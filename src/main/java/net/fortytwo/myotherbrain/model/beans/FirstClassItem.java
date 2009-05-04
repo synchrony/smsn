@@ -16,4 +16,14 @@ public interface FirstClassItem {
     Float getWeight();
 
     void setWeight(Float weight);
+
+    @rdf(MOB.NAMESPACE + "title")
+    String getTitle();
+
+    void setTitle(String title);
+
+    @rdf(MOB.NAMESPACE + "description")
+    String getDescription();
+
+    void setDescription(String description);
 }

@@ -19,7 +19,12 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:owl="http://www.w3.org/2002/07/owl#">
-    <owl:Ontology rdf:about=""/>
+    <owl:Ontology rdf:about="">
+        <rdfs:comment
+            >Ontology for MyOtherBrain knowledge bases.
+
+Note: it has been a design decision not to re-use elements from other, previously existing ontologies, even where these might seem appropriate.  For instance, this ontology introduces its own title (&quot;name&quot;) and description properties rather than re-using existing Dublin Core properties.  This allows more precise modeling of the domain (for instance, this ontology requires that names and descriptions are string-valued), necessary for application development, while it does not preclude mapping to and from widely-used community ontologies for the purpose of data integration.</rdfs:comment>
+    </owl:Ontology>
     
 
 
@@ -142,6 +147,30 @@
     
 
 
+    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#contactEmailAddress -->
+
+    <owl:DatatypeProperty rdf:about="#contactEmailAddress">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the preferred contact email address for the user associated with an account.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Account"/>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#description -->
+
+    <owl:DatatypeProperty rdf:about="#description">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates a string value which describes an item.  Equivalent to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fortytwo.net/2009/01/myotherbrain.owl#fileIdentifier -->
 
     <owl:DatatypeProperty rdf:about="#fileIdentifier">
@@ -153,6 +182,17 @@
     
 
 
+    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#literalValue -->
+
+    <owl:DatatypeProperty rdf:about="#literalValue">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >For now, data type and language of the literal are unspecified, being stored in the literal value itself.  There is thus no range restriction on this property.  Is this permissible in OWL?</rdfs:comment>
+        <rdfs:domain rdf:resource="#LiteralItem"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fortytwo.net/2009/01/myotherbrain.owl#mimeType -->
 
     <owl:DatatypeProperty rdf:about="#mimeType">
@@ -160,6 +200,18 @@
         <rdfs:comment
             >Indicates the media type of a file.</rdfs:comment>
         <rdfs:domain rdf:resource="#FileBasedResource"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#name -->
+
+    <owl:DatatypeProperty rdf:about="#name">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates a string value which may serve as a symbol for the subject item.  Equivalent to dc:title, but constrained to string values.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -207,18 +259,6 @@
             >Indicates the date and time of an relationship.</rdfs:comment>
         <rdfs:domain rdf:resource="#Event"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#title -->
-
-    <owl:DatatypeProperty rdf:about="#title">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment
-            >Indicates a string value which may serve as a symbol for the subject item.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -339,6 +379,14 @@
     
 
 
+    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#LiteralItem -->
+
+    <owl:Class rdf:about="#LiteralItem">
+        <rdfs:subClassOf rdf:resource="#FirstClassItem"/>
+    </owl:Class>
+    
+
+
     <!-- http://fortytwo.net/2009/01/myotherbrain.owl#RippleQuery -->
 
     <owl:Class rdf:about="#RippleQuery">
@@ -415,7 +463,10 @@
 
     <!-- http://fortytwo.net/2009/01/myotherbrain.owl#AdminGraph -->
 
-    <Graph rdf:about="#AdminGraph"/>
+    <Graph rdf:about="#AdminGraph">
+        <rdfs:comment
+            >A special named graph for the storage of secure administrative information such as user account metadata.</rdfs:comment>
+    </Graph>
     
 
 
