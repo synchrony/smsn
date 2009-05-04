@@ -56,7 +56,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:ObjectProperty rdf:about="#object">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the object of an association.</rdfs:comment>
+            >Indicates the object of an association, analogously to the object of an RDF triple.</rdfs:comment>
         <rdfs:domain rdf:resource="#Association"/>
         <rdfs:range rdf:resource="#FirstClassItem"/>
     </owl:ObjectProperty>
@@ -93,7 +93,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:ObjectProperty rdf:about="#subject">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the subject of an association.</rdfs:comment>
+            >Indicates the subject of an association, analogously to the subject of an RDF triple.</rdfs:comment>
         <rdfs:domain rdf:resource="#Association"/>
         <rdfs:range rdf:resource="#FirstClassItem"/>
     </owl:ObjectProperty>
@@ -164,7 +164,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#description">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates a string value which describes an item.  Equivalent to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
+            >Indicates a textual description of an item.  Similar to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
         <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
@@ -209,7 +209,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#name">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates a string value which may serve as a symbol for the subject item.  Equivalent to dc:title, but constrained to string values.</rdfs:comment>
+            >Indicates a textual identifier for the subject item.  Similar to dc:title, but constrained to string values.</rdfs:comment>
         <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
@@ -233,7 +233,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#placeStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the geospatial location of an relationship.</rdfs:comment>
+            >Indicates the geospatial location of an event.</rdfs:comment>
         <rdfs:domain rdf:resource="#Event"/>
     </owl:DatatypeProperty>
     
@@ -256,7 +256,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#timeStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the date and time of an relationship.</rdfs:comment>
+            >Indicates the date and time of an event.</rdfs:comment>
         <rdfs:domain rdf:resource="#Event"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>

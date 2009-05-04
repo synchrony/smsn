@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY myotherbrain "http://fortytwo.net/2009/01/myotherbrain.owl#" >
+    <!ENTITY myotherbrain_messaging "http://fortytwo.net/2009/05/myotherbrain_messaging.owl#" >
+]>
+
+
+<rdf:RDF xmlns="http://fortytwo.net/2009/05/myotherbrain_messaging.owl#"
+     xml:base="http://fortytwo.net/2009/05/myotherbrain_messaging.owl"
+     xmlns:myotherbrain="http://fortytwo.net/2009/01/myotherbrain.owl#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:myotherbrain_messaging="http://fortytwo.net/2009/05/myotherbrain_messaging.owl#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#">
+    <owl:Ontology rdf:about="">
+        <owl:versionInfo>1.0-alpha1</owl:versionInfo>
+        <owl:imports rdf:resource="http://fortytwo.net/2009/01/myotherbrain.owl"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#aboutItem -->
+
+    <owl:ObjectProperty rdf:about="#aboutItem">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#TreeNode"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#explanationOf -->
+
+    <owl:ObjectProperty rdf:about="#explanationOf">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Explanation"/>
+        <rdfs:range rdf:resource="#TreeNode"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#parentNode -->
+
+    <owl:ObjectProperty rdf:about="#parentNode">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#TreeNode"/>
+        <rdfs:range rdf:resource="#TreeNode"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#position -->
+
+    <owl:DatatypeProperty rdf:about="#position">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >The 1-indexed position of a node in the list of children of its parent.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TreeNode"/>
+        <rdfs:range rdf:resource="&xsd;positiveInteger"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#schemaVersion -->
+
+    <owl:DatatypeProperty rdf:about="#schemaVersion">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Message"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#significance -->
+
+    <owl:DatatypeProperty rdf:about="#significance">
+        <rdfs:comment
+            >Provisional.  Indicates the &quot;weight&quot; or relevance of the link connecting a parent node to a child node.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TreeNode"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#sparqlVariable -->
+
+    <owl:DatatypeProperty rdf:about="#sparqlVariable">
+        <rdfs:comment
+            >Provisional. Indicates binding of an item to variable of a specified name, with respect to a specified query.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TreeNode"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#typeIcon -->
+
+    <owl:DatatypeProperty rdf:about="#typeIcon">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment>Provisional.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TreeNode"/>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/01/myotherbrain.owl#FirstClassItem -->
+
+    <owl:Class rdf:about="&myotherbrain;FirstClassItem"/>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#Explanation -->
+
+    <owl:Class rdf:about="#Explanation">
+        <rdfs:subClassOf rdf:resource="#SecondClassItem"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#Message -->
+
+    <owl:Class rdf:about="#Message">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#SecondClassItem -->
+
+    <owl:Class rdf:about="#SecondClassItem">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A resource which may be addressable but which cannot be the subject or object of Associations.  Provisional -- maybe second-class items are simply &quot;potential&quot; first-class items which are simply not (yet) persisted in the triple store.  Either way, they&#39;re items in &quot;working memory&quot;.  On the other hand, there may be a place for addressable, second-class items such as Explanations with no possibility for persistent storage.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain_messaging.owl#TreeNode -->
+
+    <owl:Class rdf:about="#TreeNode">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A second-class wrapper for a first-class item with a link to a parent node.  The meaning of the node is contextual with respect to the parent, and no distinction is made between information about the item itself versus information about the child-parent link.
+Note: the network of TreeNodes connected by parentNode edges is required to be a tree.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 2.2.1.842) http://owlapi.sourceforge.net -->
+
