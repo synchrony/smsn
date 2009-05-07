@@ -1,0 +1,27 @@
+<assembly>
+	<id>src</id>
+	<formats>
+		<format>zip</format>
+		<!--<format>tar.gz</format>-->
+	</formats>
+	<fileSets>
+		<fileSet>
+			<includes>
+				<include>LICENSE.txt</include>
+				<include>pom.xml</include>
+                <include>README.txt</include>
+                <include>example.properties</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<fileMode>0775</fileMode>
+			<includes>
+				<include>ripple.sh</include>
+				<include>ripple.bat</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>src</directory>
+		</fileSet>
+	</fileSets>
+</assembly>
