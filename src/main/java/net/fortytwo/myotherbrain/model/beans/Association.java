@@ -10,15 +10,15 @@ import org.openrdf.elmo.annotations.rdf;
  * Time: 11:25:26 PM
  * To change this template use File | Settings | File Templates.
  */
-@rdf(MOB.NAMESPACE + "Association")
+@rdf(MOB.ASSOCIATION)
 public interface Association extends FirstClassItem {
-    @rdf(MOB.NAMESPACE + "subject")
-    FirstClassItem getSubject();
-
-    void setSubject(FirstClassItem subject);
-
-    @rdf(MOB.NAMESPACE + "object")
+    @rdf(MOB.OBJECT)
     FirstClassItem getObject();
 
     void setObject(FirstClassItem object);
+
+    @rdf(MOB.SUBJECT)
+    FirstClassItem getSubject();
+
+    void setSubject(FirstClassItem subject);
 }

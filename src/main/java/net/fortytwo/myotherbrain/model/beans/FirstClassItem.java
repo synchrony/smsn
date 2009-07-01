@@ -5,6 +5,7 @@ import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.annotations.rdf;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,47 +14,54 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * Time: 11:29:19 PM
  * To change this template use File | Settings | File Templates.
  */
-@rdf(MOB.NAMESPACE + "FirstClassItem")
+@rdf(MOB.FIRSTCLASSITEM)
 public interface FirstClassItem extends Thing {
 
-    @rdf(MOB.NAMESPACE + "markedWith")
-    Marker getMarkedWith();
+    @rdf(MOB.ALIAS)
+    Set<Thing> getAlias();
 
-    void setMarkedWith(Marker markedWith);
+    void setAlias(Set<Thing> alias);
 
-    @rdf(MOB.NAMESPACE + "name")
-    String getName();
+    @rdf(MOB.CREATIONPLACESTAMP)
+    GeoPoint getCreationPlaceStamp();
 
-    void setName(String name);
+    void setCreationPlaceStamp(GeoPoint creationPlaceStamp);
 
-    @rdf(MOB.NAMESPACE + "description")
+    @rdf(MOB.CREATIONTIMESTAMP)
+    XMLGregorianCalendar getCreationTimeStamp();
+
+    void setCreationTimeStamp(XMLGregorianCalendar creationTimeStamp);
+
+    @rdf(MOB.DESCRIPTION)
     String getDescription();
 
     void setDescription(String description);
 
-    @rdf(MOB.NAMESPACE + "sensitivity")
-    SensitivityLevel getSensitivity();
-
-    void setSensitivity(SensitivityLevel sensitivity);
-
-    @rdf(MOB.NAMESPACE + "icon")
-    WebResourceAlias getIcon();
-
-    void setIcon(WebResourceAlias icon);
-
-    @rdf(MOB.NAMESPACE + "lastModificationTime")
-    XMLGregorianCalendar getLastModificationTime();
-
-    void setLastModificationTime(XMLGregorianCalendar lastModificationTime);
-
-    @rdf(MOB.NAMESPACE + "score")
-    Float getScore();
-
-    void setScore(Float score);
-
-    @rdf(MOB.NAMESPACE + "emphasis")
+    @rdf(MOB.EMPHASIS)
     Float getEmphasis();
 
     void setEmphasis(Float emphasis);
 
+    @rdf(MOB.ICON)
+    WebResource getIcon();
+
+    void setIcon(WebResource icon);
+
+    @rdf(MOB.MARKERTAG)
+    Set<Marker> getMarkerTag();
+
+    void setMarkerTag(Set<Marker> markerTag);
+
+    @rdf(MOB.NAME)
+    String getName();
+
+    void setName(String name);
+
+    // Note: the mob:score property is not used.  Rather, it serves as a parent
+    //       for other, dynamically-defined properties.
+
+    @rdf(MOB.SENSITIVITY)
+    SensitivityLevel getSensitivity();
+
+    void setSensitivity(SensitivityLevel sensitivity);
 }

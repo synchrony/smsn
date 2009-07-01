@@ -10,21 +10,21 @@ import java.net.URI;
  * Date: May 7, 2009
  * Time: 7:52:19 PM
  */
-@rdf(MOB.NAMESPACE + "Literal")
+@rdf(MOB.LITERAL)
 public interface Literal extends FirstClassItem {
-    
-    @rdf(MOB.NAMESPACE + "lexicalForm")
-    String getLexicalForm();
 
-    void setLexicalForm(String lexicalForm);
+    @rdf(MOB.DATATYPEURI)
+    URI getDatatypeURI();
 
-    @rdf(MOB.NAMESPACE + "languageTag")
+    void setDatatypeURI(URI datatypeURI);
+
+    @rdf(MOB.LANGUAGETAG)
     String getLanguageTag();
 
     void setLanguageTag(String languageTag);
 
-    @rdf(MOB.NAMESPACE + "datatypeURI")
-    URI getDatatypeURI();
+    @rdf(MOB.LEXICALFORM)
+    String getLexicalForm();
 
-    void setDatatypeURI(URI datatypeURI);
+    void setLexicalForm(String lexicalForm);
 }

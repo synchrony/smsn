@@ -127,11 +127,11 @@ public class UndoStackTest extends TestCase {
             this.newValue = newValue;
         }
 
-        protected void executeUndo() {
+        protected void executeUndo(Object t) {
             currentValue = memento;
         }
 
-        protected void executeRedo() {
+        protected void executeRedo(Object t) {
             memento = currentValue;
 
             currentValue = newValue;

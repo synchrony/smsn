@@ -9,6 +9,6 @@ import org.openrdf.elmo.annotations.rdf;
  * Date: May 7, 2009
  * Time: 7:45:54 PM
  */
-@rdf(MOB.NAMESPACE + "Marker")
+@rdf(MOB.MARKER)
 public interface Marker extends Thing {
 }

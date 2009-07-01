@@ -11,8 +11,8 @@
 ]>
 
 
-<rdf:RDF xmlns="http://fortytwo.net/2009/05/myotherbrain.owl#"
-     xml:base="http://fortytwo.net/2009/05/myotherbrain.owl"
+<rdf:RDF xmlns="http://fortytwo.net/2009/05/myotherbrain#"
+     xml:base="http://fortytwo.net/2009/05/myotherbrain"
      xmlns:myotherbrain="http://fortytwo.net/2009/05/myotherbrain#"
      xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
@@ -39,72 +39,97 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#icon -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#alias -->
 
-    <owl:ObjectProperty rdf:about="&myotherbrain;icon">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+    <owl:ObjectProperty rdf:about="#alias">
         <rdfs:comment
-            >Indicates an image which may serve as a symbol for the subject item.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
-        <rdfs:range rdf:resource="&myotherbrain;WebResourceAlias"/>
+            >Indicates an alias for the subject item (for instance, the DBpedia resource for Paris may be an alias for a MOB concept of Paris). This property is similar to owl:sameAs.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#markedWith -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#creationPlaceStamp -->
 
-    <owl:ObjectProperty rdf:about="&myotherbrain;markedWith">
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
-        <rdfs:range rdf:resource="&myotherbrain;Marker"/>
+    <owl:ObjectProperty rdf:about="#creationPlaceStamp">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Provisional.  Indicates the geospatial position at which an item was created.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="#GeoPoint"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#icon -->
+
+    <owl:ObjectProperty rdf:about="#icon">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates an image which may serve as a symbol for the subject item.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="#WebResource"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#markerTag -->
+
+    <owl:ObjectProperty rdf:about="#markerTag">
+        <rdfs:comment
+            >Indicates a simple marker which describes or draws attention to the item.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="#Marker"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#object -->
 
-    <owl:ObjectProperty rdf:about="&myotherbrain;object">
+    <owl:ObjectProperty rdf:about="#object">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the object of an association, analogous to the object of an RDF triple.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Association"/>
-        <rdfs:range rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#Association"/>
+        <rdfs:range rdf:resource="#FirstClassItem"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#privateGraph -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#personalGraph -->
 
-    <owl:ObjectProperty rdf:about="&myotherbrain;privateGraph">
+    <owl:ObjectProperty rdf:about="#personalGraph">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
         <rdfs:comment
             >Indicates the unique named graph associated with an account.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Account"/>
-        <rdfs:range rdf:resource="&myotherbrain;Graph"/>
+        <rdfs:domain rdf:resource="#Account"/>
+        <rdfs:range rdf:resource="#Graph"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#sensitivity -->
 
-    <owl:ObjectProperty rdf:about="&myotherbrain;sensitivity">
+    <owl:ObjectProperty rdf:about="#sensitivity">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the visibility level of a first-class item.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
-        <rdfs:range rdf:resource="&myotherbrain;SensitivityLevel"/>
+            >Indicates the sensitivity level of a first-class item.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="#SensitivityLevel"/>
     </owl:ObjectProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#subject -->
 
-    <owl:ObjectProperty rdf:about="&myotherbrain;subject">
+    <owl:ObjectProperty rdf:about="#subject">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the subject of an association, analogous to the subject of an RDF triple.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Association"/>
-        <rdfs:range rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#Association"/>
+        <rdfs:range rdf:resource="#FirstClassItem"/>
     </owl:ObjectProperty>
     
 
@@ -122,23 +147,23 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#contactEmailAddress -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;contactEmailAddress">
+    <owl:DatatypeProperty rdf:about="#contactEmailAddress">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the preferred contact email address for the user associated with an account.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Account"/>
+        <rdfs:domain rdf:resource="#Account"/>
         <rdfs:range rdf:resource="&xsd;anyURI"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#creationTime -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#creationTimeStamp -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;creationTime">
+    <owl:DatatypeProperty rdf:about="#creationTimeStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Provisional.  Indicates the date and time at which an item was created.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
+            >Provisional.  Indicates the date and time at which an item was created. Perusing my photo collection in Picasa indicates that knowing when an item originated can be very enlightening.</rdfs:comment>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -146,11 +171,11 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#datatypeURI -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;datatypeURI">
+    <owl:DatatypeProperty rdf:about="#datatypeURI">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the datatype URI of a typed literal.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Literal"/>
+            >Indicates the datatype URI of a typed literal. Note that it would have been possible to make this an ObjectProperty rather than reifying the URI of the datatype. The current choice has been made on the basis that XML Schema data types are generally not described on the Semantic Web (if they are, what is their rdf:type?).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Literal"/>
         <rdfs:range rdf:resource="&xsd;anyURI"/>
     </owl:DatatypeProperty>
     
@@ -158,11 +183,11 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#description -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;description">
+    <owl:DatatypeProperty rdf:about="#description">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates a textual description of an item.  Similar to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -170,11 +195,11 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#emphasis -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;emphasis">
+    <owl:DatatypeProperty rdf:about="#emphasis">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the non-negative weight or significance of an item.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
     
@@ -182,46 +207,59 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#languageTag -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;languageTag">
+    <owl:DatatypeProperty rdf:about="#languageTag">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the language tag of a plain literal.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Literal"/>
+        <rdfs:domain rdf:resource="#Literal"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#lastModificationTime -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#latitude -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;lastModificationTime">
+    <owl:DatatypeProperty rdf:about="#latitude">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Provisional.  Indicates the date and time at which an item was last modified.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
-        <rdfs:range rdf:resource="&xsd;dateTime"/>
+            >The latitude value, in degrees, of a geospatial point.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GeoPoint"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#lexicalForm -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;lexicalForm">
+    <owl:DatatypeProperty rdf:about="#lexicalForm">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the lexical form of a literal.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Literal"/>
+        <rdfs:domain rdf:resource="#Literal"/>
         <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#longitude -->
+
+    <owl:DatatypeProperty rdf:about="#longitude">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >The longitude value, in degrees, of a geospatial point.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GeoPoint"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#name -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;name">
+    <owl:DatatypeProperty rdf:about="#name">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates a textual identifier for the subject item.  Similar to dc:title, but constrained to string values.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -229,23 +267,11 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#passwordSha1Sum -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;passwordSha1Sum">
+    <owl:DatatypeProperty rdf:about="#passwordSha1Sum">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the hashed password associated with an account.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Account"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://fortytwo.net/2009/05/myotherbrain#placeStamp -->
-
-    <owl:DatatypeProperty rdf:about="&myotherbrain;placeStamp">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment
-            >Indicates the geospatial location of an event.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Event"/>
+        <rdfs:domain rdf:resource="#Account"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -253,11 +279,11 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#representationMediaType -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;representationMediaType">
+    <owl:DatatypeProperty rdf:about="#representationMediaType">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the media type of a Web resource.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;WebResourceAlias"/>
+        <rdfs:domain rdf:resource="#WebResource"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -265,58 +291,34 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#representationSha1Sum -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;representationSha1Sum">
+    <owl:DatatypeProperty rdf:about="#representationSha1Sum">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates a hash of the contents of a particular Web resource.  This may be used to check whether those contents have changed since this metadata was generated.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;WebResourceAlias"/>
+        <rdfs:domain rdf:resource="#WebResource"/>
         <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://fortytwo.net/2009/05/myotherbrain#resourceURI -->
-
-    <owl:DatatypeProperty rdf:about="&myotherbrain;resourceURI">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment
-            >Indicates the URI of a Web resource.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;ResourceAlias"/>
-        <rdfs:range rdf:resource="&xsd;anyURI"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#score -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;score">
+    <owl:DatatypeProperty rdf:about="#score">
         <rdfs:comment
             >Parent property for any number of metrics such as PageRank which assign a float-valued score to each item in the knowledge base.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;FirstClassItem"/>
+        <rdfs:domain rdf:resource="#FirstClassItem"/>
         <rdfs:range rdf:resource="&xsd;float"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://fortytwo.net/2009/05/myotherbrain#timeStamp -->
-
-    <owl:DatatypeProperty rdf:about="&myotherbrain;timeStamp">
-        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment
-            >Indicates the date and time of an event.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Event"/>
-        <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#userName -->
 
-    <owl:DatatypeProperty rdf:about="&myotherbrain;userName">
+    <owl:DatatypeProperty rdf:about="#userName">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
             >Indicates the unique user name associated with an account.</rdfs:comment>
-        <rdfs:domain rdf:resource="&myotherbrain;Account"/>
+        <rdfs:domain rdf:resource="#Account"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -335,7 +337,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Account -->
 
-    <owl:Class rdf:about="&myotherbrain;Account">
+    <owl:Class rdf:about="#Account">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
             >An identifier for a user which serves attribution and access control purposes.</rdfs:comment>
@@ -345,27 +347,17 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Association -->
 
-    <owl:Class rdf:about="&myotherbrain;Association">
-        <rdfs:subClassOf rdf:resource="&myotherbrain;FirstClassItem"/>
+    <owl:Class rdf:about="#Association">
+        <rdfs:subClassOf rdf:resource="#FirstClassItem"/>
         <rdfs:comment
             >A subject-object pair linking two first-class items.  As first-class items themselves, associations may be referred to by other associations.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#Event -->
-
-    <owl:Class rdf:about="&myotherbrain;Event">
-        <rdfs:subClassOf rdf:resource="&myotherbrain;FirstClassItem"/>
-        <rdfs:comment
-            >A computational event which happens at a distinct time and/or place, analogous to a sensorimotor relationship or a momentary human thought.</rdfs:comment>
-    </owl:Class>
-    
-
-
     <!-- http://fortytwo.net/2009/05/myotherbrain#FirstClassItem -->
 
-    <owl:Class rdf:about="&myotherbrain;FirstClassItem">
+    <owl:Class rdf:about="#FirstClassItem">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
             >A resource which may be the subject or object of associations.</rdfs:comment>
@@ -373,9 +365,19 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
+    <!-- http://fortytwo.net/2009/05/myotherbrain#GeoPoint -->
+
+    <owl:Class rdf:about="#GeoPoint">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A point on the Earth&#39;s surface, specified in terms of longitude and latitude.</rdfs:comment>
+    </owl:Class>
+    
+
+
     <!-- http://fortytwo.net/2009/05/myotherbrain#Graph -->
 
-    <owl:Class rdf:about="&myotherbrain;Graph">
+    <owl:Class rdf:about="#Graph">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
             >A named graph in the sense of the Named Graphs extension to RDF. See http://www.w3.org/2004/03/trix/rdfg-1/Graph.</rdfs:comment>
@@ -385,8 +387,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Literal -->
 
-    <owl:Class rdf:about="&myotherbrain;Literal">
-        <rdfs:subClassOf rdf:resource="&myotherbrain;FirstClassItem"/>
+    <owl:Class rdf:about="#Literal">
+        <rdfs:subClassOf rdf:resource="#FirstClassItem"/>
         <rdfs:comment
             >A reified RDF literal.</rdfs:comment>
     </owl:Class>
@@ -395,7 +397,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Marker -->
 
-    <owl:Class rdf:about="&myotherbrain;Marker">
+    <owl:Class rdf:about="#Marker">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
             >A simple marker for first-class items.</rdfs:comment>
@@ -403,19 +405,9 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#ResourceAlias -->
-
-    <owl:Class rdf:about="&myotherbrain;ResourceAlias">
-        <rdfs:subClassOf rdf:resource="&myotherbrain;FirstClassItem"/>
-        <rdfs:comment
-            >A first-class item which serves as a wrapper for an arbitrary resource identified by a URI.</rdfs:comment>
-    </owl:Class>
-    
-
-
     <!-- http://fortytwo.net/2009/05/myotherbrain#SensitivityLevel -->
 
-    <owl:Class rdf:about="&myotherbrain;SensitivityLevel">
+    <owl:Class rdf:about="#SensitivityLevel">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
             >The degree of sensitivity of a first-class item, in terms of whether the information contained in the item should be shared with individuals other than its owner.</rdfs:comment>
@@ -423,10 +415,10 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#WebResourceAlias -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#WebResource -->
 
-    <owl:Class rdf:about="&myotherbrain;WebResourceAlias">
-        <rdfs:subClassOf rdf:resource="&myotherbrain;ResourceAlias"/>
+    <owl:Class rdf:about="#WebResource">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
             >An alias for a Web information resource.  Such a resource is expected to have an associated Web-accessible representation.</rdfs:comment>
     </owl:Class>
@@ -450,48 +442,66 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#AdminGraph -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Broken -->
 
-    <myotherbrain:Graph rdf:about="&myotherbrain;AdminGraph">
+    <Marker rdf:about="#Broken">
         <rdfs:comment
-            >A special named graph for the storage of secure administrative information such as user account metadata.</rdfs:comment>
-    </myotherbrain:Graph>
+            >An example marker. Indicates that an item (for instance, a query which is no longer in agreement with the schema) is no longer valid and needs to be repaired.</rdfs:comment>
+    </Marker>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#MOBAdminGraph -->
+
+    <Graph rdf:about="#MOBAdminGraph">
+        <rdfs:comment
+            >A special named graph for the storage of secure administrative information for MOB applications, such as user account metadata.</rdfs:comment>
+    </Graph>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#MOBOntologyGraph -->
+
+    <Graph rdf:about="#MOBOntologyGraph">
+        <rdfs:comment
+            >A special named graph for the storage of immutable ontology data for MOB applications.</rdfs:comment>
+    </Graph>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Personal -->
 
-    <myotherbrain:SensitivityLevel rdf:about="&myotherbrain;Personal">
+    <SensitivityLevel rdf:about="#Personal">
         <rdfs:comment
             >Indicates that a first-class item should not be visible to everyone, but that it may be visible to someone other than its owner.</rdfs:comment>
-    </myotherbrain:SensitivityLevel>
+    </SensitivityLevel>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Private -->
 
-    <myotherbrain:SensitivityLevel rdf:about="&myotherbrain;Private">
+    <SensitivityLevel rdf:about="#Private">
         <rdfs:comment
             >Indicates that a first-class item should not be visible to anyone apart from its owner.</rdfs:comment>
-    </myotherbrain:SensitivityLevel>
+    </SensitivityLevel>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Public -->
 
-    <myotherbrain:SensitivityLevel rdf:about="&myotherbrain;Public">
+    <SensitivityLevel rdf:about="#Public">
         <rdfs:comment
             >Indicates that a first-class item should be visible to everyone.</rdfs:comment>
-    </myotherbrain:SensitivityLevel>
+    </SensitivityLevel>
     
 
 
     <!-- http://fortytwo.net/2009/05/myotherbrain#Starred -->
 
-    <myotherbrain:Marker rdf:about="&myotherbrain;Starred">
+    <Marker rdf:about="#Starred">
         <rdfs:comment
             >An example marker.</rdfs:comment>
-    </myotherbrain:Marker>
+    </Marker>
 </rdf:RDF>
 
 

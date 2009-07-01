@@ -10,37 +10,39 @@ package net.fortytwo.myotherbrain.undo;
  * Date: May 4, 2009
  * Time: 12:04:13 AM
  */
-public abstract class UndoableAction {
-    private enum State { DONE, UNDONE };
+public abstract class UndoableAction<T> {
+    private enum State { DONE, UNDONE }
 
     private State currentState = State.UNDONE;
 
-    protected abstract void executeUndo();
+    protected abstract void executeUndo(T t);
 
-    protected abstract void executeRedo();
+    protected abstract void executeRedo(T t);
 
     /**
      * @throws IllegalStateException if the call to this method does not follow a call to redo()
+     * @param t
      */
-    public void undo() {
+    public void undo(T t) {
         if (State.DONE != currentState) {
             throw new IllegalStateException("action has not yet been done: " + this);
         }
         
-        executeUndo();
+        executeUndo(t);
 
         currentState = State.UNDONE;
     }
 
     /**
      * @throws IllegalStateException if the call to this method follows a previous call to redo(), without an intermediate undo()
+     * @param t
      */
-    public void redo() {
+    public void redo(T t) {
         if (State.UNDONE != currentState) {
             throw new IllegalStateException("action has alredy been done: " + this);
         }
 
-        executeRedo();
+        executeRedo(t);
 
         currentState = State.DONE;
     }

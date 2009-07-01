@@ -75,7 +75,7 @@ public class UndoStack {
 
         // Executing the action is the last thing we do, in case of
         // uncaught Exceptions.
-        action.redo();
+        action.redo(null);
     }
 
     /**
@@ -91,7 +91,7 @@ public class UndoStack {
 
             // Executing the action is the last thing we do, in case of
             // uncaught Exceptions.
-            action.undo();
+            action.undo(null);
         }
     }
 
@@ -108,7 +108,7 @@ public class UndoStack {
 
             // Executing the action is the last thing we do, in case of
             // uncaught Exceptions.
-            action.redo();
+            action.redo(null);
         }
     }
 }

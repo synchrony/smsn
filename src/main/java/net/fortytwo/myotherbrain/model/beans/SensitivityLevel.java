@@ -9,6 +9,6 @@ import org.openrdf.elmo.annotations.rdf;
  * Date: May 7, 2009
  * Time: 7:46:15 PM
  */
-@rdf(MOB.NAMESPACE + "SensitivityLevel")
+@rdf(MOB.SENSITIVITYLEVEL)
 public interface SensitivityLevel extends Thing {
 }

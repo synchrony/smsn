@@ -12,15 +12,19 @@
     <description>external cognition for the Semantic Web</description>
 
     <repositories>
-        <repository>
+        <!--<repository>
             <id>fortytwo</id>
             <name>fortytwo.net Maven repository</name>
             <url>http://fortytwo.net/maven2</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>aduna-repo</id>
             <name>Aduna repository</name>
             <url>http://repo.aduna-software.org/maven2/releases</url>
+        </repository>
+        <repository>
+            <id>neo4j-public-repository</id>
+            <url>http://m2.neo4j.org/</url>
         </repository>
     </repositories>
 
@@ -51,21 +55,36 @@
             <artifactId>sesame-sail-memory</artifactId>
             <version>2.2.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-nativerdf</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo-rdf-sail</artifactId>
+            <version>0.2-stable-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>shell</artifactId>
+            <version>1.0-b9-SNAPSHOT</version>
+        </dependency>
         <!-- TODO: check that Elmo and Sesame versions line up -->
         <dependency>
             <groupId>org.openrdf.elmo</groupId>
             <artifactId>elmo-api</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>org.openrdf.elmo</groupId>
             <artifactId>elmo-sesame</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>org.openrdf.elmo</groupId>
             <artifactId>elmo-owl</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
         <!-- TODO: check that log4j and slf4j dependencies line up with OpenRDF's -->
         <dependency>

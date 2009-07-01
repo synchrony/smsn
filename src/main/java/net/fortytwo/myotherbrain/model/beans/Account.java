@@ -11,25 +11,24 @@ import java.net.URI;
  * Date: May 7, 2009
  * Time: 7:35:34 PM
  */
-@rdf(MOB.NAMESPACE + "Account")
+@rdf(MOB.ACCOUNT)
 public interface Account extends Thing {
-    @rdf(MOB.NAMESPACE + "privateGraph")
-    Graph getPrivateGraph();
-
-    void setPrivateGraph(Graph privateGraph);
-
-    @rdf(MOB.NAMESPACE + "passwordSha1Sum")
-    String getPasswordSha1Sum();
-
-    void setPasswordSha1Sum(String passwordSha1Sum);
-
-
-    @rdf(MOB.NAMESPACE + "contactEmailAddress")
+    @rdf(MOB.CONTACTEMAILADDRESS)
     URI getContactEmailAddress();
 
     void setContactEmailAddress(URI contactEmailAddress);
 
-    @rdf(MOB.NAMESPACE + "userName")
+    @rdf(MOB.PASSWORDSHA1SUM)
+    String getPasswordSha1Sum();
+
+    void setPasswordSha1Sum(String passwordSha1Sum);
+
+    @rdf(MOB.PERSONALGRAPH)
+    Graph getPersonalGraph();
+
+    void setPersonalGraph(Graph personalGraph);
+
+    @rdf(MOB.USERNAME)
     String getUserName();
 
     void setUserName(String userName);

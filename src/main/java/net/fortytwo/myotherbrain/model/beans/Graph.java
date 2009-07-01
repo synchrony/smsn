@@ -9,6 +9,6 @@ import org.openrdf.elmo.annotations.rdf;
  * Date: May 7, 2009
  * Time: 7:37:43 PM
  */
-@rdf(MOB.NAMESPACE + "Graph")
+@rdf(MOB.GRAPH)
 public interface Graph extends Thing {
 }
