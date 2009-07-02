@@ -28,7 +28,9 @@ import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoQuery;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
+import javax.xml.namespace.QName;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
@@ -86,10 +88,12 @@ public class AccountManager {
                 "([a-z0-9-]*[a-z0-9])?");
     }
 
+    private final MOBStore store;
     private final MOBModel adminModel;
 
     public AccountManager(final MOBStore store) {
-        URI adminGraph = store.getSail().getValueFactory().createURI(MOB.MOBADMINGRAPH);
+        this.store = store;
+        QName adminGraph = new QName(MOB.MOBADMINGRAPH);
         adminModel = store.createModel(adminGraph);
     }
 
@@ -218,6 +222,23 @@ public class AccountManager {
         }
     }
 
+    public Session createSession(final String userName) throws NoSuchAccountException {
+        MOBModelConnection c = adminModel.createConnection();
+        try {
+            Account account = getAccountByUserName(userName, c);
+            if (null == account) {
+                throw new NoSuchAccountException(userName);
+            }
+
+            QName personalGraph = account.getPersonalGraph().getQName();
+            MOBModel model = store.createModel(personalGraph);
+            return new Session(userName, model);
+        } finally {
+            c.rollback();
+            c.close();
+        }
+    }
+
     // TODO: return an account object
     public void authenticate(final String userName,
                              final String password) {
@@ -286,10 +307,10 @@ public class AccountManager {
     // TODO: is there any way to avoid re-compile these queries for each use?
     private static final String
             SELECT_ACCOUNT_BY_USERNAME = "SELECT ?account\n"
-                + " WHERE { ?account <" + MOB.USERNAME + "> ?userName . }",
+            + " WHERE { ?account <" + MOB.USERNAME + "> ?userName . }",
             SELECT_ACCOUNT_BY_CONTACTEMAILADDRESS = "SELECT ?account\n"
-                + "WHERE { ?account <" + MOB.CONTACTEMAILADDRESS + "> ?contactEmailAddress . }";
-    
+                    + "WHERE { ?account <" + MOB.CONTACTEMAILADDRESS + "> ?contactEmailAddress . }";
+
     private Account getAccountByUserName(final String userName,
                                          final MOBModelConnection c) {
         ElmoQuery query = c.getElmoManager().createQuery(SELECT_ACCOUNT_BY_USERNAME);
@@ -325,6 +346,11 @@ public class AccountManager {
             s = s + ";\n" + comment;
         }
         t.setRdfsComment(s);
+    }
+
+    private URI qNameToURI(final QName qname) {
+        // FIXME
+        return new URIImpl(qname.getNamespaceURI() + qname.getLocalPart());
     }
 
     ////////////////////////////////////////////////////////////////////////////

@@ -154,7 +154,7 @@ public class MOBStore {
     ////////////////////////////////////////////////////////////////////////////
     // convenience methods, may be moved ///////////////////////////////////////
 
-    public MOBModel createModel(final org.openrdf.model.URI writableGraph) {
+    public MOBModel createModel(final QName writableGraph) {
         return new MOBModel(getElmoModule(), getRepository(), writableGraph);
     }
 

@@ -1,6 +1,9 @@
 package net.fortytwo.myotherbrain;
 
 import net.fortytwo.myotherbrain.access.AccountManager;
+import net.fortytwo.myotherbrain.access.Session;
+import net.fortytwo.myotherbrain.model.beans.Association;
+import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -63,6 +66,9 @@ public class MyOtherBrain {
     }
 
     public static void main(final String[] args) throws Exception {
+        java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MyOtherBrain.class.getName());
+        logger.info("testing logging.........");
+        
         Sail sail = new MemoryStore();
         sail.initialize();
         try {
@@ -71,10 +77,29 @@ public class MyOtherBrain {
             try {
                 store.generateSeedData();
 
-                AccountManager m = new AccountManager(store);
-                m.createAccount("bob", "bobspassword", "bob@example.org");
-                m.changeUserName("bob", "robert");
-                m.changeUserName("robert", "bobby");
+                AccountManager am = new AccountManager(store);
+                am.createAccount("bob", "bobspassword", "bob@example.org");
+                am.changeUserName("bob", "robert");
+                am.changeUserName("robert", "bobby");
+
+                Session session = am.createSession("bobby");
+                MOBModel model = session.getModel();
+                MOBModelConnection c = model.createConnection();
+                try {
+                    FirstClassItem telephone = c.create(FirstClassItem.class);
+                    telephone.setName("telephone");
+                    telephone.setDescription("a device for voice communication at a distance");
+                    FirstClassItem red = c.create(FirstClassItem.class);
+                    red.setName("red");
+                    red.setDescription("the color red");
+                    Association a = c.create(Association.class);
+                    a.setSubject(telephone);
+                    a.setObject(red);
+
+                    c.commit();
+                } finally {
+                    c.close();
+                }
 
                 store.dump(System.out);
             } finally {

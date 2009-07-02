@@ -2,9 +2,8 @@ package net.fortytwo.myotherbrain;
 
 import org.openrdf.elmo.ElmoModule;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
-import org.openrdf.repository.Repository;
-import org.openrdf.model.URI;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.repository.Repository;
 
 import javax.xml.namespace.QName;
 
@@ -14,15 +13,14 @@ import javax.xml.namespace.QName;
  * Time: 2:14:16 PM
  */
 public class MOBModel {
-    private final ElmoModule elmoModule;
     private final SesameManagerFactory elmoManagerFactory;
 
     public MOBModel(final ElmoModule baseModule,
                     final Repository repository,
-                    final URI writableGraph) {
-        elmoModule = new ElmoModule();
+                    final QName writableGraph) {
+        ElmoModule elmoModule = new ElmoModule();
         if (null != writableGraph) {
-            elmoModule.setGraph(uriToQName(writableGraph));
+            elmoModule.setGraph(writableGraph);
         }
         // The graphs of the included module will be read-only.
         elmoModule.includeModule(baseModule);
@@ -34,9 +32,5 @@ public class MOBModel {
 
     public MOBModelConnection createConnection() {
         return new MOBModelConnection(elmoManagerFactory);
-    }
-
-    private QName uriToQName(final URI uri) {
-        return new QName(uri.toString());
     }
 }
