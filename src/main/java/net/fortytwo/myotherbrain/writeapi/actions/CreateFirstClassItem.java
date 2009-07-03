@@ -1,6 +1,5 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.undo.UndoableAction;
 import net.fortytwo.myotherbrain.MOBModelConnection;
 
 import java.net.URI;
@@ -11,7 +10,7 @@ import java.util.Date;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class CreateFirstClassItem extends UndoableAction<MOBModelConnection> {
+public class CreateFirstClassItem extends WriteAction {
     private final String name;
     private final String description;
     private final URI icon;
@@ -40,11 +39,11 @@ public class CreateFirstClassItem extends UndoableAction<MOBModelConnection> {
         this.creationPlaceStampLatitude = creationPlaceStampLatitude;
     }
 
-    protected void executeUndo(MOBModelConnection t) {
+    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    protected void executeRedo(MOBModelConnection t) {
+    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

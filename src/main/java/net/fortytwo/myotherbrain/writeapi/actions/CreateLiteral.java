@@ -1,6 +1,5 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.undo.UndoableAction;
 import net.fortytwo.myotherbrain.MOBModelConnection;
 
 import java.net.URI;
@@ -11,7 +10,7 @@ import java.util.Date;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class CreateLiteral extends UndoableAction<MOBModelConnection> {
+public class CreateLiteral extends WriteAction {
     private final String lexicalForm;
     private final URI datatypeURI;
     private final String languageTag;
@@ -36,6 +35,10 @@ public class CreateLiteral extends UndoableAction<MOBModelConnection> {
             final Date creationTimeStamp,
             final Float creationPlaceStampLongitude,
             final Float creationPlaceStampLatitude) {
+        if (null == lexicalForm) {
+            throw new NullPointerException();
+        }
+
         this.lexicalForm = lexicalForm;
         this.datatypeURI = datatypeURI;
         this.languageTag = languageTag;
@@ -49,11 +52,11 @@ public class CreateLiteral extends UndoableAction<MOBModelConnection> {
         this.creationPlaceStampLatitude = creationPlaceStampLatitude;
     }
 
-    protected void executeUndo(MOBModelConnection t) {
+    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    protected void executeRedo(MOBModelConnection t) {
+    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

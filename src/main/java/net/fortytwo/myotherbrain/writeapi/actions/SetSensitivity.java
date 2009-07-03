@@ -1,7 +1,8 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.undo.UndoableAction;
 import net.fortytwo.myotherbrain.MOBModelConnection;
+import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
+import net.fortytwo.myotherbrain.model.beans.SensitivityLevel;
 
 import java.net.URI;
 
@@ -10,21 +11,30 @@ import java.net.URI;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class SetSensitivity extends UndoableAction<MOBModelConnection> {
+public class SetSensitivity extends WriteAction {
     private final URI subject;
     private final URI sensitivity;
 
+    private URI oldSensitivity;
+
     public SetSensitivity(final URI subject,
-                        final URI sensitivity) {
+                          final URI sensitivity) {
+        if (null == subject) {
+            throw new NullPointerException();
+        }
+
         this.subject = subject;
         this.sensitivity = sensitivity;
     }
 
-    protected void executeUndo(MOBModelConnection t) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        item.setSensitivity(toEntity(oldSensitivity, SensitivityLevel.class, c));
     }
 
-    protected void executeRedo(MOBModelConnection t) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        oldSensitivity = toURI(item.getSensitivity());
+        item.setSensitivity(toEntity(sensitivity, SensitivityLevel.class, c));
     }
 }

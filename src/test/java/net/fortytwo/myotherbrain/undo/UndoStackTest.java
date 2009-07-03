@@ -10,75 +10,76 @@ import junit.framework.TestCase;
 public class UndoStackTest extends TestCase {
     private String currentValue = "undefined";
 
-    public void testNormalExecution() {
+    public void testNormalExecution() throws Exception {
         UndoStack stack = new UndoStack(3);
+        Object c = "";
 
         assertEquals("undefined", currentValue);
         assertFalse(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // do
-        stack.addAndDo(new SimpleAction("one"));
+        stack.addAndDo(new SimpleAction("one"), c);
         assertEquals("one", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // do
-        stack.addAndDo(new SimpleAction("two"));
+        stack.addAndDo(new SimpleAction("two"), c);
         assertEquals("two", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // undo
-        stack.undo();
+        stack.undo(c);
         assertEquals("one", currentValue);
         assertTrue(stack.canUndo());
         assertTrue(stack.canRedo());
 
         // redo
-        stack.redo();
+        stack.redo(c);
         assertEquals("two", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // undo both
-        stack.undo();
-        stack.undo();
+        stack.undo(c);
+        stack.undo(c);
         assertEquals("undefined", currentValue);
         assertFalse(stack.canUndo());
         assertTrue(stack.canRedo());
 
         // do
-        stack.addAndDo(new SimpleAction("three"));
+        stack.addAndDo(new SimpleAction("three"), c);
         assertEquals("three", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // do until the buffer is full
-        stack.addAndDo(new SimpleAction("four"));
-        stack.addAndDo(new SimpleAction("five"));
+        stack.addAndDo(new SimpleAction("four"), c);
+        stack.addAndDo(new SimpleAction("five"), c);
         assertEquals("five", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // do once more
-        stack.addAndDo(new SimpleAction("six"));
+        stack.addAndDo(new SimpleAction("six"), c);
         assertEquals("six", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
 
         // undo until at the beginning of the buffer
-        stack.undo();
-        stack.undo();
-        stack.undo();
+        stack.undo(c);
+        stack.undo(c);
+        stack.undo(c);
         assertEquals("three", currentValue);
         assertFalse(stack.canUndo());
         assertTrue(stack.canRedo());
 
         // redo until at the end of the buffer
-        stack.redo();
-        stack.redo();
-        stack.redo();
+        stack.redo(c);
+        stack.redo(c);
+        stack.redo(c);
         assertEquals("six", currentValue);
         assertTrue(stack.canUndo());
         assertFalse(stack.canRedo());
@@ -90,8 +91,9 @@ public class UndoStackTest extends TestCase {
         assertFalse(stack.canRedo());
     }
 
-    public void testExceptions() {
+    public void testExceptions() throws Exception {
         UndoStack stack;
+        Object c = "";
 
         try {
             stack = new UndoStack(-42);
@@ -107,13 +109,13 @@ public class UndoStackTest extends TestCase {
 
         stack = new UndoStack(1);
         try {
-            stack.undo();
+            stack.undo(c);
             assertTrue(false);
         } catch (IllegalStateException e) {
         }
-        stack.addAndDo(new SimpleAction("A"));
+        stack.addAndDo(new SimpleAction("A"), c);
         try {
-            stack.redo();
+            stack.redo(c);
             assertTrue(false);
         } catch (IllegalStateException e) {
         }

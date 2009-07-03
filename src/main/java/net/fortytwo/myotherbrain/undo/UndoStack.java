@@ -9,8 +9,8 @@ package net.fortytwo.myotherbrain.undo;
  * Date: May 4, 2009
  * Time: 1:59:17 AM
  */
-public class UndoStack {
-    private final UndoableAction[] stack;
+public class UndoStack<T, E extends Exception> {
+    private final UndoableAction<T, E>[] stack;
     private final int capacity;
 
     private int headIndex;
@@ -62,7 +62,8 @@ public class UndoStack {
      * with a call to undo().
      * @param action the action to execute
      */
-    public void addAndDo(final UndoableAction action) {
+    public void addAndDo(final UndoableAction<T, E> action,
+                         final T t) throws E {
         stack[(headIndex + actionsDone) % capacity] = action;
 
         if (actionsDone < capacity) {
@@ -75,40 +76,40 @@ public class UndoStack {
 
         // Executing the action is the last thing we do, in case of
         // uncaught Exceptions.
-        action.redo(null);
+        action.redo(t);
     }
 
     /**
      * Undoes the last action previously done.
      * @throws IllegalStateException if there are no actions to undo
      */
-    public void undo() {
+    public void undo(final T t) throws E {
         if (!canUndo()) {
             throw new IllegalStateException("no actions to undo");
         } else {
             actionsDone--;
-            UndoableAction action = stack[(headIndex + actionsDone) % capacity];
+            UndoableAction<T, E> action = stack[(headIndex + actionsDone) % capacity];
 
             // Executing the action is the last thing we do, in case of
             // uncaught Exceptions.
-            action.undo(null);
+            action.undo(t);
         }
     }
 
     /**
      * Redoes the last action previously undone.
-     * @throws IllegalArgumentException if there are no actions to redo
+     * @throws IllegalStateException if there are no actions to redo
      */
-    public void redo() {
+    public void redo(final T t) throws E {
         if (!canRedo()) {
             throw new IllegalStateException("no actions to redo");
         } else {
-            UndoableAction action = stack[(headIndex + actionsDone) % capacity];
+            UndoableAction<T, E> action = stack[(headIndex + actionsDone) % capacity];
             actionsDone++;
 
             // Executing the action is the last thing we do, in case of
             // uncaught Exceptions.
-            action.redo(null);
+            action.redo(t);
         }
     }
 }

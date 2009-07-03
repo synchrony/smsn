@@ -5,12 +5,18 @@ import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.model.beans.Association;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
+import net.fortytwo.myotherbrain.writeapi.actions.BreakAssociation;
+import net.fortytwo.myotherbrain.writeapi.actions.SetName;
+import net.fortytwo.myotherbrain.writeapi.actions.WriteAction;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.memory.MemoryStore;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -96,6 +102,14 @@ public class MyOtherBrain {
                     a.setSubject(telephone);
                     a.setObject(red);
 
+                    WriteAction action = new SetName(toURI(red.getQName()), "blue");
+                    action.redo(c);
+                    action.undo(c);
+
+                    WriteAction action2 = new BreakAssociation(toURI(a.getQName()));
+                    action2.redo(c);
+                    action2.undo(c);
+
                     c.commit();
                 } finally {
                     c.close();
@@ -112,6 +126,14 @@ public class MyOtherBrain {
 
     ////////////////////////////////////////////////////////////////////////////
     // temporary stuff /////////////////////////////////////////////////////////
+
+    private static URI toURI(final QName q) {
+        try {
+            return new URI(q.getNamespaceURI() + q.getLocalPart());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     // TODO: make this configurable
     private static final String MOB_RESOURCE_NS = "http://myotherbrain.fortytwo.net/resource/";
