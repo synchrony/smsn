@@ -28,13 +28,13 @@ public class SetSensitivity extends WriteAction {
     }
 
     protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
-        item.setSensitivity(toEntity(oldSensitivity, SensitivityLevel.class, c));
+        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
+        item.setSensitivity(toThing(oldSensitivity, SensitivityLevel.class, c));
     }
 
     protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldSensitivity = toURI(item.getSensitivity());
-        item.setSensitivity(toEntity(sensitivity, SensitivityLevel.class, c));
+        item.setSensitivity(toThing(sensitivity, SensitivityLevel.class, c));
     }
 }

@@ -127,7 +127,7 @@ public class MyOtherBrain {
     ////////////////////////////////////////////////////////////////////////////
     // temporary stuff /////////////////////////////////////////////////////////
 
-    private static URI toURI(final QName q) {
+    public static URI toURI(final QName q) {
         try {
             return new URI(q.getNamespaceURI() + q.getLocalPart());
         } catch (URISyntaxException e) {

@@ -27,12 +27,12 @@ public class SetDescription extends WriteAction {
     }
 
     protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         item.setDescription(oldDescription);
     }
 
     protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldDescription = item.getDescription();
         item.setDescription(description);
     }

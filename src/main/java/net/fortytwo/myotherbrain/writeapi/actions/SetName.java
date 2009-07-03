@@ -27,12 +27,12 @@ public class SetName extends WriteAction {
     }
 
     protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         item.setName(oldName);
     }
 
     protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = this.toEntity(subject, FirstClassItem.class, c);
+        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldName = item.getName();
         item.setName(name);
     }

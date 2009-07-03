@@ -1,6 +1,8 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
 import net.fortytwo.myotherbrain.MOBModelConnection;
+import net.fortytwo.myotherbrain.model.beans.Association;
+import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 
 import java.net.URI;
 import java.util.Date;
@@ -10,29 +12,23 @@ import java.util.Date;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class CreateAssociation extends WriteAction {
+public class CreateAssociation extends CreateFirstClassItem {
     private final URI associationSubject;
     private final URI associationObject;
-    private final String name;
-    private final String description;
-    private final URI icon;
-    private final URI sensitivity;
-    private final Float emphasis;
-    private final Date creationTimeStamp;
-    private final Float creationPlaceStampLongitude;
-    private final Float creationPlaceStampLatitude;
 
     public CreateAssociation(
-            final URI associationSubject,
-            final URI associationObject,
+            final URI subject,
             final String name,
             final String description,
             final URI icon,
             final URI sensitivity,
             final Float emphasis,
             final Date creationTimeStamp,
-            final Float creationPlaceStampLongitude,
-            final Float creationPlaceStampLatitude) {
+            final URI creationPlaceStamp,
+            final URI associationSubject,
+            final URI associationObject) {
+        super(subject, name, description, icon, sensitivity, emphasis,
+                creationTimeStamp, creationPlaceStamp);
         if (null == associationSubject) {
             throw new NullPointerException();
         }
@@ -40,24 +36,23 @@ public class CreateAssociation extends WriteAction {
         if (null == associationObject) {
             throw new NullPointerException();
         }
-        
+
         this.associationSubject = associationSubject;
         this.associationObject = associationObject;
-        this.name = name;
-        this.description = description;
-        this.icon = icon;
-        this.sensitivity = sensitivity;
-        this.emphasis = emphasis;
-        this.creationTimeStamp = creationTimeStamp;
-        this.creationPlaceStampLongitude = creationPlaceStampLongitude;
-        this.creationPlaceStampLatitude = creationPlaceStampLatitude;
     }
 
     protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
+        c.getElmoManager().remove(subject);
     }
 
     protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // TODO: is there any reason to use "designate" over "create"?
+        Association subject = c.getElmoManager().designate(toQName(this.subject), Association.class);
+
+        setCommonValues(subject, c);
+
+        subject.setSubject(toThing(associationSubject, FirstClassItem.class, c));
+        subject.setObject(toThing(associationObject, FirstClassItem.class, c));
     }
 }

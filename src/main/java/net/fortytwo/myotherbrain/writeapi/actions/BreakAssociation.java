@@ -27,17 +27,17 @@ public class BreakAssociation extends WriteAction {
     }
 
     protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
-        FirstClassItem item = toEntity(subject, FirstClassItem.class, c);
+        FirstClassItem item = toThing(subject, FirstClassItem.class, c);
         c.getElmoManager().removeDesignation(item, FirstClassItem.class);
         c.getElmoManager().designate(new QName(subject.toString()), Association.class);
 
-        Association a = toEntity(subject, Association.class, c);
-        a.setSubject(toEntity(oldAssociationSubject, FirstClassItem.class, c));
-        a.setObject(toEntity(oldAssociationObject, FirstClassItem.class, c));
+        Association a = toThing(subject, Association.class, c);
+        a.setSubject(toThing(oldAssociationSubject, FirstClassItem.class, c));
+        a.setObject(toThing(oldAssociationObject, FirstClassItem.class, c));
     }
 
     protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
-        Association a = toEntity(subject, Association.class, c);
+        Association a = toThing(subject, Association.class, c);
 
         oldAssociationSubject = toURI(a.getSubject());
         oldAssociationObject = toURI(a.getObject());

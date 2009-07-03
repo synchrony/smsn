@@ -37,6 +37,10 @@ public class MOBModelConnection {
 
     public <T> T create(final Class<T> c) {
         QName q = new QName(MyOtherBrain.randomURIString());
+        return create(q, c);
+    }
+
+    public <T> T create(final QName q, final Class<T> c) {
         return elmoManager.create(q, c);
     }
 }
