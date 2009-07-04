@@ -1,27 +1,26 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.writeapi;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.undo.UndoableAction;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.Entity;
 
-import javax.xml.namespace.QName;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Author: josh
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public abstract class WriteAction extends UndoableAction<MOBModelConnection, NoSuchItemException> {
+public abstract class WriteAction extends UndoableAction<WriteContext, WriteException> {
     // Note: the implementation of this class is assumed to be thread-safe.
     private static final DatatypeFactory DATATYPE_FACTORY;
 
@@ -35,11 +34,11 @@ public abstract class WriteAction extends UndoableAction<MOBModelConnection, NoS
 
     protected <T extends Thing> T toThing(final URI uri,
                                           final Class<T> cl,
-                                          final MOBModelConnection c) throws NoSuchItemException {
+                                          final WriteContext c) throws NoSuchItemException {
         if (null == uri) {
             return null;
         } else {
-            Entity entity = c.getElmoManager().find(toQName(uri));
+            Entity entity = c.getConnection().getElmoManager().find(toQName(uri));
             if (null == entity || !cl.isInstance(entity)) {
                 throw new NoSuchItemException(uri, cl);
             }
@@ -55,7 +54,7 @@ public abstract class WriteAction extends UndoableAction<MOBModelConnection, NoS
 
     protected <T extends Thing> Set<T> toThingSet(final Set<URI> uris,
                                                   final Class<T> cl,
-                                                  final MOBModelConnection c) throws NoSuchItemException {
+                                                  final WriteContext c) throws NoSuchItemException {
         Set<T> things = new HashSet<T>();
 
         for (URI u : uris) {
@@ -99,4 +98,5 @@ public abstract class WriteAction extends UndoableAction<MOBModelConnection, NoS
         cal.setTime(date);
         return DATATYPE_FACTORY.newXMLGregorianCalendar(cal);
     }
+
 }

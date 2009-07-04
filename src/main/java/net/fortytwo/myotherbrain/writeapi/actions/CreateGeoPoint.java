@@ -1,7 +1,9 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.GeoPoint;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
 
@@ -17,19 +19,26 @@ public class CreateGeoPoint extends WriteAction {
     protected final Float latitude;
 
     public CreateGeoPoint(
-            final URI subject,
-            final Float longitude,
-            final Float latitude) {
+             URI subject,
+             Float longitude,
+             Float latitude,
+                    final WriteContext c) throws WriteException {
         if (null == subject) {
             throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
         }
 
         if (null == longitude) {
             throw new NullPointerException();
+        } else {
+            longitude = c.normalizeLongitude(longitude);
         }
 
         if (null == latitude) {
             throw new NullPointerException();
+        } else {
+            latitude = c.normalizeLatitude(latitude);
         }
 
         this.subject = subject;
@@ -37,14 +46,14 @@ public class CreateGeoPoint extends WriteAction {
         this.latitude = latitude;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeUndo(final WriteContext c) throws WriteException {
         GeoPoint subject = toThing(this.subject, GeoPoint.class, c);
-        c.getElmoManager().remove(subject);
+        c.remove(subject);
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeRedo(final WriteContext c) throws WriteException {
         // TODO: is there any reason to use "designate" over "create"?
-        GeoPoint subject = c.getElmoManager().designate(toQName(this.subject), GeoPoint.class);
+        GeoPoint subject = c.designate(toQName(this.subject), GeoPoint.class);
         subject.setLongitude(longitude);
         subject.setLatitude(latitude);
     }

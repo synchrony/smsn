@@ -2,12 +2,15 @@ package net.fortytwo.myotherbrain;
 
 import net.fortytwo.myotherbrain.access.AccountManager;
 import net.fortytwo.myotherbrain.access.Session;
+import net.fortytwo.myotherbrain.model.MOBModel;
+import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.Association;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import net.fortytwo.myotherbrain.writeapi.actions.BreakAssociation;
 import net.fortytwo.myotherbrain.writeapi.actions.SetName;
-import net.fortytwo.myotherbrain.writeapi.actions.WriteAction;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.sail.Sail;
@@ -58,8 +61,7 @@ public class MyOtherBrain {
         try {
             PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(MOB_PROPERTIES_FILE));
         } catch (IOException e) {
-            LOGGER.error("unable to load properties file " + MOB_PROPERTIES_FILE);
-            System.exit(1);
+            throw new ExceptionInInitializerError(e);
         }
     }
 
@@ -92,23 +94,25 @@ public class MyOtherBrain {
                 MOBModel model = session.getModel();
                 MOBModelConnection c = model.createConnection();
                 try {
-                    FirstClassItem telephone = c.create(FirstClassItem.class);
+                    WriteContext wc = new WriteContext(c);
+
+                    FirstClassItem telephone = wc.create(FirstClassItem.class);
                     telephone.setName("telephone");
                     telephone.setDescription("a device for voice communication at a distance");
-                    FirstClassItem red = c.create(FirstClassItem.class);
+                    FirstClassItem red = wc.create(FirstClassItem.class);
                     red.setName("red");
                     red.setDescription("the color red");
-                    Association a = c.create(Association.class);
+                    Association a = wc.create(Association.class);
                     a.setSubject(telephone);
                     a.setObject(red);
 
-                    WriteAction action = new SetName(toURI(red.getQName()), "blue");
-                    action.redo(c);
-                    action.undo(c);
+                    WriteAction action = new SetName(toURI(red.getQName()), "blue", wc);
+                    action.redo(wc);
+                    action.undo(wc);
 
-                    WriteAction action2 = new BreakAssociation(toURI(a.getQName()));
-                    action2.redo(c);
-                    action2.undo(c);
+                    WriteAction action2 = new BreakAssociation(toURI(a.getQName()), wc);
+                    action2.redo(wc);
+                    action2.undo(wc);
 
                     c.commit();
                 } finally {
@@ -157,10 +161,10 @@ public class MyOtherBrain {
 
     public static String sha1SumOf(final String key) {
         SHA1_DIGEST.update(key.getBytes());
-        String hash = new String();
+        String hash = "";
         byte[] digest = SHA1_DIGEST.digest();
-        for (int i = 0; i < digest.length; i++) {
-            String hex = Integer.toHexString(digest[i]);
+        for (byte b : digest) {
+            String hex = Integer.toHexString(b);
             if (hex.length() == 1)
                 hex = "0" + hex;
             hex = hex.substring(hex.length() - 2);

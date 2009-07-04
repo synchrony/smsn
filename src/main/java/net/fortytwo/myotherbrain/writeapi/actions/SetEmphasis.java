@@ -1,7 +1,9 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
 
@@ -16,22 +18,29 @@ public class SetEmphasis extends WriteAction {
 
     private Float oldEmphasis;
 
-    public SetEmphasis(final URI subject,
-                       final Float emphasis) {
+    public SetEmphasis(URI subject,
+                       Float emphasis,
+                       final WriteContext c) throws WriteException {
         if (null == subject) {
             throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
+        }
+
+        if (null != emphasis) {
+            emphasis = c.normalizeEmphasis(emphasis);
         }
 
         this.subject = subject;
         this.emphasis = emphasis;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         item.setEmphasis(oldEmphasis);
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeRedo(final WriteContext c) throws WriteException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldEmphasis = item.getEmphasis();
         item.setEmphasis(emphasis);

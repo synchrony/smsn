@@ -1,7 +1,5 @@
 package net.fortytwo.myotherbrain.access;
 
-import net.fortytwo.myotherbrain.MOBModel;
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.error.BadEmailAddressException;
@@ -21,10 +19,13 @@ import net.fortytwo.myotherbrain.access.error.UserNameIsReservedException;
 import net.fortytwo.myotherbrain.access.error.UserNameIsTooLongException;
 import net.fortytwo.myotherbrain.access.error.UserNameIsTooShortException;
 import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBModel;
+import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.Account;
 import net.fortytwo.myotherbrain.model.beans.Graph;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoQuery;
 import org.openrdf.model.URI;
@@ -189,6 +190,7 @@ public class AccountManager {
                                            final String contactEmailAddress) throws BadPasswordException, BadUserNameException, BadEmailAddressException {
         // TODO: validate contact email address by sending an email containing a confirmation URL
         MOBModelConnection c = adminModel.createConnection();
+        WriteContext wc = new WriteContext(c);
         try {
             // Note: error messages for syntactically invalid passwords and user
             // names assume that the user has already been told what constitutes a
@@ -206,10 +208,10 @@ public class AccountManager {
 
             String timeStamp = currentTimeStamp();
 
-            Graph personalGraph = c.create(Graph.class);
-            logComment(personalGraph, "personal graph created for user '" + userName + "' on " + timeStamp);
+            Graph personalGraph = wc.create(Graph.class);
+            logComment(personalGraph, "personal analysis created for user '" + userName + "' on " + timeStamp);
 
-            Account account = c.create(Account.class);
+            Account account = wc.create(Account.class);
             logComment(account, "account created for user '" + userName + "' on " + timeStamp);
             account.setUserName(userName);
             account.setPasswordSha1Sum(MyOtherBrain.sha1SumOf(password));

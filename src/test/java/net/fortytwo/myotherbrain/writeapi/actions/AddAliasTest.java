@@ -1,9 +1,10 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.model.beans.Literal;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import org.openrdf.concepts.owl.Thing;
 
 /**
@@ -14,16 +15,16 @@ import org.openrdf.concepts.owl.Thing;
 public class AddAliasTest extends WriteActionTestCase {
 
     public void testAll() throws Exception {
-        MOBModelConnection c = model.createConnection();
+        WriteContext c = new WriteContext(model.createConnection());
 
         FirstClassItem something = c.create(FirstClassItem.class);
         Thing alias1 = c.create(Thing.class);
         Literal alias2 = c.create(Literal.class);
 
         WriteAction action1 = new AddAlias(MyOtherBrain.toURI(something.getQName()),
-                MyOtherBrain.toURI(alias1.getQName()));
+                MyOtherBrain.toURI(alias1.getQName()), c);
         WriteAction action2 = new AddAlias(MyOtherBrain.toURI(something.getQName()),
-                MyOtherBrain.toURI(alias2.getQName()));
+                MyOtherBrain.toURI(alias2.getQName()), c);
 
         assertEquals(0, something.getAlias().size());
 
@@ -47,7 +48,7 @@ public class AddAliasTest extends WriteActionTestCase {
         action1.undo(c);
         assertEquals(0, something.getAlias().size());
 
-        c.rollback();
-        c.close();
+        c.getConnection().rollback();
+        c.getConnection().close();
     }
 }

@@ -1,7 +1,8 @@
-package net.fortytwo.myotherbrain;
+package net.fortytwo.myotherbrain.model;
 
+import net.fortytwo.myotherbrain.writeapi.Quotas;
+import net.fortytwo.myotherbrain.MyOtherBrain;
 import org.openrdf.elmo.ElmoManager;
-import org.openrdf.elmo.ElmoManagerFactory;
 
 import javax.xml.namespace.QName;
 
@@ -9,10 +10,12 @@ import javax.xml.namespace.QName;
  * Note: a connection is specific to a particular user's knowledge base.
  */
 public class MOBModelConnection {
+    private final MOBModel model;
     private final ElmoManager elmoManager;
 
-    public MOBModelConnection(final ElmoManagerFactory factory) {
-        elmoManager = factory.createElmoManager();
+    public MOBModelConnection(final MOBModel model) {
+        this.model = model;
+        elmoManager = model.getElmoManagerFactory().createElmoManager();
 
         // Use an active transaction (rather than using auto-commit mode).
         // We will explicitly call commit() and rollback().
@@ -35,12 +38,7 @@ public class MOBModelConnection {
         return elmoManager;
     }
 
-    public <T> T create(final Class<T> c) {
-        QName q = new QName(MyOtherBrain.randomURIString());
-        return create(q, c);
-    }
-
-    public <T> T create(final QName q, final Class<T> c) {
-        return elmoManager.create(q, c);
+    public Quotas getQuotas() {
+        return model.getQuotas();    
     }
 }

@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.access;
 
-import net.fortytwo.myotherbrain.MOBModel;
+import net.fortytwo.myotherbrain.model.MOBModel;
 
 /**
  * Author: josh

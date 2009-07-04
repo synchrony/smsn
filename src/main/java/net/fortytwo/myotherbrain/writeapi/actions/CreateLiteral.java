@@ -1,8 +1,9 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.model.beans.Literal;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
 import java.util.Date;
@@ -18,22 +19,33 @@ public class CreateLiteral extends CreateFirstClassItem {
     private final String languageTag;
 
     public CreateLiteral(
-            final URI subject,
-            final String name,
-            final String description,
-            final URI icon,
-            final URI sensitivity,
-            final Float emphasis,
-            final Date creationTimeStamp,
-            final URI creationPlaceStamp,
-            final String lexicalForm,
-            final URI datatypeURI,
-            final String languageTag) {
+            URI subject,
+            String name,
+            String description,
+            URI icon,
+            URI sensitivity,
+            Float emphasis,
+            Date creationTimeStamp,
+            URI creationPlaceStamp,
+            String lexicalForm,
+            URI datatypeURI,
+            String languageTag,
+            final WriteContext c) throws WriteException {
         super(subject, name, description, icon, sensitivity, emphasis,
-                creationTimeStamp, creationPlaceStamp);
+                creationTimeStamp, creationPlaceStamp, c);
 
         if (null == lexicalForm) {
             throw new NullPointerException();
+        } else {
+            lexicalForm = c.normalizeLexicalForm(lexicalForm);
+        }
+
+        if (null != datatypeURI) {
+            datatypeURI = c.normalizeDatatypeURI(datatypeURI);
+        }
+
+        if (null != languageTag) {
+            languageTag = c.normalizeLanguageTag(languageTag);
         }
 
         this.lexicalForm = lexicalForm;
@@ -41,14 +53,16 @@ public class CreateLiteral extends CreateFirstClassItem {
         this.languageTag = languageTag;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    @Override
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
-        c.getElmoManager().remove(subject);
+        c.remove(subject);
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    @Override
+    protected void executeRedo(final WriteContext c) throws WriteException {
         // TODO: is there any reason to use "designate" over "create"?
-        Literal subject = c.getElmoManager().designate(toQName(this.subject), Literal.class);
+        Literal subject = c.designate(toQName(this.subject), Literal.class);
 
         setCommonValues(subject, c);
 

@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.access;
 
 import junit.framework.TestCase;
-import net.fortytwo.myotherbrain.MOBModelConnection;
+import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.access.error.EmailAddressIsInvalidException;
 import net.fortytwo.myotherbrain.access.error.EmailAddressIsTooLongException;

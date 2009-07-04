@@ -1,10 +1,11 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.model.beans.Marker;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
 
 import javax.xml.namespace.QName;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import java.util.Set;
 public class RemoveMarkerTagTest extends WriteActionTestCase {
 
     public void testAll() throws Exception {
-        MOBModelConnection c = model.createConnection();
+        WriteContext c = new WriteContext(model.createConnection());
 
         FirstClassItem subject = c.create(FirstClassItem.class);
         Marker tag1 = c.create(new QName(MOB.STARRED), Marker.class);
@@ -29,11 +30,11 @@ public class RemoveMarkerTagTest extends WriteActionTestCase {
         subject.setMarkerTag(markerTag);
 
         WriteAction action1 = new RemoveMarkerTag(MyOtherBrain.toURI(subject.getQName()),
-                MyOtherBrain.toURI(tag1.getQName()));
+                MyOtherBrain.toURI(tag1.getQName()), c);
         WriteAction action2 = new RemoveMarkerTag(MyOtherBrain.toURI(subject.getQName()),
-                MyOtherBrain.toURI(tag2.getQName()));
+                MyOtherBrain.toURI(tag2.getQName()), c);
         WriteAction action3 = new RemoveMarkerTag(MyOtherBrain.toURI(subject.getQName()),
-                MyOtherBrain.toURI(tag2.getQName()));
+                MyOtherBrain.toURI(tag2.getQName()), c);
 
         assertEquals(2, subject.getMarkerTag().size());
         assertTrue(subject.getMarkerTag().contains(tag1));
@@ -61,7 +62,7 @@ public class RemoveMarkerTagTest extends WriteActionTestCase {
         assertTrue(subject.getMarkerTag().contains(tag1));
         assertTrue(subject.getMarkerTag().contains(tag2));
 
-        c.rollback();
-        c.close();
+        c.getConnection().rollback();
+        c.getConnection().close();
     }
 }

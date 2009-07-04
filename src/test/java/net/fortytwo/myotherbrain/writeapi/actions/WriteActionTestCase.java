@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
 import junit.framework.TestCase;
-import net.fortytwo.myotherbrain.MOBModel;
+import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.access.AccountManager;
 import net.fortytwo.myotherbrain.access.Session;

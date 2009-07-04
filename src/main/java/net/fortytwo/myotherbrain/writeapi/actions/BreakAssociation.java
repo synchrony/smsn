@@ -1,8 +1,10 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.Association;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
@@ -18,33 +20,36 @@ public class BreakAssociation extends WriteAction {
     private URI oldAssociationSubject;
     private URI oldAssociationObject;
 
-    public BreakAssociation(final URI subject) {
+    public BreakAssociation(URI subject,
+                            final WriteContext c) throws WriteException {
         if (null == subject) {
             throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
         }
 
         this.subject = subject;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem item = toThing(subject, FirstClassItem.class, c);
-        c.getElmoManager().removeDesignation(item, FirstClassItem.class);
-        c.getElmoManager().designate(new QName(subject.toString()), Association.class);
+        c.removeDesignation(item, FirstClassItem.class);
+        c.designate(new QName(subject.toString()), Association.class);
 
         Association a = toThing(subject, Association.class, c);
         a.setSubject(toThing(oldAssociationSubject, FirstClassItem.class, c));
         a.setObject(toThing(oldAssociationObject, FirstClassItem.class, c));
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeRedo(final WriteContext c) throws WriteException {
         Association a = toThing(subject, Association.class, c);
 
         oldAssociationSubject = toURI(a.getSubject());
         oldAssociationObject = toURI(a.getObject());
         a.setSubject(null);
         a.setObject(null);
-        
-        c.getElmoManager().designate(new QName(subject.toString()), FirstClassItem.class);
-        c.getElmoManager().removeDesignation(a, Association.class);
+
+        c.designate(new QName(subject.toString()), FirstClassItem.class);
+        c.removeDesignation(a, Association.class);
     }
 }

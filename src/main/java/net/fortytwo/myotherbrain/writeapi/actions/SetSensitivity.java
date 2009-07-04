@@ -1,10 +1,14 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.model.beans.SensitivityLevel;
+import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Author: josh
@@ -17,22 +21,35 @@ public class SetSensitivity extends WriteAction {
 
     private URI oldSensitivity;
 
-    public SetSensitivity(final URI subject,
-                          final URI sensitivity) {
+    public SetSensitivity(URI subject,
+                          URI sensitivity,
+                          final WriteContext c) throws WriteException {
         if (null == subject) {
             throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
+        }
+
+        if (null == sensitivity) {
+            try {
+                sensitivity = new URI(MOB.PERSONAL);
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException();
+            }
+        } else {
+            sensitivity = c.normalizeResourceURI(sensitivity);
         }
 
         this.subject = subject;
         this.sensitivity = sensitivity;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         item.setSensitivity(toThing(oldSensitivity, SensitivityLevel.class, c));
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeRedo(final WriteContext c) throws WriteException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldSensitivity = toURI(item.getSensitivity());
         item.setSensitivity(toThing(sensitivity, SensitivityLevel.class, c));

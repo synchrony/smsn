@@ -1,11 +1,14 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
-import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
-import net.fortytwo.myotherbrain.model.beans.WebResource;
-import net.fortytwo.myotherbrain.model.beans.SensitivityLevel;
-import net.fortytwo.myotherbrain.model.beans.GeoPoint;
 import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
+import net.fortytwo.myotherbrain.model.beans.GeoPoint;
+import net.fortytwo.myotherbrain.model.beans.SensitivityLevel;
+import net.fortytwo.myotherbrain.model.beans.WebResource;
+import net.fortytwo.myotherbrain.writeapi.NoSuchItemException;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,16 +34,53 @@ public class CreateFirstClassItem extends WriteAction {
     // a new, distinct URI with no existing metadata.  Any metadata which is
     // already attached to the URI may be irreversibly lost in an "undo" event.
     public CreateFirstClassItem(
-            final URI subject,
-            final String name,
-            final String description,
-            final URI icon,
-            final URI sensitivity,
-            final Float emphasis,
-            final Date creationTimeStamp,
-            final URI creationPlaceStamp) {
+            URI subject,
+            String name,
+            String description,
+            URI icon,
+            URI sensitivity,
+            Float emphasis,
+            Date creationTimeStamp,
+            URI creationPlaceStamp,
+            final WriteContext c) throws WriteException {
         if (null == subject) {
             throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
+        }
+
+        if (null != name) {
+            name = c.normalizeName(name);
+        }
+
+        if (null != description) {
+            description = c.normalizeDescription(description);
+        }
+
+        if (null != icon) {
+            icon = c.normalizeResourceURI(icon);
+        }
+
+        if (null == sensitivity) {
+            try {
+                sensitivity = new URI(MOB.PERSONAL);
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException();
+            }
+        } else {
+            sensitivity = c.normalizeResourceURI(sensitivity);
+        }
+
+        if (null != emphasis) {
+            emphasis = c.normalizeEmphasis(emphasis);
+        }
+
+        if (null != creationTimeStamp) {
+            creationTimeStamp = c.normalizeCreationTimeStamp(creationTimeStamp);
+        }
+
+        if (null != creationPlaceStamp) {
+            creationPlaceStamp = c.normalizeResourceURI(creationPlaceStamp);
         }
 
         this.subject = subject;
@@ -53,20 +93,20 @@ public class CreateFirstClassItem extends WriteAction {
         this.creationPlaceStamp = creationPlaceStamp;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
-        c.getElmoManager().remove(subject);
+        c.remove(subject);
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeRedo(final WriteContext c) throws WriteException {
         // TODO: is there any reason to use "designate" over "create"?
-        FirstClassItem subject = c.getElmoManager().designate(toQName(this.subject), FirstClassItem.class);
+        FirstClassItem subject = c.designate(toQName(this.subject), FirstClassItem.class);
 
         setCommonValues(subject, c);
     }
 
     protected void setCommonValues(final FirstClassItem subject,
-                                   final MOBModelConnection c) throws NoSuchItemException {
+                                   final WriteContext c) throws NoSuchItemException {
         if (null != name) {
             subject.setName(name);
         }
@@ -79,15 +119,7 @@ public class CreateFirstClassItem extends WriteAction {
             subject.setIcon(toThing(icon, WebResource.class, c));
         }
 
-        try {
-            // Use default sensitivity level if not specified.
-            URI sl = null == sensitivity
-                    ? new URI(MOB.PERSONAL)
-                    : sensitivity;
-            subject.setSensitivity(toThing(sl, SensitivityLevel.class, c));
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException();
-        }
+        subject.setSensitivity(toThing(sensitivity, SensitivityLevel.class, c));
 
         if (null != emphasis) {
             subject.setEmphasis(emphasis);

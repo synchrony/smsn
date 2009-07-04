@@ -1,8 +1,10 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.model.beans.Marker;
+import net.fortytwo.myotherbrain.writeapi.WriteAction;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
 import java.util.Set;
@@ -18,26 +20,31 @@ public class AddMarkerTag extends WriteAction {
 
     private Set<URI> beforeMarkerTag;
 
-    public AddMarkerTag(final URI subject,
-                        final URI newMarkerTag) {
+    public AddMarkerTag(URI subject,
+                        URI newMarkerTag,
+                        final WriteContext c) throws WriteException {
         if (null == subject) {
             throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
         }
 
         if (null == newMarkerTag) {
             throw new NullPointerException();
+        } else {
+            newMarkerTag = c.normalizeResourceURI(newMarkerTag);
         }
 
         this.subject = subject;
         this.newMarkerTag = newMarkerTag;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
         subject.setMarkerTag(toThingSet(beforeMarkerTag, Marker.class, c));
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    protected void executeRedo(final WriteContext c) throws WriteException {
         FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
         Set<Marker> markerTag = subject.getMarkerTag();
         beforeMarkerTag = toURISet(markerTag);

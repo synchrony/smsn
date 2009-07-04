@@ -1,8 +1,9 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.Association;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
+import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.writeapi.WriteException;
 
 import java.net.URI;
 import java.util.Date;
@@ -17,38 +18,45 @@ public class CreateAssociation extends CreateFirstClassItem {
     private final URI associationObject;
 
     public CreateAssociation(
-            final URI subject,
-            final String name,
-            final String description,
-            final URI icon,
-            final URI sensitivity,
-            final Float emphasis,
-            final Date creationTimeStamp,
-            final URI creationPlaceStamp,
-            final URI associationSubject,
-            final URI associationObject) {
+            URI subject,
+            String name,
+            String description,
+            URI icon,
+            URI sensitivity,
+            Float emphasis,
+            Date creationTimeStamp,
+            URI creationPlaceStamp,
+            URI associationSubject,
+            URI associationObject,
+            final WriteContext c) throws WriteException {
         super(subject, name, description, icon, sensitivity, emphasis,
-                creationTimeStamp, creationPlaceStamp);
+                creationTimeStamp, creationPlaceStamp, c);
         if (null == associationSubject) {
             throw new NullPointerException();
+        } else {
+            associationSubject = c.normalizeResourceURI(associationSubject);
         }
 
         if (null == associationObject) {
             throw new NullPointerException();
+        } else {
+            associationSubject = c.normalizeResourceURI(associationSubject);
         }
 
         this.associationSubject = associationSubject;
         this.associationObject = associationObject;
     }
 
-    protected void executeUndo(final MOBModelConnection c) throws NoSuchItemException {
+    @Override
+    protected void executeUndo(final WriteContext c) throws WriteException {
         FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
-        c.getElmoManager().remove(subject);
+        c.remove(subject);
     }
 
-    protected void executeRedo(final MOBModelConnection c) throws NoSuchItemException {
+    @Override
+    protected void executeRedo(final WriteContext c) throws WriteException {
         // TODO: is there any reason to use "designate" over "create"?
-        Association subject = c.getElmoManager().designate(toQName(this.subject), Association.class);
+        Association subject = c.designate(toQName(this.subject), Association.class);
 
         setCommonValues(subject, c);
 

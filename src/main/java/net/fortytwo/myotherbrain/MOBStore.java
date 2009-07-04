@@ -3,6 +3,7 @@ package net.fortytwo.myotherbrain;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.model.beans.Account;
 import net.fortytwo.myotherbrain.model.beans.Association;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
@@ -90,7 +91,7 @@ public class MOBStore {
         repository = new SailRepository(sail);
 
         ElmoModule baseModule = new ElmoModule();
-        // This graph will be read-only in the final module.
+        // This analysis will be read-only in the final module.
         baseModule.setGraph(new QName(MOB.MOBONTOLOGYGRAPH));
 
         // Dynamically register concepts from the MOB ontology.
