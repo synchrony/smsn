@@ -32,6 +32,19 @@ public abstract class WriteAction extends UndoableAction<WriteContext, WriteExce
         }
     }
 
+    protected final URI subject;
+
+    protected WriteAction(URI subject,
+                          final WriteContext c) throws WriteException {
+        if (null == subject) {
+            throw new NullPointerException();
+        } else {
+            subject = c.normalizeResourceURI(subject);
+        }
+
+        this.subject = subject;
+    }
+
     protected <T extends Thing> T toThing(final URI uri,
                                           final Class<T> cl,
                                           final WriteContext c) throws NoSuchItemException {

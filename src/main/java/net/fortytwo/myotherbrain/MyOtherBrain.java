@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain;
 
-import net.fortytwo.myotherbrain.access.AccountManager;
+import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
@@ -41,7 +41,7 @@ public class MyOtherBrain {
             NATIVESTORE_DIRECTORY = "net.fortytwo.myotherbrain.nativeStoreDirectory",
             NEOSAIL_DIRECTORY = "net.fortytwo.myotherbrain.neoSailDirectory",
             RMISAILCLIENT_URI = "net.fortytwo.myotherbrain.rmiSailClientURI",
-            SAIL_TYPE = "net.fortytwo.myotherbrain.sailType",
+            SAIL_CLASS = "net.fortytwo.myotherbrain.sailClass",
             NAME = "net.fortytwo.myotherbrain.name",
             VERSION = "net.fortytwo.myotherbrain.version",
             REVISION = "net.fortytwo.myotherbrain.revision";
@@ -109,7 +109,7 @@ public class MyOtherBrain {
             try {
                 store.generateSeedData();
 
-                AccountManager am = new AccountManager(store);
+                AccessManager am = new AccessManager(store);
                 am.createAccount("bob", "bobspassword", "bob@example.org");
                 am.changeUserName("bob", "robert");
                 am.changeUserName("robert", "bobby");

@@ -21,7 +21,6 @@ import java.util.Date;
  */
 public class CreateFirstClassItem extends WriteAction {
 
-    protected final URI subject;
     protected final String name;
     protected final String description;
     protected final URI icon;
@@ -43,11 +42,7 @@ public class CreateFirstClassItem extends WriteAction {
             Date creationTimeStamp,
             URI creationPlaceStamp,
             final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null != name) {
             name = c.normalizeName(name);
@@ -83,7 +78,6 @@ public class CreateFirstClassItem extends WriteAction {
             creationPlaceStamp = c.normalizeResourceURI(creationPlaceStamp);
         }
 
-        this.subject = subject;
         this.name = name;
         this.description = description;
         this.icon = icon;

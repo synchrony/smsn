@@ -26,7 +26,7 @@ public class MOB {
             ALIAS = NAMESPACE + "alias",
             CREATIONPLACESTAMP = NAMESPACE + "creationPlaceStamp",
             ICON = NAMESPACE + "icon",
-            MARKERTAG = NAMESPACE + "markerTag",
+            MARKERTAG = NAMESPACE + "newMarkerTag",
             OBJECT = NAMESPACE + "object",
             PERSONALGRAPH = NAMESPACE + "personalGraph",
             SENSITIVITY = NAMESPACE + "sensitivity",

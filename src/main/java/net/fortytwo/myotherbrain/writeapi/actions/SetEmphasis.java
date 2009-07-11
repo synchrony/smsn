@@ -13,7 +13,6 @@ import java.net.URI;
  * Time: 12:03:59 AM
  */
 public class SetEmphasis extends WriteAction {
-    private final URI subject;
     private final Float emphasis;
 
     private Float oldEmphasis;
@@ -21,17 +20,12 @@ public class SetEmphasis extends WriteAction {
     public SetEmphasis(URI subject,
                        Float emphasis,
                        final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null != emphasis) {
             emphasis = c.normalizeEmphasis(emphasis);
         }
 
-        this.subject = subject;
         this.emphasis = emphasis;
     }
 

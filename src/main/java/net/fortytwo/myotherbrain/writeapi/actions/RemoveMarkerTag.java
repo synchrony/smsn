@@ -15,28 +15,22 @@ import java.util.Set;
  * Time: 12:03:59 AM
  */
 public class RemoveMarkerTag extends WriteAction {
-    private final URI subject;
-    private final URI targetTag;
+    private final URI targetMarkerTag;
 
     private Set<URI> beforeMarkerTag;
 
     public RemoveMarkerTag(URI subject,
-                           URI targetTag,
+                           URI targetMarkerTag,
                            final WriteContext c) throws WriteException {
-        if (null == subject) {
+        super(subject, c);
+
+        if (null == targetMarkerTag) {
             throw new NullPointerException();
         } else {
-            subject = c.normalizeResourceURI(subject);
+            targetMarkerTag = c.normalizeResourceURI(targetMarkerTag);
         }
 
-        if (null == targetTag) {
-            throw new NullPointerException();
-        } else {
-            targetTag = c.normalizeResourceURI(targetTag);
-        }
-
-        this.subject = subject;
-        this.targetTag = targetTag;
+        this.targetMarkerTag = targetMarkerTag;
     }
 
     protected void executeUndo(final WriteContext c) throws WriteException {
@@ -50,7 +44,7 @@ public class RemoveMarkerTag extends WriteAction {
         beforeMarkerTag = toURISet(markerTag);
 
         // Note: assumes that the returned Set is modifiable.
-        markerTag.remove(toThing(targetTag, Marker.class, c));
+        markerTag.remove(toThing(targetMarkerTag, Marker.class, c));
         // Note: assumes that removal from the Set is not necessarily persisted.
         subject.setMarkerTag(markerTag);
     }

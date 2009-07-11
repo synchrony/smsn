@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
  * Time: 12:03:59 AM
  */
 public class SetSensitivity extends WriteAction {
-    private final URI subject;
     private final URI sensitivity;
 
     private URI oldSensitivity;
@@ -24,11 +23,7 @@ public class SetSensitivity extends WriteAction {
     public SetSensitivity(URI subject,
                           URI sensitivity,
                           final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null == sensitivity) {
             try {
@@ -40,7 +35,6 @@ public class SetSensitivity extends WriteAction {
             sensitivity = c.normalizeResourceURI(sensitivity);
         }
 
-        this.subject = subject;
         this.sensitivity = sensitivity;
     }
 

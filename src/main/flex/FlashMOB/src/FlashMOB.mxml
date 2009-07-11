@@ -1,6 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
-    <mx:RemoteObject id="mobflexservice" destination="mobflexservice" />
-	<mx:Button label="Click to talk to MOB" click="mobflexservice.getVersionInfo()"/>
-	<mx:Label text="{mobflexservice.getVersionInfo.lastResult}" fontSize="14" fontWeight="bold"/>
+    <mx:RemoteObject id="mobSession" destination="flashmobsession" />
+    <mx:Script>
+    	<![CDATA[
+    		import ExamplePOJO;
+    		import CreateFirstClassItem;
+    	
+    		private function testMOBCommunication():void {
+    			mobSession.getVersionInfo();
+    			
+    			mobSession.arbitraryString();
+    			mobSession.arbitraryFloat();
+    		    mobSession.arbitraryDate();
+    		    mobSession.arbitraryURI();
+    		    mobSession.arbitraryExamplePOJO();
+    			
+    			// TODO: investigate precision issues in passed numbers
+    			// TODO: investigate passing of URIs
+    			// TODO: investigate exception handling
+    			// TODO: investigate encoding issues in passed strings
+    			
+    			var s:String = "passed string";
+    			var f:Number = 1.4142;
+    			var d:Date = new Date();
+   				//...
+   				var p:ExamplePOJO = new ExamplePOJO();
+   				p.name = "green";
+   				p.description = "a pleasant color";
+   				mobSession.passString(s);
+   				mobSession.passFloat(f);
+   				mobSession.passDate(d);
+   				//...
+   				mobSession.passExamplePOJO(p);
+   				
+   				var action:CreateFirstClassItem = new CreateFirstClassItem();
+   				action.subject = "http://example.org/stuff/reveredBeatMan";
+   				action.name = "Reverend Beat-Man";
+   				action.description = "a Swiss weirdo with some interesting music";
+   				action.sensitivity = "http://fortytwo.net/2009/05/myotherbrain#Private";
+   				action.emphasis = 0.5;
+   				action.creationTimeStamp = new Date();
+   				mobSession.enqueueAction(action);
+    		}
+    	]]>
+    </mx:Script>
+	<mx:Button label="Click to talk to MOB!" click="testMOBCommunication()"/>
+	<mx:Label text="{mobSession.getVersionInfo.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.arbitraryString.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.arbitraryFloat.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.arbitraryDate.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.arbitraryURI.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.arbitraryExamplePOJO.lastResult.toString()}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.passString.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.passFloat.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.passDate.lastResult}" fontSize="14" fontWeight="bold"/>
+	<mx:Label text="{mobSession.passExamplePOJO.lastResult.toString()}" fontSize="14" fontWeight="bold"/>
 </mx:Application>

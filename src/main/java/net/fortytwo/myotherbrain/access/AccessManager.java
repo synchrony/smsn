@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  * Date: Mar 11, 2009
  * Time: 1:40:13 PM
  */
-public class AccountManager {
+public class AccessManager {
 
     private static final int
             USERNAME_MINIMUM_LENGTH,
@@ -92,7 +92,7 @@ public class AccountManager {
     private final MOBStore store;
     private final MOBModel adminModel;
 
-    public AccountManager(final MOBStore store) {
+    public AccessManager(final MOBStore store) {
         this.store = store;
         QName adminGraph = new QName(MOB.MOBADMINGRAPH);
         adminModel = store.createModel(adminGraph);
@@ -209,7 +209,7 @@ public class AccountManager {
             String timeStamp = currentTimeStamp();
 
             Graph personalGraph = wc.create(Graph.class);
-            logComment(personalGraph, "personal analysis created for user '" + userName + "' on " + timeStamp);
+            logComment(personalGraph, "personal graph created for user '" + userName + "' on " + timeStamp);
 
             Account account = wc.create(Account.class);
             logComment(account, "account created for user '" + userName + "' on " + timeStamp);

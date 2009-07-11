@@ -3,7 +3,7 @@ package net.fortytwo.myotherbrain.writeapi.actions;
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.MOBStore;
-import net.fortytwo.myotherbrain.access.AccountManager;
+import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.memory.MemoryStore;
@@ -25,7 +25,7 @@ public abstract class WriteActionTestCase extends TestCase {
         store = new MOBStore(sail);
         store.initialize();
 
-        AccountManager manager = new AccountManager(store);
+        AccessManager manager = new AccessManager(store);
         manager.createAccount("testuser", "testpassword", "testuser@example.org");
         Session session = manager.createSession("testuser");
         model = session.getModel();

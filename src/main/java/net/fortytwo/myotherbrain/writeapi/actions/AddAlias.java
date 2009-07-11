@@ -15,7 +15,6 @@ import java.util.Set;
  * Time: 12:03:59 AM
  */
 public class AddAlias extends WriteAction {
-    private final URI subject;
     private final URI newAlias;
 
     private Set<URI> beforeAlias;
@@ -23,11 +22,7 @@ public class AddAlias extends WriteAction {
     public AddAlias(URI subject,
                     URI newAlias,
                     final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null == newAlias) {
             throw new NullPointerException();
@@ -35,7 +30,6 @@ public class AddAlias extends WriteAction {
             newAlias = c.normalizeResourceURI(newAlias);
         }
 
-        this.subject = subject;
         this.newAlias = newAlias;
     }
 

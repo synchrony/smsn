@@ -15,7 +15,6 @@ import java.util.Set;
  * Time: 12:03:59 AM
  */
 public class RemoveAlias extends WriteAction {
-    private final URI subject;
     private final URI targetAlias;
 
     private Set<URI> beforeAlias;
@@ -23,11 +22,7 @@ public class RemoveAlias extends WriteAction {
     public RemoveAlias(URI subject,
                        URI targetAlias,
                        final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null == targetAlias) {
             throw new NullPointerException();
@@ -35,7 +30,6 @@ public class RemoveAlias extends WriteAction {
             targetAlias = c.normalizeResourceURI(targetAlias);
         }
 
-        this.subject = subject;
         this.targetAlias = targetAlias;
     }
 

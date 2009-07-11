@@ -15,20 +15,13 @@ import java.net.URI;
  * Time: 12:03:59 AM
  */
 public class BreakAssociation extends WriteAction {
-    private final URI subject;
 
     private URI oldAssociationSubject;
     private URI oldAssociationObject;
 
     public BreakAssociation(URI subject,
                             final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
-
-        this.subject = subject;
+        super(subject, c);
     }
 
     protected void executeUndo(final WriteContext c) throws WriteException {

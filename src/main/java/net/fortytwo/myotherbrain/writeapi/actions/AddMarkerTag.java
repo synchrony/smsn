@@ -15,7 +15,6 @@ import java.util.Set;
  * Time: 12:03:59 AM
  */
 public class AddMarkerTag extends WriteAction {
-    private final URI subject;
     private final URI newMarkerTag;
 
     private Set<URI> beforeMarkerTag;
@@ -23,11 +22,7 @@ public class AddMarkerTag extends WriteAction {
     public AddMarkerTag(URI subject,
                         URI newMarkerTag,
                         final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null == newMarkerTag) {
             throw new NullPointerException();
@@ -35,7 +30,6 @@ public class AddMarkerTag extends WriteAction {
             newMarkerTag = c.normalizeResourceURI(newMarkerTag);
         }
 
-        this.subject = subject;
         this.newMarkerTag = newMarkerTag;
     }
 

@@ -14,7 +14,6 @@ import java.net.URI;
  */
 public class CreateGeoPoint extends WriteAction {
 
-    protected final URI subject;
     protected final Float longitude;
     protected final Float latitude;
 
@@ -23,11 +22,7 @@ public class CreateGeoPoint extends WriteAction {
              Float longitude,
              Float latitude,
                     final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null == longitude) {
             throw new NullPointerException();
@@ -41,7 +36,6 @@ public class CreateGeoPoint extends WriteAction {
             latitude = c.normalizeLatitude(latitude);
         }
 
-        this.subject = subject;
         this.longitude = longitude;
         this.latitude = latitude;
     }

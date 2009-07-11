@@ -56,10 +56,33 @@ import java.util.Properties;
 public class MOBStore {
     private static final Logger LOGGER = MyOtherBrain.getLogger(MOBStore.class);
 
+    private static MOBStore defaultStore;
+
     private final Sail sail;
     private Repository repository;
     private ElmoModule elmoModule;
     private boolean initialized = false;
+
+    public static MOBStore getDefaultStore() throws MOBStoreException {
+        if (null == defaultStore) {
+            defaultStore = new MOBStore();
+            defaultStore.initialize();
+
+            Runtime.getRuntime().addShutdownHook(new Thread("shutdown hook for default MOB store") {
+                @Override
+                public void run() {
+                    try {
+                        defaultStore.shutDown();
+                        //defaultStore.getSail().shutDown();
+                    } catch (Throwable t) {
+                        LOGGER.error("failure in store shutdown", t);
+                    }
+                }
+            });
+        }
+
+        return defaultStore;
+    }
 
     public class MOBStoreException extends Exception {
         public MOBStoreException(final Throwable cause) {
@@ -71,9 +94,9 @@ public class MOBStore {
         }
     }
 
-    public MOBStore() throws MOBStoreException {
+    private MOBStore() throws MOBStoreException {
         Properties props = MyOtherBrain.getProperties();
-        String sailType = props.getProperty(MyOtherBrain.SAIL_TYPE);
+        String sailType = props.getProperty(MyOtherBrain.SAIL_CLASS);
         sail = createSail(sailType);
     }
 

@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 public class AccountManagerTest extends TestCase {
     private Sail sail;
     private MOBStore store;
-    private AccountManager manager;
+    private AccessManager manager;
     private MOBModelConnection connection;
 
     public void setUp() throws Exception {
@@ -33,7 +33,7 @@ public class AccountManagerTest extends TestCase {
         sail.initialize();
         store = new MOBStore(sail);
         store.initialize();
-        manager = new AccountManager(store);
+        manager = new AccessManager(store);
         connection = manager.getModel().createConnection();
     }
 
@@ -45,7 +45,7 @@ public class AccountManagerTest extends TestCase {
     }
 
     public void testCheckUserName() throws Exception {
-        Method m = AccountManager.class.getMethod("checkUserName", String.class);
+        Method m = AccessManager.class.getMethod("checkUserName", String.class);
 
         assertNull(thrown(m, "a"));
         assertNull(thrown(m, "johnny"));
@@ -64,7 +64,7 @@ public class AccountManagerTest extends TestCase {
     }
 
     public void testCheckPassword() throws Exception {
-        Method m = AccountManager.class.getMethod("checkPassword", String.class);
+        Method m = AccessManager.class.getMethod("checkPassword", String.class);
 
         assertNull(thrown(m, "goodPassword"));
         assertNull(thrown(m, "MixedCaseIsOK"));
@@ -77,7 +77,7 @@ public class AccountManagerTest extends TestCase {
     }
 
     public void testCheckContactEmailAddress() throws Exception {
-        Method m = AccountManager.class.getMethod("checkContactEmailAddress", String.class);
+        Method m = AccessManager.class.getMethod("checkContactEmailAddress", String.class);
 
         assertNull(thrown(m, "a@b.ch"));
         assertNull(thrown(m, "bob.dobbs@example.org"));

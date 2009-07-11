@@ -13,19 +13,19 @@ import java.net.URI;
  * Time: 12:03:59 AM
  */
 public class SetName extends WriteAction {
-    private final URI subject;
     private final String name;
 
     private String oldName;
 
-    public SetName( URI subject,
-                    String name,
-                    final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
+    public SetName(URI subject,
+                   String name,
+                   final WriteContext c) throws WriteException {
+        super(subject, c);
+
+        if (null != name) {
+            name = c.normalizeName(name);
         }
 
-        this.subject = subject;
         this.name = name;
     }
 

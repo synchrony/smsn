@@ -13,7 +13,6 @@ import java.net.URI;
  * Time: 12:03:59 AM
  */
 public class SetDescription extends WriteAction {
-    private final URI subject;
     private final String description;
 
     private String oldDescription;
@@ -21,13 +20,12 @@ public class SetDescription extends WriteAction {
     public SetDescription(URI subject,
                           String description,
                           final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
+        super(subject, c);
+
+        if (null != description) {
             description = c.normalizeDescription(description);
         }
 
-        this.subject = subject;
         this.description = description;
     }
 

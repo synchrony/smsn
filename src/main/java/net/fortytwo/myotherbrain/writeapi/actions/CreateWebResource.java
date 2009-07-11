@@ -14,7 +14,6 @@ import java.net.URI;
  */
 public class CreateWebResource extends WriteAction {
 
-    protected final URI subject;
     protected final String representationMediaType;
     protected final String representationSha1Sum;
 
@@ -23,11 +22,7 @@ public class CreateWebResource extends WriteAction {
             String representationMediaType,
             String representationSha1Sum,
             final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
-        }
+        super(subject, c);
 
         if (null == representationMediaType) {
             throw new NullPointerException();
@@ -41,7 +36,6 @@ public class CreateWebResource extends WriteAction {
             representationSha1Sum = c.normalizeRepresentationSha1Sum(representationSha1Sum);
         }
 
-        this.subject = subject;
         this.representationMediaType = representationMediaType;
         this.representationSha1Sum = representationSha1Sum;
     }

@@ -29,6 +29,10 @@ public class WriteContext {
         return connection;
     }
 
+    public void close() {
+        connection.close();    
+    }
+
     public Quotas getQuotas() {
         return quotas;
     }

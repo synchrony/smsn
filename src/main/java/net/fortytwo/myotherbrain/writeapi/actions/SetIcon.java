@@ -14,19 +14,19 @@ import java.net.URI;
  * Time: 12:03:59 AM
  */
 public class SetIcon extends WriteAction {
-    private final URI subject;
     private final URI icon;
 
     private URI oldIcon;
 
-    public SetIcon( URI subject,
-                    URI icon,
-                    final WriteContext c) throws WriteException {
-        if (null == subject) {
-            throw new NullPointerException();
-        }
+    public SetIcon(URI subject,
+                   URI icon,
+                   final WriteContext c) throws WriteException {
+        super(subject, c);
 
-        this.subject = subject;
+        if (null != icon) {
+            icon = c.normalizeResourceURI(icon);
+        }
+        
         this.icon = icon;
     }
 
