@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
+    <mx:RemoteObject id="mobflexservice" destination="mobflexservice" />
+	<mx:Button label="Click to talk to MOB" click="mobflexservice.getVersionInfo()"/>
+	<mx:Label text="{mobflexservice.getVersionInfo.lastResult}" fontSize="14" fontWeight="bold"/>
+</mx:Application>

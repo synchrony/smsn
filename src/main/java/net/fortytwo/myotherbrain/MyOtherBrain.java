@@ -7,6 +7,7 @@ import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.beans.Association;
 import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
+import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.writeapi.WriteAction;
 import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import net.fortytwo.myotherbrain.writeapi.actions.BreakAssociation;
@@ -40,15 +41,20 @@ public class MyOtherBrain {
             NATIVESTORE_DIRECTORY = "net.fortytwo.myotherbrain.nativeStoreDirectory",
             NEOSAIL_DIRECTORY = "net.fortytwo.myotherbrain.neoSailDirectory",
             RMISAILCLIENT_URI = "net.fortytwo.myotherbrain.rmiSailClientURI",
-            SAIL_TYPE = "net.fortytwo.myotherbrain.sailType";
+            SAIL_TYPE = "net.fortytwo.myotherbrain.sailType",
+            NAME = "net.fortytwo.myotherbrain.name",
+            VERSION = "net.fortytwo.myotherbrain.version",
+            REVISION = "net.fortytwo.myotherbrain.revision";
 
     /*public static final URI[] LEGAL_DATATYPE_URIS = {
             XMLSchema.STRING
     };*/
 
-    private static final String MOB_PROPERTIES_FILE = "myotherbrain.properties";
+    private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";
+    private static final String VERSION_PROPERTIES_FILE = "version.properties";
     private static final String LOGGING_PROPERTIES_FILE = "log4j.properties";
-    private static final TypedProperties PROPERTIES;
+    private static final TypedProperties CONFIG_PROPERTIES;
+    private static final TypedProperties VERSION_PROPERTIES;
     private static final Logger LOGGER;
 
     static {
@@ -57,9 +63,11 @@ public class MyOtherBrain {
 
         LOGGER = getLogger(MyOtherBrain.class);
 
-        PROPERTIES = new TypedProperties();
+        CONFIG_PROPERTIES = new TypedProperties();
+        VERSION_PROPERTIES = new TypedProperties();
         try {
-            PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(MOB_PROPERTIES_FILE));
+            CONFIG_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
+            VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -70,13 +78,29 @@ public class MyOtherBrain {
     }
 
     public static TypedProperties getProperties() {
-        return PROPERTIES;
+        return CONFIG_PROPERTIES;
+    }
+
+    public static String getVersionInfo() {
+        String name;
+        String version;
+        int revision;
+
+        try {
+            name = VERSION_PROPERTIES.getString(NAME);
+            version = VERSION_PROPERTIES.getString(VERSION);
+            revision = VERSION_PROPERTIES.getInt(REVISION);
+        } catch (PropertyException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return name + " " + version + ", revision #" + revision;
     }
 
     public static void main(final String[] args) throws Exception {
         java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MyOtherBrain.class.getName());
-        logger.info("testing logging.........");
-        
+        logger.info(getVersionInfo());
+
         Sail sail = new MemoryStore();
         sail.initialize();
         try {

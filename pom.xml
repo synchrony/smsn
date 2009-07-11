@@ -152,6 +152,31 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <!--<condition property="osfamily-unix">
+                                    <os family="unix"/>
+                                </condition>-->
+                                <property name="versionprops" value="${basedir}/src/main/resources/net/fortytwo/myotherbrain/version.properties"/>
+                                <exec executable="bash" output="${versionprops}">
+                                    <arg value="${basedir}/src/main/bash/svn-revision.sh"/>
+                                </exec>
+                                <echo message="net.fortytwo.myotherbrain.name = ${project.name}&#xA;" file="${versionprops}" append="true"/>
+                                <echo message="net.fortytwo.myotherbrain.version = ${project.version}&#xA;" file="${versionprops}" append="true"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
