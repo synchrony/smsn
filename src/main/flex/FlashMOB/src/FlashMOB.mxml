@@ -1,12 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
-    <mx:RemoteObject id="mobSession" destination="flashmobsession" />
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:item="item.*">
+    <mx:RemoteObject id="mobSession" destination="flashmobsession">
+    	<mx:method name="getItems" result="queryHandler(event)"/>
+    </mx:RemoteObject>
     <mx:Script>
     	<![CDATA[
+    		import mx.collections.ArrayCollection;
+    		import mx.rpc.events.ResultEvent;
+    		import mx.controls.Alert;
+    		import Item;
     		import ExamplePOJO;
+    		//import item.ItemVBox;
     		import CreateFirstClassItem;
     	
+    		import mx.collections.ArrayCollection;
+    		//[Bindable]
+    		//private var myData:ArrayCollection;
+    		private function queryHandler(event:ResultEvent):void {
+    			var queryResult:ArrayCollection = event.result as ArrayCollection;
+    			//Alert.show("queryResult.length = " + queryResult.length);
+    			//Alert.show("before: " + queryResult.getItemAt(0));
+    			for (var i:int = 0; i < queryResult.length; i++) {
+    				var it:Item = queryResult.getItemAt(i) as Item;
+    				var b:ItemVBox = new ItemVBox();
+    				b.setItem(it);
+    				this.columnVBox.addChild(b);
+    			}
+    			//Alert.show("it = " + it);			
+    		}
+    		
     		private function testMOBCommunication():void {
+    			Alert.show("testing");
+    			
     			mobSession.getVersionInfo();
     			
     			mobSession.arbitraryString();
@@ -33,17 +59,26 @@
    				//...
    				mobSession.passExamplePOJO(p);
    				
+   				/*
    				var action:CreateFirstClassItem = new CreateFirstClassItem();
-   				action.subject = "http://example.org/stuff/reveredBeatMan";
-   				action.name = "Reverend Beat-Man";
-   				action.description = "a Swiss weirdo with some interesting music";
-   				action.sensitivity = "http://fortytwo.net/2009/05/myotherbrain#Private";
-   				action.emphasis = 0.5;
+   				action.subject = "http://example.org/stuff/fordPrefect";
+   				action.name = "Ford Prefect";
+   				action.description = "an odd man from a small planet somewhere in the vicinity of Betelgeuse";
+   				action.emphasis = 0.75;
    				action.creationTimeStamp = new Date();
    				mobSession.enqueueAction(action);
+   				//*/
+   				
+   				var it:Item = new Item();
+   				it.name = "Julius Caesar";
+   				it.description = "a Roman emperor";
+   				this.testItem.setItem(it);
+   				
+   				mobSession.getItems();
     		}
     	]]>
     </mx:Script>
+    <item:ItemVBox id="testItem"/>
 	<mx:Button label="Click to talk to MOB!" click="testMOBCommunication()"/>
 	<mx:Label text="{mobSession.getVersionInfo.lastResult}" fontSize="14" fontWeight="bold"/>
 	<mx:Label text="{mobSession.arbitraryString.lastResult}" fontSize="14" fontWeight="bold"/>
@@ -55,4 +90,5 @@
 	<mx:Label text="{mobSession.passFloat.lastResult}" fontSize="14" fontWeight="bold"/>
 	<mx:Label text="{mobSession.passDate.lastResult}" fontSize="14" fontWeight="bold"/>
 	<mx:Label text="{mobSession.passExamplePOJO.lastResult.toString()}" fontSize="14" fontWeight="bold"/>
+    <mx:VBox id="columnVBox"/>
 </mx:Application>

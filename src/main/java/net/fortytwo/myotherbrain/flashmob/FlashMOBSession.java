@@ -6,6 +6,7 @@ import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
 import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
+import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import net.fortytwo.myotherbrain.writeapi.WriteAction;
@@ -16,6 +17,7 @@ import org.apache.log4j.Logger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Author: josh
@@ -56,7 +58,7 @@ public class FlashMOBSession {
     public FlashMOBSession() throws MOBStore.MOBStoreException, NoSuchAccountException {
         System.out.println("FlashMOBSession constructor called");
         LOGGER.info("FlashMOBSession constructor called");
-        
+
         AccessManager am = new AccessManager(MOBStore.getDefaultStore());
         session = am.createSession(TEMP_USERNAME);
     }
@@ -116,6 +118,17 @@ public class FlashMOBSession {
 
     ////////////////////////////////////
 
+    public List<Item> getItems() {
+        MOBModelConnection c = createConnection();
+        try {
+            return Queries.getAllFirstClassItems(c);
+        } finally {
+            c.close();
+        }
+    }
+
+    ////////////////////////////////////
+
     public String[] mintRandomURIs(final int batchSize) {
         if (0 > batchSize) {
             throw new IllegalArgumentException("negative batch size");
@@ -144,10 +157,14 @@ public class FlashMOBSession {
             c.close();
         }
     }
-    
+
     ////////////////////////////////////
 
+    private MOBModelConnection createConnection() {
+        return session.getModel().createConnection();
+    }
+
     private WriteContext createWriteContext() {
-        return new WriteContext(session.getModel().createConnection());
+        return new WriteContext(createConnection());
     }
 }
