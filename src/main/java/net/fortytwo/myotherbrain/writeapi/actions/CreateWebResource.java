@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.model.beans.WebResource;
+import net.fortytwo.myotherbrain.model.concepts.WebResource;
 import net.fortytwo.myotherbrain.writeapi.WriteAction;
 import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import net.fortytwo.myotherbrain.writeapi.WriteException;
@@ -25,14 +25,10 @@ public class CreateWebResource extends WriteAction {
         super(subject, c);
 
         if (null == representationMediaType) {
-            throw new NullPointerException();
-        } else {
             representationMediaType = c.normalizeRepresentationMediaType(representationMediaType);
         }
 
         if (null == representationSha1Sum) {
-            throw new NullPointerException();
-        } else {
             representationSha1Sum = c.normalizeRepresentationSha1Sum(representationSha1Sum);
         }
 

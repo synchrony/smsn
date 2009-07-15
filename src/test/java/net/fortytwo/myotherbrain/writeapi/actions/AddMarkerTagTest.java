@@ -2,8 +2,8 @@ package net.fortytwo.myotherbrain.writeapi.actions;
 
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.model.MOB;
-import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
-import net.fortytwo.myotherbrain.model.beans.Marker;
+import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Marker;
 import net.fortytwo.myotherbrain.writeapi.WriteAction;
 import net.fortytwo.myotherbrain.writeapi.WriteContext;
 

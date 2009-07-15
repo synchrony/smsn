@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.model.beans;
+package net.fortytwo.myotherbrain.model.concepts;
 
 import net.fortytwo.myotherbrain.model.MOB;
 import org.openrdf.concepts.owl.Thing;

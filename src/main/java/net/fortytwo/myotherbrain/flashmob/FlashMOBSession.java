@@ -1,11 +1,13 @@
 package net.fortytwo.myotherbrain.flashmob;
 
+import net.fortytwo.myotherbrain.ExperimentalClassConcept;
 import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
 import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
+import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
@@ -14,6 +16,7 @@ import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import net.fortytwo.myotherbrain.writeapi.WriteException;
 import org.apache.log4j.Logger;
 
+import javax.xml.namespace.QName;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -49,6 +52,38 @@ public class FlashMOBSession {
 
     public static void main(final String[] args) throws Exception {
         MOBStore store = MOBStore.getDefaultStore();
+
+        FlashMOBSession f = new FlashMOBSession();
+        MOBModelConnection c = f.createConnection();
+        try {
+            String baseURI = "http://example.org/ns/resource";
+            QName qName1 = new QName(baseURI + "1");
+            QName qName2 = new QName(baseURI + "2");
+            ExperimentalClassConcept e1, e2;
+
+            /*
+            e1 = c.getElmoManager().create(qName1, ExperimentalClassConcept.class);
+            e2 = c.getElmoManager().create(qName2, ExperimentalClassConcept.class);
+            c.getElmoManager().remove(e1);
+            c.getElmoManager().remove(e2);   */
+
+            e1 = new ExperimentalClassConcept();
+            e2 = new ExperimentalClassConcept();
+            e1.setQName(new QName(baseURI + "1"));
+            e2.setQName(new QName(baseURI + "2"));
+
+
+            e1.setName(null);
+            e2.setName("2nd");
+            e1.setNext(e2);
+            e2.setNext(e1);
+            c.getElmoManager().persist(e1);
+
+            c.commit();
+        } finally {
+            c.close();
+        }
+
         //store.generateSeedData();
         //AccessManager am = new AccessManager(store);
         //am.createAccount(TEMP_USERNAME, TEMP_PASSWORD, TEMP_CONTACTEMAILADDRESS);
@@ -118,7 +153,7 @@ public class FlashMOBSession {
 
     ////////////////////////////////////
 
-    public List<Item> getItems() {
+    public List<FirstClassItemBean> getItems() {
         MOBModelConnection c = createConnection();
         try {
             return Queries.getAllFirstClassItems(c);
@@ -126,6 +161,44 @@ public class FlashMOBSession {
             c.close();
         }
     }
+
+    public List<FirstClassItemBean> getItemsAssociatedFrom(final FirstClassItemBean it) {
+        MOBModelConnection c = createConnection();
+        try {
+            return Queries.getItemsAssociatedFrom(it, c);
+        } finally {
+            c.close();
+        }
+    }
+
+    public ExperimentalClassConcept getExperimentalObject() {
+        String uri = "http://example.org/ns/experResource";
+
+        MOBModelConnection c = createConnection();
+        try {
+            ExperimentalClassConcept e
+                    = new ExperimentalClassConcept();
+            //        = c.getElmoManager().create(new QName(uri), ExperimentalClassConcept.class);
+            e.setQName(new QName(uri));
+            //e.setName("a brand new resource");
+            e.setDescription("this is a description, not a name");
+            c.getElmoManager().persist(e);
+            c.commit();
+            //e = new ExperimentalClassConcept(e);
+            return e;
+        } finally {
+            c.close();
+        }
+    }
+
+    /*public Association getAssociationExperimental() {
+        MOBModelConnection c = createConnection();
+        try {
+
+        } finally {
+            c.close();
+        }
+    }*/
 
     ////////////////////////////////////
 

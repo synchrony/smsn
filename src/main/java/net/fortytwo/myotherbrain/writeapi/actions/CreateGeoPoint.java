@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.model.beans.GeoPoint;
+import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
 import net.fortytwo.myotherbrain.writeapi.WriteAction;
 import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import net.fortytwo.myotherbrain.writeapi.WriteException;

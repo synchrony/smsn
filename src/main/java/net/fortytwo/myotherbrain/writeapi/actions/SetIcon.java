@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.writeapi.actions;
 
-import net.fortytwo.myotherbrain.model.beans.FirstClassItem;
-import net.fortytwo.myotherbrain.model.beans.WebResource;
+import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.WebResource;
 import net.fortytwo.myotherbrain.writeapi.WriteAction;
 import net.fortytwo.myotherbrain.writeapi.WriteContext;
 import net.fortytwo.myotherbrain.writeapi.WriteException;
