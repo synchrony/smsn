@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:ViewColumn xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="view.*">
+	<mx:Script>
+		<![CDATA[
+			import view.View;
+			import model.FirstClassItem;
+			
+			protected override function createView(item:FirstClassItem):View {
+				return new EditView();
+			}
+		]]>
+	</mx:Script>
+</view:ViewColumn>

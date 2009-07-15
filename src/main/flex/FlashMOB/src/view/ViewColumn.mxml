@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" verticalGap="0">
+	<mx:Script>
+		<![CDATA[
+			import view.simple.SimpleView;
+			import mx.events.CloseEvent;
+			import model.FirstClassItem;
+	   		import mx.controls.Alert;
+			
+			public function addItem(it:FirstClassItem):void {
+				it = StaticStuff.itemRegistry.registerItem(it);
+				//Alert.show("adding item...");
+				var v:View = createView(it);
+				v.setItem(it);
+				this.containerVBox.addChild(v);
+
+				v.addEventListener(CloseEvent.CLOSE, closeHandler);	
+			}
+			
+			protected function createView(item:FirstClassItem):View {
+				Alert.show("override me");
+				return null;
+			}	
+			
+			protected function removeView(v:View):void {
+				StaticStuff.itemRegistry.unregisterItem(v.item);
+				this.containerVBox.removeChild(v);	
+			}	
+					
+			private function closeHandler(event:CloseEvent):void {
+				//Alert.show("you will have closed that view");
+				removeView(event.target as View);
+			}
+			
+			private function createNewItem():void {
+				addItem(StaticStuff.createNewItem());
+			}		
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%" height="{this.height - columnFooter.height}"
+		paddingLeft="5" paddingRight="5"
+		horizontalScrollPolicy="off" verticalScrollPolicy="auto">
+		<mx:Spacer height="8"/>
+		<mx:VBox id="containerVBox" width="100%"
+			paddingLeft="0" paddingRight="0" verticalGap="5"/>
+		<mx:Spacer height="8"/>
+	</mx:VBox>
+	<mx:HBox id="columnFooter" paddingTop="3">
+		<mx:Button label="New item" click="createNewItem()"/>		
+	</mx:HBox>	
+</mx:VBox>

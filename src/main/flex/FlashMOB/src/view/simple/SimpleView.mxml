@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:View xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="view.*">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			private function showInfo():void {
+				var s:String = "";
+				s += "URI: " + this.item.subject + "\n";
+				if (null != this.item.creationTimeStamp) {
+					s += "created: " + this.item.creationTimeStamp + "\n";
+				}
+				s += "sensitivity: " + StaticStuff.getSensitivityShortName(this.item.sensitivity) + "\n";
+				//if (this.item.emphasis) {
+					s += "emphasis: " + this.item.emphasis + "\n";
+				//}
+				Alert.show(s, this.item.name);
+			}
+			
+			private function selectSource():String {
+				return StaticStuff.getSensitivityImageForItem(this.item);
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%" height="100%">
+		<mx:Text htmlText="{item.description}" truncateToFit="false" width="100%"/>
+	</mx:VBox>
+	<mx:ControlBar paddingBottom="2" paddingRight="2">
+		<mx:Spacer width="100%"/>
+	    <mx:Image source="{selectSource()}" alpha="0.25" click="showInfo()"/>
+	    <!--<mx:Image source="assets/icons/12x12/info.png" alpha="0.5" click="showInfo()"/>-->
+	</mx:ControlBar>
+</view:View>
