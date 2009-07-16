@@ -1,14 +1,14 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
 import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
-import net.fortytwo.myotherbrain.writeapi.NoSuchItemException;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.NoSuchItemException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,7 +41,7 @@ public class CreateFirstClassItem extends WriteAction {
             Float emphasis,
             Date creationTimeStamp,
             URI creationPlaceStamp,
-            final WriteContext c) throws WriteException {
+            final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null != name) {
@@ -87,12 +87,12 @@ public class CreateFirstClassItem extends WriteAction {
         this.creationPlaceStamp = creationPlaceStamp;
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
         c.remove(subject);
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         // TODO: is there any reason to use "designate" over "create"?
         FirstClassItem subject = c.designate(toQName(this.subject), FirstClassItem.class);
 

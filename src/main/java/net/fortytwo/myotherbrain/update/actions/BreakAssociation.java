@@ -1,10 +1,10 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.Association;
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
@@ -20,11 +20,11 @@ public class BreakAssociation extends WriteAction {
     private URI oldAssociationObject;
 
     public BreakAssociation(URI subject,
-                            final WriteContext c) throws WriteException {
+                            final WriteContext c) throws UpdateException {
         super(subject, c);
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem item = toThing(subject, FirstClassItem.class, c);
         c.removeDesignation(item, FirstClassItem.class);
         c.designate(new QName(subject.toString()), Association.class);
@@ -34,7 +34,7 @@ public class BreakAssociation extends WriteAction {
         a.setObject(toThing(oldAssociationObject, FirstClassItem.class, c));
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         Association a = toThing(subject, Association.class, c);
 
         oldAssociationSubject = toURI(a.getSubject());

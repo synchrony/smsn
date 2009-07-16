@@ -1,10 +1,7 @@
 package net.fortytwo.myotherbrain.model;
 
-import net.fortytwo.myotherbrain.writeapi.Quotas;
-import net.fortytwo.myotherbrain.MyOtherBrain;
+import net.fortytwo.myotherbrain.update.Quotas;
 import org.openrdf.elmo.ElmoManager;
-
-import javax.xml.namespace.QName;
 
 /**
  * Note: a connection is specific to a particular user's knowledge base.

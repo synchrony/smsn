@@ -1,9 +1,9 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 
@@ -21,7 +21,7 @@ public class CreateWebResource extends WriteAction {
             URI subject,
             String representationMediaType,
             String representationSha1Sum,
-            final WriteContext c) throws WriteException {
+            final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null == representationMediaType) {
@@ -36,12 +36,12 @@ public class CreateWebResource extends WriteAction {
         this.representationSha1Sum = representationSha1Sum;
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         WebResource subject = toThing(this.subject, WebResource.class, c);
         c.remove(subject);
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         // TODO: is there any reason to use "designate" over "create"?
         WebResource subject = c.designate(toQName(this.subject), WebResource.class);
         subject.setRepresentationMediaType(representationMediaType);

@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.writeapi;
+package net.fortytwo.myotherbrain.update;
 
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.MOB;

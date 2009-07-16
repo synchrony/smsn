@@ -1,9 +1,9 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 
@@ -21,7 +21,7 @@ public class CreateGeoPoint extends WriteAction {
              URI subject,
              Float longitude,
              Float latitude,
-                    final WriteContext c) throws WriteException {
+                    final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null == longitude) {
@@ -40,12 +40,12 @@ public class CreateGeoPoint extends WriteAction {
         this.latitude = latitude;
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         GeoPoint subject = toThing(this.subject, GeoPoint.class, c);
         c.remove(subject);
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         // TODO: is there any reason to use "designate" over "create"?
         GeoPoint subject = c.designate(toQName(this.subject), GeoPoint.class);
         subject.setLongitude(longitude);

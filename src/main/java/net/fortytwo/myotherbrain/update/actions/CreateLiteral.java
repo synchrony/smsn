@@ -1,9 +1,9 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.Literal;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 import java.util.Date;
@@ -30,7 +30,7 @@ public class CreateLiteral extends CreateFirstClassItem {
             String lexicalForm,
             URI datatypeURI,
             String languageTag,
-            final WriteContext c) throws WriteException {
+            final WriteContext c) throws UpdateException {
         super(subject, name, description, icon, sensitivity, emphasis,
                 creationTimeStamp, creationPlaceStamp, c);
 
@@ -54,13 +54,13 @@ public class CreateLiteral extends CreateFirstClassItem {
     }
 
     @Override
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
         c.remove(subject);
     }
 
     @Override
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         // TODO: is there any reason to use "designate" over "create"?
         Literal subject = c.designate(toQName(this.subject), Literal.class);
 

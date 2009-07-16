@@ -25,7 +25,7 @@ import net.fortytwo.myotherbrain.model.concepts.Account;
 import net.fortytwo.myotherbrain.model.concepts.Graph;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
+import net.fortytwo.myotherbrain.update.WriteContext;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoQuery;
 import org.openrdf.model.URI;

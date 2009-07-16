@@ -1,10 +1,10 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.Marker;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 import java.util.Set;
@@ -21,7 +21,7 @@ public class AddMarkerTag extends WriteAction {
 
     public AddMarkerTag(URI subject,
                         URI newMarkerTag,
-                        final WriteContext c) throws WriteException {
+                        final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null == newMarkerTag) {
@@ -33,12 +33,12 @@ public class AddMarkerTag extends WriteAction {
         this.newMarkerTag = newMarkerTag;
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
         subject.setMarkerTag(toThingSet(beforeMarkerTag, Marker.class, c));
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
         Set<Marker> markerTag = subject.getMarkerTag();
         beforeMarkerTag = toURISet(markerTag);

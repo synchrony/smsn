@@ -1,9 +1,9 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 
@@ -19,7 +19,7 @@ public class SetName extends WriteAction {
 
     public SetName(URI subject,
                    String name,
-                   final WriteContext c) throws WriteException {
+                   final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null != name) {
@@ -29,12 +29,12 @@ public class SetName extends WriteAction {
         this.name = name;
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         item.setName(oldName);
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldName = item.getName();
         item.setName(name);

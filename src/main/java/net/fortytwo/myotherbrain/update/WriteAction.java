@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.writeapi;
+package net.fortytwo.myotherbrain.update;
 
 import net.fortytwo.myotherbrain.undo.UndoableAction;
 import org.openrdf.concepts.owl.Thing;
@@ -20,7 +20,7 @@ import java.util.Set;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public abstract class WriteAction extends UndoableAction<WriteContext, WriteException> {
+public abstract class WriteAction extends UndoableAction<WriteContext, UpdateException> {
     // Note: the implementation of this class is assumed to be thread-safe.
     private static final DatatypeFactory DATATYPE_FACTORY;
 
@@ -35,7 +35,7 @@ public abstract class WriteAction extends UndoableAction<WriteContext, WriteExce
     protected final URI subject;
 
     protected WriteAction(URI subject,
-                          final WriteContext c) throws WriteException {
+                          final WriteContext c) throws UpdateException {
         if (null == subject) {
             throw new NullPointerException();
         } else {

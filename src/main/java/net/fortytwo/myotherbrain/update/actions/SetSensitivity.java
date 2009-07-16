@@ -1,11 +1,11 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
 import net.fortytwo.myotherbrain.model.MOB;
-import net.fortytwo.myotherbrain.writeapi.WriteAction;
-import net.fortytwo.myotherbrain.writeapi.WriteContext;
-import net.fortytwo.myotherbrain.writeapi.WriteException;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,7 +22,7 @@ public class SetSensitivity extends WriteAction {
 
     public SetSensitivity(URI subject,
                           URI sensitivity,
-                          final WriteContext c) throws WriteException {
+                          final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null == sensitivity) {
@@ -38,12 +38,12 @@ public class SetSensitivity extends WriteAction {
         this.sensitivity = sensitivity;
     }
 
-    protected void executeUndo(final WriteContext c) throws WriteException {
+    protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         item.setSensitivity(toThing(oldSensitivity, SensitivityLevel.class, c));
     }
 
-    protected void executeRedo(final WriteContext c) throws WriteException {
+    protected void executeRedo(final WriteContext c) throws UpdateException {
         FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
         oldSensitivity = toURI(item.getSensitivity());
         item.setSensitivity(toThing(sensitivity, SensitivityLevel.class, c));

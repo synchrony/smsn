@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.writeapi.actions;
+package net.fortytwo.myotherbrain.update.actions;
 
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.model.MOBModel;

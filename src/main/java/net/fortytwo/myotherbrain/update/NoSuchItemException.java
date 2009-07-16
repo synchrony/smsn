@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.writeapi;
+package net.fortytwo.myotherbrain.update;
 
 import java.net.URI;
 
@@ -8,7 +8,7 @@ import java.net.URI;
  * Date: Jul 1, 2009
  * Time: 10:06:22 PM
  */
-public class NoSuchItemException extends WriteException {
+public class NoSuchItemException extends UpdateException {
     public NoSuchItemException(final URI subject,
                                final Class cl) {
         // TODO: use the URI of the class from the MOB ontology, instead of the Java class name
