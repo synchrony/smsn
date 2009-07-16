@@ -1,165 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application layout="absolute"
-	xmlns:mx="http://www.adobe.com/2006/mxml"
-	xmlns:view="view.*"
-	verticalScrollPolicy="off" horizontalScrollPolicy="off" themeColor="#0000FF" initialize="constructor()" fontFamily="Verdana" color="#2D2D2D">
-    <!--<mx:RemoteObject id="mobSession" destination="flashmobsession">
-    	<mx:method name="getItems" result="queryHandler(event)"/>
-    	<mx:method name="getVersionInfo" result="showVersionInfo(event)"/>
-    </mx:RemoteObject>-->
-	<mx:XMLList id="menuData">
-		<menuitem label="File">
-			<menuitem label="CreateExperItem"/>
-		</menuitem>
-		<menuitem label="Edit">
-			<menuitem label="Undo"/>
-			<menuitem label="Redo"/>
-		</menuitem>
-		<menuitem label="Help">
-			<menuitem label="About" view="aboutView"/>	
-		</menuitem>
-	</mx:XMLList>
+                xmlns:mx="http://www.adobe.com/2006/mxml"
+                xmlns:view="view.*"
+                verticalScrollPolicy="off" horizontalScrollPolicy="off" themeColor="#0000FF" initialize="constructor()"
+                fontFamily="Verdana" color="#000000" borderColor="#FF9C00">
+    <mx:XMLList id="menuData">
+        <menuitem label="File">
+            <menuitem label="CreateExperItem"/>
+        </menuitem>
+        <menuitem label="Edit">
+            <menuitem label="Undo"/>
+            <menuitem label="Redo"/>
+        </menuitem>
+        <menuitem label="View">
+        	<menuitem label="New column">
+        		<menuitem label="Simple view"/>
+        		<menuitem label="Edit view"/>
+        	</menuitem>
+        	<menuitem label="Visibility level">
+        		<menuitem label="Public"/>
+        		<menuitem label="Personal"/>
+        		<menuitem label="Private"/>
+        	</menuitem>
+        </menuitem>
+        <menuitem label="Help">
+            <menuitem label="About" view="aboutView"/>
+        </menuitem>
+    </mx:XMLList>
+    <mx:Style>
+    	Alert {
+    		color: #000000;
+    		borderColor: #d4ccff;
+    		backgroundColor: #d4ccff;
+    	}
+    	.menuGradient {
+            backgroundImage: ClassReference("GradientBackground");
+            backgroundSize: "100%";
+            fillColors:  #d4ccff, #FFFFFF;
+            fillAlphas: 1.0, 1.0;
+        }
+    </mx:Style>
     <mx:Script>
     	<![CDATA[
     		import mx.rpc.events.FaultEvent;
-    		import mx.rpc.remoting.RemoteObject;
-    		import view.edit.EditViewColumn;
-    		import view.simple.SimpleViewColumn;
-    		import mx.events.MenuEvent;
-    		import view.ViewColumn;
-    		import mx.collections.ArrayCollection;
-    		import mx.rpc.events.ResultEvent;
-    		import mx.controls.Alert;
-    		import model.FirstClassItem;
-    		import ExamplePOJO;
-    		import actions.CreateFirstClassItem;
-    		import mx.collections.ArrayCollection;
+        import mx.rpc.remoting.RemoteObject;
+        import view.edit.EditViewColumn;
+        import view.simple.SimpleViewColumn;
+        import mx.events.MenuEvent;
+        import view.ViewColumn;
+        import mx.collections.ArrayCollection;
+        import mx.rpc.events.ResultEvent;
+        import mx.controls.Alert;
+        import model.FirstClassItem;
+        import actions.CreateFirstClassItem;
+        import mx.collections.ArrayCollection;
 
-			[Bindable]
-			public static var mobSession:RemoteObject;
-			
-			private function constructor():void {
-				mobSession = new RemoteObject();
-				mobSession.destination = "flashmobsession";
-				mobSession.getItems.addEventListener(ResultEvent.RESULT, queryHandler);
-				mobSession.getVersionInfo.addEventListener(ResultEvent.RESULT, showVersionInfo);
-				mobSession.enqueueAction.addEventListener(FaultEvent.FAULT, handleEnqueueActionError);
-				
-				mobSession.getExperimentalObject.addEventListener(ResultEvent.RESULT, showExperimentalObject);
-								
-				testMOBCommunication();	
-			}
-			
-			private function handleEnqueueActionError(event:FaultEvent):void {
-				Alert.show("error: " + event);
-			}
-			/*
-			    <mx:RemoteObject id="mobSession" destination="flashmobsession">
-    	<mx:method name="getItems" result="queryHandler(event)"/>
-    	<mx:method name="getVersionInfo" result="showVersionInfo(event)"/>
-    </mx:RemoteObject>
-    
-			            public function useRemoteObject(intArg:int, strArg:String):void {
-                employeeRO = new RemoteObject();
-                employeeRO.destination = "SalaryManager";
-                employeeRO.getList.addEventListener("result", getListResultHandler);
-                employeeRO.addEventListener("fault", faultHandler);
-                employeeRO.getList(deptComboBox.selectedItem.data);
+        [Bindable]
+        public static var mobSession:RemoteObject;
+
+        private function constructor():void {
+            mobSession = new RemoteObject();
+            mobSession.destination = "flashmobsession";
+            mobSession.getItems.addEventListener(ResultEvent.RESULT, queryHandler);
+            mobSession.getVersionInfo.addEventListener(ResultEvent.RESULT, showVersionInfo);
+            mobSession.enqueueAction.addEventListener(FaultEvent.FAULT, handleEnqueueActionError);
+
+            mobSession.getExperimentalObject.addEventListener(ResultEvent.RESULT, showExperimentalObject);
+
+            testMOBCommunication();
+        }
+
+		private function createNewSimpleViewColumn():ViewColumn {
+            var v:ViewColumn = new SimpleViewColumn();			
+            this.viewColumnHBox.addViewColumn(v);
+            return v;
+		}
+		
+		private function createNewEditViewColumn():ViewColumn {
+            var v:ViewColumn = new EditViewColumn();			
+            this.viewColumnHBox.addViewColumn(v);
+            return v;			
+		}
+		
+        private function handleEnqueueActionError(event:FaultEvent):void {
+            Alert.show("error: " + event);
+        }
+        
+        /*
+                  <mx:RemoteObject id="mobSession" destination="flashmobsession">
+          <mx:method name="getItems" result="queryHandler(event)"/>
+          <mx:method name="getVersionInfo" result="showVersionInfo(event)"/>
+      </mx:RemoteObject>
+              */
+
+        private function queryHandler(event:ResultEvent):void {
+            var v1:ViewColumn = createNewSimpleViewColumn();
+            var v2:ViewColumn = createNewEditViewColumn();
+
+            var queryResult:ArrayCollection = event.result as ArrayCollection;
+            for (var i:int = 0; i < queryResult.length; i++) {
+                var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
+                v1.addItem(it);
+                v2.addItem(it);
             }
-			*/
-			
-    		private function queryHandler(event:ResultEvent):void {
-    			var v1:ViewColumn = new SimpleViewColumn();
-    			var v2:ViewColumn = new EditViewColumn();
-    			this.viewColumnHBox.addViewColumn(v1);
-    			this.viewColumnHBox.addViewColumn(v2);
-    			
-    			var queryResult:ArrayCollection = event.result as ArrayCollection;
-    			for (var i:int = 0; i < queryResult.length; i++) {
-    				var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
-    				v1.addItem(it);
-    				v2.addItem(it);
-    			}
-    		}
-    		
-    		private function menuClickHandler(event:MenuEvent):void {
-    			if ("About" == event.item.@label) {
-    				mobSession.getVersionInfo();
+        }
+
+        private function menuClickHandler(event:MenuEvent):void {
+            if ("About" == event.item.@label) {
+                mobSession.getVersionInfo();
     			//	Alert.show("you selected " + event.item.@label, "Menu Selection");
-    			} else if ("CreateExperItem" == event.item.@label) {
-    				mobSession.getExperimentalObject();
-    			}	
-    		}
-    		
-    		private function showVersionInfo(event:ResultEvent):void {
-    			var s:String = event.result as String;
-    			
-    			Alert.show(s, "About");	
-    		}
-    		
-    		private function showExperimentalObject(event:ResultEvent):void {
-    			var o:ExperimentalClassConcept = event.result as ExperimentalClassConcept;
-    			o.showMe();
-    		}
-    		
-    		private function testMOBCommunication():void {    			
-    			//mobSession.getVersionInfo();
-    			
-    			mobSession.arbitraryString();
-    			mobSession.arbitraryFloat();
-    		    mobSession.arbitraryDate();
-    		    mobSession.arbitraryURI();
-    		    mobSession.arbitraryExamplePOJO();
+            } else if ("CreateExperItem" == event.item.@label) {
+                mobSession.getExperimentalObject();
+            } else if ("Simple view" == event.item.@label) {
+            	createNewSimpleViewColumn();
+            } else if ("Edit view" == event.item.@label) {
+            	createNewEditViewColumn();
+            }
+        }
+
+        private function showVersionInfo(event:ResultEvent):void {
+            var s:String = event.result as String;
+
+            Alert.show(s, "About");
+        }
+
+        private function showExperimentalObject(event:ResultEvent):void {
+            var o:ExperimentalClassConcept = event.result as ExperimentalClassConcept;
+            o.showMe();
+        }
+
+        private function testMOBCommunication():void {
+            mobSession.arbitraryString();
+            mobSession.arbitraryFloat();
+            mobSession.arbitraryDate();
+            mobSession.arbitraryURI();
+            mobSession.arbitraryExamplePOJO();
     			
     			// TODO: investigate precision issues in passed numbers
-    			// TODO: investigate passing of URIs
-    			// TODO: investigate exception handling
-    			// TODO: investigate encoding issues in passed strings
-    			
-    			var s:String = "passed string";
-    			var f:Number = 1.4142;
-    			var d:Date = new Date();
-   				//...
-   				var p:ExamplePOJO = new ExamplePOJO();
-   				p.name = "green";
-   				p.description = "a pleasant color";
-   				mobSession.passString(s);
-   				mobSession.passFloat(f);
-   				mobSession.passDate(d);
-   				//...
-   				mobSession.passExamplePOJO(p);
-   				
-   				/*
-   				var action:CreateFirstClassItem = new CreateFirstClassItem();
-   				action.subject = "http://example.org/stuff/krikkitSpacecraft";
-   				action.name = "Krikkit spacecraft";
-   				action.description = "they come with a <b>whop</b> and leave with a <b>foop</b>";
-   				action.emphasis = 0.75;
-   				action.creationTimeStamp = new Date();
-   				mobSession.enqueueAction(action);
-   				//*/
-   				
-   				//var it:Item = new Item();
-   				//it.name = "Julius Caesar";
-   				//it.description = "a Roman emperor";
-   				//this.testItem.setItem(it);
-   				
-   				mobSession.getItems();
-    		}
+            // TODO: investigate passing of URIs
+            // TODO: investigate exception handling
+            // TODO: investigate encoding issues in passed strings
+
+            mobSession.getItems();
+        }
+        
+        private function showSecurityLevel():void {
+        	Alert.show("Current visibility level is: Private", "Visibility level");
+        }
     	]]>
     </mx:Script>
-    <mx:VBox id="applicationVBox" width="100%" height="100%" backgroundColor="#C0C0C0" verticalGap="0">	
-	    <mx:MenuBar id="applicationMenuBar" dataProvider="{menuData}" labelField="@label" width="100%" itemClick="menuClickHandler(event)"  fillAlphas="[1.0, 1.0]" fillColors="[#D4CCFF, #FFFFFF]"/>
-		<!--<mx:Button label="Click to talk to MOB!" click="testMOBCommunication()"/>-->
-		<view:ViewColumnHBox id="viewColumnHBox" backgroundColor="#FFFFFF"/>		
-		<!--<mx:Label text="{mobSession.arbitraryString.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.arbitraryFloat.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.arbitraryDate.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.arbitraryURI.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.arbitraryExamplePOJO.lastResult.toString()}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.passString.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.passFloat.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.passDate.lastResult}" fontSize="14" fontWeight="bold"/>
-		<mx:Label text="{mobSession.passExamplePOJO.lastResult.toString()}" fontSize="14" fontWeight="bold"/>-->
+    <mx:VBox id="applicationVBox" width="100%" height="100%" verticalGap="0" borderStyle="none" backgroundColor="#FFFFFF" borderColor="#FF0000">
+    	<mx:Canvas styleName="menuGradient" width="100%">
+        <mx:MenuBar id="applicationMenuBar" dataProvider="{menuData}" labelField="@label" width="100%"
+                    itemClick="menuClickHandler(event)"
+                    alpha="0"/>
+        </mx:Canvas>	
+<!--                    fillAlphas="[1.0, 1.0, 1.0, 1.0]" fillColors="[#D4CCFF, #FFFFFF]" alpha="1.0" borderColor="#FFFFFF"/>-->
+        <view:ViewColumnHBox id="viewColumnHBox"/>
     </mx:VBox>
+    <mx:Image source="assets/icons/12x12/sensitivityLevels/private.png" alpha="0.25"
+    	x="{applicationVBox.width - (12 + (applicationMenuBar.height - 12) / 2)}" y="{applicationMenuBar.height / 2 - 6}"
+    	click="showSecurityLevel()"/>
 </mx:Application>

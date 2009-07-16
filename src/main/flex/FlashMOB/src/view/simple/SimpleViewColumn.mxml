@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <view:ViewColumn xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="view.*">
-	<mx:Script>
+    <mx:Script>
 		<![CDATA[
 			import mx.controls.Alert;
-			import view.View;
-			import model.FirstClassItem;
-			
-			protected override function createView(item:FirstClassItem):View {
-				return new SimpleView();
-			}
+        import view.View;
+        import model.FirstClassItem;
+
+        protected override function createView(item:FirstClassItem):View {
+            return new SimpleView();
+        }
 		]]>
 	</mx:Script>
 </view:ViewColumn>

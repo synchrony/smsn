@@ -27,7 +27,7 @@ public class MOBModel {
         if (null != writableGraph) {
             elmoModule.setGraph(writableGraph);
         }
-        // The graphs of the included module will be read-only.
+        // The graphs of the included module will be query-only.
         elmoModule.includeModule(baseModule);
 
         elmoManagerFactory

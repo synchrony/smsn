@@ -70,7 +70,7 @@ public class AccessManager {
             throw new ExceptionInInitializerError(e);
         }
 
-        // Note: these patterns aren't read from a properties file for reasons
+        // Note: these patterns aren't query from a properties file for reasons
         // of convenience and because they are Java-specific.
         USERNAME_PATTERN = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*");
         PASSWORD_PATTERN = Pattern.compile("[\\x21-\\x7e]+");

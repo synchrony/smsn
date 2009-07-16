@@ -8,6 +8,8 @@ import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
 import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
 import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
+import net.fortytwo.myotherbrain.flashmob.model.FreetextSearchResult;
+import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
@@ -103,6 +105,22 @@ public class FlashMOBSession {
         return MyOtherBrain.getVersionInfo();
     }
 
+    private String visibilityLevel = MOB.PERSONAL;
+
+    public String getVisibilityLevel() {
+        return visibilityLevel;
+    }
+
+    public void setVisibilityLevel(final String visibilityLevel) {
+        if (visibilityLevel.equals(MOB.PUBLIC)
+                || visibilityLevel.equals(MOB.PERSONAL)
+                || visibilityLevel.equals(MOB.PRIVATE)) {
+            this.visibilityLevel = visibilityLevel;
+        } else {
+            throw new IllegalArgumentException("not a valid sensitivity level: " + visibilityLevel);
+        }
+    }
+
     ////////////////////////////////////
 
     public String arbitraryString() {
@@ -119,13 +137,6 @@ public class FlashMOBSession {
 
     public URI arbitraryURI() throws URISyntaxException {
         return new URI("http://example.org/myResource");
-    }
-
-    public ExamplePOJO arbitraryExamplePOJO() {
-        ExamplePOJO p = new ExamplePOJO();
-        p.setName("hummingbird");
-        p.setDescription("a small bird with a high metabolism");
-        return p;
     }
 
     ////////////////////////////////////
@@ -146,17 +157,17 @@ public class FlashMOBSession {
         return u;
     }
 
-    public ExamplePOJO passExamplePOJO(final ExamplePOJO p) {
-        System.out.println("passing example POJO: " + p.getName() + ", " + p.getDescription());
-        return p;
-    }
-
     ////////////////////////////////////
+
+    public FreetextSearchResult evaluateFreetextQuery(final String query) {
+        // TODO
+        return null;
+    }
 
     public List<FirstClassItemBean> getItems() {
         MOBModelConnection c = createConnection();
         try {
-            return Queries.getAllFirstClassItems(c);
+            return FlashMOBQuery.getAllFirstClassItems(c);
         } finally {
             c.close();
         }
@@ -165,7 +176,7 @@ public class FlashMOBSession {
     public List<FirstClassItemBean> getItemsAssociatedFrom(final FirstClassItemBean it) {
         MOBModelConnection c = createConnection();
         try {
-            return Queries.getItemsAssociatedFrom(it, c);
+            return FlashMOBQuery.getItemsAssociatedFrom(it, c);
         } finally {
             c.close();
         }

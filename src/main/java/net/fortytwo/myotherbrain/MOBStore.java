@@ -114,7 +114,7 @@ public class MOBStore {
         repository = new SailRepository(sail);
 
         ElmoModule baseModule = new ElmoModule();
-        // This analysis will be read-only in the final module.
+        // This analysis will be query-only in the final module.
         baseModule.setGraph(new QName(MOB.MOBONTOLOGYGRAPH));
 
         // Dynamically register concepts from the MOB ontology.

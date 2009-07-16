@@ -1,52 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
-	horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" verticalGap="0">
-	<mx:Script>
+	xmlns:view="view.*"
+         horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" verticalGap="0"
+         borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+         dragEnter="handleDragEnter(event);"
+         dragDrop="handleDragDrop(event);">
+    <mx:Style>
+        .gradientBackground1 {
+            backgroundImage: ClassReference("GradientBackground");
+            backgroundSize: "100%";
+            fillColors: #FFFFFF, #d4ccff;
+            fillAlphas: 1.0, 1.0;
+        }
+        .fadeoutBackground1 {
+            backgroundImage: ClassReference("GradientBackground");
+            backgroundSize: "100%";
+            fillColors: #FFFFFF, #FFFFFF;
+            fillAlphas: 0.0, 1.0;
+        }
+    </mx:Style>
+    <mx:Script>
 		<![CDATA[
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
 			import view.simple.SimpleView;
-			import mx.events.CloseEvent;
-			import model.FirstClassItem;
-	   		import mx.controls.Alert;
-			
-			public function addItem(it:FirstClassItem):void {
-				it = StaticStuff.itemRegistry.registerItem(it);
-				//Alert.show("adding item...");
-				var v:View = createView(it);
-				v.setItem(it);
-				this.containerVBox.addChild(v);
+        import mx.events.CloseEvent;
+        import model.FirstClassItem;
+        import mx.controls.Alert;
 
-				v.addEventListener(CloseEvent.CLOSE, closeHandler);	
-			}
-			
-			protected function createView(item:FirstClassItem):View {
-				Alert.show("override me");
-				return null;
-			}	
-			
-			protected function removeView(v:View):void {
-				StaticStuff.itemRegistry.unregisterItem(v.item);
-				this.containerVBox.removeChild(v);	
-			}	
-					
-			private function closeHandler(event:CloseEvent):void {
-				//Alert.show("you will have closed that view");
-				removeView(event.target as View);
-			}
-			
-			private function createNewItem():void {
-				addItem(StaticStuff.createNewItem());
-			}		
+		public function handleDragEnter(event:DragEvent):void {
+			//Alert.show("you've dragged into a column");
+			//handleDragDrop(event);
+			if (event.dragSource.hasFormat("item")) {
+                // Get the drop target component from the event object.
+                var dropTarget:ViewColumn=ViewColumn(event.currentTarget);
+                // Accept the drop.
+                DragManager.acceptDragDrop(dropTarget);
+                Alert.show("accepted the drag");
+            } else {
+            	Alert.show("no 'item' format");
+            }
+		}
+		
+		public function handleDragDrop(event:DragEvent):void {
+			Alert.show("you've dropped me");
+            var item:FirstClassItem = event.dragSource.dataForFormat("item") as FirstClassItem;
+            if (null == item) {
+            	Alert.show("no item in drag event");
+            } else {
+            	addItem(item);
+            }
+        }
+		
+        public function addItem(it:FirstClassItem):void {
+            it = StaticStuff.itemRegistry.registerItem(it);
+				//Alert.show("adding item...");
+            var v:View = createView(it);
+            v.setItem(it);
+            this.containerVBox.addChild(v);
+
+            v.addEventListener(CloseEvent.CLOSE, closeHandler);
+        }
+
+        protected function createView(item:FirstClassItem):View {
+            Alert.show("override me");
+            return null;
+        }
+
+        protected function removeView(v:View):void {
+            StaticStuff.itemRegistry.unregisterItem(v.item);
+            this.containerVBox.removeChild(v);
+        }
+
+        private function closeHandler(event:CloseEvent):void {
+            //Alert.show("you will have closed that view");
+            removeView(event.target as View);
+        }
+
+        private function createNewItem():void {
+            addItem(StaticStuff.createNewItem());
+        }
+        
+        private function clear():void {
+        	var a:Array = new Array();
+        	for (var i:int = 0; i < this.containerVBox.getChildren().length; i++) {
+        		a[i] = this.containerVBox.getChildren()[i];	
+        	}
+        	
+        	for (var j:int = 0; j < a.length; j++) {
+        		removeView(a[j] as View);
+        	}
+        }
+        
+        private function close():void {
+        	clear();
+        	(this.parent as ViewColumnHBox).removeViewColumn(this);
+        }
 		]]>
 	</mx:Script>
-	<mx:VBox width="100%" height="{this.height - columnFooter.height}"
-		paddingLeft="5" paddingRight="5"
-		horizontalScrollPolicy="off" verticalScrollPolicy="auto">
-		<mx:Spacer height="8"/>
-		<mx:VBox id="containerVBox" width="100%"
-			paddingLeft="0" paddingRight="0" verticalGap="5"/>
-		<mx:Spacer height="8"/>
-	</mx:VBox>
-	<mx:HBox id="columnFooter" paddingTop="3">
-		<mx:Button label="New item" click="createNewItem()"/>		
-	</mx:HBox>	
+    <mx:VBox width="100%" height="{this.height - columnFooter.height}"
+             paddingLeft="5" paddingRight="5"
+             borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+             horizontalScrollPolicy="off" verticalScrollPolicy="auto">
+        <mx:Spacer height="8"/>
+        <mx:VBox id="containerVBox" width="100%"
+        	     borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+                 paddingLeft="0" paddingRight="0" verticalGap="5"/>
+        <mx:Spacer height="8"/>
+    </mx:VBox>
+        <!--<mx:MenuBar labelField="@label" width="100%"
+                     fillAlphas="[1.0, 1.0, 1.0, 1.0]" fillColors="[#D4CCFF, #FFFFFF, #D4CCFF, #FFFFFF]" alpha="1.0" borderColor="#FFFFFF"/>
+                     <mx:Spacer height="3"/>-->
+    <mx:VBox id="columnFooter" paddingTop="3" paddingBottom="3" paddingLeft="3" paddingRight="3" width="100%" borderStyle="none"
+    	height="{footerContents.height + 6}"
+    	styleName="gradientBackground1">
+    	<mx:HBox id="footerContents" paddingBottom="0" paddingLeft="0" paddingTop="0" paddingRight="0" width="100%" backgroundAlpha="0.0">  		
+	        <mx:Button label="New item" click="createNewItem()"/>
+	        <mx:Spacer width="100%"/>
+	        <mx:Button label="Clear" click="clear()"/>
+	        <mx:Button label="Close" click="close()"/>
+    	</mx:HBox> 
+    </mx:VBox>
 </mx:VBox>

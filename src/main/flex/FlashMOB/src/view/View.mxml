@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
-	backgroundColor="#F9F9F9" width="100%" roundedBottomCorners="true" cornerRadius="7" dropShadowEnabled="false" borderAlpha="1"
-	title="{item.name}"
-	borderColor="#FFFFFF" borderThickness="1" borderStyle="solid"
-	paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0"
-	showCloseButton="true"
-	mouseDown="initiateDrag(event)">
-	<mx:Script>
+                backgroundColor="#FCFCFC" width="100%" roundedBottomCorners="true" cornerRadius="7"
+                dropShadowEnabled="false" borderAlpha="1"
+                title="{item.name}"
+                borderColor="#FFFFFF" borderThickness="1" borderStyle="solid"
+                paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0"
+                showCloseButton="true"
+                mouseDown="initiateDrag(event)">
+    <mx:Script>
 		<![CDATA[
 			import mx.core.BitmapAsset;
-			import mx.managers.DragManager;
-			import mx.core.UIComponent;
-			import mx.core.DragSource;
-			import mx.controls.Alert;
-			import mx.events.CloseEvent;
-			import model.FirstClassItem;
-			
-			[Bindable]
-			public var item:FirstClassItem;			
+        import mx.managers.DragManager;
+        import mx.core.UIComponent;
+        import mx.core.DragSource;
+        import mx.controls.Alert;
+        import mx.events.CloseEvent;
+        import model.FirstClassItem;
+
+        [Bindable]
+        public var item:FirstClassItem;
 			//[Bindable]
-			//protected var nameValue:String;
-			//[Bindable]
-			//protected var descriptionValue:String;
-			
-			public function setItem(newItem:FirstClassItem):void {
-				this.item = newItem;
-				//this.nameValue = newItem.name;
-				//this.descriptionValue = newItem.description;
-			}
+        //protected var nameValue:String;
+        //[Bindable]
+        //protected var descriptionValue:String;
+
+        public function setItem(newItem:FirstClassItem):void {
+            this.item = newItem;
+			//this.nameValue = newItem.name;
+            //this.descriptionValue = newItem.description;
+        }
 			
 			////////////////////////////
-						
-			[Embed(source="assets/icons/12x12/info.png")]
-			private var dragItemImage:Class;
-			private var dragItemProxy:BitmapAsset = BitmapAsset(new dragItemImage());
-						
-			private function initiateDrag(event:MouseEvent):void {
-				var source:DragSource = new DragSource();
-				source.addData(this.item, "item");
-				DragManager.doDrag(event.target as UIComponent, source, event, dragItemProxy, 0, 0, 1);
-				//Alert.show("we made it");
-			}
+
+        [Embed(source="assets/icons/12x12/info.png")]
+        private var dragItemImage:Class;
+        private var dragItemProxy:BitmapAsset = BitmapAsset(new dragItemImage());
+
+        private function initiateDrag(event:MouseEvent):void {
+            var source:DragSource = new DragSource();
+            source.addData(this.item, "item");
+            DragManager.doDrag(event.target as UIComponent, source, event, dragItemProxy, 0, 0, 1);
+			//Alert.show("initiated drag");
+        }
 		]]>
 	</mx:Script>
 </mx:TitleWindow>
