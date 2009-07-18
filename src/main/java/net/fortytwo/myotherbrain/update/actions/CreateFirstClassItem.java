@@ -23,6 +23,7 @@ public class CreateFirstClassItem extends WriteAction {
 
     protected final String name;
     protected final String description;
+    protected final String richTextDescription;
     protected final URI icon;
     protected final URI sensitivity;
     protected final Float emphasis;
@@ -36,6 +37,7 @@ public class CreateFirstClassItem extends WriteAction {
             URI subject,
             String name,
             String description,
+            String richTextDescription,
             URI icon,
             URI sensitivity,
             Float emphasis,
@@ -50,6 +52,10 @@ public class CreateFirstClassItem extends WriteAction {
 
         if (null != description) {
             description = c.normalizeDescription(description);
+        }
+
+        if (null != richTextDescription) {
+            description = c.normalizeRichTextDescription(richTextDescription);
         }
 
         if (null != icon) {
@@ -80,6 +86,7 @@ public class CreateFirstClassItem extends WriteAction {
 
         this.name = name;
         this.description = description;
+        this.richTextDescription = richTextDescription;
         this.icon = icon;
         this.sensitivity = sensitivity;
         this.emphasis = emphasis;
@@ -107,6 +114,10 @@ public class CreateFirstClassItem extends WriteAction {
 
         if (null != description) {
             subject.setDescription(description);
+        }
+
+        if (null != richTextDescription) {
+            subject.setRichTextDescription(richTextDescription);
         }
 
         if (null != icon) {

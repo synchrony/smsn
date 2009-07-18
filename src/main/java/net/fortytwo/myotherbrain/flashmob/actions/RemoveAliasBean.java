@@ -5,8 +5,8 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Date: Jul 11, 2009
  * Time: 2:23:35 PM
  */
-public class RemoveAliasBean extends SubjectBean {
-    protected String targetAlias;
+public class RemoveAliasBean extends ResourceActionBean {
+    private String targetAlias;
 
     public String getTargetAlias() {
         return targetAlias;

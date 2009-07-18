@@ -5,8 +5,8 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Date: Jul 11, 2009
  * Time: 2:28:51 PM
  */
-public class SetSensitivityBean extends SubjectBean {
-    protected String sensitivity;
+public class SetSensitivityBean extends ResourceActionBean {
+    private String sensitivity;
 
     public String getSensitivity() {
         return sensitivity;

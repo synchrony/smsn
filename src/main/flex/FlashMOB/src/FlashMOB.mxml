@@ -2,8 +2,10 @@
 <mx:Application layout="absolute"
                 xmlns:mx="http://www.adobe.com/2006/mxml"
                 xmlns:view="view.*"
+                backgroundColor="#FFFFFF"
                 verticalScrollPolicy="off" horizontalScrollPolicy="off" themeColor="#0000FF" initialize="constructor()"
-                fontFamily="Verdana" color="#000000" borderColor="#FF9C00">
+                fontFamily="Verdana" color="#000000" borderColor="#FF9C00"
+                pageTitle="My Other Brain">
     <mx:XMLList id="menuData">
         <menuitem label="File">
             <menuitem label="CreateExperItem"/>
@@ -42,6 +44,7 @@
     </mx:Style>
     <mx:Script>
     	<![CDATA[
+    		import model.MOB;
     		import mx.rpc.events.FaultEvent;
         import mx.rpc.remoting.RemoteObject;
         import view.edit.EditViewColumn;
@@ -142,6 +145,17 @@
             // TODO: investigate encoding issues in passed strings
 
             mobSession.getItems();
+            
+            
+            //var h:ResultEventHandler
+            
+            function handleResult(event:ResultEvent):void {
+            	var level:String = event.result as String;
+            	Alert.show("visibility level has been set to: " + level);
+            }
+            
+            var w:MOBDispatcher = new MOBDispatcher();
+            w.setVisibilityLevel(MOB.PUBLIC, handleResult, null);
         }
         
         private function showSecurityLevel():void {

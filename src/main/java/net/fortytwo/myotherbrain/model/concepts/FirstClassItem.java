@@ -57,6 +57,11 @@ public interface FirstClassItem extends Thing {
 
     void setName(String name);
 
+    @rdf(MOB.RICHTEXTDESCRIPTION)
+    String getRichTextDescription();
+
+    void setRichTextDescription(String richTextDescription);
+
     // Note: the mob:score property is not used.  Rather, it serves as a parent
     //       for other, dynamically-defined properties.
 

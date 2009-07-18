@@ -1,6 +1,5 @@
 package net.fortytwo.myotherbrain.flashmob.actions;
 
-import java.net.URI;
 import java.util.Date;
 
 /**
@@ -8,15 +7,16 @@ import java.util.Date;
  * Date: Jul 11, 2009
  * Time: 2:14:19 PM
  */
-public class CreateFirstClassItemBean extends SubjectBean {
+public class CreateFirstClassItemBean extends ResourceActionBean {
 
-    protected String name;
-    protected String description;
-    protected String icon;
-    protected String sensitivity;
-    protected Float emphasis;
-    protected Date creationTimeStamp;
-    protected String creationPlaceStamp;
+    private String name;
+    private String description;
+    private String richTextDescription;
+    private String icon;
+    private String sensitivity;
+    private Float emphasis;
+    private Date creationTimeStamp;
+    private String creationPlaceStamp;
 
     public String getName() {
         return name;
@@ -32,6 +32,14 @@ public class CreateFirstClassItemBean extends SubjectBean {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    public String getRichTextDescription() {
+        return richTextDescription;
+    }
+
+    public void setRichTextDescription(String richTextDescription) {
+        this.richTextDescription = richTextDescription;
     }
 
     public String getIcon() {

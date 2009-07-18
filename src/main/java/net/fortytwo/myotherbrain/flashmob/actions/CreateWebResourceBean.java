@@ -5,9 +5,9 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Date: Jul 11, 2009
  * Time: 2:22:19 PM
  */
-public class CreateWebResourceBean extends SubjectBean {
-    protected String representationMediaType;
-    protected String representationSha1Sum;
+public class CreateWebResourceBean extends ResourceActionBean {
+    private String representationMediaType;
+    private String representationSha1Sum;
 
     public String getRepresentationMediaType() {
         return representationMediaType;

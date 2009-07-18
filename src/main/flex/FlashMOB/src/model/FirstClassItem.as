@@ -6,6 +6,7 @@ public class FirstClassItem {
     public var subject:String;
     public var name:String;
     public var description:String;
+    public var richTextDescription:String;
     public var icon:String;
     public var sensitivity:String;
     public var emphasis:Number;

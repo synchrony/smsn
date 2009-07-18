@@ -6,9 +6,9 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Time: 2:20:45 PM
  */
 public class CreateLiteralBean extends CreateFirstClassItemBean {
-    protected String lexicalForm;
-    protected String datatypeURI;
-    protected String languageTag;
+    private String lexicalForm;
+    private String datatypeURI;
+    private String languageTag;
 
     public String getLexicalForm() {
         return lexicalForm;

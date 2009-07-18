@@ -5,8 +5,8 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Date: Jul 11, 2009
  * Time: 2:27:12 PM
  */
-public class SetEmphasisBean extends SubjectBean {
-    protected Float emphasis;
+public class SetEmphasisBean extends ResourceActionBean {
+    private Float emphasis;
 
     public Float getEmphasis() {
         return emphasis;

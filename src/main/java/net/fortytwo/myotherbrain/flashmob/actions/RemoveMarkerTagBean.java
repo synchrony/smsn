@@ -5,8 +5,8 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Date: Jul 11, 2009
  * Time: 2:24:09 PM
  */
-public class RemoveMarkerTagBean extends SubjectBean {
-    protected String targetMarkerTag;
+public class RemoveMarkerTagBean extends ResourceActionBean {
+    private String targetMarkerTag;
 
     public String getTargetMarkerTag() {
         return targetMarkerTag;

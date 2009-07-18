@@ -2,6 +2,7 @@
 <view:View xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="view.*">
     <mx:Script>
 		<![CDATA[
+			import model.MOB;
 			import mx.controls.Alert;
         private function showInfo():void {
             var s:String = "";
@@ -9,7 +10,7 @@
             if (null != this.item.creationTimeStamp) {
                 s += "created: " + this.item.creationTimeStamp + "\n";
             }
-            s += "sensitivity: " + StaticStuff.getSensitivityShortName(this.item.sensitivity) + "\n";
+            s += "sensitivity: " + MOB.getLocalName(this.item.sensitivity) + "\n";
 				//if (this.item.emphasis) {
             s += "emphasis: " + this.item.emphasis + "\n";
 				//}
@@ -19,10 +20,14 @@
         private function selectSource():String {
             return StaticStuff.getSensitivityImageForItem(this.item);
         }
+        
+        private function showDescription():void {
+        	Alert.show(this.item.description);	
+        }
 		]]>
 	</mx:Script>
     <mx:VBox width="100%" height="100%">
-        <mx:Text htmlText="{this.item.description}" truncateToFit="false" width="100%"/>
+        <mx:Text htmlText="{this.item.richTextDescription}" truncateToFit="false" width="100%" doubleClick="showDescription()"/>
     </mx:VBox>
     <mx:Image source="{this.item.icon}"/>
     <mx:ControlBar paddingBottom="2" paddingRight="2">

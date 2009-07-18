@@ -30,7 +30,7 @@ public class WriteContext {
     }
 
     public void close() {
-        connection.close();    
+        connection.close();
     }
 
     public Quotas getQuotas() {
@@ -86,6 +86,12 @@ public class WriteContext {
     public String normalizeDescription(final String description) throws QuotaException {
         String s = description.trim();
         quotas.checkDescription(s);
+        return s;
+    }
+
+    public String normalizeRichTextDescription(final String richTextDescription) throws QuotaException {
+        String s = richTextDescription.trim();
+        quotas.checkRichTextDescription(s);
         return s;
     }
 

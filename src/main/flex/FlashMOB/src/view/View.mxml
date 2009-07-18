@@ -4,12 +4,12 @@
                 dropShadowEnabled="false" borderAlpha="1"
                 title="{item.name}"
                 borderColor="#FFFFFF" borderThickness="1" borderStyle="solid"
-                paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0"
+                paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" verticalGap="0"
                 showCloseButton="true"
                 mouseDown="initiateDrag(event)">
     <mx:Script>
 		<![CDATA[
-			import mx.core.BitmapAsset;
+		import mx.core.BitmapAsset;
         import mx.managers.DragManager;
         import mx.core.UIComponent;
         import mx.core.DragSource;
@@ -19,7 +19,7 @@
 
         [Bindable]
         public var item:FirstClassItem;
-			//[Bindable]
+		//[Bindable]
         //protected var nameValue:String;
         //[Bindable]
         //protected var descriptionValue:String;

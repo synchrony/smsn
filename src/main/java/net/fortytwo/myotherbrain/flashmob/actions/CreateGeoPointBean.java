@@ -5,9 +5,9 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Date: Jul 11, 2009
  * Time: 2:19:38 PM
  */
-public class CreateGeoPointBean extends SubjectBean {
-    protected Float longitude;
-    protected Float latitude;
+public class CreateGeoPointBean extends ResourceActionBean {
+    private Float longitude;
+    private Float latitude;
 
     public Float getLongitude() {
         return longitude;

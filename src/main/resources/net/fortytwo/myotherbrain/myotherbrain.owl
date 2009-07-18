@@ -301,6 +301,16 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
+    <!-- http://fortytwo.net/2009/05/myotherbrain#richTextDescription -->
+
+    <owl:DatatypeProperty rdf:about="#richTextDescription">
+        <rdfs:comment
+            >A rich-text (constrained HTML) formatted description of an item.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#description"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fortytwo.net/2009/05/myotherbrain#score -->
 
     <owl:DatatypeProperty rdf:about="#score">

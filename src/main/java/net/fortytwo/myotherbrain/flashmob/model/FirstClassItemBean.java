@@ -12,6 +12,7 @@ public class FirstClassItemBean {
     private String subject;
     private String name;
     private String description;
+    private String richTextDescription;
     private String icon;
     private String sensitivity;
     private Float emphasis;
@@ -40,6 +41,14 @@ public class FirstClassItemBean {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+  
+    public String getRichTextDescription() {
+        return richTextDescription;
+    }
+
+    public void setRichTextDescription(String richTextDescription) {
+        this.richTextDescription = richTextDescription;
     }
 
     public String getIcon() {

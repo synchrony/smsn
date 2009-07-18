@@ -48,6 +48,7 @@ public class MOB {
             REPRESENTATIONMEDIATYPE = NAMESPACE + "representationMediaType",
             REPRESENTATIONSHA1SUM = NAMESPACE + "representationSha1Sum",
             RESOURCEURI = NAMESPACE + "resourceURI",
+            RICHTEXTDESCRIPTION = NAMESPACE + "richTextDescription",
             SCORE = NAMESPACE + "score",
             USERNAME = NAMESPACE + "userName",
 

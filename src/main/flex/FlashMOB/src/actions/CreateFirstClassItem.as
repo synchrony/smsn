@@ -2,11 +2,12 @@ package actions
 {
 [Bindable]
 [RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.actions.CreateFirstClassItemBean")]
-public class CreateFirstClassItem {
+public class CreateFirstClassItem extends Action {
     //public var type:String;
     public var subject:String;
     public var name:String;
     public var description:String;
+    public var richTextDescription:String;
     public var icon:String;
     public var sensitivity:String;
     public var emphasis:Number;

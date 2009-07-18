@@ -6,8 +6,8 @@ package net.fortytwo.myotherbrain.flashmob.actions;
  * Time: 2:17:46 PM
  */
 public class CreateAssociationBean extends CreateFirstClassItemBean {
-    protected String associationSubject;
-    protected String associationObject;
+    private String associationSubject;
+    private String associationObject;
 
     public String getAssociationSubject() {
         return associationSubject;

@@ -6,16 +6,16 @@ import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
-import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
 import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
 import net.fortytwo.myotherbrain.flashmob.model.FreetextSearchResult;
+import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
-import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
 import net.fortytwo.myotherbrain.update.UpdateException;
+import net.fortytwo.myotherbrain.update.WriteAction;
 import org.apache.log4j.Logger;
 
 import javax.xml.namespace.QName;
@@ -31,6 +31,39 @@ import java.util.List;
  */
 public class FlashMOBSession {
     private static final Logger LOGGER = MyOtherBrain.getLogger(FlashMOBSession.class);
+
+    public enum SensitivityLevel {
+        PUBLIC(MOB.PUBLIC, 0),
+        PERSONAL(MOB.PERSONAL, 1),
+        PRIVATE(MOB.PRIVATE, 2);
+
+        private String uri;
+        private int value;
+
+        private SensitivityLevel(final String uri,
+                                 final int value) {
+            this.uri = uri;
+            this.value = value;
+        }
+
+        public boolean exceeds(final SensitivityLevel other) {
+            return this.value > other.value;
+        }
+
+        public String toString() {
+            return uri;
+        }
+
+        public static SensitivityLevel fromURI(final String uri) {
+            for (SensitivityLevel l : values()) {
+                if (l.uri.equals(uri)) {
+                    return l;
+                }
+            }
+            
+            return null;
+        }
+    }
 
     public static final int
             URIMINTING_MAXBATCHSIZE;
@@ -52,9 +85,12 @@ public class FlashMOBSession {
 
     private final Session session;
 
+    private SensitivityLevel currentVisibilityLevel = SensitivityLevel.fromURI(MOB.PERSONAL);
+
     public static void main(final String[] args) throws Exception {
         MOBStore store = MOBStore.getDefaultStore();
 
+        /*
         FlashMOBSession f = new FlashMOBSession();
         MOBModelConnection c = f.createConnection();
         try {
@@ -63,11 +99,11 @@ public class FlashMOBSession {
             QName qName2 = new QName(baseURI + "2");
             ExperimentalClassConcept e1, e2;
 
-            /*
-            e1 = c.getElmoManager().create(qName1, ExperimentalClassConcept.class);
-            e2 = c.getElmoManager().create(qName2, ExperimentalClassConcept.class);
-            c.getElmoManager().remove(e1);
-            c.getElmoManager().remove(e2);   */
+
+            //e1 = c.getElmoManager().create(qName1, ExperimentalClassConcept.class);
+            //e2 = c.getElmoManager().create(qName2, ExperimentalClassConcept.class);
+            //c.getElmoManager().remove(e1);
+            //c.getElmoManager().remove(e2);
 
             e1 = new ExperimentalClassConcept();
             e2 = new ExperimentalClassConcept();
@@ -84,7 +120,7 @@ public class FlashMOBSession {
             c.commit();
         } finally {
             c.close();
-        }
+        }*/
 
         //store.generateSeedData();
         //AccessManager am = new AccessManager(store);
@@ -98,27 +134,6 @@ public class FlashMOBSession {
 
         AccessManager am = new AccessManager(MOBStore.getDefaultStore());
         session = am.createSession(TEMP_USERNAME);
-    }
-
-    public String getVersionInfo() {
-        System.out.println("getVersionInfo has been called.");
-        return MyOtherBrain.getVersionInfo();
-    }
-
-    private String visibilityLevel = MOB.PERSONAL;
-
-    public String getVisibilityLevel() {
-        return visibilityLevel;
-    }
-
-    public void setVisibilityLevel(final String visibilityLevel) {
-        if (visibilityLevel.equals(MOB.PUBLIC)
-                || visibilityLevel.equals(MOB.PERSONAL)
-                || visibilityLevel.equals(MOB.PRIVATE)) {
-            this.visibilityLevel = visibilityLevel;
-        } else {
-            throw new IllegalArgumentException("not a valid sensitivity level: " + visibilityLevel);
-        }
     }
 
     ////////////////////////////////////
@@ -158,6 +173,26 @@ public class FlashMOBSession {
     }
 
     ////////////////////////////////////
+
+    public String getVersionInfo() {
+        System.out.println("getVersionInfo has been called.");
+        return MyOtherBrain.getVersionInfo();
+    }
+
+    public String getVisibilityLevel() {
+        return currentVisibilityLevel.toString();
+    }
+
+    public String setVisibilityLevel(final String visibilityLevel) {
+        SensitivityLevel l = SensitivityLevel.fromURI(visibilityLevel);
+        if (null != l) {
+            this.currentVisibilityLevel = l;
+        } else {
+            throw new IllegalArgumentException("not a valid sensitivity level: " + visibilityLevel);
+        }
+
+        return l.toString();
+    }
 
     public FreetextSearchResult evaluateFreetextQuery(final String query) {
         // TODO
@@ -202,17 +237,6 @@ public class FlashMOBSession {
         }
     }
 
-    /*public Association getAssociationExperimental() {
-        MOBModelConnection c = createConnection();
-        try {
-
-        } finally {
-            c.close();
-        }
-    }*/
-
-    ////////////////////////////////////
-
     public String[] mintRandomURIs(final int batchSize) {
         if (0 > batchSize) {
             throw new IllegalArgumentException("negative batch size");
@@ -241,6 +265,15 @@ public class FlashMOBSession {
             c.close();
         }
     }
+
+    /*public Association getAssociationExperimental() {
+        MOBModelConnection c = createConnection();
+        try {
+
+        } finally {
+            c.close();
+        }
+    }*/
 
     ////////////////////////////////////
 

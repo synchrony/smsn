@@ -22,6 +22,7 @@ public class CreateLiteral extends CreateFirstClassItem {
             URI subject,
             String name,
             String description,
+            String richTextDescription,
             URI icon,
             URI sensitivity,
             Float emphasis,
@@ -31,7 +32,7 @@ public class CreateLiteral extends CreateFirstClassItem {
             URI datatypeURI,
             String languageTag,
             final WriteContext c) throws UpdateException {
-        super(subject, name, description, icon, sensitivity, emphasis,
+        super(subject, name, description, richTextDescription, icon, sensitivity, emphasis,
                 creationTimeStamp, creationPlaceStamp, c);
 
         if (null == lexicalForm) {

@@ -21,6 +21,7 @@ public class CreateAssociation extends CreateFirstClassItem {
             URI subject,
             String name,
             String description,
+            String richTextDescription,
             URI icon,
             URI sensitivity,
             Float emphasis,
@@ -29,7 +30,7 @@ public class CreateAssociation extends CreateFirstClassItem {
             URI associationSubject,
             URI associationObject,
             final WriteContext c) throws UpdateException {
-        super(subject, name, description, icon, sensitivity, emphasis,
+        super(subject, name, description, richTextDescription, icon, sensitivity, emphasis,
                 creationTimeStamp, creationPlaceStamp, c);
         if (null == associationSubject) {
             throw new NullPointerException();
