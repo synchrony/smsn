@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:effects="effects.*"
                 backgroundColor="#FCFCFC" width="100%" roundedBottomCorners="true" cornerRadius="7"
                 dropShadowEnabled="false" borderAlpha="1"
                 title="{item.name}"
+                verticalScrollPolicy="off"
                 borderColor="#FFFFFF" borderThickness="1" borderStyle="solid"
                 paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" verticalGap="0"
                 showCloseButton="true"
-                mouseDown="initiateDrag(event)">
+                mouseDown="initiateDrag(event)"
+                removedEffect="{sequenceOut}">
     <mx:Script>
 		<![CDATA[
 		import mx.core.BitmapAsset;
@@ -30,7 +33,7 @@
             //this.descriptionValue = newItem.description;
         }
 			
-			////////////////////////////
+		////////////////////////////
 
         [Embed(source="assets/icons/12x12/info.png")]
         private var dragItemImage:Class;
@@ -44,4 +47,9 @@
         }
 		]]>
 	</mx:Script>
+	<mx:Sequence id="sequenceOut">
+		<!--<mx:Fade id="fadeIn" duration="300"/>
+		<effects:ItemRemoveEffect id="hideIt"/>-->
+		<mx:Resize id="resizeOut" heightFrom="{this.height}" heightTo="0" hideChildrenTargets="true"/>
+	</mx:Sequence>
 </mx:TitleWindow>

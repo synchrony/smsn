@@ -20,4 +20,8 @@ public class Session {
     public MOBModel getModel() {
         return model;
     }
+
+    public String getUserName() {
+        return userName;
+    }
 }

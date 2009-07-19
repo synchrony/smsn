@@ -1,27 +1,23 @@
 package net.fortytwo.myotherbrain.flashmob;
 
-import net.fortytwo.myotherbrain.ExperimentalClassConcept;
 import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
+import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
 import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
 import net.fortytwo.myotherbrain.flashmob.model.FreetextSearchResult;
-import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
+import net.fortytwo.myotherbrain.flashmob.model.SessionInfo;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
-import net.fortytwo.myotherbrain.update.WriteContext;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
 import org.apache.log4j.Logger;
 
-import javax.xml.namespace.QName;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -138,52 +134,16 @@ public class FlashMOBSession {
 
     ////////////////////////////////////
 
-    public String arbitraryString() {
-        return "foobar";
+    public SessionInfo getSessionInfo() {
+        SessionInfo info = new SessionInfo();
+        info.setBaseURI(MyOtherBrain.MOB_RESOURCE_NS + "r");
+        info.setUserName(session.getUserName());
+        info.setVersionInfo(MyOtherBrain.getVersionInfo());
+        info.setVisibilityLevel(currentVisibilityLevel.toString());
+        return info;
     }
 
-    public Date arbitraryDate() {
-        return new Date();
-    }
-
-    public Float arbitraryFloat() {
-        return 3.1415f;
-    }
-
-    public URI arbitraryURI() throws URISyntaxException {
-        return new URI("http://example.org/myResource");
-    }
-
-    ////////////////////////////////////
-
-    public String passString(final String s) {
-        return s;
-    }
-
-    public Date passDate(final Date d) {
-        return d;
-    }
-
-    public Float passFloat(final Float f) {
-        return f;
-    }
-
-    public URI passURI(final URI u) {
-        return u;
-    }
-
-    ////////////////////////////////////
-
-    public String getVersionInfo() {
-        System.out.println("getVersionInfo has been called.");
-        return MyOtherBrain.getVersionInfo();
-    }
-
-    public String getVisibilityLevel() {
-        return currentVisibilityLevel.toString();
-    }
-
-    public String setVisibilityLevel(final String visibilityLevel) {
+    public SessionInfo setVisibilityLevel(final String visibilityLevel) {
         SensitivityLevel l = SensitivityLevel.fromURI(visibilityLevel);
         if (null != l) {
             this.currentVisibilityLevel = l;
@@ -191,7 +151,7 @@ public class FlashMOBSession {
             throw new IllegalArgumentException("not a valid sensitivity level: " + visibilityLevel);
         }
 
-        return l.toString();
+        return getSessionInfo();
     }
 
     public FreetextSearchResult evaluateFreetextQuery(final String query) {
@@ -217,6 +177,7 @@ public class FlashMOBSession {
         }
     }
 
+    /*
     public ExperimentalClassConcept getExperimentalObject() {
         String uri = "http://example.org/ns/experResource";
 
@@ -251,7 +212,7 @@ public class FlashMOBSession {
         }
 
         return results;
-    }
+    }*/
 
     public void enqueueAction(final ActionBean bean) throws UpdateException {
         System.out.println("enqueueing action: " + bean);

@@ -164,7 +164,7 @@ public class MyOtherBrain {
     }
 
     // TODO: make this configurable
-    private static final String MOB_RESOURCE_NS = "http://myotherbrain.fortytwo.net/resource/";
+    public static final String MOB_RESOURCE_NS = "http://myotherbrain.fortytwo.net/resource/";
     private static final Random random = new Random();
 
     // TODO: move me

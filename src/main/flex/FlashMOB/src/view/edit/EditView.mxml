@@ -46,7 +46,13 @@
     <!--<mx:Canvas width="30" height="30" 
             backgroundColor="red" 
             borderStyle="solid" cornerRadius="7"/>-->
-    <ponents:CompactPanel backgroundColor="#B1AFFF" title="testing" borderColor="#BFE2FA"/>
+    <!--<ponents:CompactPanel backgroundColor="#B1AFFF" title="testing" borderColor="#BFE2FA"/>
+    <mx:HBox>
+    	<mx:Image id="testImage" source="assets/testImage.jpg"/>
+    	<mx:VBox>
+    		<mx:Button label="show"/>
+    	</mx:VBox>    	
+    </mx:HBox>-->
     <mx:HBox>
         <mx:Panel title="sensitivity:" dropShadowEnabled="false" width="100%" borderStyle="solid" backgroundAlpha="0.0">
             <mx:RadioButtonGroup id="sensitivityLevels"/>

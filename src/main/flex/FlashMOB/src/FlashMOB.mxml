@@ -44,7 +44,9 @@
     </mx:Style>
     <mx:Script>
     	<![CDATA[
+    		import model.SessionInfo;
     		import model.MOB;
+    		import rpc.MOBDispatcher;
     		import mx.rpc.events.FaultEvent;
         import mx.rpc.remoting.RemoteObject;
         import view.edit.EditViewColumn;
@@ -58,19 +60,11 @@
         import actions.CreateFirstClassItem;
         import mx.collections.ArrayCollection;
 
-        [Bindable]
-        public static var mobSession:RemoteObject;
-
+		public static const dispatcher:MOBDispatcher = new MOBDispatcher();
+		public static var sessionInfo:SessionInfo;
+		
         private function constructor():void {
-            mobSession = new RemoteObject();
-            mobSession.destination = "flashmobsession";
-            mobSession.getItems.addEventListener(ResultEvent.RESULT, queryHandler);
-            mobSession.getVersionInfo.addEventListener(ResultEvent.RESULT, showVersionInfo);
-            mobSession.enqueueAction.addEventListener(FaultEvent.FAULT, handleEnqueueActionError);
-
-            mobSession.getExperimentalObject.addEventListener(ResultEvent.RESULT, showExperimentalObject);
-
-            testMOBCommunication();
+            getSessionInfo();
         }
 
 		private function createNewSimpleViewColumn():ViewColumn {
@@ -84,82 +78,66 @@
             this.viewColumnHBox.addViewColumn(v);
             return v;			
 		}
-		
-        private function handleEnqueueActionError(event:FaultEvent):void {
-            Alert.show("error: " + event);
-        }
-        
-        /*
-                  <mx:RemoteObject id="mobSession" destination="flashmobsession">
-          <mx:method name="getItems" result="queryHandler(event)"/>
-          <mx:method name="getVersionInfo" result="showVersionInfo(event)"/>
-      </mx:RemoteObject>
-              */
-
-        private function queryHandler(event:ResultEvent):void {
-            var v1:ViewColumn = createNewSimpleViewColumn();
-            var v2:ViewColumn = createNewEditViewColumn();
-
-            var queryResult:ArrayCollection = event.result as ArrayCollection;
-            for (var i:int = 0; i < queryResult.length; i++) {
-                var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
-                v1.addItem(it);
-                v2.addItem(it);
-            }
-        }
 
         private function menuClickHandler(event:MenuEvent):void {
-            if ("About" == event.item.@label) {
-                mobSession.getVersionInfo();
+        	var label:String = event.item.@label;
+        	
+            if ("About" == label) {
+	            Alert.show(sessionInfo.versionInfo, "About");
     			//	Alert.show("you selected " + event.item.@label, "Menu Selection");
-            } else if ("CreateExperItem" == event.item.@label) {
-                mobSession.getExperimentalObject();
-            } else if ("Simple view" == event.item.@label) {
+            //} else if ("CreateExperItem" == event.item.@label) {
+            //    mobSession.getExperimentalObject();
+            } else if ("Simple view" == label) {
             	createNewSimpleViewColumn();
-            } else if ("Edit view" == event.item.@label) {
+            } else if ("Edit view" == label) {
             	createNewEditViewColumn();
+            } else if ("Public" == label || "Personal" == label || "Private" == label) {
+            	setVisibilityLevel(MOB.NAMESPACE + label);
             }
         }
 
-        private function showVersionInfo(event:ResultEvent):void {
-            var s:String = event.result as String;
-
-            Alert.show(s, "About");
-        }
-
-        private function showExperimentalObject(event:ResultEvent):void {
-            var o:ExperimentalClassConcept = event.result as ExperimentalClassConcept;
-            o.showMe();
-        }
-
-        private function testMOBCommunication():void {
-            mobSession.arbitraryString();
-            mobSession.arbitraryFloat();
-            mobSession.arbitraryDate();
-            mobSession.arbitraryURI();
-            mobSession.arbitraryExamplePOJO();
-    			
-    			// TODO: investigate precision issues in passed numbers
+        private function getSessionInfo():void {
+		    function handler0(event:ResultEvent):void {
+		    	updateSessionInfo(event.result as SessionInfo);	
+		    }
+		    dispatcher.getSessionInfo(handler0, null);
+		    
+    		// TODO: investigate precision issues in passed numbers
             // TODO: investigate passing of URIs
             // TODO: investigate exception handling
             // TODO: investigate encoding issues in passed strings
-
-            mobSession.getItems();
-            
-            
-            //var h:ResultEventHandler
-            
-            function handleResult(event:ResultEvent):void {
-            	var level:String = event.result as String;
-            	Alert.show("visibility level has been set to: " + level);
+ 
+            function handler(event:ResultEvent):void {
+	            var v1:ViewColumn = createNewSimpleViewColumn();
+	            var v2:ViewColumn = createNewEditViewColumn();
+	
+	            var queryResult:ArrayCollection = event.result as ArrayCollection;
+	            for (var i:int = 0; i < queryResult.length; i++) {
+	                var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
+	                v1.addItem(it);
+	                v2.addItem(it);
+	            }
+	        }
+	        dispatcher.getItems(handler, null);            
+        }
+        
+        private function setVisibilityLevel(level:String):void {
+            function handler(event:ResultEvent):void {
+            	updateSessionInfo(event.result as SessionInfo);
+            	//Alert.show("visibility level has been set to: " + MOB.getLocalName(visibilityLevel));
             }
             
-            var w:MOBDispatcher = new MOBDispatcher();
-            w.setVisibilityLevel(MOB.PUBLIC, handleResult, null);
+            dispatcher.setVisibilityLevel(level, handler, null);       		
+        }
+        
+        private function updateSessionInfo(info:SessionInfo):void {
+        	sessionInfo = info;
+        	this.visibilityLevelIcon.source = "assets/icons/12x12/sensitivityLevels/"
+        			+ MOB.getLocalName(sessionInfo.visibilityLevel).toLowerCase() + ".png";	
         }
         
         private function showSecurityLevel():void {
-        	Alert.show("Current visibility level is: Private", "Visibility level");
+        	Alert.show("Current visibility level is:" + MOB.getLocalName(sessionInfo.visibilityLevel), "Visibility level");
         }
     	]]>
     </mx:Script>
@@ -172,7 +150,7 @@
 <!--                    fillAlphas="[1.0, 1.0, 1.0, 1.0]" fillColors="[#D4CCFF, #FFFFFF]" alpha="1.0" borderColor="#FFFFFF"/>-->
         <view:ViewColumnHBox id="viewColumnHBox"/>
     </mx:VBox>
-    <mx:Image source="assets/icons/12x12/sensitivityLevels/private.png" alpha="0.25"
+    <mx:Image id="visibilityLevelIcon" source="assets/icons/12x12/sensitivityLevels/private.png" alpha="0.33"
     	x="{applicationVBox.width - (12 + (applicationMenuBar.height - 12) / 2)}" y="{applicationMenuBar.height / 2 - 6}"
     	click="showSecurityLevel()"/>
 </mx:Application>

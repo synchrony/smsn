@@ -57,6 +57,7 @@
 				//Alert.show("adding item...");
             var v:View = createView(it);
             v.setItem(it);
+            //v.addedEffect = this.fadeIn;
             this.containerVBox.addChild(v);
 
             v.addEventListener(CloseEvent.CLOSE, closeHandler);
@@ -74,7 +75,9 @@
 
         private function closeHandler(event:CloseEvent):void {
             //Alert.show("you will have closed that view");
-            removeView(event.target as View);
+            var v:View = event.target as View;
+            v.alpha = 0.0;
+            removeView(v);
         }
 
         private function createNewItem():void {
