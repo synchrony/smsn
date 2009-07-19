@@ -53,8 +53,8 @@
         }
 		
         public function addItem(it:FirstClassItem):void {
+				//Alert.show("adding item: " + it);
             it = StaticStuff.itemRegistry.registerItem(it);
-				//Alert.show("adding item...");
             var v:View = createView(it);
             v.setItem(it);
             //v.addedEffect = this.fadeIn;
@@ -73,7 +73,7 @@
             this.containerVBox.removeChild(v);
         }
 
-        private function closeHandler(event:CloseEvent):void {
+        protected function closeHandler(event:CloseEvent):void {
             //Alert.show("you will have closed that view");
             var v:View = event.target as View;
             v.alpha = 0.0;
@@ -94,6 +94,11 @@
         		removeView(a[j] as View);
         	}
         }
+        
+        // Override me
+ 		public function search():void {
+ 			Alert.show("this should have been overridden");
+ 		}
         
         private function close():void {
         	clear();
@@ -120,6 +125,10 @@
     	<mx:HBox id="footerContents" paddingBottom="0" paddingLeft="0" paddingTop="0" paddingRight="0" width="100%" backgroundAlpha="0.0">  		
 	        <mx:Button label="New item" click="createNewItem()"/>
 	        <mx:Spacer width="100%"/>
+	        <mx:HBox id="searchComponent" visible="false">
+	        	<mx:TextInput id="searchInput"/>
+	        	<mx:Button label="Search" click="this.search()"/>
+	        </mx:HBox>
 	        <mx:Button label="Clear" click="clear()"/>
 	        <mx:Button label="Close" click="close()"/>
     	</mx:HBox> 

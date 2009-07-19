@@ -4,13 +4,14 @@ import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
-import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
 import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
 import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
 import net.fortytwo.myotherbrain.flashmob.model.SessionInfo;
 import net.fortytwo.myotherbrain.flashmob.model.WeightedItem;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
+import net.fortytwo.myotherbrain.query.FreetextSearch;
+import net.fortytwo.myotherbrain.query.QueryException;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import net.fortytwo.myotherbrain.update.UpdateException;
@@ -18,7 +19,6 @@ import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
 import org.apache.log4j.Logger;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -57,7 +57,7 @@ public class FlashMOBSession {
                     return l;
                 }
             }
-            
+
             return null;
         }
     }
@@ -125,12 +125,17 @@ public class FlashMOBSession {
         store.dump(System.out);
     }
 
-    public FlashMOBSession() throws MOBStore.MOBStoreException, NoSuchAccountException {
+    public FlashMOBSession() throws Throwable {
         System.out.println("FlashMOBSession constructor called");
         LOGGER.info("FlashMOBSession constructor called");
 
-        AccessManager am = new AccessManager(MOBStore.getDefaultStore());
-        session = am.createSession(TEMP_USERNAME);
+        try {
+            AccessManager am = new AccessManager(MOBStore.getDefaultStore());
+            session = am.createSession(TEMP_USERNAME);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     ////////////////////////////////////
@@ -155,12 +160,24 @@ public class FlashMOBSession {
         return getSessionInfo();
     }
 
-    public List<WeightedItem> freetextQuery(final String query) {
-        // TODO
-        return new LinkedList<WeightedItem>();
+    public List<WeightedItem> freetextQuery(final String query) throws Throwable {
+        WeightedBeanCollector coll = new WeightedBeanCollector();
+        MOBModelConnection c = createConnection();
+        try {
+            try {
+            FreetextSearch.executeFreetextSearch(query, coll, c);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                throw t;
+            }
+        } finally {
+            c.close();
+        }
+
+        return coll.getResults();
     }
 
-    public List<FirstClassItemBean> getItems() {
+    public List<FirstClassItemBean> getItems() throws QueryException {
         MOBModelConnection c = createConnection();
         try {
             return FlashMOBQuery.getAllFirstClassItems(c);
@@ -169,7 +186,7 @@ public class FlashMOBSession {
         }
     }
 
-    public List<FirstClassItemBean> getItemsAssociatedFrom(final FirstClassItemBean it) {
+    public List<FirstClassItemBean> getItemsAssociatedFrom(final FirstClassItemBean it) throws QueryException {
         MOBModelConnection c = createConnection();
         try {
             return FlashMOBQuery.getItemsAssociatedFrom(it, c);

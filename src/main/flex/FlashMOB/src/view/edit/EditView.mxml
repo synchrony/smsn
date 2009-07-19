@@ -17,11 +17,12 @@
 
             // Note: apparently the bindability of nameValue and descriptionValue is in only one direction.
             this.item.name = stringValue(this.nameField.text);
-            this.item.description = stringValue(this.descriptionField.text);
+            this.item.description = this.descriptionField.textArea.text;
             this.item.richTextDescription = stringValue(this.descriptionField.htmlText);
             this.item.emphasis = Number(this.emphasisField.text);
             this.item.icon = stringValue(this.iconField.text);
             this.item.sensitivity = this.sensitivityLevels.selectedValue as String;
+//Alert.show("plain text?: " + this.descriptionField.textArea.text);
 
             StaticStuff.createItemTmp(this.item);
         }

@@ -1,21 +1,9 @@
 package net.fortytwo.myotherbrain;
 
-import net.fortytwo.myotherbrain.access.AccessManager;
-import net.fortytwo.myotherbrain.access.Session;
-import net.fortytwo.myotherbrain.model.MOBModel;
-import net.fortytwo.myotherbrain.model.MOBModelConnection;
-import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
-import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
-import net.fortytwo.myotherbrain.update.WriteAction;
-import net.fortytwo.myotherbrain.update.WriteContext;
-import net.fortytwo.myotherbrain.update.actions.BreakAssociation;
-import net.fortytwo.myotherbrain.update.actions.SetName;
+import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.memory.MemoryStore;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -40,6 +28,7 @@ public class MyOtherBrain {
     public static final String
             NATIVESTORE_DIRECTORY = "net.fortytwo.myotherbrain.nativeStoreDirectory",
             NEOSAIL_DIRECTORY = "net.fortytwo.myotherbrain.neoSailDirectory",
+            NEOFULLTEXT_DIRECTORY = "net.fortytwo.myotherbrain.neoFullTextDirectory",
             RMISAILCLIENT_URI = "net.fortytwo.myotherbrain.rmiSailClientURI",
             SAIL_CLASS = "net.fortytwo.myotherbrain.sailClass",
             NAME = "net.fortytwo.myotherbrain.name",
@@ -97,7 +86,26 @@ public class MyOtherBrain {
         return name + " " + version + ", revision #" + revision;
     }
 
+    private void doit() throws Exception {
+        MOBStore store = MOBStore.getDefaultStore();
+
+        /*
+        Repository repo = new SailRepository(store.getSail());
+        RepositoryConnection rc = repo.getConnection();
+        try {
+            rc.add(new File("/Users/josh/projects/fortytwo/myotherbrain/backup/dump_2009_07_16.trig"), "", RDFFormat.TRIG);
+            rc.commit();
+        } finally {
+            rc.close();
+        } */
+
+        store.dump(System.out);
+    }
+
     public static void main(final String[] args) throws Exception {
+        (new MyOtherBrain()).doit();
+        return;
+        /*
         java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MyOtherBrain.class.getName());
         logger.info(getVersionInfo());
 
@@ -106,6 +114,7 @@ public class MyOtherBrain {
         try {
             MOBStore store = new MOBStore(sail);
             store.initialize();
+
             try {
                 store.generateSeedData();
 
@@ -142,14 +151,13 @@ public class MyOtherBrain {
                 } finally {
                     c.close();
                 }
-
-                store.dump(System.out);
             } finally {
+                store.dump(System.out);
                 store.shutDown();
             }
         } finally {
             sail.shutDown();
-        }
+        }         */
     }
 
     ////////////////////////////////////////////////////////////////////////////

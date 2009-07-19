@@ -120,6 +120,7 @@
             function handler(event:ResultEvent):void {
 	            var v1:ViewColumn = createNewSimpleViewColumn();
 	            var v2:ViewColumn = createNewEditViewColumn();
+	            var v3:ViewColumn = createNewSearchViewColumn();
 	
 	            var queryResult:ArrayCollection = event.result as ArrayCollection;
 	            for (var i:int = 0; i < queryResult.length; i++) {

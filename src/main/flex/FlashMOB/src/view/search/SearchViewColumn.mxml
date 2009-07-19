@@ -3,6 +3,7 @@
 	initialize="constructor()">
     <mx:Script>
 		<![CDATA[
+			import mx.events.CloseEvent;
 			import mx.collections.ArrayCollection;
 			import model.WeightedItem;
 			import mx.rpc.events.ResultEvent;
@@ -17,27 +18,27 @@
 		private var searchText:TextInput;
 		
 		private function constructor():void {
-			searchText = new TextInput();
-			this.footerContents.addChild(searchText);
-			
-			var b:Button = new Button();
-			b.label = "Search";	
-			this.footerContents.addChild(b);	
+			this.searchComponent.visible = true;	
 		}
 		
-		private function search():void {
-			function handle(event:ResultEvent):void {
-		        var queryResult:ArrayCollection = event.result as ArrayCollection;
-	            for (var i:int = 0; i < queryResult.length; i++) {
-	                var wi:WeightedItem = queryResult.getItemAt(i) as WeightedItem;
-	                this.addItem(wi.item);
-	            }	
-			}	
-			
-			var query:String = this.searchText.text;
-			FlashMOB.dispatcher.freeTextQuery(query, handle, null);	
+		private function handleSearchResult(event:ResultEvent):void {
+		    var queryResult:ArrayCollection = event.result as ArrayCollection;
+            for (var i:int = 0; i < queryResult.length; i++) {
+                var wi:WeightedItem = queryResult.getItemAt(i) as WeightedItem;
+                this.addItem(wi.item);
+            }		
 		}
 		
+		public override function search():void {
+			var query:String = this.searchInput.text;
+			//Alert.show("about to query on: " + query);
+			
+			// TODO: this is strange -- handleSearchResult was originally a function defined within this function, but it simply
+			// failed to make further method calls (although it had access to variables).  Perhaps it's not possible to call
+			// methods from within an "internal" method in ActionScript.
+			FlashMOB.dispatcher.freeTextQuery(query, handleSearchResult, null);	
+		}
+        	
         protected override function createView(item:FirstClassItem):View {
             return new SimpleView();
         }

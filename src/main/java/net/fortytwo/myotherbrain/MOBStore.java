@@ -20,6 +20,8 @@ import org.neo4j.rdf.sail.NeoSail;
 import org.neo4j.rdf.sail.rmi.RmiSailClient;
 import org.neo4j.rdf.store.CachingLuceneIndexService;
 import org.neo4j.rdf.store.VerboseQuadStore;
+import org.neo4j.rdf.fulltext.FulltextIndex;
+import org.neo4j.rdf.fulltext.SimpleFulltextIndex;
 import org.neo4j.util.index.IndexService;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoModule;
@@ -181,7 +183,7 @@ public class MOBStore {
     // convenience methods, may be moved ///////////////////////////////////////
 
     public MOBModel createModel(final QName writableGraph) {
-        return new MOBModel(getElmoModule(), getRepository(), writableGraph);
+        return new MOBModel(getSail(), getElmoModule(), getRepository(), writableGraph);
     }
 
     public void dump(final OutputStream out) throws RepositoryException, RDFHandlerException {
@@ -270,15 +272,17 @@ public class MOBStore {
     private Sail createNeoSail() throws MOBStoreException {
         TypedProperties props = MyOtherBrain.getProperties();
 
-        String dir;
+        String dir, fulltextDir;
         try {
             dir = props.getString(MyOtherBrain.NEOSAIL_DIRECTORY);
+            fulltextDir = props.getString(MyOtherBrain.NEOFULLTEXT_DIRECTORY, null);
         } catch (PropertyException e) {
             throw new MOBStoreException(e);
         }
         LOGGER.debug("instantiating NeoSail in directory: " + dir);
         final NeoService neo = new EmbeddedNeo(dir);
         neo.enableRemoteShell();
+
         final IndexService idx = new CachingLuceneIndexService(neo);
         Runtime.getRuntime().addShutdownHook(new Thread("Neo shutdown hook") {
             @Override
@@ -288,7 +292,13 @@ public class MOBStore {
             }
         });
 
-        VerboseQuadStore store = new VerboseQuadStore(neo, idx);
+        FulltextIndex fulltextIndex = (null == fulltextDir)
+                ? null
+                : new SimpleFulltextIndex(neo, new File(fulltextDir));
+
+        VerboseQuadStore store = (null == fulltextIndex)
+                ? new VerboseQuadStore(neo, idx)
+                : new VerboseQuadStore(neo, idx, null, fulltextIndex);
         Sail sail = new NeoSail(neo, store);
 
         try {

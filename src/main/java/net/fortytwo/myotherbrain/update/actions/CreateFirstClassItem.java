@@ -55,7 +55,7 @@ public class CreateFirstClassItem extends WriteAction {
         }
 
         if (null != richTextDescription) {
-            description = c.normalizeRichTextDescription(richTextDescription);
+            richTextDescription = c.normalizeRichTextDescription(richTextDescription);
         }
 
         if (null != icon) {

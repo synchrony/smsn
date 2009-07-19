@@ -1,7 +1,10 @@
 package net.fortytwo.myotherbrain.model;
 
 import net.fortytwo.myotherbrain.update.Quotas;
+import org.neo4j.rdf.sail.NeoSail;
 import org.openrdf.elmo.ElmoManager;
+import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.SailException;
 
 /**
  * Note: a connection is specific to a particular user's knowledge base.
@@ -9,7 +12,7 @@ import org.openrdf.elmo.ElmoManager;
 public class MOBModelConnection {
     private final MOBModel model;
     private final ElmoManager elmoManager;
-
+    
     public MOBModelConnection(final MOBModel model) {
         this.model = model;
         elmoManager = model.getElmoManagerFactory().createElmoManager();
@@ -37,5 +40,14 @@ public class MOBModelConnection {
 
     public Quotas getQuotas() {
         return model.getQuotas();    
+    }
+
+    public SailConnection createSailConnection() throws SailException {
+        return model.getSail().getConnection();
+    }
+
+    // FIXME: this is a hack
+    public boolean freeTextSearchSupported() {
+        return model.getSail() instanceof NeoSail;
     }
 }

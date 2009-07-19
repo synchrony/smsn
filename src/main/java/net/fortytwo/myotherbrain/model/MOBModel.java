@@ -6,6 +6,7 @@ import org.openrdf.elmo.ElmoModule;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.Repository;
+import org.openrdf.sail.Sail;
 
 import javax.xml.namespace.QName;
 
@@ -16,13 +17,17 @@ import javax.xml.namespace.QName;
  */
 public class MOBModel {
     private final SesameManagerFactory elmoManagerFactory;
+    private final Sail sail;
 
     // TODO: this belongs not so much in a model as in a session
     private final Quotas quotas;
 
-    public MOBModel(final ElmoModule baseModule,
+    public MOBModel(final Sail sail,
+                    final ElmoModule baseModule,
                     final Repository repository,
                     final QName writableGraph) {
+        this.sail = sail;
+
         ElmoModule elmoModule = new ElmoModule();
         if (null != writableGraph) {
             elmoModule.setGraph(writableGraph);
@@ -47,5 +52,10 @@ public class MOBModel {
 
     public Quotas getQuotas() {
         return quotas;
+    }
+
+    public Sail getSail() {
+        // FIXME: this sail does not have the appropriate access restrictions
+        return sail;
     }
 }
