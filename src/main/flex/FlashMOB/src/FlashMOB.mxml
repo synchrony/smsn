@@ -18,6 +18,7 @@
         	<menuitem label="New column">
         		<menuitem label="Simple view"/>
         		<menuitem label="Edit view"/>
+        		<menuitem label="Search view"/>
         	</menuitem>
         	<menuitem label="Visibility level">
         		<menuitem label="Public"/>
@@ -44,6 +45,7 @@
     </mx:Style>
     <mx:Script>
     	<![CDATA[
+    		import view.search.SearchViewColumn;
     		import model.SessionInfo;
     		import model.MOB;
     		import rpc.MOBDispatcher;
@@ -79,6 +81,12 @@
             return v;			
 		}
 
+		private function createNewSearchViewColumn():ViewColumn {
+            var v:ViewColumn = new SearchViewColumn();			
+            this.viewColumnHBox.addViewColumn(v);
+            return v;			
+		}
+		
         private function menuClickHandler(event:MenuEvent):void {
         	var label:String = event.item.@label;
         	
@@ -91,6 +99,8 @@
             	createNewSimpleViewColumn();
             } else if ("Edit view" == label) {
             	createNewEditViewColumn();
+            } else if ("Search view" == label) {
+            	createNewSearchViewColumn();
             } else if ("Public" == label || "Personal" == label || "Private" == label) {
             	setVisibilityLevel(MOB.NAMESPACE + label);
             }

@@ -7,8 +7,8 @@ import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.access.error.NoSuchAccountException;
 import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
 import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
-import net.fortytwo.myotherbrain.flashmob.model.FreetextSearchResult;
 import net.fortytwo.myotherbrain.flashmob.model.SessionInfo;
+import net.fortytwo.myotherbrain.flashmob.model.WeightedItem;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
@@ -18,6 +18,7 @@ import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
 import org.apache.log4j.Logger;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -154,9 +155,9 @@ public class FlashMOBSession {
         return getSessionInfo();
     }
 
-    public FreetextSearchResult evaluateFreetextQuery(final String query) {
+    public List<WeightedItem> freetextQuery(final String query) {
         // TODO
-        return null;
+        return new LinkedList<WeightedItem>();
     }
 
     public List<FirstClassItemBean> getItems() {

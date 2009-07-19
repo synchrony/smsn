@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:ViewColumn xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="view.*"
+	initialize="constructor()">
+    <mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import model.WeightedItem;
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.TextInput;
+			import mx.controls.Button;
+			import mx.controls.Alert;
+        import view.View;
+        import view.simple.SimpleView;
+        import model.FirstClassItem;
+        import model.WeightedItem;
+
+		private var searchText:TextInput;
+		
+		private function constructor():void {
+			searchText = new TextInput();
+			this.footerContents.addChild(searchText);
+			
+			var b:Button = new Button();
+			b.label = "Search";	
+			this.footerContents.addChild(b);	
+		}
+		
+		private function search():void {
+			function handle(event:ResultEvent):void {
+		        var queryResult:ArrayCollection = event.result as ArrayCollection;
+	            for (var i:int = 0; i < queryResult.length; i++) {
+	                var wi:WeightedItem = queryResult.getItemAt(i) as WeightedItem;
+	                this.addItem(wi.item);
+	            }	
+			}	
+			
+			var query:String = this.searchText.text;
+			FlashMOB.dispatcher.freeTextQuery(query, handle, null);	
+		}
+		
+        protected override function createView(item:FirstClassItem):View {
+            return new SimpleView();
+        }
+		]]>
+	</mx:Script>
+</view:ViewColumn>

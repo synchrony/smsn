@@ -5,7 +5,6 @@ import actions.Action;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 import mx.rpc.remoting.RemoteObject;
-import mx.controls.Alert;
 
 public class MOBDispatcher
 {	
@@ -13,6 +12,7 @@ public class MOBDispatcher
     private static var mobSession:RemoteObject = new RemoteObject();
 
 	private var enqueueActionHandler:FunctionHandler = new FunctionHandler("enqueueAction");
+	private var freeTextQueryHandler:FunctionHandler = new FunctionHandler("freeTextQuery");
 	private var getItemsHandler:FunctionHandler = new FunctionHandler("getItems");
 	private var getSessionInfoHandler:FunctionHandler = new FunctionHandler("getSessionInfo");
 	private var setVisibilityLevelHandler:FunctionHandler = new FunctionHandler("setVisibilityLevel");
@@ -23,7 +23,10 @@ public class MOBDispatcher
 
         mobSession.enqueueAction.addEventListener(ResultEvent.RESULT, enqueueActionHandler.handleResultEvent);
         mobSession.enqueueAction.addEventListener(FaultEvent.FAULT, enqueueActionHandler.handleFaultEvent);
-  
+
+        mobSession.freeTextQuery.addEventListener(ResultEvent.RESULT, freeTextQueryHandler.handleResultEvent);
+        mobSession.freeTextQuery.addEventListener(FaultEvent.FAULT, freeTextQueryHandler.handleFaultEvent);
+          
         mobSession.getItems.addEventListener(ResultEvent.RESULT, getItemsHandler.handleResultEvent);
         mobSession.getItems.addEventListener(FaultEvent.FAULT, getItemsHandler.handleFaultEvent);
 
@@ -41,6 +44,11 @@ public class MOBDispatcher
 		mobSession.enqueueAction(action);			
 	}
 
+	public function freeTextQuery(query:String, resultHandler:Function, faultHandler:Function):void {
+		freeTextQueryHandler.setHandlers(resultHandler, faultHandler);
+		mobSession.freeTextQuery(query);	
+	}
+	
 	public function getItems(resultHandler:Function, faultHandler:Function):void {
 		getItemsHandler.setHandlers(resultHandler, faultHandler);
 		mobSession.getItems();			
