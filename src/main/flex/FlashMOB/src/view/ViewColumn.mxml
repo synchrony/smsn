@@ -2,9 +2,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:view="view.*"
          horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" verticalGap="0"
-         borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
-         dragEnter="handleDragEnter(event);"
-         dragDrop="handleDragDrop(event);">
+         borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000">
     <mx:Style>
         .gradientBackground1 {
             backgroundImage: ClassReference("GradientBackground");
@@ -21,6 +19,7 @@
     </mx:Style>
     <mx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.managers.DragManager;
 			import mx.events.DragEvent;
 			import view.simple.SimpleView;
@@ -28,29 +27,29 @@
         import model.FirstClassItem;
         import mx.controls.Alert;
 
-		public function handleDragEnter(event:DragEvent):void {
-			//Alert.show("you've dragged into a column");
-			//handleDragDrop(event);
-			if (event.dragSource.hasFormat("item")) {
+        // Called when the user moves the drag proxy onto the drop target.
+        private function dragEnterHandler(event:DragEvent):void {
+            // Accept the drag only if the user is dragging data 
+            // identified by the 'color' format value.
+            if (event.dragSource.hasFormat("item")) {
                 // Get the drop target component from the event object.
-                var dropTarget:ViewColumn=ViewColumn(event.currentTarget);
+                
+                var dropTarget:VBox = VBox(event.currentTarget);
                 // Accept the drop.
                 DragManager.acceptDragDrop(dropTarget);
-                Alert.show("accepted the drag");
-            } else {
-            	Alert.show("no 'item' format");
             }
-		}
-		
-		public function handleDragDrop(event:DragEvent):void {
-			Alert.show("you've dropped me");
+        }
+                
+        // Called if the target accepts the dragged object and the user 
+        // releases the mouse button while over this container. 
+        private function dragDropHandler(event:DragEvent):void {
             var item:FirstClassItem = event.dragSource.dataForFormat("item") as FirstClassItem;
             if (null == item) {
             	Alert.show("no item in drag event");
             } else {
             	addItem(item);
-            }
-        }
+            }           
+        } 
 		
         public function addItem(it:FirstClassItem):void {
 				//Alert.show("adding item: " + it);
@@ -107,9 +106,12 @@
 		]]>
 	</mx:Script>
     <mx:VBox width="100%" height="{this.height - columnFooter.height}"
-             paddingLeft="5" paddingRight="5"
-             borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
-             horizontalScrollPolicy="off" verticalScrollPolicy="auto">
+            paddingLeft="5" paddingRight="5"
+            borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+            horizontalScrollPolicy="off" verticalScrollPolicy="auto"
+         	dragEnter="dragEnterHandler(event);" 
+			dragDrop="dragDropHandler(event);"
+			backgroundColor="#FFFFFF"> <!-- note: oddly enough, this backgroundColor is necessary for drag and drop -->
         <mx:Spacer height="8"/>
         <mx:VBox id="containerVBox" width="100%"
         	     borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"

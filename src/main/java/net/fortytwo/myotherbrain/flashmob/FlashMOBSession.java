@@ -5,7 +5,8 @@ import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
-import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean;
+import net.fortytwo.myotherbrain.flashmob.model.AssociationBean;
+import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemWithAssociatedObjects;
 import net.fortytwo.myotherbrain.flashmob.model.SessionInfo;
 import net.fortytwo.myotherbrain.flashmob.model.WeightedItem;
 import net.fortytwo.myotherbrain.model.MOB;
@@ -14,7 +15,6 @@ import net.fortytwo.myotherbrain.query.FreetextSearch;
 import net.fortytwo.myotherbrain.query.QueryException;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
-import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
 import org.apache.log4j.Logger;
@@ -83,6 +83,7 @@ public class FlashMOBSession {
     private final Session session;
 
     private SensitivityLevel currentVisibilityLevel = SensitivityLevel.fromURI(MOB.PERSONAL);
+    private float currentEmphasisThreshold = 0f;
 
     public static void main(final String[] args) throws Exception {
         MOBStore store = MOBStore.getDefaultStore();
@@ -146,6 +147,7 @@ public class FlashMOBSession {
         info.setUserName(session.getUserName());
         info.setVersionInfo(MyOtherBrain.getVersionInfo());
         info.setVisibilityLevel(currentVisibilityLevel.toString());
+        info.setEmphasisThreshold(currentEmphasisThreshold);
         return info;
     }
 
@@ -157,6 +159,17 @@ public class FlashMOBSession {
             throw new IllegalArgumentException("not a valid sensitivity level: " + visibilityLevel);
         }
 
+        return getSessionInfo();
+    }
+
+    public SessionInfo setEmphasisThreshold(final float threshold) {
+        if (threshold < 0) {
+            throw new IllegalArgumentException("threshold must be greater than or equal to zero");
+        } else if (threshold > 1) {
+            throw new IllegalArgumentException("threshold must be less than or equal to one");
+        }
+
+        currentEmphasisThreshold = threshold;
         return getSessionInfo();
     }
 
@@ -177,19 +190,25 @@ public class FlashMOBSession {
         return coll.getResults();
     }
 
-    public List<FirstClassItemBean> getItems() throws QueryException {
+    public List<FirstClassItemWithAssociatedObjects> getItems() throws QueryException {
         MOBModelConnection c = createConnection();
         try {
-            return FlashMOBQuery.getAllFirstClassItems(c);
+            return FlashMOBQuery.getAllItemsWithAssociatedObjects(c);
         } finally {
             c.close();
         }
     }
 
-    public List<FirstClassItemBean> getItemsAssociatedFrom(final FirstClassItemBean it) throws QueryException {
+    /**
+     *
+     * @param subject
+     * @return a list of association beans, with their object references populated
+     * @throws QueryException
+     */
+    public List<AssociationBean> getObjectAssociations(final String subject) throws QueryException {
         MOBModelConnection c = createConnection();
         try {
-            return FlashMOBQuery.getItemsAssociatedFrom(it, c);
+            return FlashMOBQuery.getObjectAssociations(subject, c);
         } finally {
             c.close();
         }
@@ -232,14 +251,19 @@ public class FlashMOBSession {
         return results;
     }*/
 
-    public void enqueueAction(final ActionBean bean) throws UpdateException {
+    public void enqueueAction(final ActionBean bean) throws Throwable {
         System.out.println("enqueueing action: " + bean);
         WriteContext c = createWriteContext();
         try {
+            try {
             WriteAction a = StaticStuff.createAction(bean, c);
             a.redo(c);
             c.getConnection().commit();
             System.out.println("...done");
+            } catch (Throwable t) {
+                t.printStackTrace();
+                throw t;
+            }
         } finally {
             c.close();
         }

@@ -10,6 +10,10 @@ public class AssociationBean extends FirstClassItemBean {
     private String associationSubject;
     private String associationObject;
 
+    // Note: these will never constitute a cycle (at the Object level)
+    private FirstClassItemBean subjectBean;
+    private FirstClassItemBean objectBean;
+
     public String getAssociationSubject() {
         return associationSubject;
     }
@@ -24,5 +28,21 @@ public class AssociationBean extends FirstClassItemBean {
 
     public void setAssociationObject(final String associationObject) {
         this.associationObject = associationObject;
+    }
+
+    public FirstClassItemBean getSubjectBean() {
+        return subjectBean;
+    }
+
+    public void setSubjectBean(FirstClassItemBean subjectBean) {
+        this.subjectBean = subjectBean;
+    }
+
+    public FirstClassItemBean getObjectBean() {
+        return objectBean;
+    }
+
+    public void setObjectBean(FirstClassItemBean objectBean) {
+        this.objectBean = objectBean;
     }
 }

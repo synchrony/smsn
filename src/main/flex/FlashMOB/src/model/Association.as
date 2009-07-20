@@ -7,6 +7,10 @@ package model
 		public var associationSubject:String;
     	public var associationObject:String;
     	
+    	// Null <==> not specified
+    	public var subjectBean:FirstClassItem;
+    	public var objectBean:FirstClassItem;
+    	
 		public function Association()
 		{
 			super();

@@ -1,5 +1,7 @@
 package model
 {
+	import mx.collections.ArrayCollection;
+	
 [Bindable]
 [RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean")]
 public class FirstClassItem {
@@ -13,6 +15,10 @@ public class FirstClassItem {
     public var creationTimeStamp:Date;
     public var creationPlaceStamp:String;
 
+    // Null <==> not specified
+    // Note: because of the possibility of cyclical references, a FlashMOB FirstClassItem should never be passed down to MOB
+	public var objectAssociations:ArrayCollection;
+	
     public function FirstClassItem() {
     }
 

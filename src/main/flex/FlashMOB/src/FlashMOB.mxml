@@ -25,6 +25,14 @@
         		<menuitem label="Personal"/>
         		<menuitem label="Private"/>
         	</menuitem>
+        	<menuitem label="Emphasis threshold">
+        		<menuitem label="0"/>
+        		<menuitem label="1"/>
+        		<menuitem label="2"/>
+        		<menuitem label="3"/>
+        		<menuitem label="4"/>
+        		<menuitem label="5"/>
+        	</menuitem>
         </menuitem>
         <menuitem label="Help">
             <menuitem label="About" view="aboutView"/>
@@ -45,6 +53,7 @@
     </mx:Style>
     <mx:Script>
     	<![CDATA[
+    		import model.FirstClassItemWithAssociatedObjects;
     		import view.search.SearchViewColumn;
     		import model.SessionInfo;
     		import model.MOB;
@@ -61,6 +70,7 @@
         import model.FirstClassItem;
         import actions.CreateFirstClassItem;
         import mx.collections.ArrayCollection;
+        import DragDropExperiment;
 
 		public static const dispatcher:MOBDispatcher = new MOBDispatcher();
 		public static var sessionInfo:SessionInfo;
@@ -90,6 +100,7 @@
         private function menuClickHandler(event:MenuEvent):void {
         	var label:String = event.item.@label;
         	
+        	// TODO: there must be a better way to differentiate between menu items than comparing labels
             if ("About" == label) {
 	            Alert.show(sessionInfo.versionInfo, "About");
     			//	Alert.show("you selected " + event.item.@label, "Menu Selection");
@@ -103,6 +114,9 @@
             	createNewSearchViewColumn();
             } else if ("Public" == label || "Personal" == label || "Private" == label) {
             	setVisibilityLevel(MOB.NAMESPACE + label);
+            } else if ("0" == label || "1" == label || "2" == label || "3" == label || "4" == label || "5" == label) {
+            	var threshold:Number = Number(label) / 5.0;
+            	setEmphasisThreshold(threshold);	
             }
         }
 
@@ -118,15 +132,16 @@
             // TODO: investigate encoding issues in passed strings
  
             function handler(event:ResultEvent):void {
+	            var v3:ViewColumn = createNewSearchViewColumn();
 	            var v1:ViewColumn = createNewSimpleViewColumn();
 	            var v2:ViewColumn = createNewEditViewColumn();
-	            var v3:ViewColumn = createNewSearchViewColumn();
 	
 	            var queryResult:ArrayCollection = event.result as ArrayCollection;
 	            for (var i:int = 0; i < queryResult.length; i++) {
-	                var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
+	            	var f:FirstClassItemWithAssociatedObjects = queryResult.getItemAt(i) as FirstClassItemWithAssociatedObjects;
+	            	var it:FirstClassItem = f.subject;
+	                //var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
 	                v1.addItem(it);
-	                v2.addItem(it);
 	            }
 	        }
 	        dispatcher.getItems(handler, null);            
@@ -141,14 +156,32 @@
             dispatcher.setVisibilityLevel(level, handler, null);       		
         }
         
+        private function setEmphasisThreshold(threshold:Number):void {
+        	function handler(event:ResultEvent):void {
+        		updateSessionInfo(event.result as SessionInfo);	
+        	}
+        	
+        	dispatcher.setEmphasisThreshold(threshold, handler, null);
+        }
+        
         private function updateSessionInfo(info:SessionInfo):void {
         	sessionInfo = info;
         	this.visibilityLevelIcon.source = "assets/icons/12x12/sensitivityLevels/"
-        			+ MOB.getLocalName(sessionInfo.visibilityLevel).toLowerCase() + ".png";	
+        			+ MOB.getLocalName(sessionInfo.visibilityLevel).toLowerCase() + ".png";
+        	this.userNameInfo.text = sessionInfo.userName;
+        	this.emphasisThresholdInfo.text = sessionInfo.emphasisThreshold.toString();	
         }
         
         private function showSecurityLevel():void {
         	Alert.show("Current visibility level is:" + MOB.getLocalName(sessionInfo.visibilityLevel), "Visibility level");
+        }
+        
+        private function showUserInfo():void {
+        	Alert.show("Logged in as '" + sessionInfo.userName + "'", "Authentication");
+        }
+        
+        private function showEmphasisThreshold():void {
+        	Alert.show("Current emphasis threshold is: " + sessionInfo.emphasisThreshold, "Emphasis threshold");
         }
     	]]>
     </mx:Script>
@@ -161,7 +194,13 @@
 <!--                    fillAlphas="[1.0, 1.0, 1.0, 1.0]" fillColors="[#D4CCFF, #FFFFFF]" alpha="1.0" borderColor="#FFFFFF"/>-->
         <view:ViewColumnHBox id="viewColumnHBox"/>
     </mx:VBox>
-    <mx:Image id="visibilityLevelIcon" source="assets/icons/12x12/sensitivityLevels/private.png" alpha="0.33"
-    	x="{applicationVBox.width - (12 + (applicationMenuBar.height - 12) / 2)}" y="{applicationMenuBar.height / 2 - 6}"
-    	click="showSecurityLevel()"/>
+    <mx:HBox id="applicationInfoCorner" alpha="0.33"
+    	paddingBottom="0" paddingTop="0" paddingLeft="0" paddingRight="0" horizontalGap="3"
+    	x="{applicationVBox.width - (applicationInfoCorner.width + (applicationMenuBar.height - applicationInfoCorner.height) / 2)}"
+	    	y="{(applicationMenuBar.height - applicationInfoCorner.height) / 2}">  
+    	<mx:Text id="userNameInfo" click="showUserInfo()"/> 
+    	<mx:Text id="emphasisThresholdInfo" click="showEmphasisThreshold()"/> 	
+	    <mx:Image id="visibilityLevelIcon" source="assets/icons/12x12/sensitivityLevels/private.png"
+	    	click="showSecurityLevel()"/>
+    </mx:HBox>
 </mx:Application>

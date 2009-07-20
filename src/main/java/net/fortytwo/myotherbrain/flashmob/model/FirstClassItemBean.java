@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.flashmob.model;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Author: josh
@@ -18,6 +19,17 @@ public class FirstClassItemBean {
     private Float emphasis;
     private Date creationTimeStamp;
     private String creationPlaceStamp;
+
+    // Note: these will never constitute a cycle (at the Object level)
+    private List<AssociationBean> objectAssociations;
+    
+    public List<AssociationBean> getObjectAssociations() {
+        return objectAssociations;
+    }
+
+    public void setObjectAssociations(List<AssociationBean> objectAssociations) {
+        this.objectAssociations = objectAssociations;
+    }
 
     public String getSubject() {
         return subject;

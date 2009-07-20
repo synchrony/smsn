@@ -10,6 +10,7 @@ public class SessionInfo {
     private String visibilityLevel;
     private String versionInfo;
     private String baseURI;
+    private float emphasisThreshold;
 
     public String getUserName() {
         return userName;
@@ -41,5 +42,13 @@ public class SessionInfo {
 
     public void setBaseURI(String baseURI) {
         this.baseURI = baseURI;
+    }
+
+    public float getEmphasisThreshold() {
+        return emphasisThreshold;
+    }
+
+    public void setEmphasisThreshold(float emphasisThreshold) {
+        this.emphasisThreshold = emphasisThreshold;
     }
 }

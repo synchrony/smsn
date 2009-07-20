@@ -2,6 +2,9 @@ package rpc
 {
 import actions.Action;
 
+import model.FirstClassItem;
+
+import mx.rpc.AsyncToken;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 import mx.rpc.remoting.RemoteObject;
@@ -11,57 +14,46 @@ public class MOBDispatcher
     [Bindable]
     private static var mobSession:RemoteObject = new RemoteObject();
 
-	private var enqueueActionHandler:FunctionHandler = new FunctionHandler("enqueueAction");
-	private var freeTextQueryHandler:FunctionHandler = new FunctionHandler("freeTextQuery");
-	private var getItemsHandler:FunctionHandler = new FunctionHandler("getItems");
-	private var getSessionInfoHandler:FunctionHandler = new FunctionHandler("getSessionInfo");
-	private var setVisibilityLevelHandler:FunctionHandler = new FunctionHandler("setVisibilityLevel");
-	
     public function MOBDispatcher()
     {
         mobSession.destination = "flashmobsession";
-
-        mobSession.enqueueAction.addEventListener(ResultEvent.RESULT, enqueueActionHandler.handleResultEvent);
-        mobSession.enqueueAction.addEventListener(FaultEvent.FAULT, enqueueActionHandler.handleFaultEvent);
-
-        mobSession.freeTextQuery.addEventListener(ResultEvent.RESULT, freeTextQueryHandler.handleResultEvent);
-        mobSession.freeTextQuery.addEventListener(FaultEvent.FAULT, freeTextQueryHandler.handleFaultEvent);
-          
-        mobSession.getItems.addEventListener(ResultEvent.RESULT, getItemsHandler.handleResultEvent);
-        mobSession.getItems.addEventListener(FaultEvent.FAULT, getItemsHandler.handleFaultEvent);
-
-        mobSession.getSessionInfo.addEventListener(ResultEvent.RESULT, getSessionInfoHandler.handleResultEvent);
-        mobSession.getSessionInfo.addEventListener(FaultEvent.FAULT, getSessionInfoHandler.handleFaultEvent);
-
-		mobSession.setVisibilityLevel.addEventListener(ResultEvent.RESULT, setVisibilityLevelHandler.handleResultEvent);
-		mobSession.setVisibilityLevel.addEventListener(FaultEvent.FAULT, setVisibilityLevelHandler.handleFaultEvent);
     }
 
     ////////////////////////////////////
 	
-	public function enqueueAction(action:Action, resultHandler:Function, faultHandler:Function):void {
-		enqueueActionHandler.setHandlers(resultHandler, faultHandler);
-		mobSession.enqueueAction(action);			
+	public function enqueueAction(action:Action, handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.enqueueAction(action);			
+		token.addResponder(new RPCHandler("enqueueAction", handleResult, handleFault));			
 	}
 
-	public function freeTextQuery(query:String, resultHandler:Function, faultHandler:Function):void {
-		freeTextQueryHandler.setHandlers(resultHandler, faultHandler);
-		mobSession.freeTextQuery(query);	
+	public function freeTextQuery(query:String, handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.freeTextQuery(query);	
+		token.addResponder(new RPCHandler("freeTextQuery", handleResult, handleFault));			
 	}
 	
-	public function getItems(resultHandler:Function, faultHandler:Function):void {
-		getItemsHandler.setHandlers(resultHandler, faultHandler);
-		mobSession.getItems();			
+	public function getItems(handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.getItems();			
+		token.addResponder(new RPCHandler("getItems", handleResult, handleFault));			
 	}
 
-	public function getSessionInfo(resultHandler:Function, faultHandler:Function):void {
-		getSessionInfoHandler.setHandlers(resultHandler, faultHandler);
-		mobSession.getSessionInfo();			
+	public function getObjectAssociations(subject:FirstClassItem, handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.getObjectAssociations(subject.subject);
+		token.addResponder(new RPCHandler("getObjectAssociations", handleResult, handleFault));			
+	}
+		
+	public function getSessionInfo(handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.getSessionInfo();			
+		token.addResponder(new RPCHandler("getSessionInfo", handleResult, handleFault));			
 	}
 	
-	public function setVisibilityLevel(level:String, resultHandler:Function, faultHandler:Function):void {
-		setVisibilityLevelHandler.setHandlers(resultHandler, faultHandler);
-		mobSession.setVisibilityLevel(level);	
+	public function setEmphasisThreshold(threshold:Number, handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.setEmphasisThreshold(threshold);	
+		token.addResponder(new RPCHandler("setEmphasisThreshold", handleResult, handleFault));			
+	}
+	
+	public function setVisibilityLevel(level:String, handleResult:Function, handleFault:Function):void {
+		var token:AsyncToken = mobSession.setVisibilityLevel(level);	
+		token.addResponder(new RPCHandler("setVisibilityLevel", handleResult, handleFault));			
 	}
 }
 }

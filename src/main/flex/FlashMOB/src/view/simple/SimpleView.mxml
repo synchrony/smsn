@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<view:View xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="view.*">
+<view:View xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="view.*"
+	xmlns:root="*"
+	initialize="constructor()">
     <mx:Script>
 		<![CDATA[
+			import mx.collections.ItemResponder;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.AsyncToken;
+			import mx.rpc.events.ResultEvent;
+			import ponents.renderers.MinimalItemRenderer;
+			import mx.controls.Label;
+			import mx.controls.List;
+			import mx.controls.Text;
+			import model.AssociationWithObject;
+			import mx.collections.ArrayCollection;
 			import model.MOB;
 			import mx.controls.Alert;
+		
+		[Bindable]
+		private var _associations:ArrayCollection = new ArrayCollection();
+		
+		private function handler(event:ResultEvent):void {
+			var coll:ArrayCollection = event.result as ArrayCollection;
+			for (var i:int = 0; i < coll.length; i++) {
+				_associations.addItem(coll.getItemAt(i));
+				//Alert.show("objectBean: " + coll.getItemAt(i).objectBean.name);
+			}			
+		}
+					
+		private function constructor():void {			
+			FlashMOB.dispatcher.getObjectAssociations(this.item, handler, null);	
+		}
+
         private function showInfo():void {
             var s:String = "";
             s += "URI: " + this.item.subject + "\n";
@@ -24,15 +53,30 @@
         private function showDescription():void {
         	Alert.show(this.item.description);	
         }
+        
+        private function dataChangedTmp():void {
+        	Alert.show("data has changed!");
+        }
 		]]>
 	</mx:Script>
     <mx:VBox width="100%" height="100%">
         <mx:Text htmlText="{this.item.richTextDescription}" truncateToFit="false" width="100%" doubleClick="showDescription()"/>
+    	<mx:Image source="{this.item.icon}"/>
+    	<mx:VBox paddingLeft="15" paddingRight="0" paddingTop="0" paddingBottom="0">  		
+	    	<mx:DataGrid id="associationDataGrid" dataProvider="{this._associations}"
+	    		width="100%" backgroundAlpha="0" borderStyle="none" variableRowHeight="true"
+	    		dataChange="dataChangedTmp()">
+	    		<mx:columns>
+	    			<mx:DataGridColumn dataField="subject"/>
+	    			<!--<mx:DataGridColumn dataField="objectBean.name" itemRenderer="ponents.renderers.MinimalItemRenderer"/>-->
+	    		</mx:columns>
+	    	</mx:DataGrid>       
+    	</mx:VBox>
+    	<!--<mx:VBox id="associationsVBox" paddingLeft="10" width="100%" height="50"/>-->        
     </mx:VBox>
-    <mx:Image source="{this.item.icon}"/>
+
     <mx:ControlBar paddingBottom="2" paddingRight="2">
         <mx:Spacer width="100%"/>
         <mx:Image source="{selectSource()}" alpha="0.25" click="showInfo()"/>
-        <!--<mx:Image source="assets/icons/12x12/info.png" alpha="0.5" click="showInfo()"/>-->
     </mx:ControlBar>
 </view:View>
