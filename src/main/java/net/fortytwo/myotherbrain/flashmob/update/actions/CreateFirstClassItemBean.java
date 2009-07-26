@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashmob.actions;
+package net.fortytwo.myotherbrain.flashmob.update.actions;
 
 import java.util.Date;
 

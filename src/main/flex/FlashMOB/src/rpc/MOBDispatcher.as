@@ -4,9 +4,8 @@ import actions.Action;
 
 import model.FirstClassItem;
 
+import mx.controls.Alert;
 import mx.rpc.AsyncToken;
-import mx.rpc.events.FaultEvent;
-import mx.rpc.events.ResultEvent;
 import mx.rpc.remoting.RemoteObject;
 
 public class MOBDispatcher
@@ -37,7 +36,8 @@ public class MOBDispatcher
 	}
 
 	public function getObjectAssociations(subject:FirstClassItem, handleResult:Function, handleFault:Function):void {
-		var token:AsyncToken = mobSession.getObjectAssociations(subject.subject);
+		//Alert.show("getting object associations for: " + subject.name);
+		var token:AsyncToken = mobSession.getObjectAssociations(subject.uri);
 		token.addResponder(new RPCHandler("getObjectAssociations", handleResult, handleFault));			
 	}
 		

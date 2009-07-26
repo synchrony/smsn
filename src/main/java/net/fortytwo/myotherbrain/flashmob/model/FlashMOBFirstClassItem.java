@@ -1,16 +1,15 @@
 package net.fortytwo.myotherbrain.flashmob.model;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Author: josh
  * Date: Jul 11, 2009
  * Time: 9:23:23 PM
  */
-public class FirstClassItemBean {
+public class FlashMOBFirstClassItem {
 
-    private String subject;
+    private String uri;
     private String name;
     private String description;
     private String richTextDescription;
@@ -20,23 +19,12 @@ public class FirstClassItemBean {
     private Date creationTimeStamp;
     private String creationPlaceStamp;
 
-    // Note: these will never constitute a cycle (at the Object level)
-    private List<AssociationBean> objectAssociations;
-    
-    public List<AssociationBean> getObjectAssociations() {
-        return objectAssociations;
+    public String getUri() {
+        return uri;
     }
 
-    public void setObjectAssociations(List<AssociationBean> objectAssociations) {
-        this.objectAssociations = objectAssociations;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(final String subject) {
-        this.subject = subject;
+    public void setUri(final String subject) {
+        this.uri = subject;
     }
 
     public String getName() {
@@ -101,5 +89,16 @@ public class FirstClassItemBean {
 
     public void setCreationPlaceStamp(final String creationPlaceStamp) {
         this.creationPlaceStamp = creationPlaceStamp;
+    }
+
+    ////////////////////////////////////
+    
+    public boolean equals(final Object other) {
+        return other instanceof FlashMOBFirstClassItem
+                && ((FlashMOBFirstClassItem) other).uri.equals(uri);
+    }
+
+    public int hashCode() {
+        return uri.hashCode();
     }
 }

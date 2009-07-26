@@ -53,12 +53,13 @@
     </mx:Style>
     <mx:Script>
     	<![CDATA[
-    		import model.FirstClassItemWithAssociatedObjects;
-    		import view.search.SearchViewColumn;
-    		import model.SessionInfo;
-    		import model.MOB;
-    		import rpc.MOBDispatcher;
-    		import mx.rpc.events.FaultEvent;
+    		import view.edit.EditItemViewColumn;
+        import view.ItemViewColumn;
+        import view.search.SearchViewColumn;
+        import SessionInfo;
+        import model.MOB;
+        import rpc.MOBDispatcher;
+        import mx.rpc.events.FaultEvent;
         import mx.rpc.remoting.RemoteObject;
         import view.edit.EditViewColumn;
         import view.simple.SimpleViewColumn;
@@ -70,118 +71,132 @@
         import model.FirstClassItem;
         import actions.CreateFirstClassItem;
         import mx.collections.ArrayCollection;
-        import DragDropExperiment;
 
-		public static const dispatcher:MOBDispatcher = new MOBDispatcher();
-		public static var sessionInfo:SessionInfo;
-		
+        public static const dispatcher:MOBDispatcher = new MOBDispatcher();
+        public static var sessionInfo:SessionInfo;
+
         private function constructor():void {
             getSessionInfo();
         }
 
-		private function createNewSimpleViewColumn():ViewColumn {
-            var v:ViewColumn = new SimpleViewColumn();			
+		//private function createNewSimpleViewColumn():ViewColumn {
+        //    var v:ViewColumn = new SimpleViewColumn();			
+        //    this.viewColumnHBox.addViewColumn(v);
+        //    return v;
+        //}
+
+        //private function createNewEditViewColumn():ViewColumn {
+        //    var v:ViewColumn = new EditViewColumn();			
+        //    this.viewColumnHBox.addViewColumn(v);
+        //    return v;			
+        //}
+
+        private function createNewSearchViewColumn():ViewColumn {
+            var v:ViewColumn = new SearchViewColumn();
             this.viewColumnHBox.addViewColumn(v);
             return v;
-		}
-		
-		private function createNewEditViewColumn():ViewColumn {
-            var v:ViewColumn = new EditViewColumn();			
-            this.viewColumnHBox.addViewColumn(v);
-            return v;			
-		}
+        }
 
-		private function createNewSearchViewColumn():ViewColumn {
-            var v:ViewColumn = new SearchViewColumn();			
-            this.viewColumnHBox.addViewColumn(v);
-            return v;			
-		}
-		
+        private function createNewItemViewColumnTmp():ItemViewColumn {
+            var v:ItemViewColumn = new ItemViewColumn();
+            this.viewColumnHBox.addItemViewColumn(v);
+            return v;
+        }
+
+        private function createEditItemViewColumnTmp():ItemViewColumn {
+            var v:ItemViewColumn = new EditItemViewColumn();
+            this.viewColumnHBox.addItemViewColumn(v);
+            return v;
+        }
+
         private function menuClickHandler(event:MenuEvent):void {
-        	var label:String = event.item.@label;
+            var label:String = event.item.@label;
         	
         	// TODO: there must be a better way to differentiate between menu items than comparing labels
             if ("About" == label) {
-	            Alert.show(sessionInfo.versionInfo, "About");
+                Alert.show(sessionInfo.versionInfo, "About");
     			//	Alert.show("you selected " + event.item.@label, "Menu Selection");
-            //} else if ("CreateExperItem" == event.item.@label) {
-            //    mobSession.getExperimentalObject();
+                //} else if ("CreateExperItem" == event.item.@label) {
+                //    mobSession.getExperimentalObject();
             } else if ("Simple view" == label) {
-            	createNewSimpleViewColumn();
+                createNewItemViewColumnTmp();
             } else if ("Edit view" == label) {
-            	createNewEditViewColumn();
+                createEditItemViewColumnTmp();
             } else if ("Search view" == label) {
-            	createNewSearchViewColumn();
+                createNewSearchViewColumn();
             } else if ("Public" == label || "Personal" == label || "Private" == label) {
-            	setVisibilityLevel(MOB.NAMESPACE + label);
+                setVisibilityLevel(MOB.NAMESPACE + label);
             } else if ("0" == label || "1" == label || "2" == label || "3" == label || "4" == label || "5" == label) {
-            	var threshold:Number = Number(label) / 5.0;
-            	setEmphasisThreshold(threshold);	
+                var threshold:Number = Number(label) / 5.0;
+                setEmphasisThreshold(threshold);
             }
         }
 
         private function getSessionInfo():void {
-		    function handler0(event:ResultEvent):void {
-		    	updateSessionInfo(event.result as SessionInfo);	
-		    }
-		    dispatcher.getSessionInfo(handler0, null);
+            function handler0(event:ResultEvent):void {
+                updateSessionInfo(event.result as SessionInfo);
+            }
+            dispatcher.getSessionInfo(handler0, null);
 		    
     		// TODO: investigate precision issues in passed numbers
             // TODO: investigate passing of URIs
             // TODO: investigate exception handling
             // TODO: investigate encoding issues in passed strings
- 
+
+            var v4:ItemViewColumn = createNewItemViewColumnTmp();
+            var v5:ItemViewColumn = createEditItemViewColumnTmp();
+
+            var v3:ViewColumn = createNewSearchViewColumn();
+	            //var v1:ViewColumn = createNewSimpleViewColumn();
+            //var v2:ViewColumn = createNewEditViewColumn();
+
             function handler(event:ResultEvent):void {
-	            var v3:ViewColumn = createNewSearchViewColumn();
-	            var v1:ViewColumn = createNewSimpleViewColumn();
-	            var v2:ViewColumn = createNewEditViewColumn();
-	
-	            var queryResult:ArrayCollection = event.result as ArrayCollection;
-	            for (var i:int = 0; i < queryResult.length; i++) {
-	            	var f:FirstClassItemWithAssociatedObjects = queryResult.getItemAt(i) as FirstClassItemWithAssociatedObjects;
-	            	var it:FirstClassItem = f.subject;
-	                //var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
-	                v1.addItem(it);
-	            }
-	        }
-	        dispatcher.getItems(handler, null);            
+                var queryResult:ArrayCollection = event.result as ArrayCollection;
+                for (var i:int = 0; i < queryResult.length; i++) {
+                    //FIXME	            	var f:FirstClassItemWithAssociatedObjects = queryResult.getItemAt(i) as FirstClassItemWithAssociatedObjects;
+                    //	            	var it:FirstClassItem = f.subject;
+                    //var it:FirstClassItem = queryResult.getItemAt(i) as FirstClassItem;
+                    //	                v4.addItem(it);
+                }
+            }
+            dispatcher.getItems(handler, null);
         }
-        
+
         private function setVisibilityLevel(level:String):void {
             function handler(event:ResultEvent):void {
-            	updateSessionInfo(event.result as SessionInfo);
+                updateSessionInfo(event.result as SessionInfo);
             	//Alert.show("visibility level has been set to: " + MOB.getLocalName(visibilityLevel));
             }
-            
-            dispatcher.setVisibilityLevel(level, handler, null);       		
+
+            dispatcher.setVisibilityLevel(level, handler, null);
         }
-        
+
         private function setEmphasisThreshold(threshold:Number):void {
-        	function handler(event:ResultEvent):void {
-        		updateSessionInfo(event.result as SessionInfo);	
-        	}
-        	
-        	dispatcher.setEmphasisThreshold(threshold, handler, null);
+            function handler(event:ResultEvent):void {
+                updateSessionInfo(event.result as SessionInfo);
+            }
+
+            dispatcher.setEmphasisThreshold(threshold, handler, null);
         }
-        
+
         private function updateSessionInfo(info:SessionInfo):void {
-        	sessionInfo = info;
-        	this.visibilityLevelIcon.source = "assets/icons/12x12/sensitivityLevels/"
-        			+ MOB.getLocalName(sessionInfo.visibilityLevel).toLowerCase() + ".png";
-        	this.userNameInfo.text = sessionInfo.userName;
-        	this.emphasisThresholdInfo.text = sessionInfo.emphasisThreshold.toString();	
+            sessionInfo = info;
+            this.visibilityLevelIcon.source = "assets/icons/12x12/sensitivityLevels/"
+                    + MOB.getLocalName(sessionInfo.sensitivityUpperBound).toLowerCase() + ".png";
+            this.userNameInfo.text = sessionInfo.userName;
+            this.emphasisThresholdInfo.text = sessionInfo.emphasisLowerBound.toString();
         }
-        
+
         private function showSecurityLevel():void {
-        	Alert.show("Current visibility level is:" + MOB.getLocalName(sessionInfo.visibilityLevel), "Visibility level");
+            Alert.show("Current visibility level is:" + MOB.getLocalName(sessionInfo.sensitivityUpperBound), "Visibility level");
         }
-        
+
         private function showUserInfo():void {
-        	Alert.show("Logged in as '" + sessionInfo.userName + "'", "Authentication");
+            Alert.show("Logged in as '" + sessionInfo.userName + "'", "Authentication");
         }
-        
+
         private function showEmphasisThreshold():void {
-        	Alert.show("Current emphasis threshold is: " + sessionInfo.emphasisThreshold, "Emphasis threshold");
+            Alert.show("Current emphasis threshold is: " + sessionInfo.emphasisLowerBound, "Emphasis threshold");
         }
     	]]>
     </mx:Script>

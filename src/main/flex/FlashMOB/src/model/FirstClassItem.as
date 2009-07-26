@@ -5,7 +5,7 @@ package model
 [Bindable]
 [RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean")]
 public class FirstClassItem {
-    public var subject:String;
+    public var uri:String;
     public var name:String;
     public var description:String;
     public var richTextDescription:String;

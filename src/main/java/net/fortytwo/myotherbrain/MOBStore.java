@@ -16,13 +16,14 @@ import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import org.apache.log4j.Logger;
 import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.NeoService;
+import org.neo4j.rdf.fulltext.FulltextIndex;
+import org.neo4j.rdf.fulltext.SimpleFulltextIndex;
 import org.neo4j.rdf.sail.NeoSail;
 import org.neo4j.rdf.sail.rmi.RmiSailClient;
 import org.neo4j.rdf.store.CachingLuceneIndexService;
 import org.neo4j.rdf.store.VerboseQuadStore;
-import org.neo4j.rdf.fulltext.FulltextIndex;
-import org.neo4j.rdf.fulltext.SimpleFulltextIndex;
 import org.neo4j.util.index.IndexService;
+import org.openrdf.concepts.owl.ObjectProperty;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoModule;
 import org.openrdf.repository.Repository;
@@ -121,6 +122,7 @@ public class MOBStore {
 
         // Dynamically register concepts from the MOB ontology.
         baseModule.addConcept(Thing.class);
+        baseModule.addConcept(ObjectProperty.class);  // Dunno why this is necessary, but Elmo logs warnings without it
         baseModule.addConcept(Account.class);
         baseModule.addConcept(Association.class);
         baseModule.addConcept(FirstClassItem.class);

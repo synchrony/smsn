@@ -5,7 +5,6 @@
 		<![CDATA[
 			import mx.events.CloseEvent;
 			import mx.collections.ArrayCollection;
-			import model.WeightedItem;
 			import mx.rpc.events.ResultEvent;
 			import mx.controls.TextInput;
 			import mx.controls.Button;
@@ -13,7 +12,6 @@
         import view.View;
         import view.simple.SimpleView;
         import model.FirstClassItem;
-        import model.WeightedItem;
 
 		private var searchText:TextInput;
 		
@@ -24,8 +22,8 @@
 		private function handleSearchResult(event:ResultEvent):void {
 		    var queryResult:ArrayCollection = event.result as ArrayCollection;
             for (var i:int = 0; i < queryResult.length; i++) {
-                var wi:WeightedItem = queryResult.getItemAt(i) as WeightedItem;
-                this.addItem(wi.item);
+//FIXME                var wi:WeightedItem = queryResult.getItemAt(i) as WeightedItem;
+//                this.addItem(wi.item);
             }		
 		}
 		

@@ -4,11 +4,11 @@ import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
-import net.fortytwo.myotherbrain.flashmob.actions.ActionBean;
-import net.fortytwo.myotherbrain.flashmob.model.AssociationBean;
-import net.fortytwo.myotherbrain.flashmob.model.FirstClassItemWithAssociatedObjects;
-import net.fortytwo.myotherbrain.flashmob.model.SessionInfo;
-import net.fortytwo.myotherbrain.flashmob.model.WeightedItem;
+import net.fortytwo.myotherbrain.flashmob.model.FlashMOBAssociation;
+import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryEvaluator;
+import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryResult;
+import net.fortytwo.myotherbrain.flashmob.update.StaticStuff;
+import net.fortytwo.myotherbrain.flashmob.update.actions.ActionBean;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.query.FreetextSearch;
@@ -82,8 +82,9 @@ public class FlashMOBSession {
 
     private final Session session;
 
-    private SensitivityLevel currentVisibilityLevel = SensitivityLevel.fromURI(MOB.PERSONAL);
-    private float currentEmphasisThreshold = 0f;
+    // Mutable values which control visibility of items and relationships.
+    private SensitivityLevel sensitivityUpperBound = SensitivityLevel.fromURI(MOB.PERSONAL);
+    private float emphasisLowerBound = 0f;
 
     public static void main(final String[] args) throws Exception {
         MOBStore store = MOBStore.getDefaultStore();
@@ -141,44 +142,12 @@ public class FlashMOBSession {
 
     ////////////////////////////////////
 
-    public SessionInfo getSessionInfo() {
-        SessionInfo info = new SessionInfo();
-        info.setBaseURI(MyOtherBrain.MOB_RESOURCE_NS + "r");
-        info.setUserName(session.getUserName());
-        info.setVersionInfo(MyOtherBrain.getVersionInfo());
-        info.setVisibilityLevel(currentVisibilityLevel.toString());
-        info.setEmphasisThreshold(currentEmphasisThreshold);
-        return info;
-    }
-
-    public SessionInfo setVisibilityLevel(final String visibilityLevel) {
-        SensitivityLevel l = SensitivityLevel.fromURI(visibilityLevel);
-        if (null != l) {
-            this.currentVisibilityLevel = l;
-        } else {
-            throw new IllegalArgumentException("not a valid sensitivity level: " + visibilityLevel);
-        }
-
-        return getSessionInfo();
-    }
-
-    public SessionInfo setEmphasisThreshold(final float threshold) {
-        if (threshold < 0) {
-            throw new IllegalArgumentException("threshold must be greater than or equal to zero");
-        } else if (threshold > 1) {
-            throw new IllegalArgumentException("threshold must be less than or equal to one");
-        }
-
-        currentEmphasisThreshold = threshold;
-        return getSessionInfo();
-    }
-
     public List<WeightedItem> freetextQuery(final String query) throws Throwable {
         WeightedBeanCollector coll = new WeightedBeanCollector();
         MOBModelConnection c = createConnection();
         try {
             try {
-            FreetextSearch.executeFreetextSearch(query, coll, c);
+                FreetextSearch.executeFreetextSearch(query, coll, c);
             } catch (Throwable t) {
                 t.printStackTrace();
                 throw t;
@@ -193,22 +162,21 @@ public class FlashMOBSession {
     public List<FirstClassItemWithAssociatedObjects> getItems() throws QueryException {
         MOBModelConnection c = createConnection();
         try {
-            return FlashMOBQuery.getAllItemsWithAssociatedObjects(c);
+            return FlashMOBQueryEvaluator.getAllItemsWithAssociatedObjects(c);
         } finally {
             c.close();
         }
     }
 
     /**
-     *
      * @param subject
      * @return a list of association beans, with their object references populated
      * @throws QueryException
      */
-    public List<AssociationBean> getObjectAssociations(final String subject) throws QueryException {
+    public List<FlashMOBAssociation> getObjectAssociations(final String subject) throws QueryException {
         MOBModelConnection c = createConnection();
         try {
-            return FlashMOBQuery.getObjectAssociations(subject, c);
+            return FlashMOBQueryEvaluator.getObjectAssociations(subject, c);
         } finally {
             c.close();
         }
@@ -251,24 +219,6 @@ public class FlashMOBSession {
         return results;
     }*/
 
-    public void enqueueAction(final ActionBean bean) throws Throwable {
-        System.out.println("enqueueing action: " + bean);
-        WriteContext c = createWriteContext();
-        try {
-            try {
-            WriteAction a = StaticStuff.createAction(bean, c);
-            a.redo(c);
-            c.getConnection().commit();
-            System.out.println("...done");
-            } catch (Throwable t) {
-                t.printStackTrace();
-                throw t;
-            }
-        } finally {
-            c.close();
-        }
-    }
-
     /*public Association getAssociationExperimental() {
         MOBModelConnection c = createConnection();
         try {
@@ -277,6 +227,75 @@ public class FlashMOBSession {
             c.close();
         }
     }*/
+
+    ////////////////////////////////////
+
+    public SessionInfo getSessionInfo() {
+        SessionInfo info = new SessionInfo();
+        info.setBaseURI(MyOtherBrain.MOB_RESOURCE_NS + "r");
+        info.setUserName(session.getUserName());
+        info.setVersionInfo(MyOtherBrain.getVersionInfo());
+        info.setSensitivityUpperBound(sensitivityUpperBound.toString());
+        info.setEmphasisLowerBound(emphasisLowerBound);
+        return info;
+    }
+
+    public SessionInfo setSensitivityUpperBound(final String maxSensitivity) {
+        SensitivityLevel l = SensitivityLevel.fromURI(maxSensitivity);
+        if (null != l) {
+            this.sensitivityUpperBound = l;
+        } else {
+            throw new IllegalArgumentException("not a valid sensitivity level: " + maxSensitivity);
+        }
+
+        return getSessionInfo();
+    }
+
+    public SessionInfo setEmphasisLowerBound(final float minEmphasis) {
+        if (minEmphasis < 0) {
+            throw new IllegalArgumentException("threshold must be greater than or equal to zero");
+        } else if (minEmphasis > 1) {
+            throw new IllegalArgumentException("threshold must be less than or equal to one");
+        }
+
+        emphasisLowerBound = minEmphasis;
+        return getSessionInfo();
+    }
+
+    public List<FlashMOBQueryResult> evaluateQuery(final FlashMOBQueryEvaluator query,
+                                                   final int startIndex,
+                                                   final int endIndex) {
+
+    }
+
+    // FIXME: use the undo/redo queue
+    public void doActions(final List<ActionBean> actions) throws Throwable {
+        for (ActionBean bean : actions) {
+            System.out.println("enqueueing action: " + bean);
+            WriteContext c = createWriteContext();
+            try {
+                try {
+                    WriteAction a = StaticStuff.createAction(bean, c);
+                    a.redo(c);
+                    c.getConnection().commit();
+                    System.out.println("...done");
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    throw t;
+                }
+            } finally {
+                c.close();
+            }
+        }
+    }
+
+    public void undoActions(final List<ActionBean> actions) {
+
+    }
+
+    public void redoActions(final List<ActionBean> actions) {
+
+    }
 
     ////////////////////////////////////
 

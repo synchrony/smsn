@@ -12,11 +12,11 @@ public class ItemRegistry
 
     // TODO: decide what to do if the item *is* in the registry but its fields differ from those of the registered copy.
     public function registerItem(item:FirstClassItem):FirstClassItem {
-        var r:ItemReference = this.referencesBySubject[item.subject] as ItemReference;
+        var r:ItemReference = this.referencesBySubject[item.uri] as ItemReference;
 
         if (null == r) {
             r = new ItemReference(item);
-            this.referencesBySubject[item.subject] = r;
+            this.referencesBySubject[item.uri] = r;
         }
 
         r.referenceCount++;
@@ -24,14 +24,14 @@ public class ItemRegistry
     }
 
     public function unregisterItem(item:FirstClassItem):void {
-        var r:ItemReference = this.referencesBySubject[item.subject] as ItemReference;
+        var r:ItemReference = this.referencesBySubject[item.uri] as ItemReference;
 
         if (null == r) {
             Alert.show("tried to unregister an item not in the registry: " + item);
         } else {
             r.referenceCount--;
             if (r.referenceCount < 1) {
-                this.referencesBySubject[item.subject] = null;
+                this.referencesBySubject[item.uri] = null;
             }
         }
     }

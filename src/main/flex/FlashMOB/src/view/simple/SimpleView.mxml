@@ -2,19 +2,18 @@
 <view:View xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:view="view.*"
 	xmlns:root="*"
+	xmlns:ponents="ponents.*"
 	initialize="constructor()">
     <mx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.collections.ItemResponder;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.AsyncToken;
 			import mx.rpc.events.ResultEvent;
-			import ponents.renderers.MinimalItemRenderer;
 			import mx.controls.Label;
 			import mx.controls.List;
 			import mx.controls.Text;
-			import model.AssociationWithObject;
-			import mx.collections.ArrayCollection;
 			import model.MOB;
 			import mx.controls.Alert;
 		
@@ -26,7 +25,16 @@
 			for (var i:int = 0; i < coll.length; i++) {
 				_associations.addItem(coll.getItemAt(i));
 				//Alert.show("objectBean: " + coll.getItemAt(i).objectBean.name);
-			}			
+			}
+			
+			// TODO: update dynamically
+			this.associationsGrid.rowCount = _associations.length;	
+			if (0 == _associations.length) {
+				//this.associationsGrid.visible = false;
+				//this.associationsGrid.height = 0;
+			} else {
+				this.associationsGrid.visible = true;
+			}	
 		}
 					
 		private function constructor():void {			
@@ -35,7 +43,7 @@
 
         private function showInfo():void {
             var s:String = "";
-            s += "URI: " + this.item.subject + "\n";
+            s += "URI: " + this.item.uri + "\n";
             if (null != this.item.creationTimeStamp) {
                 s += "created: " + this.item.creationTimeStamp + "\n";
             }
@@ -55,28 +63,30 @@
         }
         
         private function dataChangedTmp():void {
-        	Alert.show("data has changed!");
+        	//Alert.show("data has changed!");
+        	//associationsGrid.rowCount = this._associations.length;
         }
 		]]>
 	</mx:Script>
     <mx:VBox width="100%" height="100%">
         <mx:Text htmlText="{this.item.richTextDescription}" truncateToFit="false" width="100%" doubleClick="showDescription()"/>
     	<mx:Image source="{this.item.icon}"/>
-    	<mx:VBox paddingLeft="15" paddingRight="0" paddingTop="0" paddingBottom="0">  		
-	    	<mx:DataGrid id="associationDataGrid" dataProvider="{this._associations}"
-	    		width="100%" backgroundAlpha="0" borderStyle="none" variableRowHeight="true"
-	    		dataChange="dataChangedTmp()">
+    	<mx:VBox paddingLeft="15" paddingRight="0" paddingTop="0" paddingBottom="1" width="100%">  		
+	    	<mx:DataGrid id="associationsGrid" dataProvider="{this._associations}" rowCount="0" visible="false"
+	    		selectable="false" showHeaders="false" dragEnabled="true"
+	    		added="dataChangedTmp()" removed="dataChangedTmp()"
+	    		width="100%" backgroundAlpha="0" borderStyle="none" variableRowHeight="true">
 	    		<mx:columns>
-	    			<mx:DataGridColumn dataField="subject"/>
-	    			<!--<mx:DataGridColumn dataField="objectBean.name" itemRenderer="ponents.renderers.MinimalItemRenderer"/>-->
+	    			<mx:DataGridColumn itemRenderer="ponents.renderers.MinimalItemRenderer"/>
+	    			<mx:DataGridColumn itemRenderer="ponents.renderers.MinimalSourceRenderer"/>
 	    		</mx:columns>
 	    	</mx:DataGrid>       
     	</mx:VBox>
-    	<!--<mx:VBox id="associationsVBox" paddingLeft="10" width="100%" height="50"/>-->        
     </mx:VBox>
 
     <mx:ControlBar paddingBottom="2" paddingRight="2">
         <mx:Spacer width="100%"/>
         <mx:Image source="{selectSource()}" alpha="0.25" click="showInfo()"/>
+        <!--<ponents:SensitivityIcon data="{this.item}"/>-->
     </mx:ControlBar>
 </view:View>

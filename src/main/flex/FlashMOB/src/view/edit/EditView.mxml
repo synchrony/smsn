@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <view:View xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:view="view.*"
-	xmlns:ponents="ponents.*" initialize="constructor()">
+	xmlns:ponents="ponents.*"
+	xmlns:renderers="ponents.renderers.*" initialize="constructor()">
     <mx:Script>
         <![CDATA[
         import model.MOB;
@@ -10,6 +11,7 @@
 
         private function constructor():void {
             this.sensitivityLevels.selectedValue = this.item.sensitivity;
+            this.experViewList.addItem(this.item);
         }
 
         private function save():void {
@@ -54,6 +56,7 @@
     		<mx:Button label="show"/>
     	</mx:VBox>    	
     </mx:HBox>-->
+    <view:NewViewList id="experViewList"/>
     <mx:HBox>
         <mx:Panel title="sensitivity:" dropShadowEnabled="false" width="100%" borderStyle="solid" backgroundAlpha="0.0">
             <mx:RadioButtonGroup id="sensitivityLevels"/>

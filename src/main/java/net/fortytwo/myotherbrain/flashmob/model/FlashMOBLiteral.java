@@ -5,10 +5,10 @@ package net.fortytwo.myotherbrain.flashmob.model;
  * Date: Jul 14, 2009
  * Time: 6:19:09 PM
  */
-public class LiteralBean extends FirstClassItemBean {
+public class FlashMOBLiteral extends FlashMOBFirstClassItem {
     
     private String lexicalForm;
-    private String datatypeURI;
+    private String datatypeUri;
     private String languageTag;
 
     public String getLexicalForm() {
@@ -19,12 +19,12 @@ public class LiteralBean extends FirstClassItemBean {
         this.lexicalForm = lexicalForm;
     }
 
-    public String getDatatypeURI() {
-        return datatypeURI;
+    public String getDatatypeUri() {
+        return datatypeUri;
     }
 
-    public void setDatatypeURI(final String datatypeURI) {
-        this.datatypeURI = datatypeURI;
+    public void setDatatypeUri(final String datatypeUri) {
+        this.datatypeUri = datatypeUri;
     }
 
     public String getLanguageTag() {
