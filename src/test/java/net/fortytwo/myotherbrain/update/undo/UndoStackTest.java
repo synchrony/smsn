@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.undo;
+package net.fortytwo.myotherbrain.update.undo;
 
 import junit.framework.TestCase;
 

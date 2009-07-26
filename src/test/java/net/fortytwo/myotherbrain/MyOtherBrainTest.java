@@ -23,8 +23,8 @@ public class MyOtherBrainTest extends TestCase {
     private Session session;
     private MOBModel model;
 
-    private MOBModelConnection c = model.createConnection();
-    private WriteContext wc = new WriteContext(c);
+    private MOBModelConnection c;
+    private WriteContext wc;
 
     public void setUp() throws Exception {
         sail = new MemoryStore();

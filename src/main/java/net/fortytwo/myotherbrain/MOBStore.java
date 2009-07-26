@@ -133,7 +133,7 @@ public class MOBStore {
         baseModule.addConcept(SensitivityLevel.class);
         baseModule.addConcept(WebResource.class);
 
-        baseModule.addConcept(ExperimentalClassConcept.class, MOB.NAMESPACE + "ExperimentalClassConcept");
+        //baseModule.addConcept(ExperimentalClassConcept.class, MOB.NAMESPACE + "ExperimentalClassConcept");
 
         elmoModule = new ElmoModule();
         elmoModule.includeModule(baseModule);

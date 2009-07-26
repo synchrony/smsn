@@ -4,14 +4,13 @@ import net.fortytwo.myotherbrain.MOBStore;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.AccessManager;
 import net.fortytwo.myotherbrain.access.Session;
-import net.fortytwo.myotherbrain.flashmob.model.FlashMOBAssociation;
-import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryEvaluator;
+import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQuery;
+import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryExecutor;
 import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryResult;
-import net.fortytwo.myotherbrain.flashmob.update.StaticStuff;
+import net.fortytwo.myotherbrain.flashmob.update.ActionFactory;
 import net.fortytwo.myotherbrain.flashmob.update.actions.ActionBean;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
-import net.fortytwo.myotherbrain.query.FreetextSearch;
 import net.fortytwo.myotherbrain.query.QueryException;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
@@ -19,6 +18,7 @@ import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
 import org.apache.log4j.Logger;
 
+import javax.xml.namespace.QName;
 import java.util.List;
 
 /**
@@ -58,7 +58,12 @@ public class FlashMOBSession {
                 }
             }
 
-            return null;
+            throw new IllegalArgumentException("no such sensitivity level: " + uri);
+        }
+
+        public static SensitivityLevel find(final net.fortytwo.myotherbrain.model.concepts.SensitivityLevel l) {
+            QName q = l.getQName();
+            return fromURI(q.getNamespaceURI() + q.getLocalPart());
         }
     }
 
@@ -81,6 +86,7 @@ public class FlashMOBSession {
     }
 
     private final Session session;
+    private final FlashMOBQueryExecutor queryExecutor;
 
     // Mutable values which control visibility of items and relationships.
     private SensitivityLevel sensitivityUpperBound = SensitivityLevel.fromURI(MOB.PERSONAL);
@@ -134,99 +140,12 @@ public class FlashMOBSession {
         try {
             AccessManager am = new AccessManager(MOBStore.getDefaultStore());
             session = am.createSession(TEMP_USERNAME);
+            queryExecutor = new FlashMOBQueryExecutor(session.getModel(), this.getSessionInfo());
         } catch (Throwable t) {
             t.printStackTrace();
             throw t;
         }
     }
-
-    ////////////////////////////////////
-
-    public List<WeightedItem> freetextQuery(final String query) throws Throwable {
-        WeightedBeanCollector coll = new WeightedBeanCollector();
-        MOBModelConnection c = createConnection();
-        try {
-            try {
-                FreetextSearch.executeFreetextSearch(query, coll, c);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                throw t;
-            }
-        } finally {
-            c.close();
-        }
-
-        return coll.getResults();
-    }
-
-    public List<FirstClassItemWithAssociatedObjects> getItems() throws QueryException {
-        MOBModelConnection c = createConnection();
-        try {
-            return FlashMOBQueryEvaluator.getAllItemsWithAssociatedObjects(c);
-        } finally {
-            c.close();
-        }
-    }
-
-    /**
-     * @param subject
-     * @return a list of association beans, with their object references populated
-     * @throws QueryException
-     */
-    public List<FlashMOBAssociation> getObjectAssociations(final String subject) throws QueryException {
-        MOBModelConnection c = createConnection();
-        try {
-            return FlashMOBQueryEvaluator.getObjectAssociations(subject, c);
-        } finally {
-            c.close();
-        }
-    }
-
-    /*
-    public ExperimentalClassConcept getExperimentalObject() {
-        String uri = "http://example.org/ns/experResource";
-
-        MOBModelConnection c = createConnection();
-        try {
-            ExperimentalClassConcept e
-                    = new ExperimentalClassConcept();
-            //        = c.getElmoManager().create(new QName(uri), ExperimentalClassConcept.class);
-            e.setQName(new QName(uri));
-            //e.setName("a brand new resource");
-            e.setDescription("this is a description, not a name");
-            c.getElmoManager().persist(e);
-            c.commit();
-            //e = new ExperimentalClassConcept(e);
-            return e;
-        } finally {
-            c.close();
-        }
-    }
-
-    public String[] mintRandomURIs(final int batchSize) {
-        if (0 > batchSize) {
-            throw new IllegalArgumentException("negative batch size");
-        } else if (batchSize > URIMINTING_MAXBATCHSIZE) {
-            throw new IllegalArgumentException(
-                    "requested batch is too large (maximum size is " + URIMINTING_MAXBATCHSIZE + ")");
-        }
-
-        String[] results = new String[batchSize];
-        for (int i = 0; i < batchSize; i++) {
-            results[i] = MyOtherBrain.randomURIString();
-        }
-
-        return results;
-    }*/
-
-    /*public Association getAssociationExperimental() {
-        MOBModelConnection c = createConnection();
-        try {
-
-        } finally {
-            c.close();
-        }
-    }*/
 
     ////////////////////////////////////
 
@@ -262,10 +181,10 @@ public class FlashMOBSession {
         return getSessionInfo();
     }
 
-    public List<FlashMOBQueryResult> evaluateQuery(final FlashMOBQueryEvaluator query,
-                                                   final int startIndex,
-                                                   final int endIndex) {
-
+    public List<FlashMOBQueryResult> executeQuery(final FlashMOBQuery query,
+                                                  final int startIndex,
+                                                  final int endIndex) throws QueryException {
+        return queryExecutor.execute(query, startIndex, endIndex);
     }
 
     // FIXME: use the undo/redo queue
@@ -275,7 +194,7 @@ public class FlashMOBSession {
             WriteContext c = createWriteContext();
             try {
                 try {
-                    WriteAction a = StaticStuff.createAction(bean, c);
+                    WriteAction a = ActionFactory.createAction(bean, c);
                     a.redo(c);
                     c.getConnection().commit();
                     System.out.println("...done");
@@ -290,11 +209,11 @@ public class FlashMOBSession {
     }
 
     public void undoActions(final List<ActionBean> actions) {
-
+        // TODO
     }
 
     public void redoActions(final List<ActionBean> actions) {
-
+        // TODO
     }
 
     ////////////////////////////////////

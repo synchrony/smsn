@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.update;
 
-import net.fortytwo.myotherbrain.undo.UndoableAction;
+import net.fortytwo.myotherbrain.update.undo.UndoableAction;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.Entity;
 

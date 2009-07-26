@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.model;
 
-import net.fortytwo.myotherbrain.update.Quotas;
+import net.fortytwo.myotherbrain.access.Quotas;
 import org.neo4j.rdf.sail.NeoSail;
 import org.openrdf.elmo.ElmoManager;
 import org.openrdf.sail.SailConnection;

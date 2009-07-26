@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.model;
 
-import net.fortytwo.myotherbrain.update.Quotas;
+import net.fortytwo.myotherbrain.access.Quotas;
 import org.openrdf.elmo.ElmoManagerFactory;
 import org.openrdf.elmo.ElmoModule;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
