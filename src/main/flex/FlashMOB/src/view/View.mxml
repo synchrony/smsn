@@ -21,7 +21,7 @@
         import mx.core.DragSource;
         import mx.controls.Alert;
         import mx.events.CloseEvent;
-        import model.FirstClassItem;
+        import model.concepts.FirstClassItem;
 
         [Bindable]
         public var item:FirstClassItem;

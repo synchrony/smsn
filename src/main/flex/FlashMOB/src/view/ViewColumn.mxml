@@ -24,7 +24,7 @@
 			import mx.events.DragEvent;
 			import view.simple.SimpleView;
         import mx.events.CloseEvent;
-        import model.FirstClassItem;
+        import model.concepts.FirstClassItem;
         import mx.controls.Alert;
 
         // Called when the user moves the drag proxy onto the drop target.

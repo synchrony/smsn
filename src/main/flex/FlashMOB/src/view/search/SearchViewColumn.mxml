@@ -11,7 +11,7 @@
 			import mx.controls.Alert;
         import view.View;
         import view.simple.SimpleView;
-        import model.FirstClassItem;
+        import model.concepts.FirstClassItem;
 
 		private var searchText:TextInput;
 		

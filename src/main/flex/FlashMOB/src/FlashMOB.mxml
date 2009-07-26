@@ -68,7 +68,7 @@
         import mx.collections.ArrayCollection;
         import mx.rpc.events.ResultEvent;
         import mx.controls.Alert;
-        import model.FirstClassItem;
+        import model.concepts.FirstClassItem;
         import actions.CreateFirstClassItem;
         import mx.collections.ArrayCollection;
 

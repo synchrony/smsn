@@ -2,7 +2,7 @@ package rpc
 {
 import actions.Action;
 
-import model.FirstClassItem;
+import model.concepts.FirstClassItem;
 
 import mx.controls.Alert;
 import mx.rpc.AsyncToken;

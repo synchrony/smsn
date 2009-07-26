@@ -8,7 +8,7 @@ package net.fortytwo.myotherbrain.flashmob.model;
 public class FlashMOBLiteral extends FlashMOBFirstClassItem {
     
     private String lexicalForm;
-    private String datatypeUri;
+    private String datatypeURI;
     private String languageTag;
 
     public String getLexicalForm() {
@@ -19,12 +19,12 @@ public class FlashMOBLiteral extends FlashMOBFirstClassItem {
         this.lexicalForm = lexicalForm;
     }
 
-    public String getDatatypeUri() {
-        return datatypeUri;
+    public String getDatatypeURI() {
+        return datatypeURI;
     }
 
-    public void setDatatypeUri(final String datatypeUri) {
-        this.datatypeUri = datatypeUri;
+    public void setDatatypeURI(final String datatypeURI) {
+        this.datatypeURI = datatypeURI;
     }
 
     public String getLanguageTag() {

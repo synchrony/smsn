@@ -7,27 +7,27 @@ package net.fortytwo.myotherbrain.flashmob.model;
  */
 public class FlashMOBAssociation extends FlashMOBFirstClassItem {
     
-    private String subjectUri;
-    private String objectUri;
+    private String subjectURI;
+    private String objectURI;
 
     // Note: these will never constitute a cycle (at the Object level)
     private FlashMOBFirstClassItem subject;
     private FlashMOBFirstClassItem object;
 
-    public String getSubjectUri() {
-        return subjectUri;
+    public String getSubjectURI() {
+        return subjectURI;
     }
 
-    public void setSubjectUri(final String subjectUri) {
-        this.subjectUri = subjectUri;
+    public void setSubjectURI(final String subjectURI) {
+        this.subjectURI = subjectURI;
     }
 
-    public String getObjectUri() {
-        return objectUri;
+    public String getObjectURI() {
+        return objectURI;
     }
 
-    public void setObjectUri(final String objectUri) {
-        this.objectUri = objectUri;
+    public void setObjectURI(final String objectURI) {
+        this.objectURI = objectURI;
     }
 
     public FlashMOBFirstClassItem getSubject() {

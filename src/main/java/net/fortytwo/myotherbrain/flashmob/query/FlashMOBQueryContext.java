@@ -50,12 +50,12 @@ public class FlashMOBQueryContext {
         FlashMOBFirstClassItem i;
         if (fci instanceof Association) {
             i = new FlashMOBAssociation();
-            ((FlashMOBAssociation) i).setSubjectUri(toString(((Association) fci).getSubject().getQName()));
-            ((FlashMOBAssociation) i).setObjectUri(toString(((Association) fci).getObject().getQName()));
+            ((FlashMOBAssociation) i).setSubjectURI(toString(((Association) fci).getSubject().getQName()));
+            ((FlashMOBAssociation) i).setObjectURI(toString(((Association) fci).getObject().getQName()));
         } else if (fci instanceof Literal) {
             i = new FlashMOBLiteral();
             ((FlashMOBLiteral) i).setLexicalForm(((Literal) fci).getLexicalForm());
-            ((FlashMOBLiteral) i).setDatatypeUri(toString(((Literal) fci).getDatatypeURI()));
+            ((FlashMOBLiteral) i).setDatatypeURI(toString(((Literal) fci).getDatatypeURI()));
             ((FlashMOBLiteral) i).setLanguageTag(((Literal) fci).getLanguageTag());
         } else {
             i = new FlashMOBFirstClassItem();

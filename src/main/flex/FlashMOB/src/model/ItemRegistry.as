@@ -1,6 +1,7 @@
 package model
 {
 import mx.controls.Alert;
+import model.concepts.FirstClassItem;
 
 public class ItemRegistry
 {

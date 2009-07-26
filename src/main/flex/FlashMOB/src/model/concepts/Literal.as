@@ -1,7 +1,7 @@
-package model
+package model.concepts
 {
 [Bindable]
-[RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.model.LiteralBean")]
+[RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.model.FlashMOBLiteral")]
 public class Literal extends FirstClassItem
 {
     public var lexicalForm:String;
@@ -12,6 +12,5 @@ public class Literal extends FirstClassItem
     {
         super();
     }
-
 }
 }

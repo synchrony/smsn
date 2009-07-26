@@ -1,9 +1,9 @@
-package model
+package model.concepts
 {
 	import mx.collections.ArrayCollection;
 	
 [Bindable]
-[RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.model.FirstClassItemBean")]
+[RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.model.FlashMOBFirstClassItem")]
 public class FirstClassItem {
     public var uri:String;
     public var name:String;
