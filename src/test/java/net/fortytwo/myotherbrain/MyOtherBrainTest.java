@@ -198,7 +198,7 @@ public class MyOtherBrainTest extends TestCase {
         // TODO: Magnus' language background
         // TODO: Magnus' convincing tone
         // TODO: the Hungarian's defensive bias seems to outweigh Magnus' bias
-        // TODO: I had been predisposed to like Finnish at the time of this conversation, felt taken aback by Magnus' comments
+        // TODO: I had been predisposed to like Finnish at the time of this conversation, felt surprised by Magnus' comments
         // TODO: analogies of disputant's tones with other, unrelated situations
     }
 

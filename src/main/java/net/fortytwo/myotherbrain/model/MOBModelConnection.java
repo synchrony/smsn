@@ -43,6 +43,7 @@ public class MOBModelConnection {
     }
 
     public SailConnection createSailConnection() throws SailException {
+        // FIXME: where is this connection closed?
         return model.getSail().getConnection();
     }
 

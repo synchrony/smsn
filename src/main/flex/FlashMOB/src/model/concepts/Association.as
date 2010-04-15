@@ -14,7 +14,6 @@ package model.concepts
 		public function Association()
 		{
 			super();
-		}
-		
+		}		
 	}
 }

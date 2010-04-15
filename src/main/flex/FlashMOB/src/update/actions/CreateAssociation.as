@@ -1,7 +1,7 @@
-package actions
+package update.actions
 {
 [Bindable]
-[RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.actions.CreateAssociationBean")]
+[RemoteClass(alias="net.fortytwo.myotherbrain.flashmob.update.actions.CreateAssociationBean")]
 public class CreateAssociation extends Action {
     public var subject:String;
     public var name:String;

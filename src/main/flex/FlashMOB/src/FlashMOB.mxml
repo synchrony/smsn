@@ -69,7 +69,7 @@
         import mx.rpc.events.ResultEvent;
         import mx.controls.Alert;
         import model.concepts.FirstClassItem;
-        import actions.CreateFirstClassItem;
+        import update.actions.CreateFirstClassItem;
         import mx.collections.ArrayCollection;
 
         public static const dispatcher:MOBDispatcher = new MOBDispatcher();

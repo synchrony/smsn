@@ -1,6 +1,6 @@
 package rpc
 {
-import actions.Action;
+import update.actions.Action;
 
 import model.concepts.FirstClassItem;
 
