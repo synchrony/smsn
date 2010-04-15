@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:ItemViewColumn xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="view.*"
+	initialize="constructor()">
+	<mx:Script>
+		<![CDATA[
+            import mx.core.ClassFactory; 
+            
+			private function constructor():void {
+				// For the reason this has been cast as ClassFactory, see:
+				//     http://livedocs.adobe.com/flex/3/html/help.html?content=cellrenderer_4.html
+				this.associationsList.itemRenderer = new ClassFactory(view.edit.EditItemRenderer);
+			}
+		]]>
+	</mx:Script>
+</view:ItemViewColumn>

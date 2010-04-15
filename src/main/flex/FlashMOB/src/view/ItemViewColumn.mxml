@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="view.*"
+         horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" verticalGap="0"
+         borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000">
+    <mx:Style>
+        .gradientBackground1 {
+            backgroundImage: ClassReference("GradientBackground");
+            backgroundSize: "100%";
+            fillColors: #FFFFFF, #d4ccff;
+            fillAlphas: 1.0, 1.0;
+        }
+    </mx:Style>
+    <mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
+			import view.simple.SimpleView;
+        import mx.events.CloseEvent;
+        import model.concepts.FirstClassItem;
+        import mx.controls.Alert;
+
+        public function addItem(it:FirstClassItem):void {
+				//Alert.show("adding item: " + it);
+            it = StaticStuff.itemRegistry.registerItem(it);
+            
+            this.associationsList.addItem(it);
+
+            //v.addEventListener(CloseEvent.CLOSE, closeHandler);
+        }
+
+        private function createNewItem():void {
+            addItem(StaticStuff.createNewItem());
+        }
+        
+        private function clear():void {
+        	this.associationsList.clear();
+        }
+        
+        // Override me
+ 		public function search():void {
+ 			Alert.show("this should have been overridden");
+ 		}
+        
+        private function close():void {
+        	clear();
+        	(this.parent as ViewColumnHBox).removeItemViewColumn(this);
+        }
+		]]>
+	</mx:Script>
+    <mx:VBox width="100%" height="{this.height - columnFooter.height}"
+            paddingLeft="5" paddingRight="5" paddingTop="0" paddingBottom="0"
+            borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+            horizontalScrollPolicy="off" verticalScrollPolicy="auto"
+			backgroundColor="#FFFFFF"> <!-- note: oddly enough, this backgroundColor is necessary for custom drag and drop -->
+        <mx:Spacer height="8"/>
+        <view:NewViewList id="associationsList" width="100%" minHeight="{this.height - columnFooter.height - 16}"
+			borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+			paddingLeft="0" paddingRight="0"
+			verticalScrollPolicy="off"/>
+        <!--
+        <mx:VBox id="containerVBox" width="100%"
+        	     borderStyle="none" backgroundAlpha="0.0" borderColor="#FF0000"
+                 paddingLeft="0" paddingRight="0" verticalGap="5"/>-->
+        <mx:Spacer height="8"/>
+    </mx:VBox>
+    <!--<mx:MenuBar labelField="@label" width="100%"
+         fillAlphas="[1.0, 1.0, 1.0, 1.0]" fillColors="[#D4CCFF, #FFFFFF, #D4CCFF, #FFFFFF]" alpha="1.0" borderColor="#FFFFFF"/>
+         <mx:Spacer height="3"/>-->
+    <mx:VBox id="columnFooter" paddingTop="3" paddingBottom="3" paddingLeft="3" paddingRight="3" width="100%" borderStyle="none"
+    	height="{footerContents.height + 6}"
+    	styleName="gradientBackground1">
+    	<mx:HBox id="footerContents" paddingBottom="0" paddingLeft="0" paddingTop="0" paddingRight="0" width="100%" backgroundAlpha="0.0">  		
+	        <mx:Button label="New item" click="createNewItem()"/>
+	        <mx:Spacer width="100%"/>
+	        <mx:HBox id="searchComponent" visible="false">
+	        	<mx:TextInput id="searchInput"/>
+	        	<mx:Button label="Search" click="this.search()"/>
+	        </mx:HBox>
+	        <mx:Button label="Clear" click="clear()"/>
+	        <mx:Button label="Close" click="close()"/>
+    	</mx:HBox> 
+    </mx:VBox>
+</mx:VBox>

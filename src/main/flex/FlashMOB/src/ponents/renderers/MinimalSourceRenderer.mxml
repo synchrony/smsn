@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" dataChange="handleDataChange()" horizontalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			import model.concepts.Association;
+			import mx.controls.Alert;
+			
+			private function handleDataChange():void {
+				this.sensitivityImage.source = StaticStuff.getSensitivityImageForItem(this.data as Association);
+			}
+		]]>
+	</mx:Script>
+	<mx:Spacer width="100%"/>
+	<mx:Image id="sensitivityImage" alpha="0.25"/>
+</mx:HBox>

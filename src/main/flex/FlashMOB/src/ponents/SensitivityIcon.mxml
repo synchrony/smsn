@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Image xmlns:mx="http://www.adobe.com/2006/mxml" alpha="0.25" click="showInfo()" dataChange="handleDataChange()">
+	<mx:Script>
+		<![CDATA[
+			import model.MOB;
+			import model.FirstClassItem;
+			import model.Association;
+			import mx.controls.Alert;
+		
+		//[Bindable]
+		//public var item:FirstClassItem;
+			
+		private function handleDataChange():void {
+			Alert.show("data = " + this.data);
+			this.source = StaticStuff.getSensitivityImageForItem(data as FirstClassItem);
+		}
+		
+		// TODO: merge with SimpleView.showInfo	
+	    private function showInfo():void {
+            var s:String = "";
+            s += "URI: " + this.data.subject + "\n";
+            if (null != this.data.creationTimeStamp) {
+                s += "created: " + this.data.creationTimeStamp + "\n";
+            }
+            s += "sensitivity: " + MOB.getLocalName(this.data.sensitivity) + "\n";
+				//if (this.item.emphasis) {
+            s += "emphasis: " + this.data.emphasis + "\n";
+				//}
+            Alert.show(s, this.data.name);
+        }
+		]]>
+	</mx:Script>	
+</mx:Image>
