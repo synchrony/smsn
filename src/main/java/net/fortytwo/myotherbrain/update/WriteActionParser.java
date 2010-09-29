@@ -212,7 +212,7 @@ public class WriteActionParser {
 
         WriteActionConstructor cons = constructors.get(name);
         if (null == cons) {
-            throw new UpdateException("unfamiliar action: " + name);
+            throw new WriteActionParseException("unfamiliar action: " + name);
         }
 
         return cons.construct(params, c);
@@ -225,11 +225,11 @@ public class WriteActionParser {
     // JSON ////////////////////////////////////////////////////////////////////
 
     protected static String getString(final JSONObject j,
-                                      final Enum key) throws MissingFieldException {
+                                      final Enum key) throws WriteActionParseException {
         try {
             return j.getString(key.toString());
         } catch (JSONException e) {
-            throw new MissingFieldException(key);
+            throw WriteActionParseException.missingField(key);
         }
     }
 
@@ -255,7 +255,7 @@ public class WriteActionParser {
     }
 
     protected static Date getDate(final JSONObject j,
-                                  final Enum key) throws MissingFieldException {
+                                  final Enum key) throws WriteActionParseException {
         String s = getString(j, key);
 
         XMLGregorianCalendar c = DATATYPES.newXMLGregorianCalendar(s);

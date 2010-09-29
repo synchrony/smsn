@@ -13,27 +13,49 @@ public class WriteActionParserTest extends WriteActionTestCase {
     private WriteActionParser parser = new WriteActionParser();
 
     public void testAll() throws Exception {
-        WriteContext c = new WriteContext(model.createConnection());
-
         String s = "{" +
                 "  action: 'addMarkerTag'," +
                 "  params: {" +
-                "    blah: ..." +
+                "    subject: 'http://example.org/ns/foo'," +
+                "    newMarkerTag: 'http://example.org/ns/bar'," +
                 "  }" +
                 "}";
 
-        WriteAction a = parse(s, c);
-
-        c.getConnection().rollback();
-        c.getConnection().close();
+        WriteAction a = parse(s, context);
     }
 
     public void testNonexistentAction() throws Exception {
-        // TODO
+        String s = "{" +
+                "  action: 'bogusAction'," +
+                "  params: {" +
+                "  }" +
+                "}";
+
+        boolean caught = false;
+        try {
+            parse(s, context);
+        } catch (WriteActionParseException e) {
+            caught = true;
+        }
+
+        assertTrue(caught);
     }
 
     public void testMissingField() throws Exception {
-        // TODO
+        String s = "{" +
+                "  action: 'addMarkerTag'," +
+                "  params: {" +
+                "  }" +
+                "}";
+
+        boolean caught = false;
+        try {
+            parse(s, context);
+        } catch (WriteActionParseException e) {
+            caught = true;
+        }
+
+        assertTrue(caught);
     }
 
     public void testNonexistentField() throws Exception {
