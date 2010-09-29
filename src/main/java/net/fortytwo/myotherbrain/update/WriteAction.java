@@ -35,15 +35,13 @@ public abstract class WriteAction extends UndoableAction<WriteContext, UpdateExc
 
     protected final URI subject;
 
-    protected WriteAction(URI subject,
+    protected WriteAction(final URI subject,
                           final WriteContext c) throws UpdateException {
         if (null == subject) {
             throw new NullPointerException();
-        } else {
-            subject = c.normalizeResourceURI(subject);
         }
-
-        this.subject = subject;
+        
+        this.subject = c.normalizeResourceURI(subject);
     }
 
     protected <T extends Thing> T toThing(final URI uri,

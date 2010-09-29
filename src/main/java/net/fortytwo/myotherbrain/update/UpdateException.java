@@ -9,4 +9,8 @@ public class UpdateException extends Exception {
     public UpdateException(final String message) {
         super(message);
     }
+
+    public UpdateException(final Throwable cause) {
+        super(cause);
+    }
 }
