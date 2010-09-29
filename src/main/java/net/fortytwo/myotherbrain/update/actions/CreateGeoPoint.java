@@ -1,9 +1,9 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
+import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
-import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 
@@ -18,10 +18,10 @@ public class CreateGeoPoint extends WriteAction {
     protected final Float latitude;
 
     public CreateGeoPoint(
-             URI subject,
-             Float longitude,
-             Float latitude,
-                    final WriteContext c) throws UpdateException {
+            URI subject,
+            Float longitude,
+            Float latitude,
+            final WriteContext c) throws UpdateException {
         super(subject, c);
 
         if (null == longitude) {

@@ -2,9 +2,9 @@ package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.Marker;
+import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
-import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 import java.util.Set;
@@ -32,7 +32,7 @@ public class AddMarkerTag extends WriteAction {
 
         this.newMarkerTag = newMarkerTag;
     }
-
+         
     protected void executeUndo(final WriteContext c) throws UpdateException {
         FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
         subject.setMarkerTag(toThingSet(beforeMarkerTag, Marker.class, c));

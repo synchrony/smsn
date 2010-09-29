@@ -2,9 +2,9 @@ package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
+import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
-import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 
@@ -26,7 +26,7 @@ public class SetIcon extends WriteAction {
         if (null != icon) {
             icon = c.normalizeResourceURI(icon);
         }
-        
+
         this.icon = icon;
     }
 

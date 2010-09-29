@@ -2,8 +2,8 @@ package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.Literal;
-import net.fortytwo.myotherbrain.update.WriteContext;
 import net.fortytwo.myotherbrain.update.UpdateException;
+import net.fortytwo.myotherbrain.update.WriteContext;
 
 import java.net.URI;
 import java.util.Date;

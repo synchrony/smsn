@@ -19,12 +19,16 @@
     </mx:Style>
     <mx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
-			import mx.managers.DragManager;
-			import mx.events.DragEvent;
-			import view.simple.SimpleView;
+        import mx.collections.ArrayCollection;
+        import mx.managers.DragManager;
+        import mx.events.DragEvent;
+
+        import view.simple.SimpleView;
+
         import mx.events.CloseEvent;
+
         import model.concepts.FirstClassItem;
+
         import mx.controls.Alert;
 
         // Called when the user moves the drag proxy onto the drop target.
@@ -33,27 +37,27 @@
             // identified by the 'color' format value.
             if (event.dragSource.hasFormat("item")) {
                 // Get the drop target component from the event object.
-                
+
                 var dropTarget:VBox = VBox(event.currentTarget);
                 // Accept the drop.
                 DragManager.acceptDragDrop(dropTarget);
             }
         }
-                
+
         // Called if the target accepts the dragged object and the user 
         // releases the mouse button while over this container. 
         private function dragDropHandler(event:DragEvent):void {
             var item:FirstClassItem = event.dragSource.dataForFormat("item") as FirstClassItem;
             if (null == item) {
-            	Alert.show("no item in drag event");
+                Alert.show("no item in drag event");
             } else {
-            	addItem(item);
-            }           
-        } 
-		
+                addItem(item);
+            }
+        }
+
         public function addItem(it:FirstClassItem):void {
-				//Alert.show("adding item: " + it);
-            it = StaticStuff.itemRegistry.registerItem(it);
+            //Alert.show("adding item: " + it);
+            it = StaticStuff.itemRegistry.subscribeToItem(it);
             var v:View = createView(it);
             v.setItem(it);
             //v.addedEffect = this.fadeIn;
@@ -68,7 +72,7 @@
         }
 
         protected function removeView(v:View):void {
-            StaticStuff.itemRegistry.unregisterItem(v.item);
+            StaticStuff.itemRegistry.unsubscribeFromItem(v.item);
             this.containerVBox.removeChild(v);
         }
 
@@ -82,26 +86,26 @@
         private function createNewItem():void {
             addItem(StaticStuff.createNewItem());
         }
-        
+
         private function clear():void {
-        	var a:Array = new Array();
-        	for (var i:int = 0; i < this.containerVBox.getChildren().length; i++) {
-        		a[i] = this.containerVBox.getChildren()[i];	
-        	}
-        	
-        	for (var j:int = 0; j < a.length; j++) {
-        		removeView(a[j] as View);
-        	}
+            var a:Array = new Array();
+            for (var i:int = 0; i < this.containerVBox.getChildren().length; i++) {
+                a[i] = this.containerVBox.getChildren()[i];
+            }
+
+            for (var j:int = 0; j < a.length; j++) {
+                removeView(a[j] as View);
+            }
         }
-        
+
         // Override me
- 		public function search():void {
- 			Alert.show("this should have been overridden");
- 		}
-        
+        public function search():void {
+            Alert.show("this should have been overridden");
+        }
+
         private function close():void {
-        	clear();
-        	(this.parent as ViewColumnHBox).removeViewColumn(this);
+            clear();
+            (this.parent as ViewColumnHBox).removeViewColumn(this);
         }
 		]]>
 	</mx:Script>

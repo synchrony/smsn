@@ -6,9 +6,9 @@ import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
 import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
 import net.fortytwo.myotherbrain.update.NoSuchItemException;
+import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
-import net.fortytwo.myotherbrain.update.UpdateException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,7 +32,7 @@ public class CreateFirstClassItem extends WriteAction {
 
     // Note: in all "create" actions, the supplied subject URI is expected to be
     // a new, distinct URI with no existing metadata.  Any metadata which is
-    // already attached to the URI may be irreversibly lost in an "undo" event.
+    // previously attached to the URI may be irreversibly lost in an "undo" event.
     public CreateFirstClassItem(
             URI subject,
             String name,

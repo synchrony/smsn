@@ -30,6 +30,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.5</version>
@@ -50,11 +55,11 @@
             <artifactId>jackrabbit-webdav</artifactId>
             <version>1.5.5</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>net.fortytwo</groupId>
             <artifactId>restpipe</artifactId>
             <version>1.0-alpha1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-sail-memory</artifactId>
@@ -168,12 +173,15 @@
                                 <!--<condition property="osfamily-unix">
                                     <os family="unix"/>
                                 </condition>-->
-                                <property name="versionprops" value="${basedir}/src/main/resources/net/fortytwo/myotherbrain/version.properties"/>
+                                <property name="versionprops"
+                                          value="${basedir}/src/main/resources/net/fortytwo/myotherbrain/version.properties"/>
                                 <exec executable="bash" output="${versionprops}">
                                     <arg value="${basedir}/src/main/bash/svn-revision.sh"/>
                                 </exec>
-                                <echo message="net.fortytwo.myotherbrain.name = ${project.name}&#xA;" file="${versionprops}" append="true"/>
-                                <echo message="net.fortytwo.myotherbrain.version = ${project.version}&#xA;" file="${versionprops}" append="true"/>
+                                <echo message="net.fortytwo.myotherbrain.name = ${project.name}&#xA;"
+                                      file="${versionprops}" append="true"/>
+                                <echo message="net.fortytwo.myotherbrain.version = ${project.version}&#xA;"
+                                      file="${versionprops}" append="true"/>
                             </tasks>
                         </configuration>
                         <goals>

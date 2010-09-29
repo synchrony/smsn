@@ -13,18 +13,22 @@
     </mx:Style>
     <mx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
-			import mx.managers.DragManager;
-			import mx.events.DragEvent;
-			import view.simple.SimpleView;
+        import mx.collections.ArrayCollection;
+        import mx.managers.DragManager;
+        import mx.events.DragEvent;
+
+        import view.simple.SimpleView;
+
         import mx.events.CloseEvent;
+
         import model.concepts.FirstClassItem;
+
         import mx.controls.Alert;
 
         public function addItem(it:FirstClassItem):void {
-				//Alert.show("adding item: " + it);
-            it = StaticStuff.itemRegistry.registerItem(it);
-            
+            //Alert.show("adding item: " + it);
+            it = StaticStuff.itemRegistry.subscribeToItem(it);
+
             this.associationsList.addItem(it);
 
             //v.addEventListener(CloseEvent.CLOSE, closeHandler);
@@ -33,19 +37,19 @@
         private function createNewItem():void {
             addItem(StaticStuff.createNewItem());
         }
-        
+
         private function clear():void {
-        	this.associationsList.clear();
+            this.associationsList.clear();
         }
-        
+
         // Override me
- 		public function search():void {
- 			Alert.show("this should have been overridden");
- 		}
-        
+        public function search():void {
+            Alert.show("this should have been overridden");
+        }
+
         private function close():void {
-        	clear();
-        	(this.parent as ViewColumnHBox).removeItemViewColumn(this);
+            clear();
+            (this.parent as ViewColumnHBox).removeItemViewColumn(this);
         }
 		]]>
 	</mx:Script>

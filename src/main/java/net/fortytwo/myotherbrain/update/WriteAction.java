@@ -21,6 +21,7 @@ import java.util.Set;
  * Time: 12:03:59 AM
  */
 public abstract class WriteAction extends UndoableAction<WriteContext, UpdateException> {
+
     // Note: the implementation of this class is assumed to be thread-safe.
     private static final DatatypeFactory DATATYPE_FACTORY;
 
@@ -111,5 +112,4 @@ public abstract class WriteAction extends UndoableAction<WriteContext, UpdateExc
         cal.setTime(date);
         return DATATYPE_FACTORY.newXMLGregorianCalendar(cal);
     }
-
 }
