@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.update.actions;
 
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
@@ -31,12 +31,12 @@ public class SetIcon extends WriteAction {
     }
 
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
+        Atom item = this.toThing(subject, Atom.class, c);
         item.setIcon(toThing(oldIcon, WebResource.class, c));
     }
 
     protected void executeRedo(final WriteContext c) throws UpdateException {
-        FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
+        Atom subject = this.toThing(this.subject, Atom.class, c);
         oldIcon = toURI(subject.getIcon());
         subject.setIcon(toThing(icon, WebResource.class, c));
     }

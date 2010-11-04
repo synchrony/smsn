@@ -14,7 +14,7 @@ public class MOB {
             // Classes
             ACCOUNT = NAMESPACE + "Account",
             ASSOCIATION = NAMESPACE + "Association",
-            FIRSTCLASSITEM = NAMESPACE + "FirstClassItem",
+            ATOM = NAMESPACE + "Atom",
             GEOPOINT = NAMESPACE + "GeoPoint",
             GRAPH = NAMESPACE + "Graph",
             LITERAL = NAMESPACE + "Literal",

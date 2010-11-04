@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,9 +43,10 @@ public class MyOtherBrain {
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";
     private static final String VERSION_PROPERTIES_FILE = "version.properties";
     private static final String LOGGING_PROPERTIES_FILE = "log4j.properties";
-    private static final TypedProperties CONFIG_PROPERTIES;
     private static final TypedProperties VERSION_PROPERTIES;
     private static final Logger LOGGER;
+
+    private static TypedProperties CONFIGURATION;
 
     static {
         PropertyConfigurator.configure(
@@ -52,10 +54,10 @@ public class MyOtherBrain {
 
         LOGGER = getLogger(MyOtherBrain.class);
 
-        CONFIG_PROPERTIES = new TypedProperties();
+        CONFIGURATION = new TypedProperties();
         VERSION_PROPERTIES = new TypedProperties();
         try {
-            CONFIG_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
+            CONFIGURATION.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
             VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
@@ -66,8 +68,12 @@ public class MyOtherBrain {
         return Logger.getLogger(c);
     }
 
-    public static TypedProperties getProperties() {
-        return CONFIG_PROPERTIES;
+    public static TypedProperties getConfiguration() {
+        return CONFIGURATION;
+    }
+
+    public static void setConfiguration(final Properties properties) {
+        CONFIGURATION = new TypedProperties(properties);
     }
 
     public static String getVersionInfo() {
@@ -104,7 +110,7 @@ public class MyOtherBrain {
 
     public static void main(final String[] args) throws Exception {
         (new MyOtherBrain()).doit();
-        return;
+
         /*
         java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MyOtherBrain.class.getName());
         logger.info(getVersionInfo());
@@ -129,10 +135,10 @@ public class MyOtherBrain {
                 try {
                     WriteContext wc = new WriteContext(c);
 
-                    FirstClassItem telephone = wc.create(FirstClassItem.class);
+                    Atom telephone = wc.create(Atom.class);
                     telephone.setName("telephone");
                     telephone.setDescription("a device for voice communication at a distance");
-                    FirstClassItem red = wc.create(FirstClassItem.class);
+                    Atom red = wc.create(Atom.class);
                     red.setName("red");
                     red.setDescription("the color red");
                     Association a = wc.create(Association.class);
@@ -172,13 +178,16 @@ public class MyOtherBrain {
     }
 
     // TODO: make this configurable
-    public static final String MOB_RESOURCE_NS = "http://myotherbrain.fortytwo.net/resource/";
+    public static final String
+            BASE_URI = "http://myotherbrain.fortytwo.net/",
+            ATOM_BASEURI = BASE_URI + "atom/";
+
     private static final Random random = new Random();
 
     // TODO: move me
-    public static String randomURIString() {
+    public static String randomAtomIdentifier() {
         // TODO: improve me
-        return MOB_RESOURCE_NS + "r" + random.nextInt(100000);
+        return ATOM_BASEURI + "r" + random.nextInt(100000);
     }
 
     private static final MessageDigest SHA1_DIGEST;

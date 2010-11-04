@@ -2,7 +2,7 @@ package net.fortytwo.myotherbrain.query;
 
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import org.neo4j.rdf.sail.FulltextQueryResult;
 import org.neo4j.rdf.sail.NeoRdfSailConnection;
 import org.openrdf.elmo.Entity;
@@ -22,7 +22,7 @@ import java.util.Arrays;
  */
 public class FreeTextQueries {
     public static void executeFreetextSearch(final String query,
-                                             final Handler<WeightedValue<FirstClassItem>, QueryException> handler,
+                                             final Handler<WeightedValue<Atom>, QueryException> handler,
                                              final MOBModelConnection c) throws QueryException {
         if (!c.freeTextSearchSupported()) {
             return;
@@ -73,10 +73,10 @@ public class FreeTextQueries {
             URI u = wv.value;
 
             Entity item = c.getElmoManager().find(new QName(u.toString()));
-            if (null != item && item instanceof FirstClassItem) {
-                WeightedValue<FirstClassItem> f = new WeightedValue<FirstClassItem>();
+            if (null != item && item instanceof Atom) {
+                WeightedValue<Atom> f = new WeightedValue<Atom>();
                 f.weight = wv.weight;
-                f.value = (FirstClassItem) item;
+                f.value = (Atom) item;
                 handler.handle(f);
             }
         }

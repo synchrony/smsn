@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.MyOtherBrain;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.Literal;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
@@ -17,7 +17,7 @@ public class AddAliasTest extends WriteActionTestCase {
     public void testAll() throws Exception {
         WriteContext c = new WriteContext(model.createConnection());
 
-        FirstClassItem something = c.create(FirstClassItem.class);
+        Atom something = c.create(Atom.class);
         Thing alias1 = c.create(Thing.class);
         Literal alias2 = c.create(Literal.class);
 

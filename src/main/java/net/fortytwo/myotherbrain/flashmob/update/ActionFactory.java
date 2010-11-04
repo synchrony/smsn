@@ -23,7 +23,7 @@ import net.fortytwo.myotherbrain.update.actions.AddAlias;
 import net.fortytwo.myotherbrain.update.actions.AddMarkerTag;
 import net.fortytwo.myotherbrain.update.actions.BreakAssociation;
 import net.fortytwo.myotherbrain.update.actions.CreateAssociation;
-import net.fortytwo.myotherbrain.update.actions.CreateFirstClassItem;
+import net.fortytwo.myotherbrain.update.actions.CreateAtom;
 import net.fortytwo.myotherbrain.update.actions.CreateGeoPoint;
 import net.fortytwo.myotherbrain.update.actions.CreateLiteral;
 import net.fortytwo.myotherbrain.update.actions.CreateWebResource;
@@ -93,7 +93,7 @@ public class ActionFactory {
 
         actionBeanHandlers.put(CreateFirstClassItemBean.class, new ActionBeanHandler<CreateFirstClassItemBean>() {
             public WriteAction createAction(CreateFirstClassItemBean bean, WriteContext c) throws UpdateException {
-                return new CreateFirstClassItem(toURI(bean.getSubject()),
+                return new CreateAtom(toURI(bean.getSubject()),
                         bean.getName(),
                         bean.getDescription(),
                         bean.getRichTextDescription(),

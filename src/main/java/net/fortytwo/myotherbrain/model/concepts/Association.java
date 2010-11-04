@@ -11,14 +11,14 @@ import org.openrdf.elmo.annotations.rdf;
  * To change this template use File | Settings | File Templates.
  */
 @rdf(MOB.ASSOCIATION)
-public interface Association extends FirstClassItem {
+public interface Association extends Atom {
     @rdf(MOB.OBJECT)
-    FirstClassItem getObject();
+    Atom getObject();
 
-    void setObject(FirstClassItem object);
+    void setObject(Atom object);
 
     @rdf(MOB.SUBJECT)
-    FirstClassItem getSubject();
+    Atom getSubject();
 
-    void setSubject(FirstClassItem subject);
+    void setSubject(Atom subject);
 }

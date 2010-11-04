@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.update.actions;
 
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.Marker;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
@@ -34,12 +34,12 @@ public class RemoveMarkerTag extends WriteAction {
     }
 
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
+        Atom subject = this.toThing(this.subject, Atom.class, c);
         subject.setMarkerTag(toThingSet(beforeMarkerTag, Marker.class, c));
     }
 
     protected void executeRedo(final WriteContext c) throws UpdateException {
-        FirstClassItem subject = this.toThing(this.subject, FirstClassItem.class, c);
+        Atom subject = this.toThing(this.subject, Atom.class, c);
         Set<Marker> markerTag = subject.getMarkerTag();
         beforeMarkerTag = toURISet(markerTag);
 

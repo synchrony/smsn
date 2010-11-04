@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteContext;
 
@@ -13,7 +13,7 @@ import java.util.Date;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class CreateAssociation extends CreateFirstClassItem {
+public class CreateAssociation extends CreateAtom {
     private final URI associationSubject;
     private final URI associationObject;
 
@@ -50,7 +50,7 @@ public class CreateAssociation extends CreateFirstClassItem {
 
     @Override
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
+        Atom subject = toThing(this.subject, Atom.class, c);
         c.remove(subject);
     }
 
@@ -61,7 +61,7 @@ public class CreateAssociation extends CreateFirstClassItem {
 
         setCommonValues(subject, c);
 
-        subject.setSubject(toThing(associationSubject, FirstClassItem.class, c));
-        subject.setObject(toThing(associationObject, FirstClassItem.class, c));
+        subject.setSubject(toThing(associationSubject, Atom.class, c));
+        subject.setObject(toThing(associationObject, Atom.class, c));
     }
 }

@@ -59,7 +59,7 @@ public class AccessManager {
 
     static {
         String base = "net.fortytwo.myotherbrain.access.";
-        TypedProperties p = MyOtherBrain.getProperties();
+        TypedProperties p = MyOtherBrain.getConfiguration();
         try {
             USERNAME_MINIMUM_LENGTH = p.getInt(base + "userNameMinimumLength");
             USERNAME_MAXIMUM_LENGTH = p.getInt(base + "userNameMaximumLength");

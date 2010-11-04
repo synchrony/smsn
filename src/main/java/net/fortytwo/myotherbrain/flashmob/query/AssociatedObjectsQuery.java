@@ -2,7 +2,7 @@ package net.fortytwo.myotherbrain.flashmob.query;
 
 import net.fortytwo.myotherbrain.flashmob.model.FlashMOBFirstClassItem;
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.query.OntologyBasedQueries;
 import net.fortytwo.myotherbrain.query.Handler;
 import net.fortytwo.myotherbrain.query.QueryException;
@@ -28,7 +28,7 @@ public class AssociatedObjectsQuery implements FlashMOBQuery {
 
         Handler<Association, QueryException> handler = new Handler<Association, QueryException>() {
             public boolean handle(final Association a) throws QueryException {
-                FirstClassItem obj = a.getObject();
+                Atom obj = a.getObject();
 
                 // For now, only discover an association if both the association and its object are visible.
                 if (c.isVisible(a) && c.isVisible(obj)) {
@@ -49,7 +49,7 @@ public class AssociatedObjectsQuery implements FlashMOBQuery {
             }
         };
 
-        FirstClassItem subject = c.find(subjectURI);
+        Atom subject = c.find(subjectURI);
 
         if (c.isVisible(subject)) {
             OntologyBasedQueries.handleOutboundAssociations(subject, handler, c.getModelConnection());

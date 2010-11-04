@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
@@ -25,13 +25,13 @@ public class BreakAssociation extends WriteAction {
     }
 
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem item = toThing(subject, FirstClassItem.class, c);
-        c.removeDesignation(item, FirstClassItem.class);
+        Atom item = toThing(subject, Atom.class, c);
+        c.removeDesignation(item, Atom.class);
         c.designate(new QName(subject.toString()), Association.class);
 
         Association a = toThing(subject, Association.class, c);
-        a.setSubject(toThing(oldAssociationSubject, FirstClassItem.class, c));
-        a.setObject(toThing(oldAssociationObject, FirstClassItem.class, c));
+        a.setSubject(toThing(oldAssociationSubject, Atom.class, c));
+        a.setObject(toThing(oldAssociationObject, Atom.class, c));
     }
 
     protected void executeRedo(final WriteContext c) throws UpdateException {
@@ -42,7 +42,7 @@ public class BreakAssociation extends WriteAction {
         a.setSubject(null);
         a.setObject(null);
 
-        c.designate(new QName(subject.toString()), FirstClassItem.class);
+        c.designate(new QName(subject.toString()), Atom.class);
         c.removeDesignation(a, Association.class);
     }
 }

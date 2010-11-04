@@ -4,7 +4,7 @@ import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.model.concepts.Account;
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
 import net.fortytwo.myotherbrain.model.concepts.Graph;
 import net.fortytwo.myotherbrain.model.concepts.Literal;
@@ -98,7 +98,7 @@ public class MOBStore {
     }
 
     private MOBStore() throws MOBStoreException {
-        Properties props = MyOtherBrain.getProperties();
+        Properties props = MyOtherBrain.getConfiguration();
         String sailType = props.getProperty(MyOtherBrain.SAIL_CLASS);
         sail = createSail(sailType);
     }
@@ -125,7 +125,7 @@ public class MOBStore {
         baseModule.addConcept(ObjectProperty.class);  // Dunno why this is necessary, but Elmo logs warnings without it
         baseModule.addConcept(Account.class);
         baseModule.addConcept(Association.class);
-        baseModule.addConcept(FirstClassItem.class);
+        baseModule.addConcept(Atom.class);
         baseModule.addConcept(GeoPoint.class);
         baseModule.addConcept(Graph.class);
         baseModule.addConcept(Literal.class);
@@ -251,7 +251,7 @@ public class MOBStore {
     }
 
     private Sail createNativeStore() throws MOBStoreException {
-        TypedProperties props = MyOtherBrain.getProperties();
+        TypedProperties props = MyOtherBrain.getConfiguration();
         File dir;
 
         try {
@@ -272,7 +272,7 @@ public class MOBStore {
     }
 
     private Sail createNeoSail() throws MOBStoreException {
-        TypedProperties props = MyOtherBrain.getProperties();
+        TypedProperties props = MyOtherBrain.getConfiguration();
 
         String dir, fulltextDir;
         try {
@@ -313,7 +313,7 @@ public class MOBStore {
     }
 
     private Sail createRMISailClient() throws MOBStoreException {
-        TypedProperties props = MyOtherBrain.getProperties();
+        TypedProperties props = MyOtherBrain.getConfiguration();
         URI uri;
         try {
             uri = props.getURI(MyOtherBrain.RMISAILCLIENT_URI);

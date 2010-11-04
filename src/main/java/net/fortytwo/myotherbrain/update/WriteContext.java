@@ -40,7 +40,7 @@ public class WriteContext {
     }
 
     public <T> T create(final Class<T> c) {
-        QName q = new QName(MyOtherBrain.randomURIString());
+        QName q = new QName(MyOtherBrain.randomAtomIdentifier());
         return create(q, c);
     }
 

@@ -22,7 +22,7 @@ public class Quotas {
             URI_MAX_LENGTH;
 
     static {
-        TypedProperties props = MyOtherBrain.getProperties();
+        TypedProperties props = MyOtherBrain.getConfiguration();
         String prefix = "net.fortytwo.myotherbrain.access.quotas.";
         try {
             NAME_MAX_LENGTH = props.getInt(prefix + "nameMaximumLength");

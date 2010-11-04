@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.update.actions;
 
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.Literal;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteContext;
@@ -13,7 +13,7 @@ import java.util.Date;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class CreateLiteral extends CreateFirstClassItem {
+public class CreateLiteral extends CreateAtom {
     private final String lexicalForm;
     private final URI datatypeURI;
     private final String languageTag;
@@ -56,7 +56,7 @@ public class CreateLiteral extends CreateFirstClassItem {
 
     @Override
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
+        Atom subject = toThing(this.subject, Atom.class, c);
         c.remove(subject);
     }
 

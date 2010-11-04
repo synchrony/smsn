@@ -76,7 +76,7 @@ public class FlashMOBSession {
             TEMP_CONTACTEMAILADDRESS = "josh@fortytwo.net";
 
     static {
-        TypedProperties props = MyOtherBrain.getProperties();
+        TypedProperties props = MyOtherBrain.getConfiguration();
         String prefix = "net.fortytwo.myotherbrain.";
         try {
             URIMINTING_MAXBATCHSIZE = props.getInt(prefix + "uriMintingMaxBatchSize");
@@ -151,7 +151,7 @@ public class FlashMOBSession {
 
     public SessionInfo getSessionInfo() {
         SessionInfo info = new SessionInfo();
-        info.setBaseURI(MyOtherBrain.MOB_RESOURCE_NS + "r");
+        info.setBaseURI(MyOtherBrain.ATOM_BASEURI + "r");
         info.setUserName(session.getUserName());
         info.setVersionInfo(MyOtherBrain.getVersionInfo());
         info.setSensitivityUpperBound(sensitivityUpperBound.toString());

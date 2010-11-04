@@ -4,7 +4,7 @@ import net.fortytwo.myotherbrain.update.actions.AddAlias;
 import net.fortytwo.myotherbrain.update.actions.AddMarkerTag;
 import net.fortytwo.myotherbrain.update.actions.BreakAssociation;
 import net.fortytwo.myotherbrain.update.actions.CreateAssociation;
-import net.fortytwo.myotherbrain.update.actions.CreateFirstClassItem;
+import net.fortytwo.myotherbrain.update.actions.CreateAtom;
 import net.fortytwo.myotherbrain.update.actions.CreateGeoPoint;
 import net.fortytwo.myotherbrain.update.actions.CreateLiteral;
 import net.fortytwo.myotherbrain.update.actions.CreateWebResource;
@@ -43,156 +43,156 @@ public class WriteActionParser {
         }
     }
 
-    private final Map<String, WriteActionConstructor> constructors;
+    private final Map<JSONRemoting.WriteActionType, WriteActionConstructor> constructors;
 
     public WriteActionParser() {
-        constructors = new HashMap<String, WriteActionConstructor>();
+        constructors = new HashMap<JSONRemoting.WriteActionType, WriteActionConstructor>();
 
-        constructors.put("addAlias", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.addAlias, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new AddAlias(
-                        getURI(j, Param.subject),
-                        getURI(j, Param.newAlias),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.newAlias),
                         c);
             }
         });
-        constructors.put("addMarkerTag", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.addMarkerTag, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new AddMarkerTag(
-                        getURI(j, Param.subject),
-                        getURI(j, Param.newMarkerTag),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.newMarkerTag),
                         c);
             }
         });
-        constructors.put("breakAssociation", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.breakAssociation, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new BreakAssociation(
-                        getURI(j, Param.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
                         c);
             }
         });
-        constructors.put("createAssociation", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.createAssociation, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new CreateAssociation(
-                        getURI(j, Param.subject),
-                        optString(j, Param.name),
-                        optString(j, Param.description),
-                        optString(j, Param.richTextDescription),
-                        optURI(j, Param.icon),
-                        optURI(j, Param.sensitivity),
-                        optFloat(j, Param.emphasis),
-                        optDate(j, Param.creationTimeStamp),
-                        optURI(j, Param.creationPlaceStamp),
-                        getURI(j, Param.associationSubject),
-                        getURI(j, Param.associationObject),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        optString(j, JSONRemoting.WriteActionParam.name),
+                        optString(j, JSONRemoting.WriteActionParam.description),
+                        optString(j, JSONRemoting.WriteActionParam.richTextDescription),
+                        optURI(j, JSONRemoting.WriteActionParam.icon),
+                        optURI(j, JSONRemoting.WriteActionParam.sensitivity),
+                        optFloat(j, JSONRemoting.WriteActionParam.emphasis),
+                        optDate(j, JSONRemoting.WriteActionParam.creationTimeStamp),
+                        optURI(j, JSONRemoting.WriteActionParam.creationPlaceStamp),
+                        getURI(j, JSONRemoting.WriteActionParam.associationSubject),
+                        getURI(j, JSONRemoting.WriteActionParam.associationObject),
                         c);
             }
         });
-        constructors.put("createFirstClassItem", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.createAtom, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
-                return new CreateFirstClassItem(
-                        getURI(j, Param.subject),
-                        optString(j, Param.name),
-                        optString(j, Param.description),
-                        optString(j, Param.richTextDescription),
-                        optURI(j, Param.icon),
-                        optURI(j, Param.sensitivity),
-                        optFloat(j, Param.emphasis),
-                        optDate(j, Param.creationTimeStamp),
-                        optURI(j, Param.creationPlaceStamp),
+                return new CreateAtom(
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        optString(j, JSONRemoting.WriteActionParam.name),
+                        optString(j, JSONRemoting.WriteActionParam.description),
+                        optString(j, JSONRemoting.WriteActionParam.richTextDescription),
+                        optURI(j, JSONRemoting.WriteActionParam.icon),
+                        optURI(j, JSONRemoting.WriteActionParam.sensitivity),
+                        optFloat(j, JSONRemoting.WriteActionParam.emphasis),
+                        optDate(j, JSONRemoting.WriteActionParam.creationTimeStamp),
+                        optURI(j, JSONRemoting.WriteActionParam.creationPlaceStamp),
                         c);
             }
         });
-        constructors.put("createGeoPoint", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.createGeoPoint, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new CreateGeoPoint(
-                        getURI(j, Param.subject),
-                        getFloat(j, Param.longitude),
-                        getFloat(j, Param.latitude),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getFloat(j, JSONRemoting.WriteActionParam.longitude),
+                        getFloat(j, JSONRemoting.WriteActionParam.latitude),
                         c);
             }
         });
-        constructors.put("createLiteral", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.createLiteral, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new CreateLiteral(
-                        getURI(j, Param.subject),
-                        optString(j, Param.name),
-                        optString(j, Param.description),
-                        optString(j, Param.richTextDescription),
-                        optURI(j, Param.icon),
-                        optURI(j, Param.sensitivity),
-                        optFloat(j, Param.emphasis),
-                        optDate(j, Param.creationTimeStamp),
-                        optURI(j, Param.creationPlaceStamp),
-                        getString(j, Param.lexicalForm),
-                        optURI(j, Param.datatypeURI),
-                        optString(j, Param.languageTag),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        optString(j, JSONRemoting.WriteActionParam.name),
+                        optString(j, JSONRemoting.WriteActionParam.description),
+                        optString(j, JSONRemoting.WriteActionParam.richTextDescription),
+                        optURI(j, JSONRemoting.WriteActionParam.icon),
+                        optURI(j, JSONRemoting.WriteActionParam.sensitivity),
+                        optFloat(j, JSONRemoting.WriteActionParam.emphasis),
+                        optDate(j, JSONRemoting.WriteActionParam.creationTimeStamp),
+                        optURI(j, JSONRemoting.WriteActionParam.creationPlaceStamp),
+                        getString(j, JSONRemoting.WriteActionParam.lexicalForm),
+                        optURI(j, JSONRemoting.WriteActionParam.datatypeURI),
+                        optString(j, JSONRemoting.WriteActionParam.languageTag),
                         c);
             }
         });
-        constructors.put("createWebResource", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.createWebResource, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new CreateWebResource(
-                        getURI(j, Param.subject),
-                        optString(j, Param.representationMediaType),
-                        optString(j, Param.representationSha1Sum),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        optString(j, JSONRemoting.WriteActionParam.representationMediaType),
+                        optString(j, JSONRemoting.WriteActionParam.representationSha1Sum),
                         c);
             }
         });
-        constructors.put("removeAlias", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.removeAlias, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new RemoveAlias(
-                        getURI(j, Param.subject),
-                        getURI(j, Param.targetAlias),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.targetAlias),
                         c);
             }
         });
-        constructors.put("removeMarkerTag", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.removeMarkerTag, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new RemoveMarkerTag(
-                        getURI(j, Param.subject),
-                        getURI(j, Param.targetMarkerTag),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.targetMarkerTag),
                         c);
             }
         });
-        constructors.put("setDescription", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.setDescription, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new SetDescription(
-                        getURI(j, Param.subject),
-                        getString(j, Param.description),
-                        optString(j, Param.richTextDescription),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getString(j, JSONRemoting.WriteActionParam.description),
+                        optString(j, JSONRemoting.WriteActionParam.richTextDescription),
                         c);
             }
         });
-        constructors.put("setEmphasis", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.setEmphasis, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new SetEmphasis(
-                        getURI(j, Param.subject),
-                        getFloat(j, Param.emphasis),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getFloat(j, JSONRemoting.WriteActionParam.emphasis),
                         c);
             }
         });
-        constructors.put("setIcon", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.setIcon, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new SetIcon(
-                        getURI(j, Param.subject),
-                        getURI(j, Param.icon),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.icon),
                         c);
             }
         });
-        constructors.put("setName", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.setName, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new SetName(
-                        getURI(j, Param.subject),
-                        getString(j, Param.name),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getString(j, JSONRemoting.WriteActionParam.name),
                         c);
             }
         });
-        constructors.put("setSensitivity", new WriteActionConstructor() {
+        constructors.put(JSONRemoting.WriteActionType.setSensitivity, new WriteActionConstructor() {
             public WriteAction construct(JSONObject j, WriteContext c) throws UpdateException {
                 return new SetSensitivity(
-                        getURI(j, Param.subject),
-                        getURI(j, Param.sensitivity),
+                        getURI(j, JSONRemoting.WriteActionParam.subject),
+                        getURI(j, JSONRemoting.WriteActionParam.sensitivity),
                         c);
             }
         });
@@ -210,9 +210,16 @@ public class WriteActionParser {
             throw new UpdateException(e);
         }
 
-        WriteActionConstructor cons = constructors.get(name);
-        if (null == cons) {
+        JSONRemoting.WriteActionType type;
+
+        try {
+            type = JSONRemoting.WriteActionType.valueOf(name);
+        } catch (IllegalArgumentException e) {
             throw new WriteActionParseException("unfamiliar action: " + name);
+        }
+        WriteActionConstructor cons = constructors.get(type);
+        if (null == cons) {
+            throw new IllegalStateException("no constructor for type " + type);
         }
 
         return cons.construct(params, c);
@@ -295,30 +302,5 @@ public class WriteActionParser {
             XMLGregorianCalendar c = DATATYPES.newXMLGregorianCalendar(s);
             return c.toGregorianCalendar().getTime();
         }
-    }
-
-    public static enum Param {
-        subject,
-        name,
-        description,
-        richTextDescription,
-        icon,
-        sensitivity,
-        emphasis,
-        creationTimeStamp,
-        newAlias,
-        newMarkerTag,
-        longitude,
-        latitude,
-        lexicalForm,
-        datatypeURI,
-        languageTag,
-        targetMarkerTag,
-        representationMediaType,
-        representationSha1Sum,
-        targetAlias,
-        creationPlaceStamp,
-        associationSubject,
-        associationObject,
     }
 }

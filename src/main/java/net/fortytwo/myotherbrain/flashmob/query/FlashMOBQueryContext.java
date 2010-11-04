@@ -7,7 +7,7 @@ import net.fortytwo.myotherbrain.flashmob.model.FlashMOBFirstClassItem;
 import net.fortytwo.myotherbrain.flashmob.model.FlashMOBLiteral;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.Literal;
 import net.fortytwo.myotherbrain.query.Handler;
 import net.fortytwo.myotherbrain.query.QueryException;
@@ -40,13 +40,13 @@ public class FlashMOBQueryContext {
         return connection;
     }
 
-    public FirstClassItem find(final String uri) {
+    public Atom find(final String uri) {
         Entity e = connection.getElmoManager().find(new QName(uri));
 
-        return null == e ? null : (FirstClassItem) e;
+        return null == e ? null : (Atom) e;
     }
 
-    public static FlashMOBFirstClassItem toBean(final FirstClassItem fci) {
+    public static FlashMOBFirstClassItem toBean(final Atom fci) {
         FlashMOBFirstClassItem i;
         if (fci instanceof Association) {
             i = new FlashMOBAssociation();
@@ -89,15 +89,15 @@ public class FlashMOBQueryContext {
         return null == u ? null : u.toString();
     }
 
-    public boolean isVisible(final FirstClassItem item) {
+    public boolean isVisible(final Atom item) {
         return item.getEmphasis() >= emphasisLowerBound
                 && !FlashMOBSession.SensitivityLevel.find(item.getSensitivity()).exceeds(this.sensitivityUpperBound);
     }
 
-    public Handler<FirstClassItem, QueryException> createVisibilityFilter(
-            final Handler<FirstClassItem, QueryException> subordinateHandler) {
-        return new Handler<FirstClassItem, QueryException>() {
-            public boolean handle(FirstClassItem item) throws QueryException {
+    public Handler<Atom, QueryException> createVisibilityFilter(
+            final Handler<Atom, QueryException> subordinateHandler) {
+        return new Handler<Atom, QueryException>() {
+            public boolean handle(Atom item) throws QueryException {
                 return !isVisible(item) || subordinateHandler.handle(item);
             }
         };

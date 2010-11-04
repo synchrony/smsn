@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.MOB;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
@@ -39,12 +39,12 @@ public class SetSensitivity extends WriteAction {
     }
 
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
+        Atom item = this.toThing(subject, Atom.class, c);
         item.setSensitivity(toThing(oldSensitivity, SensitivityLevel.class, c));
     }
 
     protected void executeRedo(final WriteContext c) throws UpdateException {
-        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
+        Atom item = this.toThing(subject, Atom.class, c);
         oldSensitivity = toURI(item.getSensitivity());
         item.setSensitivity(toThing(sensitivity, SensitivityLevel.class, c));
     }

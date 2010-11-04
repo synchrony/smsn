@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.update.actions;
 
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.update.UpdateException;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
@@ -30,12 +30,12 @@ public class SetEmphasis extends WriteAction {
     }
 
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
+        Atom item = this.toThing(subject, Atom.class, c);
         item.setEmphasis(oldEmphasis);
     }
 
     protected void executeRedo(final WriteContext c) throws UpdateException {
-        FirstClassItem item = this.toThing(subject, FirstClassItem.class, c);
+        Atom item = this.toThing(subject, Atom.class, c);
         oldEmphasis = item.getEmphasis();
         item.setEmphasis(emphasis);
     }

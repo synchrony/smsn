@@ -14,8 +14,8 @@ import java.util.Set;
  * Time: 11:29:19 PM
  * To change this template use File | Settings | File Templates.
  */
-@rdf(MOB.FIRSTCLASSITEM)
-public interface FirstClassItem extends Thing {
+@rdf(MOB.ATOM)
+public interface Atom extends Thing {
 
     @rdf(MOB.ALIAS)
     Set<Thing> getAlias();

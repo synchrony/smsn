@@ -13,17 +13,17 @@
 
 <rdf:RDF xmlns="http://fortytwo.net/2009/05/myotherbrain#"
      xml:base="http://fortytwo.net/2009/05/myotherbrain"
-     xmlns:myotherbrain="http://fortytwo.net/2009/05/myotherbrain#"
-     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
-     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:owl="http://www.w3.org/2002/07/owl#">
+     xmlns:myotherbrain="http://fortytwo.net/2009/05/myotherbrain#">
     <owl:Ontology rdf:about="">
         <rdfs:comment
             >Ontology for MyOtherBrain knowledge bases.
 
-Note: it has been a design decision not to re-use elements from other, previously existing ontologies, even where these might seem appropriate.  For instance, this ontology introduces its own title (&quot;name&quot;) and description properties rather than re-using existing Dublin Core properties.  This allows more precise modeling of the domain (for instance, this ontology requires that names and descriptions are string-valued), necessary for application development, while it does not preclude mapping to and from widely-used community ontologies for the purpose of data integration.</rdfs:comment>
+Note: it has been a design decision not to re-use elements from other, previously existing ontologies, even where these might seem appropriate.  For instance, this ontology introduces its own title (&quot;name&quot;) and description properties rather than re-using existing Dublin Core properties.  This allows more precise modeling of the domain (for instance, this ontology requires that names and descriptions are string-valued), which is expedient for application development.  However, this does not preclude mapping to and from widely-used community ontologies when integrating data with other sources.</rdfs:comment>
     </owl:Ontology>
     
 
@@ -43,8 +43,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <owl:ObjectProperty rdf:about="#alias">
         <rdfs:comment
-            >Indicates an alias for the subject item (for instance, the DBpedia resource for Paris may be an alias for a MOB concept of Paris). This property is similar to owl:sameAs.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates an alias for an atom (for instance, the DBpedia resource for Paris may be an alias for a MOB concept of Paris). This property is similar to owl:sameAs.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="&owl;Thing"/>
     </owl:ObjectProperty>
     
@@ -55,8 +55,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:ObjectProperty rdf:about="#creationPlaceStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Provisional.  Indicates the geospatial position at which an item was created.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Provisional.  Indicates the geospatial position at which an atom was created.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="#GeoPoint"/>
     </owl:ObjectProperty>
     
@@ -67,8 +67,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:ObjectProperty rdf:about="#icon">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates an image which may serve as a symbol for the subject item.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates an image which may serve as a symbol for an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="#WebResource"/>
     </owl:ObjectProperty>
     
@@ -78,8 +78,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <owl:ObjectProperty rdf:about="#markerTag">
         <rdfs:comment
-            >Indicates a simple marker which describes or draws attention to the item.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates a simple tag which describes or draws attention to an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="#Marker"/>
     </owl:ObjectProperty>
     
@@ -92,7 +92,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
         <rdfs:comment
             >Indicates the object of an association, analogous to the object of an RDF triple.</rdfs:comment>
         <rdfs:domain rdf:resource="#Association"/>
-        <rdfs:range rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="#Atom"/>
     </owl:ObjectProperty>
     
 
@@ -115,8 +115,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:ObjectProperty rdf:about="#sensitivity">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the sensitivity level of a first-class item.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates the sensitivity level of an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="#SensitivityLevel"/>
     </owl:ObjectProperty>
     
@@ -129,7 +129,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
         <rdfs:comment
             >Indicates the subject of an association, analogous to the subject of an RDF triple.</rdfs:comment>
         <rdfs:domain rdf:resource="#Association"/>
-        <rdfs:range rdf:resource="#FirstClassItem"/>
+        <rdfs:range rdf:resource="#Atom"/>
     </owl:ObjectProperty>
     
 
@@ -162,8 +162,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#creationTimeStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Provisional.  Indicates the date and time at which an item was created. Perusing my photo collection in Picasa indicates that knowing when an item originated can be very enlightening.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Provisional.  Indicates the date and time at which an atom was created. Perusing my photo collection in Picasa indicates that knowing when an atom originated can be very enlightening.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -186,8 +186,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#description">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates a textual description of an item.  Similar to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates a textual description of an atom.  Similar to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -198,8 +198,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#emphasis">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates the non-negative weight or significance of an item.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates the non-negative weight or significance of an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
     
@@ -258,8 +258,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:DatatypeProperty rdf:about="#name">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:comment
-            >Indicates a textual identifier for the subject item.  Similar to dc:title, but constrained to string values.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Indicates a textual identifier for an atom.  Similar to dc:title, but constrained to string values.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
@@ -305,7 +305,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <owl:DatatypeProperty rdf:about="#richTextDescription">
         <rdfs:comment
-            >A rich-text (constrained HTML) formatted description of an item.</rdfs:comment>
+            >A rich-text (constrained HTML) formatted description of an atom.</rdfs:comment>
         <rdfs:subPropertyOf rdf:resource="#description"/>
     </owl:DatatypeProperty>
     
@@ -315,8 +315,8 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <owl:DatatypeProperty rdf:about="#score">
         <rdfs:comment
-            >Parent property for any number of metrics such as PageRank which assign a float-valued score to each item in the knowledge base.</rdfs:comment>
-        <rdfs:domain rdf:resource="#FirstClassItem"/>
+            >Parent property for any number of metrics such as PageRank which assign a float-valued score to each atom in the knowledge base.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
         <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
     
@@ -358,19 +358,19 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <!-- http://fortytwo.net/2009/05/myotherbrain#Association -->
 
     <owl:Class rdf:about="#Association">
-        <rdfs:subClassOf rdf:resource="#FirstClassItem"/>
+        <rdfs:subClassOf rdf:resource="#Atom"/>
         <rdfs:comment
-            >A subject-object pair linking two first-class items.  As first-class items themselves, associations may be referred to by other associations.</rdfs:comment>
+            >A subject-object pair linking two atoms.  As atoms themselves, associations may be referred to by other associations.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- http://fortytwo.net/2009/05/myotherbrain#FirstClassItem -->
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Atom -->
 
-    <owl:Class rdf:about="#FirstClassItem">
+    <owl:Class rdf:about="#Atom">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
-            >A resource which may be the subject or object of associations.</rdfs:comment>
+            >A first-class resource which may be the subject or object of associations.</rdfs:comment>
     </owl:Class>
     
 
@@ -398,7 +398,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <!-- http://fortytwo.net/2009/05/myotherbrain#Literal -->
 
     <owl:Class rdf:about="#Literal">
-        <rdfs:subClassOf rdf:resource="#FirstClassItem"/>
+        <rdfs:subClassOf rdf:resource="#Atom"/>
         <rdfs:comment
             >A reified RDF literal.</rdfs:comment>
     </owl:Class>
@@ -410,7 +410,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:Class rdf:about="#Marker">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
-            >A simple marker for first-class items.</rdfs:comment>
+            >A simple tag for atoms.</rdfs:comment>
     </owl:Class>
     
 
@@ -420,7 +420,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     <owl:Class rdf:about="#SensitivityLevel">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:comment
-            >The degree of sensitivity of a first-class item, in terms of whether the information contained in the item should be shared with individuals other than its owner.</rdfs:comment>
+            >The degree of sensitivity of an atom, in terms of whether the information contained in the item should be shared with individuals other than its owner.</rdfs:comment>
     </owl:Class>
     
 
@@ -456,7 +456,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <Marker rdf:about="#Broken">
         <rdfs:comment
-            >An example marker. Indicates that an item (for instance, a query which is no longer in agreement with the schema) is no longer valid and needs to be repaired.</rdfs:comment>
+            >An example marker. Indicates that an atom (for instance, a query which is no longer in agreement with the schema) is no longer valid and needs to be repaired.</rdfs:comment>
     </Marker>
     
 
@@ -483,7 +483,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <SensitivityLevel rdf:about="#Personal">
         <rdfs:comment
-            >Indicates that a first-class item should not be visible to everyone, but that it may be visible to someone other than its owner.</rdfs:comment>
+            >Indicates that an atom should not be visible to everyone, but that it may be visible to someone other than its owner.</rdfs:comment>
     </SensitivityLevel>
     
 
@@ -492,7 +492,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <SensitivityLevel rdf:about="#Private">
         <rdfs:comment
-            >Indicates that a first-class item should not be visible to anyone apart from its owner.</rdfs:comment>
+            >Indicates that an atom should not be visible to anyone apart from its owner.</rdfs:comment>
     </SensitivityLevel>
     
 
@@ -501,7 +501,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
 
     <SensitivityLevel rdf:about="#Public">
         <rdfs:comment
-            >Indicates that a first-class item should be visible to everyone.</rdfs:comment>
+            >Indicates that an atom should be visible to everyone.</rdfs:comment>
     </SensitivityLevel>
     
 

@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.model.MOB;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
 import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
@@ -19,7 +19,7 @@ import java.util.Date;
  * Date: Jun 28, 2009
  * Time: 12:03:59 AM
  */
-public class CreateFirstClassItem extends WriteAction {
+public class CreateAtom extends WriteAction {
 
     protected final String name;
     protected final String description;
@@ -33,7 +33,7 @@ public class CreateFirstClassItem extends WriteAction {
     // Note: in all "create" actions, the supplied subject URI is expected to be
     // a new, distinct URI with no existing metadata.  Any metadata which is
     // previously attached to the URI may be irreversibly lost in an "undo" event.
-    public CreateFirstClassItem(
+    public CreateAtom(
             URI subject,
             String name,
             String description,
@@ -95,18 +95,18 @@ public class CreateFirstClassItem extends WriteAction {
     }
 
     protected void executeUndo(final WriteContext c) throws UpdateException {
-        FirstClassItem subject = toThing(this.subject, FirstClassItem.class, c);
+        Atom subject = toThing(this.subject, Atom.class, c);
         c.remove(subject);
     }
 
     protected void executeRedo(final WriteContext c) throws UpdateException {
         // TODO: is there any reason to use "designate" over "create"?
-        FirstClassItem subject = c.designate(toQName(this.subject), FirstClassItem.class);
+        Atom subject = c.designate(toQName(this.subject), Atom.class);
 
         setCommonValues(subject, c);
     }
 
-    protected void setCommonValues(final FirstClassItem subject,
+    protected void setCommonValues(final Atom subject,
                                    final WriteContext c) throws NoSuchItemException {
         if (null != name) {
             subject.setName(name);

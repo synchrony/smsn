@@ -2,7 +2,7 @@ package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.model.MOB;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.Marker;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
@@ -21,7 +21,7 @@ public class RemoveMarkerTagTest extends WriteActionTestCase {
     public void testAll() throws Exception {
         WriteContext c = new WriteContext(model.createConnection());
 
-        FirstClassItem subject = c.create(FirstClassItem.class);
+        Atom subject = c.create(Atom.class);
         Marker tag1 = c.create(new QName(MOB.STARRED), Marker.class);
         Marker tag2 = c.create(new QName(MOB.BROKEN), Marker.class);
         Set<Marker> markerTag = new HashSet<Marker>();

@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain;
 
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import org.openrdf.model.URI;
 
@@ -21,11 +21,11 @@ public class WebDAVPrototype {
      * @param mediaType
      */
     // TODO: use the appropriate class for mediaType
-    // TODO: use a more specific return type than FirstClassItem
-    public FirstClassItem pushResource(final URI resourceURI,
-                                       final InputStream content,
-                                       final String mediaType,
-                                       final MOBModelConnection modelConnection) {
+    // TODO: use a more specific return type than Atom
+    public Atom pushResource(final URI resourceURI,
+                             final InputStream content,
+                             final String mediaType,
+                             final MOBModelConnection modelConnection) {
         return null;
     }
 

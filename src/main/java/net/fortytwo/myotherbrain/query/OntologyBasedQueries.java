@@ -3,7 +3,7 @@ package net.fortytwo.myotherbrain.query;
 import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import org.openrdf.elmo.ElmoQuery;
 import org.openrdf.model.vocabulary.RDF;
 
@@ -17,18 +17,18 @@ import java.util.Iterator;
 public class OntologyBasedQueries {
     private static final String
             SELECT_ITEMS = "SELECT ?item\n"
-            + " WHERE { ?item <" + RDF.TYPE + "> <" + MOB.FIRSTCLASSITEM + "> . }",
+            + " WHERE { ?item <" + RDF.TYPE + "> <" + MOB.ATOM + "> . }",
             SELECT_OUTBOUND_ASSOCIATIONS = "SELECT ?ass\n"
                     + " WHERE { ?ass <" + MOB.SUBJECT + "> ?subject . }";
 
     // Note: no inference
-    public static <E extends Exception> void handleAllItems(final Handler<FirstClassItem, E> handler,
+    public static <E extends Exception> void handleAllItems(final Handler<Atom, E> handler,
                                                             final MOBModelConnection c) throws E {
         ElmoQuery query = c.getElmoManager().createQuery(SELECT_ITEMS);
         handleResults(query, handler);
     }
 
-    public static <E extends Exception> void handleOutboundAssociations(final FirstClassItem subject,
+    public static <E extends Exception> void handleOutboundAssociations(final Atom subject,
                                                                         final Handler<Association, E> handler,
                                                                         final MOBModelConnection c) throws E {
         ElmoQuery query = c.getElmoManager().createQuery(SELECT_OUTBOUND_ASSOCIATIONS);

@@ -6,7 +6,7 @@ import net.fortytwo.myotherbrain.access.Session;
 import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.update.WriteContext;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.memory.MemoryStore;
@@ -52,26 +52,26 @@ public class MyOtherBrainTest extends TestCase {
         sail.shutDown();
     }
 
-    private FirstClassItem associationLabel;
-    private FirstClassItem doer;
-    private FirstClassItem character;
-    private FirstClassItem nationality;
-    private FirstClassItem provenance;
-    private FirstClassItem memory;
-    private FirstClassItem unknownForgotten;
-    private FirstClassItem meaningOfSpeech;
-    private FirstClassItem tone;
-    private FirstClassItem petulantDefiant;
-    private FirstClassItem contradicts;
-    private FirstClassItem conflictOfInterest;
-    private FirstClassItem supportingEvidence;
-    private FirstClassItem mocking;
-    private FirstClassItem accordingTo;
-    private FirstClassItem opposites;
-    private FirstClassItem member;
-    private FirstClassItem conditionalUpon;
-    private FirstClassItem implies;
-    private FirstClassItem notFeelingIt;
+    private Atom associationLabel;
+    private Atom doer;
+    private Atom character;
+    private Atom nationality;
+    private Atom provenance;
+    private Atom memory;
+    private Atom unknownForgotten;
+    private Atom meaningOfSpeech;
+    private Atom tone;
+    private Atom petulantDefiant;
+    private Atom contradicts;
+    private Atom conflictOfInterest;
+    private Atom supportingEvidence;
+    private Atom mocking;
+    private Atom accordingTo;
+    private Atom opposites;
+    private Atom member;
+    private Atom conditionalUpon;
+    private Atom implies;
+    private Atom notFeelingIt;
 
     public void testAll() throws Exception {
         associationLabel = item();
@@ -101,17 +101,17 @@ public class MyOtherBrainTest extends TestCase {
         implies = item();
         notFeelingIt = item();
 
-        FirstClassItem tmp;
+        Atom tmp;
 
-        FirstClassItem magnus = item();
+        Atom magnus = item();
         magnus.setName("Magnus");
-        FirstClassItem hungarianGuy = item();
+        Atom hungarianGuy = item();
         hungarianGuy.setName("tubby Hungarian guy with glasses (can't remember his name)");
-        FirstClassItem finnishLanguage = item();
+        Atom finnishLanguage = item();
         finnishLanguage.setName("the Finnish language");
-        FirstClassItem ugly = item();
+        Atom ugly = item();
         ugly.setName("ugly (of language)");
-        FirstClassItem beautiful = item();
+        Atom beautiful = item();
         beautiful.setName("beautiful (of language)");
         opposites(beautiful, ugly).setName("beautiful and ugyl are opposite characteristics");
 
@@ -126,13 +126,13 @@ public class MyOtherBrainTest extends TestCase {
         hungarianGuySaysFinnishIsBeautiful.setName("the Hungarian guy claims that Finnish is beautiful");
 
         // Specific event of Magnus speaking
-        FirstClassItem magnusSpeaks = item();
+        Atom magnusSpeaks = item();
         eventInMemory(magnusSpeaks).setName("I remember this indirectly");
         assoc(assoc(magnusSpeaks, finnishIsUgly),
                 meaningOfSpeech);
 
         // Specific event of the Hungarian guy speaking
-        FirstClassItem hungarianGuySpeaks = item();
+        Atom hungarianGuySpeaks = item();
         hungarianGuySpeaks.setName("Hungarian guy says in a thick accent: \" Finnish ist eine schoene Sprache!\"");
         eventInMemory(hungarianGuySpeaks).setName("I remember this clearly, including the Hungarian's accent and tone");
         assoc(assoc(hungarianGuySpeaks, finnishIsBeautiful),
@@ -142,51 +142,51 @@ public class MyOtherBrainTest extends TestCase {
                 .setDescription("the way he said it reminds me of Mr. Finer: \"'he' is nominative case!\"");
 
         // Magnus is Swedish, Hungarian guy is Hungarian
-        FirstClassItem swedishPerson = item();
+        Atom swedishPerson = item();
         swedishPerson.setName("Swedish");
         Association magnusIsSwedish = assertNationality(magnus, swedishPerson);
         magnusIsSwedish.setName("Magnus is Swedish");
         tmp = assertProvenance(magnusIsSwedish, memory);
         tmp.setName("I have ample memories of Magnus being Swedish, speaking Swedish");
-        FirstClassItem hungarianPerson = item();
+        Atom hungarianPerson = item();
         hungarianPerson.setName("Hungarian");
         Association hungarianGuyIsHungarian = assertNationality(hungarianGuy, hungarianPerson);
         forgottenWhyIKnowThis(hungarianGuyIsHungarian)
                 .setName("I don't remember how I know the Hungarian guy is Hungarian");
 
         // Magnus' and the Hungarian guy's nationalities bias them w.r.t. their opinions of the Finnish language
-        FirstClassItem magnusConflict = conflictOfInterestMakesLessPlausible(
+        Atom magnusConflict = conflictOfInterestMakesLessPlausible(
                 magnusIsSwedish, magnusSaysFinnishIsUgly);
         magnusConflict.setName("Magnus is biased against Finnish because he is Swedish");
-        FirstClassItem swedishAnimosityTowardsFinland = item();
+        Atom swedishAnimosityTowardsFinland = item();
         swedishAnimosityTowardsFinland.setName("possible friendly rivalry between Sweden and Finland");
         supportedBy(magnusConflict, swedishAnimosityTowardsFinland)
                 .setName("Magnus' opinion may be influenced by his Swedish attitudes towards Finland");
-        FirstClassItem hungarianGuyConflict = conflictOfInterestMakesLessPlausible(
+        Atom hungarianGuyConflict = conflictOfInterestMakesLessPlausible(
                 hungarianGuyIsHungarian, hungarianGuySaysFinnishIsBeautiful);
         hungarianGuyConflict.setName("the Hungarian guy is biased towards Finnish because he is Hungarian");
-        FirstClassItem hungarianSympathyTowardsFinnish = item();
+        Atom hungarianSympathyTowardsFinnish = item();
         hungarianSympathyTowardsFinnish.setName("perhaps Hungarians like Finnish because it is a related language");
         supportedBy(hungarianGuyConflict, hungarianSympathyTowardsFinnish)
                 .setName("the Hungarian guy's opinion may be influenced by Hungarian attitudes towards Finnish, which is related to Hungarian");
 
         // Magnus ridicules Finnish for its "hard" phonetic character
-        FirstClassItem yksiKaksiKolme = item();
+        Atom yksiKaksiKolme = item();
         yksiKaksiKolme.setName("\"yksi, kaksi, kolme\"");
-        FirstClassItem hardCharacter = item();
+        Atom hardCharacter = item();
         hardCharacter.setName("\"hard\" phonetic character");
-        FirstClassItem yksiIsHard = hasCharacter(yksiKaksiKolme, hardCharacter);
+        Atom yksiIsHard = hasCharacter(yksiKaksiKolme, hardCharacter);
         yksiIsHard.setName("this expression sounds \"hard\"");
         yksiKaksiKolme.setDescription("\"one, two, three\" in Finnish");
-        FirstClassItem magnusYksiRemark = item();
+        Atom magnusYksiRemark = item();
         magnusYksiRemark.setName("Magnus says \"yksi, kaksi, kolme\" in a mocking tone");
         eventInMemory(magnusYksiRemark)
                 .setName("I remember this clearly, including Magnus' voice and his mocking tone");
         theWayYouSaidIt(magnusYksiRemark, mocking)
                 .setDescription("he said it mockingly (and convincingly)");
-        FirstClassItem magnusSupport = supportedBy(magnusSaysFinnishIsUgly, yksiIsHard);
+        Atom magnusSupport = supportedBy(magnusSaysFinnishIsUgly, yksiIsHard);
         magnusSupport.setDescription("Magnus illustrates his claim that Finnish is ugly with an example of the \"hard\" character of the language");
-        FirstClassItem hardImpliesUgly = implication(hardCharacter, ugly);
+        Atom hardImpliesUgly = implication(hardCharacter, ugly);
         hardImpliesUgly.setDescription("the implication that a hard-sounding language is also ugly");
         isConditionalUpon(magnusSupport, hardImpliesUgly)
                 .setDescription("Magnus' argument rests on the hard ==> ugly implication");
@@ -211,21 +211,21 @@ public class MyOtherBrainTest extends TestCase {
 
     ////////////////////////////////////
 
-    private FirstClassItem item() {
-        return wc.create(FirstClassItem.class);
+    private Atom item() {
+        return wc.create(Atom.class);
     }
 
-    private Association assoc(final FirstClassItem subject,
-                              final FirstClassItem object) {
+    private Association assoc(final Atom subject,
+                              final Atom object) {
         Association a = wc.create(Association.class);
         a.setSubject(subject);
         a.setObject(object);
         return a;
     }
 
-    private Association labeledAssociation(final FirstClassItem subject,
-                                           final FirstClassItem object,
-                                           final FirstClassItem label) {
+    private Association labeledAssociation(final Atom subject,
+                                           final Atom object,
+                                           final Atom label) {
         Association a = assoc(subject, object);
         Association b = assoc(a, label);
         assoc(b, associationLabel);
@@ -234,78 +234,78 @@ public class MyOtherBrainTest extends TestCase {
 
     ////////////////////////////////////
 
-    private Association saidBy(final FirstClassItem assertion,
-                               final FirstClassItem speaker) {
+    private Association saidBy(final Atom assertion,
+                               final Atom speaker) {
         return labeledAssociation(assertion, speaker, doer);
     }
 
-    private Association hasCharacter(final FirstClassItem subject,
-                                     final FirstClassItem object) {
+    private Association hasCharacter(final Atom subject,
+                                     final Atom object) {
         return labeledAssociation(subject, object, character);
     }
 
-    private Association assertNationality(final FirstClassItem subject,
-                                          final FirstClassItem natl) {
+    private Association assertNationality(final Atom subject,
+                                          final Atom natl) {
         return labeledAssociation(subject, natl, nationality);
     }
 
-    private Association assertProvenance(final FirstClassItem subject,
-                                         final FirstClassItem prov) {
+    private Association assertProvenance(final Atom subject,
+                                         final Atom prov) {
         return labeledAssociation(subject, prov, provenance);
     }
 
-    private Association eventInMemory(final FirstClassItem event) {
+    private Association eventInMemory(final Atom event) {
         return assoc(event, memory);
     }
 
-    private Association oneAssertionContradictsTheOther(final FirstClassItem assertion1,
-                                                        final FirstClassItem assertion2) {
+    private Association oneAssertionContradictsTheOther(final Atom assertion1,
+                                                        final Atom assertion2) {
         return labeledAssociation(assertion1, assertion2, contradicts);
     }
 
-    private Association theWayYouSaidIt(final FirstClassItem assertion,
-                                        final FirstClassItem theTone) {
+    private Association theWayYouSaidIt(final Atom assertion,
+                                        final Atom theTone) {
         return labeledAssociation(assertion, theTone, tone);
     }
 
-    private Association forgottenWhyIKnowThis(final FirstClassItem fact) {
+    private Association forgottenWhyIKnowThis(final Atom fact) {
         return assertProvenance(fact, unknownForgotten);
     }
 
-    private Association conflictOfInterestMakesLessPlausible(final FirstClassItem fact,
-                                                             final FirstClassItem assertion) {
+    private Association conflictOfInterestMakesLessPlausible(final Atom fact,
+                                                             final Atom assertion) {
         return labeledAssociation(fact, assertion, conflictOfInterest);
     }
 
-    private Association supportedBy(final FirstClassItem fact,
-                                    final FirstClassItem evidence) {
+    private Association supportedBy(final Atom fact,
+                                    final Atom evidence) {
         return labeledAssociation(fact, evidence, supportingEvidence);
     }
 
-    private Association trueAccordingTo(final FirstClassItem opinion,
-                                        final FirstClassItem opinionHolder) {
+    private Association trueAccordingTo(final Atom opinion,
+                                        final Atom opinionHolder) {
         return labeledAssociation(opinion, opinionHolder, accordingTo);
     }
 
-    private Association isConditionalUpon(final FirstClassItem fact,
-                                          final FirstClassItem condition) {
+    private Association isConditionalUpon(final Atom fact,
+                                          final Atom condition) {
         return labeledAssociation(fact, condition, conditionalUpon);
     }
 
-    private Association implication(final FirstClassItem premise,
-                                    final FirstClassItem conclusion) {
+    private Association implication(final Atom premise,
+                                    final Atom conclusion) {
         return labeledAssociation(premise, conclusion, implies);
     }
 
     ////////////////////////////////////
 
-    private Association imNotFeelingIt(final FirstClassItem assertion) {
+    private Association imNotFeelingIt(final Atom assertion) {
         return assoc(assertion, notFeelingIt);
     }
 
-    private FirstClassItem opposites(final FirstClassItem first,
-                                     final FirstClassItem second) {
-        FirstClassItem statement = item();
+    private Atom opposites(final Atom first,
+                                     final Atom second) {
+        Atom statement = item();
         assoc(statement, opposites);
         labeledAssociation(statement, first, member);
         labeledAssociation(statement, second, member);

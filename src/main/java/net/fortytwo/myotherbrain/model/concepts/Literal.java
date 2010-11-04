@@ -11,7 +11,7 @@ import java.net.URI;
  * Time: 7:52:19 PM
  */
 @rdf(MOB.LITERAL)
-public interface Literal extends FirstClassItem {
+public interface Literal extends Atom {
 
     @rdf(MOB.DATATYPEURI)
     URI getDatatypeURI();

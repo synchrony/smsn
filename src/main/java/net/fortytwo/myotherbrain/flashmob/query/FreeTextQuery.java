@@ -2,7 +2,7 @@ package net.fortytwo.myotherbrain.flashmob.query;
 
 import net.fortytwo.myotherbrain.flashmob.model.FlashMOBFirstClassItem;
 import net.fortytwo.myotherbrain.query.WeightedValue;
-import net.fortytwo.myotherbrain.model.concepts.FirstClassItem;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.query.FreeTextQueries;
 import net.fortytwo.myotherbrain.query.Handler;
 import net.fortytwo.myotherbrain.query.QueryException;
@@ -25,10 +25,10 @@ public class FreeTextQuery implements FlashMOBQuery {
 
     public void execute(final Handler<FlashMOBQueryResult, QueryException> resultHandler,
                         final FlashMOBQueryContext c) throws QueryException {
-        Handler<WeightedValue<FirstClassItem>, QueryException> handler
-                = new Handler<WeightedValue<FirstClassItem>, QueryException>() {
-            public boolean handle(final WeightedValue<FirstClassItem> value) throws QueryException {
-                FirstClassItem item = value.value;
+        Handler<WeightedValue<Atom>, QueryException> handler
+                = new Handler<WeightedValue<Atom>, QueryException>() {
+            public boolean handle(final WeightedValue<Atom> value) throws QueryException {
+                Atom item = value.value;
 
                 if (c.isVisible(item)) {
                     FlashMOBFirstClassItem bean = c.toBean(item);
