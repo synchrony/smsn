@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.query;
 
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.concepts.Association;
 import net.fortytwo.myotherbrain.model.concepts.Atom;
@@ -17,9 +17,9 @@ import java.util.Iterator;
 public class OntologyBasedQueries {
     private static final String
             SELECT_ITEMS = "SELECT ?item\n"
-            + " WHERE { ?item <" + RDF.TYPE + "> <" + MOB.ATOM + "> . }",
+            + " WHERE { ?item <" + RDF.TYPE + "> <" + MOBOntology.ATOM + "> . }",
             SELECT_OUTBOUND_ASSOCIATIONS = "SELECT ?ass\n"
-                    + " WHERE { ?ass <" + MOB.SUBJECT + "> ?subject . }";
+                    + " WHERE { ?ass <" + MOBOntology.SUBJECT + "> ?subject . }";
 
     // Note: no inference
     public static <E extends Exception> void handleAllItems(final Handler<Atom, E> handler,

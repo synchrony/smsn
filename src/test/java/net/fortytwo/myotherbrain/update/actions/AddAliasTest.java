@@ -17,9 +17,9 @@ public class AddAliasTest extends WriteActionTestCase {
     public void testAll() throws Exception {
         WriteContext c = new WriteContext(model.createConnection());
 
-        Atom something = c.create(Atom.class);
-        Thing alias1 = c.create(Thing.class);
-        Literal alias2 = c.create(Literal.class);
+        Atom something = c.createAtom(Atom.class);
+        Thing alias1 = c.createAtom(Thing.class);
+        Literal alias2 = c.createAtom(Literal.class);
 
         WriteAction action1 = new AddAlias(MyOtherBrain.toURI(something.getQName()),
                 MyOtherBrain.toURI(alias1.getQName()), c);

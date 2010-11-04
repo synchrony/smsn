@@ -8,7 +8,6 @@ package net.fortytwo.myotherbrain.flashmob;
 public class SessionInfo {
     private String userName;
     private String versionInfo;
-    private String baseURI;
     private String sensitivityUpperBound;
     private float emphasisLowerBound;
 
@@ -34,14 +33,6 @@ public class SessionInfo {
 
     public void setVersionInfo(final String versionInfo) {
         this.versionInfo = versionInfo;
-    }
-
-    public String getBaseURI() {
-        return baseURI;
-    }
-
-    public void setBaseURI(final String baseURI) {
-        this.baseURI = baseURI;
     }
 
     public float getEmphasisLowerBound() {

@@ -212,12 +212,12 @@ public class MyOtherBrainTest extends TestCase {
     ////////////////////////////////////
 
     private Atom item() {
-        return wc.create(Atom.class);
+        return wc.createAtom(Atom.class);
     }
 
     private Association assoc(final Atom subject,
                               final Atom object) {
-        Association a = wc.create(Association.class);
+        Association a = wc.createAtom(Association.class);
         a.setSubject(subject);
         a.setObject(object);
         return a;

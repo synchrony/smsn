@@ -1,9 +1,21 @@
 package net.fortytwo.myotherbrain;
 
+import net.fortytwo.myotherbrain.access.AccessManager;
+import net.fortytwo.myotherbrain.access.Session;
+import net.fortytwo.myotherbrain.model.MOBModel;
+import net.fortytwo.myotherbrain.model.MOBModelConnection;
+import net.fortytwo.myotherbrain.model.concepts.Association;
+import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
+import net.fortytwo.myotherbrain.update.WriteAction;
+import net.fortytwo.myotherbrain.update.WriteContext;
+import net.fortytwo.myotherbrain.update.actions.BreakAssociation;
+import net.fortytwo.myotherbrain.update.actions.SetName;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openrdf.sail.Sail;
+import org.openrdf.sail.memory.MemoryStore;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -11,8 +23,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,8 +34,8 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public class MyOtherBrain {
-    public static final String MOB_ONTOLOGY_FILE = "myotherbrain.owl";
     public static final String DEFAULT_BASEURI = "http://example.org/replaceThisBaseURI#";
+    public static final String MOB_ONTOLOGY_FILE = "myotherbrain.owl";
 
     // Configuration properties.
     public static final String
@@ -111,7 +123,7 @@ public class MyOtherBrain {
     public static void main(final String[] args) throws Exception {
         (new MyOtherBrain()).doit();
 
-        /*
+        //*
         java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MyOtherBrain.class.getName());
         logger.info(getVersionInfo());
 
@@ -135,13 +147,13 @@ public class MyOtherBrain {
                 try {
                     WriteContext wc = new WriteContext(c);
 
-                    Atom telephone = wc.create(Atom.class);
+                    Atom telephone = wc.createAtom(Atom.class);
                     telephone.setName("telephone");
                     telephone.setDescription("a device for voice communication at a distance");
-                    Atom red = wc.create(Atom.class);
+                    Atom red = wc.createAtom(Atom.class);
                     red.setName("red");
                     red.setDescription("the color red");
-                    Association a = wc.create(Association.class);
+                    Association a = wc.createAtom(Association.class);
                     a.setSubject(telephone);
                     a.setObject(red);
 
@@ -163,7 +175,7 @@ public class MyOtherBrain {
             }
         } finally {
             sail.shutDown();
-        }         */
+        }         //*/
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -180,14 +192,21 @@ public class MyOtherBrain {
     // TODO: make this configurable
     public static final String
             BASE_URI = "http://myotherbrain.fortytwo.net/",
-            ATOM_BASEURI = BASE_URI + "atom/";
+            ATOM_BASEURI = BASE_URI + "atom/",
+            GRAPH_BASEURI = BASE_URI + "graph/";
 
     private static final Random random = new Random();
 
     // TODO: move me
     public static String randomAtomIdentifier() {
         // TODO: improve me
-        return ATOM_BASEURI + "r" + random.nextInt(100000);
+        return ATOM_BASEURI + random.nextInt(100000);
+    }
+
+    // TODO: move me
+    public static String randomGraphIdentifier() {
+        // TODO: improve me
+        return GRAPH_BASEURI + random.nextInt(100000);
     }
 
     private static final MessageDigest SHA1_DIGEST;

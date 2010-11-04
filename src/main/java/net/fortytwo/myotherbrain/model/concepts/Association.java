@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.model.concepts;
 
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import org.openrdf.elmo.annotations.rdf;
 
 /**
@@ -10,14 +10,14 @@ import org.openrdf.elmo.annotations.rdf;
  * Time: 11:25:26 PM
  * To change this template use File | Settings | File Templates.
  */
-@rdf(MOB.ASSOCIATION)
+@rdf(MOBOntology.ASSOCIATION)
 public interface Association extends Atom {
-    @rdf(MOB.OBJECT)
+    @rdf(MOBOntology.OBJECT)
     Atom getObject();
 
     void setObject(Atom object);
 
-    @rdf(MOB.SUBJECT)
+    @rdf(MOBOntology.SUBJECT)
     Atom getSubject();
 
     void setSubject(Atom subject);

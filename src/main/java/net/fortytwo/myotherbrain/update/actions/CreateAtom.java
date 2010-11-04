@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.update.actions;
 
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.GeoPoint;
 import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
@@ -64,7 +64,7 @@ public class CreateAtom extends WriteAction {
 
         if (null == sensitivity) {
             try {
-                sensitivity = new URI(MOB.PERSONAL);
+                sensitivity = new URI(MOBOntology.PERSONAL);
             } catch (URISyntaxException e) {
                 throw new IllegalStateException();
             }

@@ -18,7 +18,7 @@ import net.fortytwo.myotherbrain.access.error.UserNameIsInvalidException;
 import net.fortytwo.myotherbrain.access.error.UserNameIsReservedException;
 import net.fortytwo.myotherbrain.access.error.UserNameIsTooLongException;
 import net.fortytwo.myotherbrain.access.error.UserNameIsTooShortException;
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.model.concepts.Account;
@@ -94,7 +94,7 @@ public class AccessManager {
 
     public AccessManager(final MOBStore store) {
         this.store = store;
-        QName adminGraph = new QName(MOB.MOBADMINGRAPH);
+        QName adminGraph = new QName(MOBOntology.MOBADMINGRAPH);
         adminModel = store.createModel(adminGraph);
     }
 
@@ -208,10 +208,10 @@ public class AccessManager {
 
             String timeStamp = currentTimeStamp();
 
-            Graph personalGraph = wc.create(Graph.class);
+            Graph personalGraph = wc.createGraph();
             logComment(personalGraph, "personal graph created for user '" + userName + "' on " + timeStamp);
 
-            Account account = wc.create(Account.class);
+            Account account = wc.createAtom(Account.class);
             logComment(account, "account created for user '" + userName + "' on " + timeStamp);
             account.setUserName(userName);
             account.setPasswordSha1Sum(MyOtherBrain.sha1SumOf(password));
@@ -309,9 +309,9 @@ public class AccessManager {
     // TODO: is there any way to avoid re-compile these queries for each use?
     private static final String
             SELECT_ACCOUNT_BY_USERNAME = "SELECT ?account\n"
-            + " WHERE { ?account <" + MOB.USERNAME + "> ?userName . }",
+            + " WHERE { ?account <" + MOBOntology.USERNAME + "> ?userName . }",
             SELECT_ACCOUNT_BY_CONTACTEMAILADDRESS = "SELECT ?account\n"
-                    + "WHERE { ?account <" + MOB.CONTACTEMAILADDRESS + "> ?contactEmailAddress . }";
+                    + "WHERE { ?account <" + MOBOntology.CONTACTEMAILADDRESS + "> ?contactEmailAddress . }";
 
     private Account getAccountByUserName(final String userName,
                                          final MOBModelConnection c) {

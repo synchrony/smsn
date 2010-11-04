@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain;
 
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.MOBModel;
 import net.fortytwo.myotherbrain.model.concepts.Account;
 import net.fortytwo.myotherbrain.model.concepts.Association;
@@ -118,7 +118,7 @@ public class MOBStore {
 
         ElmoModule baseModule = new ElmoModule();
         // This analysis will be query-only in the final module.
-        baseModule.setGraph(new QName(MOB.MOBONTOLOGYGRAPH));
+        baseModule.setGraph(new QName(MOBOntology.MOBONTOLOGYGRAPH));
 
         // Dynamically register concepts from the MOB ontology.
         baseModule.addConcept(Thing.class);
@@ -203,7 +203,7 @@ public class MOBStore {
         try {
             InputStream is = MyOtherBrain.class.getResourceAsStream(
                     MyOtherBrain.MOB_ONTOLOGY_FILE);
-            org.openrdf.model.URI ontoGraph = getSail().getValueFactory().createURI(MOB.MOBONTOLOGYGRAPH);
+            org.openrdf.model.URI ontoGraph = getSail().getValueFactory().createURI(MOBOntology.MOBONTOLOGYGRAPH);
             try {
                 rc.add(is, MyOtherBrain.DEFAULT_BASEURI, RDFFormat.RDFXML, ontoGraph);
             } finally {

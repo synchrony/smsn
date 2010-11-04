@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.update.actions;
 
 import net.fortytwo.myotherbrain.MyOtherBrain;
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.concepts.Atom;
 import net.fortytwo.myotherbrain.model.concepts.Marker;
 import net.fortytwo.myotherbrain.update.WriteAction;
@@ -19,9 +19,9 @@ public class AddMarkerTagTest extends WriteActionTestCase {
     public void testAll() throws Exception {
         WriteContext c = new WriteContext(model.createConnection());
 
-        Atom subject = c.create(Atom.class);
-        Marker tag1 = c.create(new QName(MOB.STARRED), Marker.class);
-        Marker tag2 = c.create(new QName(MOB.BROKEN), Marker.class);
+        Atom subject = c.createAtom(Atom.class);
+        Marker tag1 = c.create(new QName(MOBOntology.STARRED), Marker.class);
+        Marker tag2 = c.create(new QName(MOBOntology.BROKEN), Marker.class);
 
         WriteAction action1 = new AddMarkerTag(MyOtherBrain.toURI(subject.getQName()),
                 MyOtherBrain.toURI(tag1.getQName()), c);

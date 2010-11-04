@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.model.concepts;
 
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.annotations.rdf;
 
@@ -9,15 +9,15 @@ import org.openrdf.elmo.annotations.rdf;
  * Date: May 7, 2009
  * Time: 7:53:04 PM
  */
-@rdf(MOB.GEOPOINT)
+@rdf(MOBOntology.GEOPOINT)
 public interface GeoPoint extends Thing {
 
-    @rdf(MOB.LATITUDE)
+    @rdf(MOBOntology.LATITUDE)
     Float getLatitude();
 
     void setLatitude(Float latitude);
 
-    @rdf(MOB.LONGITUDE)
+    @rdf(MOBOntology.LONGITUDE)
     Float getLongitude();
 
     void setLongitude(Float longitude);

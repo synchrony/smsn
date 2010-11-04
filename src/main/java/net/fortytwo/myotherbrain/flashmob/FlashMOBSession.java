@@ -9,7 +9,7 @@ import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryExecutor;
 import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryResult;
 import net.fortytwo.myotherbrain.flashmob.update.ActionFactory;
 import net.fortytwo.myotherbrain.flashmob.update.actions.ActionBean;
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
 import net.fortytwo.myotherbrain.query.QueryException;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
@@ -30,9 +30,9 @@ public class FlashMOBSession {
     private static final Logger LOGGER = MyOtherBrain.getLogger(FlashMOBSession.class);
 
     public enum SensitivityLevel {
-        PUBLIC(MOB.PUBLIC, 0),
-        PERSONAL(MOB.PERSONAL, 1),
-        PRIVATE(MOB.PRIVATE, 2);
+        PUBLIC(MOBOntology.PUBLIC, 0),
+        PERSONAL(MOBOntology.PERSONAL, 1),
+        PRIVATE(MOBOntology.PRIVATE, 2);
 
         private String uri;
         private int value;
@@ -89,7 +89,7 @@ public class FlashMOBSession {
     private final FlashMOBQueryExecutor queryExecutor;
 
     // Mutable values which control visibility of items and relationships.
-    private SensitivityLevel sensitivityUpperBound = SensitivityLevel.fromURI(MOB.PERSONAL);
+    private SensitivityLevel sensitivityUpperBound = SensitivityLevel.fromURI(MOBOntology.PERSONAL);
     private float emphasisLowerBound = 0f;
 
     public static void main(final String[] args) throws Exception {
@@ -151,7 +151,6 @@ public class FlashMOBSession {
 
     public SessionInfo getSessionInfo() {
         SessionInfo info = new SessionInfo();
-        info.setBaseURI(MyOtherBrain.ATOM_BASEURI + "r");
         info.setUserName(session.getUserName());
         info.setVersionInfo(MyOtherBrain.getVersionInfo());
         info.setSensitivityUpperBound(sensitivityUpperBound.toString());

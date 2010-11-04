@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.model.concepts;
 
-import net.fortytwo.myotherbrain.model.MOB;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.annotations.rdf;
 
@@ -14,50 +14,50 @@ import java.util.Set;
  * Time: 11:29:19 PM
  * To change this template use File | Settings | File Templates.
  */
-@rdf(MOB.ATOM)
+@rdf(MOBOntology.ATOM)
 public interface Atom extends Thing {
 
-    @rdf(MOB.ALIAS)
+    @rdf(MOBOntology.ALIAS)
     Set<Thing> getAlias();
 
     void setAlias(Set<Thing> alias);
 
-    @rdf(MOB.CREATIONPLACESTAMP)
+    @rdf(MOBOntology.CREATIONPLACESTAMP)
     GeoPoint getCreationPlaceStamp();
 
     void setCreationPlaceStamp(GeoPoint creationPlaceStamp);
 
-    @rdf(MOB.CREATIONTIMESTAMP)
+    @rdf(MOBOntology.CREATIONTIMESTAMP)
     XMLGregorianCalendar getCreationTimeStamp();
 
     void setCreationTimeStamp(XMLGregorianCalendar creationTimeStamp);
 
-    @rdf(MOB.DESCRIPTION)
+    @rdf(MOBOntology.DESCRIPTION)
     String getDescription();
 
     void setDescription(String description);
 
-    @rdf(MOB.EMPHASIS)
+    @rdf(MOBOntology.EMPHASIS)
     Float getEmphasis();
 
     void setEmphasis(Float emphasis);
 
-    @rdf(MOB.ICON)
+    @rdf(MOBOntology.ICON)
     WebResource getIcon();
 
     void setIcon(WebResource icon);
 
-    @rdf(MOB.MARKERTAG)
+    @rdf(MOBOntology.MARKERTAG)
     Set<Marker> getMarkerTag();
 
     void setMarkerTag(Set<Marker> markerTag);
 
-    @rdf(MOB.NAME)
+    @rdf(MOBOntology.NAME)
     String getName();
 
     void setName(String name);
 
-    @rdf(MOB.RICHTEXTDESCRIPTION)
+    @rdf(MOBOntology.RICHTEXTDESCRIPTION)
     String getRichTextDescription();
 
     void setRichTextDescription(String richTextDescription);
@@ -65,7 +65,7 @@ public interface Atom extends Thing {
     // Note: the mob:score property is not used.  Rather, it serves as a parent
     //       for other, dynamically-defined properties.
 
-    @rdf(MOB.SENSITIVITY)
+    @rdf(MOBOntology.SENSITIVITY)
     SensitivityLevel getSensitivity();
 
     void setSensitivity(SensitivityLevel sensitivity);

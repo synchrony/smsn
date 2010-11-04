@@ -20,9 +20,9 @@ public class RemoveAliasTest extends WriteActionTestCase {
     public void testAll() throws Exception {
         WriteContext c = new WriteContext(model.createConnection());
 
-        Atom subject = c.create(Atom.class);
-        Thing alias1 = c.create(Thing.class);
-        Literal alias2 = c.create(Literal.class);
+        Atom subject = c.createAtom(Atom.class);
+        Thing alias1 = c.createAtom(Thing.class);
+        Literal alias2 = c.createAtom(Literal.class);
         Set<Thing> alias = new HashSet<Thing>();
         alias.add(alias1);
         alias.add(alias2);

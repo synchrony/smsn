@@ -1,10 +1,11 @@
 package net.fortytwo.myotherbrain.update;
 
-import net.fortytwo.myotherbrain.model.MOBModelConnection;
-import net.fortytwo.myotherbrain.model.MOB;
 import net.fortytwo.myotherbrain.MyOtherBrain;
-import net.fortytwo.myotherbrain.access.error.QuotaException;
 import net.fortytwo.myotherbrain.access.Quotas;
+import net.fortytwo.myotherbrain.access.error.QuotaException;
+import net.fortytwo.myotherbrain.model.MOBModelConnection;
+import net.fortytwo.myotherbrain.model.MOBOntology;
+import net.fortytwo.myotherbrain.model.concepts.Graph;
 import org.openrdf.concepts.owl.Thing;
 
 import javax.xml.namespace.QName;
@@ -39,9 +40,14 @@ public class WriteContext {
         return quotas;
     }
 
-    public <T> T create(final Class<T> c) {
+    public <T> T createAtom(final Class<T> c) {
         QName q = new QName(MyOtherBrain.randomAtomIdentifier());
         return create(q, c);
+    }
+
+    public Graph createGraph() {
+        QName q = new QName(MyOtherBrain.randomGraphIdentifier());
+        return create(q, Graph.class);
     }
 
     public <T> T create(final QName q, final Class<T> c) {
@@ -102,7 +108,7 @@ public class WriteContext {
                 || emphasis.isNaN()
                 || emphasis < 0
                 || emphasis > 1) {
-            throw new BadValueException(MOB.EMPHASIS, emphasis);
+            throw new BadValueException(MOBOntology.EMPHASIS, emphasis);
         }
 
         return emphasis;
@@ -110,7 +116,7 @@ public class WriteContext {
 
     public String normalizeLanguageTag(final String languageTag) throws BadValueException {
         if (2 != languageTag.length()) {
-            throw new BadValueException(MOB.LANGUAGETAG, languageTag);
+            throw new BadValueException(MOBOntology.LANGUAGETAG, languageTag);
         }
 
         // Note: currently, language tag values are not checked against any official list of language tags.
@@ -123,7 +129,7 @@ public class WriteContext {
                 || latitude.isNaN()
                 || latitude < -90f
                 || latitude > 90f) {
-            throw new BadValueException(MOB.LATITUDE, latitude);
+            throw new BadValueException(MOBOntology.LATITUDE, latitude);
         }
 
         return latitude;
@@ -139,7 +145,7 @@ public class WriteContext {
     public Float normalizeLongitude(final Float longitude) throws BadValueException {
         if (longitude.isInfinite()
                 || longitude.isNaN()) {
-            throw new BadValueException(MOB.LONGITUDE, longitude);
+            throw new BadValueException(MOBOntology.LONGITUDE, longitude);
         }
 
         return longitude % 180f;
@@ -159,12 +165,12 @@ public class WriteContext {
 
     public String normalizeRepresentationSha1Sum(final String representationSha1Sum) throws BadValueException {
         if (40 != representationSha1Sum.length()) {
-            throw new BadValueException(MOB.REPRESENTATIONSHA1SUM, representationSha1Sum);
+            throw new BadValueException(MOBOntology.REPRESENTATIONSHA1SUM, representationSha1Sum);
         }
 
         for (byte b : representationSha1Sum.getBytes()) {
             if (!((b >= '0' && b <= '9') || (b >= 'a' && b <= 'f'))) {
-                throw new BadValueException(MOB.REPRESENTATIONSHA1SUM, representationSha1Sum);
+                throw new BadValueException(MOBOntology.REPRESENTATIONSHA1SUM, representationSha1Sum);
             }
         }
 
