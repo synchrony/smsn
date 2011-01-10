@@ -76,6 +76,16 @@ public class MyOtherBrain {
         }
     }
 
+    private static final MessageDigest SHA1_DIGEST;
+
+    static {
+        try {
+            SHA1_DIGEST = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     public static Logger getLogger(final Class c) {
         return Logger.getLogger(c);
     }
@@ -207,16 +217,6 @@ public class MyOtherBrain {
     public static String randomGraphIdentifier() {
         // TODO: improve me
         return GRAPH_BASEURI + random.nextInt(100000);
-    }
-
-    private static final MessageDigest SHA1_DIGEST;
-
-    static {
-        try {
-            SHA1_DIGEST = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new ExceptionInInitializerError(e);
-        }
     }
 
     public static String sha1SumOf(final String key) {

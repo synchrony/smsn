@@ -26,6 +26,12 @@
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org/</url>
         </repository>
+        <repository>
+            <id>jsonrpc4j-webdav-maven-repo</id>
+            <name>jsonrpc4j maven repository</name>
+            <url>http://jsonrpc4j.googlecode.com/svn/maven/repo/</url>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -33,6 +39,11 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode</groupId>
+            <artifactId>jsonrpc4j</artifactId>
+            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

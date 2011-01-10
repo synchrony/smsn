@@ -1,0 +1,89 @@
+#nav {
+	list-style: none;
+	line-height: 1;
+	background: white;
+	font-weight: bold;
+	padding: 0;
+	border: solid #eda;
+	border-width: 1px 0;
+	margin: 0 0 1em 0;
+    z-index: 1000;
+}
+
+#nav ul {
+	float: left;
+	list-style: none;
+	line-height: 1;
+	background: white;
+	font-weight: bold;
+	padding: 0;
+	border: solid #eda;
+	border-width: 1px 0;
+	margin: 0 0 1em 0;
+    z-index: 1000;
+}
+
+#nav a {
+	display: block;
+	width: 10em;
+	w\idth: 6em;
+	color: #7C6240;
+	text-decoration: none;
+	padding: 0.25em 2em;
+    z-index: 1000;
+}
+
+#nav a.daddy {
+	background: url(images/rightarrow2.gif) center right no-repeat;
+    z-index: 1000;
+}
+
+#nav li {
+	float: left;
+	padding: 0;
+	width: 10em;
+    z-index: 1000;
+}
+
+#nav li ul {
+	position: absolute;
+	left: -999em;
+	height: auto;
+	width: 14.4em;
+	w\idth: 13.9em;
+	font-weight: normal;
+	border-width: 0.25em;
+	margin: 0;
+    z-index: 1000;
+}
+
+#nav li li {
+	padding-right: 1em;
+	width: 13em
+}
+
+#nav li ul a {
+	width: 13em;
+	w\idth: 9em;
+    z-index: 1000;
+}
+
+#nav li ul ul {
+	margin: -1.75em 0 0 14em;
+    z-index: 1000;
+}
+
+#nav li:hover ul ul, #nav li:hover ul ul ul, #nav li.sfhover ul ul, #nav li.sfhover ul ul ul {
+	left: -999em;
+    z-index: 1000;
+}
+
+#nav li:hover ul, #nav li li:hover ul, #nav li li li:hover ul, #nav li.sfhover ul, #nav li li.sfhover ul, #nav li li li.sfhover ul {
+	left: auto;
+    z-index: 1000;
+}
+
+#nav li:hover, #nav li.sfhover {
+	background: #eda;
+    z-index: 1000;
+}

@@ -1,0 +1,87 @@
+#nav{list-style: none; }
+
+ #nav ul {
+	padding: 0;
+	margin:0;
+	list-style: none;
+    width:12em;
+    z-index:99;
+    position:relative;
+    overflow:visible;
+   }
+
+#nav li {
+    margin:0;
+    position: relative;
+    float:left;
+	width: 12em;
+	background-color:#DFDFDF;
+    border:solid 1px #CECECE;
+    display:block;
+    height:auto;
+}
+#nav ul li{ background-color:#DFDFDF;}
+
+#nav ul li{ border-width:1px 1px 0 0;}
+#nav ul ul li{ border-width:1px 1px 0 1px;}
+#nav ul ul li:last-child{border-width:1px;}
+
+#nav a {
+    text-decoration:none;
+    display:block;
+    padding: 0.1em;
+    margin:0.2em 0 0.2em 0.1em;
+    width:11.5em;
+    height:1.05em;
+}
+
+#nav a:hover, #nav li:hover{
+    background-color:#DFDFDF;
+}
+#nav ul li:hover, #nav ul li a:hover{ background-color:#DFDFDF;}
+
+
+#nav ul{
+    display:none;
+}
+
+/*all see this */
+#nav ul ul, #nav ul ul ul{
+    display:none;
+    position:absolute;
+    margin-top:-1.8em;
+    margin-left:12em;
+}
+
+/* non-IE browsers see this */
+ #nav ul li>ul, #nav ul ul li>ul{
+    margin-top:-1.35em;
+ }
+
+
+#nav li:hover ul ul, #nav li:hover ul ul ul, #nav li:hover ul ul ul ul, #nav li:hover ul ul ul ul ul{
+    display:none;
+}
+
+#nav li:hover ul, #nav ul li:hover ul, #nav ul ul li:hover ul, #nav ul ul ul li:hover ul, #nav ul ul ul ul li:hover ul{
+    display:block;
+}
+
+
+
+li>ul {
+	top: auto;
+	left: auto;
+}
+/* site style */
+#holdm{position:absolute; left:20px; margin-left:-2.5em; z-index:100; width:80%; }
+
+     #vertm{width:15em; float:left;}
+     .com{color:purple; margin-top:10px; }
+    li.small{height:10px;}
+    li.small a{height:10px; line-height:10px;}
+	.colorspot span{visibility:hidden;}
+	.colorspot{float:left; width:.5em; height:.5em; line-height:.5em; overflow:hidden; margin:1px 1px 0 0;  text-decoration:none;}
+	#colorcon{background-color:#000; padding:2px; float:left;}
+	#colordisp{width:100%; height:1.2em; text-align:center; background-color:#CCC;}
+

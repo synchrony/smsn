@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="http://www.w3.org/StyleSheets/TR/W3C-REC.css" type="text/css"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>MyOtherBrain</title>
+
+    <!--<link rel="icon" href="../../favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon"/>-->
+
+    <link media="screen" type="text/css" href="mob.css" rel="stylesheet"/>
+
+    <link media="screen" type="text/css" href="menus.css" rel="stylesheet"/>
+
+    <script type="text/javascript" src="lib/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/Application.js"></script>
+    <script type="text/javascript" src="js/widgets/MenuBar.js"></script>
+    <script type="text/javascript" src="js/ItemRegistry.js"></script>
+    <script type="text/javascript" src="js/widgets/ItemView.js"></script>
+    <script type="text/javascript" src="js/widgets/views/FullItemView.js"></script>
+    <script type="text/javascript" src="js/widgets/ItemViewColonnade.js"></script>
+    <script type="text/javascript" src="js/widgets/columns/ShowItemsColumn.js"></script>
+
+    <script type="text/javascript">/* <![CDATA[ */
+
+    var settings = {
+        "mobEndpoint": "http://localhost:8182/"    
+    };
+
+    var sfHover = function() {
+        var sfEls = document.getElementById("nav").getElementsByTagName("LI");
+        for (var i = 0; i < sfEls.length; i++) {
+            sfEls[i].onmouseover = function() {
+                this.className += " sfhover";
+            };
+            sfEls[i].onmouseout = function() {
+                this.className = this.className.replace(new RegExp(" sfhover\\b"), "");
+            };
+        }
+    };
+
+    if (window.attachEvent) {
+        window.attachEvent("onload", sfHover);
+    }
+
+    /*
+     var MOB = {};
+
+     MOB.MyPrototype = function() {
+     this.foo = "bound to this";
+     var bar = "wah";
+     var r = document.createElement("div");
+
+     r.foo = "bound to r";
+
+     r.refresh = function() {
+     alert("refreshing. behold: " + this.foo);
+     };
+
+     return r;
+     };
+
+     //alert("foobar");
+
+     var v = new MOB.MyPrototype();
+     //alert("behold: " + v.foo);
+     v.refresh();
+     */
+
+    $(document).ready(function() {
+
+        //alert("r: " + Math.random());
+        var app = new MOB.Application();
+        var e = document.getElementById("everything");
+        e.appendChild(app.getElement());
+
+        var itemA = {
+            uri: "http://example.org/someResource",
+            name: "Foobar",
+            description: "This is a good resource.  One of the best.",
+            sensitivity: "public"
+        };
+
+        var itemAUpdated = {
+            uri: "http://example.org/someResource",
+            name: "Foobar (modified)",
+            description: "A new description.",
+            sensitivity: "private"
+        };
+
+        var itemB = {
+            uri: "http://example.org/anotherResource",
+            name: "The End",
+            description: "This is the end. Beautiful friend, the end.",
+            sensitivity: "public",
+            icon: "http://icons.iconarchive.com/icons/flameia/machemicals/48/search-icon.png"
+        };
+
+        /*
+         var v = new MOB.FullItemView(itemA, app, null);
+         b.appendChild(v.getElement());
+         var v2 = new MOB.FullItemView(itemA, app, null);
+         b.appendChild(v2.getElement());
+         //alert("about to update (size is " + app.getItemRegistry().size() + ")");
+         app.getItemRegistry().updateItem(itemAUpdated);
+         //alert("about to update again");
+         v.destroy();
+         app.getItemRegistry().updateItem(itemA);
+         v2.destroy();
+         */
+
+        var cd = app.getItemViewColonnade();
+
+        var c;
+        c = new MOB.ShowItemsColumn(app, function() {
+            cd.removeColumn(c);
+        });
+        cd.addColumn(c);
+        c.addItem(itemA);
+        c.addItem(itemA);
+        //alert("about to update (size is " + app.getItemRegistry().size() + ")");
+        app.getItemRegistry().updateItem(itemAUpdated);
+        //c.destroy();
+        //alert("done (size is " + app.getItemRegistry().size() + ")");
+
+        var c2;
+        c2 = new MOB.ShowItemsColumn(app, function() {
+            cd.removeColumn(c2);
+        });
+        cd.addColumn(c2);
+        c2.addItem(itemB);
+
+    });
+
+    /* ]]> */</script>
+</head>
+<body>
+<div id="everything">
+    <!--
+    <div class="mob-application">
+        <div class="mob-header">
+            <div class="mob-menu-bar">
+                <ul id="nav">
+                    <li><a href="#">File</a>
+                        <ul>
+                            <li><a href="#" onclick="handleConnect();">Connect</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Edit</a>
+                        <ul>
+                            <li><a href="#" id="mob-undo-menuitem" onclick="handleUndo();">Undo</a></li>
+                            <li><a href="#" id="mob-redo-menuitem" onclick="handleRedo();">Redo</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">View</a>
+                        <ul>
+                            <li><a href="#" class="daddy">New column</a>
+                                <ul>
+                                    <li><a href="#" onclick="handleCreateShowItemsColumn();">Show</a></li>
+                                    <li><a href="#" onclick="handleCreateEditItemsColumn();">Edit</a></li>
+                                    <li><a href="#" onclick="handleCreateSearchColumn();">Search</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#" class="daddy">Set visibility</a>
+                                <ul>
+                                    <li><a href="#" onclick="handleSetVisibilityPublic();">Public</a></li>
+                                    <li><a href="#" onclick="handleSetVisibilityPersonal();">Personal</a></li>
+                                    <li><a href="#" onclick="handleSetVisibilityPrivate();">Private</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#" class="daddy">Set emphasis</a>
+                                <ul>
+                                    <li><a href="#" onclick="handleSetEmphasisThreshold(0);">0</a></li>
+                                    <li><a href="#" onclick="handleSetEmphasisThreshold(1);">1</a></li>
+                                    <li><a href="#" onclick="handleSetEmphasisThreshold(2);">2</a></li>
+                                    <li><a href="#" onclick="handleSetEmphasisThreshold(3);">3</a></li>
+                                    <li><a href="#" onclick="handleSetEmphasisThreshold(4);">4</a></li>
+                                    <li><a href="#" onclick="handleSetEmphasisThreshold(5);">5</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Help</a>
+                        <ul>
+                            <li><a href="#" onclick="handleAboutMyOtherBrain();">About MyOtherBrain</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="mob-application-body" id="appbody"></div>
+        <div class="mob-application-footer">This is the footer</div>
+    </div>
+    -->
+</div>
+</body>
+</html>
