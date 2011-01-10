@@ -12,7 +12,8 @@
 
     <modules>
 	<module>core</module>
-	<module>android</module>  
+	<module>server</module>
+	<module>android</module>
  </modules>
 
     <build>
