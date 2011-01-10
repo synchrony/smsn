@@ -17,32 +17,33 @@
 package net.fortytwo.myotherbrain;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
-import net.fortytwo.myotherbrain.R;
 
 /**
  * This class provides a basic demonstration of how to write an Android
  * activity. Inside of its window, it places a single view: an EditText that
  * displays and edits some internal text.
  */
-public class MyOtherBrainMain extends Activity {
-    
+public class Main extends Activity {
+
     static final private int BACK_ID = Menu.FIRST;
     static final private int CLEAR_ID = Menu.FIRST + 1;
 
     private EditText mEditor;
-    
-    public MyOtherBrainMain() {
+    private final Activity thisActivity = this;
+
+    public Main() {
     }
 
-    /** Called with the activity is first created. */
+    /**
+     * Called with the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +56,11 @@ public class MyOtherBrainMain extends Activity {
         mEditor = (EditText) findViewById(R.id.editor);
 
         // Hook up button presses to the appropriate event handler.
-        ((Button) findViewById(R.id.back)).setOnClickListener(mBackListener);
-        ((Button) findViewById(R.id.clear)).setOnClickListener(mClearListener);
-        
+        findViewById(R.id.back).setOnClickListener(mBackListener);
+        findViewById(R.id.clear).setOnClickListener(mClearListener);
+        findViewById(R.id.debugging).setOnClickListener(launchDebuggingActivity);
+        findViewById(R.id.brainpingsettings).setOnClickListener(launchBrainPingPreferences);
+
         mEditor.setText(getText(R.string.main_label));
     }
 
@@ -105,12 +108,12 @@ public class MyOtherBrainMain extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case BACK_ID:
-            finish();
-            return true;
-        case CLEAR_ID:
-            mEditor.setText("");
-            return true;
+            case BACK_ID:
+                finish();
+                return true;
+            case CLEAR_ID:
+                mEditor.setText("");
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -131,6 +134,18 @@ public class MyOtherBrainMain extends Activity {
     OnClickListener mClearListener = new OnClickListener() {
         public void onClick(View v) {
             mEditor.setText("");
+        }
+    };
+
+    private final OnClickListener launchDebuggingActivity = new OnClickListener() {
+        public void onClick(View view) {
+            startActivity(new Intent(thisActivity, Debugging.class));
+        }
+    };
+
+    private final OnClickListener launchBrainPingPreferences = new OnClickListener() {
+        public void onClick(View view) {
+            startActivity(new Intent(thisActivity, BrainPingSettings.class));
         }
     };
 }
