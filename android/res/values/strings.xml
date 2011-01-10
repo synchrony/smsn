@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DroidspeakDebugging</string>
+    <string name="app_name">MyOtherBrain</string>
+
+    <!-- Simple strings. -->
+    <string name="skeleton_app">Skeleton App</string>
+    <string name="back">Back</string>
+    <string name="clear">Clear</string>
+
+    <!-- This is a complex string containing style runs. -->
+    <string name="main_label">Hello from your other brain!</string>
 </resources>
