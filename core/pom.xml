@@ -8,116 +8,22 @@
     <artifactId>myotherbrain-core</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
-    <name>MyOtherBrain</name>
-    <description>external cognition for the Semantic Web</description>
+    <name>MyOtherBrain Core</name>
 
     <repositories>
-        <!--<repository>
+        <repository>
             <id>fortytwo</id>
             <name>fortytwo.net Maven repository</name>
             <url>http://fortytwo.net/maven2</url>
-        </repository>-->
-        <repository>
-            <id>aduna-repo</id>
-            <name>Aduna repository</name>
-            <url>http://repo.aduna-software.org/maven2/releases</url>
-        </repository>
-        <repository>
-            <id>neo4j-public-repository</id>
-            <url>http://m2.neo4j.org/</url>
-        </repository>
-        <repository>
-            <id>jsonrpc4j-webdav-maven-repo</id>
-            <name>jsonrpc4j maven repository</name>
-            <url>http://jsonrpc4j.googlecode.com/svn/maven/repo/</url>
-            <layout>default</layout>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode</groupId>
-            <artifactId>jsonrpc4j</artifactId>
-            <version>0.4</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-api</artifactId>
-            <version>2.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-graph-impl</artifactId>
-            <version>2.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-webdav</artifactId>
-            <version>1.5.5</version>
-        </dependency>
-        <!--<dependency>
-            <groupId>net.fortytwo</groupId>
-            <artifactId>restpipe</artifactId>
-            <version>1.0-alpha1</version>
-        </dependency>-->
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-memory</artifactId>
-            <version>2.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-nativerdf</artifactId>
-            <version>2.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo-rdf-sail</artifactId>
-            <version>0.2-stable-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>shell</artifactId>
-            <version>1.0-b9-SNAPSHOT</version>
-        </dependency>
-        <!-- TODO: check that Elmo and Sesame versions line up -->
-        <dependency>
-            <groupId>org.openrdf.elmo</groupId>
-            <artifactId>elmo-api</artifactId>
-            <version>1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.elmo</groupId>
-            <artifactId>elmo-sesame</artifactId>
-            <version>1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.elmo</groupId>
-            <artifactId>elmo-owl</artifactId>
-            <version>1.5</version>
-        </dependency>
-        <!-- TODO: check that log4j and slf4j dependencies line up with OpenRDF's -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
@@ -125,8 +31,8 @@
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <directory>target</directory>
-        <outputDirectory>target/classes</outputDirectory>
-        <testOutputDirectory>target/test-classes</testOutputDirectory>
+        <!--<outputDirectory>target/classes</outputDirectory>
+        <testOutputDirectory>target/test-classes</testOutputDirectory>-->
         <finalName>${artifactId}-${version}</finalName>
         <resources>
             <resource>
@@ -147,59 +53,6 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/standalone.xml</descriptor>
-                    </descriptors>
-                    <finalName>myotherbrain-${project.version}</finalName>
-                    <outputDirectory>target</outputDirectory>
-                    <workDirectory>target/assembly/work</workDirectory>
-                    <tarLongFileMode>warn</tarLongFileMode>
-                    <archive>
-                        <manifest>
-                            <mainClass>net.fortytwo.myotherbrain.MyOtherBrain</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <!--
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <tasks>
-                                <property name="versionprops"
-                                          value="${basedir}/src/main/resources/net/fortytwo/myotherbrain/version.properties"/>
-                                <exec executable="bash" output="${versionprops}">
-                                    <arg value="${basedir}/src/main/bash/svn-revision.sh"/>
-                                </exec>
-                                <echo message="net.fortytwo.myotherbrain.name = ${project.name}&#xA;"
-                                      file="${versionprops}" append="true"/>
-                                <echo message="net.fortytwo.myotherbrain.version = ${project.version}&#xA;"
-                                      file="${versionprops}" append="true"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 
