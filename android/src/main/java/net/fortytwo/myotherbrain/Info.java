@@ -3,13 +3,13 @@ package net.fortytwo.myotherbrain;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class Debugging extends Activity
+public class Info extends Activity
 {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.debugging);
+        setContentView(R.layout.info);
     }
 }

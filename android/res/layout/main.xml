@@ -48,11 +48,6 @@
         <Button android:id="@+id/clear" style="@style/ActionButton"
             android:text="@string/clear" android:textColor="@color/red" />
 
-        <Button android:id="@+id/debugging" style="@style/ActionButton"
-                android:text="debug"/>
-        <Button android:id="@+id/brainpingsettings" style="@style/ActionButton"
-                android:text="brainping"/>
-
     </LinearLayout>
 
 </LinearLayout>

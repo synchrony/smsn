@@ -15,17 +15,12 @@ public class BrainPingSettings extends PreferenceActivity {
             START_TIME = "brainping_starttime",
             END_TIME = "brainping_endtime";
 
-    //private final DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getApplicationContext());
-
-    private SharedPreferences prefs;
-
-
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Note: this is the earliest you can get preferences.  Getting them at construction time results in an error.
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         addPreferencesFromResource(R.xml.brainping);
 
@@ -69,40 +64,4 @@ public class BrainPingSettings extends PreferenceActivity {
             }
         }); */
     }
-
-    /*
-    private void setStartTime(final float f) {
-        if (f < 0f || f >= 24f) {
-            throw new IllegalArgumentException();
-        }
-
-        startTime = f;
-        editor.putFloat(START_TIME, startTime);
-        editor.commit();
-        if (startTime > endTime) {
-            setEndTime(startTime);
-        }
-    }
-
-    private void setEndTime(final float f) {
-        if (f < 0f || f >= 24f) {
-            throw new IllegalArgumentException();
-        }
-
-        endTime = f;
-        editor.putFloat(END_TIME, endTime);
-        editor.commit();
-        if (endTime < startTime) {
-            setStartTime(endTime);
-        }
-    }
-
-    private void setFrequency(final float f) {
-        if (f <= 0f || f > 288f) {
-            throw new IllegalArgumentException();
-        }
-
-        frequency = f;
-        editor.putFloat(FREQUENCY, frequency);
-    }*/
 }

@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,12 +32,7 @@ import android.widget.EditText;
  * displays and edits some internal text.
  */
 public class Main extends Activity {
-
-    static final private int BACK_ID = Menu.FIRST;
-    static final private int CLEAR_ID = Menu.FIRST + 1;
-
     private EditText editor;
-    private final Activity thisActivity = this;
 
     public Main() {
     }
@@ -54,13 +50,10 @@ public class Main extends Activity {
         // Find the text editor view inside the layout, because we
         // want to do various programmatic things with it.
         editor = (EditText) findViewById(R.id.editor);
-        //System.out.println("editor = " + editor);
 
         // Hook up button presses to the appropriate event handler.
-        findViewById(R.id.back).setOnClickListener(mBackListener);
-        findViewById(R.id.clear).setOnClickListener(mClearListener);
-        findViewById(R.id.debugging).setOnClickListener(launchDebuggingActivity);
-        findViewById(R.id.brainpingsettings).setOnClickListener(launchBrainPingPreferences);
+        findViewById(R.id.back).setOnClickListener(backListener);
+        findViewById(R.id.clear).setOnClickListener(clearListener);
 
         editor.setText(getText(R.string.main_label));
     }
@@ -80,12 +73,8 @@ public class Main extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        // We are going to create two menus. Note that we assign them
-        // unique integer IDs, labels from our string resources, and
-        // given them shortcuts.
-        menu.add(0, BACK_ID, 0, R.string.back).setShortcut('0', 'b');
-        menu.add(0, CLEAR_ID, 0, R.string.clear).setShortcut('1', 'c');
-
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -98,7 +87,7 @@ public class Main extends Activity {
 
         // Before showing the menu, we need to decide whether the clear
         // item is enabled depending on whether there is text to clear.
-        menu.findItem(CLEAR_ID).setVisible(editor.getText().length() > 0);
+        //menu.findItem(SETTINGS_ID).setVisible(editor.getText().length() > 0);
 
         return true;
     }
@@ -109,21 +98,23 @@ public class Main extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case BACK_ID:
-                finish();
+            case R.id.info:
+                startActivity(new Intent(this, Info.class));
+                System.out.println("debug!");
                 return true;
-            case CLEAR_ID:
-                editor.setText("");
+            case R.id.settings:
+                startActivity(new Intent(this, BrainPingSettings.class));
+                System.out.println("settings!");
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
      * A call-back for when the user presses the back button.
      */
-    OnClickListener mBackListener = new OnClickListener() {
+    OnClickListener backListener = new OnClickListener() {
         public void onClick(View v) {
             finish();
         }
@@ -132,21 +123,9 @@ public class Main extends Activity {
     /**
      * A call-back for when the user presses the clear button.
      */
-    OnClickListener mClearListener = new OnClickListener() {
+    OnClickListener clearListener = new OnClickListener() {
         public void onClick(View v) {
             editor.setText("");
-        }
-    };
-
-    private final OnClickListener launchDebuggingActivity = new OnClickListener() {
-        public void onClick(View view) {
-            startActivity(new Intent(thisActivity, Debugging.class));
-        }
-    };
-
-    private final OnClickListener launchBrainPingPreferences = new OnClickListener() {
-        public void onClick(View view) {
-            startActivity(new Intent(thisActivity, BrainPingSettings.class));
         }
     };
 }
