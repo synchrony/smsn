@@ -35,7 +35,7 @@ public class Main extends Activity {
     static final private int BACK_ID = Menu.FIRST;
     static final private int CLEAR_ID = Menu.FIRST + 1;
 
-    private EditText mEditor;
+    private EditText editor;
     private final Activity thisActivity = this;
 
     public Main() {
@@ -53,7 +53,8 @@ public class Main extends Activity {
 
         // Find the text editor view inside the layout, because we
         // want to do various programmatic things with it.
-        mEditor = (EditText) findViewById(R.id.editor);
+        editor = (EditText) findViewById(R.id.editor);
+        //System.out.println("editor = " + editor);
 
         // Hook up button presses to the appropriate event handler.
         findViewById(R.id.back).setOnClickListener(mBackListener);
@@ -61,7 +62,7 @@ public class Main extends Activity {
         findViewById(R.id.debugging).setOnClickListener(launchDebuggingActivity);
         findViewById(R.id.brainpingsettings).setOnClickListener(launchBrainPingPreferences);
 
-        mEditor.setText(getText(R.string.main_label));
+        editor.setText(getText(R.string.main_label));
     }
 
     /**
@@ -97,7 +98,7 @@ public class Main extends Activity {
 
         // Before showing the menu, we need to decide whether the clear
         // item is enabled depending on whether there is text to clear.
-        menu.findItem(CLEAR_ID).setVisible(mEditor.getText().length() > 0);
+        menu.findItem(CLEAR_ID).setVisible(editor.getText().length() > 0);
 
         return true;
     }
@@ -112,7 +113,7 @@ public class Main extends Activity {
                 finish();
                 return true;
             case CLEAR_ID:
-                mEditor.setText("");
+                editor.setText("");
                 return true;
         }
 
@@ -133,7 +134,7 @@ public class Main extends Activity {
      */
     OnClickListener mClearListener = new OnClickListener() {
         public void onClick(View v) {
-            mEditor.setText("");
+            editor.setText("");
         }
     };
 

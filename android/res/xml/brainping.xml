@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2008 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="BrainPing settings" >
+
+    <CheckBoxPreference
+        android:key="brainping_enabled"
+        android:title="Enable brain pings"
+        android:summary="Randomly throughout the day" />
+
+    <ListPreference
+        android:key="brainping_frequency"
+        android:dependency="brainping_enabled"
+        android:title="Frequency"
+        android:summary="Ping me this many times per day"
+        android:defaultValue="1"
+        android:entries="@array/brainping_frequency_labels"
+        android:entryValues="@array/brainping_frequency_values"/>
+
+    <TimePickerPreference
+        android:key="brainping_starttime"
+        android:dependency="brainping_enabled"
+        android:title="Start time"
+        android:summary="Earliest time for pings"
+        android:defaultValue="10:00" />
+
+    <TimePickerPreference
+        android:key="brainping_endtime"
+        android:dependency="brainping_enabled"
+        android:title="End time"
+        android:summary="Latest time for pings"
+        android:defaultValue="22:00" />
+
+    <RingtonePreference
+        android:key="brainping_ringtone"
+        android:dependency="brainping_enabled"
+        android:title="Ping tone"
+        android:summary="An audio cue to play on ping" />
+
+    <CheckBoxPreference
+        android:key="brainping_vibrate"
+        android:dependency="brainping_enabled"
+        android:title="Vibrate"
+        android:summaryOn="Disable haptic cue on ping"
+        android:summaryOff="Enable haptic cue on ping" />
+
+    <!--<com.android.settings.bluetooth.BluetoothNamePreference
+        android:key="bt_name"
+        android:title="Title 2..."
+        android:summary="Summary 2..."
+        android:dialogTitle="Dialog title 2..."
+        android:dependency="bt_checkbox"
+        android:persistent="false"
+        android:singleLine="true" />-->
+
+    <!--<com.android.settings.ProgressCategory
+        android:key="bt_device_list"
+        android:title="Title 5..."
+        android:dependency="bt_checkbox"
+        android:orderingFromXml="false" />-->
+
+</PreferenceScreen>
