@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain;
+package net.fortytwo.myotherbrain.ping;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,13 +7,10 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.TimePickerPreference;
+import net.fortytwo.myotherbrain.R;
 
 
 public class BrainPingSettings extends PreferenceActivity {
-    private static final String
-            ENABLED = "brainping_enabled",
-            START_TIME = "brainping_starttime",
-            END_TIME = "brainping_endtime";
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -21,7 +18,6 @@ public class BrainPingSettings extends PreferenceActivity {
 
         // Note: this is the earliest you can get preferences.  Getting them at construction time results in an error.
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
         addPreferencesFromResource(R.xml.brainping);
 
         /*
@@ -62,6 +58,13 @@ public class BrainPingSettings extends PreferenceActivity {
 
                 return true;
             }
-        }); */
+        }); //*/
+    }
+
+    @Override
+    public void onStop() {
+        System.out.println("stopping...");
+        super.onStop();
+        BrainPingScheduler.getInstance().preferencesUpdated();
     }
 }

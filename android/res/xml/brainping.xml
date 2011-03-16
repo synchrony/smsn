@@ -1,48 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="BrainPing settings" >
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="BrainPing settings">
 
     <CheckBoxPreference
-        android:key="brainping_enabled"
-        android:title="Enable brain pings"
-        android:summary="Randomly throughout the day" />
+            android:key="brainping_enabled"
+            android:title="Enable brain pings"
+            android:summary="Randomly throughout the day"
+            android:defaultValue="false"/>
 
     <ListPreference
-        android:key="brainping_frequency"
-        android:dependency="brainping_enabled"
-        android:title="Frequency"
-        android:summary="Ping me this many times on average"
-        android:defaultValue="1"
-        android:entries="@array/brainping_frequency_labels"
-        android:entryValues="@array/brainping_frequency_values"/>
+            android:key="brainping_frequency"
+            android:dependency="brainping_enabled"
+            android:title="Frequency"
+            android:summary="Ping me this many times on average"
+            android:defaultValue="1"
+            android:entries="@array/brainping_frequency_labels"
+            android:entryValues="@array/brainping_frequency_values"/>
 
     <TimePickerPreference
-        android:key="brainping_starttime"
-        android:dependency="brainping_enabled"
-        android:title="Start time"
-        android:summary="Don't ping me earlier than this"
-        android:defaultValue="10:00" />
+            android:key="brainping_starttime"
+            android:dependency="brainping_enabled"
+            android:title="Start time"
+            android:summary="Don't ping me earlier than this"
+            android:defaultValue="10:00"/>
 
     <TimePickerPreference
-        android:key="brainping_endtime"
-        android:dependency="brainping_enabled"
-        android:title="End time"
-        android:summary="Don't ping me later than this"
-        android:defaultValue="22:00" />
+            android:key="brainping_endtime"
+            android:dependency="brainping_enabled"
+            android:title="End time"
+            android:summary="Don't ping me later than this"
+            android:defaultValue="22:00"/>
 
     <RingtonePreference
-        android:key="brainping_ringtone"
-        android:dependency="brainping_enabled"
-        android:title="Ping tone"
-        android:summary="An audio cue to play on ping" />
+            android:key="brainping_ringtone"
+            android:dependency="brainping_enabled"
+            android:title="Ping tone"
+            android:summary="An audio cue to play on ping"/>
 
     <CheckBoxPreference
-        android:key="brainping_vibrate"
-        android:dependency="brainping_enabled"
-        android:title="Vibrate"
-        android:summaryOn="Use haptic cue on ping"
-        android:summaryOff="Use haptic cue on ping" />
+            android:key="brainping_vibrate"
+            android:dependency="brainping_enabled"
+            android:title="Vibrate"
+            android:summaryOn="Use haptic cue on ping"
+            android:summaryOff="Use haptic cue on ping"
+            android:defaultValue="false"/>
 
     <!--<com.android.settings.bluetooth.BluetoothNamePreference
         android:key="bt_name"

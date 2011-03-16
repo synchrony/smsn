@@ -18,13 +18,20 @@ package net.fortytwo.myotherbrain;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import net.fortytwo.myotherbrain.ping.BrainPingPopup;
+import net.fortytwo.myotherbrain.ping.BrainPingService;
+import net.fortytwo.myotherbrain.ping.BrainPingSettings;
+
+import java.util.Map;
 
 /**
  * This class provides a basic demonstration of how to write an Android
@@ -33,6 +40,8 @@ import android.widget.EditText;
  */
 public class Main extends Activity {
     private EditText editor;
+
+    private final Activity thisActivity = this;
 
     public Main() {
     }
@@ -56,6 +65,9 @@ public class Main extends Activity {
         findViewById(R.id.clear).setOnClickListener(clearListener);
 
         editor.setText(getText(R.string.main_label));
+
+        // Force the service to start.
+        startService(new Intent(this, BrainPingService.class));
     }
 
     /**
@@ -125,7 +137,10 @@ public class Main extends Activity {
      */
     OnClickListener clearListener = new OnClickListener() {
         public void onClick(View v) {
-            editor.setText("");
+            editor.setText("foo\nbar");
+
+            startActivity(new Intent(thisActivity, BrainPingPopup.class));
         }
     };
+
 }

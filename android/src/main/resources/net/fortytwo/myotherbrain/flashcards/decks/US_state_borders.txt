@@ -1,0 +1,48 @@
+Alabama: Mississippi, Tennessee, Georgia, Florida
+Arizona: California, Nevada, Utah, New Mexico
+Arkansas: Missouri, Tennessee, Mississippi, Louisiana, Texas, Oklahoma
+California: Oregon, Nevada, Arizona
+Colorado: Wyoming, Nebraska, Kansas, Oklahoma, New Mexico, Utah
+Connecticut: New York, Massachusetts, Rhode Island
+Delaware: Pennsylvania, New Jersey, Maryland
+Florida: Georgia, Alabama
+Georgia: Alabama, Florida, South Carolina, North Carolina, Tennessee
+Idaho: Montana, Wyoming, Utah, Nevada, Oregon, Washington
+Illinois: Iowa, Wisconsin, Indiana, Kentucky, Missouri
+Indiana: Michigan, Ohio, Kentucky, Illinois
+Iowa: Minnesota, Wisconsin, Illinois, Missouri, Nebraska, South Dakota
+Kansas: Nebraska, Missouri, Oklahoma, Colorado
+Kentucky: Missouri, Illinois, Indiana, Ohio, West Virginia, Virginia, Tennessee
+Louisiana: Texas, Arkansas, Mississippi
+Maine: New Hampshire
+Maryland: West Virgina, Virginia, Delaware, Pennsylvania, District of Columbia
+Massachusetts: Connecticut, Rhode Island, New Hampshire, Vermont, New York
+Michigan: Wisconsin, Indiana, Ohio
+Minnesota: North Dakota, South Dakota, Iowa, Wisconsin
+Mississippi: Tennessee, Alabama, Louisiana, Arkansas
+Missouri: Iowa, Illinois, Kentucky, Tennessee, Arkansas, Oklahoma, Kansas, Nebraska
+Montana: North Dakota, South Dakota, Wyoming, Idaho
+Nebraska: South Dakota, Iowa, Missouri, Kansas, Colorado, Wyoming
+Nevada: Oregon, Idaho, Utah, Arizona, California
+New Hampshire: Maine, Massachusetts, Vermont
+New Jersey: New York, Pennsylvania, Delaware
+New Mexico: Colorado, Oklahoma, Texas, Arizona
+New York: Vermont, Massachusetts, New Jersey, Pennsylvania, Connecticut
+North Carolina: Virginia, Tennessee, Georgia, South Carolina
+North Dakota: Minnesota, South Dakota, Montana
+Ohio: Pennsylvania, West Virginia, Kentucky, Indiana, Michigan
+Oklahoma: Kansas, Missouri, Arkansas, Texas, New Mexico, Colorado
+Oregon: Washington, Idaho, Nevada, California
+Pennsylvania: New York, New Jersey, Maryland, Delaware, West Virginia, Ohio
+Rhode Island: Massachusetts, Connecticut
+South Carolina: Georgia, North Carolina
+South Dakota: North Dakota, Minnesota, Iowa, Nebraska, Wyoming, Montana
+Tennessee: North Carolina, Georgia, Alabama, Mississippi, Arkansas, Missouri, Kentucky, Virginia
+Texas: New Mexico, Oklahoma, Arkansas, Louisiana
+Utah: Idaho, Wyoming, Colorado, Arizona, Nevada
+Vermont: New Hampshire, Massachusetts, New York
+Virginia: North Carolina, Tennessee, Kentucky, West Virginia, Maryland, District of Columbia
+Washington: Idaho, Oregon
+West Virginia: Pennsylvania, Maryland, Virginia, Kentucky, Ohio
+Wisconsin: Minnesota, Iowa, Illinois, Michigan
+Wyoming: Montana, South Dakota, Nebraska, Colorado, Utah, Idaho
