@@ -42,29 +42,31 @@ public class CommandLineGame extends Game<String, String> {
     private boolean tryCard(final Card c,
                             final BufferedReader br,
                             final int line) throws IOException {
-        PrintStream ps = System.out;
-        //PrintStream ps = new PrintStream(System.out, true, "UTF-8");
+        //PrintStream ps = System.out;
+        PrintStream ps = new PrintStream(System.out, true, "UTF-8");
         ps.println("" + line + ") " + deck.getQuestion(c));
         showCardHistory(c);
 
         while (true) {
             showQueue();
             String input = br.readLine();
-            switch (input.charAt(0)) {
-                case 'r':
-                    ps.println("\t" + deck.getAnswer(c));
-                    return true;
-                case 'w':
-                    ps.println("\t" + deck.getAnswer(c));
-                    return false;
-                case 'e':
-                    ps.println("\t" + deck.getAnswer(c));
-                    break;
-                case 'q':
-                    System.exit(0);
-                    break;
-                default:
-                    ps.print("r/w/e/q?  ");
+            if (0 < input.length()) {
+                switch (input.charAt(0)) {
+                    case 'r':
+                        ps.println("\t" + deck.getAnswer(c));
+                        return true;
+                    case 'w':
+                        ps.println("\t" + deck.getAnswer(c));
+                        return false;
+                    case 'e':
+                        ps.println("\t" + deck.getAnswer(c));
+                        break;
+                    case 'q':
+                        System.exit(0);
+                        break;
+                    default:
+                        ps.print("r/w/e/q?  ");
+                }
             }
         }
     }
@@ -96,7 +98,7 @@ public class CommandLineGame extends Game<String, String> {
             //Deck<String, String> d = new USStateBorders();
             //Deck<String, String> d = new NationalCapitals();
             Deck<String, String> d = new NPCRVocabulary();
-            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards_tmp.txt"));
+            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 
             new CommandLineGame(d, h).play();
         } catch (Throwable e) {

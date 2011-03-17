@@ -85,11 +85,12 @@ public class NPCRVocabulary extends Deck<String, String> {
         StringBuilder sb = new StringBuilder();
 
         sb.append(c.simplified)
-        .append(" (").append(c.traditional).append(")")
-        .append(" -- ")
-        .append(c.type)
-        .append(": ")
-        .append(c.meaning);
+                .append(" (").append(c.traditional).append(") ")
+                .append(c.pinyin)
+                .append(" -- ")
+                .append(c.type)
+                .append(": ")
+                .append(c.meaning);
 
         return sb.toString();
     }
