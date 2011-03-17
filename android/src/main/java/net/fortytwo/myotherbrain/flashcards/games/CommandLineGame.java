@@ -8,12 +8,14 @@ import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.decks.NPCRVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.NationalCapitals;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 /**
  * User: josh
@@ -40,7 +42,9 @@ public class CommandLineGame extends Game<String, String> {
     private boolean tryCard(final Card c,
                             final BufferedReader br,
                             final int line) throws IOException {
-        System.out.println("" + line + ") " + deck.getQuestion(c));
+        PrintStream ps = System.out;
+        //PrintStream ps = new PrintStream(System.out, true, "UTF-8");
+        ps.println("" + line + ") " + deck.getQuestion(c));
         showCardHistory(c);
 
         while (true) {
@@ -48,21 +52,19 @@ public class CommandLineGame extends Game<String, String> {
             String input = br.readLine();
             switch (input.charAt(0)) {
                 case 'r':
-                    //System.out.println("\t--> right");
-                    System.out.println("\t" + deck.getAnswer(c));
+                    ps.println("\t" + deck.getAnswer(c));
                     return true;
                 case 'w':
-                    //System.out.println("\t--> wrong");
-                    System.out.println("\t" + deck.getAnswer(c));
+                    ps.println("\t" + deck.getAnswer(c));
                     return false;
                 case 'e':
-                    System.out.println("\t" + deck.getAnswer(c));
+                    ps.println("\t" + deck.getAnswer(c));
                     break;
                 case 'q':
                     System.exit(0);
                     break;
                 default:
-                    System.out.print("r/w/e/q?  ");
+                    ps.print("r/w/e/q?  ");
             }
         }
     }
@@ -92,8 +94,9 @@ public class CommandLineGame extends Game<String, String> {
     public static void main(final String[] args) {
         try {
             //Deck<String, String> d = new USStateBorders();
-            Deck<String, String> d = new NationalCapitals();
-            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
+            //Deck<String, String> d = new NationalCapitals();
+            Deck<String, String> d = new NPCRVocabulary();
+            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards_tmp.txt"));
 
             new CommandLineGame(d, h).play();
         } catch (Throwable e) {
