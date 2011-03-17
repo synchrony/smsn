@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class USStateBorders extends Deck<String, String> {
     private final Map<String, String[]> borders;
-    private final Map<String, Card> cards = new HashMap<String, Card>();
+    private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
 
     public USStateBorders() throws IOException {
         super("us_state_borders");
@@ -62,39 +62,48 @@ public class USStateBorders extends Deck<String, String> {
         Collections.shuffle(keys);
         //int count = 0;
         for (String s : keys) {
-            Card c = new Card(s);
+            Card<String, String> c = new LocalCard(s, this);
             cards.put(c.getName(), c);
             //if (++count > 5) break;
         }
     }
 
-    public String getQuestion(final Card card) {
-        return "Which US states border on " + card.getName() + "?";
-    }
-
-    public String getAnswer(final Card card) {
-        StringBuilder sb = new StringBuilder();
-        String[] heads = borders.get(card.getName());
-        for (int i = 0; i < heads.length; i++) {
-            if (i > 0) {
-                sb.append((2 < heads.length) ? ", " : " ");
-                if (heads.length - 1 == i) {
-                    sb.append("and ");
-                }
-            }
-
-            sb.append(heads[i]);
-        }
-
-        return sb.toString();
-    }
-
     @Override
-    public Collection<Card> getCards() {
+    public Collection<Card<String, String>> getCards() {
         return cards.values();
     }
 
-    public Card getCard(final String name) {
+    public Card<String, String> getCard(final String name) {
         return cards.get(name);
+    }
+
+    private class LocalCard extends Card<String, String> {
+        public LocalCard(final String name,
+                         final Deck deck) {
+            super(name, deck);
+        }
+
+        @Override
+        public String getQuestion() {
+            return "Which US states border on " + getName() + "?";
+        }
+
+        @Override
+        public String getAnswer() {
+            StringBuilder sb = new StringBuilder();
+            String[] heads = borders.get(getName());
+            for (int i = 0; i < heads.length; i++) {
+                if (i > 0) {
+                    sb.append((2 < heads.length) ? ", " : " ");
+                    if (heads.length - 1 == i) {
+                        sb.append("and ");
+                    }
+                }
+
+                sb.append(heads[i]);
+            }
+
+            return sb.toString();
+        }
     }
 }

@@ -14,8 +14,9 @@ import java.io.IOException;
 public abstract class GameHistory {
     public abstract void log(Trial trial) throws IOException;
 
+    public abstract CloseableIterator<Trial> getHistory();
+
     public abstract CloseableIterator<Trial> getHistory(Deck deck);
 
-    public abstract CloseableIterator<Trial> getHistory(Deck deck,
-                                                        Card card);
+    public abstract CloseableIterator<Trial> getHistory(Card card);
 }

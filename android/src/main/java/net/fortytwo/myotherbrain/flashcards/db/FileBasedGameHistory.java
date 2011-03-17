@@ -59,6 +59,11 @@ public class FileBasedGameHistory extends GameHistory {
         writer.flush();
     }
 
+    public CloseableIterator<Trial> getHistory() {
+        List<Trial> h = trials;
+        return new TrivialCloseableIterator<Trial>(h.iterator());
+    }
+
     public CloseableIterator<Trial> getHistory(final Deck deck) {
         List<Trial> h = new LinkedList<Trial>();
         for (Trial t : trials) {
@@ -70,11 +75,10 @@ public class FileBasedGameHistory extends GameHistory {
         return new TrivialCloseableIterator<Trial>(h.iterator());
     }
 
-    public CloseableIterator<Trial> getHistory(final Deck deck,
-                                               final Card card) {
+    public CloseableIterator<Trial> getHistory(final Card card) {
         List<Trial> h = new LinkedList<Trial>();
         for (Trial t : trials) {
-            if (t.getDeckName().equals(deck.getName())
+            if (t.getDeckName().equals(card.getDeck().getName())
                     && t.getCardName().equals(card.getName())) {
                 h.add(t);
             }

@@ -3,6 +3,8 @@ package net.fortytwo.myotherbrain.flashcards;
 import java.util.Collection;
 
 /**
+ * A set of cards with a common theme.
+ *
  * User: josh
  * Date: 3/5/11
  * Time: 6:59 PM
@@ -10,7 +12,7 @@ import java.util.Collection;
 public abstract class Deck<Q, A> {
     private final String name;
 
-    public Deck(String name) {
+    public Deck(final String name) {
         this.name = name;
     }
 
@@ -18,11 +20,7 @@ public abstract class Deck<Q, A> {
         return name;
     }
 
-    public abstract Card getCard(String name);
+    public abstract Card<Q, A> getCard(String name);
 
-    public abstract Collection<Card> getCards();
-
-    public abstract Q getQuestion(Card card);
-
-    public abstract A getAnswer(Card card);
+    public abstract Collection<Card<Q, A>> getCards();
 }

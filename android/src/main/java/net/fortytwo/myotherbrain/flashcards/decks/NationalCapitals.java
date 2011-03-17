@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +19,7 @@ import java.util.Map;
 // TODO: use country codes as keys, instead of full names
 public class NationalCapitals extends Deck<String, String> {
     private final Map<String, String> answers;
-    private final Map<String, Card> cards = new HashMap<String, Card>();
+    private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
 
     public NationalCapitals() throws IOException {
         super("national_capitals");
@@ -40,7 +37,7 @@ public class NationalCapitals extends Deck<String, String> {
                 if (0 < l.length()) {
                     int i = l.indexOf(":");
                     String q = l.substring(0, i).trim();
-                    String a = l.substring(i+1).trim();
+                    String a = l.substring(i + 1).trim();
                     answers.put(q, a);
                 }
             }
@@ -49,26 +46,35 @@ public class NationalCapitals extends Deck<String, String> {
         }
 
         for (String s : answers.keySet()) {
-            Card c = new Card(s);
+            Card<String, String> c = new LocalCard(s, this);
             cards.put(c.getName(), c);
         }
     }
 
-    public String getQuestion(final Card card) {
-        return "What is the capital city of " + card.getName() + "?";
-    }
-
-    public String getAnswer(final Card card) {
-        return answers.get(card.getName());
-    }
-
     @Override
-    public Card getCard(final String name) {
+    public Card<String, String> getCard(final String name) {
         return cards.get(name);
     }
 
     @Override
-    public Collection<Card> getCards() {
+    public Collection<Card<String, String>> getCards() {
         return cards.values();
+    }
+
+    private class LocalCard extends Card<String, String> {
+        public LocalCard(final String name,
+                         final Deck deck) {
+            super(name, deck);
+        }
+
+        @Override
+        public String getQuestion() {
+            return "What is the capital city of " + getName() + "?";
+        }
+
+        @Override
+        public String getAnswer() {
+            return answers.get(getName());
+        }
     }
 }

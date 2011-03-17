@@ -4,6 +4,8 @@ import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.Game;
 import net.fortytwo.myotherbrain.flashcards.GameplayException;
+import net.fortytwo.myotherbrain.flashcards.Pile;
+import net.fortytwo.myotherbrain.flashcards.SingleDeckPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.FileBasedGameHistory;
@@ -23,13 +25,13 @@ import java.io.PrintStream;
  * Time: 11:58 AM
  */
 public class CommandLineGame extends Game<String, String> {
-    public CommandLineGame(final Deck<String, String> deck,
+    public CommandLineGame(final Pile<String, String> pile,
                            final GameHistory history) {
-        super(deck, history);
+        super(pile, history);
     }
 
     private void showCardHistory(final Card c) {
-        CloseableIterator<Trial> h = history.getHistory(deck, c);
+        CloseableIterator<Trial> h = history.getHistory(c);
         try {
             while (h.hasNext()) {
                 System.out.println("\t\t" + h.next().tabDelimited());
@@ -44,20 +46,20 @@ public class CommandLineGame extends Game<String, String> {
                             final int line) throws IOException {
         //PrintStream ps = System.out;
         PrintStream ps = new PrintStream(System.out, true, "UTF-8");
-        ps.println("\n" + line + ") " + deck.getQuestion(c) + "\n");
+        ps.println("\n" + line + ") " + c.getQuestion() + "\n");
 
         while (true) {
             String input = br.readLine();
             if (0 < input.length()) {
                 switch (input.charAt(0)) {
                     case 'r':
-                        ps.println("\t" + deck.getAnswer(c));
+                        ps.println("\t" + c.getAnswer());
                         return true;
                     case 'w':
-                        ps.println("\t" + deck.getAnswer(c));
+                        ps.println("\t" + c.getAnswer());
                         return false;
                     case 'p':
-                        ps.println("\t" + deck.getAnswer(c));
+                        ps.println("\t" + c.getAnswer());
                         break;
                     case 'h':
                         showCardHistory(c);
@@ -85,10 +87,10 @@ public class CommandLineGame extends Game<String, String> {
 
                 if (tryCard(c, br, ++line)) {
                     c.correct(now);
-                    history.log(new Trial(deck.getName(), c.getName(), now, Trial.Result.Correct));
+                    history.log(new Trial(c.getDeck().getName(), c.getName(), now, Trial.Result.Correct));
                 } else {
                     c.incorrect(now);
-                    history.log(new Trial(deck.getName(), c.getName(), now, Trial.Result.Incorrect));
+                    history.log(new Trial(c.getDeck().getName(), c.getName(), now, Trial.Result.Incorrect));
                 }
             } catch (IOException e) {
                 throw new GameplayException(e);
@@ -102,9 +104,10 @@ public class CommandLineGame extends Game<String, String> {
             //Deck<String, String> d = new USStateBorders();
             //Deck<String, String> d = new NationalCapitals();
             Deck<String, String> d = new NPCRVocabulary();
+            Pile<String, String> p = new SingleDeckPile<String, String>(d);
             GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 
-            new CommandLineGame(d, h).play();
+            new CommandLineGame(p, h).play();
         } catch (Throwable e) {
             e.printStackTrace(System.err);
             System.exit(1);

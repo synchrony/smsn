@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 public class NPCRVocabulary extends Deck<String, String> {
     private final Map<String, Character> characters;
-    private final Map<String, Card> cards = new HashMap<String, Card>();
+    private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
 
     private class Character {
         String context1, context2;
@@ -64,7 +63,7 @@ public class NPCRVocabulary extends Deck<String, String> {
                 for (int i = 0; i < c.simplified.length(); i++) {
                     sb.append("\\u").append(Integer.valueOf(c.simplified.charAt(i)));
                 }
-                Card card = new Card(sb.toString());
+                Card<String, String> card = new LocalCard(sb.toString(), this);
 
                 characters.put(card.getName(), c);
                 cards.put(card.getName(), card);
@@ -74,33 +73,42 @@ public class NPCRVocabulary extends Deck<String, String> {
         }
     }
 
-    public String getQuestion(final Card card) {
-        Character c = characters.get(card.getName());
-        return c.simplified + " = ?";
-    }
-
-    public String getAnswer(final Card card) {
-        Character c = characters.get(card.getName());
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(c.simplified)
-                .append(" (").append(c.traditional).append(") ")
-                .append(c.pinyin)
-                .append(" -- ")
-                .append(c.type)
-                .append(": ")
-                .append(c.meaning);
-
-        return sb.toString();
-    }
-
     @Override
-    public Collection<Card> getCards() {
+    public Collection<Card<String, String>> getCards() {
         return cards.values();
     }
 
-    public Card getCard(final String name) {
+    public Card<String, String> getCard(final String name) {
         return cards.get(name);
+    }
+
+    private class LocalCard extends Card<String, String> {
+        public LocalCard(final String name,
+                         final Deck deck) {
+            super(name, deck);
+        }
+
+        @Override
+        public String getQuestion() {
+            Character c = characters.get(getName());
+            return c.simplified + " = ?";
+        }
+
+        @Override
+        public String getAnswer() {
+            Character c = characters.get(getName());
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(c.simplified)
+                    .append(" (").append(c.traditional).append(") ")
+                    .append(c.pinyin)
+                    .append(" -- ")
+                    .append(c.type)
+                    .append(": ")
+                    .append(c.meaning);
+
+            return sb.toString();
+        }
     }
 }

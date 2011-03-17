@@ -1,30 +1,37 @@
 package net.fortytwo.myotherbrain.flashcards;
 
-import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
-
 /**
  * User: josh
  * Date: 3/5/11
  * Time: 7:01 PM
  */
-public class Card {
-    public enum Status {Active, Inactive}
-
+public abstract class Card<Q, A> {
     private static final long
             FIRST_DELAY_CORRECT = 60000,
             FIRST_DELAY_INCORRECT = 30000;
 
     private final String name;
+    private final Deck deck;
 
     private long lastTrial = 0;
     private long nextTrial = 0;
 
-    public Card(final String name) {
+    public Card(final String name,
+                final Deck deck) {
         this.name = name;
+        this.deck = deck;
     }
+
+    public abstract Q getQuestion();
+
+    public abstract A getAnswer();
 
     public String getName() {
         return name;
+    }
+
+    public Deck getDeck() {
+        return deck;
     }
 
     public void correct(final long now) {

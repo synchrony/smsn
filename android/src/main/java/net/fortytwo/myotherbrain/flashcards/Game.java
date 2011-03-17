@@ -17,33 +17,25 @@ import java.util.Set;
  * Time: 11:50 AM
  */
 public abstract class Game<Q, A> {
-    protected final List<Card> pool;
+    protected final Pile<Q, A> pile;
     protected final PriorityQueue<Card> active;
-    protected final Deck<Q, A> deck;
     protected final GameHistory history;
 
-    public Game(final Deck<Q, A> deck,
+    public Game(final Pile<Q, A> pile,
                 final GameHistory history) {
-        this.deck = deck;
         this.history = history;
-
-        // Create the pool of all cards.
-        pool = new LinkedList<Card>();
-        pool.addAll(deck.getCards());
-
-        // Randomize the pool, so that every cold start is not the same.
-        Collections.shuffle(pool);
+        this.pile = pile;
 
         // Create the active queue, which orders cards by increasing scheduled time.
         active = new PriorityQueue<Card>(1, new CardComparator());
 
         // Restore game history.
         Set<Card> cardsInHistory = new HashSet<Card>();
-        CloseableIterator<Trial> h = history.getHistory(deck);
+        CloseableIterator<Trial> h = history.getHistory();
         try {
             while (h.hasNext()) {
                 Trial t = h.next();
-                Card c = deck.getCard(t.getCardName());
+                Card c = pile.drawCard(t.getDeckName(), t.getCardName());
                 if (null != c) {
                     switch (t.getResult()) {
                         case Correct:
@@ -63,7 +55,6 @@ public abstract class Game<Q, A> {
         }
 
         for (Card c : cardsInHistory) {
-            pool.remove(c);
             active.add(c);
         }
     }
@@ -73,15 +64,15 @@ public abstract class Game<Q, A> {
     public Card drawCard() {
         long now = System.currentTimeMillis();
         if (0 == active.size()) {
-            if (0 == pool.size()) {
-                throw new IllegalStateException("empty card pool");
+            if (pile.isEmpty()) {
+                throw new IllegalStateException("empty card stack and no active cards");
             }
 
-            return pool.remove(0);
+            return pile.drawRandomCard();
         } else if (active.peek().getNextTrial() <= now) {
             return active.poll();
-        } else if (0 < pool.size()) {
-            return pool.remove(0);
+        } else if (!pile.isEmpty()) {
+            return pile.drawRandomCard();
         } else {
             long delay = active.peek().getNextTrial() - now;
             System.out.println("waiting " + delay + "ms");
