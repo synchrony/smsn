@@ -44,11 +44,9 @@ public class CommandLineGame extends Game<String, String> {
                             final int line) throws IOException {
         //PrintStream ps = System.out;
         PrintStream ps = new PrintStream(System.out, true, "UTF-8");
-        ps.println("" + line + ") " + deck.getQuestion(c));
-        showCardHistory(c);
+        ps.println("\n" + line + ") " + deck.getQuestion(c) + "\n");
 
         while (true) {
-            showQueue();
             String input = br.readLine();
             if (0 < input.length()) {
                 switch (input.charAt(0)) {
@@ -58,14 +56,20 @@ public class CommandLineGame extends Game<String, String> {
                     case 'w':
                         ps.println("\t" + deck.getAnswer(c));
                         return false;
-                    case 'e':
+                    case 'p':
                         ps.println("\t" + deck.getAnswer(c));
+                        break;
+                    case 'h':
+                        showCardHistory(c);
+                        break;
+                    case 'i':
+                        showQueue();
                         break;
                     case 'q':
                         System.exit(0);
                         break;
                     default:
-                        ps.print("r/w/e/q?  ");
+                        ps.print("(r)ight / (w)rong / (p)eek / (h)istory / (i)nfo / (q)uit ?  ");
                 }
             }
         }

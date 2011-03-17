@@ -76,7 +76,7 @@ public class NPCRVocabulary extends Deck<String, String> {
 
     public String getQuestion(final Card card) {
         Character c = characters.get(card.getName());
-        return c.simplified;
+        return c.simplified + " = ?";
     }
 
     public String getAnswer(final Card card) {
