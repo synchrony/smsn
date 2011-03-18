@@ -5,6 +5,7 @@ import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.Game;
 import net.fortytwo.myotherbrain.flashcards.GameplayException;
 import net.fortytwo.myotherbrain.flashcards.Pile;
+import net.fortytwo.myotherbrain.flashcards.PriorityPile;
 import net.fortytwo.myotherbrain.flashcards.SingleDeckPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
@@ -12,6 +13,7 @@ import net.fortytwo.myotherbrain.flashcards.db.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.decks.NPCRVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.NationalCapitals;
+import net.fortytwo.myotherbrain.flashcards.decks.USStateBorders;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -101,13 +103,20 @@ public class CommandLineGame extends Game<String, String> {
 
     public static void main(final String[] args) {
         try {
-            //Deck<String, String> d = new USStateBorders();
-            //Deck<String, String> d = new NationalCapitals();
-            Deck<String, String> d = new NPCRVocabulary();
-            Pile<String, String> p = new SingleDeckPile<String, String>(d);
+            Deck<String, String> d1 = new USStateBorders();
+            Deck<String, String> d2 = new NationalCapitals();
+            Deck<String, String> d3 = new NPCRVocabulary();
+
+            //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
+
+            PriorityPile<String, String> pile = new PriorityPile<String, String>();
+            pile.addDeck(d1, 1);
+            pile.addDeck(d2, 1);
+            pile.addDeck(d3, 4);
+
             GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 
-            new CommandLineGame(p, h).play();
+            new CommandLineGame(pile, h).play();
         } catch (Throwable e) {
             e.printStackTrace(System.err);
             System.exit(1);
