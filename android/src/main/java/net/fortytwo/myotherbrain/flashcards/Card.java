@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards;
 
+import java.util.Random;
+
 /**
  * User: josh
  * Date: 3/5/11
@@ -9,6 +11,11 @@ public abstract class Card<Q, A> {
     private static final long
             FIRST_DELAY_CORRECT = 60000,
             FIRST_DELAY_INCORRECT = 30000;
+
+    // Randomized delays will be within this ratio of the precise value.
+    private static final double IMPRECISION = 0.1;
+
+    private final Random random = new Random();
 
     private final String name;
     private final Deck deck;
@@ -38,13 +45,15 @@ public abstract class Card<Q, A> {
         long delay = 0 == lastTrial
                 ? FIRST_DELAY_CORRECT
                 : increaseDelay(now - lastTrial);
+        delay = randomizeDelay(delay);
         nextTrial = now + delay;
         lastTrial = now;
     }
 
     public void incorrect(final long now) {
         lastTrial = now;
-        nextTrial = lastTrial + FIRST_DELAY_INCORRECT;
+        long delay = randomizeDelay(FIRST_DELAY_INCORRECT);
+        nextTrial = lastTrial + delay;
     }
 
     public long getNextTrial() {
@@ -53,6 +62,11 @@ public abstract class Card<Q, A> {
 
     private long increaseDelay(final long delay) {
         return delay * 2;
+    }
+
+    private long randomizeDelay(final long delay) {
+        long d = (long) (IMPRECISION * delay * (random.nextDouble() * 2 - 1));
+        return delay + d;
     }
 
     @Override
