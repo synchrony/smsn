@@ -134,7 +134,9 @@ public abstract class Game<Q, A> {
 
     protected void showQueue() {
         long now = System.currentTimeMillis();
-        StringBuilder sb = new StringBuilder("\t\t");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t").append(active.size()).append(" cards:\n");
+        sb.append("\t\t");
 
         List<Card> ordered = new LinkedList<Card>();
         ordered.addAll(active);

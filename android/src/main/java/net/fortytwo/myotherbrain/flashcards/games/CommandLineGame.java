@@ -6,11 +6,12 @@ import net.fortytwo.myotherbrain.flashcards.Game;
 import net.fortytwo.myotherbrain.flashcards.GameplayException;
 import net.fortytwo.myotherbrain.flashcards.Pile;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
-import net.fortytwo.myotherbrain.flashcards.SingleDeckPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.decks.HSK4Characters;
+import net.fortytwo.myotherbrain.flashcards.decks.HSK4Compounds;
 import net.fortytwo.myotherbrain.flashcards.decks.NPCRVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.NationalCapitals;
 import net.fortytwo.myotherbrain.flashcards.decks.USStateBorders;
@@ -36,7 +37,7 @@ public class CommandLineGame extends Game<String, String> {
         CloseableIterator<Trial> h = history.getHistory(c);
         try {
             while (h.hasNext()) {
-                System.out.println("\t\t" + h.next().tabDelimited());
+                System.out.println("\t\t" + h.next().printPlainText());
             }
         } finally {
             h.close();
@@ -103,16 +104,20 @@ public class CommandLineGame extends Game<String, String> {
 
     public static void main(final String[] args) {
         try {
-            Deck<String, String> d1 = new USStateBorders();
-            Deck<String, String> d2 = new NationalCapitals();
-            Deck<String, String> d3 = new NPCRVocabulary();
+            Deck<String, String> stateBorders = new USStateBorders();
+            Deck<String, String> nationalCapitals = new NationalCapitals();
+            Deck<String, String> npcrVocabulary = new NPCRVocabulary();
+            Deck<String, String> hsk4Characters = new HSK4Characters();
+            Deck<String, String> hsk4Compounds = new HSK4Compounds();
 
             //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
             PriorityPile<String, String> pile = new PriorityPile<String, String>();
-            pile.addDeck(d1, 1);
-            pile.addDeck(d2, 1);
-            pile.addDeck(d3, 4);
+            //pile.addDeck(stateBorders, 1);
+            pile.addDeck(nationalCapitals, 1);
+            //pile.addDeck(npcrVocabulary, 4);
+            pile.addDeck(hsk4Compounds, 2);
+            pile.addDeck(hsk4Characters, 8);
 
             GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 

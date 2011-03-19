@@ -54,7 +54,7 @@ public class FileBasedGameHistory extends GameHistory {
     public void log(final Trial trial) throws IOException {
         //trials.add(0, trial);
         trials.add(trial);
-        writer.write(trial.tabDelimited());
+        writer.write(trial.printTabDelimited());
         writer.write('\n');
         writer.flush();
     }

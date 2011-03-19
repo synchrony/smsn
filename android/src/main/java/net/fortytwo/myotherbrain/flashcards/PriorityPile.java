@@ -22,6 +22,10 @@ public class PriorityPile<Q, A> implements Pile<Q, A> {
     public Card drawCard(final String deckName,
                          final String cardName) {
         PileWithPriority p = pilesByName.get(deckName);
+        if (null == p) {
+            return null;
+        }
+
         boolean b = p.pile.isEmpty();
         Card c = p.pile.drawCard(deckName, cardName);
         if (p.pile.isEmpty() && !b) {

@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards;
 
+import java.util.Date;
+
 /**
  * User: josh
  * Date: 3/5/11
@@ -39,7 +41,18 @@ public class Trial {
         return result;
     }
 
-    public String tabDelimited() {
+    public String printPlainText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(deckName)
+                .append(" ").append(cardName)
+                .append(" ").append("(").append(new Date(time)).append(")")
+                .append(" ").append(result);
+
+        return sb.toString();
+    }
+
+    public String printTabDelimited() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(deckName)
