@@ -1,8 +1,10 @@
-package net.fortytwo.myotherbrain.flashcards.db;
+package net.fortytwo.myotherbrain.flashcards.db.file;
 
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.Trial;
+import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
+import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

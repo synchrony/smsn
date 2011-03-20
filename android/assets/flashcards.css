@@ -1,0 +1,13 @@
+body {
+    background-color: #000;
+    color: #fff;
+}
+
+.question {
+    font-size: xx-large;
+    text-align: center;
+}
+
+.answer {
+    font-size: x-large;
+}

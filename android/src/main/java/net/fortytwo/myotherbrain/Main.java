@@ -1,43 +1,18 @@
-/*
- * Copyright (C) 2007 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package net.fortytwo.myotherbrain;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import net.fortytwo.myotherbrain.flashcards.games.Flashcards4Android;
 import net.fortytwo.myotherbrain.ping.BrainPingPopup;
-import net.fortytwo.myotherbrain.ping.BrainPingService;
 import net.fortytwo.myotherbrain.ping.BrainPingSettings;
 
-import java.util.Map;
-
-/**
- * This class provides a basic demonstration of how to write an Android
- * activity. Inside of its window, it places a single view: an EditText that
- * displays and edits some internal text.
- */
 public class Main extends Activity {
     private EditText editor;
 
@@ -50,7 +25,7 @@ public class Main extends Activity {
      * Called with the activity is first created.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Inflate our UI from its XML layout description.
@@ -63,11 +38,12 @@ public class Main extends Activity {
         // Hook up button presses to the appropriate event handler.
         findViewById(R.id.back).setOnClickListener(backListener);
         findViewById(R.id.clear).setOnClickListener(clearListener);
+        findViewById(R.id.flashcards).setOnClickListener(flashcardsListener);
 
-        editor.setText(getText(R.string.main_label));
+        editor.setText("foo");//getText(R.string.main_label));
 
         // Force the service to start.
-        startService(new Intent(this, BrainPingService.class));
+        //     startService(new Intent(this, BrainPingService.class));
     }
 
     /**
@@ -126,7 +102,7 @@ public class Main extends Activity {
     /**
      * A call-back for when the user presses the back button.
      */
-    OnClickListener backListener = new OnClickListener() {
+    private OnClickListener backListener = new OnClickListener() {
         public void onClick(View v) {
             finish();
         }
@@ -135,11 +111,17 @@ public class Main extends Activity {
     /**
      * A call-back for when the user presses the clear button.
      */
-    OnClickListener clearListener = new OnClickListener() {
+    private OnClickListener clearListener = new OnClickListener() {
         public void onClick(View v) {
             editor.setText("foo\nbar");
 
             startActivity(new Intent(thisActivity, BrainPingPopup.class));
+        }
+    };
+
+    private OnClickListener flashcardsListener = new OnClickListener() {
+        public void onClick(View v) {
+            startActivity(new Intent(thisActivity, Flashcards4Android.class));
         }
     };
 

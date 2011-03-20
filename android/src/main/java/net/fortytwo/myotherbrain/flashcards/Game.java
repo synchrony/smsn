@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public abstract class Game<Q, A> {
     protected final Pile<Q, A> pile;
-    protected final PriorityQueue<Card> active;
+    protected final PriorityQueue<Card<Q, A>> active;
     protected final GameHistory history;
 
     public Game(final Pile<Q, A> pile,
@@ -27,15 +27,15 @@ public abstract class Game<Q, A> {
         this.pile = pile;
 
         // Create the active queue, which orders cards by increasing scheduled time.
-        active = new PriorityQueue<Card>(1, new CardComparator());
+        active = new PriorityQueue<Card<Q, A>>(1, new CardComparator());
 
         // Restore game history.
-        Set<Card> cardsInHistory = new HashSet<Card>();
+        Set<Card<Q, A>> cardsInHistory = new HashSet<Card<Q, A>>();
         CloseableIterator<Trial> h = history.getHistory();
         try {
             while (h.hasNext()) {
                 Trial t = h.next();
-                Card c = pile.drawCard(t.getDeckName(), t.getCardName());
+                Card<Q, A> c = pile.drawCard(t.getDeckName(), t.getCardName());
                 if (null != c) {
                     switch (t.getResult()) {
                         case Correct:
@@ -54,14 +54,14 @@ public abstract class Game<Q, A> {
             h.close();
         }
 
-        for (Card c : cardsInHistory) {
+        for (Card<Q, A> c : cardsInHistory) {
             active.add(c);
         }
     }
 
     public abstract void play() throws GameplayException;
 
-    public Card drawCard() {
+    public Card<Q, A> drawCard() {
         long now = System.currentTimeMillis();
         if (0 == active.size()) {
             if (pile.isEmpty()) {
@@ -88,7 +88,7 @@ public abstract class Game<Q, A> {
         }
     }
 
-    public void replaceCard(final Card c) {
+    public void replaceCard(final Card<Q, A> c) {
         active.add(c);
     }
 
@@ -132,8 +132,9 @@ public abstract class Game<Q, A> {
         return sb.toString();
     }
 
-    protected void showQueue() {
+    protected String showQueue() {
         long now = System.currentTimeMillis();
+
         StringBuilder sb = new StringBuilder();
         sb.append("\t").append(active.size()).append(" cards:\n");
         sb.append("\t\t");
@@ -151,10 +152,10 @@ public abstract class Game<Q, A> {
             }
 
             String d = formatDelay(c.getNextTrial() - now);
-            sb.append(c.getName()).append(" (").append(d).append(")");
+            sb.append(c).append(" (").append(d).append(")");
         }
 
-        System.out.println(sb.toString());
+        return sb.toString();
     }
 
     private String pad(final long d) {

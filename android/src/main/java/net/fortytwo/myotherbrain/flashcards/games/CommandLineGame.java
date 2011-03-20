@@ -8,7 +8,7 @@ import net.fortytwo.myotherbrain.flashcards.Pile;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
-import net.fortytwo.myotherbrain.flashcards.db.FileBasedGameHistory;
+import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.decks.HSK4Characters;
 import net.fortytwo.myotherbrain.flashcards.decks.HSK4Compounds;
@@ -68,7 +68,7 @@ public class CommandLineGame extends Game<String, String> {
                         showCardHistory(c);
                         break;
                     case 'i':
-                        showQueue();
+                        ps.println(showQueue());
                         break;
                     case 'q':
                         System.exit(0);
@@ -84,7 +84,7 @@ public class CommandLineGame extends Game<String, String> {
         int line = 0;
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
-            Card c = drawCard();
+            Card<String, String> c = drawCard();
             try {
                 long now = System.currentTimeMillis();
 

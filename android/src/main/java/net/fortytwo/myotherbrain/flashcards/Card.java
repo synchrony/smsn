@@ -79,4 +79,9 @@ public abstract class Card<Q, A> {
     public int hashCode() {
         return name.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

@@ -50,35 +50,41 @@ public abstract class VocabularyDeck extends Deck<String, String> {
     }
 
     private class LocalCard extends Card<String, String> {
+        private final Term term;
+
         public LocalCard(final String name,
                          final Deck deck) {
             super(name, deck);
+
+            term = terms.get(getName());
         }
 
         @Override
         public String getQuestion() {
-            Term c = terms.get(getName());
-            return c.normativeForm + " = ?";
+            return term.normativeForm + " = ?";
         }
 
         @Override
         public String getAnswer() {
-            Term c = terms.get(getName());
-
             StringBuilder sb = new StringBuilder();
 
-            sb.append(c.normativeForm);
-            if (null != c.alternativeForm) {
-                sb.append(" (").append(c.alternativeForm).append(")");
+            sb.append(term.normativeForm);
+            if (null != term.alternativeForm) {
+                sb.append(" (").append(term.alternativeForm).append(")");
             }
-            sb.append(" ").append(c.pronunciation)
+            sb.append(" ").append(term.pronunciation)
                     .append(" -- ");
-            if (null != c.type) {
-                sb.append(c.type).append(": ");
+            if (null != term.type) {
+                sb.append(term.type).append(": ");
             }
-            sb.append(c.meaning);
+            sb.append(term.meaning);
 
             return sb.toString();
+        }
+
+        @Override
+        public String toString() {
+            return term.normativeForm;
         }
     }
 }

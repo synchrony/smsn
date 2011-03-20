@@ -19,10 +19,10 @@ public interface Pile<Q, A> {
      * @param cardName the name of the card
      * @return the matching card
      */
-    Card drawCard(String deckName,
+    Card<Q, A> drawCard(String deckName,
                   String cardName);
 
-    Card drawRandomCard();
+    Card<Q, A> drawRandomCard();
 
     boolean isEmpty();
 }

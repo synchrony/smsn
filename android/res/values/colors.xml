@@ -20,8 +20,8 @@
      a solid color. -->
 
 <resources>
-    <!-- Retrieved via Resources.getColor() and friends. -->
     <color name="red">#f00</color>
+    <color name="green">#0f0</color>
 
     <!-- Retrieved via Resources.getDrawable() and friends. -->
     <drawable name="semi_black">#80000000</drawable>
