@@ -80,13 +80,13 @@ public class BrainPingScheduler {
             startTime = startTimeTmp;
             endTime = endTimeTmp;
 
-            Log.i("info", "brain ping preferences updated");
+            Log.i("info_layout", "brain ping preferences updated");
             scheduleNextPing(true);
         }
     }
 
     public void accept() {
-        Log.i("info", "brain ping accepted");
+        Log.i("info_layout", "brain ping accepted");
         scheduleNextPing(false);
     }
 
@@ -171,7 +171,7 @@ public class BrainPingScheduler {
             Calendar now = new GregorianCalendar();
             Calendar next = nextPingTime(now, refreshSchedule);
 
-            Log.i("info", "scheduling next ping for " + next);
+            Log.i("info_layout", "scheduling next ping for " + next);
 
             long delay = next.getTimeInMillis() - now.getTimeInMillis();
 

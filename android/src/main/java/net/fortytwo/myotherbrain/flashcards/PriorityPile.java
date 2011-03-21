@@ -65,7 +65,7 @@ public class PriorityPile<Q, A> implements Pile<Q, A> {
     }
 
     /**
-     * @param deck     a deck of flashcards to add
+     * @param deck     a deck of flashcards_settings to add
      * @param priority a positive numeric value representing the priority of the deck (relatively high values indicating
      *                 relatively high priority).
      *                 New cards will drawn from a given deck with a probability proportional to the deck's priority.

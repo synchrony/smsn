@@ -2,11 +2,8 @@ package net.fortytwo.myotherbrain.ping;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.preference.TimePickerPreference;
 import net.fortytwo.myotherbrain.R;
 
 
@@ -18,7 +15,7 @@ public class BrainPingSettings extends PreferenceActivity {
 
         // Note: this is the earliest you can get preferences.  Getting them at construction time results in an error.
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        addPreferencesFromResource(R.xml.brainping);
+        addPreferencesFromResource(R.xml.brainping_settings);
 
         /*
         // TODO: this listener is unnecessary

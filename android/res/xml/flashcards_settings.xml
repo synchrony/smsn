@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="Flashcards settings">
+
+    <ListPreference
+            android:key="flashcards_delay_first_correct_answer"
+            android:title="Initial delay: correct"
+            android:summary="Delay after first correct answer"
+            android:defaultValue="60000"
+            android:entries="@array/flashcards_first_delay_labels"
+            android:entryValues="@array/flashcards_first_delay_values"/>
+
+    <ListPreference
+            android:key="flashcards_delay_first_incorrect_answer"
+            android:title="Initial delay: incorrect"
+            android:summary="Delay after first incorrect answer"
+            android:defaultValue="30000"
+            android:entries="@array/flashcards_first_delay_labels"
+            android:entryValues="@array/flashcards_first_delay_values"/>
+
+    <ListPreference
+            android:key="flashcards_delay_imprecision"
+            android:title="Delay imprecision"
+            android:summary="Randomizes delay between trials of a card"
+            android:defaultValue="0.1"
+            android:entries="@array/flashcards_delay_imprecision_labels"
+            android:entryValues="@array/flashcards_delay_imprecision_values"/>
+
+</PreferenceScreen>

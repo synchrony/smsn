@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!-- Questions -->
+    <RelativeLayout android:id="@+id/questionFace"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+        <WebView android:id="@+id/questionText"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_centerInParent="true"
+                 android:layout_weight="1">
+        </WebView>
+    </RelativeLayout>
+
+    <!-- Answers -->
+    <RelativeLayout android:id="@+id/answerFace"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+        <!-- Buttons -->
+        <RelativeLayout android:id="@+id/answerButtons"
+                        android:layout_alignParentBottom="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/semi_black">
+            <Button android:id="@+id/correct"
+                    style="@style/ActionButton"
+                    android:text="I got it right!"
+                    android:textColor="@color/green"
+                    android:layout_alignParentLeft="true"/>
+            <Button android:id="@+id/incorrect"
+                    style="@style/ActionButton"
+                    android:text="I got it wrong."
+                    android:textColor="@color/red"
+                    android:layout_alignParentRight="true"/>
+        </RelativeLayout>
+
+        <!-- Answer text -->
+        <WebView android:id="@+id/answerText"
+                 android:layout_alignParentTop="true"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content">
+        </WebView>
+
+    </RelativeLayout>
+
+    <!-- Debug info_layout -->
+    <TextView android:id="@+id/debugText"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:freezesText="true"
+              android:visibility="gone">
+    </TextView>
+
+</RelativeLayout>

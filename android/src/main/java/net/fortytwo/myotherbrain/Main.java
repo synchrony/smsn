@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-import net.fortytwo.myotherbrain.flashcards.games.Flashcards4Android;
+import net.fortytwo.myotherbrain.flashcards.games.android.Flashcards4Android;
 import net.fortytwo.myotherbrain.ping.BrainPingPopup;
 import net.fortytwo.myotherbrain.ping.BrainPingSettings;
 
@@ -29,7 +29,7 @@ public class Main extends Activity {
         super.onCreate(savedInstanceState);
 
         // Inflate our UI from its XML layout description.
-        setContentView(R.layout.main);
+        setContentView(R.layout.main_layout);
 
         // Find the text editor view inside the layout, because we
         // want to do various programmatic things with it.
@@ -73,10 +73,6 @@ public class Main extends Activity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        // Before showing the menu, we need to decide whether the clear
-        // item is enabled depending on whether there is text to clear.
-        //menu.findItem(SETTINGS_ID).setVisible(editor.getText().length() > 0);
-
         return true;
     }
 
@@ -88,7 +84,7 @@ public class Main extends Activity {
         switch (item.getItemId()) {
             case R.id.info:
                 startActivity(new Intent(this, Info.class));
-                System.out.println("debug!");
+                System.out.println("info_layout!");
                 return true;
             case R.id.settings:
                 startActivity(new Intent(this, BrainPingSettings.class));

@@ -132,7 +132,7 @@ public abstract class Game<Q, A> {
         return sb.toString();
     }
 
-    protected String showQueue() {
+    public String showQueue() {
         long now = System.currentTimeMillis();
 
         StringBuilder sb = new StringBuilder();

@@ -4,16 +4,29 @@
           android:versionCode="1"
           android:versionName="1.0">
     <application android:label="@string/app_name" android:icon="@drawable/icon">
+
+        <!-- Main -->
         <activity android:name=".Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".flashcards.games.Flashcards4Android"
+
+        <!-- Flashcards -->
+        <activity android:name=".flashcards.games.android.Flashcards4Android"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
+        <activity android:name=".flashcards.games.android.FlashcardsSettings"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".flashcards.games.android.FlashcardsInfo"
+                  android:label="@string/app_name"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+
+        <!-- BrainPing -->
         <activity android:name=".Info"
                   android:label="@string/app_name">
         </activity>
@@ -29,5 +42,6 @@
                 <category android:name="android.intent.category.HOME"/>
             </intent-filter>
         </service>
+
     </application>
 </manifest> 

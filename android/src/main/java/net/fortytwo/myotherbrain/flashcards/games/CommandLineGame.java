@@ -119,7 +119,7 @@ public class CommandLineGame extends Game<String, String> {
             pile.addDeck(hsk4Compounds, 2);
             pile.addDeck(hsk4Characters, 8);
 
-            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
+            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards_settings.txt"));
 
             new CommandLineGame(pile, h).play();
         } catch (Throwable e) {

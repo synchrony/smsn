@@ -1,12 +1,15 @@
-package net.fortytwo.myotherbrain.flashcards.games;
+package net.fortytwo.myotherbrain.flashcards.games.android;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import net.fortytwo.myotherbrain.R;
@@ -27,8 +30,10 @@ import net.fortytwo.myotherbrain.flashcards.decks.NationalCapitals;
 import java.io.IOException;
 
 public class Flashcards4Android extends Activity {
+    public static final String INFO = "flashcards_info_layout";
+
     private RelativeLayout questionFace;
-    private LinearLayout answerFace;
+    private RelativeLayout answerFace;
     private WebView questionText;
     private WebView answerText;
     private TextView debugText;
@@ -40,15 +45,19 @@ public class Flashcards4Android extends Activity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.flashcards);
+        setContentView(R.layout.flashcards_layout);
 
         questionFace = (RelativeLayout) findViewById(R.id.questionFace);
-        answerFace = (LinearLayout) findViewById(R.id.answerFace);
         questionText = (WebView) findViewById(R.id.questionText);
-        answerText = (WebView) findViewById(R.id.answerText);
-        debugText = (TextView) findViewById(R.id.debugText);
+        // This is one way of getting rid of the white margin otherwise visible on the right of the WebView.
+        questionText.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        questionText.setOnTouchListener(questionTouched);
 
-        questionFace.setOnTouchListener(questionTouched);
+        answerFace = (RelativeLayout) findViewById(R.id.answerFace);
+        answerText = (WebView) findViewById(R.id.answerText);
+        answerText.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+
+        debugText = (TextView) findViewById(R.id.debugText);
 
         findViewById(R.id.correct).setOnClickListener(correct);
         findViewById(R.id.incorrect).setOnClickListener(incorrect);
@@ -62,6 +71,43 @@ public class Flashcards4Android extends Activity {
         } catch (Exception e) {
             //throw new IllegalStateException(e);
             e.printStackTrace(System.err);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.flashcards_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.info:
+                //System.out.println("info_layout!");
+                Intent i = new Intent(this, FlashcardsInfo.class);
+                Bundle b = new Bundle();
+                b.putString(INFO, game.showQueue());
+                i.putExtras(b);
+                startActivity(i);
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(this, FlashcardsSettings.class));
+                //System.out.println("settings!");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
