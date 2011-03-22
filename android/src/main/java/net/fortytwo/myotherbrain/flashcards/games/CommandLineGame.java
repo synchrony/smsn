@@ -11,6 +11,7 @@ import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Compounds;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.NPCRVocabulary;
@@ -111,16 +112,20 @@ public class CommandLineGame extends Game<String, String> {
             Deck<String, String> npcrVocabulary = new NPCRVocabulary();
             Deck<String, String> hsk4Characters = new HSK4Characters();
             Deck<String, String> hsk4Compounds = new HSK4Compounds();
+            Deck<String, String> frenchVocabulary = new FrenchVocabulary();
 
             //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
             PriorityPile<String, String> pile = new PriorityPile<String, String>();
+            //*
             //pile.addDeck(stateBorders, 1);
             pile.addDeck(nationalCapitals, 1);
             pile.addDeck(internationalBorders, 1);
             //pile.addDeck(npcrVocabulary, 4);
             pile.addDeck(hsk4Compounds, 2);
             pile.addDeck(hsk4Characters, 8);
+            //*/
+            pile.addDeck(frenchVocabulary, 1);
 
             GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 

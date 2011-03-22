@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -31,30 +32,26 @@ public class NPCRVocabulary extends VocabularyDeck {
             String l;
             while ((l = br.readLine()) != null) {
                 //System.out.println(l);
-                Term c = new Term();
+                Term t = new Term();
                 String context1, context2;
                 context1 = l.trim();
                 l = br.readLine();
                 context2 = l.trim();
-                c.context = context1 + ":" + context2;
+                t.context = context1 + ":" + context2;
                 l = br.readLine();
-                c.alternativeForm = l.trim();
+                t.alternativeForms = new LinkedList<String>();
+                t.alternativeForms.add(l.trim());
                 l = br.readLine();
-                c.normativeForm = l.trim();
+                t.normativeForm = l.trim();
                 l = br.readLine();
-                c.pronunciation = l.trim();
+                t.pronunciation = l.trim();
                 l = br.readLine();
-                c.meaning = l.trim();
+                t.meaning = l.trim();
                 //System.out.println("\t" + c.meaning);
                 l = br.readLine();
-                c.type = l.trim();
+                t.type = l.trim();
 
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < c.normativeForm.length(); i++) {
-                    sb.append("\\u").append(Integer.valueOf(c.normativeForm.charAt(i)));
-                }
-
-                characters.put(sb.toString(), c);
+                characters.put(findCardName(t), t);
             }
         } finally {
             is.close();

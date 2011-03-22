@@ -31,20 +31,15 @@ public class HSK4Compounds extends VocabularyDeck {
             BufferedReader br = new BufferedReader(r);
             String l;
             while ((l = br.readLine()) != null) {
-                Term c = new Term();
+                Term t = new Term();
                 int tab = l.indexOf('\t');
                 int star = l.indexOf('*');
-                c.normativeForm = l.substring(0, tab).trim();
-                c.pronunciation = l.substring(tab + 1, star).trim();
-                c.meaning = l.substring(star + 1).trim();
+                t.normativeForm = l.substring(0, tab).trim();
+                t.pronunciation = l.substring(tab + 1, star).trim();
+                t.meaning = l.substring(star + 1).trim();
                 //System.out.println(c.normativeForm + ", " + c.pronunciation + ", " + c.meaning);
 
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < c.normativeForm.length(); i++) {
-                    sb.append("\\u").append(Integer.valueOf(c.normativeForm.charAt(i)));
-                }
-
-                terms.put(sb.toString(), c);
+                terms.put(findCardName(t), t);
             }
         } finally {
             is.close();
