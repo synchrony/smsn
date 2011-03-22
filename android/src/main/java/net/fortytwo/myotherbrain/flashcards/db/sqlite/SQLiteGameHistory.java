@@ -3,11 +3,19 @@ package net.fortytwo.myotherbrain.flashcards.db.sqlite;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: josh
@@ -28,7 +36,52 @@ public class SQLiteGameHistory extends GameHistory {
 
     public SQLiteGameHistory(final SQLiteDatabase db) {
         this.db = db;
+        //correctUnicodeIssue();
     }
+
+    /*
+    private final Pattern BAD_ESCAPE = Pattern.compile("\\\\u[0-9][0-9][0-9][0-9][0-9]");
+
+    private void correctUnicodeIssue() {
+        Collection<Trial> allTrials = new LinkedList<Trial>();
+        CloseableIterator<Trial> iter = getHistory();
+        while (iter.hasNext()) {
+            allTrials.add(iter.next());
+        }
+        iter.close();
+
+        for (Trial t : allTrials) {
+            String cardName = t.getCardName();
+            String newName = replaceBadEscapes(cardName);
+            if (!cardName.equals(newName)) {
+                System.out.println("replacing " + cardName + " with " + newName);
+                ContentValues up = new ContentValues();
+                up.put(HISTORY__CARD, newName);
+                db.update(HISTORY, up, "deck=? AND card=? AND time=?", new String[]{t.getDeckName(), t.getCardName(), String.valueOf(t.getTime())});
+            }
+        }
+    }
+
+    private String replaceBadEscapes(String s) {
+        Matcher m = BAD_ESCAPE.matcher(s);
+        if (m.find()) {
+            String t = s.substring(0, m.start())
+                    + unicode(Integer.valueOf(s.substring(m.start() + 2, m.end())))
+                    + s.substring(m.end());
+            return replaceBadEscapes(t);
+        } else {
+            return s;
+        }
+    }
+
+    private String unicode(final int c) {
+        StringBuilder sb = new StringBuilder("\\u");
+        sb.append(VocabularyDeck.HEX_CHARS[(c >> 12) & 0xF]);
+        sb.append(VocabularyDeck.HEX_CHARS[(c >> 8) & 0xF]);
+        sb.append(VocabularyDeck.HEX_CHARS[(c >> 4) & 0xF]);
+        sb.append(VocabularyDeck.HEX_CHARS[c & 0xF]);
+        return sb.toString();
+    }  */
 
     @Override
     public void log(final Trial trial) {
@@ -96,6 +149,7 @@ public class SQLiteGameHistory extends GameHistory {
         public Trial next() {
             String deckName = cursor.getString(0);
             String cardName = cursor.getString(1);
+            System.out.println(cardName);
             long time = Long.valueOf(cursor.getString(2));
             //long time = (long) cursor.getInt(2);
             Trial.Result result = Trial.Result.valueOf(cursor.getString(3));

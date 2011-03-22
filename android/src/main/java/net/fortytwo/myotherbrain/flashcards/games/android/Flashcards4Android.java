@@ -24,6 +24,7 @@ import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.sqlite.SQLiteGameHistoryHelper;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Compounds;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
@@ -160,6 +161,7 @@ public class Flashcards4Android extends Activity {
         //Deck<String, String> stateBorders = new USStateBorders();
         Deck<String, String> nationalCapitals = new NationalCapitals();
         Deck<String, String> internationalBorders = new InternationalBorders();
+        Deck<String, String> frenchVocab = new FrenchVocabulary();
         //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
         Deck<String, String> hsk4Characters = new HSK4Characters();
         Deck<String, String> hsk4Compounds = new HSK4Compounds();
@@ -171,7 +173,8 @@ public class Flashcards4Android extends Activity {
         pile.addDeck(nationalCapitals, 1);
         pile.addDeck(internationalBorders, 1);
         //pile.addDeck(npcrVocabulary, 4);
-        pile.addDeck(hsk4Compounds, 2);
+        pile.addDeck(frenchVocab, 4);
+        pile.addDeck(hsk4Compounds, 3);
         pile.addDeck(hsk4Characters, 8);
 
         GameHistory h = new SQLiteGameHistory(db);
@@ -310,7 +313,7 @@ public class Flashcards4Android extends Activity {
             }
         }
 
-        System.out.println("converted '" + s + "' to '" + sb.toString() + "'");
+        //System.out.println("converted '" + s + "' to '" + sb.toString() + "'");
         return sb.toString();
     }
 }

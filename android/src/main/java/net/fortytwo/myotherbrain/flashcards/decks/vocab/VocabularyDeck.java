@@ -60,7 +60,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
     }
 
     // Note: escapes both high and low (whitespace < 0x20) characters.
-    private String unicodeEscape(String s) {
+    private static String unicodeEscape(final String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
