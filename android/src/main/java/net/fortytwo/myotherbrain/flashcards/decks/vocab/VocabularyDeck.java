@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.decks;
+package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;

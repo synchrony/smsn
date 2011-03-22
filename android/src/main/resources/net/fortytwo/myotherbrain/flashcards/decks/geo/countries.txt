@@ -1,0 +1,238 @@
+A	Austria	Vienna
+AFG	Afghanistan	Kabul
+AG	Antigua and Barbuda	Saint Johns
+AL	Albania	Tirane
+AMSA	American Samoa	Pago Pago
+AND	Andorra	Andorra la Vella
+ANG	Angola	Luanda
+ARM	Armenia	Yerevan
+ARU	Aruba	Oranjestad
+AUS	Australia	Canberra
+AXA	Anguilla	The Valley
+AZ	Azerbaijan	Baku
+B	Belgium	Brussels
+BD	Bangladesh	Dhaka
+BDS	Barbados	Bridgetown
+BEN	Benin	Porto-Novo
+BERM	Bermuda	Hamilton
+BF	Burkina Faso	Ouagadougou
+BG	Bulgaria	Sofia
+BHT	Bhutan	Thimphu
+BI	Burundi	Bujumbura
+BIH	Bosnia and Herzegovina	Sarajevo
+BOL	Bolivia	La Paz
+BR	Brazil	Brasilia
+BRN	Bahrain	Manama
+BRU	Brunei	Bandar Seri Begawan
+BS	Bahamas	Nassau
+BVIR	British Virgin Islands	Road Town
+BY	Belarus	Minsk
+BZ	Belize	Belmopan
+CAM	Cameroon	Yaounde
+CAYM	Cayman Islands	George Town
+C	Cuba	Havana
+CDN	Canada	Ottawa
+CH	Switzerland	Bern
+CI	Cote dIvoire	Yamoussoukro
+CL	Sri Lanka	Colombo
+COCO	Cocos Islands	West Island
+CO	Colombia	Bogota
+COM	Comoros	Moroni
+COOK	Cook Islands	Avarua
+CR	Costa Rica	San Jose
+CV	Cape Verde	Praia
+CY	Cyprus	Nicosia
+CZ	Czech Republic	Prague
+D	Germany	Berlin
+DJI	Djibouti	Djibouti
+DK	Denmark	Copenhagen
+DOM	Dominican Republic	Santo Domingo
+DZ	Algeria	Algier
+EAK	Kenya	Nairobi
+EAT	Tanzania	Dar es Salaam
+EAU	Uganda	Kampala
+EC	Ecuador	Quito
+ER	Eritrea	Asmara
+ES	El Salvador	San Salvador
+E	Spain	Madrid
+ET	Egypt	Cairo
+ETH	Ethiopia	Addis Ababa
+EW	Estonia	Tallinn
+FALK	Falkland Islands	Stanley
+FARX	Faroe Islands	Torshavn
+F	France	Paris
+FGU	French Guiana	Cayenne
+FJI	Fiji	Suva
+FL	Liechtenstein	Vaduz
+FPOL	French Polynesia	Papeete
+FSM	Micronesia	Palikir
+GAZA	Gaza Strip
+GBG	Guernsey	Saint Peter Port
+GBJ	Jersey	Saint Helier
+GBM	Man	Douglas
+GB	United Kingdom	London
+GBZ	Gibraltar	Gibraltar
+GCA	Guatemala	Guatemala City
+GE	Georgia	Tbilisi
+G	Gabon	Libreville
+GH	Ghana	Accra
+GNB	Guinea-Bissau	Bissau
+GQ	Equatorial Guinea	Malabo
+GR	Greece	Athens
+GROX	Greenland	Nuuk
+GUAD	Guadeloupe	Basse-Terre
+GUAM	Guam	Agana
+GUY	Guyana	Georgetown
+HCA	Honduras	Tegucigalpa
+HELX	Saint Helena	Jamestown
+H	Hungary	Budapest
+HONX	Hong Kong	Hong Kong
+HR	Croatia	Zagreb
+I	Italy	Rome
+IL	Israel	Jerusalem
+IND	India	New Delhi
+IR	Iran	Tehran
+IRL	Ireland	Dublin
+IRQ	Iraq	Baghdad
+IS	Iceland	Reykjavik
+JA	Jamaica	Kingston
+J	Japan	Tokyo
+JOR	Jordan	Amman
+KAZ	Kazakstan	Almaty
+K	Cambodia	Phnom Penh
+KGZ	Kyrgyzstan	Bishkek
+KIR	Kiribati	Tarawa
+KN	Saint Kitts and Nevis	Basseterre
+KOS	Kosovo	Pristina
+KWT	Kuwait	Kuwait
+LAO	Laos	Vientiane
+LAR	Libya	Tripoli
+LB	Liberia	Monrovia
+L	Luxembourg	Luxembourg
+LS	Lesotho	Maseru
+LT	Lithuania	Vilnius
+LV	Latvia	Riga
+MACX	Macau	Macau
+MAL	Malaysia	Kuala Lumpur
+MA	Morocco	Rabat
+MART	Martinique	Fort-de-France
+MAYO	Mayotte	Mamoutzou
+MC	Monaco	Monaco
+MD	Moldova	Chisinau
+MEX	Mexico	Mexico City
+MH	Marshall Islands	Majuro
+MK	Macedonia	Skopje
+M	Malta	Valletta
+MNE	Montenegro	Podgorica
+MNG	Mongolia	Ulaanbaatar
+MNTS	Montserrat	Plymouth
+MOC	Mozambique	Maputo
+MS	Mauritius	Port Louis
+MV	Maldives	Male
+MW	Malawi	Lilongwe
+MYA	Myanmar	Rangoon
+NAM	Namibia	Windhoek
+NA	Netherlands Antilles	Willemstad
+NAU	Nauru	Yaren
+NCA	New Caledonia	Noumea
+NEP	Nepal	Kathmandu
+NIC	Nicaragua	Managua
+NIUE	Niue	Alofi
+NL	Netherlands	Amsterdam
+NMIS	Northern Mariana Islands	Saipan
+N	Norway	Oslo
+NOK	North Korea	Pyongyang
+NORF	Norfolk Island	Kingston
+NZ	New Zealand	Wellington
+OM	Oman	Muscat
+PAL	Palau	Melekeok
+PA	Panama	Panama City
+PE	Peru	Lima
+PITC	Pitcairn Islands	Adamstown
+PK	Pakistan	Islamabad
+PL	Poland	Warsaw
+PNG	Papua New Guinea	Port Moresby
+P	Portugal	Lisbon
+PR	Puerto Rico	San Juan
+PY	Paraguay	Asuncion
+Q	Qatar	Doha
+RA	Argentina	Buenos Aires
+RB	Botswana	Gaborone
+RCA	Central African Republic	Bangui
+RCB	Congo	Brazzaville
+RCH	Chile	Santiago
+RC	Taiwan	Taipei
+REUN	Reunion	Saint-Denis
+RG	Guinea	Conakry
+RH	Haiti	Port-au-Prince
+RI	Indonesia	Jakarta
+RIM	Mauritania	Nouakchott
+RL	Lebanon	Beirut
+RM	Madagascar	Antananarivo
+RMM	Mali	Bamako
+RN	Niger	Niamey
+ROK	South Korea	Seoul
+RO	Romania	Bucharest
+ROU	Uruguay	Montevideo
+RP	Philippines	Manila
+R	Russia	Moscow
+RSA	South Africa	Pretoria
+RSM	San Marino	San Marino
+RT	Togo	Lome
+RWA	Rwanda	Kigali
+SA	Saudi Arabia	Riyadh
+SD	Swaziland	Mbabane
+SF	Finland	Helsinki
+SGP	Singapore	Singapore
+SK	Slovakia	Bratislava
+SLB	Solomon Islands	Honiara
+SLO	Slovenia	Ljubljana
+SMAR	Saint Martin	Marigot
+SME	Suriname	Paramaribo
+SN	Senegal	Dakar
+SPMI	Saint Pierre and Miquelon	Saint-Pierre
+SP	Somalia	Mogadishu
+SRB	Serbia	Belgrade
+S	Sweden	Stockholm
+STP	Sao Tome and Principe	Sao Tome
+SUD	Sudan	Khartoum
+SVAX	Svalbard	Longyearbyen
+SYR	Syria	Damascus
+SY	Seychelles	Victoria
+TAD	Tajikistan	Dushanbe
+TCH	Chad	NDjamena
+THA	Thailand	Bangkok
+TJ	China	Beijing
+TL	Timor-Leste	Dili
+TM	Turkmenistan	Ashgabat
+TN	Tunisia	Tunis
+TO	Tonga	Nukualofa
+TR	Turkey	Ankara
+TT	Trinidad and Tobago	Port-of-Spain
+TUCA	Turks and Caicos Islands	Grand Turk
+TUV	Tuvalu	Funafuti
+UAE	United Arab Emirates	Abu Dhabi
+UA	Ukraine	Kiev
+USA	United States	Washington
+UZB	Uzbekistan	Tashkent
+V	Holy See	Vatican City
+VIRG	Virgin Islands	Charlotte Amalie
+VN	Vietnam	Hanoi
+VU	Vanuatu	Port-Vila
+WAFU	Wallis and Futuna	Mata-Utu
+WAG	Gambia	Banjul
+WAL	Sierra Leone	Freetown
+WAN	Nigeria	Abuja
+WD	Dominica	Roseau
+WEST	West Bank
+WG	Grenada	Saint Georges
+WL	Saint Lucia	Castries
+WSA	Western Sahara	El Aaiun
+WS	Samoa	Apia
+WV	Saint Vincent and the Grenadines	Kingstown
+XMAS	Christmas Island	Flying Fish Cove
+YE	Yemen	Sanaa
+YV	Venezuela	Caracas
+ZRE	Zaire	Kinshasa
+ZW	Zimbabwe	Harare
+Z	Zambia	Lusaka

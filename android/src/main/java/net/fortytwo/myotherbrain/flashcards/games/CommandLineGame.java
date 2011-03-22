@@ -10,11 +10,12 @@ import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
-import net.fortytwo.myotherbrain.flashcards.decks.HSK4Characters;
-import net.fortytwo.myotherbrain.flashcards.decks.HSK4Compounds;
-import net.fortytwo.myotherbrain.flashcards.decks.NPCRVocabulary;
-import net.fortytwo.myotherbrain.flashcards.decks.NationalCapitals;
-import net.fortytwo.myotherbrain.flashcards.decks.USStateBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Compounds;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.NPCRVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
+import net.fortytwo.myotherbrain.flashcards.decks.geo.USStateBorders;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -89,10 +90,10 @@ public class CommandLineGame extends Game<String, String> {
                 long now = System.currentTimeMillis();
 
                 if (tryCard(c, br, ++line)) {
-                    c.correct(now);
+                    correct(c, now);
                     history.log(new Trial(c.getDeck().getName(), c.getName(), now, Trial.Result.Correct));
                 } else {
-                    c.incorrect(now);
+                    incorrect(c, now);
                     history.log(new Trial(c.getDeck().getName(), c.getName(), now, Trial.Result.Incorrect));
                 }
             } catch (IOException e) {
@@ -106,6 +107,7 @@ public class CommandLineGame extends Game<String, String> {
         try {
             Deck<String, String> stateBorders = new USStateBorders();
             Deck<String, String> nationalCapitals = new NationalCapitals();
+            Deck<String, String> internationalBorders = new InternationalBorders();
             Deck<String, String> npcrVocabulary = new NPCRVocabulary();
             Deck<String, String> hsk4Characters = new HSK4Characters();
             Deck<String, String> hsk4Compounds = new HSK4Compounds();
@@ -115,11 +117,12 @@ public class CommandLineGame extends Game<String, String> {
             PriorityPile<String, String> pile = new PriorityPile<String, String>();
             //pile.addDeck(stateBorders, 1);
             pile.addDeck(nationalCapitals, 1);
+            pile.addDeck(internationalBorders, 1);
             //pile.addDeck(npcrVocabulary, 4);
             pile.addDeck(hsk4Compounds, 2);
             pile.addDeck(hsk4Characters, 8);
 
-            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards_settings.txt"));
+            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 
             new CommandLineGame(pile, h).play();
         } catch (Throwable e) {

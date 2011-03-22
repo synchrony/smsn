@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -17,6 +18,21 @@ import java.util.Set;
  * Time: 11:50 AM
  */
 public abstract class Game<Q, A> {
+    private static final long
+            SECOND = 1000,
+            MINUTE = SECOND * 60,
+            HOUR = MINUTE * 60,
+            DAY = HOUR * 24;
+
+    private long
+            delayAfterFirstCorrect = 60000,
+            delayAfterFirstIncorrect = 30000;
+
+    // Randomized delays will be within this ratio of the precise value.
+    private double delayImprecision = 0.1;
+
+    private final Random random = new Random();
+
     protected final Pile<Q, A> pile;
     protected final PriorityQueue<Card<Q, A>> active;
     protected final GameHistory history;
@@ -39,10 +55,10 @@ public abstract class Game<Q, A> {
                 if (null != c) {
                     switch (t.getResult()) {
                         case Correct:
-                            c.correct(t.getTime());
+                            correct(c, t.getTime());
                             break;
                         case Incorrect:
-                            c.incorrect(t.getTime());
+                            incorrect(c, t.getTime());
                             break;
                         case Cancelled:
                             throw new IllegalStateException("the 'cancelled' result is not yet supported");
@@ -60,6 +76,32 @@ public abstract class Game<Q, A> {
     }
 
     public abstract void play() throws GameplayException;
+
+    protected void correct(final Card c,
+                           final long now) {
+        long delay = 0 == c.lastTrial
+                ? delayAfterFirstCorrect
+                : increaseDelay(now - c.lastTrial);
+        delay = randomizeDelay(delay);
+        c.nextTrial = now + delay;
+        c.lastTrial = now;
+    }
+
+    protected void incorrect(final Card c,
+                             final long now) {
+        c.lastTrial = now;
+        long delay = randomizeDelay(delayAfterFirstIncorrect);
+        c.nextTrial = c.lastTrial + delay;
+    }
+
+    private long increaseDelay(final long delay) {
+        return delay * 2;
+    }
+
+    private long randomizeDelay(final long delay) {
+        long d = (long) (delayImprecision * delay * (random.nextDouble() * 2 - 1));
+        return delay + d;
+    }
 
     public Card<Q, A> drawCard() {
         long now = System.currentTimeMillis();
@@ -91,12 +133,6 @@ public abstract class Game<Q, A> {
     public void replaceCard(final Card<Q, A> c) {
         active.add(c);
     }
-
-    private static final long
-            SECOND = 1000,
-            MINUTE = SECOND * 60,
-            HOUR = MINUTE * 60,
-            DAY = HOUR * 24;
 
     protected String formatDelay(final long delay) {
         StringBuilder sb = new StringBuilder();
@@ -167,4 +203,17 @@ public abstract class Game<Q, A> {
             return ((Long) first.getNextTrial()).compareTo(second.getNextTrial());
         }
     }
+
+    public void setDelayAfterFirstCorrect(long delay) {
+        this.delayAfterFirstCorrect = delay;
+    }
+
+    public void setDelayAfterFirstIncorrect(long delay) {
+        this.delayAfterFirstIncorrect = delay;
+    }
+
+    public void setDelayImprecision(double imprecision) {
+        this.delayImprecision = imprecision;
+    }
+
 }

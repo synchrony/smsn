@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.decks;
+package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
 import java.io.BufferedReader;
 import java.io.IOException;

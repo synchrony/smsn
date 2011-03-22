@@ -23,9 +23,10 @@ import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.sqlite.SQLiteGameHistoryHelper;
-import net.fortytwo.myotherbrain.flashcards.decks.HSK4Characters;
-import net.fortytwo.myotherbrain.flashcards.decks.HSK4Compounds;
-import net.fortytwo.myotherbrain.flashcards.decks.NationalCapitals;
+import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Compounds;
+import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
 
 import java.io.IOException;
 
@@ -158,6 +159,7 @@ public class Flashcards4Android extends Activity {
     private AndroidGame createGame(final SQLiteDatabase db) throws IOException {
         //Deck<String, String> stateBorders = new USStateBorders();
         Deck<String, String> nationalCapitals = new NationalCapitals();
+        Deck<String, String> internationalBorders = new InternationalBorders();
         //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
         Deck<String, String> hsk4Characters = new HSK4Characters();
         Deck<String, String> hsk4Compounds = new HSK4Compounds();
@@ -167,6 +169,7 @@ public class Flashcards4Android extends Activity {
         PriorityPile<String, String> pile = new PriorityPile<String, String>();
         //pile.addDeck(stateBorders, 1);
         pile.addDeck(nationalCapitals, 1);
+        pile.addDeck(internationalBorders, 1);
         //pile.addDeck(npcrVocabulary, 4);
         pile.addDeck(hsk4Compounds, 2);
         pile.addDeck(hsk4Characters, 8);
@@ -199,7 +202,7 @@ public class Flashcards4Android extends Activity {
 
         public void correct() throws IOException {
             long now = System.currentTimeMillis();
-            card.correct(now);
+            correct(card, now);
             history.log(new Trial(card.getDeck().getName(), card.getName(), now, Trial.Result.Correct));
             replaceCard(card);
             nextCard();
@@ -207,7 +210,7 @@ public class Flashcards4Android extends Activity {
 
         public void incorrect() throws IOException {
             long now = System.currentTimeMillis();
-            card.incorrect(now);
+            incorrect(card, now);
             history.log(new Trial(card.getDeck().getName(), card.getName(), now, Trial.Result.Incorrect));
             replaceCard(card);
             nextCard();

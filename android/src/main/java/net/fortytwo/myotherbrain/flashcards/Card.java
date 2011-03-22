@@ -8,20 +8,12 @@ import java.util.Random;
  * Time: 7:01 PM
  */
 public abstract class Card<Q, A> {
-    private static final long
-            FIRST_DELAY_CORRECT = 60000,
-            FIRST_DELAY_INCORRECT = 30000;
-
-    // Randomized delays will be within this ratio of the precise value.
-    private static final double IMPRECISION = 0.1;
-
-    private final Random random = new Random();
 
     private final String name;
     private final Deck deck;
 
-    private long lastTrial = 0;
-    private long nextTrial = 0;
+    public long lastTrial = 0;
+    public long nextTrial = 0;
 
     public Card(final String name,
                 final Deck deck) {
@@ -41,32 +33,8 @@ public abstract class Card<Q, A> {
         return deck;
     }
 
-    public void correct(final long now) {
-        long delay = 0 == lastTrial
-                ? FIRST_DELAY_CORRECT
-                : increaseDelay(now - lastTrial);
-        delay = randomizeDelay(delay);
-        nextTrial = now + delay;
-        lastTrial = now;
-    }
-
-    public void incorrect(final long now) {
-        lastTrial = now;
-        long delay = randomizeDelay(FIRST_DELAY_INCORRECT);
-        nextTrial = lastTrial + delay;
-    }
-
     public long getNextTrial() {
         return nextTrial;
-    }
-
-    private long increaseDelay(final long delay) {
-        return delay * 2;
-    }
-
-    private long randomizeDelay(final long delay) {
-        long d = (long) (IMPRECISION * delay * (random.nextDouble() * 2 - 1));
-        return delay + d;
     }
 
     @Override

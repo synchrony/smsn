@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.decks;
+package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,20 +12,19 @@ import java.util.Map;
  * Date: 3/19/11
  * Time: 8:20 PM
  */
-public class HSK4Compounds extends VocabularyDeck {
-
-    public HSK4Compounds() throws IOException {
-        super("hsk4_compounds");
+public class HSK4Characters extends VocabularyDeck {
+    public HSK4Characters() throws IOException {
+        super("hsk4_characters");
     }
 
     @Override
     public Map<String, Term> createVocabulary() throws IOException {
         Map<String, Term> terms = new HashMap<String, Term>();
 
-        // HSK level 4 vocabulary list retrieved on 2011-3-19 from:
+        // HSK level 4 character list retrieved on 2011-3-19 from:
         //     http://www.chinese-forums.com/index.php?/topic/14829-hsk-character-lists/
         // (provided by user renzhe)
-        InputStream is = HSK4Characters.class.getResourceAsStream("hsk4-multitab.txt");
+        InputStream is = HSK4Characters.class.getResourceAsStream("hsk4-allchars-tab.txt");
         try {
             InputStreamReader r = new InputStreamReader(is, "UTF-8");
             BufferedReader br = new BufferedReader(r);
