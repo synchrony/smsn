@@ -67,7 +67,13 @@ public class InternationalBorders extends Deck<String, String> {
                     sb.append(country.neighbors.get(i).name);
                 }
             }
-            sb.append(" and ___?");
+
+            if (first) {
+                sb.append("___?");
+            } else {
+                sb.append(" and ___?");
+            }
+
             return sb.toString();
         }
 

@@ -149,7 +149,7 @@ public class SQLiteGameHistory extends GameHistory {
         public Trial next() {
             String deckName = cursor.getString(0);
             String cardName = cursor.getString(1);
-            System.out.println(cardName);
+            //System.out.println(cardName);
             long time = Long.valueOf(cursor.getString(2));
             //long time = (long) cursor.getInt(2);
             Trial.Result result = Trial.Result.valueOf(cursor.getString(3));
