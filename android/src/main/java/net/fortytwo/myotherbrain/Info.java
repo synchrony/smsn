@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
+import net.fortytwo.myotherbrain.R;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.games.android;
+package net.fortytwo.myotherbrain.flashcards.android;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,8 +21,8 @@ import net.fortytwo.myotherbrain.flashcards.Pile;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
-import net.fortytwo.myotherbrain.flashcards.db.sqlite.SQLiteGameHistory;
-import net.fortytwo.myotherbrain.flashcards.db.sqlite.SQLiteGameHistoryHelper;
+import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
+import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistoryHelper;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;

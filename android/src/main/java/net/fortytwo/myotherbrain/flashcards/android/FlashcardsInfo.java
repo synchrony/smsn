@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.games.android;
+package net.fortytwo.myotherbrain.flashcards.android;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-import net.fortytwo.myotherbrain.flashcards.games.android.Flashcards4Android;
+import net.fortytwo.myotherbrain.flashcards.android.Flashcards4Android;
 import net.fortytwo.myotherbrain.ping.BrainPingPopup;
 import net.fortytwo.myotherbrain.ping.BrainPingSettings;
 

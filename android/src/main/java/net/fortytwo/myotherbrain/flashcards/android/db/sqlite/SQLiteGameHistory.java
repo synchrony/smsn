@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.db.sqlite;
+package net.fortytwo.myotherbrain.flashcards.android.db.sqlite;
 
 import android.content.ContentValues;
 import android.database.Cursor;

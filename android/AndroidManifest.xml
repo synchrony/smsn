@@ -14,14 +14,14 @@
         </activity>
 
         <!-- Flashcards -->
-        <activity android:name=".flashcards.games.android.Flashcards4Android"
+        <activity android:name=".flashcards.android.Flashcards4Android"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>
-        <activity android:name=".flashcards.games.android.FlashcardsSettings"
+        <activity android:name=".flashcards.android.FlashcardsSettings"
                   android:label="@string/app_name">
         </activity>
-        <activity android:name=".flashcards.games.android.FlashcardsInfo"
+        <activity android:name=".flashcards.android.FlashcardsInfo"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar">
         </activity>

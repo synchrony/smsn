@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Path to JAR
-JAR=`dirname $0`/target/myotherbrain-android-*.jar
+JAR=`dirname $0`/target/myotherbrain-core-*.jar
 
 # Find Java
 if [ "$JAVA_HOME" = "" ] ; then
