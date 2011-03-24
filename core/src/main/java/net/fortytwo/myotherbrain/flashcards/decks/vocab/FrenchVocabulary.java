@@ -1,12 +1,8 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.Locale;
 
 /**
  * User: josh
@@ -19,42 +15,31 @@ public class FrenchVocabulary extends VocabularyDeck {
     }
 
     @Override
-    public Map<String, Term> createVocabulary() throws IOException {
-        Map<String, Term> terms = new HashMap<String, Term>();
+    public Dictionary createVocabulary() throws IOException {
+        Dictionary dict = new Dictionary();
 
-        // French dictionary retrieved on 2011-3-22 from:
-        //     http://www.dicts.info/uddl.php
-        InputStream is = FrenchVocabulary.class.getResourceAsStream("OmegaWiki_French_dictionary.txt");
+        VocabularySource omegaWiki = new VocabularySource("OmegaWiki");
+        omegaWiki.setUrl("http://www.dicts.info/uddl.php");
+        omegaWiki.setTimestamp("2011-03-22T11:10:01+01:00");
+
+        InputStream is = FrenchVocabulary.class.getResourceAsStream("OmegaWiki_French_English.txt");
         try {
-            InputStreamReader r = new InputStreamReader(is, "UTF-8");
-            BufferedReader br = new BufferedReader(r);
-            String l;
-            while ((l = br.readLine()) != null) {
-                l = l.trim();
-                if (!l.startsWith("#")) {
-                    Term t = new Term();
-                    int tab = l.indexOf('\t');
-                    String french = l.substring(0, tab).trim();
-                    if (french.contains(";")) {
-                        String[] a = french.split(";");
-                        t.normativeForm = a[0].trim();
-                        t.alternativeForms = new LinkedList<String>();
-                        for (int i = 1; i < a.length; i++) {
-                            t.alternativeForms.add(a[i].trim());
-                        }
-                    } else {
-                        t.normativeForm = french;
-                    }
-                    t.meaning = l.substring(tab + 1).trim();
-                    //System.out.println(c.normativeForm + ", " + c.pronunciation + ", " + c.meaning);
-
-                    terms.put(findCardName(t), t);
-                }
-            }
+            VocabularyParsers.parseDictsInfoList(is, dict, Locale.FRENCH, omegaWiki);
         } finally {
             is.close();
         }
 
-        return terms;
+        VocabularySource wiktionary = new VocabularySource("Wiktionary");
+        wiktionary.setUrl("http://www.dicts.info/uddl.php");
+        wiktionary.setTimestamp("2011-03-23T11:21:30+01:00");
+
+        is = FrenchVocabulary.class.getResourceAsStream("Wiktionary_French_English.txt");
+        try {
+            VocabularyParsers.parseDictsInfoList(is, dict, Locale.FRENCH, wiktionary);
+        } finally {
+            is.close();
+        }
+
+        return dict;
     }
 }

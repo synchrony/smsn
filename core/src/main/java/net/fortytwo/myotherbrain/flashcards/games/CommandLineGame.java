@@ -51,20 +51,20 @@ public class CommandLineGame extends Game<String, String> {
                             final int line) throws IOException {
         //PrintStream ps = System.out;
         PrintStream ps = new PrintStream(System.out, true, "UTF-8");
-        ps.println("\n" + line + ") " + c.getQuestion() + "\n");
+        ps.println(line + ") " + c.getQuestion() + "\n");
 
         while (true) {
             String input = br.readLine();
             if (0 < input.length()) {
                 switch (input.charAt(0)) {
                     case 'r':
-                        ps.println("\t" + c.getAnswer());
+                        ps.println(c.getAnswer());
                         return true;
                     case 'w':
-                        ps.println("\t" + c.getAnswer());
+                        ps.println(c.getAnswer());
                         return false;
                     case 'p':
-                        ps.println("\t" + c.getAnswer());
+                        ps.println(c.getAnswer());
                         break;
                     case 'h':
                         showCardHistory(c);
@@ -125,7 +125,7 @@ public class CommandLineGame extends Game<String, String> {
             pile.addDeck(hsk4Compounds, 2);
             pile.addDeck(hsk4Characters, 8);
             //*/
-            pile.addDeck(frenchVocabulary, 1);
+            pile.addDeck(frenchVocabulary, 10);
 
             GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
 

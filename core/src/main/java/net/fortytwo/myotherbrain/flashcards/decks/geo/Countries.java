@@ -21,7 +21,7 @@ import java.util.Map;
 
     FINDING COUNTRY BORDERS ########
 
-    rapper -i rdfxml -o ntriples mondial.rdf  > mondial.nt
+    rapper -i rdfxml -o ntriples mondial.rdf > mondial.nt
     grep bordering mondial.nt  > borders
     cat borders | sed 's/[_][:]//' | sed 's/[<].*countries.//' | sed 's/[/]...//'|sort > edges
     cat edges |sed 's/.*[ ]//' | tr '\n' ' '
@@ -41,6 +41,19 @@ import java.util.Map;
         SELECT DISTINCT ?countryCode ?countryName ?capitalCityName WHERE { \
             ?country <http://www.semwebtech.org/mondial/10/meta#name> ?countryName . \
             ?country <http://www.semwebtech.org/mondial/10/meta#carCode> ?countryCode . \
+            OPTIONAL { \
+                ?country <http://www.semwebtech.org/mondial/10/meta#capital> ?capital . \
+                ?capital <http://www.semwebtech.org/mondial/10/meta#name> ?capitalCityName . \
+            } \
+        }" -D file:///data/tmp/mondial/mondial.rdf > tmp.txt
+    cat tmp.txt | grep -v countryCode | sed 's/["][,]["]/_/' | sed 's/["][,]["]/_/' | sed 's/^.*[,]["]//' | sed 's/["]$//' | tr '_' '\t' | sed 's/["][,]//' | sort > countries.txt
+
+    FINDING US STATE NAMES AND CAPITALS #########
+
+    roqet -r csv -i sparql -e "\
+        SELECT DISTINCT ?stateCode ?stateName ?capitalCityName WHERE { \
+            ?country <http://www.semwebtech.org/mondial/10/meta#name> ?stateName . \
+            ?country <http://www.semwebtech.org/mondial/10/meta#carCode> ?stateCode . \
             OPTIONAL { \
                 ?country <http://www.semwebtech.org/mondial/10/meta#capital> ?capital . \
                 ?capital <http://www.semwebtech.org/mondial/10/meta#name> ?capitalCityName . \

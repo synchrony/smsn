@@ -22,29 +22,21 @@ public abstract class VocabularyDeck extends Deck<String, String> {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
     };
 
-    private final Map<String, Term> terms;
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
-
-    protected class Term {
-        public String type;
-        public String normativeForm;
-        public List<String> alternativeForms;
-        public String pronunciation;
-        public String meaning;
-        public String context;
-    }
 
     public VocabularyDeck(final String name) throws IOException {
         super(name);
 
-        terms = createVocabulary();
+        Dictionary d = createVocabulary();
+        for (String key : d.getKeys()) {
+            List<Term> defs = d.getDefinitions(key);
 
-        for (String s : terms.keySet()) {
-            cards.put(s, new LocalCard(s, this));
+            String n = findCardName(key);
+            cards.put(n, new LocalCard(n, this, defs));
         }
     }
 
-    public abstract Map<String, Term> createVocabulary() throws IOException;
+    public abstract Dictionary createVocabulary() throws IOException;
 
     @Override
     public Collection<Card<String, String>> getCards() {
@@ -55,8 +47,8 @@ public abstract class VocabularyDeck extends Deck<String, String> {
         return cards.get(name);
     }
 
-    protected String findCardName(final Term t) {
-        return unicodeEscape(t.normativeForm);
+    protected String findCardName(final String norm) {
+        return unicodeEscape(norm);
     }
 
     // Note: escapes both high and low (whitespace < 0x20) characters.
@@ -78,53 +70,57 @@ public abstract class VocabularyDeck extends Deck<String, String> {
     }
 
     private class LocalCard extends Card<String, String> {
-        private final Term term;
+        private final List<Term> defs;
 
         public LocalCard(final String name,
-                         final Deck deck) {
+                         final Deck deck,
+                         final List<Term> defs) {
             super(name, deck);
 
-            term = terms.get(getName());
+            this.defs = defs;
         }
 
         @Override
         public String getQuestion() {
-            return term.normativeForm + " = ?";
+            return defs.get(0).getForms().get(0) + " = ?";
         }
 
         @Override
         public String getAnswer() {
             StringBuilder sb = new StringBuilder();
 
-            sb.append(term.normativeForm);
-            if (null != term.alternativeForms && 0 < term.alternativeForms.size()) {
-                sb.append(" (");
-                boolean first = true;
-                for (String f : term.alternativeForms) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        sb.append("; ");
-                    }
-                    sb.append(f);
+            for (Term t : defs) {
+                if (null != t.getSource()) {
+                    sb.append("[").append(t.getSource().getLabel()).append("]\n");
                 }
-                sb.append(")");
+                sb.append(t.getForms().get(0));
+                if (2 <= t.getForms().size()) {
+                    sb.append(" (");
+                    for (int i = 1; i < t.getForms().size(); i++) {
+                        if (i > 0) {
+                            sb.append("; ");
+                        }
+                        sb.append(t.getForms().get(i));
+                    }
+                    sb.append(")");
+                }
+                if (null != t.getPronunciation()) {
+                    sb.append(" ").append(t.getPronunciation());
+                }
+                sb.append(" -- ");
+                if (null != t.getType()) {
+                    sb.append(t.getType()).append(": ");
+                }
+                sb.append(t.getMeaning());
+                sb.append("\n");
             }
-            if (null != term.pronunciation) {
-                sb.append(" ").append(term.pronunciation);
-            }
-            sb.append(" -- ");
-            if (null != term.type) {
-                sb.append(term.type).append(": ");
-            }
-            sb.append(term.meaning);
 
             return sb.toString();
         }
 
         @Override
         public String toString() {
-            return term.normativeForm;
+            return defs.get(0).getForms().get(0);
         }
     }
 }
