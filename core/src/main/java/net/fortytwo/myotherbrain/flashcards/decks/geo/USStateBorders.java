@@ -25,7 +25,7 @@ public class USStateBorders extends Deck<String, String> {
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
 
     public USStateBorders() throws IOException {
-        super("us_state_borders");
+        super("us_state_borders", "US state borders");
 
         borders = new HashMap<String, String[]>();
 
@@ -102,6 +102,8 @@ public class USStateBorders extends Deck<String, String> {
 
                 sb.append(heads[i]);
             }
+
+            sb.append("\n");
 
             return sb.toString();
         }

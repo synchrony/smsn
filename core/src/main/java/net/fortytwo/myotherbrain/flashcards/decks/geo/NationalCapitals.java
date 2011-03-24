@@ -18,7 +18,7 @@ public class NationalCapitals extends Deck<String, String> {
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
 
     public NationalCapitals() throws IOException {
-        super("national_capitals");
+        super("national_capitals", "national capitals");
 
         for (Countries.Country c : Countries.getInstance().getCountries()) {
             Card<String, String> card = new LocalCard(c, this);
@@ -51,7 +51,7 @@ public class NationalCapitals extends Deck<String, String> {
 
         @Override
         public String getAnswer() {
-            return country.capitalCity.name;
+            return country.capitalCity.name + "\n";
         }
 
         @Override

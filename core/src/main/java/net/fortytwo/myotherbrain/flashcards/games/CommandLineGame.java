@@ -12,11 +12,13 @@ import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Compounds;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.NPCRVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.NPCRChineseVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.USStateBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.SwedishVocabulary;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,9 +53,11 @@ public class CommandLineGame extends Game<String, String> {
                             final int line) throws IOException {
         //PrintStream ps = System.out;
         PrintStream ps = new PrintStream(System.out, true, "UTF-8");
-        ps.println(line + ") " + c.getQuestion() + "\n");
+        ps.println("[" + c.getDeck().getLabel() + "]");
+        ps.println(line + ") " + c.getQuestion());
 
         while (true) {
+            ps.print('\t');
             String input = br.readLine();
             if (0 < input.length()) {
                 switch (input.charAt(0)) {
@@ -109,10 +113,12 @@ public class CommandLineGame extends Game<String, String> {
             Deck<String, String> stateBorders = new USStateBorders();
             Deck<String, String> nationalCapitals = new NationalCapitals();
             Deck<String, String> internationalBorders = new InternationalBorders();
-            Deck<String, String> npcrVocabulary = new NPCRVocabulary();
-            Deck<String, String> hsk4Characters = new HSK4Characters();
-            Deck<String, String> hsk4Compounds = new HSK4Compounds();
+            Deck<String, String> npcrVocabulary = new NPCRChineseVocabulary();
+            Deck<String, String> hsk4Characters = new HSK4ChineseCharacters();
+            Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds();
             Deck<String, String> frenchVocabulary = new FrenchVocabulary();
+            Deck<String, String> germanVocabulary = new GermanVocabulary();
+            Deck<String, String> swedishVocabulary = new SwedishVocabulary();
 
             //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
@@ -126,8 +132,10 @@ public class CommandLineGame extends Game<String, String> {
             pile.addDeck(hsk4Characters, 8);
             //*/
             pile.addDeck(frenchVocabulary, 10);
+            pile.addDeck(germanVocabulary, 10);
+            pile.addDeck(swedishVocabulary, 10);
 
-            GameHistory h = new FileBasedGameHistory(new File("/tmp/flashcards.txt"));
+            GameHistory h = new FileBasedGameHistory(new File("/tmp/tmpflashcards.txt"));
 
             new CommandLineGame(pile, h).play();
         } catch (Throwable e) {

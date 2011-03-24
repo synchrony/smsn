@@ -1,5 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -90,6 +91,8 @@ public class Term {
     }
 
     public static void main(final String[] args) {
-
+        for (Locale l : NumberFormat.getAvailableLocales()) {
+            System.out.println(l.getDisplayName()+ " / " + l.getISO3Language());
+        }
     }
 }

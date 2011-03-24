@@ -1,0 +1,5501 @@
+# Swedish-English dictionary created from OmegaWiki database
+# Created on: c
+# Licence: GNU Free Documentation Licence http://www.gnu.org/copyleft/fdl.html
+# Download updated version of this file at: http://www.dicts.info/uddl.php
+# Contact us at: http://www.dicts.info/contact.php
+A(H5N1) ; H5N1	H5N1 ; Influenza A virus subtype H5N1 ; A(H5N1)
+AOX-värde (absorberbar organisk halogen)	AOX value
+ASEAN ; ASEAN-staterna ; Sydostasiatiska nationers förbund	ASEAN ; Association of Southeast Asian Nations
+Abchazien	Abkhazia
+Abidjan	Abidjan
+Abraham Lincoln	Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln ; Abraham Lincoln
+Abuja	Abuja
+Adelaide	Adelaide
+Adriatiska havet	Adriatic Sea
+Afghanistan	Afghanistan ; Transitional Islamic State of Afghanistan
+Afrika	Africa
+Albanien	Albania ; Republic of Albania
+Algeriet	Algeria ; People's Democratic Republic of Algeria
+Alperna	Alps
+Amerikanska Samoa	American Samoa
+Ames test	Ames test
+Amsterdam	Amsterdam
+Andorra	Andorra ; Principality of Andorra
+Angola	Angola ; Republic of Angola
+Anguilla	Anguilla
+Antarktis	Antarctica
+Antarktiska oceanen ; Södra oceanen	Antarctic Ocean ; Southern Ocean
+Antigua och Barbuda	Antigua and Barbuda
+Argentina	Argentina ; Argentine Republic
+Arizona	Arizona
+Arktiska havet ; Norra ishavet	Arctic Ocean
+Armenien	Armenia
+Articulata	Articulata
+Aruba	Aruba
+Asien	Asia
+Aten	Athens
+Atlantiska havet ; Atlantiska oceanen ; Atlanten	Atlantic Ocean
+Australien	Australia ; Commonwealth of Australia
+Azerbajdzjan	Azerbaijan ; Republic of Azerbaijan
+Azorerna	Azores
+Bahamas	Bahamas ; Commonwealth of the Bahamas ; Bahama Islands
+Bahrain	Bahrain
+Balearerna	Balearic Islands
+Bangladesh	Bangladesh ; People's Republic of Bangladesh
+Barbados	Barbados
+Belgien	Belgium ; Kingdom of Belgium
+Belgrad	Belgrade
+Belize	Belize
+Belmopan	Belmopan
+Benin	Benin ; Benin ; Republic of Benin
+Berlin	Berlin
+Bermuda	Bermuda
+Bern	Berne
+Betlehem	Bethlehem
+Bhutan	Bhutan ; Kingdom of Bhutan
+Bibeln	Bible
+Birmingham	Birmingham
+Björnvaktaren	Boötes
+Bolivia	Bolivia ; Republic of Bolivia
+Bonn	Bonn
+Borneo	Borneo ; Kalimantan
+Bosnien och Hercegovina	Bosnia and Herzegovina ; Republic of Bosnia and Herzegovina
+Botswana	Botswana ; Republic of Botswana
+Bourgogne	Bourgogne
+Bouvetön	Bouvet Island
+Brasilien	Brazil
+Bratislava	Bratislava
+Brittiska territoriet i Indiska oceanen	British Indian Ocean Territory ; BIOT
+Brunei	Brunei ; Negara Brunei Darussalam
+Bryssel	Brussels
+Bukarest	Bucharest
+Bulgarien	Bulgaria ; Republic of Bulgaria
+Burkina Faso	Burkina Faso
+Burundi	Burundi ; Republic of Burundi
+Cassiopeja	Cassiopeia
+Caymanöarna	Cayman Islands
+Centralafrika	Central Africa
+Centralafrikanska republiken	Central African Republic
+Centralamerika ; Mellanamerika	Central America
+Centralasien	Central Asia
+Charente	Charente
+Chelicerata (palpkäkar)	chelicerate
+Chihuahua	Chihuahua
+Chile	Chile ; Republic of Chile
+Chiroptera-taxa (fladdermöss)	chiropteran
+Chordata (ryggsträngsdjur, kordater) ; ryggsträngsdjur	chordate
+Chrysophyta (guldalger)	chrysophyta
+Colombia	Colombia ; Republic of Colombia
+Comorerna	Comoros ; Union of the Comoros
+Cooköarna	Cook Islands
+Costa Rica	Costa Rica ; Republic of Costa Rica
+Cypern	Cyprus ; Republic of Cyprus
+DDT	DDT ; dichloro-diphenyl-trichloroethane
+DNA ; deoxiribonukleinsyra	DNA ; deoxyribonucleic acid
+Dagestan	Dagestan
+Dakar	Dakar
+Danmark	Denmark ; Kingdom of Denmark
+Djibouti	Djibouti ; Republic of Djibouti
+Dominica	Dominica ; Commonwealth of Dominica
+Dominikanska republiken	Dominican Republic
+Downs syndrom	Down syndrome ; Down’s syndrome
+Dublin	Dublin
+EG-direktiv	EC directive
+EG-direktiv om bekämpningsmedel	EC directive on biocides
+EG-direktiv om deponering av avfall	EC directive on waste disposal
+EG-direktiv om vattenskydd	EC directive on water protection
+EG-domstol	Court of Justice of the European Communities
+EG-fördrag	EC Treaty
+EG-förordning ; EU-förordning	EC regulation
+EG-förordning om existerande kemikalier	EC regulation on existing chemicals
+EG-förordning om miljöstyrning	EC regulation on eco-management and audit
+EG-miljömärke	EC ecolabel
+EG-politik	EC policy
+EG-rätten; gemenskapsrätt; gemenskapslagstiftning	Community law
+EG:s ministerråd	EC Council of Ministers
+Echinodermata (tagghudingar)	echinoderm
+Ecuador	Ecuador ; Republic of Ecuador
+Egeiska havet	Aegean Sea
+Egypten	Egypt ; Arab Republic of Egypt
+Eiffeltornet	Eiffel Tower
+Ekvatorialguinea	Equatorial Guinea ; Republic of Equatorial Guinea
+El Salvador	El Salvador ; Republic of El Salvador
+Elfenbenskusten	Ivory Coast ; Cote d'Ivoire ; Republic of Cote d'Ivoire
+England	England
+Eritrea	Eritrea
+Estland	Estonia ; Republic of Estonia
+Etiopien	Ethiopia ; Federal Democratic Republic of Ethiopia
+Euratom	Euratom
+Europa	Europe
+Europaparlamentet	European Parliament
+Europeiska domstolen	European Court of Justice
+Europeiska gemenskaperna	European Communities
+Europeiska gemenskapernas kommission	European Commission
+Europeiska miljöbyrån	European Environment Agency
+Europeiska miljörådet	European Environmental Council
+Europeiska monetära fonden	European Monetary Fund
+Europeiska monetära systemet	European Monetary System ; EMS
+Europeiska rådet	EU Council
+Europeiska unionen	EU ; European Union
+Falklandsöarna	Falkland Islands
+Fiji	Fiji ; Republic of the Fiji Islands
+Filippinerna	Philippines
+Finland ; Republiken Finland	Finland ; Republic of Finland
+Flandern	Flanders ; Flemish region
+Flevoland	Flevoland
+Frankrike	France
+Franska Guyana	French Guiana
+Franska Polynesien	French Polynesia
+Franska sydterritorierna	French Southern Territories ; French Southern and Antarctic LandsA ; French Southern and Antarctic Lands ; Territory of the French Southern and Antarctic Lands
+Fuji	Mount Fuji
+Färöarna	Faroe Islands
+Förenade Arabemiraten	United Arab Emirates
+Förenta nationerna	UN ; United Nations
+GIS-digitalformat	GIS digital format
+GIS-digitalsystem	GIS digital system
+GIS-digitalteknik	GIS digital technique
+GIS-laboratorium	GIS laboratory
+Gabon	Gabon ; Gabonese Republic
+Gaborone	Gaborone
+Gambia	Gambia ; Gambia ; Gambia ; Gambia ; The Gambia ; Republic of The Gambia
+Gazaremsan	Gaza Strip
+Georgia	Georgia
+Georgien	Georgia
+Ghana	Ghana ; Republic of Ghana
+Gibraltar	Gibraltar
+God jul och gott nytt år	Merry Christmas and a happy New Year
+Gott Nytt År ; gott nytt år	Happy New Year
+Gregorianska kalendern	Gregorian calendar
+Grekland	Greece ; Hellenic Republic
+Grenada	Grenada
+Grönland	Greenland
+Guadeloupe	Guadeloupe
+Guam	Guam ; Guam ; Guam
+Guatemala	Guatemala ; Republic of Guatemala
+Guinea	Guinea ; Republic of Guinea
+Guinea-Bissau	Guinea-Bissau ; Republic of Guinea-Bissau
+Guyana	Guyana ; Republic of Guyana
+HCFC; "mjuka freoner" ; HCFC ; mjuka freoner	partially halogenated chlorofluorohydrocarbon
+Haag	The Hague
+Haiti	Haiti ; Republic of Haiti
+Hannover	Hanover
+Herkules	Hercules
+Herkules ; Herakles	Hercules
+Honduras	Honduras ; Republic of Honduras
+ISO-norm	ISO standard
+Iliaden	Iliad
+Indien	India ; Republic of India
+Indiska oceanen	Indian Ocean
+Indonesien	Indonesia ; Republic of Indonesia
+Indonesien ; Jakarta ; Djakarta	Jakarta ; Djakarta ; DKI Jakarta
+Indre	Indre
+Internationella domstolen	International Court of Justice
+Internationella valutafonden	IMF ; International Monetary Fund
+Internet	Internet
+Internettjänsteproducent	internet service provider ; ISP ; Internet access provider ; Internet service provider
+Irak	Iraq ; Republic of Iraq
+Iran	Iran ; Islamic Republic of Iran
+Irland	Ireland ; Republic of Ireland
+Island	Iceland ; Republic of Iceland
+Isle of Man	Isle of Man ; Isle of Mann ; Mann
+Israel	Israel ; State of Israel
+Italien	Italian Republic ; Italy
+Jakthundarna	Canes Venatici
+Jamaica	Jamaica
+Japan	Japan ; State of Japan
+Jerevan	Erevan ; Yerevan
+Jersey	Jersey ; Bailiwick of Jersey
+Jordanien	Jordan ; Hashemite Kingdom of Jordan
+Jorden ; Tellus	earth ; Earth ; the world ; Blue Planet
+Jugoslavien	Yugoslavia
+Jul	Christmas
+Julön	Christmas Island
+Jupiter	Jupiter
+Kairo	Cairo
+Kambodja	Cambodia ; Kingdom of Cambodia
+Kamerun	Cameroon ; Republic of Cameroon
+Kanada	Canada
+Kap Verde	Cape Verde ; Republic of Cape Verde
+Karibiska havet ; Karibiska sjön	Caribbean Sea
+Kaspiska havet	Caspian Sea
+Kazakstan	Kazakhstan ; Republic of Kazakhstan
+Kenya	Kenya ; Republic of Kenya
+Khartoum	Khartoum
+Kina	People's Republic of China ; China
+Kirgizistan	Kyrgyzstan ; Kyrgyz Republic
+Kiribati	Kiribati ; Republic of Kiribati
+Kongo-Kinshasa ; Demokratiska republiken Kongo	Democratic Republic of the Congo ; Congo-Kinshasa
+Konungariket Nederländerna	Holland ; Kingdom of the Netherlands ; The Netherlands
+Korfu	Corfu
+Kosovo	Kosovo
+Kraków	Krakow ; Cracow
+Kroatien	Croatia ; Republic of Croatia
+Kuba	Cuba ; Republic of Cuba
+Kuwait	Kuwait ; State of Kuwait
+Kyoto	Kyoto
+Köpenhamn	Copenhagen
+Lagos	Lagos
+Laos	Laos ; Lao People's Democratic Republic
+Lausanne	Lausanne
+Lejonet	Leo
+Lesotho	Lesotho ; Kingdom of Lesotho
+Lettland	Latvia ; Republic of Latvia
+Libanon	Lebanon ; Lebanese Republic
+Liberia	Liberia ; Republic of Liberia
+Libyen	Libya ; Great Socialist People's Libyan Arab Jamahiriya
+Liechtenstein	Liechtenstein ; Principality of Liechtenstein
+Lilla hunden	Canis Minor
+Lissabon	Lisbon
+Litauen	Lithuania ; Republic of Lithuania
+London	London
+Luxemburg	Luxembourg ; Grand Duchy of Luxembourg
+Lyon	Lyon
+Madagaskar	Madagascar ; Republic of Madagascar
+Makedonien	Macedonia ; Republic of Macedonia
+Malawi	Malawi ; Republic of Malaŵi
+Malaysia	Malaysia
+Maldiverna	Maldives ; Republic of the Maldives
+Mali	Mali ; Republic of Mali
+Malta	Malta ; Republic of Malta
+Markovkedja	Markov chain ; Markoff chain
+Marocko	Morocco ; Kingdom of Morocco
+Marshallöarna	Marshall Islands ; Republic of the Marshall Islands
+Martinique	Martinique
+Mauretanien	Mauritania ; Islamic Republic of Mauritania
+Mauritius	Mauritius ; Republic of Mauritius
+Mayotte	Mayotte
+Medelhavet	Mediterranean Sea
+Medelhavsområdet	Mediterranean Area
+Mekka	Mecca
+Mercury	Mercury
+Mexico	Mexico ; United Mexican States
+Mikronesien ; Mikronesiens federerade stater	Micronesia ; Federated States of Micronesia
+Milano	Milan
+Milwaukee	Milwaukee
+Moldavien	Moldova
+Monaco	Monaco
+Mongoliet	Mongolia
+Montenegro	Montenegro
+Montserrat	Montserrat
+Moskva	Moscow
+Moçambique	Mozambique
+Mustelidae (mårddjur)	mustelid
+Myanmar ; Burma	Myanmar
+München	Munich
+NOEL (no-observed-effect level (concentration))	NOEL
+Nagorno-Karabach	Nagorno-Karabakh
+Nairobi	Nairobi
+Namibia	Namibia
+Nauru	Nauru ; Republic of Nauru
+Neapel	Naples
+Nepal	Nepal
+Neptunus	Neptune
+New York	New York
+Nicaragua	Nicaragua
+Niedersachsen	Lower Saxony
+Niger	Niger
+Nigeria	Nigeria
+Niue	Niue
+Nord- och Latinamerika	Americas
+Nord-Syd-relationer	North-South relationship
+Nordamerika	North America
+Nordatlanten ; Norra Atlanten	North Atlantic Ocean
+Nordirland	Northern Ireland
+Nordkorea	North Korea ; Democratic People's Republic of Korea
+Norge	Norway ; Kingdom of Norway
+Nuuk	Nuuk
+Nya Kaledonien	New Caledonia
+Nya Zeeland	New Zealand
+Oceanien	Oceania
+Oman	Oman ; Sultanate of Oman
+Orléans	Orleans
+Oslo	Oslo
+Oxen	Taurus
+PR; public relations ; PR ; public relations	public relations
+Pakistan	Pakistan ; Islamic Republic of Pakistan
+Palau	Palau
+Panama	Panama
+Papua Nya Guinea	Papua New Guinea
+Paradisfågeln	Apus
+Paraguay	Paraguay
+Paris	Paris
+Peking	Beijing
+Peru	Peru ; Republic of Peru
+Philadelphia	Philadelphia
+Pinnipedia (sälar och valrossar)	pinniped
+Polen	Poland
+Porifera (svampdjur) ; svampdjur	poriferan
+Portugal	Portugal
+Posidonia oceanica (Poseidons skägg)	posidonia ; neptunegrass
+Procaryotæ (prokaryota organismer) ; prokaryot	procaryote
+Puerto Rico	Puerto Rico
+Pyrenéerna	Pyrenees
+Qatar	Qatar
+Republiken Kongo ; Kongo-Brazzaville	Republic of the Congo ; Congo-Brazzaville
+Rhône	Rhône
+Rom	Rome
+Rumänien	Romania
+Ryssland ; Ryska federationen	Russia ; Russian Federation
+Sachalin	Sakhalin ; Saghalien
+Sachsen	Saxony
+Saint-Pierre och Miquelon	Saint-Pierre and Miquelon
+Salomonöarna	Solomon Islands
+Samoa	Samoa
+San Marino	San Marino
+Sankt Petersburg	Leningrad ; Petrograd ; Saint Petersburg ; St. Petersburg
+Sapir–Whorf-hypotesen	Sapir–Whorf hypothesis
+Saturnus	Saturn
+Saudiarabien	Saudi Arabia ; Kingdom of Saudi Arabia
+Schweiz	Switzerland
+Seine	Seine
+Senegal	Senegal
+Serbien	Serbia
+Serbien och Montenegro	Serbia and Montenegro
+Seychellerna	Seychelles ; Republic of Seychelles
+Sierra Leone	Sierra Leone
+Singapore	Singapore
+Skottland	Scotland
+Skytten	Sagittarius
+Slovakien	Slovakia
+Slovenien	Slovenia
+Solkungen	Sun King
+Sotji	Sochi
+Spanien	Spain
+Sri Lanka	Sri Lanka
+Stenbocken	Capricorn
+Stilla havet	Pacific Ocean
+Stora hunden	Canis Major
+Storbritannien	Great Britain ; Britain
+Storbritannien, ; Storbritannien ; Förenade konungariket Storbritannien och Nordirland	United Kingdom ; United Kingdom of Great Britain and Northern Ireland ; UK
+Sudan	Sudan
+Surinam	Suriname
+Svarta Havet	Black Sea
+Sverige	Sweden
+Sydafrika	South Africa
+Sydamerika	South America
+Sydasien	Southern Asia ; South Asia
+Sydkorea	South Korea ; Republic of Korea
+Sydöstasien	Southeast Asia
+Syrien	Syria ; Syrian Arab Republic
+TV-program	television programme
+Tadzjikistan	Tajikistan
+Taiwan	Taiwan
+Tanzania	Tanzania
+Tchad	Chad ; Republic of Chad
+Teheran	Tehran
+Tennessee	Tennessee
+Thailand	Thailand
+Thüringen	Thuringia
+Tjeckien ; Tjeckiska republiken	Czech Republic ; Czechia
+Togo	Togo
+Tokyo	Tokyo
+Tonga	Tonga
+Toronto	Toronto
+Trettondedag jul	Epiphany
+Tunisien	Tunisia
+Turkiet	Turkey
+Turkmenistan	Turkmenistan
+Tvillingarna	Gemini
+Tyska demokratiska republiken	GDR ; German Democratic Republic
+Tyskland	Germany ; Federal Republic of Germany
+USA ; Amerikas förenta stater ; Förenta staterna	United States ; United States of America ; America ; US ; U.S. ; U.S.A. ; U.S. of A. ; States
+Uganda	Uganda ; Republic of Uganda
+Ukraina	Ukraine
+Ungern	Hungary ; Republic of Hungary
+Uranus	Uranus
+Utah	Utah
+Vaduz	Vaduz
+Vatikanstaten	Vatican City ; The Holy See ; State of the Vatican City
+Vattumannen	Aquarius
+Venedig	Venice
+Venezuela	Venezuela
+Venus	Venus
+Vintergatan	Milky Way ; Galaxy
+Vitryssland	Belarus ; Republic of Belarus
+Volga	Volga
+Väduren	Aries
+Wales	Wales
+Wallis- och Futunaöarna	Wallis and Futuna ; Territory of the Wallis and Futuna Islands
+Wien	Vienna
+Wikipedia	Wikipedia
+Wiktionary	Wiktionary
+Wyoming	Wyoming
+Yemen	Yemen ; Republic of Yemen
+Zambia	Zambia ; Republic of Zambia
+Zanzibar	Zanzibar
+Zimbabwe	Zimbabwe ; Republic of Zimbabwe
+abakus ; kulram	abacus
+abchaziska	Abkhaz ; Abkhazian ; Abkhazian
+abiotisk faktor	abiotic factor
+abiotisk miljö ; abiotisk omgivning	abiotic environment
+abolitionist	abolitionist
+absolut	absolutely
+absorption ; upptagning	absorption
+absorption av miljöföroreningar	pollutant absorption
+acceleration	acceleration
+acceptabel risknivå	acceptable risk level
+acceptabelt dagligt intag ; ADI-värde	acceptable daily intake
+aciditet	acidity
+ackumulator	accumulator
+ackumulering av miljöföroreningar	pollutant accumulation
+actinid	actinide
+actinium	actinium
+addera ; summera	add
+addition	addition
+addition ; tillökning	chemical addition
+adjektiv	adjective ; describing word
+administration ; administration, förvaltning ; förvaltning	administration ; direction ; management
+administrativ behörighet	administrative competence ; administrative ability
+administrativ gräns	administrative boundary
+administrativ handling ; administrativt dokument	administrative deed
+administrativ instruktion	administrative instructions
+administrativ organisation	administrative organisation
+administrativ påföljd	administrative sanction
+administrativt förfarande	administrative procedure
+administrativt godkännande	administrative fiat
+administrativt yrke	administrative occupation
+adoption	adoption
+adsorption	adsorption
+adverb	adverb
+aerob process	aerobic treatment
+aerobiologi	aerobiology
+aerobisk process	aerobic process
+aerodynamiskt brus	aerodynamic noise
+aerosol	aerosol
+afar	Afar ; Afar
+affär ; butik	shop
+affärspolitk	business policy
+affärstransaktion ; handelstransaktion	commercial transaction
+affärsverksamhet	business
+affärsverksamhet	business activity
+aforism	aphorism
+afrikaans	Afrikaans
+aggressiv	aggressive
+agorafobi	agoraphobia ; agoraphobia ; agoraphobia ; agoraphobia
+agrart system	agrosystem
+agroindustri	agroindustry
+agrokemisk	agrochemical
+agronomi; jordbrukslära ; agronomi ; jordbrukslära	agronomy
+agronomiskt värde	agronomic value
+aids	AIDS
+akt	chart
+akt ; gärning ; gärning ; dåd	act ; deed
+aktionsgrupp	action group ; action committee
+aktiv befolkning	active population
+aktivist	activist
+aktivt deltagande	active participation
+aktivt kol	activated carbon
+aktivt slam	activated sludge
+akustik	acoustics
+akustisk kvalitet	acoustical quality
+akustisk nivå	acoustic level ; sound pressure level
+akustiska egenskaper	acoustic property
+akustiskt välbehag	acoustic comfort
+akvamarin	aquamarine
+akvarium	aquarium
+akvatiskt ekosystem	aquatic ecosystem
+akvedukt; vattenledning ; akvedukt ; vattenledning	aqueduct
+akvifer	aquifer
+alarm; larm ; alarm ; larm	alarm ; alert ; warning
+albinism	albinism
+alfabet	alphabet
+alfastrålning	alpha radiation
+algblomning	algal bloom
+algebra	algebra
+alger ; alg	alga
+algicid	algicide ; algaecide
+alibi	alibi
+alicykliskt kolväte	alicyclic hydrocarbon
+alifat ; alifatiskt kolväte	aliphatic hydrocarbon
+alifatisk förening	aliphatic compound
+alkalimetaller ; grundämnen i grupp 1	alkaline ; element of group I ; alkaline metal ; alkali metal
+alkalinitet	basicity
+alkaliskt batteri	alkaline battery
+alkan	alkane ; paraffin ; methane series ; alkane series
+alkemi	alchemy
+alkemist	alchemist
+alkohol	alcohol
+alkoholbränsle	fuel alcohol
+alkoholism	alcoholism
+alkoholist ; fyllo ; suput	drunk ; drunkard ; boozer
+alkylföreningar	alkyl compound
+allergen	allergen
+allergi	allergy
+allmän förvaltningsordning	general administrative order
+allmän kemi	general chemistry
+allmän opinion ; folkopinion	public opinion
+allmän tillgång till mark	public access to land
+allmän utbildning	general education
+allmänna kommunikationer ; kollektivtrafik	public transport
+allmännytta	public utility
+allotropi	allotropy
+alltid ; när som helst	anytime
+alluvial slätt	alluvial plain
+almanacka	almanac
+alternativ teknik	alternative technology
+alternativt material	alternative material
+aluminium	aluminium
+aluminiumförpackning	aluminium container
+aluminiumhalt	aluminium content
+alveol ; alveol; lungblåsa; tandhåla; cell; bicell ; cell ; lungblåsa ; tandhåla ; bicell	air sac ; alveolus
+amalgam	amalgam
+ambassad	embassy ; diplomatic mission
+ambassadör	ambassador
+ambitiös	ambitious
+ambulans	ambulance
+americium	americium
+amerikansk fotboll	American football ; American football
+ametist	amethyst
+amfetamin	amphetamine
+amfibier ; amfibie	amphibian
+amfiteater	amphitheatre
+amin	amine
+aminosyra	amino acid
+ammoniak	ammonia
+ammonisering	ammonification
+ammonium	ammonium
+amplitud	aAmplitude ; amplitude
+anaerobisk behandling	anaerobic treatment
+anagram	anagram
+anakonda	anaconda
+analfabet	illiterate
+analog	analogous
+analogi	analogy
+analys	analysis
+analys av ekosystem	ecosystem analysis
+analysprogram	analysis programme
+analytisk kemi	analytical chemistry
+analytisk metod; analysmetod ; analytisk metod ; analysmetod	analytical method
+analytisk utrustning	analytical equipment
+anarki	anarchy
+anarkism	anarchism
+anatomi	anatomy
+and ; anka	duck
+andfåglar ; egentliga andfåglar	swans, geese and ducks
+andning ; respiration	respiration
+andningsluft	respiratory air
+andningssjukdom	respiratory disease
+andningssystem	respiratory system
+angiospermer ; blomväxter	angiosperm ; flowering plant
+angrepp på föda	infestation of food
+angrepp på gröda	infestation of crops
+angreppssätt	approach
+angripare	aggressor ; assailant ; attacker ; assaulter
+animalieproduktion	animal production
+animalisk produkt	animal product
+animaliska födoämnen	animal nutrition
+animaliska resurser	animal resource
+animaliskt avfall	animal waste
+anime	anime
+anjon	anion
+ankare	anchor
+anklagad	defendant ; accused
+ankomst	arrival
+anlays av naturliga faror	natural risk analysis
+anläggning som innebär stor fara	major risk installation
+anläggning som kräver godkännande	installation requiring approval
+anläggningsoptimering	installation optimisation
+anläggningsutrustning	plant equipment
+anmarkning	observation
+anpassa	arrange ; adapt ; adjust ; conform ; accommodate ; suit
+anpassningsperiod	adaptation period
+anrikat uran	enriched uranium
+anrikning	concentration
+anrikning	enrichment
+ansikte	face
+ansträngning	effort ; exertion
+anställning ; sysselsättning	employment
+ansvar	liability
+ansvarighet för miljöföroreningar	pollution liability
+antagande	assumption ; supposition
+antagonism	antagonism
+antenn	aerial
+antibiotika ; antibiotikum	antibiotic
+antikropp	antibody
+antilop	antelope
+antimon	antimony
+antipartikel	antiparticle
+antites	antithesis
+antonym ; motsatsord	antonym
+antropolog	anthropologist
+antropologi	anthropology
+antropologiskt reservat	anthropologic reserve
+användare	user
+användbar	useful
+användning av jorden	land occupation
+användning av kärnenergi	nuclear energy use
+användningsklassificering av mark	land use classification
+apartheid	apartheid
+apati	apathy
+apegado ; fäst vid	attached
+apelsin	orange
+apoptos	apoptosis
+apostel	apostle
+apotek	chemist's ; chemist's shop ; pharmacy
+apotekare	chemist ; pharmacist
+aprikos	apricot
+april	April
+arabiska	Arabic ; Standard Arabic
+aragonska	Aragonese ; Aragonese
+arbetarskydd	industrial safety
+arbetarskydd; säkerhet mot arbetsskador; arbetssäkerhet; arbetsmiljö	occupational safety
+arbete	labour
+arbetsbetingad sjukdom; arbetssjukdom; yrkessjukdom ; arbetssjukdom ; yrkessjukdom	occupational disease
+arbetskraft	labour force
+arbetskraft	manpower
+arbetslöshet	unemployment
+arbetsmarknad	labour market
+arbetsmedicin	industrial medicine
+arbetsmedicin	occupational medicine
+arbetsolycka	work accident
+arbetsplats	workplace
+arbetsrelationer	labour relations
+arbetsrätt	labour law
+arboretum	arboretum
+argon	argon
+aristokrati	aristocracy
+aritmetik	arithmetic ; arithmetics
+arkeolog	archeologist ; archaeologist
+arkeologi	archaeology ; archeology ; archæology
+arkeologisk	archaeological
+arkeologiskt område	archaeological site
+arketyp	archetype
+arkitekt	architect
+arkitektur	architecture
+arkiv	archive
+arm	arm
+armbåge	elbow
+armeniska	Armenian
+armhåla	armpit
+aromatisk förening	aromatic compound
+aromatiskt kolväte	aromatic hydrocarbon
+aromatiskt ämne	aromatic substance
+arrende; utarrendering; leasning; uthyrande ; arrende ; utarrendering ; leasning ; uthyrande	lease
+arrondering; sammanläggning av jordbruksfastigheter	land consolidation
+arsenik	arsenic
+arter ; art	species
+artikel	article
+artrit	arthritis
+artropoder; leddjur ; artropoder ; leddjur	arthropod
+artskydd	protection of species
+artär	artery
+arvode; avgift; vederlag ; arvode ; avgift ; vederlag	fee
+arvsmassa	germ plasm
+arvsordning	devolution
+asbest	asbestos
+asbestcement	asbestos cement
+asbestos	asbestosis
+asfalt	asphalt
+aska	ash
+asket	ascetic
+askfat	ashtray
+askgrå	ashen
+aspirin	aspirin
+assamesiska	Assamese ; Assamese
+assimilation	assimilation
+assimilera	assimilate
+assistera	assist
+astat	astatine
+astenosfär	asthenosphere
+asterisk	asterisk
+asteroid	asteroid
+astma	asthma
+astrofysik	astrophysics
+astrolog	astrologer
+astrologi	astrology ; star divination
+astrometri	astrometry
+astronautik	astronautics
+astronom	astronomer
+astronomi	astronomy
+asturiska	Astur-Leonese ; Asturian ; Asturian-Leonese ; Astur
+asymmetrisk	asymmetric ; asymmetrical
+asymptot	asymptote
+ateist	atheist
+atlas	atlas
+atmosfär	atmosphere
+atmosfärens struktur	atmospheric structure
+atmosfärfysik	atmospheric physics
+atmosfärisk aerosol	atmospheric aerosol
+atmosfärisk cirkulation	atmospheric circulation
+atmosfärisk korrektion	atmospheric correction
+atmosfärisk process	atmospheric process
+atmosfärisk sammansättning	atmospheric composition
+atmosfäriskt beståndselement	atmospheric component
+atmosfäriskt ozon	atmospheric ozone
+atmosfäriskt stoftnedfall	atmospheric fallout
+atmosfärkemi	atmospheric chemistry
+atmosfärsvetenskaper	atmospheric science
+atoll	atoll
+atom	atom
+atommassa	atomic mass
+atrazin	atrazine
+attack	attack
+attrahera	attract
+attraktiv	atractive
+attribut	attribute
+audiovisuell presentation	audio-visual presentation
+audiovisuell utrustning	audiovisual equipment
+audiovisuella medier	audiovisual media
+augusti	August
+auktion	auction
+auktoritativ	authoritative
+auktoritär	authoritarian
+autoekologi	autoecology
+avbetsningsanläggning ; betsningsanläggning	pickling plant
+avdunstning	evaporation
+avel; uppfödning ; avel ; uppfödning	breeding
+avelsmetod	breeding technique
+avfackling	flaring
+avfall ; spill	waste
+avfallbaserat bränsle	refuse derived fuel
+avfallsuppröjning	pollution abatement waste
+avfettning	degreasing
+avfärgning; avsvärtning	de-inking
+avgas	exhaust gas
+avgift; debitera; uttaxera; uttaxering ; avgift ; debitera ; uttaxera ; uttaxering	levy
+avgiftning	detoxification
+avkastning	yield
+avklorering	dechlorination
+avlagring; sedimentation; sedimentering ; sedimentation	sedimentation (geology) ; sedimentation
+avloppssystem för regnvatten	rain water sewer system
+avloppsvatten ; spillvatten	waste water
+avlägsnande; rening; infångande ; rening ; avlägsnande ; infångande	removal
+avlägsning av miljöföroreningar	pollutant elimination
+avreglering	deregulation
+avrinningsmönster	discharge regime
+avrinningsområde	catchment area
+avrinningsområde	flood runoff
+avsaltning	desalination
+avsaltning av vatten	water desalination
+avsaltningsanläggning	desalination plant
+avsalugröda	cash crop
+avskräckande	deterrent
+avskräckande; avskräckning; avskräckningsmedel	deterrence
+avsky	abhor ; loathe ; detest
+avslipande	abrasive
+avspelning; återgivning; reproduktion; fortplantning; förökning ; fortplantning ; reproduktion	reproduction
+avsvavling	desulphurisation
+avsvavling av bränsle	desulphurisation of fuel
+avtal	agreement
+avtal ; kontrakt; avtal ; kontrakt	contract
+avvärja	avert
+axiom	axiom
+azerbajdzjanska ; azeri ; azeriska	Azerbaijani ; Azeri ; Azerbaijani Cluster
+babian	baboon
+bacon	bacon
+badminton	badminton
+badmästare	lifeguard
+badvatten	bathing water
+bagare	baker
+bageri	baker ; bakery
+bakgrundsljud	background noise
+bakgrundsnivå	background level
+bakgrundsstrålning	background radiation
+bakpulver	baking powder
+bakterie; mikrob ; bakterie ; mikrob	germ
+bakteriedödande medel	bactericide
+bakterier ; bakterium	bacterium
+bakterierening	biofiltration
+bakteriologi	bacteriology
+bakteriologisk förorening	bacteriological pollution
+bakåt	aback
+balans	balance
+balans mellan näringsämnen	nutrient balance
+ballad	ballad
+balsal	ballroom
+bana; kurs ; bana ; kurs	trajectory
+banan	banana
+bank	bank
+bankrutt	bankruptcy
+bankskydd; batteriskydd ; bankskydd ; batteriskydd	bank protection
+bankverksamhet	banking
+barium	barium
+barn	child
+barn ; barn ; spädbarn	infant
+barnafödsel ; förlossning	birth ; birth ; birth ; childbirth ; childbirth ; childbirth ; parturition
+barnbarn	grandchild
+barndödlighet	infant mortality
+barnläkare	paediatrician
+barometer	barometer
+baron	baron
+barriärrev	barrier reef
+barrskog	coniferous forest
+barrträd	coniferous tree
+barrträd ; barrväxt	conifer
+bas	base
+baseboll	baseball ; baseball game
+basket ; basketboll	basketball ; basketball game
+baskiska	Basque ; Basque
+bastardisering av fauna	bastardisation of fauna
+bastardisering av flora	bastardisation of flora
+batteri	battery
+bearbetad jordbruksprodukt	processed agricultural produce
+bearbetade livsmedel	processed foodstuff
+bearbetning	processing
+bearbetningsteknik	process technology
+bearbetningsteknik för digitala bilder	digital image processing technique
+bedrägeri	fraud
+bedömning av miljöföroreningar	pollutant assessment
+bedömning av naturarv	natural heritage assessment
+bedömning av risker för miljön	environmental risk assessment
+bedömning av skada	damage assessment
+befolkning	human population
+befolkningens sammansättning	composition of population
+befolkningsstruktur	population structure
+befolkningstäthet; folktäthet	population density
+befolkningsutveckling ; befolkningsutveckling; demografisk utveckling ; demografisk utveckling	population trend
+befruktning	fertilisation ; fecundation
+begrava ; gravskick	funeral
+begäran	petition
+behandling av  avloppsvatten på stället	on-site wastewater treatment
+behandling av avloppsvatten	lagooning
+behandling av dricksvatten	drinking water treatment
+behov	need
+behov ; efterfrågan, krav, behov ; efterfrågan ; krav	demand
+behållare ; container	container
+bekvämlightesflagg	flag of convenience
+bekämpande av oljeföroreningar	oil pollution abatement
+bekämpning av skadedjur	pest control
+bekämpning av torka	drought control
+belastbarhet	load bearing capacity
+belastning genom tungmetaller	heavy metal load
+belysning	lighting
+beläggning	coating
+ben	leg
+bengali	Bengali ; Bengali
+bensen	benzene
+bensin	petrol
+bensin-alkoholmotorbränsle; gasohol ; gasohol	gasohol
+bensinmotor	gasoline engine
+bensinstation	filling station
+bensopyren	benzopyrene
+bentisk region; bentisk zon	benthic division
+bentos; bottenfauna ; bentos ; bottenfauna	benthos
+beredskapsplan; åtgärdsplan	emergency plan
+berg	mountain
+berg ; höjd ; kulle	colina ; hill ; loma
+berg ; sten ; sten; berg	rock
+bergskedja	mountain range
+bergsklimat	mountain climate
+bergsort	mountain resort
+bergsskog	mountain forest
+bergstrakt	mountainous area
+berkelium	berkelium
+beryllium	beryllium ; glucinium
+beräkning	calculation
+beräkningsmetod	calculation method
+besiktning; inspektion; kontroll ; inspektion ; besiktning ; kontroll	inspection
+besittande	possession
+beskärning; glesning	pruning
+beslut	decision
+beslutsfrämjande	decision making support
+beslutsfrämjande system	decision-support system
+beslutsprocess	decision process
+bestigning	ascent
+bestrålning	irradiation
+bestrålning av livsmedel	food irradiation
+bestämmelsemetod	determination method
+beständig organisk förorening	persistant organic pollutant
+beständighet	persistence
+bestånd	population
+beståndsdel i landskap	landscape component
+betalningspolitik	pay policy
+betande; betning; bete; betesmark ; betesmark ; betande ; betning ; bete	grazing
+betastrålning	beta radiation
+beteende hos djur	animal behaviour
+beteende; uppförande ; beteende ; uppförande	behaviour
+beteendeforskning	behavioural science
+beteendemönster	behaviour pattern
+betesmark	pasture
+betong	concrete
+betongindustri	concrete products industry
+betraktande	consideration
+bevakat jaktområde	controlled hunting zone
+bevarande av  bevis	preservation of evidence
+bevattning	irrigation
+bevattningsjordbruk; konstbevattnad odling	irrigation farming
+bevattningssystem	irrigation system
+bevisbarhet	demonstrability
+beväxning	fouling growth
+bi ; bin	bee
+bibliografi	bibliography
+bibliografisk information	bibliographic information
+bibliografiskt informationssystem	bibliographic information system
+bibliotek	library
+bibliotekarie	librarian
+bibliotekstjänst	library service
+bidrag; subvention ; bidrag ; subvention	subsidy
+bieffekt; biverkan; sidoeffekt ; biverkning ; biverkan	side effect
+bifångst	by-catch
+bikupa	beehive
+bil	car ; automobile
+bilateral	bilateral
+bilateral konvention	bilateral convention
+bilavgaser	motor vehicle exhaust gas
+bildfiltrering	image filtering
+bildförbättring	image enhancement
+bildklassifiering	image classification
+bildning av miljöföroreningar	pollutant formation
+bildregistrering	image registration
+bildäck	car tyre
+bilindustri	motor vehicle industry
+bilindustrin	automobile industry
+bilparkering ; parkeringsplats	car park
+bindemedel	adhesive
+bioackumulation	bioaccumulation
+bioackumulativ förorening	bioaccumulative pollutant
+biobränsle	biofuel
+biocenos	biocoenosis
+biocid	biocide
+biodlare	beekeeper ; apiculturist
+biodling	apiculture ; beekeeping
+bioetik	bioethics
+biofysik	biophysics
+biogas	biogas
+biogeografi	biogeography
+biogeografiskt område	biogeographical region
+biogeokemiskt kretslopp	biogeochemical cycle
+biokemi	biochemistry
+biokemisk metod	biochemical method
+biokemisk syreförbrukning	biochemical oxygen demand
+biokemiska processer	biochemical process
+biokemiska ämnen	biochemical substance
+bioklimatologi	bioclimatology
+biokoncentrationsfaktor	bioconcentration factor
+biologi	biology ; biological science
+biologisk analys	biological analysis
+biologisk avloppsvattenrening	biological wastewater treatment
+biologisk balans i vatten	biological water balance
+biologisk bekämpning (av skadedjur)	biological pest control
+biologisk bädd	bacterial bed
+biologisk egenskap	biological attribute
+biologisk förorening	biological contamination
+biologisk förorening	biological pollutant
+biologisk förorening	biological pollution
+biologisk indikator	biological indicator
+biologisk indikator	biomarker
+biologisk kontroll	biological monitoring
+biologisk mångfald; biologisk diversitet; biodiversitet ; biologisk mångfald ; biologisk diversitet ; biodiversitet	biodiversity
+biologisk nedbrytning	biodegradation
+biologisk nedbrytning ; nedbrytbarhet ; nedbrytbarhet; biologisk nedbrytning; biologisk nedbrytbarhet ; biologisk nedbrytbarhet	biodegradability
+biologisk produktion	biological production
+biologisk rening	biological treatment
+biologisk rening av avfall	biological waste treatment
+biologisk rening av förbränningsgas	biological waste gas purification
+biologisk säkerhet	biosafety
+biologisk test	biological test
+biologisk utveckling	biological development
+biologisk verkan	biological effect
+biologiska processer ; biologisk process	biological process
+biologiska resurser ; biologisk resurs	biological resource
+biologiska vapen	biological weapon
+biologiskt arv	biological heritage
+biologiskt icke-nedbrytbar förorening	non-biodegradable pollutant
+biologiskt kretslopp	biological cycle
+biologiskt nedbrytbar förorening	biodegradable pollutant
+biologiskt reservat	biological reserve ; wildlife reserve
+biologiskt skogreservat	forest biological reserve
+bioluminescens	bioluminescence
+biom	biome
+biomassa	biomass
+bioreaktor	bioreactor
+biorytm	biorhythm
+biosfär	biosphere
+biosfär-reservat	biosphere reserve
+biosyntes	biosynthesis
+bioteknik	biological engineering
+bioteknik	biotechnology
+bioteknisk fara	biotechnological hazard
+biotillgänglighet	bio-availability
+biotisk (miljö)faktor	biotic factor
+biotiskt index	biotic index
+biotop	biotope
+biotopföreskrifter; biotopordning	biotope order
+biotopförlust	loss of biotope
+biotopnät	biotope network
+biovetenskaper ; livsvetenskaper	life science
+biprodukt	by-product
+biskop	bishop
+biskydd	bee conservation
+biståndspolitik	aid policy
+biståndssamarbete; utvecklingssamarbete ; utvecklingssamarbete ; biståndssamarbete	development co-operation
+bitumen	bitumen
+björn	bear
+björnar	ursid
+blad ; löv	leaf
+blad ; sida	page
+bladförlust; barrförlust; avlövning	defoliation
+bladverk; barrskrud ; bladverk ; barrskrud ; barrskrud ; lövverk	foliage
+blandad	assorted
+blandande; blandning ; blandning ; blandande	mixing
+blandbarhet	miscibility
+blandjordbruk	mixed farming
+blandskog	mixed forest
+blekjord	bleaching clay
+blekmedel	bleaching agent
+blekningsprocess	bleaching process
+blind ; synskadad	blind
+blockflöjt	recorder
+blod	blood
+blodplasma	blood plasma
+blogu	blog ; weblog ; web log
+blomkål	cauliflower
+blomlöksodling	bulb cultivation
+blomma	flower ; bloom ; blossom
+blomväxter	flowering plant
+bly	lead
+blyertspenna	pencil
+blyförening	lead compound
+blyhalt i blod	lead level in blood
+bläck	ink
+bläckfisk ; bläckfisk ; åttaarmad bläckfisk	octopus
+blända	dazzle
+blå	blue
+blåbär	huckleberry ; blueberry
+blågrönalger	blue-green alga ; cyanobacteria
+blåsa	blister
+blöja	nappy
+blötning; blötläggning; doppning ; blötning ; blötläggning ; doppning	soaking
+bobyggnad	nesting
+bobyggnadsområde	nesting area
+bohrium	bohrium
+bok	book
+bokföring	accountancy
+bokföring	accounting
+bokföring	bookkeeping
+bokföringssystem	accounting system
+bokmål	Bokmål
+bokstav	letter
+bomull	cotton
+bondgård; gård	farm building
+bonsai	bonsai
+bor	boron
+bord	table
+bordssalt ; koksalt ; salt	salt
+borg ; fästning ; slott	castle
+borgmästare	mayor
+borranordning	drilling installation
+borrning	drilling
+bortskaffande av de döda	disposal of the dead
+bortskaffande av krigsmaterial	disposal of warfare materials
+boskapsavel	livestock breeding
+bosniska	Bosnian ; Bosnian
+bostad	dwelling
+bostadsbestånd	housing density
+bostadsförbättring; förbättring av bostadsförhållanden	housing improvement
+bostadshus	residential building
+bostadslag	housing legislation
+bostadsområde	residential area
+bostadsområde med minskad trafik	residential area with traffic calmings
+bostäder	housing
+bosättning	human settlement
+botanik	botany ; phytology
+botanik	botany
+botanisk trädgård	botanical garden
+botaniskt reservat	botanical conservatory
+brand ; eld	fire
+brandfarligt ämne	inflammable substance
+brandförebyggande	fire precaution
+brandkår	fire service
+brandman ; brandsoldat	firefighter ; fireman ; firewoman ; fire fighter ; fire-eater
+brandskydd	fire protection
+brandskyddskrav	fire safety requirement
+bredbent	astride
+breddgrad ; latitud	latitude
+bretonska	Breton ; Breton
+brevbärare	postman
+bro	bridge
+broccoli	broccoli
+brom	bromine
+bromatologi	food science
+brott	crime
+brott ; brott; överträdelse; infraktion ; överträdelse ; infraktion	infraction
+brottslighet	criminality
+brunn	well
+brunn	water well
+bruttonationalinkomst ; bruttonationalprodukt	GDP ; gross domestic product
+bruttonationalinkomst; bruttonationalprodukt	gross national product
+brytning av sten	quarrying
+brytning utanför kusten	offshore mining
+brytnings-och utvinningsindustri	extractive industry
+brytningsförordning	mining regulation
+brytningsindustri	mining industry
+brytningslag	mining law
+brytningsprodukt	mining product
+bräckt vatten	brackish water
+bräddavlopp	overflow (outlet)
+brännbar, lättantändlig produkt	flammable product
+brännbarhet	combustibility
+brännolja; eldningsolja ; eldningsolja ; brännolja	fuel oil
+bränsle	fuel
+bränslecell	fuel cell
+bränsleförbrukning	fuel consumption
+bränslesammansättning	fuel composition
+bränsletankinstallation	fuel tank installation
+bröd	bread
+bröstmjölk	breast milk
+bubbel-policy (utsläppshandel) ; bubbel-policy	bubble policy (emissions trading) ; bubble policy
+budget	budget
+budgetpolicy	budget policy
+bukspottkörtel	pancreas
+bulgar	Bulgarian
+bulgariska	Bulgarian ; Bulgarian
+buller	noise pollutant
+buller	noise pollution
+buller ; buller; brus; ljud ; oväsen ; brus	noise
+buller ; oväsen ; brus	noise ; noise, vibrations ; racket
+buller från hushållen	domestic noise
+buller från kommersiell verksamhet	commercial noise
+buller från omgivningen	environmental noise
+buller orsakat av djur	animal noise
+bulleranalys	noise analysis
+bullerbekämpning	noise control
+bullerbekämpning; bullerbegränsning	noise abatement
+bulleremission	noise emission
+bulleremissionsavgift	noise emission levy
+bullerlagstiftning	noise legislation
+bullernivå	noise level
+bullerreduktion	noise reduction
+bullerskala	noise spectrum
+bullerskärm; ljudskärm	noise barrier
+bullerstörning	noise immission
+bullerstörning	noise disturbance ; noise pollution
+burmanska ; burmesiska	Burmese
+buske	shrub
+buskröjning	bush clearing
+buss	bus ; coach
+busstation	bus station
+by	village
+bygdeturism	agritourism
+byggavfall	building waste
+byggd struktur	built structure
+bygge med återvunna material	construction with recycled material
+byggelement	building component
+byggmark	building land
+byggnad	building
+byggnad annan än bostadshus	non-residential building
+byggnadsarbete	construction work
+byggnadsbuller	construction noise
+byggnadsindustri	building industry
+byggnadslag	building regulation
+byggnadslov; byggnadstillstånd	building permit
+byggnadsmaterial	building material
+byggnadsmaterialsindustri	building materials industry
+byggnadsplan	building planning
+byggnadspolitik	construction policy
+byggnadsrenovering	building restoration
+byggnadsrivning; husrivning	building destruction
+byggnadsteknik	building technology
+byggnadsteknik	construction technology
+byggnadstillstånd	planning permission
+byggnadstjänst	building service
+byggnadsutrustning	construction equipment
+byggområde	building area
+byråkrati	bureaucracy
+byråkratisering	bureaucratisation
+byxor	trousers
+bäck	brook
+bädd ; säng	bed
+bärnsten	amber
+bättre	better
+bäver	beaver
+båge ; pilbåge	bow
+bågskytt	archer ; archer
+båt	boat
+båt ; hantverk ; hantverk; båt	craft ; arts and crafts
+bödel	executioner
+böna	bean ; edible bean
+böter; vite ; vite ; böter	fine
+californium	californium
+camping	camping ; camping ground
+camping ; campingplats	camping site
+cancer ; kräfta	cancer
+cancerframkallande	carcinogenicity
+cancerogen ; cancerframkallande ämne	carcinogen
+cancerrisk	cancer risk
+cd-rom	CD-ROM
+cd-romsöktjänst	CD-ROM search service
+cefalopoder; huvudfotingar ; cefalopoder ; huvudfotingar	cephalopod
+cell	cell ; electrochemical cell ; energy cell ; Galvanic cell ; στοιχείο
+cell ; cell	cell ; cell
+celldelning	mitosis
+cellulosa	cellulose
+cellulosaindustri	cellulose industry
+cement	cement
+cementindustri	cement industry
+cementtillverkning	cement manufacture
+central regering	central government
+centralisering	centralisation
+centralt parkområde	central park area
+centrifugering	centrifugation
+centrum för fjärranalys	remote sensing centre
+centrum för kärnforskning	nuclear research centre
+cerium	cerium
+cesium	caesium
+champagne	champagne
+chanh ; citron	lemon
+chanukka	Hannukah
+checheno	Chechen ; Chechen
+chihuahua	Chihuahua ; chihuahua
+choklad	chocolate
+cigarett	cigarette
+cigarr	cigar
+cirkulation (vår- och höst-) (limnologi) ; cirkulation	overturn (limnology)
+civil flygtrafik	civil air traffic
+civil säkerhet	civil safety
+civilrätt	civil law
+civilskydd	civilian protection
+civilstånd; det äktenskapliga ståndet	marital status
+curium	curium
+cyanat	cyanate
+cyanid	cyanide
+cykel	bicycle ; bike ; cycle
+cykelbana	cycle path
+cyklon; virvelvind ; cyklon ; virvelvind	cyclone
+cytologi ; cellära	cytology
+cytotoxisk verkan	cytotoxicity
+dag	day ; daytime
+dagbok	diary
+dagbrytning	opencast mining ; open-pit mining
+daggmask	earthworm
+dagstidning	newspaper
+dal	valley
+damm	pond
+damm ; damm; fördämning ; fördämning	dam
+damm ; pöl; göl; damm; pool; bassäng ; pöl ; göl ; pool ; bassäng ; lammikko ; amme	pool ; puddle ; puddle
+damm ; stoft	dust
+dammdränering; dammtömning	dam draining
+dammhaltsprovare, -mätare	impactor
+dammsugare	vacuum cleaner
+dans	dance
+danska	Danish
+darmstadtium	darmstadtium
+data om miljösituationen	data on the state of the environment
+dataanalys	data analysis
+databas	database
+databehandling	data processing
+databehandling	information processing
+databehandlingssystem	data processing system
+databärare	data carrier
+datacentral	data centre
+datainsamling;datafångst	data acquisition
+datanät	information network
+dataskydd	data protection
+dataöverföring	information transfer
+datering	dating
+dator	computer
+debatt om kärnenergi	nuclear debate
+debitera	debit
+december	December
+decentralisering	decentralisation
+decibel	decibel
+deflation	deflation
+degasifiering av avfallsupplag	landfill degasification
+degliknande avfall	paste-like waste
+degradation; vittring ; vittring ; degradation	degradation
+dehydratiserat slam	dehydrated sludge
+deklaration	declaration ; statement
+deklaration om allmän nytta	declaration of public utility
+dekontaminering; sanering ; sanering ; dekontaminering	decontamination
+dekret; förordning ; förordning ; dekret	decree
+dekret; förordning ; förordning ; dekret	executive order
+delegerad ledning; delegerad styrning	delegated management
+delfin	dolphin
+delgivning	notification
+delstatslag	provincial/regional law (D) ; regional legislation
+delstatsmyndighet	provincial/regional authority (D) ; regional authority ; provincial authority
+delta	delta
+deltagande	participation
+demografi	demography
+demografisk förändring ; demografisk utveckling	demographic development
+demografisk förändring ; demografisk utveckling	demographic evolution
+demografisk förändring; befolkningstillväxt	population movement
+demokrati	democracy
+dendrokronologi	dendrochronology ; tree-ring dating
+dendrometri	dendrometry
+denguefeber ; dengue	dengue fever
+denitrifiering/denitrifikation av förbränningsgas	denitrification of waste gas
+denitrifiering;denitrifikation	denitrification
+deponering; uppläggning ; deponering ; uppläggning	landfill
+deponering;uppläggning	deposition
+deponigas	landfill gas
+dermatologi	dermatology
+desinfektion	disinfection
+desinfektionsmedel	disinfectant
+desorption	desorption
+destillering; destillation	distillation
+destinationstransport	destination of transport
+destruktion av slaktdjurskroppar	carcass disposal
+det att säden lägger sig; husrum; logi ; det att säden lägger sig ; husrum ; logi	lodging
+detektering	detection
+detektor	detector
+detergent ; tvättmedel	detergent
+deuterium	deuterium
+dialys	dialysis
+diarré	diarrhea
+didaktik	didactics
+dieselbränsle ; diesel	diesel fuel ; diesel
+dieselmotor	diesel engine
+differentiering	differentiation
+diffus föroreningskälla	diffuse source
+diffusa utsläpp; diffus förorening	diffuse pollution
+diffusion	diffusion
+digestion	digestion
+digital geologisk modell	digital land model
+digitalisering	digitising
+digitalt bildbehandlinssystem	image processing digital system
+dike	ditch
+dimma ; dis	fog
+dimma ; dis	mist
+dimma ; dis	haze
+dioxin	dioxin
+dipersion	dispersion
+direktansluten tjänst; direkttjänst	on-line service
+direktinduktor	direct discharger
+direktiv	directive
+direktiv om miljökonsekvensbeskrivning	EIA directive
+diskriminering	discrimination
+diskussionsgrupp	newsgroup
+disponibel	available
+distribution; utdelning ; distribution	distribution
+division	division
+djuphavsbrytning	deep sea mining
+djuphavsdeponi	deep-sea disposal
+djuphavsfiske ; storsjöfiske	deep sea fishing
+djur	animal
+djurarter	animal species
+djurarv	animal heritage
+djurbestånd	animal population
+djurbiologi	animal biology
+djurekologi	animal ecology
+djurens livsmiljö	animal habitat
+djurens reproduktion	animal reproduction
+djurexkrement	animal excrement
+djurfisiologi	animal physiology
+djurfoder	animal foodstuff
+djurförsök	animal experiment
+djurhandel	animal trade
+djurhållning	livestock farming
+djurkorridor	animal corridor
+djurmatning	feeding of animals
+djurrättigheter	animal rights
+djursjukdomar	animal disease
+djurskada	animal damage
+djurskydd	animal conservatory
+djurskydd	animal protection
+djurskydd	protection of animals
+djuruppfödning	animal husbandry
+djurvandring	animal migration
+djärv	audacious
+docka	doll
+doktrin	doctrine
+dokuemtationsstudie ; litteraturstudie	literature study
+dokument; handling ; dokument ; handling	document
+dokumentation	documentation
+dokumentationscentrum	documentation centre
+dokumentationsdatabas	literature data bank
+dokumentationssystem	documentary system
+dokumenttyp	document type
+dokumentutlåning	document lending
+dokumentärfilm	documentary film
+dom	judgement (sentence) ; sentence ; judgement
+domarbeslut	judiciary rule
+domesticerat djur	domesticated animal
+domrätt ; domvärjo ; jurisdiktion	jurisdiction
+domstol	court
+domstol	court of justice
+donation	donation
+dos	dose
+dosering	dosage
+dotterson ; sonson	grandson
+dra samman	assemble ; get together ; gather
+dragspel	accordion ; squeeze box ; piano accordion
+dricka	drink ; gulp ; quaff ; sip
+dricka ; dryck	beverage ; drink
+dricksvatten	drinking water
+dricksvattenförråd; dricksvattentillförsel; distribution av dricksvatten ; dricksvattenförråd ; dricksvattentillförsel ; distribution av dricksvatten	drinking water supply
+driftdata	operating data
+drivmedel; bränsle	propellant
+drivnätsfiske	drift net fishing
+dromedar	dromedary
+drottning	queen
+druva	grape
+dryckindustrin	beverage industry
+dränering; vattenavledning	drainage
+dräneringssystem	drainage system
+dräneringsvatten	drainage water
+drömma	dream
+dubbel avfallshantering	dual waste management
+dubbelekonomi	dual economy
+dubbelstjärna	binary star
+dubnium	dubnium
+dumpning	dumping
+dumpning i havet	ocean dumping
+duva	pigeon ; dove
+dyn	dune
+dyslexi	dyslexia
+dysprosium	dysprosium
+däggdjur	mammal
+dödlighet	mortality
+dödsstraff	death penalty ; capital punishment ; death sentence
+dörr	door
+döv	deaf
+e-post	electronic mail ; email ; e-mail
+edafologi	edaphology
+effekt	power (physics) ; power
+effektivitetskriterium	efficiency criterion
+effektivitetsnivå	efficiency level
+effektkällor	impact source
+effektreducering	impact minimisation
+effektupphävande	impact reversal
+efterbehandling	post-treatment
+efterförbränning	afterburning ; afterburning ; afterburner
+egennamn ; namn	name ; proper name ; proper noun
+egenskap	property ; asset
+einsteinium	einsteinium
+ej ; icke ; inte	not
+ejakulation	ejaculation
+ek	oak
+ekofisiologi	ecophysiology
+ekohus	green building
+ekollon	acorn
+ekologi	ecology
+ekologisk balans	ecological balance
+ekologisk belastningsförmåga	ecological carrying capacity
+ekologisk bokföring	ecological bookkeeping
+ekologisk divergens	ecological inequality
+ekologisk faktor	ecological factor
+ekologisk inventering	ecological stocktaking
+ekologisk katastrof ; miljökatastrof	ecocatastrophe
+ekologisk nisch	ecological niche
+ekologisk parameter	ecological parameter
+ekologisk rörelse	ecologist movement
+ekologisk utveckling	ecodevelopment
+ekologisk ymnighet	ecological abundance
+ekologiskt jordbruk; biodynamisk odling	organic farming
+ekologiskt känsligt område; miljökänsligt område	ecologically sensitive area
+ekologiskt samhälle	ecological community
+ekonomi	economic science ; economics
+ekonomi	economy
+ekonomi ; finanser	finances
+ekonomibyggnad	agricultural building
+ekonomisk analys	economic analysis
+ekonomisk dominans	economic concentration
+ekonomisk ersättning ; ekonomisk kompensation	financial compensation
+ekonomisk förvaltning	financial management
+ekonomisk geografi	economic geography
+ekonomisk konkurrens	economic competition
+ekonomisk lönsamhet	economic viability
+ekonomisk miljövärdering	environmental economic valuation
+ekonomisk och ekologisk effektivitet	economical-ecological efficiency
+ekonomisk plan	economic plan
+ekonomisk planering	economic planning
+ekonomisk politik	economic policy
+ekonomisk prognos	economic forecasting
+ekonomisk sektor	economic sector
+ekonomisk stimulans	economic incentive
+ekonomisk struktur	economic structure
+ekonomisk tendens	economic trend
+ekonomisk teori	economic theory
+ekonomisk tillväxt	economic growth
+ekonomisk utveckling	economic development
+ekonomisk verksamhet	economic activity
+ekonomiska data	economic data
+ekonomiska förvaltningredskap	economic management instrument
+ekonomiska rättigheter	economic rights
+ekonomiskt bistånd	financial assistance
+ekonomiskt läge	economic situation
+ekonomiskt område	economic region
+ekonomiskt redskap	economic instrument
+ekonomiskt stöd	economic support
+ekonomiskt stöd	financial aid
+ekonomiskt system	economic system
+ekopediatri (?)	eco-paediatrics
+ekosystem	ecosystem
+ekoturism; miljöanpassad turism ; ekoturism	ecotourism
+ekvation	equation
+ekvatorialt klimat	equatorial climate
+ekvivalent dos	equivalent dose
+elasticitet	elasticity
+eldning; tändning; bränsle ; bränning	firing
+eldningsbränsle	domestic fuel
+eldningsolja	domestic fuel oil
+elefant	elephant
+elefanter	proboscidean
+elektricitet; el; ström ; elektricitet	electricity
+elektricitetsverk; elverk	electricity company
+elektriska hushållsapparatsindustrin	electrical goods industry
+elektriskt batteri	electric battery
+elektriskt fordon	electric vehicle
+elektrokinetik	electrokinetics
+elektrolys	electrolysis
+elektromagnetism	electromagnetism
+elektron	electron
+elektronik	electronics
+elektronisk anslagstavla	BBS ; bulletin board system
+elektroniska avfallsprodukter	electronic scrap
+elektroniskt datanät	electronic information network
+elektroniskt material	electronic material
+elektrosmog	electrosmog
+elektroteknik	electrical engineering
+elektroteknisk industri	electrotechnical industry
+elektroteknisk utrustning	electrotechnical equipment
+elfenben	ivory
+elförbrukning	electricity consumption
+elförsörjning	electric power supply
+elhushållning	electricity supply industry
+elindustrin	electrical industry
+elkraft ; elektrisk effekt	electric power
+elkraftverk	electric power plant
+eller	or
+elproduktion	electricity generation
+emancipation	emancipation
+embryo	embryo
+embryogenes	embryogenesis
+emission av miljöföroreningar	pollutant emission
+emission; utsläpp ; emission ; utsläpp	emission
+emissionsdata	emission data
+emissionsfaktor	emission factor
+emissionskälla	emission source
+emissionsläge	emission situation
+emissionsprognos	emission forecast
+emulgering	emulsification
+emulsion	emulsion
+en stund	awhile
+encyklopedi	encyclopaedia
+endemiska arter; inhemska arter	endemic species
+endokrinologi	endocrinology
+endokrint system	endocrine system
+energi	energy
+energi från biomassa; grön energi	biomass energy
+energibalans	energy balance
+energibehov	energy demand
+energidistributionssystem	energy distribution system
+energieffektivitet	energy efficiency
+energiekonomi	energy economics
+energiförbrukning	energy consumption
+energiförbrukning	energy utilisation ; energy use
+energiförlust	energy dissipation
+energiförsörjning	energy supply
+energihushållning	energy management
+energiindustri	energy industry
+energikälla	energy source
+energikällmaterial	energy source material
+energilagar	energy legislation
+energilagring	energy storage
+energimarknad	energy market
+energins miljöpåverkningar	environmental impact of energy
+energiomvandling	energy conversion
+energipolitik	energy policy
+energiprocess	energy process
+energiproduktion	energy production
+energislag	energy type
+energisparande	energy saving
+energiteknik	energy technology
+energitillgångar	energy resource
+engelsk trädgård	English garden
+engelska	English
+engångsbehållare	non-returnable container
+enkel ; lätt	easy ; piece of cake ; like shooting fish in a barrel
+enregiresurser som inte kan förnyas	non-renewable energy resource
+enskild avloppsvattenrening	individual wastewater treatment
+enskilda ekonomiska företags mål	goal of individual economic business
+enterovirus	enterovirus
+entreprenör	entrepreneur
+envälde	autocracy
+enzym	enzyme
+epicentrum	epicentre
+epidemi	epidemic
+epidemiologi	epidemiology
+epigram	epigram
+epilepsi	epilepsy
+erbium	erbium
+ergonomi	ergonomics
+erosion	erosion
+erosionsövervakning	erosion control
+ersättning; tillgång till tvistlösning; tillgång till domstolsprövning	redress
+ersättningskostnad	replacement cost
+ersättningsämne för fosfat	phosphate substitute
+ersättningsåtgärd	compensatory measure
+esperanto	Esperanto ; Esperanto
+estetik	aesthetics
+estniska ; estniska	Estonian
+etanol	ethanol
+eter	ether
+etik	ethics
+etikettering	labelling
+etiketteringsplikt	obligation to label
+etnografia	ethnography
+etnologi	ethnology
+etologi	ethology
+etsande ämne	etching substance
+etsning	etching
+ett	one
+europeisk standard	European standard
+europeiskt naturreservat	European nature reserve
+europium	europium
+eutrofiering	eutrophication
+evapotranspiration	evapotranspiration
+exakt vetenskap	exact science
+exeptionell avgift	exceptional tax
+existerande kemikalier	existing chemical
+exotiska arter	exotic species
+experiment	experiment
+experiment ; mål ; prov ; prov; försök; experiment; mål; rättegång; process ; försök ; rättegång ; process	case ; lawsuit ; trial
+experimentell undersökning	experimental study
+expertsystem	expert system
+explicit	explicit
+explosion	explosion
+explosiv	explosive
+exponering	residual risk
+exponering; bestrålning	exposure
+exponeringsgräns	permissible exposure limit
+export	export
+export av farligt avfall	export of hazardous wastes
+exportlicens	export licence
+expropriation	expropriation
+extensiv boskapsuppfödning	extensive cattle farming
+externa ekonomiska förbindelser	foreign economic relations
+extra förpackning	additional packaging
+fackförening	trades union
+fader ; far ; pappa	father
+fagott	bassoon
+faktorsmarknad	factor market
+fallskärm	parachute
+familj	family
+familjeplanering	family planning
+familjerätt	family law
+fanerogamer ; fröväxt ; fanerogam	phanerogam ; spermatophyte
+fara	hazard
+fara för grundvatten	groundwater endangering
+fara för hälsan	health hazard
+fara för kärnolycka	nuclear hazard
+fara för miljö och hälsa	environmental health hazard
+fara för miljön	environmental hazard
+fara för sjöfart	navigational hazard
+farfar ; morfar	grandfather
+farlig facilitet	dangerous installation
+farligt gods	dangerous goods
+farligt område	hazard area
+farm ; gård ; lantbruk	farm
+farmaceutisk industri	pharmaceutical industry
+farmaceutiskt avfall	pharmaceutical waste
+farmakokinetik	pharmacokinetics
+farmakologi	pharmacology
+faroanalys	danger analysis
+fartyg ; skepp	ship
+fartyg för återhämtning av  spillolja	oil recovery vessel
+farvatten ; vatten ; vattenmassor	water ; body of water
+fasan	pheasant
+fascism	fascism
+fastighetsregister; fastighetsbok	land register
+fastighetsskatt; grundskatt	land tax
+fattigdom	poverty
+fauna; djurvärld ; fauna ; djurvärld	fauna
+februari	February
+federal lag	federal law
+fekala bakterier	faecal bacterium
+fel; brist; förkastning (geol.) ; förkastning	fault
+fem	five
+fenol	phenol
+ferie ; lov ; semester	holiday ; opor-garai
+fermium	fermium
+feromon	pheromone
+fiber	fibre
+fiende	enemy
+film	film
+filologi	philology
+filosofi	philosophy
+filter	filter
+filterkaka	filter cake
+filtrering	filtration
+finansiella bidrag	financial contribution
+finansiering	financing
+finansieringsorgan; finansiellt instrument	financial instrument
+finansmarknad; finansiell marknad	financial market
+findamm;respirabelt damm ; findamm ; respirabelt damm	fine dust
+finger	finger
+finmekanik	precision engineering
+finne ; finne ; akne	acne
+finska	Finnish
+firmor ; företag ; firma	firm ; corporation ; enterprise ; company ; venture
+fisk	fish
+fiskbestånd	fish stock
+fiskbestånd; fiskeresurser	fishery resource
+fiskdöd	fish kill
+fiske	fishing
+fiskebank; fångstplats; fiskevatten ; fiskebank ; fångstplats ; fiskevatten	fishing ground
+fiskebåt	fishing vessel
+fiskelag	fishing law
+fiskelicens; fiskekort	fishing licence
+fiskepolitik	fishery policy
+fiskereservat; fikskonserv ; fiskereservat	fishing preserve
+fiskeri	fishery
+fiskeriekonomi	fishery economics
+fiskerinäring	fishing industry
+fiskeristruktur	fisheries structure
+fiskets miljöpåverkningar	environmental impact of fishing
+fiskförgiftning	fish toxicity
+fiskodling	fish farming
+fisksjukdom	fish disease
+fjäder	feather
+fjäderfä	poultry
+fjäderfäavel	poultry farming
+fjäril	butterfly
+fjärilar	lepidopteran
+fjärranalys	remote sensing
+fjärrvärme	district heating
+fjärrvärmeanläggning	district heating plant
+flamländska	Flemish
+flamskyddsmedel	fireproofing agent
+flaskkapsyl	bottle cap
+flexibel inställning till miljö-	flexible approach to environmental protection
+flicka	girl
+flinta	flint ; flintstone
+flockning; flockulering; koagulation ; flockning ; flockulering	flocculation
+flod ; älv	river
+flodbädd	river bed
+flodmynning	estuary
+flodmynningsförorening	estuary pollution
+flodresurser ; flodresurs	fluvial resource
+flodvatten	river water
+flora	flora (biology) ; flora
+flora ; flora (dokument)	flora (document) ; flora
+flotation	flotation
+fluidik; flödesteknik ; flödesteknik ; fluidik	fluidics
+fluidiserad bädd	fluidised bed
+fluidisering	fluidisation
+fluor	fluorine
+fluoridering	fluoridation
+flushing; spolning ; flushing ; spolning	flushing
+flyg på låg höjd	low-level flight
+flygaska	fly ash
+flygfoto; flygbild ; flygfoto ; flygbild	aerial photograph
+flygfotografering	aerial photography
+flyglag	aviation law
+flygplan	aircraft
+flygplan	aeroplane ; bird ; plane
+flygplansbuller	aircraft noise
+flygplats	airport
+flygpost	airmail
+flygsäkerhet	air safety
+flygtrafik	air traffic
+flygtrafiksrätt	air traffic law
+flyktighet	volatility
+flyktigt ämne	volatile substance
+flykting	refugee
+flytande avfall	liquid waste
+flytande tillstånd	liquid state
+flytgödsel	liquid manure
+flyttfågel	migratory bird
+flädrar	elder ; elderberry
+flöde	low flow
+flöde	flow
+flöde ; översvämning ; översvämning; flöde	flood
+flödesreglering	flood control
+flöjt	flute
+fobi ; skräck ; skräck	phobia
+foder	fodder ; provender ; forage
+foderlag	forage law
+fodermaterial	liner material
+foderväxt	fodder plant
+foderväxt	forage crop
+folk	people
+folkhälsa	public health
+folklig tradition	folk tradition
+folklore	folklore
+folkmord	genocide
+folkomröstning	referendum ; plebiscite
+folkräkning	census survey
+folkvandring	human migration
+fond; kapital ; kapital ; fond	financial fund
+fontän	fountain
+fordon	vehicle
+fordon för kollektivtransport	public transport vehicle
+forell	trout
+forskning	research
+forskning av verkan	research of the effects
+forskning avseende ekosystem	ecosystem research
+forskningscentrum	research centre
+forskningspolitik	research policy
+forskningsprojekt	research project
+fortbildning	continuing education
+fortplantningsprocess; spridningsprocess	propagation process
+fosfat	phosphate
+fosfatbortförsel	phosphate removal
+fosfor	phosphorus
+fosforgödselmedel	phosphatic fertiliser
+fossil	fossil
+fossilt bränsle	fossil fuel
+fot	foot
+fotboll	football
+foto ; fotografi ; kort	photo ; photograph
+fotogen; flygfotogen ; fotogen	kerosene
+fotografi	photography
+fotogrammetri	photogrammetry
+fotokemisk förorenig	photochemical pollution
+fotokemisk oxidation	photochemical oxidant
+fotokemisk produkt	photochemical product
+fotokemisk reaktion	photochemical reaction
+fotokemisk smog	photochemical smog
+fotokemiskt medel	photochemical agent
+foton	photon
+fotonedbrytning	photodegradation
+fotosyntes	photosynthesis
+fraktur	fracture
+framdrivningsteknik	propulsion technique
+francium	francium
+franska	French ; French
+fransman	Frenchman
+fred	peace
+fredag	Friday
+fredsbevarande	peacekeeping
+frekvensfilter	acoustic filter ; audio filter
+freon	freon
+fri rörlighet för kapital; fri kapitalrörelse	free movement of capital
+frihandel	free trade
+frihet	freedom ; liberty
+frihet	freedom
+frisiska	Frisian ; Western Frisian
+frisör	hairdresser ; barber
+fritid	leisure time
+fritid ; fritid; rekreation ; rekreation	recreation
+fritid ; kollektivfritid	mass recreation
+fritidsaktivitet	leisure activity
+fritidscentrum	leisure centre
+frost	frost
+fru ; hustru ; maka	wife ; spouse
+frukost	breakfast
+frukt	fruit
+fruktodling	fruit cultivation
+fruktträd	fruit tree
+främjande av handel och industri	promotion of trade and industry
+främmande	foreign
+främmande ; underlig ; konstig	strange ; odd
+fråga	question
+frö ; utsäde	seed
+fukt	moisture
+full	full
+funktionsämne	functional substance
+furan	furan
+fydelning; inkvartering ; fydelning ; inkvartering	quartering
+fyllningmaterial	filling material
+fyra	four
+fyrhörning	quadrilateral
+fyrkant ; kvadrat ; plats ; torg ; vinkelhake	square
+fyrtaktsmotor	four stroke engine
+fyrverkeri	firework
+fysik	physics
+fysikalisk förorening	physical pollutant
+fysikalisk förorening	physical pollution
+fysikalisk förändring	physical alteration
+fysikalisk kemi	physical chemistry
+fysikalisk kemisk analys	physicochemical analysis
+fysikalisk kemisk behandling	physicochemical treatment
+fysikalisk kemisk rening	physicochemical purification
+fysikalisk mätning av  miljöföroreningar	physical measurement of pollution
+fysikaliska egenskaper ; fysikalisk egenskap	physical property
+fysikaliska kemiska processer	physicochemical process
+fysikaliska processer ; fysikalisk process	physical process
+fysiklaisk behandling	physical treatment
+fysikvetenskaper	physical science
+fysiologi	physiology
+fysisk geografi	physical geography
+fysisk kondition	physical conditions
+fysisk planering	physical planning
+fytomassa	phytomass
+fytoplankton	phytoplankton
+fytotoxicitet; växtskadlighet ; fytotoxicitet ; växtskadlighet	phytotoxicity
+fällning	precipitation ; precipitation (chemical)
+fältförsök	field experiment
+fältstudie	field study
+färg ; färg ; färg	colour ; colour ; colo(u)r
+färg ; färg, färgmedel, lösligt färgämne ; färgmedel ; lösligt färgämne	dye
+färg ; färg; målarfärg ; målarfärg	paint
+färgsammansättning	colour composition
+färja	ferry
+färskvatten ; sötvatten	freshwater
+färöiska	Faroese ; Faeroese
+fågel ; fåglar	bird
+fågelart	bird species
+fågelfauna	avifauna
+fågelreservat	bird sanctuary
+fågelskydd	protection of birds
+fågeluppfödning	aviculture
+fångstresultat	catch yield
+får	sheep
+får	ovine
+fåraherde	shepherd
+födelsedag	birthday
+födelsekontroll	birth control
+födoämnen ; näring	nutrition
+fönster ; fönster	window
+förbehandlingsanordning för mineral	mineral conditioner
+förberedning av byggplatsen	building site preparation
+förbindelser mellan öster och väster	East-West relations
+förbluffa	astound
+förbränning	incineration
+förbränning av avfall	incineration of waste
+förbränningsgas	combustion gas
+förbränningsgas; rökgas	flue gas
+förbränningsmotor	combustion engine
+förbränningsrest	incineration residue
+förbränningsrest ; förbränningsrester	combustion residue
+förbränningsugn	incinerator
+förbud	prohibition
+förbud mot CFC och haloner	CFC and halons prohibition
+förbundsmyndighet	federal authority
+förbundsregering	federal government
+förbättring av effektiviteten	improvement of efficiency
+fördelning av miljöföroreningar; spridning av miljöföroreningar	pollutant distribution
+fördrag	treaty
+fördriven person	displaced person
+förebyggande av katastrofer	disaster prevention
+förebyggande av miljöföroreningar	pollution prevention
+förebyggande av naturliga faror	natural risks prevention
+förebyggande av skogsbränder	prevention of forest fires
+förebyggande hälsovårdsåtgärd	preventive health measure
+förebyggande information	preventive information
+förebyggande åtgärd	prevention measure
+föregripande av fara	anticipation of danger
+förening	association
+företags miljöekonomi	environmental economics of firms
+företagsekonomi	business economics
+företagshälsovård	occupational health care
+företagsorganisation	business organisation
+företagspolitik	company policy
+företagsstruktur	company structure
+förevisa (vb); utställningsföremål (s) ; utställning	exhibit
+författarskap	authorship
+författning	administrative law
+förflyttning av  miljöföroreningar	pollutant migration
+förgiftning	intoxication
+förgiftning	poisoning
+förhållande mellan orsak och verkan	cause-effect relation
+förhållande mellan raser	race relations
+förhållande mellan valutor	monetary relations
+förhållandet hälsa-miljö	health-environment relationship
+förhållandet kraft-värme	power-heat relation
+förhållandet mellan jorden och solen	Earth-Sun relationship
+förkläde	apron
+förkorta	abridge
+förkortning	abbreviation
+förköp; förköpsrätt ; förköp ; förköpsrätt	pre-emption
+förlust	loss
+förnedring	abasement
+förnybara resurser	renewable resource
+förnybart råmaterial	renewable raw material
+förnyelse; renovering; regeneration; regenerering; återbildning; föryngring	regeneration
+förnyelsebar energikälla	renewable energy source
+förordning	legal regulation
+förordning ; förordning; reglering ; reglering	regulation
+förordning am maximalt tillåtna gränsvärden	regulation on maximum permissible limits
+förordning om arbetsmiljö; förordning om arbetarskydd	occupational safety regulation
+förordning om elektroniska avfallsprodukter	electronic scrap regulation
+förordning om jordbävningsförebyggande	antiseismic regulation
+förordning; stadga; föreskrift	ordinance
+föroreining av sötvatten	freshwater degradation
+förorenad mark	contaminated soil
+förorenad substans	polluted matter
+förorenaren betalar (PPP)	polluter-pays principle
+förorenat område	polluted site
+förorening ; miljöförstöring ; miljöförstöring	pollution
+förorening av  miljön	environmental pollution
+förorening av atmosfären	atmospheric pollution
+förorening av foder	forage contamination
+förorening av grundvatten	groundwater pollution
+förorening av livsmedel	food contamination
+förorening av sötvatten	freshwater pollution
+förorening från hushåll	domestic pollution
+förorening orsakad av jordbruk	agricultural pollution
+förorening; kontamination	contamination
+föroreningar; miljöföroreningar	pollutant
+föroreningens biologiska verkan	biological effect of pollution
+föroreningens effekt	pollution effect
+föroreningsbegränsande stimulans	antipollution incentive
+föroreningsbekämpande teknik	pollution control technology
+föroreningsbekämpande åtgärd	pollution control measure
+föroreningsbekämpning	pollution abatement
+föroreningsbekämpning; reglering av utsläpp	pollution control
+föroreningsbelastning	pollution load
+föroreningsexponering	pollutant exposure
+föroreningsflöde	pollutant flow
+föroreningsförsäkring	pollution insurance
+föroreningsindikator	pollution indicator
+förort; förstad ; förort ; förstad	suburb
+förpackning	packaging
+förpackningsavfall	packaging waste
+förpackningsindustri	packing industry
+försaltning av vatten	water salination
+försegling av underlag till avfallsupplag	landfill base sealing
+försiktighetsprincip	precautionary principle
+förskott	advance
+förslagen	artful
+första reningssteget	primary treatment
+förste ; första	first
+förstärkning av vallar	dyke reinforcement
+förstöring av ekosystem	ecosystem degradation
+förstöring av livsmiljö	habitat destruction
+försurning	acidification
+försvar; skydd ; skydd ; försvar	defence
+försäkring	insurance
+försäkringsskydd	insurance coverage
+försäkringsverksamhet	insurance business
+förteckning; inventarium	inventory
+förteckning; register; index ; förteckning ; register ; index	index
+förutsägning av översvämningar	flood forecast
+förvaltning av arvgods	patrimonial management
+förvaltning av bergområden	mountain management
+förvaltning av bosättningar	human settlement management
+förvaltning av fiskerier	fisheries management
+förvaltning av naturresurser	management of natural resources
+förvaltning av skog	forest management
+förvaltning; ledning; hushållning	management
+förvaltningskontrakt	management contract
+förvaltningsmetod	management technique
+förvaltningsplan	management plan
+förvaring av livsmedel	food storage
+förvärv	acquisition
+förvåna	astonish
+förvånande	astonishing
+förvåning	astonishment
+förädlingseffekter	carry-over effect
+föråldrad	obsolete
+gadolinium	gadolinium
+gaffel ; uma	fork
+galiciska	Galician ; Galician
+galla	bile
+gallblåsa	gallbladder
+gallium	gallium
+galvanisering	galvanisation
+gammal anläggning	antiquated plant
+gammal avlagring; gammalt deponi	old landfill site
+gammalt förorenat ställe	old hazardous site
+gammastrålning	gamma radiation
+garage	garage
+gas	gas
+gas i flytande tillstånd	liquefied gas
+gasblanding	gas mixture
+gasdistribution	gas supply
+gasdriven anläggning	gas powered plant
+gasformig	gaseous state
+gasformig luftförorening	gaseous air pollutant
+gasföretag	gas company
+gasförvätskning	gas liquefaction
+gaskromatografi	gas chromatography
+gasledning	gas pipeline
+gasmotor	gas engine
+gasning ; rökning	fumigation
+gasnät	gas network
+gasrening	gas purification
+gasreservoar	gas reservoir
+gastropod; snäckdjur	gastropod
+gasverk	gaswork
+gata ; landsväg ; väg	road
+gejser	geyser
+gemensam handelspolitik	common commercial policy
+gemensam jordbrukspolitik	common agricultural policy ; common agricultural policy of the EU
+gemensam regel	common agreement
+gemensam tariffpolitik	common tariff policy
+gemensamt genomförande	joint implementation
+gemenskapernas budget	Community budget
+gemenskapernas rättssystem	Community legal system
+gemenskapsbestämmelse	Community ruling
+gemenskapsfinanser	Community finance
+gemenskapsrättsakt	Community act
+gen	gene
+genealogi	genealogy
+generell ; generellt	general
+genetik	genetics
+genetisk förändring	genetic modification
+genetisk information	genetic information
+genetisk variation	genetic variation
+genetisk verkan	genetic effect
+genetiska resurser ; genetisk resurs	genetic resource
+genetiskt förändrad organism	genetically modified organism
+genetiskt mångfald	genetic diversity
+genom	genome
+genomsipprande vatten	percolating water
+genotyp	genotype
+genpool	genetic pool ; gene pool
+genteknik	genetic engineering
+gentoxicitet	genotoxicity
+geodesi	geodesy
+geofysik	geophysics
+geofysisk krigföring	environmental warfare
+geofysisk miljö	geophysical environment
+geogen faktor	geogenic factor
+geografi	geography
+geografibaserad information	geo-referenced information
+geografibaserade data	geo-referenced data
+geografisk fördelning av befolkningen	geographical distribution of population
+geografisk projektion	geographical projection
+geografiskt informationssystem	geographic information system
+geologi	geology
+geologisk katastrof	geological disaster
+geologiska processer	geological process
+geometri	geometry
+geometrisk korrektion	geometric correction
+geomorfisk process	geomorphic process
+geomorfologi	geomorphology
+georgiska	Georgian ; Georgian
+geoteknik	geotechnology
+geoteknik	geotechnics
+geotermisk energi	geothermal energy
+geovetenskap	earth science
+gepard	cheetah ; chetah
+geranium	geranium
+germanium	germanium
+geting	wasp
+gift	poison
+giftighet; toxicitet ; giftighet ; toxicitet	toxicity
+giljotin	guillotine ; guillotine ; guillotine
+gips	gypsum
+giraff	giraffe
+gisslan	hostage
+gitarr	guitar
+gjuteriindutri	ironwork industry
+glaciologi	glaciology
+glaciär	glacier
+glas	glass
+glasfiber	fibreglass
+glasindustri	glass industry
+glass	ice cream
+glasyr; lasyr; glans; glasera; lasera; polera; glätta ; glasyr ; lasyr ; glans ; glasera ; lasera ; polera ; glätta	glaze
+glasögon	glasses ; spectacles
+glaukom	glaucoma
+global konvention	global convention
+global miljöfond	Global Environment Facility ; GEF
+global modell	global model
+global synpunkt	global aspect
+global uppvärmning	global warming
+glupsk	avaricious
+glupsk	avid
+glykolys	glycolysis
+gnagare	rodent
+god förvaltning	good management
+god jul	Merry Christmas
+god kväll	good evening
+godkännande ; tillstånd	authorisation
+godkännande av installationer	approval of installations
+golf	golf
+golf ; golf; bukt; vik	gulf
+golf ; vik; bukt ; vik ; bukt	bay
+gong	gong
+gonorré	gonorrhea
+gorilla	gorilla
+gottgörelse; ersättning; skadeersättning; skadestånd ; skadeersättning ; gottgörelse ; ersättning ; skadestånd	indemnity
+grabb ; kille ; pojke	boy
+grad av aciditet ; surhetsgrad	acidity degree
+grammatik	grammer ; grammar
+granit	granite
+grannen ; granne	neighbour ; vecino
+granulometri	granulometry
+graviditet	pregnancy
+graviton	graviton
+grekiska	Greek ; Greek
+gren	branch
+grodor ; groda	frog
+groning	germination
+grumlighet	turbidity
+grundkontroll	baseline monitoring
+grundlag	constitution
+grundläggande	fundamental
+grundläggande livsmedelsbehov	basic food requirement
+grundläggande skolutbildning	primary education
+grundutbildning; grundläggande utbildning	initial training
+grundvatten	groundwater
+grundvattenskydd	groundwater protection
+grundämne ; kemiska element	chemical element ; element
+grundämnen i grupp 2 (alkaliska jordmetaller) ; grundämnen i grupp 2 ; alkaliska jordmetaller	element of group II (alkaline earth metals) ; alkaline earth metal ; element of group II
+grundämnen i grupp 3	element of group III
+grundämnen i grupp 4	element of group IV
+grundämnen i grupp 5	element of group V
+grundämnen i grupp 6	element of group VI
+grundämnen i grupp 7	element of group VII ; halogen
+gruppbeteende	group behaviour
+grus	gravel
+grusgrav	gravel pit
+grustäkt	gravel extraction
+gruva	mine
+gruvavfall	mining waste
+gruvdistrikt; gruvfält; bregslag ; gruvdistrikt ; gruvfält ; bregslag	mining district
+grymhet	atrocity
+gräns	boundary
+gräns	border
+gränsvärde	limit value
+gränsyta mella hav och luft	ocean-air interface
+gränsöverskridande	boundary crossing
+gräs	grass
+gräsbrand	grass fire
+gräshoppa	locust
+gräshoppor ; gräshoppa	grasshopper
+gräsmark; grässlätt	grassland
+gräsmatta	open lawn
+gräsväxter	graminaceous plant
+gröna revolutionen	green revolution
+gröna vågen	green tide
+gröngödsel	green manure
+grönländska	Kalaallisut
+grönområde ; grönt område	green space
+grönsak	green vegetable
+grönsak ; grönsak; växt ; växt	vegetable
+grönt bälte; grönt område	green corridor
+gujarati	Gujarati ; Gujarati
+gul	yellow
+guld	gold
+gummi	rubber
+gurka	cucumber
+guvenör	governor
+gymnasium; studentexamen	secondary education
+gyttjig strand	mud flat
+gå ; resa ; åka	go
+gå på	attend
+gångstig	footpath
+gås	goose
+gödsel	manure
+gödsel ; gödselmedel	fertiliser
+gödsel ; stallgödsel; dynga; gödsel; spillning; träck ; stallgödsel ; dynga ; spillning ; träck	animal manure
+gödsling av  jord	soil fertilisation
+göra	do
+hackat avfall	refuse shredder
+hafnium	hafnium
+hagel	hail
+haiku	haiku
+haj	shark
+hallucination	hallucination
+haloform	haloform
+halogen(erad) förening	halogenated compound
+halogenerad förorening	halogenated pollutant
+halogenerat bifenyl/difenyl	halogenated biphenyl
+halogenerat fenol	halogenated phenol
+halogenerat kolväte; halon	halogenated hydrocarbon
+halveringstid	half-life
+halvfabrikat	intermediate goods
+halvledare	semiconductor
+halvmetall	semi-metal
+halvö	peninsula
+hamn	harbour
+han	he
+handel	trade
+handel med livsmedel	food commerce
+handel med växter	plant trade
+handel mellan öster och väster	East-West trade
+handel och distribution	distributive trade
+handel och konsumtion	trade and consumption
+handelsflotta	merchant shipping
+handelsrätt	commercial law
+handflata	palm
+handikappad person; invalid	disabled person
+handlingsregler	code of practice
+hantverksföretag	handicraft business
+harem	harem
+harmonisering av lagar	harmonisation of law
+harpun	harpoon
+harts	resin
+hassium	hassium
+hastighet	speed
+hastighet ; pris ; pris; kurs; snabbhet; snabbhet; takt ; kurs ; snabbhet ; takt	rate
+hat	hate ; hatred
+hattsvamp ; svamp	mushroom
+hav ; hav	sea
+havsbruk	mariculture
+havsdäggdjur	marine mammal
+havsfauna	marine fauna
+havsfiske	marine fishery
+havsförorening	marine pollution
+havsklimat	oceanic climate
+havsmiljö	marine environment
+havsnivå; vattennivå; vattenstånd ; havsnivå	sea level
+havsorganism	marine organism
+havsström	ocean current
+havstemperatur	ocean temperature
+havsvatten	sea water
+hebreiska	Hebrew
+hedmark	heathland
+hedning	heathen ; infidel ; pagan
+hedonism	hedonism
+hegemoni	hegemony
+hej	hello ; hey ; hi ; howdy
+hej då	adieu ; bye ; cheerio ; farewell ; good day ; goodbye
+helg ; veckoslut	weekend
+helikopter	helicopter
+helium	helium
+hematologi	haematology
+hemligt ; hemlig	secret
+hemorragi ; blödning	haemorrhage ; bleeding
+hemsida	homepage
+heroin	heroin
+herravälde	ascendancy
+heterocyklisk förening	heterocyclic compound
+himmel	heaven ; sky
+hinder	obstacle ; obstruction
+hindi	Hindi ; Hindi
+hinna; beläggning; film; folie ; film	film
+historia	history
+historia ; berättelse	story
+historiografi	historiography
+historisk forskning	historical research
+historisk utveckling	historical evolution
+historiskt centrum	historic centre
+historiskt monument	historical monument
+historiskt ställe	historical site
+hjort; rådjur ; hjort ; rådjur	deer
+hjärnhinneinflammation	meningitis
+hjärninflammation	encephalitis
+hjärta	heart
+holmium	holmium
+homeostas	homeostasis
+homonym	homonym
+honung	honey
+hopp	hope
+horisont	horizon
+hormon	hormone
+hotellbransch	hotel industry
+hovdjur	ungulate
+hud	skin
+humanitärt bistånd	humanitarian aid
+humla	bumblebee
+humus	humus
+hund	dog
+hunddjur	canid
+hundra	hundred
+hunger	hunger ; hunger ; hunger
+hungersnöd	famine
+hus	home ; home ; house
+husdjur	farm animal
+husdjur ; sällskapsdjur	pet
+husdjursbestånd; boskap ; husdjursbestånd ; boskap	livestock
+hushåll	household
+hushållens miljöpåverkningar	environmental impact of households
+hushållsapparat	domestic appliance
+hushållsavfall	domestic waste
+hushållsavfallsdeponi	domestic waste landfill
+hushållskemikalie	household chemical
+hushållsutgifter	household expenditure
+hushållsvara	household goods
+husvagn	mobile home
+huvud	head
+huvudnäringsmedel	staple food
+huvudstad	capital
+hybrid-DNA-metoder	recombinant DNA technology
+hybridisering	hybridisation
+hydraulik; vattenbyggnad	hydraulics
+hydraulisk konstruktion	hydraulic construction
+hydrografi; sjömätning	hydrography
+hydrografiskt flodområde	hydrographic basin
+hydrografiskt nät	hydrographic network
+hydrologi	hydrology
+hydrologisk balans	hydrologic balance
+hydrologisk cykel	hydrologic cycle
+hydrologisk katastrof	hydrologic disaster
+hydrologiskt flöde	hydrologic flow
+hydrolys	hydrolysis
+hydrometeorologi	hydrometeorology
+hydrometry	hydrometry
+hydrosfär	hydrosphere
+hyena	hyena
+hygien	hygiene
+hypertext	hypertext
+hypofys	pituitary gland
+hyponym ; snävare begrepp	hyponym ; narrower terms ; narrower term
+hyreshus	apartment block
+häck	hedge
+häckande fågel	breeding bird
+häger	heron
+hälsa	health
+hälso- och miljökonsekvensbeskrivning	environmental health impact assessment
+hälsoförknippad bioteknik	health-related biotechnology
+hälsosam organism	beneficial organism
+hälsoskyddsförordning	health regulation
+hälsoskyddslagstiftning	health legislation
+hälsovård	health care
+hälsovård	health service
+hälsovårdsyrke	health care profession
+häpnadsväckande	astounding
+här	here
+häst	horse
+hästdjur	equine
+hävd; prescription; ordination ; hävd ; prescription ; ordination	prescription
+hävda	assert
+häxa	witch
+håla	cave
+hållbarhetsprincipen	principle of sustainability
+hår	hair
+hårddisk	hard disk drive ; hard disk ; HD
+hårdhet	hardness
+hög	long
+höghastighetsjärnväg	high-speed railway
+höghastighetståg	high-speed train
+höghus	high-rise building
+högljuddhet	loudness
+högre utbildning; universitetsundervisning	higher education
+högsjöfiske	open sea fishing
+högspänningsledning	high voltage line
+högt berg	high mountain
+högvatten	high tide water
+höjd	altitude
+höns	chicken
+hönsfåglar	gallinacean
+hörapparat	hearing system
+hörsel	hearing
+hörselskärpa	hearing acuity
+höst	autumn
+i land	ashore
+i morgon ; i morgon ; morgondag	tomorrow
+i sömn	asleep
+icke-flyktigt ämne	non-volatile substance
+icke-förorenande bränsle	non-polluting fuel
+icke-förorenande energikälla	non-polluting energy source
+icke-joniserande strålning	non-ionising radiation
+icke-konventionell energi	non-conventional energy
+icke-metall	non-metal
+icke-metalliskt mineral	non-metallic mineral
+icke-statlig organisation	non-governmental organisation
+icke-utbyggt område	non-built-up area
+icke-varaktig konsumtionsvara	non-durable goods
+ideologi	ideology
+ido	Ido ; Ido
+idrott; sport ; sport ; idrott	sport
+igelkott	hedgehog
+igenfyllning av gruvor	mine filling
+ikweta	equator
+illamående	nausea
+immission	immission
+immission av miljöföroreningar	pollutant immission
+immissionsbelastning	immission load
+immissionsgräns	immission limit
+immissionsprognos	immission forecast
+immissionsskada	immission damage
+immissionsövervakning	immission control
+immobilisering av föroreningar	pollutant immobilisation
+immunitet	immunity
+immunoanalys; immunoassay	immunoassay
+immunologi	immunology
+immunologisk sjukdom	immunological disease
+immunsystem	immune system
+import	import
+importlicens	import licence
+impregnering	impregnation
+impregneringsämne; impregneringsmedel	impregnating agent
+impulsbrus; impulsstörning	impulsive noise
+in situ ; in situ; på platesen ; på platsen	in situ
+in vitro-analys	in vitro assay
+in vivo-analys	in vivo assay
+inbyggning; iblandning; nedbrukning; införlivande ; inbyggning ; iblandning ; nedbrukning ; införlivande	incorporation
+inbördes rättshjälp	judicial assistance
+indexering av dokumentation	indexing of documentation
+indikator	indicator
+indikator för miljökvalitén	indicator of environmental quality
+indirekt induktor	indirect discharger
+indium	indium
+individ	individual
+individuell transport	private transport
+indonesiska	Indonesian
+industri	industry
+industrial environment ; industrimiljö	industrial environment
+industrialisering	industrialisation
+industrianläggning	industrial installation
+industrianläggning	industrial plant (building) ; industrial plant
+industriavfall	industrial waste
+industriavgas	industrial waste gas
+industriavloppsvatten	industrial effluent
+industriavloppsvatten	industrial waste water
+industribuller	industrial noise
+industribyggnad	industrial building
+industriell förorening	industrial pollution
+industriell kartläggning	industrial zoning
+industriell produktion	industrial production
+industriell tillverkning	industrial manufacturing
+industriell utveckling	industrial development
+industriella processer	industrial process
+industriellt samhälle	industrial society
+industriförening	industrial association
+industrigröda	industrial crop
+industrilagstiftning	industrial legislation
+industrilokalisering	industrial site
+industrimaterial	industrial material
+industrimiljöpolitik	industrial environmental policy
+industrins miljöpåverkningar	environmental impact of industry
+industrinäring	industrial economics
+industriområde	industrial area
+industriplanering	industrial planning
+industripolitik	industrial policy
+industriprodukt	industrial product
+industrislam	industrial sludge
+industristruktur	industrial structure
+industritipp	industrial dumping
+industriutrustning	industrial equipment
+industriutsläpp	industrial emission
+industriverksamhet	industrial activity
+industriväxt	industrial plant (organism) ; industrial plant
+inert konvertering	inertisation
+infektion	infection
+infektionssjukdom	infectious disease ; communicable diseases
+infektionssjukdom; överförbar sjukdom; smittsam sjukdom ; infektionssjukdom ; smittsam sjukdom	infectious disease
+infiltration	infiltration
+inflation	inflation
+influensa ; flunsa	influenza ; flu
+informatil; informatikteknik ; informatikteknik ; informatil	informatics ; computer science ; information science
+information	info ; information
+informationsblad; nyhetsbrev ; informationsblad ; nyhetsbrev	newsletter
+informationsclearing	information clearing-house
+informationsinfrastruktur	information infrastructure
+informationskälla	information source
+informationsmapp	information kit
+informationsplikt	obligation to inform
+informationssystem	information system
+informationsteknik	information technology ; IT
+informationsteknisk industri	information technology industry
+informationsutbyte	information exchange
+informell förhandling	informal negotiation
+infraljud	infrasound
+infrastruktur	infrastructure
+infrastrålning; infrarödstrålning ; infrastrålning ; infrarödstrålning	infrared radiation
+införande av djurarter	introduction of animal species
+införande av växtsorter	introduction of plant species
+ingenjör	engineer
+ingenjörsvetenskap; teknik ; teknik ; ingenjörsvetenskap	engineering
+inget	nothing
+ingripande i natur och landskap	intervention in nature and landscape
+ingripande på land	intervention on land
+inhemsk lagstiftning	national legislation
+inhemsk teknik	indigenous technology
+inhemska kunskaper	indigenous knowledge
+inkapsling	encapsulation
+inkomst från ränta	balancing of interests
+inkomst; intäkt	income
+inkomstskatt	income tax
+inlandssjöfart	inland waterways transport
+inlandsvatten	inland water
+inledande procedur	preliminary proceedings
+innovation	innovation
+inomhusluftförorening	indoor air pollution
+inomhusmiljö	indoor environment
+inre europeiska marknaden	internal European market
+inre omflyttning	internal migration
+inredning	fitting (plumbing) ; fitting ; plumbing equipment ; plumbing fixtures
+inrikeshandel	domestic trade
+insekter ; insekt	insect
+insektsdödande medel; insekticid	insecticide
+insektsätare	insectivore
+insjöfart	inland navigation
+insjöfiske	inland fishery
+inspektion	inspection service
+inspektionsmyndighet	controlling authority
+institution för miljöstyrning	environmental administration institution
+institutionalisering	institutionalisation
+institutionell struktur	institutional structure
+institutionell verksamhet	institutional activity
+instrumentering	instrumentation
+inte på min gård-attityd	NIMBY aptitude ; NIMBY attitude
+integrerad bekämpning av skadedjur	integrated pest control
+integrerad ledning	integrated management
+integrerad övervakning av miljöföroreningar	integrated pollution control
+integrerat miljöskydd	integrated environmental protection technology
+integrering i marknaden	preparation for market
+intensiv husdjursuppfödning	intensive animal husbandry
+intensivt lantbruk; åkerbruk	intensive farming
+interferometri	microscopy
+interlingua	Interlingua ; Interlingua, "Simplified" Latin ; Interlingua, "Simplified" Latin
+intermittent buller	intermittent noise
+internalisering av externa kostnader	internalisation of external costs
+internationell arbetsdelning	international division of labour
+internationell balans	international balance
+internationell ekonomisk rätt	international economic law
+internationell fördelning	international distribution
+internationell handel	international trade
+internationell harmonisering	international harmonisation
+internationell jämförelse	international transaction
+internationell konflikt	international conflict
+internationell konkurrenskraft	international competitiveness
+internationell konvention	international convention
+internationell organisation	international organisation
+internationell politik	international politics
+internationell privaträtt	private international law
+internationell rätt	international law
+internationell standardisering; internationell normalisering ; internationell standardisering ; internationell normalisering	international standardisation
+internationell säkerhet	international safety
+internationell vattenväg	international watercourse
+internationell överenskommelse	international agreement
+internationella relationer	international relations
+internationella relationer på miljöområdet	international environmental relations
+internationella sjöfartsorganisationens kodex	IMCO code
+internationellt bistånd	international assistance
+internationellt samarbete	international co-operation
+internationellt viktigt ekosystem	internationally important ecosystem
+internredovisning; debiteringsstyrning;	management accounting
+interpolation	interpolation
+interventionsfond	intervention fund
+intresse; ränta ; intresse ; ränta	interest
+intressegrupp	interest group
+intressekonflikt	conflict of interests
+intygande; utfärdande av intyg	certification
+inversion	inversion
+inversionsskikt	inversion layer
+invertebrat	invertebrate
+investering	investment
+investering i föroreningsbekämpning	pollution control investment
+invändning	objection
+invånare	inhabitant
+iridium	iridium
+iriska	Irish ; Irish ; Irish Gaelic ; Irish
+irreversibelt fenomen	irreversibility of the phenomenon
+is	ice
+isberg	iceberg
+isbjörn	polar bear
+ishockey	ice hockey
+islam	Islam
+isländska	Icelandic
+isolation ; isolering	insulation
+isomer	isomer
+isotop	isotope
+italienska	Italian ; Italian
+ja	aye ; yeah ; yep ; yes
+jade	jade
+jag	I
+jaguar	jaguar
+jak	yak
+jakt	hunting
+jaktlicens	hunting licence
+jaktreservat	hunting reserve
+januari	January
+japanska	Japanese ; Japanese
+javanesiska	Javanese
+jazz	jazz
+jiddisch	Yiddish
+jobb ; yrke	employment ; employment ; job ; job ; occupation ; work ; work
+jod	iodine
+jonbytare	ion exchanger
+jonbyte	ion exchange
+joner	ion
+joniserande strålning	ionising radiation
+jonosfär	ionosphere
+jord ; jord; jordmån; mark ; jordmån ; mark	soil
+jord- och skogsbruk	agroforestry
+jordbehandling	land development
+jordbruk	agricultural exploitation
+jordbruk ; jordbruk ; lantbruk ; lantbruk	agriculture ; agriculture
+jordbruk ; lantbruk	agriculture
+jordbruk i torrområde bedrivet utan bevattning	dry farming
+jordbrukets miljöpåverkningar	environmental impact of agriculture
+jordbrukningsmetod	agricultural method
+jordbruks- och boskapsindustri	agriculture and cattle industry
+jordbruks- och livsmedelsproduktion ; livsmedelsproduktion	food production (agriculture) ; food production
+jordbruksekonomi	agricultural economics
+jordbruksfastighet	agricultural real estate
+jordbruksförvaltning	agricultural management
+jordbrukshydraulik	agricultural hydraulics
+jordbruksindustri	factory farming
+jordbruksmark	agricultural land
+jordbrukspolitik	agricultural policy
+jordbruksprodukt	agricultural product
+jordbruksproduktion	agricultural production ; farm production ; agricultural output
+jordbruksproduktionsmedel	means of agricultural production
+jordbruksskadegörare	agricultural pest
+jordbruksstruktur	agricultural structure
+jordbruksteknik; lantbruksteknik ; lantbruksteknik ; jordbruksteknik	agricultural engineering
+jordbävning	earthquake
+jordekologi	land ecology
+jordekorrar ; jordekorre	chipmunk
+jordformning	land forming
+jordfördelning	land setup
+jordförorening	land pollution
+jordförvaltning och planering	land management and planning
+jordgubbe	strawberry
+jordlott; marktilldelning	land allotment
+jordplanering	land planning
+jordsanering; jordåtervinning	land restoration
+jordskorpan	earth's crust ; crust ; Earth's crust
+jordskorpesänkning ; kompaktion	subsidence
+jordskred	landslide
+jordtäcke; ytbädd	overburden
+jordvärde	land value
+jordärtskocka	artichoke
+journalist ; reporter	journalist
+journalistik	journalism
+judendom	Judaism
+judo	judo
+julgran	Christmas tree
+juli	July
+juni	June
+juridisk akt	juridical act
+juridisk myndighet	judicial body
+juridisk text	legal text
+juridiskt skyddad rättighet	legally protected right
+juridiskt system	judicial system
+juristkåren	legal profession
+justera	adjust
+jämförande rätt	comparative law
+jämförande undersökning	comparative test
+jämförelse	comparison
+jämförelse mellan laboratorier	interlaboratory comparison
+järn	iron
+järn och stålindustri	iron and steel industry
+järnindustri	iron industry
+järnmetall ; icke-järnmetall	non-ferrous metal
+järnskrot	iron scrap
+järnväg	railway
+järnvägsfordon	railroad vehicle ; carriage ; wagon
+järnvägsnät	railway network
+järnvägsstation	railway station
+järnvägstrafik	rail traffic
+järnvägstransport	rail transport
+jäsning	fermentation
+jäst	yeast
+kabel	cable
+kackerlackor ; kackerlacka	cockroach
+kadmium	cadmium
+kaffe	coffee
+kalcium	calcium
+kalciumhalt	calcium content
+kalender ; almanacka	calendar
+kaliber	caliber
+kalibrering	calibration
+kalium	potassium
+kaliumgödselmedel	potassium fertiliser
+kaliumklorid ; pottaska	potash
+kalkon	turkey
+kalksten	limestone
+kallbrand	gangrene
+kalligrafi	calligraphy
+kambodjanska	Khmer ; Central Khmer
+kamel	camel
+kamera ; stillbildskamera	camera
+kamouflage	camouflage
+kanal	canal
+kanalisering	channelling
+kanin	rabbit
+kanjon	canyon
+kannada	Kannada ; Kannada
+kaosteori	chaos theory
+kapitel	chapter
+karakteristisk	characteristic
+karate	karate
+karbonat	carbonate
+karcinogenitetstest	carcinogenicity test
+kardinal	cardinal
+kardiologi	cardiology
+kardiovaskulär sjukdom	cardiovascular disease
+kardiovaskulära systemet	cardiovascular system
+karelska	Karelian
+karriär	career
+karst	karst
+karta	map
+karta	map chart
+kartering av lavar	mapping of lichens
+kartering; kartläggning; avbildning	mapping
+kartografi	cartography
+kastanj	chestnut
+katalanska	Catalan ; Catalan
+katalys	catalysis
+katalysator	catalyst
+katalysator ; katalytisk avgasrenare; katalysator ; katalytisk avgasrenare	catalytic converter
+katapult	catapult
+katastrof	catastrophe
+katastrof för jordbruk	agricultural disaster
+katastrof orsakad av människor	human-made disaster
+katastrofberedskap	disaster preparedness
+katastrofer	disaster
+katastrofhjälp	disaster relief
+katastrofområde	disaster zone
+katastrofplan	disaster contingency plan
+katastrofplanering för miljön	environmental contingency planning
+katastrofövervakning	disaster control service
+kategori	category
+kategori av utrotningshotade djur	category of endangered species
+katjon	cation
+katt	cat
+kattdjur	felid
+kaviar	caviar
+kazakiska	Kazakh ; Kazakh
+kemi	chemistry
+kemikalielag	chemicals act
+kemikalier i miljön	chemical in the environment
+kemipolitik	chemical policy
+kemisk analys	chemical analysis
+kemisk anläggning	chemical installation
+kemisk behandling	chemical treatment
+kemisk bekämpning (av skadedjur)	chemical pest control
+kemisk fabrik	chemical plant
+kemisk frätning	chemical corrosivity
+kemisk förening	compound ; chemical compound
+kemisk förening	chemical composition
+kemisk förorening	chemical contamination
+kemisk förorening	chemical pollutant
+kemisk förorening	chemical pollution
+kemisk industri	chemical industry
+kemisk mätning av förorening	chemical measurement of pollution
+kemisk nederbörd	chemical fallout
+kemisk produkt	chemical product
+kemisk risk	chemical risk
+kemisk sanering	chemical decontamination
+kemisk sorption	chemisorption
+kemisk syreförbrukning	chemical oxygen demand
+kemisk; kemikalie ; kemisk ; kemikalie	chemical
+kemiska egenskaper ; kemisk egenskap	chemical property
+kemiska processer ; kemisk process	chemical process
+kemiska reaktioner ; kemisk reaktion	chemical reaction
+kemiska strukturer ; kemisk struktur	chemical structure
+kemiskt avfall	chemical waste
+kemiskt vapen	chemical weapon
+kemtvätt	dry cleaning
+keramik	ceramics
+keramikindustri	ceramics industry
+kernnedsmältning	core meltdown
+kilogram	kilogram
+kinematografisk film	cinematographic film
+kinesiska	Chinese
+kirurg	surgeon
+kirurgi	surgery
+kisel ; silicium	silicon
+kiselalger	diatom
+klarinett	clarinet
+klassifikation; klassificering	classification
+klassindelning enligt varor och tjänster	business classification
+kleptomani	kleptomania
+kliché	platitude ; cliche ; cliché
+klimat	climate
+klimatförändring orsakad av människan	man-made climate change
+klimatisk förändring	climatic change ; climate change
+klimatisk förändring	climatic alteration
+klimatisk verkan	climatic effect
+klimatiska resurser	climate resource
+klimatiskt experiment	climatic experiment
+klimatologi	climatology
+klimatskydd	climate protection
+klimattyp	climate type
+klimatzon	climatic zone
+klimax; höjdpukt ; klimax ; höjdpukt	climax
+kliniskt symtom	clinical symptom
+klippa	cliff
+klitoris	button ; clit ; clitoris
+kloning	cloning
+klor ; klorgas	chlorine
+klorerat kolväte	chlorinated hydrocarbon
+klorerat kolväte; klororganisk förening	organochlorine compound
+klorering	chlorination
+klorfenol	chlorophenol
+klorid	chloride
+klorofluorkarbon	CFC ; chlorofluorocarbon
+klorofyll	chlorophyll
+kloros	chlorosis
+klä ; kläda	dress ; clothe
+kläda	attire
+kläder	clothing ; apparel
+klädnadsindustri	clothing industry
+klädsel	attire
+klänning	dress
+klätterväxt	climbing plant (wall) ; climbing plant
+knappbatteri	button-cell battery
+kniv	knife
+ko	cow
+koagulant; koaguleringsmedel; koagulermedel	flocculant
+koagulering	coagulation
+kobolt	cobalt
+kod	code
+kodifiering	codification
+koffein	caffeine
+kokain	cocaine
+kokare	kettle
+kokpunkt	boiling point
+koks	coke
+kol	carbon
+kol	coal
+kolbaserad energi	coal-based energy
+kolbrytning	coal mining
+koldioxid	carbon dioxide
+koldioxidskatt	carbon dioxide tax
+kolesterol	cholesterol
+kolhydrat	carbohydrate
+koliforma bakterier	coliform bacterium
+kolindustri	coal industry
+kolkraftverk	coal-fired power plant
+kollektiv avloppsvattenrening	collective wastewater treatment
+kollektivtransport	mass transport
+kolloid	colloid
+kolloidalt tillstånd	colloidal state
+koloni	colony
+kolonisering	colonisation
+kolorimetri	colourimetry
+koloxid	carbon monoxide
+kolraffinering	coal refining
+kolteknik	coal technology
+koltrast	blackbird
+kolväte	hydrocarbon
+kolvätereservoar	hydrocarbon storage tank
+komapktion; kompriemring; pressning ; pressning ; komapktion ; kompriemring	compaction
+kombinationseffekt	combination effect
+kombinerade transporter	combined transport
+kombinerat avloppssytem	combined sewer system
+kombinerat avloppsvatten	combined waste water
+komet	comet
+komma	come
+kommersialisering	commercialisation
+kommersiell köksväxtodling	market gardening
+kommersiell trafik	commercial traffic
+kommersiellt fordon	commercial vehicle
+kommun	municipality
+kommun ; län; kommun; grevskap ; län ; grevskap	county
+kommunal förvaltning av vatten	municipal water management
+kommunal miljöplan	municipal environment plan
+kommunal miljöpolitik	municipal environmental policy
+kommunal nivå	municipal level
+kommunal renhållning	municipal cleansing service
+kommunal rätt	municipal law
+kommunalt avfall	municipal waste
+kommunalt vattenförsörjningssystem	municipal water distribution system
+kommunikation	communications
+kommunikationsindustri	communications industry
+kommunikationsmedel	means of communication
+kommunikationspolitik	communications policy
+kommunikationssystem	communications system
+kommunism	communism
+kompensation; ersättning; skadestånd ; ersättning ; skadestånd ; kompensation	compensation
+komplexbildare	complexing agent
+kompost	compost
+komposterbarhet ; nedbrytbarhet ; nedbrytbarhet; komposterbarhet	degradability
+komposterbart avfall	compostable waste
+kompostering	composting
+kompressor	compressor
+kompromisspolitik (handel med utsläpp)	offset policy (emissions trading)
+koncentration	concentration
+koncentration av miljöföroreningar	pollutant concentration
+koncession; beviljande ; koncession ; beviljande	concession
+kondensering	condensation (process) ; condensation
+kondom	condom ; prophylactic ; rubber ; safe ; safety
+konferens	conference
+konflikt; skiljaktighet ; konflikt ; skiljaktighet	conflict
+kongress	congress
+konkurrens	competition
+konkurrens	competitiveness
+konkurrensregler	competition law
+konsekvensförebyggande	impact prevention
+konsekvensutredning; konsekvensbeskrivning	impact assessment
+konserv; reservat ; marmelad ; sylt	preserve
+konserveringsmedel; skyddsmedel; ; konserveringsmedel	preservative
+konsonant	consonant
+konst	art
+konstgjort språk	constructed language ; artificial language
+konstgödsel	chemical fertiliser
+konsthantverk	handicraft
+konstodlingsteknik	artificial reproductive technique
+konstruerad miljö	built environment
+konstruerat dräneringssystem	built drainage system
+konsultverksamhet	consultancy
+konsumentavfall	consumer waste
+konsumentbeteende	consumer behaviour
+konsumentgrupp	consumer group
+konsumentinformation	consumer information
+konsumentskydd	consumer protection
+konsumentvara	consumer product
+konsumtion	consumption
+konsumtion av  primärenergi	primary energy consumption
+konsumtion av råmaterial	raw material consumption
+konsumtionsmönster	consumption pattern
+konsumtionsvara	consumer goods
+kontamination; radioaktiv kontamination ; radioaktiv kontamination	radioactive contamination
+kontinantalsockel	continental shelf
+kontinent	continent
+kontinentalklimat	continental climate
+kontinuerligt arbetande; fortsatt belastning ; kontinuerligt arbetande ; fortsatt belastning	continuous load
+konto	account
+kontor	office
+kontroll; övervakning ; kontroll ; övervakning	monitoring
+kontrollerad förbränning	controlled burning
+konturbruk	contour farming
+konurbation	conurbation
+konvention	convention
+konventionell energi	conventional energy
+koordinatsystem	co-ordinate system
+koppar	copper
+koraller ; korall	coral
+korallrev	coral reef
+korallrevslagun	coral reef lagoon
+koreanska	Korean ; Korean
+kork	cork
+korn	barley
+korn; sädeskorn; spannmål ; korn ; sädeskorn ; spannmål	grain
+korniska	Cornish
+korridor	corridor
+korrosion	corrosion
+korrosionshämmare	corrosion inhibitor
+korruption	corruption
+korsikanska	Corsican ; Corsican
+korsord	crossword
+kort ; liten	short ; small
+kortvarig	ephemeral
+kosmetikaindustri	cosmetic industry
+kosmisk strålning	cosmic radiation
+kosmologi	cosmology
+kostnad	cost
+kostnader av elproduktion	electricity generation cost
+kostnader orsakade av  miljöföroreningar	pollution cost
+kostnadsminimerande planering	minimal cost planning
+kostnadsminskning	cost reduction
+kostnadsökning	cost increase
+kraftföretag	power company
+kraftledning	electric line ; power line
+kraftstation	power station
+kraftverk med kombinerad cykel	combined cycle-power station
+kraftvärmeverk	heat and power station
+kramatografisk analys	chromatographic analysis
+kreativitet	creativity ; inventiveness
+kredit	credit
+kreditpolitk	credit policy
+kreditstöd	credit assistance
+krig	war
+krigsfånge	prisoner of war ; POW ; PoW ; PW
+krishantering	crisis management
+kristall	crystal
+kristallisering	crystallisation
+kristallografi	crystallography
+krita	chalk
+kriterier för miljöbedömning	environmental assessment criterion
+kritisk belastning	critical load
+kritisk nivå	critical level
+kroatiska	Croatian ; Croation
+krokodiler ; krokodil	crocodile
+krom	chromium
+kromatografi	chromatography
+kromosom	chromosome
+krucifix	crucifix
+kryptogamer ; kryptogam ; sporväxt	cryptogam
+krypton	krypton
+kryssning	cruising
+kräftan ; Kräftan	Cancer
+kräftdjur	crustacean
+kräva	assert
+kula	bullet
+kulspruta	machine gun
+kultur	culture
+kulturarv	cultural heritage
+kulturell inrättning	cultural facility
+kulturell utveckling	cultural development
+kulturindikator	cultural indicator
+kulturlandskap	agricultural landscape
+kulturpolitik	cultural policy
+kungörelse	notice
+kursplan	curriculum
+kust	coast
+kust; strand; litoral; kuststräcka ; strand ; kust ; litoral ; kuststräcka	littoral
+kustbevakning	coastguard
+kustens ekosystem	coastal ecosystem
+kustens utveckling	coastal development
+kustfiske	coastal fishing
+kustförorening	coastal pollution
+kustmiljö	coastal environment
+kustområde	coastal area
+kustskydd	coast protection
+kustvatten	coastal water
+kvalitetscertifikat	quality certification
+kvalitetsnorm	quality standard
+kvalitetsstyrning; kvalitetskontroll	quality control
+kvalitetssäkring	quality assurance
+kvalité på grundvatten	groundwater quality
+kvalster	mite
+kvarn	mill
+kvicksilver	mercury
+kvinna	female ; woman
+kvittblivning av batterier	battery disposal
+kväve	nitrogen
+kvävedioxid	nitrogen dioxide
+kvävefixering	nitrogen fixation
+kvävehaltigt gödselmedel	nitrogenous fertiliser
+kvävemonoxid	nitrogen monoxide
+kväveoxid	nitrogen oxide
+kväveoxider	nitrogen oxides
+kvävets kretslopp	nitrogen cycle
+kyla	cold
+kylmedel	refrigerant
+kylning	cooling
+kylning	refrigeration
+kylningsindustri	refrigeration industry
+kylolja	cooling oil
+kylskåp	refrigerator ; fridge
+kylskåp; kylrum ; kylskåp ; kylrum	refrigerator
+kyltorn	cooling tower
+kylvatten	cooling water
+kymriska ; walesiska	Welsh ; Welsh
+kypare	waiter
+kyrka	church
+källaren	basement
+källvatten	spring water
+känsla för naturen	feeling for nature
+kärlek	love
+kärlväxter ; kärlväxt	tracheophyte ; vascular plant
+kärn(krafts)reaktor ; kärnkraftsreaktor ; kärnreaktor	nuclear reactor
+kärnbränsle	nuclear fuel
+kärnbränsleelement	nuclear fuel element
+kärnenergi	nuclear energy
+kärnenergilagstiftning	nuclear energy legislation
+kärnenergiolycka	nuclear accident
+kärnfusion	nuclear fusion
+kärnfysik	nuclear physics
+kärnklyvning	nuclear fission
+kärnkraftsolycka (explosion) ; kärnkraftsolycka	nuclear explosion (accident) ; nuclear explosion
+kärnkraftverk	nuclear power plant
+kärnreaktion ; 核反応	nuclear reaction
+kärnsäkerhet; kärnkraftssäkerhet	nuclear safety
+kärnteknisk anläggning	nuclear facility
+kärnvapen	nuclear weapon
+kärnvapenprov	nuclear test
+kärr ; sumpmark ; våtmark	marsh
+kådplanta	resinous plant
+köp; inköp ; inköp ; köp	buy ; purchase
+köpa	buy ; purchase
+köpcentrum	shopping centre
+köpman	merchant
+körsbär	cherry
+körtel	gland
+kött	meat
+köttdjur; nötkreatur	beef cattle
+köttätare ; rovdjur	carnivore
+laboratorieavfall	laboratory waste
+laboratorieexperiment	laboratory experiment
+laboratorieforskning	laboratory research
+laboratorieteknik	laboratory technique ; laboratory techniques
+laboratorietest	laboratory test
+laboratorium	laboratory
+lack; lackera ; lack ; lackera	lacquer
+lag	law ; law (science)
+lag ; lagar	law
+lag ; lagstiftning	law
+lag om blyhalt i bensin	lead-in-petrol law
+lag om databehandling	data processing law
+lag om farligt gods	dangerous goods law
+lag om farligt gods	dangerous goods regulation
+lag om gödselemedel	fertiliser law
+lag om immissionsövervakning	immission control law
+lagar om miljöfarliga ämnen	hazardous substances legislation
+lagen om avfallsdisponering	waste disposal act
+lagerföring	stocking
+lagförslag	law draft
+lagstiftande församling;	legislature
+lagstiftande myndighet	legislative authority
+lagstiftning	legislation
+lagstiftning om ansvar	liability legislation
+lagstiftning om genteknik	genetic engineering legislation
+lagstiftning om miljöförorening	legislation on pollution
+lagstiftning om miljökemikalier	environmental chemicals legislation
+lagstiftning om miljökonsekvensbeskrivning	EIA law
+lagstiftning på jordbrukets område	agricultural legislation
+lagstiftningsbehörighet	legislative competence
+lagstiftningsförfarande	legislative procedure
+lagstiftningsinformation	legislative information
+lagstiftningsram	framework legislation
+lagun	lagoon
+lagändring	law amendment
+lakvatten; pressvatten i avfallsupplag	landfill leachate
+lampa	lamp ; light
+land ; mark	land
+land ; område ; territorium; område; land ; territorium	territory
+land-cover	land cover
+landbaserad verksamhet	land-based activity
+landbaserade havsföroreningar	land-based marine pollution
+landform	landform
+landskap ; landskap; natur ; natur	landscape
+landskap efter brytning	landscape after mining
+landskapsarkitektur	landscape planning
+landskapsekologi	landscape ecology
+landskapsförstöring	landscape consumption
+landskapsförändring	landscape alteration
+landskapsskydd	landscape protection
+landskaputnyttjning	landscape utilisation
+lanskapsarkitektur; landskapsvård	landscape architecture
+lantan	lanthanum
+lantbruksmaskiner ; jordbruksredskap	agricultural equipment ; agricultural machinery ; farm machinery
+lantbruksmaskiner och jordbruksredskap	agricultural equipment
+lantbruksteknik	farming technique
+lanterna ; lykta	lantern
+lantgård där avloppsvattnet [renas och] används som gödningsämne ; lantgård där avloppsvattnet (renas och) används som gödningsämne	sewage farm
+lantligt område ; landsbygd	rural area
+lantställe	country lodge
+lao	Lao ; Lao
+lasarett ; sjukhus	hospital ; clinic
+laser	laser ; Light Amplification by Stimulated Emission of Radiation
+lastbil	lorry
+latin	Latin ; Latin
+lavar ; lav	lichen
+lavendel	lavender ; lavander
+lavin ; skred	avalanche
+lavinskydd	avalanche protection
+lawrencium	lawrencium
+lax	salmon
+ledförbindelse ; led	joint ; articulation
+ledning	pipeline
+ledning ; rör; ledning ; rör	pipe
+ledningsförmåga; konduktivitet ; ledningsförmåga ; konduktivitet ; elektrisk konduktivitet	conductivity ; electrical conductivity
+leende	smile
+legering	alloy
+lejon	lion
+lek ; spel ; sport	game
+leopard	leopard
+lera; lerjord ; lera ; lerjord	clay
+letargi	lethargy ; sluggishness ; languor
+lettiska	Latvian ; Latvian
+leukemi	leukaemia
+lever	liver
+leveransavi	dispatch note
+levnadsstandard	living standard
+levnadsvillkor	living condition
+lexikon	lexicon
+liberalism	liberalism
+licensieringsförfarande	licencing procedure
+lignit	lignite
+lignitbrytning	lignite mining
+lillfinger	little finger ; pinkie
+lim	glue
+limnologi	limnology
+lind; kalk ; lind ; kalk	lime
+lineär ljudstrålare	linear source of sound
+linje	alignment
+linje	line
+linjekälla	line source
+lins	lens
+lins	lentil
+lipid	lipid
+lipofilt ämne	lipophilic substance
+litauiska	Lithuanian ; Lithuanian
+litium	lithium
+litografi	lithography
+litosfär	lithosphere
+litteratur	literature
+litteraturutvärdering	literature evaluation
+livskvalitet	quality of life
+livslängd; livscykel ; livscykel	life cycle
+livsmedel	foodstuff
+livsmedel ; mat	food
+livsmedel från lantbruksproduktionen	agri-foodstuff
+livsmedelbehov; livsmedelkrav	food requirement
+livsmedelkvalitet	food quality
+livsmedelsberedningsindustri; livsmedelsförädlingsindustri ; livsmedelsberedningsindustri ; livsmedelsförädlingsindustri	food processing industry
+livsmedelsförorening	food pollutant
+livsmedelshygien	food hygiene
+livsmedelsindustri	food industry
+livsmedelskonservering	food preservation
+livsmedelstillsats; fodertillsats	food additive
+livsmedelteknik	food technology
+livsmiljö	living environment
+livsmiljö ; utbredningsområde; livsmiljö ; utbredningsområde	habitat
+livsrum	living space
+livsstil; livsföring ; livsstil ; livsföring	lifestyle
+ljud	sound
+ljudisolering	acoustic insulation
+ljudmätning	sound measurement
+ljus	light
+ljus ; stearinljus	candle
+lo	lynx
+lok ; lokomotiv	locomotive
+lokal ekonomi	local finance
+lokal fritid; lokal rekreation	local recreation
+lokal miljökonsekvensbeskrivning	EIA (local)
+lokal myndighet	local authority
+lokal passagerartrafik	local passenger service
+lokal regering	local government
+lokal regeringspolitik	local government policy
+lokal skogsodling	local afforestation
+lokal trafik	local traffic
+lokal utveckling	local development
+lokal värmetillförsel	local heat supply
+lokalisering av industrier	location of industries
+longitud; längd	longitude
+loppor ; loppa	flea
+lotsning	pilotage
+lotteri	lottery
+lovande	auspicious
+luft	air
+luftavläggning	atmospheric layering
+luftburet buller	airborne noise
+luftförorening	air pollution
+luftförorening	air pollutant
+luftkonditionering	air conditioning ; AC ; air-conditioning
+luftkraftledning	overhead power line
+luftkvalitet	air quality
+luftkvalitetsstyrning	air quality management
+luftkvalitetsövervakning	air quality monitoring
+luftning	aeration
+luftrumsplanering	airspace planning
+lufttemperatur	air temperature
+lufttransport	air transportation
+lufttransport; förflyttning av luftmassor	air movement
+lukt	odour
+luktande förorening	olfactory pollution
+lump	rag
+lunch ; lunch ; lunch ; lunch ; lunch	lunch ; lunch ; lunch ; lunch ; luncheon
+lund; skogstomt ; lund ; skogstomt	bocage
+lunga	lung
+lungsjukdom	pulmonary disease
+lut	lye
+lutetium	lutetium
+lux	lux
+luxemburgiska	Luxembourgish ; Luxemburgish ; Luxembourgian
+lymfatiskt system; lymfsystem ; lymfsystem ; lymfatiskt system	lymphatic system
+lysförmåga; luminositet ; luminositet ; lysförmåga	luminosity
+lysimetri	lysimetry
+lyssna	attend
+läckning; läckage; infiltrationsförlust ; läckning ; läckage ; infiltrationsförlust	leakage
+läder	leather
+läderindustri	leather industry
+läger	camp ; military camp ; army camp ; campsite
+läkemedel	drug
+lämplig teknik	appropriate technology
+lämplig tillgång till livsmedel; lämpligt livsmedelsförråd	adequate food supply
+läpp	lip
+läppstift	lipstick
+lära	teach
+lärare	teacher
+läsa	read
+lätthet	facility
+lågkostnadsbyggnad	low-cost housing
+lågnivåteknik	low-level technology
+lån mellan bibliotek	inter-library loan
+långsam	slow
+långstidseffekt	long-term effect
+långstidsexperiment	long-term experiment
+långtrafik	long-distance traffic
+lök	onion
+lön	salary
+lönsamhet	cost-benefit
+lönsamhetsanalys	cost-benefit analysis
+lördag	Saturday
+löslighet	solubility
+lösning av miljöproblem	environmental problem solving
+lösningsmedel	solvent
+lövskog	deciduous forest ; deciduous wood
+lövträd	deciduous tree
+lövträd	broad-leaved tree
+macchia	maquis
+mag-tarmkanalen	gastrointestinal tract ; alimentary canal
+mage	stomach
+magnesium	magnesium
+magnetband	magnetic tape
+magnetsim ; magnetism	magnetism
+maj	May
+majonnäs	mayonnaise
+make ; man	husband ; spouse
+makedonska	Macedonian ; Macedonian
+makrill	mackerel
+makroekonomi	macroeconomics
+makroekonomiskt mål	macroeconomic goal
+makrofyt	macrophyte
+malaria	malaria
+malayalam	Malayalam ; Malayalam
+malm	ore
+malning ; polering ; slipning	grinding
+malningsrest	residue of grinding
+maltesiska	Maltese
+mamma ; moder ; mor	mother
+man	male ; man
+man ; människa	man
+mandarin	mandarin ; Mandarin ; Standard Mandarin
+mandel	almond
+mangan	manganese
+mango	mango
+mangrove	mangrove
+maori	Maori
+marathi	Marathi ; Marāthi ; Marāthi ; MarÄthi
+marginaljord	marginal land
+marin naturpark	marine park
+marina; småbåtshamn; strandpromenad ; marina ; småbåtshamn	marina
+marinbiologi	marine biology
+marinekologi	marine ecology
+maringeologi	marine geology
+marint ekosystem	marine ecosystem
+marint reservat	marine reserve
+marint skyddsområde	protected marine zone
+markanvändning	land use
+markanvändningssystem	land use regime
+markbetäckning; komposttäckning; gödselhalm	mulch
+markbördighet; jordens bördighet	soil fertility
+markförvaltningsinterventionsområde	land-management intervention area
+markhöjning	raising a site
+marklära; pedologi ; marklära	soil science
+marknad	market ; marketplace
+marknadsekonomi	market economy
+marknadsform	market form
+marknadsföring av miljövänliga produkter	ecomarketing
+marknadspris	market price
+marknadsundersökning	market study
+marknadsundersökning; opinionsundersökning	market research
+marmor	marble
+mars	March
+marskjord	fen
+marsvin	guinea pig
+maskineri ; maskineri; maskiner ; maskiner	machinery ; mechanism
+maskinindustri	mechanical industry
+maskintillverkning	machine manufacture
+maskinvibration	mechanical vibration
+maskros	dandelion
+massa	mass
+massmedia	mass media
+masugn	blast furnace
+matematik	mathematics
+matematisk analys	mathematical analysis
+matematisk metod	mathematical method
+material	material ; materials
+materialegenskaper	properties of materials
+materials livslängd	material life cycle
+materialvetenskap	materials science
+matta	carpet
+mausoleum	mausoleum
+maximal immissionshalt	maximum immission concentration
+med ; tillsammans med	alongside ; amongst ; with
+medborgare; stadsbo ; medborgare ; stadsbo	citizen
+medborgarinitiativ	citizen initiative
+medborgarnas medvetenhet	citizen awareness
+medborgarrätt	citizen rights
+meddelande om fara	risk communication
+medel som motverkar förruttnelse	antifouling agent
+medelhavsklimat	Mediterranean climate
+medförbränning	co-incineration
+medgäldenär	joint debtor
+medicin	medicine ; medicine (practice)
+medicin ; medicin; läkarvetenskap ; läkarvetenskap	medical science
+medicinalväxt	medicinal plant
+mediterran skog	Mediterranean forest
+mediterrant träslag	Mediterranean wood
+medlidande	pity ; compassion
+meitnerium	meitnerium
+mejeriindustri	dairy industry
+mejeriprodukt	dairy product
+mejning; slåtter ; mejning ; slåtter	mowing
+mekanisk utrustning	mechanical equipment
+mekanisk verkstad	engineering work
+mellan	between
+mellangård	perineum
+melodi	melody ; tune
+membran	membrane
+mendelevium	mendelevium
+menora	menorah
+metabolism	metabolism
+metabolit	metabolite
+metafor	metaphor
+metafysik	metaphysics
+metainformation; metadata	metainformation
+metall	metal
+metallavfall	metal waste
+metallindustri	metal products industry
+metallindustri (ej järn-)	non-ferrous metal industry
+metallmineral	metallic mineral
+metallorganisk förening	organometallic compound
+metalloxid	metal oxide
+metallurgi	metallurgy
+metallurgisk industri	metallurgical industry
+metallvara; metallprodukt	metal product
+metangas	methane ; marsh gas ; methyl hydride
+metanjäsning	methanisation
+metanol	methanol
+meteor ; meteor ; meteor ; meteor ; meteor ; stjärnfall	meteor ; meteor ; meteor ; meteor ; meteor ; shooting star ; falling star
+meteorit	meteorite
+meteorologi	meteorology
+meteorologisk forskning	meteorological research
+meteorologisk katastrof	meteorological disaster
+meteorologisk parameter	meteorological parameter
+meteorologiska fenomen	meteorological phenomenon
+metning	angling ; fishing ; line-fishing
+metod	method
+metodologi; metod	methodology
+metrologi; mätningslära ; metrologi ; mätningslära	metrology
+metronom	metronome
+metropol; huvudstad; storstad ; metropol ; storstad	metropolis
+mijöskydd i företaget	environmental protection in the enterprise
+mikrobiologi	microbiology
+mikrobiologisk analys	microbiological analysis
+mikrodator	microcomputer
+mikroekosystem	microecosystem
+mikroelektronik	microelectronics ; microminiaturization ; microsystem electronics
+mikrofiltrering	microfiltration
+mikrofon	microphone
+mikroförorening	micropollutant
+mikroklimat	microclimate
+mikroklimatologi	microclimatology
+mikroorganism	micro-organism
+mikrovåg	microwave
+mildrande åtgärd	mitigation measure
+militär lufttrafik	military air traffic
+militär utrustning	military equipment
+militär verksamhet	military activities
+militär; militär styrka ; militär	armed forces
+militära aspekter	military aspects
+militärt område	military zone
+miljö	environment
+miljö och hälsa	environmental health
+miljö- och hälsoskydd	environmental health protection
+miljöanalys	environmental analysis
+miljöanpassad arkitektur	environmental sustainable architecture
+miljöanpassning	ecological adaptation
+miljöansvar	environmental liability
+miljöansvarigt förhållande	environmentally responsible behaviour
+miljöaspekt av bebyggelser	environmental aspect of human settlements
+miljöbedömning	ecological assessment
+miljöbedömning	environmental assessment
+miljöbetingad sjukdom	environmentally related disease
+miljöbevarande	environmental conservation
+miljöbidrag	environmental subsidy
+miljöbrott	environmental crime
+miljöbrott	offence against the environment
+miljöbrottlag	environmental criminal law
+miljöbrottslighet	environmental criminality
+miljöbörs	environmental stock exchange
+miljöcertifiering (miljöredovisning) ; miljöcertifiering	environmental statement (eco-audit) ; environmental statement ; eco-audit
+miljödata	environmental data
+miljöekonomi	environmental economics
+miljöekonomiska frågor	environmental economy issue
+miljöetik	environmental ethics
+miljöfarlig export av kemikalier	hazardous chemical export
+miljöfarlig soptipp	hazardous waste dump
+miljöfarliga föroreningar	hazard of pollutants
+miljöfarligt arbetsmaterial	hazardous working material
+miljöfarligt avfall; kemiskt riskavfall	hazardous waste
+miljöfarligt ämne	hazardous substance
+miljöfarligt ämne	environmentally dangerous substance
+miljöfientlig firma	environmentally unfriendly firm
+miljöfonder	environmental fund
+miljöforskning	environmental research
+miljöförenlighet	environmental compatibility
+miljöföretag	environmental enterprise
+miljöförstöring	degradation of the environment
+miljöförstöringsstraff	penalty for environmental damage
+miljöförsummelse	environmental misconduct
+miljöförändring	environmental change
+miljöhistoria	environmental history
+miljöindex	environmental index
+miljöindikator	environmental indicator
+miljöindustri	environmental industry
+miljöinformatik	environmental informatics
+miljöinformation	environmental information
+miljöinformationsnät	environmental information network
+miljöinformationssystem	environmental information system
+miljöinsikt	environmental perception
+miljöinvestering	environmental investment
+miljökatastrof	environmental accident
+miljökemi	environmental chemistry
+miljökoncept	concept of environment
+miljökonsekvens	environmental consequence
+miljökonsekvens	environmental impact
+miljökonsekvens ; verkan på miljön	effect on the environment ; environmental consequence
+miljökonsekvensbeskrivning (MKB)	environmental impact statement
+miljökonsekvensbeskrivning ; miljökonsekvensutredning ; MKB	EIA ; environmental impact assessment
+miljökonsekvensstudie	environmental impact study
+miljökostnader	environmental cost
+miljökriterier	environmental criterion
+miljökvalitetskriterium	environmental quality criterion
+miljökvalitetsmål	environmental quality objective
+miljökvalitetsnorm	environmental quality standard
+miljökvalité	environmental quality
+miljölagstiftningsförfarande	environmental legislative process
+miljömarknad	environment market
+miljömedborgarskap	environmental citizenship
+miljömedicin	environmental medicine
+miljömedvetande	environmental awareness
+miljömedveten kultur	environmental culture
+miljömuseum	ecomuseum
+miljömärke	ecolabel
+miljömärkning	ecolabelling
+miljöområde	ecozone
+miljöplan	environmental plan
+miljöplanering	environmental planning
+miljöpolicy ; miljöpolitik	environmental policy
+miljöpolitiskt instrument	environmental policy instrument
+miljöpris	environmental incentive
+miljöprogram	environmental programme
+miljöprovbank	environmental specimen bank
+miljöpsykologi	environmental psychology
+miljöpåverkningar från rekreationaktiviteter	environmental impact of recreation
+miljöpåverkningar från transporter	environmental impact of transport
+miljörapport	environmental report
+miljörevision	environmental auditing
+miljöräkenskaper	environmental accounting
+miljöskada	environmental damage
+miljöskatt; miljöavgifter	environmental tax
+miljöskydd	environmental protection
+miljöskyddsförening	environmental protection association
+miljöskyddsföreskrifter	environmental protection order
+miljöskyddsförordning	environmental protection regulation
+miljöskyddskostnader	environmental protection cost
+miljöskyddslag	environmental law
+miljöskyddslagstiftning	environmental legislation
+miljöskyddslagstiftning göllande jordbruk	environmental legislation on agriculture
+miljöskyddsnämnd; naturvårdsverk	environmental protection agency
+miljöskyddsorganisation	environmental protection organisation
+miljöskyddsteknik	environmental protection technology
+miljöstatistik	environmental statistics
+miljöstudie	environmental study
+miljöstyrning	environmental management
+miljösäkerhet	environmental security
+miljöteknik	environmental engineering
+miljöteknik	environmental technology
+miljöterminologi	environmental terminology
+miljötillstånd, -kontingent	environmental licence
+miljötoxicitet	ecotoxicity
+miljötoxikologi	ecotoxicology
+miljötoxikologisk bedömning	ecotoxicological evaluation
+miljötyp	ecotype
+miljöundervisning	environmental teaching
+miljöutbildning	environmental education
+miljöutbildning	environmental training
+miljöutveckling	environmental development
+miljövetenskap	environmental science
+miljövänlig	environment friendly
+miljövänlig bil; bil i miljöklass 1	clean air car
+miljövänlig produkt	environmentally friendly product
+miljövänlig styrning	environmentally friendly management
+miljövänlig upphandling	environmental friendly procurement
+miljövård	environmentalism
+miljövård	maintenance of environment
+miljöövervakning	environmental control
+miljöövervakning	environmental monitoring
+minderårig	minor
+mineral	mineral
+mineral förorening	mineral pollution
+minerala ämnen	mineral matter
+mineralavfall	mineral waste
+mineralbrytning	mineral extraction
+mineralfyndighet	mineral deposit
+mineralindustri	mineral industry
+mineralisering; förvandling till mineral ; mineralisering	mineralisation
+mineralogi	mineralogy
+mineralolja	mineral oil
+mineralresurser	mineral resource
+mineralull	mineral fibre
+mineralvatten	mineral water
+minikjol	miniskirt ; mini-skirt
+ministerbehörighet; ministerbefogenhet; ministerkompetens	minister competence
+ministerialförordning	ministerial decree
+ministerium; departemente	ministry
+minoritet	minority
+minskning av  förorening	pollutant reduction
+minskning av utsläpp	emission reduction
+minut	minute
+missbildning	malformation
+misslyckad	abortive
+mistral	mistral
+mjäla; silt ; mjäla ; silt	silt
+mjälte	spleen
+mjölk	milk
+mjölkproducerande gård	dairy farm
+modell	model
+modellering	modelling
+moderkaka	placenta
+moderskap	motherhood ; maternity
+molekylärbiologi	molecular biology
+mollusker; blötdjur ; mollusker ; blötdjur	mollusc
+moln	cloud
+molybdeeni	molybdenum
+monetär bedömning	monetary assessment
+monetär ekonomi	monetary economics
+monopol	monopoly
+monteringsbyggnad; elementbyggnad	prefabricated building
+monument	monument
+monumentskydd	conservation of monuments
+mordbrand	arson
+morfin	morphine
+morfologi	morphology
+mosaik	mosaic
+moské	mosque
+mossarter ; mossart	bryophyte
+mossor ; mossa	moss
+motett	motet
+motor	engine
+motorbränsle	motor fuel
+motorfordon	motor vehicle
+motorväg	motorway ; pike ; expressway ; freeway ; state highway ; superhighway ; throughway ; thruway
+motorväg	highway
+motstridande användning	conflicting use
+motstånd; resistans ; motståndskraft	resistance (biological) ; resistance
+mottagande	acceptance ; credence
+mudder; slam ; mudder ; slam	mud
+muddermassa	dredged material
+muddring	dredging
+multilateralt avtal	multilateral agreement
+multimediateknik	multimedia technology
+multinationellt företag	multinational firm
+multispektralskanner	multispectral scanner
+mulåsna ; mula	mule
+mun	beak ; mouth
+murare	mason ; bricklayer ; stonemason
+murning; murverk; frimureri ; murverk	masonry
+mus	mouse
+museum	museum
+musik	music
+musikal	musical
+musiker	musician
+musikinstrument ; instrument	instrument ; musical instrument
+muskulatur	muscular system
+musselodling	mussel farming
+mutagen	mutagen
+mutagenicitet	mutagenicity
+mutagenicitetsprovning	mutagenicity testing
+mutant	mutant
+mutation	mutation
+mygga	musquito ; mosquito
+mykologi	mycology
+mykorrhiza	mycorrhiza
+myndighet	administrative body ; administrative organ
+myndighet	authority body
+mynt	coin ; money
+myra	ant
+mystisk	mysterious
+myt; saga; sägen; legend ; myt ; saga ; sägen ; legend	myth
+människans livsmiljö	human habitat
+människans verksamhet	anthropic activity
+människors hälsa	human health
+människovetenskap	human science
+mänsklig ekologi	human ecology
+mänsklig kropp	human body
+mänsklig sjukdom	human disease
+mänskliga rättigheter	human rights
+märkare; markör	marker
+märr ; sto	mare
+mätare; mätinstrument ; mätare ; mätinstrument	measuring instrument
+mätmetod	measuring method
+mätning	measuring
+mätning av  miljöföroreningar	pollution measurement
+mätning av buller	noise measurement
+mätprogram	measuring programme
+mål ; dialekt	dialect
+målarverksamhet	painting business
+målarverkstad	paint shop
+målgrupp	target group
+målkvalitet	quality objective
+målningsutrymme	paint room
+månad	month
+måndag	Monday
+måne ; måne	moon ; moon ; satelite ; satelite
+mås	gull
+möbelindustri	furniture industry
+möbler	furniture
+mönsterigenkänning	pattern recognition
+mördare ; lönnmördare	assassin ; assassinator
+mörk	black ; dark
+nadir	nadir
+nakenfröig växt; gymnosperm ; nakenfröig växt ; gymnosperm	gymnosperm
+nationalekonomi	national economy
+nationalisering; socialisering; naturalisering	nationalisation
+nationalpark; naturreservat ; naturreservat ; nationalpark	national park
+nationalt fiskereservat	national fishing reserve
+nationell bokföring	national accounting
+nationell gräns	national boundary
+nationell miljöbokföring	national environmental accounting
+nationell planering; boverk	national planning
+natrium	sodium
+naturarv	natural heritage
+naturfiber	natural fibre
+naturgas	natural gas
+naturgasundersökning	natural gas exploration
+naturkatastrof	natural disaster
+naturlandskap	natural scenery
+naturlig fara	natural hazard
+naturlig fara	natural risk
+naturlig föryngring; självförnyelse; naturlig återväxt	natural regeneration
+naturlig radioaktivitet	natural radioactivity
+naturlig skog	natural forest
+naturligt gödselmedel	natural fertiliser
+naturligt ämne ; naturmaterial	natural material
+naturliv	wildlife ; 野生生物
+naturmiljö	natural environment
+naturminne	natural monument
+naturområde	natural area
+naturpark	natural park
+naturreservat	nature reserve
+naturreservat; naturpark	integral natural reserve
+naturresurser; naturtillgångar ; naturresurs ; naturtillgång	natural resource
+naturskydd	nature conservation
+naturskydd	nature protection
+naturskyddslagstiftning	nature conservation legislation
+naturskyddsorganisation	nature conservation organisation
+naturskyddsprogram	nature conservation programme
+natursten	natural stone
+naturvetenskap	natural science
+naturvärde	natural value
+naturvård	landscape conservation
+naturvårdsförvaltning	landscape management
+naturvårdspolitik	landscape conservation policy
+navel	belly button ; bellybutton ; navel ; omphalos ; omphalus ; umbilicus
+neapolitanska	Neapolitan ; Neapolitan
+nedbrytning av miljöföroreningar	pollutant degradation
+nedbrytning av naturresurser	degradation of natural resources
+nedbrytningsprodukt	degradation product
+nederbörd	atmospheric precipitation ; precipitation
+nederländska ; holländska	Dutch
+nedfall av miljöföroreningar; avlagring av miljöföroreningar	pollutant deposition
+nedläggning	closing down
+nedläggning av ett företag	closing down of firm
+nedsatt hörsel	hearing impairment
+nej	no
+nekros	necrosis
+nematoder; rundmaskar ; nematod ; rundmask	nematode
+neodym	neodymium
+neologism	neologism
+neon	neon
+nepalesiska ; nepali	Nepali ; Nepali
+nepotism	nepotism
+neptunium	neptunium
+nervsystem	nervous system
+nettningspolitik (handel med utsläpp)	netting policy (emissions trading) ; netting policy
+neurologi	neurology
+neurotoxicitet	neurotoxicity
+neutralisering; neutralisation ; neutralisering ; neutralisation	neutralisation
+neutralt avfall; inert avfall	inert waste
+ni	y'all ; you ; you lot ; yous
+nickel	nickel
+nio	9 ; nine
+niob	niobium
+nitrat	nitrate
+nitratförening	nitro compound
+nitrifiering; nitrifikation ; nitrifiering ; nitrifikation	nitrification
+nitrosamin	nitrosamine
+njure ; njure ; njure	kidney
+nobelium	nobelium
+noll	zero ; null
+nomad; nomadisk ; nomad ; nomadisk	nomad
+nomenklatur	nomenclature
+norm	norm
+norm ; norm; standard ; standard	standard
+norm om bostadskvalitet	housing quality standard
+normer för miljöföroreningar	pollution norm
+norska	Norwegian
+noshörning	rhino ; rhinoceros
+not	note
+november	November
+nukleinsyra	nucleic acid
+ny	new ; novel
+ny gemenskap	new community
+ny installation; ny anläggning	new installation
+ny teknik	new technology
+nynorsk ; nynorska ; nynorska	Nynorsk
+nyodling; utdikning; efterbehandling; återvinning av land	land reclamation
+nytt material; nytt ämne	new material
+nytt år	New Year ; New Year's Day
+nyttjande av hav	ocean exploitation
+näringsgren	branch of activity
+näringsjord	nutrient medium
+näringskedja	food chain
+näringsurtagning	nutrient removal
+näringsvärde	nutritive value of food
+näringsämne	nutrient
+näringsämnenas cykel	nutrient cycle
+näringsämnesinnehåll	nutrient content
+näsa	nose
+näsborre	nostril
+näsduk	handkerchief
+nässeldjur	coelenterate
+nästan	almost
+nätfiske	phishing
+nödfall	emergency
+nödhjälp	emergency relief
+nöjesfält; tivoli ; nöjesfält ; tivoli	amusement park
+nötkreatur	cattle
+oanvänt militärområde	disused military site
+obduktion	autopsy
+obehandlat vatten	raw water
+oberoende	independence
+observationssatellit	observation satellite
+observatorium	observatory
+ocean	ocean ; sea ; body of water ; bounding main
+oceanografi	oceanography
+oceanströmning	ocean circulation
+och	and ; as well as ; in addition to ; together with ; too
+och	and
+odefinierat juridiskt begrepp	indefinite legal concept
+odlad växt	cultivated plant
+odling	cultivation ; tillage
+odling av jordbruksmark	cultivation of agricultural land
+odling av träd och buskar	arboriculture
+odlingsmetod	cultivation method
+odlingssystem	cultivation system
+offentlig byggnad	public building
+offentlig diskussion	public discussion
+offentlig finansiering	public financing
+offentlig folkrätt	public international law
+offentlig hearing; offentligt åhörande	public hearing
+offentlig information	public information
+offentlig institution	public institution
+offentlig institution av  administrativt slag	public institution of administrative nature
+offentlig institution av  industriellt och kommersiellt slag	public institution of industrial and commercial nature
+offentlig medvetenhetskampanj	public awareness campaign
+offentlig park	public park
+offentlig rätt	public law
+offentlig undersökning	public inquiry
+offentlig upphandling	public procurement
+offentlig åtgärd	public action
+offentlig; allmänheten ; allmänheten ; offentlig	public
+offentliga arbeten	public works
+offentliga finanser	public finance
+offentliga sektorn	public sector
+offentliga utgifter	public expenditure
+offentligt bad	public bath
+offentligt bistånd	public aid
+offentligt deltagande	public participation
+offentligt deltagande; allmänhetens deltagande	public attendance
+offentligt kontrakt; offentligt avtal	public contract
+offentligt maritimt område	public maritime domain
+offentligt vattenvägsområde	public waterways domain
+offer	sacrifice
+officiell förhandling; officiell domstolsbehandling; officiell handläggning ; officiell förhandling ; officiell domstolsbehandling ; officiell handläggning	official hearing
+officiell tjänst; officiell förpliktelse ; officiell tjänst ; officiell förpliktelse	official duty
+officiellt språk	official language
+oftalmologi	ophthalmology
+ogräs	weed
+ogräsbekämpningsmedel; herbicid ; ogräsbekämpningsmedel ; ogräsmedel ; herbicid	herbicide
+ohm	ohm
+okontrollerat utsläpp av organismer	accidental release of organisms
+oktav	octave
+oktober	October
+oligarki	oligarchy
+oligopol	oligopoly
+olika mål	conflict of aims
+oliv	olive
+olivoljerester	olive oil mill wastewater
+olje- och fettindustri	oil and fat industry
+oljebarriär	oil boom
+oljebaserad energi	oil-based energy
+oljebindande medel	oil binding agent
+oljeborrning	drilling for oil
+oljeborrning	oil exploration
+oljeförbrukning	petroleum consumption
+oljeförorening	oil pollution
+oljeindustri	petroleum industry
+oljeledning	oil pipeline
+oljeproduktion	oil production (chain)
+oljeraffinaderi	oil refinery
+oljetanker ; tankfartyg	oil tanker
+oljeutsläpp	oil slick
+oljeutsläpp	oil spill
+oljeutsläpp ; oljeutsläpp; oljekatastrof ; oljekatastrof	oil disaster
+oljeutvinning	oil extraction
+olycka	accident
+olösligt ämne	insoluble substance
+omega	omega
+omflyttning	rehousing
+omflyttning av djur	animal displacement
+omgivningsbuller	neighbourhood noise
+område	distribution area
+område med diverse användning	mixed use area
+område med företrädesrätt	pre-emption zone
+område med gågator	pedestrian zone ; pedestrian area ; car-free zone ; auto-free zone ; pedestrianised zone
+område med oförorenad luft	clean air area
+område som är utsatt för potentiell förorening	area of potential pollution
+område utsatt för påfrestning	area under stress
+områdesskydd	land conservation
+omröstning	voting
+omvänd osmos	reverse osmosis
+onkologi	oncology
+onsdag	Wednesday ; quarta-feira
+ontogeni ; ontogeni	ontogenesis ; ontogenesis ; ontogeny
+ontologi	ontology
+oorganisk förorening	inorganic pollutant
+oorganisk kemi	inorganic chemistry
+oorganiskt gödselmedel	inorganic fertiliser
+opera	opera
+operett	operetta
+opinionsundersökning	public opinion polling
+opinionsundersökning	opinion survey
+opium	opium
+optik	optics
+optimism ; optimism ; optimism	optimism ; optimism ; optimism ; optimism ; optimism ; optimism ; optimism
+oralsex	oral sex
+ord	word
+ordbok	dictionary
+ordklass	part of speech ; lexical category
+ordlista	glossary
+ordlista; vokabulär; ordförråd ; ordförråd ; vokabulär	vocabulary
+ordning ; beställning	order
+ordning; beställning ; ordning ; beställning	order
+ordspråk	proverb ; saying ; maxim
+organ	organ
+organell	organelle
+organisation	organisation (law)
+organisation av  rättssystemet	organisation of the legal system
+organisation av undervisning; utbildningsorganisation	organisation of teaching
+organisk  förening	organophosphorous compound
+organisk  svavelförening	organosulphur compound
+organisk förorening	organic pollutant
+organisk förorening	organic pollution
+organisk halogenförening	organohalogen compound
+organisk kemi	organic chemistry
+organisk kväveförening	organonitrogen compound
+organisk syreförening	organooxygen compound
+organiskt avfall	organic waste
+organiskt kol	organic carbon
+organiskt kväve	organic nitrogen
+organiskt lösningsmedel	organic solvent
+organiskt material	organic matter
+organiskt ämne	organic substance
+organism	organism
+organismer som inte är  målorganismer	non-target organism
+organoleptisk egenskap	organoleptic property
+orimlig skorstenshöjd	excessive height of chimney stacks
+orkester	orchestra
+orkidé	orchid
+orm	snake
+ormbunkar ; ormbunke	fern
+ornitologi	ornithology
+oro för miljön	environmental anxiety
+orografi	orography
+orsak till olycka	accident source ; cause of the accident
+ortografi	orthography
+osmium	osmium
+osmos	osmosis
+ost	cheese
+ostron	oyster
+ostronodling	oyster farming
+oxidation	oxidation
+oxidationsreduktion	oxidation-reduction
+oxider	oxide
+oxiderande medel	oxidising agent
+oxiderbart material	oxidisable material
+oxygen ; syre ; syrgas	oxygen
+ozon	ozone
+ozonisering	ozonisation
+ozonnedbrytningspotential; ozonnedbrytande faktor; ODP	ozone depletion potential
+ozonskikt	ozone layer
+pacifist	pacifist
+packis	ice pack
+paddor ; padda	toad
+paleoekologi	palaeoecology
+paleoentologi	palaeontology
+paleoklimatologi	palaeoclimatology
+palindrom	palindrome
+palladium	palladium
+palm	palm
+pandemi	pandemic
+papegoja	parrot
+papper	paper
+pappersavfall	waste paper
+pappersindustri	paper industry
+parabel	parabola
+parametrar	parameter
+parasit	parasite
+parasitologi	parasitology
+parlament	Parliament
+parlamentsdebatt	parliamentary debate
+parlamentsrapport	parliamentary report
+parotit ; påssjuka	mumps
+partikel	particle
+partikelseparator	particle separator
+partiklar i atmosfären	atmospheric particulate
+partnerskap mellan den offentliga och den privata sektorn	public-private partnership
+patent	patent
+patogen	pathogen
+patogen organism	pathogenic organism
+patologi	pathology
+patologisk verkan	pathologic effect
+pedagogik	pedagogy
+pedosfär	pedosphere
+pegoterat; polyetylenterftalat	polyethylene terephtalate
+pendlartrafik	commuter traffic
+penningmarknad	money market
+pentaklorfenol	pentachlorophenol
+per capita-data	per capita data
+perifärt parkområde	peripheral park area
+periodiska systemet	periodic table
+periphyton	periphyton
+permeabilitet; genomsläpplighet ; permeabilitet ; genomsläpplighet	permeability
+peroxyacetylnitrat	peroxyacetylnitrate
+persiska ; farsi	Persian ; Western Farsi ; Farsi
+person	person
+personbil	private car
+personligt ansvar	personal responsibility
+persontransport	passenger transport
+pessimism	pessmism
+pesticid	pesticide
+pesticiders beständighet	persistence of pesticides
+pesticidrestmängd	residual pesticide
+petrokemisk	petrochemical
+petrokemisk industri	petrochemical industry
+petroleum	petroleum
+piano	piano ; pianoforte
+piemontesiska	Piedmontese ; Piedmontese ; Piemontese ; Piemontese
+pil	arrow
+pilotanläggning	pilot plant
+pilotprojekt	pilot project
+pilspets	arrowhead
+pingvin	penguin
+pixel; bildpunkt ; pixel ; bildpunkt	pixel
+pizza	pizza
+plan	plane
+plan	plan
+plan källa	plane source
+plan över markanvändning	land use plan
+planering av kustområde	coastal zone planning
+planering av markanvändning	land use planning
+planering på jordbruksområdet	agricultural planning
+planering; projektring	planning
+planet	planet
+plankton	plankton
+plantering	planting
+plantor ; växt	plant
+plantskola	nursery (plant breeding) ; nursery ; plant nursery
+plasmateknik	plasma technology
+plast	plastic
+plastavfall	plastic waste
+platform	stage
+platin	platinum
+plats	place ; location
+plutonium ; plutonium ; plutonium	plutonium ; plutonium ; plutonium
+plötslig	sudden ; abrupt ; precipitous
+polarområde	polar region
+polder	polder
+policyprogrammering	policy planning
+polis	police
+polislag	police law
+polisstyrka	police power
+politik	politics
+politik ; politik; policy; strategi ; policy ; strategi	policy
+politisk doktrin	political doctrine
+politisk ekologi	political ecology
+politisk geografi	political geography
+politisk ideologi	political ideology
+politisk integration	policy integration
+politisk makt	political power
+politisk organisation	political organisation
+politisk riktlinje	policy guideline
+politisk rådgivning	political counselling
+politiskt intrument	policy instrument
+politiskt parti	party ; political party
+pollen; frömjöl ; pollen ; frömjöl	pollen
+polonium	polonium
+polska	Polish ; Polish
+polybromerad bifenyl; polybromerad difenyl	polybrominated biphenyl
+polycykliskt aromatiskt kolväte	polycyclic aromatic hydrocarbon
+polycykliskt kolväte	polycyclic hydrocarbon
+polygon	polygon
+polyklordibenzodioxin	polychlordibenzo-p-dioxin
+polyklordibenzofuran	polychlorinated dibenzofuran
+polyklorerad bifenyl; polyklorerad difenyl	polychlorinated biphenyl
+polyklorerad terfenyl (PCT)	polychlorinated terphenyl
+polymer	polymer
+polymerisation	polymerisation
+polyvinylklorid	polyvinyl chloride
+pool ; simbassäng	swimming pool
+populationsdynamik	population dynamics
+populationsekologi	population ecology
+porslin	porcelain
+portugisisk ; portugisiska	Portuguese ; Portuguese
+positron	positron
+postkontor	post office
+potatis ; pottis	potato ; patato
+pragmatik	pragmatics
+praseodym	praseodymium
+prata ; tala ; säga	say
+preklusion	foreclosure
+prelat	prelate
+premiefond	incentive fund
+premieskatt	incentive tax
+preposition	preposition
+president	president
+pressning	pressing
+primater	primate
+primtal	prime number ; prime
+primärsektor	primary sector
+primärskog ; urskog	primary forest
+principen om att samhället betalar	community-pays principle
+prins	prince
+prioritering ur miljösynpunkt	environmental priority
+pris	price
+pris fritt gården	farm price
+prispolitik	prices policy
+privat hushåll	private household
+privat område	private domain
+privat skog	private forest
+privata sektorn	private sector
+privatisering	privatisation
+privaträtt	private law
+privatskog	forestry unit
+problem ; problemo	problem
+processanalys	process analysis
+processrätt	procedural law
+producenten komposterar	composting by producer
+producentens ansvar	producer liability
+produktansvar	product liability
+produktbedömning	product evaluation
+produkter; varor	product
+produktidentifiering	product identification
+produktinformation	product information
+produktionspolitik	production policy
+produktivitet	productivity
+produktivitetstrend	productivity trend
+produktjämförelse	product comparison
+produktreklam	product advertising
+produktslivslängd	product life cycle
+produktstandard	product standard
+prognos	forecast
+prognosuppgifter	prognostic data
+program	programme
+programvara ; mjukvara	software
+programvaruutveckling ; utveckling av programvara	software development
+projekt	project
+projekteringslagstiftning	planning law
+projekteringsåtgärd	planning measure
+prometium	promethium
+prostata	prostate
+prostitution	prostitution
+protaktinium	protactinium
+proteinprodukt	protein product
+protokoll	protocol
+protozoa ; urdjur	protozoan
+prov ; test	test
+provins	province
+prövning där alla sökande konkurrerar	competitive examination
+prövning; metod; teknik	assay
+prövningsförfarande	hearing procedure
+psykiater	psychiatrist
+psykisk verkan	psychic effect
+psykologi	psychology
+psykologisk påfrestning	psychological stress
+psykologisk verkan	psychological effect
+psykosomatisk verkan	psychosomatic effect
+psykosomatsik sjukdom ; psykosomatisk sjukdom	psychosomatic illness
+pump	pump
+pumpning	pumping
+pungdjur	marsupial
+punjabi	Punjabi ; Panjabi
+punkt	point
+punktstrålare	point source
+purin	purin
+pyralen	pyralene
+pyrolys; förgasning ; förgasning	gasification
+pyrolys; förgasning ; pyrolys	pyrolysis
+pyrrhusseger	Pyrrhic victory
+päls	fur
+pälsberedning	furriery
+pälsdjur	fur animal
+päron	pear
+påsk	Easter
+påtryckningsgrupp	pressure group
+påve	pope
+rabatt	discount
+rabbin	rabbi
+radar	radar
+radband	rosary
+radio	radio
+radioaktiv förorening	radioactive pollutant
+radioaktivitet	radioactivity ; radioactive decay
+radioaktivt avfall	radioactive waste ; nuclear waste
+radioaktivt regn; surt regn	rainout
+radioaktivt spårämne	radioactive tracer
+radioaktivt stoftnedfall	radioactive fallout
+radioaktivt ämne	radioactive substance
+radioelement	radioelement
+radiokativ soptipp	radioactive dumping
+radiologi	radiology
+radionuklid	radionuclide
+radioprogram	radio programme
+radium	radium
+radon	radon
+raffinaderi	refinery
+raffinering	refining
+ramadan	Ramadan
+ramprogram för jordbruket	agriculture framework plan
+rapport om miljösituationen	report on the state of the environment
+rapportera till ministern	report to the minister
+rapporteringsprocess	reporting process
+raps	rape
+raster	raster
+raster till vektor	raster to vector
+reaktion mellan pesticider	interaction of pesticides
+reaktionskinetik	reaction kinetics
+reaktor	reactor
+reaktor	digester
+reaktorsäkerhet	reactor safety
+recept	recipe
+reduktion; reducering; minskning ; reduktion	chemical reduction
+redution av krafstationer	power station derating
+referensinformation	referral information
+referenssystem	referral information system
+reflektometri	reflectometry
+reflexion; reflektion; återspegling ; reflexion ; reflektion ; återspegling	reflection
+regering (kabinett)	government (cabinet)
+regeringens ansvar	government liability
+regeringsbyggnad	government building
+regeringsstrategi	government policy
+reginal plan	regional plan
+region	region
+regional förordning	regional regulation
+regional konvention	regional convention
+regional lag	regional law
+regional naturpark	regional natural park
+regional planering	regional planning
+regional statistik	regional statistics
+regional struktur	regional structure
+regional utveckling	regional development
+regionmyndighet	regional authority
+registrerat anläggningsområde	registered site
+registrering	registration
+registrering av ämnen	recording of substances
+registreringsförfarande	registration proceeding
+registreringsplikt	registration obligation
+reglering av  jordbruksproduktionen	regulation of agricultural production
+regn	rain
+regn- och vindskydd för djur	animal shelter
+regnbåge	rainbow
+regnskog	rain forest
+regnvatten	rain water
+regulativ lag	regulative law
+reklam	advertisement ; promotion
+rekommendation	recommendation
+rekreationsområde	recreational area
+relationsdatabas	relational database
+religion	religion
+ren	reindeer
+ren teknik	clean technology
+renaturering	renaturation
+rengöring; uppröjning	cleaning up
+renhållningsavdelning	cleansing department
+rening	purification
+rening av avloppsvatten; rening av spillvatten	waste water purification
+rening genom marken	purification through the soil
+reningsanläggning	purification plant
+reningsförmåga ; självreningsförmåga	purifying power
+reningsverk	purification facility
+renlighet	cleanliness
+renässans	renaissance
+reparationsverksamhet	repair business
+representation	representation
+reproduktiv manipulation	reproductive manipulation
+reptilier ; kräldjur ; kräldjur ; kräldjur ; reptili ; reptili ; reptili	reptile ; reptile ; reptile
+resa	travel
+reservoar; magasin	reservoir
+resolution	resolution
+resorption	resorption
+restanalys	residue analysis
+restavfall	residual waste
+restitutionsanspråk	claim for restitution
+restmängd vatten	residual amount of water
+resurs	resource ; resources
+resurser som inte kan förnyas	non-renewable resource
+resursreserv	resource reserve
+resursvärdering	resource appraisal
+rev	reef
+revision	audit
+revision av bokföring	inspection of records
+rhenium	rhenium
+rimlighet	reasonableness
+ringmaskar; ledmaskar; annelider ; ringmaskar ; ledmaskar ; annelider	annelid
+rinnande vatten	flowing water
+ris	rice
+ris ; riskorn ; risgryn	rice
+risk för kärnolycka	nuclear risk
+risk för miljöföroreningar	pollution risk
+risker för miljön	environmental risk
+rivningsavfall	demolition waste
+rivningsverksamhet	demolition business
+rodd ; segling	boating
+rodium	rhodium
+roman	novel
+romb	rhombus ; rhomb
+ros	rose
+rot	root
+roterugn	rotary furnace
+rovdjur	predator
+rovfågel	bird of prey
+rubidium	rubidium
+rubin	ruby
+rulljud	rolling noise
+rullstol	wheelchair
+rumänska	Romanian ; Romanaian
+rundskrivelse	circular mail
+rustning	armament
+rustningsomvandling	armament conversion
+rutenium	ruthenium
+rutherfordium	rutherfordium
+rutsystem	gridding
+rutt	route
+ruvning	brooding
+rymd ; rymden	space ; space ; space (interplanetary) ; interplanetary space
+rymdfärder; rymdfart ; rymdfart	space travel
+rymdsatellit	artificial satellite
+ryska	Russian ; Russian
+räddningssystem	rescue system
+räddningstjänst	rescue service
+rätt att göra framställningar	petition right
+rättsbranschen	law branch
+rättslig form av organisationer	legal form of organisations
+rättslig grund; juridisk grund; rättskälla	legal basis
+rättslig åtgärd	legal remedy
+rättsligt förfarande	legal procedure
+rättslära	jurisprudence
+rättsregler som gäller fängelser	law relating to prisons
+rättssystem	legal system
+rättstvist; process ; process ; rättstvist	litigation
+rättvisa ; rättvisa; rätt	justice
+rätvingar ; rätvinge	orthopteran
+råd; rådgivning ; råd ; rådgivning	advice
+rådgivande myndighet	government advisory body
+råolja	crude oil
+råvara; råmaterial ; råvara ; råmaterial	raw material
+röd glada	red kite
+röjning	land clearing
+röjningsarbete efter katastrof	disaster cleanup operation
+rök	smoke
+rök ; rök; gaser ; gaser	fume
+rökning	smoking
+röntgenium	roentgenium
+rötning	digestion
+rötslam	clearing sludge
+safir	sapphire
+sahara	sahara
+salamandrar ; salamander	salamander
+saligförklaring	beatification
+sallat ; huvudsallat	lettuce
+salt	salt
+salt badvatten	bathing seawater
+saltsyra	hydrochloric acid ; muriatic acid
+saltvatten	salt water
+saluföra; avsättning;saluföring;försäljning ; försäljning ; saluföra ; avsättning ; saluföring	marketing
+samarbete	co-operation
+samarbetspolitik	co-operation policy
+samarbetsprincip	co-operation principle
+samarium	samarium
+sambandet mellan dos och respons	dose-effect relationship
+samhälle	society
+samhällsvetenskap	social science
+sammansatt formation ; komplexbildning	complex formation
+sammansatt förorening	composite pollution
+sammansatt produkt	miscellaneous product
+sammantryckning; kompression ; sammantryckning ; kompression	compression
+sammhällets facilitet	community facility ; public facility
+samordning	co-ordination
+samråd; rådgivning; rådfrågning ; rådgivning ; samråd ; rådfrågning	consultation
+samtidig generering; parallell generering	cogeneration
+samtycka	assent
+samtycke	assent
+sand	sand
+sandbank	barrier beach
+sanddyn	sand dune
+sanering	radioactive decontamination
+sanitär utrustning	sanitary fitting
+sanning	truth
+sanskrit	Sanskrit ; Sanskrit
+sardin	sardine
+satellit	satellite
+satsvis bearbetning	batch process
+saxofon	saxophone
+schack	chess
+schakal	jackal
+schimpans	chimpanzee
+se	see
+seaborgium	seaborgium
+sebra	zebra
+sediment; avlagring ; sediment ; avlagring	sediment
+sedimentologi	sedimentology
+segelfartyg	sailing ship
+seismisk aktivitet	seismic activity
+seismisk våg	seismic sea wave ; tsunami
+selen	selenium
+selleri	celery
+semantik	semantics
+semesterläger	holiday camp
+semiotik	semiotics ; semiology
+separator	separator
+september	September
+serbiska	Serbian ; Serbian
+servett	napkin
+servitut	easement
+setswana	Tswana
+sexologi	sexology
+sextant	sextant
+sfinx	sphinx
+sicilianska	Sicilian ; Sicilian
+siemens	siemens
+silke	silk
+silver	silver
+simulering	simulation
+sindhi	Sindhi ; Sindhi
+sjuka-hussjukan	building related illness ; sick building syndrome
+sjukdomar ; sjukdom	disease ; illness ; affliction
+sjukdomsorsak	disease cause
+sjukligt fet	fat ; obese
+sjukvårdsavfall; sjukhusavfall ; sjukhusavfall ; sjukvårdsavfall	hospital waste
+självmord	suicide
+sjö	lake
+sjöbassäng	lake basin
+sjöfart	navigation
+sjöfart	maritime navigation
+sjöförorening	lake pollution
+sjökort	chart ; nautical chart
+sjörätt; sjölag	maritime law
+sjötransport	maritime transport
+skada	damage
+skada	injury
+skada ; sår	wound
+skada orsakad av militära manöver	damage from military manoeuvres
+skadedjur ; skadegörare	pest
+skadedjursangrepp	pest infestation
+skadeersättning	compensation for damage
+skadeförebyggande	damage prevention
+skadeförsäkring	damage insurance
+skadoreducering	minimisation of damage
+skalbaggar ; skalbaggar; baciller ; baciller ; skalbagge ; halvvinge	bug ; põrnikas
+skalbaggar ; skalbagge	beetle
+skaldjur	shellfish ; shellfish
+skamsen	ashamed
+skandium	scandium
+skarp	acrid
+skatt	tax
+skattelagstiftning	financial law
+sked	spoon
+skelett	skeleton
+skeppsmaskinteknik	marine engineering
+skidbacke; skidspår	ski run
+skidåkning	skiing
+skilsmässan ; skilsmässa	divorce
+sko	shoe
+skog	forest
+skogens ekologi	forest ecology
+skogens ekosystem	forest ecosystem
+skogsbrand	forest fire
+skogsbruk	forest exploitation
+skogsbruk ; skogsnäring ; skogsnäring; skogsbruk	forestry
+skogsbrukets miljöpåverkningar	environmental impact of forestry
+skogsbruksprodukt	forest product
+skogsbruksproduktion	forest production
+skogsekonomi	forestry economics
+skogsförorening	forest deterioration
+skogsförstöring	forest cover destruction
+skogshuggare	lumberjack
+skogshuggning	cutting
+skogsindustri	forest industry
+skogsnäring	forestry practice
+skogsodling; skogsplantering ; skogsodling ; skogsplantering	afforestation ; tree planting ; afforestment
+skogspolitik	forest policy
+skogsreservat	forest reserve
+skogsresurser	forest resource
+skogsskadegörare	forest pest
+skogsskador	forest damage
+skogsskydd	forest protection
+skogsskövling ; skogsskövling; avskogning; kalhuggning ; avskogning ; kalhuggning	deforestation
+skogsvårdslag	forestry law
+skogsvårdslagstiftning	forestry legislation
+skola	school
+skorsten	chimney
+skorstenshöjd	chimney height
+skottskog	coppice with standards
+skottår	leap year
+skratta	laugh
+skriva	write
+skrivbordsstudie; studie baserad på dokumentation	desk study
+skruvmejsel ; tyrnsgriw	screwdriver
+skräddare	tailor
+skuld	debt
+skuldbetalning	debt service
+skulptör	sculptor
+skumbildande medel	foaming agent
+skydd ; skydd; vård; konservering ; vård ; konservering	conservation
+skydd ; tillflykt; skydd; reservat ; tillflykt ; reservat	refuge
+skydd av bergslandskap	mountain protection
+skydd av biotoper	biotope protection
+skydd av den industriella äganderätten	industrial property right
+skydd av naturområde	natural areas protection
+skydd av naturresurser	natural resource conservation
+skydd av resurser	resource conservation
+skydd av äganderätt	property protection
+skydd från grannar	protection from neighbours
+skydd mot buller	noise protection
+skydd mot översvämningar	flood protection
+skyddade arter	protected species
+skyddat dricksvattenområde	drinking water protection area
+skyddat flodmynningsområde	estuarine conservation area
+skyddat landskap	landscape protection area
+skyddat landskap	protected landscape
+skyddsområde	protected area
+skyddspolitik	conservation policy
+skyddssystem	protection system
+skyddsåtgärd	protective measure
+sköldkörtel	thyroid
+sköldpaddor ; sköldpadda	tortoise
+skörd	harvest
+sköta	attend
+slagg	slag
+slagolja	bilge oil
+slagvatten	bilge water
+slakta	slaughter
+slaktare	butcher
+slaktdjur	animal for slaughter
+slakteri ; slakthus	slaughterhouse ; slaughter-house ; abattoir ; butchery ; shambles
+slakteri ; slakthus	slaughter-house
+slamkompost	refuse-sludge compost
+slamning; slamavskiljning	racking
+slovakiska	Slovak ; Slovak
+slovenska	Slovene ; Slovenian ; Slovenian
+sluss	canal lock
+slutförvaring	final storage
+sluttning; backe ; sluttning ; backe	slope
+slätt	plain
+smaklig måltid	enjoy your meal ; have a nice meal
+smaksättning; smaktillsats	flavouring
+smed	blacksmith
+smittkoppor	smallpox
+smog	smog
+smoglarm; smogvarning ; smogvarning	smog warning
+smält slam	digested sludge
+smältning	melting
+småskog	coppice
+småskog ; småskog; snårskog; savann ; snårskog ; savann	brushwood
+smör	butter
+smörjmedel	lubricant
+snabb trafik	fast traffic
+snabbreaktor	fast reactor
+snabbtest	rapid test
+snabbtåg	rapid transit train
+snedvridning av konkurrensen	distortion of competition
+snokar	colubrid
+snö	snow
+snöskred	snowslide
+social grupp	social group
+socialpsykologi	social psychology
+socialt beteende	social behaviour
+socialt skydd	social protection
+socialundersökning	social survey
+socialvård	social welfare
+socioekonomiska aspekter av bosättningar	socioeconomic aspect of human settlements
+sociologi	sociology
+socka	sock
+socker	sugar
+solcell	solar cell
+solenergi	solar energy
+solenergiteknik	solar energy technology
+solfångare	solar collector
+solkraftstation	solar power station
+solsken	duration of sunshine
+solstrålning	solar radiation
+somaleză	Somali ; somali
+sommar	summer
+sopbil	refuse collection vehicle
+sophink	waste bin
+soptip; deponi ; soptipp ; deponi	waste dump
+soptipp	municipal dumping
+sorption	sorption
+sot	soot
+spanska	Castilian ; Spanish ; Spanish
+sparris	asparagus
+spasmodisk krupp ; falsk krupp ; pseudokrupp	spasmodic croup
+speditör	forwarding agent
+spenat	spinach
+spillvatten	process water
+spillvatten från hushåll	domestic waste water
+spillvattenslam	residual waste sludge
+spindel	spider
+spindelnät	web ; spider web
+spindelväv	cobweb
+spindlar ; spindel	spider
+spis; drivhus ; spis ; drivhus	stove
+spjut	pike ; spear
+spridning av miljöföroreningar	pollutant dispersion
+spridning i marken	land disposal
+spridningsberäkning	dispersion calculation
+springare	knight ; knight
+spruta	syringe
+språk	language
+språksociologi ; sociolingvistik	sociolinguistics ; sociology of language
+språkvetenskap ; lingvistik	linguistics
+spänning	voltage
+spärrskikt	boundary layer
+spånadsväxt; textilväxt; fiberväxt ; spånadsväxt ; textilväxt ; fiberväxt	textile plant
+spårelement	trace element
+stad	city
+stadscentrum	city centre
+stadslån; offentlig upptagning av lån	public debt
+stadsperiferiskt område	periurban space
+standard för skadedjursbekämpning	pesticide control standard
+stat	country ; nation ; state
+station	station
+statistik	statistics
+statistik över den industriella produktionen	industrial production statistics
+statlig och kommunal tjänst	public function
+statskupp	putsch ; coup d'état
+statsrätt	constitutional law
+statsägd jord; offentlig ägendom	public domain
+stegring av fällning	precipitation enhancement
+steklar ; stekel	hymenopteran
+sten	stone
+stenbrott	quarry
+stenkol	black coal ; black coal ; black coal ; anthracite coal
+sterilisering	sterilisation
+steroid	steroid
+stickling; skott ; stickling	cutting ; cutting (vegetative propagation)
+stickprov	random test
+stift	diocese ; diocese
+stig	path
+stigande havsnivå	rising sea level
+stigning	ascent
+stjäla	bag ; pocket ; steal
+stjärna	star
+stjärnbild	constellation
+stoftavskiljning	dust removal
+stoftnedfall	fallout
+stol	chair
+stor	big ; large
+stor fara	major risk
+stor förbränningsanläggning	large combustion plant
+stork	stork
+storm	storm ; tempest
+stormarknad	supermarket
+storolycka	major accident
+storsjö-; djuphavs-	deep sea
+storvilt	big game
+straff ; vite; påföljd; sanktion; straff ; vite ; påföljd ; sanktion	penalty
+straffrätt	criminal law
+straffrättsförfarande	criminal law procedure
+straffrättsligt ansvar	criminal liability
+strand	beach
+strand ; strand; strandområde ; strandområde	seashore
+strandrenhållning	beach cleansing
+strategisk	strategic
+stress; tryck; spänning ; tryck ; stress ; spänning	stress
+strontium	strontium
+struts	ostrich
+strävan	aspiration
+strålning	radiation ; radiations
+strålningsdos	radiation dose
+strålningsfysik	radiation physics
+strålningsverkan	radiation effect
+strålsjuka	radiation sickness
+strålskada	radiation damage
+strålskydd	radiation protection
+strålskyddslag	radiation protection law
+strö	litter
+strömningsfält	flow field
+stum	dumb
+styresform	form of government
+styrning av luftkvaliteten	air quality control
+styrning av resurser; förvaltning av resurser; resurshushållning	resources management
+styrning av ökenspridning	desertification control
+styrningsåtgärd	control measure
+städ	anvil
+ställning	attitude
+stärkelse	starch
+stål	steel
+stödområde; utvecklingsområde	development area
+störningsfri teknik	noise-free technology
+substantiv	noun ; substantive
+substitution; ersättning ; substitution	replacement
+sundhetsbehandling	phytosanitary treatment
+supernova	supernova
+sur nederbörd	acid deposition
+surt regn	acid rain
+svamp	fungus
+svamp ; svampar	mycete
+svampbekämpningsmedel; fungicid ; svampmedel ; ungicid ; svampbekämpningsmedel ; fungicid	fungicide
+svart	black
+svavel	sulphur
+svaveldioxid	sulphur dioxide
+svavelkoncentration	sulphur concentration
+svavelväte	hydrogen sulphide
+svenska	Swedish
+svetsning	welding
+svinstall	piggery
+svärd	sword
+svärmor	mother-in-law ; mother in law
+svårhanterbart avfall	hard-to-dispose-of waste
+svårhanterligt avfall	bulky waste
+svårt	difficult
+swahili	Swahili
+sy	sew
+syfilis	syphilis
+symbios	symbiosis
+symfoni	symphony
+synagoga	synagogue
+syndrom	syndrome
+synekologi	synecology
+syntax	syntax
+syra	acid
+syrhalt	oxygen content
+syrsättning	oxygenation
+sysselsättning inom miljövården	environmental occupation
+sysselsättning och miljö	employment and environment
+sysselsättningseffekt	employment level effect
+sysselsättningsstruktur	employment structure
+system för registrering av data	data recording technique
+system med kreditering av utsläppsminskningar	emission reduction banking
+säckpipa	bagpipes
+säkerhet	safety ; security
+säkerhetsåtgärd; skyddsåtgärder ; säkerhetsåtgärd ; skyddsåtgärder	safety measure
+säkring av råmaterial	raw material securing
+sälja	sell
+sällsynta arter	rare species
+sågspån	sawdust
+sångfågel	songbird
+söktjänst på Internet	internet search service
+sömn	sleep
+sömnbesvär	sleep disturbance
+söndag	Sunday
+sönderfallsprodukt	decay product
+söt	sweet
+sötningsmedel	sweetener
+sött badvatten	bathing freshwater
+sötvattensekosystem	freshwater ecosystem
+sötvattensorganism	freshwater organism
+sötvattensresurser ; sötvattensresurs	freshwater resource
+ta hand om	attend
+ta med	bring
+ta över	takeover
+tack	cheers ; thank you ; thanks
+tacksägelse	thank you
+tadzjikiska	Tajik
+tagalog	Tagalog
+tak ; yttertak	roof ; roof ; roof
+tal; talförmåga ; tal	speech
+tall	pino ; pine
+tallium	thallium
+tamilska ; tamil	Tamil ; Tamil
+tand	molar ; tooth
+tandläkare	dentist
+tandvård	dentistry
+tangentbord	keyboard
+tankbil	tanker
+tanker ; tanker; tankfartyg ; tankfartyg	tanker ; tanker (ship)
+tannin; garvsyra ; tannin ; garvsyra	tannin
+tantal	tantalum
+tatariska	Tatar ; Tatar
+taxonomi	taxonomy
+te	tea
+teckenspråk	sign language
+tegel	brick
+teknetium	technetium
+teknik; teknologi ; teknik ; teknologi	technology
+tekniköverföring	technology transfer
+tekniska åtgärder på avstånd från utsläppskällan	end-of-pipe technology
+telefon	phone ; telephone
+telekommunikation	telecommunications ; telecommunication
+telemetri; avståndsmätning ; avståndsmätning ; telemetri	telemetry
+television	television
+tellur	tellurium
+telugu	Telugu ; Telugu
+temperatur	temperature
+tenn	tin
+tennis	tennis
+teokrati	theocracy
+teologi	theology
+terapi ; behandling	therapy
+teratogen	teratogen
+terbium	terbium
+termidynamik ; termodynamik	thermodynamics
+terminolgi ; terminologi	terminology
+termisk utrustning	thermal equipment
+termiter ; termit	termite
+terrakotta	terracotta ; terracotta ; terracotta ; terra cotta
+terrorism	terrorism
+terrorist	terrorist
+terrängbil	all-terrain vehicle
+terrängkontur; terrängform	relief (land)
+tertiärsektor; tjänstesektor ; tertiärsektor ; tjänstesektor	tertiary sector
+tes; sats; teori; avhandling; thesis ; avhandling	thesis
+testosteron	testosterone
+textilindustri	textile industry
+thai ; thailändska	Thai ; Thai
+tid	time
+tidigt	early
+tidskrift	journal ; mag ; magazine ; periodical
+tidszon	timezone
+tidvatten	tidal water
+tidvattenkraftverk	tidal power station
+tidvattensområde	intertidal zone
+tiger	tiger
+tillbehör	attachment
+tilldelning	allocation ; allotment ; resource allotment
+tilldelningsplan	allocation plan
+tillfartsväg	access road
+tillflyktsort	emergency shelter
+tillfällig förorening	incidental pollution
+tillfälligt beslut	interim decision
+tillgivenhet	attachment
+tillgång	supply
+tillgång och efterfrågan ; utbud och efterfrågan	supply and demand
+tillgång till administrativa dokument	access to administrative documents
+tillgång till domstol	access to the courts
+tillgång till information	access to information
+tillgång till kultur	access to culture
+tillhandahållande av parkering	parking provision
+tillrinning; tillströmning ; tillrinning ; tillströmning	inflow
+tillsammans	together
+tillsatsmedel	additive
+tillsatsmedel i bränsle	fuel additive
+tillstånd	permission
+tillverkning av apparater	instrument manufacture
+tillverkning av gödsel	manure production
+tillverkningsverksamhet	manufacturing activity
+tillverkningsyrke	manufacturing trade
+tilläggsavgift; bidrag ; tilläggsavgift ; bidrag	premium
+tillämpad ekologi	applied ecology
+tillämpad forskning	applied research
+tillämpad näring	applied nutrition
+tillämpad vetenskap	applied science
+tillämpning av lagar; brottsbekämpning; stärkande av lagar	law enforcement
+tillämpningslag	implementation law
+tillåtlig maximalhalt	maximum admissible concentration
+timme	hour
+timmer ; trä; timmer; virke ; virke ; trä	wood
+timmerskog	timber forest
+tio	ten
+tisdag	Tuesday
+titan	titanium
+titandioxid	titanium dioxide
+tjeckiska	Czech ; Czech
+tjur	bull
+tjuvasjiska	Chuvash ; Chuvash ; Chuwash ; Chovash ; Chavash ; Chttash
+tjänstefel; oriktig gärning	wrongful act
+tobak	tobacco
+toffel	slipper
+tolk	interpreter
+tolkningsmetod	interpretation method
+tom	empty
+tomat	tomato
+tomt; byggplats ; tomt ; byggplats	building site
+tonfisken ; tonfisk	tunafish
+topografi	topography
+topologi	topology
+torium	thorium
+torka	drought
+torkning	drying
+torndao; virvelstorm ; tornado ; virvelstorm ; tromb	tornado
+torped	torpedo
+torr	dry
+torr gräsmatta; gräsmatta för torr miljö	dry lawn
+torrdeposition	dry deposition
+torrmark	arid land
+torsdag	Thursday
+torv	peat
+torvutvinning	peat extraction
+toxikologi	toxicology
+toxin	toxin
+toxisk metall	toxic metal
+toxiskt ömne ; toxiskt ämne	toxic substance
+traditionell	traditional
+trafik	traffic
+trafik på icke-topplasttid	off-peak travelling
+trafikbetingad förorening	motor vehicle pollution
+trafikbuller	traffic noise
+transpiration	transpiration
+transport	transport
+transport	transport ; transportation
+transport av farligt gods	dangerous materials transport
+transport av gods	freight transport
+transport av tunga varor	heavy goods vehicle traffic
+transport på land	land transportation
+transport över långa avstånd	long-distance transport
+transportslag; transportsätt	mode of transportation
+tre	three
+triangel ; trekant ; trehörning	triangle
+trigonometri	trigonometry
+tritium	tritium
+trofisk nivå	trophic level
+trollkarl	wizard ; sorcerer ; magician
+trollsländor	dragonfly
+trombon	trombone
+tropik	tropics ; torrid zone
+tropisk regnskog	tropical rain forest
+tropisk skog	tropical forest
+tropisk växt	tropical plant
+trumpet	trumpet
+tryck	pressure
+tryckarbete	printing work
+tryckning; press; förlag; tidningspress (pressen)	press
+tryckutrustning	pressure equipment
+trä	wood
+träd	tree
+trädesmark	fallow area
+trädgård	garden
+trädgård	home garden
+trädgård i fransk stil	French formal garden
+trädgårdsavfall	garden waste
+trädgårdsmästare	gardener
+trädgårdsodling; trägårdsnäring	horticulture
+träkol	charcoal
+trävara	wood product
+trådbuss	trolley bus ; trolleybus
+tulium	thulium
+tull	customs
+tullagstiftning	customs regulation
+tulltaxa	customs tariff
+tulpan	tulip
+tumme	thumb
+tumör	neoplasm ; tumour
+tundra	tundra
+tung	heavy
+tunga	tongue
+tungmetall	heavy metal
+tunnel	tunnel
+tunnelbana	underground railway
+tunnelbana ; tunnelbanetåg	underground train
+turbin	turbine
+turism	tourism
+turismens miljöpåverkningar	environmental impact of tourism
+turkiska	Turkish ; Turkish
+tusen	thousand
+tvestjärt	earwig
+tvilling	twin
+tvärsäker	assertive
+tvärvetenskaplig forskning	interdisciplinary research
+tvättning	laundering
+två	two
+tvål	soap
+tyfon	typhoon
+tyg ; tyg ; tyg; väv; system; konstruktion ; väv ; textil	fabric
+tyg ; väv ; vävnad	tissue
+tyngd	weight
+typ av  förorening	pollution type
+typer av ekosystem	ecosystem type
+tysk	German
+tyska	German
+tyska (Schweiz)	German (Switzerland)
+tyska (Österrike)	German (Austria)
+täckning av avfallsupplag	landfill covering
+täckning; täckande ; täckning ; täckande	covering ; roofing
+tärning	dice ; die ; die ; die
+tätbebyggelse ; tätbebyggt område	built-up area
+täthet	density
+tå	toe
+tåg	train
+törst	thirst
+u-båt	submarine
+udde	headland
+ugn	oven
+ukrainska	Ukrainian ; Ukrainian
+ull	wool
+ultraviolett strålning	ultraviolet radiation
+undantag	exception
+undantagslagar	emergency law
+underhus	Lower House
+underhåll	maintenance (technical) ; maintenance
+underhåll, arvoden, traktamente	allowance
+undernäring; näringsbrist; felnäring	malnutrition
+undersökning av  nyttan för allmänheten	public benefit inquiry
+undertryckande; repression	repression
+undervisning	teaching
+undervärdering av jordbruket	agricultural undervaluation
+unge	young
+ungerska	Hungarian
+universitet ; universitet	university ; university ; academy
+ununbium	ununbium
+ununhexium	ununhexium
+ununoctium	ununoctium
+ununpentium	ununpentium
+ununquadium	ununquadium
+ununseptium	ununseptium
+ununtrium	ununtrium
+upparbetning	reprocessing
+uppdrag	assignment
+uppdrag; mandat	mandate
+uppdämd sjö	artificial lake
+uppdämning (politik); inneslutning ; inneslutning	containment (nuclear industry) ; containment
+uppfostran; fostran ; uppfostran ; fostran	upbringing
+upplysningstjänst	reference service
+upplösning	dissolution
+upplösning	resolution ; resolution (parameter)
+upplösning ; upplösning; nedbrytning; sönderfall; sönderdelning; vittring ; nedbrytning ; sönderdelning ; vittring	decomposition
+upplöst organiskt kol	dissolved organic carbon
+upplöst syre	dissolved oxygen
+uppmärksam	attentive
+uppnå	attain
+uppskatta	appreciate
+upptagningsområde	catchment
+uran	uranium
+urbanisering	urbanisation
+urdu	Urdu ; Urdu
+urin	urine
+urlakning	leaching
+usurpera	usurp
+utanför; extern	off-site
+utarmning	impoverishment
+utbildning	education
+utbildning; övning; skolning	training
+utbildningsanstalt	educational institution
+utbildningsbana	educational path
+utbildningscentrum	training centre
+utbildningsnivå	level of education
+utbildningsplanering	educational planning
+utbildningspolitik	education policy
+utbildningssystem	educational system
+utbyte av data	data exchange
+utbyte av elektroniska data	interchange of electronic data
+utdöda arter	extinct species
+utformande ; utformning	design (project) ; design ; project design
+utforskning	exploration
+utförbar	viable ; viable ; feasible
+utgifter	expenditure
+utgrävning	excavation (process) ; excavation ; earthworks ; digging
+utgrävningshög	excavation heap
+utgrävningssida	excavation side
+utgrävningsställe	excavation site
+utgrävt hål	excavated hole
+uthyrning av fastigheter	estate rental
+utjämningasavgift	compensatory tax
+utjämningsmagasin	retaining reservoir
+utjäst slam; jäsningsrest; uppslamning ; utjäst slam ; jäsningsrest ; uppslamning	sludge
+utjäst slam;jäsningsrest ; utjäst slam ; jäsningsrest	effluent
+utkast till lagstiftning	draft legislation
+utnyttjande av  resurser	resource exploitation
+utnyttjande av resurser	resource utilisation
+utnyttjning av underjordiskt vatten	exploitation of underground water
+utplånande	extinction (ecological) ; extinction
+utrikeshandel	foreign trade
+utrikespolitik	foreign policy
+utrotningshotade djurarter	endangered animal species
+utrotningshotade växtsorter	endangered plant species
+utrustning för föroreningsbekämpning	pollution abatement equipment
+utrustning för föroreningsbekämpning; utrustning för reglering av utsläpp	pollution control equipment
+utrustningar ; utrustning	equipment
+utröna	ascertain
+utsläpp av  radioaktivitet	radioactive emission
+utsläpp av muterade mirkoorganismer	mutated micro-organisms release
+utsläpp från jordbruk	agricultural effluent
+utsläpp i atmosfären	atmospheric emission
+utsläpp i vatten	emission to water
+utsläppsnorm; emissionsnorm	emission standard
+utsläppsregister	emission register
+utsläppsstyrning	emission control
+utspädd syra	diluted acid
+utsugningsanordning	exhaust device
+utsäde	seed
+utsättning av organismer	release of organisms
+utsättning för buller	noise exposure plan
+utsättning för strålning	radiation exposure
+uttagning av grundvatten	groundwater extraction
+uttal	pronunciation
+uttorkning	drying out
+uttunning av ozonskiktet	ozone layer depletion
+utvecklade länder ; utveclat land ; utvecklat land ; industriland ; i-land	developed country
+utveckling av  miljöföroreningar	pollutant evolution
+utveckling; evolution ; evolution	evolution
+utvecklingsbana för miljöföroreningar	pollutant pathway
+utvecklingsbistånd	development aid
+utvecklingslinje; utvecklingskurva	progress line
+utvecklingsländer; u-länder ; u-land ; underutvecklat land	less developed country
+utvecklingsländer; u-länder ; utvecklingsland ; u-land	developing country
+utvecklingsmodell	development model
+utvecklingsmönster	development pattern
+utvecklingsplan	development plan
+utvidgningspolitik	enlargement policy
+utvidgningsprogram	enlargement programme
+utvinning	extraction
+utvinning av naturgas	natural gas extraction
+vaccinering ; vaccination	vaccination
+vad ; vadställe	ford
+vadrande arbete	migrant labour
+vakt	attendant
+val	ballot
+valar ; val	whale
+valar ; valar; valdjur ; valdjur	cetacean
+valfångst	whaling
+vall	dyke
+vallonska	Walloon ; Walloon
+valross	walrus
+valuta	currency
+valuta politik	exchange policy
+vampyr	vampire
+vanadium ; vanadin	vanadium
+vandalism	vandalism
+vandrande fiskar	migratory fish
+vandringsstig	hiking trail
+vapen	weapon
+vapenförråd	armoury
+vapenstillestånd	armistice
+varaktig konsumtionsvara	durable goods
+varg ; ulv	wolf
+varmblodiga djur ; varmblodigt djur	warm-blooded animal
+varmvatten	hot water
+varningssystem	early warning system
+varor	goods
+varor och tjänster	goods and services
+vass	reed
+vassla	whey
+vatten	water
+vatten tillhöriga staten	demesnial water
+vatten vilka ej tillhör staten	non-demesnial water
+vattenavledning; dränering	draining
+vattenbehandling	water treatment
+vattenbiologi	hydrobiology
+vattenbruk	hydroculture
+vattenbruk	aquaculture
+vattenbrukets miljöpåverkningar	environmental impact of aquaculture
+vattenbyggnation; vattenbyggnadsteknik	hydraulic engineering
+vattendelare	watershed
+vattendjur	aquatic animal
+vattenekologi	aquatic ecology
+vattenfall	waterfall
+vattenfågel; sjöfågel ; andfågel	waterfowl
+vattenförråd; vattenförsörjning; vattendistribution	water supply
+vattengeologi	hydrogeology
+vattenkostnad	water cost
+vattenkraft	hydroelectric energy
+vattenkraftanläggning ; vattenkraftverk	hydroelectric power plant
+vattenkvarn	water mill
+vattenkälla	spring ; spring (hydrology, land)
+vattenloppor	water flea
+vattenluftning; syrsättning av vatten	water aeration
+vattenmiljö	aquatic environment
+vattennivå; vattenstånd ; vattennivå ; vattenstånd	water level
+vattenorganism	aquatic organism
+vattenpolo	water polo
+vattenpump	water pump
+vattenreservoar	water reservoir
+vattenresurser ; vattenresurs	water resource
+vattenskyddsrätt	water protection legislation
+vattenväxt	aquatic plant
+vecka	week
+ved	fuel wood
+vegetabilisk olja	vegetable oil
+vegetabiliska resurser	plant resource
+vektor; smittspridare; smittbärare ; vektor ; smittspridare ; smittbärare	vector
+ventilation	ventilation
+verb	verb
+verkan ; effekt	effect
+verkan av buller på hälsan	health effect of noise
+verkan på hälsan	effect on health
+verkan på människan	effect on man
+verklighet	reality
+verkställande av miljöskyddslag	environmental law enforcement
+verkställighet; tillämpning; genomförande ; verkställighet ; tillämpning ; genomförande	enforcement
+vertebrater; ryggradsdjur ; vertebrater ; ryggradsdjur ; vertebrat	vertebrate
+vetenskap	science
+vetenskaplig dispyt	scientific dispute
+vetenskaplig forskning	scientific research
+vetenskapligt samarbete	scientific co-operation
+vetenskapsman	scientist
+veteran	veteran
+veterinär	veterinarian ; veterinary
+vi	nosotros ; we
+vidare begrepp ; hyperonym ; holonym	broader term ; broader terms ; hypernym ; holonym
+viden	willow
+vietnamesiska	Vietnamese ; Vietnamese
+vik; bukt; å; bäck ; vik ; bukt	creek
+vik; håla ; vik	cove
+vild fauna	wild fauna ; wildlife ; wild animals
+vild växt; vildväxande växt ; vild växt	wild plant
+villebråd ; vilt	game
+vilt djur	wild animal
+vin	wine
+vinbottensats; vinass ; vinbottensats ; vinass	vinasse
+vind	attic
+vind	wind
+vindkraft	wind power
+vingård	vineyard
+vinst	profit
+vinter	winter
+vinäger	vinegar
+virologi	virology
+virus	virus
+viskositet; klibbighet ; viskositet	viscosity
+vismut	bismuth
+vit	white
+vitamin	vitamin
+vitryska ; vitryska ; vitryska	Belarusan ; Belarusan ; Belarusian ; Belorussian ; Byelorussian
+vittne	witness
+vokal	vowel
+volapük	Volapük
+volfram	tungsten
+voljär	aviary
+volleyboll	volleyball
+vrist	instep
+vrist ; fotled	ankle ; talocrural joint
+vulkan	volcano
+vulkanisering	vulcanisation
+vulkanism	volcanism
+vulkanutbrott	volcanic eruption
+vuxen	adult
+vuxenutbildning	adult education
+väckarklocka	alarm clock
+väder	weather
+väderkvarn	windmill
+väg- och vattenbyggnad	civil engineering
+vägg; mur; vall; barriär ; vall ; vägg ; mur ; barriär	wall
+vägnät	road network
+vägsalt	road salt
+välstånd	prosperity
+vända bort	avert
+värdefull ; oskattbar	valuable
+värdeförändring	change in value
+värdering	appraisal
+värdering	evaluation
+värdering av tekniken	evaluation of technology
+värderingskriterium	evaluation criterion
+värderingsmetod	evaluation method
+värld	world
+världsarv	world heritage site
+världskrig	world war
+värmare; motståndsvärmare	heater
+värme	heat
+värme	heating
+värmeanläggning	heating plant
+värmekraftanläggning ; värmekraftverk	thermal power plant
+värmelagring; värmeackumulering	heat storage
+värmepump	heat pump
+värmetillförsel	heat supply
+västeuropa	Western Europe
+väte; hydrogen ; väte ; hydrogen	hydrogen
+vätska	liquid
+växelbruk	crop rotation
+växelverkan mellan luft och vatten	air-water interaction
+växtarter	plant species
+växtarv	plant heritage
+växtbehandling	crop treatment
+växtbestånd	plant population
+växtbiologi	plant biology
+växtdel; anläggningsdel	plant component
+växtekologi	plant ecology
+växtfortplantning	plant reproduction
+växtfysiologi	plant physiology
+växtförädling	plant breeding
+växthuseffekt	greenhouse effect
+växthusgas	greenhouse gas
+växthusodling	greenhouse cultivation
+växtodling	crop production
+växtodling; växtkultur	plant production
+växtpatologi	phytopathology
+växtsamhälle	plant community
+växtsjukdom	plant disease
+växtskydd	crop protection
+växtskydd	plant protection
+växtskyddsmedel	plant protection product
+växtsociologi	phytosociology
+växturval	plant selection
+växtätare; gräsätare; herbivor ; växtätare ; gräsätare ; herbivor	herbivore ; plant eater
+vår	spring
+vårdinrättning	health facility
+våtmark	bog
+vördnad	awe
+webb; www; världsväv ; webb ; www ; världsväv	World Wide Web ; WWW
+wiki	wiki
+xenon	xenon
+xhosa	Xhosa
+xylofon	xylophone
+yrkesfiske	commercial fishery
+yrkeshälsa; arbetsmiljö	occupational health
+yrkesställning	occupational status
+ytspänning	surface tension
+ytterbium	ytterbium
+yttrandefrihet	freedom of speech ; freedom of speech
+yttre drag	externality
+yttre område	outer space (allocation plan) ; outer space
+yttrium	yttrium
+zink	zinc
+zirkonium	zirconium
+zodiak	zodiac
+zoologi	zoology
+zoologisk trädgård; djurpark ; djurpark ; zoologisk trädgård ; zoo	zoological garden
+zoonos	zoonosis
+zulu	Zulu
+Åland	Åland Islands
+Örnen	Aquila
+Östafrika	East Africa
+Österrike	Austria ; Republic of Austria
+Österrike-Ungern	Austria-Hungary ; Austro-Hungarian Empire
+Östeuropa	Eastern Europe
+Östtimor	East Timor ; Democratic Republic of Timor-Leste
+ädelgas ; grundämne i grupp 0	element of group 0 ; noble gas
+ägande; äganderätt	ownership
+ägare	owner
+ägg	egg
+äggstock	ovary
+äggviteämne ; protein	protein ; poly peptide
+äldre människa	elderly person
+älska	love
+ämnens förhållande till varandra	behaviour of substances
+ämnesbalans	balance of matter
+äng	meadow
+ängel	angel
+äpple	apple
+ärkebiskop	archbishop
+ärkehertig	archduke
+äta	eat
+äta	consume ; eat ; swallow
+ätlig	edible
+ätliga fetter; matfett ; ätliga fetter ; matfett	edible fat
+äventyr	adventure
+åker ; äng ; fält ; hage ; land ; trädgårdsland	field ; land ; land ; acre ; patch
+åkerbruk	arable farming
+åkerren ; vändteg	headland
+åkerskada	field damage
+åklagarmyndighet	public prosecutor's office
+ålder	age
+ånggenerator	steam generator
+ångpanna	boiler
+ångtryck	vapour pressure
+år	year ; solar year
+årstid	season
+åsikt; uppfattning; yttrande; utlåtande ; åsikt ; uppfattning ; yttrande ; utlåtande	opinion ; stance
+åska	thunder
+åskväder	thunderstorm
+åsna	donkey ; ass
+åtal; lagföring; rättslig åtgärd ; rättslig åtgärd ; åtal ; lagföring	prosecution
+återanvändbar plast	recyclable plastic
+återanvändbarhet	recyclability
+återanvändning av rester	residue recycling
+återanvändningspotential	recycling potential
+återhämtning av oljerester	oil residue recuperation
+återinförande av  växtsorter	plant species reintroduction
+återinförande av djurarter	animal species reintroduction
+återinföring	reintroduction
+återmobilisering av föroreningar	pollutant remobilisation
+återplantering av skog	reforestation
+återställande av anläggning	installation restoration
+återställande av flora	flora restoration
+återställande av naturlivet	fauna restoration
+återupprättelse ; rehabilitering	återställande ; rehabilitation
+återvinning	life-cycle management
+återvinning av bergslandskap	land restoration in mountain areas
+återvinning av gruvfält	mining site restoration ; mine reclamation
+återvinning av landskap	recovery of landscape
+återvinning; återanvändning	recycling
+återvinnings- och avfallslagstiftning	recycling management and waste law
+återvinningsindustrin	reclamation industry
+återvinningskvot	recycling ratio
+återvinningsmaterial	recycled material
+återvinningspapper	recycled paper
+återvinningsplan	recovery plan
+åtta	eight
+ö	island ; isle
+ödlor	lizard
+öga	eye
+ögonbryn	eyebrow
+ögrupp	archipelago
+öka	augment
+öken	desert
+ökenklimat	desert climate
+ökenspridning	desertification
+ökning av folkmängden; befolkningstillväxt	population growth
+öl	beer
+öns ekosystem	island ecosystem
+öppet hav	open sea
+öra	ear
+öronskydd	hearing protection
+östasien ; sydvästasien ; Västasien ; Sydvästasien	Western Asia ; Southwest Asia
+östasien ; Östasien	Eastern Asia ; East Asia
+överbefolkning	overpopulation
+överbetning	overgrazing
+överenskommelse	agreement
+överenskommelse om returförpackningar	arrangement for a deposit on packaging
+överensstämmelse	homologation
+överexploatering	overexploitation
+överfiske	overfishing
+överföring av kol till vätska	coal liquefaction
+övergivet fordon	abandoned vehicle ; car wreck
+övergivet industriområde	industrial wasteland
+övergångselement	transition element ; transition metal
+övergångsställe	crossing place
+övergångsställe för djur	crossing place for animals
+övergödning	overfertilisation
+överklagande	appeal
+överklagandeförfarande	appeal procedure
+överlämnat område	abandoned industrial site
+överraska	surprise
+översikt över skogsskador	inventory of forest damage
+översvämning	alluvion ; flood ; overflowing ; inundation
+översvämning	flooding
+översätta	translate ; interpret
+översättning	translation
+övervakning av  miljöföroreningar	pollutant monitoring
+övervakning av atmosfären	atmospheric monitoring
+övervakning av havsmiljön	marine monitoring
+övervakning av miljöföroreningar	pollution monitoring
+övervakningsdata	monitoring data
+övervakningsdatanät	monitoring network
+övervakningskriterium	monitoring criterion
+övervakningsstation	monitoring station
+övervakningsteknik	monitoring technique
+övervakningsutrustning	monitoring equipment
+övervikt	obesity
+övervintrande ; övervintring	overwintering

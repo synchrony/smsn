@@ -25,8 +25,8 @@ import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistoryHelper;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Characters;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4Compounds;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
 
 import java.io.IOException;
@@ -163,8 +163,8 @@ public class Flashcards4Android extends Activity {
         Deck<String, String> internationalBorders = new InternationalBorders();
         Deck<String, String> frenchVocab = new FrenchVocabulary();
         //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
-        Deck<String, String> hsk4Characters = new HSK4Characters();
-        Deck<String, String> hsk4Compounds = new HSK4Compounds();
+        Deck<String, String> hsk4Characters = new HSK4ChineseCharacters();
+        Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds();
 
         //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 

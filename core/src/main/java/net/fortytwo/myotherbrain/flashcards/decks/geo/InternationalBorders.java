@@ -19,7 +19,7 @@ public class InternationalBorders extends Deck<String, String> {
     private final Random random = new Random();
 
     public InternationalBorders() throws IOException {
-        super("international_borders");
+        super("international_borders", "international borders");
 
         for (Countries.Country c : Countries.getInstance().getCountries()) {
             if (c.neighbors.size() > 0) {
@@ -79,7 +79,7 @@ public class InternationalBorders extends Deck<String, String> {
 
         @Override
         public String getAnswer() {
-            return answer.name;
+            return answer.name + "\n";
         }
 
         @Override

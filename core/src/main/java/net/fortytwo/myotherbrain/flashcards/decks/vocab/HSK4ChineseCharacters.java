@@ -8,10 +8,9 @@ import java.io.InputStream;
  * Date: 3/19/11
  * Time: 8:20 PM
  */
-public class HSK4Compounds extends VocabularyDeck {
-
-    public HSK4Compounds() throws IOException {
-        super("hsk4_compounds");
+public class HSK4ChineseCharacters extends VocabularyDeck {
+    public HSK4ChineseCharacters() throws IOException {
+        super("hsk4_characters", "HSK Chinese characters");
     }
 
     @Override
@@ -23,7 +22,7 @@ public class HSK4Compounds extends VocabularyDeck {
         source.setUrl("http://www.chinese-forums.com/index.php?/topic/14829-hsk-character-lists/");
         source.setTimestamp("2011-3-19");
 
-        InputStream is = HSK4Characters.class.getResourceAsStream("hsk4-multitab.txt");
+        InputStream is = HSK4ChineseCharacters.class.getResourceAsStream("hsk4-allchars-tab.txt");
         try {
             VocabularyParsers.parseHSK4List(is, dict, source);
         } finally {

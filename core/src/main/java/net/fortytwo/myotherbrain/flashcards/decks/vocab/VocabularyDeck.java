@@ -24,8 +24,9 @@ public abstract class VocabularyDeck extends Deck<String, String> {
 
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
 
-    public VocabularyDeck(final String name) throws IOException {
-        super(name);
+    public VocabularyDeck(final String name,
+                          final String label) throws IOException {
+        super(name, label);
 
         Dictionary d = createVocabulary();
         for (String key : d.getKeys()) {
@@ -97,7 +98,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                 if (2 <= t.getForms().size()) {
                     sb.append(" (");
                     for (int i = 1; i < t.getForms().size(); i++) {
-                        if (i > 0) {
+                        if (i > 1) {
                             sb.append("; ");
                         }
                         sb.append(t.getForms().get(i));

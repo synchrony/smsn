@@ -38,15 +38,13 @@ public class VocabularyParsers {
                     t.setSource(source);
                 }
                 int tab = l.indexOf('\t');
-                String french = l.substring(0, tab).trim();
-                if (french.contains(";")) {
-                    String[] a = french.split(";");
-                    t.addForm(a[0].trim());
-                    for (int i = 1; i < a.length; i++) {
-                        t.addForm(a[i].trim());
+                String lex = l.substring(0, tab).trim();
+                if (lex.contains(";")) {
+                    for (String s : lex.split(";")) {
+                        t.addForm(simplify(s.trim()));
                     }
                 } else {
-                    t.addForm(french);
+                    t.addForm(simplify(lex));
                 }
                 t.setMeaning(l.substring(tab + 1).trim());
                 //System.out.println(c.normativeForm + ", " + c.pronunciation + ", " + c.meaning);
@@ -54,6 +52,17 @@ public class VocabularyParsers {
                 dict.add(t);
             }
         }
+    }
+
+    // Simplifies lexical forms from sources such as Wiktionary, which contain occasionally strange free-form text by users.
+    private static String simplify(final String s) {
+        String t = s.replaceAll("[\\x00-\\x1F]", " ");
+        String tmp;
+        do {
+            tmp = t;
+            t = t.replaceAll("  ", " ");
+        } while (tmp.length() > t.length());
+        return t;
     }
 
     public static void parseHSK4List(final InputStream is,

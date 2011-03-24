@@ -1,0 +1,5204 @@
+# Swedish-English dictionary created from English Wiktionary
+# Created on: 2011-03-24T07:47:47+01:00
+# Licence: GNU Free Documentation Licence http://www.gnu.org/copyleft/fdl.html
+# Download updated version of this file at: http://www.dicts.info/uddl.php
+# Contact us at: http://www.dicts.info/contact.php
+'''Sofia'''	Sofia
+''expressed by nominalization	one
+(''spicy'') chilipeppar	pepper
+(Forna Jugoslaviska Republiken) Makedonien	Macedonia
+(Jesus Kristus	Christ
+(de) sju dödssynderna	seven deadly sins
+(det) periodiska systemet	periodic table
+(ett) predikat	predicate
+(grodyngel	tadpole
+(låta) bero	leave
+-bar	-ible
+-het	-ity
+-ism	-ism
+-logi	-logy
+-s	of
+Aaron	Aaron
+Abbe	Abraham
+Abel	Abel
+Abidjan	Abidjan
+Abraham	Abraham
+Abu Dhabi	Abu Dhabi
+Adam	Adam
+Adam och Eva	Adam and Eve
+Adde	Adam
+Aden	Aden
+Adolf	Adolf
+Adolf	Adolph
+Adrian	Adrian
+Afghanistan	Afghanistan
+Agata	Agatha
+Agnes	Agnes
+Aischylos	Aeschylus
+Akilles	Achilles
+Akilleshäl	Achilles heel
+Akropolis	Acropolis
+Al-Andalus	Al-Andalus
+Alaska	Alaska
+Alban	Alban
+Albanien	Albania
+Albert	Albert
+Albin	Albin
+Alexander	Alexander
+Alfons	Alphonse
+Alfred	Alfred
+Alger	Algiers
+Algeriet	Algeria
+Allah	Allah
+Allan	Alan
+Alperna	Alps
+Alzheimers sjukdom	Alzheimer's disease
+Amerika	America
+Amerikanska Samoa	American Samoa
+Amerikas förenade stater	United States of America
+Amor	Cupid
+Amsterdam	Amsterdam
+Anders	Andrew
+Andorra	Andorra
+Andra världskriget	World War II
+Angola	Angola
+Ankara	Ankara
+Anna	Ann
+Antarktis	Antarctica
+Antigua och Barbuda	Antigua and Barbuda
+Anton	Anthony
+Apuleius	Apuleius
+Archangelsk	Arkhangelsk
+Ares	Ares
+Argentina	Argentina
+Armenien	Armenia
+Artur	Arthur
+Aruba	Aruba
+Asien	Asia
+Askungen	Cinderella
+Aten	Athens
+Athena	Athena
+Atlanten	Atlantic Ocean
+Australien	Australia
+Ayers Rock	Ayers Rock
+Ayers Rock	Uluru
+Azerbajdzjan	Azerbaijan
+BNP	GDP
+Bahamas	Bahamas
+Bahrain	Bahrain
+Balearerna	Balearic Islands
+Bali	Bali
+Bangladesh	Bangladesh
+Barbados	Barbados
+Barbro	Barbara
+Beijing	Beijing
+Beirut	Beirut
+Belgien	Belgium
+Belize	Belize
+Benin	Benin
+Berings hav	Bering Sea
+Berlin	Berlin
+Bermuda	Bermuda
+Betlehem	Bethlehem
+Bhutan	Bhutan
+Bibel	Bible
+Bitola	Monastir
+Bolivia	Bolivia
+Bologna	Bologna
+Bosnien	Bosnia
+Bosnien och Hercegovina	Bosnia and Herzegovina
+Bosporen	Bosphorus
+Botswana	Botswana
+Bottniska viken	Gulf of Bothnia
+Brasilien	Brazil
+Brasilien	Brasil
+Bratislava	Bratislava
+Bretagne	Brittany
+Bretagniska	Breton
+Bronsåldern	Bronze Age
+Brunei	Brunei
+Bryssel	Brussels
+Buddha	Buddha
+Bukarest	Bucharest
+Bulgarien	Bulgaria
+Burgund	Burgundy
+Burkina Faso	Burkina Faso
+Burma	Burma
+Burundi	Burundi
+Byrålåda	drawer
+Bysantinska riket	Byzantine Empire
+Böhmen	Bohemia
+Centralafrikanska republiken	Central African Republic
+Checheno	Chechen
+Cheddar	Cheddar cheese
+Chennai	Chennai
+Cheopspyramiden	Great Pyramid of Giza
+Chile	Chile
+Chrusjtjov	Khrushchev
+Coca-Cola	Coca-Cola
+Colombia	Columbia
+Colombia	Colombia
+Comorerna	Comoros
+Cooköarna	Cook Islands
+Costa Rica	Costa Rica
+Cypern	Cyprus
+Damaskus	Damascus
+Daniel	Daniel
+Danmark	Denmark
+David	David
+Demokritos	Democritus
+Djibouti	Djibouti
+Dominica	Dominica
+Dominikanska republiken	Dominican Republic
+Domkraft	jack
+Donau	Danube
+Dorisk	Doric
+Dublin	Dublin
+Dubrovnik	Dubrovnik
+Döda havet	Dead Sea
+Ecuador	Ecuador
+Edvard	Edward
+Egeiska havet	Aegean Sea
+Egypten	Egypt
+Ekvatorialguinea	Equatorial Guinea
+El Salvador	El Salvador
+Elfenbenskusten	Ivory Coast
+Elisabet	Elizabeth
+Emilia	Emily
+England	England
+Epirus	Epirus
+Erik	Eric
+Eritrea	Eritrea
+Ernst	Ernest
+Ester	Esther
+Estland	Estonia
+Etiopien	Ethiopia
+Euripides	Euripides
+Europa	Europe
+Europeiska	EU
+Europeiska centralbanken	European Central Bank
+Europeiska unionen	European Union
+Falklandsöarna	Falkland Islands
+Fez, Fes	Fez
+Fiji	Fiji
+Filip	Philip
+Filippinerna	Philippines
+Finland	Finland
+Finska viken	Gulf of Finland
+Fiskarna	Pisces
+Flandern	Flanders
+Fomalhaut	Fomalhaut
+Fr	Mrs
+Frankrike	France
+Frans	Francis
+Franska Guyana	French Guiana
+Fröken	Miss
+Färöarna	Faroe Islands
+Förenade Arabemiraten	United Arab Emirates
+Förenta nationerna	United Nations
+Första Moseboken	Genesis
+Första världskriget	World War I
+Gabon	Gabon
+Galizien	Galicia
+Gambia	Gambia
+Ganesha	Ganesha
+Ganges	Ganges
+Gasell	gazelle
+Genua	Genoa
+Genève	Geneva
+Georg	George
+Georgien	Georgia
+Ghana	Ghana
+Gibraltar	Gibraltar
+Glasgow	Glasgow
+God Jul och Gott Nytt År	Merry Christmas and a Happy New Year!
+Golden Gate-bron	Golden Gate Bridge
+Grekland	Greece
+Grenada	Grenada
+Grönland	Greenland
+Guadeloupe	Guadeloupe
+Guam	Guam
+Guatemala	Guatemala
+Gud	God
+Gudinna	Goddess
+Guernsey	Guernsey
+Guinea	Guinea
+Guinea-Bissau	Guinea-Bissau
+Gujarati	Gujarati
+Gula havet	Yellow Sea
+Guyana	Guyana
+HTML-färger	web colors
+Haag	The Hague
+Haiti	Haiti
+Hapsal	Haapsalu
+Harmagedon	Armageddon
+Havanna	Havana
+Helena	Helen
+Helsingfors	Helsinki
+Henrik	Henry
+Herodotos	Herodotus
+Hesiodos	Hesiod
+Hippokrates	Hippocrates
+Hizbollah	Hezbollah
+Holland	Holland
+Honduras	Honduras
+Hr	Mr
+Hubbles lag	Hubble constant
+Indien	India
+Indiens historia: Indus-Sarasvati	Indus Valley Civilization
+Indiska oceanen	Indian Ocean
+Indones	Indonesian
+Indonesien	Indonesia
+Internetprotokoll	Internet Protocol
+Irak	Iraq
+Iran	Iran
+Irene	Irene
+Irland	Ireland
+Isak	Isaac
+Island	Iceland
+Ismael	Ishmael
+Israel	Israel
+Italien	Italy
+Jag älskar dig	I love you
+Jainism	Jainism
+Jakob	James
+Jakob	Jacob
+Jalalabad	Jalalabad
+Jamaica	Jamaica
+Janus	Janus
+Japan	Japan
+Jehovas vittne	Jehovah's Witnesses
+Jehovas vittnen	Jehovah's Witnesses
+Jeremia	Jeremiah
+Jerusalem	Jerusalem
+Jesaja	Isaiah
+Jesus	Jesus
+Jiddisch	Yiddish
+Joakim	Joachim
+Johan	John
+Johanna	Jane
+Johannes	John
+Joniska havet	Ionian Sea
+Jordan	Jordan
+Jordanien	Jordan
+Josef	Joseph
+Jugoslavien	Yugoslavia
+Julia	Juliet
+Jungfrun	Virgo
+Kaba	Caaba
+Kali	Kali
+Kalifornien	California
+Kambodja	Cambodia
+Kamerun	Cameroon
+Kanada	Canada
+Kanadagås	Canada goose
+Kanadensare	Canadian
+Kap Verde	Cape Verde
+Kapitolium	capitol
+Karl	Charles
+Karlovac	Karlovac
+Kaspiska havet	Caspian Sea
+Katalonien	Catalonia
+Katarina	Catherine
+Kaukasien	Caucasus
+Kazakstan	Kazakhstan
+Kenya	Kenya
+Khartoum	Khartoum
+Kina	China
+Kirgizistan	Kyrgyzstan
+Kiribati	Kiribati
+Kohtla-Järve	Kohtla-Järve
+Kongo	Congo
+Kongo-Brazzaville	Congo
+Kongo-Kinshasa	Congo
+Konstantinopel	Constantinople
+Korea	Korea
+Korniska	Cornish
+Krambjörnarna	Care Bears
+Kristoffer	Christopher
+Kroatien	Croatia
+Kräftan	Cancer
+Kuba	Cuba
+Kurdistan	Kurdistan
+Kuwait	Kuwait
+Kyoto	Kyoto
+Köln	Cologne
+Köpenhamn	Copenhagen
+Laos	Laos
+Lars	Laurence
+Laura	Laura
+Lejonet	Leo
+Lesotho	Lesotho
+Lettland	Latvia
+Libanon	Lebanon
+Liberia	Liberia
+Libyen	Libya
+Liechtenstein	Liechtenstein
+Litauen	Lithuania
+London	London
+Ludvig	Louis
+Lukas	Luke
+Lukianos	Lucian
+Luxemburg	Luxembourg
+Maas	Meuse
+Madagaskar	Madagascar
+Madrid	Madrid
+Makedonien	Macedonia
+Malawi	Malawi
+Malaysia	Malaysia
+Maldiverna	Maldives
+Mali	Mali
+Malta	Malta
+Man	Isle of Man
+Manitoba	Manitoba
+Margareta	Margaret
+Maria	Mary
+Markus	Mark
+Marocko	Morocco
+Mars	Mars
+Marshallöarna	Marshall Islands
+Marta	Martha
+Martin, Mårten	Martin
+Martinique	Martinique
+Mattias	Matthew
+Mauretanien	Mauritania
+Mauritius	Mauritius
+Mayotte	Mayotte
+McDonald’s	McDonald's
+Medelhavet	Mediterranean Sea
+Mekka	Mecca
+Mellanöstern	Middle East
+Menorca	Minorca
+Merkurius	Mercury
+Mesolitisk tid	Mesolithic
+Mexico City	Mexico City
+Mexico City	Mexico
+Mexiko	Mexico
+Mika	Micah
+Mikael	Michael
+Mikronesien	Micronesia
+Milano	Milan
+Mirjam	Miriam
+Mississippi	Mississippi
+Mississippifloden	Mississippi
+Missouri	Missouri
+Moldavien	Moldova
+Monaco	Monaco
+Mongoliet	Mongolia
+Moses	Moses
+Moskva	Moscow
+Motståndare	adversary
+Moçambique	Mozambique
+Musa	Muse
+Musse Pigg	Mickey Mouse
+Myanmar (1), burmesiska	Myanmar
+Möbiusband	Möbius strip
+München	Munich
+NATO	NATO
+Nagykanizsa	Nagykanizsa
+Nahuatl	Nahuatl
+Namibia	Namibia
+Nauru	Nauru
+Nederländerna	Netherlands
+Neolitisk tid	Neolithic
+Nepal	Nepal
+Neptunus	Neptune
+New Jersey	New Jersey
+New York	New York
+New York	New York City
+Nicaragua	Nicaragua
+Niger	Niger
+Nigeria	Nigeria
+Nike	Nike
+Nilen	Nile
+Nils	Nicholas
+Niue	Niue
+Noak	Noah
+Nordamerika	North America
+Nordeuropa	Northern Europe
+Nordkorea	North Korea
+Nordsjön	North Sea
+Norfolkön	Norfolk Island
+Norge	Norway
+Norra ishavet	Arctic Ocean
+Northern Territory	Northern Territory
+Nya Guinea	New Guinea
+Nya Zeeland	New Zealand
+Nyx	Nyx
+När katten är borta, dansar råttorna på bordet	when the cat's away the mice will play
+Oceanien	Oceania
+Ockhams rakkniv	Occam's razor
+Odysséen	Odyssey
+Oidentifierat flygande föremål	unidentified flying object
+Olympiska Spelen	Olympic Games
+Olympiska vinterspel	Olympic Winter Games
+Oman	Oman
+Orinoco	Orinoco
+Ouagadougou	Ouagadougou
+Oxen	Taurus
+Pakistan	Pakistan
+Palau	Palau
+Palestina	Palestine
+Panama	Panama
+Panchatantra	Panchatantra
+Pandjab	Punjab
+Pangea	Pangaea
+Papua Nya Guinea	Papua New Guinea
+Paris	Paris
+Perikles	Pericles
+Peru	Peru
+Plancks konstant	Planck's constant
+Plinius	Pliny
+Pluto	Pluto
+Polen	Poland
+Portugal	Portugal
+Prag	Prague
+Preussen	Prussia
+Puerto Rico	Puerto Rico
+Pythagoras	Pythagoras
+Påskön	Easter Island
+Qatar	Qatar
+Quidditch	quidditch
+Rakel	Rachel
+Rakvere, (Wesenberg	Rakvere
+Regnbåge	rainbow trout
+Rhen	Rhine
+Riga	Riga
+Rigabukten	Gulf of Riga
+Rikard	Richard
+Robert	Robert
+Rom byggdes inte på en dag	Rome wasn't built in a day
+Romer	Roman
+Romerska riket	Roman Empire
+Rosettastenen	Rosetta Stone
+Roxana	Roxanne
+Rumänien	Romania
+Rwanda	Rwanda
+Ryska federationen	Russian Federation
+Ryssland	Russia
+Röda havet	Red Sea
+Rödluvan	Little Red Riding Hood
+Saint Christopher och Nevis	Saint Kitts and Nevis
+Saint Lucia	Saint Lucia
+Saint Vincent och Grenadinerna	Saint Vincent and the Grenadines
+Salladslök	scallion
+Salomonöarna	Solomon Islands
+Samoa	Samoa
+Samosata	Samosata
+Samuel	Samuel
+San Marino (1)	San Marino
+Sara	Sarah
+Sarajevo	Sarajevo
+Sardinien	Sardinia
+Satan	Satan
+Saturnus	Saturn
+Saudiarabien	Saudi Arabia
+Schrödingers katt	Schrödinger's cat
+Schweiz	Switzerland
+Senegal	Senegal
+Septuaginta	Septuagint
+Serbien och Montenegro	Serbia and Montenegro
+Serbokroatiska	Serbo-Croatian
+Seychellerna	Seychelles
+Sfinxen	Sphinx
+Sherlock Holmes	Sherlock Holmes
+Shiraz	Shiraz
+Shiraz, Syrah	Shiraz
+Sicilien	Sicily
+Sierra Leone	Sierra Leone
+Singapore	Singapore
+Skandinavien	Scandinavia
+Skottland	Scotland
+Skytten	Sagittarius
+Slovakien	Slovakia
+Slovenien	Slovenia
+Sofia	Sophia
+Somalia	Somalia
+Somaliska	Somali
+Sovjetunionen	Soviet Union
+Spanien	Spain
+Spindelmannen	Spider-Man
+Sri Lanka	Sri Lanka
+Stefan	Stephen
+Stevia	stevia
+Stilla havet	Pacific Ocean
+Storbritannien	United Kingdom
+Storbritannien	Great Britain
+Stövel	boot
+Sudan	Sudan
+Sudetenland	Sudetenland
+Suezkanalen	Suez Canal
+Surinam	Suriname
+Svalbard	Svalbard
+Svalbard och Jan Mayen	Svalbard and Jan Mayen Islands
+Svarta havet	Black Sea
+Sverige	Sweden
+Swaziland	Swaziland
+Sydafrika	South Africa
+Sydeuropa	Southern Europe
+Sydkorea	South Korea
+Syrien	Syria
+Söul	Seoul
+Tadzjikistan	Tajikistan
+Taiwan	Taiwan
+Tanzania	Tanzania
+Tasmanien	Tasmania
+Tchad	Chad
+Teresia	Teresa
+Tetris	Tetris
+Thailand	Thailand
+Themsen	Thames
+Timişoara	Timişoara
+Tjeckien	Czechia
+Tjeckien	Czech Republic
+Togo	Togo
+Tokelau	Tokelau
+Tomas	Thomas
+Tonga	Tonga
+Transnistrien	Transnistria
+Transsylvanien	Transylvania
+Trinidad och Tobago	Trinidad and Tobago
+Tunisien	Tunisia
+Turkiet	Turkey
+Turkmenistan	Turkmenistan
+Tuvalu	Tuvalu
+Tyros	Tyre
+Tysk-Romerska Riket	Holy Roman Empire
+Tyska orden	Teutonic Knights
+Tyskland	Germany
+Törnrosa	Sleeping Beauty
+UFO	UFO
+Uganda	Uganda
+Ukraina	Ukraine
+Ulrika	Ulrica
+Ungern	Hungary
+Uppenbarelseboken	Revelation
+Uranos	Uranus
+Uranus	Uranus
+Uruguay	Uruguay
+Uzbekistan	Uzbekistan
+VSV	QED
+Valakiet	Wallachia
+Vancouver	Vancouver
+Vanuatu	Vanuatu
+Vattumannen	Aquarius
+Venedig	Venice
+Venezuela	Venezuela
+Venus	Venus
+Vietnam	Vietnam
+Viktoria	Victoria
+Vilhelm	William
+Vincent	Vincent
+Vintergatan	galaxy
+Vintergatan	Milky Way
+Vita huset	White House
+Vitryska SSR	Byelorussian SSR
+Vitryssland	Belarus
+Volkswagen Typ 1, bubbla	beetle
+Väduren	Aries
+Västeuropa	Western Europe
+Västsahara	Western Sahara
+Vågen	Libra
+Vår Fru	Our Lady
+Wales	Wales
+Warszawa	Warsaw
+Wikimedia	Wikimedia Foundation
+Wikipedia	Wikipedia
+Wiktionary	Wiktionary
+Yemen	Yemen
+Zagreb	Zagreb
+Zambia	Zambia
+Zimbabwe	Zimbabwe
+Zoo, djurpark	zoo
+Zoroastrism	Zoroastrianism
+abaca	Manila hemp
+abborre	perch
+abchaziska	Abkhazian
+abchaziska	Abkhaz
+abort	abortion
+absint	absinthe
+absolut	absolute
+absoluta nollpunkten	absolute zero
+absorbera	absorb
+absorption	absorption
+abstrakt	abstract
+absurd, befängd	absurd
+acceleration	acceleration
+accelerera	accelerate
+acceptabel	acceptable
+acceptans	acceptance
+acetat	acetate
+acetylen	acetylene
+ackord	chord
+ackumulator	accumulator
+ackusativ	accusative case
+ackusativ	accusative
+ad hoc	ad hoc
+adamsäpple	Adam's apple
+addera	add
+addition	addition
+adjektiv	adjective
+adjö	goodbye
+adverb	adverb
+advokat	lawyer
+advokat	attorney
+afghan	Afghan
+afghansk	Afghan
+afghanska	Afghan
+afrikaans	Afrikaans
+agenda	calendar
+agera	act
+agera	play
+aggressiv	aggressive
+agnosticism	agnosticism
+agorafobi	agoraphobia
+aids	AIDS
+ainu	Ainu
+aj	ouch
+akkadiska	Akkadian
+akromegali	acromegaly
+akronym	acronym
+akt	act
+aktie	share
+aktinium	actinium
+aktivitet	activity
+akupunktur	acupuncture
+akvatisk	aquatic
+akvifär	aquifer
+al	alder
+al-Qaida	al-Qaeda
+albino	albino
+aldrig	never
+alfa	alpha
+alfabet	alphabet
+alfabetisk	alphabetical
+alfabetisk	alphabetic
+algebra	algebra
+algerier	Algerian
+algerisk	Algerian
+algoritm	algorithm
+alkemist	alchemist
+alkohol-	alcoholic
+alkoholhaltig	alcoholic
+alkoholist	alcoholic
+alla	each
+alla	all
+alla	everybody
+alla	everyone
+allaredan	already
+allerstädes närvarande	ubiquitous
+alligator	alligator
+allt	everything
+allt	all
+alltför	too
+alltså	then
+alm	elm
+alpacka	alpaca
+alpkaja	alpine chough
+alpstenbock	ibex
+alruna	mandrake
+alternativ	choice
+altitud	altitude
+aluminium	aluminium
+aluminium	aluminum
+alv	elf
+amatör	amateur
+ambassad	embassy
+ambassadör	ambassador
+ambigram	ambigram
+ambrosia	ambrosia
+ambulans	ambulance
+americium	americium
+amerikan	American
+amerikansk	American
+amerikansk bison	American bison
+amerikansk fotboll	football
+amhariska	Amharic
+anagram	anagram
+analog	analogue
+analogi	analogy
+analsex	anal sex
+analys	analysis
+ananas	pineapple
+anarki	anarchy
+anarkism	anarchism
+anblick	sight
+and	duck
+anda	spirit
+ande	spirit
+andel	share
+andlig	spiritual
+andra	second
+andrahandsvara	second
+anemi	anemia
+anföringstecken	quotation mark
+angenäm	pleasant
+anime	anime
+ankare	anchor
+ankel	ankle
+anknytning	link
+ankomst	arrival
+anlägga	build
+anmärkning	remark
+annan	other
+annons	advertisement
+ansikte	face
+anställa	employ
+anställd	employee
+ansvar	responsibility
+anta	suppose
+anteckna	record
+anteckning	note
+antenn	antenna
+antikrist	antichrist
+antilop	antelope
+antimon	antimony
+antonym	antonym
+antropologi	anthropology
+använd	old
+använda	use
+användare	user
+apa	monkey
+apatit	apatite
+apelsin	orange
+apelsinträd	orange
+apelträ	apple
+apostrof	apostrophe
+apotek	pharmacy
+appendix	appendix
+aprikos	apricot
+aprikosträd	apricot
+april	April
+ar	are
+arab	Arab
+arabisk	Arabic
+arabiska	Arabic
+arbetare	worker
+arbetare i alla länder, förenen eder	workers of the world, unite
+arbete	work
+arbetslöshet	unemployment
+area	area
+arg	angry
+arginin	arginine
+argon	argon
+argument	argument
+argumentation	argument
+aritmetik	arithmetic
+arkaisk	archaic
+arkeologi	archaeology
+arkitekt	architect
+arkitektur	architecture
+arkiv	file
+arkiv	archive
+arkivera	archive
+arm	arm
+armband	bracelet
+armborst	crossbow
+armenier	Armenian
+armenisk	Armenian
+armeniska	Armenian
+armhåla	armpit
+arrogans	arrogance
+arrogant	arrogant
+arsenik	arsenic
+arsle	ass
+arsle	asshole
+art	species
+artikel	paper
+arton	eighteen
+as	carcass
+ask	box
+ask	ash
+askkopp	ashtray
+astat	astatine
+asterisk	asterisk
+astronomi	astronomy
+ateism	atheism
+atom	atom
+atombomb	atomic bomb
+atombomb	A-bomb
+atombomb	atom bomb
+atombomb	Template:A-bomb/Translations
+atomkärna	atomic nucleus
+atomnummer	atomic number
+att	that
+att	to
+augusti	August
+auktion	auction
+australiensisk	Australian
+australier	Australian
+autokrati	autocracy
+autonomi	autonomy
+av	by
+av choklad	chocolate
+avbrott	break
+aveny	avenue
+avfyra	fire
+avgå	resign
+avkastning	fruit
+avkunna	sentence
+avliden	deceased
+avlidna	deceased
+avlägsen	remote
+avlägsna	remove
+avokado	avocado
+avsikt	purpose
+avskild	separate
+avskildhet	privacy
+avskilja	separate
+avsky	abhor
+avsky	abominate
+avsluta	close
+avsluta	complete
+avslå	reject
+avstånd	distance
+avsugning	blowjob
+avtal	contract
+avtal	agreement
+avvikelse	difference
+axel	axis
+azerbajdzjan	Azeri
+azerbajdzjanska	Azeri
+babian	baboon
+backe	hill
+backgammon	backgammon
+bad	bath
+baddräkt	swimsuit
+badkar	bath
+badrum	bathroom
+badrum	bath
+bagare	baker
+bageri	bakery
+bajonett	bayonet
+bajskorv	turd
+bak-	hinder
+bakfylla	hangover
+baklucka	trunk
+baksida	back
+bakterie	bacterium
+bakterier	bacteria
+bakände	back
+bal	ball
+balalajka	balalaika
+balans	balance
+balansvåg	scales
+balansvåg	balance
+balansvåg	scale
+balja	sheath
+balja	scabbard
+balkong	balcony
+banan	banana
+band	tape
+band	band
+banderoll	banner
+bandy	bandy
+baner	banner
+bank	bank
+bankrutt	bankrupt
+bar	bar
+bara	only
+bara	just
+barium	barium
+bark	bark
+barn	child
+barnbarn	grandchild
+barnmorska	midwife
+barnvakt	babysitter
+baron	baron
+bas	base
+bas	bass
+baseball	baseball
+bask	Basque
+basket	basketball
+baskiska	Basque
+batteri	battery
+be	ask
+beachvolleyboll	beach volleyball
+beck	pitch
+bedja	pray
+befallning	order
+befintlig	actual
+befolkning	population
+befordra	promote
+befordra	transport
+befria	free
+begravningsplats	cemetery
+begravningsplats	graveyard
+begäran	request
+begåvning	gift
+behag	pleasure
+behaga	please
+behaglig	sweet
+behov	need
+behå	bra
+behöva	need
+beige	beige
+beklaga	regret
+bekymmerslös	carefree
+bekämpa	fight
+belgare	Belgian
+belgisk	Belgian
+belladonna	deadly nightshade
+belysa	light
+belyst	light
+belägring	siege
+belöning	reward
+ben	leg
+ben	bone
+bensin	gasoline
+bensin	petrol
+bensinstation	gas station
+beredd	ready
+berg	mountain
+berg	rock
+berguv	eagle owl
+berkelium	berkelium
+beryllium	beryllium
+beräkna	calculate
+berätta	tell
+berättelse	history
+besatthet	obsession
+besegra	own
+beskrivning	description
+best	beast
+best	animal
+bestick	cutlery
+bestämd artikel	definite article
+besvär	trouble
+besättning	crew
+besöka	visit
+betala	pay
+betala	foot
+beteende	behavior
+beteende	behaviour
+betjänt	servant
+betong	concrete
+betong-	concrete
+betyda	mean
+betydelse	sense
+betydelse	significance
+beundran	admiration
+bevis	proof
+bi	bee
+bibliotek	library
+bidé	bidet
+bifalla	second
+bikini	bikini
+bikupa	beehive
+bil	car
+bild	image
+bildskärm	monitor
+biljard	billiards
+biljon	trillion
+biljon	billion
+binda	tie
+bindestreck	hyphen
+bio	movie
+biografi	biography
+biokemi	biochemistry
+biologi	biology
+bisam	muskrat
+biskop	bishop
+bisonoxe	buffalo
+bit	bit
+bita	bite
+bitter	bitter
+bivax	beeswax
+björk	birch
+björn	bear
+blad	leaf
+blad	blade
+blanda	mix
+blek	light
+blek	pale
+bli	become
+bli kär	fall in love
+blindhet	blindness
+blindtarm	appendix
+blixt	lightning
+block	cube
+blod	blood
+blodgrupp	blood type
+blodig	bloody
+blogg	blog
+blomkål	cauliflower
+blomma	flower
+bly	lead
+bly	lead/experiment2
+bly	lead/experiment
+blyertspenna	pencil
+blyfri	unleaded
+blyfri bensin	unleaded fuel
+blyg	timid
+blyg	shy
+bläckfisk	octopus
+bläckfisk	squid
+blå	blue
+blåbär	blueberry
+blåmes	blue tit
+blått	azure
+blåval	blue whale
+blöja	diaper
+blötdjur	mollusc
+bo	live
+bo	dwell
+bocka	bow
+bockning	bow
+bockskägg	goatee
+bodybuilding	bodybuilding
+bofink	chaffinch
+bog	bow
+bohrium	bohrium
+bok	book
+bok	beech
+boka	book
+bokstav	letter
+boll	ball
+bomb	bomb
+bombardera	bomb
+bomull	cotton
+bonde	farmer
+bonde	pawn
+bor	boron
+bord	table
+bordeaux	maroon
+bordell	brothel
+bordtennis	table tennis
+bordtennis	ping pong
+borsta	brush
+borste	brush
+boskap	cattle
+bostad	residence
+bot	fine
+bota	cure
+bovete	buckwheat
+boxning	boxing
+bra	good
+brandman	firefighter
+brasa	fire
+brasilian	Brazilian
+brasiliansk	Brazilian
+bredvid	next
+brev	letter
+bridge	bridge
+brilliant	diamond
+brinna	burn
+britt	Briton
+bro	bridge
+brom	bromine
+brons	bronze
+bronsfärg	bronze
+brorsdotter	niece
+brorson	nephew
+brosch	brooch
+broschyr	brochure
+brott	crime
+brottning	wrestling
+brottslighet	crime
+brud	bird
+brudgum	bridegroom
+brudgum	groom
+bruksanvisning	manual
+brun	brown
+brun dvärg	brown dwarf
+brunn	well
+bruttonationalprodukt	gross domestic product
+brygga	pier
+bryta	break
+bryta ned	break
+brytas	break
+bräda	board
+bränna	burn
+bränna	fire
+brännskada	burn
+bränsle	fuel
+bråck	hernia
+brådskande	urgent
+bröd	bread
+bröllop	wedding
+bröst	breast
+bud	messenger
+buddhism	Buddhism
+buffel	buffalo
+buk	abdomen
+buk	stomach
+bukett	bouquet
+bukspottkörtel	pancreas
+bukt	bay
+bulgar	Bulgarian
+bulgarisk	Bulgarian
+bulgariska	Bulgarian
+bulla	bull
+bumerang	boomerang
+burk	can
+bushen	bush
+buss	bus
+buteljera	bottle
+by	village
+byggande	building
+bygge	building
+byrå	office
+byråkrati	bureaucracy
+byta	change
+byte	byte
+byxor	pants
+byxor	trousers
+bäck	brook
+bäcken	cymbal
+bädd	bed
+bänk	bench
+bär	berry
+bära	carry
+bära	bear
+bära	wear
+bärnsten	amber
+bäst	best
+bättre	better
+bäver	beaver
+båda	both
+båge	bow
+bågskjutning	archery
+bågskytt	archer
+båt	boat
+bög	fruit
+böja	bow
+böna	bean
+börd	family
+börja	begin
+början	birth
+cancer	cancer
+cedilj	cedilla
+cell	cell
+cellulosa	cellulose
+cembalo	harpsichord
+cent	cent
+centimeter	centimetre
+cerium	cerium
+cesium	caesium
+chanse	chance
+chanukka	Hanukkah
+check	check
+check	cheque
+chef	boss
+chock	shock
+choklad	chocolate
+choklad	cocoa
+chokladbit	chocolate
+chokladbrun	chocolate
+cigarett	cigarette
+cigarr	cigar
+cigg	smoke
+cirkel	circle
+cirkla	circle
+citat	quotation
+citron	lemon
+citronmeliss	lemon balm
+cittra	zither
+cocktail	cocktail
+copyright	copyright
+curium	curium
+cyan	cyan
+cykel	bicycle
+cykel	bike
+cykel	cycle
+cyklon	cyclone
+dadel	date
+dag	day
+dagbok	diary
+dagg	dew
+daggmask	earthworm
+dagjämning	equinox
+daglig	daily
+dagligt	daily
+dagstidning	newspaper
+dal	valley
+dam	queen
+damm	pond
+damm	dust
+dammsugare	vacuum cleaner
+dans	dance
+dansa	dance
+dansare	dancer
+dansk	Danish
+dansk	Dane
+danska	Danish
+darmstadtium	darmstadtium
+datavetenskap	computer science
+dativ	dative case
+dativ	dative
+dator	computer
+datorspel	computer game
+de	they
+de flesta	most
+de tio budorden	Ten Commandments
+debatt	debate
+debattera	debate
+december	December
+defaitism	defeatism
+deg	dough
+deism	deism
+dekad	decade
+deklarera	declare
+del	part
+delfin	dolphin
+delikat	delicious
+delmängd	subset
+delrepublik	republic
+delta	participate
+delta	partake
+deltagare	participant
+demokrati	democracy
+den	the
+den	it
+den	that
+den här	this
+deoxiribonukleinsyra	deoxyribonucleic acid
+deras	their
+dervisch	Dervish
+dessa	these
+dessutom	then
+dessutom	moreover
+det finns	there is
+det var en gång	once upon a time
+det är rena grekiskan	it's all Greek to me
+deuterium	deuterium
+dialekt	dialect
+dialog	dialogue
+diameter	diameter
+diarré	shit
+diarré	diarrhea
+differens	difference
+differentialekvation	differential equation
+digerdöden	Black Death
+dikt	poem
+diktator	dictator
+dill	dill
+dimma	fog
+dirigent	conductor
+diskett	diskette
+diskussion	discussion
+diskutera	discuss
+dissertation	thesis
+distansera sig	distance
+dit	there
+dit	thither
+division	division
+djinn	genie
+djup	deep
+djur	animal
+djurisk	animal
+dobra	dobra
+dock	albeit
+docka	doll
+doktor	doctor
+dolk	dagger
+dolk	knife
+dom	sentence
+domare	referee
+domkyrka	cathedral
+donation	donation
+dop	baptism
+dotter	daughter
+dotterdotter	granddaughter
+dovhjort	fallow deer
+doxologi	doxology
+dra	pull
+dra åt helvete	fuck you
+dragkedja	zip fastener
+dragspel	accordion
+drake	dragon
+drake	kite
+drastisk	drastic
+drejskiva	lathe
+dricka	drink
+drickande	drink
+drickbar	potable
+dricksvatten	drinking water
+drink	drink
+drog	drug
+dromedar	dromedary
+dront	dodo
+droppe	drop
+drottning	queen
+drucken	drunk
+dryck	drink
+dryck	beverage
+dröm	dream
+drömma	dream
+drönare	drone
+du	thou
+dubbel	double
+dum	stupid
+duma	duma
+dundra	thunder
+dusch	shower
+duscha	shower
+dussin	dozen
+duva	pigeon
+duva	dove
+dvs	i.e.
+dvärg	dwarf
+dvärgplanet	dwarf planet
+dygd	virtue
+dygn	day
+dyn	dune
+dyna	cushion
+dyr	expensive
+dyrbar	precious
+däck	tire
+däggdjur	mammal
+där	there
+där	where
+därför	hence
+därför att	because
+därmed	ergo
+därpå	then
+då	then
+dålig	bad
+dålig	poor
+dåre	fool
+dö	die
+död	death
+död	dead
+döda	kill
+dödfödd	stillborn
+dödlig	mortal
+dödlighet	mortality
+dödshjälp	euthanasia
+dölja	conceal
+döpa	name
+dörr	door
+döv	deaf
+e-post	e-mail
+ed	oath
+effektivitet	efficacy
+efter	after
+efter	by
+efter Kristus	anno Domini
+efter Kristus	Anno Domini
+efterfrågan	demand
+eftermiddag	afternoon
+efternamn	surname
+eftersom	for
+eftersom	as
+egen	own
+egendom	property
+egennamn	proper noun
+egenskap	property
+egentlig	proper
+egentligen	really
+egenvärde	eigenvalue
+ego	ego
+egoistisk	selfish
+egyptier	Egyptian
+egyptisk	Egyptian
+ejakulera	ejaculate
+ek	oak
+ek	stag-beetle
+eko-	eco-
+ekollon	acorn
+ekologi	ecology
+ekonomi	economy
+ekonomi	economics
+ekorre	squirrel
+eksem	eczema
+ekumenik	ecumenism
+ekvation	equation
+ekvator	equator
+el	electricity
+elak	wicked
+elak	mean
+elasticitetsmodul	Young's modulus
+eld	fire
+eld	pyre
+eldfluga	firefly
+eldkastare	flamethrower
+eldstad	fireplace
+elefant	elephant
+elektromagnet	electromagnet
+elektromagnetism	electromagnetism
+elektron	electron
+elev	pupil
+elfenben	ivory
+elfte	eleventh
+eller	or
+ellips	ellipse
+elva	eleven
+embryo	embryo
+emergens	emergence
+en	an
+en	juniper
+en	you
+en gång	once
+en gång per vecka	weekly
+enantiomer	enantiomer
+encyklopedi	encyclopedia
+encyklopedi	encyclopaedia
+enda	only
+energi	energy
+energisk	strong
+engagera	absorb
+engelsk	English
+engelsk mil	mile
+engelska	English
+engelsman	English
+engelsman	Englishman
+enhet	unit
+enhjuling	unicycle
+enhörning	unicorn
+enighet	agreement
+enkel	simple
+enligt	according to
+enorm	vast
+ensam	alone
+ensamhet	solitude
+enskild	several
+ental	singular
+entusiasm	enthusiasm
+er	you
+era	era
+era	age
+erbjuda	offer
+erhålla	obtain
+erkänna	recognize
+ersätta	substitute
+ersätta	replace
+eskatologi	eschatology
+esperanto	Esperanto
+ess	ace
+essä	essay
+est	Estonian
+estetik	aesthetics
+estetisk	aesthetic
+estnisk	Estonian
+estniska	Estonian
+et cetera	etcetera
+et cetera, etc.	et cetera
+etablerande	establishment
+etc, et c.	etc.
+etikett	tag
+etikett	label
+etiologi	aetiology
+etnisk rensning	ethnic cleansing
+ett par	couple
+etta	one
+etta	first
+eukaryoter	eukaryote
+euklidisk geometri	Euclidean geometry
+eunuck	eunuch
+euro	euro
+europeisk	European
+europé	European
+evig	eternal
+examen	degree
+examen	examination
+exempel	example
+existens	existence
+existera	exist
+experiment	experiment
+exploatera	exploit
+extern	external
+extraordinär	extraordinary
+f.Kr	BC
+fabrik	factory
+fack	sphere
+fader	father
+fager	fair
+fagott	bassoon
+faktisk	actual
+faktum	fact
+faktura	invoice
+fakultet	school
+fakultet	factorial
+falk	falcon
+fall	fall
+fall	case
+falla	fall
+fallskärm	parachute
+falsk	false
+familj	family
+famn	fathom
+fan	shit
+fan	fuck
+fan	fan
+fantastisk	great
+farao	pharaoh
+farbror	uncle
+farfar	grandfather
+farlig	dangerous
+farmor	paternal grandmother
+fart	speed
+fartyg	vessel
+fasad	façade
+fasan	pheasant
+fascism	fascism
+fast	solid
+fast form	solid
+fasta	fast
+faster	aunt
+fastetid	fast
+fastän	while
+fat	plate
+fatta	get
+fattig	poor
+fattigdom	poverty
+fe	fairy
+feber	temperature
+februari	February
+federation	federation
+feg	yellow
+feghet	cowardice
+fegis	coward
+fel	mistake
+fel	wrong
+fem	five
+femhundra	five hundred
+femte	fifth
+femtio	fifty
+femtioett	fifty-one
+femtiotvå	fifty-two
+femton	fifteen
+fenix	phoenix
+fest	party
+festival	festival
+fet	fat
+fet	bold
+fett	fat
+ficka	pocket
+ficktjuv	pickpocket
+fiende	enemy
+figur	figure
+fil	file
+fila	file
+filial	branch
+filosof	philosopher
+filosofi	philosophy
+fin	beautiful
+final	final
+finansmästare	treasurer
+finger	finger
+fingerborg	thimble
+fingerdjur	aye-aye
+finna	find
+finne	Finn
+finsk	Finnish
+finska	Finnish
+fiol	violin
+fis	fart
+fis	wind
+fisa	fart
+fisk	fish
+fiska	fish
+fiske	fishing
+fiskespö	fishing rod
+fiskgjuse	osprey
+fiskkrok	fishhook
+fiskmås	common gull
+fitta	cunt
+fitta	pussy
+fitta	twat
+fjorton	fourteen
+fjäder	spring
+fjäder	feather
+fjäll	scale
+fjällig bläcksvamp	lawyer's wig
+fjärde	fourth
+fjärdedel	quarter
+fjäril	butterfly
+fjärilsim	butterfly
+fladdermus	bat
+flagga	flag
+flamingo	flamingo
+flamländska	Flemish
+flaska	bottle
+flat	flat
+flata	lesbian
+flicka	girl
+flickvän	girlfriend
+flitig	diligent
+flock	flock
+flod	river
+flodhäst	hippopotamus
+fluga	fly
+fluga	bowtie
+flundra	flounder
+fluor	fluorine
+flyga	fly
+flygande tefat	flying saucer
+flygkorridor	corridor
+flygplan	airplane
+flygplan	aeroplane
+flygplats	airport
+flygvapen	air force
+flyktig	ephemeral
+flytande	liquid
+flytande	fluent
+flytta	move
+flytta sig	move
+fläck	spot
+fläcka	dirty
+fläkt	fan
+fläsk	pork
+flöjt	flute
+fobi	phobia
+foder	fodder
+foglig	docile
+folk	people
+folkmord	genocide
+fonem	phoneme
+fordon	vehicle
+form	shape
+formel	formula
+fornkyrkoslaviska	Old Church Slavonic
+fort	fast
+fortfarande	still
+fortgång	march
+fosfor	phosphorus
+foster	fetus
+foster	foetus
+fostermor	stepmother
+fot	foot
+fotboll	football
+fotboll	soccer
+fotgängare	pedestrian
+fotografera	photograph
+fotografi	photograph
+fotografi	picture
+foton	photon
+framför	before
+framhärda	persist
+framsteg	progress
+framstående	prominent
+framtid	future
+framåt	onward
+framåt	forward
+francium	francium
+fransk	French
+franska	French
+fransmän	French
+fras	sentence
+fras	phrase
+fred	peace
+fredag	Friday
+frekvens	frequency
+frestelse	temptation
+fri	free
+frid	peace
+frikalla	absolve
+frimärke	postage stamp
+fris	Frisian
+frisisk	Frisian
+frisk	well
+frisk	sweet
+frisör	barber
+frukost	breakfast
+frukt	fruit
+frukta	fear
+fruktan	fear
+frysa	freeze
+fräken	freckle
+främling	alien
+främlingsfientlighet	xenophobia
+främmande	foreign
+främmande	strange
+främre	forward
+fräsch	fresh
+fråga	ask
+fråga	question
+frågetecken	question mark
+från	from
+frö	seed
+fröken	miss
+fukta	wet
+fuktig	moist
+fuktighet	moisture
+ful	ugly
+ful	dirty
+full	full
+fullkomlig	perfect
+fullödig	full
+fungera	function
+fungera	work
+funktion	function
+futurum	future
+fyllo	drunk
+fyr	lighthouse
+fyra	four
+fyrtaktsmotor	four-stroke engine
+fyrti	forty
+fyrtiett	forty-one
+fyrtiofem	forty-five
+fyrtiofyra	forty-four
+fyrtionio	forty-nine
+fyrtiosex	forty-six
+fyrtiosju	forty-seven
+fyrtiotre	forty-three
+fyrtiotvå	forty-two
+fyrtioåtta	forty-eight
+fysik	physics
+fysisk	physical
+fäktning	fencing
+fält	field
+fängelse	prison
+färg	paint
+färgsätta	Template:color-colour (verb)
+färja	ferry
+färre	fewer
+färöiska	Faroese
+fästa	stick
+fästing	tick
+få	few
+få	get
+få	may
+få	receive
+få tag i	get
+fågel	bird
+fågelskrämma	scarecrow
+fågelsång	call
+fågelunge	chick
+får	sheep
+fåra	furrow
+fårhund	sheepdog
+föda	bear
+föda	birth
+född	born
+födelse	birth
+födelsedag	birthday
+föl	foal
+följa	follow
+följaktligen	thus
+följande	subsequent
+fönster	window
+för	ago
+för	for
+förbanna	curse
+förbannelse	curse
+förbereda	prepare
+förbjuda	forbid
+förbjuda	prohibit
+förbränning	burn
+förbränningsmotor	internal combustion engine
+förbättra	improve
+fördom	prejudice
+före	before
+föredraga	prefer
+förefalla	seem
+föreläsning	talk
+förena	unite
+förening	society
+föreslå	suggest
+föreslå	propose
+föreställa	present
+författare	author
+förflutna	past
+förflyttning	translation
+förfölja	pursue
+förgifta	poison
+förgätmigej	forget-me-not
+förgäves	in vain
+förhindra	prevent
+förhud	prepuce
+förhållande	relationship
+förklara	explain
+förkläde	apron
+förkortad	abbreviated
+förkylning	cold
+förlora	lose
+förlåt	sorry
+förlåta	forgive
+förmåga	ability
+förmörkelse	eclipse
+förnamn	first name
+förnamn	given name
+förra	last year
+förra	previous
+förresten	by the way
+förrgår	ereyesterday
+förrgår	day before yesterday
+förrättning	function
+försats	pre-ejaculate
+förse	provide
+förste	first
+förströelse	recreation
+förstärka	reinforce
+förstå	appreciate
+förstå	understand
+förstå	see
+förstånd	mind
+förstånd	reason
+förstånd	brain
+förstöra	destroy
+förstörd	spoilt
+försummelse	neglect
+försvinna	go
+försvinna	vanish
+försäljare	salesman
+försäljare	salesperson
+försäljning	sale
+försöka	attempt
+förteckning	index
+förutom	but
+förutse	foresee
+förutsäga	predict
+förutsäga	forecast
+förälder	parent
+föräldralöst barn	orphan
+föräldrar	parents
+förändring	change
+gaffel	fork
+galax	galaxy
+galen	crazy
+galen	nut
+galge	gallows
+galla	bile
+gallium	gallium
+galt	boar
+gam	vulture
+gammal	old
+gammelfarfar	great-grandfather
+garantera	guarantee
+garanti	guarantee
+garderob	wardrobe
+gas	gas
+gaskammare	gas chamber
+gata	street
+gatlingkanon	Gatling gun
+gay	queer
+ge	give
+ge	hand
+ge sig	surrender
+ge ut	spend
+gemensam	common
+gems	chamois
+generation	age
+genetik	genetic
+genitiv	genitive case
+genitiv	genitive
+genom att	by
+genomförbar	feasible
+genomslagskopia	carbon
+genomsnitt	mean
+genomsnittlig	mean
+genomtränga	penetrate
+genus	gender
+geografi	geography
+geologi	geology
+geometri	geometry
+georgier	Georgian
+georgiska	Georgian
+germanium	germanium
+gerundium	gerund
+get	goat
+geting	wasp
+geting	hornet
+gevär	rifle
+giffel	croissant
+gift	poison
+gift	venom
+gifta sig	marry
+giftig	toxic
+gikt	gout
+giltig	valid
+giraff	giraffe
+girig	greedy
+gissa	guess
+gitarr	guitar
+gitarrist	guitarist
+gitter	lattice
+giv mig	give me
+glaciär	glacier
+glad	happy
+glad	gay
+glad påsk	Happy Easter
+glas	glass
+glasharmonika	glass harmonica
+glasnost	glasnost
+glass	ice cream
+glass	ice
+glasögon	spectacles
+glida	slide
+gliring	taunt
+global uppvärmning	global warming
+globalisation	globalisation
+glutenintolerans	coeliac disease
+glädje	happiness
+glänsande	splendid
+glödlampa	light bulb
+glömska	oblivion
+gnaga	gnaw
+gnejs	gneiss
+gnida	rub
+gnista	spark
+gnosticism	Gnosticism
+go	go
+god	good
+god dag	good day
+god eftermiddag	good afternoon
+god jul	Merry Christmas
+god kväll	good evening
+god morgon	good morning
+god natt	good night
+godhet	good
+gods	goods
+godtycklig	arbitrary
+golf	golf
+golv	floor
+googla	google
+googling	google
+gorilla	gorilla
+gott nytt år	Happy New Year
+grad	degree
+graf	graph
+grafiskt användargränssnitt	graphical user interface
+gram	gram
+grammatik	grammar
+grann	gay
+granne	neighbour
+grannskap	neighbourhood
+grannskap	neighborhood
+grape	grapefruit
+gratis	free
+gratis	gratis
+grattis på födelsedagen	happy birthday
+gratulera	congratulate
+graviditet	pregnancy
+grek	Greek
+grekisk	Greek
+grekiska	Greek
+gren	fork
+grep	fork
+greve	count
+grip	griffin
+gripa	seize
+gris	pig
+groda	frog
+grotta	cave
+grumlig	dirty
+grund	shallow
+grund	base
+grupp	group
+gruva	mine
+gruvarbetare	miner
+gry	dawn
+grym	cruel
+gryning	dawn
+gryt	den
+gryta	pot
+grädde	cream
+gräla	scold
+gräns	limit
+gräns mot hav	coast
+gräs	grass
+gräsand	mallard
+gräset är alltid grönare på andra sidan	the grass is always greener on the other side
+gräshoppa	grasshopper
+gräshoppa	locust
+gräslök	chive
+grävling	badger
+grå	grey
+gråbo	mugwort
+gråhäger	grey heron
+gråta	weep
+grön	green
+gröngöling	green woodpecker
+grönländska	Greenlandic
+grönsak	vegetable
+grönt	vert
+gubbe	old man
+gud	god
+gudinna	goddess
+gul	yellow
+gul	amber
+guld	gold
+guld	or
+guld-	gold
+guldfisk	goldfish
+guldmynt	gold
+gullig	cute
+gulsot	jaundice
+gunga	swing
+gunga	rock
+gurka	cucumber
+gurkmeja	turmeric
+gylf	fly
+gyllene	gold
+gynnsam	happy
+gädda	pike
+gärna	willingly
+gärning	deed
+gäspa	yawn
+gäspning	yawn
+gäst	guest
+gästgiveri	inn
+gå	go
+gå	walk
+gå ned	set
+gå sönder	break
+gå upp	get up
+gå ut och gå	walk
+gård	farm
+gård	place
+gård	yard
+gårdag	yesterday
+gås	goose
+gåsgam	griffon vulture
+gök	cuckoo
+göra	do
+göra ont	hurt
+gördel	belt
+ha	have
+ha	defecate
+ha sönder	break
+hackbräde	dulcimer
+hackspett	woodpecker
+hafnium	hafnium
+hagel	hail
+hagelgevär	shotgun
+hagla	hail
+hagtorn	hawthorn
+haj	shark
+hajj	hajj
+haka	chin
+hakkors	swastika
+hallick	pimp
+hallon	raspberry
+hallonbuske	raspberry
+hallå	hello
+hallå	hi
+hals	throat
+hals	neck
+halsband	necklace
+halsband	collar
+halsduk	scarf
+halva	halva
+halvbror	half brother
+halveringstid	half-life
+halvklot	hemisphere
+halvledare	semiconductor
+halvö	peninsula
+hamburgare	hamburger
+hammare	hammer
+hamn	port
+hamn	harbor
+hamnstad	port
+hamster	hamster
+han	he
+hand	hand
+handboll	handball
+handduk	towel
+handel	trade
+handfat	washbasin
+handflata	palm
+handla	shop
+handled	wrist
+handling	act
+handling	action
+hane	bull
+hangarfartyg	aircraft carrier
+hans	his
+hardnackad	stubborn
+hare	hare
+harem	harem
+harpun	harpoon
+harv	harrow
+hasselnöt	hazelnut
+hassium	hassium
+hat	hatred
+hata	hate
+hatt	hat
+havre	oat
+hebreisk	Hebrew
+hebreiska	Hebrew
+hebré	Hebrew
+hedonism	hedonism
+hel	all
+helg	weekend
+helgedom	shrine
+helikopter	helicopter
+helium	helium
+heltal	integer
+heltal	number
+helvete	hell
+hem	home
+hemgift	dowry
+hemland	home
+hemlig	secret
+hemlighet	secret
+hemsk	terrible
+henne	her
+henne själv	herself
+hennes	her
+hermafrodit	hermaphrodite
+hermelin	ermine
+herre gud	oh my God
+hertiginna	duchess
+het	hot
+heterogen	heterogeneous
+heterosexualitet	heterosexuality
+hicka	hiccup
+hidjra	Hegira
+hidjra	Hijra
+himmel	sky
+himmel	heaven
+hinder	obstacle
+hindi	Hindi
+hindra	hinder
+hink	bucket
+hiss	lift
+hiss	elevator
+hisskorg	car
+historia	history
+historia	story
+historik	history
+hit	here
+hjort	deer
+hjortron	cloudberry
+hjul	wheel
+hjälm	helmet
+hjälp	help
+hjälpa	help
+hjälpsam	sweet
+hjälpverb	auxiliary verb
+hjälte	hero
+hjärna	brain
+hjärnstammen	brain stem
+hjärta	heart
+hjärter	heart
+hjärtinfarkt	heart attack
+hobbit	hobbit
+hobby	hobby
+hockey	hockey
+holländare	Dutch
+holländsk	Dutch
+holmium	holmium
+homeopati	homeopathy
+homogen	homogeneous
+homosexualitet	homosexuality
+homosexuell	gay
+homosexuell	homosexual
+hon	she
+honom	him
+honung	honey
+hop	heap
+hopp	hope
+hopp	leap
+hoppa	leap
+hoppa	spring
+hoppa	skip
+hoppas	hope
+hor	adultery
+hora	whore
+horn	horn
+house	house music
+hud	skin
+huggorm	viper
+humla	bumblebee
+hummer	lobster
+hund	dog
+hund	hound
+hundra	hundred
+hunger	hunger
+hungersnöd	famine
+hur	how
+hur	how much
+hur gammal är du	How old are you?
+hur mycket blir det	how much is it
+hur är det	how are you
+hus	house
+husar	hussar
+husmus	house mouse
+hustru	wife
+huvud	head
+huvudbry	puzzle
+huvudsaklig	principal
+huvudsaklig	main
+huvudstad	capital
+hydda	hut
+hyena	hyena
+hylla	shelf
+hyperbel	hyperbola
+hyperlänk	link
+hyponym	hyponym
+hyra	rent
+hyvel	plane
+hyvla	plane
+häckla	taunt
+häftapparat	stapler
+häger	heron
+häl	heel
+hälft	half
+hälla	pour
+hämnd	revenge
+hända	happen
+händelse	occurrence
+hänglås	padlock
+hängmatta	hammock
+hänvisa	refer
+här	here
+härd	stove
+härma	copy
+häst	horse
+häxa	witch
+hållfast	strong
+hållplats	stop
+hårdvara	hardware
+hö	hay
+hög	tall
+hög	high
+hög	pile
+höger	right
+höger-	right
+högern	right
+högskola	school
+högtalare	speaker
+högtid	holiday
+höja	raise
+höjd	height
+hök	hawk
+höna	hen
+höra	hear
+hörn	angle
+höst	autumn
+hövlig	polite
+i	today
+i går	yesterday
+i kväll	tonight
+ibland	sometimes
+icke dess mindre	nevertheless
+idag	today
+ideal	ideal
+identitet	identity
+idiom	idiom
+idiot	idiot
+idisslare	ruminant
+idé	thought
+idé	idea
+igel	leech
+igelkott	hedgehog
+igen	again
+ihärdighet	perseverance
+ikonostas	iconostasis
+iktyologi	ichthyology
+illamående	nausea
+iller	polecat
+ilska	anger
+imorgon	tomorrow
+imperativ	imperative
+imperfekt	past tense
+imperialism	imperialism
+inbördeskrig	civil war
+indian	Indian
+indiansk	Indian
+indier	Indian
+indisk	Indian
+indium	indium
+indonesiska	Indonesian
+infarkt	infarct
+inflation	inflation
+influensa	influenza
+influensa	flu
+information	information
+ingefära	ginger
+ingen	no
+ingen	nobody
+ingen	no one
+ingen	none
+ingen orsak	you're welcome
+ingen rökning	no smoking
+ingenjör	engineer
+ingenstans	nowhere
+inget	nothing
+ingång	access
+inhemsk	native
+inkludera	include
+inkomst	income
+inlägga	protest
+inne	in
+innehåll	content
+inse	realize
+insekt	insect
+inskränka	restrict
+instrument	instrument
+instrumentalis	instrumental case
+instämmande	approval
+inte	not
+intelligent	bright
+interferon	interferon
+interlingua	Interlingua
+internationell	international
+internationella fonetiska alfabetet	International Phonetic Alphabet
+intressant	interesting
+inträda	enter
+inuti	within
+invändning	objection
+iridium	iridium
+irisk	Irish
+iriska	Irish
+irländare	Irish
+irländsk	Irish
+is	ice
+isberg	iceberg
+isbjörn	polar bear
+ishockey	ice hockey
+islam	Islam
+isländsk	Icelandic
+isländska	Icelandic
+israel	Israeli
+israelisk	Israeli
+istapp	icicle
+italiensk	Italian
+italienska	Italian
+ja	yes
+jag	I
+jag förstår inte	I don't understand
+jag med	me too
+jag tror det	I think so
+jag vet inte	I don't know
+jag är kär i dig	I'm in love with you
+jaga	chase
+jaga	hunt
+jak	yak
+jakt	hunt
+jakt	chase
+jama	meow
+januari	January
+japan	Japanese
+japansk	Japanese
+japanska	Japanese
+jeans	jeans
+jihad	jihad
+jo	yes
+jobba	work
+jod	iodine
+jord	earth
+jord	soil
+jorda	earth
+jordbruk	agriculture
+jorden	Earth
+jordgubbe	strawberry
+jordgubbsplanta	strawberry
+jordnöt	peanut
+joule	joule
+journalistik	journalism
+joystick	joystick
+jude	Jew
+judinna	Jewess
+judisk	Jewish
+judo	judo
+juice, saft	juice
+jul	Christmas
+julafton	Christmas Eve
+julgran	Christmas tree
+juli	July
+jultomten	Santa Claus
+jungfru	virgin
+juni	June
+just	just
+justering	adjustment
+juvel	gem
+juvel	jewel
+jägare	hunter
+jämn	smooth
+jämn	even
+järn	iron
+järn-	iron
+järnväg	railroad
+järnåldern	Iron Age
+järv	wolverine
+jäst	yeast
+jätte	giant
+kabel	cable
+kackerlacka	cockroach
+kadaver	cadaver
+kadmium	cadmium
+kaffe	coffee
+kaffebuske	coffee
+kaja	jackdaw
+kaka	cookie
+kakao	cocoa
+kaktus	cactus
+kalcedon	chalcedony
+kalcium	calcium
+kalender	calendar
+kalium	potassium
+kalkon	turkey
+kalksten	limestone
+kall	cold
+kall fusion	cold fusion
+kalla	call
+kallt krig	cold war
+kalv	calf
+kam	comb
+kamel	camel
+kamel	Camelus dromedarius
+kamera	camera
+kamouflage	camouflage
+kamp	struggle
+kampanj	campaign
+kamrat	friend
+kamrat	comrade
+kan	may
+kanadensisk	Canadian
+kanalisera	channel
+kanin	rabbit
+kanske	maybe
+kanske	perhaps
+kaos	chaos
+kaosteori	chaos theory
+kapabel	able
+kapital	capital
+kapitalism	capitalism
+kapplöpning	race
+karaktär	character
+karamell	sweet
+karamell	caramel
+karbonpapper	carbon
+karboxyl-	carboxylic
+karboxylsyra	carboxylic acid
+kardinaltal	cardinal number
+kardiolog	cardiologist
+karelska	Karelian
+karriär	career
+karta	map
+kaskelot	sperm whale
+kassaskåp	safe
+kassettbandspelare	tape recorder
+kast	caste
+kasta	throw
+kasus	case
+katalan	Catalan
+katalansk	Catalan
+katalanska	Catalan
+katapult	catapult
+kategori	category
+katt	cat
+katt	tom
+kattdjur	cat
+kattuggla	tawny owl
+kattunge	kitten
+kaviar	caviar
+kedja	chain
+kejsare	emperor
+kemisk	chemical
+kemist	chemist
+kenotaf	cenotaph
+keramik	ceramic
+kex	biscuit
+keyboard	keyboard
+kid	fawn
+kikare	binoculars
+kikärt	chickpea
+kil	wedge
+kila runt hörnet	kick the bucket
+kille	boy
+kilogram	kilogram
+kilometer	kilometre
+kilometer	kilometer
+kinamat	Chinese
+kind	cheek
+kindtand	molar
+kines	Chinese
+kineser	Chinese
+kinesisk	Chinese
+kinesiska	Chinese
+kisel	silicon
+kisse	pussy
+kisse	kitty
+kittla	tickle
+kivi	kiwi
+kiwi	kiwi fruit
+kjol	skirt
+klar	bright
+klarinett	clarinet
+klassifikation	classification
+klaustrofobi	claustrophobia
+klaviatur	keyboard
+kliché	cliché
+klingonska	Klingon
+klippa	rock
+klippblock	rock
+klippduva	rock dove
+klister	glue
+klocka	watch
+klocka	bell
+klockan	o'clock
+klockspel	glockenspiel
+klor	chlorine
+klorofyll	chlorophyll
+kloster	monastery
+klot	sphere
+klot	ball
+klubb	club
+klubba	club
+klubbor	clubs
+klä	dress
+klä av	undress
+kläder	clothes
+klädesplagg	garment
+klänning	dress
+klättra	climb
+klösa	scratch
+klöver	club
+klöver	clover
+knacka	knock
+knapp	scarce
+knappast	hardly
+knappnål	pin
+knekt	knight
+knekt	jack
+kniv	knife
+knoge	knuckle
+knop	knot
+knopp	bud
+knulla	fuck
+knä	knee
+knäfalla	genuflect
+knäskål	kneecap
+ko	cow
+koala	koala
+kobolt	cobalt
+kock	cook
+kod	code
+koffert	trunk
+kofot	crowbar
+koka	boil
+kokabuske	coca
+kokain	cocaine
+kokbok	cookbook
+kokosnöt	coconut
+kol	carbon
+kol	coal
+koldioxid	carbon dioxide
+kolera	cholera
+kolhydrat	carbohydrate
+kolibri	hummingbird
+kolja	haddock
+kolon	colon
+koloni	colony
+koloxid	carbon monoxide
+koltrast	blackbird
+koma	coma
+komet	comet
+komma	come
+komma ihåg	remember
+kommentar	comment
+kommer att	will
+kommer det börja regna	Is it going to rain?
+kommittologi	comitology
+kommunism	communism
+kommunist	communist
+kommunistisk	communist
+komparativ	comparative
+kompass	compass
+kompetent	able
+komplett	complete
+komplex	complex
+komplexa tal	complex number
+komplikation	complexity
+komponent	component
+koncept	concept
+konduktör	conductor
+konfiskera	confiscate
+konflikt	conflict
+konjak	cognac
+konjunktion	conjunction
+konjunktiv	subjunctive
+konkret	concrete
+konkurrens	competition
+konsensus	consensus
+konsern	corporation
+konserv	tin
+konservburk	can
+konservera	can
+konsonant	consonant
+konst	art
+konstellation	constellation
+konstgjord	false
+konståkning	figure skating
+kontakta	contact
+kontaktlins	contact lens
+kontanter	cash
+kontanter	money
+kontinent	continent
+kontor	office
+kontroll	control
+kontrollera	control
+kontrollsumma	checksum
+konversation	talk
+konversation	conversation
+konvertibel mark	convertible mark
+konvex	convex
+koordinat	coordinate
+kopiera	copy
+kopp	cup
+koppar	copper
+koppel	leash
+kopra	copra
+koran	Qur'an
+koranen	Qur'an
+koreansk	Korean
+koreanska	Korean
+korg	basket
+korn	barley
+korp	raven
+korridor	corridor
+kors	cross
+korsa	cross
+korset	cross
+korsett	corset
+korsord	crossword
+korståg	crusade
+korv	sausage
+kosmologi	cosmology
+kossa	cow
+kostym	suit
+kraft	force
+kraftfull	strong
+kram	hug
+krama	hug
+kran	crane
+kratta	rake
+krav	requirement
+kreativ	creative
+krets	circle
+kricket	cricket
+krig	war
+krigare	warrior
+krigföring	warfare
+krigsfånge	prisoner of war
+krimtatariska	Crimean Tatar
+kris	crisis
+kristall	crystal
+kristen	Christian
+kroat	Croatian
+kroatisk	Croatian
+kroatiska	Croatian
+krog	pub
+krokodil	crocodile
+krom	chromium
+kromosom	chromosome
+krona	crown
+kronhjort	red deer
+kronärtskocka	artichoke
+kropp	body
+kropp	field
+krusbär	gooseberry
+krycka	crutch
+krypa	creep
+krypton	krypton
+kryptonit	kryptonite
+kräfta	crayfish
+kräkas	vomit
+kräm	cream
+kränga	rock
+kränkning	violation
+kråka	crow
+kub	cube
+kubism	cubism
+kuckeliku	cock-a-doodle-doo
+kudde	pillow
+kuk	cock
+kula	bullet
+kula	ball
+kullager	ball bearing
+kulspetspenna	ballpoint pen
+kulspruta	machine gun
+kulting	piglet
+kultur	culture
+kund	customer
+kung	king
+kungarike	kingdom
+kungsörn	golden eagle
+kunna	can
+kunna	know
+kunskap	knowledge
+kunskap	science
+kur	cure
+kurdiska	Kurdish
+kurragömma	hide and seek
+kurs	course
+kurva	curve
+kurva	arc
+kusin	cousin
+kuvert	envelope
+kvabbso	lumpsucker
+kvacksalveri	quackery
+kvadrat	square
+kvadratrot	square root
+kvalitet	quality
+kvantisering	quantization
+kvar	left
+kvark	quark
+kvartal	quarter
+kvast	broom
+kvicksand	quicksand
+kvicksilver	mercury
+kvinna	woman
+kvinnor	women
+kvinnotjusare	womanizer
+kvist	stick
+kvitto	receipt
+kväkare	Quaker
+kväll	evening
+kvällning	nightfall
+kvällsmat	supper
+kväve	nitrogen
+kyckling	chicken
+kyla	cold
+kylskåp	refrigerator
+kypare	waiter
+kyrillisk	Cyrillic
+kyrka	church
+kyss	kiss
+kyssa	kiss
+kyssas	kiss
+källa	spring
+källa	root
+källkod	source code
+känguru	kangaroo
+känna	know
+känna	feel
+kännemärke	feature
+känsla	feeling
+känslor	feeling
+käpp	stick
+kärlek	love
+kärna	core
+kålrot	swede
+kålrot	rutabaga
+kåt	horny
+kö	queue
+kök	kitchen
+kön	sex
+köpa	buy
+kör	choir
+körsbär	cherry
+körsbärsträd	cherry
+körtel	gland
+lacrosse	lacrosse
+ladda ner	download
+lag	law
+lag	team
+laga mat	cook
+lagas	cook
+lager	laurel
+lager	coat
+lager	stock
+lagligt	legal
+lakan	sheet
+lamm	lamb
+land	country
+land	land
+land-	country
+landmina	land mine
+landsbygd	country
+lantan	lanthanum
+laotier	Lao
+laotier	Laotian
+laotiska	Lao
+laotiska	Laotian
+larv	caterpillar
+larv	larva
+lastbil	truck
+latin	Latin
+latinsk	Latin
+latinska alfabetet	Latin alphabet
+lav	lichen
+lavin	avalanche
+lawrencium	lawrencium
+lax	salmon
+le	smile
+leda	head
+leda	lead
+leda	lead/experiment2
+leda	lead/experiment
+ledare	head
+ledare	conductor
+ledig	vacant
+ledighet	holiday
+ledsen	sad
+ledsen	sorry
+leende	smile
+legering	alloy
+lejon	lion
+lejoninna	lioness
+leka	play
+leksak	toy
+lektion	lesson
+lemur	lemur
+leopard	leopard
+lera	mud
+lera	clay
+lett	Latvian
+lettiska	Latvian
+leva	live
+levande	live
+lever	liver
+levermossa	liverwort
+levitation	levitation
+lexem	lexeme
+lida	suffer
+liftare	hitchhike
+ligg	fuck
+ligga	lie
+lik	corpse
+lik	similar
+lika	as
+likformig	uniform
+likna	resemble
+likör	liqueur
+lila	purple
+lilja	lily
+liljekonvalj	lily of the valley
+lillfinger	little finger
+lin	flax
+lingvistik	linguistics
+linjal	ruler
+linje	line
+linjär algebra	linear algebra
+lins	lens
+lita på	rely
+lite	a little
+liten	small
+liten	little
+liter	litre
+literary: mammaknullare	motherfucker
+litium	lithium
+litteratur	literature
+liv	life
+liviska	Livonian
+livmoder	womb
+livselixir	elixir of life
+livslängd	age
+livstid	life
+livsviktig	vital
+ljud	noise
+ljuda	sound
+ljudhastighet	speed of sound
+ljuga	lie
+ljum	lukewarm
+ljus	light
+ljus	candle
+ljus	bright
+ljuskrona	chandelier
+ljusstake	candlestick
+ljusår	light year
+ljuv	sweet
+lo	lynx
+lock	cover
+lock	lid
+lockespindel	harvestman
+logaritm	logarithm
+logik	logic
+lok	engine
+lokativ	locative
+lokförare	engineer
+lol, asg	lol
+loppa	flea
+loppspel	tiddlywinks
+lova	praise
+luft	air
+lufta	air
+luftballong	balloon
+lugn	quiet
+lukt	odour
+lukt	smell
+lukt	scent
+lukta	smell
+lunch	lunch
+lunga	lung
+lus	louse
+lycka till	good luck
+lyckosam	lucky
+lydig	obedient
+lydnad	obedience
+lyra	lyre
+lysa	shine
+lysin	lysine
+lyssna	listen
+läder	leather
+lägenhet	apartment
+lägga	place
+lägga	put
+lägga	lay
+läkare	physician
+läkemedel	medicine
+lämna	leave
+lämna	quit
+längd	length
+längta	long
+länk	link
+läpp	lip
+läppstift	lipstick
+lära	teach
+lärare	teacher
+lärare	professor
+lärka	lark
+lärobok	textbook
+läsa	read
+läsbar	legible
+läsk	soda
+läsk	soft drink
+lätt	easy
+lätt	light
+lättnad	relief
+läxa	homework
+låg	low
+låna (ut)	lend
+lång	long
+långfinger	middle finger
+långfredag	Good Friday
+långsam	slow
+långt	far
+lår	thigh
+lår	case
+lås	lock
+låtsa	pretend
+löfte	promise
+lögn	lie
+lögnare	liar
+löjlig	ridiculous
+lök	onion
+lön	salary
+lön	wage
+lönn	maple
+löpare	bishop
+lördag	Saturday
+lösa	resolve
+lösning	solution
+löv	leaf
+machete	machete
+madrass	mattress
+magasin	shop
+magasin	magazine
+mage	stomach
+mage	belly
+magnesium	magnesium
+magnetisk	magnetic
+magnetism	magnetism
+maj	May
+majonnäs	mayonnaise
+majoritet	majority
+majrova	turnip
+majs	maize
+majs	corn
+make	twin
+make	husband
+makrilli	mackerel
+makroekonomi	macroeconomics
+makt	power
+mal	moth
+mala	grind
+malajiska	Malay
+mall	template
+malm	ore
+malört	wormwood
+malört	absinth
+mamma	mummy
+mamma	mum
+mammut	mammoth
+man	man
+man	one
+man	you
+man	mane
+mandarin	Mandarin
+mandarin	mandarin orange
+mandarin	Chinese
+mandarin	mandarin
+mandarinträd	mandarin orange
+mandel	almond
+mandelträd	almond
+manet	jellyfish
+mangan	manganese
+mango	mango
+maniok	cassava
+marin	navy
+marionett	puppet
+marionett	marionette
+mark	mark
+markgreve	margrave
+marmor	marble
+mars	March
+marsch	march
+marschera	march
+marshalliska	Marshallese
+marsian	Martian
+marsvin	guinea pig
+martyr	martyr
+marxism	Marxism
+mask	worm
+maskin	machine
+maskinöversättning	machine translation
+maskros	dandelion
+massaker	massacre
+massförstörelsevapen	weapon of mass destruction
+massförstörelsevapen	weapons of mass destruction
+massiv	solid
+mast	mast
+mat	food
+mata	feed
+match	match
+match	fight
+matematik	mathematics
+matematiker	mathematician
+matolja	oil
+matris	matrix
+matros	sailor
+matt	checkmate
+matta	carpet
+mc	bike
+med	with
+med vänliga hälsningar	best regards
+medalj	medal
+medan	while
+medan	as
+meddela	notify
+meddelande	message
+medelmåttig	mediocre
+medeltiden	Middle Ages
+medicin	medicine
+medlidande	pity
+medurs	clockwise
+medvetande	consciousness
+medveten	conscious
+meitnerium	meitnerium
+meja	mow
+melankoni	melancholy
+melanom	melanoma
+melass	molasses
+melass	treacle
+mellan	between
+mellangård	perineum
+mellanrum	space
+melodi	melody
+men	but
+mena	mean
+mendelevium	mendelevium
+mening	opinion
+menora	menorah
+menstruation	menstruation
+menuett	minuet
+meny	menu
+mervärdesskatt	value added tax
+mes	tit
+mesencephalon	midbrain
+metafor	metaphor
+metall	metal
+metan	methane
+metastas	metastasis
+meter	meter
+meter	metre
+metod	method
+metrosexuell	metrosexual
+middag	noon
+midja	waist
+midnatt	midnight
+mig	me
+mig själv	myself
+mikrovågsugn	microwave oven
+miljard	milliard
+miljard	billion
+miljardär	billionaire
+miljon	million
+miljonär	millionaire
+miljö	environment
+millimeter	millimetre
+min	my
+min	face
+min	mine
+mina	mine
+mindre hackspett	lesser spotted woodpecker
+mineralogi	mineralogy
+mineralvatten	water
+minervauggla	little owl
+minister	minister
+minne	memory
+minus	minus
+minut	minute
+mirakel	miracle
+missbruk	abuse
+missbruka	abuse
+missförstå	mistake
+missförstå	misunderstand
+misshandel	abuse
+misshandla	abuse
+misslyckande	failure
+misstänka	suspect
+mitokondrie	mitochondrion
+mitt	Template:center-centre-noun
+mittpunkt	Template:center-centre-noun
+mjau	meow
+mjuk	soft
+mjukvara	software
+mjältbrand	anthrax
+mjälte	spleen
+mjöd	mead
+mjöl	flour
+mjöl	meal
+mjölk	milk
+mjölka	milk
+mjölkerska	milkmaid
+moafåglar	moa
+mobiltelefon	mobile phone
+mobiltelefon	cell phone
+mod	courage
+modell	model
+modern	modern
+modersmål	mother tongue
+modig	brave
+modig	bold
+modus	mood
+mogen	ripe
+mogen	mature
+moksja	Moksha
+molekyl	molecule
+moln	cloud
+molybden	molybdenum
+momang	moment
+moms	VAT
+monarki	monarchy
+mongol	Mongolian
+mongoliska	Mongolian
+monoteism	monotheism
+mor	mother
+moral	morality
+morbror	uncle
+mord	murder
+morfar	grandfather
+morfem	morpheme
+morgon	morning
+morgon stund har guld i mun	the early bird gets the worm
+morgondag	tomorrow
+mormor	maternal grandmother
+morot	carrot
+moské	mosque
+mossa	moss
+moster	aunt
+mot	for
+mot	versus
+motiv	motive
+motivera	motivate
+motor	engine
+motorcykel	motorcycle
+motorsåg	chainsaw
+motorväg	highway
+motsatt	opposite
+motstånd	resistance
+mottaga	receive
+mottaga	copy
+mottagande	reception
+moturs	anticlockwise
+mufflon	mouflon
+mugg	mug
+mugglare	Muggle
+mullvad	mole
+multiplicera	multiply
+multiplikation	multiplication
+multiversum	multiverse
+mumie	mummy
+mun	mouth
+mungiga	Jew's harp
+mungo	mongoose
+munk	monk
+munk	doughnut
+muntlig	oral
+mur	wall
+murmeldjur	marmot
+mus	mouse
+musa	muse
+museum	museum
+musik	music
+musikal	musical
+musikant	musician
+muslim	Muslim
+muslimsk	Muslim
+mussla	scallop
+mustasch	moustache
+mustasch	mustache
+muta	bribe
+mycket	very
+mycket	much
+mycket lite	minute
+mygga	mosquito
+mynt	coin
+mynta	mint
+myntverk	mint
+myr	swamp
+myra	ant
+myrornas krig	snow
+myrra	myrrh
+myrslok	aardvark
+mysterium	mystery
+mystisk	mysterious
+myt	myth
+mytologi	mythology
+män	men
+mängd	set
+mängdlära	set theory
+människa	Man
+människa	human
+människa	man
+människa	human being
+människoapa	ape
+mänsklig	human
+mänskliga rättigheter	human rights
+märg	marrow
+märke	mark
+märke	make
+märr	mare
+mätare	meter
+mätt	full
+mål	goal
+måla	paint
+målare	painter
+måltid	meal
+målvakt	goalkeeper
+månad	month
+månadsvis	monthly
+måndag	Monday
+måne	moon
+månen	Moon
+många	many
+månvarv	moon
+mård	marten
+mårddjur	mink
+mås	gull
+mås	seagull
+måste	must
+måttstock	scale
+möda	trouble
+mögel	mould
+möglighet	possibility
+möjlig	possible
+mörda	murder
+mördare	murderer
+mörk	dark
+mörk	obscure
+mörker	darkness
+mörker	dark
+möta	meet
+nacke	nape
+nagel	nail
+naken	naked
+namn	name
+namnsdag	name day
+narr	fool
+nation	nation
+nationalism	nationalism
+nationalitet	nationality
+nationalsång	national anthem
+nationell	national
+natrium	sodium
+natt	night
+natt	nocturnal
+natur	nature
+naturgas	natural gas
+naturlig	natural
+naturligtvis	of course
+navel	navel
+ned	down
+nederländska	Dutch
+nedladdning	download
+nedtrycka	oppress
+negativ	negative
+neger	nigger
+nej	no
+nejlika	carnation
+nekrofili	necrophilia
+nentsiska	Nenets
+neodym	neodymium
+neon	neon
+neptunium	neptunium
+nervös	nervous
+neutral	neutral
+neutrino	neutrino
+neutron	neutron
+nevö	nephew
+ni	you
+nickel	nickel
+niece	niece
+nio	nine
+niob	niobium
+nionde	ninth
+nippel	nipple
+nittio	ninety
+nitton	nineteen
+njure	kidney
+nobelium	nobelium
+noggrannhet	accuracy
+noll	zero
+noll	love
+nolla	zero
+nollställe	zero
+nominativ	nominative case
+nominativ	nominative
+nonsens	nonsense
+nord	north
+normal	normal
+norr	north
+norrman	Norwegian
+norsk	Norwegian
+norska	Norwegian
+nos	nose
+noshörning	rhinoceros
+nota	check
+november	November
+nr	no.
+nu	now
+nu	present
+nu	currently
+nudel	noodle
+nummer	number
+numrera	number
+nutida	contemporary
+nuvarande	present
+nuvarande	current
+ny	recent
+ny	new
+nyckel	key
+nyckelpiga	ladybird
+nyckelpiga	ladybug
+nyhet	news
+nyheter	news
+nysa	sneeze
+nystan	ball
+nytt år	New Year
+nyttig	useful
+näbb	beak
+näbbdjur	platypus
+näbbmus	shrew
+nämna	name
+när	when
+när	as
+när grisar flyger	when pigs fly
+nära	near
+nära	close
+nära	next
+närhet	vicinity
+närvarande	present
+närvaro	presence
+näsa	nose
+näsborre	nostril
+näsduk	handkerchief
+näsduk	tissue
+näst sista	penultimate
+nästa	next
+nästan	almost
+nästan	nearly
+näste	nest
+nät	net
+någon	someone
+någon	somebody
+någon	anyone
+någonstans	somewhere
+något	something
+några	some
+nål	needle
+nödvändig	necessary
+nöjd	happy
+nörd	nerd
+nöt	nut
+nötkreatur	cow
+nötkött	beef
+nötskrika	jay
+oas	oasis
+obestämd artikel	indefinite article
+obesvarad kärlek	unrequited love
+obetydlig	slight
+obetydlig	insignificant
+objekt	object
+objektiv	objective
+oboe	oboe
+observatorium	observatory
+observera	observe
+observera	watch
+occitanska	Occitan
+ocean	ocean
+och	and
+och	plus
+och-tecken	ampersand
+också	also
+också	too
+odödlig	immortal
+odödlighet	immortality
+offentlig	public
+offentliggöra	publish
+offer	sacrifice
+offra	sacrifice
+ofta	often
+ogift	unmarried
+ogräs	weed
+ohövlig	rude
+ojämn	rough
+ok	yoke
+oktagon	octagon
+oktober	October
+olika	various
+oliv	olive
+olivträd	olive tree
+olja	oil
+olycka	misfortune
+olämplig	bad
+om	if
+om	about
+om	on
+ombytlig	variable
+omelett	omelette
+omge	circle
+omloppsbana	orbit
+omslag	cover
+omständighet	circumstance
+omöjlig	impossible
+onanera	masturbate
+ond	evil
+ond	bad
+ondska	evil
+ondskans axelmakter	axis of evil
+onsdag	Wednesday
+onödig	unnecessary
+opassande	bad
+operation	operation
+operativsystem	operating system
+operera	operate
+orange	orange
+ord	word
+ordbok	dictionary
+ordklass	part of speech
+ordna	arrange
+ordna	sort
+ordnat par	ordered pair
+ordning	order
+ordnung	order
+ordspråk	proverb
+ordspråk	saying
+ordvits	pun
+oren	dirty
+organisation	organization
+organism	organism
+orgel	organ
+original-	original
+orkan	hurricane
+orkester	orchestra
+orm	snake
+orm	serpent
+ormvråk	buzzard
+oro	worry
+oroa sig	worry
+orre	black grouse
+orsak	reason
+ortoklas	orthoclase
+orättmätig	dirty
+orättvis	unjust
+osmium	osmium
+ost	cheese
+ost	east
+ostlig	east
+ostvart	east
+oundviklig	inevitable
+ovanlighet	novelty
+overksam	idle
+oxe	ox
+oxymoron	oxymoron
+padda	toad
+paj	pie
+paket	package
+palats	palace
+palladium	palladium
+palm	palm
+panda	panda
+pandeism	pandeism
+panenteism	panentheism
+panna	forehead
+pannkaka	pancake
+panteism	pantheism
+papegoja	parrot
+pappa	daddy
+papper	paper
+pappers-	paper
+par	pair
+parabel	parabola
+parad	parade
+paradis	paradise
+paradox	paradox
+parallell	parallel
+paraply	umbrella
+parfym	perfume
+pariserhjul	Ferris wheel
+park	garden
+park	park
+parkera	park
+parotit	mumps
+parti	party
+particip	participle
+pascha	pasha
+pass	passport
+passa	fit
+passagerare	passenger
+passare	pair of compasses
+patient	patient
+patt	stalemate
+paus	pause
+pederast	pederast
+pejorativt	pejorative
+pekfinger	forefinger
+pelare	pillar
+pengar	money
+penis	penis
+penna	pen
+penny	penny
+pentagon	pentagon
+peppar	pepper
+pepparrot	horseradish
+perestrojka	perestroika
+perfekt klassisk gas	ideal gas
+perfektparticip	past participle
+period	period
+person	person
+personlig	personal
+personlighet	personality
+pest	plague
+petroleum	petroleum
+piggsvin	porcupine
+pil	arrow
+pil	willow
+pilgrimsfalk	peregrine falcon
+piller	pill
+pingvin	penguin
+pipa	pipe
+pirat	pirate
+piraya	piranha
+piska	whip
+pissa	piss
+pistol	pistol
+pixel	pixel
+pjäs	play
+plan	plane
+plan	field
+planera	plan
+planet	planet
+planeten X	Planet X
+planta	plant
+plantera	plant
+platform	stage
+platina	platinum
+plats	place
+plats	room
+plattform	platform
+ploga	ear
+ploja	plough
+ploja	plow
+plommon	plum
+plommonträd	plum
+plural	plural
+plural, flertal	plural
+plutonium	plutonium
+plåga	torment
+plåmbok	wallet
+plåster	band-aid
+plöja	till
+plötslig	sudden
+plötsligt	suddenly
+poesi	poetry
+poet	poet
+pojke	boy
+pojkvän	friend
+pojkvän	boyfriend
+pol	pole
+polack	Pole
+polera	polish
+polis	police
+polis	police officer
+polisstation	police station
+politik	politics
+politik	policy
+politiker	politician
+polityr	polish
+polonium	polonium
+polsk	Polish
+polska	Polish
+polyamori	polyamory
+polygon	polygon
+polysyntetisk	polysynthetic
+pommes frites	french fries
+popcorn	popcorn
+popemobile	Popemobile
+populär	popular
+porslin	porcelain
+portion	portion
+portugis	Portuguese
+portugisisk	Portuguese
+portugisiska	Portuguese
+position	position
+positiv	positive
+possessivt pronomen	possessive pronoun
+postkontor	post office
+potatis	potato
+poängsumma	score
+pragmatisk	pragmatic
+praktik	practice
+prata	talk
+precis	precise
+premiärminister	prime minister
+prenumerera	subscribe
+preposition	preposition
+present	gift
+present	present
+president	president
+prick	dot
+prim	prime
+primtal	prime number
+primär	primary
+princip	principle
+pris	price
+pris	prize
+privat	private
+privilegium	privilege
+problem	problem
+procedur	procedure
+procent	percent
+process	process
+producera	produce
+produkt	product
+program	Template:program-programme-noun
+programmeringsspråk	programming language
+projekt	project
+promenad	walk
+prometium	promethium
+pronomen	pronoun
+propaganda	propaganda
+prosit	bless you
+prostituerad	prostitute
+protes	prosthesis
+protestant	Protestant
+protokoll	minute
+proton	proton
+prototyp	prototype
+prov	test
+provbit	sample
+provins	province
+prydlig	neat
+prärievarg	coyote
+präst	priest
+psykiater	psychiatrist
+psykolog	psychologist
+psykologi	psychology
+psykopolitik	psychopolitics
+puck	puck
+puder	powder
+puls	pulse
+pump	pump
+pund	pound
+pung	pouch
+pungråtta	opossum
+punkt	period
+punkt	point
+punkt	dot
+purjolök	leek
+purpur	purpure
+pyjamas	pajamas
+pyjamas	pyjamas
+pyramid	pyramid
+pytonorm	python
+pärlhöna (hjälmpärlhöna)	guinea fowl
+päron	pear
+päronträd	pear
+på	at
+på	on
+på	about
+på väg att	about
+påfågel	peacock
+påminna	remind
+påsk	Easter
+påskynda	accelerate
+påskägg	Easter egg
+påstående	statement
+påve	pope
+quechua	Quechua
+rabarb	rhubarb
+rabatt	bed
+rabbin	rabbi
+rad	row
+radio	radio
+radon	radon
+rak	right
+rak	straight
+raka	shave
+raket	rocket
+raket	missile
+rakkniv	razor
+ram	frame
+rand	edge
+rapphöna	partridge
+rapport	report
+rapportera	report
+rea	sale
+reaktion	reaction
+realisera	realize
+realism	realism
+rebell	rebel
+recept	prescription
+rede	nest
+redigera	edit
+referat	abstract
+regel	law
+regel	rule
+regelbunden	regular
+regering	government
+regissör	director
+registrera	register
+reglera	regulate
+reglering	regulation
+regn	rain
+regnbåge	rainbow
+rekommendera	recommend
+rekord	record
+relativ	relative
+religion	religion
+ren	reindeer
+ren	pure
+rep	rope
+reparation	repair
+reparera	repair
+repetera	repeat
+representant	representative
+representera	represent
+reptil	reptile
+republik	republic
+resa	travel
+resa	voyage
+resa	trip
+resa	journey
+resande	travel
+reserv	reserve
+reservera	reserve
+respekt	respect
+rest	rest
+restaurang	restaurant
+resultat	result
+resurs	resource
+resväska	suitcase
+retirera	retreat
+revben	rib
+revolution	revolution
+ribba	bar
+rida	ride
+riddare	knight
+rik	rich
+rike	kingdom
+rike	realm
+riket	empire
+riklighet	plenty
+rikoschettera	skim
+ring	ring
+ringa	ring
+ringa	phone
+ringa	call
+ringa	telephone
+ringa in	circle
+ringfinger	ring finger
+ris	rice
+rita	draw
+riva	tear
+ro	row
+rock	rock
+rock	coat
+rocka	ray
+rockad	castling
+rodium	rhodium
+rodna	Template:color-colour (verb)
+rolig	funny
+rollfigur	character
+rom	roe
+rom	rum
+roman	novel
+romare	Latin
+rop	call
+ropa	call
+ros	rose
+rosa	pink
+rosmarin	rosemary
+rost	rust
+rostfritt stål	stainless steel
+rot	root
+rovfågel	bird of prey
+rubidium	rubidium
+ruin	ruin
+rulla	roll
+rullstol	wheelchair
+rulltrappa	escalator
+rum	room
+rumfartyg	spacecraft
+rumän	Romanian
+rumänsk	Romanian
+rumänska	Romanian
+runka	jerk off
+runt	about
+rustning	armour
+rutenium	ruthenium
+rutil	rutile
+rutten	rotten
+ruttna	decay
+ruttna	rot
+rygg	back
+ryggmärg	spinal cord
+ryggrad	backbone
+ryggrad	spine
+ryka	smoke
+rymd	space
+rymdfärja	Space Shuttle
+rysk	Russian
+ryska	Russian
+ryss	Russian
+rädda	save
+rädda	rescue
+rädisa	radish
+räka	shrimp
+rät	right
+rät triangel	right triangle
+rätt	right
+rätt	law
+rätta	right
+rättsligt	legal
+rättvis	just
+räv	fox
+rå	raw
+råd	council
+rådjur	roe deer
+råg	rye
+råka	rook
+råolja	crude oil
+råtta	rat
+råvara	raw material
+röd	red
+rödförskjutning	redshift
+rödhake	robin
+rödvin	red wine
+rök	smoke
+röka	smoke
+röntgenium	roentgenium
+rör	pipe
+röra	touch
+rörelse	motion
+rörmokare	plumber
+röst	voice
+rösta	vote
+rött	gules
+röva	rob
+rövhål	asshole
+sabel	sabre
+sabotage	sabotage
+saffran	saffron
+safir	sapphire
+saga	fable
+sak	thing
+sakna	miss
+sallad	salad
+sallat	lettuce
+salt	salty
+salt	salt
+salta	salt
+saltsyra	hydrochloric acid
+samarbeta	collaborate
+samarbeta, kollaborera	collaborate
+samhälle	society
+samiska	Saami
+samiska	Sami
+sammanfattning	summary
+sammanstötning	wreck
+samslaviska	Old Slavonic
+samslaviska	Common Slavonic
+samtalsämne	topic
+samtida	contemporary
+samtidig	simultaneous
+samtidigt	simultaneously
+samuraj	samurai
+samvete	conscience
+sand	sand
+sandpapper	sandpaper
+sandstrand	beach
+sandstrand	sand
+sandwich	sandwich
+sann	true
+sann	real
+sanning	truth
+sannolikt	probably
+sarkasm	sarcasm
+sarkofag	sarcophagus
+satellit	satellite
+sax	scissors
+saxofon	saxophone
+scen	scene
+schack	chess
+schack	check
+schackbräde	chessboard
+schakal	jackal
+schampoo	shampoo
+schema	scheme
+schimpans	chimpanzee
+se	see
+se	sight
+segel	sail
+seger	victory
+seger	win
+segla	sail
+segling	sailing
+sekel	century
+sekreterare	secretary
+sekt	sect
+sekund	second
+sekundant	second
+selen	selenium
+semestra	vacation
+sena	tendon
+senap	mustard
+senat	senate
+sengångare	sloth
+sensation	feeling
+september	September
+serb	Serbian
+serb	Serb
+serbisk	Serbian
+sergeant	sergeant
+seriös	serious
+servett	napkin
+sevärdhet	sight
+sex	six
+sex	sex
+sexologi	sexology
+sextio	sixty
+sexton	sixteen
+sexuell	sexual
+sexuella trakasserier	sexual harassment
+sfär	sphere
+show	show
+sida	page
+sida	side
+siffra	numeral
+siffra	figure
+sig själv	himself
+sig själv	oneself
+sig själva	themselves
+sigill	seal
+sigsjälvt	itself
+sikte	sight
+sikte	aim
+silke	silk
+silkesfjäril	silkworm
+sill	herring
+silver	silver
+silver	argent
+simbassäng	swimming pool
+simma	swim
+sinne	sense
+sinnesfrid	peace
+sinnessjukdom	insanity
+sist	last
+sju	seven
+sjuhundrafemtio	seven hundred and fifty
+sjuk	sick
+sjukdom	illness
+sjukdom	disease
+sjukhus	hospital
+sjuksköterska	sister
+sjuksköterska	nurse
+sjunde	seventh
+sjunga	sing
+sjunka	sink
+sjusovare	dormouse
+sjuttio	seventy
+sjutton	seventeen
+själ	soul
+själv	self
+självbiografi	autobiography
+självmord	suicide
+självständig	sovereign
+självständighet	independence
+sjätte	sixth
+sjö	sea
+sjö	lake
+sjöflygplan	seaplane
+sjöfågel	waterfowl
+sjörövare	pirate
+sjöstjärna	starfish
+skabb	scabies
+skada	injury
+skada	wound
+skada	damage
+skal	peel
+skalbagge	beetle
+skall	bark
+skalle	skull
+skallig	bald
+skam	shame
+skandium	scandium
+skapa	create
+skarp	sharp
+skata	magpie
+skatt	treasure
+skatt	tax
+sked	spoon
+skelett	skeleton
+skenbar	ostensible
+skenben	shinbone
+skepp	ship
+skicka	send
+skicklighet	skill
+skida	ski
+skidskytte	biathlon
+skilsmässa	divorce
+skinka	ham
+skit	shit
+skita	shit
+skitsnack	bullshit
+skitstövel	bastard
+skjorta	shirt
+skjuta	shoot
+skjuta	fire
+skjuta på	push
+skjutvapen	firearm
+sko	shoe
+skog	forest
+skogsdunge	woods
+skokräm	shoe polish
+skola	school
+skotsk gäliska	Scottish Gaelic
+skott	shot
+skottår	leap year
+skrattmås	black-headed gull
+skribent	writer
+skrika	shout
+skrika	scream
+skriva	write
+skrivmaskin	typewriter
+skruv	screw
+skruvmejsel	screwdriver
+skräck	terror
+skräck	fear
+skräddare	tailor
+skrämma	scare
+skräpmat	junk food
+skugga	shadow
+skuld	guilt
+skulderblad	shoulder blade
+skuldra	shoulder
+skulptur	sculpture
+skum	foam
+skumma	skim
+skumrask	twilight
+skunk	skunk
+skur	shower
+skydda	shield
+skydda	protect
+skyddsling	minion
+skyffel	shovel
+skyltfönster	window
+skymning	twilight
+skynda	hurry
+skyskrapa	skyscraper
+skägg	beard
+skälla	bark
+skämt	joke
+skämta	joke
+skänka	gift
+skänka	donate
+skär	pink
+skärgård	archipelago
+skådespelare	actor
+skådespelerska	actress
+skål	cheers
+sköld	shield
+sköldpadda	turtle
+sköldpadda	tortoise
+slag	battle
+slagskepp	battleship
+slagträ	bat
+slaktare	butcher
+slank	slender
+slav	Slav
+slicka	lick
+slingra	snake
+slips	tie
+slips	necktie
+slott	castle
+slovak	Slovak
+slovakiska	Slovak
+sloven	Slovene
+sloven	Slovenian
+slovensk	Slovene
+slovenska	Slovene
+slovenska	Slovenian
+slug	sly
+slup	sloop
+sluta	quit
+sluta	stop
+slyna	bitch
+släkt	people
+släkte	genus
+släkting	relative
+släppa	release
+slå	beat
+slå två flugor i en smäll	kill two birds with one stone
+slå vad	bet
+slö	dull
+smaklig måltid	bon appétit
+smed	smith
+smeknamn	nickname
+smickra	butter up
+smärta	pain
+smör	butter
+snabb	quick
+snabb	fast
+snabb	rapid
+snabbmat	fast food
+snabel	trunk
+snabel-a	at sign
+snabel-a	at symbol
+snart	soon
+snitt	intersection
+snobb	snob
+snopp	dick
+snor	snot
+snubbe	dude
+snuskig	dirty
+snäll	kind
+snö	snow
+snöa	snow
+snöboll	snowball
+snöflinga	snowflake
+snögubbe	snowman
+snöleopard	snow leopard
+snöstorm	snowstorm
+socialism	socialism
+socka	sock
+sockerbeta	sugar beet
+sockervadd	cotton candy
+soffa	sofa
+sol	Sun
+solfjäder	fan
+solglasögon	sunglasses
+solnedgång	sunset
+solros	sunflower
+solsystem	solar system
+soluppgång	sunrise
+som	that
+som	as
+som	who
+som	like
+som	which
+sometimes expressed by the prefix ut-	out
+sommar	summer
+sonatform	sonata form
+sondotter	granddaughter
+sonett	sonnet
+soppa	soup
+sorbiska	Sorbian
+sorg	sorrow
+sort	sort
+sortera	sort
+sortering	sort
+soul	soul
+sova	sleep
+sovrum	bedroom
+spade	spade
+spader	spade
+spader	spades
+spagetti	spaghetti
+spanska	Spanish
+spara	save
+spark	kick
+sparka	fire
+sparka	kick
+sparv	sparrow
+specialitet	specialty
+specialitet	speciality
+speciell	special
+specifik	specific
+spegel	Template:mirror/Translations
+spel	game
+spel	play
+spela	play
+spela trumpet	trumpet
+spelkort	playing card
+spelpjäs	man
+spets	lace
+spik	nail
+spika	nail
+spillkråka	black woodpecker
+spindel	spider
+spion	spy
+spionera	spy
+spis	fire
+sport	sport
+spott	saliva
+spotta	spit
+sprida	scatter
+springa	run/experiment
+springa	run
+springare	knight
+sprit	spirit
+språk	language
+späckhuggare	orca
+späckhuggare	killer whale
+spädbarn	baby
+spänning	stress
+spänning	voltage
+spårvagn	tram
+spöke	ghost
+stabil	stable
+stackare	worm
+stackars	poor
+stad	city
+stad	town
+stam	trunk
+stam	tree trunk
+stam	tribe
+stamcell	stem cell
+stank	stink
+stanna	stop
+stanna	stay
+stare	starling
+stark	strong
+start	start
+stat	state
+station	station
+statistik	statistics
+statskupp	coup d'état
+staty	statue
+stav	pole
+stav	stick
+stava	spell
+stavelse	syllable
+steg	step
+stege	ladder
+stek	steak
+steka	fry
+sten	stone
+sten-	stone
+stena	stone
+stenåldern	Stone Age
+stick	get lost
+stig	path
+stiga	appreciate
+stiga	ascend
+stigbygel	stirrup
+stilig	handsome
+stim	school
+stjäla	steal
+stjärna	star
+stock	log
+stol	chair
+stolt	proud
+stolthet	pride
+stoppa	stop
+stor	big
+stor	large
+stork	stork
+storskarv	cormorant
+stortå	big toe
+straff	sentence
+straff	penalty
+straffa	punish
+strand	shore
+strejk	strike
+strid	fight
+strida	fight
+strof	stanza
+strontium	strontium
+strumpa	stocking
+struphuvud	larynx
+struts	ostrich
+stryka	iron
+strykjärn	iron
+sträcka	stretch
+sträng	string
+sträng	strict
+stråke	bow
+stråle	ray
+ström	current
+ström	stream
+ström	flow
+strömbrytare	switch
+strömma	flow
+student	student
+studera	study
+stum	dumb
+stum	mute
+stund	while
+stycke	piece
+stygg	naughty
+styra	rule
+styrka	strength
+styvfar	stepfather
+ställa till, sätta i gång	stir up
+stämning	mood
+ständig	permanent
+stänga	close
+stänga igen	can
+stängd	closed
+stål	steel
+stål-	steel
+stöld	theft
+stör	stake
+större hackspett	great spotted woodpecker
+subjekt	subject
+subliminal perception	subliminal message
+substantiv	noun
+subtrahera	subtract
+subtraktion	subtraction
+suga	suck
+sugrör	drinking straw
+sumeriska	Sumerian
+summa	total
+summa	sum
+superlativ	superlative
+sur	sour
+sur	acid
+surrealism	surrealism
+surt regn	acid rain
+svag	weak
+svaghet	weakness
+sval	cool
+svala	swallow
+svamp	mushroom
+svamp	fungus
+svan	swan
+svans	tail
+svar	answer
+svart	black
+svart	sable
+svart hål	black hole
+svartnäbbad islom	great northern diver
+svavel	sulfur
+svensk	Swedish
+svensk	Swede
+svenska	Swedish
+svett	sweat
+svett	perspiration
+svettas	sweat
+svägerska	sister-in-law
+svälja	swallow
+svälla	swell
+svältning	starvation
+svära	swear
+svärd	sword
+svärdotter	daughter-in-law
+svärord	swear word
+svärson	son-in-law
+svår	difficult
+swedish	english
+sy	sew
+syd	south
+sydamerika	South America
+sydnäktergal	nightingale
+sydost	southeast
+sydöstra	southeast
+syl	awl
+syllogism	syllogism
+sylt	jelly
+symaskin	sewing machine
+symfoni	symphony
+sympatisk	nice
+sympatiska nervsystemet	sympathetic nervous system
+symptom	symptom
+syn	sight
+synagoga	synagogue
+synd	sin
+synd	shame
+synda	sin
+syndabock	scapegoat
+synkronisera	synchronize
+synlig	visible
+synonymordbok	thesaurus
+synvinkel	angle
+syra	acid
+syra-	acid
+syre	oxygen
+syrsa	cricket
+syskon	sibling
+sysselsättning	occupation
+system	system
+syster	sister
+systerdotter	niece
+systerson	nephew
+säck	sack
+säckpipa	bagpipes
+sädesledare	vas deferens
+sädesvätska	semen
+säker	sure
+säkerhet	security
+säkerligen	surely
+säl	seal
+sälja	sell
+sällan	seldom
+sällsynt	rare
+säsong	season
+sätt	way
+sätta	set
+sätta eld på	set on fire
+sätta sig	sit down
+sätta värde på	appreciate
+så	how
+så	sow
+så småningom	eventually
+så snart som	once
+såg	saw
+såga	saw
+såll	sieve
+sång	song
+sångare	singer
+sånglärka	skylark
+sår	wound
+såra	wound
+såra	hurt
+sås	sauce
+sås	gravy
+såvida ej	unless
+söder	south
+södra	southern
+söka	search
+söka	seek
+sökande	search
+sökare	seeker
+sökmotor	search engine
+sömn	sleep
+söndag	Sunday
+sörja	mourn
+söt	sweet
+t-shirt	T-shirt
+t.ex.	e.g.
+ta	take
+ta itu med	face
+ta upp	open
+tabell	table
+tack	thank you
+tack	please
+tack	thanks
+tack så mycket	thank you very much
+tack, jag mår bra	I'm fine, thank you
+tacka	ewe
+tadzjikiska	Tajik
+taggtråd	barbed wire
+tak	roof
+tak	ceiling
+tal	number
+tal	language
+tal	speech
+tala	speak
+talang	talent
+talar du engelska	do you speak English
+talare	speaker
+talgoxe	great tit
+tall	pine
+tallium	thallium
+tallkottkörteln	pineal gland
+talrik	numerous
+tam	tame
+tamil	Tamil
+tamiller	ferret
+tamilska befrielsetigrarna	Tamil Tigers
+tand	tooth
+tandborste	toothbrush
+tandkräm	toothpaste
+tandkött	gum
+tandläkare	dentist
+tangent	key
+tangentbord	keyboard
+tanke	thought
+tant	aunt
+tantal	tantalum
+tapet	wallpaper
+tapir	tapir
+tarm	intestine
+tatuera	tattoo
+tatuering	tattoo
+tavla	picture
+tavla	board
+tax	dachshund
+taxi	taxi
+te	tea
+teater	theater/homonyms
+teblad	tea leaf
+tecken	sign
+teddybjörn	teddy bear
+tegel	brick
+teknetium	technetium
+teknik	technique
+telefon	telephone
+telefon	phone
+telefonnummer	telephone number
+telefonsamtal	call
+telegram	telegram
+teleskop	telescope
+television	television
+tellur	tellurium
+tema	theme
+temperatur	temperature
+tempus	tense
+tendens	tendency
+tenn	tin
+tennis	tennis
+teologi	theology
+teori	theory
+termiter	termite
+termometer	thermometer
+territorium	territory
+terrorism	terrorism
+tesked	teaspoon
+testamente	will
+testosteron	testosterone
+thailändska	Thai
+tia	ten
+tid	time
+tid	age
+tidigare	old
+tidigare	once
+tidigt	early
+tidningspapper	newspaper
+tidskrift	magazine
+tiger	tiger
+tik	bitch
+till	to
+till	until
+till exempel	for example
+tillbaka	back
+tillfredsställning	satisfaction
+tillfälle	opportunity
+tillfälle	occasion
+tillfällig	temporary
+tillfällig	occasional
+tillräcklig	sufficient
+tillräckligt	enough
+tills	until
+tills	till
+tillsammans	together
+tillstånd	state
+tillstånd	condition
+tillvaro, existens	being
+tillåtelse	permission
+timglas	hourglass
+timme	hour
+timmerman	carpenter
+tio	ten
+tio tusen	ten thousand
+tionde	tenth
+tisdag	Tuesday
+tistel	thistle
+titan	titanium
+titel	title
+tjeck	Czech
+tjeckisk	Czech
+tjeckiska	Czech
+tjej	chick
+tjock	thick
+tjock	fat
+tjugo	twenty
+tjugoett	twenty-one
+tjugofem	twenty-five
+tjugofyra	twenty-four
+tjugonio	twenty-nine
+tjugosex	twenty-six
+tjugosju	twenty-seven
+tjugotre	twenty-three
+tjugotvå	twenty-two
+tjugoåtta	twenty-eight
+tjur	bull
+tjuv	thief
+tjäder	capercaillie
+tjänst	service
+tjära	tar
+toalett	bathroom
+toalett	toilet
+toalettpapper	toilet paper
+tobak	tobacco
+tolerera	tolerate
+tolfte	twelfth
+tolk	interpreter
+tolv	twelve
+tom	empty
+tomat	tomato
+tomma mängden	empty set
+tomt	garden
+ton	tone
+ton	ton
+tonart	key
+tonåring	teenager
+topp	top
+topp	peak
+torg	square
+torka	dry
+torn	castle
+torn	rook
+tornado	tornado
+tornfalk	common kestrel
+tornfalk	kestrel
+tornuggla	barn owl
+torr	dry
+torsdag	Thursday
+torsk	cod
+torv	peat
+tradition	tradition
+trafik	traffic
+tragedi	tragedy
+trakt	region
+traktor	tractor
+trana	crane
+tranbär	cranberry
+transformation	transformation
+transitivt verb	transitive verb
+transport	transportation
+transrealism	transrealism
+transvestit	transvestite
+trappa	stairs
+trappa	stair
+trasig	bad
+tratt	funnel
+tre	three
+tre gånger	thrice
+trea	three
+tredje	third
+tremulant	trill
+trettio	thirty
+trettioett	thirty-one
+trettiofem	thirty-five
+trettiofyra	thirty-four
+trettionio	thirty-nine
+trettiosex	thirty-six
+trettiosju	thirty-seven
+trettiotre	thirty-three
+trettiotvå	thirty-two
+trettioåtta	thirty-eight
+tretton	thirteen
+trettonde	thirteenth
+triangel	triangle
+triljon	trillion
+tro	think
+tro	belief
+trogen	true
+trollformel	spell
+trollslända	dragonfly
+trollstav	magic wand
+trombon	trombone
+tron	throne
+trottoar	pavement
+trumhinna	eardrum
+tryck	pressure
+trycka	press
+trycka	print
+trygghet	safety
+trä	wood
+trä	timber
+träblåsinstrument	woodwind instrument
+träd	tree
+trädgård	garden
+träffa	meet
+träna	train
+träning	training
+träning	exercise
+tråd	thread
+tråd	wire
+tråkig	boring
+tråkig	dull
+trång	narrow
+trött	tired
+tsar	czar
+tsar	tzar
+tsar	tsar
+tsarinna	tsarina
+tsarinna	czarina
+tsunami	tsunami
+tuberculos	tuberculosis
+tugga	chew
+tuggummi	chewing gum
+tulpan	tulip
+tumme	thumb
+tung	heavy
+tunga	tongue
+tungkyss	french kiss
+tungt vatten	heavy water
+tupp	rooster
+tupp	cock
+tur	luck
+turist	tourist
+turk	Turk
+turkisk	Turkish
+turkiska	Turkish
+turkos	turquoise
+tursam	lucky
+turturduva	turtle dove
+tusen	thousand
+tusen tack	many thanks
+tuta	horn
+tv, teve	TV
+tveka	doubt
+tvekan	doubt
+tvestjärt	earwig
+tvetydig	ambiguous
+tvätta	wash
+tvättbjörn	raccoon
+två	two
+två	twice
+två veckor	fortnight
+tvåa	two
+tvåhundra	two hundred
+tvål	soap
+tycka	think
+tycka om	like
+tydlig	obvious
+tygel	rein
+tyngd	gravity
+tyngd	weight
+tysk	German
+tyska	German
+tyst	quiet
+tystna	quiet
+tystnad	silence
+tyvärr	unfortunately
+täcka	cover
+tält	tent
+tända	light
+tändsticka	match
+tändstift	spark plug
+tänka	think
+tänka	mean
+tärning	die
+tävling	competition
+tå	toe
+tåg	train
+tåla	bear
+tålamod	patience
+tålmodig	patient
+tår	tear
+tårta	cake
+tömma	empty
+törst	thirst
+törstig	thirsty
+ubåt	submarine
+uggla	owl
+ugn	oven
+ugn	stove
+ukrainsk	Ukrainian
+ukrainska	Ukrainian
+ull	wool
+unbibium	unbibium
+unbinilium	unbinilium
+unbiunium	unbiunium
+under	under
+under	wonder
+underbar	wonderful
+underbyxa	pants
+underbyxa	underpants
+underhandling	negotiation
+underhåll	service
+underpant	pledge
+undertrycka	suppress
+undra	wonder
+undvika	avoid
+ung	young
+ungdom	youth
+unge	young
+ungefär	about
+ungersk	Hungarian
+ungersk notation	Hungarian notation
+ungerska	Hungarian
+ungkarl	bachelor
+ungrare	Hungarian
+uniform	uniform
+union	union
+universell	universal
+universitet	university
+uns	ounce
+ununennium	ununennium
+ununhexium	ununhexium
+ununpentium	ununpentium
+ununquadium	ununquadium
+ununseptium	ununseptium
+ununtrium	ununtrium
+upp	up
+uppenbara	reveal
+uppfriska	refresh
+upphöja	cube
+upphöra	cease
+uppleva	experience
+uppmuntra	encourage
+uppriktig	sincere
+uppror	rebellion
+uppskatta	appreciate
+uppskjuta	postpone
+uppstå	arise
+upptäcka	discover
+uppvisning	show
+uppåt	up
+urgermanska	Proto-Germanic
+urin	urine
+urinblåsa	bladder
+urindoeuropeiska	Proto-Indo-European
+urinera	urinate
+ursprung	origin
+ursäkta	sorry
+ursäkta	excuse me
+ursäkta mig	pardon me
+ursäkta mig	excuse me
+ursäkta?	excuse me
+ut och in	inside out
+utan	without
+utelämnande	omission
+utgåva	edition
+utmärkt	excellent
+utnämna	name
+utomjording	extraterrestrial
+utomjording	alien
+utseende	look
+uttal	pronunciation
+uttala	pronounce
+utter	otter
+uttryck	expression
+uttråkad	bored
+uttråkning	boredom
+utveckling	development
+utvälja	select
+va	what
+vacker	pretty
+vad	what
+vad	bet
+vad fan	what the fuck
+vad är klockan	what time is it
+vadställe	ford
+vag	vague
+vagga	cradle
+vagn	car
+vagn	waggon
+vagn	wagon
+vakt	watch
+vakt	guard
+vakta	guard
+vaktel	quail
+val	whale
+val	election
+val	choice
+vallmo	poppy
+valnöt	walnut
+valross	walrus
+valuta	currency
+valuta	money
+vampyr	vampire
+vanadin	vanadium
+vanilj	vanilla
+vaniljstång	vanilla
+vanlig	ordinary
+vanlig	common
+vanlig	usual
+vanlig	plain
+vante	glove
+vapen	weapon
+vapen	arm
+vapen	coat of arms
+var	pus
+var	where
+var	were
+var är toaletten?	where is the toilet
+vara	be
+vara här	be
+vara skyldig	owe
+vardagsrum	living room
+varelse	being
+varför	why
+varför	wherefore
+varg	wolf
+variabel	variable
+varje	every
+varje vecka	weekly
+vars	whose
+vart	where
+varuautomat	vending machine
+vas	vase
+vass	reed
+vatten	water
+vattenfall	waterfall
+vattenkanna	can
+vattenmelon	watermelon
+vattentät	waterproof
+vattna	water
+vax	wax
+vecka	week
+vecko-	weekly
+vektor	vector
+vem	who
+vems	whose
+ven	vein
+veranda	verandah
+verb	verb
+verk	work
+verklig	real
+verkligen	actually
+verklighet	reality
+verktyg	tool
+versal	capital
+vessla	least weasel
+veta	know
+vete	wheat
+vetenskap	science
+vetenskapsman	scientist
+vezir	vizier
+vi	we
+vi själva	ourselves
+vid	at
+vid	wide
+vid	by
+vid god hälsa	health
+vidarebefodra	forward
+vietnames	Vietnamese
+vietnamesisk	Vietnamese
+vietnamesiska	Vietnamese
+vika	fold
+vikt	weight
+viktig	important
+vila	rest
+vild	wild
+vildsvin	wild boar
+vildsvin	boar
+vilja	will
+vilken	which
+vilken	what
+vin	wine
+vinbär	currant
+vind	wind
+vind	attic
+vinda	wind
+vindruva	grape
+vinge	wing
+vinka	wave
+vinkel	angle
+vinkelrät	perpendicular
+vinna	win
+vinruta	rue
+vinröd	wine
+vinst	profit
+vinter	winter
+vinäger	vinegar
+viol	violet
+violett	violet
+virke	timber
+virologi	virology
+virus	virus
+virveltrumma	snare drum
+vis	wise
+visa	show
+visa	prove
+visare	hand
+visdomstand	wisdom tooth
+visent	European bison
+visent	wisent
+vises sten	philosopher's stone
+visitkort	business card
+viska	whisper
+vissla	whistle
+vissling	whistle
+visum	visa
+vit	white
+vit dvärg	white dwarf
+vitlök	garlic
+vitryska	Belarusian
+vitryska	Belorussian
+vitt	white
+vitt vin	white wine
+vittnesmål	testimony
+vodka	vodka
+vokal	vowel
+vokativ	vocative case
+vokativ	vocative
+volfram	tungsten
+volleyboll	volleyball
+volt	volt
+votiska	Votic
+vrede	wrath
+vrida	twist
+vulkan	volcano
+vuxen	adult
+vy	view
+vykort	postcard
+väder	weather
+väg	road
+väg	way
+vägg	wall
+vägra	refuse
+vägren	shoulder
+väl	well
+välja	choose
+välkommen	welcome
+vända	face
+väninna	girlfriend
+vänskap	friendship
+vänster	left
+vänta	wait
+värde	worth
+värde	value
+värdefull	valuable
+värdelös	worthless
+värld	world
+världskrig	world war
+värre	worse
+värst	worst
+väsentlig	substantial
+väst	west
+västerländsk	west
+västerut	west
+västlig	west
+väte	hydrogen
+vätska	liquid
+vävnad	tissue
+växel	change
+växel	switch
+växthus	greenhouse
+växthuseffekt	greenhouse effect
+våld	violence
+våldta	rape
+våldtäkt	rape
+våning	story
+våning	floor
+vår	spring
+vår	our
+vårta	wart
+våt	wet
+webbplats	web site
+whisky	whiskey
+whisky	whisky
+wiki	wiki
+wikifiera	wikify
+xenon	xenon
+xhosa	Xhosa
+ylle	wool
+yngling	youth
+yoghurt	yoghurt
+yrke	profession
+yta	surface
+yta	face
+yttrandefrihet	freedom of speech
+yttrium	yttrium
+yxa	axe
+zink	zinc
+zirkonium	zirconium
+zoologi	zoology
+Österrike	Austria
+Östersjön	Baltic Sea
+Östeuropa	Eastern Europe
+Östtimor	East Timor
+äckel	disgust
+ädel	noble
+äga	have
+äga	own
+äga	possess
+ägare	owner
+ägg	egg
+äggula	yolk
+äggula	egg yolk
+äggvita	albumen
+äkta	true
+älg	moose
+älg	elk
+älska	love
+älska	make love
+älskling	love
+älskling	honey
+ämne	substance
+än	than
+ändra	change
+ändras	change
+äng	meadow
+änka	widow
+ännu	yet
+äntligen	finally
+äppelpaj	apple pie
+äppelträd	apple tree
+äpple	apple
+är	is
+är	are
+är	am
+ära	honor
+ära	honour
+ärkeängel	archangel
+ärlig	honest
+ärr	scar
+ärta	pea
+ärva	inherit
+äss	ace
+äta	eat
+äta	breakfast
+äta lunch	lunch
+ätbar	edible
+även	even
+äventyr	adventure
+åka	ride
+åka	head
+ål	eel
+ålder	age
+ålderdom	age
+åldras	age
+ånger	regret
+ångmaskin	steam engine
+år	year
+åra	oar
+årlig	annual
+årlig	yearly
+årstid	season
+årtusende	millennium
+åska	thunder
+åskmuller	thunder
+åsna	donkey
+åsna	ass
+åt	ate
+återkasta	reflect
+återstå	remain
+åtminstone	at least
+åtta	eight
+åttio	eighty
+åttioett	eighty-one
+åttonde	eighth
+ö	island
+ödla	lizard
+öga	eye
+ögonblick	second
+ögonblick	minute
+ögonblickligen	immediately
+ögonbryn	eyebrow
+ögonfrans	eyelash
+ögonlock	eyelid
+öken	desert
+öl	beer
+öm	tender
+ömsesidig	mutual
+önska	wish
+önskan	wish
+öppen	open
+öppna	open
+öppnas	open
+öra	ear
+örn	eagle
+öronvax	earwax
+ösregna	rain cats and dogs
+öster	east
+österländsk	east
+över	over
+överallt	everywhere
+överdriva	exaggerate
+överensstämma	agree
+överensstämmelse	agreement
+överflödig	superfluous
+överföra	transfer
+överge	abolish
+övergiven	abandoned
+överlägsen	superior
+övermorgon	day after tomorrow
+övermorgon	overmorrow
+övernaturlig	supernatural
+överraska	surprise
+överraskning	surprise
+överste	colonel
+översvämning	flood
+översätta	translate
+översättare	translator
+översättning	translation
+översättningar	translations
+övertyga	persuade
+övervinna	overcome
+övning	exercise
+övre	upper

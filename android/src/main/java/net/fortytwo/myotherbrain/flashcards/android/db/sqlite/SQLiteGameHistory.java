@@ -3,19 +3,11 @@ package net.fortytwo.myotherbrain.flashcards.android.db.sqlite;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * User: josh

@@ -9,9 +9,9 @@ import java.util.Locale;
  * Date: 3/19/11
  * Time: 8:20 PM
  */
-public class FrenchVocabulary extends VocabularyDeck {
-    public FrenchVocabulary() throws IOException {
-        super("french_vocabulary", "French vocabulary");
+public class GermanVocabulary extends VocabularyDeck {
+    public GermanVocabulary() throws IOException {
+        super("german_vocabulary", "German vocabulary");
     }
 
     @Override
@@ -20,22 +20,22 @@ public class FrenchVocabulary extends VocabularyDeck {
 
         VocabularySource omegaWiki = new VocabularySource("OmegaWiki");
         omegaWiki.setUrl("http://www.dicts.info/uddl.php");
-        omegaWiki.setTimestamp("2011-03-22T11:10:01+01:00");
+        omegaWiki.setTimestamp("2011-03-24T07:33:00+01:00");
 
-        InputStream is = FrenchVocabulary.class.getResourceAsStream("OmegaWiki_French_English.txt");
+        InputStream is = GermanVocabulary.class.getResourceAsStream("OmegaWiki_German_English.txt");
         try {
-            VocabularyParsers.parseDictsInfoList(is, dict, Locale.FRENCH, omegaWiki);
+            VocabularyParsers.parseDictsInfoList(is, dict, Locale.GERMAN, omegaWiki);
         } finally {
             is.close();
         }
 
         VocabularySource wiktionary = new VocabularySource("Wiktionary");
         wiktionary.setUrl("http://www.dicts.info/uddl.php");
-        wiktionary.setTimestamp("2011-03-23T11:21:30+01:00");
+        wiktionary.setTimestamp("2011-03-24T07:35:12+01:00");
 
-        is = FrenchVocabulary.class.getResourceAsStream("Wiktionary_French_English.txt");
+        is = GermanVocabulary.class.getResourceAsStream("Wiktionary_German_English.txt");
         try {
-            VocabularyParsers.parseDictsInfoList(is, dict, Locale.FRENCH, wiktionary);
+            VocabularyParsers.parseDictsInfoList(is, dict, Locale.GERMAN, wiktionary);
         } finally {
             is.close();
         }

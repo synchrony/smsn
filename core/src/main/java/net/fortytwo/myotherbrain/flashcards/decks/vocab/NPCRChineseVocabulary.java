@@ -8,10 +8,10 @@ import java.io.InputStream;
  * Date: 3/9/11
  * Time: 6:04 PM
  */
-public class NPCRVocabulary extends VocabularyDeck {
+public class NPCRChineseVocabulary extends VocabularyDeck {
 
-    public NPCRVocabulary() throws IOException {
-        super("npcr_vocabulary");
+    public NPCRChineseVocabulary() throws IOException {
+        super("npcr_vocabulary", "NPCR Chinese vocabulary");
     }
 
     @Override
@@ -23,7 +23,7 @@ public class NPCRVocabulary extends VocabularyDeck {
         source.setUrl("http://hskflashcards.com/download.php");
         source.setTimestamp("2011-3-17");
 
-        InputStream is = NPCRVocabulary.class.getResourceAsStream("NPCR_vocabulary.txt");
+        InputStream is = NPCRChineseVocabulary.class.getResourceAsStream("NPCR_vocabulary.txt");
         try {
             VocabularyParsers.parseNPCRList(is, dict, source);
         } finally {
