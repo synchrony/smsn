@@ -11,7 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import net.fortytwo.myotherbrain.R;
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
@@ -20,16 +19,15 @@ import net.fortytwo.myotherbrain.flashcards.GameplayException;
 import net.fortytwo.myotherbrain.flashcards.Pile;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
-import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistoryHelper;
+import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.decks.SimpleDeck;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
-import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.SwedishVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 
 import java.io.IOException;
@@ -37,11 +35,21 @@ import java.io.IOException;
 public class Flashcards4Android extends Activity {
     public static final String INFO = "flashcards_info_layout";
 
+    public static final String HTML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+            "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n" +
+            "        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n" +
+            "<head>\n" +
+            "    <link rel=\"stylesheet\" type=\"text/css\" href=\"flashcards.css\"/>\n" +
+            "</head>\n" +
+            "<body>\n";
+    public static final String HTML_SUFFIX = "</body>\n" +
+            "</html>";
+
     private RelativeLayout questionFace;
     private RelativeLayout answerFace;
     private WebView questionText;
     private WebView answerText;
-    private TextView debugText;
 
     private AndroidGame game;
     private SQLiteDatabase db;
@@ -61,8 +69,6 @@ public class Flashcards4Android extends Activity {
         answerFace = (RelativeLayout) findViewById(R.id.answerFace);
         answerText = (WebView) findViewById(R.id.answerText);
         answerText.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-
-        debugText = (TextView) findViewById(R.id.debugText);
 
         findViewById(R.id.correct).setOnClickListener(correct);
         findViewById(R.id.incorrect).setOnClickListener(incorrect);
@@ -103,7 +109,7 @@ public class Flashcards4Android extends Activity {
                 //System.out.println("info_layout!");
                 Intent i = new Intent(this, FlashcardsInfo.class);
                 Bundle b = new Bundle();
-                b.putString(INFO, game.showQueue());
+                b.putString(INFO, game.showQueue(VocabularyDeck.Format.HTML));
                 i.putExtras(b);
                 startActivity(i);
                 return true;
@@ -173,6 +179,11 @@ public class Flashcards4Android extends Activity {
         //Deck<String, String> germanVocab = new GermanVocabulary(f);
         //Deck<String, String> swedishVocab = new SwedishVocabulary(f);
 
+        SimpleDeck misc = new SimpleDeck("miscellaneous", "Miscellaneous");
+        misc.addCard("meaningless random number",
+                "What is the value of the meaningless random number generated on 2011-03-28?",
+                "0106314906");
+
         //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
         PriorityPile<String, String> pile = new PriorityPile<String, String>();
@@ -185,6 +196,7 @@ public class Flashcards4Android extends Activity {
         //pile.addDeck(swedishVocab, 4);
         pile.addDeck(hsk4Compounds, 4);
         pile.addDeck(hsk4Characters, 8);
+        pile.addDeck(misc, 5);
 
         GameHistory h = new SQLiteGameHistory(db);
 
@@ -205,7 +217,6 @@ public class Flashcards4Android extends Activity {
         }
 
         public void nextCard() {
-            debugText.setText(showQueue());
             card = drawCard();
             showQuestion(card);
             showAnswer(card);
@@ -228,17 +239,6 @@ public class Flashcards4Android extends Activity {
             nextCard();
         }
     }
-
-    private static final String HTML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-            "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n" +
-            "        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n" +
-            "<head>\n" +
-            "    <link rel=\"stylesheet\" type=\"text/css\" href=\"flashcards.css\"/>\n" +
-            "</head>\n" +
-            "<body>\n";
-    private static final String HTML_SUFFIX = "</body>\n" +
-            "</html>";
 
     private void showQuestion(final Card<String, String> card) {
         String text = HTML_PREFIX + card.getQuestion() + HTML_SUFFIX;

@@ -4,6 +4,14 @@ body {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+.foreground {
+    color: #fff;
+}
+
+.background {
+    color: #888;
+}
+
 .question {
     font-size: xx-large;
     text-align: center;
@@ -23,6 +31,9 @@ body {
     text-align: right;
     font-size: medium;
     color: #f00;
+}
+
+.answer-definition {
 }
 
 .answer-primary-form {

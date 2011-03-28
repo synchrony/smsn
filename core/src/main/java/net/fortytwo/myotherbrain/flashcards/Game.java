@@ -2,7 +2,9 @@ package net.fortytwo.myotherbrain.flashcards;
 
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 
+import javax.swing.text.html.HTML;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -168,16 +170,25 @@ public abstract class Game<Q, A> {
         return sb.toString();
     }
 
-    public String showQueue() {
+    public String showQueue(final VocabularyDeck.Format format) {
         long now = System.currentTimeMillis();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("\t").append(active.size()).append(" cards:\n");
-        sb.append("\t\t");
+
+        if (VocabularyDeck.Format.HTML == format) {
+            sb.append("<div>").append(active.size()).append(" cards:</div>\n<br/>\n<div>");
+        } else {
+            sb.append("\t").append(active.size()).append(" cards:\n");
+            sb.append("\t\t");
+        }
 
         List<Card> ordered = new LinkedList<Card>();
         ordered.addAll(active);
         Collections.sort(ordered, new CardComparator());
+
+        if (VocabularyDeck.Format.HTML == format) {
+            sb.append("<span class=\"background\">");
+        }
 
         boolean first = true;
         for (Card c : ordered) {
@@ -187,8 +198,20 @@ public abstract class Game<Q, A> {
                 sb.append(", ");
             }
 
+            if (VocabularyDeck.Format.HTML == format) {
+                sb.append("<span class=\"foreground\">");
+                sb.append(VocabularyDeck.htmlEscape(c.toString()));
+                sb.append("</span>");
+            } else {
+                sb.append(c);
+            }
+
             String d = formatDelay(c.getNextTrial() - now);
-            sb.append(c).append(" (").append(d).append(")");
+            sb.append(" (").append(d).append(")");
+        }
+
+        if (VocabularyDeck.Format.HTML == format) {
+            sb.append("</span>\n</div>\n");
         }
 
         return sb.toString();

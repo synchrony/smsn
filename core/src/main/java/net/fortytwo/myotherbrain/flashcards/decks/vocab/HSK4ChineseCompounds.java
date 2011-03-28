@@ -16,7 +16,7 @@ public class HSK4ChineseCompounds extends VocabularyDeck {
     }
 
     @Override
-    public Dictionary createVocabulary() throws IOException {
+    protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
         VocabularySource source = new VocabularySource("renzhe's lists");

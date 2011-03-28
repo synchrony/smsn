@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.Card;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -15,7 +17,7 @@ public class FrenchVocabulary extends VocabularyDeck {
     }
 
     @Override
-    public Dictionary createVocabulary() throws IOException {
+    protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
         VocabularySource omegaWiki = new VocabularySource("OmegaWiki French-English");
@@ -41,5 +43,15 @@ public class FrenchVocabulary extends VocabularyDeck {
         }
 
         return dict;
+    }
+
+    public static void main(final String[] args) throws IOException {
+        FrenchVocabulary deck = new FrenchVocabulary(Format.HTML);
+        for (Card card : deck.getCards()) {
+            if (card.getName().startsWith("zone pi")) {
+                System.out.println(card.getName() + ":");
+                System.out.println("\t" + card.getAnswer());
+            }
+        }
     }
 }

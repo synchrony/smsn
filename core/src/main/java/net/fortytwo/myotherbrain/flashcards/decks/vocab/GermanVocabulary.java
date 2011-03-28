@@ -15,7 +15,7 @@ public class GermanVocabulary extends VocabularyDeck {
     }
 
     @Override
-    public Dictionary createVocabulary() throws IOException {
+    protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
         VocabularySource omegaWiki = new VocabularySource("OmegaWiki German-English");

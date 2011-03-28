@@ -20,10 +20,6 @@ import java.util.Map;
 public abstract class VocabularyDeck extends Deck<String, String> {
     public enum Format {TEXT, HTML}
 
-    private static final char[] HEX_CHARS = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-    };
-
     protected final Locale locale;
     private final Format format;
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
@@ -41,12 +37,12 @@ public abstract class VocabularyDeck extends Deck<String, String> {
         for (String key : d.getKeys()) {
             List<Term> defs = d.getDefinitions(key);
 
-            String n = findCardName(key);
+            String n = Card.findCardName(key);
             cards.put(n, new LocalCard(n, this, defs));
         }
     }
 
-    public abstract Dictionary createVocabulary() throws IOException;
+    protected abstract Dictionary createVocabulary() throws IOException;
 
     @Override
     public Collection<Card<String, String>> getCards() {
@@ -55,28 +51,6 @@ public abstract class VocabularyDeck extends Deck<String, String> {
 
     public Card<String, String> getCard(final String name) {
         return cards.get(name);
-    }
-
-    protected String findCardName(final String norm) {
-        return unicodeEscape(norm);
-    }
-
-    // Note: escapes both high and low (whitespace < 0x20) characters.
-    private static String unicodeEscape(final String s) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c < 32 || (c >> 7) > 0) {
-                sb.append("\\u");
-                sb.append(HEX_CHARS[(c >> 12) & 0xF]);
-                sb.append(HEX_CHARS[(c >> 8) & 0xF]);
-                sb.append(HEX_CHARS[(c >> 4) & 0xF]);
-                sb.append(HEX_CHARS[c & 0xF]);
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
     }
 
     private class LocalCard extends Card<String, String> {
@@ -95,10 +69,10 @@ public abstract class VocabularyDeck extends Deck<String, String> {
             StringBuilder sb = new StringBuilder();
 
             if (Format.HTML == format) {
-                sb.append("<div class='question'>\n");
+                sb.append("<div class=\"question\">\n");
 
                 // Context
-                sb.append("<div class='question-context'>").append(deck.getLabel()).append("</div>\n");
+                sb.append("<div class=\"question-context\">").append(deck.getLabel()).append("</div>\n");
             }
 
             String question = defs.get(0).getForms().get(0) + " = ?";
@@ -119,7 +93,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
             StringBuilder sb = new StringBuilder();
 
             if (Format.HTML == format) {
-                sb.append("<div class='answer'>\n");
+                sb.append("<div class=\"answer\">\n");
             }
 
             for (Term t : defs) {
@@ -127,14 +101,14 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                 if (null != t.getSource()) {
                     String label = t.getSource().getLabel();
                     if (Format.HTML == format) {
-                        sb.append("<div class='answer-source'>");
+                        sb.append("<div class=\"answer-source\">");
                         label = htmlEscape(label);
                     } else {
                         sb.append("[");
                     }
 
                     if (Format.HTML == format && null != t.getSource().getUrl()) {
-                        sb.append("<a href='" + t.getSource().getUrl() + "'>");
+                        sb.append("<a href=\"" + t.getSource().getUrl() + "\">");
                     }
                     sb.append(label);
                     if (Format.HTML == format) {
@@ -146,15 +120,19 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                     }
 
                     if (Format.HTML == format) {
-                        sb.append("</div>");
+                        sb.append("</div>\n");
                     }
+                }
+
+                if (Format.HTML == format) {
+                    sb.append("<div class=\"answer-definition\">");
                 }
 
                 // Primary form;
                 String primaryForm = t.getForms().get(0);
                 if (Format.HTML == format) {
                     primaryForm = htmlEscape(primaryForm);
-                    sb.append("<span class='answer-primary-form'>");
+                    sb.append("<span class=\"answer-primary-form\">");
                 }
                 sb.append(primaryForm);
                 if (Format.HTML == format) {
@@ -164,7 +142,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                 // Secondary forms
                 if (2 <= t.getForms().size()) {
                     if (Format.HTML == format) {
-                        sb.append("<span class='answer-secondary-forms>");
+                        sb.append("<span class=\"answer-secondary-forms\">");
                     }
                     sb.append(" (");
                     for (int i = 1; i < t.getForms().size(); i++) {
@@ -187,7 +165,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                 if (null != t.getPronunciation()) {
                     String p = t.getPronunciation();
                     if (Format.HTML == format) {
-                        sb.append("<span class='answer-pronunciation'>");
+                        sb.append("<span class=\"answer-pronunciation\">");
                         p = htmlEscape(p);
                     }
                     sb.append(" ").append(p);
@@ -202,7 +180,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                 if (null != t.getType()) {
                     String type = t.getType();
                     if (Format.HTML == format) {
-                        sb.append("<span class='answer-type'>");
+                        sb.append("<span class=\"answer-type\">");
                         type = htmlEscape(type);
                     }
                     sb.append(type).append(": ");
@@ -214,7 +192,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                 // Meaning
                 String meaning = t.getMeaning();
                 if (Format.HTML == format) {
-                    sb.append("<span class='answer-meaning'>");
+                    sb.append("<span class=\"answer-meaning\">");
                     meaning = htmlEscape(meaning);
                 }
                 sb.append(meaning);
@@ -222,6 +200,10 @@ public abstract class VocabularyDeck extends Deck<String, String> {
                     sb.append("</span>");
                 }
                 sb.append("\n");
+
+                if (Format.HTML == format) {
+                    sb.append("</div>\n");
+                }
             }
 
             if (Format.HTML == format) {
@@ -237,7 +219,7 @@ public abstract class VocabularyDeck extends Deck<String, String> {
         }
     }
 
-    private static String htmlEscape(final String s) {
+    public static String htmlEscape(final String s) {
         StringBuffer sb = new StringBuffer(s.length());
         // true if last char was blank
         boolean lastWasBlankChar = false;

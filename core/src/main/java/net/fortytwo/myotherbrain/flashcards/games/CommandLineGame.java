@@ -75,7 +75,7 @@ public class CommandLineGame extends Game<String, String> {
                         showCardHistory(c);
                         break;
                     case 'i':
-                        ps.println(showQueue());
+                        ps.println(showQueue(VocabularyDeck.Format.TEXT));
                         break;
                     case 'q':
                         System.exit(0);

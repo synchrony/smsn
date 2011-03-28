@@ -19,7 +19,7 @@ public class SwedishVocabulary extends VocabularyDeck {
     }
 
     @Override
-    public Dictionary createVocabulary() throws IOException {
+    protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
         Locale locale = findSwedishLocale();
