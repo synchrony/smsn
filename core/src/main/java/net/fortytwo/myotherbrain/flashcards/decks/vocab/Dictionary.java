@@ -3,6 +3,7 @@ package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,13 +14,15 @@ import java.util.Set;
  */
 public class Dictionary {
     private final Map<String, List<Term>> terms;
+    private final Locale locale;
 
-    public Dictionary() {
+    public Dictionary(final Locale locale) {
+        this.locale = locale;
         terms = new HashMap<String, List<Term>>();
     }
 
     public void add(final Term t) {
-        String s = t.normalizePrimaryForm();
+        String s = t.normalizePrimaryForm(locale);
 
         List<Term> defs = terms.get(s);
         if (null == defs) {

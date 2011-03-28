@@ -2,6 +2,7 @@ package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 /**
  * User: josh
@@ -10,13 +11,13 @@ import java.io.InputStream;
  */
 public class NPCRChineseVocabulary extends VocabularyDeck {
 
-    public NPCRChineseVocabulary() throws IOException {
-        super("npcr_vocabulary", "NPCR Chinese vocabulary");
+    public NPCRChineseVocabulary(final Format format) throws IOException {
+        super("npcr_vocabulary", "NPCR Chinese vocabulary", Locale.CHINESE, format);
     }
 
     @Override
     public Dictionary createVocabulary() throws IOException {
-        Dictionary dict = new Dictionary();
+        Dictionary dict = new Dictionary(locale);
 
         VocabularySource source = new VocabularySource("NPCR");
         source.setComment("New Practical Chinese Reader vocabulary list");

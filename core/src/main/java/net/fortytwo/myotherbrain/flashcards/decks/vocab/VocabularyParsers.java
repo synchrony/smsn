@@ -19,13 +19,11 @@ public class VocabularyParsers {
      *
      * @param is     the <code>InputStream</code> to parse
      * @param dict   the dictionary into which to place parsed definitions
-     * @param locale the language of this term
      * @param source the source of this definition (e.g. an online dictionary)
      * @throws IOException if parsing fails
      */
     public static void parseDictsInfoList(final InputStream is,
                                           final Dictionary dict,
-                                          final Locale locale,
                                           final VocabularySource source) throws IOException {
         InputStreamReader r = new InputStreamReader(is, "UTF-8");
         BufferedReader br = new BufferedReader(r);
@@ -33,7 +31,7 @@ public class VocabularyParsers {
         while ((l = br.readLine()) != null) {
             l = l.trim();
             if (!l.startsWith("#")) {
-                Term t = new Term(locale);
+                Term t = new Term();
                 if (null != source) {
                     t.setSource(source);
                 }
@@ -72,7 +70,7 @@ public class VocabularyParsers {
         BufferedReader br = new BufferedReader(r);
         String l;
         while ((l = br.readLine()) != null) {
-            Term t = new Term(Locale.CHINESE);
+            Term t = new Term();
             if (null != source) {
                 t.setSource(source);
             }
@@ -94,7 +92,7 @@ public class VocabularyParsers {
         BufferedReader br = new BufferedReader(r);
         String l;
         while ((l = br.readLine()) != null) {
-            Term t = new Term(Locale.CHINESE);
+            Term t = new Term();
             if (null != source) {
                 t.setSource(source);
             }

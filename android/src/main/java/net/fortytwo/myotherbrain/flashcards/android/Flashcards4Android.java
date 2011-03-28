@@ -25,9 +25,12 @@ import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistoryHelper;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.SwedishVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 
 import java.io.IOException;
 
@@ -161,10 +164,14 @@ public class Flashcards4Android extends Activity {
         //Deck<String, String> stateBorders = new USStateBorders();
         Deck<String, String> nationalCapitals = new NationalCapitals();
         Deck<String, String> internationalBorders = new InternationalBorders();
-        Deck<String, String> frenchVocab = new FrenchVocabulary();
         //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
-        Deck<String, String> hsk4Characters = new HSK4ChineseCharacters();
-        Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds();
+
+        VocabularyDeck.Format f = VocabularyDeck.Format.HTML;
+        Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f);
+        Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f);
+        Deck<String, String> frenchVocab = new FrenchVocabulary(f);
+        //Deck<String, String> germanVocab = new GermanVocabulary(f);
+        //Deck<String, String> swedishVocab = new SwedishVocabulary(f);
 
         //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
@@ -174,7 +181,9 @@ public class Flashcards4Android extends Activity {
         pile.addDeck(internationalBorders, 1);
         //pile.addDeck(npcrVocabulary, 4);
         pile.addDeck(frenchVocab, 4);
-        pile.addDeck(hsk4Compounds, 3);
+        //pile.addDeck(germanVocab, 4);
+        //pile.addDeck(swedishVocab, 4);
+        pile.addDeck(hsk4Compounds, 4);
         pile.addDeck(hsk4Characters, 8);
 
         GameHistory h = new SQLiteGameHistory(db);
@@ -232,7 +241,7 @@ public class Flashcards4Android extends Activity {
             "</html>";
 
     private void showQuestion(final Card<String, String> card) {
-        String text = HTML_PREFIX + "<p class='question'>" + htmlEscape(card.getQuestion()) + "</p>" + HTML_SUFFIX;
+        String text = HTML_PREFIX + card.getQuestion() + HTML_SUFFIX;
         questionText.loadDataWithBaseURL("file:///android_asset/", text, "application/xhtml+xml", "utf-8", null);
 
         // This seems to be necessary in order to refresh the view.
@@ -240,7 +249,7 @@ public class Flashcards4Android extends Activity {
     }
 
     private void showAnswer(final Card<String, String> card) {
-        String text = HTML_PREFIX + "<span class='answer'>" + htmlEscape(card.getAnswer()) + "</span>" + HTML_SUFFIX;
+        String text = HTML_PREFIX + card.getAnswer() + HTML_SUFFIX;
         answerText.loadDataWithBaseURL("file:///android_asset/", text, "application/xhtml+xml", "utf-8", null);
 
         // This seems to be necessary in order to refresh the view.
@@ -261,59 +270,4 @@ public class Flashcards4Android extends Activity {
         System.out.println("converted '" + s + "' to '" + sb.toString() + "'");
         return sb.toString();
     }   */
-
-    private static String htmlEscape(String s) {
-        StringBuffer sb = new StringBuffer(s.length());
-        // true if last char was blank
-        boolean lastWasBlankChar = false;
-        int len = s.length();
-        char c;
-
-        for (int i = 0; i < len; i++) {
-            c = s.charAt(i);
-            if (c == ' ') {
-                // blank gets extra work,
-                // this solves the problem you get if you replace all
-                // blanks with &nbsp;, if you do that you loss
-                // word breaking
-                if (lastWasBlankChar) {
-                    lastWasBlankChar = false;
-                    sb.append("&nbsp;");
-                } else {
-                    lastWasBlankChar = true;
-                    sb.append(' ');
-                }
-            } else {
-                lastWasBlankChar = false;
-                //
-                // HTML Special Chars
-                if (c == '"')
-                    sb.append("&quot;");
-                else if (c == '&')
-                    sb.append("&amp;");
-                else if (c == '<')
-                    sb.append("&lt;");
-                else if (c == '>')
-                    sb.append("&gt;");
-                else if (c == '\n')
-                    // Handle Newline
-                    sb.append("&lt;br/&gt;");
-                else {
-                    int ci = 0xffff & c;
-                    if (ci < 160)
-                        // nothing special only 7 Bit
-                        sb.append(c);
-                    else {
-                        // Not 7 Bit use the unicode system
-                        sb.append("&#");
-                        sb.append(Integer.toString(ci));
-                        sb.append(';');
-                    }
-                }
-            }
-        }
-
-        //System.out.println("converted '" + s + "' to '" + sb.toString() + "'");
-        return sb.toString();
-    }
 }

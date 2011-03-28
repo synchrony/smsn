@@ -33,9 +33,7 @@
         <item name="android:textStyle">italic</item>
     </style>
 
-
-
-        <style name="info_label">
+    <style name="info_label">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:textAppearance">@style/TextAppearance.info_label</item>

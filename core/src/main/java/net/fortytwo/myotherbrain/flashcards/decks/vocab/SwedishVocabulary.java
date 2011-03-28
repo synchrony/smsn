@@ -14,36 +14,36 @@ import java.util.logging.Logger;
 public class SwedishVocabulary extends VocabularyDeck {
     private static final Logger LOGGER = Logger.getLogger(SwedishVocabulary.class.getName());
 
-    public SwedishVocabulary() throws IOException {
-        super("swedish_vocabulary", "Swedish vocabulary");
+    public SwedishVocabulary(final Format format) throws IOException {
+        super("swedish_vocabulary", "Swedish vocabulary", findSwedishLocale(), format);
     }
 
     @Override
     public Dictionary createVocabulary() throws IOException {
-        Dictionary dict = new Dictionary();
+        Dictionary dict = new Dictionary(locale);
 
         Locale locale = findSwedishLocale();
         if (null == locale) {
             LOGGER.warning("locale for Swedish vocabulary is not available.  Loading an empty dictionary.");
         } else {
-            VocabularySource omegaWiki = new VocabularySource("OmegaWiki");
+            VocabularySource omegaWiki = new VocabularySource("OmegaWiki Swedish-English");
             omegaWiki.setUrl("http://www.dicts.info/uddl.php");
             omegaWiki.setTimestamp("2011-03-24T07:46:30+01:00");
 
             InputStream is = SwedishVocabulary.class.getResourceAsStream("OmegaWiki_Swedish_English.txt");
             try {
-                VocabularyParsers.parseDictsInfoList(is, dict, Locale.GERMAN, omegaWiki);
+                VocabularyParsers.parseDictsInfoList(is, dict, omegaWiki);
             } finally {
                 is.close();
             }
 
-            VocabularySource wiktionary = new VocabularySource("Wiktionary");
+            VocabularySource wiktionary = new VocabularySource("Wiktionary Swedish-English");
             wiktionary.setUrl("http://www.dicts.info/uddl.php");
             wiktionary.setTimestamp("2011-03-24T07:47:47+01:00");
 
             is = SwedishVocabulary.class.getResourceAsStream("Wiktionary_Swedish_English.txt");
             try {
-                VocabularyParsers.parseDictsInfoList(is, dict, Locale.GERMAN, wiktionary);
+                VocabularyParsers.parseDictsInfoList(is, dict, wiktionary);
             } finally {
                 is.close();
             }
@@ -52,7 +52,7 @@ public class SwedishVocabulary extends VocabularyDeck {
         return dict;
     }
 
-    private Locale findSwedishLocale() {
+    private static Locale findSwedishLocale() {
         for (Locale l : NumberFormat.getAvailableLocales()) {
             if (l.getISO3Language().equals("swe")) {
                 return l;

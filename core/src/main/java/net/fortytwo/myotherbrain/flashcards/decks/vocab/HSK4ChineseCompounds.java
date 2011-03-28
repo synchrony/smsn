@@ -2,6 +2,7 @@ package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 /**
  * User: josh
@@ -10,13 +11,13 @@ import java.io.InputStream;
  */
 public class HSK4ChineseCompounds extends VocabularyDeck {
 
-    public HSK4ChineseCompounds() throws IOException {
-        super("hsk4_compounds", "HSK Chinese compounds");
+    public HSK4ChineseCompounds(final Format format) throws IOException {
+        super("hsk4_compounds", "HSK Chinese compounds", Locale.CHINESE, format);
     }
 
     @Override
     public Dictionary createVocabulary() throws IOException {
-        Dictionary dict = new Dictionary();
+        Dictionary dict = new Dictionary(locale);
 
         VocabularySource source = new VocabularySource("renzhe's lists");
         source.setComment("HSK level 4 vocabulary lists compiled by user renzhe");

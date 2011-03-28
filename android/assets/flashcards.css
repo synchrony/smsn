@@ -1,6 +1,7 @@
 body {
     background-color: #000;
     color: #fff;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .question {
@@ -10,4 +11,36 @@ body {
 
 .answer {
     font-size: x-large;
+}
+
+.question-context {
+    text-align: left;
+    font-size: medium;
+    color: #f00;
+}
+
+.answer-source {
+    text-align: right;
+    font-size: medium;
+    color: #f00;
+}
+
+.answer-primary-form {
+    font-size: x-large;
+}
+
+.answer-secondary-forms {
+    font-size: large;
+}
+
+.answer-pronunciation {
+    font-weight: bold;
+}
+
+.answer-type {
+
+}
+
+.answer-meaning {
+    font-size: large;
 }

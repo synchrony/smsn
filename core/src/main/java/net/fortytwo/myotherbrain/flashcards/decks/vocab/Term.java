@@ -1,5 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +13,7 @@ import java.util.Locale;
  * Date: 3/23/11
  * Time: 7:26 PM
  */
-public class Term {
-    private final Locale locale;
+public class Term {//} implements Serializable {
     private String type;
     private List<String> forms;
     private String pronunciation;
@@ -22,8 +22,7 @@ public class Term {
     private VocabularySource source;
     private List<Term> examples;
 
-    public Term(final Locale locale) {
-        this.locale = locale;
+    public Term() {
     }
 
     public String getType() {
@@ -34,7 +33,7 @@ public class Term {
         this.type = type;
     }
 
-    public String normalizePrimaryForm() {
+    public String normalizePrimaryForm(final Locale locale) {
         return forms.get(0).toLowerCase(locale);
     }
 
@@ -92,7 +91,7 @@ public class Term {
 
     public static void main(final String[] args) {
         for (Locale l : NumberFormat.getAvailableLocales()) {
-            System.out.println(l.getDisplayName()+ " / " + l.getISO3Language());
+            System.out.println(l.getDisplayName() + " / " + l.getISO3Language());
         }
     }
 }

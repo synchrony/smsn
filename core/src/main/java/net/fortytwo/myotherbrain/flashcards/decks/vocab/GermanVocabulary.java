@@ -10,32 +10,32 @@ import java.util.Locale;
  * Time: 8:20 PM
  */
 public class GermanVocabulary extends VocabularyDeck {
-    public GermanVocabulary() throws IOException {
-        super("german_vocabulary", "German vocabulary");
+    public GermanVocabulary(final Format format) throws IOException {
+        super("german_vocabulary", "German vocabulary", Locale.GERMAN, format);
     }
 
     @Override
     public Dictionary createVocabulary() throws IOException {
-        Dictionary dict = new Dictionary();
+        Dictionary dict = new Dictionary(locale);
 
-        VocabularySource omegaWiki = new VocabularySource("OmegaWiki");
+        VocabularySource omegaWiki = new VocabularySource("OmegaWiki German-English");
         omegaWiki.setUrl("http://www.dicts.info/uddl.php");
         omegaWiki.setTimestamp("2011-03-24T07:33:00+01:00");
 
         InputStream is = GermanVocabulary.class.getResourceAsStream("OmegaWiki_German_English.txt");
         try {
-            VocabularyParsers.parseDictsInfoList(is, dict, Locale.GERMAN, omegaWiki);
+            VocabularyParsers.parseDictsInfoList(is, dict, omegaWiki);
         } finally {
             is.close();
         }
 
-        VocabularySource wiktionary = new VocabularySource("Wiktionary");
+        VocabularySource wiktionary = new VocabularySource("Wiktionary German-English");
         wiktionary.setUrl("http://www.dicts.info/uddl.php");
         wiktionary.setTimestamp("2011-03-24T07:35:12+01:00");
 
         is = GermanVocabulary.class.getResourceAsStream("Wiktionary_German_English.txt");
         try {
-            VocabularyParsers.parseDictsInfoList(is, dict, Locale.GERMAN, wiktionary);
+            VocabularyParsers.parseDictsInfoList(is, dict, wiktionary);
         } finally {
             is.close();
         }

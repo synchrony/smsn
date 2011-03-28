@@ -19,6 +19,7 @@ import net.fortytwo.myotherbrain.flashcards.decks.vocab.NPCRChineseVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.USStateBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.SwedishVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -113,12 +114,14 @@ public class CommandLineGame extends Game<String, String> {
             Deck<String, String> stateBorders = new USStateBorders();
             Deck<String, String> nationalCapitals = new NationalCapitals();
             Deck<String, String> internationalBorders = new InternationalBorders();
-            Deck<String, String> npcrVocabulary = new NPCRChineseVocabulary();
-            Deck<String, String> hsk4Characters = new HSK4ChineseCharacters();
-            Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds();
-            Deck<String, String> frenchVocabulary = new FrenchVocabulary();
-            Deck<String, String> germanVocabulary = new GermanVocabulary();
-            Deck<String, String> swedishVocabulary = new SwedishVocabulary();
+
+            VocabularyDeck.Format f = VocabularyDeck.Format.TEXT;
+            Deck<String, String> npcrVocabulary = new NPCRChineseVocabulary(f);
+            Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f);
+            Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f);
+            Deck<String, String> frenchVocabulary = new FrenchVocabulary(f);
+            Deck<String, String> germanVocabulary = new GermanVocabulary(f);
+            Deck<String, String> swedishVocabulary = new SwedishVocabulary(f);
 
             //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
@@ -128,8 +131,8 @@ public class CommandLineGame extends Game<String, String> {
             pile.addDeck(nationalCapitals, 1);
             pile.addDeck(internationalBorders, 1);
             //pile.addDeck(npcrVocabulary, 4);
-            pile.addDeck(hsk4Compounds, 2);
-            pile.addDeck(hsk4Characters, 8);
+            pile.addDeck(hsk4Compounds, 5);
+            pile.addDeck(hsk4Characters, 10);
             //*/
             pile.addDeck(frenchVocabulary, 10);
             pile.addDeck(germanVocabulary, 10);
