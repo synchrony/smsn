@@ -93,19 +93,12 @@ public class CommandLineGame extends Game<String, String> {
         while (true) {
             Card<String, String> c = drawCard();
             try {
-                long now = System.currentTimeMillis();
+                boolean r = tryCard(c, br, ++line);
 
-                if (tryCard(c, br, ++line)) {
-                    correct(c, now);
-                    history.log(new Trial(c.getDeck().getName(), c.getName(), now, Trial.Result.Correct));
-                } else {
-                    incorrect(c, now);
-                    history.log(new Trial(c.getDeck().getName(), c.getName(), now, Trial.Result.Incorrect));
-                }
+                this.logAndReplace(c, r ? Trial.Result.Correct : Trial.Result.Incorrect);
             } catch (IOException e) {
                 throw new GameplayException(e);
             }
-            replaceCard(c);
         }
     }
 

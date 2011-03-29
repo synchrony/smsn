@@ -14,11 +14,8 @@ import android.widget.RelativeLayout;
 import net.fortytwo.myotherbrain.R;
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
-import net.fortytwo.myotherbrain.flashcards.Game;
 import net.fortytwo.myotherbrain.flashcards.GameplayException;
-import net.fortytwo.myotherbrain.flashcards.Pile;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
-import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistoryHelper;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
@@ -29,6 +26,7 @@ import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
+import net.fortytwo.myotherbrain.flashcards.games.AsynchronousGame;
 
 import java.io.IOException;
 
@@ -51,12 +49,15 @@ public class Flashcards4Android extends Activity {
     private WebView questionText;
     private WebView answerText;
 
-    private AndroidGame game;
-    private SQLiteDatabase db;
+    private static Flashcards4Android activity;
+    private static AsynchronousGame game;
+    private static SQLiteDatabase db;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        activity = this;
 
         setContentView(R.layout.flashcards_layout);
 
@@ -74,15 +75,23 @@ public class Flashcards4Android extends Activity {
         findViewById(R.id.incorrect).setOnClickListener(incorrect);
 
         SQLiteGameHistoryHelper openHelper = new SQLiteGameHistoryHelper(this);
-        db = openHelper.getWritableDatabase();
 
         try {
-            game = createGame(db);
+            // Create the game only once.  In subsequent instances of this activity, re-use it.
+            if (null == db) {
+                db = openHelper.getWritableDatabase();
+                game = createGame(db);
+            }
+
             game.play();
         } catch (Exception e) {
             //throw new IllegalStateException(e);
             e.printStackTrace(System.err);
         }
+    }
+
+    private Flashcards4Android getCurrentActivity() {
+        return activity;
     }
 
     @Override
@@ -124,7 +133,7 @@ public class Flashcards4Android extends Activity {
 
     @Override
     public void onDestroy() {
-        db.close();
+        //db.close();
         super.onDestroy();
     }
 
@@ -132,7 +141,7 @@ public class Flashcards4Android extends Activity {
         public void onClick(final View v) {
             try {
                 game.correct();
-            } catch (IOException e) {
+            } catch (GameplayException e) {
                 e.printStackTrace(System.err);
             }
         }
@@ -142,7 +151,7 @@ public class Flashcards4Android extends Activity {
         public void onClick(final View v) {
             try {
                 game.incorrect();
-            } catch (IOException e) {
+            } catch (GameplayException e) {
                 e.printStackTrace(System.err);
             }
         }
@@ -166,7 +175,7 @@ public class Flashcards4Android extends Activity {
         answerFace.setVisibility(View.VISIBLE);
     }
 
-    private AndroidGame createGame(final SQLiteDatabase db) throws IOException {
+    private AsynchronousGame createGame(final SQLiteDatabase db) throws IOException {
         //Deck<String, String> stateBorders = new USStateBorders();
         Deck<String, String> nationalCapitals = new NationalCapitals();
         Deck<String, String> internationalBorders = new InternationalBorders();
@@ -200,44 +209,15 @@ public class Flashcards4Android extends Activity {
 
         GameHistory h = new SQLiteGameHistory(db);
 
-        return new AndroidGame(pile, h);
-    }
-
-    private class AndroidGame extends Game<String, String> {
-        private Card<String, String> card;
-
-        public AndroidGame(final Pile<String, String> pile,
-                           final GameHistory history) {
-            super(pile, history);
-        }
-
-        @Override
-        public void play() throws GameplayException {
-            nextCard();
-        }
-
-        public void nextCard() {
-            card = drawCard();
-            showQuestion(card);
-            showAnswer(card);
-            enterQuestionMode();
-        }
-
-        public void correct() throws IOException {
-            long now = System.currentTimeMillis();
-            correct(card, now);
-            history.log(new Trial(card.getDeck().getName(), card.getName(), now, Trial.Result.Correct));
-            replaceCard(card);
-            nextCard();
-        }
-
-        public void incorrect() throws IOException {
-            long now = System.currentTimeMillis();
-            incorrect(card, now);
-            history.log(new Trial(card.getDeck().getName(), card.getName(), now, Trial.Result.Incorrect));
-            replaceCard(card);
-            nextCard();
-        }
+        return new AsynchronousGame<String, String>(pile, h) {
+            @Override
+            public void nextQuestion(final Card<String, String> current) {
+                Flashcards4Android a = getCurrentActivity();
+                a.showQuestion(current);
+                a.showAnswer(current);
+                a.enterQuestionMode();
+            }
+        };
     }
 
     private void showQuestion(final Card<String, String> card) {

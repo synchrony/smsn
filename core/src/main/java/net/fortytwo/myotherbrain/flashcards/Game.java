@@ -4,7 +4,7 @@ import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 
-import javax.swing.text.html.HTML;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -63,7 +63,7 @@ public abstract class Game<Q, A> {
                             incorrect(c, t.getTime());
                             break;
                         case Cancelled:
-                            throw new IllegalStateException("the 'cancelled' result is not yet supported");
+                            throw new IllegalStateException("the '" + Trial.Result.Cancelled + "' result is not supported");
                     }
                     cardsInHistory.add(c);
                 }
@@ -79,8 +79,8 @@ public abstract class Game<Q, A> {
 
     public abstract void play() throws GameplayException;
 
-    protected void correct(final Card c,
-                           final long now) {
+    private void correct(final Card c,
+                         final long now) {
         long delay = 0 == c.lastTrial
                 ? delayAfterFirstCorrect
                 : increaseDelay(now - c.lastTrial);
@@ -89,11 +89,35 @@ public abstract class Game<Q, A> {
         c.lastTrial = now;
     }
 
-    protected void incorrect(final Card c,
-                             final long now) {
+    private void incorrect(final Card c,
+                           final long now) {
         c.lastTrial = now;
         long delay = randomizeDelay(delayAfterFirstIncorrect);
         c.nextTrial = c.lastTrial + delay;
+    }
+
+    protected void logAndReplace(final Card<Q, A> c,
+                                 final Trial.Result result) throws GameplayException {
+        long now = System.currentTimeMillis();
+
+        switch (result) {
+            case Correct:
+                correct(c, now);
+                break;
+            case Incorrect:
+                incorrect(c, now);
+                break;
+            case Cancelled:
+                throw new IllegalStateException("the '" + Trial.Result.Cancelled + "' result is not supported");
+        }
+
+        try {
+            history.log(new Trial(c.getDeck().getName(), c.getName(), now, result));
+        } catch (IOException e) {
+            throw new GameplayException(e);
+        }
+
+        replaceCard(c);
     }
 
     private long increaseDelay(final long delay) {
@@ -107,17 +131,28 @@ public abstract class Game<Q, A> {
 
     public Card<Q, A> drawCard() {
         long now = System.currentTimeMillis();
+
+        // No active cards; draw from the pile.
         if (0 == active.size()) {
             if (pile.isEmpty()) {
                 throw new IllegalStateException("empty card stack and no active cards");
             }
 
             return pile.drawRandomCard();
-        } else if (active.peek().getNextTrial() <= now) {
+        }
+
+        // There is an overdue active card; draw it.
+        else if (active.peek().getNextTrial() <= now) {
             return active.poll();
-        } else if (!pile.isEmpty()) {
+        }
+
+        // There are no overdue cards, but the pile is not empty; draw from the pile.
+        else if (!pile.isEmpty()) {
             return pile.drawRandomCard();
-        } else {
+        }
+
+        // There are no overdue cards and the pile is empty; wait until a card becomes overdue.
+        else {
             long delay = active.peek().getNextTrial() - now;
             System.out.println("waiting " + delay + "ms");
             synchronized (this) {

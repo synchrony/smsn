@@ -24,10 +24,10 @@ public class SQLiteGameHistory extends GameHistory {
             HISTORY__RESULT = "result",
             HISTORY__TIME = "time";
 
-    private final SQLiteDatabase db;
+    private final SQLiteDatabase database;
 
-    public SQLiteGameHistory(final SQLiteDatabase db) {
-        this.db = db;
+    public SQLiteGameHistory(final SQLiteDatabase database) {
+        this.database = database;
         //correctUnicodeIssue();
     }
 
@@ -83,13 +83,13 @@ public class SQLiteGameHistory extends GameHistory {
         cv.put(HISTORY__TIME, String.valueOf(trial.getTime()));
         //cv.put(HISTORY__TIME, trial.getTime());
         cv.put(HISTORY__RESULT, trial.getResult().toString());
-        db.insert(HISTORY, HISTORY__ID, cv);
+        database.insert(HISTORY, HISTORY__ID, cv);
     }
 
     @Override
     public CloseableIterator<Trial> getHistory() {
         String[] cols = new String[]{HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
-        return new CursorIterator(db.query(HISTORY,
+        return new CursorIterator(database.query(HISTORY,
                 cols,
                 null,
                 null,
@@ -101,7 +101,7 @@ public class SQLiteGameHistory extends GameHistory {
     @Override
     public CloseableIterator<Trial> getHistory(final Deck deck) {
         String[] cols = new String[]{HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
-        return new CursorIterator(db.query(HISTORY,
+        return new CursorIterator(database.query(HISTORY,
                 cols,
                 HISTORY__DECK + "=?",
                 new String[]{deck.getName()},
@@ -113,7 +113,7 @@ public class SQLiteGameHistory extends GameHistory {
     @Override
     public CloseableIterator<Trial> getHistory(final Card card) {
         String[] cols = new String[]{HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
-        return new CursorIterator(db.query(HISTORY,
+        return new CursorIterator(database.query(HISTORY,
                 cols,
                 HISTORY__DECK + "=? AND " + HISTORY__CARD + "=?",
                 new String[]{card.getDeck().getName(), card.getName()},
