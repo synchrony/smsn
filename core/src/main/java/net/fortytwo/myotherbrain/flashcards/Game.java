@@ -27,8 +27,8 @@ public abstract class Game<Q, A> {
             DAY = HOUR * 24;
 
     private long
-            delayAfterFirstCorrect = 60000,
-            delayAfterFirstIncorrect = 30000;
+            delayAfterFirstCorrect = 120000,
+            delayAfterFirstIncorrect = 60000;
 
     // Randomized delays will be within this ratio of the precise value.
     private double delayImprecision = 0.1;
@@ -208,12 +208,24 @@ public abstract class Game<Q, A> {
     public String showQueue(final VocabularyDeck.Format format) {
         long now = System.currentTimeMillis();
 
+        int overdue = 0;
+        for (Card c : active) {
+            if (c.getNextTrial() <= now) {
+                overdue++;
+            }
+        }
+        int percentOverdue = (overdue * 100) / active.size();
+
         StringBuilder sb = new StringBuilder();
 
         if (VocabularyDeck.Format.HTML == format) {
-            sb.append("<div>").append(active.size()).append(" cards:</div>\n<br/>\n<div>");
+            sb.append("<div>");
+            sb.append(active.size()).append(" cards<br/>\n");
+            sb.append(overdue).append(" (").append(percentOverdue).append("%) due for review");
+            sb.append("</div>\n<br/>\n<div>\n");
         } else {
-            sb.append("\t").append(active.size()).append(" cards:\n");
+            sb.append("\t").append(active.size()).append(" cards\n");
+            sb.append(overdue).append(" (").append(percentOverdue).append("%) due for review\n");
             sb.append("\t\t");
         }
 

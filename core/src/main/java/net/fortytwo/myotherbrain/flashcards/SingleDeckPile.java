@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards;
 
+import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,14 +23,21 @@ public class SingleDeckPile<Q, A> implements Pile<Q, A> {
 
         // Create the pool of all cards.
         pool = new LinkedList<Card<Q, A>>();
-        pool.addAll(deck.getCards());
+        CloseableIterator<Card<Q, A>> iter = deck.getCards();
+        try {
+            while (iter.hasNext()) {
+                pool.add(iter.next());
+            }
+        } finally {
+            iter.close();
+        }
 
         // Randomize the pool, so that every cold start is not the same.
         Collections.shuffle(pool);
     }
 
     public Card<Q, A> drawCard(final String deckName,
-                         final String cardName) {
+                               final String cardName) {
         if (!deckName.equals(deck.getName())) {
             return null;
         }

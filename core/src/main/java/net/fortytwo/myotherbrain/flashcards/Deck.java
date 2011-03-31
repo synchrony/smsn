@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards;
 
-import java.util.Collection;
+import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 
 /**
  * A set of cards with a common theme.
@@ -29,5 +29,5 @@ public abstract class Deck<Q, A> {
 
     public abstract Card<Q, A> getCard(String name);
 
-    public abstract Collection<Card<Q, A>> getCards();
+    public abstract CloseableIterator<Card<Q, A>> getCards();
 }

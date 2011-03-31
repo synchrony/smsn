@@ -9,6 +9,8 @@ import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 
+import java.io.IOException;
+
 /**
  * User: josh
  * Date: 3/14/11
@@ -16,7 +18,13 @@ import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
  */
 public class SQLiteGameHistory extends GameHistory {
     public static final String
+            CARDS = "cards",
             HISTORY = "history";
+    public static final String
+            CARDS__ID = "_id",
+            CARDS__DECK = "deck",
+            CARDS__CARD = "card",
+            CARDS__DATA = "data";
     public static final String
             HISTORY__ID = "_id",
             HISTORY__DECK = "deck",
@@ -29,6 +37,14 @@ public class SQLiteGameHistory extends GameHistory {
     public SQLiteGameHistory(final SQLiteDatabase database) {
         this.database = database;
         //correctUnicodeIssue();
+    }
+
+    public void close() throws IOException {
+        // Do nothing (the database is to be closed outside of this history).
+    }
+
+    public void clear() throws IOException {
+        database.delete(SQLiteGameHistory.HISTORY, null, null);
     }
 
     /*

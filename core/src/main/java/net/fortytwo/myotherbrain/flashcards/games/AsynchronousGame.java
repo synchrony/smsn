@@ -44,7 +44,7 @@ public abstract class AsynchronousGame<Q, A> extends Game<Q, A> {
     }
 
     public void incorrect() throws GameplayException {
-        logAndReplace(current, Trial.Result.Correct);
+        logAndReplace(current, Trial.Result.Incorrect);
         current = null;
         nextCard();
     }

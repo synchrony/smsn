@@ -7,9 +7,11 @@ import net.fortytwo.myotherbrain.flashcards.GameplayException;
 import net.fortytwo.myotherbrain.flashcards.Pile;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.db.memory.MemoryCardStore;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
@@ -109,12 +111,13 @@ public class CommandLineGame extends Game<String, String> {
             Deck<String, String> internationalBorders = new InternationalBorders();
 
             VocabularyDeck.Format f = VocabularyDeck.Format.TEXT;
-            Deck<String, String> npcrVocabulary = new NPCRChineseVocabulary(f);
-            Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f);
-            Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f);
-            Deck<String, String> frenchVocabulary = new FrenchVocabulary(f);
-            Deck<String, String> germanVocabulary = new GermanVocabulary(f);
-            Deck<String, String> swedishVocabulary = new SwedishVocabulary(f);
+            CardStore<String, String> store = new MemoryCardStore<String, String>();
+            Deck<String, String> npcrVocabulary = new NPCRChineseVocabulary(f, store);
+            Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f, store);
+            Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f, store);
+            Deck<String, String> frenchVocabulary = new FrenchVocabulary(f, store);
+            Deck<String, String> germanVocabulary = new GermanVocabulary(f, store);
+            Deck<String, String> swedishVocabulary = new SwedishVocabulary(f, store);
 
             //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 

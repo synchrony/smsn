@@ -2,16 +2,15 @@ package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
+import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
- * A deck of Chinese characters with pronunciation and meaning.
+ * A deck of vocabulary terms with pronunciation and meaning.
  * <p/>
  * User: josh
  * Date: 3/9/11
@@ -21,202 +20,36 @@ public abstract class VocabularyDeck extends Deck<String, String> {
     public enum Format {TEXT, HTML}
 
     protected final Locale locale;
-    private final Format format;
-    private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
+    private final CardStore<String, String> store;
 
     public VocabularyDeck(final String name,
                           final String label,
                           final Locale locale,
-                          final Format format) throws IOException {
+                          final Format format,
+                          final CardStore<String, String> store) throws IOException {
         super(name, label);
 
+        this.store = store;
         this.locale = locale;
-        this.format = format;
 
         Dictionary d = createVocabulary();
         for (String key : d.getKeys()) {
             List<Term> defs = d.getDefinitions(key);
 
             String n = Card.findCardName(key);
-            cards.put(n, new LocalCard(n, this, defs));
+            store.add(new VocabularyCard(n, this, defs, format));
         }
     }
 
     protected abstract Dictionary createVocabulary() throws IOException;
 
     @Override
-    public Collection<Card<String, String>> getCards() {
-        return cards.values();
+    public CloseableIterator<Card<String, String>> getCards() {
+        return store.findAll(this);
     }
 
     public Card<String, String> getCard(final String name) {
-        return cards.get(name);
-    }
-
-    private class LocalCard extends Card<String, String> {
-        private final List<Term> defs;
-
-        public LocalCard(final String name,
-                         final Deck deck,
-                         final List<Term> defs) {
-            super(name, deck);
-
-            this.defs = defs;
-        }
-
-        @Override
-        public String getQuestion() {
-            StringBuilder sb = new StringBuilder();
-
-            if (Format.HTML == format) {
-                sb.append("<div class=\"question\">\n");
-
-                // Context
-                sb.append("<div class=\"question-context\">").append(deck.getLabel()).append("</div>\n");
-            }
-
-            String question = defs.get(0).getForms().get(0) + " = ?";
-            if (Format.HTML == format) {
-                question = htmlEscape(question);
-            }
-            sb.append(question);
-
-            if (Format.HTML == format) {
-                sb.append("</div>\n");
-            }
-
-            return sb.toString();
-        }
-
-        @Override
-        public String getAnswer() {
-            StringBuilder sb = new StringBuilder();
-
-            if (Format.HTML == format) {
-                sb.append("<div class=\"answer\">\n");
-            }
-
-            for (Term t : defs) {
-                // Source
-                if (null != t.getSource()) {
-                    String label = t.getSource().getLabel();
-                    if (Format.HTML == format) {
-                        sb.append("<div class=\"answer-source\">");
-                        label = htmlEscape(label);
-                    } else {
-                        sb.append("[");
-                    }
-
-                    if (Format.HTML == format && null != t.getSource().getUrl()) {
-                        sb.append("<a href=\"" + t.getSource().getUrl() + "\">");
-                    }
-                    sb.append(label);
-                    if (Format.HTML == format) {
-                        if (null != t.getSource().getUrl()) {
-                            sb.append("</a>");
-                        }
-                    } else {
-                        sb.append("]\n");
-                    }
-
-                    if (Format.HTML == format) {
-                        sb.append("</div>\n");
-                    }
-                }
-
-                if (Format.HTML == format) {
-                    sb.append("<div class=\"answer-definition\">");
-                }
-
-                // Primary form;
-                String primaryForm = t.getForms().get(0);
-                if (Format.HTML == format) {
-                    primaryForm = htmlEscape(primaryForm);
-                    sb.append("<span class=\"answer-primary-form\">");
-                }
-                sb.append(primaryForm);
-                if (Format.HTML == format) {
-                    sb.append("</span>");
-                }
-
-                // Secondary forms
-                if (2 <= t.getForms().size()) {
-                    if (Format.HTML == format) {
-                        sb.append("<span class=\"answer-secondary-forms\">");
-                    }
-                    sb.append(" (");
-                    for (int i = 1; i < t.getForms().size(); i++) {
-                        if (i > 1) {
-                            sb.append("; ");
-                        }
-                        String form = t.getForms().get(i);
-                        if (Format.HTML == format) {
-                            form = htmlEscape(form);
-                        }
-                        sb.append(form);
-                    }
-                    sb.append(")");
-                    if (Format.HTML == format) {
-                        sb.append("</span>");
-                    }
-                }
-
-                // Pronunciation
-                if (null != t.getPronunciation()) {
-                    String p = t.getPronunciation();
-                    if (Format.HTML == format) {
-                        sb.append("<span class=\"answer-pronunciation\">");
-                        p = htmlEscape(p);
-                    }
-                    sb.append(" ").append(p);
-                    if (Format.HTML == format) {
-                        sb.append("</span>");
-                    }
-                }
-
-                sb.append(": ");
-
-                // Type
-                if (null != t.getType()) {
-                    String type = t.getType();
-                    if (Format.HTML == format) {
-                        sb.append("<span class=\"answer-type\">");
-                        type = htmlEscape(type);
-                    }
-                    sb.append(type).append(": ");
-                    if (Format.HTML == format) {
-                        sb.append("</span>");
-                    }
-                }
-
-                // Meaning
-                String meaning = t.getMeaning();
-                if (Format.HTML == format) {
-                    sb.append("<span class=\"answer-meaning\">");
-                    meaning = htmlEscape(meaning);
-                }
-                sb.append(meaning);
-                if (Format.HTML == format) {
-                    sb.append("</span>");
-                }
-                sb.append("\n");
-
-                if (Format.HTML == format) {
-                    sb.append("</div>\n");
-                }
-            }
-
-            if (Format.HTML == format) {
-                sb.append("</div>\n");
-            }
-
-            return sb.toString();
-        }
-
-        @Override
-        public String toString() {
-            return defs.get(0).getForms().get(0);
-        }
+        return store.find(this, name);
     }
 
     public static String htmlEscape(final String s) {

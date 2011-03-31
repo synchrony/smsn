@@ -5,6 +5,7 @@ import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.db.TrivialCloseableIterator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,9 +25,12 @@ import java.util.List;
  */
 public class FileBasedGameHistory extends GameHistory {
     private final List<Trial> trials;
-    private final BufferedWriter writer;
+    private FileWriter fwriter;
+    private BufferedWriter writer;
+    private final File db;
 
     public FileBasedGameHistory(final File db) throws IOException {
+        this.db = db;
         trials = new LinkedList<Trial>();
 
         if (db.exists()) {
@@ -49,8 +52,23 @@ public class FileBasedGameHistory extends GameHistory {
         //OutputStream os = new FileOutputStream(db);
         //writer = new PrintWriter(os, true);
 
-        // Open the file for append.  Note: the writer is never closed.
-        writer = new BufferedWriter(new FileWriter(db, true));
+        open();
+    }
+
+    private void open() throws IOException {
+        // Open the file for append.
+        fwriter = new FileWriter(db, true);
+        writer = new BufferedWriter(fwriter);
+    }
+
+    public void close() throws IOException {
+        fwriter.close();
+    }
+
+    public void clear() throws IOException {
+        close();
+        new FileWriter(db).close();
+        open();
     }
 
     public void log(final Trial trial) throws IOException {
@@ -89,27 +107,4 @@ public class FileBasedGameHistory extends GameHistory {
         return new TrivialCloseableIterator<Trial>(h.iterator());
     }
 
-    private class TrivialCloseableIterator<T> implements CloseableIterator<T> {
-        private final Iterator<T> inner;
-
-        public TrivialCloseableIterator(Iterator<T> inner) {
-            this.inner = inner;
-        }
-
-        public void close() {
-            // Do nothing.
-        }
-
-        public boolean hasNext() {
-            return inner.hasNext();
-        }
-
-        public T next() {
-            return inner.next();
-        }
-
-        public void remove() {
-            inner.remove();
-        }
-    }
 }

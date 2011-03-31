@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -10,8 +12,9 @@ import java.util.Locale;
  * Time: 8:20 PM
  */
 public class HSK4ChineseCharacters extends VocabularyDeck {
-    public HSK4ChineseCharacters(final Format format) throws IOException {
-        super("hsk4_characters", "HSK Chinese characters", Locale.CHINESE, format);
+    public HSK4ChineseCharacters(final Format format,
+                            final CardStore<String, String> store) throws IOException {
+        super("hsk4_characters", "HSK Chinese characters", Locale.CHINESE, format, store);
     }
 
     @Override

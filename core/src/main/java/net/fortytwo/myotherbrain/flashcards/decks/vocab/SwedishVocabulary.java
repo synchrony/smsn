@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
@@ -14,8 +16,9 @@ import java.util.logging.Logger;
 public class SwedishVocabulary extends VocabularyDeck {
     private static final Logger LOGGER = Logger.getLogger(SwedishVocabulary.class.getName());
 
-    public SwedishVocabulary(final Format format) throws IOException {
-        super("swedish_vocabulary", "Swedish vocabulary", findSwedishLocale(), format);
+    public SwedishVocabulary(final Format format,
+                            final CardStore<String, String> store) throws IOException {
+        super("swedish_vocabulary", "Swedish vocabulary", findSwedishLocale(), format, store);
     }
 
     @Override

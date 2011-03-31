@@ -2,6 +2,8 @@ package net.fortytwo.myotherbrain.flashcards.decks.geo;
 
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
+import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
+import net.fortytwo.myotherbrain.flashcards.db.TrivialCloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.Countries;
 
 import java.io.IOException;
@@ -32,8 +34,8 @@ public class NationalCapitals extends Deck<String, String> {
     }
 
     @Override
-    public Collection<Card<String, String>> getCards() {
-        return cards.values();
+    public CloseableIterator<Card<String, String>> getCards() {
+        return new TrivialCloseableIterator<Card<String, String>>(cards.values().iterator());
     }
 
     private class LocalCard extends Card<String, String> {

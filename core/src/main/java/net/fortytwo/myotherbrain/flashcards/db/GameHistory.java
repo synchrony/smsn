@@ -19,4 +19,8 @@ public abstract class GameHistory {
     public abstract CloseableIterator<Trial> getHistory(Deck deck);
 
     public abstract CloseableIterator<Trial> getHistory(Card card);
+
+    public abstract void clear() throws IOException;
+
+    public abstract void close() throws IOException;
 }

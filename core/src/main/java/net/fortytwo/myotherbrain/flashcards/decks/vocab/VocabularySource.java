@@ -1,11 +1,21 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
-* User: josh
-* Date: 3/24/11
-* Time: 1:06 PM
-*/
+ * User: josh
+ * Date: 3/24/11
+ * Time: 1:06 PM
+ */
 public class VocabularySource {
+    private static final String
+            LABEL = "label",
+            COMMENT = "comment",
+            URL = "url",
+            TIMESTAMP = "timestamp";
+
     private final String label;
     private String comment;
     private String url;
@@ -13,6 +23,28 @@ public class VocabularySource {
 
     public VocabularySource(final String label) {
         this.label = label;
+    }
+
+    public VocabularySource(final JSONObject json) throws JSONException {
+        label = json.getString(LABEL);
+        comment = json.optString(COMMENT);
+        url = json.optString(URL);
+        timestamp = json.optString(TIMESTAMP);
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(LABEL, label);
+        if (null != comment) {
+            json.put(COMMENT, comment);
+        }
+        if (null != url) {
+            json.put(URL, url);
+        }
+        if (null != timestamp) {
+            json.put(TIMESTAMP, timestamp);
+        }
+        return json;
     }
 
     public String getLabel() {

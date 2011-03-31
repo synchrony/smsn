@@ -9,11 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Date: 3/5/11
  * Time: 7:13 PM
  */
-public class SQLiteGameHistoryHelper extends SQLiteOpenHelper {
+public class SQLiteFlashcardsHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "flashcards.db";
     public static final int CURRENT_VERSION = 1;
 
-    public SQLiteGameHistoryHelper(final Context context) {
+    public SQLiteFlashcardsHelper(final Context context) {
         super(context, DATABASE_NAME, null, CURRENT_VERSION);
     }
 
@@ -27,6 +27,12 @@ public class SQLiteGameHistoryHelper extends SQLiteOpenHelper {
                 // This does not affect ORDER BY behavior, except perhaps in terms of performance.
                 SQLiteGameHistory.HISTORY__TIME + "  TEXT NOT NULL, " +
                 SQLiteGameHistory.HISTORY__RESULT + " TEXT NOT NULL)");
+
+        db.execSQL("CREATE TABLE " + SQLiteGameHistory.CARDS + " (" +
+                SQLiteGameHistory.CARDS__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                SQLiteGameHistory.CARDS__DECK + " TEXT NOT NULL, " +
+                SQLiteGameHistory.CARDS__CARD + " TEXT NOT NULL, " +
+                SQLiteGameHistory.CARDS__DATA + " TEXT NOT NULL)");
     }
 
     @Override

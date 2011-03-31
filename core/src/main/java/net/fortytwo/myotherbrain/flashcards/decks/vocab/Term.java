@@ -1,5 +1,9 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -8,12 +12,21 @@ import java.util.Locale;
 
 /**
  * The definition of a vocabulary term.
- *
+ * <p/>
  * User: josh
  * Date: 3/23/11
  * Time: 7:26 PM
  */
 public class Term {//} implements Serializable {
+    private static final String
+            CONTEXT = "context",
+            EXAMPLES = "examples",
+            FORMS = "forms",
+            MEANING = "meaning",
+            PRONUNCIATION = "pronunciation",
+            SOURCE = "source",
+            TYPE = "type";
+
     private String type;
     private List<String> forms;
     private String pronunciation;
@@ -23,6 +36,77 @@ public class Term {//} implements Serializable {
     private List<Term> examples;
 
     public Term() {
+    }
+
+    public Term(final JSONObject json) throws JSONException {
+        type = json.optString(TYPE);
+        pronunciation = json.optString(PRONUNCIATION);
+        meaning = json.optString(MEANING);
+        context = json.optString(CONTEXT);
+
+        JSONObject s = json.optJSONObject(SOURCE);
+        if (null != s) {
+            source = new VocabularySource(s);
+        }
+
+        JSONArray f = json.optJSONArray(FORMS);
+        if (null != f && 1 <= f.length()) {
+            forms = new LinkedList<String>();
+            for (int i = 0; i < f.length(); i++) {
+                forms.add(f.getString(i));
+            }
+        }
+
+        JSONArray ex = json.optJSONArray(EXAMPLES);
+        if (null != ex && 1 <= ex.length()) {
+            examples = new LinkedList<Term>();
+            for (int i = 0; i < ex.length(); i++) {
+                examples.add(new Term(ex.getJSONObject(i)));
+            }
+        }
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject json = new JSONObject();
+
+        if (null != type) {
+            json.put(TYPE, type);
+        }
+
+        if (null != forms && 1 <= forms.size()) {
+            JSONArray f = new JSONArray();
+            for (String form : forms) {
+                f.put(form);
+            }
+            json.put(FORMS, f);
+        }
+
+        if (null != pronunciation) {
+            json.put(PRONUNCIATION, pronunciation);
+        }
+
+        if (null != meaning) {
+            json.put(MEANING, meaning);
+        }
+
+        if (null != context) {
+            json.put(CONTEXT, context);
+        }
+
+        if (null != source) {
+            JSONObject s = source.toJson();
+            json.put(SOURCE, s);
+        }
+
+        if (null != examples && 1 <= examples.size()) {
+            JSONArray ex = new JSONArray();
+            for (Term t : examples) {
+                ex.put(t.toJson());
+            }
+            json.put(EXAMPLES, ex);
+        }
+
+        return json;
     }
 
     public String getType() {

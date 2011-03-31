@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -11,8 +13,9 @@ import java.util.Locale;
  */
 public class NPCRChineseVocabulary extends VocabularyDeck {
 
-    public NPCRChineseVocabulary(final Format format) throws IOException {
-        super("npcr_vocabulary", "NPCR Chinese vocabulary", Locale.CHINESE, format);
+    public NPCRChineseVocabulary(final Format format,
+                            final CardStore<String, String> store) throws IOException {
+        super("npcr_vocabulary", "NPCR Chinese vocabulary", Locale.CHINESE, format, store);
     }
 
     @Override

@@ -16,9 +16,14 @@ import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.GameplayException;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
+import net.fortytwo.myotherbrain.flashcards.Trial;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
-import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistoryHelper;
+import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteFlashcardsHelper;
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
+import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
+import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
+import net.fortytwo.myotherbrain.flashcards.db.memory.MemoryCardStore;
 import net.fortytwo.myotherbrain.flashcards.decks.SimpleDeck;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
@@ -28,6 +33,7 @@ import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 import net.fortytwo.myotherbrain.flashcards.games.AsynchronousGame;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Flashcards4Android extends Activity {
@@ -52,6 +58,7 @@ public class Flashcards4Android extends Activity {
     private static Flashcards4Android activity;
     private static AsynchronousGame game;
     private static SQLiteDatabase db;
+    private static GameHistory history;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -74,7 +81,7 @@ public class Flashcards4Android extends Activity {
         findViewById(R.id.correct).setOnClickListener(correct);
         findViewById(R.id.incorrect).setOnClickListener(incorrect);
 
-        SQLiteGameHistoryHelper openHelper = new SQLiteGameHistoryHelper(this);
+        SQLiteFlashcardsHelper openHelper = new SQLiteFlashcardsHelper(this);
 
         try {
             // Create the game only once.  In subsequent instances of this activity, re-use it.
@@ -122,6 +129,9 @@ public class Flashcards4Android extends Activity {
                 i.putExtras(b);
                 startActivity(i);
                 return true;
+            case R.id.save:
+                saveHistory();
+                return true;
             case R.id.settings:
                 startActivity(new Intent(this, FlashcardsSettings.class));
                 //System.out.println("settings!");
@@ -135,6 +145,29 @@ public class Flashcards4Android extends Activity {
     public void onDestroy() {
         //db.close();
         super.onDestroy();
+    }
+
+    private void saveHistory() {
+        try {
+            FileBasedGameHistory h = new FileBasedGameHistory(
+                    new File("/sdcard/flashcards-history.txt"));
+            try {
+                h.clear();
+
+                CloseableIterator<Trial> i = history.getHistory();
+                try {
+                    while (i.hasNext()) {
+                        h.log(i.next());
+                    }
+                } finally {
+                    i.close();
+                }
+            } finally {
+                h.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
     }
 
     private View.OnClickListener correct = new View.OnClickListener() {
@@ -182,11 +215,12 @@ public class Flashcards4Android extends Activity {
         //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
 
         VocabularyDeck.Format f = VocabularyDeck.Format.HTML;
-        Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f);
-        Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f);
-        Deck<String, String> frenchVocab = new FrenchVocabulary(f);
-        //Deck<String, String> germanVocab = new GermanVocabulary(f);
-        //Deck<String, String> swedishVocab = new SwedishVocabulary(f);
+        CardStore<String, String> store = new MemoryCardStore<String, String>();
+        Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f, store);
+        Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f, store);
+        Deck<String, String> frenchVocab = new FrenchVocabulary(f, store);
+        //Deck<String, String> germanVocab = new GermanVocabulary(f, store);
+        //Deck<String, String> swedishVocab = new SwedishVocabulary(f, store);
 
         SimpleDeck misc = new SimpleDeck("miscellaneous", "Miscellaneous");
         misc.addCard("meaningless random number",
@@ -207,9 +241,9 @@ public class Flashcards4Android extends Activity {
         pile.addDeck(hsk4Characters, 8);
         pile.addDeck(misc, 5);
 
-        GameHistory h = new SQLiteGameHistory(db);
+        history = new SQLiteGameHistory(db);
 
-        return new AsynchronousGame<String, String>(pile, h) {
+        return new AsynchronousGame<String, String>(pile, history) {
             @Override
             public void nextQuestion(final Card<String, String> current) {
                 Flashcards4Android a = getCurrentActivity();
@@ -223,17 +257,11 @@ public class Flashcards4Android extends Activity {
     private void showQuestion(final Card<String, String> card) {
         String text = HTML_PREFIX + card.getQuestion() + HTML_SUFFIX;
         questionText.loadDataWithBaseURL("file:///android_asset/", text, "application/xhtml+xml", "utf-8", null);
-
-        // This seems to be necessary in order to refresh the view.
-        //questionText.reload();
     }
 
     private void showAnswer(final Card<String, String> card) {
         String text = HTML_PREFIX + card.getAnswer() + HTML_SUFFIX;
         answerText.loadDataWithBaseURL("file:///android_asset/", text, "application/xhtml+xml", "utf-8", null);
-
-        // This seems to be necessary in order to refresh the view.
-        //answerText.reload();
     }
     /*
     private String htmlEscape(final String s) {

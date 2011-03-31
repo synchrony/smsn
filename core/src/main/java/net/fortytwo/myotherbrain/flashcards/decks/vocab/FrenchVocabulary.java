@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
-import net.fortytwo.myotherbrain.flashcards.Card;
+import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +12,9 @@ import java.util.Locale;
  * Time: 8:20 PM
  */
 public class FrenchVocabulary extends VocabularyDeck {
-    public FrenchVocabulary(final Format format) throws IOException {
-        super("french_vocabulary", "French vocabulary", Locale.FRENCH, format);
+    public FrenchVocabulary(final Format format,
+                            final CardStore<String, String> store) throws IOException {
+        super("french_vocabulary", "French vocabulary", Locale.FRENCH, format, store);
     }
 
     @Override
@@ -46,12 +47,14 @@ public class FrenchVocabulary extends VocabularyDeck {
     }
 
     public static void main(final String[] args) throws IOException {
-        FrenchVocabulary deck = new FrenchVocabulary(Format.HTML);
+        /*
+        CardStore<String, String> store = new MemoryCardStore<String, String>();
+        FrenchVocabulary deck = new FrenchVocabulary(Format.HTML, store);
         for (Card card : deck.getCards()) {
             if (card.getName().startsWith("zone pi")) {
                 System.out.println(card.getName() + ":");
                 System.out.println("\t" + card.getAnswer());
             }
-        }
+        }*/
     }
 }
