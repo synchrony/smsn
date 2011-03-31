@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class SQLiteFlashcardsHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "flashcards.db";
-    public static final int CURRENT_VERSION = 1;
+    public static final int CURRENT_VERSION = 2;
 
     public SQLiteFlashcardsHelper(final Context context) {
         super(context, DATABASE_NAME, null, CURRENT_VERSION);
@@ -19,6 +19,11 @@ public class SQLiteFlashcardsHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(final SQLiteDatabase db) {
+        createHistoryTable(db);
+        createCardsTable(db);
+    }
+
+    private void createHistoryTable(final SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + SQLiteGameHistory.HISTORY + " (" +
                 SQLiteGameHistory.HISTORY__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SQLiteGameHistory.HISTORY__DECK + " TEXT NOT NULL, " +
@@ -27,7 +32,9 @@ public class SQLiteFlashcardsHelper extends SQLiteOpenHelper {
                 // This does not affect ORDER BY behavior, except perhaps in terms of performance.
                 SQLiteGameHistory.HISTORY__TIME + "  TEXT NOT NULL, " +
                 SQLiteGameHistory.HISTORY__RESULT + " TEXT NOT NULL)");
+    }
 
+    private void createCardsTable(final SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + SQLiteGameHistory.CARDS + " (" +
                 SQLiteGameHistory.CARDS__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SQLiteGameHistory.CARDS__DECK + " TEXT NOT NULL, " +
@@ -39,6 +46,8 @@ public class SQLiteFlashcardsHelper extends SQLiteOpenHelper {
     public void onUpgrade(final SQLiteDatabase db,
                           final int oldVersion,
                           final int newVersion) {
-        // No need to upgrade yet.
+        if (oldVersion < 2 && newVersion >= 2) {
+            createCardsTable(db);
+        }
     }
 }

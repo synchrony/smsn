@@ -12,6 +12,8 @@ import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import java.io.IOException;
 
 /**
+ * Note: in ordering results by increasing HISTORY__ID instead of HISTORY__TIME, it is assumed that these have the same order.
+ *
  * User: josh
  * Date: 3/14/11
  * Time: 6:48 PM
@@ -31,6 +33,8 @@ public class SQLiteGameHistory extends GameHistory {
             HISTORY__CARD = "card",
             HISTORY__RESULT = "result",
             HISTORY__TIME = "time";
+
+    private final String[] COLUMNS = new String[]{HISTORY__ID, HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
 
     private final SQLiteDatabase database;
 
@@ -104,38 +108,35 @@ public class SQLiteGameHistory extends GameHistory {
 
     @Override
     public CloseableIterator<Trial> getHistory() {
-        String[] cols = new String[]{HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
         return new CursorIterator(database.query(HISTORY,
-                cols,
+                COLUMNS,
                 null,
                 null,
                 null,
                 null,
-                HISTORY__TIME));
+                HISTORY__ID));
     }
 
     @Override
     public CloseableIterator<Trial> getHistory(final Deck deck) {
-        String[] cols = new String[]{HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
         return new CursorIterator(database.query(HISTORY,
-                cols,
+                COLUMNS,
                 HISTORY__DECK + "=?",
                 new String[]{deck.getName()},
                 null,
                 null,
-                HISTORY__TIME));
+                HISTORY__ID));
     }
 
     @Override
     public CloseableIterator<Trial> getHistory(final Card card) {
-        String[] cols = new String[]{HISTORY__DECK, HISTORY__CARD, HISTORY__TIME, HISTORY__RESULT};
         return new CursorIterator(database.query(HISTORY,
-                cols,
+                COLUMNS,
                 HISTORY__DECK + "=? AND " + HISTORY__CARD + "=?",
                 new String[]{card.getDeck().getName(), card.getName()},
                 null,
                 null,
-                HISTORY__TIME));
+                HISTORY__ID));
     }
 
     private class CursorIterator implements CloseableIterator<Trial> {
@@ -155,12 +156,13 @@ public class SQLiteGameHistory extends GameHistory {
         }
 
         public Trial next() {
-            String deckName = cursor.getString(0);
-            String cardName = cursor.getString(1);
+            int id = cursor.getInt(0);
+            String deckName = cursor.getString(1);
+            String cardName = cursor.getString(2);
             //System.out.println(cardName);
-            long time = Long.valueOf(cursor.getString(2));
-            //long time = (long) cursor.getInt(2);
-            Trial.Result result = Trial.Result.valueOf(cursor.getString(3));
+            long time = Long.valueOf(cursor.getString(3));
+            //long time = (long) cursor.getInt(3);
+            Trial.Result result = Trial.Result.valueOf(cursor.getString(4));
             Trial t = new Trial(deckName, cardName, time, result);
 
             cursor.moveToNext();
@@ -170,5 +172,42 @@ public class SQLiteGameHistory extends GameHistory {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+    }
+
+    private abstract class CompoundCursorIterator implements CloseableIterator<Trial> {
+        private CloseableIterator<Trial> cur;
+        private int pageNumber = 0;
+        private final int pageSize = 500;
+        private int count = 0;
+
+        public void close() {
+            if (null != cur) {
+                cur.close();
+            }
+        }
+
+        public boolean hasNext() {
+            if (null == cur || count == pageSize) {
+                if (null != cur) {
+                    cur.close();
+                }
+                cur = new CursorIterator(createCursor(pageNumber, pageSize));
+                count = 0;
+            }
+
+            return cur.hasNext();
+        }
+
+        public Trial next() {
+            count++;
+            return cur.next();
+        }
+
+        public void remove() {
+            cur.remove();
+        }
+
+        public abstract Cursor createCursor(int pageNumber,
+                                            int pageSize);
     }
 }

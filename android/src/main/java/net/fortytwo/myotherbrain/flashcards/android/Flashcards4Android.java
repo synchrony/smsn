@@ -3,6 +3,7 @@ package net.fortytwo.myotherbrain.flashcards.android;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,8 +18,8 @@ import net.fortytwo.myotherbrain.flashcards.Deck;
 import net.fortytwo.myotherbrain.flashcards.GameplayException;
 import net.fortytwo.myotherbrain.flashcards.PriorityPile;
 import net.fortytwo.myotherbrain.flashcards.Trial;
-import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteFlashcardsHelper;
+import net.fortytwo.myotherbrain.flashcards.android.db.sqlite.SQLiteGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
@@ -28,8 +29,10 @@ import net.fortytwo.myotherbrain.flashcards.decks.SimpleDeck;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
+import net.fortytwo.myotherbrain.flashcards.decks.vocab.SwedishVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 import net.fortytwo.myotherbrain.flashcards.games.AsynchronousGame;
 
@@ -81,7 +84,7 @@ public class Flashcards4Android extends Activity {
         findViewById(R.id.correct).setOnClickListener(correct);
         findViewById(R.id.incorrect).setOnClickListener(incorrect);
 
-        SQLiteFlashcardsHelper openHelper = new SQLiteFlashcardsHelper(this);
+        SQLiteOpenHelper openHelper = new SQLiteFlashcardsHelper(this);
 
         try {
             // Create the game only once.  In subsequent instances of this activity, re-use it.
@@ -150,7 +153,8 @@ public class Flashcards4Android extends Activity {
     private void saveHistory() {
         try {
             FileBasedGameHistory h = new FileBasedGameHistory(
-                    new File("/sdcard/flashcards-history.txt"));
+                    // TODO: choose a more generic location
+                    new File("/sdcard/42/flashcards-history.txt"));
             try {
                 h.clear();
 
@@ -215,7 +219,11 @@ public class Flashcards4Android extends Activity {
         //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
 
         VocabularyDeck.Format f = VocabularyDeck.Format.HTML;
+
         CardStore<String, String> store = new MemoryCardStore<String, String>();
+        //CardStore<String, String> store = new SQLiteCardStore<String, String>(db, new VocabularySerializer(f));
+        store.clear();
+
         Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f, store);
         Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f, store);
         Deck<String, String> frenchVocab = new FrenchVocabulary(f, store);

@@ -51,7 +51,7 @@ public class VocabularySerializer implements CardSerializer<String, String> {
 
             return new VocabularyCard(name, deck, defs, format);
         } catch (JSONException e) {
-            throw new IOException(e);
+            throw new IOException("failed to deserialize card '" + name + "' of deck '" + deck.getName() + "' with data: " + data, e);
         }
     }
 }
