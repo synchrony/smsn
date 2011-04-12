@@ -27,8 +27,8 @@ public abstract class Game<Q, A> {
             DAY = HOUR * 24;
 
     private long
-            delayAfterFirstCorrect = 120000,
-            delayAfterFirstIncorrect = 60000;
+            delayAfterFirstCorrect = 240000,
+            delayAfterFirstIncorrect = 100000;
 
     // Randomized delays will be within this ratio of the precise value.
     private double delayImprecision = 0.1;
@@ -218,7 +218,7 @@ public abstract class Game<Q, A> {
 
         StringBuilder sb = new StringBuilder();
 
-        if (VocabularyDeck.Format.HTML == format) {
+        if (Deck.Format.HTML == format) {
             sb.append("<div>");
             sb.append(active.size()).append(" cards<br/>\n");
             sb.append(overdue).append(" (").append(percentOverdue).append("%) due for review");
@@ -233,7 +233,7 @@ public abstract class Game<Q, A> {
         ordered.addAll(active);
         Collections.sort(ordered, new CardComparator());
 
-        if (VocabularyDeck.Format.HTML == format) {
+        if (Deck.Format.HTML == format) {
             sb.append("<span class=\"background\">");
         }
 
@@ -245,9 +245,9 @@ public abstract class Game<Q, A> {
                 sb.append(", ");
             }
 
-            if (VocabularyDeck.Format.HTML == format) {
+            if (Deck.Format.HTML == format) {
                 sb.append("<span class=\"foreground\">");
-                sb.append(VocabularyDeck.htmlEscape(c.toString()));
+                sb.append(Deck.htmlEscape(c.toString()));
                 sb.append("</span>");
             } else {
                 sb.append(c);
@@ -257,7 +257,7 @@ public abstract class Game<Q, A> {
             sb.append(" (").append(d).append(")");
         }
 
-        if (VocabularyDeck.Format.HTML == format) {
+        if (Deck.Format.HTML == format) {
             sb.append("</span>\n</div>\n");
         }
 

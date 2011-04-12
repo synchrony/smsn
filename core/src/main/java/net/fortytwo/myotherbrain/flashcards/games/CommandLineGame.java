@@ -13,6 +13,7 @@ import net.fortytwo.myotherbrain.flashcards.db.file.FileBasedGameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.GameHistory;
 import net.fortytwo.myotherbrain.flashcards.db.memory.MemoryCardStore;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
+import net.fortytwo.myotherbrain.flashcards.decks.tech.HttpStatusCodes;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
@@ -77,7 +78,7 @@ public class CommandLineGame extends Game<String, String> {
                         showCardHistory(c);
                         break;
                     case 'i':
-                        ps.println(showQueue(VocabularyDeck.Format.TEXT));
+                        ps.println(showQueue(Deck.Format.TEXT));
                         break;
                     case 'q':
                         System.exit(0);
@@ -106,18 +107,22 @@ public class CommandLineGame extends Game<String, String> {
 
     public static void main(final String[] args) {
         try {
-            Deck<String, String> stateBorders = new USStateBorders();
-            Deck<String, String> nationalCapitals = new NationalCapitals();
-            Deck<String, String> internationalBorders = new InternationalBorders();
+            VocabularyDeck.Format f = Deck.Format.TEXT;
 
-            VocabularyDeck.Format f = VocabularyDeck.Format.TEXT;
+            Deck<String, String> stateBorders = new USStateBorders();
+            Deck<String, String> nationalCapitals = new NationalCapitals(f);
+            Deck<String, String> internationalBorders = new InternationalBorders(f);
+
             CardStore<String, String> store = new MemoryCardStore<String, String>();
+
             Deck<String, String> npcrVocabulary = new NPCRChineseVocabulary(f, store);
             Deck<String, String> hsk4Characters = new HSK4ChineseCharacters(f, store);
             Deck<String, String> hsk4Compounds = new HSK4ChineseCompounds(f, store);
             Deck<String, String> frenchVocabulary = new FrenchVocabulary(f, store);
             Deck<String, String> germanVocabulary = new GermanVocabulary(f, store);
             Deck<String, String> swedishVocabulary = new SwedishVocabulary(f, store);
+
+            Deck<String, String> httpStatusCodes = new HttpStatusCodes(f, store);
 
             //Pile<String, String> pile = new SingleDeckPile<String, String>(d);
 
@@ -133,6 +138,7 @@ public class CommandLineGame extends Game<String, String> {
             pile.addDeck(frenchVocabulary, 10);
             pile.addDeck(germanVocabulary, 10);
             pile.addDeck(swedishVocabulary, 10);
+            pile.addDeck(httpStatusCodes, 1000);
 
             GameHistory h = new FileBasedGameHistory(new File("/tmp/tmpflashcards.txt"));
 

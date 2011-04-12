@@ -1,5 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.decks.InformationSource;
 import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class FrenchVocabulary extends VocabularyDeck {
     protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
-        VocabularySource omegaWiki = new VocabularySource("OmegaWiki French-English");
+        InformationSource omegaWiki = new InformationSource("OmegaWiki French-English");
         omegaWiki.setUrl("http://www.dicts.info/uddl.php");
         omegaWiki.setTimestamp("2011-03-22T11:10:01+01:00");
 
@@ -32,7 +33,7 @@ public class FrenchVocabulary extends VocabularyDeck {
             is.close();
         }
 
-        VocabularySource wiktionary = new VocabularySource("Wiktionary French-English");
+        InformationSource wiktionary = new InformationSource("Wiktionary French-English");
         wiktionary.setUrl("http://www.dicts.info/uddl.php");
         wiktionary.setTimestamp("2011-03-23T11:21:30+01:00");
 

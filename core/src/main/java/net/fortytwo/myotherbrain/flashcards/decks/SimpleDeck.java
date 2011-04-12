@@ -18,10 +18,13 @@ import java.util.Random;
 public class SimpleDeck extends Deck<String, String> {
     private final Map<String, Card<String, String>> cards;
     private final Deck<String, String> thisDeck = this;
+    private final Format format;
 
-    public SimpleDeck(final String name,
+    public SimpleDeck(final Format format,
+                      final String name,
                       final String label) {
         super(name, label);
+        this.format = format;
         this.cards = new HashMap<String, Card<String, String>>();
     }
 
@@ -61,12 +64,18 @@ public class SimpleDeck extends Deck<String, String> {
 
         @Override
         public String getQuestion() {
-            return question;
+            QuestionFormatter f = new QuestionFormatter(deck, format);
+            f.setQuestion(question);
+            return f.format();
         }
 
         @Override
         public String getAnswer() {
-            return answer;
+            AnswerFormatter f = new AnswerFormatter(format);
+            Answer a = new Answer();
+            a.addForm(answer);
+            f.addAnswer(a);
+            return f.format();
         }
     }
 

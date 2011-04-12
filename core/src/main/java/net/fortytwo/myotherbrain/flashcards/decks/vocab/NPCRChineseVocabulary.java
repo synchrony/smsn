@@ -1,5 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.decks.InformationSource;
 import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class NPCRChineseVocabulary extends VocabularyDeck {
     protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
-        VocabularySource source = new VocabularySource("NPCR");
+        InformationSource source = new InformationSource("NPCR");
         source.setComment("New Practical Chinese Reader vocabulary list");
         source.setUrl("http://hskflashcards.com/download.php");
         source.setTimestamp("2011-3-17");

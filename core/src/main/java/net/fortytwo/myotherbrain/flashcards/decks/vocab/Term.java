@@ -1,10 +1,10 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.decks.InformationSource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class Term {//} implements Serializable {
     private String pronunciation;
     private String meaning;
     private String context;
-    private VocabularySource source;
+    private InformationSource source;
     private List<Term> examples;
 
     public Term() {
@@ -46,7 +46,7 @@ public class Term {//} implements Serializable {
 
         JSONObject s = json.optJSONObject(SOURCE);
         if (null != s) {
-            source = new VocabularySource(s);
+            source = new InformationSource(s);
         }
 
         JSONArray f = json.optJSONArray(FORMS);
@@ -165,11 +165,11 @@ public class Term {//} implements Serializable {
         this.examples = examples;
     }
 
-    public VocabularySource getSource() {
+    public InformationSource getSource() {
         return source;
     }
 
-    public void setSource(VocabularySource source) {
+    public void setSource(InformationSource source) {
         this.source = source;
     }
 

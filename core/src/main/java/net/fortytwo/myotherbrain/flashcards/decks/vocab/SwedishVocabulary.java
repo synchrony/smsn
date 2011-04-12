@@ -1,5 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.decks.InformationSource;
 import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class SwedishVocabulary extends VocabularyDeck {
         if (null == locale) {
             LOGGER.warning("locale for Swedish vocabulary is not available.  Loading an empty dictionary.");
         } else {
-            VocabularySource omegaWiki = new VocabularySource("OmegaWiki Swedish-English");
+            InformationSource omegaWiki = new InformationSource("OmegaWiki Swedish-English");
             omegaWiki.setUrl("http://www.dicts.info/uddl.php");
             omegaWiki.setTimestamp("2011-03-24T07:46:30+01:00");
 
@@ -40,7 +41,7 @@ public class SwedishVocabulary extends VocabularyDeck {
                 is.close();
             }
 
-            VocabularySource wiktionary = new VocabularySource("Wiktionary Swedish-English");
+            InformationSource wiktionary = new InformationSource("Wiktionary Swedish-English");
             wiktionary.setUrl("http://www.dicts.info/uddl.php");
             wiktionary.setTimestamp("2011-03-24T07:47:47+01:00");
 

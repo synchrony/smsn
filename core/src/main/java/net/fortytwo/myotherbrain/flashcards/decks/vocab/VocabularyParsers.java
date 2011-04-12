@@ -1,10 +1,11 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.decks.InformationSource;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
 
 /**
  * A number of static convenience methods for parsing vocabulary lists in different formats.
@@ -24,7 +25,7 @@ public class VocabularyParsers {
      */
     public static void parseDictsInfoList(final InputStream is,
                                           final Dictionary dict,
-                                          final VocabularySource source) throws IOException {
+                                          final InformationSource source) throws IOException {
         InputStreamReader r = new InputStreamReader(is, "UTF-8");
         BufferedReader br = new BufferedReader(r);
         String l;
@@ -65,7 +66,7 @@ public class VocabularyParsers {
 
     public static void parseHSK4List(final InputStream is,
                                      final Dictionary dict,
-                                     final VocabularySource source) throws IOException {
+                                     final InformationSource source) throws IOException {
         InputStreamReader r = new InputStreamReader(is, "UTF-8");
         BufferedReader br = new BufferedReader(r);
         String l;
@@ -87,7 +88,7 @@ public class VocabularyParsers {
 
     public static void parseNPCRList(final InputStream is,
                                      final Dictionary dict,
-                                     final VocabularySource source) throws IOException {
+                                     final InformationSource source) throws IOException {
         InputStreamReader r = new InputStreamReader(is, "UTF-8");
         BufferedReader br = new BufferedReader(r);
         String l;

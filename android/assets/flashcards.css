@@ -13,18 +13,28 @@ body {
 }
 
 .question {
-    font-size: xx-large;
     text-align: center;
+}
+
+.question-context {
+    text-align: center;
+    font-size: medium;
+    color: #f00;
+}
+
+.question-body {
+}
+
+.question-body-longtext {
+    font-size: x-large;
+}
+
+.question-body-shorttext {
+    font-size: xx-large;
 }
 
 .answer {
     font-size: x-large;
-}
-
-.question-context {
-    text-align: left;
-    font-size: medium;
-    color: #f00;
 }
 
 .answer-source {

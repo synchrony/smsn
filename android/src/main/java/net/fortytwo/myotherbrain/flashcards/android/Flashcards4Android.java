@@ -28,11 +28,10 @@ import net.fortytwo.myotherbrain.flashcards.db.memory.MemoryCardStore;
 import net.fortytwo.myotherbrain.flashcards.decks.SimpleDeck;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.InternationalBorders;
 import net.fortytwo.myotherbrain.flashcards.decks.geo.NationalCapitals;
+import net.fortytwo.myotherbrain.flashcards.decks.tech.HttpStatusCodes;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.FrenchVocabulary;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.GermanVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCharacters;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.HSK4ChineseCompounds;
-import net.fortytwo.myotherbrain.flashcards.decks.vocab.SwedishVocabulary;
 import net.fortytwo.myotherbrain.flashcards.decks.vocab.VocabularyDeck;
 import net.fortytwo.myotherbrain.flashcards.games.AsynchronousGame;
 
@@ -128,7 +127,7 @@ public class Flashcards4Android extends Activity {
                 //System.out.println("info_layout!");
                 Intent i = new Intent(this, FlashcardsInfo.class);
                 Bundle b = new Bundle();
-                b.putString(INFO, game.showQueue(VocabularyDeck.Format.HTML));
+                b.putString(INFO, game.showQueue(Deck.Format.HTML));
                 i.putExtras(b);
                 startActivity(i);
                 return true;
@@ -213,12 +212,12 @@ public class Flashcards4Android extends Activity {
     }
 
     private AsynchronousGame createGame(final SQLiteDatabase db) throws IOException {
-        //Deck<String, String> stateBorders = new USStateBorders();
-        Deck<String, String> nationalCapitals = new NationalCapitals();
-        Deck<String, String> internationalBorders = new InternationalBorders();
-        //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
+        VocabularyDeck.Format f = Deck.Format.HTML;
 
-        VocabularyDeck.Format f = VocabularyDeck.Format.HTML;
+        //Deck<String, String> stateBorders = new USStateBorders();
+        Deck<String, String> nationalCapitals = new NationalCapitals(f);
+        Deck<String, String> internationalBorders = new InternationalBorders(f);
+        //Deck<String, String> npcrVocabulary = new NPCRVocabulary();
 
         CardStore<String, String> store = new MemoryCardStore<String, String>();
         //CardStore<String, String> store = new SQLiteCardStore<String, String>(db, new VocabularySerializer(f));
@@ -230,7 +229,9 @@ public class Flashcards4Android extends Activity {
         //Deck<String, String> germanVocab = new GermanVocabulary(f, store);
         //Deck<String, String> swedishVocab = new SwedishVocabulary(f, store);
 
-        SimpleDeck misc = new SimpleDeck("miscellaneous", "Miscellaneous");
+        Deck<String, String> httpStatusCodes = new HttpStatusCodes(f, store);
+
+        SimpleDeck misc = new SimpleDeck(f, "miscellaneous", "Miscellaneous");
         misc.addCard("meaningless random number",
                 "What is the value of the meaningless random number generated on 2011-03-28?",
                 "0106314906");
@@ -248,6 +249,7 @@ public class Flashcards4Android extends Activity {
         pile.addDeck(hsk4Compounds, 4);
         pile.addDeck(hsk4Characters, 8);
         pile.addDeck(misc, 5);
+        pile.addDeck(httpStatusCodes, 3);
 
         history = new SQLiteGameHistory(db);
 

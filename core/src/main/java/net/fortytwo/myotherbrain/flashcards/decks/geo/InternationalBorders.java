@@ -2,11 +2,13 @@ package net.fortytwo.myotherbrain.flashcards.decks.geo;
 
 import net.fortytwo.myotherbrain.flashcards.Card;
 import net.fortytwo.myotherbrain.flashcards.Deck;
+import net.fortytwo.myotherbrain.flashcards.decks.Answer;
+import net.fortytwo.myotherbrain.flashcards.decks.AnswerFormatter;
 import net.fortytwo.myotherbrain.flashcards.db.CloseableIterator;
 import net.fortytwo.myotherbrain.flashcards.db.TrivialCloseableIterator;
+import net.fortytwo.myotherbrain.flashcards.decks.QuestionFormatter;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -19,9 +21,11 @@ import java.util.Random;
 public class InternationalBorders extends Deck<String, String> {
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();
     private final Random random = new Random();
+    private final Format format;
 
-    public InternationalBorders() throws IOException {
+    public InternationalBorders(final Format format) throws IOException {
         super("international_borders", "international borders");
+        this.format = format;
 
         for (Countries.Country c : Countries.getInstance().getCountries()) {
             if (c.neighbors.size() > 0) {
@@ -57,6 +61,7 @@ public class InternationalBorders extends Deck<String, String> {
             answer = country.neighbors.get(r);
 
             StringBuilder sb = new StringBuilder(country.name + " borders on ");
+
             boolean first = true;
             for (int i = 0; i < country.neighbors.size(); i++) {
                 if (i != r) {
@@ -76,17 +81,25 @@ public class InternationalBorders extends Deck<String, String> {
                 sb.append(" and ___?");
             }
 
-            return sb.toString();
+            QuestionFormatter t = new QuestionFormatter(deck, format);
+            t.setQuestion(sb.toString());
+
+            return t.format();
         }
 
         @Override
         public String getAnswer() {
-            return answer.name + "\n";
+            AnswerFormatter t = new AnswerFormatter(format);
+            Answer a = new Answer();
+            a.setSource(Countries.getInstance().getSource());
+            a.setMeaning(answer.name);
+            t.addAnswer(a);
+            return t.format();
         }
 
         @Override
         public String toString() {
-            return "borders:" + country.code;
+            return "intbord:" + country.code;
         }
     }
 }

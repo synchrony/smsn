@@ -1,5 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards.decks.vocab;
 
+import net.fortytwo.myotherbrain.flashcards.decks.InformationSource;
 import net.fortytwo.myotherbrain.flashcards.db.CardStore;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class HSK4ChineseCharacters extends VocabularyDeck {
     protected Dictionary createVocabulary() throws IOException {
         Dictionary dict = new Dictionary(locale);
 
-        VocabularySource source = new VocabularySource("renzhe's lists");
+        InformationSource source = new InformationSource("renzhe's lists");
         source.setComment("HSK level 4 vocabulary lists compiled by user renzhe");
         source.setUrl("http://www.chinese-forums.com/index.php?/topic/14829-hsk-character-lists/");
         source.setTimestamp("2011-3-19");

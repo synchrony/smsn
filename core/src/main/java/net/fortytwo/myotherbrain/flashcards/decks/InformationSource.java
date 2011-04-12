@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.flashcards.decks.vocab;
+package net.fortytwo.myotherbrain.flashcards.decks;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,7 +9,7 @@ import org.json.JSONObject;
  * Date: 3/24/11
  * Time: 1:06 PM
  */
-public class VocabularySource {
+public class InformationSource {
     private static final String
             LABEL = "label",
             COMMENT = "comment",
@@ -21,11 +21,11 @@ public class VocabularySource {
     private String url;
     private String timestamp;
 
-    public VocabularySource(final String label) {
+    public InformationSource(final String label) {
         this.label = label;
     }
 
-    public VocabularySource(final JSONObject json) throws JSONException {
+    public InformationSource(final JSONObject json) throws JSONException {
         label = json.getString(LABEL);
         comment = json.optString(COMMENT);
         url = json.optString(URL);
