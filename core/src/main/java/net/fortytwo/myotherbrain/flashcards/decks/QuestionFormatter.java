@@ -54,11 +54,11 @@ public class QuestionFormatter {
         sb.append("<div class=\"question-context\">").append(deck.getLabel()).append("</div>\n");
 
         sb.append("<div class=\"question-body\">\n");
-        String c = question.length() > 10
+        String c = question.length() > 20
                 ? "question-body-longtext"
                 : "question-body-shorttext";
         sb.append("<span class=\"").append(c).append("\">");
-        sb.append(question);
+        sb.append(Deck.htmlEscape(question));
         sb.append("</span>");
         sb.append("</div>\n");
 

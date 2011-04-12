@@ -68,11 +68,7 @@ public class HttpStatusCodes extends Deck<String, String> {
                         public String getQuestion() {
                             StringBuilder sb = new StringBuilder();
                             sb.append(code);
-                            if (Format.HTML == format) {
-                                sb.append(" =&nbsp;?");
-                            } else {
-                                sb.append(" = ?");
-                            }
+                            sb.append(" = ?");
 
                             QuestionFormatter f = new QuestionFormatter(deck, format);
                             f.setQuestion(sb.toString());
@@ -85,11 +81,7 @@ public class HttpStatusCodes extends Deck<String, String> {
                             Answer a = new Answer();
                             f.addAnswer(a);
                             a.setSource(source);
-                            if (Format.HTML == format) {
-                                a.addForm("<a href=\"" + url + "\">" + code + "</a>");
-                            } else {
-                                a.addForm("" + code);
-                            }
+                            a.addForm("" + code, url);
                             a.setMeaning(label);
                             return f.format();
                         }

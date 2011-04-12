@@ -32,9 +32,7 @@ class VocabularyCard extends Card<String, String> {
 
     @Override
     public String getQuestion() {
-        String question = Deck.Format.HTML == format
-                ? Deck.htmlEscape(definitions.get(0).getForms().get(0)) + " =&nbsp;?"
-                : definitions.get(0).getForms().get(0) + " = ?";
+        String question = definitions.get(0).getForms().get(0) + " = ?";
 
         QuestionFormatter f = new QuestionFormatter(deck, format);
         f.setQuestion(question);

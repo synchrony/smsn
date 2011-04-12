@@ -47,7 +47,7 @@ public class AnswerFormatter {
 
             if (a.getForms().size() > 0) {
                 // Primary form;
-                sb.append(a.getForms().get(0));
+                sb.append(a.getForms().get(0).getLabel());
 
                 // Secondary forms
                 if (2 <= a.getForms().size()) {
@@ -56,7 +56,7 @@ public class AnswerFormatter {
                         if (i > 1) {
                             sb.append("; ");
                         }
-                        sb.append(a.getForms().get(i));
+                        sb.append(a.getForms().get(i).getLabel());
                     }
                     sb.append(")");
                 }
@@ -117,10 +117,9 @@ public class AnswerFormatter {
 
             if (0 < a.getForms().size()) {
                 // Primary form;
-                String primaryForm = a.getForms().get(0);
-                primaryForm = Deck.htmlEscape(primaryForm);
+                Answer.Form primaryForm = a.getForms().get(0);
                 sb.append("<span class=\"answer-primary-form\">");
-                sb.append(primaryForm);
+                sb.append(formatForm(primaryForm));
                 sb.append("</span>");
 
                 // Secondary forms
@@ -131,9 +130,8 @@ public class AnswerFormatter {
                         if (i > 1) {
                             sb.append("; ");
                         }
-                        String form = a.getForms().get(i);
-                        form = Deck.htmlEscape(form);
-                        sb.append(form);
+                        Answer.Form form = a.getForms().get(i);
+                        sb.append(formatForm(form));
                     }
                     sb.append(")");
                     sb.append("</span>");
@@ -179,5 +177,11 @@ public class AnswerFormatter {
         sb.append("</div>\n");
 
         return sb.toString();
+    }
+
+    private String formatForm(final Answer.Form form) {
+        return null == form.getUrl()
+                ? Deck.htmlEscape(form.getLabel())
+                : "<a href=\"" + form.getUrl() + "\">" + Deck.htmlEscape(form.getLabel()) + "</a>";
     }
 }

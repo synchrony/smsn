@@ -9,7 +9,7 @@ import java.util.List;
 * Time: 4:26 PM
 */
 public class Answer {
-    private final List<String> forms = new LinkedList<String>();
+    private final List<Form> forms = new LinkedList<Form>();
     private InformationSource source;
     private String meaning;
     private String type;
@@ -19,7 +19,7 @@ public class Answer {
         return source;
     }
 
-    public List<String> getForms() {
+    public List<Form> getForms() {
         return forms;
     }
 
@@ -39,8 +39,13 @@ public class Answer {
         this.source = source;
     }
 
-    public void addForm(final String form) {
-        this.forms.add(form);
+    public void addForm(final String label) {
+        this.forms.add(new Form(label, null));
+    }
+
+    public void addForm(final String label,
+                        final String url) {
+        this.forms.add(new Form(label, url));
     }
 
     public void setMeaning(final String meaning) {
@@ -53,5 +58,24 @@ public class Answer {
 
     public void setPronuncation(final String pronunciation) {
         this.pronunciation = pronunciation;
+    }
+
+    public class Form {
+        private final String label;
+        private final String url;
+
+        public Form(final String label,
+                    final String url) {
+            this.label = label;
+            this.url = url;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getUrl() {
+            return url;
+        }
     }
 }
