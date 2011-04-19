@@ -62,14 +62,18 @@ proportion.correct.before <- function(t) {
     overall.proportion.correct(subset(trials, time < t))
 }
 
-daily.accuracy <- function(t) {
+daily_accuracy <- function(t) {
     overall.proportion.correct(subset(trials, time < t & time >= (t - 86400000)))
 }
 
 #first.trials <- data.frame(card=cards, time=mapply(first.trial.time, cards))
 
-daily.new.cards <- function(t) {
+daily_new_cards <- function(t) {
     NROW(subset(first.trials, time < t & time >= (t - 86400000)))
+}
+
+daily_trials <- function(t) {
+    NROW(subset(trials, time < t & time >= (t - 86400000)))
 }
 
 card.success.time <- function(c) {
@@ -171,17 +175,30 @@ proportion.correct("french_vocabulary")
 ################################################################################
 # plots
 
+########################################
+# overall
+
 times <- seq(min(trials$time), max(trials$time), length.out = 1000)
 plot(
     (times - min(trials$time)) / 86400000,
     mapply(proportion.correct.before, times),
     xlab="time elapsed (days)", ylab="proportion of trials correct", type="l")
+
+
+########################################
+# day by day
+
+times <- seq(min(trials$time), max(trials$time), length.out = 1000)
 plot(
     (times - min(trials$time)) / 86400000,
-    mapply(daily.accuracy, times),
+    mapply(daily_trials, times),
+    xlab="time elapsed (days)", ylab="# of trials in preceding day", type="l")
+plot(
+    (times - min(trials$time)) / 86400000,
+    mapply(daily_accuracy, times),
     xlab="time elapsed (days)", ylab="accuracy in preceding day", type="l")
 plot(
     (times - min(trials$time)) / 86400000,
-    mapply(daily.new.cards, times),
-    xlab="time elapsed (days)", ylab="new cards tried in preceding day", type="l")
+    mapply(daily_new_cards, times),
+    xlab="time elapsed (days)", ylab="# of new cards tried in preceding day", type="l")
 
