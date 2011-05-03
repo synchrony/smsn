@@ -27,8 +27,8 @@ public abstract class Game<Q, A> {
             DAY = HOUR * 24;
 
     private long
-            delayAfterFirstCorrect = 240000,
-            delayAfterFirstIncorrect = 100000;
+            delayAfterFirstCorrect = 600000,
+            delayAfterFirstIncorrect = 150000;
 
     // Randomized delays will be within this ratio of the precise value.
     private double delayImprecision = 0.1;

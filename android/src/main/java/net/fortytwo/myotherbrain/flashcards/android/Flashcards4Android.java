@@ -231,7 +231,7 @@ public class Flashcards4Android extends Activity {
 
         Deck<String, String> httpStatusCodes = new HttpStatusCodes(f, store);
 
-        SimpleDeck misc = new SimpleDeck(f, "miscellaneous", "Miscellaneous");
+        SimpleDeck misc = new SimpleDeck(f, "miscellaneous", "miscellaneous");
         misc.addCard("meaningless random number",
                 "What is the value of the meaningless random number generated on 2011-03-28?",
                 "0106314906");

@@ -16,6 +16,8 @@ import net.fortytwo.myotherbrain.R;
  * Time: 5:05 PM
  */
 public class BrainPingPopup extends Activity {
+    private static final String LOG_TAG = BrainPingPopup.class.getName();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,24 +49,14 @@ public class BrainPingPopup extends Activity {
     }
 
     private void acknowledgeBrainPing() {
-        Log.i("info_layout", "brain ping acknowledged");
-        BrainPingScheduler s = BrainPingScheduler.getInstance();
-        if (null == s) {
-            System.err.println("BrainPing scheduler is not available");
-        } else {
-            s.accept();
-        }
+        Log.i(LOG_TAG, "brain ping acknowledged");
+        // Do nothing.
         finish();
     }
 
     private void postponeBrainPing() {
-        //Log.i("info_layout", "brain ping postponed");
-        //BrainPingScheduler s = BrainPingScheduler.getInstance();
-        //if (null == s) {
-        //    System.err.println("BrainPing scheduler is not available");
-        //} else {
-        //    s.postpone();
-        //}
-        //finish();
+        Log.i(LOG_TAG, "brain ping postponed");
+        // Do nothing.
+        finish();
     }
 }

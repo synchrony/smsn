@@ -13,6 +13,9 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 import net.fortytwo.myotherbrain.R;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 
 /**
  * User: josh
@@ -22,14 +25,26 @@ import net.fortytwo.myotherbrain.R;
 public class BrainPingService extends IntentService {
     public static final int BRAINPING_ID = 1;
 
-    private static final Service INSTANCE = new BrainPingService("foo");
+    private static final Service INSTANCE;
 
-    public BrainPingService(String name) {
-        super(name);
+    static {
+        INSTANCE = new BrainPingService();
+    }
 
-                Toast.makeText(this, "BrainPingService constructor", Toast.LENGTH_LONG).show();
+    private final Collection<Pinger> pingers;
 
-        System.out.println("I have been created");
+    public BrainPingService() {
+        super("brain ping service");
+        pingers = new LinkedList<Pinger>();
+        this.add(new DeepThoughtsPinger(getApplicationContext()));
+
+        Toast.makeText(this, "BrainPingService constructor", Toast.LENGTH_LONG).show();
+
+        System.out.println("BrainPingService has been instantiated");
+    }
+
+    public void add(final Pinger p) {
+        pingers.add(p);
     }
 
     public static Service getInstance() {
@@ -73,12 +88,15 @@ public class BrainPingService extends IntentService {
     public void onCreate() {
         Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
 
+        // FIXME
+        Collection<Pinger> pingers = null;
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         new BrainPingScheduler(prefs, new Runnable() {
             public void run() {
                 doNotification();
             }
-        });
+        }, pingers);
     }
 
     @Override
@@ -87,7 +105,7 @@ public class BrainPingService extends IntentService {
 
     @Override
     public void onStart(Intent intent, int startid) {
-        System.out.println("I have been started");
+        System.out.println("BrainPingService has been started");
         //doNotification();
     }
 }

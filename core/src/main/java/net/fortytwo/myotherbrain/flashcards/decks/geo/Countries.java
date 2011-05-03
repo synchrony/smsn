@@ -127,7 +127,7 @@ public class Countries {
                         // Not all countries have a capital city in this data set (currently GAZA, WEST)
                         if (a.length > 5) {
                             City t = new City();
-                            t.name = a[2].trim();
+                            t.name = a[5].trim();
                             c.capitalCity = t;
                         }
 

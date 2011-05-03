@@ -129,7 +129,7 @@ public class CommandLineGame extends Game<String, String> {
             PriorityPile<String, String> pile = new PriorityPile<String, String>();
             //*
             //pile.addDeck(stateBorders, 1);
-            pile.addDeck(nationalCapitals, 1);
+            pile.addDeck(nationalCapitals, 1000);
             pile.addDeck(internationalBorders, 1);
             //pile.addDeck(npcrVocabulary, 4);
             pile.addDeck(hsk4Compounds, 5);
@@ -138,7 +138,7 @@ public class CommandLineGame extends Game<String, String> {
             pile.addDeck(frenchVocabulary, 10);
             pile.addDeck(germanVocabulary, 10);
             pile.addDeck(swedishVocabulary, 10);
-            pile.addDeck(httpStatusCodes, 1000);
+            pile.addDeck(httpStatusCodes, 5);
 
             GameHistory h = new FileBasedGameHistory(new File("/tmp/tmpflashcards.txt"));
 

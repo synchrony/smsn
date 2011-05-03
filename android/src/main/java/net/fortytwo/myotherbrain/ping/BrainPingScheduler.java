@@ -3,8 +3,9 @@ package net.fortytwo.myotherbrain.ping;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.Timer;
@@ -22,6 +23,13 @@ public class BrainPingScheduler {
             END_TIME = "brainping_endtime",
             FREQUENCY = "brainping_frequency";
 
+    private static final String LOG_TAG = BrainPingScheduler.class.getName();
+
+    private static final long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
+
+    // Randomized delays will be within this ratio of the precise value.
+    private static final double delayImprecision = 0.5;
+
     private static final boolean DEFAULT_ENABLED = false;
     private static final String DEFAULT_FREQUENCY = "1";
     private static final String DEFAULT_START_TIME = "10:00";
@@ -30,15 +38,14 @@ public class BrainPingScheduler {
     private final Random random = new Random();
     private final SharedPreferences prefs;
     private final Runnable task;
+    private final Collection<Pinger> pingers;
+
     private Timer timer;
 
     private boolean enabled = true;
     private int frequency = 0;
     private long startTime = -1;
     private long endTime = -1;
-
-    private Calendar[] schedule;
-    private int scheduleIndex;
 
     // FIXME: this is a hack
     private static BrainPingScheduler INSTANCE;
@@ -48,11 +55,13 @@ public class BrainPingScheduler {
     }
 
     public BrainPingScheduler(final SharedPreferences prefs,
-                              final Runnable task) {
+                              final Runnable task,
+                              final Collection<Pinger> pingers) {
         INSTANCE = this;
 
         this.prefs = prefs;
         this.task = task;
+        this.pingers = pingers;
         this.timer = new Timer();
 
         preferencesUpdated();
@@ -79,14 +88,10 @@ public class BrainPingScheduler {
             startTime = startTimeTmp;
             endTime = endTimeTmp;
 
-            Log.i("info_layout", "brain ping preferences updated");
-            scheduleNextPing(true);
+            Log.i(LOG_TAG, "brain ping preferences updated");
+// TODO: restore me
+//            schedulePings();
         }
-    }
-
-    public void accept() {
-        Log.i("info_layout", "brain ping accepted");
-        scheduleNextPing(false);
     }
 
     private long parseTime(final String time) {
@@ -112,65 +117,22 @@ public class BrainPingScheduler {
         return 1000 * 60 * (minutes + 60 * hours);
     }
 
-    private void createSchedule(final Calendar now) {
-        long n = millisToday(now);
-        Calendar morning = (Calendar) now.clone();
-        morning.set(Calendar.HOUR_OF_DAY, 0);
-        morning.set(Calendar.MINUTE, 0);
-        morning.set(Calendar.MILLISECOND, 0);
-        if (n >= endTime) {
-            morning.add(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        if (frequency < 1) {
-            throw new IllegalStateException();
-        }
-
-        schedule = new Calendar[frequency];
-        long span = endTime - startTime;
-
-        for (int i = 0; i < frequency; i++) {
-            long offset = startTime + (long) (random.nextDouble() * span);
-            Calendar c = (Calendar) morning.clone();
-            c.setTimeInMillis(c.getTimeInMillis() + offset);
-            schedule[i] = c;
-        }
-
-        Arrays.sort(schedule);
+    private long randomizeDelay(final long delay) {
+        long d = (long) (delayImprecision * delay * (random.nextDouble() * 2 - 1));
+        return delay + d;
     }
 
-    private Calendar nextPingTime(final Calendar now,
-                                  final boolean refresh) {
-        if (refresh) {
-            createSchedule(now);
-            //...
-        }
-
-        // Break out when a suitable time is found.
-        while (true) {
-            scheduleIndex++;
-
-            if (null == schedule || scheduleIndex >= schedule.length) {
-                createSchedule(now);
-                scheduleIndex = 0;
-            }
-
-            Calendar cal = schedule[scheduleIndex];
-            if (cal.compareTo(now) > 0) {
-                return cal;
-            }
-        }
-    }
-
-    private void scheduleNextPing(final boolean refreshSchedule) {
+ /*
+    private void schedulePings() {
         timer.cancel();
         timer = new Timer();
 
         if (enabled) {
             Calendar now = new GregorianCalendar();
-            Calendar next = nextPingTime(now, refreshSchedule);
+            for (Pinger p : pingers) {
+                scheduleNextPing(p, now);
+            }
 
-            Log.i("info_layout", "scheduling next ping for " + next);
 
             long delay = next.getTimeInMillis() - now.getTimeInMillis();
 
@@ -182,4 +144,61 @@ public class BrainPingScheduler {
             }, delay);
         }
     }
+
+    private void scheduleNextPing(final Pinger p,
+                                  final Calendar now) {
+        long millisPerDay = endTime - startTime;
+
+        Calendar thisMorning = (Calendar) now.clone();
+        thisMorning.set(Calendar.HOUR_OF_DAY, 0);
+        thisMorning.set(Calendar.MINUTE, 0);
+        thisMorning.set(Calendar.SECOND, 0);
+        thisMorning.set(Calendar.MILLISECOND, 0);
+
+        long f = startTime;
+        long l = MILLIS_IN_DAY - endTime;
+
+        long last = prefs.getLong(p.getName() + "_last_ping", now.getTimeInMillis());
+        long rel = thisMorning.getTimeInMillis() - last;
+        long days = rel / MILLIS_IN_DAY;
+        long rem = rel % MILLIS_IN_DAY;
+
+        long elapsed = rel - (days * gap)
+
+        long lastRel = last - now.getTimeInMillis();
+
+        //long rel = (long) (millisPerDay / p.getFrequency());
+        //rel = randomizeDelay(rel);
+
+
+        Log.i(LOG_TAG, "scheduling next '" + p.getName() + "' ping for " + next);
+    }
+
+    private long fromRelativeTime(final long rel,
+                                  final Calendar now) {
+
+    }
+
+    private long toRelativeTime(final long abs,
+                                final Calendar now) {
+        Calendar thisMorning = (Calendar) now.clone();
+        thisMorning.set(Calendar.HOUR_OF_DAY, 0);
+        thisMorning.set(Calendar.MINUTE, 0);
+        thisMorning.set(Calendar.SECOND, 0);
+        thisMorning.set(Calendar.MILLISECOND, 0);
+
+        //Calendar then = new GregorianCalendar();
+        //then.setTime(new Date(abs));
+        //int yearDiff = now.get(Calendar.YEAR) - then.get(Calendar.YEAR);
+        //int dayDiff = now.
+
+        long rel = now.getTimeInMillis() - abs;
+        long days = rel / MILLIS_IN_DAY;
+
+        Calendar then = new GregorianCalendar();
+        then.setTime(new Date(abs));
+
+
+    }
+    */
 }
