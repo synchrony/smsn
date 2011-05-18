@@ -74,44 +74,44 @@ public class MyOtherBrainTest extends TestCase {
     private Atom notFeelingIt;
 
     public void testAll() throws Exception {
-        associationLabel = item();
+        associationLabel = atom();
         associationLabel.setDescription("special value associated with the predicate of a (subject, predicate, object)" +
                 " structure which is analogous to a triple in RDF");
-        doer = item();
-        character = item();
+        doer = atom();
+        character = atom();
         character.setName("descriptive of the character of the subject, e.g. scary, endearing, etc.");
-        nationality = item();
+        nationality = atom();
         nationality.setName("nationality");
-        provenance = item();
-        memory = item();
-        unknownForgotten = item();
-        meaningOfSpeech = item();
-        tone = item();
-        petulantDefiant = item();
+        provenance = atom();
+        memory = atom();
+        unknownForgotten = atom();
+        meaningOfSpeech = atom();
+        tone = atom();
+        petulantDefiant = atom();
         petulantDefiant.setName("tone of the Hungarian guy rebuking Magnus' insult of the Finnish language");
-        contradicts = item();
-        conflictOfInterest = item();
-        supportingEvidence = item();
-        mocking = item();
-        accordingTo = item();
+        contradicts = atom();
+        conflictOfInterest = atom();
+        supportingEvidence = atom();
+        mocking = atom();
+        accordingTo = atom();
         accordingTo.setDescription("in the expressed opinion of the object, the subject is true");
-        opposites = item();
-        member = item();
-        conditionalUpon = item();
-        implies = item();
-        notFeelingIt = item();
+        opposites = atom();
+        member = atom();
+        conditionalUpon = atom();
+        implies = atom();
+        notFeelingIt = atom();
 
         Atom tmp;
 
-        Atom magnus = item();
+        Atom magnus = atom();
         magnus.setName("Magnus");
-        Atom hungarianGuy = item();
+        Atom hungarianGuy = atom();
         hungarianGuy.setName("tubby Hungarian guy with glasses (can't remember his name)");
-        Atom finnishLanguage = item();
+        Atom finnishLanguage = atom();
         finnishLanguage.setName("the Finnish language");
-        Atom ugly = item();
+        Atom ugly = atom();
         ugly.setName("ugly (of language)");
-        Atom beautiful = item();
+        Atom beautiful = atom();
         beautiful.setName("beautiful (of language)");
         opposites(beautiful, ugly).setName("beautiful and ugyl are opposite characteristics");
 
@@ -126,13 +126,13 @@ public class MyOtherBrainTest extends TestCase {
         hungarianGuySaysFinnishIsBeautiful.setName("the Hungarian guy claims that Finnish is beautiful");
 
         // Specific event of Magnus speaking
-        Atom magnusSpeaks = item();
+        Atom magnusSpeaks = atom();
         eventInMemory(magnusSpeaks).setName("I remember this indirectly");
         assoc(assoc(magnusSpeaks, finnishIsUgly),
                 meaningOfSpeech);
 
         // Specific event of the Hungarian guy speaking
-        Atom hungarianGuySpeaks = item();
+        Atom hungarianGuySpeaks = atom();
         hungarianGuySpeaks.setName("Hungarian guy says in a thick accent: \" Finnish ist eine schoene Sprache!\"");
         eventInMemory(hungarianGuySpeaks).setName("I remember this clearly, including the Hungarian's accent and tone");
         assoc(assoc(hungarianGuySpeaks, finnishIsBeautiful),
@@ -142,13 +142,13 @@ public class MyOtherBrainTest extends TestCase {
                 .setDescription("the way he said it reminds me of Mr. Finer: \"'he' is nominative case!\"");
 
         // Magnus is Swedish, Hungarian guy is Hungarian
-        Atom swedishPerson = item();
+        Atom swedishPerson = atom();
         swedishPerson.setName("Swedish");
         Association magnusIsSwedish = assertNationality(magnus, swedishPerson);
         magnusIsSwedish.setName("Magnus is Swedish");
         tmp = assertProvenance(magnusIsSwedish, memory);
         tmp.setName("I have ample memories of Magnus being Swedish, speaking Swedish");
-        Atom hungarianPerson = item();
+        Atom hungarianPerson = atom();
         hungarianPerson.setName("Hungarian");
         Association hungarianGuyIsHungarian = assertNationality(hungarianGuy, hungarianPerson);
         forgottenWhyIKnowThis(hungarianGuyIsHungarian)
@@ -158,27 +158,27 @@ public class MyOtherBrainTest extends TestCase {
         Atom magnusConflict = conflictOfInterestMakesLessPlausible(
                 magnusIsSwedish, magnusSaysFinnishIsUgly);
         magnusConflict.setName("Magnus is biased against Finnish because he is Swedish");
-        Atom swedishAnimosityTowardsFinland = item();
+        Atom swedishAnimosityTowardsFinland = atom();
         swedishAnimosityTowardsFinland.setName("possible friendly rivalry between Sweden and Finland");
         supportedBy(magnusConflict, swedishAnimosityTowardsFinland)
                 .setName("Magnus' opinion may be influenced by his Swedish attitudes towards Finland");
         Atom hungarianGuyConflict = conflictOfInterestMakesLessPlausible(
                 hungarianGuyIsHungarian, hungarianGuySaysFinnishIsBeautiful);
         hungarianGuyConflict.setName("the Hungarian guy is biased towards Finnish because he is Hungarian");
-        Atom hungarianSympathyTowardsFinnish = item();
+        Atom hungarianSympathyTowardsFinnish = atom();
         hungarianSympathyTowardsFinnish.setName("perhaps Hungarians like Finnish because it is a related language");
         supportedBy(hungarianGuyConflict, hungarianSympathyTowardsFinnish)
                 .setName("the Hungarian guy's opinion may be influenced by Hungarian attitudes towards Finnish, which is related to Hungarian");
 
         // Magnus ridicules Finnish for its "hard" phonetic character
-        Atom yksiKaksiKolme = item();
+        Atom yksiKaksiKolme = atom();
         yksiKaksiKolme.setName("\"yksi, kaksi, kolme\"");
-        Atom hardCharacter = item();
+        Atom hardCharacter = atom();
         hardCharacter.setName("\"hard\" phonetic character");
         Atom yksiIsHard = hasCharacter(yksiKaksiKolme, hardCharacter);
         yksiIsHard.setName("this expression sounds \"hard\"");
         yksiKaksiKolme.setDescription("\"one, two, three\" in Finnish");
-        Atom magnusYksiRemark = item();
+        Atom magnusYksiRemark = atom();
         magnusYksiRemark.setName("Magnus says \"yksi, kaksi, kolme\" in a mocking tone");
         eventInMemory(magnusYksiRemark)
                 .setName("I remember this clearly, including Magnus' voice and his mocking tone");
@@ -206,12 +206,12 @@ public class MyOtherBrainTest extends TestCase {
 
     public void testInference() {
         // Is Finnish a beautiful language?  If so, why?  If not, why not?
-        
+
     }
 
     ////////////////////////////////////
 
-    private Atom item() {
+    private Atom atom() {
         return wc.createAtom(Atom.class);
     }
 
@@ -304,8 +304,8 @@ public class MyOtherBrainTest extends TestCase {
     }
 
     private Atom opposites(final Atom first,
-                                     final Atom second) {
-        Atom statement = item();
+                           final Atom second) {
+        Atom statement = atom();
         assoc(statement, opposites);
         labeledAssociation(statement, first, member);
         labeledAssociation(statement, second, member);

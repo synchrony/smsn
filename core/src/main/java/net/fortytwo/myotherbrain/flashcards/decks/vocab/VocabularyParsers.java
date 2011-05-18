@@ -18,15 +18,15 @@ public class VocabularyParsers {
     /**
      * Parses vocabulary lists in the format provided by http://www.dicts.info/uddl.php
      *
-     * @param is     the <code>InputStream</code> to parse
+     * @param in     the <code>InputStream</code> to parse
      * @param dict   the dictionary into which to place parsed definitions
      * @param source the source of this definition (e.g. an online dictionary)
      * @throws IOException if parsing fails
      */
-    public static void parseDictsInfoList(final InputStream is,
+    public static void parseDictsInfoList(final InputStream in,
                                           final Dictionary dict,
                                           final InformationSource source) throws IOException {
-        InputStreamReader r = new InputStreamReader(is, "UTF-8");
+        InputStreamReader r = new InputStreamReader(in, "UTF-8");
         BufferedReader br = new BufferedReader(r);
         String l;
         while ((l = br.readLine()) != null) {
