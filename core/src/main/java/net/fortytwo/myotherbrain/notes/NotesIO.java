@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * User: josh
@@ -16,6 +17,15 @@ import java.util.List;
  * Time: 6:00 PM
  */
 public class NotesIO {
+    private static final int MAX_TYPE_LENGTH = 5;
+
+    // Regex of valid id prefixes, including parentheses, colon and trailing space
+    // TODO: are '=' and '-' the usual base-64 filler characters?
+    private final Pattern ID = Pattern.compile("\\([a-zA-Z0-9=-]+:[a-zA-Z0-9=-]+\\) ");
+
+    // Tabs count as four spaces each.
+    private static final String TAB_REPLACEMENT = "    ";
+
     public void write(final List<NoteContext> notes,
                       final OutputStream out) {
         PrintStream p = new PrintStream(out);
@@ -54,11 +64,32 @@ public class NotesIO {
                 context = new NoteContext(text);
                 contexts.add(context);
             } else {
-                int indent = 0;
+                Note.Id id = null;
 
+                // Extract id
+                if (l.startsWith("(")) {
+                    int k = l.indexOf(") ");
+                    if (k < 0) {
+                        throw new NoteParsingException(lineNumber, "line terminated within apparent note ID");
+                    }
+
+                    String s = l.substring(0, k + 2);
+                    if (!ID.matcher(s).matches()) {
+                        throw new NoteParsingException(lineNumber, "invalid note ID");
+                    }
+
+                    int i = s.indexOf(":");
+                    int j = s.indexOf(")");
+                    id = new Note.Id(s.substring(i + 1, j), s.substring(1, i));
+
+                    l = l.substring(k + 2);
+                }
+
+                // Find indent level
+                int indent = 0;
                 if (l.startsWith(" ") || l.startsWith("\t")) {
                     // Tabs count as four spaces.
-                    l = l.replaceAll("[\\t]", "    ");
+                    l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
                     int i = 0;
                     while (l.charAt(i) == ' ') {
                         i++;
@@ -90,12 +121,9 @@ public class NotesIO {
                 if (j < 0) {
                     j = l.length();
                 }
-                //if (j < 0) {
-                //    throw new NoteParsingException(lineNumber, "no note type");
-                //}
 
                 String type = l.substring(0, j);
-                if (type.length() > 5) {
+                if (type.length() > MAX_TYPE_LENGTH) {
                     throw new NoteParsingException(lineNumber, "apparent note type is too long: " + type);
                 }
                 l = l.substring(j);
@@ -173,6 +201,10 @@ public class NotesIO {
                     n.setQualifier(qualifier);
                 }
 
+                if (null != id) {
+                    n.setId(id);
+                }
+
                 if (0 < indent) {
                     hierarchy.get(hierarchy.size() - 1).addChild(n);
                 } else {
@@ -210,6 +242,14 @@ public class NotesIO {
     private static void printNote(final Note n,
                                   final int indent,
                                   final PrintStream p) {
+        if (null != n.getId()) {
+            p.print("(");
+            p.print(n.getId().getAssociationId());
+            p.print(":");
+            p.print(n.getId().getAtomId());
+            p.print(") ");
+        }
+
         for (int i = 0; i < indent; i++) {
             p.print("    ");
         }

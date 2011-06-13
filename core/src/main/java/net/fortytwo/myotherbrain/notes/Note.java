@@ -12,6 +12,7 @@ public class Note extends NoteNode {
     private final String type;
     private final List<Note> children;
     private String qualifier;
+    private Id id;
 
     public Note(final String type,
                 final String text) {
@@ -39,5 +40,31 @@ public class Note extends NoteNode {
 
     public void setQualifier(String qualifier) {
         this.qualifier = qualifier;
+    }
+
+    public Id getId() {
+        return id;
+    }
+
+    public void setId(Id id) {
+        this.id = id;
+    }
+
+    public static class Id {
+        private final String atomId;
+        private final String associationId;
+
+        public Id(String atomId, String associationId) {
+            this.atomId = atomId;
+            this.associationId = associationId;
+        }
+
+        public String getAtomId() {
+            return atomId;
+        }
+
+        public String getAssociationId() {
+            return associationId;
+        }
     }
 }
