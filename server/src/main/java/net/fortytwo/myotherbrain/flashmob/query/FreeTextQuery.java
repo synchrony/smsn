@@ -1,11 +1,10 @@
 package net.fortytwo.myotherbrain.flashmob.query;
 
 import net.fortytwo.myotherbrain.flashmob.model.FlashMOBFirstClassItem;
-import net.fortytwo.myotherbrain.query.WeightedValue;
 import net.fortytwo.myotherbrain.model.concepts.Atom;
-import net.fortytwo.myotherbrain.query.FreeTextQueries;
 import net.fortytwo.myotherbrain.query.Handler;
 import net.fortytwo.myotherbrain.query.QueryException;
+import net.fortytwo.myotherbrain.query.WeightedValue;
 
 /**
  * Author: josh
@@ -46,6 +45,10 @@ public class FreeTextQuery implements FlashMOBQuery {
             }
         };
 
+        // TODO: restore free-text search in some form
+
+        /*
         FreeTextQueries.executeFreetextSearch(queryExpression, handler, c.getModelConnection());
+        */
     }
 }

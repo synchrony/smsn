@@ -1,26 +1,12 @@
 package net.fortytwo.myotherbrain.query;
 
-import info.aduna.iteration.CloseableIteration;
-import net.fortytwo.myotherbrain.model.MOBModelConnection;
-import net.fortytwo.myotherbrain.model.concepts.Atom;
-import org.neo4j.rdf.sail.FulltextQueryResult;
-import org.neo4j.rdf.sail.NeoRdfSailConnection;
-import org.openrdf.elmo.Entity;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailException;
-
-import javax.xml.namespace.QName;
-import java.util.Arrays;
-
 /**
  * Author: josh
  * Date: Jul 15, 2009
  * Time: 6:26:50 PM
  */
 public class FreeTextQueries {
+    /*
     public static void executeFreetextSearch(final String query,
                                              final Handler<WeightedValue<Atom>, QueryException> handler,
                                              final MOBModelConnection c) throws QueryException {
@@ -80,5 +66,5 @@ public class FreeTextQueries {
                 handler.handle(f);
             }
         }
-    }
+    } */
 }

@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain;
 
-import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.MOBModel;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.concepts.Account;
 import net.fortytwo.myotherbrain.model.concepts.Association;
 import net.fortytwo.myotherbrain.model.concepts.Atom;
@@ -14,15 +14,6 @@ import net.fortytwo.myotherbrain.model.concepts.WebResource;
 import net.fortytwo.myotherbrain.tools.properties.PropertyException;
 import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
 import org.apache.log4j.Logger;
-import org.neo4j.api.core.EmbeddedNeo;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.rdf.fulltext.FulltextIndex;
-import org.neo4j.rdf.fulltext.SimpleFulltextIndex;
-import org.neo4j.rdf.sail.NeoSail;
-import org.neo4j.rdf.sail.rmi.RmiSailClient;
-import org.neo4j.rdf.store.CachingLuceneIndexService;
-import org.neo4j.rdf.store.VerboseQuadStore;
-import org.neo4j.util.index.IndexService;
 import org.openrdf.concepts.owl.ObjectProperty;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoModule;
@@ -45,10 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.Properties;
 
 /**
@@ -226,11 +213,16 @@ public class MOBStore {
             sail = createMemoryStore();
         } else if (sailType.equals(NativeStore.class.getName())) {
             sail = createNativeStore();
-        } else if (sailType.equals(NeoSail.class.getName())) {
+        }
+
+        /*
+        else if (sailType.equals(NeoSail.class.getName())) {
             sail = createNeoSail();
         } else if (sailType.equals(RmiSailClient.class.getName())) {
             sail = createRMISailClient();
-        } else {
+        }*/
+
+        else {
             throw new MOBStoreException("unhandled Sail type: " + sailType);
         }
 
@@ -271,6 +263,7 @@ public class MOBStore {
         return sail;
     }
 
+    /*
     private Sail createNeoSail() throws MOBStoreException {
         TypedProperties props = MyOtherBrain.getConfiguration();
 
@@ -336,5 +329,5 @@ public class MOBStore {
         // initialized on the server side.
 
         return sail;
-    }
+    }*/
 }

@@ -1,7 +1,6 @@
 package net.fortytwo.myotherbrain.model;
 
 import net.fortytwo.myotherbrain.access.Quotas;
-import org.neo4j.rdf.sail.NeoSail;
 import org.openrdf.elmo.ElmoManager;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
@@ -48,7 +47,8 @@ public class MOBModelConnection {
     }
 
     // FIXME: this is a hack
+    /*
     public boolean freeTextSearchSupported() {
         return model.getSail() instanceof NeoSail;
-    }
+    } */
 }
