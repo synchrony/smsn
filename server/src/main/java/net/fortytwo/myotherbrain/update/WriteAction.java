@@ -40,7 +40,7 @@ public abstract class WriteAction extends UndoableAction<WriteContext, UpdateExc
         if (null == subject) {
             throw new NullPointerException();
         }
-        
+
         this.subject = c.normalizeResourceURI(subject);
     }
 

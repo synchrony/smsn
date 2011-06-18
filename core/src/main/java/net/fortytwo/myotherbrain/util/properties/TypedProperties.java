@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.tools.properties;
+package net.fortytwo.myotherbrain.util.properties;
 
 import java.io.File;
 import java.net.MalformedURLException;

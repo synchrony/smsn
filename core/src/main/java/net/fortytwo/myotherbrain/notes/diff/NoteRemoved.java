@@ -8,7 +8,7 @@ package net.fortytwo.myotherbrain.notes.diff;
 public class NoteRemoved {
     private final String associationId;
 
-    public NoteRemoved(String associationId) {
+    public NoteRemoved(final String associationId) {
         this.associationId = associationId;
 
         if (null == associationId) {

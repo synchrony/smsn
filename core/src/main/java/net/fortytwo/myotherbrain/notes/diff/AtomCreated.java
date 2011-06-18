@@ -11,7 +11,10 @@ public class AtomCreated {
     private final String name;
     private final String description;
 
-    public AtomCreated(String id, String type, String name, String description) {
+    public AtomCreated(final String id,
+                       final String type,
+                       final String name,
+                       final String description) {
         this.id = id;
         this.type = type;
         this.name = name;

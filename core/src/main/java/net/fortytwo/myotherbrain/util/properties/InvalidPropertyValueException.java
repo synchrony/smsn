@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.tools.properties;
+package net.fortytwo.myotherbrain.util.properties;
 
 /**
  * Author: josh

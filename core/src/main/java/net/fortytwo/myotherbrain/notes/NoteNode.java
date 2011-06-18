@@ -11,10 +11,10 @@ public abstract class NoteNode {
     public NoteNode(final String text) {
         this.text = text;
 
-        if (null == text) {
-            throw new IllegalArgumentException("note text must be non-null" +
-                    " (although it may be an empty string)");
-        }
+        //if (null == text) {
+        //    throw new IllegalArgumentException("note text must be non-null" +
+        //            " (although it may be an empty string)");
+        //}
     }
 
     public String getText() {

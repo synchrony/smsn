@@ -1,21 +1,8 @@
 package net.fortytwo.myotherbrain;
 
-import net.fortytwo.myotherbrain.access.AccessManager;
-import net.fortytwo.myotherbrain.access.Session;
-import net.fortytwo.myotherbrain.model.MOBModel;
-import net.fortytwo.myotherbrain.model.MOBModelConnection;
-import net.fortytwo.myotherbrain.model.concepts.Association;
-import net.fortytwo.myotherbrain.model.concepts.Atom;
-import net.fortytwo.myotherbrain.tools.properties.PropertyException;
-import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
-import net.fortytwo.myotherbrain.update.WriteAction;
-import net.fortytwo.myotherbrain.update.WriteContext;
-import net.fortytwo.myotherbrain.update.actions.BreakAssociation;
-import net.fortytwo.myotherbrain.update.actions.SetName;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.memory.MemoryStore;
+
+import net.fortytwo.myotherbrain.util.properties.PropertyException;
+import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -25,6 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,6 +36,13 @@ public class MyOtherBrain {
             VERSION = "net.fortytwo.myotherbrain.version",
             REVISION = "net.fortytwo.myotherbrain.revision";
 
+    public static final String
+            CREATED = "created",
+            MEMBER = "member",
+            TEXT = "text",
+            TYPE = "type",
+            WEIGHT = "weight";
+
     /*public static final URI[] LEGAL_DATATYPE_URIS = {
             XMLSchema.STRING
     };*/
@@ -61,9 +56,6 @@ public class MyOtherBrain {
     private static TypedProperties CONFIGURATION;
 
     static {
-        PropertyConfigurator.configure(
-                MyOtherBrain.class.getResource(LOGGING_PROPERTIES_FILE));
-
         LOGGER = getLogger(MyOtherBrain.class);
 
         CONFIGURATION = new TypedProperties();
@@ -87,7 +79,7 @@ public class MyOtherBrain {
     }
 
     public static Logger getLogger(final Class c) {
-        return Logger.getLogger(c);
+        return Logger.getLogger(c.getName());
     }
 
     public static TypedProperties getConfiguration() {
@@ -112,80 +104,6 @@ public class MyOtherBrain {
         }
 
         return name + " " + version + ", revision #" + revision;
-    }
-
-    private void doit() throws Exception {
-        MOBStore store = MOBStore.getDefaultStore();
-
-        /*
-        Repository repo = new SailRepository(store.getSail());
-        RepositoryConnection rc = repo.getConnection();
-        try {
-            rc.add(new File("/Users/josh/projects/fortytwo/myotherbrain/backup/dump_2009_07_16.trig"), "", RDFFormat.TRIG);
-            rc.commit();
-        } finally {
-            rc.close();
-        } */
-
-        store.dump(System.out);
-    }
-
-    public static void main(final String[] args) throws Exception {
-        (new MyOtherBrain()).doit();
-
-        //*
-        java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MyOtherBrain.class.getName());
-        logger.info(getVersionInfo());
-
-        Sail sail = new MemoryStore();
-        sail.initialize();
-        try {
-            MOBStore store = new MOBStore(sail);
-            store.initialize();
-
-            try {
-                store.generateSeedData();
-
-                AccessManager am = new AccessManager(store);
-                am.createAccount("bob", "bobspassword", "bob@example.org");
-                am.changeUserName("bob", "robert");
-                am.changeUserName("robert", "bobby");
-
-                Session session = am.createSession("bobby");
-                MOBModel model = session.getModel();
-                MOBModelConnection c = model.createConnection();
-                try {
-                    WriteContext wc = new WriteContext(c);
-
-                    Atom telephone = wc.createAtom(Atom.class);
-                    telephone.setName("telephone");
-                    telephone.setDescription("a device for voice communication at a distance");
-                    Atom red = wc.createAtom(Atom.class);
-                    red.setName("red");
-                    red.setDescription("the color red");
-                    Association a = wc.createAtom(Association.class);
-                    a.setSubject(telephone);
-                    a.setObject(red);
-
-                    WriteAction action = new SetName(toURI(red.getQName()), "blue", wc);
-                    action.redo(wc);
-                    action.undo(wc);
-
-                    WriteAction action2 = new BreakAssociation(toURI(a.getQName()), wc);
-                    action2.redo(wc);
-                    action2.undo(wc);
-
-                    c.commit();
-                } finally {
-                    c.close();
-                }
-            } finally {
-                store.dump(System.out);
-                store.shutDown();
-            }
-        } finally {
-            sail.shutDown();
-        }         //*/
     }
 
     ////////////////////////////////////////////////////////////////////////////

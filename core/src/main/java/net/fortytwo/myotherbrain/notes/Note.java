@@ -12,7 +12,8 @@ public class Note extends NoteNode {
     private final String type;
     private final List<Note> children;
     private String qualifier;
-    private Id id;
+    private String atomId;
+    private String associationId;
 
     public Note(final String type,
                 final String text) {
@@ -42,29 +43,32 @@ public class Note extends NoteNode {
         this.qualifier = qualifier;
     }
 
-    public Id getId() {
-        return id;
+    public String getAtomId() {
+        return atomId;
     }
 
-    public void setId(Id id) {
-        this.id = id;
+    public String getAssociationId() {
+        return associationId;
     }
 
-    public static class Id {
-        private final String atomId;
-        private final String associationId;
+    public void setAtomId(String atomId) {
+        this.atomId = atomId;
+    }
 
-        public Id(String atomId, String associationId) {
-            this.atomId = atomId;
-            this.associationId = associationId;
-        }
+    public void setAssociationId(String associationId) {
+        this.associationId = associationId;
+    }
 
-        public String getAtomId() {
-            return atomId;
+    @Override
+    public String toString() {
+        String d = getText();
+        if (null != d && d.length() > 20) {
+            d = d.substring(0, 17) + "...";
         }
-
-        public String getAssociationId() {
-            return associationId;
+        String t = getType();
+        if (null != t && t.length() > 20) {
+            t = t.substring(0, 17) + "...";
         }
+        return "note(" + t + ", " + d + ")";
     }
 }

@@ -46,17 +46,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>frames</artifactId>
-            <version>0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-core</artifactId>
-            <version>0.8</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>1.0</version>

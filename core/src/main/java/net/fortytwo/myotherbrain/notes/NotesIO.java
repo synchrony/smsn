@@ -64,7 +64,8 @@ public class NotesIO {
                 context = new NoteContext(text);
                 contexts.add(context);
             } else {
-                Note.Id id = null;
+                String atomId = null;
+                String associationId = null;
 
                 // Extract id
                 if (l.startsWith("(")) {
@@ -80,7 +81,8 @@ public class NotesIO {
 
                     int i = s.indexOf(":");
                     int j = s.indexOf(")");
-                    id = new Note.Id(s.substring(i + 1, j), s.substring(1, i));
+                    atomId = s.substring(i + 1, j);
+                    associationId = s.substring(1, i);
 
                     l = l.substring(k + 2);
                 }
@@ -201,8 +203,12 @@ public class NotesIO {
                     n.setQualifier(qualifier);
                 }
 
-                if (null != id) {
-                    n.setId(id);
+                if (null != atomId) {
+                    n.setAtomId(atomId);
+                }
+
+                if (null != associationId) {
+                    n.setAssociationId(associationId);
                 }
 
                 if (0 < indent) {
@@ -242,11 +248,15 @@ public class NotesIO {
     private static void printNote(final Note n,
                                   final int indent,
                                   final PrintStream p) {
-        if (null != n.getId()) {
+        if (null != n.getAtomId() || null != n.getAssociationId()) {
             p.print("(");
-            p.print(n.getId().getAssociationId());
+            if (null != n.getAssociationId()) {
+                p.print(padId(n.getAssociationId()));
+            }
             p.print(":");
-            p.print(n.getId().getAtomId());
+            if (null != n.getAtomId()) {
+                p.print(padId(n.getAtomId()));
+            }
             p.print(") ");
         }
 
@@ -254,7 +264,7 @@ public class NotesIO {
             p.print("    ");
         }
 
-        p.print(0 == n.getType().length() ? "_" : n.getType());
+        p.print(null == n.getType() || 0 == n.getType().length() ? "_" : n.getType());
         p.print("  ");
 
         p.print(n.getText());
@@ -266,6 +276,14 @@ public class NotesIO {
         }
     }
 
+    private static String padId( String id) {
+        while (id.length() < 5) {
+            id = "0" + id;
+        }
+
+        return id;
+    }
+
     public static void main(final String[] args) throws Exception {
         NotesIO p = new NotesIO();
         List<NoteContext> contexts;
@@ -273,9 +291,10 @@ public class NotesIO {
         InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
         try {
             contexts = p.parse(in);
-            p.write(contexts, System.out);
         } finally {
             in.close();
         }
+
+        p.write(contexts, System.out);
     }
 }

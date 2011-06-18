@@ -2,8 +2,8 @@ package net.fortytwo.myotherbrain.access;
 
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.access.error.QuotaException;
-import net.fortytwo.myotherbrain.tools.properties.PropertyException;
-import net.fortytwo.myotherbrain.tools.properties.TypedProperties;
+import net.fortytwo.myotherbrain.util.properties.PropertyException;
+import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 
 import java.net.URI;
 
