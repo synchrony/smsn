@@ -35,6 +35,14 @@ public class NotesIO {
         }
     }
 
+    public void writeChildren(final Note note,
+                              final OutputStream out) {
+        PrintStream p = new PrintStream(out);
+        for (Note n : note.getChildren()) {
+            printNote(n, 0, p);
+        }
+    }
+
     public List<NoteContext> parse(final InputStream in) throws IOException, NoteParsingException {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
         NoteContext context = null;

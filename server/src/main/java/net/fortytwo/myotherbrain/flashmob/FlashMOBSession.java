@@ -9,17 +9,17 @@ import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryExecutor;
 import net.fortytwo.myotherbrain.flashmob.query.FlashMOBQueryResult;
 import net.fortytwo.myotherbrain.flashmob.update.ActionFactory;
 import net.fortytwo.myotherbrain.flashmob.update.actions.ActionBean;
-import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.model.MOBModelConnection;
+import net.fortytwo.myotherbrain.model.MOBOntology;
 import net.fortytwo.myotherbrain.query.QueryException;
-import net.fortytwo.myotherbrain.util.properties.PropertyException;
-import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 import net.fortytwo.myotherbrain.update.WriteAction;
 import net.fortytwo.myotherbrain.update.WriteContext;
-import org.apache.log4j.Logger;
+import net.fortytwo.myotherbrain.util.properties.PropertyException;
+import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 
 import javax.xml.namespace.QName;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Author: josh

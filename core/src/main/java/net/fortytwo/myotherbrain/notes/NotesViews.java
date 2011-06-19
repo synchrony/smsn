@@ -68,6 +68,34 @@ public class NotesViews {
         return n;
     }
 
+    public Atom toGraph(final NoteContext context) {
+        Atom self = getOrCreateAtom(context.getAtomId());
+
+        if (null != context.getText()) {
+            self.setText(context.getText());
+        }
+
+        self.setType(".");
+
+        for (NoteContext child : context.getChildren()) {
+            Atom ass = getOrCreateAtom(child.getAssociationId());
+
+            Atom c = toGraph(child);
+            ass.addMember(self);
+            ass.addMember(c);
+        }
+
+        for (Note child : context.getNotes()) {
+            Atom ass = getOrCreateAtom(child.getAssociationId());
+
+            Atom c = toGraph(child);
+            ass.addMember(self);
+            ass.addMember(c);
+        }
+
+        return self;
+    }
+
     public Atom toGraph(final Note note) {
 
         Atom self = getOrCreateAtom(note.getAtomId());
@@ -94,14 +122,10 @@ public class NotesViews {
     public void toGraph(final List<NoteContext> notes,
                         final Atom ref) {
         for (NoteContext c : notes) {
-            for (Note n : c.getNotes()) {
-                Atom a = toGraph(n);
-                Atom ass = getOrCreateAtom(n.getAssociationId());
-                ass.addMember(ref);
-                ass.addMember(a);
-            }
-
-            toGraph(c.getChildren(), ref);
+            Atom a = toGraph(c);
+            Atom ass = getOrCreateAtom(c.getAssociationId());
+            ass.addMember(ref);
+            ass.addMember(a);
         }
     }
 
@@ -142,8 +166,8 @@ public class NotesViews {
         NotesIO p = new NotesIO();
         List<NoteContext> contexts;
 
-        InputStream in = new FileInputStream("/tmp/notes.txt");
-//        InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
+        //InputStream in = new FileInputStream("/tmp/notes.txt");
+        InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
         try {
             contexts = p.parse(in);
         } finally {
@@ -154,18 +178,15 @@ public class NotesViews {
         FramesManager manager = new FramesManager(graph);
         NotesViews m = new NotesViews(graph, manager);
         Atom root = m.getOrCreateAtom(null);
-        root.setText("[root]");
+        root.setText("Josh's notes");
+        root.setType(".");
 
         m.toGraph(contexts, root);
 
         GraphMLWriter.outputGraph(graph, System.out);
         System.out.println();
 
-        Note n = m.toNote((String) root.element().getId(), null, 5);
-        NoteContext c = new NoteContext("stuff");
-        c.addNote(n);
-        List<NoteContext> s = new LinkedList<NoteContext>();
-        s.add(c);
-        p.write(s, System.out);
+        Note n = m.toNote((String) root.element().getId(), null, 3);
+        p.writeChildren(n, System.out);
     }
 }

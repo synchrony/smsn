@@ -7,6 +7,8 @@ package net.fortytwo.myotherbrain.notes;
  */
 public abstract class NoteNode {
     private final String text;
+    protected String atomId;
+    protected String associationId;
 
     public NoteNode(final String text) {
         this.text = text;
@@ -19,5 +21,21 @@ public abstract class NoteNode {
 
     public String getText() {
         return text;
+    }
+
+    public String getAtomId() {
+        return atomId;
+    }
+
+    public String getAssociationId() {
+        return associationId;
+    }
+
+    public void setAtomId(String atomId) {
+        this.atomId = atomId;
+    }
+
+    public void setAssociationId(String associationId) {
+        this.associationId = associationId;
     }
 }

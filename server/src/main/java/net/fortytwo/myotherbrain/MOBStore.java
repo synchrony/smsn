@@ -13,7 +13,6 @@ import net.fortytwo.myotherbrain.model.concepts.SensitivityLevel;
 import net.fortytwo.myotherbrain.model.concepts.WebResource;
 import net.fortytwo.myotherbrain.util.properties.PropertyException;
 import net.fortytwo.myotherbrain.util.properties.TypedProperties;
-import org.apache.log4j.Logger;
 import org.openrdf.concepts.owl.ObjectProperty;
 import org.openrdf.concepts.owl.Thing;
 import org.openrdf.elmo.ElmoModule;
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Author: josh
@@ -65,7 +65,7 @@ public class MOBStore {
                         defaultStore.shutDown();
                         //defaultStore.getSail().shutDown();
                     } catch (Throwable t) {
-                        LOGGER.error("failure in store shutdown", t);
+                        LOGGER.severe("failure in store shutdown: " + t);
                     }
                 }
             });
@@ -99,7 +99,7 @@ public class MOBStore {
             throw new IllegalStateException("store has already been initialized");
         }
 
-        LOGGER.debug("initializing MOB store");
+        LOGGER.fine("initializing MOB store");
 
         repository = new SailRepository(sail);
 
@@ -157,7 +157,7 @@ public class MOBStore {
             throw new IllegalStateException("not yet initialized");
         }
 
-        LOGGER.debug("shutting down MOB store");
+        LOGGER.fine("shutting down MOB store");
 
         // Note: elmoModule doesn't need to be closed or shutDown.
 
@@ -230,7 +230,7 @@ public class MOBStore {
     }
 
     private Sail createMemoryStore() throws MOBStoreException {
-        LOGGER.debug("instantiating MemoryStore");
+        LOGGER.fine("instantiating MemoryStore");
 
         Sail sail = new MemoryStore();
         try {
@@ -252,7 +252,7 @@ public class MOBStore {
             throw new MOBStoreException(e);
         }
 
-        LOGGER.debug("insstantiating NativeStore in directory: " + dir);
+        LOGGER.fine("insstantiating NativeStore in directory: " + dir);
         Sail sail = new NativeStore(dir);
         try {
             sail.initialize();
