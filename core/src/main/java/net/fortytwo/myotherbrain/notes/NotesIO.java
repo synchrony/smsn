@@ -231,6 +231,22 @@ public class NotesIO {
         return contexts;
     }
 
+    public List<Note> flatten(final List<NoteContext> contexts) {
+        List<Note> notes = new LinkedList<Note>();
+        for (NoteContext c : contexts) {
+            Note n = new Note(".", c.getText());
+            notes.add(n);
+
+            if (c.getChildren().size() > 0) {
+                n.getChildren().addAll(flatten(c.getChildren()));
+            }
+
+            n.getChildren().addAll(c.getNotes());
+        }
+
+        return notes;
+    }
+
     public class NoteParsingException extends Exception {
         public NoteParsingException(final int lineNumber,
                                     final String message) {
@@ -283,7 +299,7 @@ public class NotesIO {
         }
     }
 
-    private static String padId( String id) {
+    private static String padId(String id) {
         while (id.length() < 5) {
             id = "0" + id;
         }

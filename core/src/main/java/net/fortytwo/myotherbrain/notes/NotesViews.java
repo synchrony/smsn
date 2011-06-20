@@ -68,34 +68,6 @@ public class NotesViews {
         return n;
     }
 
-    public Atom toGraph(final NoteContext context) {
-        Atom self = getOrCreateAtom(context.getAtomId());
-
-        if (null != context.getText()) {
-            self.setText(context.getText());
-        }
-
-        self.setType(".");
-
-        for (NoteContext child : context.getChildren()) {
-            Atom ass = getOrCreateAtom(child.getAssociationId());
-
-            Atom c = toGraph(child);
-            ass.addMember(self);
-            ass.addMember(c);
-        }
-
-        for (Note child : context.getNotes()) {
-            Atom ass = getOrCreateAtom(child.getAssociationId());
-
-            Atom c = toGraph(child);
-            ass.addMember(self);
-            ass.addMember(c);
-        }
-
-        return self;
-    }
-
     public Atom toGraph(final Note note) {
 
         Atom self = getOrCreateAtom(note.getAtomId());
@@ -119,9 +91,9 @@ public class NotesViews {
         return self;
     }
 
-    public void toGraph(final List<NoteContext> notes,
+    public void toGraph(final List<Note> notes,
                         final Atom ref) {
-        for (NoteContext c : notes) {
+        for (Note c : notes) {
             Atom a = toGraph(c);
             Atom ass = getOrCreateAtom(c.getAssociationId());
             ass.addMember(ref);
@@ -164,12 +136,12 @@ public class NotesViews {
 
     public static void main(final String[] args) throws Exception {
         NotesIO p = new NotesIO();
-        List<NoteContext> contexts;
+        List<Note> notes;
 
         //InputStream in = new FileInputStream("/tmp/notes.txt");
         InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
         try {
-            contexts = p.parse(in);
+            notes = p.flatten(p.parse(in));
         } finally {
             in.close();
         }
@@ -181,7 +153,7 @@ public class NotesViews {
         root.setText("Josh's notes");
         root.setType(".");
 
-        m.toGraph(contexts, root);
+        m.toGraph(notes, root);
 
         GraphMLWriter.outputGraph(graph, System.out);
         System.out.println();

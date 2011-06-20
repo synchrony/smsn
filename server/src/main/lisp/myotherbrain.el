@@ -27,7 +27,7 @@
     (let ((atom-id (car (last (find-id)))))
         (if atom-id
             (url-retrieve
-                (concat "http://localhost:8182/josh/myotherbrain/read-notes?root=" atom-id) 'receive-view))))
+                (concat "http://localhost:8182/josh/myotherbrain/view-notes?root=" atom-id) 'receive-view))))
 
 
 (defun visit-meta ()
@@ -35,7 +35,39 @@
     (let ((assoc-id (car (find-id))))
         (if assoc-id
             (url-retrieve
-                (concat "http://localhost:8182/josh/myotherbrain/read-notes?root=" assoc-id) 'receive-view))))
+                (concat "http://localhost:8182/josh/myotherbrain/view-notes?root=" assoc-id) 'receive-view))))
+
+(defun http-post (url args callback)
+  "Send ARGS to URL as a POST request."
+  (let ((url-request-method "POST")
+        (url-request-extra-headers
+         '(("Content-Type" . "application/x-www-form-urlencoded")))
+        (url-request-data
+         (mapconcat (lambda (arg)
+                      (concat (w3m-url-encode-string (car arg))
+                              "="
+                              (w3m-url-encode-string (car (last arg)))))
+;;                      (concat (url-hexify-string (car arg))
+;;                              "="
+;;                              (url-hexify-string (cdr arg))))
+                    args
+                    "&")))
+    (url-retrieve url callback)))
+
+(defun push-view ()
+    (interactive)
+    (let (
+        (root-id (find-root-id (buffer-name)))
+        (entity (buffer-string)))
+;;        (message (concat "http://localhost:8182/josh/myotherbrain/update-notes?root=" root-id))))
+        (http-post
+            "http://localhost:8182/josh/myotherbrain/update-notes"
+            (list (list "root" root-id) (list "view" entity))
+            'handle-post-response)))
+
+(defun handle-post-response (status)
+    (interactive)
+    (message status))
 
 (defun my-debug ()
     (interactive)
@@ -52,6 +84,9 @@
 (defun view-name (root-id)
     (concat "view-" root-id))
 
+(defun find-root-id (viewname)
+    (substring viewname (+ 1 (string-match "\-" viewname))))
+
 (defun receive-view (status)
     (let ((json-object-type 'hash-table))
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
@@ -66,12 +101,38 @@
 
 (global-set-key (kbd "C-c i") 'visit-item)
 (global-set-key (kbd "C-c m") 'visit-meta)
+(global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
 
+;;(add-hook
+;;     'after-save-hook
+;;     (lambda () (message "you have saved!")))
 
-(add-hook
-     'after-save-hook
-     (lambda () (message "you have saved!")))
 
+;; Uncomment only when debugging
+(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'myotherbrain)
+
+
+
+
+
+
+
+
+
+
+
+(defun w3m-url-encode-string (str &optional coding)
+  (apply (function concat)
+         (mapcar
+          (lambda (ch)
+            (cond
+             ((string-match "[-a-zA-Z0-9_:/]" (char-to-string ch)) ; xxx?
+              (char-to-string ch))      ; printable
+             (t
+              (format "%%%02X" ch))))   ; escape
+          ;; Coerce a string to a list of chars.
+          (append (encode-coding-string str (or coding 'iso-2022-jp))
+                  nil))))

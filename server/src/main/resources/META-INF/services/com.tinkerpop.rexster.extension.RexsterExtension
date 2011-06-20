@@ -1,1 +1,2 @@
-net.fortytwo.myotherbrain.server.ReadNotesExtension
+net.fortytwo.myotherbrain.server.ViewNotesExtension
+net.fortytwo.myotherbrain.server.UpdateNotesExtension

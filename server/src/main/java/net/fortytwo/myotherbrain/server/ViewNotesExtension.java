@@ -25,17 +25,17 @@ import java.util.logging.Logger;
  * Date: 6/19/11
  * Time: 1:40 PM
  */
-@ExtensionNaming(namespace = "myotherbrain", name = "read-notes")
-public class ReadNotesExtension extends AbstractRexsterExtension {
-    private static final Logger LOGGER = Logger.getLogger(ReadNotesExtension.class.getName());
+@ExtensionNaming(namespace = "myotherbrain", name = "view-notes")
+public class ViewNotesExtension extends AbstractRexsterExtension {
+    private static final Logger LOGGER = Logger.getLogger(ViewNotesExtension.class.getName());
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "A simple ping extension.")
-    public ExtensionResponse evaluatePing(@RexsterContext RexsterResourceContext context,
-                                          @RexsterContext Graph graph,
-                                          @ExtensionRequestParameter(name = "root", description = "id of the root atom (vertex) to view") String root) {
+    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the MOB Notes format")
+    public ExtensionResponse handleViewRequest(@RexsterContext RexsterResourceContext context,
+                                               @RexsterContext Graph graph,
+                                               @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root) {
         try {
-            LOGGER.fine("notes request with root " + root);
+            LOGGER.fine("view-notes request for: " + root);
 
             try {
                 root = new Integer(root).toString();
