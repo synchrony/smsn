@@ -20,8 +20,7 @@ public class NotesIO {
     private static final int MAX_TYPE_LENGTH = 5;
 
     // Regex of valid id prefixes, including parentheses, colon and trailing space
-    // TODO: are '=' and '-' the usual base-64 filler characters?
-    private final Pattern ID = Pattern.compile("\\([a-zA-Z0-9=-]+:[a-zA-Z0-9=-]+\\) ");
+    private final Pattern ID = Pattern.compile("\\([a-zA-Z0-9+/]+:[a-zA-Z0-9+/]+\\) ");
 
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
