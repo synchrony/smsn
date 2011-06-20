@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,6 +26,8 @@ public class NotesIO {
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
 
+    public enum Format {FLAT, WITH_CONTEXTS}
+
     public void write(final List<NoteContext> notes,
                       final OutputStream out) {
         PrintStream p = new PrintStream(out);
@@ -34,19 +37,37 @@ public class NotesIO {
         }
     }
 
-    public void writeChildren(final Note note,
-                              final OutputStream out) {
+    public void writeNotes(final List<Note> notes,
+                           final OutputStream out) {
         PrintStream p = new PrintStream(out);
-        for (Note n : note.getChildren()) {
+        for (Note n : notes) {
             printNote(n, 0, p);
         }
     }
 
-    public List<NoteContext> parse(final InputStream in) throws IOException, NoteParsingException {
+    public void writeChildren(final Note note,
+                              final OutputStream out) {
+        writeNotes(note.getChildren(), out);
+    }
+
+    public List<Note> parseNotes(final InputStream in) throws IOException, NoteParsingException {
+        List<Note> notes = new LinkedList<Note>();
+        parsePrivate(in, null, notes);
+        return notes;
+    }
+
+    public List<NoteContext> parseContexts(final InputStream in) throws IOException, NoteParsingException {
+        List<NoteContext> contexts = new LinkedList<NoteContext>();
+        parsePrivate(in, contexts, null);
+        return contexts;
+    }
+
+    private void parsePrivate(final InputStream in,
+                              final Collection<NoteContext> contexts,
+                              final Collection<Note> notes) throws IOException, NoteParsingException {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
         NoteContext context = null;
-
-        List<NoteContext> contexts = new LinkedList<NoteContext>();
+        boolean flat = null == contexts;
 
         InputStreamReader r = new InputStreamReader(in, "UTF-8");
         BufferedReader br = new BufferedReader(r);
@@ -58,18 +79,25 @@ public class NotesIO {
             //System.out.println("" + lineNumber + ") " + line);
 
             if (0 == l.trim().length()) {
-                context = null;
-                hierarchy.clear();
-            } else if (l.startsWith("[")) {
-                int m = l.lastIndexOf("]");
-                if (m < 0) {
-                    throw new NoteParsingException(lineNumber, "non-terminated note context");
+                // In the "flat" format, empty lines are simply ignored
+                if (!flat) {
+                    context = null;
+                    hierarchy.clear();
                 }
-                String text = l.substring(1, m).trim();
+            } else if (l.startsWith("[")) {
+                if (flat) {
+                    throw new NoteParsingException(lineNumber, "contexts are not allowed in the 'flat' format");
+                } else {
+                    int m = l.lastIndexOf("]");
+                    if (m < 0) {
+                        throw new NoteParsingException(lineNumber, "non-terminated note context");
+                    }
+                    String text = l.substring(1, m).trim();
 
-                hierarchy.clear();
-                context = new NoteContext(text);
-                contexts.add(context);
+                    hierarchy.clear();
+                    context = new NoteContext(text);
+                    contexts.add(context);
+                }
             } else {
                 String atomId = null;
                 String associationId = null;
@@ -121,7 +149,7 @@ public class NotesIO {
                     hierarchy.removeLast();
                 }
 
-                if (0 == indent && null == context) {
+                if (0 == indent && null == context && !flat) {
                     context = new NoteContext("");
                     contexts.add(context);
                 }
@@ -221,14 +249,16 @@ public class NotesIO {
                 if (0 < indent) {
                     hierarchy.get(hierarchy.size() - 1).addChild(n);
                 } else {
-                    context.addNote(n);
+                    if (flat) {
+                        notes.add(n);
+                    } else {
+                        context.addNote(n);
+                    }
                 }
 
                 hierarchy.add(n);
             }
         }
-
-        return contexts;
     }
 
     public List<Note> flatten(final List<NoteContext> contexts) {
@@ -313,7 +343,7 @@ public class NotesIO {
 
         InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
         try {
-            contexts = p.parse(in);
+            contexts = p.parseContexts(in);
         } finally {
             in.close();
         }

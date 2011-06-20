@@ -2,6 +2,20 @@
 (require 'json)
 
 
+;; from Emacs-w3m
+(defun w3m-url-encode-string (str &optional coding)
+  (apply (function concat)
+         (mapcar
+          (lambda (ch)
+            (cond
+             ((string-match "[-a-zA-Z0-9_:/]" (char-to-string ch)) ; xxx?
+              (char-to-string ch))      ; printable
+             (t
+              (format "%%%02X" ch))))   ; escape
+          ;; Coerce a string to a list of chars.
+          (append (encode-coding-string str (or coding 'iso-2022-jp))
+                  nil))))
+
 (defun current-line ()
     (interactive)
     (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
@@ -63,11 +77,11 @@
         (http-post
             "http://localhost:8182/josh/myotherbrain/update-notes"
             (list (list "root" root-id) (list "view" entity))
-            'handle-post-response)))
+            'receive-view)))
 
-(defun handle-post-response (status)
-    (interactive)
-    (message status))
+;;(defun handle-post-response (status)
+;;    (interactive)
+;;    (message status))
 
 (defun my-debug ()
     (interactive)
@@ -88,6 +102,7 @@
     (substring viewname (+ 1 (string-match "\-" viewname))))
 
 (defun receive-view (status)
+    (auto-fill-mode -1)
     (let ((json-object-type 'hash-table))
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
             (let (
@@ -113,26 +128,3 @@
 (add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'myotherbrain)
-
-
-
-
-
-
-
-
-
-
-
-(defun w3m-url-encode-string (str &optional coding)
-  (apply (function concat)
-         (mapcar
-          (lambda (ch)
-            (cond
-             ((string-match "[-a-zA-Z0-9_:/]" (char-to-string ch)) ; xxx?
-              (char-to-string ch))      ; printable
-             (t
-              (format "%%%02X" ch))))   ; escape
-          ;; Coerce a string to a list of chars.
-          (append (encode-coding-string str (or coding 'iso-2022-jp))
-                  nil))))

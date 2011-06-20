@@ -36,6 +36,7 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
                                                @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root) {
         try {
             LOGGER.fine("view-notes request for: " + root);
+            int levels = 3;
 
             try {
                 root = new Integer(root).toString();
@@ -45,12 +46,13 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
 
             Map<String, String> map = new HashMap<String, String>();
             map.put("root", root);
+            map.put("levels", "" + levels);
 
             FramesManager manager = new FramesManager(graph);
             NotesViews m = new NotesViews(graph, manager);
             NotesIO p = new NotesIO();
 
-            Note n = m.toNote(root, null, 3);
+            Note n = m.toNote(root, null, levels);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {

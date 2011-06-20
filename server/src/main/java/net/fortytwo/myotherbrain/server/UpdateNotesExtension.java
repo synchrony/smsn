@@ -17,6 +17,7 @@ import net.fortytwo.myotherbrain.notes.NotesIO;
 import net.fortytwo.myotherbrain.notes.NotesViews;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
         try {
             LOGGER.fine("update-notes request for: " + root);
             System.out.println("update-notes request for: " + root);
+            int levels = 3;
 
             try {
                 root = new Integer(root).toString();
@@ -51,21 +53,33 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
 
             Map<String, String> map = new HashMap<String, String>();
             map.put("root", root);
+            map.put("levels", "" + levels);
 
             FramesManager manager = new FramesManager(graph);
             NotesViews m = new NotesViews(graph, manager);
             NotesIO p = new NotesIO();
 
-            List<Note> before, after;
+            List<Note> update;
 
-            before = m.toNote(root, null, 3).getChildren();
             InputStream in = new ByteArrayInputStream(view.getBytes());
             try {
-                after = p.flatten(p.parse(in));
+                update = p.parseNotes(in);
             } finally {
                 in.close();
             }
-            System.out.println("before: " + before.size() + ", after: " + after.size());
+
+            // Apply the update
+            m.applyUpdate(update, root, null, levels - 1);
+
+            // Finally, generate a fresh view (post-update) and return it to the requester.
+            Note n = m.toNote(root, null, levels);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                p.writeChildren(n, bos);
+                map.put("view", bos.toString());
+            } finally {
+                bos.close();
+            }
 
             return ExtensionResponse.ok(map);
         } catch (Exception e) {
