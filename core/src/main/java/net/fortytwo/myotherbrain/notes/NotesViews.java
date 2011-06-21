@@ -210,9 +210,8 @@ public class NotesViews {
         }
     }
 
-    private void breakAssociation(final String assId) {
-        //Atom a = manager.frame(graph.getVertex(assId), Atom.class);
-        graph.removeVertex(graph.getVertex(assId));
+    private void breakAssociation(final String assKey) {
+        graph.removeVertex(getAtom(assKey).element());
     }
 
     public static class UpdateException extends Exception {

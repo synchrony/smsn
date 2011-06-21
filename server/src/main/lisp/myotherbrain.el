@@ -52,7 +52,7 @@
     (let ((atom-id (car (last (find-id)))))
         (if atom-id
             (url-retrieve
-                (concat (base-url) "view-notes?root=" atom-id) 'receive-view))))
+                (concat (base-url) "view-notes?root=" (w3m-url-encode-string atom-id)) 'receive-view))))
 
 
 (defun visit-meta ()
@@ -60,7 +60,7 @@
     (let ((assoc-id (car (find-id))))
         (if assoc-id
             (url-retrieve
-                (concat (base-url) "view-notes?root=" assoc-id) 'receive-view))))
+                (concat (base-url) "view-notes?root=" (w3m-url-encode-string assoc-id)) 'receive-view))))
 
 (defun http-post (url args callback)
   "Send ARGS to URL as a POST request."

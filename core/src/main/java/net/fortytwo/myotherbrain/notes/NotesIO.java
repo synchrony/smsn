@@ -22,7 +22,7 @@ public class NotesIO {
 
     // Regex of valid id prefixes, including parentheses, colon and trailing space
     public static final Pattern KEY_PREFIX = Pattern.compile("\\([a-zA-Z0-9+/]+:[a-zA-Z0-9+/]+\\) ");
-    public static final Pattern KEY = Pattern.compile("[a-zA-Z0-9]+");
+    public static final Pattern KEY = Pattern.compile("[a-zA-Z0-9/+]+");
 
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
