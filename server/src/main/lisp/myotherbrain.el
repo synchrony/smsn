@@ -1,6 +1,14 @@
 (eval-when-compile (require 'cl))
 (require 'json)
 
+;; Required global variables: tinkernotes-rexster-host, tinkernotes-rexster-port, tinkernotes-rexster-graph
+;;
+;; For example:
+;;
+;;     (defun tinkernotes ()
+;;         (defvar tinkernotes-rexster-host "localhost")
+;;         (defvar tinkernotes-rexster-port "8182")
+;;         (defvar tinkernotes-rexster-graph "tinkernotes"))
 
 ;; from Emacs-w3m
 (defun w3m-url-encode-string (str &optional coding)
@@ -36,12 +44,15 @@
                         (list assoc-id atom-id))))
             (list nil nil))))
 
+(defun base-url ()
+    (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/myotherbrain/"))
+
 (defun visit-item ()
     (interactive)
     (let ((atom-id (car (last (find-id)))))
         (if atom-id
             (url-retrieve
-                (concat "http://localhost:8182/tinkernotes/myotherbrain/view-notes?root=" atom-id) 'receive-view))))
+                (concat (base-url) "view-notes?root=" atom-id) 'receive-view))))
 
 
 (defun visit-meta ()
@@ -49,7 +60,7 @@
     (let ((assoc-id (car (find-id))))
         (if assoc-id
             (url-retrieve
-                (concat "http://localhost:8182/tinkernotes/myotherbrain/view-notes?root=" assoc-id) 'receive-view))))
+                (concat (base-url) "view-notes?root=" assoc-id) 'receive-view))))
 
 (defun http-post (url args callback)
   "Send ARGS to URL as a POST request."
@@ -73,15 +84,10 @@
     (let (
         (root-id (find-root-id (buffer-name)))
         (entity (buffer-string)))
-;;        (message (concat "http://localhost:8182/tinkernotes/myotherbrain/update-notes?root=" root-id))))
         (http-post
-            "http://localhost:8182/tinkernotes/myotherbrain/update-notes"
+            (concat (base-url) "update-notes")
             (list (list "root" root-id) (list "view" entity))
             'receive-view)))
-
-;;(defun handle-post-response (status)
-;;    (interactive)
-;;    (message status))
 
 (defun my-debug ()
     (interactive)
