@@ -21,7 +21,8 @@ public class NotesIO {
     private static final int MAX_TYPE_LENGTH = 5;
 
     // Regex of valid id prefixes, including parentheses, colon and trailing space
-    private final Pattern ID = Pattern.compile("\\([a-zA-Z0-9+/]+:[a-zA-Z0-9+/]+\\) ");
+    public static final Pattern KEY_PREFIX = Pattern.compile("\\([a-zA-Z0-9+/]+:[a-zA-Z0-9+/]+\\) ");
+    public static final Pattern KEY = Pattern.compile("[a-zA-Z0-9]+");
 
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
@@ -110,7 +111,7 @@ public class NotesIO {
                     }
 
                     String s = l.substring(0, k + 2);
-                    if (!ID.matcher(s).matches()) {
+                    if (!KEY_PREFIX.matcher(s).matches()) {
                         throw new NoteParsingException(lineNumber, "invalid note ID");
                     }
 
@@ -239,11 +240,11 @@ public class NotesIO {
                 }
 
                 if (null != atomId) {
-                    n.setAtomId(atomId);
+                    n.setAtomKey(atomId);
                 }
 
                 if (null != associationId) {
-                    n.setAssociationId(associationId);
+                    n.setAssociationKey(associationId);
                 }
 
                 if (0 < indent) {
@@ -301,14 +302,14 @@ public class NotesIO {
     private static void printNote(final Note n,
                                   final int indent,
                                   final PrintStream p) {
-        if (null != n.getAtomId() || null != n.getAssociationId()) {
+        if (null != n.getAtomKey() || null != n.getAssociationKey()) {
             p.print("(");
-            if (null != n.getAssociationId()) {
-                p.print(padId(n.getAssociationId()));
+            if (null != n.getAssociationKey()) {
+                p.print(padId(n.getAssociationKey()));
             }
             p.print(":");
-            if (null != n.getAtomId()) {
-                p.print(padId(n.getAtomId()));
+            if (null != n.getAtomKey()) {
+                p.print(padId(n.getAtomKey()));
             }
             p.print(") ");
         }

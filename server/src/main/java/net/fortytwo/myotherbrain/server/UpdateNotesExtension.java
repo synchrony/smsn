@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.server;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
@@ -39,15 +40,17 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
                                                  @RexsterContext Graph graph,
                                                  @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root,
                                                  @ExtensionRequestParameter(name = "view", description = "the updated view") String view) {
+        if (!(graph instanceof IndexableGraph)) {
+            return ExtensionResponse.error("graph must be an instance of IndexableGraph");
+        }
+
         //new Exception().printStackTrace(System.out);
         try {
             LOGGER.fine("update-notes request for: " + root);
             System.out.println("update-notes request for: " + root);
             int levels = 3;
 
-            try {
-                root = new Integer(root).toString();
-            } catch (NumberFormatException e) {
+            if (!NotesIO.KEY.matcher(root).matches()) {
                 return ExtensionResponse.error("bad root id: " + root);
             }
 
@@ -56,7 +59,7 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
             map.put("levels", "" + levels);
 
             FramesManager manager = new FramesManager(graph);
-            NotesViews m = new NotesViews(graph, manager);
+            NotesViews m = new NotesViews((IndexableGraph) graph, manager);
             NotesIO p = new NotesIO();
 
             List<Note> update;

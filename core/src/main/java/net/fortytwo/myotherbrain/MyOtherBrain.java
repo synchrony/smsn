@@ -38,6 +38,7 @@ public class MyOtherBrain {
 
     public static final String
             CREATED = "created",
+            KEY = "key",
             MEMBER = "member",
             TEXT = "text",
             TYPE = "type",
