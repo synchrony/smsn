@@ -35,27 +35,27 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
     public ExtensionResponse handleViewRequest(@RexsterContext RexsterResourceContext context,
                                                @RexsterContext Graph graph,
                                                @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root) {
-        if (!(graph instanceof IndexableGraph)) {
-            return ExtensionResponse.error("graph must be an instance of IndexableGraph");
-        }
-
         try {
             LOGGER.fine("view-notes request for: " + root);
-            int levels = 3;
+            int depth = 3;
 
             if (!NotesIO.KEY.matcher(root).matches()) {
-                return ExtensionResponse.error("bad root id: " + root);
+                return ExtensionResponse.error("root of view is not a valid key: " + root);
+            }
+
+            if (!(graph instanceof IndexableGraph)) {
+                return ExtensionResponse.error("graph must be an instance of IndexableGraph");
             }
 
             Map<String, String> map = new HashMap<String, String>();
             map.put("root", root);
-            map.put("levels", "" + levels);
+            map.put("depth", "" + depth);
 
             FramesManager manager = new FramesManager(graph);
             NotesViews m = new NotesViews((IndexableGraph) graph, manager);
             NotesIO p = new NotesIO();
 
-            Note n = m.toNote(root, null, levels);
+            Note n = m.toNote(root, depth);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
@@ -68,7 +68,7 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
             return ExtensionResponse.ok(map);
         } catch (Exception e) {
             // TODO
-            e.printStackTrace(System.err);
+            e.printStackTrace(System.out);
             return ExtensionResponse.error(e);
         }
     }

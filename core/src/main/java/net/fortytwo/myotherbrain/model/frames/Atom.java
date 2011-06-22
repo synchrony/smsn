@@ -73,9 +73,15 @@ public interface Atom extends VertexFrame {
     @Relation(label = "alias")
     void addAlias(WebResource alias);
 
-    @Relation(label = MyOtherBrain.MEMBER)
-    Collection<Atom> getMembers();
+    @Relation(label = MyOtherBrain.FROM)
+    Atom getFrom();
 
-    @Relation(label = MyOtherBrain.MEMBER)
-    void addMember(Atom member);
+    @Relation(label = MyOtherBrain.FROM)
+    void setFrom(Atom from);
+
+    @Relation(label = MyOtherBrain.TO)
+    Atom getTo();
+
+    @Relation(label = MyOtherBrain.TO)
+    void setTo(Atom to);
 }

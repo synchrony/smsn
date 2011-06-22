@@ -38,9 +38,11 @@ public class MyOtherBrain {
 
     public static final String
             CREATED = "created",
+            FROM = "from",
             KEY = "key",
-            MEMBER = "member",
+            //MEMBER = "member",
             TEXT = "text",
+            TO = "to",
             TYPE = "type",
             WEIGHT = "weight";
 

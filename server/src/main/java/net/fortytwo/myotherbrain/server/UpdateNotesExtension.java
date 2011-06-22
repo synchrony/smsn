@@ -40,10 +40,6 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
                                                  @RexsterContext Graph graph,
                                                  @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root,
                                                  @ExtensionRequestParameter(name = "view", description = "the updated view") String view) {
-        if (!(graph instanceof IndexableGraph)) {
-            return ExtensionResponse.error("graph must be an instance of IndexableGraph");
-        }
-
         //new Exception().printStackTrace(System.out);
         try {
             LOGGER.fine("update-notes request for: " + root);
@@ -51,7 +47,11 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
             int levels = 3;
 
             if (!NotesIO.KEY.matcher(root).matches()) {
-                return ExtensionResponse.error("bad root id: " + root);
+                return ExtensionResponse.error("root of view is not a valid key: " + root);
+            }
+
+            if (!(graph instanceof IndexableGraph)) {
+                return ExtensionResponse.error("graph must be an instance of IndexableGraph");
             }
 
             Map<String, String> map = new HashMap<String, String>();
@@ -72,10 +72,10 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
             }
 
             // Apply the update
-            m.applyUpdate(update, root, null, levels - 1);
+            m.applyUpdate(update, root, levels - 1);
 
             // Finally, generate a fresh view (post-update) and return it to the requester.
-            Note n = m.toNote(root, null, levels);
+            Note n = m.toNote(root, levels);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
                 p.writeChildren(n, bos);

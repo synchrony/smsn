@@ -107,17 +107,21 @@
 (defun find-root-id (viewname)
     (substring viewname (+ 1 (string-match "\-" viewname))))
 
+
 (defun receive-view (status)
-    (auto-fill-mode -1)
     (let ((json-object-type 'hash-table))
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
-            (let (
-                (id (gethash "root" json))
-                (view (gethash "view" json)))
-                    (switch-to-buffer (view-name id))
-                    (erase-buffer)
-                    (insert view)
-                    (beginning-of-buffer)))))
+            (if status
+                (let (
+                    (error (gethash "error" json)))
+                        (message (concat "Error: " error)))
+                (let (
+                    (id (gethash "root" json))
+                    (view (gethash "view" json)))
+                        (switch-to-buffer (view-name id))
+                        (erase-buffer)
+                        (insert view)
+                        (beginning-of-buffer))))))
 
 
 (global-set-key (kbd "C-c i") 'visit-item)
