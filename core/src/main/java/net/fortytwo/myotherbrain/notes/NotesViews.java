@@ -78,7 +78,7 @@ public class NotesViews {
         Note n = new Note(type, text);
         n.setAtomKey(atomKey);
 
-        if (depth > 1) {
+        if (depth > 0) {
             for (Atom ass : getOutboundAssociations(av)) {
                 Atom to = ass.getTo();
 
@@ -147,7 +147,7 @@ public class NotesViews {
     private void applyUpdate(final List<Note> update,
                              final Atom root,
                              final int depth) throws InvalidUpdateException {
-        if (depth < 1) {
+        if (depth < 0) {
             return;
         }
 

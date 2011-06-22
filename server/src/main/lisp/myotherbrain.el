@@ -139,10 +139,6 @@
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
 
-;;(add-hook
-;;     'after-save-hook
-;;     (lambda () (message "you have saved!")))
-
 
 ;; Uncomment only when debugging
 (add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
