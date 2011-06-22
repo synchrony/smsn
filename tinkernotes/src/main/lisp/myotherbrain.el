@@ -128,6 +128,7 @@
                     (root (gethash "root" json))
                     (view (gethash "view" json)))
                         (switch-to-buffer (view-name root))
+                        (tinkernotes-mode)
                         (erase-buffer)
                         (insert view)
                         (beginning-of-buffer)
@@ -138,6 +139,17 @@
 (global-set-key (kbd "C-c m") 'visit-meta)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
+
+
+(setq syntax-keywords
+ '(
+   ("^\([0-9A-Za-z+/]*:[0-9A-Za-z+/]*\)" . font-lock-doc-face)
+  ))
+
+(define-derived-mode tinkernotes-mode fundamental-mode
+  (setq font-lock-defaults '(syntax-keywords))
+  (setq mode-name "tinkernotes")
+)
 
 
 ;; Uncomment only when debugging
