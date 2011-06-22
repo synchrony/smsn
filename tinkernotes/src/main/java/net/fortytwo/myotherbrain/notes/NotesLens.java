@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLWriter;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.myotherbrain.model.frames.Atom;
@@ -30,15 +29,17 @@ import java.util.Set;
  * Date: 6/18/11
  * Time: 7:26 PM
  */
-public class NotesViews {
+public class NotesLens {
     private static final String KEYS = "keys";
+
+    private static final Random RANDOM = new Random();
 
     private final IndexableGraph graph;
     private final FramesManager manager;
     private final Index<Vertex> keys;
 
-    public NotesViews(final IndexableGraph graph,
-                      final FramesManager manager) {
+    public NotesLens(final IndexableGraph graph,
+                     final FramesManager manager) {
         this.graph = graph;
         this.manager = manager;
 
@@ -60,13 +61,8 @@ public class NotesViews {
         keys = graph.getIndex(KEYS, Vertex.class);
     }
 
-    private String getKey(final Atom a) {
-        return (String) a.element().getProperty(MyOtherBrain.KEY);
-    }
-
-    public Note toNote(final String atomKey,
-                       final int depth) throws NoSuchRootException {
-        //System.out.println("toNote(" + atomKey + ", " + parent + ", " + depth + ")");
+    public Note view(final String atomKey,
+                     final int depth) throws NoSuchRootException {
         Atom av;
         try {
             av = getAtom(atomKey);
@@ -86,7 +82,7 @@ public class NotesViews {
                     throw new IllegalArgumentException("association has no 'to' atom");
                 }
 
-                Note n2 = toNote(getKey(to), depth - 1);
+                Note n2 = view(getKey(to), depth - 1);
                 n2.setAssociationKey(getKey(ass));
                 n.addChild(n2);
             }
@@ -96,65 +92,23 @@ public class NotesViews {
         return n;
     }
 
-    // TODO: merge this with applyUpdate
-    public Atom toGraph(final Note note,
-                        final boolean recursive) throws InvalidUpdateException {
-
-        Atom root = null == note.getAtomKey()
-                ? createAtom()
-                : getAtom(note.getAtomKey());
-
-        root.setText(note.getText());
-        root.setType(note.getType());
-
-        if (recursive) {
-            for (Note child : note.getChildren()) {
-                Atom c = toGraph(child, true);
-
-                if (null == child.getAssociationKey()) {
-                    Atom ass = createAtom();
-                    ass.setFrom(root);
-                    ass.setTo(c);
-                }
-
-                // Note: "bad" associations are simply ignored here.  This is designed for a fresh add, not an update.
-            }
-        }
-
-        return root;
+    public void update(final String rootKey,
+                       final List<Note> children,
+                       final int depth) throws InvalidUpdateException {
+        update(getAtom(rootKey), children, depth, true);
     }
 
-    // TODO: merge this with applyUpdate
-    public void toGraph(final List<Note> notes,
-                        final Atom ref) throws InvalidUpdateException {
-        for (Note c : notes) {
-            Atom a = toGraph(c, true);
-
-            if (null == c.getAssociationKey()) {
-                Atom ass = createAtom();
-                ass.setFrom(ref);
-                ass.setTo(a);
-            }
-        }
-    }
-
-    public void applyUpdate(final List<Note> update,
-                            final String root,
-                            final int depth) throws InvalidUpdateException {
-        applyUpdate(update, getAtom(root), depth, true);
-    }
-
-    private void applyUpdate(final List<Note> update,
-                             final Atom root,
-                             final int depth,
-                             boolean destructive) throws InvalidUpdateException {
-        if (depth < 0) {
+    private void update(final Atom root,
+                        final List<Note> children,
+                        final int depth,
+                        boolean destructive) throws InvalidUpdateException {
+        if (depth < 1) {
             destructive = false;
         }
 
         List<Note> before;
         try {
-            before = toNote(getKey(root), 2).getChildren();
+            before = view(getKey(root), 1).getChildren();
         } catch (NoSuchRootException e) {
             throw new InvalidUpdateException(e.getMessage());
         }
@@ -166,7 +120,7 @@ public class NotesViews {
         }
 
         Map<String, Note> afterMap = new HashMap<String, Note>();
-        for (Note n : update) {
+        for (Note n : children) {
             if (null != n.getAssociationKey()) {
                 //System.out.println("\tafter: " + n.getAssociationId() + ", " + n.getAtomId());
                 afterMap.put(n.getAssociationKey(), n);
@@ -184,35 +138,39 @@ public class NotesViews {
                     throw new InvalidUpdateException("atom ID of updated association has changed");
                 }
             } else {
-                //System.out.println("breaking association " + assId);
+                System.out.println("breaking association " + assId);
+                new Exception().printStackTrace();
                 breakAssociation(getAtom(assId));
             }
         }
 
         // Add any new associations, and update fields
-        for (Note n : update) {
+        for (Note n : children) {
             String assId = n.getAssociationKey();
             //System.out.println("assId = " + assId);
-            Atom a;
+            Atom a = null == n.getAtomKey()
+                    ? createAtom()
+                    : getAtom(n.getAtomKey());
+
+            root.setText(n.getText());
+            root.setType(n.getType());
 
             if (null == assId || null == beforeMap.get(assId)) {
                 destructive = false;
-                a = toGraph(n, false);
 
                 Atom ass = createAtom();
                 ass.setFrom(root);
                 ass.setTo(a);
             } else {
+                // Validate against the existing association
                 if (null == n.getAtomKey()) {
                     throw new InvalidUpdateException("non-null association ID with null atom ID");
                 } else if (!n.getAtomKey().equals(beforeMap.get(assId).getAtomKey())) {
                     throw new InvalidUpdateException("atom ID of updated association has changed");
                 }
-
-                a = toGraph(n, false);
             }
 
-            applyUpdate(n.getChildren(), a, depth - 1, destructive);
+            update(a, n.getChildren(), depth - 1, destructive);
         }
     }
 
@@ -221,13 +179,17 @@ public class NotesViews {
         ass.setTo(null);
     }
 
+    private String getKey(final Atom a) {
+        return (String) a.asVertex().getProperty(MyOtherBrain.KEY);
+    }
+
     private Atom getAtom(final Vertex v) {
         return manager.frame(v, Atom.class);
     }
 
     private Atom getAtom(final String key) throws InvalidUpdateException {
         if (null == key) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("null atom key");
         }
 
         Vertex v;
@@ -256,8 +218,6 @@ public class NotesViews {
         return a;
     }
 
-    private static final Random RANDOM = new Random();
-
     private String createKey() {
         byte[] bytes = new byte[5];
         for (int i = 0; i < 5; i++) {
@@ -279,7 +239,7 @@ public class NotesViews {
     private Collection<Atom> getOutboundAssociations(final Atom from) {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
-        for (Edge e : from.element().getInEdges()) {
+        for (Edge e : from.asVertex().getInEdges()) {
             if (e.getLabel().equals(MyOtherBrain.FROM)) {
                 c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
             }
@@ -336,17 +296,17 @@ public class NotesViews {
 
         IndexableGraph graph = new TinkerGraph();
         FramesManager manager = new FramesManager(graph);
-        NotesViews m = new NotesViews(graph, manager);
+        NotesLens m = new NotesLens(graph, manager);
         Atom root = m.createAtom();
-        root.element().setProperty(MyOtherBrain.KEY, "00000");
+        root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setText("Josh's notes");
         root.setType(".");
-        m.toGraph(notes, root);
+        m.update(root.getKey(), notes, 0);
 
-        GraphMLWriter.outputGraph(graph, System.out);
-        System.out.println();
+        //GraphMLWriter.outputGraph(graph, System.out);
+        //System.out.println();
 
-        //Note n = m.toNote((String) root.element().getProperty(MyOtherBrain.KEY), 3);
-        //p.writeChildren(n, System.out);
+        Note n = m.view((String) root.asVertex().getProperty(MyOtherBrain.KEY), 3);
+        p.writeChildren(n, System.out);
     }
 }

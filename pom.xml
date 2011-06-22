@@ -13,7 +13,7 @@
     <modules>
         <module>core</module>
         <module>server</module>
-	<module>tinkernotes</module>
+        <module>tinkernotes</module>
         <module>android</module>
     </modules>
 

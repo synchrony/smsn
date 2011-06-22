@@ -14,7 +14,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesIO;
-import net.fortytwo.myotherbrain.notes.NotesViews;
+import net.fortytwo.myotherbrain.notes.NotesLens;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -52,14 +52,14 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
             map.put("depth", "" + depth);
 
             FramesManager manager = new FramesManager(graph);
-            NotesViews m = new NotesViews((IndexableGraph) graph, manager);
+            NotesLens m = new NotesLens((IndexableGraph) graph, manager);
             NotesIO p = new NotesIO();
 
             Note n;
 
             try {
-                n = m.toNote(rootKey, depth);
-            } catch (NotesViews.NoSuchRootException e) {
+                n = m.view(rootKey, depth);
+            } catch (NotesLens.NoSuchRootException e) {
                 return ExtensionResponse.error(e.getMessage());
             }
 

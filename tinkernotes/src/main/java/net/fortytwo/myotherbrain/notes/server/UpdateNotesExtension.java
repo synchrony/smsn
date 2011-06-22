@@ -15,7 +15,7 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesIO;
-import net.fortytwo.myotherbrain.notes.NotesViews;
+import net.fortytwo.myotherbrain.notes.NotesLens;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -59,27 +59,27 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
             map.put("levels", "" + levels);
 
             FramesManager manager = new FramesManager(graph);
-            NotesViews m = new NotesViews((IndexableGraph) graph, manager);
+            NotesLens m = new NotesLens((IndexableGraph) graph, manager);
             NotesIO p = new NotesIO();
 
-            List<Note> update;
+            List<Note> children;
 
             InputStream in = new ByteArrayInputStream(view.getBytes());
             try {
-                update = p.parseNotes(in);
+                children = p.parseNotes(in);
             } finally {
                 in.close();
             }
 
             // Apply the update
             try {
-                m.applyUpdate(update, root, levels - 1);
-            } catch (NotesViews.InvalidUpdateException e) {
+                m.update(root, children, levels - 1);
+            } catch (NotesLens.InvalidUpdateException e) {
                 return ExtensionResponse.error("invalid update: " + e.getMessage());
             }
 
             // Finally, generate a fresh view (post-update) and return it to the requester.
-            Note n = m.toNote(root, levels);
+            Note n = m.view(root, levels);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
                 p.writeChildren(n, bos);

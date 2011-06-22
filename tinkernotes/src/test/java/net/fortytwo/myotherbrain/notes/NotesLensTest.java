@@ -23,18 +23,18 @@ import java.util.Set;
  * Date: 6/20/11
  * Time: 7:58 PM
  */
-public class NotesViewsTest extends TestCase {
+public class NotesLensTest extends TestCase {
     private IndexableGraph graph;
     private FramesManager manager;
     private NotesIO io;
-    private NotesViews views;
+    private NotesLens lens;
 
     @Override
     public void setUp() throws Exception {
         graph = new TinkerGraph();
         manager = new FramesManager(graph);
         io = new NotesIO();
-        views = new NotesViews(graph, manager);
+        lens = new NotesLens(graph, manager);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class NotesViewsTest extends TestCase {
     private Collection<Atom> getOutboundAssociations(final Atom subject) {
         Collection<Atom> c = new LinkedList<Atom>();
 
-        for (Edge e : subject.element().getInEdges()) {
+        for (Edge e : subject.asVertex().getInEdges()) {
             if (e.getLabel().equals(MyOtherBrain.FROM)) {
                 c.add(getAtom(e.getOutVertex()));
             }
