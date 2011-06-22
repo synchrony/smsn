@@ -72,7 +72,11 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
             }
 
             // Apply the update
-            m.applyUpdate(update, root, levels - 1);
+            try {
+                m.applyUpdate(update, root, levels - 1);
+            } catch (NotesViews.InvalidUpdateException e) {
+                return ExtensionResponse.error("invalid update: " + e.getMessage());
+            }
 
             // Finally, generate a fresh view (post-update) and return it to the requester.
             Note n = m.toNote(root, levels);

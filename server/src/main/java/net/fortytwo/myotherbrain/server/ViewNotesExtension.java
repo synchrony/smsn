@@ -34,13 +34,13 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the MOB Notes format")
     public ExtensionResponse handleViewRequest(@RexsterContext RexsterResourceContext context,
                                                @RexsterContext Graph graph,
-                                               @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root) {
+                                               @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey) {
         try {
-            LOGGER.fine("view-notes request for: " + root);
+            LOGGER.fine("view-notes request for: " + rootKey);
             int depth = 3;
 
-            if (!NotesIO.KEY.matcher(root).matches()) {
-                return ExtensionResponse.error("root of view is not a valid key: " + root);
+            if (!NotesIO.KEY.matcher(rootKey).matches()) {
+                return ExtensionResponse.error("root of view is not a valid key: '" + rootKey + "'");
             }
 
             if (!(graph instanceof IndexableGraph)) {
@@ -48,14 +48,20 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
             }
 
             Map<String, String> map = new HashMap<String, String>();
-            map.put("root", root);
+            map.put("root", rootKey);
             map.put("depth", "" + depth);
 
             FramesManager manager = new FramesManager(graph);
             NotesViews m = new NotesViews((IndexableGraph) graph, manager);
             NotesIO p = new NotesIO();
 
-            Note n = m.toNote(root, depth);
+            Note n;
+
+            try {
+                n = m.toNote(rootKey, depth);
+            } catch (NotesViews.NoSuchRootException e) {
+                return ExtensionResponse.error(e.getMessage());
+            }
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {

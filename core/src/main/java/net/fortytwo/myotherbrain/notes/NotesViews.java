@@ -64,9 +64,14 @@ public class NotesViews {
     }
 
     public Note toNote(final String atomKey,
-                       final int depth) {
+                       final int depth) throws NoSuchRootException {
         //System.out.println("toNote(" + atomKey + ", " + parent + ", " + depth + ")");
-        Atom av = getAtom(atomKey);
+        Atom av;
+        try {
+            av = getAtom(atomKey);
+        } catch (InvalidUpdateException e) {
+            throw new NoSuchRootException("there is no atom with key '" + atomKey + "'");
+        }
         String type = av.getType();
         String text = av.getText();
         Note n = new Note(type, text);
@@ -92,7 +97,7 @@ public class NotesViews {
 
     // TODO: merge this with applyUpdate
     public Atom toGraph(final Note note,
-                        final boolean recursive) {
+                        final boolean recursive) throws InvalidUpdateException {
 
         Atom root = null == note.getAtomKey()
                 ? createAtom()
@@ -120,7 +125,7 @@ public class NotesViews {
 
     // TODO: merge this with applyUpdate
     public void toGraph(final List<Note> notes,
-                        final Atom ref) {
+                        final Atom ref) throws InvalidUpdateException {
         for (Note c : notes) {
             Atom a = toGraph(c, true);
 
@@ -134,18 +139,23 @@ public class NotesViews {
 
     public void applyUpdate(final List<Note> update,
                             final String root,
-                            final int depth) throws UpdateException {
+                            final int depth) throws InvalidUpdateException {
         applyUpdate(update, getAtom(root), depth);
     }
 
     private void applyUpdate(final List<Note> update,
                              final Atom root,
-                             final int depth) throws UpdateException {
+                             final int depth) throws InvalidUpdateException {
         if (depth < 1) {
             return;
         }
 
-        List<Note> before = toNote(getKey(root), 2).getChildren();
+        List<Note> before;
+        try {
+            before = toNote(getKey(root), 2).getChildren();
+        } catch (NoSuchRootException e) {
+            throw new InvalidUpdateException(e.getMessage());
+        }
 
         Map<String, Note> beforeMap = new HashMap<String, Note>();
         for (Note n : before) {
@@ -167,9 +177,9 @@ public class NotesViews {
                 Note b = beforeMap.get(assId);
                 Note a = afterMap.get(assId);
                 if (null == a.getAtomKey()) {
-                    throw new UpdateException("non-null association ID with null atom ID");
+                    throw new InvalidUpdateException("non-null association ID with null atom ID");
                 } else if (!a.getAtomKey().equals(b.getAtomKey())) {
-                    throw new UpdateException("atom ID of updated association has changed");
+                    throw new InvalidUpdateException("atom ID of updated association has changed");
                 }
             } else {
                 //System.out.println("breaking association " + assId);
@@ -191,9 +201,9 @@ public class NotesViews {
                 ass.setTo(a);
             } else {
                 if (null == n.getAtomKey()) {
-                    throw new UpdateException("non-null association ID with null atom ID");
+                    throw new InvalidUpdateException("non-null association ID with null atom ID");
                 } else if (!n.getAtomKey().equals(beforeMap.get(assId).getAtomKey())) {
-                    throw new UpdateException("atom ID of updated association has changed");
+                    throw new InvalidUpdateException("atom ID of updated association has changed");
                 }
 
                 a = toGraph(n, false);
@@ -208,17 +218,11 @@ public class NotesViews {
         ass.setTo(null);
     }
 
-    public static class UpdateException extends Exception {
-        public UpdateException(final String message) {
-            super(message);
-        }
-    }
-
     private Atom getAtom(final Vertex v) {
         return manager.frame(v, Atom.class);
     }
 
-    private Atom getAtom(final String key) {
+    private Atom getAtom(final String key) throws InvalidUpdateException {
         if (null == key) {
             throw new IllegalStateException();
         }
@@ -228,7 +232,7 @@ public class NotesViews {
         CloseableSequence<Vertex> s = keys.get(MyOtherBrain.KEY, key);
         try {
             if (!s.hasNext()) {
-                throw new IllegalStateException("no such vertex: " + key);
+                throw new InvalidUpdateException("no such vertex: " + key);
             }
             v = s.next();
             if (s.hasNext()) {
@@ -279,6 +283,18 @@ public class NotesViews {
         }
 
         return c;
+    }
+
+    public static class InvalidUpdateException extends Exception {
+        public InvalidUpdateException(final String message) {
+            super(message);
+        }
+    }
+
+    public static class NoSuchRootException extends Exception {
+        public NoSuchRootException(final String message) {
+            super(message);
+        }
     }
 
     public static void main(final String[] args) throws Exception {

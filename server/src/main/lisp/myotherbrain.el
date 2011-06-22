@@ -108,20 +108,30 @@
     (substring viewname (+ 1 (string-match "\-" viewname))))
 
 
+(defun info-message (msg)
+    (message (concat "Info: " msg)))
+
+(defun error-message (msg)
+    (message (concat "Error: " msg)))
+
+
 (defun receive-view (status)
     (let ((json-object-type 'hash-table))
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
             (if status
-                (let (
+                (let ((msg (gethash "message" json))
                     (error (gethash "error" json)))
-                        (message (concat "Error: " error)))
+                        (if error
+                            (error-message error)
+                            (error-message msg)))
                 (let (
-                    (id (gethash "root" json))
+                    (root (gethash "root" json))
                     (view (gethash "view" json)))
-                        (switch-to-buffer (view-name id))
+                        (switch-to-buffer (view-name root))
                         (erase-buffer)
                         (insert view)
-                        (beginning-of-buffer))))))
+                        (beginning-of-buffer)
+                        (info-message (concat "updated to view (root: '" root "')")))))))
 
 
 (global-set-key (kbd "C-c i") 'visit-item)
