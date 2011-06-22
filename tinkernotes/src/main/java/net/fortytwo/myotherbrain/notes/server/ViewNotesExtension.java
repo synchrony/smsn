@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.server;
+package net.fortytwo.myotherbrain.notes.server;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;

@@ -5,10 +5,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>myotherbrain-core</artifactId>
+    <artifactId>tinkernotes</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
-    <name>MyOtherBrain-Core</name>
+    <name>TinkerNotes</name>
 
     <repositories>
         <repository>
@@ -29,19 +29,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.fortytwo.myotherbrain</groupId>
+            <artifactId>myotherbrain-core</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.tinkerpop</groupId>
-            <artifactId>frames</artifactId>
-            <version>0.4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-core</artifactId>
-            <version>0.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>1.0</version>
+            <artifactId>rexster</artifactId>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -55,8 +50,8 @@
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <directory>target</directory>
-        <!--<outputDirectory>target/classes</outputDirectory>
-        <testOutputDirectory>target/test-classes</testOutputDirectory>-->
+        <outputDirectory>target/classes</outputDirectory>
+        <testOutputDirectory>target/test-classes</testOutputDirectory>
         <finalName>${artifactId}-${version}</finalName>
         <resources>
             <resource>
@@ -75,6 +70,32 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/standalone.xml</descriptor>
+                    </descriptors>
+                    <finalName>tinkernotes-${project.version}</finalName>
+                    <outputDirectory>target</outputDirectory>
+                    <workDirectory>target/assembly/work</workDirectory>
+                    <tarLongFileMode>warn</tarLongFileMode>
+                    <archive>
+                        <manifest>
+                            <mainClass>net.fortytwo.myotherbrain.MyOtherBrain</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
