@@ -141,14 +141,15 @@ public class NotesViews {
     public void applyUpdate(final List<Note> update,
                             final String root,
                             final int depth) throws InvalidUpdateException {
-        applyUpdate(update, getAtom(root), depth);
+        applyUpdate(update, getAtom(root), depth, true);
     }
 
     private void applyUpdate(final List<Note> update,
                              final Atom root,
-                             final int depth) throws InvalidUpdateException {
+                             final int depth,
+                             boolean destructive) throws InvalidUpdateException {
         if (depth < 0) {
-            return;
+            destructive = false;
         }
 
         List<Note> before;
@@ -195,6 +196,7 @@ public class NotesViews {
             Atom a;
 
             if (null == assId || null == beforeMap.get(assId)) {
+                destructive = false;
                 a = toGraph(n, false);
 
                 Atom ass = createAtom();
@@ -210,7 +212,7 @@ public class NotesViews {
                 a = toGraph(n, false);
             }
 
-            applyUpdate(n.getChildren(), a, depth - 1);
+            applyUpdate(n.getChildren(), a, depth - 1, destructive);
         }
     }
 
