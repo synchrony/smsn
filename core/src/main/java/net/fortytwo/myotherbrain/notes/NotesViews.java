@@ -15,6 +15,7 @@ import net.fortytwo.myotherbrain.model.frames.Atom;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -274,15 +275,37 @@ public class NotesViews {
     }
 
     private Collection<Atom> getOutboundAssociations(final Atom from) {
-        Collection<Atom> c = new LinkedList<Atom>();
+        List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
         for (Edge e : from.element().getInEdges()) {
             if (e.getLabel().equals(MyOtherBrain.FROM)) {
-                c.add(getAtom(e.getOutVertex()));
+                c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
             }
         }
 
-        return c;
+        Collections.sort(c);
+
+        Collection<Atom> r = new LinkedList<Atom>();
+        for (TimestampedAtom ta : c) {
+            r.add(ta.atom);
+        }
+
+        return r;
+    }
+
+    private class TimestampedAtom implements Comparable<TimestampedAtom> {
+        public Atom atom;
+        public long timestamp;
+
+        public TimestampedAtom(final Atom a) {
+            atom = a;
+            timestamp = a.getCreated();
+        }
+
+        // Order from newest to oldest
+        public int compareTo(final TimestampedAtom other) {
+            return ((Long) other.timestamp).compareTo(timestamp);
+        }
     }
 
     public static class InvalidUpdateException extends Exception {
