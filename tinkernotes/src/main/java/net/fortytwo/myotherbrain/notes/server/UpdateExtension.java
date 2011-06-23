@@ -35,12 +35,13 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
-                                           @ExtensionRequestParameter(name = "view", description = "the updated view") String view) {
+                                           @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
+                                           @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
 
         LOGGER.fine("update-notes request for: " + rootKey);
         System.out.println("update-notes request for: " + rootKey);
 
-        return this.handleRequestInternal(graph, rootKey, depth, view);
+        return this.handleRequestInternal(graph, rootKey, depth, view, inverse);
     }
 
     @Override
@@ -51,7 +52,8 @@ public class UpdateExtension extends TinkerNotesExtension {
                                                        final NotesSyntax p,
                                                        final Atom root,
                                                        final int depth,
-                                                       final String view) throws Exception {
+                                                       final String view,
+                                                       final boolean inverse) throws Exception {
         List<Note> children;
 
         InputStream in = new ByteArrayInputStream(view.getBytes());
@@ -64,12 +66,12 @@ public class UpdateExtension extends TinkerNotesExtension {
         // Apply the update
         try {
             // TODO: pass the root node to update(), and use (depth) instead of (depth-1)
-            m.update(root, children, depth - 1);
+            m.update(root, children, depth - 1, inverse);
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        addView(map, m, root, depth, p);
+        addView(map, m, root, depth, p, inverse);
 
         return ExtensionResponse.ok(map);
     }

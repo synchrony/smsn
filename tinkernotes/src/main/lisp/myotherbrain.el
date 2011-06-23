@@ -58,13 +58,12 @@
     (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
 
 ;; Buffer-local variables. Given them initial, global bindings.
-(setq view-depth nil)
+(setq view-depth 3)
 (setq view-root nil)
 (setq view-title nil)
-(make-local-variable 'view-root)
-(make-local-variable 'view-depth)
-(make-local-variable 'view-title)
+(setq view-inverse nil)
 
+;; TODO: this is probably unnecessary, due to the global binding above.
 (defun get-view-depth ()
     (if view-depth view-depth 3))
 
@@ -102,18 +101,25 @@
                         (if error
                             (error-message error)
                             (error-message msg)))
+
                 (let (
                     (root (gethash "root" json))
                     (view (gethash "view" json))
                     (depth (string-to-number (gethash "depth" json)))
+                    (inverse (string-equal "true" (gethash "inverse" json)))
                     (title (gethash "title" json)))
                         (switch-to-buffer (view-name root))
                         (tinkernotes-mode)
                         (erase-buffer)
                         (insert view)
                         (beginning-of-buffer)
+                        (make-local-variable 'view-root)
+                        (make-local-variable 'view-depth)
+                        (make-local-variable 'view-inverse)
+                        (make-local-variable 'view-title)
                         (setq view-root root)
                         (setq view-depth depth)
+                        (setq view-inverse inverse)
                         (setq view-title title)
                         (info-message (concat "updated to view " (view-info))))))))
 
@@ -124,38 +130,47 @@
     (concat
         "(root: " view-root
          " :depth " (number-to-string view-depth)
+         " :inverse " (if view-inverse "t" "nil")
          " :title \"" view-title "\")"))  ;; TODO: actuallly escape the title string
 
-(defun request-view (root depth)
+(defun request-view (root depth inverse)
     (url-retrieve
-        (concat (base-url) "view-notes?root=" (w3m-url-encode-string root) "&depth=" (number-to-string depth)) 'receive-view))
+        (concat (base-url) "view-notes"
+            "?root=" (w3m-url-encode-string root)
+            "&depth=" (number-to-string depth)
+            "&inverse=" (if inverse "true" "false")) 'receive-view))
 
 (defun visit-item ()
     (interactive)
     (let ((atom-id (car (last (find-id)))))
         (if atom-id
-            (request-view atom-id (get-view-depth)))))
+            (request-view atom-id (get-view-depth) view-inverse))))
 
 (defun visit-meta ()
     (interactive)
     (let ((link-id (car (find-id))))
         (if link-id
-            (request-view link-id (get-view-depth)))))
+            (request-view link-id (get-view-depth) view-inverse))))
 
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root (get-view-depth))))
+        (request-view view-root (get-view-depth) view-inverse)))
 
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- (get-view-depth) 1))))
+        (request-view view-root (- (get-view-depth) 1) view-inverse)))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ (get-view-depth) 1))))
+        (request-view view-root (+ (get-view-depth) 1) view-inverse)))
+
+(defun invert-view ()
+    (interactive)
+    (if view-root
+        (request-view view-root (get-view-depth) (not view-inverse))))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -166,7 +181,11 @@
         (entity (buffer-string)))
         (http-post
             (concat (base-url) "update-notes")
-            (list (list "root" view-root) (list "view" entity) (list "depth" (number-to-string (get-view-depth))))
+            (list
+                (list "root" view-root)
+                (list "view" entity)
+                (list "inverse" (if view-inverse "true" "false"))
+                (list "depth" (number-to-string (get-view-depth))))
             'receive-view)))
 
 
@@ -188,6 +207,7 @@
 (global-set-key (kbd "C-c r") 'refresh-view)
 (global-set-key (kbd "C-c -") 'decrease-depth)
 (global-set-key (kbd "C-c +") 'increase-depth)
+(global-set-key (kbd "C-c ~") 'invert-view)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
 

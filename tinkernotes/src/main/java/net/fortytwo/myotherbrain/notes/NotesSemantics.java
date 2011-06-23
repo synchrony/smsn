@@ -64,15 +64,17 @@ public class NotesSemantics {
     /**
      * Generates a view of the graph.
      *
-     * @param root  the key of the root atom of the view
-     * @param depth the depth of the view.
-     *              A view of depth 0 contains only the root,
-     *              while a view of depth 1 also contains all children of the root,
-     *              a view of depth 2 all grandchildren, etc.
+     * @param root    the key of the root atom of the view
+     * @param depth   the depth of the view.
+     *                A view of depth 0 contains only the root,
+     *                while a view of depth 1 also contains all children of the root,
+     *                a view of depth 2 all grandchildren, etc.
+     * @param inverse whether to produce an inverted view (in which links are followed "backwards")
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
     public Note view(final Atom root,
-                     final int depth) {
+                     final int depth,
+                     final boolean inverse) {
 
         String type = root.getType();
         String text = root.getText();
@@ -80,14 +82,15 @@ public class NotesSemantics {
         n.setTargetKey(root.getKey());
 
         if (depth > 0) {
-            for (Atom link : getOutlinks(root)) {
-                Atom to = link.getTo();
+            Collection<Atom> links = inverse ? getInLinks(root) : getOutlinks(root);
+            for (Atom link : links) {
+                Atom target = inverse ? link.getFrom() : link.getTo();
 
-                if (null == to) {
-                    throw new IllegalArgumentException("link has no 'to' atom");
+                if (null == target) {
+                    throw new IllegalArgumentException("link " + link.getKey() + " has no '" + (inverse ? "from" : "to") + "' atom");
                 }
 
-                Note n2 = view(to, depth - 1);
+                Note n2 = view(target, depth - 1, inverse);
                 n2.setLinkKey(link.getKey());
                 n.addChild(n2);
             }
@@ -100,26 +103,29 @@ public class NotesSemantics {
     /**
      * Updates the graph.
      *
-     * @param root  the root of the subgraph to be updated
+     * @param root     the root of the subgraph to be updated
      * @param children the children of the root atom
      * @param depth    the minimum depth to which the graph will be updated
+     * @param inverse  whether to push an inverted view (in which links are followed "backwards")
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
                        final List<Note> children,
-                       final int depth) throws InvalidUpdateException {
-        update(root, children, depth, true);
+                       final int depth,
+                       final boolean inverse) throws InvalidUpdateException {
+        updateInternal(root, children, depth, true, inverse);
     }
 
-    private void update(final Atom root,
-                        final List<Note> children,
-                        final int depth,
-                        boolean destructive) throws InvalidUpdateException {
+    private void updateInternal(final Atom root,
+                                final List<Note> children,
+                                final int depth,
+                                boolean destructive,
+                                boolean inverse) throws InvalidUpdateException {
         if (depth < 1) {
             destructive = false;
         }
 
-        List<Note> before = view(root, 1).getChildren();
+        List<Note> before = view(root, 1, inverse).getChildren();
 
         Map<String, Note> beforeMap = new HashMap<String, Note>();
         for (Note n : before) {
@@ -172,8 +178,13 @@ public class NotesSemantics {
                 destructive = false;
 
                 Atom link = createAtom();
-                link.setFrom(root);
-                link.setTo(a);
+                if (inverse) {
+                    link.setFrom(a);
+                    link.setTo(root);
+                } else {
+                    link.setFrom(root);
+                    link.setTo(a);
+                }
             } else {
                 // Validate against the existing link
                 if (null == n.getTargetKey()) {
@@ -183,7 +194,7 @@ public class NotesSemantics {
                 }
             }
 
-            update(a, n.getChildren(), depth - 1, destructive);
+            updateInternal(a, n.getChildren(), depth - 1, destructive, inverse);
         }
     }
 
@@ -245,6 +256,23 @@ public class NotesSemantics {
         return new String(bytes);
     }
 
+    private Collection<Atom> getInLinks(final Atom from) {
+        List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
+
+        for (Edge e : from.asVertex().getInEdges(MyOtherBrain.TO)) {
+            c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
+        }
+
+        Collections.sort(c);
+
+        Collection<Atom> r = new LinkedList<Atom>();
+        for (TimestampedAtom ta : c) {
+            r.add(ta.atom);
+        }
+
+        return r;
+    }
+
     private Collection<Atom> getOutlinks(final Atom from) {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
@@ -302,12 +330,12 @@ public class NotesSemantics {
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setText("Josh's notes");
         root.setType(".");
-        m.update(root, notes, 0);
+        m.update(root, notes, 0, false);
 
         //GraphMLWriter.outputGraph(graph, System.out);
         //System.out.println();
 
-        Note n = m.view(root, 3);
+        Note n = m.view(root, 3, false);
         p.writeChildren(n, System.out);
     }
 }

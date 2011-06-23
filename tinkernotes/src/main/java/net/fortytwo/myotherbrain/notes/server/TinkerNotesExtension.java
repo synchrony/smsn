@@ -27,7 +27,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected ExtensionResponse handleRequestInternal(final Graph graph,
                                                       final String rootKey,
                                                       final int depth,
-                                                      final String view) {
+                                                      final String view,
+                                                      final boolean inverse) {
         try {
             if (depth < 1) {
                 return ExtensionResponse.error("depth must be at least 1");
@@ -48,6 +49,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             Map<String, String> map = new HashMap<String, String>();
             map.put("root", rootKey);
             map.put("depth", "" + depth);
+            map.put("inverse", "" + inverse);
 
             FramesManager manager = new FramesManager(graph);
             NotesSemantics m = new NotesSemantics((IndexableGraph) graph, manager);
@@ -59,7 +61,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
             map.put("title", null == root.getText() || 0 == root.getText().length() ? "[no name]" : root.getText());
 
-            return handleRequestProtected(map, graph, manager, m, p, root, depth, view);
+            return handleRequestProtected(map, graph, manager, m, p, root, depth, view, inverse);
         } catch (Exception e) {
             // TODO
             e.printStackTrace(System.out);
@@ -71,8 +73,9 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                            final NotesSemantics m,
                            final Atom root,
                            final int depth,
-                           final NotesSyntax p) throws IOException {
-        Note n = m.view(root, depth);
+                           final NotesSyntax p,
+                           final boolean inverse) throws IOException {
+        Note n = m.view(root, depth, inverse);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -90,5 +93,6 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                                                                 final NotesSyntax p,
                                                                 final Atom root,
                                                                 final int depth,
-                                                                final String view) throws Exception;
+                                                                final String view,
+                                                                final boolean inverse) throws Exception;
 }
