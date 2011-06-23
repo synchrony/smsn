@@ -10,29 +10,6 @@ import com.tinkerpop.frames.VertexFrame;
  * Time: 2:57 PM
  */
 public interface Atom extends VertexFrame {
-    @Property("name")
-    String getName();
-
-    @Property("name")
-    void setName(String name);
-
-    @Property(MyOtherBrain.KEY)
-    String getKey();
-
-    @Property(MyOtherBrain.KEY)
-    void setKey(String key);
-
-    @Property(MyOtherBrain.TEXT)
-    String getText();
-
-    @Property(MyOtherBrain.TEXT)
-    void setText(String description);
-
-    @Property(MyOtherBrain.TYPE)
-    String getType();
-
-    @Property(MyOtherBrain.TYPE)
-    void setType(final String tags);
 
     @Property(MyOtherBrain.CREATED)
     long getCreated();
@@ -40,23 +17,35 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.CREATED)
     void setCreated(long created);
 
-    @Property("lastEditTime")
-    long getLastEditTime();
+    @Property(MyOtherBrain.KEY)
+    String getKey();
 
-    @Property("lastEditTime")
-    void setLastEditTime(long lastEditTime);
+    @Property(MyOtherBrain.KEY)
+    void setKey(String key);
+
+    @Property(MyOtherBrain.TYPE)
+    String getType();
+
+    @Property(MyOtherBrain.TYPE)
+    void setType(final String tags);
+
+    @Property(MyOtherBrain.VALUE)
+    String getValue();
+
+    @Property(MyOtherBrain.VALUE)
+    void setValue(String description);
+
+    @Property(MyOtherBrain.VISIBILITY)
+    Float getVisibility();
+
+    @Property(MyOtherBrain.VISIBILITY)
+    void setVisibility(float visibility);
 
     @Property(MyOtherBrain.WEIGHT)
     Float getWeight();
 
     @Property(MyOtherBrain.WEIGHT)
     void setWeight(float weight);
-
-    @Property("sensitivity")
-    Float getSensitivity();
-
-    @Property("sensitivity")
-    void setSensitivity(float sensitivity);
 
     @Relation(label = MyOtherBrain.FROM)
     Atom getFrom();

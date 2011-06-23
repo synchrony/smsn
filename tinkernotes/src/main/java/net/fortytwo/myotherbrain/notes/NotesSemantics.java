@@ -77,8 +77,8 @@ public class NotesSemantics {
                      final boolean inverse) {
 
         String type = root.getType();
-        String text = root.getText();
-        Note n = new Note(type, text);
+        String value = root.getValue();
+        Note n = new Note(type, value);
         n.setTargetKey(root.getKey());
 
         if (depth > 0) {
@@ -172,7 +172,7 @@ public class NotesSemantics {
                 }
             }
 
-            a.setText(n.getText());
+            a.setValue(n.getValue());
             a.setType(n.getType());
 
             if (null == linkKey || null == beforeMap.get(linkKey)) {
@@ -329,7 +329,7 @@ public class NotesSemantics {
         NotesSemantics m = new NotesSemantics(graph, manager);
         Atom root = m.createAtom();
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
-        root.setText("Josh's notes");
+        root.setValue("Josh's notes");
         root.setType(".");
         m.update(root, notes, 0, false);
 

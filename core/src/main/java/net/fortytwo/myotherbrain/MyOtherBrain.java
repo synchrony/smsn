@@ -40,15 +40,11 @@ public class MyOtherBrain {
             CREATED = "created",
             FROM = "from",
             KEY = "key",
-            //MEMBER = "member",
-            TEXT = "text",
             TO = "to",
             TYPE = "type",
+            VALUE = "value",
+            VISIBILITY = "visibility",
             WEIGHT = "weight";
-
-    /*public static final URI[] LEGAL_DATATYPE_URIS = {
-            XMLSchema.STRING
-    };*/
 
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";
     private static final String VERSION_PROPERTIES_FILE = "version.properties";

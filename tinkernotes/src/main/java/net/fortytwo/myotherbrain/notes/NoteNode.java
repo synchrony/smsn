@@ -6,12 +6,12 @@ package net.fortytwo.myotherbrain.notes;
  * Time: 6:13 PM
  */
 public abstract class NoteNode {
-    private final String text;
+    private final String value;
     protected String targetKey;
     protected String linkKey;
 
-    public NoteNode(final String text) {
-        this.text = text;
+    public NoteNode(final String value) {
+        this.value = value;
 
         //if (null == text) {
         //    throw new IllegalArgumentException("note text must be non-null" +
@@ -19,8 +19,8 @@ public abstract class NoteNode {
         //}
     }
 
-    public String getText() {
-        return text;
+    public String getValue() {
+        return value;
     }
 
     public String getTargetKey() {

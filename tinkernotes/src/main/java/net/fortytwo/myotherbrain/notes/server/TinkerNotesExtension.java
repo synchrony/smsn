@@ -59,7 +59,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             if (null == root) {
                 return ExtensionResponse.error("no such atom: " + rootKey);
             }
-            map.put("title", null == root.getText() || 0 == root.getText().length() ? "[no name]" : root.getText());
+            map.put("title", null == root.getValue() || 0 == root.getValue().length() ? "[no name]" : root.getValue());
 
             return handleRequestProtected(map, graph, manager, m, p, root, depth, view, inverse);
         } catch (Exception e) {

@@ -265,7 +265,7 @@ public class NotesSyntax {
     public List<Note> flatten(final List<NoteContext> contexts) {
         List<Note> notes = new LinkedList<Note>();
         for (NoteContext c : contexts) {
-            Note n = new Note(".", c.getText());
+            Note n = new Note(".", c.getValue());
             notes.add(n);
 
             if (c.getChildren().size() > 0) {
@@ -287,9 +287,9 @@ public class NotesSyntax {
 
     private static void printContext(final NoteContext c,
                                      final PrintStream p) {
-        if (0 < c.getText().length()) {
+        if (0 < c.getValue().length()) {
             p.print("[");
-            p.print(c.getText());
+            p.print(c.getValue());
             p.print("]");
             p.print("\n");
         }
@@ -321,7 +321,7 @@ public class NotesSyntax {
         p.print(null == n.getType() || 0 == n.getType().length() ? "_" : n.getType());
         p.print("  ");
 
-        p.print(n.getText());
+        p.print(n.getValue());
 
         p.print("\n");
 
