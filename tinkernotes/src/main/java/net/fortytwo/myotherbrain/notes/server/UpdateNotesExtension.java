@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.myotherbrain.model.frames.Atom;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesIO;
 import net.fortytwo.myotherbrain.notes.NotesLens;
@@ -38,16 +39,16 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "an extension for updating a portion of a MyOtherBrain graph using the MOB Notes format")
     public ExtensionResponse handleUpdateRequest(@RexsterContext RexsterResourceContext context,
                                                  @RexsterContext Graph graph,
-                                                 @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String root,
+                                                 @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
                                                  @ExtensionRequestParameter(name = "view", description = "the updated view") String view) {
         //new Exception().printStackTrace(System.out);
         try {
-            LOGGER.fine("update-notes request for: " + root);
-            System.out.println("update-notes request for: " + root);
-            int levels = 3;
+            LOGGER.fine("update-notes request for: " + rootKey);
+            System.out.println("update-notes request for: " + rootKey);
+            int depth = 3;
 
-            if (!NotesIO.KEY.matcher(root).matches()) {
-                return ExtensionResponse.error("root of view is not a valid key: " + root);
+            if (!NotesIO.KEY.matcher(rootKey).matches()) {
+                return ExtensionResponse.error("root of view is not a valid key: " + rootKey);
             }
 
             if (!(graph instanceof IndexableGraph)) {
@@ -55,8 +56,8 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
             }
 
             Map<String, String> map = new HashMap<String, String>();
-            map.put("root", root);
-            map.put("levels", "" + levels);
+            map.put("root", rootKey);
+            map.put("depth", "" + depth);
 
             FramesManager manager = new FramesManager(graph);
             NotesLens m = new NotesLens((IndexableGraph) graph, manager);
@@ -71,15 +72,21 @@ public class UpdateNotesExtension extends AbstractRexsterExtension {
                 in.close();
             }
 
+            Atom root = m.getAtom(rootKey);
+            if (null == root) {
+                return ExtensionResponse.error("no such atom: " + rootKey);
+            }
+
             // Apply the update
             try {
-                m.update(root, children, levels - 1);
+                // TODO: pass the root node to update(), and use (depth) instead of (depth-1)
+                m.update(root, children, depth - 1);
             } catch (NotesLens.InvalidUpdateException e) {
                 return ExtensionResponse.error("invalid update: " + e.getMessage());
             }
 
             // Finally, generate a fresh view (post-update) and return it to the requester.
-            Note n = m.view(root, levels);
+            Note n = m.view(m.getAtom(rootKey), depth);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
                 p.writeChildren(n, bos);

@@ -240,11 +240,11 @@ public class NotesIO {
                 }
 
                 if (null != atomId) {
-                    n.setAtomKey(atomId);
+                    n.setTargetKey(atomId);
                 }
 
                 if (null != associationId) {
-                    n.setAssociationKey(associationId);
+                    n.setLinkKey(associationId);
                 }
 
                 if (0 < indent) {
@@ -302,14 +302,14 @@ public class NotesIO {
     private static void printNote(final Note n,
                                   final int indent,
                                   final PrintStream p) {
-        if (null != n.getAtomKey() || null != n.getAssociationKey()) {
+        if (null != n.getTargetKey() || null != n.getLinkKey()) {
             p.print("(");
-            if (null != n.getAssociationKey()) {
-                p.print(padId(n.getAssociationKey()));
+            if (null != n.getLinkKey()) {
+                p.print(padId(n.getLinkKey()));
             }
             p.print(":");
-            if (null != n.getAtomKey()) {
-                p.print(padId(n.getAtomKey()));
+            if (null != n.getTargetKey()) {
+                p.print(padId(n.getTargetKey()));
             }
             p.print(") ");
         }

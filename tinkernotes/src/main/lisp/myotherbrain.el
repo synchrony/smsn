@@ -57,10 +57,10 @@
 
 (defun visit-meta ()
     (interactive)
-    (let ((assoc-id (car (find-id))))
-        (if assoc-id
+    (let ((link-id (car (find-id))))
+        (if link-id
             (url-retrieve
-                (concat (base-url) "view-notes?root=" (w3m-url-encode-string assoc-id)) 'receive-view))))
+                (concat (base-url) "view-notes?root=" (w3m-url-encode-string link-id)) 'receive-view))))
 
 (defun http-post (url args callback)
   "Send ARGS to URL as a POST request."
@@ -79,14 +79,18 @@
                     "&")))
     (url-retrieve url callback)))
 
+(defun refresh-view ()
+    (interactive)
+    (url-retrieve
+        (concat (base-url) "view-notes?root=" (w3m-url-encode-string view-root)) 'receive-view))
+
 (defun push-view ()
     (interactive)
     (let (
-        (root-id (find-root-id (buffer-name)))
         (entity (buffer-string)))
         (http-post
             (concat (base-url) "update-notes")
-            (list (list "root" root-id) (list "view" entity))
+            (list (list "root" view-root) (list "view" entity))
             'receive-view)))
 
 (defun my-debug ()
@@ -104,8 +108,6 @@
 (defun view-name (root-id)
     (concat "view-" root-id))
 
-(defun find-root-id (viewname)
-    (substring viewname (+ 1 (string-match "\-" viewname))))
 
 
 (defun info-message (msg)
@@ -126,17 +128,23 @@
                             (error-message msg)))
                 (let (
                     (root (gethash "root" json))
-                    (view (gethash "view" json)))
+                    (view (gethash "view" json))
+                    (depth (gethash "depth" json)))
                         (switch-to-buffer (view-name root))
                         (tinkernotes-mode)
                         (erase-buffer)
                         (insert view)
                         (beginning-of-buffer)
-                        (info-message (concat "updated to view (root: '" root "')")))))))
+                        (make-local-variable 'view-root)
+                        (setq view-root root)
+                        (make-local-variable 'view-depth)
+                        (setq view-depth depth)
+                        (info-message (concat "updated to view (root: " root ")")))))))
 
 
 (global-set-key (kbd "C-c i") 'visit-item)
 (global-set-key (kbd "C-c m") 'visit-meta)
+(global-set-key (kbd "C-c r") 'refresh-view)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
 

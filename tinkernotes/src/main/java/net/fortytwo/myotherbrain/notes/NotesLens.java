@@ -61,29 +61,34 @@ public class NotesLens {
         keys = graph.getIndex(KEYS, Vertex.class);
     }
 
-    public Note view(final String atomKey,
-                     final int depth) throws NoSuchRootException {
-        Atom av;
-        try {
-            av = getAtom(atomKey);
-        } catch (InvalidUpdateException e) {
-            throw new NoSuchRootException("there is no atom with key '" + atomKey + "'");
-        }
-        String type = av.getType();
-        String text = av.getText();
+    /**
+     * Generates a view of the graph.
+     *
+     * @param root  the key of the root atom of the view
+     * @param depth the depth of the view.
+     *              A view of depth 0 contains only the root,
+     *              while a view of depth 1 also contains all children of the root,
+     *              a view of depth 2 all grandchildren, etc.
+     * @return a partial view of the graph as a tree of <code>Note</code> objects
+     */
+    public Note view(final Atom root,
+                     final int depth) {
+
+        String type = root.getType();
+        String text = root.getText();
         Note n = new Note(type, text);
-        n.setAtomKey(atomKey);
+        n.setTargetKey(root.getKey());
 
         if (depth > 0) {
-            for (Atom ass : getOutboundAssociations(av)) {
-                Atom to = ass.getTo();
+            for (Atom link : getOutlinks(root)) {
+                Atom to = link.getTo();
 
                 if (null == to) {
-                    throw new IllegalArgumentException("association has no 'to' atom");
+                    throw new IllegalArgumentException("link has no 'to' atom");
                 }
 
-                Note n2 = view(getKey(to), depth - 1);
-                n2.setAssociationKey(getKey(ass));
+                Note n2 = view(to, depth - 1);
+                n2.setLinkKey(link.getKey());
                 n.addChild(n2);
             }
         }
@@ -92,10 +97,18 @@ public class NotesLens {
         return n;
     }
 
-    public void update(final String rootKey,
+    /**
+     * Updates the graph.
+     *
+     * @param root  the root of the subgraph to be updated
+     * @param children the children of the root atom
+     * @param depth    the minimum depth to which the graph will be updated
+     * @throws InvalidUpdateException if the update cannot be performed as specified
+     */
+    public void update(final Atom root,
                        final List<Note> children,
                        final int depth) throws InvalidUpdateException {
-        update(getAtom(rootKey), children, depth, true);
+        update(root, children, depth, true);
     }
 
     private void update(final Atom root,
@@ -106,67 +119,67 @@ public class NotesLens {
             destructive = false;
         }
 
-        List<Note> before;
-        try {
-            before = view(getKey(root), 1).getChildren();
-        } catch (NoSuchRootException e) {
-            throw new InvalidUpdateException(e.getMessage());
-        }
+        List<Note> before = view(root, 1).getChildren();
 
         Map<String, Note> beforeMap = new HashMap<String, Note>();
         for (Note n : before) {
-            //System.out.println("\tbefore: " + n.getAssociationId() + ", " + n.getAtomId());
-            beforeMap.put(n.getAssociationKey(), n);
+            beforeMap.put(n.getLinkKey(), n);
         }
 
         Map<String, Note> afterMap = new HashMap<String, Note>();
         for (Note n : children) {
-            if (null != n.getAssociationKey()) {
-                //System.out.println("\tafter: " + n.getAssociationId() + ", " + n.getAtomId());
-                afterMap.put(n.getAssociationKey(), n);
+            if (null != n.getLinkKey()) {
+                afterMap.put(n.getLinkKey(), n);
             }
         }
 
-        // Remove any deleted associations
-        for (String assId : beforeMap.keySet()) {
-            if (afterMap.keySet().contains(assId)) {
-                Note b = beforeMap.get(assId);
-                Note a = afterMap.get(assId);
-                if (null == a.getAtomKey()) {
-                    throw new InvalidUpdateException("non-null association ID with null atom ID");
-                } else if (!a.getAtomKey().equals(b.getAtomKey())) {
-                    throw new InvalidUpdateException("atom ID of updated association has changed");
+        // Remove any deleted links
+        if (destructive) {
+            for (String linkKey : beforeMap.keySet()) {
+                if (afterMap.keySet().contains(linkKey)) {
+                    Note b = beforeMap.get(linkKey);
+                    Note a = afterMap.get(linkKey);
+                    if (null == a.getTargetKey()) {
+                        throw new InvalidUpdateException("non-null link key with null target key");
+                    } else if (!a.getTargetKey().equals(b.getTargetKey())) {
+                        throw new InvalidUpdateException("target key of updated link has changed");
+                    }
+                } else {
+                    System.out.println("breaking link " + linkKey);
+                    //new Exception().printStackTrace();
+                    breakLink(getAtom(linkKey));
                 }
-            } else {
-                System.out.println("breaking association " + assId);
-                new Exception().printStackTrace();
-                breakAssociation(getAtom(assId));
             }
         }
 
-        // Add any new associations, and update fields
+        // Add any new links, and update fields
         for (Note n : children) {
-            String assId = n.getAssociationKey();
-            //System.out.println("assId = " + assId);
-            Atom a = null == n.getAtomKey()
-                    ? createAtom()
-                    : getAtom(n.getAtomKey());
+            String linkKey = n.getLinkKey();
+            Atom a;
+            if (null == n.getTargetKey()) {
+                a = createAtom();
+            } else {
+                a = getAtom(n.getTargetKey());
+                if (null == a) {
+                    throw new InvalidUpdateException("no such vertex: " + n.getTargetKey());
+                }
+            }
 
-            root.setText(n.getText());
-            root.setType(n.getType());
+            a.setText(n.getText());
+            a.setType(n.getType());
 
-            if (null == assId || null == beforeMap.get(assId)) {
+            if (null == linkKey || null == beforeMap.get(linkKey)) {
                 destructive = false;
 
-                Atom ass = createAtom();
-                ass.setFrom(root);
-                ass.setTo(a);
+                Atom link = createAtom();
+                link.setFrom(root);
+                link.setTo(a);
             } else {
-                // Validate against the existing association
-                if (null == n.getAtomKey()) {
-                    throw new InvalidUpdateException("non-null association ID with null atom ID");
-                } else if (!n.getAtomKey().equals(beforeMap.get(assId).getAtomKey())) {
-                    throw new InvalidUpdateException("atom ID of updated association has changed");
+                // Validate against the existing link
+                if (null == n.getTargetKey()) {
+                    throw new InvalidUpdateException("non-null link key with null target key");
+                } else if (!n.getTargetKey().equals(beforeMap.get(linkKey).getTargetKey())) {
+                    throw new InvalidUpdateException("target key of updated link has changed");
                 }
             }
 
@@ -174,22 +187,18 @@ public class NotesLens {
         }
     }
 
-    private void breakAssociation(final Atom ass) {
-        ass.setFrom(null);
-        ass.setTo(null);
-    }
-
-    private String getKey(final Atom a) {
-        return (String) a.asVertex().getProperty(MyOtherBrain.KEY);
+    private void breakLink(final Atom link) {
+        link.setFrom(null);
+        link.setTo(null);
     }
 
     private Atom getAtom(final Vertex v) {
         return manager.frame(v, Atom.class);
     }
 
-    private Atom getAtom(final String key) throws InvalidUpdateException {
+    public Atom getAtom(final String key) throws InvalidUpdateException {
         if (null == key) {
-            throw new IllegalStateException("null atom key");
+            throw new IllegalArgumentException("null atom key");
         }
 
         Vertex v;
@@ -197,7 +206,7 @@ public class NotesLens {
         CloseableSequence<Vertex> s = keys.get(MyOtherBrain.KEY, key);
         try {
             if (!s.hasNext()) {
-                throw new InvalidUpdateException("no such vertex: " + key);
+                return null;
             }
             v = s.next();
             if (s.hasNext()) {
@@ -236,13 +245,11 @@ public class NotesLens {
         return new String(bytes);
     }
 
-    private Collection<Atom> getOutboundAssociations(final Atom from) {
+    private Collection<Atom> getOutlinks(final Atom from) {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
-        for (Edge e : from.asVertex().getInEdges()) {
-            if (e.getLabel().equals(MyOtherBrain.FROM)) {
-                c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
-            }
+        for (Edge e : from.asVertex().getInEdges(MyOtherBrain.FROM)) {
+            c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
         }
 
         Collections.sort(c);
@@ -276,12 +283,6 @@ public class NotesLens {
         }
     }
 
-    public static class NoSuchRootException extends Exception {
-        public NoSuchRootException(final String message) {
-            super(message);
-        }
-    }
-
     public static void main(final String[] args) throws Exception {
         NotesIO p = new NotesIO();
         List<Note> notes;
@@ -301,12 +302,12 @@ public class NotesLens {
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setText("Josh's notes");
         root.setType(".");
-        m.update(root.getKey(), notes, 0);
+        m.update(root, notes, 0);
 
         //GraphMLWriter.outputGraph(graph, System.out);
         //System.out.println();
 
-        Note n = m.view((String) root.asVertex().getProperty(MyOtherBrain.KEY), 3);
+        Note n = m.view(root, 3);
         p.writeChildren(n, System.out);
     }
 }

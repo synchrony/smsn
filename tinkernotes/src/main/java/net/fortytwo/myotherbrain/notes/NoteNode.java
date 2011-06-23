@@ -7,8 +7,8 @@ package net.fortytwo.myotherbrain.notes;
  */
 public abstract class NoteNode {
     private final String text;
-    protected String atomKey;
-    protected String associationKey;
+    protected String targetKey;
+    protected String linkKey;
 
     public NoteNode(final String text) {
         this.text = text;
@@ -23,19 +23,19 @@ public abstract class NoteNode {
         return text;
     }
 
-    public String getAtomKey() {
-        return atomKey;
+    public String getTargetKey() {
+        return targetKey;
     }
 
-    public String getAssociationKey() {
-        return associationKey;
+    public String getLinkKey() {
+        return linkKey;
     }
 
-    public void setAtomKey(final String atomKey) {
-        this.atomKey = atomKey;
+    public void setTargetKey(final String targetKey) {
+        this.targetKey = targetKey;
     }
 
-    public void setAssociationKey(final String associationKey) {
-        this.associationKey = associationKey;
+    public void setLinkKey(final String linkKey) {
+        this.linkKey = linkKey;
     }
 }

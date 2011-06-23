@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.myotherbrain.model.frames.Atom;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesIO;
 import net.fortytwo.myotherbrain.notes.NotesLens;
@@ -31,7 +32,7 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
     private static final Logger LOGGER = Logger.getLogger(ViewNotesExtension.class.getName());
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the MOB Notes format")
+    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the TinkerNotes format")
     public ExtensionResponse handleViewRequest(@RexsterContext RexsterResourceContext context,
                                                @RexsterContext Graph graph,
                                                @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey) {
@@ -55,13 +56,11 @@ public class ViewNotesExtension extends AbstractRexsterExtension {
             NotesLens m = new NotesLens((IndexableGraph) graph, manager);
             NotesIO p = new NotesIO();
 
-            Note n;
-
-            try {
-                n = m.view(rootKey, depth);
-            } catch (NotesLens.NoSuchRootException e) {
-                return ExtensionResponse.error(e.getMessage());
+            Atom root = m.getAtom(rootKey);
+            if (null == root) {
+                return ExtensionResponse.error("no such atom: " + rootKey);
             }
+            Note n = m.view(root, depth);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
