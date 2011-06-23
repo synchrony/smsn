@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
-import net.fortytwo.myotherbrain.model.frames.Atom;
+import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import net.fortytwo.myotherbrain.notes.NotesSyntax;

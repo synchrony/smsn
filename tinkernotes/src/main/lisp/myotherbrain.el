@@ -57,15 +57,11 @@
     (interactive)
     (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
 
-;; Buffer-local variables. Given them initial, global bindings.
+;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
 (setq view-depth 3)
 (setq view-root nil)
 (setq view-title nil)
 (setq view-inverse nil)
-
-;; TODO: this is probably unnecessary, due to the global binding above.
-(defun get-view-depth ()
-    (if view-depth view-depth 3))
 
 (defun find-id ()
     (let ((line (current-line)))
@@ -144,33 +140,33 @@
     (interactive)
     (let ((atom-id (car (last (find-id)))))
         (if atom-id
-            (request-view atom-id (get-view-depth) view-inverse))))
+            (request-view atom-id view-depth view-inverse))))
 
 (defun visit-meta ()
     (interactive)
     (let ((link-id (car (find-id))))
         (if link-id
-            (request-view link-id (get-view-depth) view-inverse))))
+            (request-view link-id view-depth view-inverse))))
 
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root (get-view-depth) view-inverse)))
+        (request-view view-root view-depth view-inverse)))
 
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- (get-view-depth) 1) view-inverse)))
+        (request-view view-root (- view-depth 1) view-inverse)))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ (get-view-depth) 1) view-inverse)))
+        (request-view view-root (+ view-depth 1) view-inverse)))
 
 (defun invert-view ()
     (interactive)
     (if view-root
-        (request-view view-root (get-view-depth) (not view-inverse))))
+        (request-view view-root view-depth (not view-inverse))))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -185,7 +181,7 @@
                 (list "root" view-root)
                 (list "view" entity)
                 (list "inverse" (if view-inverse "true" "false"))
-                (list "depth" (number-to-string (get-view-depth))))
+                (list "depth" (number-to-string view-depth)))
             'receive-view)))
 
 

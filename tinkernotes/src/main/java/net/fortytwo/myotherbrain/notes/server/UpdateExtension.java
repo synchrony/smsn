@@ -11,7 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.myotherbrain.model.frames.Atom;
+import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import net.fortytwo.myotherbrain.notes.NotesSyntax;
@@ -65,8 +65,7 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         // Apply the update
         try {
-            // TODO: pass the root node to update(), and use (depth) instead of (depth-1)
-            m.update(root, children, depth - 1, inverse);
+            m.update(root, children, depth, inverse);
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }

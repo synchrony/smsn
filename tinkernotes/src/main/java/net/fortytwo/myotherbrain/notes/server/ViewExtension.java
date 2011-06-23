@@ -10,7 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.myotherbrain.model.frames.Atom;
+import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import net.fortytwo.myotherbrain.notes.NotesSyntax;
 

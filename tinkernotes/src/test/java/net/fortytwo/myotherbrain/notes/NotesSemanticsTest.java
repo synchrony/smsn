@@ -6,8 +6,8 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import junit.framework.TestCase;
+import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MyOtherBrain;
-import net.fortytwo.myotherbrain.model.frames.Atom;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

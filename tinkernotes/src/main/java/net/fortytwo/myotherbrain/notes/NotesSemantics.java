@@ -8,8 +8,8 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
+import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MyOtherBrain;
-import net.fortytwo.myotherbrain.model.frames.Atom;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -151,8 +151,9 @@ public class NotesSemantics {
                         throw new InvalidUpdateException("target key of updated link has changed");
                     }
                 } else {
-                    System.out.println("breaking link " + linkKey);
-                    //new Exception().printStackTrace();
+                    // Avoid attempting to remove a link more than once (if it appears more than once in the tree).
+                    beforeMap.remove(linkKey);
+
                     breakLink(getAtom(linkKey));
                 }
             }

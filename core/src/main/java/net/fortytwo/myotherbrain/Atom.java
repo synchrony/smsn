@@ -1,11 +1,8 @@
-package net.fortytwo.myotherbrain.model.frames;
+package net.fortytwo.myotherbrain;
 
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.Relation;
 import com.tinkerpop.frames.VertexFrame;
-import net.fortytwo.myotherbrain.MyOtherBrain;
-
-import java.util.Collection;
 
 /**
  * User: josh
@@ -60,18 +57,6 @@ public interface Atom extends VertexFrame {
 
     @Property("sensitivity")
     void setSensitivity(float sensitivity);
-
-    @Relation(label = "icon")
-    Collection<WebResource> getIcon();
-
-    @Relation(label = "icon")
-    void addIcon(WebResource icon);
-
-    @Relation(label = "alias")
-    Collection<WebResource> getAlias();
-
-    @Relation(label = "alias")
-    void addAlias(WebResource alias);
 
     @Relation(label = MyOtherBrain.FROM)
     Atom getFrom();
