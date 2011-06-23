@@ -62,6 +62,10 @@
 (setq view-root nil)
 (setq view-title nil)
 (setq view-inverse nil)
+(setq view-min-visibility 0)
+(setq view-max-visibility 1)
+(setq view-min-weight 0)
+(setq view-max-weight 1)
 
 (defun find-id ()
     (let ((line (current-line)))
@@ -86,7 +90,7 @@
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun base-url ()
-    (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/myotherbrain/"))
+    (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/tinkernotes/"))
 
 (defun receive-view (status)
     (let ((json-object-type 'hash-table))
@@ -102,6 +106,10 @@
                     (root (gethash "root" json))
                     (view (gethash "view" json))
                     (depth (string-to-number (gethash "depth" json)))
+                    (min-visibility (string-to-number (gethash "minVisibility" json)))
+                    (max-visibility (string-to-number (gethash "maxVisibility" json)))
+                    (min-weight (string-to-number (gethash "minWeight" json)))
+                    (max-weight (string-to-number (gethash "maxWeight" json)))
                     (inverse (string-equal "true" (gethash "inverse" json)))
                     (title (gethash "title" json)))
                         (switch-to-buffer (view-name root))
@@ -113,8 +121,16 @@
                         (make-local-variable 'view-depth)
                         (make-local-variable 'view-inverse)
                         (make-local-variable 'view-title)
+                        (make-local-variable 'view-min-visibility)
+                        (make-local-variable 'view-max-visibility)
+                        (make-local-variable 'view-min-weight)
+                        (make-local-variable 'view-max-weight)
                         (setq view-root root)
                         (setq view-depth depth)
+                        (setq view-min-visibility min-visibility)
+                        (setq view-max-visibility max-visibility)
+                        (setq view-min-weight min-weight)
+                        (setq view-max-weight max-weight)
                         (setq view-inverse inverse)
                         (setq view-title title)
                         (info-message (concat "updated to view " (view-info))))))))
@@ -127,46 +143,52 @@
         "(root: " view-root
          " :depth " (number-to-string view-depth)
          " :inverse " (if view-inverse "t" "nil")
+         " :visibility [" (number-to-string view-min-visibility) ", " (number-to-string view-max-visibility) "]"
+         " :weight [" (number-to-string view-min-weight) ", " (number-to-string view-max-weight) "]"
          " :title \"" view-title "\")"))  ;; TODO: actuallly escape the title string
 
-(defun request-view (root depth inverse)
+(defun request-view (root depth inverse minv maxv minw maxw)
     (url-retrieve
-        (concat (base-url) "view-notes"
+        (concat (base-url) "view"
             "?root=" (w3m-url-encode-string root)
             "&depth=" (number-to-string depth)
+            "&minVisibility=" (number-to-string minv)
+            "&maxVisibility=" (number-to-string maxv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)
             "&inverse=" (if inverse "true" "false")) 'receive-view))
 
 (defun visit-item ()
     (interactive)
     (let ((atom-id (car (last (find-id)))))
         (if atom-id
-            (request-view atom-id view-depth view-inverse))))
+            (request-view atom-id view-depth view-inverse view-min-visibility view-max-visibility view-min-weight view-max-weight))))
 
 (defun visit-meta ()
     (interactive)
     (let ((link-id (car (find-id))))
         (if link-id
-            (request-view link-id view-depth view-inverse))))
+            (request-view link-id view-depth view-inverse view-min-visibility view-max-visibility view-min-weight view-max-weight))))
 
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse)))
+        (request-view view-root view-depth view-inverse view-min-visibility view-max-visibility view-min-weight view-max-weight)))
 
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- view-depth 1) view-inverse)))
+        (request-view view-root (- view-depth 1) view-inverse view-min-visibility view-max-visibility view-min-weight view-max-weight)))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ view-depth 1) view-inverse)))
+        (request-view view-root (+ view-depth 1) view-inverse view-min-visibility view-max-visibility view-min-weight view-max-weight)))
 
 (defun invert-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (not view-inverse))))
+        (request-view view-root view-depth (not view-inverse) view-min-visibility view-max-visibility view-min-weight view-max-weight)))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -176,7 +198,7 @@
     (let (
         (entity (buffer-string)))
         (http-post
-            (concat (base-url) "update-notes")
+            (concat (base-url) "update")
             (list
                 (list "root" view-root)
                 (list "view" entity)
@@ -201,8 +223,8 @@
 (global-set-key (kbd "C-c i") 'visit-item)
 (global-set-key (kbd "C-c m") 'visit-meta)
 (global-set-key (kbd "C-c r") 'refresh-view)
-(global-set-key (kbd "C-c -") 'decrease-depth)
-(global-set-key (kbd "C-c +") 'increase-depth)
+(global-set-key (kbd "C-c C-d ,") 'decrease-depth)
+(global-set-key (kbd "C-c C-d .") 'increase-depth)
 (global-set-key (kbd "C-c ~") 'invert-view)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
@@ -223,4 +245,4 @@
 (add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 
-(provide 'myotherbrain)
+(provide 'tinkernotes)

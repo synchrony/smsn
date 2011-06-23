@@ -6,6 +6,7 @@ import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import net.fortytwo.myotherbrain.notes.NotesSyntax;
@@ -27,6 +28,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected ExtensionResponse handleRequestInternal(final Graph graph,
                                                       final String rootKey,
                                                       final int depth,
+                                                      final Filter filter,
                                                       final String view,
                                                       final boolean inverse) {
         try {
@@ -36,6 +38,22 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             if (depth > 5) {
                 return ExtensionResponse.error("depth may not be more than 5");
+            }
+
+            if (filter.minVisibility < 0 || filter.maxVisibility > 1) {
+                return ExtensionResponse.error("minimum and maximum visibility must lie between 0 and 1 (inclusive)");
+            }
+
+            if (filter.maxVisibility < filter.minVisibility) {
+                return ExtensionResponse.error("maximum visibility must be greater than or equal to minimum visibility");
+            }
+
+            if (filter.minWeight < 0 || filter.maxWeight > 1) {
+                return ExtensionResponse.error("minimum and maximum weight must lie between 0 and 1 (inclusive)");
+            }
+
+            if (filter.maxWeight < filter.minWeight) {
+                return ExtensionResponse.error("maximum weight must be greater than or equal to minimum weight");
             }
 
             if (!NotesSyntax.KEY.matcher(rootKey).matches()) {
@@ -50,10 +68,14 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             map.put("root", rootKey);
             map.put("depth", "" + depth);
             map.put("inverse", "" + inverse);
+            map.put("minVisibility", "" + filter.minVisibility);
+            map.put("maxVisibility", "" + filter.maxVisibility);
+            map.put("minWeight", "" + filter.minWeight);
+            map.put("maxWeight", "" + filter.maxWeight);
 
             FramesManager manager = new FramesManager(graph);
             NotesSemantics m = new NotesSemantics((IndexableGraph) graph, manager);
-            NotesSyntax p = new NotesSyntax();
+            NotesSyntax syntax = new NotesSyntax();
 
             Atom root = m.getAtom(rootKey);
             if (null == root) {
@@ -61,7 +83,18 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
             map.put("title", null == root.getValue() || 0 == root.getValue().length() ? "[no name]" : root.getValue());
 
-            return handleRequestProtected(map, graph, manager, m, p, root, depth, view, inverse);
+            Params p = new Params();
+            p.map = map;
+            p.graph = graph;
+            p.manager = manager;
+            p.m = m;
+            p.p = syntax;
+            p.root = root;
+            p.depth = depth;
+            p.view = view;
+            p.inverse = inverse;
+            p.filter = filter;
+            return handleRequestProtected(p);
         } catch (Exception e) {
             // TODO
             e.printStackTrace(System.out);
@@ -69,30 +102,31 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         }
     }
 
-    protected void addView(final Map<String, String> map,
-                           final NotesSemantics m,
-                           final Atom root,
-                           final int depth,
-                           final NotesSyntax p,
-                           final boolean inverse) throws IOException {
-        Note n = m.view(root, depth, inverse);
+    protected void addView(final Params p) throws IOException {
+        Note n = p.m.view(p.root, p.depth, p.filter, p.inverse);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            p.writeChildren(n, bos);
-            map.put("view", bos.toString());
+            p.p.writeChildren(n, bos);
+            p.map.put("view", bos.toString());
         } finally {
             bos.close();
         }
     }
 
-    protected abstract ExtensionResponse handleRequestProtected(final Map<String, String> map,
-                                                                final Graph graph,
-                                                                final FramesManager manager,
-                                                                final NotesSemantics m,
-                                                                final NotesSyntax p,
-                                                                final Atom root,
-                                                                final int depth,
-                                                                final String view,
-                                                                final boolean inverse) throws Exception;
+    protected abstract ExtensionResponse handleRequestProtected(Params p) throws Exception;
+
+
+    protected class Params {
+        public Map<String, String> map;
+        public Graph graph;
+        public FramesManager manager;
+        public NotesSemantics m;
+        public NotesSyntax p;
+        public Atom root;
+        public int depth;
+        public String view;
+        public boolean inverse;
+        public Filter filter;
+    }
 }
