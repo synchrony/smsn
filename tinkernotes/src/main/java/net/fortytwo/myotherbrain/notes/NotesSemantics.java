@@ -29,7 +29,7 @@ import java.util.Set;
  * Date: 6/18/11
  * Time: 7:26 PM
  */
-public class NotesLens {
+public class NotesSemantics {
     private static final String KEYS = "keys";
 
     private static final Random RANDOM = new Random();
@@ -38,8 +38,8 @@ public class NotesLens {
     private final FramesManager manager;
     private final Index<Vertex> keys;
 
-    public NotesLens(final IndexableGraph graph,
-                     final FramesManager manager) {
+    public NotesSemantics(final IndexableGraph graph,
+                          final FramesManager manager) {
         this.graph = graph;
         this.manager = manager;
 
@@ -284,7 +284,7 @@ public class NotesLens {
     }
 
     public static void main(final String[] args) throws Exception {
-        NotesIO p = new NotesIO();
+        NotesSyntax p = new NotesSyntax();
         List<Note> notes;
 
         //InputStream in = new FileInputStream("/tmp/notes.txt");
@@ -297,7 +297,7 @@ public class NotesLens {
 
         IndexableGraph graph = new TinkerGraph();
         FramesManager manager = new FramesManager(graph);
-        NotesLens m = new NotesLens(graph, manager);
+        NotesSemantics m = new NotesSemantics(graph, manager);
         Atom root = m.createAtom();
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setText("Josh's notes");

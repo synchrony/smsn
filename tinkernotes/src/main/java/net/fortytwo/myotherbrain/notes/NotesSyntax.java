@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Date: 5/18/11
  * Time: 6:00 PM
  */
-public class NotesIO {
+public class NotesSyntax {
     private static final int MAX_TYPE_LENGTH = 5;
 
     // Regex of valid id prefixes, including parentheses, colon and trailing space
@@ -339,7 +339,7 @@ public class NotesIO {
     }
 
     public static void main(final String[] args) throws Exception {
-        NotesIO p = new NotesIO();
+        NotesSyntax p = new NotesSyntax();
         List<NoteContext> contexts;
 
         InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");

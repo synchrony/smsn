@@ -12,16 +12,16 @@ import java.util.List;
  * Date: 6/20/11
  * Time: 7:58 PM
  */
-public class NotesIOTest extends TestCase {
+public class NotesSyntaxTest extends TestCase {
     //private Graph graph;
     //private FramesManager manager;
-    private NotesIO io;
+    private NotesSyntax syntax;
 
     @Override
     public void setUp() throws Exception {
         //graph = new TinkerGraph();
         //manager = new FramesManager(graph);
-        io = new NotesIO();
+        syntax = new NotesSyntax();
     }
 
     @Override
@@ -53,10 +53,10 @@ public class NotesIOTest extends TestCase {
         assertEquals("e", contexts.get(1).getNotes().get(0).getText());
     }
 
-    private List<NoteContext> parse(final String s) throws IOException, NotesIO.NoteParsingException {
+    private List<NoteContext> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return io.parseContexts(in);
+            return syntax.parseContexts(in);
         } finally {
             in.close();
         }

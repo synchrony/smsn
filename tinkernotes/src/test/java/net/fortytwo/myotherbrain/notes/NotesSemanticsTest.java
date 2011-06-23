@@ -23,18 +23,18 @@ import java.util.Set;
  * Date: 6/20/11
  * Time: 7:58 PM
  */
-public class NotesLensTest extends TestCase {
+public class NotesSemanticsTest extends TestCase {
     private IndexableGraph graph;
     private FramesManager manager;
-    private NotesIO io;
-    private NotesLens lens;
+    private NotesSyntax syntax;
+    private NotesSemantics semantics;
 
     @Override
     public void setUp() throws Exception {
         graph = new TinkerGraph();
         manager = new FramesManager(graph);
-        io = new NotesIO();
-        lens = new NotesLens(graph, manager);
+        syntax = new NotesSyntax();
+        semantics = new NotesSemantics(graph, manager);
     }
 
     @Override
@@ -135,10 +135,10 @@ public class NotesLensTest extends TestCase {
         return manager.frame(v, Atom.class);
     }
 
-    private List<Note> parse(final String s) throws IOException, NotesIO.NoteParsingException {
+    private List<Note> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return io.parseNotes(in);
+            return syntax.parseNotes(in);
         } finally {
             in.close();
         }
