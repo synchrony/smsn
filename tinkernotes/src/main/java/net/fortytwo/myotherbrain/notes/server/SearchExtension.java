@@ -10,42 +10,55 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Filter;
+import net.fortytwo.myotherbrain.notes.Note;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * User: josh
  * Date: 6/19/11
  * Time: 1:40 PM
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "view")
-public class ViewExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "tinkernotes", name = "search")
+public class SearchExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the TinkerNotes format")
+    @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
+                                           @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
-        LOGGER.fine("view request for: " + rootKey);
+                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight) {
+        LOGGER.fine("search request for \"" + query + "\"");
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 
         Params p = new Params();
         p.graph = graph;
-        p.depth = depth;
         p.filter = filter;
-        p.inverse = inverse;
-        return this.handleRequestInternal(p, rootKey);
+        p.query = query;
+        return this.handleRequestInternal(p, null);
     }
 
     @Override
     protected ExtensionResponse handleRequestProtected(final Params p) throws Exception {
-        addView(p);
+        addSearchResults(p);
 
         return ExtensionResponse.ok(p.map);
+    }
+
+    protected void addSearchResults(final Params p) throws IOException {
+        Note n = p.m.search(p.query, p.filter);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            p.p.writeChildren(n, bos);
+            p.map.put("view", bos.toString());
+        } finally {
+            bos.close();
+        }
     }
 }

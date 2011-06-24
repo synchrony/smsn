@@ -39,12 +39,18 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
 
-        LOGGER.fine("update-notes request for: " + rootKey);
+        LOGGER.fine("update request for: " + rootKey);
         System.out.println("update-notes request for: " + rootKey);
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 
-        return this.handleRequestInternal(graph, rootKey, depth, filter, view, inverse);
+        Params p = new Params();
+        p.graph = graph;
+        p.depth = depth;
+        p.filter = filter;
+        p.inverse = inverse;
+        p.view = view;
+        return this.handleRequestInternal(p, rootKey);
     }
 
     @Override

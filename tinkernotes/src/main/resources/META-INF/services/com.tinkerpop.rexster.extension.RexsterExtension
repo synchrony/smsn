@@ -1,2 +1,3 @@
 net.fortytwo.myotherbrain.notes.server.ViewExtension
+net.fortytwo.myotherbrain.notes.server.SearchExtension
 net.fortytwo.myotherbrain.notes.server.UpdateExtension

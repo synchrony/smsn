@@ -122,6 +122,35 @@ public class NotesSemantics {
         updateInternal(root, children, depth, filter, true, inverse);
     }
 
+    /**
+     * Performs full text search.
+     *
+     * @param query  the search query
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @return an ordered list of query results
+     */
+    public Note search(final String query,
+                       final Filter filter) {
+        Note result = new Note(".", "query results for \"" + query + "\"");
+
+        // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
+        CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
+        try {
+            while (i.hasNext()) {
+                Atom a = getAtom(i.next());
+                if (filter.isVisible(a)) {
+                    Note n = view(a, 0, filter, false);
+                    result.addChild(n);
+                }
+            }
+        } finally {
+            i.close();
+        }
+
+        return result;
+    }
+
     private void updateInternal(final Atom root,
                                 final List<Note> children,
                                 final int depth,

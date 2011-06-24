@@ -84,7 +84,9 @@
             (list nil nil))))
 
 (defun view-name (root-id)
-    (concat "view-" root-id))
+    (if root-id
+        (concat "view-" root-id)
+        "anonymous view"))
 
 
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,7 +107,7 @@
                 (let (
                     (root (gethash "root" json))
                     (view (gethash "view" json))
-                    (depth (string-to-number (gethash "depth" json)))
+                    (depth (gethash "depth" json))
                     (min-sharability (string-to-number (gethash "minSharability" json)))
                     (max-sharability (string-to-number (gethash "maxSharability" json)))
                     (min-weight (string-to-number (gethash "minWeight" json)))
@@ -126,7 +128,7 @@
                         (make-local-variable 'view-min-weight)
                         (make-local-variable 'view-max-weight)
                         (setq view-root root)
-                        (setq view-depth depth)
+                        (if depth (setq view-depth (string-to-number depth)))
                         (setq view-min-sharability min-sharability)
                         (setq view-max-sharability max-sharability)
                         (setq view-min-weight min-weight)
@@ -158,6 +160,15 @@
             "&maxWeight=" (number-to-string maxw)
             "&inverse=" (if inverse "true" "false")) 'receive-view))
 
+(defun request-search-results (query minv maxv minw maxw)
+    (url-retrieve
+        (concat (base-url) "search"
+            "?query=" (w3m-url-encode-string query)
+            "&minSharability=" (number-to-string minv)
+            "&maxSharability=" (number-to-string maxv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)) 'receive-view))
+
 (defun visit-item ()
     (interactive)
     (let ((atom-id (car (last (find-id)))))
@@ -169,6 +180,14 @@
     (let ((link-id (car (find-id))))
         (if link-id
             (request-view link-id view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+
+(defun search ()
+    (interactive)
+    (let ((query (read-from-minibuffer "query: ")))
+        (if (> (length query) 0)
+            (request-search-results
+                (concat "*" query "*")
+                view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
 (defun refresh-view ()
     (interactive)
@@ -265,6 +284,7 @@
 (global-set-key (kbd "C-c ~") 'invert-view)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
+(global-set-key (kbd "C-c s") 'search)
 (global-set-key (kbd "C-c C-w C-[ ,") 'decrease-min-weight)
 (global-set-key (kbd "C-c C-w C-[ .") 'increase-min-weight)
 (global-set-key (kbd "C-c C-w C-] ,") 'decrease-max-weight)

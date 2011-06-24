@@ -25,75 +25,66 @@ import java.util.logging.Logger;
 public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected static final Logger LOGGER = Logger.getLogger(TinkerNotesExtension.class.getName());
 
-    protected ExtensionResponse handleRequestInternal(final Graph graph,
-                                                      final String rootKey,
-                                                      final int depth,
-                                                      final Filter filter,
-                                                      final String view,
-                                                      final boolean inverse) {
+    protected ExtensionResponse handleRequestInternal(final Params p,
+                                                      final String rootKey) {
         try {
-            if (depth < 1) {
-                return ExtensionResponse.error("depth must be at least 1");
-            }
+            p.map = new HashMap<String, String>();
 
-            if (depth > 5) {
-                return ExtensionResponse.error("depth may not be more than 5");
-            }
-
-            if (filter.minSharability < 0 || filter.maxSharability > 1) {
-                return ExtensionResponse.error("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
-            }
-
-            if (filter.maxSharability < filter.minSharability) {
-                return ExtensionResponse.error("maximum sharability must be greater than or equal to minimum sharability");
-            }
-
-            if (filter.minWeight < 0 || filter.maxWeight > 1) {
-                return ExtensionResponse.error("minimum and maximum weight must lie between 0 and 1 (inclusive)");
-            }
-
-            if (filter.maxWeight < filter.minWeight) {
-                return ExtensionResponse.error("maximum weight must be greater than or equal to minimum weight");
-            }
-
-            if (!NotesSyntax.KEY.matcher(rootKey).matches()) {
-                return ExtensionResponse.error("root of view is not a valid key: " + rootKey);
-            }
-
-            if (!(graph instanceof IndexableGraph)) {
+            if (!(p.graph instanceof IndexableGraph)) {
                 return ExtensionResponse.error("graph must be an instance of IndexableGraph");
             }
 
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("root", rootKey);
-            map.put("depth", "" + depth);
-            map.put("inverse", "" + inverse);
-            map.put("minWeight", "" + filter.minWeight);
-            map.put("maxWeight", "" + filter.maxWeight);
-            map.put("minSharability", "" + filter.minSharability);
-            map.put("maxSharability", "" + filter.maxSharability);
+            p.manager = new FramesManager(p.graph);
+            p.m = new NotesSemantics((IndexableGraph) p.graph, p.manager);
+            p.p = new NotesSyntax();
 
-            FramesManager manager = new FramesManager(graph);
-            NotesSemantics m = new NotesSemantics((IndexableGraph) graph, manager);
-            NotesSyntax syntax = new NotesSyntax();
+            if (null != p.depth) {
+                if (p.depth < 1) {
+                    return ExtensionResponse.error("depth must be at least 1");
+                }
 
-            Atom root = m.getAtom(rootKey);
-            if (null == root || !filter.isVisible(root)) {
-                return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
+                if (p.depth > 5) {
+                    return ExtensionResponse.error("depth may not be more than 5");
+                }
+
+                p.map.put("depth", "" + p.depth);
             }
-            map.put("title", null == root.getValue() || 0 == root.getValue().length() ? "[no title]" : root.getValue());
 
-            Params p = new Params();
-            p.map = map;
-            p.graph = graph;
-            p.manager = manager;
-            p.m = m;
-            p.p = syntax;
-            p.root = root;
-            p.depth = depth;
-            p.view = view;
-            p.inverse = inverse;
-            p.filter = filter;
+            if (p.filter.minSharability < 0 || p.filter.maxSharability > 1) {
+                return ExtensionResponse.error("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
+            }
+
+            if (p.filter.maxSharability < p.filter.minSharability) {
+                return ExtensionResponse.error("maximum sharability must be greater than or equal to minimum sharability");
+            }
+
+            if (p.filter.minWeight < 0 || p.filter.maxWeight > 1) {
+                return ExtensionResponse.error("minimum and maximum weight must lie between 0 and 1 (inclusive)");
+            }
+
+            if (p.filter.maxWeight < p.filter.minWeight) {
+                return ExtensionResponse.error("maximum weight must be greater than or equal to minimum weight");
+            }
+
+            p.map.put("minWeight", "" + p.filter.minWeight);
+            p.map.put("maxWeight", "" + p.filter.maxWeight);
+            p.map.put("minSharability", "" + p.filter.minSharability);
+            p.map.put("maxSharability", "" + p.filter.maxSharability);
+
+            if (null != rootKey) {
+                p.root = p.m.getAtom(rootKey);
+                if (null == p.root || !p.filter.isVisible(p.root)) {
+                    return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
+                }
+
+                p.map.put("root", rootKey);
+                p.map.put("title", null == p.root.getValue() || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
+            }
+
+            if (null != p.inverse) {
+                p.map.put("inverse", "" + p.inverse);
+            }
+
             return handleRequestProtected(p);
         } catch (Exception e) {
             // TODO
@@ -116,7 +107,6 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected abstract ExtensionResponse handleRequestProtected(Params p) throws Exception;
 
-
     protected class Params {
         public Map<String, String> map;
         public Graph graph;
@@ -124,9 +114,10 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public NotesSemantics m;
         public NotesSyntax p;
         public Atom root;
-        public int depth;
+        public Integer depth;
         public String view;
-        public boolean inverse;
+        public Boolean inverse;
         public Filter filter;
+        public String query;
     }
 }
