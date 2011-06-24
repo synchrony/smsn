@@ -12,6 +12,7 @@
 
     <modules>
         <module>core</module>
+	<module>flashcards</module>
         <module>server</module>
         <module>tinkernotes</module>
         <module>android</module>

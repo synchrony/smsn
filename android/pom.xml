@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>net.fortytwo.myotherbrain</groupId>
-            <artifactId>myotherbrain-core</artifactId>
+            <artifactId>flashcards</artifactId>
             <version>0.1</version>
         </dependency>
         <dependency>
@@ -30,17 +30,10 @@
             <version>2.2.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
         <directory>target</directory>
         <!--<outputDirectory>target/classes</outputDirectory>
         <testOutputDirectory>target/test-classes</testOutputDirectory>-->
