@@ -25,24 +25,22 @@ public class Filter {
         float visibility = atom.getVisibility();
         float weight = atom.getWeight();
 
-        return visibility >= minVisibility && visibility <= maxVisibility
-                && weight >= minWeight && weight <= maxWeight;
+        // Strictly greater than the minimum, less than or equal to the maximum.
+        // Values range from 0 (exclusive) to 1 (inclusive).
+        return visibility > minVisibility && visibility <= maxVisibility
+                && weight > minWeight && weight <= maxWeight;
     }
 
     public void makeVisible(final Atom atom) {
         float visibility = atom.getVisibility();
         float weight = atom.getWeight();
 
-        if (visibility < minVisibility) {
-            visibility = minVisibility;
-        } else if (visibility > maxVisibility) {
-            visibility = maxVisibility;
+        if (visibility <= minVisibility || visibility > maxVisibility) {
+            atom.setVisibility((maxVisibility - minVisibility) / 2);
         }
 
-        if (weight < minWeight) {
-            weight = minWeight;
-        } else if (weight > maxWeight) {
-            weight = maxWeight;
+        if (weight <= minWeight || weight > maxWeight) {
+            atom.setWeight((maxWeight - minWeight) / 2);
         }
     }
 }

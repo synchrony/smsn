@@ -190,6 +190,39 @@
     (if view-root
         (request-view view-root view-depth (not view-inverse) view-min-visibility view-max-visibility view-min-weight view-max-weight)))
 
+(defun decrease-min-weight ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse view-min-visibility view-max-visibility (- view-min-weight 0.25) view-max-weight)))
+(defun increase-min-weight ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse view-min-visibility view-max-visibility (+ view-min-weight 0.25) view-max-weight)))
+(defun decrease-max-weight ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse view-min-visibility view-max-visibility view-min-weight (- view-max-weight 0.25))))
+(defun increase-max-weight ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse view-min-visibility view-max-visibility view-min-weight (+ view-max-weight 0.25))))
+(defun decrease-min-visibility ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse (- view-min-visibility 0.25) view-max-visibility view-min-weight view-max-weight)))
+(defun increase-min-visibility ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse (+ view-min-visibility 0.25) view-max-visibility view-min-weight view-max-weight)))
+(defun decrease-max-visibility ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse view-min-visibility (- view-max-visibility 0.25) view-min-weight view-max-weight)))
+(defun increase-max-visibility ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-inverse view-min-visibility (+ view-max-visibility 0.25) view-min-weight view-max-weight)))
+
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -232,7 +265,14 @@
 (global-set-key (kbd "C-c ~") 'invert-view)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c d") 'my-debug)
-
+(global-set-key (kbd "C-c C-w C-[ ,") 'decrease-min-weight)
+(global-set-key (kbd "C-c C-w C-[ .") 'increase-min-weight)
+(global-set-key (kbd "C-c C-w C-] ,") 'decrease-max-weight)
+(global-set-key (kbd "C-c C-w C-] .") 'increase-max-weight)
+(global-set-key (kbd "C-c C-v C-[ ,") 'decrease-min-visibility)
+(global-set-key (kbd "C-c C-v C-[ .") 'increase-min-visibility)
+(global-set-key (kbd "C-c C-v C-] ,") 'decrease-max-visibility)
+(global-set-key (kbd "C-c C-v C-] .") 'increase-max-visibility)
 
 (setq syntax-keywords
  '(
