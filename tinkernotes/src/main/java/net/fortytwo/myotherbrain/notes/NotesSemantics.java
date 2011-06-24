@@ -106,12 +106,12 @@ public class NotesSemantics {
     /**
      * Updates the graph.
      *
-     * @param root          the root of the subgraph to be updated
-     * @param children      the children of the root atom
-     * @param depth         the minimum depth to which the graph will be updated
-     * @param filter  a collection of criteria for atoms and links.
-     *                Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param inverse       whether to push an inverted view (in which links are followed "backwards")
+     * @param root     the root of the subgraph to be updated
+     * @param children the children of the root atom
+     * @param depth    the minimum depth to which the graph will be updated
+     * @param filter   a collection of criteria for atoms and links.
+     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param inverse  whether to push an inverted view (in which links are followed "backwards")
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
@@ -168,31 +168,45 @@ public class NotesSemantics {
 
         // Add any new links, and update fields
         for (Note n : children) {
-            String linkKey = n.getLinkKey();
-            Atom a;
+            Atom target;
             if (null == n.getTargetKey()) {
-                a = createAtom(filter);
+                target = createAtom(filter);
             } else {
-                a = getAtom(n.getTargetKey());
-                if (null == a) {
-                    throw new InvalidUpdateException("no such vertex: " + n.getTargetKey());
+                target = getAtom(n.getTargetKey());
+                if (null == target) {
+                    throw new InvalidUpdateException("no such atom: " + n.getTargetKey());
                 }
+
+                // Note: if we were to equate visibility with security, this would be a security issue,
+                // as one could simply guess keys randomly until one finds an actual atom, making it visible.
+                // The benefit of visibility is for user interaction, not access control.
+                filter.makeVisible(target);
             }
+            target.setType(n.getType());
+            target.setValue(n.getValue());
 
-            a.setValue(n.getValue());
-            a.setType(n.getType());
+            String linkKey = n.getLinkKey();
+            boolean createLink = false;
 
-            if (null == linkKey || null == beforeMap.get(linkKey)) {
+            if (null == linkKey) {
+                createLink = true;
                 destructive = false;
-
-                Atom link = createAtom(filter);
-                if (inverse) {
-                    link.setFrom(a);
-                    link.setTo(root);
-                } else {
-                    link.setFrom(root);
-                    link.setTo(a);
+            } else if (null == beforeMap.get(linkKey)) {
+                Atom link = getAtom(linkKey);
+                boolean exists = link != null;
+                if (exists) {
+                    exists = inverse
+                            ? link.getFrom().getKey().equals(target.getKey()) && link.getTo().getKey().equals(root.getKey())
+                            : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey());
                 }
+
+                if (exists) {
+                    filter.makeVisible(link);
+                } else {
+                    createLink = true;
+                }
+
+                destructive = false;
             } else {
                 // Validate against the existing link
                 if (null == n.getTargetKey()) {
@@ -202,7 +216,18 @@ public class NotesSemantics {
                 }
             }
 
-            updateInternal(a, n.getChildren(), depth - 1, filter, destructive, inverse);
+            if (createLink) {
+                Atom link = createAtom(filter);
+                if (inverse) {
+                    link.setFrom(target);
+                    link.setTo(root);
+                } else {
+                    link.setFrom(root);
+                    link.setTo(target);
+                }
+            }
+
+            updateInternal(target, n.getChildren(), depth - 1, filter, destructive, inverse);
         }
     }
 
@@ -273,7 +298,10 @@ public class NotesSemantics {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
         for (Edge e : from.asVertex().getInEdges(MyOtherBrain.TO)) {
-            c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
+            Atom link = getAtom(e.getOutVertex());
+            if (filter.isVisible(link) && filter.isVisible(link.getFrom())) {
+                c.add(new TimestampedAtom(link));
+            }
         }
 
         Collections.sort(c);
@@ -291,7 +319,10 @@ public class NotesSemantics {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
         for (Edge e : from.asVertex().getInEdges(MyOtherBrain.FROM)) {
-            c.add(new TimestampedAtom(getAtom(e.getOutVertex())));
+            Atom link = getAtom(e.getOutVertex());
+            if (filter.isVisible(link) && filter.isVisible(link.getTo())) {
+                c.add(new TimestampedAtom(link));
+            }
         }
 
         Collections.sort(c);
