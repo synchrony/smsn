@@ -40,12 +40,12 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 return ExtensionResponse.error("depth may not be more than 5");
             }
 
-            if (filter.minVisibility < 0 || filter.maxVisibility > 1) {
-                return ExtensionResponse.error("minimum and maximum visibility must lie between 0 and 1 (inclusive)");
+            if (filter.minSharability < 0 || filter.maxSharability > 1) {
+                return ExtensionResponse.error("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
             }
 
-            if (filter.maxVisibility < filter.minVisibility) {
-                return ExtensionResponse.error("maximum visibility must be greater than or equal to minimum visibility");
+            if (filter.maxSharability < filter.minSharability) {
+                return ExtensionResponse.error("maximum sharability must be greater than or equal to minimum sharability");
             }
 
             if (filter.minWeight < 0 || filter.maxWeight > 1) {
@@ -68,10 +68,10 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             map.put("root", rootKey);
             map.put("depth", "" + depth);
             map.put("inverse", "" + inverse);
-            map.put("minVisibility", "" + filter.minVisibility);
-            map.put("maxVisibility", "" + filter.maxVisibility);
             map.put("minWeight", "" + filter.minWeight);
             map.put("maxWeight", "" + filter.maxWeight);
+            map.put("minSharability", "" + filter.minSharability);
+            map.put("maxSharability", "" + filter.maxSharability);
 
             FramesManager manager = new FramesManager(graph);
             NotesSemantics m = new NotesSemantics((IndexableGraph) graph, manager);

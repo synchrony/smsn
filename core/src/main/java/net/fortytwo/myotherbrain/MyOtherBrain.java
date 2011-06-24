@@ -43,7 +43,7 @@ public class MyOtherBrain {
             TO = "to",
             TYPE = "type",
             VALUE = "value",
-            VISIBILITY = "visibility",
+            SHARABILITY = "sharability",
             WEIGHT = "weight";
 
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";

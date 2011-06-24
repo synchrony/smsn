@@ -25,14 +25,14 @@ public class ViewExtension extends TinkerNotesExtension {
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
-                                           @ExtensionRequestParameter(name = "minVisibility", description = "minimum-visibility criterion for atoms in the view") Float minVisibility,
-                                           @ExtensionRequestParameter(name = "maxVisibility", description = "maximum-visibility criterion for atoms in the view") Float maxVisibility,
+                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
+                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
         LOGGER.fine("view-notes request for: " + rootKey);
 
-        Filter filter = new Filter(minVisibility, maxVisibility, minWeight, maxWeight);
+        Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 
         return this.handleRequestInternal(graph, rootKey, depth, filter, null, inverse);
     }

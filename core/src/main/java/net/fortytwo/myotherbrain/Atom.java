@@ -35,11 +35,11 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.VALUE)
     void setValue(String description);
 
-    @Property(MyOtherBrain.VISIBILITY)
-    Float getVisibility();
+    @Property(MyOtherBrain.SHARABILITY)
+    Float getSharability();
 
-    @Property(MyOtherBrain.VISIBILITY)
-    void setVisibility(float visibility);
+    @Property(MyOtherBrain.SHARABILITY)
+    void setSharability(float sharability);
 
     @Property(MyOtherBrain.WEIGHT)
     Float getWeight();

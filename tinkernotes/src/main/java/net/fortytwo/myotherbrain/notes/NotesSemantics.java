@@ -177,9 +177,9 @@ public class NotesSemantics {
                     throw new InvalidUpdateException("no such atom: " + n.getTargetKey());
                 }
 
-                // Note: if we were to equate visibility with security, this would be a security issue,
+                // Note: if we were to equate sharability with security, this would be a security issue,
                 // as one could simply guess keys randomly until one finds an actual atom, making it visible.
-                // The benefit of visibility is for user interaction, not access control.
+                // The benefit of sharability is for user interaction, not access control.
                 filter.makeVisible(target);
             }
             target.setType(n.getType());
@@ -268,8 +268,8 @@ public class NotesSemantics {
         a.setKey(createKey());
         a.setCreated(new Date().getTime());
 
-        // Place visibility and weight in the middle of the applicable ranges.
-        a.setVisibility((filter.maxVisibility - filter.minVisibility) / 2);
+        // Place sharability and weight in the middle of the applicable ranges.
+        a.setSharability((filter.maxSharability - filter.minSharability) / 2);
         a.setWeight((filter.maxWeight - filter.minWeight) / 2);
 
         return a;
