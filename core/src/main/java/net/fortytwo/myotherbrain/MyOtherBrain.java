@@ -48,7 +48,6 @@ public class MyOtherBrain {
 
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";
     private static final String VERSION_PROPERTIES_FILE = "version.properties";
-    private static final String LOGGING_PROPERTIES_FILE = "log4j.properties";
     private static final TypedProperties VERSION_PROPERTIES;
     private static final Logger LOGGER;
 

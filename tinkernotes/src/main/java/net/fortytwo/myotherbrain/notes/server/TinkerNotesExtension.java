@@ -79,9 +79,9 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             Atom root = m.getAtom(rootKey);
             if (null == root || !filter.isVisible(root)) {
-                return ExtensionResponse.error("root atom does not exist or is not visible: " + rootKey);
+                return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
             }
-            map.put("title", null == root.getValue() || 0 == root.getValue().length() ? "[no name]" : root.getValue());
+            map.put("title", null == root.getValue() || 0 == root.getValue().length() ? "[no title]" : root.getValue());
 
             Params p = new Params();
             p.map = map;
