@@ -203,6 +203,10 @@
                 (list "root" view-root)
                 (list "view" entity)
                 (list "inverse" (if view-inverse "true" "false"))
+                (list "minVisibility" (number-to-string view-min-visibility))
+                (list "maxVisibility" (number-to-string view-max-visibility))
+                (list "minWeight" (number-to-string view-min-weight))
+                (list "maxWeight" (number-to-string view-max-weight))
                 (list "depth" (number-to-string view-depth)))
             'receive-view)))
 

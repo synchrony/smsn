@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.notes;
 
+import net.fortytwo.myotherbrain.Atom;
+
 /**
 * User: josh
 * Date: 6/24/11
@@ -18,4 +20,12 @@ public class Filter {
 
     public final float minVisibility, maxVisibility;
     public final float minWeight, maxWeight;
+
+    public boolean isVisible(final Atom atom) {
+        float visibility = atom.getVisibility();
+        float weight = atom.getWeight();
+
+        return visibility >= minVisibility && visibility <= maxVisibility
+                && weight >= minWeight && weight <= maxWeight;
+    }
 }
