@@ -28,11 +28,13 @@ public class SearchExtension extends TinkerNotesExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
+                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight) {
-        LOGGER.fine("search request for \"" + query + "\"");
+                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
+                                           @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
+        LOGGER.info("search request for \"" + query + "\"");
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 
@@ -40,6 +42,8 @@ public class SearchExtension extends TinkerNotesExtension {
         p.graph = graph;
         p.filter = filter;
         p.query = query;
+        p.depth = depth;
+        p.inverse = inverse;
         return this.handleRequestInternal(p, null);
     }
 
@@ -51,7 +55,7 @@ public class SearchExtension extends TinkerNotesExtension {
     }
 
     protected void addSearchResults(final Params p) throws IOException {
-        Note n = p.m.search(p.query, p.filter);
+        Note n = p.m.search(p.query, p.depth, p.filter, p.inverse);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {

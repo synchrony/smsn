@@ -30,7 +30,7 @@ public class ViewExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
-        LOGGER.fine("view request for: " + rootKey);
+        LOGGER.info("view request for: " + rootKey);
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 

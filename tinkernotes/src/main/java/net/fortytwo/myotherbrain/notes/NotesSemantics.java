@@ -131,7 +131,9 @@ public class NotesSemantics {
      * @return an ordered list of query results
      */
     public Note search(final String query,
-                       final Filter filter) {
+                       final int depth,
+                       final Filter filter,
+                       final boolean inverse) {
         Note result = new Note(".", "query results for \"" + query + "\"");
 
         // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
@@ -140,7 +142,7 @@ public class NotesSemantics {
             while (i.hasNext()) {
                 Atom a = getAtom(i.next());
                 if (filter.isVisible(a)) {
-                    Note n = view(a, 0, filter, false);
+                    Note n = view(a, depth - 1, filter, inverse);
                     result.addChild(n);
                 }
             }

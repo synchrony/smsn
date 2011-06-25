@@ -164,6 +164,8 @@
     (url-retrieve
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
+            "&depth=2"
+            "&inverse=false"
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
             "&minWeight=" (number-to-string minw)

@@ -39,7 +39,7 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
 
-        LOGGER.fine("update request for: " + rootKey);
+        LOGGER.info("update request for: " + rootKey);
         System.out.println("update-notes request for: " + rootKey);
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
