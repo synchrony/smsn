@@ -83,6 +83,7 @@
                         (list assoc-id atom-id))))
             (list nil nil))))
 
+
 (defun view-name (root-id)
     (if root-id
         (concat "view-" root-id)
@@ -169,12 +170,17 @@
                 (link-value (cdr (assoc 'value link)))
 		        (link-weight (cdr (assoc 'weight link)))
 	            (link-sharability (cdr (assoc 'sharability link)))
-                (target-key (cdr (assoc 'key link)))
+                (target-key (cdr (assoc 'key target)))
                 (target-value (cdr (assoc 'value target)))
 		        (target-weight (cdr (assoc 'weight target)))
 		        (target-sharability (cdr (assoc 'sharability target))))
-                    (insert (concat "(" link-key ":" target-key ") "))
-                    (loop for i from 1 to indent do (insert "    "))
+                    (insert
+		                (propertize (concat "(" link-key ":" target-key ") ")
+		                    'target-weight target-weight
+		                	'target-sharability target-sharability
+		                	'link-weight link-weight
+			                'link-sharability link-sharability))
+			        (loop for i from 1 to indent do (insert "    "))
                     (insert (concat
 		                (colorize link-value link-weight link-sharability) "  "
 			            (colorize target-value target-weight target-sharability) "\n"))
@@ -204,6 +210,19 @@
             "&maxWeight=" (number-to-string maxw)
             "&inverse=" (if inverse "true" "false")) 'receive-view))
 
+(defun request-view-url  (root depth inverse minv maxv minw maxw)
+	(concat (base-url) "view"
+            "?root=" (w3m-url-encode-string root)
+            "&depth=" (number-to-string depth)
+            "&minSharability=" (number-to-string minv)
+            "&maxSharability=" (number-to-string maxv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)
+            "&inverse=" (if inverse "true" "false")))
+
+(defun refresh-view-new (url)
+    (url-retrieve url 'receive-view))
+
 (defun request-search-results (query minv maxv minw maxw)
     (url-retrieve
         (concat (base-url) "search"
@@ -215,17 +234,129 @@
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)) 'receive-view))
 
+(defun find-link-weight ()
+    (get-text-property (line-beginning-position) 'link-weight))
+
+(defun find-link-sharability ()
+    (get-text-property (line-beginning-position) 'link-sharability))
+
+(defun find-target-weight ()
+    (get-text-property (line-beginning-position) 'target-weight))
+
+(defun find-target-sharability ()
+    (get-text-property (line-beginning-position) 'target-sharability))
+
+(defun set-properties (key weight sharability)
+    (interactive)
+    (if view-root
+        (let ((url (request-view-url view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+(setq hack-url url)
+            (url-retrieve
+                (concat (base-url) "set"
+                    "?key=" (w3m-url-encode-string key)
+                    "&weight=" (number-to-string weight)
+                    "&sharability=" (number-to-string sharability))
+	(lambda (status)
+        (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
+            (if status
+                (let ((msg (cdr (assoc 'message json)))
+				    (error (cdr (assoc 'error json))))
+                        (if error
+                            (error-message error)
+                            (error-message msg)))
+		         (refresh-view-new hack-url))))
+		                     ))
+        (not-in-view)))
+
+(defun current-line-target ()
+    (car (last (find-id))))
+
+(defun current-line-link ()
+    (car (find-id)))
+
 (defun visit-item ()
     (interactive)
-    (let ((atom-id (car (last (find-id)))))
-        (if atom-id
-            (request-view atom-id view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+    (let ((key (current-line-target)))
+        (if key
+            (request-view key view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
 (defun visit-meta ()
     (interactive)
-    (let ((link-id (car (find-id))))
-        (if link-id
-            (request-view link-id view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+    (let ((key (current-line-link)))
+        (if key
+            (request-view key view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+
+(defun decrease-link-weight ()
+    (interactive)
+    (let (
+        (key (current-line-link))
+	(weight (find-link-weight))
+	(sharability (find-link-sharability)))
+            (if key
+	        (set-properties key (- weight 0.25) sharability))))
+
+(defun increase-link-weight ()
+    (interactive)
+    (let (
+        (key (current-line-link))
+	(weight (find-link-weight))
+	(sharability (find-link-sharability)))
+            (if key
+	        (set-properties key (+ weight 0.25) sharability))))
+
+(defun decrease-target-weight ()
+    (interactive)
+    (let (
+        (key (current-line-target))
+	(weight (find-target-weight))
+	(sharability (find-target-sharability)))
+            (if key
+	        (set-properties key (- weight 0.25) sharability))))
+
+(defun increase-target-weight ()
+    (interactive)
+    (let (
+        (key (current-line-target))
+	(weight (find-target-weight))
+	(sharability (find-target-sharability)))
+            (if key
+	        (set-properties key (+ weight 0.25) sharability))))
+
+(defun decrease-link-sharability ()
+    (interactive)
+    (let (
+        (key (current-line-link))
+	(weight (find-link-weight))
+	(sharability (find-link-sharability)))
+            (if key
+		    (set-properties key weight (- sharability 0.25)))))
+
+(defun increase-link-sharability ()
+    (interactive)
+    (let (
+        (key (current-line-link))
+	(weight (find-link-weight))
+	(sharability (find-link-sharability)))
+            (if key
+		    (set-properties key weight (+ sharability 0.25)))))
+
+(defun decrease-target-sharability ()
+    (interactive)
+    (let (
+        (key (current-line-target))
+	(weight (find-target-weight))
+	(sharability (find-target-sharability)))
+            (if key
+		    (set-properties key weight (- sharability 0.25)))))
+
+(defun increase-target-sharability ()
+    (interactive)
+    (let (
+        (key (current-line-target))
+	(weight (find-target-weight))
+	(sharability (find-target-sharability)))
+            (if key
+		    (set-properties key weight (+ sharability 0.25)))))
 
 (defun search ()
     (interactive)
@@ -235,58 +366,80 @@
                 (concat "*" query "*")
                 view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
+(defun not-in-view ()
+	(error-message "this command must be executed from within a view"))
+
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
 
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- view-depth 1) view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+        (request-view view-root (- view-depth 1) view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ view-depth 1) view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+        (request-view view-root (+ view-depth 1) view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
 
 (defun invert-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (not view-inverse) view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+        (request-view view-root view-depth (not view-inverse) view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
 
 (defun decrease-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight)))
+        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight))
+        (not-in-view))
+
 (defun increase-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight)))
+        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight))
+        (not-in-view))
+
 (defun decrease-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25))))
+        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25)))
+        (not-in-view))
+
 (defun increase-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25))))
+        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25)))
+        (not-in-view))
+
 (defun decrease-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight)))
+        (request-view view-root view-depth view-inverse (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
+            (not-in-view))
+
 (defun increase-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight)))
+        (request-view view-root view-depth view-inverse (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
+            (not-in-view))
+
 (defun decrease-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight)))
+        (request-view view-root view-depth view-inverse view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight))
+            (not-in-view))
+
 (defun increase-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight)))
+        (request-view view-root view-depth view-inverse view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight))
+            (not-in-view))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -339,6 +492,14 @@
 (global-set-key (kbd "C-c C-v C-[ .") 'increase-min-sharability)
 (global-set-key (kbd "C-c C-v C-] ,") 'decrease-max-sharability)
 (global-set-key (kbd "C-c C-v C-] .") 'increase-max-sharability)
+(global-set-key (kbd "C-c C-l C-w ,") 'decrease-link-weight)
+(global-set-key (kbd "C-c C-l C-w .") 'increase-link-weight)
+(global-set-key (kbd "C-c C-t C-w ,") 'decrease-target-weight)
+(global-set-key (kbd "C-c C-t C-w .") 'increase-target-weight)
+(global-set-key (kbd "C-c C-l C-s ,") 'decrease-link-sharability)
+(global-set-key (kbd "C-c C-l C-s .") 'increase-link-sharability)
+(global-set-key (kbd "C-c C-t C-s ,") 'decrease-target-sharability)
+(global-set-key (kbd "C-c C-t C-s .") 'increase-target-sharability)
 
 ;;(setq syntax-keywords
 ;; '(
