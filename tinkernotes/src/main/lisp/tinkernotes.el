@@ -176,6 +176,8 @@
 		        (target-sharability (cdr (assoc 'sharability target))))
                     (insert
 		                (propertize (concat "(" link-key ":" target-key ") ")
+					'face '(:foreground "white")
+					'invisible t
 		                    'target-weight target-weight
 		                	'target-sharability target-sharability
 		                	'link-weight link-weight
