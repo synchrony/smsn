@@ -95,47 +95,91 @@
     (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/tinkernotes/"))
 
 (defun receive-view (status)
-    (let ((json-object-type 'hash-table))
-        (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
-            (if status
-                (let ((msg (gethash "message" json))
-                    (error (gethash "error" json)))
-                        (if error
-                            (error-message error)
-                            (error-message msg)))
+    (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
+        (if status
+            (let ((msg (gethash "message" json))
+                (error (gethash "error" json)))
+                    (if error
+                        (error-message error)
+                        (error-message msg)))
 
-                (let (
-                    (root (gethash "root" json))
-                    (view (gethash "view" json))
-                    (depth (gethash "depth" json))
-                    (min-sharability (string-to-number (gethash "minSharability" json)))
-                    (max-sharability (string-to-number (gethash "maxSharability" json)))
-                    (min-weight (string-to-number (gethash "minWeight" json)))
-                    (max-weight (string-to-number (gethash "maxWeight" json)))
-                    (inverse (string-equal "true" (gethash "inverse" json)))
-                    (title (gethash "title" json)))
-                        (switch-to-buffer (view-name root))
-                        (tinkernotes-mode)
-                        (erase-buffer)
-                        (insert view)
-                        (beginning-of-buffer)
-                        (make-local-variable 'view-root)
-                        (make-local-variable 'view-depth)
-                        (make-local-variable 'view-inverse)
-                        (make-local-variable 'view-title)
-                        (make-local-variable 'view-min-sharability)
-                        (make-local-variable 'view-max-sharability)
-                        (make-local-variable 'view-min-weight)
-                        (make-local-variable 'view-max-weight)
-                        (setq view-root root)
-                        (if depth (setq view-depth (string-to-number depth)))
-                        (setq view-min-sharability min-sharability)
-                        (setq view-max-sharability max-sharability)
-                        (setq view-min-weight min-weight)
-                        (setq view-max-weight max-weight)
-                        (setq view-inverse inverse)
-                        (setq view-title title)
-                        (info-message (concat "updated to view " (view-info))))))))
+            (let (
+                (root (cdr (assoc 'root json)))
+                (view (cdr (assoc 'view json)))
+                (depth (cdr (assoc 'depth json)))
+                (min-sharability (string-to-number (cdr (assoc 'minSharability json))))
+                (max-sharability (string-to-number (cdr (assoc 'maxSharability json))))
+                (min-weight (string-to-number (cdr (assoc 'minWeight json))))
+                (max-weight (string-to-number (cdr (assoc 'maxWeight json))))
+                (inverse (string-equal "true" (cdr (assoc 'inverse json))))
+                (title (cdr (assoc 'title json))))
+                    (switch-to-buffer (view-name root))
+                    ;;(tinkernotes-mode)
+                    (erase-buffer)
+                    (let ((view-json (json-read-from-string view)))
+                        (write-view (cdr (assoc 'children view-json)) 0))
+                    (beginning-of-buffer)
+                    (make-local-variable 'view-root)
+                    (make-local-variable 'view-depth)
+                    (make-local-variable 'view-inverse)
+                    (make-local-variable 'view-title)
+                    (make-local-variable 'view-min-sharability)
+                    (make-local-variable 'view-max-sharability)
+                    (make-local-variable 'view-min-weight)
+                    (make-local-variable 'view-max-weight)
+                    (setq view-root root)
+                    (if depth (setq view-depth (string-to-number depth)))
+                    (setq view-min-sharability min-sharability)
+                    (setq view-max-sharability max-sharability)
+                    (setq view-min-weight min-weight)
+                    (setq view-max-weight max-weight)
+                    (setq view-inverse inverse)
+                    (setq view-title title)
+                    (info-message (concat "updated to view " (view-info)))))))
+
+(setq full-colors '(
+    "#330000" "#660000" "#990000" "#CC0000"  ;; private:   red
+    "#332600" "#664C00" "#997200" "#CC9900"  ;; protected: orange
+    "#003300" "#006600" "#009900" "#00CC00"  ;; public:    green
+    "#000033" "#000066" "#000099" "#0000CC"  ;; demo:      blue
+    ))
+
+(setq reduced-colors '("red" "red" "blue" "blue"))
+
+(setq full-colors-supported (> (length (defined-colors)) 8))
+
+(defun colorize (text weight sharability)
+    (let (
+        (i (- (ceiling (* sharability 4)) 1))
+        (j (- (ceiling (* weight 4)) 1)))
+            (let ((color
+                (if full-colors-supported
+                    (elt full-colors (+ j (* i 4)))
+                    (elt reduced-colors i))))
+    (propertize text 'face (list :foreground color)))))
+
+(defun write-view (children indent)
+    (loop for json across children do
+    (let (
+        (link (cdr (assoc 'link json)))
+        (target (cdr (assoc 'target json)))
+        (children (cdr (assoc 'children json))))
+            (let (
+                (link-key (cdr (assoc 'key link)))
+                (link-value (cdr (assoc 'value link)))
+		        (link-weight (cdr (assoc 'weight link)))
+	            (link-sharability (cdr (assoc 'sharability link)))
+                (target-key (cdr (assoc 'key link)))
+                (target-value (cdr (assoc 'value target)))
+		        (target-weight (cdr (assoc 'weight target)))
+		        (target-sharability (cdr (assoc 'sharability target))))
+                    (insert (concat "(" link-key ":" target-key ") "))
+                    (loop for i from 1 to indent do (insert "    "))
+                    (insert (concat
+		                (colorize link-value link-weight link-sharability) "  "
+			            (colorize target-value target-weight target-sharability) "\n"))
+                    (write-view children (+ indent 1))
+                    ))))
 
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -275,7 +319,7 @@
 
 (defun my-debug ()
     (interactive)
-    (message (find-id)))
+    (message (number-to-string (length (defined-colors)))))
 
 
 (global-set-key (kbd "C-c i") 'visit-item)
@@ -296,15 +340,15 @@
 (global-set-key (kbd "C-c C-v C-] ,") 'decrease-max-sharability)
 (global-set-key (kbd "C-c C-v C-] .") 'increase-max-sharability)
 
-(setq syntax-keywords
- '(
-   ("^\([0-9A-Za-z+/]*:[0-9A-Za-z+/]*\)" . font-lock-doc-face)
-  ))
-
-(define-derived-mode tinkernotes-mode fundamental-mode
-  (setq font-lock-defaults '(syntax-keywords))
-  (setq mode-name "tinkernotes")
-)
+;;(setq syntax-keywords
+;; '(
+;;   ("^\([0-9A-Za-z+/]*:[0-9A-Za-z+/]*\)" . font-lock-doc-face)
+;;  ))
+;;
+;;(define-derived-mode tinkernotes-mode fundamental-mode
+;;  (setq font-lock-defaults '(syntax-keywords))
+;;  (setq mode-name "tinkernotes")
+;;)
 
 
 ;; Uncomment only when debugging

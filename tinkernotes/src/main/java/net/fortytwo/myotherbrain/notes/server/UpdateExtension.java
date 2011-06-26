@@ -59,7 +59,7 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         InputStream in = new ByteArrayInputStream(p.view.getBytes());
         try {
-            children = p.p.parseNotes(in);
+            children = p.syntax.readNotes(in);
         } finally {
             in.close();
         }

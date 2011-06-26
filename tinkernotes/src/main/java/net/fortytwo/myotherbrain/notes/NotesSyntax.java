@@ -1,5 +1,9 @@
 package net.fortytwo.myotherbrain.notes;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,10 +31,10 @@ public class NotesSyntax {
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
 
-    public enum Format {FLAT, WITH_CONTEXTS}
+    public enum Format {FLAT, WITH_CONTEXTS, JSON}
 
-    public void write(final List<NoteContext> notes,
-                      final OutputStream out) {
+    public void writeContexts(final List<NoteContext> notes,
+                              final OutputStream out) throws JSONException {
         PrintStream p = new PrintStream(out);
         for (NoteContext c : notes) {
             printContext(c, p);
@@ -39,25 +43,56 @@ public class NotesSyntax {
     }
 
     public void writeNotes(final List<Note> notes,
-                           final OutputStream out) {
+                           final OutputStream out) throws JSONException {
         PrintStream p = new PrintStream(out);
         for (Note n : notes) {
             printNote(n, 0, p);
         }
     }
 
-    public void writeChildren(final Note note,
-                              final OutputStream out) {
-        writeNotes(note.getChildren(), out);
+    public JSONObject toJSON(final Note n) throws JSONException {
+        JSONObject json = new JSONObject();
+
+        if (null != n.getLinkKey()) {
+            JSONObject link = new JSONObject();
+            json.put("link", link);
+
+            link.put("key", n.getLinkKey());
+            link.put("weight", n.getLinkWeight());
+            link.put("sharability", n.getLinkSharability());
+            link.put("value", n.getType());
+        }
+
+        if (null != n.getTargetKey()) {
+            JSONObject target = new JSONObject();
+            json.put("target", target);
+
+            target.put("key", n.getTargetKey());
+            target.put("weight", n.getTargetWeight());
+            target.put("sharability", n.getTargetSharability());
+            target.put("value", n.getValue());
+        }
+
+        if (0 < n.getChildren().size()) {
+            JSONArray c = new JSONArray();
+            json.put("children", c);
+            int i = 0;
+            for (Note child : n.getChildren()) {
+                c.put(i, toJSON(child));
+                i++;
+            }
+        }
+
+        return json;
     }
 
-    public List<Note> parseNotes(final InputStream in) throws IOException, NoteParsingException {
+    public List<Note> readNotes(final InputStream in) throws IOException, NoteParsingException {
         List<Note> notes = new LinkedList<Note>();
         parsePrivate(in, null, notes);
         return notes;
     }
 
-    public List<NoteContext> parseContexts(final InputStream in) throws IOException, NoteParsingException {
+    public List<NoteContext> readContexts(final InputStream in) throws IOException, NoteParsingException {
         List<NoteContext> contexts = new LinkedList<NoteContext>();
         parsePrivate(in, contexts, null);
         return contexts;
@@ -286,7 +321,7 @@ public class NotesSyntax {
     }
 
     private static void printContext(final NoteContext c,
-                                     final PrintStream p) {
+                                     final PrintStream p) throws JSONException {
         if (0 < c.getValue().length()) {
             p.print("[");
             p.print(c.getValue());
@@ -301,7 +336,8 @@ public class NotesSyntax {
 
     private static void printNote(final Note n,
                                   final int indent,
-                                  final PrintStream p) {
+                                  final PrintStream p) throws JSONException {
+
         if (null != n.getTargetKey() || null != n.getLinkKey()) {
             p.print("(");
             if (null != n.getLinkKey()) {
@@ -344,11 +380,12 @@ public class NotesSyntax {
 
         InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
         try {
-            contexts = p.parseContexts(in);
+            contexts = p.readContexts(in);
         } finally {
             in.close();
         }
 
-        p.write(contexts, System.out);
+        p.writeContexts(contexts, System.out);
+        //p.writeNotes(p.flatten(contexts), Format.JSON, System.out);
     }
 }

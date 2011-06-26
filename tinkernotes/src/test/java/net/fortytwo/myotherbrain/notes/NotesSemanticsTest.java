@@ -138,7 +138,7 @@ public class NotesSemanticsTest extends TestCase {
     private List<Note> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return syntax.parseNotes(in);
+            return syntax.readNotes(in);
         } finally {
             in.close();
         }

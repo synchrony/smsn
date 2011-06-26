@@ -13,6 +13,11 @@ public class Note extends NoteNode {
     private final List<Note> children;
     private String qualifier;
 
+    private float linkWeight;
+    private float linkSharability;
+    private float targetWeight;
+    private float targetSharability;
+
     public Note(final String type,
                 final String text) {
         super(text);
@@ -52,5 +57,37 @@ public class Note extends NoteNode {
             t = t.substring(0, 17) + "...";
         }
         return "note(" + t + ", " + d + ")";
+    }
+
+    public float getTargetWeight() {
+        return targetWeight;
+    }
+
+    public void setTargetWeight(float targetWeight) {
+        this.targetWeight = targetWeight;
+    }
+
+    public float getTargetSharability() {
+        return targetSharability;
+    }
+
+    public void setTargetSharability(float targetSharability) {
+        this.targetSharability = targetSharability;
+    }
+
+    public float getLinkWeight() {
+        return linkWeight;
+    }
+
+    public void setLinkWeight(float linkWeight) {
+        this.linkWeight = linkWeight;
+    }
+
+    public float getLinkSharability() {
+        return linkSharability;
+    }
+
+    public void setLinkSharability(float linkSharability) {
+        this.linkSharability = linkSharability;
     }
 }

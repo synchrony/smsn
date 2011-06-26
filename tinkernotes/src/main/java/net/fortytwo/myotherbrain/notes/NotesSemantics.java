@@ -84,6 +84,9 @@ public class NotesSemantics {
         Note n = new Note(type, value);
         n.setTargetKey(root.getKey());
 
+        n.setTargetWeight(root.getWeight());
+        n.setTargetSharability(root.getSharability());
+
         if (depth > 0) {
             Collection<Atom> links = inverse ? getInLinks(root, filter) : getOutlinks(root, filter);
             for (Atom link : links) {
@@ -95,6 +98,8 @@ public class NotesSemantics {
 
                 Note n2 = view(target, depth - 1, filter, inverse);
                 n2.setLinkKey(link.getKey());
+                n2.setLinkWeight(link.getWeight());
+                n2.setLinkSharability(link.getSharability());
                 n.addChild(n2);
             }
         }
@@ -396,7 +401,7 @@ public class NotesSemantics {
         //InputStream in = new FileInputStream("/tmp/notes.txt");
         InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
         try {
-            notes = p.flatten(p.parseContexts(in));
+            notes = p.flatten(p.readContexts(in));
         } finally {
             in.close();
         }
@@ -414,6 +419,6 @@ public class NotesSemantics {
         //System.out.println();
 
         Note n = m.view(root, 3, filter, false);
-        p.writeChildren(n, System.out);
+        p.writeNotes(n.getChildren(), System.out);
     }
 }

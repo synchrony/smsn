@@ -56,7 +56,7 @@ public class NotesSyntaxTest extends TestCase {
     private List<NoteContext> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return syntax.parseContexts(in);
+            return syntax.readContexts(in);
         } finally {
             in.close();
         }

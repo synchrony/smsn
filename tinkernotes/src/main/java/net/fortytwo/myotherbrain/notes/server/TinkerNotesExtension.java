@@ -10,8 +10,9 @@ import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import net.fortytwo.myotherbrain.notes.NotesSyntax;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             p.manager = new FramesManager(p.graph);
             p.m = new NotesSemantics((IndexableGraph) p.graph, p.manager);
-            p.p = new NotesSyntax();
+            p.syntax = new NotesSyntax();
 
             if (null != p.depth) {
                 if (p.depth < 1) {
@@ -95,14 +96,14 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected void addView(final Params p) throws IOException {
         Note n = p.m.view(p.root, p.depth, p.filter, p.inverse);
+        JSONObject json;
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            p.p.writeChildren(n, bos);
-            p.map.put("view", bos.toString());
-        } finally {
-            bos.close();
+            json = p.syntax.toJSON(n);
+        } catch (JSONException e) {
+            throw new IOException(e);
         }
+        p.map.put("view", json.toString());
     }
 
     protected abstract ExtensionResponse handleRequestProtected(Params p) throws Exception;
@@ -112,7 +113,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Graph graph;
         public FramesManager manager;
         public NotesSemantics m;
-        public NotesSyntax p;
+        public NotesSyntax syntax;
         public Atom root;
         public Integer depth;
         public String view;
