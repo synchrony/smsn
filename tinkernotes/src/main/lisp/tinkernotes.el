@@ -142,14 +142,14 @@
     "#330000" "#660000" "#990000" "#CC0000"  ;; private:   red
     "#332600" "#664C00" "#997200" "#CC9900"  ;; protected: orange
     "#003300" "#006600" "#009900" "#00CC00"  ;; public:    green
-    "#000033" "#000066" "#000099" "#0000CC"  ;; demo:      blue
+    "#000066" "#000099" "#0000CC" "#0000FF"  ;; demo:      blue
     ))
 
 (setq reduced-colors '("red" "red" "blue" "blue"))
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability)
+(defun colorize (text weight sharability bold)
     (let (
         (i (- (ceiling (* sharability 4)) 1))
         (j (- (ceiling (* weight 4)) 1)))
@@ -157,7 +157,9 @@
                 (if full-colors-supported
                     (elt full-colors (+ j (* i 4)))
                     (elt reduced-colors i))))
-    (propertize text 'face (list :foreground color)))))
+	    (if bold
+        (propertize text 'face (list 'bold 'italic  :foreground color))
+        (propertize text 'face (list :foreground color))))))
 
 (defun write-view (children indent)
     (loop for json across children do
@@ -174,6 +176,14 @@
                 (target-value (cdr (assoc 'value target)))
 		        (target-weight (cdr (assoc 'weight target)))
 		        (target-sharability (cdr (assoc 'sharability target))))
+		            ;;(if (not link-key) (error "missing link key"))
+		            ;;(if (not link-value) (error (concat "missing value for link with key " link-key)))
+		            (if (not link-weight) (error (concat "missing weight for link with key " link-key)))
+		            (if (not link-sharability) (error (concat "missing sharability for link with key " link-key)))
+		            (if (not target-key) (error "missing target key"))
+		            (if (not target-value) (error (concat "missing value for target with key " target-key)))
+		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
+		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
                     (insert
 		                (propertize (concat "(" link-key ":" target-key ") ")
 					'face '(:foreground "white")
@@ -184,8 +194,8 @@
 			                'link-sharability link-sharability))
 			        (loop for i from 1 to indent do (insert "    "))
                     (insert (concat
-		                (colorize link-value link-weight link-sharability) "  "
-			            (colorize target-value target-weight target-sharability) "\n"))
+		                (colorize link-value link-weight link-sharability t) "  "
+			            (colorize target-value target-weight target-sharability nil) "\n"))
                     (write-view children (+ indent 1))
                     ))))
 

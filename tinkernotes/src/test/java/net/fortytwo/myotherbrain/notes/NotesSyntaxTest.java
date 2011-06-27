@@ -44,13 +44,13 @@ public class NotesSyntaxTest extends TestCase {
         assertEquals(2, contexts.get(0).getNotes().size());
         assertEquals(1, contexts.get(1).getNotes().size());
         assertEquals(2, contexts.get(0).getNotes().get(0).getChildren().size());
-        assertEquals("a", contexts.get(0).getNotes().get(0).getValue());
-        assertEquals("c", contexts.get(0).getNotes().get(0).getChildren().get(1).getValue());
-        assertEquals("d", contexts.get(0).getNotes().get(1).getValue());
-        assertEquals("V", contexts.get(0).getNotes().get(1).getType());
-        assertEquals("", contexts.get(0).getValue());
-        assertEquals("second context", contexts.get(1).getValue());
-        assertEquals("e", contexts.get(1).getNotes().get(0).getValue());
+        assertEquals("a", contexts.get(0).getNotes().get(0).getTargetValue());
+        assertEquals("c", contexts.get(0).getNotes().get(0).getChildren().get(1).getTargetValue());
+        assertEquals("d", contexts.get(0).getNotes().get(1).getTargetValue());
+        assertEquals("V", contexts.get(0).getNotes().get(1).getLinkValue());
+        assertEquals("", contexts.get(0).getTargetValue());
+        assertEquals("second context", contexts.get(1).getTargetValue());
+        assertEquals("e", contexts.get(1).getNotes().get(0).getTargetValue());
     }
 
     private List<NoteContext> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {

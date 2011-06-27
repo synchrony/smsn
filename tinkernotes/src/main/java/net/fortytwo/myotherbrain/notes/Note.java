@@ -9,25 +9,27 @@ import java.util.List;
  * Time: 5:51 PM
  */
 public class Note extends NoteNode {
-    private final String type;
     private final List<Note> children;
     private String qualifier;
+    private String linkValue;
 
     private float linkWeight;
     private float linkSharability;
     private float targetWeight;
     private float targetSharability;
 
-    public Note(final String type,
-                final String text) {
+    public Note(final String text) {
         super(text);
 
-        this.type = type;
         children = new LinkedList<Note>();
     }
 
-    public String getType() {
-        return type;
+    public String getLinkValue() {
+        return linkValue;
+    }
+
+    public void setLinkValue(String linkValue) {
+        this.linkValue = linkValue;
     }
 
     public List<Note> getChildren() {
@@ -48,11 +50,11 @@ public class Note extends NoteNode {
 
     @Override
     public String toString() {
-        String d = getValue();
+        String d = getTargetValue();
         if (null != d && d.length() > 20) {
             d = d.substring(0, 17) + "...";
         }
-        String t = getType();
+        String t = getLinkValue();
         if (null != t && t.length() > 20) {
             t = t.substring(0, 17) + "...";
         }

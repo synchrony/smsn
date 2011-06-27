@@ -40,10 +40,9 @@ public class MyOtherBrain {
             CREATED = "created",
             FROM = "from",
             KEY = "key",
-            TO = "to",
-            TYPE = "type",
-            VALUE = "value",
             SHARABILITY = "sharability",
+            TO = "to",
+            VALUE = "value",
             WEIGHT = "weight";
 
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";

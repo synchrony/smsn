@@ -23,12 +23,6 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.KEY)
     void setKey(String key);
 
-    @Property(MyOtherBrain.TYPE)
-    String getType();
-
-    @Property(MyOtherBrain.TYPE)
-    void setType(final String tags);
-
     @Property(MyOtherBrain.VALUE)
     String getValue();
 

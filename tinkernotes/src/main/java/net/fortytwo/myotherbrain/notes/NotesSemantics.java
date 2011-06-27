@@ -7,11 +7,14 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +62,24 @@ public class NotesSemantics {
         }
 
         keys = graph.getIndex(KEYS, Vertex.class);
+
+        // TODO: temporary
+        /*
+        graph.clear();
+        try {
+            GraphMLReader.inputGraph(graph, new FileInputStream("/Users/josh/data/tinkernotes_backup/tinkernotes-1309168662074.xml"));
+        } catch (XMLStreamException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        for (Vertex v : graph.getVertices()) {
+            Atom a = getAtom(v);
+
+            if (null == a.getValue() && null != a.getTo()) {
+                a.setValue((String) a.getTo().asVertex().getProperty("type"));
+            }
+        }*/
     }
 
     /**
@@ -79,9 +100,8 @@ public class NotesSemantics {
                      final Filter filter,
                      final boolean inverse) {
 
-        String type = root.getType();
         String value = root.getValue();
-        Note n = new Note(type, value);
+        Note n = new Note(value);
         n.setTargetKey(root.getKey());
 
         n.setTargetWeight(root.getWeight());
@@ -98,6 +118,7 @@ public class NotesSemantics {
 
                 Note n2 = view(target, depth - 1, filter, inverse);
                 n2.setLinkKey(link.getKey());
+                n2.setLinkValue(link.getValue());
                 n2.setLinkWeight(link.getWeight());
                 n2.setLinkSharability(link.getSharability());
                 n.addChild(n2);
@@ -131,15 +152,21 @@ public class NotesSemantics {
      * Performs full text search.
      *
      * @param query  the search query
+     * @param depth  depth of the search results view
      * @param filter a collection of criteria for atoms and links.
      *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param inverse whether to produce an inverse view of search results (important only if depth > 1)
      * @return an ordered list of query results
      */
     public Note search(final String query,
                        final int depth,
                        final Filter filter,
                        final boolean inverse) {
-        Note result = new Note(".", "query results for \"" + query + "\"");
+        // TODO: use search score for link weight
+        float linkWeight = (filter.minWeight + filter.maxWeight) / 2;
+        float linkSharability = (filter.minSharability + filter.maxSharability) / 2;
+
+        Note result = new Note("query results for \"" + query + "\"");
 
         // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
         CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
@@ -148,6 +175,9 @@ public class NotesSemantics {
                 Atom a = getAtom(i.next());
                 if (filter.isVisible(a)) {
                     Note n = view(a, depth - 1, filter, inverse);
+                    n.setLinkValue(".");
+                    n.setLinkWeight(linkWeight);
+                    n.setLinkSharability(linkSharability);
                     result.addChild(n);
                 }
             }
@@ -218,8 +248,8 @@ public class NotesSemantics {
                 // The benefit of sharability is for user interaction, not access control.
                 filter.makeVisible(target);
             }
-            target.setType(n.getType());
-            target.setValue(n.getValue());
+            //target.setType(n.getLinkValue());
+            target.setValue(n.getTargetValue());
 
             String linkKey = n.getLinkKey();
             boolean createLink = false;
@@ -254,6 +284,7 @@ public class NotesSemantics {
 
             if (createLink) {
                 Atom link = createAtom(filter);
+                link.setValue(n.getLinkValue());
                 if (inverse) {
                     link.setFrom(target);
                     link.setTo(root);
@@ -336,7 +367,7 @@ public class NotesSemantics {
         for (Edge e : from.asVertex().getInEdges(MyOtherBrain.TO)) {
             Atom link = getAtom(e.getOutVertex());
             if (filter.isVisible(link) && filter.isVisible(link.getFrom())) {
-                c.add(new TimestampedAtom(link));
+                c.add(new TimestampedAtom(link, link.getFrom()));
             }
         }
 
@@ -357,7 +388,7 @@ public class NotesSemantics {
         for (Edge e : from.asVertex().getInEdges(MyOtherBrain.FROM)) {
             Atom link = getAtom(e.getOutVertex());
             if (filter.isVisible(link) && filter.isVisible(link.getTo())) {
-                c.add(new TimestampedAtom(link));
+                c.add(new TimestampedAtom(link, link.getTo()));
             }
         }
 
@@ -374,15 +405,25 @@ public class NotesSemantics {
     private class TimestampedAtom implements Comparable<TimestampedAtom> {
         public Atom atom;
         public long timestamp;
+        public float weight;
 
-        public TimestampedAtom(final Atom a) {
+        public TimestampedAtom(final Atom a,
+                               final Atom target) {
             atom = a;
             timestamp = a.getCreated();
+            weight = a.getWeight();
+            if (null != target) {
+                weight += target.getWeight();
+            }
         }
 
-        // Order from newest to oldest
+        // Order from highest weighted to lowest weighted and from from newest to oldest
         public int compareTo(final TimestampedAtom other) {
-            return ((Long) other.timestamp).compareTo(timestamp);
+            int cmp = ((Float) other.weight).compareTo(weight);
+
+            return 0 == cmp
+                    ? ((Long) other.timestamp).compareTo(timestamp)
+                    : cmp;
         }
     }
 
@@ -412,7 +453,6 @@ public class NotesSemantics {
         Atom root = m.createAtom(filter);
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setValue("Josh's notes");
-        root.setType(".");
         m.update(root, notes, 0, filter, false);
 
         //GraphMLWriter.outputGraph(graph, System.out);

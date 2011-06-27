@@ -53,25 +53,25 @@ public class NotesSyntax {
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
 
-        if (null != n.getLinkKey()) {
+        //if (null != n.getLinkKey()) {
             JSONObject link = new JSONObject();
             json.put("link", link);
 
             link.put("key", n.getLinkKey());
             link.put("weight", n.getLinkWeight());
             link.put("sharability", n.getLinkSharability());
-            link.put("value", n.getType());
-        }
+            link.put("value", n.getLinkValue());
+        //}
 
-        if (null != n.getTargetKey()) {
+        //if (null != n.getTargetKey()) {
             JSONObject target = new JSONObject();
             json.put("target", target);
 
             target.put("key", n.getTargetKey());
             target.put("weight", n.getTargetWeight());
             target.put("sharability", n.getTargetSharability());
-            target.put("value", n.getValue());
-        }
+            target.put("value", n.getTargetValue());
+        //}
 
         if (0 < n.getChildren().size()) {
             JSONArray c = new JSONArray();
@@ -195,9 +195,9 @@ public class NotesSyntax {
                     j = l.length();
                 }
 
-                String type = l.substring(0, j);
-                if (type.length() > MAX_TYPE_LENGTH) {
-                    throw new NoteParsingException(lineNumber, "apparent note type is too long: " + type);
+                String linkValue = l.substring(0, j);
+                if (linkValue.length() > MAX_TYPE_LENGTH) {
+                    throw new NoteParsingException(lineNumber, "apparent note type is too long: " + linkValue);
                 }
                 l = l.substring(j);
 
@@ -268,7 +268,8 @@ public class NotesSyntax {
                     }
                 }
 
-                Note n = new Note(type, description);
+                Note n = new Note(description);
+                n.setLinkValue(linkValue);
 
                 if (null != qualifier) {
                     n.setQualifier(qualifier);
@@ -300,7 +301,8 @@ public class NotesSyntax {
     public List<Note> flatten(final List<NoteContext> contexts) {
         List<Note> notes = new LinkedList<Note>();
         for (NoteContext c : contexts) {
-            Note n = new Note(".", c.getValue());
+            Note n = new Note(c.getTargetValue());
+            n.setLinkValue(".");
             notes.add(n);
 
             if (c.getChildren().size() > 0) {
@@ -322,9 +324,9 @@ public class NotesSyntax {
 
     private static void printContext(final NoteContext c,
                                      final PrintStream p) throws JSONException {
-        if (0 < c.getValue().length()) {
+        if (0 < c.getTargetValue().length()) {
             p.print("[");
-            p.print(c.getValue());
+            p.print(c.getTargetValue());
             p.print("]");
             p.print("\n");
         }
@@ -354,10 +356,10 @@ public class NotesSyntax {
             p.print("    ");
         }
 
-        p.print(null == n.getType() || 0 == n.getType().length() ? "_" : n.getType());
+        p.print(null == n.getLinkValue() || 0 == n.getLinkValue().length() ? "_" : n.getLinkValue());
         p.print("  ");
 
-        p.print(n.getValue());
+        p.print(n.getTargetValue());
 
         p.print("\n");
 

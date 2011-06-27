@@ -36,6 +36,7 @@ public class SetPropertiesExtension extends AbstractRexsterExtension {
                                            @ExtensionRequestParameter(name = "weight", description = "new weight of the atom") Float weight,
                                            @ExtensionRequestParameter(name = "sharability", description = "new sharability of the atom") Float sharability) {
         LOGGER.info("set properties request for: " + key);
+        System.out.println("set properties request for: " + key);
 
         try {
             if (!(graph instanceof IndexableGraph)) {
