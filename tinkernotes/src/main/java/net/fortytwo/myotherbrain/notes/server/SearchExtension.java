@@ -53,6 +53,7 @@ public class SearchExtension extends TinkerNotesExtension {
     protected ExtensionResponse handleRequestProtected(final Params p) throws Exception {
         addSearchResults(p);
 
+        p.map.put("title", "search results (read-only)");
         return ExtensionResponse.ok(p.map);
     }
 

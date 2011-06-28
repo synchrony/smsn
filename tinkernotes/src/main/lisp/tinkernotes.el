@@ -286,13 +286,13 @@
 (defun current-line-link ()
     (car (find-id)))
 
-(defun visit-item ()
+(defun visit-target ()
     (interactive)
     (let ((key (current-line-target)))
         (if key
             (request-view key view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
-(defun visit-meta ()
+(defun visit-link ()
     (interactive)
     (let ((key (current-line-link)))
         (if key
@@ -487,8 +487,8 @@
     (message (number-to-string (length (defined-colors)))))
 
 
-(global-set-key (kbd "C-c i") 'visit-item)
-(global-set-key (kbd "C-c m") 'visit-meta)
+(global-set-key (kbd "C-c t") 'visit-target)
+(global-set-key (kbd "C-c l") 'visit-link)
 (global-set-key (kbd "C-c r") 'refresh-view)
 (global-set-key (kbd "C-c C-d ,") 'decrease-depth)
 (global-set-key (kbd "C-c C-d .") 'increase-depth)
@@ -512,6 +512,13 @@
 (global-set-key (kbd "C-c C-l C-s .") 'increase-link-sharability)
 (global-set-key (kbd "C-c C-t C-s ,") 'decrease-target-sharability)
 (global-set-key (kbd "C-c C-t C-s .") 'increase-target-sharability)
+
+;; Note: these should perhaps be local settings
+(global-set-key (kbd "C-c C-s C-t") 'toggle-truncate-lines)
+(setq-default truncate-lines t)
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "ivory")
+
 
 ;;(setq syntax-keywords
 ;; '(

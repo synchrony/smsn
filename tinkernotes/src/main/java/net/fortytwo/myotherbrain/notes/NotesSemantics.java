@@ -7,14 +7,11 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,9 +62,9 @@ public class NotesSemantics {
 
         // TODO: temporary
         /*
-        graph.clear();
+        //graph.clear();
         try {
-            GraphMLReader.inputGraph(graph, new FileInputStream("/Users/josh/data/tinkernotes_backup/tinkernotes-1309168662074.xml"));
+            GraphMLReader.inputGraph(graph, new FileInputStream("/Users/josh/data/tinkernotes_backup/tinkernotes-1309170805891.xml"));
         } catch (XMLStreamException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (FileNotFoundException e) {
