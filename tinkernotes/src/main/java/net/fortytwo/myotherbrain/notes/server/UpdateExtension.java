@@ -38,6 +38,7 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
+        new Exception().printStackTrace();
 
         LOGGER.info("update request for: " + rootKey);
         System.out.println("update request for: " + rootKey);

@@ -30,7 +30,7 @@
     "Send ARGS to URL as a POST request."
     (let ((url-request-method "POST")
         (url-request-extra-headers
-            '(("Content-Type" . "application/x-www-form-urlencoded")))
+            '(("Content-Type" . "application/x-www-form-urlencoded;charset=UTF-8")))
         (url-request-data
             (mapconcat (lambda (arg)
                 (concat

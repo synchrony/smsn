@@ -35,6 +35,13 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 return ExtensionResponse.error("graph must be an instance of IndexableGraph");
             }
 
+            if (null != p.view) {
+                // Force the use of the UTF-8 charset, which is apparently not chosen by Jersey
+                // even when it is specified by the client in the Content-Type header, e.g.
+                //    Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+                p.view = new String(p.view.getBytes("UTF-8"));
+            }
+
             p.manager = new FramesManager(p.graph);
             p.m = new NotesSemantics((IndexableGraph) p.graph, p.manager);
             p.syntax = new NotesSyntax();
