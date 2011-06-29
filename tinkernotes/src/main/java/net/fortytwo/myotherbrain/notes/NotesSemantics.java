@@ -61,6 +61,9 @@ public class NotesSemantics {
         keys = graph.getIndex(KEYS, Vertex.class);
 
         // TODO: temporary
+        //Vertex v = graph.getVertex(2639);
+        //System.out.println("v = " + v);
+        //v.setProperty("value", "ˆˆˆˆˆˆˆˆˆˆ");
         /*
         //graph.clear();
         try {
@@ -148,10 +151,10 @@ public class NotesSemantics {
     /**
      * Performs full text search.
      *
-     * @param query  the search query
-     * @param depth  depth of the search results view
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param query   the search query
+     * @param depth   depth of the search results view
+     * @param filter  a collection of criteria for atoms and links.
+     *                Atoms and links which do not meet the criteria are not to appear in search results.
      * @param inverse whether to produce an inverse view of search results (important only if depth > 1)
      * @return an ordered list of query results
      */
@@ -245,7 +248,6 @@ public class NotesSemantics {
                 // The benefit of sharability is for user interaction, not access control.
                 filter.makeVisible(target);
             }
-            //target.setType(n.getLinkValue());
             target.setValue(n.getTargetValue());
 
             String linkKey = n.getLinkKey();
@@ -265,6 +267,7 @@ public class NotesSemantics {
 
                 if (exists) {
                     filter.makeVisible(link);
+                    link.setValue(n.getLinkValue());
                 } else {
                     createLink = true;
                 }
@@ -277,6 +280,9 @@ public class NotesSemantics {
                 } else if (!n.getTargetKey().equals(beforeMap.get(linkKey).getTargetKey())) {
                     throw new InvalidUpdateException("target key of updated link has changed");
                 }
+
+                Atom link = getAtom(linkKey);
+                link.setValue(n.getLinkValue());
             }
 
             if (createLink) {

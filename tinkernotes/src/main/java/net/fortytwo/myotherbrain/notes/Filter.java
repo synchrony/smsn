@@ -8,6 +8,10 @@ import net.fortytwo.myotherbrain.Atom;
  * Time: 12:22 AM
  */
 public class Filter {
+    public Filter() {
+        this(0f, 1f, 0f, 1f);
+    }
+
     public Filter(final float minSharability,
                   final float maxSharability,
                   final float minWeight,

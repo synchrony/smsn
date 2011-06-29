@@ -15,28 +15,28 @@
 
 ;; from Emacs-w3m
 (defun w3m-url-encode-string (str &optional coding)
-  (apply (function concat)
-         (mapcar
-          (lambda (ch)
-            (cond
-             ((string-match "[-a-zA-Z0-9_:/]" (char-to-string ch)) ; xxx?
-              (char-to-string ch))      ; printable
-             (t
-              (format "%%%02X" ch))))   ; escape
+    ;;(interactive)(read-from-minibuffer (concat "arg: " str))
+    (apply (function concat)
+        (mapcar (lambda (ch) (cond
+                    ((string-match "[-a-zA-Z0-9_:/]" (char-to-string ch)) ; xxx?
+                        (char-to-string ch))      ; printable
+                    (t
+                        (format "%%%02X" ch))))   ; escape
           ;; Coerce a string to a list of chars.
-          (append (encode-coding-string str (or coding 'iso-2022-jp))
+          (append (encode-coding-string str (or coding 'utf-8))
                   nil))))
 
 (defun http-post (url args callback)
-  "Send ARGS to URL as a POST request."
-  (let ((url-request-method "POST")
+    "Send ARGS to URL as a POST request."
+    (let ((url-request-method "POST")
         (url-request-extra-headers
-         '(("Content-Type" . "application/x-www-form-urlencoded")))
+            '(("Content-Type" . "application/x-www-form-urlencoded")))
         (url-request-data
-         (mapconcat (lambda (arg)
-                      (concat (w3m-url-encode-string (car arg))
-                              "="
-                              (w3m-url-encode-string (car (last arg)))))
+            (mapconcat (lambda (arg)
+                (concat
+                    (w3m-url-encode-string (car arg))
+                    "="
+                    (w3m-url-encode-string (car (last arg)))))
 ;;                      (concat (url-hexify-string (car arg))
 ;;                              "="
 ;;                              (url-hexify-string (cdr arg))))
@@ -46,9 +46,7 @@
 
 (defun strip-http-headers (entity)
     (let ((i (string-match "\n\n" entity)))
-        (if (>= i 0)
-            (substring entity (+ i 2))
-            entity)))
+            (decode-coding-string (substring entity (+ i 2)) 'utf-8)))
 
 
 ;; BUFFERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -95,11 +93,20 @@
 (defun base-url ()
     (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/tinkernotes/"))
 
+(defun receive-view-alt (status)
+    (let ((s (strip-http-headers (buffer-string))))
+        (switch-to-buffer "foo")
+	(insert (number-to-string (length s)))
+	(loop for c across s do
+	    (insert (number-to-string c))
+	    (insert " "))
+	(insert s)))
+
 (defun receive-view (status)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
         (if status
-            (let ((msg (gethash "message" json))
-                (error (gethash "error" json)))
+            (let ((msg (cdr (assoc 'message json)))
+                (error (cdr (assoc 'error json))))
                     (if error
                         (error-message error)
                         (error-message msg)))
@@ -516,9 +523,22 @@
 ;; Note: these should perhaps be local settings
 (global-set-key (kbd "C-c C-s C-t") 'toggle-truncate-lines)
 (setq-default truncate-lines t)
-(global-hl-line-mode 1)
-(set-face-background 'hl-line "ivory")
-
+(if full-colors-supported
+    (let ((bogus nil))
+        (global-hl-line-mode 1)
+        (set-face-background 'hl-line "ivory")))
+(defvar current-date-format "%Y-%m-%d")
+(defun insert-current-date ()
+  "insert the current date into the current buffer."
+       (interactive)
+       (insert (format-time-string current-date-format (current-time))))
+(global-set-key (kbd "C-c C-i d") 'insert-current-date)
+;; These may or may not be necessary
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
 
 ;;(setq syntax-keywords
 ;; '(

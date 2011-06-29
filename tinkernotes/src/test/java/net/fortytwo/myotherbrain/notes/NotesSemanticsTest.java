@@ -8,6 +8,7 @@ import com.tinkerpop.frames.FramesManager;
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MyOtherBrain;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -40,6 +41,28 @@ public class NotesSemanticsTest extends TestCase {
     @Override
     public void tearDown() throws Exception {
         graph.shutdown();
+    }
+
+    public void testEncoding() throws Exception {
+        Atom parent = createAtom("11111");
+        Atom root = createAtom("22222");
+        Filter f = new Filter();
+
+        Note parentBefore = new Note("foo");
+        Note before = new Note("cheval ˆ phynances");
+        before.setLinkValue("a link");
+        parentBefore.addChild(before);
+
+        //System.out.println(before.getTargetValue());
+
+        semantics.update(parent, parentBefore.getChildren(), 1, f, false);
+
+        Note after = semantics.view(parent, 1, f, false);
+
+        JSONObject json = syntax.toJSON(after);
+        //System.out.println(json.toString());
+        JSONObject j = json.getJSONArray("children").getJSONObject(0);
+        assertEquals("cheval ˆ phynances", j.getJSONObject("target").getString("value"));
     }
 
     public void testAll() throws Exception {
@@ -123,8 +146,12 @@ public class NotesSemanticsTest extends TestCase {
         return count;
     }
 
-    private Atom createAtom(final String id) {
-        return manager.frame(graph.addVertex(id), Atom.class);
+    private Atom createAtom(final String key) {
+        Atom a = manager.frame(graph.addVertex(null), Atom.class);
+        a.setKey(key);
+        a.setWeight(0.5f);
+        a.setSharability(0.5f);
+        return a;
     }
 
     private Atom getAtom(final String id) {
