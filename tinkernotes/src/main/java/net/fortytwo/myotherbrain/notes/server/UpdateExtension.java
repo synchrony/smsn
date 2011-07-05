@@ -38,10 +38,10 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
-        new Exception().printStackTrace();
+        //new Exception().printStackTrace();
 
         LOGGER.info("update request for: " + rootKey);
-        System.out.println("update request for: " + rootKey);
+        System.err.println("update request for: " + rootKey);
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 
@@ -55,7 +55,7 @@ public class UpdateExtension extends TinkerNotesExtension {
     }
 
     @Override
-    protected ExtensionResponse handleRequestProtected(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final Params p) throws Exception {
         List<Note> children;
 
         InputStream in = new ByteArrayInputStream(p.view.getBytes());

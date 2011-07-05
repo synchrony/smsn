@@ -85,7 +85,7 @@
 (defun view-name (root-id)
     (if root-id
         (concat "view-" root-id)
-        "anonymous view"))
+        (concat "anonymous-" (number-to-string (random 1000)))))
 
 
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
@@ -193,8 +193,8 @@
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
                     (insert
 		                (propertize (concat "(" link-key ":" target-key ") ")
-					'face '(:foreground "white")
-					'invisible t
+					;;'face '(:foreground "white")
+					;;'invisible t
 		                    'target-weight target-weight
 		                	'target-sharability target-sharability
 		                	'link-weight link-weight

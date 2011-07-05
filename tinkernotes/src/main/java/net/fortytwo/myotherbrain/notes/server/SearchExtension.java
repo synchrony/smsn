@@ -36,7 +36,7 @@ public class SearchExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
         LOGGER.info("search request for \"" + query + "\"");
-        System.out.println("search request for \"" + query + "\"");
+        System.err.println("search request for \"" + query + "\"");
 
         Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
 
@@ -50,7 +50,7 @@ public class SearchExtension extends TinkerNotesExtension {
     }
 
     @Override
-    protected ExtensionResponse handleRequestProtected(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final Params p) throws Exception {
         addSearchResults(p);
 
         p.map.put("title", "search results (read-only)");

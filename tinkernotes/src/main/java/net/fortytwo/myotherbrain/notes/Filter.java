@@ -22,8 +22,8 @@ public class Filter {
         this.maxWeight = maxWeight;
     }
 
-    public final float minSharability, maxSharability;
-    public final float minWeight, maxWeight;
+    public final Float minSharability, maxSharability;
+    public final Float minWeight, maxWeight;
 
     public boolean isVisible(final Atom atom) {
         float sharability = atom.getSharability();

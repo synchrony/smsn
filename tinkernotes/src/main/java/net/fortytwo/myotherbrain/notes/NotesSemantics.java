@@ -145,7 +145,9 @@ public class NotesSemantics {
                        final int depth,
                        final Filter filter,
                        final boolean inverse) throws InvalidUpdateException {
+        // Destructive updates are enabled for now.
         updateInternal(root, children, depth, filter, true, inverse);
+        //updateInternal(root, children, depth, filter, false, inverse);
     }
 
     /**
@@ -369,7 +371,11 @@ public class NotesSemantics {
 
         for (Edge e : from.asVertex().getInEdges(MyOtherBrain.TO)) {
             Atom link = getAtom(e.getOutVertex());
-            if (filter.isVisible(link) && filter.isVisible(link.getFrom())) {
+            Atom f = link.getFrom();
+            if (null == f) {
+                throw new IllegalStateException("vertex " + link.asVertex().getId() + " has a 'to' but no 'from' edge");
+            }
+            if (filter.isVisible(link) && filter.isVisible(f)) {
                 c.add(new TimestampedAtom(link, link.getFrom()));
             }
         }
@@ -390,7 +396,11 @@ public class NotesSemantics {
 
         for (Edge e : from.asVertex().getInEdges(MyOtherBrain.FROM)) {
             Atom link = getAtom(e.getOutVertex());
-            if (filter.isVisible(link) && filter.isVisible(link.getTo())) {
+            Atom f = link.getTo();
+            if (null == f) {
+                throw new IllegalStateException("vertex " + link.asVertex().getId() + " has a 'from' but no 'to' edge");
+            }
+            if (filter.isVisible(link) && filter.isVisible(f)) {
                 c.add(new TimestampedAtom(link, link.getTo()));
             }
         }

@@ -2,6 +2,7 @@ package net.fortytwo.myotherbrain.notes.server;
 
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -58,30 +59,33 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 p.map.put("depth", "" + p.depth);
             }
 
-            if (p.filter.minSharability < 0 || p.filter.maxSharability > 1) {
-                return ExtensionResponse.error("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
-            }
+            if (null != p.filter) {
+                if (p.filter.minSharability < 0 || p.filter.maxSharability > 1) {
+                    return ExtensionResponse.error("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
+                }
 
-            if (p.filter.maxSharability < p.filter.minSharability) {
-                return ExtensionResponse.error("maximum sharability must be greater than or equal to minimum sharability");
-            }
+                if (p.filter.maxSharability < p.filter.minSharability) {
+                    return ExtensionResponse.error("maximum sharability must be greater than or equal to minimum sharability");
+                }
 
-            if (p.filter.minWeight < 0 || p.filter.maxWeight > 1) {
-                return ExtensionResponse.error("minimum and maximum weight must lie between 0 and 1 (inclusive)");
-            }
+                p.map.put("minSharability", "" + p.filter.minSharability);
+                p.map.put("maxSharability", "" + p.filter.maxSharability);
 
-            if (p.filter.maxWeight < p.filter.minWeight) {
-                return ExtensionResponse.error("maximum weight must be greater than or equal to minimum weight");
-            }
+                if (p.filter.minWeight < 0 || p.filter.maxWeight > 1) {
+                    return ExtensionResponse.error("minimum and maximum weight must lie between 0 and 1 (inclusive)");
+                }
 
-            p.map.put("minWeight", "" + p.filter.minWeight);
-            p.map.put("maxWeight", "" + p.filter.maxWeight);
-            p.map.put("minSharability", "" + p.filter.minSharability);
-            p.map.put("maxSharability", "" + p.filter.maxSharability);
+                if (p.filter.maxWeight < p.filter.minWeight) {
+                    return ExtensionResponse.error("maximum weight must be greater than or equal to minimum weight");
+                }
+
+                p.map.put("minWeight", "" + p.filter.minWeight);
+                p.map.put("maxWeight", "" + p.filter.maxWeight);
+            }
 
             if (null != rootKey) {
                 p.root = p.m.getAtom(rootKey);
-                if (null == p.root || !p.filter.isVisible(p.root)) {
+                if (null == p.root || (null != p.filter && !p.filter.isVisible(p.root))) {
                     return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
                 }
 
@@ -93,7 +97,25 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 p.map.put("inverse", "" + p.inverse);
             }
 
-            return handleRequestProtected(p);
+            boolean manual = p.graph instanceof TransactionalGraph
+                    && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) p.graph).getTransactionMode();
+
+            if (manual) {
+                ((TransactionalGraph) p.graph).startTransaction();
+            }
+            boolean normal = false;
+
+            try {
+                ExtensionResponse r = performTransaction(p);
+                normal = true;
+                return r;
+            } finally {
+                if (manual) {
+                    ((TransactionalGraph) p.graph).stopTransaction(normal
+                            ? TransactionalGraph.Conclusion.SUCCESS
+                            : TransactionalGraph.Conclusion.FAILURE);
+                }
+            }
         } catch (Exception e) {
             // TODO
             e.printStackTrace(System.out);
@@ -113,7 +135,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         p.map.put("view", json.toString());
     }
 
-    protected abstract ExtensionResponse handleRequestProtected(Params p) throws Exception;
+    protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
 
     protected class Params {
         public Map<String, String> map;
@@ -127,5 +149,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Boolean inverse;
         public Filter filter;
         public String query;
+        public Float newWeight;
+        public Float newSharability;
     }
 }
