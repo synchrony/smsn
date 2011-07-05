@@ -193,7 +193,9 @@
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
                     (insert
 		                (propertize (concat "(" link-key ":" target-key ") ")
-					;;'face '(:foreground "white")
+					        'face (if full-colors-supported
+					                 '(:foreground "grey80" :background "grey97")
+					                 '(:foreground "black"))
 					;;'invisible t
 		                    'target-weight target-weight
 		                	'target-sharability target-sharability
