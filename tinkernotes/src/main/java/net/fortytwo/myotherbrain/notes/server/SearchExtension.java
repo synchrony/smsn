@@ -17,9 +17,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
- * User: josh
- * Date: 6/19/11
- * Time: 1:40 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "search")
 public class SearchExtension extends TinkerNotesExtension {

@@ -67,13 +67,12 @@
 
 (defun find-id ()
     (let ((line (current-line)))
-        (if (string-match "^\([0-9A-Za-z+/]*:[0-9A-Za-z+/]*\)" line)
+        (if (string-match "^[0-9A-Za-z@&]*:[0-9A-Za-z@&]*: " line)
             (let (
-                (i1 (string-match "\(" line))
                 (i2 (string-match ":" line))
-                (i3 (string-match "\)" line)))
+                (i3 (string-match ": " line)))
                 (let (
-                    (s1 (substring line (+ 1 i1) i2))
+                    (s1 (substring line 0 i2))
                     (s2 (substring line (+ 1 i2) i3)))
                     (let (
                         (assoc-id (if (< 0 (length s1)) s1 nil))
@@ -192,7 +191,7 @@
 		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
                     (insert
-		                (propertize (concat "(" link-key ":" target-key ") ")
+		                (propertize (concat link-key ":" target-key ": ")
 					        'face (if full-colors-supported
 					                 '(:foreground "grey80" :background "grey97")
 					                 '(:foreground "black"))

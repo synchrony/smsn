@@ -19,9 +19,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 6/19/11
- * Time: 1:40 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "update")
 public class UpdateExtension extends TinkerNotesExtension {

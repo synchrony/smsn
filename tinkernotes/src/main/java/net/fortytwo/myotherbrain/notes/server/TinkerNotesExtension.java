@@ -20,9 +20,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * User: josh
- * Date: 6/19/11
- * Time: 1:40 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected static final Logger LOGGER = Logger.getLogger(TinkerNotesExtension.class.getName());

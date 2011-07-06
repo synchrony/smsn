@@ -1,9 +1,7 @@
 package net.fortytwo.myotherbrain.notes;
 
 /**
- * User: josh
- * Date: 5/18/11
- * Time: 6:13 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class NoteNode {
     private final String targetValue;

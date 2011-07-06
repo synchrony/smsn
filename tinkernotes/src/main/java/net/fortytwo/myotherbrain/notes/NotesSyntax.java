@@ -17,21 +17,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * User: josh
- * Date: 5/18/11
- * Time: 6:00 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NotesSyntax {
-    private static final int MAX_TYPE_LENGTH = 5;
-
     // Regex of valid id prefixes, including parentheses, colon and trailing space
-    public static final Pattern KEY_PREFIX = Pattern.compile("\\([a-zA-Z0-9+/]+:[a-zA-Z0-9+/]+\\) ");
-    public static final Pattern KEY = Pattern.compile("[a-zA-Z0-9/+]+");
+    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:[a-zA-Z0-9@&]+: ");
+
+    private static final int MAX_TYPE_LENGTH = 5;
 
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
-
-    public enum Format {FLAT, WITH_CONTEXTS, JSON}
 
     public void writeContexts(final List<NoteContext> notes,
                               final OutputStream out) throws JSONException {
@@ -54,23 +49,23 @@ public class NotesSyntax {
         JSONObject json = new JSONObject();
 
         //if (null != n.getLinkKey()) {
-            JSONObject link = new JSONObject();
-            json.put("link", link);
+        JSONObject link = new JSONObject();
+        json.put("link", link);
 
-            link.put("key", n.getLinkKey());
-            link.put("weight", n.getLinkWeight());
-            link.put("sharability", n.getLinkSharability());
-            link.put("value", n.getLinkValue());
+        link.put("key", n.getLinkKey());
+        link.put("weight", n.getLinkWeight());
+        link.put("sharability", n.getLinkSharability());
+        link.put("value", n.getLinkValue());
         //}
 
         //if (null != n.getTargetKey()) {
-            JSONObject target = new JSONObject();
-            json.put("target", target);
+        JSONObject target = new JSONObject();
+        json.put("target", target);
 
-            target.put("key", n.getTargetKey());
-            target.put("weight", n.getTargetWeight());
-            target.put("sharability", n.getTargetSharability());
-            target.put("value", n.getTargetValue());
+        target.put("key", n.getTargetKey());
+        target.put("weight", n.getTargetWeight());
+        target.put("sharability", n.getTargetSharability());
+        target.put("value", n.getTargetValue());
         //}
 
         if (0 < n.getChildren().size()) {
@@ -110,9 +105,13 @@ public class NotesSyntax {
         String line;
         int lineNumber = 0;
         while ((line = br.readLine()) != null) {
-            String l = line;
             lineNumber++;
             //System.out.println("" + lineNumber + ") " + line);
+
+            String l = line;
+
+            // Tabs count as four spaces.
+            l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
 
             if (0 == l.trim().length()) {
                 // In the "flat" format, empty lines are simply ignored
@@ -135,34 +134,23 @@ public class NotesSyntax {
                     contexts.add(context);
                 }
             } else {
-                String atomId = null;
-                String associationId = null;
+                String targetKey = null;
+                String linkKey = null;
 
-                // Extract id
-                if (l.startsWith("(")) {
-                    int k = l.indexOf(") ");
-                    if (k < 0) {
-                        throw new NoteParsingException(lineNumber, "line terminated within apparent note ID");
-                    }
+                // Extract keys
+                int k = l.indexOf(" ");
+                if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k + 1)).matches()) {
+                    int i = l.indexOf(":");
+                    int j = l.indexOf(":", i+1);
+                    linkKey = l.substring(0, i);
+                    targetKey = l.substring(i + 1, j);
 
-                    String s = l.substring(0, k + 2);
-                    if (!KEY_PREFIX.matcher(s).matches()) {
-                        throw new NoteParsingException(lineNumber, "invalid note ID");
-                    }
-
-                    int i = s.indexOf(":");
-                    int j = s.indexOf(")");
-                    atomId = s.substring(i + 1, j);
-                    associationId = s.substring(1, i);
-
-                    l = l.substring(k + 2);
+                    l = l.substring(k + 1);
                 }
 
                 // Find indent level
                 int indent = 0;
-                if (l.startsWith(" ") || l.startsWith("\t")) {
-                    // Tabs count as four spaces.
-                    l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
+                if (l.startsWith(" ")) {
                     int i = 0;
                     while (l.charAt(i) == ' ') {
                         i++;
@@ -275,12 +263,12 @@ public class NotesSyntax {
                     n.setQualifier(qualifier);
                 }
 
-                if (null != atomId) {
-                    n.setTargetKey(atomId);
+                if (null != targetKey) {
+                    n.setTargetKey(targetKey);
                 }
 
-                if (null != associationId) {
-                    n.setLinkKey(associationId);
+                if (null != linkKey) {
+                    n.setLinkKey(linkKey);
                 }
 
                 if (0 < indent) {
@@ -341,15 +329,14 @@ public class NotesSyntax {
                                   final PrintStream p) throws JSONException {
 
         if (null != n.getTargetKey() || null != n.getLinkKey()) {
-            p.print("(");
             if (null != n.getLinkKey()) {
-                p.print(padId(n.getLinkKey()));
+                p.print(padKey(n.getLinkKey()));
             }
             p.print(":");
             if (null != n.getTargetKey()) {
-                p.print(padId(n.getTargetKey()));
+                p.print(padKey(n.getTargetKey()));
             }
-            p.print(") ");
+            p.print(": ");
         }
 
         for (int i = 0; i < indent; i++) {
@@ -368,7 +355,7 @@ public class NotesSyntax {
         }
     }
 
-    private static String padId(String id) {
+    private static String padKey(String id) {
         while (id.length() < 5) {
             id = "0" + id;
         }

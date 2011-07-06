@@ -4,9 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 5/18/11
- * Time: 5:55 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteContext extends NoteNode {
     private final List<Note> notes;

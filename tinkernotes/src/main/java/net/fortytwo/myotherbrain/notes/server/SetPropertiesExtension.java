@@ -13,9 +13,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import java.util.logging.Logger;
 
 /**
- * User: josh
- * Date: 6/19/11
- * Time: 1:40 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "set")
 public class SetPropertiesExtension extends TinkerNotesExtension {

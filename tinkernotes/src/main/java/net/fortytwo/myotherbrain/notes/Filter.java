@@ -3,9 +3,7 @@ package net.fortytwo.myotherbrain.notes;
 import net.fortytwo.myotherbrain.Atom;
 
 /**
- * User: josh
- * Date: 6/24/11
- * Time: 12:22 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Filter {
     public Filter() {

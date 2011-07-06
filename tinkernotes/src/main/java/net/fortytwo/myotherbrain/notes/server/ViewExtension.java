@@ -12,9 +12,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Filter;
 
 /**
- * User: josh
- * Date: 6/19/11
- * Time: 1:40 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "view")
 public class ViewExtension extends TinkerNotesExtension {

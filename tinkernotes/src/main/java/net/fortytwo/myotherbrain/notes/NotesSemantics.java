@@ -25,14 +25,13 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * User: josh
- * Date: 6/18/11
- * Time: 7:26 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NotesSemantics {
     private static final String KEYS = "keys";
 
-    private static final int RANDOM_KEY_MAXTRIALS = 1000;
+    private static final int KEY_DIGITS = 7;
+    private static final int RANDOM_KEY_MAXTRIALS = 100;
 
     private static final Random RANDOM = new Random();
 
@@ -63,25 +62,7 @@ public class NotesSemantics {
         keys = graph.getIndex(KEYS, Vertex.class);
 
         // TODO: temporary
-        //Vertex v = graph.getVertex(2639);
-        //System.out.println("v = " + v);
-        //v.setProperty("value", "ˆˆˆˆˆˆˆˆˆˆ");
-        /*
-        //graph.clear();
-        try {
-            GraphMLReader.inputGraph(graph, new FileInputStream("/Users/josh/data/tinkernotes_backup/tinkernotes-1309170805891.xml"));
-        } catch (XMLStreamException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        for (Vertex v : graph.getVertices()) {
-            Atom a = getAtom(v);
-
-            if (null == a.getValue() && null != a.getTo()) {
-                a.setValue((String) a.getTo().asVertex().getProperty("type"));
-            }
-        }*/
+        //migrateKeys();
     }
 
     /**
@@ -365,8 +346,8 @@ public class NotesSemantics {
      */
     private String createKey() {
         for (int j = 0; j < RANDOM_KEY_MAXTRIALS; j++) {
-            byte[] bytes = new byte[5];
-            for (int i = 0; i < 5; i++) {
+            byte[] bytes = new byte[KEY_DIGITS];
+            for (int i = 0; i < KEY_DIGITS; i++) {
                 int n = RANDOM.nextInt(64);
                 int b = n < 26
                         ? 'A' + n
@@ -375,7 +356,7 @@ public class NotesSemantics {
                         : n < 62
                         ? '0' + n - 52
                         : n < 63
-                        ? '/' : '+';
+                        ? '@' : '&';
                 bytes[i] = (byte) b;
             }
 
@@ -436,6 +417,12 @@ public class NotesSemantics {
         }
 
         return r;
+    }
+
+    private void migrateKeys() {
+        for (Vertex v : graph.getVertices()) {
+            v.setProperty(MyOtherBrain.KEY, createKey());
+        }
     }
 
     private class TimestampedAtom implements Comparable<TimestampedAtom> {
