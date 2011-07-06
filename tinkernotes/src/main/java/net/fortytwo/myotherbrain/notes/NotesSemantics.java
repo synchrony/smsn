@@ -32,6 +32,8 @@ import java.util.Set;
 public class NotesSemantics {
     private static final String KEYS = "keys";
 
+    private static final int RANDOM_KEY_MAXTRIALS = 1000;
+
     private static final Random RANDOM = new Random();
 
     private final IndexableGraph graph;
@@ -315,7 +317,7 @@ public class NotesSemantics {
         return manager.frame(v, Atom.class);
     }
 
-    public Atom getAtom(final String key) throws InvalidUpdateException {
+    public Atom getAtom(final String key) {
         if (null == key) {
             throw new IllegalArgumentException("null atom key");
         }
@@ -350,22 +352,40 @@ public class NotesSemantics {
         return a;
     }
 
+    /*
+        For 5-digit numbers of base 64, expect a collision after 32768 trials (on average).
+        There are 1,073,741,824 possibilities.
+
+        int base = 64;
+        int length = 5;
+        BigDecimal poss = new BigDecimal(base).pow(length);
+        BigDecimal trials = new BigDecimal(Math.sqrt((double) base)).pow(length);
+        System.out.println("For " + length + "-digit numbers of base " + base + ", expect a collision after "
+                + trials + " trials (on average).  There are " + poss + " possibilities.");
+     */
     private String createKey() {
-        byte[] bytes = new byte[5];
-        for (int i = 0; i < 5; i++) {
-            int n = RANDOM.nextInt(64);
-            int b = n < 26
-                    ? 'A' + n
-                    : n < 52
-                    ? 'a' + n - 26
-                    : n < 62
-                    ? '0' + n - 52
-                    : n < 63
-                    ? '/' : '+';
-            bytes[i] = (byte) b;
+        for (int j = 0; j < RANDOM_KEY_MAXTRIALS; j++) {
+            byte[] bytes = new byte[5];
+            for (int i = 0; i < 5; i++) {
+                int n = RANDOM.nextInt(64);
+                int b = n < 26
+                        ? 'A' + n
+                        : n < 52
+                        ? 'a' + n - 26
+                        : n < 62
+                        ? '0' + n - 52
+                        : n < 63
+                        ? '/' : '+';
+                bytes[i] = (byte) b;
+            }
+
+            String key = new String(bytes);
+            if (null == getAtom(key)) {
+                return key;
+            }
         }
 
-        return new String(bytes);
+        throw new IllegalStateException("no unoccupied keys have been found");
     }
 
     private Collection<Atom> getInLinks(final Atom from,
