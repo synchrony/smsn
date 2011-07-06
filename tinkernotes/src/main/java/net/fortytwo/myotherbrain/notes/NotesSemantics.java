@@ -380,7 +380,7 @@ public class NotesSemantics {
                 throw new IllegalStateException("vertex " + link.asVertex().getId() + " has a 'to' but no 'from' edge");
             }
             if (filter.isVisible(link) && filter.isVisible(f)) {
-                c.add(new TimestampedAtom(link, link.getFrom()));
+                c.add(new TimestampedAtom(link));
             }
         }
 
@@ -405,7 +405,7 @@ public class NotesSemantics {
                 throw new IllegalStateException("vertex " + link.asVertex().getId() + " has a 'from' but no 'to' edge");
             }
             if (filter.isVisible(link) && filter.isVisible(f)) {
-                c.add(new TimestampedAtom(link, link.getTo()));
+                c.add(new TimestampedAtom(link));
             }
         }
 
@@ -430,14 +430,13 @@ public class NotesSemantics {
         public long timestamp;
         public float weight;
 
-        public TimestampedAtom(final Atom a,
-                               final Atom target) {
+        public TimestampedAtom(final Atom a) {
             atom = a;
             timestamp = a.getCreated();
             weight = a.getWeight();
-            if (null != target) {
-                weight += target.getWeight();
-            }
+            //if (null != target) {
+            //    weight += target.getWeight();
+            //}
         }
 
         // Order from highest weighted to lowest weighted and from from newest to oldest
