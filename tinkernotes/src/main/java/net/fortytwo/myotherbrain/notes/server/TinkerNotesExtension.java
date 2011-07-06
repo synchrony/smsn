@@ -111,6 +111,10 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 return r;
             } finally {
                 if (manual) {
+                    if (!normal) {
+                        System.err.println("rolling back transaction");
+                    }
+
                     ((TransactionalGraph) p.graph).stopTransaction(normal
                             ? TransactionalGraph.Conclusion.SUCCESS
                             : TransactionalGraph.Conclusion.FAILURE);

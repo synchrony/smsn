@@ -229,7 +229,10 @@ public class NotesSemantics {
                     // Avoid attempting to remove a link more than once (if it appears more than once in the tree).
                     beforeMap.remove(linkKey);
 
-                    breakLink(getAtom(linkKey));
+                    Atom link = getAtom(linkKey);
+                    if (null != link) {
+                        breakLink(link);
+                    }
                 }
             }
         }
