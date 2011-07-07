@@ -64,6 +64,7 @@
 (setq view-max-sharability 1)
 (setq view-min-weight 0)
 (setq view-max-weight 1)
+(setq view-atoms nil)
 
 (defun find-id ()
     (let ((line (current-line)))
@@ -92,15 +93,6 @@
 (defun base-url ()
     (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/tinkernotes/"))
 
-(defun receive-view-alt (status)
-    (let ((s (strip-http-headers (buffer-string))))
-        (switch-to-buffer "foo")
-	(insert (number-to-string (length s)))
-	(loop for c across s do
-	    (insert (number-to-string c))
-	    (insert " "))
-	(insert s)))
-
 (defun receive-view-debug (status)
     (message (buffer-string)))
 
@@ -123,11 +115,6 @@
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root))
-                    ;;(tinkernotes-mode)
-                    (erase-buffer)
-                    (let ((view-json (json-read-from-string view)))
-                        (write-view (cdr (assoc 'children view-json)) 0))
-                    (beginning-of-buffer)
                     (make-local-variable 'view-root)
                     (make-local-variable 'view-depth)
                     (make-local-variable 'view-style)
@@ -136,6 +123,7 @@
                     (make-local-variable 'view-max-sharability)
                     (make-local-variable 'view-min-weight)
                     (make-local-variable 'view-max-weight)
+                    (make-local-variable 'view-atoms)
                     (setq view-root root)
                     (if depth (setq view-depth (string-to-number depth)))
                     (setq view-min-sharability min-sharability)
@@ -144,6 +132,12 @@
                     (setq view-max-weight max-weight)
                     (setq view-style style)
                     (setq view-title title)
+                    (setq view-atoms (make-hash-table :test 'equal))
+                    ;;(tinkernotes-mode)
+                    (erase-buffer)
+                    (let ((view-json (json-read-from-string view)))
+                        (write-view (cdr (assoc 'children view-json)) 0))
+                    (beginning-of-buffer)
                     (info-message (concat "updated to view " (view-info)))))))
 
 (setq full-colors '(
@@ -184,6 +178,8 @@
                 (target-value (cdr (assoc 'value target)))
 		        (target-weight (cdr (assoc 'weight target)))
 		        (target-sharability (cdr (assoc 'sharability target))))
+		            (if link-key (puthash link-key link view-atoms))
+		            (if target-key (puthash target-key target view-atoms))
 		            ;;(if (not link-key) (error "missing link key"))
 		            ;;(if (not link-value) (error (concat "missing value for link with key " link-key)))
 		            (if (not link-weight) (error (concat "missing weight for link with key " link-key)))
@@ -315,6 +311,29 @@
 
 (defun current-line-link ()
     (car (find-id)))
+
+(defun show-info (key)
+    (let ((atom (gethash key view-atoms)))
+        (let (
+            (value (cdr (assoc 'value atom)))
+		    (weight (cdr (assoc 'weight atom)))
+	        (sharability (cdr (assoc 'sharability atom))))
+	            (message (concat
+	                 "weight: " (number-to-string weight)
+	                 " sharability: " (number-to-string sharability)
+	                 " value: " value)))))
+
+(defun link-info ()
+    (interactive)
+    (let ((key (current-line-link)))
+        (if key
+            (show-info key))))
+
+(defun target-info()
+    (interactive)
+    (let ((key (current-line-target)))
+        (if key
+            (show-info key))))
 
 (defun visit-target ()
     (interactive)
@@ -534,6 +553,8 @@
     (interactive)
     (message (number-to-string (length (defined-colors)))))
 
+(global-set-key (kbd "C-c C-i l") 'link-info)
+(global-set-key (kbd "C-c C-i t") 'target-info)
 (global-set-key (kbd "C-c s") 'search)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c l") 'visit-link)
@@ -549,10 +570,10 @@
 (global-set-key (kbd "C-c C-w C-[ .") 'increase-min-weight)
 (global-set-key (kbd "C-c C-w C-] ,") 'decrease-max-weight)
 (global-set-key (kbd "C-c C-w C-] .") 'increase-max-weight)
-(global-set-key (kbd "C-c C-v C-[ ,") 'decrease-min-sharability)
-(global-set-key (kbd "C-c C-v C-[ .") 'increase-min-sharability)
-(global-set-key (kbd "C-c C-v C-] ,") 'decrease-max-sharability)
-(global-set-key (kbd "C-c C-v C-] .") 'increase-max-sharability)
+(global-set-key (kbd "C-c C-s C-[ ,") 'decrease-min-sharability)
+(global-set-key (kbd "C-c C-s C-[ .") 'increase-min-sharability)
+(global-set-key (kbd "C-c C-s C-] ,") 'decrease-max-sharability)
+(global-set-key (kbd "C-c C-s C-] .") 'increase-max-sharability)
 (global-set-key (kbd "C-c C-l C-w ,") 'decrease-link-weight)
 (global-set-key (kbd "C-c C-l C-w .") 'increase-link-weight)
 (global-set-key (kbd "C-c C-t C-w ,") 'decrease-target-weight)
