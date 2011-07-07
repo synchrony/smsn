@@ -59,7 +59,7 @@
 (setq view-depth 3)
 (setq view-root nil)
 (setq view-title nil)
-(setq view-inverse nil)
+(setq view-style "targets")
 (setq view-min-sharability 0)
 (setq view-max-sharability 1)
 (setq view-min-weight 0)
@@ -101,6 +101,9 @@
 	    (insert " "))
 	(insert s)))
 
+(defun receive-view-debug (status)
+    (message (buffer-string)))
+
 (defun receive-view (status)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
         (if status
@@ -109,7 +112,6 @@
                     (if error
                         (error-message error)
                         (error-message msg)))
-
             (let (
                 (root (cdr (assoc 'root json)))
                 (view (cdr (assoc 'view json)))
@@ -118,7 +120,7 @@
                 (max-sharability (string-to-number (cdr (assoc 'maxSharability json))))
                 (min-weight (string-to-number (cdr (assoc 'minWeight json))))
                 (max-weight (string-to-number (cdr (assoc 'maxWeight json))))
-                (inverse (string-equal "true" (cdr (assoc 'inverse json))))
+                (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root))
                     ;;(tinkernotes-mode)
@@ -128,7 +130,7 @@
                     (beginning-of-buffer)
                     (make-local-variable 'view-root)
                     (make-local-variable 'view-depth)
-                    (make-local-variable 'view-inverse)
+                    (make-local-variable 'view-style)
                     (make-local-variable 'view-title)
                     (make-local-variable 'view-min-sharability)
                     (make-local-variable 'view-max-sharability)
@@ -140,7 +142,7 @@
                     (setq view-max-sharability max-sharability)
                     (setq view-min-weight min-weight)
                     (setq view-max-weight max-weight)
-                    (setq view-inverse inverse)
+                    (setq view-style style)
                     (setq view-title title)
                     (info-message (concat "updated to view " (view-info)))))))
 
@@ -210,27 +212,28 @@
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun invert-view-style (style)
+    (cond
+        ((string-equal style "targets") "targets-inverse")
+        ((string-equal style "links") "links-inverse")
+        ((string-equal style "targets-inverse") "targets")
+        ((string-equal style "links-inverse") "links")))
+
 (defun view-info ()
     (concat
         "(root: " view-root
          " :depth " (number-to-string view-depth)
-         " :inverse " (if view-inverse "t" "nil")
+         " :style " view-style
          " :sharability [" (number-to-string view-min-sharability) ", " (number-to-string view-max-sharability) "]"
          " :weight [" (number-to-string view-min-weight) ", " (number-to-string view-max-weight) "]"
          " :title \"" view-title "\")"))  ;; TODO: actuallly escape the title string
 
-(defun request-view (root depth inverse minv maxv minw maxw)
-    (url-retrieve
-        (concat (base-url) "view"
-            "?root=" (w3m-url-encode-string root)
-            "&depth=" (number-to-string depth)
-            "&minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)
-            "&inverse=" (if inverse "true" "false")) 'receive-view))
+(defun request-view (root depth style minv maxv minw maxw)
+    ;;(interactive)(message (request-view-url root depth style minv maxv minw maxw) 'receive-view))
+    (url-retrieve (request-view-url root depth style minv maxv minw maxw) 'receive-view))
+    ;;(url-retrieve "http://localhost:8183/main/gremlin/tinkernotes" 'receive-view-debug))
 
-(defun request-view-url  (root depth inverse minv maxv minw maxw)
+(defun request-view-url  (root depth style minv maxv minw maxw)
 	(concat (base-url) "view"
             "?root=" (w3m-url-encode-string root)
             "&depth=" (number-to-string depth)
@@ -238,7 +241,7 @@
             "&maxSharability=" (number-to-string maxv)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)
-            "&inverse=" (if inverse "true" "false")))
+            "&style=" style))
 
 (defun refresh-view-new (url)
     (url-retrieve url 'receive-view))
@@ -248,7 +251,7 @@
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
             "&depth=2"
-            "&inverse=false"
+            "&style=" "targets"  ;; TODO
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
             "&minWeight=" (number-to-string minw)
@@ -269,7 +272,7 @@
 (defun set-properties (key weight sharability)
     (interactive)
     (if view-root
-        (let ((url (request-view-url view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+        (let ((url (request-view-url view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)))
 (setq hack-url url)
             (url-retrieve
                 (concat (base-url) "set"
@@ -298,13 +301,13 @@
     (interactive)
     (let ((key (current-line-target)))
         (if key
-            (request-view key view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
 (defun visit-link ()
     (interactive)
     (let ((key (current-line-link)))
         (if key
-            (request-view key view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
 (defun decrease-link-weight ()
     (interactive)
@@ -392,73 +395,73 @@
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
 
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- view-depth 1) view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root (- view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ view-depth 1) view-inverse view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root (+ view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
 
 (defun invert-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (not view-inverse) view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root view-depth (invert-view-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
 
 (defun decrease-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight))
         (not-in-view))
 
 (defun increase-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight))
         (not-in-view))
 
 (defun decrease-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25)))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25)))
         (not-in-view))
 
 (defun increase-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25)))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25)))
         (not-in-view))
 
 (defun decrease-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root view-depth view-style (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
             (not-in-view))
 
 (defun increase-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root view-depth view-style (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
             (not-in-view))
 
 (defun decrease-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight))
+        (request-view view-root view-depth view-style view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight))
             (not-in-view))
 
 (defun increase-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-inverse view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight))
+        (request-view view-root view-depth view-style view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight))
             (not-in-view))
 
 
@@ -473,7 +476,7 @@
             (list
                 (list "root" view-root)
                 (list "view" entity)
-                (list "inverse" (if view-inverse "true" "false"))
+                (list "style" view-style)
                 (list "minSharability" (number-to-string view-min-sharability))
                 (list "maxSharability" (number-to-string view-max-sharability))
                 (list "minWeight" (number-to-string view-min-weight))
@@ -493,7 +496,6 @@
 (defun my-debug ()
     (interactive)
     (message (number-to-string (length (defined-colors)))))
-
 
 (global-set-key (kbd "C-c t") 'visit-target)
 (global-set-key (kbd "C-c l") 'visit-link)

@@ -35,7 +35,7 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
-                                           @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
+                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
         //new Exception().printStackTrace();
 
         LOGGER.info("update request for: " + rootKey);
@@ -47,9 +47,8 @@ public class UpdateExtension extends TinkerNotesExtension {
         p.graph = graph;
         p.depth = depth;
         p.filter = filter;
-        p.inverse = inverse;
         p.view = view;
-        return this.handleRequestInternal(p, rootKey);
+        return this.handleRequestInternal(p, rootKey, styleName);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         // Apply the update
         try {
-            p.m.update(p.root, children, p.depth, p.filter, p.inverse);
+            p.m.update(p.root, children, p.depth, p.filter, p.style);
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }

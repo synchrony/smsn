@@ -27,7 +27,7 @@ public class ViewExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
+                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
         LOGGER.info("view request for: " + rootKey);
         System.err.println("view request for: " + rootKey);
 
@@ -37,8 +37,7 @@ public class ViewExtension extends TinkerNotesExtension {
         p.graph = graph;
         p.depth = depth;
         p.filter = filter;
-        p.inverse = inverse;
-        return this.handleRequestInternal(p, rootKey);
+        return this.handleRequestInternal(p, rootKey, styleName);
     }
 
     @Override

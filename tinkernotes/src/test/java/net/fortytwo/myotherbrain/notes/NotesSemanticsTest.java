@@ -55,9 +55,9 @@ public class NotesSemanticsTest extends TestCase {
 
         //System.out.println(before.getTargetValue());
 
-        semantics.update(parent, parentBefore.getChildren(), 1, f, false);
+        semantics.update(parent, parentBefore.getChildren(), 1, f, NotesSemantics.ViewStyle.TARGETS);
 
-        Note after = semantics.view(parent, 1, f, false);
+        Note after = semantics.view(parent, 1, f, NotesSemantics.ViewStyle.TARGETS);
 
         JSONObject json = syntax.toJSON(after);
         //System.out.println(json.toString());

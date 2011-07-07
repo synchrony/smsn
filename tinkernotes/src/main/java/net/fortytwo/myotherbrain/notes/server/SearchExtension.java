@@ -32,7 +32,7 @@ public class SearchExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "inverse", description = "whether to create an inverted view") Boolean inverse) {
+                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
         LOGGER.info("search request for \"" + query + "\"");
         System.err.println("search request for \"" + query + "\"");
 
@@ -43,8 +43,7 @@ public class SearchExtension extends TinkerNotesExtension {
         p.filter = filter;
         p.query = query;
         p.depth = depth;
-        p.inverse = inverse;
-        return this.handleRequestInternal(p, null);
+        return this.handleRequestInternal(p, null, styleName);
     }
 
     @Override
@@ -56,7 +55,7 @@ public class SearchExtension extends TinkerNotesExtension {
     }
 
     protected void addSearchResults(final Params p) throws IOException {
-        Note n = p.m.search(p.query, p.depth, p.filter, p.inverse);
+        Note n = p.m.search(p.query, p.depth, p.filter, p.style);
         JSONObject json;
 
         try {

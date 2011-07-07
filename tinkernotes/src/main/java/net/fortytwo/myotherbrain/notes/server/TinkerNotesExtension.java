@@ -26,7 +26,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected static final Logger LOGGER = Logger.getLogger(TinkerNotesExtension.class.getName());
 
     protected ExtensionResponse handleRequestInternal(final Params p,
-                                                      final String rootKey) {
+                                                      final String rootKey,
+                                                      final String styleName) {
         try {
             p.map = new HashMap<String, String>();
 
@@ -91,8 +92,14 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 p.map.put("title", null == p.root.getValue() || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
             }
 
-            if (null != p.inverse) {
-                p.map.put("inverse", "" + p.inverse);
+            if (null != styleName) {
+                p.style = NotesSemantics.ViewStyle.find(styleName);
+
+                if (null == p.style) {
+                    return ExtensionResponse.error("unsupported view style: " + styleName);
+                }
+
+                p.map.put("style", p.style.getName());
             }
 
             boolean manual = p.graph instanceof TransactionalGraph
@@ -126,7 +133,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     }
 
     protected void addView(final Params p) throws IOException {
-        Note n = p.m.view(p.root, p.depth, p.filter, p.inverse);
+        Note n = p.m.view(p.root, p.depth, p.filter, p.style);
         JSONObject json;
 
         try {
@@ -148,7 +155,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Atom root;
         public Integer depth;
         public String view;
-        public Boolean inverse;
+        public NotesSemantics.ViewStyle style;
         public Filter filter;
         public String query;
         public Float newWeight;

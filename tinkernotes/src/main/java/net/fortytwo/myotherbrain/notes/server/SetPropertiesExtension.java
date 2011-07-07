@@ -42,7 +42,7 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         p.graph = graph;
         p.newWeight = weight;
         p.newSharability = sharability;
-        return this.handleRequestInternal(p, key);
+        return this.handleRequestInternal(p, key, null);
     }
 
     @Override

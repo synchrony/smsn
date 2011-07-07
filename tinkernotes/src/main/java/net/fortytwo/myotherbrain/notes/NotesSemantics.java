@@ -68,20 +68,20 @@ public class NotesSemantics {
     /**
      * Generates a view of the graph.
      *
-     * @param root    the key of the root atom of the view
-     * @param depth   the depth of the view.
-     *                A view of depth 0 contains only the root,
-     *                while a view of depth 1 also contains all children of the root,
-     *                a view of depth 2 all grandchildren, etc.
-     * @param filter  a collection of criteria for atoms and links.
-     *                Atoms and links which do not meet the criteria are not to appear in the view.
-     * @param inverse whether to produce an inverted view (in which links are followed "backwards")
+     * @param root   the key of the root atom of the view
+     * @param depth  the depth of the view.
+     *               A view of depth 0 contains only the root,
+     *               while a view of depth 1 also contains all children of the root,
+     *               a view of depth 2 all grandchildren, etc.
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in the view.
+     * @param style  the style of view to produce
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
     public Note view(final Atom root,
                      final int depth,
                      final Filter filter,
-                     final boolean inverse) {
+                     final ViewStyle style) {
 
         String value = root.getValue();
         Note n = new Note(value);
@@ -91,15 +91,15 @@ public class NotesSemantics {
         n.setTargetSharability(root.getSharability());
 
         if (depth > 0) {
-            Collection<Atom> links = inverse ? getInLinks(root, filter) : getOutlinks(root, filter);
+            Collection<Atom> links = getLinks(root, style, filter);
             for (Atom link : links) {
-                Atom target = inverse ? link.getFrom() : link.getTo();
+                Atom target = getTarget(link, style);
 
                 if (null == target) {
-                    throw new IllegalArgumentException("link " + link.getKey() + " has no '" + (inverse ? "from" : "to") + "' atom");
+                    throw new IllegalArgumentException("link " + link.getKey() + " has no target");
                 }
 
-                Note n2 = view(target, depth - 1, filter, inverse);
+                Note n2 = view(target, depth - 1, filter, style);
                 n2.setLinkKey(link.getKey());
                 n2.setLinkValue(link.getValue());
                 n2.setLinkWeight(link.getWeight());
@@ -120,33 +120,33 @@ public class NotesSemantics {
      * @param depth    the minimum depth to which the graph will be updated
      * @param filter   a collection of criteria for atoms and links.
      *                 Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param inverse  whether to push an inverted view (in which links are followed "backwards")
+     * @param style    the style of update to push
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
                        final List<Note> children,
                        final int depth,
                        final Filter filter,
-                       final boolean inverse) throws InvalidUpdateException {
+                       final ViewStyle style) throws InvalidUpdateException {
         // Destructive updates are enabled for now.
-        updateInternal(root, children, depth, filter, true, inverse);
+        updateInternal(root, children, depth, filter, true, style);
         //updateInternal(root, children, depth, filter, false, inverse);
     }
 
     /**
      * Performs full text search.
      *
-     * @param query   the search query
-     * @param depth   depth of the search results view
-     * @param filter  a collection of criteria for atoms and links.
-     *                Atoms and links which do not meet the criteria are not to appear in search results.
-     * @param inverse whether to produce an inverse view of search results (important only if depth > 1)
+     * @param query  the search query
+     * @param depth  depth of the search results view
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param style  the style of update to push
      * @return an ordered list of query results
      */
     public Note search(final String query,
                        final int depth,
                        final Filter filter,
-                       final boolean inverse) {
+                       final ViewStyle style) {
         // TODO: use search score for link weight
         float linkWeight = (filter.minWeight + filter.maxWeight) / 2;
         float linkSharability = (filter.minSharability + filter.maxSharability) / 2;
@@ -159,7 +159,7 @@ public class NotesSemantics {
             while (i.hasNext()) {
                 Atom a = getAtom(i.next());
                 if (filter.isVisible(a)) {
-                    Note n = view(a, depth - 1, filter, inverse);
+                    Note n = view(a, depth - 1, filter, style);
                     n.setLinkValue(".");
                     n.setLinkWeight(linkWeight);
                     n.setLinkSharability(linkSharability);
@@ -178,12 +178,12 @@ public class NotesSemantics {
                                 final int depth,
                                 final Filter filter,
                                 boolean destructive,
-                                boolean inverse) throws InvalidUpdateException {
+                                ViewStyle style) throws InvalidUpdateException {
         if (depth < 1) {
             destructive = false;
         }
 
-        List<Note> before = view(root, 1, filter, inverse).getChildren();
+        List<Note> before = view(root, 1, filter, style).getChildren();
 
         Map<String, Note> beforeMap = new HashMap<String, Note>();
         for (Note n : before) {
@@ -246,14 +246,8 @@ public class NotesSemantics {
                 destructive = false;
             } else if (null == beforeMap.get(linkKey)) {
                 Atom link = getAtom(linkKey);
-                boolean exists = link != null;
-                if (exists) {
-                    exists = inverse
-                            ? link.getFrom().getKey().equals(target.getKey()) && link.getTo().getKey().equals(root.getKey())
-                            : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey());
-                }
 
-                if (exists) {
+                if (linkExists(root, link, target, style)) {
                     filter.makeVisible(link);
                     link.setValue(n.getLinkValue());
                 } else {
@@ -276,16 +270,69 @@ public class NotesSemantics {
             if (createLink) {
                 Atom link = createAtom(filter);
                 link.setValue(n.getLinkValue());
-                if (inverse) {
-                    link.setFrom(target);
-                    link.setTo(root);
-                } else {
-                    link.setFrom(root);
-                    link.setTo(target);
-                }
+                setLink(link, root, target, style);
             }
 
-            updateInternal(target, n.getChildren(), depth - 1, filter, destructive, inverse);
+            updateInternal(target, n.getChildren(), depth - 1, filter, destructive, style);
+        }
+    }
+
+    private boolean isInverseStyle(final ViewStyle style) {
+        switch (style) {
+            case TARGETS:
+                return false;
+            case LINKS:
+                return false;
+            case TARGETS_INVERSE:
+                return true;
+            case LINKS_INVERSE:
+                return true;
+            default:
+                throw new IllegalStateException("unsupported view style: " + style);
+        }
+    }
+
+    private Collection<Atom> getLinks(final Atom root,
+                                      final ViewStyle style,
+                                      final Filter filter) {
+        switch (style) {
+            case TARGETS:
+                return getOutlinks(root, filter);
+            case LINKS:
+                throw new UnsupportedOperationException();
+            case TARGETS_INVERSE:
+                return getInLinks(root, filter);
+            case LINKS_INVERSE:
+                throw new UnsupportedOperationException();
+            default:
+                throw new IllegalStateException("unsupported view style: " + style);
+        }
+    }
+
+    private Atom getTarget(final Atom link,
+                           final ViewStyle style) {
+        return isInverseStyle(style) ? link.getFrom() : link.getTo();
+    }
+
+    private boolean linkExists(final Atom root,
+                               final Atom link,
+                               final Atom target,
+                               final ViewStyle style) {
+        return null != link && (isInverseStyle(style)
+                ? link.getFrom().getKey().equals(target.getKey()) && link.getTo().getKey().equals(root.getKey())
+                : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey()));
+    }
+
+    private void setLink(final Atom link,
+                         final Atom source,
+                         final Atom target,
+                         final ViewStyle style) {
+        if (isInverseStyle(style)) {
+            link.setFrom(target);
+            link.setTo(source);
+        } else {
+            link.setFrom(source);
+            link.setTo(target);
         }
     }
 
@@ -455,6 +502,33 @@ public class NotesSemantics {
         }
     }
 
+    public enum ViewStyle {
+        TARGETS("targets"),
+        LINKS("links"),
+        TARGETS_INVERSE("targets-inverse"),
+        LINKS_INVERSE("links-inverse");
+
+        private final String name;
+
+        ViewStyle(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static ViewStyle find(final String name) {
+            for (ViewStyle s : values()) {
+                if (s.name.equals(name)) {
+                    return s;
+                }
+            }
+
+            return null;
+        }
+    }
+
     public static void main(final String[] args) throws Exception {
         Filter filter = new Filter(0, 1, 0, 1);
 
@@ -475,12 +549,12 @@ public class NotesSemantics {
         Atom root = m.createAtom(filter);
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setValue("Josh's notes");
-        m.update(root, notes, 0, filter, false);
+        m.update(root, notes, 0, filter, ViewStyle.TARGETS);
 
         //GraphMLWriter.outputGraph(graph, System.out);
         //System.out.println();
 
-        Note n = m.view(root, 3, filter, false);
+        Note n = m.view(root, 3, filter, ViewStyle.TARGETS);
         p.writeNotes(n.getChildren(), System.out);
     }
 }
