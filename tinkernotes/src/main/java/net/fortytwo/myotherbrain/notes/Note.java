@@ -16,8 +16,8 @@ public class Note extends NoteNode {
     private float targetWeight;
     private float targetSharability;
 
-    public Note(final String text) {
-        super(text);
+    public Note(final String targetValue) {
+        super(targetValue);
 
         children = new LinkedList<Note>();
     }

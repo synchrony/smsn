@@ -212,12 +212,33 @@
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun invert-view-style (style)
+(defun to-forward-style (style)
+    (cond
+        ((string-equal style "targets") "targets")
+        ((string-equal style "links") "links")
+        ((string-equal style "targets-inverse") "targets")
+        ((string-equal style "links-inverse") "links")))
+
+(defun to-backward-style (style)
     (cond
         ((string-equal style "targets") "targets-inverse")
         ((string-equal style "links") "links-inverse")
-        ((string-equal style "targets-inverse") "targets")
-        ((string-equal style "links-inverse") "links")))
+        ((string-equal style "targets-inverse") "targets-inverse")
+        ((string-equal style "links-inverse") "links-inverse")))
+
+(defun to-links-style (style)
+    (cond
+        ((string-equal style "targets") "links")
+        ((string-equal style "links") "links")
+        ((string-equal style "targets-inverse") "links-inverse")
+        ((string-equal style "links-inverse") "links-inverse")))
+
+(defun to-targets-style (style)
+    (cond
+        ((string-equal style "targets") "targets")
+        ((string-equal style "links") "targets")
+        ((string-equal style "targets-inverse") "targets-inverse")
+        ((string-equal style "links-inverse") "targets-inverse")))
 
 (defun view-info ()
     (concat
@@ -229,9 +250,7 @@
          " :title \"" view-title "\")"))  ;; TODO: actuallly escape the title string
 
 (defun request-view (root depth style minv maxv minw maxw)
-    ;;(interactive)(message (request-view-url root depth style minv maxv minw maxw) 'receive-view))
     (url-retrieve (request-view-url root depth style minv maxv minw maxw) 'receive-view))
-    ;;(url-retrieve "http://localhost:8183/main/gremlin/tinkernotes" 'receive-view-debug))
 
 (defun request-view-url  (root depth style minv maxv minw maxw)
 	(concat (base-url) "view"
@@ -410,10 +429,28 @@
         (request-view view-root (+ view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
 
-(defun invert-view ()
+(defun refresh-to-forward-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (invert-view-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (request-view view-root view-depth (to-forward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
+
+(defun refresh-to-backward-view ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth (to-backward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
+
+(defun refresh-to-links-view ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth (to-links-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
+        (not-in-view))
+
+(defun refresh-to-targets-view ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth (to-targets-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
 
 (defun decrease-min-weight ()
@@ -497,15 +534,17 @@
     (interactive)
     (message (number-to-string (length (defined-colors)))))
 
-(global-set-key (kbd "C-c t") 'visit-target)
+(global-set-key (kbd "C-c s") 'search)
+(global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c l") 'visit-link)
+(global-set-key (kbd "C-c t") 'visit-target)
 (global-set-key (kbd "C-c r") 'refresh-view)
+(global-set-key (kbd "C-c C-v f") 'refresh-to-forward-view)
+(global-set-key (kbd "C-c C-v b") 'refresh-to-backward-view)
+(global-set-key (kbd "C-c C-v l") 'refresh-to-links-view)
+(global-set-key (kbd "C-c C-v t") 'refresh-to-targets-view)
 (global-set-key (kbd "C-c C-d ,") 'decrease-depth)
 (global-set-key (kbd "C-c C-d .") 'increase-depth)
-(global-set-key (kbd "C-c ~") 'invert-view)
-(global-set-key (kbd "C-c p") 'push-view)
-(global-set-key (kbd "C-c d") 'my-debug)
-(global-set-key (kbd "C-c s") 'search)
 (global-set-key (kbd "C-c C-w C-[ ,") 'decrease-min-weight)
 (global-set-key (kbd "C-c C-w C-[ .") 'increase-min-weight)
 (global-set-key (kbd "C-c C-w C-] ,") 'decrease-max-weight)
@@ -522,6 +561,7 @@
 (global-set-key (kbd "C-c C-l C-s .") 'increase-link-sharability)
 (global-set-key (kbd "C-c C-t C-s ,") 'decrease-target-sharability)
 (global-set-key (kbd "C-c C-t C-s .") 'increase-target-sharability)
+(global-set-key (kbd "C-c d") 'my-debug)
 
 ;; Note: these should perhaps be local settings
 (global-set-key (kbd "C-c C-s C-t") 'toggle-truncate-lines)

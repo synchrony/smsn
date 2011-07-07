@@ -44,20 +44,20 @@ public class NotesSemanticsTest extends TestCase {
     }
 
     public void testEncoding() throws Exception {
-        Atom parent = createAtom("11111");
-        Atom root = createAtom("22222");
         Filter f = new Filter();
 
-        Note parentBefore = new Note("foo");
-        Note before = new Note("cheval ˆ phynances");
-        before.setLinkValue("a link");
-        parentBefore.addChild(before);
+        Atom root = createAtom("11111");
+
+        Note rootNote = new Note("foo");
+        Note child = new Note("cheval ˆ phynances");
+        child.setLinkValue("a link");
+        rootNote.addChild(child);
 
         //System.out.println(before.getTargetValue());
 
-        semantics.update(parent, parentBefore.getChildren(), 1, f, NotesSemantics.ViewStyle.TARGETS);
+        semantics.update(root, rootNote.getChildren(), 1, f, NotesSemantics.ViewStyle.TARGETS);
 
-        Note after = semantics.view(parent, 1, f, NotesSemantics.ViewStyle.TARGETS);
+        Note after = semantics.view(root, 1, f, NotesSemantics.ViewStyle.TARGETS);
 
         JSONObject json = syntax.toJSON(after);
         //System.out.println(json.toString());

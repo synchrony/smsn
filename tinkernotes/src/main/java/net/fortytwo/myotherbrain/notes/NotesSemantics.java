@@ -82,34 +82,7 @@ public class NotesSemantics {
                      final int depth,
                      final Filter filter,
                      final ViewStyle style) {
-
-        String value = root.getValue();
-        Note n = new Note(value);
-        n.setTargetKey(root.getKey());
-
-        n.setTargetWeight(root.getWeight());
-        n.setTargetSharability(root.getSharability());
-
-        if (depth > 0) {
-            Collection<Atom> links = getLinks(root, style, filter);
-            for (Atom link : links) {
-                Atom target = getTarget(link, style);
-
-                if (null == target) {
-                    throw new IllegalArgumentException("link " + link.getKey() + " has no target");
-                }
-
-                Note n2 = view(target, depth - 1, filter, style);
-                n2.setLinkKey(link.getKey());
-                n2.setLinkValue(link.getValue());
-                n2.setLinkWeight(link.getWeight());
-                n2.setLinkSharability(link.getSharability());
-                n.addChild(n2);
-            }
-        }
-
-        //System.out.println("yielding note: " + n);
-        return n;
+        return viewInternal(root, root, depth, filter, style);
     }
 
     /**
@@ -128,9 +101,7 @@ public class NotesSemantics {
                        final int depth,
                        final Filter filter,
                        final ViewStyle style) throws InvalidUpdateException {
-        // Destructive updates are enabled for now.
         updateInternal(root, children, depth, filter, true, style);
-        //updateInternal(root, children, depth, filter, false, inverse);
     }
 
     /**
@@ -173,12 +144,44 @@ public class NotesSemantics {
         return result;
     }
 
+    public Note viewInternal(final Atom link,
+                             final Atom target,
+                             final int depth,
+                             final Filter filter,
+                             final ViewStyle style) {
+
+        Note n = new Note(target.getValue());
+        n.setTargetKey(target.getKey());
+        n.setTargetWeight(target.getWeight());
+        n.setTargetSharability(target.getSharability());
+
+        n.setLinkValue(link.getValue());
+        n.setLinkKey(link.getKey());
+        n.setLinkWeight(link.getWeight());
+        n.setLinkSharability(link.getSharability());
+
+        if (depth > 0) {
+            for (Atom clink : getLinks(link, target, style, filter)) {
+                Atom ctarget = getTarget(clink, style);
+
+                if (null == ctarget) {
+                    throw new IllegalStateException("link " + clink.getKey() + " has no target");
+                }
+
+                Note cn = viewInternal(clink, ctarget, depth - 1, filter, style);
+                n.addChild(cn);
+            }
+        }
+
+        return n;
+    }
+
     private void updateInternal(final Atom root,
                                 final List<Note> children,
                                 final int depth,
                                 final Filter filter,
                                 boolean destructive,
-                                ViewStyle style) throws InvalidUpdateException {
+                                final ViewStyle style) throws InvalidUpdateException {
         if (depth < 1) {
             destructive = false;
         }
@@ -241,11 +244,13 @@ public class NotesSemantics {
             String linkKey = n.getLinkKey();
             boolean createLink = false;
 
+            Atom link = null;
+
             if (null == linkKey) {
                 createLink = true;
                 destructive = false;
             } else if (null == beforeMap.get(linkKey)) {
-                Atom link = getAtom(linkKey);
+                link = getAtom(linkKey);
 
                 if (linkExists(root, link, target, style)) {
                     filter.makeVisible(link);
@@ -263,17 +268,18 @@ public class NotesSemantics {
                     throw new InvalidUpdateException("target key of updated link has changed");
                 }
 
-                Atom link = getAtom(linkKey);
+                link = getAtom(linkKey);
                 link.setValue(n.getLinkValue());
             }
 
             if (createLink) {
-                Atom link = createAtom(filter);
+                link = createAtom(filter);
                 link.setValue(n.getLinkValue());
                 setLink(link, root, target, style);
             }
 
-            updateInternal(target, n.getChildren(), depth - 1, filter, destructive, style);
+            Atom source = getSource(link, target, style);
+            updateInternal(source, n.getChildren(), depth - 1, filter, destructive, style);
         }
     }
 
@@ -292,21 +298,43 @@ public class NotesSemantics {
         }
     }
 
-    private Collection<Atom> getLinks(final Atom root,
+    private boolean isLinkStyle(final ViewStyle style) {
+        switch (style) {
+            case TARGETS:
+                return false;
+            case LINKS:
+                return true;
+            case TARGETS_INVERSE:
+                return false;
+            case LINKS_INVERSE:
+                return true;
+            default:
+                throw new IllegalStateException("unsupported view style: " + style);
+        }
+    }
+
+    private Collection<Atom> getLinks(final Atom link,
+                                      final Atom target,
                                       final ViewStyle style,
                                       final Filter filter) {
         switch (style) {
             case TARGETS:
-                return getOutlinks(root, filter);
+                return getOutlinks(target, filter);
             case LINKS:
-                throw new UnsupportedOperationException();
+                return getOutlinks(link, filter);
             case TARGETS_INVERSE:
-                return getInLinks(root, filter);
+                return getInLinks(target, filter);
             case LINKS_INVERSE:
-                throw new UnsupportedOperationException();
+                return getInLinks(link, filter);
             default:
                 throw new IllegalStateException("unsupported view style: " + style);
         }
+    }
+
+    private Atom getSource(final Atom link,
+                           final Atom target,
+                           final ViewStyle style) {
+        return isLinkStyle(style) ? link : target;
     }
 
     private Atom getTarget(final Atom link,
@@ -416,11 +444,11 @@ public class NotesSemantics {
         throw new IllegalStateException("no unoccupied keys have been found");
     }
 
-    private Collection<Atom> getInLinks(final Atom from,
+    private Collection<Atom> getInLinks(final Atom source,
                                         final Filter filter) {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
-        for (Edge e : from.asVertex().getInEdges(MyOtherBrain.TO)) {
+        for (Edge e : source.asVertex().getInEdges(MyOtherBrain.TO)) {
             Atom link = getAtom(e.getOutVertex());
             Atom f = link.getFrom();
             if (null == f) {
@@ -441,11 +469,11 @@ public class NotesSemantics {
         return r;
     }
 
-    private Collection<Atom> getOutlinks(final Atom from,
+    private Collection<Atom> getOutlinks(final Atom source,
                                          final Filter filter) {
         List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
 
-        for (Edge e : from.asVertex().getInEdges(MyOtherBrain.FROM)) {
+        for (Edge e : source.asVertex().getInEdges(MyOtherBrain.FROM)) {
             Atom link = getAtom(e.getOutVertex());
             Atom f = link.getTo();
             if (null == f) {
