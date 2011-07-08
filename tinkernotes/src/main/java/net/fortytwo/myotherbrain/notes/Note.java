@@ -13,8 +13,10 @@ public class Note extends NoteNode {
 
     private float linkWeight;
     private float linkSharability;
+    private long linkCreated;
     private float targetWeight;
     private float targetSharability;
+    private long targetCreated;
 
     public Note(final String targetValue) {
         super(targetValue);
@@ -89,5 +91,21 @@ public class Note extends NoteNode {
 
     public void setLinkSharability(float linkSharability) {
         this.linkSharability = linkSharability;
+    }
+
+    public long getLinkCreated() {
+        return linkCreated;
+    }
+
+    public void setLinkCreated(long linkCreated) {
+        this.linkCreated = linkCreated;
+    }
+
+    public long getTargetCreated() {
+        return targetCreated;
+    }
+
+    public void setTargetCreated(long targetCreated) {
+        this.targetCreated = targetCreated;
     }
 }

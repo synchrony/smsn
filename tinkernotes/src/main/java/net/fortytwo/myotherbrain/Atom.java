@@ -12,7 +12,7 @@ import com.tinkerpop.frames.VertexFrame;
 public interface Atom extends VertexFrame {
 
     @Property(MyOtherBrain.CREATED)
-    long getCreated();
+    Long getCreated();
 
     @Property(MyOtherBrain.CREATED)
     void setCreated(long created);

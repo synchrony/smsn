@@ -68,7 +68,7 @@
 
 (defun find-id ()
     (let ((line (current-line)))
-        (if (string-match "^[0-9A-Za-z@&]*:[0-9A-Za-z@&]*: " line)
+        (if (string-match "^[0-9A-Za-z@&#]*:[0-9A-Za-z@&]*: " line)
             (let (
                 (i2 (string-match ":" line))
                 (i3 (string-match ": " line)))
@@ -424,7 +424,8 @@
     (let ((query (read-from-minibuffer "query: ")))
         (if (> (length query) 0)
             (request-search-results
-                (concat "*" query "*")
+                ;;(concat "*" query "*")
+                query
                 view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
 (defun not-in-view ()

@@ -43,7 +43,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             p.manager = new FramesManager(p.graph);
-            p.m = new NotesSemantics((IndexableGraph) p.graph, p.manager);
+            p.semantics = new NotesSemantics((IndexableGraph) p.graph, p.manager);
             p.syntax = new NotesSyntax();
 
             if (null != p.depth) {
@@ -83,7 +83,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             if (null != rootKey) {
-                p.root = p.m.getAtom(rootKey);
+                p.root = p.semantics.getAtom(rootKey);
                 if (null == p.root || (null != p.filter && !p.filter.isVisible(p.root))) {
                     return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
                 }
@@ -133,7 +133,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     }
 
     protected void addView(final Params p) throws IOException {
-        Note n = p.m.view(p.root, p.depth, p.filter, p.style);
+        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style);
         JSONObject json;
 
         try {
@@ -150,7 +150,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Map<String, String> map;
         public Graph graph;
         public FramesManager manager;
-        public NotesSemantics m;
+        public NotesSemantics semantics;
         public NotesSyntax syntax;
         public Atom root;
         public Integer depth;

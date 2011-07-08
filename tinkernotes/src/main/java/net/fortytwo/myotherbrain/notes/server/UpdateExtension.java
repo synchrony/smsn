@@ -64,7 +64,7 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         // Apply the update
         try {
-            p.m.update(p.root, children, p.depth, p.filter, p.style);
+            p.semantics.update(p.root, children, p.depth, p.filter, p.style);
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }

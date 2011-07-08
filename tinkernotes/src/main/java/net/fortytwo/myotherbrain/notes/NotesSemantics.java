@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.Atom;
@@ -15,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,8 +120,7 @@ public class NotesSemantics {
                        final int depth,
                        final Filter filter,
                        final ViewStyle style) {
-        // TODO: use search score for link weight
-        float linkWeight = (filter.minWeight + filter.maxWeight) / 2;
+
         float linkSharability = (filter.minSharability + filter.maxSharability) / 2;
 
         Note result = new Note("query results for \"" + query + "\"");
@@ -127,15 +128,33 @@ public class NotesSemantics {
         // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
         CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
         try {
+            long now = new Date().getTime();
             while (i.hasNext()) {
                 Atom a = getAtom(i.next());
+
                 if (filter.isVisible(a)) {
+
+                    float score = i instanceof WeightedCloseableSequence
+                            ? ((WeightedCloseableSequence) i).currentWeight()
+                            : 1f;
+                    System.err.println("score = " + score + " (" + (i instanceof WeightedCloseableSequence) + ")");
+
+                    score *= a.getWeight();
+
                     Note n = view(a, depth - 1, filter, style);
                     n.setLinkValue(".");
-                    n.setLinkWeight(linkWeight);
+                    n.setLinkWeight(score);
                     n.setLinkSharability(linkSharability);
+                    n.setLinkCreated(now);
                     result.addChild(n);
                 }
+            }
+
+            Collections.sort(result.getChildren(), new NoteComparator());
+            int index = 0;
+            for (Note n : result.getChildren()) {
+                String k = "" + ++index;
+                n.setLinkKey("#######".substring(0, KEY_DIGITS - k.length()) + k);
             }
         } finally {
             i.close();
@@ -446,7 +465,7 @@ public class NotesSemantics {
 
     private Collection<Atom> getInLinks(final Atom source,
                                         final Filter filter) {
-        List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
+        List<Atom> c = new LinkedList<Atom>();
 
         for (Edge e : source.asVertex().getInEdges(MyOtherBrain.TO)) {
             Atom link = getAtom(e.getOutVertex());
@@ -455,23 +474,17 @@ public class NotesSemantics {
                 throw new IllegalStateException("vertex " + link.asVertex().getId() + " has a 'to' but no 'from' edge");
             }
             if (filter.isVisible(link) && filter.isVisible(f)) {
-                c.add(new TimestampedAtom(link));
+                c.add(link);
             }
         }
 
-        Collections.sort(c);
-
-        Collection<Atom> r = new LinkedList<Atom>();
-        for (TimestampedAtom ta : c) {
-            r.add(ta.atom);
-        }
-
-        return r;
+        Collections.sort(c, new AtomComparator());
+        return c;
     }
 
     private Collection<Atom> getOutlinks(final Atom source,
                                          final Filter filter) {
-        List<TimestampedAtom> c = new LinkedList<TimestampedAtom>();
+        List<Atom> c = new LinkedList<Atom>();
 
         for (Edge e : source.asVertex().getInEdges(MyOtherBrain.FROM)) {
             Atom link = getAtom(e.getOutVertex());
@@ -480,47 +493,49 @@ public class NotesSemantics {
                 throw new IllegalStateException("vertex " + link.asVertex().getId() + " has a 'from' but no 'to' edge");
             }
             if (filter.isVisible(link) && filter.isVisible(f)) {
-                c.add(new TimestampedAtom(link));
+                c.add(link);
             }
         }
 
-        Collections.sort(c);
-
-        Collection<Atom> r = new LinkedList<Atom>();
-        for (TimestampedAtom ta : c) {
-            r.add(ta.atom);
-        }
-
-        return r;
+        Collections.sort(c, new AtomComparator());
+        return c;
     }
 
+    // Used irregularly
     private void migrateKeys() {
         for (Vertex v : graph.getVertices()) {
             v.setProperty(MyOtherBrain.KEY, createKey());
         }
     }
 
-    private class TimestampedAtom implements Comparable<TimestampedAtom> {
-        public Atom atom;
-        public long timestamp;
-        public float weight;
-
-        public TimestampedAtom(final Atom a) {
-            atom = a;
-            timestamp = a.getCreated();
-            weight = a.getWeight();
-            //if (null != target) {
-            //    weight += target.getWeight();
-            //}
-        }
-
-        // Order from highest weighted to lowest weighted and from from newest to oldest
-        public int compareTo(final TimestampedAtom other) {
-            int cmp = ((Float) other.weight).compareTo(weight);
+    private class AtomComparator implements Comparator<Atom> {
+        @Override
+        public int compare(Atom a, Atom b) {
+            int cmp = b.getWeight().compareTo(a.getWeight());
 
             return 0 == cmp
-                    ? ((Long) other.timestamp).compareTo(timestamp)
+                    ? b.getCreated().compareTo(a.getCreated())
                     : cmp;
+        }
+    }
+
+    private class NoteComparator implements Comparator<Note> {
+        @Override
+        public int compare(Note a, Note b) {
+            int cmp = ((Float) b.getLinkWeight()).compareTo(a.getLinkWeight());
+            if (0 == cmp) {
+                cmp = ((Long) b.getLinkCreated()).compareTo(a.getLinkCreated());
+
+                if (0 == cmp) {
+                    cmp = ((Float) b.getTargetWeight()).compareTo(a.getTargetWeight());
+
+                    if (0 == cmp) {
+                        cmp = ((Long) b.getTargetCreated()).compareTo(a.getTargetCreated());
+                    }
+                }
+            }
+
+            return cmp;
         }
     }
 
@@ -555,6 +570,7 @@ public class NotesSemantics {
 
             return null;
         }
+
     }
 
     public static void main(final String[] args) throws Exception {
