@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class NotesSyntax {
     // Regex of valid id prefixes, including parentheses, colon and trailing space
-    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:[a-zA-Z0-9@&]+: ");
+    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&#]+:[a-zA-Z0-9@&]+: ");
 
     private static final int MAX_TYPE_LENGTH = 5;
 
@@ -144,6 +144,11 @@ public class NotesSyntax {
                     int j = l.indexOf(":", i+1);
                     linkKey = l.substring(0, i);
                     targetKey = l.substring(i + 1, j);
+
+                    // Hashes are tolerated for "ephemeral" keys, but these are not true keys.
+                    if (linkKey.contains("#")) {
+                        linkKey = null;
+                    }
 
                     l = l.substring(k + 1);
                 }
