@@ -13,35 +13,48 @@ import java.util.List;
  * Time: 7:58 PM
  */
 public class NotesSyntaxTest extends TestCase {
-    //private Graph graph;
-    //private FramesManager manager;
     private NotesSyntax syntax;
 
     @Override
     public void setUp() throws Exception {
-        //graph = new TinkerGraph();
-        //manager = new FramesManager(graph);
         syntax = new NotesSyntax();
     }
 
     @Override
     public void tearDown() throws Exception {
-        //graph.shutdown();
+    }
+
+    public void testTmp() throws Exception {
+        String s = "" +
+                "GrdTrmd:Hay7TuT: U  fortytwo.net projects\n" +
+                "csekKaM:C70Oqur:     C  MyOtherBrain\n" +
+                "ZkJScVw:eTHUNUx:         C  TinkerNotes\n" +
+                "0t11pdd:gN3poPv:     C  Laboratory projects\n" +
+                "kghy&0w:XfmjTyu:     C  Jig\n" +
+                "oHESvPC:XW7uw26:     C  SPARQL-OSC\n" +
+                "e4gT3La:pje68IN:     C  Droidspeak\n" +
+                "0z0BUet:tfVoMXt:     C  RDFAgents\n" +
+                "gAE5AmS:vgVAPdJ:     C  SesameTools\n" +
+                "xwXrTx2:ZycosUd:     C  TwitLogic\n" +
+                "OvW2663:@p7UD3W:     C  Ripple";
+
+        List<Note> notes = readNotes(s);
+        //syntax.writeNotes(notes, System.out);
     }
 
     public void testAll() throws Exception {
         String s = "" +
-                ".  a\n" +
-                "    .  b\n" +
-                "    .  c\n" +
-                "V  d\n" +
+                "                 . a\n" +
+                "                                .  b\n" +
+                "                                .  c\n" +
+                "                 V  d\n" +
                 "\n" +
                 "[second context]\n" +
-                ".  e\n" +
+                "                 .    e\n" +
                 "0000000:1111111: .  f\n" +
                 "#####42:2222222: .  g";
 
-        List<NoteContext> contexts = parse(s);
+        List<NoteContext> contexts = readContexts(s);
         assertEquals(2, contexts.size());
         assertEquals(2, contexts.get(0).getNotes().size());
         assertEquals(3, contexts.get(1).getNotes().size());
@@ -67,10 +80,19 @@ public class NotesSyntaxTest extends TestCase {
         assertEquals("2222222", contexts.get(1).getNotes().get(2).getTargetKey());
     }
 
-    private List<NoteContext> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {
+    private List<NoteContext> readContexts(final String s) throws IOException, NotesSyntax.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
             return syntax.readContexts(in);
+        } finally {
+            in.close();
+        }
+    }
+
+    private List<Note> readNotes(final String s) throws IOException, NotesSyntax.NoteParsingException {
+        InputStream in = new ByteArrayInputStream(s.getBytes());
+        try {
+            return syntax.readNotes(in);
         } finally {
             in.close();
         }

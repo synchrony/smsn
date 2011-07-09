@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class NotesSyntax {
     // Regex of valid id prefixes, including parentheses, colon and trailing space
-    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&#]+:[a-zA-Z0-9@&]+: ");
+    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&#]+:[a-zA-Z0-9@&]+:");
 
     private static final int MAX_TYPE_LENGTH = 5;
 
@@ -29,7 +30,7 @@ public class NotesSyntax {
     private static final String TAB_REPLACEMENT = "    ";
 
     public void writeContexts(final List<NoteContext> notes,
-                              final OutputStream out) throws JSONException {
+                              final OutputStream out) {
         PrintStream p = new PrintStream(out);
         for (NoteContext c : notes) {
             printContext(c, p);
@@ -38,8 +39,14 @@ public class NotesSyntax {
     }
 
     public void writeNotes(final List<Note> notes,
-                           final OutputStream out) throws JSONException {
-        PrintStream p = new PrintStream(out);
+                           final OutputStream out) {
+        PrintStream p;
+        try {
+            p = new PrintStream(out, false, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+
         for (Note n : notes) {
             printNote(n, 0, p);
         }
@@ -83,20 +90,22 @@ public class NotesSyntax {
 
     public List<Note> readNotes(final InputStream in) throws IOException, NoteParsingException {
         List<Note> notes = new LinkedList<Note>();
-        parsePrivate(in, null, notes);
+        parseInternal(in, null, notes);
         return notes;
     }
 
     public List<NoteContext> readContexts(final InputStream in) throws IOException, NoteParsingException {
         List<NoteContext> contexts = new LinkedList<NoteContext>();
-        parsePrivate(in, contexts, null);
+        parseInternal(in, contexts, null);
         return contexts;
     }
 
-    private void parsePrivate(final InputStream in,
-                              final Collection<NoteContext> contexts,
-                              final Collection<Note> notes) throws IOException, NoteParsingException {
+    private void parseInternal(final InputStream in,
+                               final Collection<NoteContext> contexts,
+                               final Collection<Note> notes) throws IOException, NoteParsingException {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
+        LinkedList<Integer> indentHierarachy = new LinkedList<Integer>();
+
         NoteContext context = null;
         boolean flat = null == contexts;
 
@@ -118,8 +127,9 @@ public class NotesSyntax {
                 if (!flat) {
                     context = null;
                     hierarchy.clear();
+                    indentHierarachy.clear();
                 }
-            } else if (l.startsWith("[")) {
+            } else if (l.trim().startsWith("[")) {
                 if (flat) {
                     throw new NoteParsingException(lineNumber, "contexts are not allowed in the 'flat' format");
                 } else {
@@ -127,21 +137,28 @@ public class NotesSyntax {
                     if (m < 0) {
                         throw new NoteParsingException(lineNumber, "non-terminated note context");
                     }
-                    String text = l.substring(1, m).trim();
+                    String text = l.substring(l.indexOf("[") + 1, m).trim();
 
                     hierarchy.clear();
+                    indentHierarachy.clear();
                     context = new NoteContext(text);
                     contexts.add(context);
                 }
             } else {
-                String targetKey = null;
-                String linkKey = null;
+                // Find indent level
+                int indent = 0;
+                while (' ' == l.charAt(indent)) {
+                    indent++;
+                }
+                l = l.substring(indent);
 
                 // Extract keys
+                String targetKey = null;
+                String linkKey = null;
                 int k = l.indexOf(" ");
-                if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k + 1)).matches()) {
+                if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k)).matches()) {
                     int i = l.indexOf(":");
-                    int j = l.indexOf(":", i+1);
+                    int j = l.indexOf(":", i + 1);
                     linkKey = l.substring(0, i);
                     targetKey = l.substring(i + 1, j);
 
@@ -150,35 +167,23 @@ public class NotesSyntax {
                         linkKey = null;
                     }
 
-                    l = l.substring(k + 1);
+                    l = l.substring(k);
+                    indent += k;
+
+                    k = 0;
+                    while (' ' == l.charAt(k)) {
+                        k++;
+                        indent++;
+                    }
+                    l = l.substring(k);
                 }
 
-                // Find indent level
-                int indent = 0;
-                if (l.startsWith(" ")) {
-                    int i = 0;
-                    while (l.charAt(i) == ' ') {
-                        i++;
-                    }
-
-                    if (0 != i % 4) {
-                        throw new NoteParsingException(lineNumber, "notes must be indented by multiples of 4 spaces");
-                    }
-
-                    indent = i / 4;
-
-                    if (indent > hierarchy.size()) {
-                        throw new NoteParsingException(lineNumber, "note is too deeply indented");
-                    }
-
-                    l = l.substring(i).trim();
-                }
-
-                while (hierarchy.size() > indent) {
+                while (0 < hierarchy.size() && indentHierarachy.getLast() >= indent) {
                     hierarchy.removeLast();
+                    indentHierarachy.removeLast();
                 }
 
-                if (0 == indent && null == context && !flat) {
+                if (0 == hierarchy.size() && null == context && !flat) {
                     context = new NoteContext("");
                     contexts.add(context);
                 }
@@ -192,27 +197,13 @@ public class NotesSyntax {
                 if (linkValue.length() > MAX_TYPE_LENGTH) {
                     throw new NoteParsingException(lineNumber, "apparent note type is too long: " + linkValue);
                 }
+                while (j < l.length() && ' ' == l.charAt(j)) {
+                    j++;
+                }
                 l = l.substring(j);
 
                 String description = "";
-                String qualifier = null;
                 if (0 < l.length()) {
-                    if (l.startsWith(" [")) {
-                        int m = l.indexOf("]");
-                        if (m < 0) {
-                            throw new NoteParsingException(lineNumber, "non-terminated note qualifier");
-                        }
-
-                        qualifier = l.substring(2, m - 1);
-                        l = l.substring(m + 1);
-                    }
-
-                    if (!l.startsWith("  ")) {
-                        throw new NoteParsingException(lineNumber, "double space after note type is missing");
-                    }
-                    // Note: a gap of *more* than two spaces is tolerated, for now.
-                    l = l.trim();
-
                     if (l.contains("{{{")) {
                         int start = lineNumber;
                         boolean inside = false;
@@ -264,19 +255,10 @@ public class NotesSyntax {
                 Note n = new Note(description);
                 n.setLinkValue(linkValue);
 
-                if (null != qualifier) {
-                    n.setQualifier(qualifier);
-                }
+                n.setTargetKey(targetKey);
+                n.setLinkKey(linkKey);
 
-                if (null != targetKey) {
-                    n.setTargetKey(targetKey);
-                }
-
-                if (null != linkKey) {
-                    n.setLinkKey(linkKey);
-                }
-
-                if (0 < indent) {
+                if (0 < hierarchy.size()) {
                     hierarchy.get(hierarchy.size() - 1).addChild(n);
                 } else {
                     if (flat) {
@@ -287,6 +269,9 @@ public class NotesSyntax {
                 }
 
                 hierarchy.add(n);
+                indentHierarachy.add(indent);
+                //System.out.println("\tsize: " + hierarchy.size());
+                //System.out.println("\tindent: " + indent);
             }
         }
     }
@@ -316,7 +301,7 @@ public class NotesSyntax {
     }
 
     private static void printContext(final NoteContext c,
-                                     final PrintStream p) throws JSONException {
+                                     final PrintStream p) {
         if (0 < c.getTargetValue().length()) {
             p.print("[");
             p.print(c.getTargetValue());
@@ -331,7 +316,7 @@ public class NotesSyntax {
 
     private static void printNote(final Note n,
                                   final int indent,
-                                  final PrintStream p) throws JSONException {
+                                  final PrintStream p) {
 
         if (null != n.getTargetKey() || null != n.getLinkKey()) {
             if (null != n.getLinkKey()) {

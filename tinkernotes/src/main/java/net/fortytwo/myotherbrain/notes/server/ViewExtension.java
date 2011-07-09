@@ -46,4 +46,9 @@ public class ViewExtension extends TinkerNotesExtension {
 
         return ExtensionResponse.ok(p.map);
     }
+
+    @Override
+    protected boolean isReadOnly() {
+        return true;
+    }
 }

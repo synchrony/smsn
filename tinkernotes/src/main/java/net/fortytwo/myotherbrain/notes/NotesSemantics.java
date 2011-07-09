@@ -137,7 +137,7 @@ public class NotesSemantics {
                     float score = i instanceof WeightedCloseableSequence
                             ? ((WeightedCloseableSequence) i).currentWeight()
                             : 1f;
-                    System.err.println("score = " + score + " (" + (i instanceof WeightedCloseableSequence) + ")");
+                    //System.err.println("score = " + score + " (" + (i instanceof WeightedCloseableSequence) + ")");
 
                     score *= a.getWeight();
 
@@ -365,9 +365,22 @@ public class NotesSemantics {
                                final Atom link,
                                final Atom target,
                                final ViewStyle style) {
-        return null != link && (isInverseStyle(style)
+        if (null == link) {
+            return false;
+        }
+
+        if (null == root || null == target) {
+            throw new IllegalArgumentException();
+        }
+
+        if (null == link.getFrom() || null == link.getTo()) {
+            throw new IllegalStateException("data corruption: link with key '"
+                    + link.getKey() + "' is missing a 'to' and/or 'from' edge");
+        }
+
+        return isInverseStyle(style)
                 ? link.getFrom().getKey().equals(target.getKey()) && link.getTo().getKey().equals(root.getKey())
-                : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey()));
+                : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey());
     }
 
     private void setLink(final Atom link,

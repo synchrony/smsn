@@ -54,6 +54,11 @@ public class SearchExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
+    @Override
+    protected boolean isReadOnly() {
+        return true;
+    }
+
     protected void addSearchResults(final Params p) throws IOException {
         Note n = p.semantics.search(p.query, p.depth, p.filter, p.style);
         JSONObject json;

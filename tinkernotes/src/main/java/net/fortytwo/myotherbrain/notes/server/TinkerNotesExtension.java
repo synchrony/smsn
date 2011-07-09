@@ -25,6 +25,10 @@ import java.util.logging.Logger;
 public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected static final Logger LOGGER = Logger.getLogger(TinkerNotesExtension.class.getName());
 
+    protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
+
+    protected abstract boolean isReadOnly();
+
     protected ExtensionResponse handleRequestInternal(final Params p,
                                                       final String rootKey,
                                                       final String styleName) {
@@ -102,12 +106,24 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 p.map.put("style", p.style.getName());
             }
 
-            boolean manual = p.graph instanceof TransactionalGraph
-                    && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) p.graph).getTransactionMode();
+            boolean manual;
+            // Force manual transaction mode (provided that the graph is transactional)
+            if (!isReadOnly() && p.graph instanceof TransactionalGraph) {
+                if (TransactionalGraph.Mode.MANUAL != ((TransactionalGraph) p.graph).getTransactionMode()) {
+                    ((TransactionalGraph) p.graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
+                }
+                manual = true;
 
-            if (manual) {
                 ((TransactionalGraph) p.graph).startTransaction();
+            } else {
+                manual = false;
             }
+
+            //System.err.println("transactional: " + (p.graph instanceof TransactionalGraph));
+            //System.err.println("mode: " + ((TransactionalGraph) p.graph).getTransactionMode());
+            //System.err.println("graph: " + p.graph);
+            //System.err.println("class: " + p.graph.getClass());
+
             boolean normal = false;
 
             try {
@@ -115,19 +131,24 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 normal = true;
                 return r;
             } finally {
-                if (manual) {
-                    if (!normal) {
-                        System.err.println("rolling back transaction");
-                    }
+                if (!isReadOnly()) {
+                    if (manual) {
+                        if (!normal) {
+                            System.err.println("rolling back transaction");
+                        }
 
-                    ((TransactionalGraph) p.graph).stopTransaction(normal
-                            ? TransactionalGraph.Conclusion.SUCCESS
-                            : TransactionalGraph.Conclusion.FAILURE);
+                        ((TransactionalGraph) p.graph).stopTransaction(normal
+                                ? TransactionalGraph.Conclusion.SUCCESS
+                                : TransactionalGraph.Conclusion.FAILURE);
+                    } else if (!normal) {
+                        System.err.println("failed update of non-transactional graph. Data integrity is not guaranteed");
+                    }
                 }
             }
         } catch (Exception e) {
             // TODO
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
+            LOGGER.warning("operation failed: " + e.getMessage());
             return ExtensionResponse.error(e);
         }
     }
@@ -143,8 +164,6 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         }
         p.map.put("view", json.toString());
     }
-
-    protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
 
     protected class Params {
         public Map<String, String> map;
