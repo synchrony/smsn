@@ -221,7 +221,11 @@ public class NotesSemantics {
 
         // Remove any deleted links
         if (destructive) {
+            Set<String> alreadyRemoved = new HashSet<String>();
             for (String linkKey : beforeMap.keySet()) {
+                if (alreadyRemoved.contains(linkKey)) {
+                    continue;
+                }
                 if (afterMap.keySet().contains(linkKey)) {
                     Note b = beforeMap.get(linkKey);
                     Note a = afterMap.get(linkKey);
@@ -232,7 +236,7 @@ public class NotesSemantics {
                     }
                 } else {
                     // Avoid attempting to remove a link more than once (if it appears more than once in the tree).
-                    beforeMap.remove(linkKey);
+                    alreadyRemoved.add(linkKey);
 
                     Atom link = getAtom(linkKey);
                     if (null != link) {
