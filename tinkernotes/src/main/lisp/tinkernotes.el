@@ -60,9 +60,9 @@
 (setq view-root nil)
 (setq view-title nil)
 (setq view-style "targets")
-(setq view-min-sharability 0)
+(setq view-min-sharability 0.25)
 (setq view-max-sharability 1)
-(setq view-min-weight 0)
+(setq view-min-weight 0.25)
 (setq view-max-weight 1)
 (setq view-atoms nil)
 
