@@ -438,8 +438,8 @@ public class NotesSemantics {
         a.setCreated(new Date().getTime());
 
         // Place sharability and weight in the middle of the applicable ranges.
-        a.setSharability((filter.maxSharability - filter.minSharability) / 2);
-        a.setWeight((filter.maxWeight - filter.minWeight) / 2);
+        a.setSharability((filter.maxSharability + filter.minSharability) / 2);
+        a.setWeight((filter.maxWeight + filter.minWeight) / 2);
 
         return a;
     }
