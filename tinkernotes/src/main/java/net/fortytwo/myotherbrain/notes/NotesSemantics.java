@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
+//import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.Atom;
@@ -134,9 +134,9 @@ public class NotesSemantics {
 
                 if (filter.isVisible(a)) {
 
-                    float score = i instanceof WeightedCloseableSequence
-                            ? ((WeightedCloseableSequence) i).currentWeight()
-                            : 1f;
+                    float score = // i instanceof WeightedCloseableSequence
+                            //? ((WeightedCloseableSequence) i).currentWeight() :
+                            1f;
                     //System.err.println("score = " + score + " (" + (i instanceof WeightedCloseableSequence) + ")");
 
                     score *= a.getWeight();
