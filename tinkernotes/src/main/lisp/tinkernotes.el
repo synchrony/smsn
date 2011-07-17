@@ -351,8 +351,8 @@
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun refresh-view-new (url)
     (url-retrieve url 'receive-view))
@@ -360,86 +360,86 @@
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root (- view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root (+ view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun refresh-to-forward-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-forward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth (to-forward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun refresh-to-backward-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-backward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth (to-backward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun refresh-to-links-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-links-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth (to-links-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun refresh-to-targets-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-targets-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth (to-targets-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun decrease-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight)
+        (not-in-view)))
 
 (defun increase-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight))
-        (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight)
+        (not-in-view)))
 
 (defun decrease-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25)))
-        (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25))
+        (not-in-view)))
 
 (defun increase-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25)))
-        (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25))
+        (not-in-view)))
 
 (defun decrease-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
-            (not-in-view))
+        (request-view view-root view-depth view-style (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun increase-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight))
-            (not-in-view))
+        (request-view view-root view-depth view-style (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun decrease-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight))
-            (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight)
+        (not-in-view)))
 
 (defun increase-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight))
-            (not-in-view))
+        (request-view view-root view-depth view-style view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight)
+        (not-in-view)))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
