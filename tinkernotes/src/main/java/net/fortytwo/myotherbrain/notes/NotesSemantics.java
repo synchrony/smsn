@@ -173,11 +173,13 @@ public class NotesSemantics {
         n.setTargetKey(target.getKey());
         n.setTargetWeight(target.getWeight());
         n.setTargetSharability(target.getSharability());
+        n.setTargetCreated(target.getCreated());
 
         n.setLinkValue(link.getValue());
         n.setLinkKey(link.getKey());
         n.setLinkWeight(link.getWeight());
         n.setLinkSharability(link.getSharability());
+        n.setLinkCreated(link.getCreated());
 
         if (depth > 0) {
             for (Atom clink : getLinks(link, target, style, filter)) {

@@ -11,12 +11,12 @@ public class Note extends NoteNode {
     private String qualifier;
     private String linkValue;
 
-    private float linkWeight;
-    private float linkSharability;
-    private long linkCreated;
-    private float targetWeight;
-    private float targetSharability;
-    private long targetCreated;
+    private Float linkWeight;
+    private Float linkSharability;
+    private Long linkCreated;
+    private Float targetWeight;
+    private Float targetSharability;
+    private Long targetCreated;
 
     public Note(final String targetValue) {
         super(targetValue);
@@ -61,51 +61,51 @@ public class Note extends NoteNode {
         return "note(" + t + ", " + d + ")";
     }
 
-    public float getTargetWeight() {
+    public Float getTargetWeight() {
         return targetWeight;
     }
 
-    public void setTargetWeight(float targetWeight) {
+    public void setTargetWeight(Float targetWeight) {
         this.targetWeight = targetWeight;
     }
 
-    public float getTargetSharability() {
+    public Float getTargetSharability() {
         return targetSharability;
     }
 
-    public void setTargetSharability(float targetSharability) {
+    public void setTargetSharability(Float targetSharability) {
         this.targetSharability = targetSharability;
     }
 
-    public float getLinkWeight() {
+    public Float getLinkWeight() {
         return linkWeight;
     }
 
-    public void setLinkWeight(float linkWeight) {
+    public void setLinkWeight(Float linkWeight) {
         this.linkWeight = linkWeight;
     }
 
-    public float getLinkSharability() {
+    public Float getLinkSharability() {
         return linkSharability;
     }
 
-    public void setLinkSharability(float linkSharability) {
+    public void setLinkSharability(Float linkSharability) {
         this.linkSharability = linkSharability;
     }
 
-    public long getLinkCreated() {
+    public Long getLinkCreated() {
         return linkCreated;
     }
 
-    public void setLinkCreated(long linkCreated) {
+    public void setLinkCreated(Long linkCreated) {
         this.linkCreated = linkCreated;
     }
 
-    public long getTargetCreated() {
+    public Long getTargetCreated() {
         return targetCreated;
     }
 
-    public void setTargetCreated(long targetCreated) {
+    public void setTargetCreated(Long targetCreated) {
         this.targetCreated = targetCreated;
     }
 }

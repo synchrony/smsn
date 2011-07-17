@@ -49,7 +49,7 @@ public class NotesSemanticsTest extends TestCase {
         Atom root = createAtom("11111");
 
         Note rootNote = new Note("foo");
-        Note child = new Note("cheval \u000e phynances");
+        Note child = new Note("cheval \u00e0 phynances");
         child.setLinkValue("a link");
         rootNote.addChild(child);
 
@@ -62,7 +62,7 @@ public class NotesSemanticsTest extends TestCase {
         JSONObject json = syntax.toJSON(after);
         //System.out.println(json.toString());
         JSONObject j = json.getJSONArray("children").getJSONObject(0);
-        assertEquals("cheval \u000e phynances", j.getJSONObject("target").getString("value"));
+        assertEquals("cheval \u00e0 phynances", j.getJSONObject("target").getString("value"));
     }
 
     public void testAll() throws Exception {

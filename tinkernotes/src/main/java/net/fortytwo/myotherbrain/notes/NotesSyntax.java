@@ -63,6 +63,7 @@ public class NotesSyntax {
         link.put("weight", n.getLinkWeight());
         link.put("sharability", n.getLinkSharability());
         link.put("value", n.getLinkValue());
+        link.put("created", n.getLinkCreated());
         //}
 
         //if (null != n.getTargetKey()) {
@@ -73,6 +74,7 @@ public class NotesSyntax {
         target.put("weight", n.getTargetWeight());
         target.put("sharability", n.getTargetSharability());
         target.put("value", n.getTargetValue());
+        target.put("created", n.getTargetCreated());
         //}
 
         if (0 < n.getChildren().size()) {
