@@ -28,7 +28,6 @@
 
 (defun http-post (url args callback)
     "Send ARGS to URL as a POST request."
-    (setq view-current-line (line-number-at-pos))
     (let ((url-request-method "POST")
         (url-request-extra-headers
             '(("Content-Type" . "application/x-www-form-urlencoded;charset=UTF-8")))
@@ -45,13 +44,12 @@
                     "&")))
     (url-retrieve url callback)))
 
+(defun http-get (url callback)
+    (url-retrieve url callback))
+
 (defun strip-http-headers (entity)
     (let ((i (string-match "\n\n" entity)))
             (decode-coding-string (substring entity (+ i 2)) 'utf-8)))
-
-(defun http-get (url callback)
-    (setq view-current-line (line-number-at-pos))
-    (url-retrieve url callback))
 
 
 ;; BUFFERS / VARIABLES ;;;;;;;;;;;;;;;;;
@@ -187,6 +185,7 @@
                     (let ((view-json (json-read-from-string view)))
                         (write-view (cdr (assoc 'children view-json)) 0))
                     (beginning-of-buffer)
+                    (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
                     ;; This is not always possible and not always helpful, but it is often both.
                     (beginning-of-line view-current-line)
@@ -300,6 +299,7 @@
         ((string-equal style "links-inverse") "targets-inverse")))
 
 (defun request-view (root depth style minv maxv minw maxw)
+    (setq view-current-line 1)
     (http-get (request-view-url root depth style minv maxv minw maxw) 'receive-view))
 
 (defun request-view-url  (root depth style minv maxv minw maxw)
@@ -312,10 +312,8 @@
             "&maxWeight=" (number-to-string maxw)
             "&style=" style))
 
-(defun refresh-view-new (url)
-    (http-get url 'receive-view))
-
 (defun request-search-results (query minv maxv minw maxw)
+    (setq view-current-line 1)
     (http-get
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
@@ -355,6 +353,9 @@
     (if view-root
         (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))
         (not-in-view))
+
+(defun refresh-view-new (url)
+    (url-retrieve url 'receive-view))
 
 (defun decrease-depth ()
     (interactive)
@@ -447,6 +448,9 @@
     (interactive)
     (let (
         (entity (buffer-string)))
+        ;; The received view may very well differ from the pushed view in terms of line numbering,
+        ;; but we'll try to stay on the same line anyway.
+        (setq view-current-line (line-number-at-pos))
         (http-post
             (concat (base-url) "update")
             (list
@@ -465,6 +469,7 @@
     (if view-root
         (let ((url (request-view-url view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)))
 (setq hack-url url)
+            (setq view-current-line (line-number-at-pos))
             (http-get
                 (concat (base-url) "set"
                     "?key=" (w3m-url-encode-string key)
@@ -602,7 +607,7 @@
 (global-set-key (kbd "C-c C-v ;") 'toggle-truncate-lines)
 (setq-default truncate-lines t)
 (if full-colors-supported
-    (let ((bogus nil))
+    (let ()
         (global-hl-line-mode 1)
         (set-face-background 'hl-line "ivory")))
 (defvar current-date-format "%Y-%m-%d")
