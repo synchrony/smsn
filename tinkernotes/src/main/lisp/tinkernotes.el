@@ -54,10 +54,6 @@
 
 ;; BUFFERS / VARIABLES ;;;;;;;;;;;;;;;;;
 
-(defun current-line ()
-    (interactive)
-    (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
-
 ;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
 (setq view-depth 3)
 (setq view-root nil)
@@ -69,6 +65,10 @@
 (setq view-max-weight 1)
 (setq view-atoms nil)
 (setq view-current-line 1)
+
+(defun current-line ()
+    (interactive)
+    (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
 
 (defun find-id ()
     (let ((line (current-line)))
@@ -83,55 +83,72 @@
                         (assoc-id (if (< 0 (length s1)) s1 nil))
                         (atom-id (if (< 0 (length s2)) s2 nil)))
                         (list assoc-id atom-id))))
-            (list nil nil))))
+            (list (get-text-property (line-beginning-position) 'link-key) (get-text-property (line-beginning-position) 'target-key))
+            )))
 
-(defun find-link-weight ()
-    (get-text-property (line-beginning-position) 'link-weight))
+;;            (list nil nil))))
 
-(defun find-link-sharability ()
-    (get-text-property (line-beginning-position) 'link-sharability))
+(defun get-key (atom)
+    (cdr (assoc 'key atom)))
 
-(defun find-target-weight ()
-    (get-text-property (line-beginning-position) 'target-weight))
+(defun get-value (atom)
+    (cdr (assoc 'value atom)))
 
-(defun find-target-sharability ()
-    (get-text-property (line-beginning-position) 'target-sharability))
+(defun get-weight (atom)
+    (cdr (assoc 'weight atom)))
+
+(defun get-sharability (atom)
+    (cdr (assoc 'sharability atom)))
 
 (defun view-name (root-id)
     (if root-id
         (concat "view-" root-id)
         (concat "anonymous-" (number-to-string (random 1000)))))
 
-(defun current-line-target ()
+(defun current-target-key ()
     (car (last (find-id))))
 
-(defun current-line-link ()
+(defun current-link-key ()
     (car (find-id)))
 
-(defun show-info (key)
-    (let ((atom (gethash key view-atoms)))
-        (let (
-            (created (cdr (assoc 'created atom)))
-            (value (cdr (assoc 'value atom)))
-		    (weight (cdr (assoc 'weight atom)))
-	        (sharability (cdr (assoc 'sharability atom))))
-	            (message (concat
-	                 "weight: " (number-to-string weight)
-	                 " sharability: " (number-to-string sharability)
-	                 " created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
-	                 " value: " value)))))
+(defun current-link ()
+    (get-atom (current-link-key)))
+
+(defun current-target ()
+    (get-atom (current-target-key)))
+    
+(defun get-atom (key)
+    (if key
+        (if view-atoms
+            (gethash key view-atoms)
+            nil)
+        nil))
+
+(defun show-info (atom)
+    (let (
+        (created (cdr (assoc 'created atom)))
+        (value (cdr (assoc 'value atom)))
+        (weight (cdr (assoc 'weight atom)))
+        (sharability (cdr (assoc 'sharability atom))))
+            (message (concat
+                 "weight: " (number-to-string weight)
+                 " sharability: " (number-to-string sharability)
+                 " created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
+                 " value: " value))))
 
 (defun link-info ()
     (interactive)
-    (let ((key (current-line-link)))
-        (if key
-            (show-info key))))
+    (let ((link (current-link)))
+        (if link
+            (show-info link)
+            (no-link))))
 
 (defun target-info()
     (interactive)
-    (let ((key (current-line-target)))
-        (if key
-            (show-info key))))
+    (let ((target (current-target)))
+        (if target
+            (show-info target)
+            (no-target))))
 
 
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
@@ -221,10 +238,10 @@
         (target (cdr (assoc 'target json)))
         (children (cdr (assoc 'children json))))
             (let (
-                (link-key (cdr (assoc 'key link)))
-                (link-value (cdr (assoc 'value link)))
-		        (link-weight (cdr (assoc 'weight link)))
-	            (link-sharability (cdr (assoc 'sharability link)))
+                (link-key (get-key link))
+                (link-value (get-value link))
+		        (link-weight (get-weight link))
+	            (link-sharability (get-sharability link))
                 (target-key (cdr (assoc 'key target)))
                 (target-value (cdr (assoc 'value target)))
 		        (target-weight (cdr (assoc 'weight target)))
@@ -247,14 +264,16 @@
 					                     '(:foreground "grey80" :background "grey97")
 					                     '(:foreground "black"))) " ")
 					         ;;'invisible t
-		                    'target-weight target-weight
-		                	'target-sharability target-sharability
-		                	'link-weight link-weight
-			                'link-sharability link-sharability))
+			                'link-key link-key
+			                'target-key target-key))
+			        ;; TODO: also propertize the whitespace. Just propertize once for the whole "line"
 			        (loop for i from 1 to indent do (insert "    "))
-                    (insert (concat
+			        ;; Also propertize target value, for the sake of {{{block text}}}
+                    (insert (propertize (concat
 		                (colorize link-value link-weight link-sharability t) "  "
-			            (colorize target-value target-weight target-sharability nil) "\n"))
+			            (colorize target-value target-weight target-sharability nil) "\n")
+			            'link-key link-key
+			            'target-key target-key))
                     (write-view children (+ indent 1))
                     ))))
 
@@ -326,15 +345,17 @@
 
 (defun visit-target ()
     (interactive)
-    (let ((key (current-line-target)))
+    (let ((key (current-target-key)))
         (if key
-            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+            (no-target))))
 
 (defun visit-link ()
     (interactive)
-    (let ((key (current-line-link)))
+    (let ((key (current-link-key)))
         (if key
-            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+            (no-link))))
 
 (defun search ()
     (interactive)
@@ -348,6 +369,12 @@
 (defun not-in-view ()
 	(error-message "this command must be executed from within a view"))
 
+(defun no-link ()
+    (error-message "there is no link associated with this line"))
+    
+(defun no-target ()
+    (error-message "there is no target associated with this line"))
+    
 (defun refresh-view ()
     (interactive)
     (if view-root
@@ -489,75 +516,91 @@
 
 (defun decrease-link-weight ()
     (interactive)
-    (let (
-        (key (current-line-link))
-	(weight (find-link-weight))
-	(sharability (find-link-sharability)))
-            (if key
-	        (set-properties key (- weight 0.25) sharability))))
+    (let ((link (current-link)))
+        (if link
+            (let (
+                (key (get-key link))
+                (weight (get-weight link))
+                (sharability (get-sharability link)))
+	                (set-properties key (- weight 0.25) sharability))
+	        (no-link))))
 
 (defun increase-link-weight ()
     (interactive)
-    (let (
-        (key (current-line-link))
-	(weight (find-link-weight))
-	(sharability (find-link-sharability)))
-            (if key
-	        (set-properties key (+ weight 0.25) sharability))))
+    (let ((link (current-link)))
+        (if link
+            (let (
+                (key (get-key link))
+                (weight (get-weight link))
+                (sharability (get-sharability link)))
+	                (set-properties key (+ weight 0.25) sharability))
+	        (no-link))))
 
 (defun decrease-target-weight ()
     (interactive)
-    (let (
-        (key (current-line-target))
-	(weight (find-target-weight))
-	(sharability (find-target-sharability)))
-            (if key
-	        (set-properties key (- weight 0.25) sharability))))
+    (let ((target (current-target)))
+        (if target
+            (let (
+                (key (get-key target))
+                (weight (get-weight target))
+                (sharability (get-sharability target)))
+	                (set-properties key (- weight 0.25) sharability))
+	        (no-target))))
 
 (defun increase-target-weight ()
     (interactive)
-    (let (
-        (key (current-line-target))
-	(weight (find-target-weight))
-	(sharability (find-target-sharability)))
-            (if key
-	        (set-properties key (+ weight 0.25) sharability))))
+    (let ((target (current-target)))
+        (if target
+            (let (
+                (key (get-key target))
+                (weight (get-weight target))
+                (sharability (get-sharability target)))
+	                (set-properties key (+ weight 0.25) sharability))
+	        (no-target))))
 
 (defun decrease-link-sharability ()
     (interactive)
-    (let (
-        (key (current-line-link))
-	(weight (find-link-weight))
-	(sharability (find-link-sharability)))
-            (if key
-		    (set-properties key weight (- sharability 0.25)))))
+    (let ((link (current-link)))
+        (if link
+            (let (
+                (key (get-key link))
+                (weight (get-weight link))
+                (sharability (get-sharability link)))
+		            (set-properties key weight (- sharability 0.25)))
+		    (no-link))))
 
 (defun increase-link-sharability ()
     (interactive)
-    (let (
-        (key (current-line-link))
-	(weight (find-link-weight))
-	(sharability (find-link-sharability)))
-            (if key
-		    (set-properties key weight (+ sharability 0.25)))))
+    (let ((link (current-link)))
+        (if link
+            (let (
+                (key (get-key link))
+                (weight (get-weight link))
+                (sharability (get-sharability link)))
+		            (set-properties key weight (+ sharability 0.25)))
+		    (no-link))))
 
 (defun decrease-target-sharability ()
     (interactive)
-    (let (
-        (key (current-line-target))
-	(weight (find-target-weight))
-	(sharability (find-target-sharability)))
-            (if key
-		    (set-properties key weight (- sharability 0.25)))))
+    (let ((target (current-target)))
+        (if target
+            (let (
+                (key (get-key target))
+                (weight (get-weight target))
+                (sharability (get-sharability target)))
+		            (set-properties key weight (- sharability 0.25)))
+		    (no-target))))
 
 (defun increase-target-sharability ()
     (interactive)
-    (let (
-        (key (current-line-target))
-	(weight (find-target-weight))
-	(sharability (find-target-sharability)))
-            (if key
-		    (set-properties key weight (+ sharability 0.25)))))
+    (let ((target (current-target)))
+        (if target
+            (let (
+                (key (get-key target))
+                (weight (get-weight target))
+                (sharability (get-sharability target)))
+		            (set-properties key weight (+ sharability 0.25)))
+		    (no-target))))
 
 
 ;; INTERFACE ;;;;;;;;;;;;;;;;;;;;;;;;;;;
