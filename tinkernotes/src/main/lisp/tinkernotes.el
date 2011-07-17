@@ -28,6 +28,7 @@
 
 (defun http-post (url args callback)
     "Send ARGS to URL as a POST request."
+    (setq view-current-line (line-number-at-pos))
     (let ((url-request-method "POST")
         (url-request-extra-headers
             '(("Content-Type" . "application/x-www-form-urlencoded;charset=UTF-8")))
@@ -48,6 +49,10 @@
     (let ((i (string-match "\n\n" entity)))
             (decode-coding-string (substring entity (+ i 2)) 'utf-8)))
 
+(defun http-get (url callback)
+    (setq view-current-line (line-number-at-pos))
+    (url-retrieve url callback))
+
 
 ;; BUFFERS / VARIABLES ;;;;;;;;;;;;;;;;;
 
@@ -65,6 +70,7 @@
 (setq view-min-weight 0.25)
 (setq view-max-weight 1)
 (setq view-atoms nil)
+(setq view-current-line 1)
 
 (defun find-id ()
     (let ((line (current-line)))
@@ -166,6 +172,7 @@
                     (make-local-variable 'view-min-weight)
                     (make-local-variable 'view-max-weight)
                     (make-local-variable 'view-atoms)
+                    (make-local-variable 'view-current-line)
                     (setq view-root root)
                     (if depth (setq view-depth (string-to-number depth)))
                     (setq view-min-sharability min-sharability)
@@ -180,6 +187,9 @@
                     (let ((view-json (json-read-from-string view)))
                         (write-view (cdr (assoc 'children view-json)) 0))
                     (beginning-of-buffer)
+                    ;; Try to move to the corresponding line in the previous view.
+                    ;; This is not always possible and not always helpful, but it is often both.
+                    (beginning-of-line view-current-line)
                     (info-message (concat "updated to view " (view-info)))))))
 
 (setq full-colors '(
@@ -290,7 +300,7 @@
         ((string-equal style "links-inverse") "targets-inverse")))
 
 (defun request-view (root depth style minv maxv minw maxw)
-    (url-retrieve (request-view-url root depth style minv maxv minw maxw) 'receive-view))
+    (http-get (request-view-url root depth style minv maxv minw maxw) 'receive-view))
 
 (defun request-view-url  (root depth style minv maxv minw maxw)
 	(concat (base-url) "view"
@@ -303,10 +313,10 @@
             "&style=" style))
 
 (defun refresh-view-new (url)
-    (url-retrieve url 'receive-view))
+    (http-get url 'receive-view))
 
 (defun request-search-results (query minv maxv minw maxw)
-    (url-retrieve
+    (http-get
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
             "&depth=2"
@@ -455,7 +465,7 @@
     (if view-root
         (let ((url (request-view-url view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)))
 (setq hack-url url)
-            (url-retrieve
+            (http-get
                 (concat (base-url) "set"
                     "?key=" (w3m-url-encode-string key)
                     "&weight=" (number-to-string weight)
