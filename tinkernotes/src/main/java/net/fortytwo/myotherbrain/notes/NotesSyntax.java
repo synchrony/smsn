@@ -29,15 +29,6 @@ public class NotesSyntax {
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
 
-    public void writeContexts(final List<NoteContext> notes,
-                              final OutputStream out) {
-        PrintStream p = new PrintStream(out);
-        for (NoteContext c : notes) {
-            printContext(c, p);
-            p.println("");
-        }
-    }
-
     public void writeNotes(final List<Note> notes,
                            final OutputStream out) {
         PrintStream p;
@@ -173,11 +164,17 @@ public class NotesSyntax {
                     indent += k;
 
                     k = 0;
-                    while (' ' == l.charAt(k)) {
+                    while (k < l.length() && ' ' == l.charAt(k)) {
                         k++;
                         indent++;
                     }
-                    l = l.substring(k);
+                    if (k > 0) {
+                        l = l.substring(k);
+                    }
+                }
+
+                if (0 == l.length()) {
+                    throw new NoteParsingException(lineNumber, "missing key value");
                 }
 
                 while (0 < hierarchy.size() && indentHierarachy.getLast() >= indent) {
@@ -190,12 +187,23 @@ public class NotesSyntax {
                     contexts.add(context);
                 }
 
-                int j = l.indexOf(" ");
+                boolean esc = false;
+                int j = -1;
+                for (int i = 0; i < l.length(); i++) {
+                    char c = l.charAt(i);
+                    if (' ' == c) {
+                        if (!esc) {
+                            j = i;
+                            break;
+                        }
+                    } else esc = '\\' == c && !esc;
+                }
+
                 if (j < 0) {
                     j = l.length();
                 }
 
-                String linkValue = l.substring(0, j);
+                String linkValue = unescapeLinkValue(l.substring(0, j));
                 if (linkValue.length() > MAX_TYPE_LENGTH) {
                     throw new NoteParsingException(lineNumber, "apparent note type is too long: " + linkValue);
                 }
@@ -204,7 +212,7 @@ public class NotesSyntax {
                 }
                 l = l.substring(j);
 
-                String description = "";
+                String targetValue = "";
                 if (0 < l.length()) {
                     if (l.contains("{{{")) {
                         int start = lineNumber;
@@ -235,10 +243,10 @@ public class NotesSyntax {
                                 continue;
                             }
 
-                            description += l;
+                            targetValue += l;
 
                             if (inside) {
-                                description += "\n";
+                                targetValue += "\n";
                                 l = br.readLine();
                                 if (null == l) {
                                     throw new NoteParsingException(start, "non-terminated verbatim block");
@@ -250,11 +258,11 @@ public class NotesSyntax {
                             }
                         }
                     } else {
-                        description = l;
+                        targetValue = l;
                     }
                 }
 
-                Note n = new Note(description);
+                Note n = new Note(targetValue);
                 n.setLinkValue(linkValue);
 
                 n.setTargetKey(targetKey);
@@ -302,18 +310,32 @@ public class NotesSyntax {
         }
     }
 
-    private static void printContext(final NoteContext c,
-                                     final PrintStream p) {
-        if (0 < c.getTargetValue().length()) {
-            p.print("[");
-            p.print(c.getTargetValue());
-            p.print("]");
-            p.print("\n");
+    private static boolean isValidValue(final String value) {
+        for (char c : value.toCharArray()) {
+            if (Character.isISOControl(c)) {
+                return false;
+            }
         }
 
-        for (Note n : c.getNotes()) {
-            printNote(n, 0, p);
-        }
+        return true;
+    }
+
+    private static String escapeLinkValue(final String value) {
+        return value.replace(" ", "\\ ");
+    }
+
+    private static String unescapeLinkValue(final String value) {
+        return value.replace("\\ ", " ");
+    }
+
+    private static String sanitizeLinkValue(final String value) {
+        return null == value || 0 == value.length() || !isValidValue(value)
+                ? "???"
+                : value;
+    }
+
+    private static String sanitizeTargetValue(final String value) {
+        return null == value || !isValidValue(value) ? "???" : value;
     }
 
     private static void printNote(final Note n,
@@ -335,10 +357,10 @@ public class NotesSyntax {
             p.print("    ");
         }
 
-        p.print(null == n.getLinkValue() || 0 == n.getLinkValue().length() ? "_" : n.getLinkValue());
+        p.print(escapeLinkValue(sanitizeLinkValue(n.getLinkValue())));
         p.print("  ");
 
-        p.print(n.getTargetValue());
+        p.print(sanitizeTargetValue(n.getTargetValue()));
 
         p.print("\n");
 
@@ -366,7 +388,7 @@ public class NotesSyntax {
             in.close();
         }
 
-        p.writeContexts(contexts, System.out);
+        //p.writeContexts(contexts, System.out);
         //p.writeNotes(p.flatten(contexts), Format.JSON, System.out);
     }
 }

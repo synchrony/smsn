@@ -10,6 +10,7 @@ public class Note extends NoteNode {
     private final List<Note> children;
     private String qualifier;
     private String linkValue;
+    private boolean meta = false;
 
     private Float linkWeight;
     private Float linkSharability;
@@ -107,5 +108,13 @@ public class Note extends NoteNode {
 
     public void setTargetCreated(Long targetCreated) {
         this.targetCreated = targetCreated;
+    }
+
+    public boolean isMeta() {
+        return meta;
+    }
+
+    public void setMeta(boolean meta) {
+        this.meta = meta;
     }
 }

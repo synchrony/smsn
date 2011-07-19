@@ -5,9 +5,7 @@ import com.tinkerpop.frames.Relation;
 import com.tinkerpop.frames.VertexFrame;
 
 /**
- * User: josh
- * Date: 5/5/11
- * Time: 2:57 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface Atom extends VertexFrame {
 
@@ -15,7 +13,7 @@ public interface Atom extends VertexFrame {
     Long getCreated();
 
     @Property(MyOtherBrain.CREATED)
-    void setCreated(long created);
+    void setCreated(Long created);
 
     @Property(MyOtherBrain.KEY)
     String getKey();
@@ -33,13 +31,13 @@ public interface Atom extends VertexFrame {
     Float getSharability();
 
     @Property(MyOtherBrain.SHARABILITY)
-    void setSharability(float sharability);
+    void setSharability(Float sharability);
 
     @Property(MyOtherBrain.WEIGHT)
     Float getWeight();
 
     @Property(MyOtherBrain.WEIGHT)
-    void setWeight(float weight);
+    void setWeight(Float weight);
 
     @Relation(label = MyOtherBrain.FROM)
     Atom getFrom();

@@ -47,7 +47,7 @@ public class NotesSyntaxTest extends TestCase {
                 "                 . a\n" +
                 "                                .  b\n" +
                 "                                .  c\n" +
-                "                 V  d\n" +
+                "                 is\\ a  d\n" +
                 "\n" +
                 "[second context]\n" +
                 "                 .    e\n" +
@@ -62,7 +62,7 @@ public class NotesSyntaxTest extends TestCase {
         assertEquals("a", contexts.get(0).getNotes().get(0).getTargetValue());
         assertEquals("c", contexts.get(0).getNotes().get(0).getChildren().get(1).getTargetValue());
         assertEquals("d", contexts.get(0).getNotes().get(1).getTargetValue());
-        assertEquals("V", contexts.get(0).getNotes().get(1).getLinkValue());
+        assertEquals("is a", contexts.get(0).getNotes().get(1).getLinkValue());
         assertEquals("", contexts.get(0).getTargetValue());
         assertEquals("second context", contexts.get(1).getTargetValue());
         assertEquals("e", contexts.get(1).getNotes().get(0).getTargetValue());
