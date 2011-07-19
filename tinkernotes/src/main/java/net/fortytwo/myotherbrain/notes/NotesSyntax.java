@@ -138,6 +138,8 @@ public class NotesSyntax {
                     contexts.add(context);
                 }
             } else {
+                boolean meta = false;
+
                 // Find indent level
                 int indent = 0;
                 while (' ' == l.charAt(indent)) {
@@ -203,7 +205,16 @@ public class NotesSyntax {
                     j = l.length();
                 }
 
-                String linkValue = unescapeLinkValue(l.substring(0, j));
+                String v = l.substring(0, j);
+                boolean sw = v.startsWith("(");
+                boolean ew = v.replace("\\)", ".").endsWith(")");
+                if (sw && ew) {
+                    meta = true;
+                    v = v.substring(1, v.length() - 1);
+                } else if (ew || sw) {
+                    throw new NoteParsingException(lineNumber, "ambiguous meta-link syntax: unmatched parenthesis");
+                }
+                String linkValue = unescapeLinkValue(v);
                 if (linkValue.length() > MAX_TYPE_LENGTH) {
                     throw new NoteParsingException(lineNumber, "apparent note type is too long: " + linkValue);
                 }
@@ -264,6 +275,7 @@ public class NotesSyntax {
 
                 Note n = new Note(targetValue);
                 n.setLinkValue(linkValue);
+                n.setMeta(meta);
 
                 n.setTargetKey(targetKey);
                 n.setLinkKey(linkKey);
@@ -321,21 +333,25 @@ public class NotesSyntax {
     }
 
     private static String escapeLinkValue(final String value) {
-        return value.replace(" ", "\\ ");
+        return value
+                .replace("\\", "\\\\")
+                .replace(" ", "\\ ")
+                .replace("(", "\\(")
+                .replace(")", "\\)");
     }
 
     private static String unescapeLinkValue(final String value) {
-        return value.replace("\\ ", " ");
+        return value
+                .replace("\\)", ")")
+                .replace("\\(", "(")
+                .replace("\\ ", " ")
+                .replace("\\\\", "\\");
     }
 
-    private static String sanitizeLinkValue(final String value) {
+    private static String sanitizeValue(final String value) {
         return null == value || 0 == value.length() || !isValidValue(value)
                 ? "???"
                 : value;
-    }
-
-    private static String sanitizeTargetValue(final String value) {
-        return null == value || !isValidValue(value) ? "???" : value;
     }
 
     private static void printNote(final Note n,
@@ -357,10 +373,18 @@ public class NotesSyntax {
             p.print("    ");
         }
 
-        p.print(escapeLinkValue(sanitizeLinkValue(n.getLinkValue())));
+        String lv = escapeLinkValue(sanitizeValue(n.getLinkValue()));
+
+        if (n.isMeta()) {
+            p.print("(");
+            p.print(lv);
+            p.print(")");
+        } else {
+            p.print(lv);
+        }
         p.print("  ");
 
-        p.print(sanitizeTargetValue(n.getTargetValue()));
+        p.print(sanitizeValue(n.getTargetValue()));
 
         p.print("\n");
 

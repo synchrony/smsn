@@ -46,7 +46,7 @@ public class NotesSyntaxTest extends TestCase {
         String s = "" +
                 "                 . a\n" +
                 "                                .  b\n" +
-                "                                .  c\n" +
+                "                                (.)  c\n" +
                 "                 is\\ a  d\n" +
                 "\n" +
                 "[second context]\n" +
@@ -60,7 +60,9 @@ public class NotesSyntaxTest extends TestCase {
         assertEquals(3, contexts.get(1).getNotes().size());
         assertEquals(2, contexts.get(0).getNotes().get(0).getChildren().size());
         assertEquals("a", contexts.get(0).getNotes().get(0).getTargetValue());
+        assertFalse(contexts.get(0).getNotes().get(0).getChildren().get(0).isMeta());
         assertEquals("c", contexts.get(0).getNotes().get(0).getChildren().get(1).getTargetValue());
+        assertTrue(contexts.get(0).getNotes().get(0).getChildren().get(1).isMeta());
         assertEquals("d", contexts.get(0).getNotes().get(1).getTargetValue());
         assertEquals("is a", contexts.get(0).getNotes().get(1).getLinkValue());
         assertEquals("", contexts.get(0).getTargetValue());
