@@ -238,7 +238,7 @@ public class NotesSemantics {
 
                 if (null != rootTarget) {
                     tmpStyle = style.isInverse() ? ViewStyle.TARGETS_INVERSE : ViewStyle.TARGETS;
-                    for (Atom link : getLinks(rootLink, rootTarget, style, filter)) {
+                    for (Atom link : getLinks(rootLink, rootTarget, tmpStyle, filter)) {
                         Atom target = getTarget(link, tmpStyle);
 
                         if (null == target) {
@@ -377,26 +377,11 @@ public class NotesSemantics {
             if (createLink) {
                 link = createAtom(filter);
                 link.setValue(n.getLinkValue());
-                setLink(link, rootTarget, target, style);
+                setLink(link, rootLink, rootTarget, target, n.isMeta(), style);
             }
 
-            Atom source = getSource(link, target, style);
+            Atom source = getSource(link, target, n.isMeta(), style);
             updateInternal(link, source, n.getChildren(), depth - 1, filter, destructive, style);
-        }
-    }
-
-    private boolean isLinkStyle(final ViewStyle style) {
-        switch (style) {
-            case TARGETS:
-                return false;
-            case LINKS:
-                return true;
-            case TARGETS_INVERSE:
-                return false;
-            case LINKS_INVERSE:
-                return true;
-            default:
-                throw new IllegalStateException("unsupported view style: " + style);
         }
     }
 
@@ -420,8 +405,13 @@ public class NotesSemantics {
 
     private Atom getSource(final Atom link,
                            final Atom target,
+                           final boolean meta,
                            final ViewStyle style) {
-        return isLinkStyle(style) ? link : target;
+        return style.isFromLinks() && style.isFromTargets()
+                ? (meta ? link : target)
+                : style.isFromLinks()
+                ? link
+                : target;
     }
 
     private Atom getTarget(final Atom link,
@@ -464,9 +454,17 @@ public class NotesSemantics {
     }
 
     private void setLink(final Atom link,
-                         final Atom source,
+                         final Atom rootLink,
+                         final Atom rootTarget,
                          final Atom target,
+                         final boolean meta,
                          final ViewStyle style) {
+        Atom source = style.isFromLinks() && style.isFromTargets()
+                ? (meta ? rootLink : rootTarget)
+                : style.isFromLinks()
+                ? rootLink
+                : rootTarget;
+
         if (style.isInverse()) {
             link.setFrom(target);
             link.setTo(source);

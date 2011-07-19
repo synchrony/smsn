@@ -234,6 +234,7 @@
 (defun write-view (children indent)
     (loop for json across children do
     (let (
+        (meta (eq t (cdr (assoc 'meta json))))
         (link (cdr (assoc 'link json)))
         (target (cdr (assoc 'target json)))
         (children (cdr (assoc 'children json))))
@@ -269,11 +270,13 @@
 			        ;; TODO: also propertize the whitespace. Just propertize once for the whole "line"
 			        (loop for i from 1 to indent do (insert "    "))
 			        ;; Also propertize target value, for the sake of {{{block text}}}
-                    (insert (propertize (concat
-		                (colorize link-value link-weight link-sharability t) "  "
-			            (colorize target-value target-weight target-sharability nil) "\n")
-			            'link-key link-key
-			            'target-key target-key))
+			        (let ((link-text
+			            (if meta (concat "(" link-value ")") link-value)))
+                            (insert (propertize (concat
+                                (colorize link-text link-weight link-sharability t) "  "
+                                (colorize target-value target-weight target-sharability nil) "\n")
+                                'link-key link-key
+                                'target-key target-key)))
                     (write-view children (+ indent 1))
                     ))))
 

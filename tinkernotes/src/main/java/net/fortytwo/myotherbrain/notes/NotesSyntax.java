@@ -49,6 +49,7 @@ public class NotesSyntax {
         //if (null != n.getLinkKey()) {
         JSONObject link = new JSONObject();
         json.put("link", link);
+        json.put("meta", n.isMeta());
 
         link.put("key", n.getLinkKey());
         link.put("weight", n.getLinkWeight());
