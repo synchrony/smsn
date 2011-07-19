@@ -273,7 +273,8 @@ public class NotesSyntax {
                     }
                 }
 
-                Note n = new Note(targetValue);
+                Note n = new Note();
+                n.setTargetValue(targetValue);
                 n.setLinkValue(linkValue);
                 n.setMeta(meta);
 
@@ -301,7 +302,8 @@ public class NotesSyntax {
     public List<Note> flatten(final List<NoteContext> contexts) {
         List<Note> notes = new LinkedList<Note>();
         for (NoteContext c : contexts) {
-            Note n = new Note(c.getTargetValue());
+            Note n = new Note();
+            n.setTargetValue(c.getTargetValue());
             n.setLinkValue(".");
             notes.add(n);
 

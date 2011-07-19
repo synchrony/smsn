@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-//import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.Atom;
@@ -25,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+//import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -84,7 +85,21 @@ public class NotesSemantics {
                      final int depth,
                      final Filter filter,
                      final ViewStyle style) {
-        return viewInternal(root, root, depth, filter, style);
+        if (null == root) {
+            throw new IllegalArgumentException();
+        }
+
+        Atom link, target;
+
+        if (style.isFromTargets()) {
+            link = null;
+            target = root;
+        } else {
+            link = root;
+            target = null;
+        }
+
+        return viewInternal(link, target, depth, filter, style);
     }
 
     /**
@@ -103,7 +118,21 @@ public class NotesSemantics {
                        final int depth,
                        final Filter filter,
                        final ViewStyle style) throws InvalidUpdateException {
-        updateInternal(root, children, depth, filter, true, style);
+        if (null == root) {
+            throw new IllegalArgumentException();
+        }
+
+        Atom link, target;
+
+        if (style.isFromTargets()) {
+            link = null;
+            target = root;
+        } else {
+            link = root;
+            target = null;
+        }
+
+        updateInternal(link, target, children, depth, filter, true, style);
     }
 
     /**
@@ -123,7 +152,8 @@ public class NotesSemantics {
 
         float linkSharability = (filter.minSharability + filter.maxSharability) / 2;
 
-        Note result = new Note("query results for \"" + query + "\"");
+        Note result = new Note();
+        result.setTargetValue("query results for \"" + query + "\"");
 
         // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
         CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
@@ -163,41 +193,81 @@ public class NotesSemantics {
         return result;
     }
 
-    public Note viewInternal(final Atom link,
-                             final Atom target,
+    public Note viewInternal(final Atom rootLink,
+                             final Atom rootTarget,
                              final int depth,
                              final Filter filter,
                              final ViewStyle style) {
 
-        Note n = new Note(target.getValue());
-        n.setTargetKey(target.getKey());
-        n.setTargetWeight(target.getWeight());
-        n.setTargetSharability(target.getSharability());
-        n.setTargetCreated(target.getCreated());
+        Note n = new Note();
 
-        n.setLinkValue(link.getValue());
-        n.setLinkKey(link.getKey());
-        n.setLinkWeight(link.getWeight());
-        n.setLinkSharability(link.getSharability());
-        n.setLinkCreated(link.getCreated());
+        if (null != rootLink) {
+            n.setLinkValue(rootLink.getValue());
+            n.setLinkKey(rootLink.getKey());
+            n.setLinkWeight(rootLink.getWeight());
+            n.setLinkSharability(rootLink.getSharability());
+            n.setLinkCreated(rootLink.getCreated());
+        }
+
+        if (null != rootTarget) {
+            n.setTargetValue(rootTarget.getValue());
+            n.setTargetKey(rootTarget.getKey());
+            n.setTargetWeight(rootTarget.getWeight());
+            n.setTargetSharability(rootTarget.getSharability());
+            n.setTargetCreated(rootTarget.getCreated());
+        }
 
         if (depth > 0) {
-            for (Atom clink : getLinks(link, target, style, filter)) {
-                Atom ctarget = getTarget(clink, style);
+            if (ViewStyle.HYBRID == style) {
+                ViewStyle tmpStyle;
 
-                if (null == ctarget) {
-                    throw new IllegalStateException("link " + clink.getKey() + " has no target");
+                if (null != rootLink) {
+                    tmpStyle = style.isInverse() ? ViewStyle.LINKS_INVERSE : ViewStyle.LINKS;
+                    for (Atom link : getLinks(rootLink, rootTarget, tmpStyle, filter)) {
+                        Atom target = getTarget(link, tmpStyle);
+
+                        if (null == target) {
+                            throw new IllegalStateException("link " + link.getKey() + " has no target");
+                        }
+
+                        Note cn = viewInternal(link, target, depth - 1, filter, style);
+                        cn.setMeta(true);
+                        n.addChild(cn);
+                    }
                 }
 
-                Note cn = viewInternal(clink, ctarget, depth - 1, filter, style);
-                n.addChild(cn);
+                if (null != rootTarget) {
+                    tmpStyle = style.isInverse() ? ViewStyle.TARGETS_INVERSE : ViewStyle.TARGETS;
+                    for (Atom link : getLinks(rootLink, rootTarget, style, filter)) {
+                        Atom target = getTarget(link, tmpStyle);
+
+                        if (null == target) {
+                            throw new IllegalStateException("link " + link.getKey() + " has no target");
+                        }
+
+                        Note cn = viewInternal(link, target, depth - 1, filter, style);
+                        n.addChild(cn);
+                    }
+                }
+            } else {
+                for (Atom link : getLinks(rootLink, rootTarget, style, filter)) {
+                    Atom target = getTarget(link, style);
+
+                    if (null == target) {
+                        throw new IllegalStateException("link " + link.getKey() + " has no target");
+                    }
+
+                    Note cn = viewInternal(link, target, depth - 1, filter, style);
+                    n.addChild(cn);
+                }
             }
         }
 
         return n;
     }
 
-    private void updateInternal(final Atom root,
+    private void updateInternal(final Atom rootLink,
+                                final Atom rootTarget,
                                 final List<Note> children,
                                 final int depth,
                                 final Filter filter,
@@ -207,8 +277,10 @@ public class NotesSemantics {
             destructive = false;
         }
 
-        List<Note> before = view(root, 1, filter, style).getChildren();
+        List<Note> before = viewInternal(rootLink, rootTarget, 1, filter, style).getChildren();
 
+        // Note: link and metalink notes will never collide, as rootLink is never the same as rootTarget and
+        // a link can have only one to or from edge.
         Map<String, Note> beforeMap = new HashMap<String, Note>();
         for (Note n : before) {
             beforeMap.put(n.getLinkKey(), n);
@@ -277,7 +349,7 @@ public class NotesSemantics {
             } else if (null == beforeMap.get(linkKey)) {
                 link = getAtom(linkKey);
 
-                if (linkExists(root, link, target, style)) {
+                if (linkExists(rootLink, rootTarget, link, target, n.isMeta(), style)) {
                     filter.makeVisible(link);
                     link.setValue(n.getLinkValue());
                 } else {
@@ -286,11 +358,16 @@ public class NotesSemantics {
 
                 destructive = false;
             } else {
+                Note b = beforeMap.get(linkKey);
+
                 // Validate against the existing link
                 if (null == n.getTargetKey()) {
-                    throw new InvalidUpdateException("non-null link key with null target key");
-                } else if (!n.getTargetKey().equals(beforeMap.get(linkKey).getTargetKey())) {
-                    throw new InvalidUpdateException("target key of updated link has changed");
+                    throw new InvalidUpdateException("non-null link key '" + linkKey + "' with null target key");
+                } else if (!n.getTargetKey().equals(b.getTargetKey())) {
+                    throw new InvalidUpdateException("target key of updated link with key '" + linkKey + "' has changed");
+                } else if (n.isMeta() != b.isMeta()) {
+                    throw new InvalidUpdateException("unknown whether updated link with key '" + linkKey + "' is a metalink: ("
+                            + b.isMeta() + " --> " + n.isMeta() + ")");
                 }
 
                 link = getAtom(linkKey);
@@ -300,26 +377,11 @@ public class NotesSemantics {
             if (createLink) {
                 link = createAtom(filter);
                 link.setValue(n.getLinkValue());
-                setLink(link, root, target, style);
+                setLink(link, rootTarget, target, style);
             }
 
             Atom source = getSource(link, target, style);
-            updateInternal(source, n.getChildren(), depth - 1, filter, destructive, style);
-        }
-    }
-
-    private boolean isInverseStyle(final ViewStyle style) {
-        switch (style) {
-            case TARGETS:
-                return false;
-            case LINKS:
-                return false;
-            case TARGETS_INVERSE:
-                return true;
-            case LINKS_INVERSE:
-                return true;
-            default:
-                throw new IllegalStateException("unsupported view style: " + style);
+            updateInternal(link, source, n.getChildren(), depth - 1, filter, destructive, style);
         }
     }
 
@@ -364,18 +426,20 @@ public class NotesSemantics {
 
     private Atom getTarget(final Atom link,
                            final ViewStyle style) {
-        return isInverseStyle(style) ? link.getFrom() : link.getTo();
+        return style.isInverse() ? link.getFrom() : link.getTo();
     }
 
-    private boolean linkExists(final Atom root,
+    private boolean linkExists(final Atom rootLink,
+                               final Atom rootTarget,
                                final Atom link,
                                final Atom target,
+                               final boolean meta,
                                final ViewStyle style) {
         if (null == link) {
             return false;
         }
 
-        if (null == root || null == target) {
+        if (null == target) {
             throw new IllegalArgumentException();
         }
 
@@ -384,7 +448,17 @@ public class NotesSemantics {
                     + link.getKey() + "' is missing a 'to' and/or 'from' edge");
         }
 
-        return isInverseStyle(style)
+        Atom root = style.isFromLinks() && style.isFromTargets()
+                ? (meta ? rootLink : rootTarget)
+                : style.isFromLinks()
+                ? rootLink
+                : rootTarget;
+
+        if (null == root) {
+            throw new IllegalArgumentException();
+        }
+
+        return style.isInverse()
                 ? link.getFrom().getKey().equals(target.getKey()) && link.getTo().getKey().equals(root.getKey())
                 : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey());
     }
@@ -393,7 +467,7 @@ public class NotesSemantics {
                          final Atom source,
                          final Atom target,
                          final ViewStyle style) {
-        if (isInverseStyle(style)) {
+        if (style.isInverse()) {
             link.setFrom(target);
             link.setTo(source);
         } else {
@@ -565,15 +639,26 @@ public class NotesSemantics {
     }
 
     public enum ViewStyle {
-        TARGETS("targets"),
-        LINKS("links"),
-        TARGETS_INVERSE("targets-inverse"),
-        LINKS_INVERSE("links-inverse");
+        TARGETS("targets", false, true, false),
+        LINKS("links", true, false, false),
+        HYBRID("hybrid", true, true, false),
+        TARGETS_INVERSE("targets-inverse", false, true, true),
+        LINKS_INVERSE("links-inverse", true, false, true),
+        HYBRID_INVERSE("hybrid-inverse", true, true, true);
 
         private final String name;
+        private final boolean fromLinks;
+        private final boolean fromTargets;
+        private final boolean inverse;
 
-        ViewStyle(String name) {
+        ViewStyle(final String name,
+                  final boolean fromLinks,
+                  final boolean fromTargets,
+                  final boolean inverse) {
             this.name = name;
+            this.fromLinks = fromLinks;
+            this.fromTargets = fromTargets;
+            this.inverse = inverse;
         }
 
         public String getName() {
@@ -590,6 +675,17 @@ public class NotesSemantics {
             return null;
         }
 
+        public boolean isFromLinks() {
+            return fromLinks;
+        }
+
+        public boolean isFromTargets() {
+            return fromTargets;
+        }
+
+        public boolean isInverse() {
+            return inverse;
+        }
     }
 
     public static void main(final String[] args) throws Exception {

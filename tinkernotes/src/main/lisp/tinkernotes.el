@@ -303,17 +303,30 @@
         ((string-equal style "targets-inverse") "targets-inverse")
         ((string-equal style "links-inverse") "links-inverse")))
 
+(defun to-hybrid-style (style)
+    (cond
+        ((string-equal style "hybrid") "hybrid")
+        ((string-equal style "targets") "hybrid")
+        ((string-equal style "links") "hybrid")
+        ((string-equal style "hybrid-inverse") "hybrid-inverse")
+        ((string-equal style "targets-inverse") "hybrid-inverse")
+        ((string-equal style "links-inverse") "hybrid-inverse")))
+
 (defun to-links-style (style)
     (cond
+        ((string-equal style "hybrid") "links")
         ((string-equal style "targets") "links")
         ((string-equal style "links") "links")
+        ((string-equal style "hybrid-inverse") "links-inverse")
         ((string-equal style "targets-inverse") "links-inverse")
         ((string-equal style "links-inverse") "links-inverse")))
 
 (defun to-targets-style (style)
     (cond
+        ((string-equal style "hybrid") "targets")
         ((string-equal style "targets") "targets")
         ((string-equal style "links") "targets")
+        ((string-equal style "hybrid-inverse") "targets-inverse")
         ((string-equal style "targets-inverse") "targets-inverse")
         ((string-equal style "links-inverse") "targets-inverse")))
 
@@ -406,6 +419,12 @@
     (interactive)
     (if view-root
         (request-view view-root view-depth (to-backward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (not-in-view)))
+
+(defun refresh-to-hybrid-view ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth (to-hybrid-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
         (not-in-view)))
 
 (defun refresh-to-links-view ()
@@ -637,8 +656,9 @@
 (global-set-key (kbd "C-c C-t C-s .") 'increase-target-sharability)
 (global-set-key (kbd "C-c C-t C-w ,") 'decrease-target-weight)
 (global-set-key (kbd "C-c C-t C-w .") 'increase-target-weight)
-(global-set-key (kbd "C-c C-v f") 'refresh-to-forward-view)
 (global-set-key (kbd "C-c C-v b") 'refresh-to-backward-view)
+(global-set-key (kbd "C-c C-v f") 'refresh-to-forward-view)
+(global-set-key (kbd "C-c C-v h") 'refresh-to-hybrid-view)
 (global-set-key (kbd "C-c C-v l") 'refresh-to-links-view)
 (global-set-key (kbd "C-c C-v t") 'refresh-to-targets-view)
 (global-set-key (kbd "C-c C-w C-[ ,") 'decrease-min-weight)

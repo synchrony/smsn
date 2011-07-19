@@ -8,9 +8,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 6/20/11
- * Time: 7:58 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NotesSyntaxTest extends TestCase {
     private NotesSyntax syntax;

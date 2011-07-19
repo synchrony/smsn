@@ -4,21 +4,16 @@ package net.fortytwo.myotherbrain.notes;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class NoteNode {
-    private final String targetValue;
+    protected String targetValue;
     protected String targetKey;
     protected String linkKey;
 
-    public NoteNode(final String targetValue) {
-        this.targetValue = targetValue;
-
-        //if (null == text) {
-        //    throw new IllegalArgumentException("note text must be non-null" +
-        //            " (although it may be an empty string)");
-        //}
-    }
-
     public String getTargetValue() {
         return targetValue;
+    }
+
+    public void setTargetValue(final String targetValue) {
+        this.targetValue = targetValue;
     }
 
     public String getTargetKey() {

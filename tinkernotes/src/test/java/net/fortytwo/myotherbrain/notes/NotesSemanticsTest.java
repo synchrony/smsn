@@ -20,9 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * User: josh
- * Date: 6/20/11
- * Time: 7:58 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NotesSemanticsTest extends TestCase {
     private IndexableGraph graph;
@@ -48,8 +46,10 @@ public class NotesSemanticsTest extends TestCase {
 
         Atom root = createAtom("11111");
 
-        Note rootNote = new Note("foo");
-        Note child = new Note("cheval \u00e0 phynances");
+        Note rootNote = new Note();
+        rootNote.setTargetValue("foo");
+        Note child = new Note();
+        child.setTargetValue("cheval \u00e0 phynances");
         child.setLinkValue("a link");
         rootNote.addChild(child);
 

@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class Note extends NoteNode {
     private final List<Note> children;
+
     private String qualifier;
     private String linkValue;
     private boolean meta = false;
@@ -19,9 +20,7 @@ public class Note extends NoteNode {
     private Float targetSharability;
     private Long targetCreated;
 
-    public Note(final String targetValue) {
-        super(targetValue);
-
+    public Note() {
         children = new LinkedList<Note>();
     }
 

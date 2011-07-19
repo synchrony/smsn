@@ -11,7 +11,7 @@ public class NoteContext extends NoteNode {
     private final List<NoteContext> children;
 
     public NoteContext(final String text) {
-        super(text);
+        setTargetValue(text);
         this.notes = new LinkedList<Note>();
         this.children = new LinkedList<NoteContext>();
     }
