@@ -231,6 +231,11 @@
         (propertize text 'face (list 'bold 'italic  :foreground color))
         (propertize text 'face (list :foreground color))))))
 
+(defun unescape-link-value (value)
+    (replace-regexp-in-string "[ ]" "\\\\ "
+        (replace-regexp-in-string "[)]" "\\\\)"
+            (replace-regexp-in-string "[(]" "\\\\(" value))))
+
 (defun write-view (children indent)
     (loop for json across children do
     (let (
@@ -271,7 +276,7 @@
 			        (loop for i from 1 to indent do (insert "    "))
 			        ;; Also propertize target value, for the sake of {{{block text}}}
 			        (let ((link-text
-			            (if meta (concat "(" link-value ")") link-value)))
+			            (if meta (concat "(" (unescape-link-value link-value) ")") (unescape-link-value link-value))))
                             (insert (propertize (concat
                                 (colorize link-text link-weight link-sharability t) "  "
                                 (colorize target-value target-weight target-sharability nil) "\n")

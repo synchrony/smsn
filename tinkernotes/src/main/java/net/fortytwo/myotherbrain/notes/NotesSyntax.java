@@ -337,7 +337,7 @@ public class NotesSyntax {
 
     private static String escapeLinkValue(final String value) {
         return value
-                .replace("\\", "\\\\")
+                //.replace("\\", "\\\\")
                 .replace(" ", "\\ ")
                 .replace("(", "\\(")
                 .replace(")", "\\)");
@@ -347,8 +347,8 @@ public class NotesSyntax {
         return value
                 .replace("\\)", ")")
                 .replace("\\(", "(")
-                .replace("\\ ", " ")
-                .replace("\\\\", "\\");
+                .replace("\\ ", " ");
+                //.replace("\\\\", "\\");
     }
 
     private static String sanitizeValue(final String value) {
