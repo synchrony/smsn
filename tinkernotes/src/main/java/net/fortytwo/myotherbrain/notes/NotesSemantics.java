@@ -380,8 +380,7 @@ public class NotesSemantics {
                 setLink(link, rootLink, rootTarget, target, n.isMeta(), style);
             }
 
-            Atom source = getSource(link, target, n.isMeta(), style);
-            updateInternal(link, source, n.getChildren(), depth - 1, filter, destructive, style);
+            updateInternal(link, target, n.getChildren(), depth - 1, filter, destructive, style);
         }
     }
 
@@ -401,17 +400,6 @@ public class NotesSemantics {
             default:
                 throw new IllegalStateException("unsupported view style: " + style);
         }
-    }
-
-    private Atom getSource(final Atom link,
-                           final Atom target,
-                           final boolean meta,
-                           final ViewStyle style) {
-        return style.isFromLinks() && style.isFromTargets()
-                ? (meta ? link : target)
-                : style.isFromLinks()
-                ? link
-                : target;
     }
 
     private Atom getTarget(final Atom link,
