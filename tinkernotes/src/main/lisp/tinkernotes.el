@@ -58,7 +58,7 @@
 (setq view-depth 3)
 (setq view-root nil)
 (setq view-title nil)
-(setq view-style "targets")
+(setq view-style "hybrid")
 (setq view-min-sharability 0.25)
 (setq view-max-sharability 1)
 (setq view-min-weight 0.25)
@@ -299,15 +299,19 @@
 
 (defun to-forward-style (style)
     (cond
+        ((string-equal style "hybrid") "hybrid")
         ((string-equal style "targets") "targets")
         ((string-equal style "links") "links")
+        ((string-equal style "hybrid-inverse") "hybrid")
         ((string-equal style "targets-inverse") "targets")
         ((string-equal style "links-inverse") "links")))
 
 (defun to-backward-style (style)
     (cond
+        ((string-equal style "hybrid") "hybrid-inverse")
         ((string-equal style "targets") "targets-inverse")
         ((string-equal style "links") "links-inverse")
+        ((string-equal style "hybrid-inverse") "hybrid-inverse")
         ((string-equal style "targets-inverse") "targets-inverse")
         ((string-equal style "links-inverse") "links-inverse")))
 
@@ -352,13 +356,13 @@
             "&maxWeight=" (number-to-string maxw)
             "&style=" style))
 
-(defun request-search-results (query minv maxv minw maxw)
+(defun request-search-results (query style minv maxv minw maxw)
     (setq view-current-line 1)
     (http-get
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
             "&depth=2"
-            "&style=" "targets"  ;; TODO
+            "&style=" style
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
             "&minWeight=" (number-to-string minw)
@@ -385,6 +389,7 @@
             (request-search-results
                 ;;(concat "*" query "*")
                 query
+                view-style
                 view-min-sharability view-max-sharability view-min-weight view-max-weight))))
 
 (defun not-in-view ()
