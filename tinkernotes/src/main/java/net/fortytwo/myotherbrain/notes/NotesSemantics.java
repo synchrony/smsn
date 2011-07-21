@@ -218,7 +218,7 @@ public class NotesSemantics {
         }
 
         if (depth > 0) {
-            if (ViewStyle.HYBRID == style) {
+            if (ViewStyle.HYBRID == style || ViewStyle.HYBRID_INVERSE == style) {
                 ViewStyle tmpStyle;
 
                 if (null != rootLink) {
