@@ -5,6 +5,7 @@ import net.fortytwo.myotherbrain.util.properties.PropertyException;
 import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 
 import javax.xml.namespace.QName;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -60,12 +61,12 @@ public class MyOtherBrain {
 
         CONFIGURATION = new TypedProperties();
         VERSION_PROPERTIES = new TypedProperties();
-//        try {
-//            CONFIGURATION.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
-//            VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
-//        } catch (IOException e) {
-//            throw new ExceptionInInitializerError(e);
-//        }
+        try {
+            CONFIGURATION.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
+            VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
     }
 
     private static final MessageDigest SHA1_DIGEST;
