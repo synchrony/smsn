@@ -10,6 +10,13 @@
     <packaging>apk</packaging>
     <name>MyOtherBrain-Android</name>
 
+    <parent>
+        <groupId>net.fortytwo.myotherbrain</groupId>
+        <artifactId>myotherbrain-all</artifactId>
+        <version>0.1</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <repositories>
         <repository>
             <id>fortytwo</id>
@@ -22,7 +29,7 @@
         <dependency>
             <groupId>net.fortytwo.myotherbrain</groupId>
             <artifactId>flashcards</artifactId>
-            <version>0.1</version>
+            <version>${myotherbrain.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
@@ -34,9 +41,8 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <directory>target</directory>
-        <!--<outputDirectory>target/classes</outputDirectory>
-        <testOutputDirectory>target/test-classes</testOutputDirectory>-->
         <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
             <resource>

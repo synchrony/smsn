@@ -1,7 +1,5 @@
 package net.fortytwo.myotherbrain.model;
 
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.access.Quotas;
 import org.openrdf.elmo.ElmoManager;
 import org.openrdf.sail.SailConnection;
@@ -37,16 +35,6 @@ public class MOBModelConnection {
 
     public ElmoManager getElmoManager() {
         return elmoManager;
-    }
-
-    public FramesManager getFramesManager() {
-        // TODO
-        return null;
-    }
-
-    public IndexableGraph getGraph() {
-        // TODO
-        return null;
     }
 
     public Quotas getQuotas() {

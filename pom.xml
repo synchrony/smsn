@@ -5,18 +5,27 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>myotherbrain</artifactId>
+    <artifactId>myotherbrain-all</artifactId>
     <version>0.1</version>
     <packaging>pom</packaging>
     <name>MyOtherBrain</name>
+    <description>This is your brain. This is your brain on the Web. Any questions?</description>
 
     <modules>
         <module>core</module>
-	<module>flashcards</module>
+        <module>flashcards</module>
         <module>server</module>
         <module>tinkernotes</module>
         <module>android</module>
     </modules>
+
+    <properties>
+        <myotherbrain.version>0.1</myotherbrain.version>
+        <sesame.version>2.4.2</sesame.version>
+        <junit.version>4.5</junit.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
     <build>
         <directory>${basedir}/target</directory>
@@ -45,5 +54,21 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <repositories>
+        <repository>
+            <id>fortytwo</id>
+            <name>fortytwo.net Maven repository</name>
+            <url>http://fortytwo.net/maven2</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>fortytwo</id>
+            <name>fortytwo.net Maven repository</name>
+            <url>file:///mnt/repository</url>
+        </repository>
+    </distributionManagement>
 
 </project>
