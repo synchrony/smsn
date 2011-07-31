@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 //import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
@@ -33,10 +32,7 @@ import java.util.Set;
 public class NotesSemantics {
     private static final String KEYS = "keys";
 
-    private static final int KEY_DIGITS = 7;
     private static final int RANDOM_KEY_MAXTRIALS = 100;
-
-    private static final Random RANDOM = new Random();
 
     private final IndexableGraph graph;
     private final FramesManager manager;
@@ -184,7 +180,7 @@ public class NotesSemantics {
             int index = 0;
             for (Note n : result.getChildren()) {
                 String k = "" + ++index;
-                n.setLinkKey("#######".substring(0, KEY_DIGITS - k.length()) + k);
+                n.setLinkKey("#######".substring(0, MyOtherBrain.KEY_DIGITS - k.length()) + k);
             }
         } finally {
             i.close();
@@ -519,21 +515,7 @@ public class NotesSemantics {
      */
     private String createKey() {
         for (int j = 0; j < RANDOM_KEY_MAXTRIALS; j++) {
-            byte[] bytes = new byte[KEY_DIGITS];
-            for (int i = 0; i < KEY_DIGITS; i++) {
-                int n = RANDOM.nextInt(64);
-                int b = n < 26
-                        ? 'A' + n
-                        : n < 52
-                        ? 'a' + n - 26
-                        : n < 62
-                        ? '0' + n - 52
-                        : n < 63
-                        ? '@' : '&';
-                bytes[i] = (byte) b;
-            }
-
-            String key = new String(bytes);
+            String key = MyOtherBrain.createRandomKey();
             if (null == getAtom(key)) {
                 return key;
             }
@@ -601,15 +583,15 @@ public class NotesSemantics {
     private class NoteComparator implements Comparator<Note> {
         @Override
         public int compare(Note a, Note b) {
-            int cmp = ((Float) b.getLinkWeight()).compareTo(a.getLinkWeight());
+            int cmp = b.getLinkWeight().compareTo(a.getLinkWeight());
             if (0 == cmp) {
-                cmp = ((Long) b.getLinkCreated()).compareTo(a.getLinkCreated());
+                cmp = b.getLinkCreated().compareTo(a.getLinkCreated());
 
                 if (0 == cmp) {
-                    cmp = ((Float) b.getTargetWeight()).compareTo(a.getTargetWeight());
+                    cmp = b.getTargetWeight().compareTo(a.getTargetWeight());
 
                     if (0 == cmp) {
-                        cmp = ((Long) b.getTargetCreated()).compareTo(a.getTargetCreated());
+                        cmp = b.getTargetCreated().compareTo(a.getTargetCreated());
                     }
                 }
             }

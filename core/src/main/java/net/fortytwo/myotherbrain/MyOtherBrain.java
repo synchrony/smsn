@@ -5,7 +5,6 @@ import net.fortytwo.myotherbrain.util.properties.PropertyException;
 import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 
 import javax.xml.namespace.QName;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -45,6 +44,10 @@ public class MyOtherBrain {
             VALUE = "value",
             WEIGHT = "weight";
 
+    public static final int KEY_DIGITS = 7;
+
+    private static final Random RANDOM = new Random();
+
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";
     private static final String VERSION_PROPERTIES_FILE = "version.properties";
     private static final TypedProperties VERSION_PROPERTIES;
@@ -57,12 +60,12 @@ public class MyOtherBrain {
 
         CONFIGURATION = new TypedProperties();
         VERSION_PROPERTIES = new TypedProperties();
-        try {
-            CONFIGURATION.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
-            VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
-        } catch (IOException e) {
-            throw new ExceptionInInitializerError(e);
-        }
+//        try {
+//            CONFIGURATION.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
+//            VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
+//        } catch (IOException e) {
+//            throw new ExceptionInInitializerError(e);
+//        }
     }
 
     private static final MessageDigest SHA1_DIGEST;
@@ -146,5 +149,23 @@ public class MyOtherBrain {
             hash = hash + hex;
         }
         return hash;
+    }
+
+    public static String createRandomKey() {
+        byte[] bytes = new byte[KEY_DIGITS];
+        for (int i = 0; i < KEY_DIGITS; i++) {
+            int n = RANDOM.nextInt(64);
+            int b = n < 26
+                    ? 'A' + n
+                    : n < 52
+                    ? 'a' + n - 26
+                    : n < 62
+                    ? '0' + n - 52
+                    : n < 63
+                    ? '@' : '&';
+            bytes[i] = (byte) b;
+        }
+
+        return new String(bytes);
     }
 }
