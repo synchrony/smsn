@@ -14,6 +14,7 @@
     <modules>
         <module>core</module>
         <module>flashcards</module>
+	<module>qrcodes</module>
         <module>server</module>
         <module>tinkernotes</module>
         <module>android</module>

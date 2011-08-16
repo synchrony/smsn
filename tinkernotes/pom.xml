@@ -40,36 +40,39 @@
             <artifactId>myotherbrain-core</artifactId>
             <version>${myotherbrain.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-graph-sail</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>-->
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>frames</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>${frames.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>rexster</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>${rexster.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-rexster-graph</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-neo4j-graph</artifactId>
+            <version>${blueprints.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--
+        <blueprints.version>0.9</blueprints.version>
+        <frames.version>0.4</frames.version>
+        <rexster.version>0.5</rexster.version>
+        -->
+        <blueprints.version>1.0-SNAPSHOT</blueprints.version>
+        <frames.version>0.5-SNAPSHOT</frames.version>
+        <rexster.version>0.6-SNAPSHOT</rexster.version>
     </properties>
 
     <build>

@@ -191,4 +191,35 @@ public class NotesSemanticsTest extends TestCase {
 
         return c;
     }
+
+    //public void main(final String[] args) throws Exception {
+    public void testTmp() throws Exception {
+        /*
+        Graph g = new Neo4jGraph("/Users/josh/data/tinkernotes");
+        GraphMLWriter w = new GraphMLWriter(g);
+        w.setNormalize(true);
+        OutputStream out = new FileOutputStream("/tmp/tinkernotes.xml");
+        try {
+            w.outputGraph(out);
+        } finally {
+            out.close();
+        } //*/
+
+        /*
+        IndexableGraph g = new Neo4jGraph("/Users/josh/data/tinkernotes");
+        Set<String> keys = new HashSet<String>();
+        keys.add("key");
+        if (null == g.getIndex("keys", Vertex.class)) {
+            g.createAutomaticIndex("keys", Vertex.class, keys);
+        }
+
+        GraphMLReader r = new GraphMLReader(g);
+        InputStream in = new FileInputStream("/tmp/tinkernotes.xml");
+        try {
+            r.inputGraph(in);
+        } finally {
+            in.close();
+        }
+        //*/
+    }
 }

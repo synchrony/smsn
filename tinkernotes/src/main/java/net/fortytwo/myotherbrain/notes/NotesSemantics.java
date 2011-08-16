@@ -657,6 +657,7 @@ public class NotesSemantics {
     }
 
     public static void main(final String[] args) throws Exception {
+
         Filter filter = new Filter(0, 1, 0, 1);
 
         NotesSyntax p = new NotesSyntax();
