@@ -383,7 +383,7 @@
     (http-get
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
-            "&depth=2"
+            "&depth=1"
             "&style=" style
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
