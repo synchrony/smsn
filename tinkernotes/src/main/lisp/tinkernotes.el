@@ -236,6 +236,18 @@
         (replace-regexp-in-string "[)]" "\\\\)"
             (replace-regexp-in-string "[(]" "\\\\(" value))))
 
+(defun light-gray (text)
+    (propertize text
+	    'face (if full-colors-supported
+		    '(:foreground "grey80")
+			'(:foreground "black"))))
+
+(defun dark-gray (text)
+    (propertize text
+	    'face (if full-colors-supported
+		    '(:foreground "grey50")
+			'(:foreground "black"))))
+
 (defun write-view (children indent)
     (loop for json across children do
     (let (
@@ -262,28 +274,25 @@
 		            (if (not target-value) (error (concat "missing value for target with key " target-key)))
 		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
-                    (insert
-                        (propertize
-                            (concat
-		                        (propertize (concat link-key ":" target-key ":")
-					                'face (if full-colors-supported
-					                     '(:foreground "grey80" :background "grey97")
-					                     '(:foreground "black"))) " ")
-					         ;;'invisible t
-			                'link-key link-key
-			                'target-key target-key))
-			        ;; TODO: also propertize the whitespace. Just propertize once for the whole "line"
-			        (loop for i from 1 to indent do (insert "    "))
-			        ;; Also propertize target value, for the sake of {{{block text}}}
-			        (let ((link-text
-			            (if meta (concat "(" (unescape-link-value link-value) ")") (unescape-link-value link-value))))
-                            (insert (propertize (concat
-                                (colorize link-text link-weight link-sharability t) "  "
-                                (colorize target-value target-weight target-sharability nil) "\n")
-                                'link-key link-key
-                                'target-key target-key)))
-                    (write-view children (+ indent 1))
-                    ))))
+		            (let ((line ""))
+		                (setq line (concat
+		                    line
+		                    (light-gray (concat link-key ":" target-key ":"))
+			                " "))
+					    (loop for i from 1 to indent do (setq line (concat line "    ")))
+					    (if meta (setq line (concat line (dark-gray "("))))
+					    (setq line (concat line
+					        (colorize (unescape-link-value link-value) link-weight link-sharability t)))
+					    (if meta (setq line (concat line (dark-gray ")"))))
+                        (setq line (concat line
+                            "  "
+                            (colorize target-value target-weight target-sharability nil)
+                            "\n"))
+                        (insert (propertize line
+                            ;;'invisible t
+			                    'link-key link-key
+			                    'target-key target-key)))
+                    (write-view children (+ indent 1))))))
 
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
