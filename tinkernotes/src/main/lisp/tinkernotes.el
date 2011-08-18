@@ -200,7 +200,7 @@
                     ;;(tinkernotes-mode)
                     (erase-buffer)
                     (let ((view-json (json-read-from-string view)))
-                        (write-view (cdr (assoc 'children view-json)) 0))
+                        (write-view (cdr (assoc 'children view-json)) (longest-key view-json)))
                     (beginning-of-buffer)
                     (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
@@ -248,6 +248,19 @@
 		    '(:foreground "grey50")
 			'(:foreground "black"))))
 
+(defun longest-key (json)
+    (let ((max 0))
+        (let (
+            (children (cdr (assoc 'children json)))
+            (link-key (get-key (cdr (assoc 'link json))))
+            (target-key (get-key (cdr (assoc 'target json)))))
+                (let ((length (+ (length link-key) (length target-key) 2)))
+                    (if (> length max) (setq max length)))
+                (loop for child across children do
+                    (let ((length (longest-key child)))
+                        (if (> length max) (setq max length))))
+                max)))
+
 (defun write-view (children indent)
     (loop for json across children do
     (let (
@@ -260,10 +273,10 @@
                 (link-value (get-value link))
 		        (link-weight (get-weight link))
 	            (link-sharability (get-sharability link))
-                (target-key (cdr (assoc 'key target)))
-                (target-value (cdr (assoc 'value target)))
-		        (target-weight (cdr (assoc 'weight target)))
-		        (target-sharability (cdr (assoc 'sharability target))))
+                (target-key (get-key target))
+                (target-value (get-value target))
+		        (target-weight (get-weight target))
+		        (target-sharability (get-sharability target)))
 		            (if link-key (puthash link-key link view-atoms))
 		            (if target-key (puthash target-key target view-atoms))
 		            ;;(if (not link-key) (error "missing link key"))
@@ -274,12 +287,12 @@
 		            (if (not target-value) (error (concat "missing value for target with key " target-key)))
 		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
-		            (let ((line ""))
+		            (let ((line "") (key (concat link-key ":" target-key ":")))
 		                (setq line (concat
 		                    line
-		                    (light-gray (concat link-key ":" target-key ":"))
+		                    (light-gray key)
 			                " "))
-					    (loop for i from 1 to indent do (setq line (concat line "    ")))
+					    (loop for i from 0 to (- indent (length key)) do (setq line (concat line " ")))
 					    (if meta (setq line (concat line (dark-gray "("))))
 					    (setq line (concat line
 					        (colorize (unescape-link-value link-value) link-weight link-sharability t)))
@@ -292,7 +305,7 @@
                             ;;'invisible t
 			                    'link-key link-key
 			                    'target-key target-key)))
-                    (write-view children (+ indent 1))))))
+                    (write-view children (+ indent 4))))))
 
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

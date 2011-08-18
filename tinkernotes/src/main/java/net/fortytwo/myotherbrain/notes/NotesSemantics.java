@@ -180,7 +180,8 @@ public class NotesSemantics {
             int index = 0;
             for (Note n : result.getChildren()) {
                 String k = "" + ++index;
-                n.setLinkKey("#######".substring(0, MyOtherBrain.KEY_DIGITS - k.length()) + k);
+                //n.setLinkKey("#######".substring(0, MyOtherBrain.KEY_DIGITS - k.length()) + k);
+                n.setLinkKey(k);
             }
         } finally {
             i.close();
