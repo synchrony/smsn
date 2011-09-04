@@ -37,7 +37,9 @@ public class ViewExtension extends TinkerNotesExtension {
         p.graph = graph;
         p.depth = depth;
         p.filter = filter;
-        return this.handleRequestInternal(p, rootKey, styleName);
+        p.rootKey = rootKey;
+        p.styleName = styleName;
+        return this.handleRequestInternal(p);
     }
 
     @Override

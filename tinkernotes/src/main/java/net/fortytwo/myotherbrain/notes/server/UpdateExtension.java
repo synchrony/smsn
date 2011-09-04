@@ -48,7 +48,9 @@ public class UpdateExtension extends TinkerNotesExtension {
         p.depth = depth;
         p.filter = filter;
         p.view = view;
-        return this.handleRequestInternal(p, rootKey, styleName);
+        p.rootKey = rootKey;
+        p.styleName = styleName;
+        return this.handleRequestInternal(p);
     }
 
     @Override

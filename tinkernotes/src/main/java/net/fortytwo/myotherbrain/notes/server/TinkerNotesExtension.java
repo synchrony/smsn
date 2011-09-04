@@ -29,9 +29,10 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected abstract boolean isReadOnly();
 
-    protected ExtensionResponse handleRequestInternal(final Params p,
-                                                      final String rootKey,
-                                                      final String styleName) {
+    protected ExtensionResponse handleRequestInternal(final Params p) {
+        String rootKey = p.rootKey;
+        String styleName = p.styleName;
+
         try {
             p.map = new HashMap<String, String>();
 
@@ -109,8 +110,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             boolean manual;
             // Force manual transaction mode (provided that the graph is transactional)
             if (!isReadOnly() && p.graph instanceof TransactionalGraph) {
-                if (TransactionalGraph.Mode.MANUAL != ((TransactionalGraph) p.graph).getTransactionMode()) {
-                    ((TransactionalGraph) p.graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
+                if (0 >= ((TransactionalGraph) p.graph).getCurrentBufferSize()) {
+                    ((TransactionalGraph) p.graph).setMaxBufferSize(-1);
                 }
                 manual = true;
 
@@ -179,5 +180,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public String query;
         public Float newWeight;
         public Float newSharability;
+        public String rootKey;
+        public String styleName;
+        public String file;
     }
 }

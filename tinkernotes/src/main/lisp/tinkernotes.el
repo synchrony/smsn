@@ -208,6 +208,16 @@
                     (beginning-of-line view-current-line)
                     (info-message (concat "updated to view " (view-info)))))))
 
+(defun receive-export-results (status)
+    (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
+        (if status
+            (let ((msg (cdr (assoc 'message json)))
+                (error (cdr (assoc 'error json))))
+                    (if error
+                        (error-message error)
+                        (error-message msg)))
+            (info-message "exported successfully"))))
+
 (setq full-colors '(
     "#330000" "#660000" "#990000" "#CC0000"  ;; private:   red
     "#332600" "#664C00" "#997200" "#CC9900"  ;; protected: orange
@@ -290,8 +300,7 @@
 		            (let ((line "") (key (concat link-key ":" target-key ":")))
 		                (setq line (concat
 		                    line
-		                    (light-gray key)
-			                " "))
+		                    (light-gray key)))
 					    (loop for i from 0 to (- indent (length key)) do (setq line (concat line " ")))
 					    (if meta (setq line (concat line (dark-gray "("))))
 					    (setq line (concat line
@@ -390,6 +399,10 @@
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)) 'receive-view))
 
+(defun do-export ()
+    (http-get
+        (concat (base-url) "export?file=/tmp/tinkernotes-dump.txt") 'receive-export-results))
+
 (defun visit-target ()
     (interactive)
     (let ((key (current-target-key)))
@@ -413,6 +426,10 @@
                 query
                 view-style
                 view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+
+(defun export ()
+    (interactive)
+    (do-export))
 
 (defun not-in-view ()
 	(error-message "this command must be executed from within a view"))
@@ -670,6 +687,7 @@
     (message (number-to-string (length (defined-colors)))))
 
 (global-set-key (kbd "C-c d") 'my-debug)
+(global-set-key (kbd "C-c e") 'export)
 (global-set-key (kbd "C-c l") 'visit-link)
 (global-set-key (kbd "C-c p") 'push-view)
 (global-set-key (kbd "C-c q") 'search)

@@ -43,7 +43,8 @@ public class SearchExtension extends TinkerNotesExtension {
         p.filter = filter;
         p.query = query;
         p.depth = depth;
-        return this.handleRequestInternal(p, null, styleName);
+        p.styleName = styleName;
+        return this.handleRequestInternal(p);
     }
 
     @Override
