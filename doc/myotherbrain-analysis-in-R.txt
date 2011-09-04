@@ -1,0 +1,41 @@
+################################################################################
+# MyOtherBrain network analysis
+################################################################################
+
+
+brain <- read.table(file("/tmp/tinkernotes-dump.txt"), header=TRUE, sep="\t")
+
+
+mean(brain$weight)
+mean(brain$sharability)
+
+
+################################################################################
+# PageRank
+
+library(igraph)
+
+tmp <- subset(brain, is.edge == 1)
+adj <- data.frame(from=tmp$from, to=tmp$to, weight=tmp$weight)
+
+write.table(adj[1:3], "/tmp/tinkernotes-adjacency.txt", row.names=FALSE, col.names=FALSE, quote=FALSE)
+g <- read.graph(file("/tmp/tinkernotes-adjacency.txt"), format="ncol", directed = FALSE, weights = TRUE, names = TRUE)
+V(g)
+E(g)$weight
+
+pg <- page.rank(g)
+pg$vector
+
+tmp <- data.frame(key=V(g)$name, pg$vector)
+merged <- merge(tmp, brain, by="key")
+ordered <- merged[rev(order(merged[, "pg.vector"])),]
+
+# View PageRank results
+ordered[1:50,]
+
+
+################################################################################
+# connected components
+
+# Discover disconnected islands of brain
+c <- clusters(g)

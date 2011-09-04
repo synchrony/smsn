@@ -46,19 +46,34 @@ public class ExportExtension extends TinkerNotesExtension {
 
     private void exportToR(final Graph g,
                            final PrintStream p) throws IOException {
+
+        p.println("id\tkey\tcreated\tweight\tsharability\tis.edge\tfrom\tto\tvalue");
+
         for (Vertex v : g.getVertices()) {
+            p.print(v.getId());
+            p.print('\t');
             p.print(v.getProperty(MyOtherBrain.KEY));
             p.print('\t');
+
+            p.print(v.getProperty(MyOtherBrain.CREATED));
+            p.print('\t');
+            p.print(v.getProperty(MyOtherBrain.WEIGHT));
+            p.print('\t');
+            p.print(v.getProperty(MyOtherBrain.SHARABILITY));
+            p.print('\t');
+
             Vertex from = getFrom(v);
             Vertex to = getTo(v);
-            if (null != from) {
+            if (null != from && null != to) {
+                p.print("1");
+                p.print('\t');
                 p.print(from.getProperty(MyOtherBrain.KEY));
-            }
-            p.print('\t');
-            if (null != to) {
+                p.print('\t');
                 p.print(to.getProperty(MyOtherBrain.KEY));
+                p.print('\t');
+            } else {
+                p.print("0\t\t\t");
             }
-            p.print('\t');
             p.print(shortValue((String) v.getProperty(MyOtherBrain.VALUE)));
             p.println("");
         }
@@ -70,9 +85,12 @@ public class ExportExtension extends TinkerNotesExtension {
             s = s.substring(0, 47) + "...";
         }
 
+        // Tabs and newlines are reserved.
         s = s.replaceAll("\\s+", " ");
 
-        return s;
+        // Note: this quotation is necessary: without it, R becomes confused and skips rows.
+        s = s.replace('\"', '_');
+        return "\"" + s + "\"";
     }
 
     private Vertex getFrom(final Vertex v) {

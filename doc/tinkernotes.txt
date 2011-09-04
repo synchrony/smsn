@@ -1,0 +1,117 @@
+
+// Create the "keys" index for a graph which doesn't already have one
+Set<String> keys = new HashSet<String>(); keys.add("key"); 
+if (null == g.getIndex("keys", Vertex.class) {
+    g.createAutomaticIndex("keys", Vertex.class, keys);
+}
+
+// Force indexing of already-loaded graph.
+for (Vertex v : g.V) { v.setProperty("key", v.getProperty("key")); }
+
+// Put the graph in manual transaction mode
+g.getTransactionMode()
+((TransactionalGraph) g).setTransactionMode(TransactionalGraph.Mode.MANUAL);
+g.getTransactionMode()
+
+// Look up an atom with a given key
+g.getIndex("keys", Vertex.class).get("key", "00000");
+
+// Show orphaned vertices
+List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { System.out.println("" + v); }
+
+// Delete orphaned vertices.
+List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { g.removeVertex(v); }
+
+// Find and remove corrupted links
+Collection<Vertex> bad = new LinkedList<Vertex>();
+for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.getId());bad.add(v);}};
+for (Vertex v : bad) {g.removeVertex(v);}
+
+// Update version-controlled graph
+// Note: we are not checking for edge key collisions
+for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}}; OutputStream out = new FileOutputStream(new File("/Users/josh/projects/fortytwo/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setNormalize(true); w.setIdProperty("key"); w.outputGraph(out); out.close();
+
+
+
+IndexableGraph g2 = new Neo4jGraph("/tmp/neo");
+Set<String> keys = new HashSet<String>();
+keys.add("key");
+g2.createAutomaticIndex("keys", Vertex.class, keys);
+for (Vertex v : g.getVertices()) {
+    Vertex v2 = g2.addVertex(v.getId());
+    for (String key : v.getPropertyKeys()) {
+    	v2.setProperty(key, v.getProperty(key));
+    }
+}
+for (Edge e : g.getEdges()) {
+    Vertex out = e.getOutVertex();
+    Vertex in = e.getInVertex();
+    CloseableSequence<Vertex> outC = keys.get("key", out.getProperty("key"));
+    CloseableSequence<Vertex> inC = keys.get("key", in.getProperty("key"));
+    Vertex out2 = outC.next();
+    Vertex in2 = inC.next();
+    outC.close();
+    inC.close();
+    Edge e2 = g2.addEdge(out2, in2);
+    for (String key : e.getPropertyKeys()) {
+    	e2.setProperty(key, e.getProperty(key));
+    }
+}
+g2.close();
+
+
+
+
+for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}};
+OutputStream out = new FileOutputStream(new File("/Users/josh/projects/fortytwo/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setIdProperty("key"); w.outputGraph(out); out.close();
+
+
+
+
+
+
+// Load from version-controlled graph (caution!)
+InputStream input = new FileInputStream(new File("/Users/josh/projects/fortytwo/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g); g.clear(); r.inputGraph(input); input.close();
+
+// Make a backup
+OutputStream out = new FileOutputStream(new File("/Users/josh/data/tinkernotes_backup/tinkernotes-" + new Date().getTime() + ".xml")); GraphMLWriter.outputGraph(g, out); out.close();
+
+
+
+// One-time switchover from "text" to "value" properties
+for (Vertex v : g.V) { System.out.println(v.getProperty("text")); }
+for (Vertex v : g.V) { if (null != v.getProperty("text")) v.setProperty("value", v.getProperty("text")); }
+for (Vertex v : g.V) { System.out.println(v.getProperty("value")); }
+for (Vertex v : g.V) { v.removeProperty("text"); }
+for (Vertex v : g.V) { System.out.println(v.getProperty("text")); }
+
+// One-time assignment of weight and sharability to all atoms
+for (Vertex v : g.V) { v.setProperty("weight", (float) 0.5); }
+for (Vertex v : g.V) { v.setProperty("sharability", (float) 0.5); }
+for (Vertex v : g.V) { v.removeProperty("visibility"); }
+
+
+ba  IDEA's XML formatter appears to have the bad habit of inserting line breaks into long lines of text (which currently causes TinkerNotes to break)
+
+mvn install
+cp target/myotherbrain-0.1-standalone.jar ~/projects/tinkerpop/rexster/target/rexster-0.5-SNAPSHOT-standalone/ext
+
+
+export REXSTER_HOME=/Users/josh/projects/tinkerpop/rexster
+./rexster-start.sh -configuration config/myotherbrain-rexster.xml
+./rexster-stop.sh
+
+
+
+http://localhost:8182/josh/myotherbrain/read-notes?root=0
+
+
+wget "http://localhost:8182/tinkernotes/tinkernotes/view?root=00000&depth=3&minSharability=0&maxSharability=1&minWeight=0&maxWeight=1&inverse=false"
+wget "http://localhost:8182/tinkernotes/tinkernotes/view?root=xu1gu&depth=3&minSharability=0&maxSharability=1&minWeight=0&maxWeight=1&inverse=false"
+
+
+mkdir .elisp
+cd .elisp/
+wget -O json.el http://cvs.savannah.gnu.org/viewvc/*checkout*/emacs/lisp/json.el?root=emacs
+
+
