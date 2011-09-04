@@ -31,7 +31,8 @@ public class ExportExtension extends TinkerNotesExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "file", description = "the path of the file to which to export") String file) {
-        LOGGER.info("export request for graph " + graph);
+        LOGGER.info("exporting graph to file: " + file);
+        System.err.println("exporting graph to file: " + file);
 
         if (null == file || file.length() == 0) {
             return ExtensionResponse.error("missing or empty 'file' parameter");
@@ -58,9 +59,20 @@ public class ExportExtension extends TinkerNotesExtension {
                 p.print(to.getProperty(MyOtherBrain.KEY));
             }
             p.print('\t');
-            p.print(v.getProperty(MyOtherBrain.VALUE));
+            p.print(shortValue((String) v.getProperty(MyOtherBrain.VALUE)));
             p.println("");
         }
+    }
+
+    private String shortValue(final String value) {
+        String s = value;
+        if (s.length() > 47) {
+            s = s.substring(0, 47) + "...";
+        }
+
+        s = s.replaceAll("\\s+", " ");
+
+        return s;
     }
 
     private Vertex getFrom(final Vertex v) {

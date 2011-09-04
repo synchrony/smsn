@@ -154,7 +154,7 @@
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun base-url ()
-    (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/" tinkernotes-rexster-graph "/tinkernotes/"))
+    (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/graphs/" tinkernotes-rexster-graph "/tinkernotes/"))
 
 (defun receive-view-debug (status)
     (message (buffer-string)))
