@@ -100,10 +100,15 @@
 (defun get-sharability (atom)
     (cdr (assoc 'sharability atom)))
 
-(defun view-name (root-id)
+(defun view-name (root-id json)
     (if root-id
-        (concat "view-" root-id)
-        (concat "anonymous-" (number-to-string (random 1000)))))
+        (let ((title (cdr (assoc 'title json))))
+            (let ((name
+                (if (> (length title) 20)
+                    (concat (substring title 0 20) "...")
+                    title)))
+                (concat name " [" root-id "]")))
+        (concat "#" (number-to-string (random 1000)))))
 
 (defun current-target-key ()
     (car (last (find-id))))
@@ -177,7 +182,7 @@
                 (max-weight (string-to-number (cdr (assoc 'maxWeight json))))
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
-                    (switch-to-buffer (view-name root))
+                    (switch-to-buffer (view-name root json))
                     (make-local-variable 'view-root)
                     (make-local-variable 'view-depth)
                     (make-local-variable 'view-style)

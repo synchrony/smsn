@@ -5,6 +5,8 @@
 
 brain <- read.table(file("/tmp/tinkernotes-dump.txt"), header=TRUE, sep="\t")
 
+# Make sure you have all rows.  R appears to skip rows when it becomes confused.
+nrow(brain)
 
 mean(brain$weight)
 mean(brain$sharability)
