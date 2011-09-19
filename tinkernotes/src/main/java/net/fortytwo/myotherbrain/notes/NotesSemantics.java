@@ -496,9 +496,8 @@ public class NotesSemantics {
         a.setKey(createKey());
         a.setCreated(new Date().getTime());
 
-        // Place sharability and weight in the middle of the applicable ranges.
-        a.setSharability((filter.maxSharability + filter.minSharability) / 2);
-        a.setWeight((filter.maxWeight + filter.minWeight) / 2);
+        a.setSharability(filter.defaultSharability);
+        a.setWeight(filter.defaultWeight);
 
         return a;
     }
@@ -659,7 +658,7 @@ public class NotesSemantics {
 
     public static void main(final String[] args) throws Exception {
 
-        Filter filter = new Filter(0, 1, 0, 1);
+        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
 
         NotesSyntax p = new NotesSyntax();
         List<Note> notes;

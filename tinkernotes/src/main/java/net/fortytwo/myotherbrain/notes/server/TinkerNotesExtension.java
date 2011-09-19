@@ -64,27 +64,12 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             if (null != p.filter) {
-                if (p.filter.minSharability < 0 || p.filter.maxSharability > 1) {
-                    return ExtensionResponse.error("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
-                }
-
-                if (p.filter.maxSharability < p.filter.minSharability) {
-                    return ExtensionResponse.error("maximum sharability must be greater than or equal to minimum sharability");
-                }
-
                 p.map.put("minSharability", "" + p.filter.minSharability);
                 p.map.put("maxSharability", "" + p.filter.maxSharability);
-
-                if (p.filter.minWeight < 0 || p.filter.maxWeight > 1) {
-                    return ExtensionResponse.error("minimum and maximum weight must lie between 0 and 1 (inclusive)");
-                }
-
-                if (p.filter.maxWeight < p.filter.minWeight) {
-                    return ExtensionResponse.error("maximum weight must be greater than or equal to minimum weight");
-                }
-
+                p.map.put("defaultSharability", "" + p.filter.defaultSharability);
                 p.map.put("minWeight", "" + p.filter.minWeight);
                 p.map.put("maxWeight", "" + p.filter.maxWeight);
+                p.map.put("defaultWeight", "" + p.filter.defaultWeight);
             }
 
             if (null != rootKey) {

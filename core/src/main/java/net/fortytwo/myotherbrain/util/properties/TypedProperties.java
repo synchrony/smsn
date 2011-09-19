@@ -15,6 +15,9 @@ import java.util.Properties;
  * FIXME: this class is nearly identical to RippleProperties, only slightly
  * better.  It may be worthwhile to let Ripple and MyOtherBrain inherit a
  * common dependency.
+ *
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TypedProperties extends Properties {
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");

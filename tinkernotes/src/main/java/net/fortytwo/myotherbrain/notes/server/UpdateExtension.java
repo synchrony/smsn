@@ -32,16 +32,23 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
+                                           @ExtensionRequestParameter(name = "defaultWeight", description = "weight of new atoms added to the view") Float defaultWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
+                                           @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        //new Exception().printStackTrace();
 
         LOGGER.info("update request for: " + rootKey);
         System.err.println("update request for: " + rootKey);
 
-        Filter filter = new Filter(minSharability, maxSharability, minWeight, maxWeight);
+        Filter filter;
+
+        try {
+            filter = new Filter(minSharability, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+        } catch (IllegalArgumentException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
 
         Params p = new Params();
         p.graph = graph;

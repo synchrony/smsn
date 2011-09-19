@@ -15,11 +15,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 /**
- * Created by IntelliJ IDEA.
- * User: josh
- * Date: Dec 12, 2008
- * Time: 4:04:20 PM
- * To change this template use File | Settings | File Templates.
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class MyOtherBrain {
     public static final String DEFAULT_BASEURI = "http://example.org/replaceThisBaseURI#";

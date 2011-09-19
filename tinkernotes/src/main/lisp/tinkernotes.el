@@ -61,8 +61,10 @@
 (setq view-style "hybrid")
 (setq view-min-sharability 0.25)
 (setq view-max-sharability 1)
+(setq view-default-sharability 0.5)
 (setq view-min-weight 0.25)
 (setq view-max-weight 1)
+(setq view-default-weight 0.5)
 (setq view-atoms nil)
 (setq view-current-line 1)
 
@@ -178,8 +180,10 @@
                 (depth (cdr (assoc 'depth json)))
                 (min-sharability (string-to-number (cdr (assoc 'minSharability json))))
                 (max-sharability (string-to-number (cdr (assoc 'maxSharability json))))
+                (default-sharability (string-to-number (cdr (assoc 'defaultSharability json))))
                 (min-weight (string-to-number (cdr (assoc 'minWeight json))))
                 (max-weight (string-to-number (cdr (assoc 'maxWeight json))))
+                (default-weight (string-to-number (cdr (assoc 'defaultWeight json))))
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root json))
@@ -189,16 +193,20 @@
                     (make-local-variable 'view-title)
                     (make-local-variable 'view-min-sharability)
                     (make-local-variable 'view-max-sharability)
+                    (make-local-variable 'view-default-sharability)
                     (make-local-variable 'view-min-weight)
                     (make-local-variable 'view-max-weight)
+                    (make-local-variable 'view-default-weight)
                     (make-local-variable 'view-atoms)
                     (make-local-variable 'view-current-line)
                     (setq view-root root)
                     (if depth (setq view-depth (string-to-number depth)))
                     (setq view-min-sharability min-sharability)
                     (setq view-max-sharability max-sharability)
+                    (setq view-default-sharability default-sharability)
                     (setq view-min-weight min-weight)
                     (setq view-max-weight max-weight)
+                    (setq view-default-weight default-weight)
                     (setq view-style style)
                     (setq view-title title)
                     (setq view-atoms (make-hash-table :test 'equal))
@@ -329,8 +337,8 @@
         "(root: " view-root
          " :depth " (number-to-string view-depth)
          " :style " view-style
-         " :sharability [" (number-to-string view-min-sharability) ", " (number-to-string view-max-sharability) "]"
-         " :weight [" (number-to-string view-min-weight) ", " (number-to-string view-max-weight) "]"
+         " :sharability [" (number-to-string view-min-sharability) ", " (number-to-string view-default-sharability) ", " (number-to-string view-max-sharability) "]"
+         " :weight [" (number-to-string view-min-weight) ", " (number-to-string view-default-weight) ", " (number-to-string view-max-weight) "]"
          " :title \"" view-title "\")"))  ;; TODO: actuallly escape the title string
 
 (defun to-forward-style (style)
@@ -378,21 +386,23 @@
         ((string-equal style "targets-inverse") "targets-inverse")
         ((string-equal style "links-inverse") "targets-inverse")))
 
-(defun request-view (root depth style minv maxv minw maxw)
+(defun request-view (root depth style minv maxv defaultv minw maxw defaultw)
     (setq view-current-line 1)
-    (http-get (request-view-url root depth style minv maxv minw maxw) 'receive-view))
+    (http-get (request-view-url root depth style minv maxv defaultv minw maxw defaultw) 'receive-view))
 
-(defun request-view-url  (root depth style minv maxv minw maxw)
+(defun request-view-url  (root depth style minv maxv defaultv minw maxw defaultw)
 	(concat (base-url) "view"
             "?root=" (w3m-url-encode-string root)
             "&depth=" (number-to-string depth)
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
+            "&defaultSharability=" (number-to-string defaultv)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)
+            "&defaultWeight=" (number-to-string defaultw)
             "&style=" style))
 
-(defun request-search-results (query style minv maxv minw maxw)
+(defun request-search-results (query style minv maxv defaultv minw maxw defaultw)
     (setq view-current-line 1)
     (http-get
         (concat (base-url) "search"
@@ -401,8 +411,10 @@
             "&style=" style
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
+            "&defaultSharability=" (number-to-string defaultv)
             "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) 'receive-view))
+            "&maxWeight=" (number-to-string maxw)
+            "&defaultWeight=" (number-to-string defaultw)) 'receive-view))
 
 (defun do-export ()
     (http-get
@@ -412,14 +424,14 @@
     (interactive)
     (let ((key (current-target-key)))
         (if key
-            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+            (request-view key view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
             (no-target))))
 
 (defun visit-link ()
     (interactive)
     (let ((key (current-link-key)))
         (if key
-            (request-view key view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+            (request-view key view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
             (no-link))))
 
 (defun search ()
@@ -430,7 +442,7 @@
                 ;;(concat "*" query "*")
                 query
                 view-style
-                view-min-sharability view-max-sharability view-min-weight view-max-weight))))
+                view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight))))
 
 (defun export ()
     (interactive)
@@ -448,7 +460,7 @@
 (defun refresh-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun refresh-view-new (url)
@@ -457,91 +469,115 @@
 (defun decrease-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (- view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root (- view-depth 1) view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun increase-depth ()
     (interactive)
     (if view-root
-        (request-view view-root (+ view-depth 1) view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root (+ view-depth 1) view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun refresh-to-forward-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-forward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth (to-forward-style view-style) view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun refresh-to-backward-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-backward-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth (to-backward-style view-style) view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun refresh-to-hybrid-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-hybrid-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth (to-hybrid-style view-style) view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun refresh-to-links-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-links-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth (to-links-style view-style) view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun refresh-to-targets-view ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth (to-targets-style view-style) view-min-sharability view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth (to-targets-style view-style) view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
+        (not-in-view)))
+
+(defun decrease-default-weight ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight (- view-default-weight 0.25))
+        (not-in-view)))
+
+(defun increase-default-weight ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight (+ view-default-weight 0.25))
         (not-in-view)))
 
 (defun decrease-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (- view-min-weight 0.25) view-max-weight)
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability (- view-min-weight 0.25) view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun increase-min-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (+ view-min-weight 0.25) view-max-weight)
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability (+ view-min-weight 0.25) view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun decrease-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (- view-max-weight 0.25))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight (- view-max-weight 0.25) view-default-weight)
         (not-in-view)))
 
 (defun increase-max-weight ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight (+ view-max-weight 0.25))
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight (+ view-max-weight 0.25) view-default-weight)
+        (not-in-view)))
+
+(defun decrease-default-sharability ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (- view-default-sharability 0.25) view-min-weight view-max-weight view-default-weight)
+        (not-in-view)))
+
+(defun increase-default-sharability ()
+    (interactive)
+    (if view-root
+        (request-view view-root view-depth view-style view-min-sharability view-max-sharability (+ view-default-sharability 0.25) view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun decrease-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style (- view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth view-style (- view-min-sharability 0.25) view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun increase-min-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style (+ view-min-sharability 0.25) view-max-sharability view-min-weight view-max-weight)
+        (request-view view-root view-depth view-style (+ view-min-sharability 0.25) view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun decrease-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability (- view-max-sharability 0.25) view-min-weight view-max-weight)
+        (request-view view-root view-depth view-style view-min-sharability (- view-max-sharability 0.25) view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 (defun increase-max-sharability ()
     (interactive)
     (if view-root
-        (request-view view-root view-depth view-style view-min-sharability (+ view-max-sharability 0.25) view-min-weight view-max-weight)
+        (request-view view-root view-depth view-style view-min-sharability (+ view-max-sharability 0.25) view-default-sharability view-min-weight view-max-weight view-default-weight)
         (not-in-view)))
 
 
@@ -562,15 +598,17 @@
                 (list "style" view-style)
                 (list "minSharability" (number-to-string view-min-sharability))
                 (list "maxSharability" (number-to-string view-max-sharability))
+                (list "defaultSharability" (number-to-string view-default-sharability))
                 (list "minWeight" (number-to-string view-min-weight))
                 (list "maxWeight" (number-to-string view-max-weight))
+                (list "defaultWeight" (number-to-string view-default-weight))
                 (list "depth" (number-to-string view-depth)))
             'receive-view)))
 
 (defun set-properties (key weight sharability)
     (interactive)
     (if view-root
-        (let ((url (request-view-url view-root view-depth view-style view-min-sharability view-max-sharability view-min-weight view-max-weight)))
+        (let ((url (request-view-url view-root view-depth view-style view-min-sharability view-max-sharability view-default-sharability view-min-weight view-max-weight view-default-weight)))
 (setq hack-url url)
             (setq view-current-line (line-number-at-pos))
             (http-get
@@ -705,6 +743,8 @@
 (global-set-key (kbd "C-c C-l C-s .") 'increase-link-sharability)
 (global-set-key (kbd "C-c C-l C-w ,") 'decrease-link-weight)
 (global-set-key (kbd "C-c C-l C-w .") 'increase-link-weight)
+(global-set-key (kbd "C-c C-s ,") 'decrease-default-sharability)
+(global-set-key (kbd "C-c C-s .") 'increase-default-sharability)
 (global-set-key (kbd "C-c C-s C-[ ,") 'decrease-min-sharability)
 (global-set-key (kbd "C-c C-s C-[ .") 'increase-min-sharability)
 (global-set-key (kbd "C-c C-s C-] ,") 'decrease-max-sharability)
@@ -719,6 +759,8 @@
 (global-set-key (kbd "C-c C-v h") 'refresh-to-hybrid-view)
 (global-set-key (kbd "C-c C-v l") 'refresh-to-links-view)
 (global-set-key (kbd "C-c C-v t") 'refresh-to-targets-view)
+(global-set-key (kbd "C-c C-w ,") 'decrease-default-weight)
+(global-set-key (kbd "C-c C-w .") 'increase-default-weight)
 (global-set-key (kbd "C-c C-w C-[ ,") 'decrease-min-weight)
 (global-set-key (kbd "C-c C-w C-[ .") 'increase-min-weight)
 (global-set-key (kbd "C-c C-w C-] ,") 'decrease-max-weight)
