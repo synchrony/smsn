@@ -1,6 +1,8 @@
 (eval-when-compile (require 'cl))
 (require 'json)
 
+(require 'goto-addr)
+
 ;; Required global variables: tinkernotes-rexster-host, tinkernotes-rexster-port, tinkernotes-rexster-graph
 ;;
 ;; For example:
@@ -729,6 +731,7 @@
     (interactive)
     (message (number-to-string (length (defined-colors)))))
 
+(global-set-key (kbd "C-c a") 'goto-address-at-point)  ;; defined in Emacs goto-addr.el
 (global-set-key (kbd "C-c d") 'my-debug)
 (global-set-key (kbd "C-c e") 'export)
 (global-set-key (kbd "C-c l") 'visit-link)
