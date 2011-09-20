@@ -244,7 +244,7 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability bold)
+(defun colorize (text weight sharability bold background)
     (let (
         (i (- (ceiling (* sharability 4)) 1))
         (j (- (ceiling (* weight 4)) 1)))
@@ -253,25 +253,25 @@
                     (elt full-colors (+ j (* i 4)))
                     (elt reduced-colors i))))
 	    (if bold
-        (propertize text 'face (list 'bold 'italic  :foreground color))
-        (propertize text 'face (list :foreground color))))))
+            (propertize text 'face (list 'bold 'italic  :foreground color :background background))
+            (propertize text 'face (list :foreground color :background background))))))
 
 (defun unescape-link-value (value)
     (replace-regexp-in-string "[ ]" "\\\\ "
         (replace-regexp-in-string "[)]" "\\\\)"
             (replace-regexp-in-string "[(]" "\\\\(" value))))
 
-(defun light-gray (text)
+(defun light-gray (text background)
     (propertize text
 	    'face (if full-colors-supported
-		    '(:foreground "grey80")
-			'(:foreground "black"))))
+		    (list :foreground "grey80" :background background)
+			(list :foreground "black"))))
 
-(defun dark-gray (text)
+(defun dark-gray (text background)
     (propertize text
 	    'face (if full-colors-supported
-		    '(:foreground "grey50")
-			'(:foreground "black"))))
+		    (list :foreground "grey50" :background background)
+			(list :foreground "black"))))
 
 (defun longest-key (json)
     (let ((max 0))
@@ -315,16 +315,16 @@
 		            (let ((line "") (key (concat link-key ":" target-key ":")))
 		                (setq line (concat
 		                    line
-		                    (light-gray key)))
-					    (loop for i from 0 to (- indent (length key)) do (setq line (concat line " ")))
-					    (if meta (setq line (concat line (dark-gray "("))))
+		                    (light-gray key "grey95")))
+		                (let ((space ""))
+                            (loop for i from 1 to (- indent (length key)) do (setq space (concat space " ")))
+                            (setq line (concat line (light-gray space "grey95") " ")))
+					    (if meta (setq line (concat line (dark-gray "(" "white"))))
 					    (setq line (concat line
-					        (colorize (unescape-link-value link-value) link-weight link-sharability t)))
-					    (if meta (setq line (concat line (dark-gray ")"))))
+					        (colorize (unescape-link-value link-value) link-weight link-sharability t "white")))
+					    (if meta (setq line (concat line (dark-gray ")" "white"))))
                         (setq line (concat line
-                            "  "
-                            (colorize target-value target-weight target-sharability nil)
-                            "\n"))
+                            (colorize (concat "  " target-value "\n") target-weight target-sharability nil "white")))
                         (insert (propertize line
                             ;;'invisible t
 			                    'link-key link-key
@@ -769,6 +769,7 @@
 (global-set-key (kbd "C-c C-w C-] ,") 'decrease-max-weight)
 (global-set-key (kbd "C-c C-w C-] .") 'increase-max-weight)
 
+
 ;; Note: these should perhaps be local settings
 (global-set-key (kbd "C-c C-v ;") 'toggle-truncate-lines)
 (setq-default truncate-lines t)
@@ -788,16 +789,6 @@
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-
-;;(setq syntax-keywords
-;; '(
-;;   ("^\([0-9A-Za-z+/]*:[0-9A-Za-z+/]*\)" . font-lock-doc-face)
-;;  ))
-;;
-;;(define-derived-mode tinkernotes-mode fundamental-mode
-;;  (setq font-lock-defaults '(syntax-keywords))
-;;  (setq mode-name "tinkernotes")
-;;)
 
 
 ;; Uncomment only when debugging
