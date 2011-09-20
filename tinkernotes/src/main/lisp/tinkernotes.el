@@ -215,7 +215,7 @@
                     ;;(tinkernotes-mode)
                     (erase-buffer)
                     (let ((view-json (json-read-from-string view)))
-                        (write-view (cdr (assoc 'children view-json)) (longest-key view-json)))
+                        (write-view (cdr (assoc 'children view-json)) (longest-key view-json) 0))
                     (beginning-of-buffer)
                     (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
@@ -286,7 +286,7 @@
                         (if (> length max) (setq max length))))
                 max)))
 
-(defun write-view (children indent)
+(defun write-view (children key-indent tree-indent)
     (loop for json across children do
     (let (
         (meta (eq t (cdr (assoc 'meta json))))
@@ -315,9 +315,12 @@
 		            (let ((line "") (key (concat link-key ":" target-key ":")))
 		                (setq line (concat
 		                    line
-		                    (light-gray key "grey95")))
+		                    (light-gray key "grey80")))
 		                (let ((space ""))
-                            (loop for i from 1 to (- indent (length key)) do (setq space (concat space " ")))
+                            (loop for i from 1 to (- key-indent (length key)) do (setq space (concat space " ")))
+                            (setq line (concat line (light-gray space "grey80"))))
+                        (let ((space ""))
+                            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "grey95") " ")))
 					    (if meta (setq line (concat line (dark-gray "(" "white"))))
 					    (setq line (concat line
@@ -329,7 +332,7 @@
                             ;;'invisible t
 			                    'link-key link-key
 			                    'target-key target-key)))
-                    (write-view children (+ indent 4))))))
+                    (write-view children key-indent (+ tree-indent 4))))))
 
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
