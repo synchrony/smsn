@@ -264,7 +264,8 @@
 (defun light-gray (text background)
     (propertize text
 	    'face (if full-colors-supported
-		    (list :foreground "grey80" :background background)
+		    (list :foreground "white" :background background)
+;;		    (list :foreground "grey80" :background background)
 			(list :foreground "black"))))
 
 (defun dark-gray (text background)
@@ -315,13 +316,13 @@
 		            (let ((line "") (key (concat link-key ":" target-key ":")))
 		                (setq line (concat
 		                    line
-		                    (light-gray key "grey80")))
+		                    (light-gray key "white")))
 		                (let ((space ""))
                             (loop for i from 1 to (- key-indent (length key)) do (setq space (concat space " ")))
-                            (setq line (concat line (light-gray space "grey80"))))
+                            (setq line (concat line (light-gray space "white"))))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
-                            (setq line (concat line (light-gray space "grey80") " ")))
+                            (setq line (concat line (light-gray space "white") " ")))
 					    (if meta (setq line (concat line (dark-gray "(" "white"))))
 					    (setq line (concat line
 					        (colorize (unescape-link-value link-value) link-weight link-sharability t "white")))
