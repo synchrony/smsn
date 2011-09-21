@@ -105,14 +105,14 @@
     (cdr (assoc 'sharability atom)))
 
 (defun view-name (root-id json)
-    (if root-id
-        (let ((title (cdr (assoc 'title json))))
+    (let ((title (cdr (assoc 'title json))))
+        (if root-id
             (let ((name
                 (if (> (length title) 20)
                     (concat (substring title 0 20) "...")
                     title)))
-                (concat name " [" root-id "]")))
-        (concat "#" (number-to-string (random 1000)))))
+                (concat name " [" root-id "]"))
+            title)))
 
 (defun current-target-key ()
     (car (last (find-id))))
@@ -321,7 +321,7 @@
                             (setq line (concat line (light-gray space "grey80"))))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
-                            (setq line (concat line (light-gray space "grey95") " ")))
+                            (setq line (concat line (light-gray space "grey80") " ")))
 					    (if meta (setq line (concat line (dark-gray "(" "white"))))
 					    (setq line (concat line
 					        (colorize (unescape-link-value link-value) link-weight link-sharability t "white")))
