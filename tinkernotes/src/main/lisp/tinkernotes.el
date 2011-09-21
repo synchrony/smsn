@@ -735,7 +735,38 @@
     (interactive)
     (message (number-to-string (length (defined-colors)))))
 
-(global-set-key (kbd "C-c a") 'goto-address-at-point)  ;; defined in Emacs goto-addr.el
+(defun visit-url-at-point ()
+    (interactive)
+    (goto-address-at-point))  ;; defined in Emacs goto-addr.el
+
+(defun browse-target-value (value-to-url)
+    (let ((target (current-target)))
+        (if target
+            (let ((value (cdr (assoc 'value target))))
+                (browse-url (funcall value-to-url value)))
+            (no-target))))
+
+(defun browse-target-value-as-url ()
+    (interactive)
+    (browse-target-value (lambda (value)
+        value)))
+
+(defun browse-target-value-in-google ()
+    (interactive)
+    (browse-target-value (lambda (value)
+        (concat "http://www.google.com/search?ie=UTF-8&q=" (w3m-url-encode-string value)))))
+
+(defun browse-target-value-in-twitter ()
+    (interactive)
+    (browse-target-value (lambda (value)
+        (concat "http://twitter.com/#!/search/" (w3m-url-encode-string value)))))
+
+(defun browse-target-value-in-wikipedia ()
+    (interactive)
+    (browse-target-value (lambda (value)
+        (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
+
+(global-set-key (kbd "C-c a") 'visit-url-at-point)
 (global-set-key (kbd "C-c d") 'my-debug)
 (global-set-key (kbd "C-c e") 'export)
 (global-set-key (kbd "C-c l") 'visit-link)
@@ -756,6 +787,10 @@
 (global-set-key (kbd "C-c C-s C-[ .") 'increase-min-sharability)
 (global-set-key (kbd "C-c C-s C-] ,") 'decrease-max-sharability)
 (global-set-key (kbd "C-c C-s C-] .") 'increase-max-sharability)
+(global-set-key (kbd "C-c C-t a") 'browse-target-value-as-url)
+(global-set-key (kbd "C-c C-t g") 'browse-target-value-in-google)
+(global-set-key (kbd "C-c C-t t") 'browse-target-value-in-twitter)
+(global-set-key (kbd "C-c C-t w") 'browse-target-value-in-wikipedia)
 (global-set-key (kbd "C-c C-t i") 'target-info)
 (global-set-key (kbd "C-c C-t C-s ,") 'decrease-target-sharability)
 (global-set-key (kbd "C-c C-t C-s .") 'increase-target-sharability)
