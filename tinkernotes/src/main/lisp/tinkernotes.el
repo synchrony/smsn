@@ -222,7 +222,7 @@
                     (setq buffer-read-only nil)
                     (erase-buffer)
                     (let ((view-json (json-read-from-string view)))
-                        (write-view (cdr (assoc 'children view-json)) (longest-key view-json) 0))
+                        (write-view editable (cdr (assoc 'children view-json)) (longest-key view-json) 0))
                     (beginning-of-buffer)
                     (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
@@ -272,8 +272,7 @@
 (defun light-gray (text background)
     (propertize text
 	    'face (if full-colors-supported
-		    (list :foreground "white" :background background)
-;;		    (list :foreground "grey80" :background background)
+		    (list :foreground "grey80" :background background)
 			(list :foreground "black"))))
 
 (defun dark-gray (text background)
@@ -295,7 +294,7 @@
                         (if (> length max) (setq max length))))
                 max)))
 
-(defun write-view (children key-indent tree-indent)
+(defun write-view (editable children key-indent tree-indent)
     (loop for json across children do
     (let (
         (meta (eq t (cdr (assoc 'meta json))))
@@ -322,12 +321,9 @@
 		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
 		            (let ((line "") (key (concat link-key ":" target-key ":")))
-		                (setq line (concat
-		                    line
-		                    (light-gray key "white")))
-		                (let ((space ""))
-                            (loop for i from 1 to (- key-indent (length key)) do (setq space (concat space " ")))
-                            (setq line (concat line (light-gray space "white"))))
+		                (loop for i from 1 to (- key-indent (length key)) do (setq key (concat key " ")))
+                        (setq line (concat line
+                            (propertize (light-gray key "white") 'invisible (not editable))))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
@@ -341,7 +337,7 @@
                             ;;'invisible t
 			                    'link-key link-key
 			                    'target-key target-key)))
-                    (write-view children key-indent (+ tree-indent 4))))))
+                    (write-view editable children key-indent (+ tree-indent 4))))))
 
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
