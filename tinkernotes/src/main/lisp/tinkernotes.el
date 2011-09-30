@@ -241,25 +241,43 @@
                         (error-message msg)))
             (info-message "exported successfully"))))
 
-(setq full-colors '(
-    "#330000" "#660000" "#990000" "#CC0000"  ;; private:   red
-    "#332600" "#664C00" "#997200" "#CC9900"  ;; protected: orange
-    "#003300" "#006600" "#009900" "#00CC00"  ;; public:    green
-    "#000066" "#000099" "#0000CC" "#0000FF"  ;; demo:      blue
-    ))
+(setq base-colors '("#660000" "#604000" "#005000" "#000066"))
 
 (setq reduced-colors '("red" "red" "blue" "blue"))
+
+(defun color-part-red (color)
+    (string-to-number (substring color 1 3) 16))
+(defun color-part-green (color)
+    (string-to-number (substring color 3 5) 16))
+(defun color-part-blue (color)
+    (string-to-number (substring color 5 7) 16))
+
+(defun color-string (red green blue)
+    (concat "#" (format "%02X" red) (format "%02X" green) (format "%02X" blue)))
+
+(defun weighted-average (a b weight)
+    (+ (* a (- 1 weight)) (* b weight)))
+
+(defun fade-color (color weight)
+    (let ((low (weighted-average color 255 0.9375))
+          (high color))
+        (weighted-average low high weight)))
+
+(defun find-color (weight sharability)
+    (let ((s (elt base-colors (- (ceiling (* sharability 4)) 1))))
+        (color-string
+            (fade-color (color-part-red s) weight)
+            (fade-color (color-part-green s) weight)
+            (fade-color (color-part-blue s) weight))))
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
 (defun colorize (text weight sharability bold background)
-    (let (
-        (i (- (ceiling (* sharability 4)) 1))
-        (j (- (ceiling (* weight 4)) 1)))
+    (let ((i (- (ceiling (* sharability 4)) 1)))
             (let ((color
                 (if full-colors-supported
-                    (elt full-colors (+ j (* i 4)))
-                    (elt reduced-colors i))))
+                    (find-color weight sharability)
+                    (elt reduced-colors (- (ceiling (* sharability 4)) 1)))))
 	    (if bold
             (propertize text 'face (list 'bold 'italic  :foreground color :background background))
             (propertize text 'face (list :foreground color :background background))))))
@@ -430,18 +448,23 @@
     (http-get
         (concat (base-url) "export?file=/tmp/tinkernotes-dump.txt") 'receive-export-results))
 
+(defun mode-for-visit ()
+    (if (or (equal tn-mode tn-edit-mode) (equal tn-mode tn-readonly-mode))
+        tn-mode
+        tn-readonly-mode))
+
 (defun tn-visit-target ()
     (interactive)
     (let ((key (current-target-key)))
         (if key
-            (request-view nil tn-readonly-mode key tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
             (no-target))))
 
 (defun tn-visit-link ()
     (interactive)
     (let ((key (current-link-key)))
         (if key
-            (request-view nil tn-readonly-mode key tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
             (no-link))))
 
 (defun tn-search ()
@@ -486,9 +509,6 @@
     (interactive)
     (if (in-view)
         (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
-
-(defun refresh-view-new (url mode)
-    (url-retrieve url (receive-view mode)))
 
 (defun tn-enter-edit-view ()
     (interactive)
@@ -624,8 +644,9 @@
 (defun set-properties (key weight sharability)
     (interactive)
     (if (in-view)
-        (let ((url (request-view-url tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
-(setq hack-url url)
+        (lexical-let (
+                (mode tn-mode)
+                (url (request-view-url tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
             (setq tn-current-line (line-number-at-pos))
             (http-get
                 (concat (base-url) "set"
@@ -640,7 +661,7 @@
                         (if error
                             (error-message error)
                             (error-message msg)))
-		         (refresh-view-new hack-url tn-mode))))))))
+                 (url-retrieve url (receive-view mode)))))))))
 
 (defun tn-decrease-link-weight ()
     (interactive)
