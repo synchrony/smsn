@@ -7,6 +7,7 @@ import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
@@ -48,7 +49,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             p.manager = new FramesManager(p.graph);
-            p.semantics = new NotesSemantics((IndexableGraph) p.graph, p.manager);
+            MOBGraph store = new MOBGraph((IndexableGraph) p.graph);
+            p.semantics = new NotesSemantics(store, p.manager);
             p.syntax = new NotesSyntax();
 
             if (null != p.depth) {

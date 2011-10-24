@@ -805,6 +805,11 @@
     (browse-target-value (lambda (value)
         (concat "http://scholar.google.com/scholar?q=" (w3m-url-encode-string value)))))
 
+(defun tn-browse-target-value-in-google-maps ()
+    (interactive)
+    (browse-target-value (lambda (value)
+        (concat "http://maps.google.com/maps?q=" (w3m-url-encode-string value)))))
+
 (defun tn-browse-target-value-in-twitter ()
     (interactive)
     (browse-target-value (lambda (value)
@@ -842,6 +847,7 @@
 (global-set-key (kbd "C-c C-t C-b e")   'tn-browse-target-value-in-ebay)
 (global-set-key (kbd "C-c C-t C-b d")   'tn-browse-target-value-in-delicious)
 (global-set-key (kbd "C-c C-t C-b g")   'tn-browse-target-value-in-google)
+(global-set-key (kbd "C-c C-t C-b m")   'tn-browse-target-value-in-google-maps)
 (global-set-key (kbd "C-c C-t C-b s")   'tn-browse-target-value-in-google-scholar)
 (global-set-key (kbd "C-c C-t C-b t")   'tn-browse-target-value-in-twitter)
 (global-set-key (kbd "C-c C-t C-b w")   'tn-browse-target-value-in-wikipedia)

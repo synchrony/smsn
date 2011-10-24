@@ -2,13 +2,13 @@ package net.fortytwo.myotherbrain.notes;
 
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
 import java.io.FileInputStream;
@@ -24,44 +24,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//import com.tinkerpop.blueprints.pgm.WeightedCloseableSequence;
-
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NotesSemantics {
-    private static final String KEYS = "keys";
 
-    private static final int RANDOM_KEY_MAXTRIALS = 100;
-
-    private final IndexableGraph graph;
+    private final MOBGraph store;
     private final FramesManager manager;
-    private final Index<Vertex> keys;
 
-    public NotesSemantics(final IndexableGraph graph,
+    public NotesSemantics(final MOBGraph store,
                           final FramesManager manager) {
-        this.graph = graph;
+        this.store = store;
         this.manager = manager;
-
-        // TODO: it would be more convenient if IndexableGraph would return a null (with getIndex) for a non-existent index, instead of throwing an exception
-        boolean indexExists = false;
-        for (Index<? extends Element> index : graph.getIndices()) {
-            if (index.getIndexName().equals(KEYS)) {
-                indexExists = true;
-                break;
-            }
-        }
-
-        if (!indexExists) {
-            Set<String> keys = new HashSet<String>();
-            keys.add(MyOtherBrain.KEY);
-            graph.createAutomaticIndex(KEYS, Vertex.class, keys);
-        }
-
-        keys = graph.getIndex(KEYS, Vertex.class);
-
-        // TODO: temporary
-        //migrateKeys();
     }
 
     /**
@@ -152,7 +126,7 @@ public class NotesSemantics {
         result.setTargetValue("query results for \"" + query + "\"");
 
         // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
-        CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
+        CloseableSequence<Vertex> i = store.getGraph().getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
         try {
             long now = new Date().getTime();
             while (i.hasNext()) {
@@ -468,60 +442,17 @@ public class NotesSemantics {
         return manager.frame(v, Atom.class);
     }
 
-    public Atom getAtom(final String key) {
-        if (null == key) {
-            throw new IllegalArgumentException("null atom key");
-        }
 
-        Vertex v;
-
-        CloseableSequence<Vertex> s = keys.get(MyOtherBrain.KEY, key);
-        try {
-            if (!s.hasNext()) {
-                return null;
-            }
-            v = s.next();
-            if (s.hasNext()) {
-                throw new IllegalStateException("multiple vertices with the same key: '" + key + "'");
-            }
-        } finally {
-            s.close();
-        }
-
-        return getAtom(v);
-    }
 
     private Atom createAtom(final Filter filter) {
-        Atom a = manager.frame(graph.addVertex(null), Atom.class);
-        a.setKey(createKey());
+        Atom a = manager.frame(store.getGraph().addVertex(null), Atom.class);
+        a.setKey(store.createKey());
         a.setCreated(new Date().getTime());
 
         a.setSharability(filter.defaultSharability);
         a.setWeight(filter.defaultWeight);
 
         return a;
-    }
-
-    /*
-        For 5-digit numbers of base 64, expect a collision after 32768 trials (on average).
-        There are 1,073,741,824 possibilities.
-
-        int base = 64;
-        int length = 5;
-        BigDecimal poss = new BigDecimal(base).pow(length);
-        BigDecimal trials = new BigDecimal(Math.sqrt((double) base)).pow(length);
-        System.out.println("For " + length + "-digit numbers of base " + base + ", expect a collision after "
-                + trials + " trials (on average).  There are " + poss + " possibilities.");
-     */
-    private String createKey() {
-        for (int j = 0; j < RANDOM_KEY_MAXTRIALS; j++) {
-            String key = MyOtherBrain.createRandomKey();
-            if (null == getAtom(key)) {
-                return key;
-            }
-        }
-
-        throw new IllegalStateException("no unoccupied keys have been found");
     }
 
     private Collection<Atom> getInLinks(final Atom source,
@@ -562,11 +493,11 @@ public class NotesSemantics {
         return c;
     }
 
-    // Used irregularly
-    private void migrateKeys() {
-        for (Vertex v : graph.getVertices()) {
-            v.setProperty(MyOtherBrain.KEY, createKey());
-        }
+
+    public Atom getAtom(final String key) {
+        Vertex v = store.getAtomVertex(key);
+
+        return getAtom(v);
     }
 
     private class AtomComparator implements Comparator<Atom> {
@@ -673,7 +604,8 @@ public class NotesSemantics {
 
         IndexableGraph graph = new TinkerGraph();
         FramesManager manager = new FramesManager(graph);
-        NotesSemantics m = new NotesSemantics(graph, manager);
+        MOBGraph store = new MOBGraph(graph);
+        NotesSemantics m = new NotesSemantics(store, manager);
         Atom root = m.createAtom(filter);
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setValue("Josh's notes");

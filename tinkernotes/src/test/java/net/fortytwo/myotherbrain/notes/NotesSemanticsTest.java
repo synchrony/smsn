@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import org.json.JSONObject;
 
@@ -33,7 +34,7 @@ public class NotesSemanticsTest extends TestCase {
         graph = new TinkerGraph();
         manager = new FramesManager(graph);
         syntax = new NotesSyntax();
-        semantics = new NotesSemantics(graph, manager);
+        semantics = new NotesSemantics(new MOBGraph(graph), manager);
     }
 
     @Override
