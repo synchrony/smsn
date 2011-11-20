@@ -148,6 +148,17 @@ public class MyOtherBrain {
         return hash;
     }
 
+    /*
+       For 5-digit numbers of base 64, expect a collision after 32768 trials (on average).
+       There are 1,073,741,824 possibilities.
+
+       int base = 64;
+       int length = 5;
+       BigDecimal poss = new BigDecimal(base).pow(length);
+       BigDecimal trials = new BigDecimal(Math.sqrt((double) base)).pow(length);
+       System.out.println("For " + length + "-digit numbers of base " + base + ", expect a collision after "
+               + trials + " trials (on average).  There are " + poss + " possibilities.");
+    */
     public static String createRandomKey() {
         byte[] bytes = new byte[KEY_DIGITS];
         for (int i = 0; i < KEY_DIGITS; i++) {

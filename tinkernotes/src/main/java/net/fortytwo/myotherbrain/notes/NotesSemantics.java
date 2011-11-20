@@ -267,6 +267,10 @@ public class NotesSemantics {
         return result;
     }
 
+    private String getKey(final Atom a) {
+        return MOBGraph.getKey(a);
+    }
+
     public Note viewInternal(final Atom rootLink,
                              final Atom rootTarget,
                              final int depth,
@@ -277,7 +281,7 @@ public class NotesSemantics {
 
         if (null != rootLink) {
             n.setLinkValue(rootLink.getValue());
-            n.setLinkKey(rootLink.getKey());
+            n.setLinkKey(getKey(rootLink));
             n.setLinkWeight(rootLink.getWeight());
             n.setLinkSharability(rootLink.getSharability());
             n.setLinkCreated(rootLink.getCreated());
@@ -285,7 +289,7 @@ public class NotesSemantics {
 
         if (null != rootTarget) {
             n.setTargetValue(rootTarget.getValue());
-            n.setTargetKey(rootTarget.getKey());
+            n.setTargetKey(getKey(rootTarget));
             n.setTargetWeight(rootTarget.getWeight());
             n.setTargetSharability(rootTarget.getSharability());
             n.setTargetCreated(rootTarget.getCreated());
@@ -301,7 +305,7 @@ public class NotesSemantics {
                         Atom target = getTarget(link, tmpStyle);
 
                         if (null == target) {
-                            throw new IllegalStateException("link " + link.getKey() + " has no target");
+                            throw new IllegalStateException("link " + getKey(link) + " has no target");
                         }
 
                         Note cn = viewInternal(link, target, depth - 1, filter, style);
@@ -316,7 +320,7 @@ public class NotesSemantics {
                         Atom target = getTarget(link, tmpStyle);
 
                         if (null == target) {
-                            throw new IllegalStateException("link " + link.getKey() + " has no target");
+                            throw new IllegalStateException("link " + getKey(link) + " has no target");
                         }
 
                         Note cn = viewInternal(link, target, depth - 1, filter, style);
@@ -328,7 +332,7 @@ public class NotesSemantics {
                     Atom target = getTarget(link, style);
 
                     if (null == target) {
-                        throw new IllegalStateException("link " + link.getKey() + " has no target");
+                        throw new IllegalStateException("link " + getKey(link) + " has no target");
                     }
 
                     Note cn = viewInternal(link, target, depth - 1, filter, style);
@@ -497,7 +501,7 @@ public class NotesSemantics {
 
         if (null == link.getFrom() || null == link.getTo()) {
             throw new IllegalStateException("data corruption: link with key '"
-                    + link.getKey() + "' is missing a 'to' and/or 'from' edge");
+                    + getKey(link) + "' is missing a 'to' and/or 'from' edge");
         }
 
         Atom root = style.isFromLinks() && style.isFromTargets()
@@ -511,8 +515,8 @@ public class NotesSemantics {
         }
 
         return style.isInverse()
-                ? link.getFrom().getKey().equals(target.getKey()) && link.getTo().getKey().equals(root.getKey())
-                : link.getFrom().getKey().equals(root.getKey()) && link.getTo().getKey().equals(target.getKey());
+                ? getKey(link.getFrom()).equals(getKey(target)) && getKey(link.getTo()).equals(getKey(root))
+                : getKey(link.getFrom()).equals(getKey(root)) && getKey(link.getTo()).equals(getKey(target));
     }
 
     private void setLink(final Atom link,
@@ -548,7 +552,6 @@ public class NotesSemantics {
 
     private Atom createAtom(final Filter filter) {
         Atom a = manager.frame(store.getGraph().addVertex(null), Atom.class);
-        a.setKey(store.createKey());
         a.setCreated(new Date().getTime());
 
         a.setSharability(filter.defaultSharability);
@@ -596,7 +599,7 @@ public class NotesSemantics {
     }
 
     public Atom getAtom(final String key) {
-        Vertex v = store.getAtomVertex(key);
+        Vertex v = store.getGraph().getVertex(key);
 
         return getAtom(v);
     }

@@ -15,12 +15,6 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.CREATED)
     void setCreated(Long created);
 
-    @Property(MyOtherBrain.KEY)
-    String getKey();
-
-    @Property(MyOtherBrain.KEY)
-    void setKey(String key);
-
     @Property(MyOtherBrain.VALUE)
     String getValue();
 

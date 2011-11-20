@@ -31,9 +31,10 @@ public class NotesSemanticsTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        graph = new TinkerGraph();
+        TinkerGraph g = new TinkerGraph();
         syntax = new NotesSyntax();
-        MOBGraph mobGraph = new MOBGraph(graph);
+        MOBGraph mobGraph = new MOBGraph(g);
+        graph = mobGraph.getGraph();
         manager = mobGraph.getManager();
         semantics = new NotesSemantics(mobGraph);
     }
@@ -149,8 +150,7 @@ public class NotesSemanticsTest extends TestCase {
     }
 
     private Atom createAtom(final String key) {
-        Atom a = manager.frame(graph.addVertex(null), Atom.class);
-        a.setKey(key);
+        Atom a = manager.frame(graph.addVertex(key), Atom.class);
         a.setWeight(0.5f);
         a.setSharability(0.5f);
         return a;

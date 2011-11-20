@@ -1,23 +1,11 @@
 
 // Load from version-controlled graph
-InputStream i = new FileInputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g); r.inputGraph(i); i.close();
-
-// Create the "keys" index for a graph which doesn't already have one
-Set<String> keys = new HashSet<String>(); keys.add("key"); 
-if (null == g.getIndex("keys", Vertex.class) {
-    g.createAutomaticIndex("keys", Vertex.class, keys);
-}
-
-// Force indexing of already-loaded graph.
-for (Vertex v : g.V) { v.setProperty("key", v.getProperty("key")); }
+com.tinkerpop.tinkubator.idindex.IdIndexGraph g2 = new com.tinkerpop.tinkubator.idindex.IdIndexGraph(g); InputStream i = new FileInputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g2); r.inputGraph(i); i.close();
 
 // Put the graph in manual transaction mode
 g.getTransactionMode()
 ((TransactionalGraph) g).setTransactionMode(TransactionalGraph.Mode.MANUAL);
 g.getTransactionMode()
-
-// Look up an atom with a given key
-g.getIndex("keys", Vertex.class).get("key", "00000");
 
 // Find orphaned vertices
 List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { System.out.println("" + v); }
@@ -33,7 +21,8 @@ Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices
 
 // Update version-controlled graph
 // Note: we are not checking for edge key collisions
-for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}}; OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setNormalize(true); w.setIdProperty("key"); w.outputGraph(out); out.close();
+com.tinkerpop.tinkubator.idindex.IdIndexGraph g2 = new com.tinkerpop.tinkubator.idindex.IdIndexGraph(g); OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g2); w.setNormalize(true); w.outputGraph(out); out.close();
+#for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}}; OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setNormalize(true); w.setIdProperty("key"); w.outputGraph(out); out.close();
 
 
 IndexableGraph g2 = new Neo4jGraph("/tmp/neo");
