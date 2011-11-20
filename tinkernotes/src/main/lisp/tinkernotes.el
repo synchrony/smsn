@@ -444,6 +444,20 @@
             "&maxWeight=" (number-to-string maxw)
             "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
 
+(defun request-ripple-results (query style minv maxv defaultv minw maxw defaultw)
+    (setq tn-current-line 1)
+    (http-get
+        (concat (base-url) "ripple"
+            "?query=" (w3m-url-encode-string query)
+            "&depth=1"
+            "&style=" style
+            "&minSharability=" (number-to-string minv)
+            "&maxSharability=" (number-to-string maxv)
+            "&defaultSharability=" (number-to-string defaultv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)
+            "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
+
 (defun do-export ()
     (http-get
         (concat (base-url) "export?file=/tmp/tinkernotes-dump.txt") 'receive-export-results))
@@ -472,6 +486,16 @@
     (let ((query (read-from-minibuffer "query: ")))
         (if (> (length query) 0)
             (request-search-results
+                ;;(concat "*" query "*")
+                query
+                tn-style
+                tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight))))
+
+(defun tn-ripple-query ()
+    (interactive)
+    (let ((query (read-from-minibuffer "query: ")))
+        (if (> (length query) 0)
+            (request-ripple-results
                 ;;(concat "*" query "*")
                 query
                 tn-style
@@ -826,9 +850,10 @@
 (global-set-key (kbd "C-c e")           'tn-export)
 (global-set-key (kbd "C-c l")           'tn-visit-link)
 (global-set-key (kbd "C-c p")           'tn-push-view)
-(global-set-key (kbd "C-c q")           'tn-search)
-(global-set-key (kbd "C-c r")           'tn-refresh-view)
+(global-set-key (kbd "C-c r")           'tn-ripple-query)
+(global-set-key (kbd "C-c s")           'tn-search)
 (global-set-key (kbd "C-c t")           'tn-visit-target)
+(global-set-key (kbd "C-c u")           'tn-refresh-view)
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
 (global-set-key (kbd "C-c C-l i")       'tn-link-info)

@@ -7,9 +7,22 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
+import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
+import net.fortytwo.flow.Collector;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
+import net.fortytwo.ripple.Ripple;
+import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.Model;
+import net.fortytwo.ripple.model.RippleList;
+import net.fortytwo.ripple.model.impl.sesame.SesameModel;
+import net.fortytwo.ripple.query.QueryEngine;
+import net.fortytwo.ripple.query.QueryPipe;
+import net.fortytwo.sesametools.replay.RecorderSail;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.sail.Sail;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -31,11 +44,26 @@ public class NotesSemantics {
 
     private final MOBGraph store;
     private final FramesManager manager;
+    private final Model rippleModel;
+    private final QueryEngine rippleQueryEngine;
 
-    public NotesSemantics(final MOBGraph store,
-                          final FramesManager manager) {
+    public NotesSemantics(final MOBGraph store) {
         this.store = store;
-        this.manager = manager;
+        this.manager = store.getManager();
+
+        try {
+            Ripple.initialize();
+
+            Sail sail = new PropertyGraphSail(store.getGraph());
+            sail.initialize();
+
+            sail = new RecorderSail(sail, System.out);
+
+            rippleModel = new SesameModel(sail);
+            rippleQueryEngine = new QueryEngine(rippleModel);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -123,7 +151,7 @@ public class NotesSemantics {
         float linkSharability = (filter.minSharability + filter.maxSharability) / 2;
 
         Note result = new Note();
-        result.setTargetValue("query results for \"" + query + "\"");
+        result.setTargetValue("full text search results for \"" + query + "\"");
 
         // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
         CloseableSequence<Vertex> i = store.getGraph().getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
@@ -160,6 +188,81 @@ public class NotesSemantics {
         } finally {
             i.close();
         }
+
+        return result;
+    }
+
+    /**
+     * Performs a Ripple query.
+     *
+     * @param query  the Ripple query to execute
+     * @param depth  depth of the search results view
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param style  the style of update to push
+     * @return an ordered list of query results
+     */
+    public Note rippleQuery(final String query,
+                            final int depth,
+                            final Filter filter,
+                            final ViewStyle style) throws RippleException {
+
+        float linkSharability = (filter.minSharability + filter.maxSharability) / 2;
+
+        Note result = new Note();
+        result.setTargetValue("Ripple results for \"" + query + "\"");
+
+        Collector<RippleList> results = new Collector<RippleList>();
+        QueryPipe qp = new QueryPipe(rippleQueryEngine, results);
+        try {
+            qp.put(query);
+        } finally {
+            qp.close();
+        }
+
+        long now = new Date().getTime();
+
+        Set<Vertex> vertices = new HashSet<Vertex>();
+
+        for (RippleList l : results) {
+            System.out.println("result list: " + l);
+            if (1 == l.length()) {
+                Value v = l.getFirst().toRDF(qp.getConnection()).sesameValue();
+                if (v instanceof URI && v.stringValue().startsWith(PropertyGraphSail.VERTEX_NS)) {
+                    String s = v.stringValue();
+
+                    if (s.startsWith(PropertyGraphSail.VERTEX_NS)) {
+                        Vertex vx = store.getGraph().getVertex(s.substring(PropertyGraphSail.VERTEX_NS.length()));
+                        vertices.add(vx);
+                    }
+                }
+            }
+        }
+
+        for (Vertex vx : vertices) {
+            Atom a = getAtom(vx);
+
+            if (filter.isVisible(a)) {
+                float score = 1f;
+
+                score *= a.getWeight();
+
+                Note n = view(a, depth - 1, filter, style);
+                n.setLinkValue(".");
+                n.setLinkWeight(score);
+                n.setLinkSharability(linkSharability);
+                n.setLinkCreated(now);
+                result.addChild(n);
+            }
+        }
+
+        Collections.sort(result.getChildren(), new NoteComparator());
+        int index = 0;
+        for (Note n : result.getChildren()) {
+            String k = "" + ++index;
+            n.setLinkKey(k);
+        }
+
 
         return result;
     }
@@ -443,7 +546,6 @@ public class NotesSemantics {
     }
 
 
-
     private Atom createAtom(final Filter filter) {
         Atom a = manager.frame(store.getGraph().addVertex(null), Atom.class);
         a.setKey(store.createKey());
@@ -492,7 +594,6 @@ public class NotesSemantics {
         Collections.sort(c, new AtomComparator());
         return c;
     }
-
 
     public Atom getAtom(final String key) {
         Vertex v = store.getAtomVertex(key);
@@ -603,9 +704,8 @@ public class NotesSemantics {
         }
 
         IndexableGraph graph = new TinkerGraph();
-        FramesManager manager = new FramesManager(graph);
         MOBGraph store = new MOBGraph(graph);
-        NotesSemantics m = new NotesSemantics(store, manager);
+        NotesSemantics m = new NotesSemantics(store);
         Atom root = m.createAtom(filter);
         root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
         root.setValue("Josh's notes");

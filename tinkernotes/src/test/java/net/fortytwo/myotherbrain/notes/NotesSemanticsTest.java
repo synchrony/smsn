@@ -32,9 +32,10 @@ public class NotesSemanticsTest extends TestCase {
     @Override
     public void setUp() throws Exception {
         graph = new TinkerGraph();
-        manager = new FramesManager(graph);
         syntax = new NotesSyntax();
-        semantics = new NotesSemantics(new MOBGraph(graph), manager);
+        MOBGraph mobGraph = new MOBGraph(graph);
+        manager = mobGraph.getManager();
+        semantics = new NotesSemantics(mobGraph);
     }
 
     @Override

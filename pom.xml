@@ -14,16 +14,16 @@
     <modules>
         <module>core</module>
         <module>flashcards</module>
-	<module>qrcodes</module>
+        <module>qrcodes</module>
         <module>server</module>
         <module>tinkernotes</module>
-	<module>speech</module>
+        <module>speech</module>
         <module>android</module>
     </modules>
 
     <properties>
         <myotherbrain.version>0.1</myotherbrain.version>
-        <sesame.version>2.5.0</sesame.version>
+        <sesame.version>2.6.0</sesame.version>
         <junit.version>4.5</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

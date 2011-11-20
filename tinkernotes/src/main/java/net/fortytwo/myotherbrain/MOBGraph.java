@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.frames.FramesManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +24,8 @@ public class MOBGraph {
     private final IndexableGraph graph;
 
     private final Index<Vertex> keys;
+
+    private final FramesManager manager;
 
     public MOBGraph(final IndexableGraph graph) {
         this.graph = graph;
@@ -45,12 +48,18 @@ public class MOBGraph {
 
         keys = graph.getIndex(KEYS, Vertex.class);
 
+        manager = new FramesManager(graph);
+
         // TODO: temporary
         //migrateKeys();
     }
 
     public IndexableGraph getGraph() {
         return graph;
+    }
+
+    public FramesManager getManager() {
+        return manager;
     }
 
     public Vertex getAtomVertex(final String key) {
@@ -76,7 +85,7 @@ public class MOBGraph {
         return v;
     }
 
-       /*
+    /*
         For 5-digit numbers of base 64, expect a collision after 32768 trials (on average).
         There are 1,073,741,824 possibilities.
 

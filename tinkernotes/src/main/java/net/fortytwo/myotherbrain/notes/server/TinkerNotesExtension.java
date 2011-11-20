@@ -50,7 +50,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             p.manager = new FramesManager(p.graph);
             MOBGraph store = new MOBGraph((IndexableGraph) p.graph);
-            p.semantics = new NotesSemantics(store, p.manager);
+            p.semantics = new NotesSemantics(store);
             p.syntax = new NotesSyntax();
 
             if (null != p.depth) {

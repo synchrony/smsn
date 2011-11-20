@@ -1,4 +1,7 @@
 
+// Load from version-controlled graph
+InputStream i = new FileInputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g); r.inputGraph(i); i.close();
+
 // Create the "keys" index for a graph which doesn't already have one
 Set<String> keys = new HashSet<String>(); keys.add("key"); 
 if (null == g.getIndex("keys", Vertex.class) {
@@ -16,21 +19,21 @@ g.getTransactionMode()
 // Look up an atom with a given key
 g.getIndex("keys", Vertex.class).get("key", "00000");
 
-// Show orphaned vertices
+// Find orphaned vertices
 List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { System.out.println("" + v); }
 
 // Delete orphaned vertices.
 List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { g.removeVertex(v); }
 
-// Find and remove corrupted links
-Collection<Vertex> bad = new LinkedList<Vertex>();
-for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.getId());bad.add(v);}};
-for (Vertex v : bad) {g.removeVertex(v);}
+// Find corrupted links
+Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.toString());bad.add(v);}};
+
+// Delete corrupted links
+Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.toString());bad.add(v);}}; for (Vertex v : bad) {g.removeVertex(v);}
 
 // Update version-controlled graph
 // Note: we are not checking for edge key collisions
-for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}}; OutputStream out = new FileOutputStream(new File("/Users/josh/projects/fortytwo/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setNormalize(true); w.setIdProperty("key"); w.outputGraph(out); out.close();
-
+for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}}; OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setNormalize(true); w.setIdProperty("key"); w.outputGraph(out); out.close();
 
 
 IndexableGraph g2 = new Neo4jGraph("/tmp/neo");
