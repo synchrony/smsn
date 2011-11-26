@@ -1,0 +1,13 @@
+#JSGF V1.0;
+
+/**
+ * JSGF Grammar for MyOtherBrain
+ */
+
+grammar mobspeech;
+
+public <command> = (Testing | Nonsense | Computer)
+    ( Date
+    | Time
+    | Stopwatch
+    | (New (To do | Event | Concept | Person | Collection | Question | Warning | Bad | Good | Thing | Procedure | Statement)));
