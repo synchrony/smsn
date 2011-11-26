@@ -1,5 +1,5 @@
 
-// Load from version-controlled graph
+// Load from version-controlled graph (caution!)
 com.tinkerpop.tinkubator.idindex.IdIndexGraph g2 = new com.tinkerpop.tinkubator.idindex.IdIndexGraph(g); InputStream i = new FileInputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g2); r.inputGraph(i); i.close();
 
 // Put the graph in manual transaction mode
@@ -20,53 +20,7 @@ Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices
 Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.toString());bad.add(v);}}; for (Vertex v : bad) {g.removeVertex(v);}
 
 // Update version-controlled graph
-// Note: we are not checking for edge key collisions
 com.tinkerpop.tinkubator.idindex.IdIndexGraph g2 = new com.tinkerpop.tinkubator.idindex.IdIndexGraph(g); OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g2); w.setNormalize(true); w.outputGraph(out); out.close();
-#for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}}; OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setNormalize(true); w.setIdProperty("key"); w.outputGraph(out); out.close();
-
-
-IndexableGraph g2 = new Neo4jGraph("/tmp/neo");
-Set<String> keys = new HashSet<String>();
-keys.add("key");
-g2.createAutomaticIndex("keys", Vertex.class, keys);
-for (Vertex v : g.getVertices()) {
-    Vertex v2 = g2.addVertex(v.getId());
-    for (String key : v.getPropertyKeys()) {
-    	v2.setProperty(key, v.getProperty(key));
-    }
-}
-for (Edge e : g.getEdges()) {
-    Vertex out = e.getOutVertex();
-    Vertex in = e.getInVertex();
-    CloseableSequence<Vertex> outC = keys.get("key", out.getProperty("key"));
-    CloseableSequence<Vertex> inC = keys.get("key", in.getProperty("key"));
-    Vertex out2 = outC.next();
-    Vertex in2 = inC.next();
-    outC.close();
-    inC.close();
-    Edge e2 = g2.addEdge(out2, in2);
-    for (String key : e.getPropertyKeys()) {
-    	e2.setProperty(key, e.getProperty(key));
-    }
-}
-g2.close();
-
-
-
-
-for (Edge e : g.getEdges()) { if (null == e.getProperty("key")) { e.setProperty("key", net.fortytwo.myotherbrain.MyOtherBrain.createRandomKey());}};
-OutputStream out = new FileOutputStream(new File("/Users/josh/projects/fortytwo/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g); w.setIdProperty("key"); w.outputGraph(out); out.close();
-
-
-
-
-
-
-// Load from version-controlled graph (caution!)
-InputStream input = new FileInputStream(new File("/Users/josh/projects/fortytwo/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g); g.clear(); r.inputGraph(input); input.close();
-
-// Make a backup
-OutputStream out = new FileOutputStream(new File("/Users/josh/data/tinkernotes_backup/tinkernotes-" + new Date().getTime() + ".xml")); GraphMLWriter.outputGraph(g, out); out.close();
 
 
 
@@ -86,12 +40,10 @@ for (Vertex v : g.V) { v.removeProperty("visibility"); }
 ba  IDEA's XML formatter appears to have the bad habit of inserting line breaks into long lines of text (which currently causes TinkerNotes to break)
 
 mvn install
-cp target/myotherbrain-0.1-standalone.jar ~/projects/tinkerpop/rexster/target/rexster-0.5-SNAPSHOT-standalone/ext
-
+cp target/tinkernotes-0.1-standalone.jar ~/projects/tinkerpop/rexster/target/rexster-0.7-SNAPSHOT-standalone/ext/
 
 export REXSTER_HOME=/Users/josh/projects/tinkerpop/rexster
-./rexster-start.sh -configuration config/myotherbrain-rexster.xml
-./rexster-stop.sh
+./rexster.sh -s -c config/myotherbrain-rexster.xml
 
 
 
