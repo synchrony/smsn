@@ -19,7 +19,6 @@ import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.ripple.model.impl.sesame.SesameModel;
 import net.fortytwo.ripple.query.QueryEngine;
 import net.fortytwo.ripple.query.QueryPipe;
-import net.fortytwo.sesametools.replay.RecorderSail;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.sail.Sail;
@@ -57,7 +56,7 @@ public class NotesSemantics {
             Sail sail = new PropertyGraphSail(store.getGraph());
             sail.initialize();
 
-            sail = new RecorderSail(sail, System.out);
+            //sail = new RecorderSail(sail, System.out);
 
             rippleModel = new SesameModel(sail);
             rippleQueryEngine = new QueryEngine(rippleModel);
@@ -499,6 +498,16 @@ public class NotesSemantics {
             throw new IllegalArgumentException();
         }
 
+        // TODO: remove debugging
+        /*
+        System.out.println("link = " + link);
+        System.out.println("  link.getClass() = " + link.getClass());
+        System.out.println("  link.asVertex().getId() = " + link.asVertex().getId());
+        System.out.println("  link.getFrom() = " + link.getFrom());
+        System.out.println("  link.getTo() = " + link.getTo());
+        System.out.flush();
+        */
+
         if (null == link.getFrom() || null == link.getTo()) {
             throw new IllegalStateException("data corruption: link with key '"
                     + getKey(link) + "' is missing a 'to' and/or 'from' edge");
@@ -546,6 +555,10 @@ public class NotesSemantics {
     }
 
     private Atom getAtom(final Vertex v) {
+        if (null == v) {
+            throw new IllegalArgumentException("null vertex");
+        }
+
         return manager.frame(v, Atom.class);
     }
 
@@ -601,7 +614,7 @@ public class NotesSemantics {
     public Atom getAtom(final String key) {
         Vertex v = store.getGraph().getVertex(key);
 
-        return getAtom(v);
+        return null == v ? null : getAtom(v);
     }
 
     private class AtomComparator implements Comparator<Atom> {

@@ -84,19 +84,6 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <!--
-        <blueprints.version>0.9</blueprints.version>
-        <frames.version>0.4</frames.version>
-        <rexster.version>0.5</rexster.version>
-        -->
-        <blueprints.version>1.1-SNAPSHOT</blueprints.version>
-        <frames.version>0.6-SNAPSHOT</frames.version>
-        <rexster.version>0.7-SNAPSHOT</rexster.version>
-        <ripple.version>0.8-SNAPSHOT</ripple.version>
-        <sesametools.version>1.6-SNAPSHOT</sesametools.version>
-    </properties>
-
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>

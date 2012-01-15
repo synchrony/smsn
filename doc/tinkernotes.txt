@@ -1,28 +1,4 @@
 
-// Load from version-controlled graph (caution!)
-com.tinkerpop.tinkubator.idindex.IdIndexGraph g2 = new com.tinkerpop.tinkubator.idindex.IdIndexGraph(g); InputStream i = new FileInputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLReader r = new GraphMLReader(g2); r.inputGraph(i); i.close();
-
-// Put the graph in manual transaction mode
-g.getTransactionMode()
-((TransactionalGraph) g).setTransactionMode(TransactionalGraph.Mode.MANUAL);
-g.getTransactionMode()
-
-// Find orphaned vertices
-List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { System.out.println("" + v); }
-
-// Delete orphaned vertices.
-List<Vertex> orphans = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) { if (!v.getInEdges().hasNext() && !v.getOutEdges().hasNext()) { orphans.add(v); }}; for (Vertex v : orphans) { g.removeVertex(v); }
-
-// Find corrupted links
-Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.toString());bad.add(v);}};
-
-// Delete corrupted links
-Collection<Vertex> bad = new LinkedList<Vertex>(); for (Vertex v : g.getVertices()) {boolean a = v.getOutEdges("from").hasNext(); boolean b = v.getOutEdges("to").hasNext(); if ((b && !a) || (a && !b)) {System.out.println(v.toString());bad.add(v);}}; for (Vertex v : bad) {g.removeVertex(v);}
-
-// Update version-controlled graph
-com.tinkerpop.tinkubator.idindex.IdIndexGraph g2 = new com.tinkerpop.tinkubator.idindex.IdIndexGraph(g); OutputStream out = new FileOutputStream(new File("/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml")); GraphMLWriter w = new GraphMLWriter(g2); w.setNormalize(true); w.outputGraph(out); out.close();
-
-
 
 // One-time switchover from "text" to "value" properties
 for (Vertex v : g.V) { System.out.println(v.getProperty("text")); }
