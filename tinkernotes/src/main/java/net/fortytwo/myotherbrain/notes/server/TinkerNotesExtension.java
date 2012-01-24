@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -151,6 +152,19 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             throw new IOException(e);
         }
         p.map.put("view", json.toString());
+    }
+
+    protected float findMinAuthorizedSharability(final Principal user,
+                                                 final float minSharability) {
+        // TODO
+        float minAuth = null == user || !user.getName().equals("josh") ? 0.75f : 0;
+
+        return Math.max(minSharability, minAuth);
+    }
+
+    protected boolean canWrite(final Principal user) {
+        // TODO
+        return null != user && user.getName().equals("josh");
     }
 
     protected class Params {

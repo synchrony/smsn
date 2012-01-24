@@ -844,6 +844,17 @@
     (browse-target-value (lambda (value)
         (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
 
+(defvar current-date-format "%Y-%m-%d")
+(defun insert-current-date ()
+  "insert the current date into the current buffer."
+       (interactive)
+       (insert (format-time-string current-date-format (current-time))))
+
+(defvar current-time-format "%H:%M:%S")
+(defun insert-current-time ()
+  "insert the current time into the current buffer."
+       (interactive)
+       (insert (format-time-string current-time-format (current-time))))
 
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-debug)
@@ -854,6 +865,8 @@
 (global-set-key (kbd "C-c s")           'tn-search)
 (global-set-key (kbd "C-c t")           'tn-visit-target)
 (global-set-key (kbd "C-c u")           'tn-refresh-view)
+(global-set-key (kbd "C-c C-a d")       'insert-current-date)
+(global-set-key (kbd "C-c C-a t")       'insert-current-time)
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
 (global-set-key (kbd "C-c C-l i")       'tn-link-info)
@@ -903,12 +916,7 @@
     (let ()
         (global-hl-line-mode 1)
         (set-face-background 'hl-line "ivory")))
-(defvar current-date-format "%Y-%m-%d")
-(defun insert-current-date ()
-  "insert the current date into the current buffer."
-       (interactive)
-       (insert (format-time-string current-date-format (current-time))))
-(global-set-key (kbd "C-c C-a d") 'insert-current-date)
+
 ;; These may or may not be necessary
 (setq locale-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)

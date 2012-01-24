@@ -14,8 +14,10 @@ import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 
+import javax.ws.rs.core.SecurityContext;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -26,7 +28,8 @@ public class UpdateExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
     @ExtensionDescriptor(description = "an extension for updating a portion of a MyOtherBrain graph using the MOB Notes format")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
@@ -42,10 +45,23 @@ public class UpdateExtension extends TinkerNotesExtension {
         LOGGER.info("update request for: " + rootKey);
         System.err.println("update request for: " + rootKey);
 
+        Principal user = null == security ? null : security.getUserPrincipal();
+
+        if (!canWrite(user)) {
+            return ExtensionResponse.error("user does not have permission to push updates");
+        }
+
+        if (null == user) {
+            System.err.println("no security");
+        } else {
+            System.out.println("user: " + user.getName());
+        }
+
         Filter filter;
 
         try {
-            filter = new Filter(minSharability, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+            float m = findMinAuthorizedSharability(user, minSharability);
+            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
         } catch (IllegalArgumentException e) {
             return ExtensionResponse.error(e.getMessage());
         }

@@ -14,7 +14,9 @@ import net.fortytwo.myotherbrain.notes.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.security.Principal;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -24,7 +26,8 @@ public class SearchExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
@@ -38,10 +41,13 @@ public class SearchExtension extends TinkerNotesExtension {
         LOGGER.info("search request for \"" + query + "\"");
         System.err.println("search request for \"" + query + "\"");
 
+        Principal user = null == security ? null : security.getUserPrincipal();
+
         Filter filter;
 
         try {
-            filter = new Filter(minSharability, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+            float m = findMinAuthorizedSharability(user, minSharability);
+            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
         } catch (IllegalArgumentException e) {
             return ExtensionResponse.error(e.getMessage());
         }

@@ -11,6 +11,8 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.MOBGraph;
 
+import javax.ws.rs.core.SecurityContext;
+import java.security.Principal;
 import java.util.logging.Logger;
 
 /**
@@ -22,13 +24,20 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for setting properties of given atoms")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "key", description = "key of the atom to be changed") String key,
                                            @ExtensionRequestParameter(name = "weight", description = "new weight of the atom") Float weight,
                                            @ExtensionRequestParameter(name = "sharability", description = "new sharability of the atom") Float sharability) {
         LOGGER.info("set properties request for: " + key);
         System.err.println("set properties request for: " + key);
+
+        Principal user = null == security ? null : security.getUserPrincipal();
+
+        if (!canWrite(user)) {
+            return ExtensionResponse.error("user does not have permission to set properties");
+        }
 
         // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
         if (weight <= 0 || weight > 1.0) {

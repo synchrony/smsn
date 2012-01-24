@@ -11,6 +11,9 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Filter;
 
+import javax.ws.rs.core.SecurityContext;
+import java.security.Principal;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -19,7 +22,8 @@ public class ViewExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the TinkerNotes format")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
@@ -33,10 +37,13 @@ public class ViewExtension extends TinkerNotesExtension {
         LOGGER.info("view request for: " + rootKey);
         System.err.println("view request for: " + rootKey);
 
+        Principal user = null == security ? null : security.getUserPrincipal();
+
         Filter filter;
 
         try {
-            filter = new Filter(minSharability, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+            float m = findMinAuthorizedSharability(user, minSharability);
+            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
         } catch (IllegalArgumentException e) {
             return ExtensionResponse.error(e.getMessage());
         }

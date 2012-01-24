@@ -15,7 +15,9 @@ import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.security.Principal;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -25,7 +27,8 @@ public class RippleExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "Ripple query") String query,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
@@ -39,10 +42,13 @@ public class RippleExtension extends TinkerNotesExtension {
         LOGGER.info("Ripple query \"" + query + "\"");
         System.err.println("Ripple query \"" + query + "\"");
 
+        Principal user = null == security ? null : security.getUserPrincipal();
+
         Filter filter;
 
         try {
-            filter = new Filter(minSharability, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+            float m = findMinAuthorizedSharability(user, minSharability);
+            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
         } catch (IllegalArgumentException e) {
             return ExtensionResponse.error(e.getMessage());
         }

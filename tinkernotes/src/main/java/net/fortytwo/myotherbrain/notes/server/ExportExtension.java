@@ -13,11 +13,13 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
+import javax.ws.rs.core.SecurityContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.security.Principal;
 import java.util.Iterator;
 
 /**
@@ -28,11 +30,16 @@ public class ExportExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain graph for analysis in R")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "file", description = "the path of the file to which to export") String file) {
         LOGGER.info("exporting graph to file: " + file);
         System.err.println("exporting graph to file: " + file);
+
+        Principal user = null == security ? null : security.getUserPrincipal();
+
+        // TODO: any security restrictions here?
 
         if (null == file || file.length() == 0) {
             return ExtensionResponse.error("missing or empty 'file' parameter");
