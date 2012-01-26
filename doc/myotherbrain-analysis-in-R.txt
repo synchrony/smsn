@@ -10,6 +10,7 @@ nrow(brain)
 
 mean(brain$weight)
 mean(brain$sharability)
+mean(nchar(brain$value))
 
 
 ################################################################################
@@ -17,6 +18,9 @@ mean(brain$sharability)
 
 library(igraph)
 
+... d <- data.frame(nchar(brain$from), brain$value)
+
+# TODO: there is no more is.edge column
 tmp <- subset(brain, is.edge == 1)
 adj <- data.frame(from=tmp$from, to=tmp$to, weight=tmp$weight)
 

@@ -43,6 +43,10 @@ public class MyOtherBrain {
 
     public static final int KEY_DIGITS = 7;
 
+    private static final char[] HEX_CHARS = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+
     private static final Random RANDOM = new Random();
 
     private static final String CONFIG_PROPERTIES_FILE = "myotherbrain.properties";
@@ -175,5 +179,23 @@ public class MyOtherBrain {
         }
 
         return new String(bytes);
+    }
+
+    // Note: escapes both high and low (whitespace < 0x20) characters.
+    public static String unicodeEscape(final String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c < 32 || (c >> 7) > 0) {
+                sb.append("\\u");
+                sb.append(HEX_CHARS[(c >> 12) & 0xF]);
+                sb.append(HEX_CHARS[(c >> 8) & 0xF]);
+                sb.append(HEX_CHARS[(c >> 4) & 0xF]);
+                sb.append(HEX_CHARS[c & 0xF]);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }

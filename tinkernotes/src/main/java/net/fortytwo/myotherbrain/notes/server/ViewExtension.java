@@ -49,7 +49,7 @@ public class ViewExtension extends TinkerNotesExtension {
         }
 
         Params p = new Params();
-        p.graph = graph;
+        p.baseGraph = graph;
         p.depth = depth;
         p.filter = filter;
         p.rootKey = rootKey;

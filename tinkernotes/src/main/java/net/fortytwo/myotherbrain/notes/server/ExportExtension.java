@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
 import javax.ws.rs.core.SecurityContext;
@@ -46,23 +47,20 @@ public class ExportExtension extends TinkerNotesExtension {
         }
 
         Params p = new Params();
-        p.graph = graph;
+        p.baseGraph = graph;
         p.file = file;
         return this.handleRequestInternal(p);
     }
 
-    private void exportToR(final Graph g,
+    private void exportToR(final MOBGraph g,
                            final PrintStream p) throws IOException {
 
-        p.println("id\tkey\tcreated\tweight\tsharability\tis.edge\tfrom\tto\tvalue");
+        p.println("created\tid\tweight\tsharability\tfrom\tto\tvalue");
 
-        for (Vertex v : g.getVertices()) {
-            p.print(v.getId());
-            p.print('\t');
-            p.print(v.getProperty(MyOtherBrain.KEY));
-            p.print('\t');
-
+        for (Vertex v : g.getGraph().getVertices()) {
             p.print(v.getProperty(MyOtherBrain.CREATED));
+            p.print('\t');
+            p.print(v.getId());
             p.print('\t');
             p.print(v.getProperty(MyOtherBrain.WEIGHT));
             p.print('\t');
@@ -72,32 +70,25 @@ public class ExportExtension extends TinkerNotesExtension {
             Vertex from = getFrom(v);
             Vertex to = getTo(v);
             if (null != from && null != to) {
-                p.print("1");
+                p.print(from.getId());
                 p.print('\t');
-                p.print(from.getProperty(MyOtherBrain.KEY));
-                p.print('\t');
-                p.print(to.getProperty(MyOtherBrain.KEY));
+                p.print(to.getId());
                 p.print('\t');
             } else {
-                p.print("0\t\t\t");
+                p.print("\t\t");
             }
-            p.print(shortValue((String) v.getProperty(MyOtherBrain.VALUE)));
-            p.println("");
+            String value = (String) v.getProperty(MyOtherBrain.VALUE);
+            if (null != value) {
+                p.print(escapeValue(value));
+            }
+            p.print('\n');
         }
     }
 
-    private String shortValue(final String value) {
-        String s = value;
-        if (s.length() > 47) {
-            s = s.substring(0, 47) + "...";
-        }
-
-        // Tabs and newlines are reserved.
-        s = s.replaceAll("\\s+", " ");
-
-        // Note: this quotation is necessary: without it, R becomes confused and skips rows.
-        s = s.replace('\"', '_');
-        return "\"" + s + "\"";
+    // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
+    // Otherwise, R becomes confused and skips rows.
+    private String escapeValue(final String value) {
+        return MyOtherBrain.unicodeEscape(value);
     }
 
     private Vertex getFrom(final Vertex v) {

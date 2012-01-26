@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.flashcards;
 
-import java.util.Random;
+import net.fortytwo.myotherbrain.MyOtherBrain;
 
 /**
  * User: josh
@@ -8,9 +8,6 @@ import java.util.Random;
  * Time: 7:01 PM
  */
 public abstract class Card<Q, A> {
-    private static final char[] HEX_CHARS = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-    };
 
     protected final String name;
     protected final Deck deck;
@@ -62,24 +59,6 @@ public abstract class Card<Q, A> {
     }
 
     public static String findCardName(final String norm) {
-        return unicodeEscape(norm);
-    }
-
-    // Note: escapes both high and low (whitespace < 0x20) characters.
-    private static String unicodeEscape(final String s) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c < 32 || (c >> 7) > 0) {
-                sb.append("\\u");
-                sb.append(HEX_CHARS[(c >> 12) & 0xF]);
-                sb.append(HEX_CHARS[(c >> 8) & 0xF]);
-                sb.append(HEX_CHARS[(c >> 4) & 0xF]);
-                sb.append(HEX_CHARS[c & 0xF]);
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
+        return MyOtherBrain.unicodeEscape(norm);
     }
 }

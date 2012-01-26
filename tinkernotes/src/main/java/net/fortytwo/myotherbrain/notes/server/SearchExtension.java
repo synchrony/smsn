@@ -53,7 +53,7 @@ public class SearchExtension extends TinkerNotesExtension {
         }
 
         Params p = new Params();
-        p.graph = graph;
+        p.baseGraph = graph;
         p.filter = filter;
         p.query = query;
         p.depth = depth;

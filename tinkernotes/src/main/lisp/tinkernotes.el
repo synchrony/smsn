@@ -579,15 +579,39 @@
     (if (in-view)
         (request-view nil tn-mode tn-root tn-depth (to-targets-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
+
+;; set weight ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun set-default-weight (s)
+    (if (in-view)
+        (if (and (> s 0) (<= s 1))
+            (setq tn-default-weight s)
+            (error-message
+                (concat "weight " (number-to-string s) " is outside of range (0, 1]")))))
+
 (defun tn-decrease-default-weight ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight (- tn-default-weight 0.25))))
+    (set-default-weight (- tn-default-weight 0.25)))
 
 (defun tn-increase-default-weight ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight (+ tn-default-weight 0.25))))
+    (set-default-weight (+ tn-default-weight 0.25)))
+
+(defun tn-set-default-weight-1 ()
+    (interactive)
+    (set-default-weight 0.25))
+
+(defun tn-set-default-weight-2 ()
+    (interactive)
+    (set-default-weight 0.5))
+
+(defun tn-set-default-weight-3 ()
+    (interactive)
+    (set-default-weight 0.75))
+
+(defun tn-set-default-weight-4 ()
+    (interactive)
+    (set-default-weight 1.0))
 
 (defun tn-decrease-min-weight ()
     (interactive)
@@ -609,15 +633,39 @@
     (if (in-view)
         (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight (+ tn-max-weight 0.25) tn-default-weight)))
 
+
+;; set sharability ;;;;;;;;;;;;;;;;;;;;;
+
+(defun set-default-sharability (s)
+    (if (in-view)
+        (if (and (> s 0) (<= s 1))
+            (setq tn-default-sharability s)
+            (error-message
+                (concat "sharability " (number-to-string s) " is outside of range (0, 1]")))))
+
 (defun tn-decrease-default-sharability ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability (- tn-default-sharability 0.25) tn-min-weight tn-max-weight tn-default-weight)))
+    (set-default-sharability (- tn-default-sharability 0.25)))
 
 (defun tn-increase-default-sharability ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability (+ tn-default-sharability 0.25) tn-min-weight tn-max-weight tn-default-weight)))
+    (set-default-sharability (+ tn-default-sharability 0.25)))
+
+(defun tn-set-default-sharability-1 ()
+    (interactive)
+    (set-default-sharability 0.25))
+
+(defun tn-set-default-sharability-2 ()
+    (interactive)
+    (set-default-sharability 0.5))
+
+(defun tn-set-default-sharability-3 ()
+    (interactive)
+    (set-default-sharability 0.75))
+
+(defun tn-set-default-sharability-4 ()
+    (interactive)
+    (set-default-sharability 1.0))
 
 (defun tn-decrease-min-sharability ()
     (interactive)
@@ -844,17 +892,22 @@
     (browse-target-value (lambda (value)
         (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
 
-(defvar current-date-format "%Y-%m-%d")
+(defvar tn-date-format "%Y-%m-%d")
+(defvar tn-time-format "%H:%M")
+(defvar tn-time-with-seconds-format "%H:%M:%S")
+
 (defun insert-current-date ()
   "insert the current date into the current buffer."
        (interactive)
-       (insert (format-time-string current-date-format (current-time))))
-
-(defvar current-time-format "%H:%M:%S")
+       (insert (format-time-string tn-date-format (current-time))))
 (defun insert-current-time ()
   "insert the current time into the current buffer."
        (interactive)
-       (insert (format-time-string current-time-format (current-time))))
+       (insert (format-time-string tn-time-format (current-time))))
+(defun insert-current-time-with-seconds ()
+  "insert the current time into the current buffer."
+       (interactive)
+       (insert (format-time-string tn-time-with-seconds-format (current-time))))
 
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-debug)
@@ -866,6 +919,7 @@
 (global-set-key (kbd "C-c t")           'tn-visit-target)
 (global-set-key (kbd "C-c u")           'tn-refresh-view)
 (global-set-key (kbd "C-c C-a d")       'insert-current-date)
+(global-set-key (kbd "C-c C-a s")       'insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'insert-current-time)
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
@@ -876,6 +930,14 @@
 (global-set-key (kbd "C-c C-l C-w .")   'tn-increase-link-weight)
 (global-set-key (kbd "C-c C-s ,")       'tn-decrease-default-sharability)
 (global-set-key (kbd "C-c C-s .")       'tn-increase-default-sharability)
+(global-set-key (kbd "C-c C-s 1")       'tn-set-default-sharability-1)
+(global-set-key (kbd "C-c C-s 2")       'tn-set-default-sharability-2)
+(global-set-key (kbd "C-c C-s 3")       'tn-set-default-sharability-3)
+(global-set-key (kbd "C-c C-s 4")       'tn-set-default-sharability-4)
+(global-set-key (kbd "C-c C-s a")       'tn-set-default-sharability-1)
+(global-set-key (kbd "C-c C-s s")       'tn-set-default-sharability-2)
+(global-set-key (kbd "C-c C-s d")       'tn-set-default-sharability-3)
+(global-set-key (kbd "C-c C-s f")       'tn-set-default-sharability-4)
 (global-set-key (kbd "C-c C-s C-[ ,")   'tn-decrease-min-sharability)
 (global-set-key (kbd "C-c C-s C-[ .")   'tn-increase-min-sharability)
 (global-set-key (kbd "C-c C-s C-] ,")   'tn-decrease-max-sharability)
@@ -903,6 +965,14 @@
 (global-set-key (kbd "C-c C-v t")       'tn-refresh-to-targets-view)
 (global-set-key (kbd "C-c C-w ,")       'tn-decrease-default-weight)
 (global-set-key (kbd "C-c C-w .")       'tn-increase-default-weight)
+(global-set-key (kbd "C-c C-w 1")       'tn-set-default-weight-1)
+(global-set-key (kbd "C-c C-w 2")       'tn-set-default-weight-2)
+(global-set-key (kbd "C-c C-w 3")       'tn-set-default-weight-3)
+(global-set-key (kbd "C-c C-w 4")       'tn-set-default-weight-4)
+(global-set-key (kbd "C-c C-w a")       'tn-set-default-weight-1)
+(global-set-key (kbd "C-c C-w s")       'tn-set-default-weight-2)
+(global-set-key (kbd "C-c C-w d")       'tn-set-default-weight-3)
+(global-set-key (kbd "C-c C-w f")       'tn-set-default-weight-4)
 (global-set-key (kbd "C-c C-w C-[ ,")   'tn-decrease-min-weight)
 (global-set-key (kbd "C-c C-w C-[ .")   'tn-increase-min-weight)
 (global-set-key (kbd "C-c C-w C-] ,")   'tn-decrease-max-weight)

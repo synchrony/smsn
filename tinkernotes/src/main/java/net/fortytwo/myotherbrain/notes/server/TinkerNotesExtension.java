@@ -38,7 +38,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         try {
             p.map = new HashMap<String, String>();
 
-            if (!(p.graph instanceof IndexableGraph)) {
+            if (!(p.baseGraph instanceof IndexableGraph)) {
                 return ExtensionResponse.error("graph must be an instance of IndexableGraph");
             }
 
@@ -49,9 +49,9 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 p.view = new String(p.view.getBytes("UTF-8"));
             }
 
-            p.manager = new FramesManager(p.graph);
-            MOBGraph store = new MOBGraph((IndexableGraph) p.graph);
-            p.semantics = new NotesSemantics(store);
+            p.manager = new FramesManager(p.baseGraph);
+            p.graph = new MOBGraph((IndexableGraph) p.baseGraph);
+            p.semantics = new NotesSemantics(p.graph);
             p.syntax = new NotesSyntax();
 
             if (null != p.depth) {
@@ -97,13 +97,13 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             boolean manual;
             // Force manual transaction mode (provided that the graph is transactional)
-            if (!isReadOnly() && p.graph instanceof TransactionalGraph) {
-                if (0 >= ((TransactionalGraph) p.graph).getCurrentBufferSize()) {
-                    ((TransactionalGraph) p.graph).setMaxBufferSize(-1);
+            if (!isReadOnly() && p.baseGraph instanceof TransactionalGraph) {
+                if (0 >= ((TransactionalGraph) p.baseGraph).getCurrentBufferSize()) {
+                    ((TransactionalGraph) p.baseGraph).setMaxBufferSize(-1);
                 }
                 manual = true;
 
-                ((TransactionalGraph) p.graph).startTransaction();
+                ((TransactionalGraph) p.baseGraph).startTransaction();
             } else {
                 manual = false;
             }
@@ -126,7 +126,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                             System.err.println("rolling back transaction");
                         }
 
-                        ((TransactionalGraph) p.graph).stopTransaction(normal
+                        ((TransactionalGraph) p.baseGraph).stopTransaction(normal
                                 ? TransactionalGraph.Conclusion.SUCCESS
                                 : TransactionalGraph.Conclusion.FAILURE);
                     } else if (!normal) {
@@ -169,7 +169,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected class Params {
         public Map<String, String> map;
-        public Graph graph;
+        public Graph baseGraph;
+        public MOBGraph graph;
         public FramesManager manager;
         public NotesSemantics semantics;
         public NotesSyntax syntax;
