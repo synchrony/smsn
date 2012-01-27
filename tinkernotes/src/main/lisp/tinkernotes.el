@@ -583,11 +583,10 @@
 ;; set weight ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun set-default-weight (s)
-    (if (in-view)
-        (if (and (> s 0) (<= s 1))
-            (setq tn-default-weight s)
-            (error-message
-                (concat "weight " (number-to-string s) " is outside of range (0, 1]")))))
+    (if (and (in-view) (> s 0) (<= s 1))
+        (setq tn-default-weight s)
+        (error-message
+            (concat "weight " (number-to-string s) " is outside of range (0, 1]"))))
 
 (defun tn-decrease-default-weight ()
     (interactive)
@@ -613,35 +612,81 @@
     (interactive)
     (set-default-weight 1.0))
 
+(defun set-min-weight (s)
+    (if (and (in-view) (>= s 0) (<= s 1))
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight tn-default-weight)
+        (error-message
+            (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
+
 (defun tn-decrease-min-weight ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability (- tn-min-weight 0.25) tn-max-weight tn-default-weight)))
+    (set-min-weight (- tn-min-weight 0.25)))
 
 (defun tn-increase-min-weight ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability (+ tn-min-weight 0.25) tn-max-weight tn-default-weight)))
+    (set-min-weight (+ tn-min-weight 0.25)))
+
+(defun tn-set-min-weight-0 ()
+    (interactive)
+    (set-min-weight 0.0))
+
+(defun tn-set-min-weight-1 ()
+    (interactive)
+    (set-min-weight 0.25))
+
+(defun tn-set-min-weight-2 ()
+    (interactive)
+    (set-min-weight 0.5))
+
+(defun tn-set-min-weight-3 ()
+    (interactive)
+    (set-min-weight 0.75))
+
+(defun tn-set-min-weight-4 ()
+    (interactive)
+    (set-min-weight 1.0))
+
+(defun set-max-weight (s)
+    (if (and (in-view) (>= s 0) (<= s 1))
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight s tn-default-weight)
+        (error-message
+            (concat "max weight " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun tn-decrease-max-weight ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight (- tn-max-weight 0.25) tn-default-weight)))
+    (set-max-weight (- tn-max-weight 0.25)))
 
 (defun tn-increase-max-weight ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight (+ tn-max-weight 0.25) tn-default-weight)))
+    (set-max-weight (+ tn-max-weight 0.25)))
 
+(defun tn-set-max-weight-0 ()
+    (interactive)
+    (set-max-weight 0.0))
+
+(defun tn-set-max-weight-1 ()
+    (interactive)
+    (set-max-weight 0.25))
+
+(defun tn-set-max-weight-2 ()
+    (interactive)
+    (set-max-weight 0.5))
+
+(defun tn-set-max-weight-3 ()
+    (interactive)
+    (set-max-weight 0.75))
+
+(defun tn-set-max-weight-4 ()
+    (interactive)
+    (set-max-weight 1.0))
 
 ;; set sharability ;;;;;;;;;;;;;;;;;;;;;
 
 (defun set-default-sharability (s)
-    (if (in-view)
-        (if (and (> s 0) (<= s 1))
-            (setq tn-default-sharability s)
-            (error-message
-                (concat "sharability " (number-to-string s) " is outside of range (0, 1]")))))
+    (if (and (in-view) (> s 0) (<= s 1))
+        (setq tn-default-sharability s)
+        (error-message
+            (concat "sharability " (number-to-string s) " is outside of range (0, 1]"))))
 
 (defun tn-decrease-default-sharability ()
     (interactive)
@@ -667,25 +712,73 @@
     (interactive)
     (set-default-sharability 1.0))
 
+(defun set-min-sharability (s)
+    (if (and (in-view) (>= s 0) (<= s 1))
+        (request-view t tn-mode tn-root tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+        (error-message
+            (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
+
 (defun tn-decrease-min-sharability ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style (- tn-min-sharability 0.25) tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+    (set-min-sharability (- tn-min-sharability 0.25)))
 
 (defun tn-increase-min-sharability ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style (+ tn-min-sharability 0.25) tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+    (set-min-sharability (+ tn-min-sharability 0.25)))
+
+(defun tn-set-min-sharability-0 ()
+    (interactive)
+    (set-min-sharability 0.0))
+
+(defun tn-set-min-sharability-1 ()
+    (interactive)
+    (set-min-sharability 0.25))
+
+(defun tn-set-min-sharability-2 ()
+    (interactive)
+    (set-min-sharability 0.5))
+
+(defun tn-set-min-sharability-3 ()
+    (interactive)
+    (set-min-sharability 0.75))
+
+(defun tn-set-min-sharability-4 ()
+    (interactive)
+    (set-min-sharability 1.0))
+
+(defun set-max-sharability (s)
+    (if (and (in-view) (>= s 0) (<= s 1))
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability s tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+        (error-message
+            (concat "max sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun tn-decrease-max-sharability ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability (- tn-max-sharability 0.25) tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+    (set-max-sharability (- tn-max-sharability 0.25)))
 
 (defun tn-increase-max-sharability ()
     (interactive)
-    (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability (+ tn-max-sharability 0.25) tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+    (set-max-sharability (+ tn-max-sharability 0.25)))
+
+(defun tn-set-max-sharability-0 ()
+    (interactive)
+    (set-max-sharability 0.0))
+
+(defun tn-set-max-sharability-1 ()
+    (interactive)
+    (set-max-sharability 0.25))
+
+(defun tn-set-max-sharability-2 ()
+    (interactive)
+    (set-max-sharability 0.5))
+
+(defun tn-set-max-sharability-3 ()
+    (interactive)
+    (set-max-sharability 0.75))
+
+(defun tn-set-max-sharability-4 ()
+    (interactive)
+    (set-max-sharability 1.0))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -735,93 +828,121 @@
                             (error-message msg)))
                  (url-retrieve url (receive-view mode)))))))))
 
-(defun tn-decrease-link-weight ()
-    (interactive)
-    (let ((link (current-link)))
-        (if link
-            (let (
-                (key (get-key link))
-                (weight (get-weight link))
-                (sharability (get-sharability link)))
-	                (set-properties key (- weight 0.25) sharability))
-	        (no-link))))
+(defun set-link-weight (v)
+    (if (and (> v 0) (<= v 1))
+        (let ((link (current-link)))
+            (if link
+                (let (
+                    (key (get-key link))
+                    (weight (get-weight link))
+                    (sharability (get-sharability link)))
+	                    (set-properties key v sharability))
+	            (no-link)))
+        (error-message
+            (concat "weight " (number-to-string v) " is outside of range (0, 1]"))))
 
-(defun tn-increase-link-weight ()
+(defun tn-set-link-weight-1 ()
     (interactive)
-    (let ((link (current-link)))
-        (if link
-            (let (
-                (key (get-key link))
-                (weight (get-weight link))
-                (sharability (get-sharability link)))
-	                (set-properties key (+ weight 0.25) sharability))
-	        (no-link))))
+    (set-link-weight 0.25))
 
-(defun tn-decrease-target-weight ()
+(defun tn-set-link-weight-2 ()
     (interactive)
-    (let ((target (current-target)))
-        (if target
-            (let (
-                (key (get-key target))
-                (weight (get-weight target))
-                (sharability (get-sharability target)))
-	                (set-properties key (- weight 0.25) sharability))
-	        (no-target))))
+    (set-link-weight 0.5))
 
-(defun tn-increase-target-weight ()
+(defun tn-set-link-weight-3 ()
     (interactive)
-    (let ((target (current-target)))
-        (if target
-            (let (
-                (key (get-key target))
-                (weight (get-weight target))
-                (sharability (get-sharability target)))
-	                (set-properties key (+ weight 0.25) sharability))
-	        (no-target))))
+    (set-link-weight 0.75))
 
-(defun tn-decrease-link-sharability ()
+(defun tn-set-link-weight-4 ()
     (interactive)
-    (let ((link (current-link)))
-        (if link
-            (let (
-                (key (get-key link))
-                (weight (get-weight link))
-                (sharability (get-sharability link)))
-		            (set-properties key weight (- sharability 0.25)))
-		    (no-link))))
+    (set-link-weight 1.0))
 
-(defun tn-increase-link-sharability ()
-    (interactive)
-    (let ((link (current-link)))
-        (if link
-            (let (
-                (key (get-key link))
-                (weight (get-weight link))
-                (sharability (get-sharability link)))
-		            (set-properties key weight (+ sharability 0.25)))
-		    (no-link))))
+(defun set-target-weight (v)
+    (if (and (> v 0) (<= v 1))
+        (let ((target (current-target)))
+            (if target
+                (let (
+                    (key (get-key target))
+                    (weight (get-weight target))
+                    (sharability (get-sharability target)))
+	                    (set-properties key v sharability))
+	            (no-target)))
+        (error-message
+            (concat "weight " (number-to-string v) " is outside of range (0, 1]"))))
 
-(defun tn-decrease-target-sharability ()
+(defun tn-set-target-weight-1 ()
     (interactive)
-    (let ((target (current-target)))
-        (if target
-            (let (
-                (key (get-key target))
-                (weight (get-weight target))
-                (sharability (get-sharability target)))
-		            (set-properties key weight (- sharability 0.25)))
-		    (no-target))))
+    (set-target-weight 0.25))
 
-(defun tn-increase-target-sharability ()
+(defun tn-set-target-weight-2 ()
     (interactive)
-    (let ((target (current-target)))
-        (if target
-            (let (
-                (key (get-key target))
-                (weight (get-weight target))
-                (sharability (get-sharability target)))
-		            (set-properties key weight (+ sharability 0.25)))
-		    (no-target))))
+    (set-target-weight 0.5))
+
+(defun tn-set-target-weight-3 ()
+    (interactive)
+    (set-target-weight 0.75))
+
+(defun tn-set-target-weight-4 ()
+    (interactive)
+    (set-target-weight 1.0))
+
+(defun set-link-sharability (v)
+    (if (and (> v 0) (<= v 1))
+        (let ((link (current-link)))
+            (if link
+                (let (
+                    (key (get-key link))
+                    (weight (get-weight link))
+                    (sharability (get-sharability link)))
+	                    (set-properties key weight v))
+	            (no-link)))
+        (error-message
+            (concat "sharability " (number-to-string v) " is outside of range (0, 1]"))))
+
+(defun tn-set-link-sharability-1 ()
+    (interactive)
+    (set-link-sharability 0.25))
+
+(defun tn-set-link-sharability-2 ()
+    (interactive)
+    (set-link-sharability 0.5))
+
+(defun tn-set-link-sharability-3 ()
+    (interactive)
+    (set-link-sharability 0.75))
+
+(defun tn-set-link-sharability-4 ()
+    (interactive)
+    (set-link-sharability 1.0))
+
+(defun set-target-sharability (v)
+    (if (and (> v 0) (<= v 1))
+        (let ((target (current-target)))
+            (if target
+                (let (
+                    (key (get-key target))
+                    (weight (get-weight target))
+                    (sharability (get-sharability target)))
+	                    (set-properties key weight v))
+	            (no-target)))
+        (error-message
+            (concat "sharability " (number-to-string v) " is outside of range (0, 1]"))))
+
+(defun tn-set-target-sharability-1 ()
+    (interactive)
+    (set-target-sharability 0.25))
+
+(defun tn-set-target-sharability-2 ()
+    (interactive)
+    (set-target-sharability 0.5))
+
+(defun tn-set-target-sharability-3 ()
+    (interactive)
+    (set-target-sharability 0.75))
+
+(defun tn-set-target-sharability-4 ()
+    (interactive)
+    (set-target-sharability 1.0))
 
 
 ;; INTERFACE ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -924,10 +1045,22 @@
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
 (global-set-key (kbd "C-c C-l i")       'tn-link-info)
-(global-set-key (kbd "C-c C-l C-s ,")   'tn-decrease-link-sharability)
-(global-set-key (kbd "C-c C-l C-s .")   'tn-increase-link-sharability)
-(global-set-key (kbd "C-c C-l C-w ,")   'tn-decrease-link-weight)
-(global-set-key (kbd "C-c C-l C-w .")   'tn-increase-link-weight)
+(global-set-key (kbd "C-c C-l C-s 1")   'tn-set-link-sharability-1)
+(global-set-key (kbd "C-c C-l C-s 2")   'tn-set-link-sharability-2)
+(global-set-key (kbd "C-c C-l C-s 3")   'tn-set-link-sharability-3)
+(global-set-key (kbd "C-c C-l C-s 4")   'tn-set-link-sharability-4)
+(global-set-key (kbd "C-c C-l C-s a")   'tn-set-link-sharability-1)
+(global-set-key (kbd "C-c C-l C-s s")   'tn-set-link-sharability-2)
+(global-set-key (kbd "C-c C-l C-s d")   'tn-set-link-sharability-3)
+(global-set-key (kbd "C-c C-l C-s f")   'tn-set-link-sharability-4)
+(global-set-key (kbd "C-c C-l C-w 1")   'tn-set-link-weight-1)
+(global-set-key (kbd "C-c C-l C-w 2")   'tn-set-link-weight-2)
+(global-set-key (kbd "C-c C-l C-w 3")   'tn-set-link-weight-3)
+(global-set-key (kbd "C-c C-l C-w 4")   'tn-set-link-weight-4)
+(global-set-key (kbd "C-c C-l C-w a")   'tn-set-link-weight-1)
+(global-set-key (kbd "C-c C-l C-w s")   'tn-set-link-weight-2)
+(global-set-key (kbd "C-c C-l C-w d")   'tn-set-link-weight-3)
+(global-set-key (kbd "C-c C-l C-w f")   'tn-set-link-weight-4)
 (global-set-key (kbd "C-c C-s ,")       'tn-decrease-default-sharability)
 (global-set-key (kbd "C-c C-s .")       'tn-increase-default-sharability)
 (global-set-key (kbd "C-c C-s 1")       'tn-set-default-sharability-1)
@@ -940,8 +1073,28 @@
 (global-set-key (kbd "C-c C-s f")       'tn-set-default-sharability-4)
 (global-set-key (kbd "C-c C-s C-[ ,")   'tn-decrease-min-sharability)
 (global-set-key (kbd "C-c C-s C-[ .")   'tn-increase-min-sharability)
+(global-set-key (kbd "C-c C-s C-[ 0")   'tn-set-min-sharability-0)
+(global-set-key (kbd "C-c C-s C-[ 1")   'tn-set-min-sharability-1)
+(global-set-key (kbd "C-c C-s C-[ 2")   'tn-set-min-sharability-2)
+(global-set-key (kbd "C-c C-s C-[ 3")   'tn-set-min-sharability-3)
+(global-set-key (kbd "C-c C-s C-[ 4")   'tn-set-min-sharability-4)
+(global-set-key (kbd "C-c C-s C-[ g")   'tn-set-min-sharability-0)
+(global-set-key (kbd "C-c C-s C-[ a")   'tn-set-min-sharability-1)
+(global-set-key (kbd "C-c C-s C-[ s")   'tn-set-min-sharability-2)
+(global-set-key (kbd "C-c C-s C-[ d")   'tn-set-min-sharability-3)
+(global-set-key (kbd "C-c C-s C-[ f")   'tn-set-min-sharability-4)
 (global-set-key (kbd "C-c C-s C-] ,")   'tn-decrease-max-sharability)
 (global-set-key (kbd "C-c C-s C-] .")   'tn-increase-max-sharability)
+(global-set-key (kbd "C-c C-s C-] 0")   'tn-set-max-sharability-0)
+(global-set-key (kbd "C-c C-s C-] 1")   'tn-set-max-sharability-1)
+(global-set-key (kbd "C-c C-s C-] 2")   'tn-set-max-sharability-2)
+(global-set-key (kbd "C-c C-s C-] 3")   'tn-set-max-sharability-3)
+(global-set-key (kbd "C-c C-s C-] 4")   'tn-set-max-sharability-4)
+(global-set-key (kbd "C-c C-s C-] g")   'tn-set-max-sharability-0)
+(global-set-key (kbd "C-c C-s C-] a")   'tn-set-max-sharability-1)
+(global-set-key (kbd "C-c C-s C-] s")   'tn-set-max-sharability-2)
+(global-set-key (kbd "C-c C-s C-] d")   'tn-set-max-sharability-3)
+(global-set-key (kbd "C-c C-s C-] f")   'tn-set-max-sharability-4)
 (global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
 (global-set-key (kbd "C-c C-t C-b a")   'tn-browse-target-value-in-amazon)
 (global-set-key (kbd "C-c C-t C-b e")   'tn-browse-target-value-in-ebay)
@@ -952,10 +1105,22 @@
 (global-set-key (kbd "C-c C-t C-b t")   'tn-browse-target-value-in-twitter)
 (global-set-key (kbd "C-c C-t C-b w")   'tn-browse-target-value-in-wikipedia)
 (global-set-key (kbd "C-c C-t i")       'tn-target-info)
-(global-set-key (kbd "C-c C-t C-s ,")   'tn-decrease-target-sharability)
-(global-set-key (kbd "C-c C-t C-s .")   'tn-increase-target-sharability)
-(global-set-key (kbd "C-c C-t C-w ,")   'tn-decrease-target-weight)
-(global-set-key (kbd "C-c C-t C-w .")   'tn-increase-target-weight)
+(global-set-key (kbd "C-c C-t C-s 1")   'tn-set-target-sharability-1)
+(global-set-key (kbd "C-c C-t C-s 2")   'tn-set-target-sharability-2)
+(global-set-key (kbd "C-c C-t C-s 3")   'tn-set-target-sharability-3)
+(global-set-key (kbd "C-c C-t C-s 4")   'tn-set-target-sharability-4)
+(global-set-key (kbd "C-c C-t C-s a")   'tn-set-target-sharability-1)
+(global-set-key (kbd "C-c C-t C-s s")   'tn-set-target-sharability-2)
+(global-set-key (kbd "C-c C-t C-s d")   'tn-set-target-sharability-3)
+(global-set-key (kbd "C-c C-t C-s f")   'tn-set-target-sharability-4)
+(global-set-key (kbd "C-c C-t C-w 1")   'tn-set-target-weight-1)
+(global-set-key (kbd "C-c C-t C-w 2")   'tn-set-target-weight-2)
+(global-set-key (kbd "C-c C-t C-w 3")   'tn-set-target-weight-3)
+(global-set-key (kbd "C-c C-t C-w 4")   'tn-set-target-weight-4)
+(global-set-key (kbd "C-c C-t C-w a")   'tn-set-target-weight-1)
+(global-set-key (kbd "C-c C-t C-w s")   'tn-set-target-weight-2)
+(global-set-key (kbd "C-c C-t C-w d")   'tn-set-target-weight-3)
+(global-set-key (kbd "C-c C-t C-w f")   'tn-set-target-weight-4)
 (global-set-key (kbd "C-c C-v b")       'tn-refresh-to-backward-view)
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
@@ -975,8 +1140,28 @@
 (global-set-key (kbd "C-c C-w f")       'tn-set-default-weight-4)
 (global-set-key (kbd "C-c C-w C-[ ,")   'tn-decrease-min-weight)
 (global-set-key (kbd "C-c C-w C-[ .")   'tn-increase-min-weight)
+(global-set-key (kbd "C-c C-w C-[ 0")   'tn-set-min-weight-0)
+(global-set-key (kbd "C-c C-w C-[ 1")   'tn-set-min-weight-1)
+(global-set-key (kbd "C-c C-w C-[ 2")   'tn-set-min-weight-2)
+(global-set-key (kbd "C-c C-w C-[ 3")   'tn-set-min-weight-3)
+(global-set-key (kbd "C-c C-w C-[ 4")   'tn-set-min-weight-4)
+(global-set-key (kbd "C-c C-w C-[ g")   'tn-set-min-weight-0)
+(global-set-key (kbd "C-c C-w C-[ a")   'tn-set-min-weight-1)
+(global-set-key (kbd "C-c C-w C-[ s")   'tn-set-min-weight-2)
+(global-set-key (kbd "C-c C-w C-[ d")   'tn-set-min-weight-3)
+(global-set-key (kbd "C-c C-w C-[ f")   'tn-set-min-weight-4)
 (global-set-key (kbd "C-c C-w C-] ,")   'tn-decrease-max-weight)
 (global-set-key (kbd "C-c C-w C-] .")   'tn-increase-max-weight)
+(global-set-key (kbd "C-c C-w C-] 0")   'tn-set-max-weight-0)
+(global-set-key (kbd "C-c C-w C-] 1")   'tn-set-max-weight-1)
+(global-set-key (kbd "C-c C-w C-] 2")   'tn-set-max-weight-2)
+(global-set-key (kbd "C-c C-w C-] 3")   'tn-set-max-weight-3)
+(global-set-key (kbd "C-c C-w C-] 4")   'tn-set-max-weight-4)
+(global-set-key (kbd "C-c C-w C-] g")   'tn-set-max-weight-0)
+(global-set-key (kbd "C-c C-w C-] a")   'tn-set-max-weight-1)
+(global-set-key (kbd "C-c C-w C-] s")   'tn-set-max-weight-2)
+(global-set-key (kbd "C-c C-w C-] d")   'tn-set-max-weight-3)
+(global-set-key (kbd "C-c C-w C-] f")   'tn-set-max-weight-4)
 
 
 ;; Note: these should perhaps be local settings
