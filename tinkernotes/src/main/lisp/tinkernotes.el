@@ -128,7 +128,12 @@
 
 (defun current-target ()
     (get-atom (current-target-key)))
-    
+
+(defun current-target-value ()
+    (let ((g (current-target)))
+        (if g
+            (cdr (assoc 'value g)))))
+
 (defun get-atom (key)
     (if key
         (if tn-atoms
@@ -962,10 +967,9 @@
     (goto-address-at-point))  ;; defined in Emacs goto-addr.el
 
 (defun browse-target-value (value-to-url)
-    (let ((target (current-target)))
-        (if target
-            (let ((value (cdr (assoc 'value target))))
-                (browse-url (funcall value-to-url value)))
+    (let ((value (current-target-value)))
+        (if value
+            (browse-url (funcall value-to-url value))
             (no-target))))
 
 (defun tn-browse-target-value-as-url ()
@@ -1030,6 +1034,19 @@
        (interactive)
        (insert (format-time-string tn-time-with-seconds-format (current-time))))
 
+(defun tn-copy-target-value-to-clipboard ()
+    (interactive)
+    (let ((g (current-target-value)))
+        (if g
+            (let ((buffer (get-buffer-create "*temp*")))
+                (with-current-buffer buffer
+                    (unwind-protect
+                         (insert g)
+                         (let ((beg 1) (end (+ (length g) 1)))
+                            (clipboard-kill-ring-save beg end))
+                        (kill-buffer buffer))))
+            (no-target))))
+
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-debug)
 (global-set-key (kbd "C-c e")           'tn-export)
@@ -1078,7 +1095,7 @@
 (global-set-key (kbd "C-c C-s C-[ 2")   'tn-set-min-sharability-2)
 (global-set-key (kbd "C-c C-s C-[ 3")   'tn-set-min-sharability-3)
 (global-set-key (kbd "C-c C-s C-[ 4")   'tn-set-min-sharability-4)
-(global-set-key (kbd "C-c C-s C-[ g")   'tn-set-min-sharability-0)
+(global-set-key (kbd "C-c C-s C-[ z")   'tn-set-min-sharability-0)
 (global-set-key (kbd "C-c C-s C-[ a")   'tn-set-min-sharability-1)
 (global-set-key (kbd "C-c C-s C-[ s")   'tn-set-min-sharability-2)
 (global-set-key (kbd "C-c C-s C-[ d")   'tn-set-min-sharability-3)
@@ -1090,12 +1107,13 @@
 (global-set-key (kbd "C-c C-s C-] 2")   'tn-set-max-sharability-2)
 (global-set-key (kbd "C-c C-s C-] 3")   'tn-set-max-sharability-3)
 (global-set-key (kbd "C-c C-s C-] 4")   'tn-set-max-sharability-4)
-(global-set-key (kbd "C-c C-s C-] g")   'tn-set-max-sharability-0)
+(global-set-key (kbd "C-c C-s C-] z")   'tn-set-max-sharability-0)
 (global-set-key (kbd "C-c C-s C-] a")   'tn-set-max-sharability-1)
 (global-set-key (kbd "C-c C-s C-] s")   'tn-set-max-sharability-2)
 (global-set-key (kbd "C-c C-s C-] d")   'tn-set-max-sharability-3)
 (global-set-key (kbd "C-c C-s C-] f")   'tn-set-max-sharability-4)
 (global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
+(global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
 (global-set-key (kbd "C-c C-t C-b a")   'tn-browse-target-value-in-amazon)
 (global-set-key (kbd "C-c C-t C-b e")   'tn-browse-target-value-in-ebay)
 (global-set-key (kbd "C-c C-t C-b d")   'tn-browse-target-value-in-delicious)
@@ -1145,7 +1163,7 @@
 (global-set-key (kbd "C-c C-w C-[ 2")   'tn-set-min-weight-2)
 (global-set-key (kbd "C-c C-w C-[ 3")   'tn-set-min-weight-3)
 (global-set-key (kbd "C-c C-w C-[ 4")   'tn-set-min-weight-4)
-(global-set-key (kbd "C-c C-w C-[ g")   'tn-set-min-weight-0)
+(global-set-key (kbd "C-c C-w C-[ z")   'tn-set-min-weight-0)
 (global-set-key (kbd "C-c C-w C-[ a")   'tn-set-min-weight-1)
 (global-set-key (kbd "C-c C-w C-[ s")   'tn-set-min-weight-2)
 (global-set-key (kbd "C-c C-w C-[ d")   'tn-set-min-weight-3)
@@ -1157,7 +1175,7 @@
 (global-set-key (kbd "C-c C-w C-] 2")   'tn-set-max-weight-2)
 (global-set-key (kbd "C-c C-w C-] 3")   'tn-set-max-weight-3)
 (global-set-key (kbd "C-c C-w C-] 4")   'tn-set-max-weight-4)
-(global-set-key (kbd "C-c C-w C-] g")   'tn-set-max-weight-0)
+(global-set-key (kbd "C-c C-w C-] z")   'tn-set-max-weight-0)
 (global-set-key (kbd "C-c C-w C-] a")   'tn-set-max-weight-1)
 (global-set-key (kbd "C-c C-w C-] s")   'tn-set-max-weight-2)
 (global-set-key (kbd "C-c C-w C-] d")   'tn-set-max-weight-3)
