@@ -148,6 +148,13 @@
         (if g
             (get-sharability g))))
 
+;; change the default sharability in the new view after a user visits a link or target
+;; The default will never be greater than 0.75 unless explicitly set by the user.
+(defun future-sharability (s)
+    (if s
+        (if (<= s 0.75) s 0.75)
+        0.5))
+
 (defun get-atom (key)
     (if key
         (if tn-atoms
@@ -490,14 +497,14 @@
     (interactive)
     (let ((key (current-target-key)))
         (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (current-target-sharability) tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight tn-default-weight)
             (no-target))))
 
 (defun tn-visit-link ()
     (interactive)
     (let ((key (current-link-key)))
         (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (current-link-sharability) tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-link-sharability)) tn-min-weight tn-max-weight tn-default-weight)
             (no-link))))
 
 (defun tn-search ()
