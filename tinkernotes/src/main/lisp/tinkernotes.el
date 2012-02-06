@@ -65,11 +65,15 @@
 (setq tn-root nil)
 (setq tn-title nil)
 (setq tn-style "hybrid")
+;; "private" atoms are hidden to begin with
 (setq tn-min-sharability 0.25)
 (setq tn-max-sharability 1)
+;; default to "average" sharability to begin with
 (setq tn-default-sharability 0.5)
-(setq tn-min-weight 0.25)
-(setq tn-max-weight 1)
+;; atoms of all weights are visible to begin with
+(setq tn-min-weight 0.0)
+(setq tn-max-weight 1.0)
+;; default to "average" weight to begin with
 (setq tn-default-weight 0.5)
 (setq tn-atoms nil)
 (setq tn-current-line 1)
@@ -132,7 +136,17 @@
 (defun current-target-value ()
     (let ((g (current-target)))
         (if g
-            (cdr (assoc 'value g)))))
+            (get-value g))))
+
+(defun current-target-sharability ()
+    (let ((g (current-target)))
+        (if g
+            (get-sharability g))))
+
+(defun current-link-sharability ()
+    (let ((g (current-link)))
+        (if g
+            (get-sharability g))))
 
 (defun get-atom (key)
     (if key
@@ -476,14 +490,14 @@
     (interactive)
     (let ((key (current-target-key)))
         (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (current-target-sharability) tn-min-weight tn-max-weight tn-default-weight)
             (no-target))))
 
 (defun tn-visit-link ()
     (interactive)
     (let ((key (current-link-key)))
         (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (current-link-sharability) tn-min-weight tn-max-weight tn-default-weight)
             (no-link))))
 
 (defun tn-search ()
