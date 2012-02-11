@@ -305,7 +305,7 @@
                     (find-color weight sharability)
                     (elt reduced-colors (- (ceiling (* sharability 4)) 1)))))
 	    (if bold
-            (propertize text 'face (list 'bold 'italic  :foreground color :background background))
+            (propertize text 'face (list 'bold :foreground color :background background))
             (propertize text 'face (list :foreground color :background background))))))
 
 (defun light-gray (text background)
