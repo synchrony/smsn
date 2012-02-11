@@ -53,7 +53,6 @@ public class NotesSemanticsTest extends TestCase {
         rootNote.setTargetValue("foo");
         Note child = new Note();
         child.setTargetValue("cheval \u00e0 phynances");
-        child.setLinkValue("a link");
         rootNote.addChild(child);
 
         //System.out.println(before.getTargetValue());

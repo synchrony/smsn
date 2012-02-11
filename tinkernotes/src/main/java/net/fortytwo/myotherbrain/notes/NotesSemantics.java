@@ -169,7 +169,6 @@ public class NotesSemantics {
                     score *= a.getWeight();
 
                     Note n = view(a, depth - 1, filter, style);
-                    n.setLinkValue(".");
                     n.setLinkWeight(score);
                     n.setLinkSharability(linkSharability);
                     n.setLinkCreated(now);
@@ -247,7 +246,6 @@ public class NotesSemantics {
                 score *= a.getWeight();
 
                 Note n = view(a, depth - 1, filter, style);
-                n.setLinkValue(".");
                 n.setLinkWeight(score);
                 n.setLinkSharability(linkSharability);
                 n.setLinkCreated(now);
@@ -279,7 +277,6 @@ public class NotesSemantics {
         Note n = new Note();
 
         if (null != rootLink) {
-            n.setLinkValue(rootLink.getValue());
             n.setLinkKey(getKey(rootLink));
             n.setLinkWeight(rootLink.getWeight());
             n.setLinkSharability(rootLink.getSharability());
@@ -428,7 +425,6 @@ public class NotesSemantics {
 
                 if (linkExists(rootLink, rootTarget, link, target, n.isMeta(), style)) {
                     filter.makeVisible(link);
-                    link.setValue(n.getLinkValue());
                 } else {
                     createLink = true;
                 }
@@ -448,12 +444,10 @@ public class NotesSemantics {
                 }
 
                 link = getAtom(linkKey);
-                link.setValue(n.getLinkValue());
             }
 
             if (createLink) {
                 link = createAtom(filter);
-                link.setValue(n.getLinkValue());
                 setLink(link, rootLink, rootTarget, target, n.isMeta(), style);
             }
 

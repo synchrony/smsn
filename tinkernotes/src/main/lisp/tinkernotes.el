@@ -308,11 +308,6 @@
             (propertize text 'face (list 'bold 'italic  :foreground color :background background))
             (propertize text 'face (list :foreground color :background background))))))
 
-(defun unescape-link-value (value)
-    (replace-regexp-in-string "[ ]" "\\\\ "
-        (replace-regexp-in-string "[)]" "\\\\)"
-            (replace-regexp-in-string "[(]" "\\\\(" value))))
-
 (defun light-gray (text background)
     (propertize text
 	    'face (if full-colors-supported
@@ -347,7 +342,6 @@
         (children (cdr (assoc 'children json))))
             (let (
                 (link-key (get-key link))
-                (link-value (get-value link))
 		        (link-weight (get-weight link))
 	            (link-sharability (get-sharability link))
                 (target-key (get-key target))
@@ -357,7 +351,6 @@
 		            (if link-key (puthash link-key link tn-atoms))
 		            (if target-key (puthash target-key target tn-atoms))
 		            ;;(if (not link-key) (error "missing link key"))
-		            ;;(if (not link-value) (error (concat "missing value for link with key " link-key)))
 		            (if (not link-weight) (error (concat "missing weight for link with key " link-key)))
 		            (if (not link-sharability) (error (concat "missing sharability for link with key " link-key)))
 		            (if (not target-key) (error "missing target key"))
@@ -373,7 +366,7 @@
                             (setq line (concat line (light-gray space "white") " ")))
 					    (if meta (setq line (concat line (dark-gray "(" "white"))))
 					    (setq line (concat line
-					        (colorize (unescape-link-value link-value) link-weight link-sharability t "white")))
+					        (colorize "\u25ba" link-weight link-sharability t "white")))
 					    (if meta (setq line (concat line (dark-gray ")" "white"))))
                         (setq line (concat line
                             (colorize (concat " " target-value "\n") target-weight target-sharability nil "white")))
@@ -393,7 +386,7 @@
          " :style " tn-style
          " :sharability [" (number-to-string tn-min-sharability) ", " (number-to-string tn-default-sharability) ", " (number-to-string tn-max-sharability) "]"
          " :weight [" (number-to-string tn-min-weight) ", " (number-to-string tn-default-weight) ", " (number-to-string tn-max-weight) "]"
-         " :title \"" tn-title "\")"))  ;; TODO: actuallly escape the title string
+         " :value \"" tn-title "\")"))  ;; TODO: actuallly escape the title string
 
 (defun to-forward-style (style)
     (cond

@@ -54,7 +54,6 @@ public class NotesSyntax {
         link.put("key", n.getLinkKey());
         link.put("weight", n.getLinkWeight());
         link.put("sharability", n.getLinkSharability());
-        link.put("value", n.getLinkValue());
         link.put("created", n.getLinkCreated());
         //}
 
@@ -276,7 +275,6 @@ public class NotesSyntax {
 
                 Note n = new Note();
                 n.setTargetValue(targetValue);
-                n.setLinkValue(linkValue);
                 n.setMeta(meta);
 
                 n.setTargetKey(targetKey);
@@ -305,7 +303,6 @@ public class NotesSyntax {
         for (NoteContext c : contexts) {
             Note n = new Note();
             n.setTargetValue(c.getTargetValue());
-            n.setLinkValue(".");
             notes.add(n);
 
             if (c.getChildren().size() > 0) {
@@ -376,14 +373,10 @@ public class NotesSyntax {
             p.print("    ");
         }
 
-        String lv = escapeLinkValue(sanitizeValue(n.getLinkValue()));
-
         if (n.isMeta()) {
-            p.print("(");
-            p.print(lv);
-            p.print(")");
+            p.print("(*)");
         } else {
-            p.print(lv);
+            p.print("*");
         }
         p.print(" ");
 

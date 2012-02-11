@@ -62,7 +62,6 @@ public class NotesSyntaxTest extends TestCase {
         assertEquals("c", contexts.get(0).getNotes().get(0).getChildren().get(1).getTargetValue());
         assertTrue(contexts.get(0).getNotes().get(0).getChildren().get(1).isMeta());
         assertEquals("d", contexts.get(0).getNotes().get(1).getTargetValue());
-        assertEquals("is a", contexts.get(0).getNotes().get(1).getLinkValue());
         assertEquals("", contexts.get(0).getTargetValue());
         assertEquals("second context", contexts.get(1).getTargetValue());
         assertEquals("e", contexts.get(1).getNotes().get(0).getTargetValue());

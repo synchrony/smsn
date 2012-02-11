@@ -10,7 +10,6 @@ public class Note extends NoteNode {
     private final List<Note> children;
 
     private String qualifier;
-    private String linkValue;
     private boolean meta = false;
 
     private Float linkWeight;
@@ -22,14 +21,6 @@ public class Note extends NoteNode {
 
     public Note() {
         children = new LinkedList<Note>();
-    }
-
-    public String getLinkValue() {
-        return linkValue;
-    }
-
-    public void setLinkValue(String linkValue) {
-        this.linkValue = linkValue;
     }
 
     public List<Note> getChildren() {
@@ -54,11 +45,7 @@ public class Note extends NoteNode {
         if (null != d && d.length() > 20) {
             d = d.substring(0, 17) + "...";
         }
-        String t = getLinkValue();
-        if (null != t && t.length() > 20) {
-            t = t.substring(0, 17) + "...";
-        }
-        return "note(" + t + ", " + d + ")";
+        return "note(" + d + ")";
     }
 
     public Float getTargetWeight() {
