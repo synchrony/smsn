@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -83,24 +82,22 @@ public class NotesSyntax {
 
     public List<Note> readNotes(final InputStream in) throws IOException, NoteParsingException {
         List<Note> notes = new LinkedList<Note>();
-        parseInternal(in, null, notes);
+        parseInternal(in, notes);
         return notes;
     }
 
     public List<NoteContext> readContexts(final InputStream in) throws IOException, NoteParsingException {
         List<NoteContext> contexts = new LinkedList<NoteContext>();
-        parseInternal(in, contexts, null);
+        parseInternal(in, null);
         return contexts;
     }
 
     private void parseInternal(final InputStream in,
-                               final Collection<NoteContext> contexts,
                                final Collection<Note> notes) throws IOException, NoteParsingException {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
         LinkedList<Integer> indentHierarachy = new LinkedList<Integer>();
 
         NoteContext context = null;
-        boolean flat = null == contexts;
 
         InputStreamReader r = new InputStreamReader(in, "UTF-8");
         BufferedReader br = new BufferedReader(r);
@@ -115,37 +112,34 @@ public class NotesSyntax {
             // Tabs count as four spaces.
             l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
 
-            if (0 == l.trim().length()) {
-                // In the "flat" format, empty lines are simply ignored
-                if (!flat) {
-                    context = null;
-                    hierarchy.clear();
-                    indentHierarachy.clear();
-                }
-            } else if (l.trim().startsWith("[")) {
-                if (flat) {
-                    throw new NoteParsingException(lineNumber, "contexts are not allowed in the 'flat' format");
-                } else {
-                    int m = l.lastIndexOf("]");
-                    if (m < 0) {
-                        throw new NoteParsingException(lineNumber, "non-terminated note context");
-                    }
-                    String text = l.substring(l.indexOf("[") + 1, m).trim();
-
-                    hierarchy.clear();
-                    indentHierarachy.clear();
-                    context = new NoteContext(text);
-                    contexts.add(context);
-                }
-            } else {
-                boolean meta = false;
-
-                // Find indent level
-                int indent = 0;
+            // Find indent level
+            int indent = 0;
+            if (l.length() > 0) {
                 while (' ' == l.charAt(indent)) {
                     indent++;
                 }
                 l = l.substring(indent);
+            }
+
+            if (l.startsWith("[")) {
+                int i = l.indexOf("]");
+
+                if (i < 0) {
+                    throw new NoteParsingException(lineNumber, "unmatched parenthesis for comment");
+                }
+
+                indent += i + 1;
+
+                while (' ' == l.charAt(indent)) {
+                    indent++;
+                }
+                l = l.substring(indent);
+            }
+
+            if (0 == l.trim().length()) {
+                // empty lines are simply ignored
+            } else {
+                boolean meta = false;
 
                 // Extract keys
                 String targetKey = null;
@@ -184,11 +178,6 @@ public class NotesSyntax {
                     indentHierarachy.removeLast();
                 }
 
-                if (0 == hierarchy.size() && null == context && !flat) {
-                    context = new NoteContext("");
-                    contexts.add(context);
-                }
-
                 boolean esc = false;
                 int j = -1;
                 for (int i = 0; i < l.length(); i++) {
@@ -214,9 +203,9 @@ public class NotesSyntax {
                 } else if (ew || sw) {
                     throw new NoteParsingException(lineNumber, "ambiguous meta-link syntax: unmatched parenthesis");
                 }
-                String linkValue = unescapeLinkValue(v);
-                if (linkValue.length() > MAX_TYPE_LENGTH) {
-                    throw new NoteParsingException(lineNumber, "apparent note type is too long: " + linkValue);
+                String bullet = v;
+                if (bullet.length() > MAX_TYPE_LENGTH) {
+                    throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
                 }
                 while (j < l.length() && ' ' == l.charAt(j)) {
                     j++;
@@ -283,11 +272,7 @@ public class NotesSyntax {
                 if (0 < hierarchy.size()) {
                     hierarchy.get(hierarchy.size() - 1).addChild(n);
                 } else {
-                    if (flat) {
-                        notes.add(n);
-                    } else {
-                        context.addNote(n);
-                    }
+                    notes.add(n);
                 }
 
                 hierarchy.add(n);
@@ -330,22 +315,6 @@ public class NotesSyntax {
         }
 
         return true;
-    }
-
-    private static String escapeLinkValue(final String value) {
-        return value
-                //.replace("\\", "\\\\")
-                .replace(" ", "\\ ")
-                .replace("(", "\\(")
-                .replace(")", "\\)");
-    }
-
-    private static String unescapeLinkValue(final String value) {
-        return value
-                .replace("\\)", ")")
-                .replace("\\(", "(")
-                .replace("\\ ", " ");
-                //.replace("\\\\", "\\");
     }
 
     private static String sanitizeValue(final String value) {
@@ -395,20 +364,5 @@ public class NotesSyntax {
         }
 
         return id;
-    }
-
-    public static void main(final String[] args) throws Exception {
-        NotesSyntax p = new NotesSyntax();
-        List<NoteContext> contexts;
-
-        InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
-        try {
-            contexts = p.readContexts(in);
-        } finally {
-            in.close();
-        }
-
-        //p.writeContexts(contexts, System.out);
-        //p.writeNotes(p.flatten(contexts), Format.JSON, System.out);
     }
 }

@@ -22,70 +22,26 @@ public class NotesSyntaxTest extends TestCase {
     public void tearDown() throws Exception {
     }
 
-    public void testTmp() throws Exception {
-        String s = "" +
-                "GrdTrmd:Hay7TuT: U  fortytwo.net projects\n" +
-                "csekKaM:C70Oqur:     C  MyOtherBrain\n" +
-                "ZkJScVw:eTHUNUx:         C  TinkerNotes\n" +
-                "0t11pdd:gN3poPv:     C  Laboratory projects\n" +
-                "kghy&0w:XfmjTyu:     C  Jig\n" +
-                "oHESvPC:XW7uw26:     C  SPARQL-OSC\n" +
-                "e4gT3La:pje68IN:     C  Droidspeak\n" +
-                "0z0BUet:tfVoMXt:     C  RDFAgents\n" +
-                "gAE5AmS:vgVAPdJ:     C  SesameTools\n" +
-                "xwXrTx2:ZycosUd:     C  TwitLogic\n" +
-                "OvW2663:@p7UD3W:     C  Ripple";
-
-        List<Note> notes = readNotes(s);
-        //syntax.writeNotes(notes, System.out);
-    }
-
-    public void testAll() throws Exception {
-        String s = "" +
-                "                 . a\n" +
-                "                                .  b\n" +
-                "                                (.)  c\n" +
-                "                 is\\ a  d\n" +
-                "\n" +
-                "[second context]\n" +
-                "                 .    e\n" +
-                "0000000:1111111: .  f\n" +
-                "#####42:2222222: .  g";
-
-        List<NoteContext> contexts = readContexts(s);
-        assertEquals(2, contexts.size());
-        assertEquals(2, contexts.get(0).getNotes().size());
-        assertEquals(3, contexts.get(1).getNotes().size());
-        assertEquals(2, contexts.get(0).getNotes().get(0).getChildren().size());
-        assertEquals("a", contexts.get(0).getNotes().get(0).getTargetValue());
-        assertFalse(contexts.get(0).getNotes().get(0).getChildren().get(0).isMeta());
-        assertEquals("c", contexts.get(0).getNotes().get(0).getChildren().get(1).getTargetValue());
-        assertTrue(contexts.get(0).getNotes().get(0).getChildren().get(1).isMeta());
-        assertEquals("d", contexts.get(0).getNotes().get(1).getTargetValue());
-        assertEquals("", contexts.get(0).getTargetValue());
-        assertEquals("second context", contexts.get(1).getTargetValue());
-        assertEquals("e", contexts.get(1).getNotes().get(0).getTargetValue());
-
-        // Link and target keys
-        assertNull(contexts.get(1).getNotes().get(0).getLinkKey());
-        assertNull(contexts.get(1).getNotes().get(0).getTargetKey());
-        assertEquals("f", contexts.get(1).getNotes().get(1).getTargetValue());
-        assertEquals("0000000", contexts.get(1).getNotes().get(1).getLinkKey());
-        assertEquals("1111111", contexts.get(1).getNotes().get(1).getTargetKey());
-
-        // "Ephemeral" link keys
-        assertEquals("g", contexts.get(1).getNotes().get(2).getTargetValue());
-        assertNull(contexts.get(1).getNotes().get(2).getLinkKey());
-        assertEquals("2222222", contexts.get(1).getNotes().get(2).getTargetKey());
-    }
-
-    private List<NoteContext> readContexts(final String s) throws IOException, NotesSyntax.NoteParsingException {
-        InputStream in = new ByteArrayInputStream(s.getBytes());
-        try {
-            return syntax.readContexts(in);
-        } finally {
-            in.close();
-        }
+    public void testReadNotes() throws Exception {
+        List<Note> notes = syntax.readNotes(NotesSyntax.class.getResourceAsStream("example-notes.txt"));
+        assertEquals(8, notes.size());
+        Note indentation = notes.get(1);
+        assertNull(indentation.getTargetKey());
+        assertNull(indentation.getLinkKey());
+        assertEquals("indentation", indentation.getTargetValue());
+        assertEquals("and this", indentation.getChildren()
+                .get(2).getChildren()
+                .get(0).getChildren()
+                .get(0).getChildren()
+                .get(0).getTargetValue());
+        Note n = notes.get(4).getChildren().get(2);
+        assertEquals("xyz", n.getLinkKey());
+        assertEquals("XYZ", n.getTargetKey());
+        Note comments = notes.get(5);
+        assertEquals("comments", comments.getTargetValue());
+        n = notes.get(5).getChildren().get(1);
+        assertEquals("abc", n.getLinkKey());
+        assertEquals("def", n.getTargetKey());
     }
 
     private List<Note> readNotes(final String s) throws IOException, NotesSyntax.NoteParsingException {

@@ -1,0 +1,33 @@
+                 * basic syntax
+                     * TinkerNotes uses a slight variant of wiki list syntax
+                     * basically, you have nested lists with bullets and values
+                 * indentation
+                     * white space before the bullet is indentation
+                     * it determines the level of nesting
+                     * items can be nested to any level
+                         * like this...
+                             * and this...
+                                 * and this
+                     * a child must be indented more than its parent
+                        * and identically to its siblings
+                        * but it can be indented differently than its cousins
+                 * bullets
+                    * the asterisk is the default bullet, but
+                    - other strings can also be bullets
+                    note: they must be <= 5 chars long
+                    *  at least one space is required between bullet and value
+                    *        but more spaces are OK
+                 * blank lines
+
+                    * they're OK
+                 * id pairs
+123:456:            * TinkerNotes deals with graph data where nodes and links have ids
+foo:bar:            * each line represents a link a target node
+&@1:Za@:                * both link and target have a base-64 id
+   xyz:XYZ:         * for the purpose of indentation, an id prefix counts as whitespace
+                 * comments
+[hi!]               * comments are enclosed in square braces, and are ignored
+[foo] abc:def:      * comments before keys before bullets before values
+                 * meta-links
+                    (*) these will probably go away, but for now they're supported
+                 * got it?

@@ -3,9 +3,7 @@ package net.fortytwo.myotherbrain.notes;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
@@ -23,8 +21,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.sail.Sail;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -696,35 +692,5 @@ public class NotesSemantics {
         public boolean isInverse() {
             return inverse;
         }
-    }
-
-    public static void main(final String[] args) throws Exception {
-
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-
-        NotesSyntax p = new NotesSyntax();
-        List<Note> notes;
-
-        //InputStream in = new FileInputStream("/tmp/notes.txt");
-        InputStream in = new FileInputStream("/Users/josh/notes/notes.txt");
-        try {
-            notes = p.flatten(p.readContexts(in));
-        } finally {
-            in.close();
-        }
-
-        IndexableGraph graph = new TinkerGraph();
-        MOBGraph store = new MOBGraph(graph);
-        NotesSemantics m = new NotesSemantics(store);
-        Atom root = m.createAtom(filter);
-        root.asVertex().setProperty(MyOtherBrain.KEY, "00000");
-        root.setValue("Josh's notes");
-        m.update(root, notes, 0, filter, ViewStyle.TARGETS);
-
-        //GraphMLWriter.outputGraph(graph, System.out);
-        //System.out.println();
-
-        Note n = m.view(root, 3, filter, ViewStyle.TARGETS);
-        p.writeNotes(n.getChildren(), System.out);
     }
 }
