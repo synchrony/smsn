@@ -385,7 +385,7 @@ public class NotesSyntax {
         } else {
             p.print(lv);
         }
-        p.print("  ");
+        p.print(" ");
 
         p.print(sanitizeValue(n.getTargetValue()));
 

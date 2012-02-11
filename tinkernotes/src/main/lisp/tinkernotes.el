@@ -376,7 +376,7 @@
 					        (colorize (unescape-link-value link-value) link-weight link-sharability t "white")))
 					    (if meta (setq line (concat line (dark-gray ")" "white"))))
                         (setq line (concat line
-                            (colorize (concat "  " target-value "\n") target-weight target-sharability nil "white")))
+                            (colorize (concat " " target-value "\n") target-weight target-sharability nil "white")))
                         (insert (propertize line
                             ;;'invisible t
 			                    'link-key link-key
