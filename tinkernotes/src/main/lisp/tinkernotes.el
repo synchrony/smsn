@@ -1,5 +1,6 @@
 (eval-when-compile (require 'cl))
 (require 'json)
+(require 'linum)
 
 (require 'goto-addr)
 
@@ -78,6 +79,9 @@
 (setq tn-atoms nil)
 (setq tn-current-line 1)
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
+
+(setq tn-enable-linum t)
+(linum-mode tn-enable-linum)
 
 (defun current-line ()
     (interactive)
@@ -255,6 +259,7 @@
                     ;; This is not always possible and not always helpful, but it is often both.
                     (beginning-of-line tn-current-line)
                     (setq buffer-read-only (not editable))
+                    (linum-mode tn-enable-linum)
                     (info-message (concat "updated to view " (view-info)))))))
 
 (defun receive-export-results (status)
@@ -1195,9 +1200,14 @@
 (global-set-key (kbd "C-c C-w C-] d")   'tn-set-max-weight-3)
 (global-set-key (kbd "C-c C-w C-] f")   'tn-set-max-weight-4)
 
+(defun toggle-linum-mode ()
+    (interactive)
+    (setq tn-enable-linum (not tn-enable-linum))
+    (linum-mode tn-enable-linum))
 
 ;; Note: these should perhaps be local settings
 (global-set-key (kbd "C-c C-v ;") 'toggle-truncate-lines)
+(global-set-key (kbd "C-c C-g l") 'toggle-linum-mode)
 (setq-default truncate-lines t)
 (if full-colors-supported
     (let ()
