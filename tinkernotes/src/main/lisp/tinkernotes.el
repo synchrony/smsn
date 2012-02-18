@@ -4,6 +4,8 @@
 
 (require 'goto-addr)
 
+(require 'ring)
+
 ;; Required global variables: tinkernotes-rexster-host, tinkernotes-rexster-port, tinkernotes-rexster-graph
 ;;
 ;; For example:
@@ -82,6 +84,26 @@
 
 (setq tn-enable-linum t)
 (linum-mode tn-enable-linum)
+
+(setq number-keymap (make-hash-table))
+(puthash "a" 1 number-keymap)
+(puthash "s" 2 number-keymap)
+(puthash "d" 3 number-keymap)
+(puthash "f" 4 number-keymap)
+(puthash "g" 5 number-keymap)
+(puthash "h" 6 number-keymap)
+(puthash "j" 7 number-keymap)
+(puthash "k" 8 number-keymap)
+(puthash "l" 9 number-keymap)
+(puthash ";" 0 number-keymap)
+
+;;(setq tn-point-ring (make-ring 7))
+
+(defun tn-push-point ()
+    (interactive)
+    (let ((addr (read-from-minibuffer "line: ")))
+        (copy-region-as-kill (line-beginning-position) (line-end-position))
+        (print (ring-remove kill-ring 0))))
 
 (defun current-line ()
     (interactive)
@@ -1080,6 +1102,7 @@
 (global-set-key (kbd "C-c C-a t")       'insert-current-time)
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
+(global-set-key (kbd "C-c C-f")         'tn-push-point)
 (global-set-key (kbd "C-c C-l i")       'tn-link-info)
 (global-set-key (kbd "C-c C-l C-s 1")   'tn-set-link-sharability-1)
 (global-set-key (kbd "C-c C-l C-s 2")   'tn-set-link-sharability-2)

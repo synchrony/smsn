@@ -38,8 +38,8 @@ public class SearchExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        LOGGER.info("search request for \"" + query + "\"");
-        System.err.println("search request for \"" + query + "\"");
+        LOGGER.info("tinkernotes search \"" + query + "\"");
+        System.err.println("tinkernotes search \"" + query + "\"");
 
         Principal user = null == security ? null : security.getUserPrincipal();
 

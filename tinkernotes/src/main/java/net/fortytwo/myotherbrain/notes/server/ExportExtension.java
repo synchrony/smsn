@@ -35,8 +35,8 @@ public class ExportExtension extends TinkerNotesExtension {
                                            @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "file", description = "the path of the file to which to export") String file) {
-        LOGGER.info("exporting graph to file: " + file);
-        System.err.println("exporting graph to file: " + file);
+        LOGGER.info("tinkernotes export " + file);
+        System.err.println("tinkernotes export " + file);
 
         Principal user = null == security ? null : security.getUserPrincipal();
 

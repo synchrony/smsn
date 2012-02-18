@@ -86,18 +86,10 @@ public class NotesSyntax {
         return notes;
     }
 
-    public List<NoteContext> readContexts(final InputStream in) throws IOException, NoteParsingException {
-        List<NoteContext> contexts = new LinkedList<NoteContext>();
-        parseInternal(in, null);
-        return contexts;
-    }
-
     private void parseInternal(final InputStream in,
                                final Collection<Note> notes) throws IOException, NoteParsingException {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
         LinkedList<Integer> indentHierarachy = new LinkedList<Integer>();
-
-        NoteContext context = null;
 
         InputStreamReader r = new InputStreamReader(in, "UTF-8");
         BufferedReader br = new BufferedReader(r);
@@ -281,23 +273,6 @@ public class NotesSyntax {
                 //System.out.println("\tindent: " + indent);
             }
         }
-    }
-
-    public List<Note> flatten(final List<NoteContext> contexts) {
-        List<Note> notes = new LinkedList<Note>();
-        for (NoteContext c : contexts) {
-            Note n = new Note();
-            n.setTargetValue(c.getTargetValue());
-            notes.add(n);
-
-            if (c.getChildren().size() > 0) {
-                n.getChildren().addAll(flatten(c.getChildren()));
-            }
-
-            n.getChildren().addAll(c.getNotes());
-        }
-
-        return notes;
     }
 
     public class NoteParsingException extends Exception {

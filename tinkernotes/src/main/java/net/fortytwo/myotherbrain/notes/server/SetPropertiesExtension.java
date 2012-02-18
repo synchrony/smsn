@@ -30,8 +30,8 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "key", description = "key of the atom to be changed") String key,
                                            @ExtensionRequestParameter(name = "weight", description = "new weight of the atom") Float weight,
                                            @ExtensionRequestParameter(name = "sharability", description = "new sharability of the atom") Float sharability) {
-        LOGGER.info("set properties request for: " + key);
-        System.err.println("set properties request for: " + key);
+        LOGGER.info("tinkernotes set properties " + key);
+        System.err.println("tinkernotes set properties " + key);
 
         Principal user = null == security ? null : security.getUserPrincipal();
 

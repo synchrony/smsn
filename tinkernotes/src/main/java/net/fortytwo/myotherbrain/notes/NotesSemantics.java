@@ -39,7 +39,6 @@ public class NotesSemantics {
 
     private final MOBGraph store;
     private final FramesManager manager;
-    private final Model rippleModel;
     private final QueryEngine rippleQueryEngine;
 
     public NotesSemantics(final MOBGraph store) {
@@ -54,7 +53,7 @@ public class NotesSemantics {
 
             //sail = new RecorderSail(sail, System.out);
 
-            rippleModel = new SesameModel(sail);
+            Model rippleModel = new SesameModel(sail);
             rippleQueryEngine = new QueryEngine(rippleModel);
         } catch (Exception e) {
             throw new IllegalStateException(e);

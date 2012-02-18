@@ -42,8 +42,8 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
 
-        LOGGER.info("update request for: " + rootKey);
-        System.err.println("update request for: " + rootKey);
+        LOGGER.info("tinkernotes update " + rootKey);
+        System.err.println("tinkernotes update " + rootKey);
 
         Principal user = null == security ? null : security.getUserPrincipal();
 
