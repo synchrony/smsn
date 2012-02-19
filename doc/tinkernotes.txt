@@ -13,6 +13,7 @@ for (Vertex v : g.V) { v.setProperty("sharability", (float) 0.5); }
 for (Vertex v : g.V) { v.removeProperty("visibility"); }
 
 for (Edge e : g.E) { e.removeProperty("created"); }
+for (Vertex v : g.V) { v.removeProperty("key"); }
 
 ba  IDEA's XML formatter appears to have the bad habit of inserting line breaks into long lines of text (which currently causes TinkerNotes to break)
 

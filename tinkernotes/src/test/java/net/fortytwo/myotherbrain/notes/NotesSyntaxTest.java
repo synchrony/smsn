@@ -24,7 +24,7 @@ public class NotesSyntaxTest extends TestCase {
 
     public void testReadNotes() throws Exception {
         List<Note> notes = syntax.readNotes(NotesSyntax.class.getResourceAsStream("example-notes.txt"));
-        assertEquals(7, notes.size());
+        assertEquals(6, notes.size());
         Note indentation = notes.get(1);
         assertNull(indentation.getTargetKey());
         assertEquals("indentation", indentation.getTargetValue());
@@ -33,16 +33,16 @@ public class NotesSyntaxTest extends TestCase {
                 .get(0).getChildren()
                 .get(0).getChildren()
                 .get(0).getTargetValue());
+        Note ws = notes.get(3);
+        assertEquals(4, ws.getChildren().size());
+        assertEquals("newlines can be preserved with triple braces {{{\n" +
+                "like this.\n" +
+                "Use as many lines of text as you need.\n" +
+                "}}}", ws.getChildren().get(2).getTargetValue());
         Note ids = notes.get(4);
         assertEquals("ids", ids.getTargetValue());
-        assertEquals("456", ids.getChildren().get(0).getTargetKey());
-        assertEquals("bar", ids.getChildren().get(1).getTargetKey());
-        assertEquals("Za@", ids.getChildren().get(2).getTargetKey());
-        assertEquals("XYZ", ids.getChildren().get(3).getTargetKey());
-        Note comments = notes.get(5);
-        assertEquals("comments", comments.getTargetValue());
-        Note n = notes.get(5).getChildren().get(1);
-        assertEquals("def", n.getTargetKey());
+        assertEquals("0txXBm", ids.getChildren().get(0).getTargetKey());
+        assertEquals("cE85nD", ids.getChildren().get(1).getTargetKey());
     }
 
     private List<Note> readNotes(final String s) throws IOException, NotesSyntax.NoteParsingException {

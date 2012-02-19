@@ -54,54 +54,6 @@ public class NotesSemantics {
         }
     }
 
-    /*
-    private void transformTmp() {
-        System.out.println("permanently transforming target graph...");
-
-        IndexableGraph g = store.getGraph();
-
-        try {
-            for (Vertex v : g.getVertices()) {
-                Vertex from = getFrom(v);
-                Vertex to = getTo(v);
-                if (null != from && null != to) {
-                    Edge edge = g.addEdge(null, from, to, NOTE);
-                    edge.setProperty("created", v.getProperty("created"));
-                    g.removeVertex(v);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-        }
-
-        System.out.println("\tdone.");
-    }
-
-    private Vertex getFrom(final Vertex v) {
-        Iterable<Edge> i = v.getOutEdges("from");
-        if (null != i) {
-            Iterator<Edge> iter = i.iterator();
-            if (iter.hasNext()) {
-                return iter.next().getInVertex();
-            }
-        }
-
-        return null;
-    }
-
-    private Vertex getTo(final Vertex v) {
-        Iterable<Edge> i = v.getOutEdges("to");
-        if (null != i) {
-            Iterator<Edge> iter = i.iterator();
-            if (iter.hasNext()) {
-                return iter.next().getInVertex();
-            }
-        }
-
-        return null;
-    }
-    */
-
     /**
      * Generates a view of the graph.
      *
@@ -119,8 +71,6 @@ public class NotesSemantics {
                      final int depth,
                      final Filter filter,
                      final boolean inverse) {
-        //transformTmp();
-
         if (null == root) {
             throw new IllegalArgumentException("null root");
         }

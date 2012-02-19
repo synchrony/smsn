@@ -102,21 +102,6 @@ public class NotesSyntax {
                 l = l.substring(indent);
             }
 
-            if (l.startsWith("[")) {
-                int i = l.indexOf("]");
-
-                if (i < 0) {
-                    throw new NoteParsingException(lineNumber, "unmatched parenthesis for comment");
-                }
-
-                indent += i + 1;
-
-                while (' ' == l.charAt(indent)) {
-                    indent++;
-                }
-                l = l.substring(indent);
-            }
-
             if (0 == l.trim().length()) {
                 // empty lines are simply ignored
             } else {

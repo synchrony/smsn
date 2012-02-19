@@ -1,31 +1,33 @@
-                 * basic syntax
-                     * TinkerNotes uses a slight variant of wiki list syntax
-                     * basically, you have nested lists with bullets and values
-                 * indentation
-                     * white space before the bullet is indentation
-                     * it determines the level of nesting
-                     * items can be nested to any level
-                         * like this...
-                             * and this...
-                                 * and this
-                     * a child must be indented more than its parent
-                        * and identically to its siblings
-                        * but it can be indented differently than its cousins
-                 * bullets
-                    * the asterisk is the default bullet, but
-                    - other strings can also be bullets
-                    !! they must be 1 or 2 chars long
-                    *  at least one space is required between bullet and value
-                    *        but more spaces are OK
-                 * blank lines
+        * basic syntax
+            * TinkerNotes uses a slight variant of wiki list syntax
+            * basically, you have nested notes with bullets and values
+        * indentation
+            * all white space before the bullet is indentation
+            * it determines the degree of nesting
+            * notes can be nested to any degree
+                * like this...
+                    * and this...
+                        * and this
+            * a child must be indented more than its parent
+              * and identically to its siblings
+              * but it can be indented differently than its cousins
+        * bullets
+            * the asterisk is the default bullet, but
+            - other strings can also be bullets
+            !! they must be 1 or 2 characters long
+            *  at least one space is required between bullet and value
+            *        but more spaces are OK, too
+        * white space
+            * tab characters are converted to four spaces each: "    "
+            * all other whitespace characters count as single spaces: " "
+            * newlines can be preserved with triple braces {{{
+like this.
+Use as many lines of text as you need.
+}}}
 
-                    * they're OK
-                 * ids
-456:                * TinkerNotes deals with graph data where nodes have ids
-bar:                * each line represents a node
-Za@:                * the node has a base-64 id
-       XYZ:         * for the purpose of indentation, an id prefix counts as whitespace
-                 * comments
-[hi!]               * comments are enclosed in square braces, and are ignored
-[foo]     def:      * comments before keys before bullets before values
-                 * got it?
+            * blank lines don't matter
+
+        * ids
+0txXBm:     * each note has a base-64 id, which is indicated with a prefix
+cE85nD:     * the id prefix is optional, and it is treated as white space
+        * got it?
