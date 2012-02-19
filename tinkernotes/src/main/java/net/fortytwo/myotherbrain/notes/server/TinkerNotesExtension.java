@@ -86,13 +86,15 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             if (null != styleName) {
-                p.style = NotesSemantics.ViewStyle.find(styleName);
-
-                if (null == p.style) {
+                if (styleName.equals("targets")) {
+                    p.inverse = false;
+                } else if (styleName.equals("targets-inverse")) {
+                    p.inverse = true;
+                } else {
                     return ExtensionResponse.error("unsupported view style: " + styleName);
                 }
 
-                p.map.put("style", p.style.getName());
+                p.map.put("style", p.inverse ? "targets-inverse" : "targets");
             }
 
             boolean manual;
@@ -143,7 +145,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     }
 
     protected void addView(final Params p) throws IOException {
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style);
+        Note n = p.semantics.view(p.root, p.depth, p.filter, p.inverse);
         JSONObject json;
 
         try {
@@ -177,13 +179,12 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Atom root;
         public Integer depth;
         public String view;
-        public NotesSemantics.ViewStyle style;
+        public boolean inverse;
         public Filter filter;
         public String query;
         public Float newWeight;
         public Float newSharability;
         public String rootKey;
         public String styleName;
-        public String file;
     }
 }

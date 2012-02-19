@@ -6,15 +6,11 @@ import java.util.List;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Note extends NoteNode {
+public class Note {
     private final List<Note> children;
 
-    private String qualifier;
-    private boolean meta = false;
-
-    private Float linkWeight;
-    private Float linkSharability;
-    private Long linkCreated;
+    private String targetValue;
+    private String targetKey;
     private Float targetWeight;
     private Float targetSharability;
     private Long targetCreated;
@@ -23,20 +19,28 @@ public class Note extends NoteNode {
         children = new LinkedList<Note>();
     }
 
+    public String getTargetValue() {
+        return targetValue;
+    }
+
+    public void setTargetValue(final String targetValue) {
+        this.targetValue = targetValue;
+    }
+
+    public String getTargetKey() {
+        return targetKey;
+    }
+
+    public void setTargetKey(final String targetKey) {
+        this.targetKey = targetKey;
+    }
+
     public List<Note> getChildren() {
         return children;
     }
 
     public void addChild(Note child) {
         children.add(child);
-    }
-
-    public String getQualifier() {
-        return qualifier;
-    }
-
-    public void setQualifier(String qualifier) {
-        this.qualifier = qualifier;
     }
 
     @Override
@@ -64,43 +68,11 @@ public class Note extends NoteNode {
         this.targetSharability = targetSharability;
     }
 
-    public Float getLinkWeight() {
-        return linkWeight;
-    }
-
-    public void setLinkWeight(Float linkWeight) {
-        this.linkWeight = linkWeight;
-    }
-
-    public Float getLinkSharability() {
-        return linkSharability;
-    }
-
-    public void setLinkSharability(Float linkSharability) {
-        this.linkSharability = linkSharability;
-    }
-
-    public Long getLinkCreated() {
-        return linkCreated;
-    }
-
-    public void setLinkCreated(Long linkCreated) {
-        this.linkCreated = linkCreated;
-    }
-
     public Long getTargetCreated() {
         return targetCreated;
     }
 
     public void setTargetCreated(Long targetCreated) {
         this.targetCreated = targetCreated;
-    }
-
-    public boolean isMeta() {
-        return meta;
-    }
-
-    public void setMeta(boolean meta) {
-        this.meta = meta;
     }
 }

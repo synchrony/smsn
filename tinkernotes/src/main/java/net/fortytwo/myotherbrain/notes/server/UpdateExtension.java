@@ -42,8 +42,8 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
 
-        LOGGER.info("tinkernotes update " + rootKey);
-        System.err.println("tinkernotes update " + rootKey);
+        LOGGER.info("tinkernotes update " + rootKey + " (depth " + depth + ")");
+        System.err.println("tinkernotes update " + rootKey + " (depth " + depth + ")");
 
         Principal user = null == security ? null : security.getUserPrincipal();
 
@@ -53,8 +53,6 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         if (null == user) {
             System.err.println("no security");
-        } else {
-            System.out.println("user: " + user.getName());
         }
 
         Filter filter;
@@ -89,7 +87,7 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         // Apply the update
         try {
-            p.semantics.update(p.root, children, p.depth, p.filter, p.style);
+            p.semantics.update(p.root, children, p.depth, p.filter, p.inverse);
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }

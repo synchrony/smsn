@@ -34,8 +34,8 @@ public class ViewExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        LOGGER.info("tinkernotes view " + rootKey);
-        System.err.println("tinkernotes view " + rootKey);
+        LOGGER.info("tinkernotes view " + rootKey + " (depth " + depth + ")");
+        System.err.println("tinkernotes view " + rootKey + " (depth " + depth + ")");
 
         Principal user = null == security ? null : security.getUserPrincipal();
 

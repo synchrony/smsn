@@ -26,7 +26,7 @@ public class MOBGraph {
         return manager;
     }
 
-    public static String getKey(final Atom a) {
+    public static String getId(final Atom a) {
         return (String) a.asVertex().getId();
     }
 

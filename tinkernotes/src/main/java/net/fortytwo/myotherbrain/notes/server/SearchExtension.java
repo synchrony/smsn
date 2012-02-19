@@ -1,7 +1,6 @@
 package net.fortytwo.myotherbrain.notes.server;
 
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
 import com.tinkerpop.rexster.extension.ExtensionNaming;
@@ -16,6 +15,7 @@ import org.json.JSONObject;
 
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 
 /**
@@ -27,7 +27,6 @@ public class SearchExtension extends TinkerNotesExtension {
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
     public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
-                                           @RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
@@ -38,6 +37,13 @@ public class SearchExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
+        try {
+            // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
+            query = new String(query.getBytes(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+
         LOGGER.info("tinkernotes search \"" + query + "\"");
         System.err.println("tinkernotes search \"" + query + "\"");
 
@@ -75,7 +81,7 @@ public class SearchExtension extends TinkerNotesExtension {
     }
 
     protected void addSearchResults(final Params p) throws IOException {
-        Note n = p.semantics.search(p.query, p.depth, p.filter, p.style);
+        Note n = p.semantics.search(p.query, p.depth, p.filter, p.inverse);
         JSONObject json;
 
         try {

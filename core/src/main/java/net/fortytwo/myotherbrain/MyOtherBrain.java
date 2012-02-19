@@ -34,10 +34,8 @@ public class MyOtherBrain {
 
     public static final String
             CREATED = "created",
-            FROM = "from",
-            KEY = "key",
+            NOTE = "note",
             SHARABILITY = "sharability",
-            TO = "to",
             VALUE = "value",
             WEIGHT = "weight";
 

@@ -24,23 +24,24 @@ public class NotesSyntaxTest extends TestCase {
 
     public void testReadNotes() throws Exception {
         List<Note> notes = syntax.readNotes(NotesSyntax.class.getResourceAsStream("example-notes.txt"));
-        assertEquals(8, notes.size());
+        assertEquals(7, notes.size());
         Note indentation = notes.get(1);
         assertNull(indentation.getTargetKey());
-        assertNull(indentation.getLinkKey());
         assertEquals("indentation", indentation.getTargetValue());
         assertEquals("and this", indentation.getChildren()
                 .get(2).getChildren()
                 .get(0).getChildren()
                 .get(0).getChildren()
                 .get(0).getTargetValue());
-        Note n = notes.get(4).getChildren().get(2);
-        assertEquals("xyz", n.getLinkKey());
-        assertEquals("XYZ", n.getTargetKey());
+        Note ids = notes.get(4);
+        assertEquals("ids", ids.getTargetValue());
+        assertEquals("456", ids.getChildren().get(0).getTargetKey());
+        assertEquals("bar", ids.getChildren().get(1).getTargetKey());
+        assertEquals("Za@", ids.getChildren().get(2).getTargetKey());
+        assertEquals("XYZ", ids.getChildren().get(3).getTargetKey());
         Note comments = notes.get(5);
         assertEquals("comments", comments.getTargetValue());
-        n = notes.get(5).getChildren().get(1);
-        assertEquals("abc", n.getLinkKey());
+        Note n = notes.get(5).getChildren().get(1);
         assertEquals("def", n.getTargetKey());
     }
 

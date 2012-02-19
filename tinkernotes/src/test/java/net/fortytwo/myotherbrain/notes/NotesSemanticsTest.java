@@ -8,17 +8,12 @@ import com.tinkerpop.frames.FramesManager;
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
-import net.fortytwo.myotherbrain.MyOtherBrain;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -57,9 +52,9 @@ public class NotesSemanticsTest extends TestCase {
 
         //System.out.println(before.getTargetValue());
 
-        semantics.update(root, rootNote.getChildren(), 1, f, NotesSemantics.ViewStyle.TARGETS);
+        semantics.update(root, rootNote.getChildren(), 1, f, false);
 
-        Note after = semantics.view(root, 1, f, NotesSemantics.ViewStyle.TARGETS);
+        Note after = semantics.view(root, 1, f, false);
 
         JSONObject json = syntax.toJSON(after);
         //System.out.println(json.toString());
@@ -170,27 +165,6 @@ public class NotesSemanticsTest extends TestCase {
         } finally {
             in.close();
         }
-    }
-
-    private Set<Atom> getAssociatedAtoms(final Atom subject) {
-        Set<Atom> s = new HashSet<Atom>();
-        for (Atom ass : getOutboundAssociations(subject)) {
-
-        }
-
-        return s;
-    }
-
-    private Collection<Atom> getOutboundAssociations(final Atom subject) {
-        Collection<Atom> c = new LinkedList<Atom>();
-
-        for (Edge e : subject.asVertex().getInEdges()) {
-            if (e.getLabel().equals(MyOtherBrain.FROM)) {
-                c.add(getAtom(e.getOutVertex()));
-            }
-        }
-
-        return c;
     }
 
     //public void main(final String[] args) throws Exception {

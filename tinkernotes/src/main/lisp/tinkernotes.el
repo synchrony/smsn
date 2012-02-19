@@ -67,7 +67,7 @@
 (setq tn-depth 3)
 (setq tn-root nil)
 (setq tn-title nil)
-(setq tn-style "hybrid")
+(setq tn-style "targets")
 ;; "private" atoms are hidden to begin with
 (setq tn-min-sharability 0.25)
 (setq tn-max-sharability 1)
@@ -111,18 +111,16 @@
 
 (defun find-id ()
     (let ((line (current-line)))
-        (if (string-match "^[0-9A-Za-z@&#]*:[0-9A-Za-z@&]*: " line)
+        (if (string-match "^[0-9A-Za-z@&]*: " line)
             (let (
-                (i2 (string-match ":" line))
                 (i3 (string-match ": " line)))
                 (let (
-                    (s1 (substring line 0 i2))
-                    (s2 (substring line (+ 1 i2) i3)))
+                    (s2 (substring line 0 i3)))
                     (let (
-                        (assoc-id (if (< 0 (length s1)) s1 nil))
+                        (assoc-id nil)
                         (atom-id (if (< 0 (length s2)) s2 nil)))
                         (list assoc-id atom-id))))
-            (list (get-text-property (line-beginning-position) 'link-key) (get-text-property (line-beginning-position) 'target-key))
+            (list nil (get-text-property (line-beginning-position) 'target-key))
             )))
 
 (defun get-key (atom)
@@ -150,12 +148,6 @@
 (defun current-target-key ()
     (car (last (find-id))))
 
-(defun current-link-key ()
-    (car (find-id)))
-
-(defun current-link ()
-    (get-atom (current-link-key)))
-
 (defun current-target ()
     (get-atom (current-target-key)))
 
@@ -166,11 +158,6 @@
 
 (defun current-target-sharability ()
     (let ((g (current-target)))
-        (if g
-            (get-sharability g))))
-
-(defun current-link-sharability ()
-    (let ((g (current-link)))
         (if g
             (get-sharability g))))
 
@@ -199,13 +186,6 @@
                  " sharability: " (number-to-string sharability)
                  " created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
                  " value: " value))))
-
-(defun tn-link-info ()
-    (interactive)
-    (let ((link (current-link)))
-        (if link
-            (show-info link)
-            (no-link))))
 
 (defun tn-target-info()
     (interactive)
@@ -351,9 +331,8 @@
     (let ((max 0))
         (let (
             (children (cdr (assoc 'children json)))
-            (link-key (get-key (cdr (assoc 'link json))))
             (target-key (get-key (cdr (assoc 'target json)))))
-                (let ((length (+ (length link-key) (length target-key) 2)))
+                (let ((length (+ (length target-key) 1)))
                     (if (> length max) (setq max length)))
                 (loop for child across children do
                     (let ((length (longest-key child)))
@@ -363,43 +342,32 @@
 (defun write-view (editable children key-indent tree-indent)
     (loop for json across children do
     (let (
-        (meta (eq t (cdr (assoc 'meta json))))
         (link (cdr (assoc 'link json)))
         (target (cdr (assoc 'target json)))
         (children (cdr (assoc 'children json))))
             (let (
-                (link-key (get-key link))
-		        (link-weight (get-weight link))
-	            (link-sharability (get-sharability link))
                 (target-key (get-key target))
                 (target-value (get-value target))
 		        (target-weight (get-weight target))
 		        (target-sharability (get-sharability target)))
-		            (if link-key (puthash link-key link tn-atoms))
 		            (if target-key (puthash target-key target tn-atoms))
-		            ;;(if (not link-key) (error "missing link key"))
-		            (if (not link-weight) (error (concat "missing weight for link with key " link-key)))
-		            (if (not link-sharability) (error (concat "missing sharability for link with key " link-key)))
 		            (if (not target-key) (error "missing target key"))
 		            (if (not target-value) (error (concat "missing value for target with key " target-key)))
 		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
-		            (let ((line "") (key (concat link-key ":" target-key ":")))
+		            (let ((line "") (key (concat target-key ":")))
 		                (loop for i from 1 to (- key-indent (length key)) do (setq key (concat key " ")))
                         (setq line (concat line
                             (propertize (light-gray key "white") 'invisible (not editable))))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
-					    (if meta (setq line (concat line (dark-gray "(" "white"))))
 					    (setq line (concat line
-					        (colorize "\u25ba" link-weight link-sharability t "white")))
-					    (if meta (setq line (concat line (dark-gray ")" "white"))))
+					        (colorize "\u25ba" target-weight target-sharability t "white")))
                         (setq line (concat line
                             (colorize (concat " " target-value "\n") target-weight target-sharability nil "white")))
                         (insert (propertize line
                             ;;'invisible t
-			                    'link-key link-key
 			                    'target-key target-key)))
                     (write-view editable children key-indent (+ tree-indent 4))))))
 
@@ -417,48 +385,13 @@
 
 (defun to-forward-style (style)
     (cond
-        ((string-equal style "hybrid") "hybrid")
         ((string-equal style "targets") "targets")
-        ((string-equal style "links") "links")
-        ((string-equal style "hybrid-inverse") "hybrid")
-        ((string-equal style "targets-inverse") "targets")
-        ((string-equal style "links-inverse") "links")))
+        ((string-equal style "targets-inverse") "targets")))
 
 (defun to-backward-style (style)
     (cond
-        ((string-equal style "hybrid") "hybrid-inverse")
         ((string-equal style "targets") "targets-inverse")
-        ((string-equal style "links") "links-inverse")
-        ((string-equal style "hybrid-inverse") "hybrid-inverse")
-        ((string-equal style "targets-inverse") "targets-inverse")
-        ((string-equal style "links-inverse") "links-inverse")))
-
-(defun to-hybrid-style (style)
-    (cond
-        ((string-equal style "hybrid") "hybrid")
-        ((string-equal style "targets") "hybrid")
-        ((string-equal style "links") "hybrid")
-        ((string-equal style "hybrid-inverse") "hybrid-inverse")
-        ((string-equal style "targets-inverse") "hybrid-inverse")
-        ((string-equal style "links-inverse") "hybrid-inverse")))
-
-(defun to-links-style (style)
-    (cond
-        ((string-equal style "hybrid") "links")
-        ((string-equal style "targets") "links")
-        ((string-equal style "links") "links")
-        ((string-equal style "hybrid-inverse") "links-inverse")
-        ((string-equal style "targets-inverse") "links-inverse")
-        ((string-equal style "links-inverse") "links-inverse")))
-
-(defun to-targets-style (style)
-    (cond
-        ((string-equal style "hybrid") "targets")
-        ((string-equal style "targets") "targets")
-        ((string-equal style "links") "targets")
-        ((string-equal style "hybrid-inverse") "targets-inverse")
-        ((string-equal style "targets-inverse") "targets-inverse")
-        ((string-equal style "links-inverse") "targets-inverse")))
+        ((string-equal style "targets-inverse") "targets-inverse")))
 
 (defun request-view (preserve-line mode root depth style minv maxv defaultv minw maxw defaultw)
     (setq tn-current-line (if preserve-line (line-number-at-pos) 1))
@@ -506,7 +439,7 @@
 
 (defun do-export ()
     (http-get
-        (concat (base-url) "export?file=/tmp/tinkernotes-dump.txt") 'receive-export-results))
+        (concat (base-url) "export") 'receive-export-results))
 
 (defun mode-for-visit ()
     (if (or (equal tn-mode tn-edit-mode) (equal tn-mode tn-readonly-mode))
@@ -519,13 +452,6 @@
         (if key
             (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight tn-default-weight)
             (no-target))))
-
-(defun tn-visit-link ()
-    (interactive)
-    (let ((key (current-link-key)))
-        (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-link-sharability)) tn-min-weight tn-max-weight tn-default-weight)
-            (no-link))))
 
 (defun tn-search ()
     (interactive)
@@ -609,21 +535,6 @@
     (interactive)
     (if (in-view)
         (request-view nil tn-mode tn-root tn-depth (to-backward-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
-
-(defun tn-refresh-to-hybrid-view ()
-    (interactive)
-    (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth (to-hybrid-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
-
-(defun tn-refresh-to-links-view ()
-    (interactive)
-    (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth (to-links-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
-
-(defun tn-refresh-to-targets-view ()
-    (interactive)
-    (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth (to-targets-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
 
 ;; set weight ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -874,35 +785,6 @@
                             (error-message msg)))
                  (url-retrieve url (receive-view mode)))))))))
 
-(defun set-link-weight (v)
-    (if (and (> v 0) (<= v 1))
-        (let ((link (current-link)))
-            (if link
-                (let (
-                    (key (get-key link))
-                    (weight (get-weight link))
-                    (sharability (get-sharability link)))
-	                    (set-properties key v sharability))
-	            (no-link)))
-        (error-message
-            (concat "weight " (number-to-string v) " is outside of range (0, 1]"))))
-
-(defun tn-set-link-weight-1 ()
-    (interactive)
-    (set-link-weight 0.25))
-
-(defun tn-set-link-weight-2 ()
-    (interactive)
-    (set-link-weight 0.5))
-
-(defun tn-set-link-weight-3 ()
-    (interactive)
-    (set-link-weight 0.75))
-
-(defun tn-set-link-weight-4 ()
-    (interactive)
-    (set-link-weight 1.0))
-
 (defun set-target-weight (v)
     (if (and (> v 0) (<= v 1))
         (let ((target (current-target)))
@@ -931,35 +813,6 @@
 (defun tn-set-target-weight-4 ()
     (interactive)
     (set-target-weight 1.0))
-
-(defun set-link-sharability (v)
-    (if (and (> v 0) (<= v 1))
-        (let ((link (current-link)))
-            (if link
-                (let (
-                    (key (get-key link))
-                    (weight (get-weight link))
-                    (sharability (get-sharability link)))
-	                    (set-properties key weight v))
-	            (no-link)))
-        (error-message
-            (concat "sharability " (number-to-string v) " is outside of range (0, 1]"))))
-
-(defun tn-set-link-sharability-1 ()
-    (interactive)
-    (set-link-sharability 0.25))
-
-(defun tn-set-link-sharability-2 ()
-    (interactive)
-    (set-link-sharability 0.5))
-
-(defun tn-set-link-sharability-3 ()
-    (interactive)
-    (set-link-sharability 0.75))
-
-(defun tn-set-link-sharability-4 ()
-    (interactive)
-    (set-link-sharability 1.0))
 
 (defun set-target-sharability (v)
     (if (and (> v 0) (<= v 1))
@@ -1091,7 +944,6 @@
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-debug)
 (global-set-key (kbd "C-c e")           'tn-export)
-(global-set-key (kbd "C-c l")           'tn-visit-link)
 (global-set-key (kbd "C-c p")           'tn-push-view)
 (global-set-key (kbd "C-c r")           'tn-ripple-query)
 (global-set-key (kbd "C-c s")           'tn-search)
@@ -1103,23 +955,6 @@
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
 (global-set-key (kbd "C-c C-f")         'tn-push-point)
-(global-set-key (kbd "C-c C-l i")       'tn-link-info)
-(global-set-key (kbd "C-c C-l C-s 1")   'tn-set-link-sharability-1)
-(global-set-key (kbd "C-c C-l C-s 2")   'tn-set-link-sharability-2)
-(global-set-key (kbd "C-c C-l C-s 3")   'tn-set-link-sharability-3)
-(global-set-key (kbd "C-c C-l C-s 4")   'tn-set-link-sharability-4)
-(global-set-key (kbd "C-c C-l C-s a")   'tn-set-link-sharability-1)
-(global-set-key (kbd "C-c C-l C-s s")   'tn-set-link-sharability-2)
-(global-set-key (kbd "C-c C-l C-s d")   'tn-set-link-sharability-3)
-(global-set-key (kbd "C-c C-l C-s f")   'tn-set-link-sharability-4)
-(global-set-key (kbd "C-c C-l C-w 1")   'tn-set-link-weight-1)
-(global-set-key (kbd "C-c C-l C-w 2")   'tn-set-link-weight-2)
-(global-set-key (kbd "C-c C-l C-w 3")   'tn-set-link-weight-3)
-(global-set-key (kbd "C-c C-l C-w 4")   'tn-set-link-weight-4)
-(global-set-key (kbd "C-c C-l C-w a")   'tn-set-link-weight-1)
-(global-set-key (kbd "C-c C-l C-w s")   'tn-set-link-weight-2)
-(global-set-key (kbd "C-c C-l C-w d")   'tn-set-link-weight-3)
-(global-set-key (kbd "C-c C-l C-w f")   'tn-set-link-weight-4)
 (global-set-key (kbd "C-c C-s ,")       'tn-decrease-default-sharability)
 (global-set-key (kbd "C-c C-s .")       'tn-increase-default-sharability)
 (global-set-key (kbd "C-c C-s 1")       'tn-set-default-sharability-1)
@@ -1184,10 +1019,7 @@
 (global-set-key (kbd "C-c C-v b")       'tn-refresh-to-backward-view)
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
-(global-set-key (kbd "C-c C-v h")       'tn-refresh-to-hybrid-view)
-(global-set-key (kbd "C-c C-v l")       'tn-refresh-to-links-view)
 (global-set-key (kbd "C-c C-v r")       'tn-enter-readonly-view)
-(global-set-key (kbd "C-c C-v t")       'tn-refresh-to-targets-view)
 (global-set-key (kbd "C-c C-w ,")       'tn-decrease-default-weight)
 (global-set-key (kbd "C-c C-w .")       'tn-increase-default-weight)
 (global-set-key (kbd "C-c C-w 1")       'tn-set-default-weight-1)

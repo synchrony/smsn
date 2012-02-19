@@ -21,9 +21,9 @@ import java.util.regex.Pattern;
  */
 public class NotesSyntax {
     // Regex of valid id prefixes, including parentheses, colon and trailing space
-    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&#]+:[a-zA-Z0-9@&]+:");
+    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:");
 
-    private static final int MAX_TYPE_LENGTH = 5;
+    private static final int MAX_BULLET_LENGTH = 2;
 
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
@@ -45,27 +45,16 @@ public class NotesSyntax {
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
 
-        //if (null != n.getLinkKey()) {
         JSONObject link = new JSONObject();
         json.put("link", link);
-        json.put("meta", n.isMeta());
 
-        link.put("key", n.getLinkKey());
-        link.put("weight", n.getLinkWeight());
-        link.put("sharability", n.getLinkSharability());
-        link.put("created", n.getLinkCreated());
-        //}
-
-        //if (null != n.getTargetKey()) {
         JSONObject target = new JSONObject();
         json.put("target", target);
-
         target.put("key", n.getTargetKey());
         target.put("weight", n.getTargetWeight());
         target.put("sharability", n.getTargetSharability());
         target.put("value", n.getTargetValue());
         target.put("created", n.getTargetCreated());
-        //}
 
         if (0 < n.getChildren().size()) {
             JSONArray c = new JSONArray();
@@ -131,22 +120,12 @@ public class NotesSyntax {
             if (0 == l.trim().length()) {
                 // empty lines are simply ignored
             } else {
-                boolean meta = false;
-
                 // Extract keys
                 String targetKey = null;
-                String linkKey = null;
                 int k = l.indexOf(" ");
                 if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k)).matches()) {
                     int i = l.indexOf(":");
-                    int j = l.indexOf(":", i + 1);
-                    linkKey = l.substring(0, i);
-                    targetKey = l.substring(i + 1, j);
-
-                    // Hashes are tolerated for "ephemeral" keys, but these are not true keys.
-                    if (linkKey.contains("#")) {
-                        linkKey = null;
-                    }
+                    targetKey = l.substring(0, i);
 
                     l = l.substring(k);
                     indent += k;
@@ -186,17 +165,8 @@ public class NotesSyntax {
                     j = l.length();
                 }
 
-                String v = l.substring(0, j);
-                boolean sw = v.startsWith("(");
-                boolean ew = v.replace("\\)", ".").endsWith(")");
-                if (sw && ew) {
-                    meta = true;
-                    v = v.substring(1, v.length() - 1);
-                } else if (ew || sw) {
-                    throw new NoteParsingException(lineNumber, "ambiguous meta-link syntax: unmatched parenthesis");
-                }
-                String bullet = v;
-                if (bullet.length() > MAX_TYPE_LENGTH) {
+                String bullet = l.substring(0, j);
+                if (bullet.length() > MAX_BULLET_LENGTH) {
                     throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
                 }
                 while (j < l.length() && ' ' == l.charAt(j)) {
@@ -256,10 +226,8 @@ public class NotesSyntax {
 
                 Note n = new Note();
                 n.setTargetValue(targetValue);
-                n.setMeta(meta);
 
                 n.setTargetKey(targetKey);
-                n.setLinkKey(linkKey);
 
                 if (0 < hierarchy.size()) {
                     hierarchy.get(hierarchy.size() - 1).addChild(n);
@@ -269,8 +237,6 @@ public class NotesSyntax {
 
                 hierarchy.add(n);
                 indentHierarachy.add(indent);
-                //System.out.println("\tsize: " + hierarchy.size());
-                //System.out.println("\tindent: " + indent);
             }
         }
     }
@@ -302,11 +268,7 @@ public class NotesSyntax {
                                   final int indent,
                                   final PrintStream p) {
 
-        if (null != n.getTargetKey() || null != n.getLinkKey()) {
-            if (null != n.getLinkKey()) {
-                p.print(padKey(n.getLinkKey()));
-            }
-            p.print(":");
+        if (null != n.getTargetKey()) {
             if (null != n.getTargetKey()) {
                 p.print(padKey(n.getTargetKey()));
             }
@@ -317,12 +279,7 @@ public class NotesSyntax {
             p.print("    ");
         }
 
-        if (n.isMeta()) {
-            p.print("(*)");
-        } else {
-            p.print("*");
-        }
-        p.print(" ");
+        p.print("* ");
 
         p.print(sanitizeValue(n.getTargetValue()));
 

@@ -61,7 +61,7 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         p.root.setWeight(p.newWeight);
         p.root.setSharability(p.newSharability);
 
-        p.map.put("key", MOBGraph.getKey(p.root));
+        p.map.put("key", MOBGraph.getId(p.root));
         p.map.put("weight", "" + p.newWeight);
         p.map.put("sharability", "" + p.newSharability);
 

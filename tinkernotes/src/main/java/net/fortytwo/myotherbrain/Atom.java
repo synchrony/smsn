@@ -1,8 +1,11 @@
 package net.fortytwo.myotherbrain;
 
+import com.tinkerpop.frames.Direction;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.Relation;
 import com.tinkerpop.frames.VertexFrame;
+
+import java.util.Collection;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -33,15 +36,21 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.WEIGHT)
     void setWeight(Float weight);
 
-    @Relation(label = MyOtherBrain.FROM)
-    Atom getFrom();
+    @Relation(label = MyOtherBrain.NOTE)
+    Collection<Atom> getOutNotes();
 
-    @Relation(label = MyOtherBrain.FROM)
-    void setFrom(Atom from);
+    @Relation(label = MyOtherBrain.NOTE)
+    void addOutNote(Atom other);
 
-    @Relation(label = MyOtherBrain.TO)
-    Atom getTo();
+    @Relation(label = MyOtherBrain.NOTE)
+    void removeOutNote(Atom other);
 
-    @Relation(label = MyOtherBrain.TO)
-    void setTo(Atom to);
+    @Relation(label = MyOtherBrain.NOTE, direction = Direction.INVERSE)
+    Collection<Atom> getInNotes();
+
+    @Relation(label = MyOtherBrain.NOTE, direction = Direction.INVERSE)
+    void addInNote(Atom other);
+
+    @Relation(label = MyOtherBrain.NOTE, direction = Direction.INVERSE)
+    void removeInNote(Atom other);
 }

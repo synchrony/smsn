@@ -76,7 +76,7 @@ public class RippleExtension extends TinkerNotesExtension {
     }
 
     protected void addSearchResults(final Params p) throws IOException, RippleException {
-        Note n = p.semantics.rippleQuery(p.query, p.depth, p.filter, p.style);
+        Note n = p.semantics.rippleQuery(p.query, p.depth, p.filter, p.inverse);
         JSONObject json;
 
         try {
