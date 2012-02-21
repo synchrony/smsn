@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.update.undo;
+package net.fortytwo.myotherbrain.util.undo;
 
 /**
  * Framework for undoable actions using the Command pattern.  Instances of this class should contain all information

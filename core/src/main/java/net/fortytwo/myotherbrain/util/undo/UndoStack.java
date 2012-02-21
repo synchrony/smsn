@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.update.undo;
+package net.fortytwo.myotherbrain.util.undo;
 
 /**
  * A "stack" of undoable actions with a fixed capacity.  It is possible to execute new actions, to undo them, and to

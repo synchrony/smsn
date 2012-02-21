@@ -232,10 +232,11 @@ public class NotesSemantics {
                                  final List<Note> children,
                                  final int depth,
                                  final Filter filter,
-                                 final boolean destructive,
+                                 boolean destructive,
                                  final boolean inverse) throws InvalidUpdateException {
-        if (0 == depth) {
-            return;
+        // Keep adding items beyond the depth of the view, but don't delete items.
+        if (0 >= depth) {
+            destructive = false;
         }
 
         Set<String> before = new HashSet<String>();
