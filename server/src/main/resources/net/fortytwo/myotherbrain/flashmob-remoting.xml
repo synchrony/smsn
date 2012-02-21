@@ -1,6 +1,0 @@
-<destination id="flashmobsession">
-    <properties>
-        <source>net.fortytwo.myotherbrain.flashmob.FlashMOBSession</source>
-        <scope>session</scope>
-    </properties>
-</destination>
