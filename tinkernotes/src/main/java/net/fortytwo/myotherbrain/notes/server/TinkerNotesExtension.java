@@ -4,20 +4,24 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.frames.FramesManager;
+import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
+import net.fortytwo.myotherbrain.notes.NotesHistory;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import net.fortytwo.myotherbrain.notes.NotesSyntax;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -27,12 +31,14 @@ import java.util.logging.Logger;
 public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected static final Logger LOGGER = Logger.getLogger(TinkerNotesExtension.class.getName());
 
+    private static final String HISTORY_ATTR = "history";
+
     protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
 
     protected abstract boolean isReadOnly();
 
     protected ExtensionResponse handleRequestInternal(final Params p) {
-        String rootKey = p.rootKey;
+        String rootKey = p.rootId;
         String styleName = p.styleName;
 
         try {
@@ -76,7 +82,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             if (null != rootKey) {
-                p.root = p.semantics.getAtom(rootKey);
+                p.root = p.graph.getAtom(rootKey);
                 if (null == p.root || (null != p.filter && !p.filter.isVisible(p.root))) {
                     return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
                 }
@@ -144,8 +150,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         }
     }
 
-    protected void addView(final Params p) throws IOException {
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.inverse);
+    protected void addView(Note n, Params p) throws IOException {
         JSONObject json;
 
         try {
@@ -169,7 +174,32 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         return null != user && user.getName().equals("josh");
     }
 
+    private NotesHistory getNotesHistory(final RexsterResourceContext context) {
+        HttpSession session = context.getRequest().getSession();
+        NotesHistory h = (NotesHistory) session.getAttribute(HISTORY_ATTR);
+        if (null == h) {
+            h = new NotesHistory();
+            session.setAttribute(HISTORY_ATTR, h);
+        }
+
+        return h;
+    }
+
+    protected void addToHistory(final String rootId,
+                                final RexsterResourceContext context) {
+        NotesHistory h = getNotesHistory(context);
+        h.visit(rootId);
+    }
+
+    protected List<String> getHistory(final RexsterResourceContext context,
+                                      final MOBGraph graph,
+                                      final Filter filter) {
+        NotesHistory h = getNotesHistory(context);
+        return h.getHistory(100, true, graph, filter);
+    }
+
     protected class Params {
+        public RexsterResourceContext context;
         public Map<String, String> map;
         public Graph baseGraph;
         public MOBGraph graph;
@@ -184,7 +214,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public String query;
         public Float newWeight;
         public Float newSharability;
-        public String rootKey;
+        public String rootId;
         public String styleName;
     }
 }

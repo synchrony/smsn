@@ -27,28 +27,26 @@ public class RippleExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
-    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
-                                           @RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "Ripple query") String query,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "defaultWeight", description = "weight of new atoms added to the view") Float defaultWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
         LOGGER.info("tinkernotes ripple \"" + query + "\"");
         System.err.println("tinkernotes ripple \"" + query + "\"");
 
+        SecurityContext security = context.getSecurityContext();
         Principal user = null == security ? null : security.getUserPrincipal();
 
         Filter filter;
 
         try {
             float m = findMinAuthorizedSharability(user, minSharability);
-            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+            filter = new Filter(m, maxSharability, -1, minWeight, maxWeight, -1);
         } catch (IllegalArgumentException e) {
             return ExtensionResponse.error(e.getMessage());
         }

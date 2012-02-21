@@ -40,7 +40,7 @@ public class NotesSemanticsTest extends TestCase {
     }
 
     public void testEncoding() throws Exception {
-        Filter f = new Filter();
+        Filter f = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
 
         Atom root = createAtom("11111");
 

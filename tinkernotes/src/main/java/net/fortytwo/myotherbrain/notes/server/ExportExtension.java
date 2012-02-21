@@ -29,12 +29,12 @@ public class ExportExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain graph for analysis in R")
-    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
-                                           @RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
         LOGGER.info("tinkernotes export ");
         System.err.println("tinkernotes export ");
 
+        SecurityContext security = context.getSecurityContext();
         Principal user = null == security ? null : security.getUserPrincipal();
 
         // TODO: any security restrictions here?

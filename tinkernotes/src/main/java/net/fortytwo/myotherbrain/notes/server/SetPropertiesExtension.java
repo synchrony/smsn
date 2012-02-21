@@ -24,15 +24,15 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for setting properties of given atoms")
-    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
-                                           @RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "key", description = "key of the atom to be changed") String key,
+                                           @ExtensionRequestParameter(name = "key", description = "id of the atom to be changed") String id,
                                            @ExtensionRequestParameter(name = "weight", description = "new weight of the atom") Float weight,
                                            @ExtensionRequestParameter(name = "sharability", description = "new sharability of the atom") Float sharability) {
-        LOGGER.info("tinkernotes set properties " + key);
-        System.err.println("tinkernotes set properties " + key);
+        LOGGER.info("tinkernotes set properties " + id);
+        System.err.println("tinkernotes set properties " + id);
 
+        SecurityContext security = context.getSecurityContext();
         Principal user = null == security ? null : security.getUserPrincipal();
 
         if (!canWrite(user)) {
@@ -52,7 +52,7 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         p.baseGraph = graph;
         p.newWeight = weight;
         p.newSharability = sharability;
-        p.rootKey = key;
+        p.rootId = id;
         return this.handleRequestInternal(p);
     }
 

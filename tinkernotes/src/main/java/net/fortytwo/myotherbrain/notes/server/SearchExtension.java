@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.notes.server;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
 import com.tinkerpop.rexster.extension.ExtensionNaming;
@@ -26,16 +27,14 @@ public class SearchExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
-    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
+    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "defaultWeight", description = "weight of new atoms added to the view") Float defaultWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
         try {
             // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
@@ -47,13 +46,14 @@ public class SearchExtension extends TinkerNotesExtension {
         LOGGER.info("tinkernotes search \"" + query + "\"");
         System.err.println("tinkernotes search \"" + query + "\"");
 
+        SecurityContext security = context.getSecurityContext();
         Principal user = null == security ? null : security.getUserPrincipal();
 
         Filter filter;
 
         try {
             float m = findMinAuthorizedSharability(user, minSharability);
-            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
+            filter = new Filter(m, maxSharability, -1, minWeight, maxWeight, -1);
         } catch (IllegalArgumentException e) {
             return ExtensionResponse.error(e.getMessage());
         }

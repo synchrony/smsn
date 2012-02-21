@@ -28,10 +28,9 @@ public class UpdateExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
     @ExtensionDescriptor(description = "an extension for updating a portion of a MyOtherBrain graph using the MOB Notes format")
-    public ExtensionResponse handleRequest(@RexsterContext SecurityContext security,
-                                           @RexsterContext RexsterResourceContext context,
+    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootKey,
+                                           @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
                                            @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
@@ -42,9 +41,10 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
 
-        LOGGER.info("tinkernotes update " + rootKey + " (depth " + depth + ")");
-        System.err.println("tinkernotes update " + rootKey + " (depth " + depth + ")");
+        LOGGER.info("tinkernotes update " + rootId + " (depth " + depth + ")");
+        System.err.println("tinkernotes update " + rootId + " (depth " + depth + ")");
 
+        SecurityContext security = context.getSecurityContext();
         Principal user = null == security ? null : security.getUserPrincipal();
 
         if (!canWrite(user)) {
@@ -69,9 +69,11 @@ public class UpdateExtension extends TinkerNotesExtension {
         p.depth = depth;
         p.filter = filter;
         p.view = view;
-        p.rootKey = rootKey;
+        p.rootId = rootId;
         p.styleName = styleName;
+
         return this.handleRequestInternal(p);
+        //visit(rootId, context);
     }
 
     @Override
@@ -92,7 +94,8 @@ public class UpdateExtension extends TinkerNotesExtension {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        addView(p);
+        Note n = p.semantics.view(p.root, p.depth, p.filter, p.inverse);
+        addView(n, p);
 
         return ExtensionResponse.ok(p.map);
     }

@@ -10,30 +10,27 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Filter;
-import net.fortytwo.myotherbrain.notes.Note;
 
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "view")
-public class ViewExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "tinkernotes", name = "history")
+public class HistoryExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the TinkerNotes format")
+    @ExtensionDescriptor(description = "an extension for viewing TinkerNotes browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        LOGGER.info("tinkernotes view " + rootId + " (depth " + depth + ")");
-        System.err.println("tinkernotes view " + rootId + " (depth " + depth + ")");
+                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
+        LOGGER.info("tinkernotes history");
+        System.err.println("tinkernotes history");
 
         SecurityContext security = context.getSecurityContext();
         Principal user = null == security ? null : security.getUserPrincipal();
@@ -49,22 +46,17 @@ public class ViewExtension extends TinkerNotesExtension {
 
         Params p = new Params();
         p.baseGraph = graph;
-        p.depth = depth;
         p.filter = filter;
-        p.rootId = rootId;
-        p.styleName = styleName;
-        ExtensionResponse r =  this.handleRequestInternal(p);
+        p.context = context;
 
-        addToHistory(rootId, context);
-
-        return r;
+        return this.handleRequestInternal(p);
     }
 
     @Override
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
+        List<String> ids = getHistory(p.context, p.graph, p.filter);
 
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.inverse);
-        addView(n, p);
+        addView(p.semantics.customView(ids, p.filter), p);
 
         return ExtensionResponse.ok(p.map);
     }

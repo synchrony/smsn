@@ -78,6 +78,22 @@ public class NotesSemantics {
         return viewRecursive(root, depth, filter, inverse);
     }
 
+    public Note customView(final List<String> atomIds,
+                           final Filter filter) {
+        Note n = new Note();
+
+        for (String id : atomIds) {
+            Atom a = store.getAtom(id);
+            if (null == a) {
+                throw new IllegalArgumentException("no such atom: " + id);
+            }
+
+            n.addChild(view(a, 0, filter, false));
+        }
+
+        return n;
+    }
+
     /**
      * Updates the graph.
      *
@@ -123,7 +139,7 @@ public class NotesSemantics {
         CloseableSequence<Vertex> i = store.getGraph().getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
         try {
             while (i.hasNext()) {
-                Atom a = getAtom(i.next());
+                Atom a = store.getAtom(i.next());
 
                 if (filter.isVisible(a)) {
                     Note n = view(a, depth - 1, filter, inverse);
@@ -186,7 +202,7 @@ public class NotesSemantics {
         }
 
         for (Vertex vx : vertices) {
-            Atom a = getAtom(vx);
+            Atom a = store.getAtom(vx);
 
             if (filter.isVisible(a)) {
                 Note n = view(a, depth - 1, filter, inverse);
@@ -198,6 +214,18 @@ public class NotesSemantics {
         return result;
     }
 
+    private Note toNote(final Atom a) {
+        Note n = new Note();
+
+        n.setTargetValue(a.getValue());
+        n.setTargetKey((String) a.asVertex().getId());
+        n.setTargetWeight(a.getWeight());
+        n.setTargetSharability(a.getSharability());
+        n.setTargetCreated(a.getCreated());
+
+        return n;
+    }
+
     private Note viewRecursive(final Atom root,
                                final int depth,
                                final Filter filter,
@@ -206,13 +234,7 @@ public class NotesSemantics {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = new Note();
-
-        n.setTargetValue(root.getValue());
-        n.setTargetKey((String) root.asVertex().getId());
-        n.setTargetWeight(root.getWeight());
-        n.setTargetSharability(root.getSharability());
-        n.setTargetCreated(root.getCreated());
+        Note n = toNote(root);
 
         if (depth > 0) {
             for (Atom target : inverse ? root.getInNotes() : root.getOutNotes()) {
@@ -256,7 +278,7 @@ public class NotesSemantics {
         if (destructive) {
             for (String id : before) {
                 if (!after.contains(id)) {
-                    Atom target = getAtom(id);
+                    Atom target = store.getAtom(id);
 
                     if (inverse) {
                         root.removeInNote(target);
@@ -273,9 +295,9 @@ public class NotesSemantics {
             Atom target;
 
             if (null == id) {
-                target = createAtom(filter);
+                target = store.createAtom(filter);
             } else {
-                target = getAtom(id);
+                target = store.getAtom(id);
 
                 if (null == target) {
                     throw new IllegalStateException("atom with given id '" + id + "' does not exist");
@@ -296,30 +318,6 @@ public class NotesSemantics {
                 updateRecursive(target, n.getChildren(), depth - 1, filter, destructive, inverse);
             }
         }
-    }
-
-    public Atom getAtom(final String key) {
-        Vertex v = store.getGraph().getVertex(key);
-
-        return null == v ? null : getAtom(v);
-    }
-
-    private Atom getAtom(final Vertex v) {
-        if (null == v) {
-            throw new IllegalArgumentException("null vertex");
-        }
-
-        return manager.frame(v, Atom.class);
-    }
-
-    private Atom createAtom(final Filter filter) {
-        Atom a = manager.frame(store.getGraph().addVertex(null), Atom.class);
-        a.setCreated(new Date().getTime());
-
-        a.setSharability(filter.defaultSharability);
-        a.setWeight(filter.defaultWeight);
-
-        return a;
     }
 
     private class NoteComparator implements Comparator<Note> {

@@ -62,6 +62,7 @@
 (setq tn-readonly-mode "readonly")
 (setq tn-edit-mode "readwrite")
 (setq tn-search-mode "search")
+(setq tn-history-mode "history")
 
 ;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
 (setq tn-depth 3)
@@ -73,6 +74,7 @@
 (setq tn-max-sharability 1)
 ;; default to "average" sharability to begin with
 (setq tn-default-sharability 0.5)
+(setq tn-future-sharability tn-default-sharability)
 ;; atoms of all weights are visible to begin with
 (setq tn-min-weight 0.0)
 (setq tn-max-weight 1.0)
@@ -219,7 +221,6 @@
                 (depth (cdr (assoc 'depth json)))
                 (min-sharability (string-to-number (cdr (assoc 'minSharability json))))
                 (max-sharability (string-to-number (cdr (assoc 'maxSharability json))))
-                (default-sharability (string-to-number (cdr (assoc 'defaultSharability json))))
                 (min-weight (string-to-number (cdr (assoc 'minWeight json))))
                 (max-weight (string-to-number (cdr (assoc 'maxWeight json))))
                 (default-weight (string-to-number (cdr (assoc 'defaultWeight json))))
@@ -243,11 +244,11 @@
                     (if depth (setq tn-depth (string-to-number depth)))
                     (setq tn-min-sharability min-sharability)
                     (setq tn-max-sharability max-sharability)
-                    (setq tn-default-sharability default-sharability)
+                    (setq tn-default-sharability tn-future-sharability)
                     (setq tn-min-weight min-weight)
                     (setq tn-max-weight max-weight)
                     (setq tn-default-weight default-weight)
-                    (setq tn-style style)
+                    (setq tn-style (if style style tn-style))
                     (setq tn-title title)
                     (setq tn-atoms (make-hash-table :test 'equal))
                     (setq tn-mode mode)
@@ -393,24 +394,34 @@
         ((string-equal style "targets") "targets-inverse")
         ((string-equal style "targets-inverse") "targets-inverse")))
 
-(defun request-view (preserve-line mode root depth style minv maxv defaultv minw maxw defaultw)
+(defun request-view (preserve-line mode root depth style minv maxv defaultv minw maxw)
     (setq tn-current-line (if preserve-line (line-number-at-pos) 1))
-    (http-get (request-view-url root depth style minv maxv defaultv minw maxw defaultw) (receive-view mode)))
+    (setq tn-future-sharability defaultv)
+    (http-get (request-view-url root depth style minv maxv minw maxw) (receive-view mode)))
 
-(defun request-view-url  (root depth style minv maxv defaultv minw maxw defaultw)
+(defun request-view-url  (root depth style minv maxv minw maxw)
 	(concat (base-url) "view"
             "?root=" (w3m-url-encode-string root)
             "&depth=" (number-to-string depth)
             "&minSharability=" (number-to-string minv)
             "&maxSharability=" (number-to-string maxv)
-            "&defaultSharability=" (number-to-string defaultv)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)
-            "&defaultWeight=" (number-to-string defaultw)
             "&style=" style))
+
+(defun request-history (minv maxv minw maxw)
+    (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
+    (http-get
+        (concat (base-url) "history"
+            "?minSharability=" (number-to-string minv)
+            "&maxSharability=" (number-to-string maxv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
 (defun request-search-results (query style minv maxv defaultv minw maxw defaultw)
     (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
     (http-get
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
@@ -425,6 +436,7 @@
 
 (defun request-ripple-results (query style minv maxv defaultv minw maxw defaultw)
     (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
     (http-get
         (concat (base-url) "ripple"
             "?query=" (w3m-url-encode-string query)
@@ -450,8 +462,13 @@
     (interactive)
     (let ((key (current-target-key)))
         (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight tn-default-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight)
             (no-target))))
+
+(defun tn-history ()
+    (interactive)
+    (request-history
+        tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
 
 (defun tn-search ()
     (interactive)
@@ -504,37 +521,37 @@
 (defun tn-refresh-view ()
     (interactive)
     (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-enter-edit-view ()
     (interactive)
     (if (and (in-view) (equal tn-mode tn-readonly-mode))
-        (request-view t tn-edit-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view t tn-edit-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-enter-readonly-view ()
     (interactive)
     (if (and (in-view) (equal tn-mode tn-edit-mode))
-        (request-view t tn-readonly-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view t tn-readonly-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-decrease-depth ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root (- tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view nil tn-mode tn-root (- tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-increase-depth ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root (+ tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view nil tn-mode tn-root (+ tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-refresh-to-forward-view ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth (to-forward-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view nil tn-mode tn-root tn-depth (to-forward-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-refresh-to-backward-view ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth (to-backward-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+        (request-view nil tn-mode tn-root tn-depth (to-backward-style tn-style) tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 
 ;; set weight ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -571,7 +588,7 @@
 
 (defun set-min-weight (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight tn-default-weight)
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -605,7 +622,7 @@
 
 (defun set-max-weight (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight s tn-default-weight)
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight s)
         (error-message
             (concat "max weight " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -671,7 +688,7 @@
 
 (defun set-min-sharability (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+        (request-view t tn-mode tn-root tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -705,7 +722,7 @@
 
 (defun set-max-sharability (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability s tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
+        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability s tn-default-sharability tn-min-weight tn-max-weight)
         (error-message
             (concat "max sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -748,6 +765,7 @@
         ;; The received view may very well differ from the pushed view in terms of line numbering,
         ;; but we'll try to stay on the same line anyway.
         (setq tn-current-line (line-number-at-pos))
+        (setq tn-future-sharability tn-default-sharability)
         (http-post
             (concat (base-url) "update")
             (list
@@ -768,8 +786,9 @@
     (if (in-view)
         (lexical-let (
                 (mode tn-mode)
-                (url (request-view-url tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
+                (url (request-view-url tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight)))
             (setq tn-current-line (line-number-at-pos))
+            (setq tn-future-sharability tn-default-sharability)
             (http-get
                 (concat (base-url) "set"
                     "?key=" (w3m-url-encode-string key)
@@ -944,6 +963,7 @@
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-debug)
 (global-set-key (kbd "C-c e")           'tn-export)
+(global-set-key (kbd "C-c h")           'tn-history)
 (global-set-key (kbd "C-c p")           'tn-push-view)
 (global-set-key (kbd "C-c r")           'tn-ripple-query)
 (global-set-key (kbd "C-c s")           'tn-search)

@@ -1,4 +1,5 @@
 net.fortytwo.myotherbrain.notes.server.ExportExtension
+net.fortytwo.myotherbrain.notes.server.HistoryExtension
 net.fortytwo.myotherbrain.notes.server.RippleExtension
 net.fortytwo.myotherbrain.notes.server.SearchExtension
 net.fortytwo.myotherbrain.notes.server.SetPropertiesExtension
