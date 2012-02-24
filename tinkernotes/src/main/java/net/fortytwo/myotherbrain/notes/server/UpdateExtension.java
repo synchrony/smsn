@@ -89,12 +89,12 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         // Apply the update
         try {
-            p.semantics.update(p.root, children, p.depth, p.filter, p.inverse);
+            p.semantics.update(p.root, children, p.depth, p.filter, true, p.style);
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.inverse);
+        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style);
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);

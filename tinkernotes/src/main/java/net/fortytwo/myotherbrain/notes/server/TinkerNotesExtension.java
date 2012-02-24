@@ -92,15 +92,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             if (null != styleName) {
-                if (styleName.equals("targets")) {
-                    p.inverse = false;
-                } else if (styleName.equals("targets-inverse")) {
-                    p.inverse = true;
-                } else {
-                    return ExtensionResponse.error("unsupported view style: " + styleName);
-                }
-
-                p.map.put("style", p.inverse ? "targets-inverse" : "targets");
+                p.style = NotesSemantics.lookupStyle(styleName);
+                p.map.put("style", p.style.getName());
             }
 
             boolean manual;
@@ -209,7 +202,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Atom root;
         public Integer depth;
         public String view;
-        public boolean inverse;
+        public NotesSemantics.AdjacencyStyle style;
         public Filter filter;
         public String query;
         public Float newWeight;

@@ -63,7 +63,7 @@ public class ViewExtension extends TinkerNotesExtension {
     @Override
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
 
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.inverse);
+        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style);
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);

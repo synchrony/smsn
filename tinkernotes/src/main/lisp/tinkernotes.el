@@ -69,6 +69,7 @@
 (setq tn-root nil)
 (setq tn-title nil)
 (setq tn-style "targets")
+;;(setq tn-style "undirected")
 ;; "private" atoms are hidden to begin with
 (setq tn-min-sharability 0.25)
 (setq tn-max-sharability 1)

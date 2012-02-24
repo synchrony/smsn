@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -54,20 +55,20 @@ public class NotesSemantics {
     /**
      * Generates a view of the graph.
      *
-     * @param root    the key of the root atom of the view
-     * @param depth   the depth of the view.
-     *                A view of depth 0 contains only the root,
-     *                while a view of depth 1 also contains all children of the root,
-     *                a view of depth 2 all grandchildren, etc.
-     * @param filter  a collection of criteria for atoms and links.
-     *                Atoms and links which do not meet the criteria are not to appear in the view.
-     * @param inverse whether to produce an inverse view
+     * @param root   the key of the root atom of the view
+     * @param depth  the depth of the view.
+     *               A view of depth 0 contains only the root,
+     *               while a view of depth 1 also contains all children of the root,
+     *               a view of depth 2 all grandchildren, etc.
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in the view.
+     * @param style  the adjacency style of the view
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
-    private Note view(final Atom root,
+    public Note view(final Atom root,
                       final int depth,
                       final Filter filter,
-                      final boolean inverse) {
+                      final AdjacencyStyle style) {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -75,9 +76,9 @@ public class NotesSemantics {
         Note n = toNote(root);
 
         if (depth > 0) {
-            for (Atom target : getAdjacentNotes(root, inverse)) {
+            for (Atom target : style.getLinked(root)) {
                 if (filter.isVisible(target)) {
-                    Note cn = view(target, depth - 1, filter, inverse);
+                    Note cn = view(target, depth - 1, filter, style);
                     n.addChild(cn);
                 }
             }
@@ -98,7 +99,7 @@ public class NotesSemantics {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(view(a, 0, filter, false));
+            n.addChild(view(a, 0, filter, FORWARD_DIRECTED_ADJACENCY));
         }
 
         return n;
@@ -113,7 +114,7 @@ public class NotesSemantics {
      * @param filter      a collection of criteria for atoms and links.
      *                    Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param destructive whether to remove items which do not appear in the update view
-     * @param inverse     whether to push an inverse view
+     * @param style       the adjacency style of the view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
@@ -121,7 +122,7 @@ public class NotesSemantics {
                        final int depth,
                        final Filter filter,
                        boolean destructive,
-                       final boolean inverse) throws InvalidUpdateException {
+                       final AdjacencyStyle style) throws InvalidUpdateException {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -132,7 +133,7 @@ public class NotesSemantics {
         }
 
         Set<String> before = new HashSet<String>();
-        for (Note n : view(root, 1, filter, inverse).getChildren()) {
+        for (Note n : view(root, 1, filter, style).getChildren()) {
             before.add(n.getTargetKey());
         }
 
@@ -150,7 +151,7 @@ public class NotesSemantics {
                 if (!after.contains(id)) {
                     Atom target = store.getAtom(id);
 
-                    unlink(root, target, inverse);
+                    style.unlink(root, target);
                 }
             }
         }
@@ -173,15 +174,11 @@ public class NotesSemantics {
             target.setValue(n.getTargetValue());
 
             if (!before.contains(id)) {
-                if (inverse) {
-                    root.addInNote(target);
-                } else {
-                    root.addOutNote(target);
-                }
+                style.link(root, target);
 
-                update(target, n.getChildren(), depth - 1, filter, false, inverse);
+                update(target, n.getChildren(), depth - 1, filter, false, style);
             } else {
-                update(target, n.getChildren(), depth - 1, filter, destructive, inverse);
+                update(target, n.getChildren(), depth - 1, filter, destructive, style);
             }
         }
     }
@@ -189,17 +186,17 @@ public class NotesSemantics {
     /**
      * Performs full text search.
      *
-     * @param query   the search query
-     * @param depth   depth of the search results view
-     * @param filter  a collection of criteria for atoms and links.
-     *                Atoms and links which do not meet the criteria are not to appear in search results.
-     * @param inverse whether to produce an inverse view
+     * @param query  the search query
+     * @param depth  depth of the search results view
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param style  the adjacency style of the view
      * @return an ordered list of query results
      */
     public Note search(final String query,
                        final int depth,
                        final Filter filter,
-                       final boolean inverse) {
+                       final AdjacencyStyle style) {
 
         Note result = new Note();
         result.setTargetValue("full text search results for \"" + query + "\"");
@@ -211,7 +208,7 @@ public class NotesSemantics {
                 Atom a = store.getAtom(i.next());
 
                 if (filter.isVisible(a)) {
-                    Note n = view(a, depth - 1, filter, inverse);
+                    Note n = view(a, depth - 1, filter, style);
                     result.addChild(n);
                 }
             }
@@ -226,11 +223,11 @@ public class NotesSemantics {
     /**
      * Performs a Ripple query.
      *
-     * @param query   the Ripple query to execute
-     * @param depth   depth of the search results view
-     * @param filter  a collection of criteria for atoms and links.
-     *                Atoms and links which do not meet the criteria are not to appear in search results.
-     * @param inverse whether to produce an inverse view
+     * @param query  the Ripple query to execute
+     * @param depth  depth of the search results view
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param style  the adjacency style of the view
      * @return an ordered list of query results
      * @throws net.fortytwo.ripple.RippleException
      *          if the query fails in Ripple
@@ -238,7 +235,7 @@ public class NotesSemantics {
     public Note rippleQuery(final String query,
                             final int depth,
                             final Filter filter,
-                            final boolean inverse) throws RippleException {
+                            final AdjacencyStyle style) throws RippleException {
 
         Note result = new Note();
         result.setTargetValue("Ripple results for \"" + query + "\"");
@@ -272,7 +269,7 @@ public class NotesSemantics {
             Atom a = store.getAtom(vx);
 
             if (filter.isVisible(a)) {
-                Note n = view(a, depth - 1, filter, inverse);
+                Note n = view(a, depth - 1, filter, style);
                 result.addChild(n);
             }
         }
@@ -293,21 +290,6 @@ public class NotesSemantics {
         return n;
     }
 
-    private Collection<Atom> getAdjacentNotes(final Atom root,
-                                              final boolean inverse) {
-        return inverse ? root.getInNotes() : root.getOutNotes();
-    }
-
-    private void unlink(final Atom source,
-                        final Atom target,
-                        final boolean inverse) {
-        if (inverse) {
-            source.removeInNote(target);
-        } else {
-            source.removeOutNote(target);
-        }
-    }
-
     private class NoteComparator implements Comparator<Note> {
         public int compare(Note a, Note b) {
             int cmp = b.getTargetWeight().compareTo(a.getTargetWeight());
@@ -325,4 +307,83 @@ public class NotesSemantics {
             super(message);
         }
     }
+
+    public interface AdjacencyStyle {
+        String getName();
+
+        Collection<Atom> getLinked(Atom root);
+
+        void link(Atom source, Atom target);
+
+        void unlink(Atom source, Atom target);
+    }
+
+    public static AdjacencyStyle lookupStyle(final String name) {
+        if (name.equals(FORWARD_DIRECTED_ADJACENCY.getName())) {
+            return FORWARD_DIRECTED_ADJACENCY;
+        } else if (name.equals(BACKWARD_DIRECTED_ADJACENCY.getName())) {
+            return BACKWARD_DIRECTED_ADJACENCY;
+        } else {
+            // TODO: don't make this the default
+            return UNDIRECTED_ADJACENCY;
+        }
+    }
+
+    public static final AdjacencyStyle FORWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
+        public String getName() {
+            return "targets";
+        }
+
+        public Collection<Atom> getLinked(Atom root) {
+            return root.getOutNotes();
+        }
+
+        public void link(Atom source, Atom target) {
+            source.addOutNote(target);
+        }
+
+        public void unlink(Atom source, Atom target) {
+            source.removeOutNote(target);
+        }
+    };
+
+    public static final AdjacencyStyle BACKWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
+        public String getName() {
+            return "targets-inverse";
+        }
+
+        public Collection<Atom> getLinked(Atom root) {
+            return root.getInNotes();
+        }
+
+        public void link(Atom source, Atom target) {
+            source.addInNote(target);
+        }
+
+        public void unlink(Atom source, Atom target) {
+            source.removeInNote(target);
+        }
+    };
+
+    public static final AdjacencyStyle UNDIRECTED_ADJACENCY = new AdjacencyStyle() {
+        public String getName() {
+            return "undirected";
+        }
+
+        public Collection<Atom> getLinked(Atom root) {
+            Collection<Atom> l = new LinkedList<Atom>();
+            l.addAll(root.getInNotes());
+            l.addAll(root.getOutNotes());
+            return l;
+        }
+
+        public void link(Atom source, Atom target) {
+            source.addOutNote(target);
+        }
+
+        public void unlink(Atom source, Atom target) {
+            source.removeInNote(target);
+            source.removeOutNote(target);
+        }
+    };
 }

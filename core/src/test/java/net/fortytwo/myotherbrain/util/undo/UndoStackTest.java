@@ -2,11 +2,6 @@ package net.fortytwo.myotherbrain.util.undo;
 
 import junit.framework.TestCase;
 
-/**
- * Author: josh
- * Date: May 4, 2009
- * Time: 3:23:08 AM
- */
 public class UndoStackTest extends TestCase {
     private String currentValue = "undefined";
 
