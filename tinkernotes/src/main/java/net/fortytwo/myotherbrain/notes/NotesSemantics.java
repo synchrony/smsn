@@ -323,15 +323,16 @@ public class NotesSemantics {
             return FORWARD_DIRECTED_ADJACENCY;
         } else if (name.equals(BACKWARD_DIRECTED_ADJACENCY.getName())) {
             return BACKWARD_DIRECTED_ADJACENCY;
-        } else {
-            // TODO: don't make this the default
+        } else if (name.equals(UNDIRECTED_ADJACENCY.getName())) {
             return UNDIRECTED_ADJACENCY;
+        } else {
+            throw new IllegalArgumentException("unknown view style: " + name);
         }
     }
 
     public static final AdjacencyStyle FORWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
         public String getName() {
-            return "targets";
+            return "directed-forward";
         }
 
         public Collection<Atom> getLinked(Atom root) {
@@ -349,7 +350,7 @@ public class NotesSemantics {
 
     public static final AdjacencyStyle BACKWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
         public String getName() {
-            return "targets-inverse";
+            return "directed-backward";
         }
 
         public Collection<Atom> getLinked(Atom root) {
