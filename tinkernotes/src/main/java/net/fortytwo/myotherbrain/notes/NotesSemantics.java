@@ -3,7 +3,6 @@ package net.fortytwo.myotherbrain.notes;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
 import net.fortytwo.myotherbrain.Atom;
@@ -19,9 +18,9 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.sail.Sail;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,12 +31,10 @@ import java.util.Set;
 public class NotesSemantics {
 
     private final MOBGraph store;
-    private final FramesManager manager;
     private final QueryEngine rippleQueryEngine;
 
     public NotesSemantics(final MOBGraph store) {
         this.store = store;
-        this.manager = store.getManager();
 
         try {
             Ripple.initialize();
@@ -67,15 +64,28 @@ public class NotesSemantics {
      * @param inverse whether to produce an inverse view
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
-    public Note view(final Atom root,
-                     final int depth,
-                     final Filter filter,
-                     final boolean inverse) {
+    private Note view(final Atom root,
+                      final int depth,
+                      final Filter filter,
+                      final boolean inverse) {
         if (null == root) {
-            throw new IllegalArgumentException("null root");
+            throw new IllegalStateException("null view root");
         }
 
-        return viewRecursive(root, depth, filter, inverse);
+        Note n = toNote(root);
+
+        if (depth > 0) {
+            for (Atom target : getAdjacentNotes(root, inverse)) {
+                if (filter.isVisible(target)) {
+                    Note cn = view(target, depth - 1, filter, inverse);
+                    n.addChild(cn);
+                }
+            }
+
+            Collections.sort(n.getChildren(), new NoteComparator());
+        }
+
+        return n;
     }
 
     public Note customView(final List<String> atomIds,
@@ -97,24 +107,83 @@ public class NotesSemantics {
     /**
      * Updates the graph.
      *
-     * @param root     the root of the subgraph to be updated
-     * @param children the children of the root atom
-     * @param depth    the minimum depth to which the graph will be updated
-     * @param filter   a collection of criteria for atoms and links.
-     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param inverse  whether to push an inverse view
+     * @param root        the root of the subgraph to be updated
+     * @param children    the children of the root atom
+     * @param depth       the minimum depth to which the graph will be updated
+     * @param filter      a collection of criteria for atoms and links.
+     *                    Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param destructive whether to remove items which do not appear in the update view
+     * @param inverse     whether to push an inverse view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
                        final List<Note> children,
                        final int depth,
                        final Filter filter,
+                       boolean destructive,
                        final boolean inverse) throws InvalidUpdateException {
         if (null == root) {
-            throw new IllegalArgumentException("null root");
+            throw new IllegalStateException("null view root");
         }
 
-        updateRecursive(root, children, depth, filter, true, inverse);
+        // Keep adding items beyond the depth of the view, but don't delete items.
+        if (0 >= depth) {
+            destructive = false;
+        }
+
+        Set<String> before = new HashSet<String>();
+        for (Note n : view(root, 1, filter, inverse).getChildren()) {
+            before.add(n.getTargetKey());
+        }
+
+        Set<String> after = new HashSet<String>();
+        for (Note n : children) {
+            String id = n.getTargetKey();
+
+            if (null != id) {
+                after.add(n.getTargetKey());
+            }
+        }
+
+        if (destructive) {
+            for (String id : before) {
+                if (!after.contains(id)) {
+                    Atom target = store.getAtom(id);
+
+                    unlink(root, target, inverse);
+                }
+            }
+        }
+
+        for (Note n : children) {
+            String id = n.getTargetKey();
+
+            Atom target;
+
+            if (null == id) {
+                target = store.createAtom(filter);
+            } else {
+                target = store.getAtom(id);
+
+                if (null == target) {
+                    throw new IllegalStateException("atom with given id '" + id + "' does not exist");
+                }
+            }
+
+            target.setValue(n.getTargetValue());
+
+            if (!before.contains(id)) {
+                if (inverse) {
+                    root.addInNote(target);
+                } else {
+                    root.addOutNote(target);
+                }
+
+                update(target, n.getChildren(), depth - 1, filter, false, inverse);
+            } else {
+                update(target, n.getChildren(), depth - 1, filter, destructive, inverse);
+            }
+        }
     }
 
     /**
@@ -182,8 +251,6 @@ public class NotesSemantics {
             qp.close();
         }
 
-        long now = new Date().getTime();
-
         Set<Vertex> vertices = new HashSet<Vertex>();
 
         for (RippleList l : results) {
@@ -226,97 +293,18 @@ public class NotesSemantics {
         return n;
     }
 
-    private Note viewRecursive(final Atom root,
-                               final int depth,
-                               final Filter filter,
-                               final boolean inverse) {
-        if (null == root) {
-            throw new IllegalStateException("null view root");
-        }
-
-        Note n = toNote(root);
-
-        if (depth > 0) {
-            for (Atom target : inverse ? root.getInNotes() : root.getOutNotes()) {
-                if (filter.isVisible(target)) {
-                    Note cn = viewRecursive(target, depth - 1, filter, inverse);
-                    n.addChild(cn);
-                }
-            }
-
-            Collections.sort(n.getChildren(), new NoteComparator());
-        }
-
-        return n;
+    private Collection<Atom> getAdjacentNotes(final Atom root,
+                                              final boolean inverse) {
+        return inverse ? root.getInNotes() : root.getOutNotes();
     }
 
-    private void updateRecursive(final Atom root,
-                                 final List<Note> children,
-                                 final int depth,
-                                 final Filter filter,
-                                 boolean destructive,
-                                 final boolean inverse) throws InvalidUpdateException {
-        // Keep adding items beyond the depth of the view, but don't delete items.
-        if (0 >= depth) {
-            destructive = false;
-        }
-
-        Set<String> before = new HashSet<String>();
-        for (Note n : viewRecursive(root, 1, filter, inverse).getChildren()) {
-            before.add(n.getTargetKey());
-        }
-
-        Set<String> after = new HashSet<String>();
-        for (Note n : children) {
-            String id = n.getTargetKey();
-
-            if (null != id) {
-                after.add(n.getTargetKey());
-            }
-        }
-
-        if (destructive) {
-            for (String id : before) {
-                if (!after.contains(id)) {
-                    Atom target = store.getAtom(id);
-
-                    if (inverse) {
-                        root.removeInNote(target);
-                    } else {
-                        root.removeOutNote(target);
-                    }
-                }
-            }
-        }
-
-        for (Note n : children) {
-            String id = n.getTargetKey();
-
-            Atom target;
-
-            if (null == id) {
-                target = store.createAtom(filter);
-            } else {
-                target = store.getAtom(id);
-
-                if (null == target) {
-                    throw new IllegalStateException("atom with given id '" + id + "' does not exist");
-                }
-            }
-
-            target.setValue(n.getTargetValue());
-
-            if (!before.contains(id)) {
-                if (inverse) {
-                    root.addInNote(target);
-                } else {
-                    root.addOutNote(target);
-                }
-
-                updateRecursive(target, n.getChildren(), depth - 1, filter, false, inverse);
-            } else {
-                updateRecursive(target, n.getChildren(), depth - 1, filter, destructive, inverse);
-            }
+    private void unlink(final Atom source,
+                        final Atom target,
+                        final boolean inverse) {
+        if (inverse) {
+            source.removeInNote(target);
+        } else {
+            source.removeOutNote(target);
         }
     }
 
