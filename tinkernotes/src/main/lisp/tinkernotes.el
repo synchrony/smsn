@@ -1,12 +1,12 @@
-(eval-when-compile (require 'cl))
-(require 'json)
-(require 'linum)
 
-(require 'goto-addr)
 
-(require 'ring)
-
-;; Required global variables: tinkernotes-rexster-host, tinkernotes-rexster-port, tinkernotes-rexster-graph
+;; TinkerNotes Emacs client
+;;
+;; Required global variables:
+;;
+;;     tinkernotes-rexster-host: IP of the rexster server
+;;     tinkernotes-rexster-port: port of the Rexster server
+;;     tinkernotes-rexster-graph: name of the Rexster graph
 ;;
 ;; For example:
 ;;
@@ -14,6 +14,19 @@
 ;;         (defvar tinkernotes-rexster-host "localhost")
 ;;         (defvar tinkernotes-rexster-port "8182")
 ;;         (defvar tinkernotes-rexster-graph "tinkernotes"))
+
+(eval-when-compile (require 'cl))
+
+;; for JSON-formatted messages to and from Rexster
+(require 'json)
+
+;; for line number annotations in buffers
+(require 'linum)
+
+;; for visiting URLs in a browser
+(require 'goto-addr)
+
+(require 'ring)
 
 
 ;; HELPER CODE ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -88,32 +101,52 @@
 (setq tn-current-line 1)
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
 
+
+;; NAVIGATION ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (setq tn-enable-linum t)
 (linum-mode tn-enable-linum)
-
-(setq number-keymap (make-hash-table))
-(puthash "a" 1 number-keymap)
-(puthash "s" 2 number-keymap)
-(puthash "d" 3 number-keymap)
-(puthash "f" 4 number-keymap)
-(puthash "g" 5 number-keymap)
-(puthash "h" 6 number-keymap)
-(puthash "j" 7 number-keymap)
-(puthash "k" 8 number-keymap)
-(puthash "l" 9 number-keymap)
-(puthash ";" 0 number-keymap)
-
-;;(setq tn-point-ring (make-ring 7))
-
-(defun tn-push-point ()
-    (interactive)
-    (let ((addr (read-from-minibuffer "line: ")))
-        (copy-region-as-kill (line-beginning-position) (line-end-position))
-        (print (ring-remove kill-ring 0))))
 
 (defun current-line ()
     (interactive)
     (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+
+(setq line-addr-keypairs (list
+    '(?0 ?0) '(?1 ?1) '(?2 ?2) '(?3 ?3) '(?4 ?4) '(?5 ?5) '(?6 ?6) '(?7 ?7) '(?8 ?8) '(?9 ?9)
+    '(?; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
+             '(?u ?1) '(?i ?2) '(?o ?3) '(?p ?4)))
+
+(setq line-addr-keymap (make-hash-table))
+(dolist (pair line-addr-keypairs)
+    (puthash (car pair) (car (cdr pair)) line-addr-keymap))
+
+(defun mapkey (c)
+    (gethash c line-addr-keymap))
+
+(defun address-to-lineno (address)
+    (if (string-match "[0-9asdfghjkl;]+" address)
+        (string-to-number (coerce (mapcar 'mapkey (coerce address 'list)) 'string))
+        nil))
+
+(defun handle-changewindow (address)
+    (setq c (car (coerce address 'list)))
+    (if (string-match "[uiop]" (string c))
+       (let ((n (string-to-number (string (gethash c line-addr-keymap)))))
+           (other-window n)
+           (coerce (cdr (coerce address 'list)) 'string))
+       address))
+
+(defun tn-goto-line ()
+    (interactive)
+    (let ((address (read-from-minibuffer "line: ")))
+        (let ((line
+                (address-to-lineno (handle-changewindow address))))
+            (if line
+                (goto-line line)
+                (error-message "invalid line address")))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun find-id ()
     (let ((line (current-line)))
@@ -974,6 +1007,7 @@
 (global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
 (global-set-key (kbd "C-c C-f")         'tn-push-point)
+(global-set-key (kbd "C-c C-l")         'tn-goto-line)
 (global-set-key (kbd "C-c C-s ,")       'tn-decrease-default-sharability)
 (global-set-key (kbd "C-c C-s .")       'tn-increase-default-sharability)
 (global-set-key (kbd "C-c C-s 1")       'tn-set-default-sharability-1)

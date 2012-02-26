@@ -37,9 +37,8 @@ public class NotesHistory {
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 
-        int count = 0;
         for (int i = totalVisits - 1; i >= low; i--) {
-            if (count >= maxlen) {
+            if (r.size() >= maxlen) {
                 break;
             }
 
@@ -48,7 +47,6 @@ public class NotesHistory {
             Atom a = graph.getAtom(id);
             if (null != a && filter.isVisible(a)) {
                 r.add(id);
-                count++;
             }
         }
 
