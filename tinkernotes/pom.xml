@@ -46,8 +46,8 @@
             <version>${frames.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>rexster</artifactId>
+            <groupId>com.tinkerpop.rexster</groupId>
+            <artifactId>rexster-server</artifactId>
             <version>${rexster.version}</version>
         </dependency>
         <dependency>

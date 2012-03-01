@@ -23,11 +23,11 @@
     <properties>
         <myotherbrain.version>0.1</myotherbrain.version>
         <sesame.version>2.6.0</sesame.version>
-        <blueprints.version>1.2-SNAPSHOT</blueprints.version>
-        <frames.version>0.7-SNAPSHOT</frames.version>
-        <rexster.version>0.8-SNAPSHOT</rexster.version>
+        <blueprints.version>1.2</blueprints.version>
+        <frames.version>0.7</frames.version>
+        <rexster.version>0.8</rexster.version>
         <ripple.version>0.8-SNAPSHOT</ripple.version>
-        <sesametools.version>1.6-SNAPSHOT</sesametools.version>
+        <sesametools.version>1.6</sesametools.version>
         <junit.version>4.5</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
