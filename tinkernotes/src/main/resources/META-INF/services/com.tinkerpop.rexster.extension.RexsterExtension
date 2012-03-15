@@ -1,3 +1,4 @@
+net.fortytwo.myotherbrain.notes.server.DuplicatesExtension
 net.fortytwo.myotherbrain.notes.server.ExportExtension
 net.fortytwo.myotherbrain.notes.server.HistoryExtension
 net.fortytwo.myotherbrain.notes.server.RippleExtension

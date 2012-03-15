@@ -93,6 +93,11 @@ public class NotesSyntax {
             // Tabs count as four spaces.
             l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
 
+            if (0 == l.trim().length()) {
+                // empty lines are simply ignored
+                continue;
+            }
+
             // Find indent level
             int indent = 0;
             if (l.length() > 0) {
@@ -102,127 +107,124 @@ public class NotesSyntax {
                 l = l.substring(indent);
             }
 
-            if (0 == l.trim().length()) {
-                // empty lines are simply ignored
-            } else {
-                // Extract keys
-                String targetKey = null;
-                int k = l.indexOf(" ");
-                if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k)).matches()) {
-                    int i = l.indexOf(":");
-                    targetKey = l.substring(0, i);
+            // Extract keys
+            String targetKey = null;
+            int k = l.indexOf(" ");
+            if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k)).matches()) {
+                int i = l.indexOf(":");
+                targetKey = l.substring(0, i);
 
+                l = l.substring(k);
+                indent += k;
+
+                k = 0;
+                while (k < l.length() && ' ' == l.charAt(k)) {
+                    k++;
+                    indent++;
+                }
+                if (k > 0) {
                     l = l.substring(k);
-                    indent += k;
+                }
+            }
 
-                    k = 0;
-                    while (k < l.length() && ' ' == l.charAt(k)) {
-                        k++;
-                        indent++;
+            if (0 == l.length()) {
+                throw new NoteParsingException(lineNumber, "missing key value");
+            }
+
+            while (0 < hierarchy.size() && indentHierarachy.getLast() >= indent) {
+                hierarchy.removeLast();
+                indentHierarachy.removeLast();
+            }
+
+            boolean esc = false;
+            int j = -1;
+            for (int i = 0; i < l.length(); i++) {
+                char c = l.charAt(i);
+                if (' ' == c) {
+                    if (!esc) {
+                        j = i;
+                        break;
                     }
-                    if (k > 0) {
-                        l = l.substring(k);
-                    }
-                }
+                } else esc = '\\' == c && !esc;
+            }
 
-                if (0 == l.length()) {
-                    throw new NoteParsingException(lineNumber, "missing key value");
-                }
+            if (j < 0) {
+                j = l.length();
+            }
 
-                while (0 < hierarchy.size() && indentHierarachy.getLast() >= indent) {
-                    hierarchy.removeLast();
-                    indentHierarachy.removeLast();
-                }
+            String bullet = l.substring(0, j);
+            if (bullet.length() > MAX_BULLET_LENGTH) {
+                throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
+            }
+            while (j < l.length() && ' ' == l.charAt(j)) {
+                j++;
+            }
+            l = l.substring(j);
 
-                boolean esc = false;
-                int j = -1;
-                for (int i = 0; i < l.length(); i++) {
-                    char c = l.charAt(i);
-                    if (' ' == c) {
-                        if (!esc) {
-                            j = i;
+            String targetValue = "";
+            if (0 < l.length()) {
+                if (l.contains("{{{")) {
+                    int start = lineNumber;
+                    boolean inside = false;
+                    int index = 0;
+                    while (true) {
+                        // Check for the closing symbol before the opening symbol
+                        int b2 = l.indexOf("}}}", index);
+                        if (b2 >= 0) {
+                            if (!inside) {
+                                throw new NoteParsingException(start, "unmatched verbatim block terminator" +
+                                        " (on line " + lineNumber + ")");
+                            }
+
+                            inside = false;
+                            index = b2 + 3;
+                            continue;
+                        }
+
+                        int b1 = l.indexOf("{{{", index);
+                        if (b1 >= 0) {
+                            if (inside) {
+                                throw new NoteParsingException(start, "nested verbatim blocks (detected on line " +
+                                        lineNumber + ") are not allowed");
+                            }
+                            inside = true;
+                            index = b1 + 3;
+                            continue;
+                        }
+
+                        targetValue += l;
+
+                        if (inside) {
+                            targetValue += "\n";
+                            l = br.readLine();
+                            if (null == l) {
+                                throw new NoteParsingException(start, "non-terminated verbatim block");
+                            }
+                            lineNumber++;
+                            index = 0;
+                        } else {
                             break;
                         }
-                    } else esc = '\\' == c && !esc;
-                }
-
-                if (j < 0) {
-                    j = l.length();
-                }
-
-                String bullet = l.substring(0, j);
-                if (bullet.length() > MAX_BULLET_LENGTH) {
-                    throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
-                }
-                while (j < l.length() && ' ' == l.charAt(j)) {
-                    j++;
-                }
-                l = l.substring(j);
-
-                String targetValue = "";
-                if (0 < l.length()) {
-                    if (l.contains("{{{")) {
-                        int start = lineNumber;
-                        boolean inside = false;
-                        int index = 0;
-                        while (true) {
-                            // Check for the closing symbol before the opening symbol
-                            int b2 = l.indexOf("}}}", index);
-                            if (b2 >= 0) {
-                                if (!inside) {
-                                    throw new NoteParsingException(start, "unmatched verbatim block terminator" +
-                                            " (on line " + lineNumber + ")");
-                                }
-
-                                inside = false;
-                                index = b2 + 3;
-                                continue;
-                            }
-
-                            int b1 = l.indexOf("{{{", index);
-                            if (b1 >= 0) {
-                                if (inside) {
-                                    throw new NoteParsingException(start, "nested verbatim blocks (detected on line " +
-                                            lineNumber + ") are not allowed");
-                                }
-                                inside = true;
-                                index = b1 + 3;
-                                continue;
-                            }
-
-                            targetValue += l;
-
-                            if (inside) {
-                                targetValue += "\n";
-                                l = br.readLine();
-                                if (null == l) {
-                                    throw new NoteParsingException(start, "non-terminated verbatim block");
-                                }
-                                lineNumber++;
-                                index = 0;
-                            } else {
-                                break;
-                            }
-                        }
-                    } else {
-                        targetValue = l;
                     }
-                }
-
-                Note n = new Note();
-                n.setTargetValue(targetValue);
-
-                n.setTargetKey(targetKey);
-
-                if (0 < hierarchy.size()) {
-                    hierarchy.get(hierarchy.size() - 1).addChild(n);
                 } else {
-                    notes.add(n);
+                    targetValue = l;
                 }
-
-                hierarchy.add(n);
-                indentHierarachy.add(indent);
             }
+
+            Note n = new Note();
+            n.setTargetValue(targetValue);
+
+            n.setTargetKey(targetKey);
+
+            if (0 < hierarchy.size()) {
+                hierarchy.get(hierarchy.size() - 1).addChild(n);
+            } else {
+                notes.add(n);
+            }
+
+            hierarchy.add(n);
+            indentHierarachy.add(indent);
+
         }
     }
 

@@ -6,14 +6,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.myotherbrain</groupId>
     <artifactId>tinkernotes</artifactId>
-    <version>0.1</version>
     <packaging>jar</packaging>
     <name>TinkerNotes</name>
 
     <parent>
         <groupId>net.fortytwo.myotherbrain</groupId>
         <artifactId>myotherbrain-all</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -46,8 +45,8 @@
             <version>${frames.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>rexster</artifactId>
+            <groupId>com.tinkerpop.rexster</groupId>
+            <artifactId>rexster-server</artifactId>
             <version>${rexster.version}</version>
         </dependency>
         <dependency>

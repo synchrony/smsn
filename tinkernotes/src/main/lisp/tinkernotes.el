@@ -1,5 +1,3 @@
-
-
 ;; TinkerNotes Emacs client
 ;;
 ;; Required global variables:
@@ -26,7 +24,7 @@
 ;; for visiting URLs in a browser
 (require 'goto-addr)
 
-(require 'ring)
+;;(require 'ring)
 
 
 ;; HELPER CODE ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -446,6 +444,16 @@
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
+(defun request-duplicates (minv maxv minw maxw)
+    (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
+    (http-get
+        (concat (base-url) "duplicates"
+            "?minSharability=" (number-to-string minv)
+            "&maxSharability=" (number-to-string maxv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+
 (defun request-search-results (query style minv maxv defaultv minw maxw defaultw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
@@ -495,6 +503,12 @@
 (defun tn-history ()
     (interactive)
     (request-history
+        tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
+
+
+(defun tn-duplicates ()
+    (interactive)
+    (request-duplicates
         tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
 
 (defun tn-search ()
@@ -903,10 +917,6 @@
 (defun error-message (msg)
     (message (concat "Error: " msg)))
 
-(defun tn-debug ()
-    (interactive)
-    (message (number-to-string (length (defined-colors)))))
-
 (defun tn-visit-url-at-point ()
     (interactive)
     (goto-address-at-point))  ;; defined in Emacs goto-addr.el
@@ -993,7 +1003,7 @@
             (no-target))))
 
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
-(global-set-key (kbd "C-c d")           'tn-debug)
+(global-set-key (kbd "C-c d")           'tn-duplicates)
 (global-set-key (kbd "C-c e")           'tn-export)
 (global-set-key (kbd "C-c h")           'tn-history)
 (global-set-key (kbd "C-c p")           'tn-push-view)
@@ -1132,7 +1142,7 @@
 
 
 ;; Uncomment only when debugging
-(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
+;;(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 
 (provide 'tinkernotes)

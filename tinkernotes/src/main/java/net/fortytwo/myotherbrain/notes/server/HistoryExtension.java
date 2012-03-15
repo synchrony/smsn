@@ -9,10 +9,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.myotherbrain.notes.Filter;
 
-import javax.ws.rs.core.SecurityContext;
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -29,30 +26,15 @@ public class HistoryExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
-        LOGGER.info("tinkernotes history");
-        System.err.println("tinkernotes history");
-
-        SecurityContext security = context.getSecurityContext();
-        Principal user = null == security ? null : security.getUserPrincipal();
-
-        Filter filter;
-
-        try {
-            float m = findMinAuthorizedSharability(user, minSharability);
-            filter = new Filter(m, maxSharability, -1, minWeight, maxWeight, -1);
-        } catch (IllegalArgumentException e) {
-            return ExtensionResponse.error(e.getMessage());
-        }
+        logInfo("tinkernotes history");
 
         Params p = new Params();
         p.baseGraph = graph;
-        p.filter = filter;
         p.context = context;
 
-        return this.handleRequestInternal(p);
+        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
     }
 
-    @Override
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         List<String> ids = getHistory(p.context, p.graph, p.filter);
 
@@ -61,7 +43,6 @@ public class HistoryExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    @Override
     protected boolean isReadOnly() {
         return true;
     }

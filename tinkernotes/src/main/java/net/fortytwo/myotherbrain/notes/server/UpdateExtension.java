@@ -10,14 +10,11 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
 
-import javax.ws.rs.core.SecurityContext;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -41,42 +38,19 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
 
-        LOGGER.info("tinkernotes update " + rootId + " (depth " + depth + ")");
-        System.err.println("tinkernotes update " + rootId + " (depth " + depth + ")");
-
-        SecurityContext security = context.getSecurityContext();
-        Principal user = null == security ? null : security.getUserPrincipal();
-
-        if (!canWrite(user)) {
-            return ExtensionResponse.error("user does not have permission to push updates");
-        }
-
-        if (null == user) {
-            System.err.println("no security");
-        }
-
-        Filter filter;
-
-        try {
-            float m = findMinAuthorizedSharability(user, minSharability);
-            filter = new Filter(m, maxSharability, defaultSharability, minWeight, maxWeight, defaultWeight);
-        } catch (IllegalArgumentException e) {
-            return ExtensionResponse.error(e.getMessage());
-        }
+        logInfo("tinkernotes update " + rootId + " (depth " + depth + ")");
 
         Params p = new Params();
         p.baseGraph = graph;
+        p.context = context;
         p.depth = depth;
-        p.filter = filter;
-        p.view = view;
         p.rootId = rootId;
         p.styleName = styleName;
+        p.view = view;
 
-        return this.handleRequestInternal(p);
-        //visit(rootId, context);
+        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
     }
 
-    @Override
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         List<Note> children;
 
@@ -100,7 +74,6 @@ public class UpdateExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    @Override
     protected boolean isReadOnly() {
         return false;
     }

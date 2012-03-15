@@ -9,15 +9,12 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -43,31 +40,18 @@ public class SearchExtension extends TinkerNotesExtension {
             throw new IllegalStateException(e);
         }
 
-        LOGGER.info("tinkernotes search \"" + query + "\"");
-        System.err.println("tinkernotes search \"" + query + "\"");
-
-        SecurityContext security = context.getSecurityContext();
-        Principal user = null == security ? null : security.getUserPrincipal();
-
-        Filter filter;
-
-        try {
-            float m = findMinAuthorizedSharability(user, minSharability);
-            filter = new Filter(m, maxSharability, -1, minWeight, maxWeight, -1);
-        } catch (IllegalArgumentException e) {
-            return ExtensionResponse.error(e.getMessage());
-        }
+        logInfo("tinkernotes search \"" + query + "\"");
 
         Params p = new Params();
         p.baseGraph = graph;
-        p.filter = filter;
-        p.query = query;
+        p.context = context;
         p.depth = depth;
+        p.query = query;
         p.styleName = styleName;
-        return this.handleRequestInternal(p);
+
+        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
     }
 
-    @Override
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         addSearchResults(p);
 
@@ -75,7 +59,6 @@ public class SearchExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    @Override
     protected boolean isReadOnly() {
         return true;
     }

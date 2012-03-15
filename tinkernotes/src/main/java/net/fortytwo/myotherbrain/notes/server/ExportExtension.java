@@ -13,13 +13,11 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
-import javax.ws.rs.core.SecurityContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.security.Principal;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -31,17 +29,15 @@ public class ExportExtension extends TinkerNotesExtension {
     @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain graph for analysis in R")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
-        LOGGER.info("tinkernotes export ");
-        System.err.println("tinkernotes export ");
-
-        SecurityContext security = context.getSecurityContext();
-        Principal user = null == security ? null : security.getUserPrincipal();
+        logInfo("tinkernotes export ");
 
         // TODO: any security restrictions here?
 
         Params p = new Params();
         p.baseGraph = graph;
-        return this.handleRequestInternal(p);
+        p.context = context;
+
+        return handleRequestInternal(p, null, null, null, null);
     }
 
     private void exportVertices(final MOBGraph g,
@@ -84,7 +80,6 @@ public class ExportExtension extends TinkerNotesExtension {
         return MyOtherBrain.unicodeEscape(value);
     }
 
-    @Override
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         OutputStream out = new FileOutputStream(new File("/tmp/tinkernotes-vertices.txt"));
         try {
@@ -103,7 +98,6 @@ public class ExportExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    @Override
     protected boolean isReadOnly() {
         return true;
     }

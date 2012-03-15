@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
@@ -36,6 +37,38 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
 
     protected abstract boolean isReadOnly();
+
+    protected ExtensionResponse handleRequestInternal(final Params p,
+                                                      Float minWeight,
+                                                      Float maxWeight,
+                                                      Float minSharability,
+                                                      Float maxSharability) {
+        SecurityContext security = p.context.getSecurityContext();
+        Principal user = null == security ? null : security.getUserPrincipal();
+
+        if (!isReadOnly() && !canWrite(user)) {
+            return ExtensionResponse.error("user does not have permission to for write operations");
+        }
+
+        if (null == user) {
+            logWarning("no security");
+        }
+
+        if (null != minWeight && null != maxWeight && null != minSharability && null != maxSharability) {
+            Filter filter;
+
+            try {
+                float m = findMinAuthorizedSharability(user, minSharability);
+                filter = new Filter(m, maxSharability, -1, minWeight, maxWeight, -1);
+            } catch (IllegalArgumentException e) {
+                return ExtensionResponse.error(e.getMessage());
+            }
+
+            p.filter = filter;
+        }
+
+        return this.handleRequestInternal(p);
+    }
 
     protected ExtensionResponse handleRequestInternal(final Params p) {
         String rootKey = p.rootId;
@@ -88,8 +121,9 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 }
 
                 p.map.put("root", rootKey);
-                p.map.put("title", null == p.root.getValue() || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
             }
+
+            p.map.put("title", null == p.root || null == p.root.getValue() || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
 
             if (null != styleName) {
                 p.style = NotesSemantics.lookupStyle(styleName);
@@ -109,11 +143,6 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 manual = false;
             }
 
-            //System.err.println("transactional: " + (p.graph instanceof TransactionalGraph));
-            //System.err.println("mode: " + ((TransactionalGraph) p.graph).getTransactionMode());
-            //System.err.println("graph: " + p.graph);
-            //System.err.println("class: " + p.graph.getClass());
-
             boolean normal = false;
 
             try {
@@ -124,21 +153,21 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 if (!isReadOnly()) {
                     if (manual) {
                         if (!normal) {
-                            System.err.println("rolling back transaction");
+                            logWarning("rolling back transaction");
                         }
 
                         ((TransactionalGraph) p.baseGraph).stopTransaction(normal
                                 ? TransactionalGraph.Conclusion.SUCCESS
                                 : TransactionalGraph.Conclusion.FAILURE);
                     } else if (!normal) {
-                        System.err.println("failed update of non-transactional graph. Data integrity is not guaranteed");
+                        logWarning("failed update of non-transactional graph. Data integrity is not guaranteed");
                     }
                 }
             }
         } catch (Exception e) {
+            logWarning("operation failed: " + e.getMessage());
             // TODO
             e.printStackTrace(System.err);
-            LOGGER.warning("operation failed: " + e.getMessage());
             return ExtensionResponse.error(e);
         }
     }
@@ -189,6 +218,16 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                                       final Filter filter) {
         NotesHistory h = getNotesHistory(context);
         return h.getHistory(100, true, graph, filter);
+    }
+
+    protected void logInfo(final String message) {
+        LOGGER.info(message);
+        System.err.println(message);
+    }
+
+    protected void logWarning(final String message) {
+        LOGGER.warning(message);
+        System.err.println(message);
     }
 
     protected class Params {

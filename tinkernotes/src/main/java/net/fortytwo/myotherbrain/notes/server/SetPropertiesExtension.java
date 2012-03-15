@@ -11,8 +11,6 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.MOBGraph;
 
-import javax.ws.rs.core.SecurityContext;
-import java.security.Principal;
 import java.util.logging.Logger;
 
 /**
@@ -29,15 +27,7 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "key", description = "id of the atom to be changed") String id,
                                            @ExtensionRequestParameter(name = "weight", description = "new weight of the atom") Float weight,
                                            @ExtensionRequestParameter(name = "sharability", description = "new sharability of the atom") Float sharability) {
-        LOGGER.info("tinkernotes set properties " + id);
-        System.err.println("tinkernotes set properties " + id);
-
-        SecurityContext security = context.getSecurityContext();
-        Principal user = null == security ? null : security.getUserPrincipal();
-
-        if (!canWrite(user)) {
-            return ExtensionResponse.error("user does not have permission to set properties");
-        }
+        logInfo("tinkernotes set properties " + id);
 
         // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
         if (weight <= 0 || weight > 1.0) {
@@ -50,13 +40,14 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
 
         Params p = new Params();
         p.baseGraph = graph;
+        p.context = context;
         p.newWeight = weight;
         p.newSharability = sharability;
         p.rootId = id;
-        return this.handleRequestInternal(p);
+
+        return handleRequestInternal(p, null, null, null, null);
     }
 
-    @Override
     protected ExtensionResponse performTransaction(Params p) throws Exception {
         p.root.setWeight(p.newWeight);
         p.root.setSharability(p.newSharability);
@@ -68,7 +59,6 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    @Override
     protected boolean isReadOnly() {
         return false;
     }
