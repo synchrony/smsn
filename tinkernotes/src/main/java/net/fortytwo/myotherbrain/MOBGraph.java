@@ -58,8 +58,8 @@ public class MOBGraph {
         Atom a = manager.frame(this.getGraph().addVertex(null), Atom.class);
         a.setCreated(new Date().getTime());
 
-        a.setSharability(filter.defaultSharability);
-        a.setWeight(filter.defaultWeight);
+        a.setSharability(filter.getDefaultSharability());
+        a.setWeight(filter.getDefaultWeight());
 
         return a;
     }

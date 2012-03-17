@@ -38,11 +38,10 @@ public class DuplicatesExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
         logInfo("tinkernotes duplicates");
 
-        Params p = new Params();
-        p.baseGraph = graph;
-        p.context = context;
+        Params p = createParams(context, graph);
+        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
 
-        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
+        return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
@@ -53,8 +52,12 @@ public class DuplicatesExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    protected boolean isReadOnly() {
+    protected boolean doesRead() {
         return true;
+    }
+
+    protected boolean doesWrite() {
+        return false;
     }
 
     protected static final int MAX_DUPLICATES = 1000;

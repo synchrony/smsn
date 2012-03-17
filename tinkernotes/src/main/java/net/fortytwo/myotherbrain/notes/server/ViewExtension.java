@@ -30,14 +30,13 @@ public class ViewExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
         logInfo("tinkernotes view " + rootId + " (depth " + depth + ")");
 
-        Params p = new Params();
-        p.baseGraph = graph;
-        p.context = context;
+        Params p = createParams(context, graph);
         p.depth = depth;
         p.rootId = rootId;
         p.styleName = styleName;
-        
-        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
+        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
+
+        return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
@@ -50,7 +49,11 @@ public class ViewExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    protected boolean isReadOnly() {
+    protected boolean doesRead() {
         return true;
+    }
+
+    protected boolean doesWrite() {
+        return false;
     }
 }

@@ -972,6 +972,11 @@
     (browse-target-value (lambda (value)
         (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
 
+(defun tn-browse-target-value-in-youtube ()
+    (interactive)
+    (browse-target-value (lambda (value)
+        (concat "http://www.youtube.com/results?search_query=" (w3m-url-encode-string value)))))
+
 (defvar tn-date-format "%Y-%m-%d")
 (defvar tn-time-format "%H:%M")
 (defvar tn-time-with-seconds-format "%H:%M:%S")
@@ -1062,6 +1067,7 @@
 (global-set-key (kbd "C-c C-t C-b s")   'tn-browse-target-value-in-google-scholar)
 (global-set-key (kbd "C-c C-t C-b t")   'tn-browse-target-value-in-twitter)
 (global-set-key (kbd "C-c C-t C-b w")   'tn-browse-target-value-in-wikipedia)
+(global-set-key (kbd "C-c C-t C-b y")   'tn-browse-target-value-in-youtube)
 (global-set-key (kbd "C-c C-t i")       'tn-target-info)
 (global-set-key (kbd "C-c C-t C-s 1")   'tn-set-target-sharability-1)
 (global-set-key (kbd "C-c C-t C-s 2")   'tn-set-target-sharability-2)

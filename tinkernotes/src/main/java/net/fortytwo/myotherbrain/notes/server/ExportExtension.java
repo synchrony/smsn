@@ -33,11 +33,9 @@ public class ExportExtension extends TinkerNotesExtension {
 
         // TODO: any security restrictions here?
 
-        Params p = new Params();
-        p.baseGraph = graph;
-        p.context = context;
+        Params p = createParams(context, graph);
 
-        return handleRequestInternal(p, null, null, null, null);
+        return handleRequestInternal(p);
     }
 
     private void exportVertices(final MOBGraph g,
@@ -98,7 +96,11 @@ public class ExportExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    protected boolean isReadOnly() {
-        return true;
+    protected boolean doesRead() {
+        return false;
+    }
+
+    protected boolean doesWrite() {
+        return false;
     }
 }

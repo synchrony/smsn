@@ -40,15 +40,14 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         logInfo("tinkernotes update " + rootId + " (depth " + depth + ")");
 
-        Params p = new Params();
-        p.baseGraph = graph;
-        p.context = context;
+        Params p = createParams(context, graph);
         p.depth = depth;
         p.rootId = rootId;
         p.styleName = styleName;
         p.view = view;
+        p.filter = createFilter(p.user, minWeight, maxWeight, defaultWeight, minSharability, maxSharability, defaultSharability);
 
-        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
+        return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
@@ -74,7 +73,11 @@ public class UpdateExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    protected boolean isReadOnly() {
-        return false;
+    protected boolean doesRead() {
+        return true;
+    }
+
+    protected boolean doesWrite() {
+        return true;
     }
 }

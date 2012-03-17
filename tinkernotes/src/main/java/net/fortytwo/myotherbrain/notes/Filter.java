@@ -6,12 +6,18 @@ import net.fortytwo.myotherbrain.Atom;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Filter {
-    public Filter(final float minSharability,
-                  final float maxSharability,
-                  float defaultSharability,
-                  final float minWeight,
+
+    private final Float minSharability, maxSharability;
+    private final Float minWeight, maxWeight;
+
+    private final Float defaultSharability, defaultWeight;
+
+    public Filter(final float minWeight,
                   final float maxWeight,
-                  float defaultWeight) {
+                  float defaultWeight,
+                  final float minSharability,
+                  final float maxSharability,
+                  float defaultSharability) {
         if (minSharability < 0 || maxSharability > 1) {
             throw new IllegalArgumentException("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
         }
@@ -48,8 +54,29 @@ public class Filter {
         this.defaultWeight = defaultWeight;
     }
 
-    public final Float minSharability, maxSharability, defaultSharability;
-    public final Float minWeight, maxWeight, defaultWeight;
+    public Float getMinSharability() {
+        return minSharability;
+    }
+
+    public Float getMaxSharability() {
+        return maxSharability;
+    }
+
+    public Float getMinWeight() {
+        return minWeight;
+    }
+
+    public Float getMaxWeight() {
+        return maxWeight;
+    }
+
+    public Float getDefaultSharability() {
+        return defaultSharability;
+    }
+
+    public Float getDefaultWeight() {
+        return defaultWeight;
+    }
 
     public boolean isVisible(final Atom atom) {
         float sharability = atom.getSharability();

@@ -38,14 +38,12 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
             return ExtensionResponse.error("sharability is outside of range (0, 1]: " + sharability);
         }
 
-        Params p = new Params();
-        p.baseGraph = graph;
-        p.context = context;
+        Params p = createParams(context, graph);
         p.newWeight = weight;
         p.newSharability = sharability;
         p.rootId = id;
 
-        return handleRequestInternal(p, null, null, null, null);
+        return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(Params p) throws Exception {
@@ -59,7 +57,11 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    protected boolean isReadOnly() {
+    protected boolean doesRead() {
         return false;
+    }
+
+    protected boolean doesWrite() {
+        return true;
     }
 }

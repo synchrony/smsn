@@ -36,41 +36,36 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
 
-    protected abstract boolean isReadOnly();
+    protected abstract boolean doesRead();
 
-    protected ExtensionResponse handleRequestInternal(final Params p,
-                                                      Float minWeight,
-                                                      Float maxWeight,
-                                                      Float minSharability,
-                                                      Float maxSharability) {
+    protected abstract boolean doesWrite();
+
+    protected Params createParams(final RexsterResourceContext context,
+                                  final Graph graph) {
+        Params p = new Params();
+        p.baseGraph = graph;
+        p.context = context;
         SecurityContext security = p.context.getSecurityContext();
-        Principal user = null == security ? null : security.getUserPrincipal();
+        p.user = null == security ? null : security.getUserPrincipal();
 
-        if (!isReadOnly() && !canWrite(user)) {
-            return ExtensionResponse.error("user does not have permission to for write operations");
-        }
-
-        if (null == user) {
+        if (null == p.user) {
             logWarning("no security");
         }
 
-        if (null != minWeight && null != maxWeight && null != minSharability && null != maxSharability) {
-            Filter filter;
-
-            try {
-                float m = findMinAuthorizedSharability(user, minSharability);
-                filter = new Filter(m, maxSharability, -1, minWeight, maxWeight, -1);
-            } catch (IllegalArgumentException e) {
-                return ExtensionResponse.error(e.getMessage());
-            }
-
-            p.filter = filter;
-        }
-
-        return this.handleRequestInternal(p);
+        return p;
     }
 
     protected ExtensionResponse handleRequestInternal(final Params p) {
+
+
+        if (doesWrite() && !canWrite(p.user)) {
+            return ExtensionResponse.error("user does not have permission to for write operations");
+        }
+
+        if (doesRead() && null == p.filter) {
+            return ExtensionResponse.error("weight and sharability filter is not set");
+        }
+
         String rootKey = p.rootId;
         String styleName = p.styleName;
 
@@ -106,18 +101,23 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             if (null != p.filter) {
-                p.map.put("minSharability", "" + p.filter.minSharability);
-                p.map.put("maxSharability", "" + p.filter.maxSharability);
-                p.map.put("defaultSharability", "" + p.filter.defaultSharability);
-                p.map.put("minWeight", "" + p.filter.minWeight);
-                p.map.put("maxWeight", "" + p.filter.maxWeight);
-                p.map.put("defaultWeight", "" + p.filter.defaultWeight);
+                p.map.put("minSharability", "" + p.filter.getMinSharability());
+                p.map.put("maxSharability", "" + p.filter.getMaxSharability());
+                p.map.put("defaultSharability", "" + p.filter.getDefaultSharability());
+                p.map.put("minWeight", "" + p.filter.getMinWeight());
+                p.map.put("maxWeight", "" + p.filter.getMaxWeight());
+                p.map.put("defaultWeight", "" + p.filter.getDefaultWeight());
             }
 
             if (null != rootKey) {
                 p.root = p.graph.getAtom(rootKey);
-                if (null == p.root || (null != p.filter && !p.filter.isVisible(p.root))) {
-                    return ExtensionResponse.error("root of view does not exist or is not visible: " + rootKey);
+
+                if (null == p.root) {
+                    return ExtensionResponse.error("root of view does not exist: " + rootKey);
+                }
+
+                if (null != p.filter && !p.filter.isVisible(p.root)) {
+                    return ExtensionResponse.error("root of view is not visible: " + rootKey);
                 }
 
                 p.map.put("root", rootKey);
@@ -132,7 +132,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             boolean manual;
             // Force manual transaction mode (provided that the graph is transactional)
-            if (!isReadOnly() && p.baseGraph instanceof TransactionalGraph) {
+            if (doesWrite() && p.baseGraph instanceof TransactionalGraph) {
                 if (0 >= ((TransactionalGraph) p.baseGraph).getCurrentBufferSize()) {
                     ((TransactionalGraph) p.baseGraph).setMaxBufferSize(-1);
                 }
@@ -150,7 +150,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 normal = true;
                 return r;
             } finally {
-                if (!isReadOnly()) {
+                if (doesWrite()) {
                     if (manual) {
                         if (!normal) {
                             logWarning("rolling back transaction");
@@ -170,6 +170,19 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             e.printStackTrace(System.err);
             return ExtensionResponse.error(e);
         }
+    }
+
+    protected Filter createFilter(final Principal user,
+                                  final float minWeight,
+                                  final float maxWeight,
+                                  final float defaultWeight,
+                                  final float minSharability,
+                                  final float maxSharability,
+                                  final float defaultSharability) {
+
+        float m = findMinAuthorizedSharability(user, minSharability);
+        return new Filter(minWeight, maxWeight, defaultWeight,
+                m, maxSharability, defaultSharability);
     }
 
     protected void addView(Note n, Params p) throws IOException {
@@ -232,6 +245,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected class Params {
         public RexsterResourceContext context;
+        public Principal user;
         public Map<String, String> map;
         public Graph baseGraph;
         public MOBGraph graph;

@@ -42,14 +42,13 @@ public class SearchExtension extends TinkerNotesExtension {
 
         logInfo("tinkernotes search \"" + query + "\"");
 
-        Params p = new Params();
-        p.baseGraph = graph;
-        p.context = context;
+        Params p = createParams(context, graph);
         p.depth = depth;
         p.query = query;
         p.styleName = styleName;
+        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
 
-        return handleRequestInternal(p, minWeight, maxWeight, minSharability, maxSharability);
+        return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
@@ -59,8 +58,12 @@ public class SearchExtension extends TinkerNotesExtension {
         return ExtensionResponse.ok(p.map);
     }
 
-    protected boolean isReadOnly() {
+    protected boolean doesRead() {
         return true;
+    }
+
+    protected boolean doesWrite() {
+        return false;
     }
 
     protected void addSearchResults(final Params p) throws IOException {
