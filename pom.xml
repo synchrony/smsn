@@ -14,10 +14,9 @@
     <modules>
         <module>core</module>
         <module>flashcards</module>
-        <module>qrcodes</module>
         <module>tinkernotes</module>
-        <module>speech</module>
         <module>android</module>
+	<module>extensions</module>
     </modules>
 
     <properties>
