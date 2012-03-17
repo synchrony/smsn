@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -23,11 +22,7 @@ public class MyOtherBrain {
 
     // Configuration properties.
     public static final String
-            NATIVESTORE_DIRECTORY = "net.fortytwo.myotherbrain.nativeStoreDirectory",
-            NEOSAIL_DIRECTORY = "net.fortytwo.myotherbrain.neoSailDirectory",
-            NEOFULLTEXT_DIRECTORY = "net.fortytwo.myotherbrain.neoFullTextDirectory",
-            RMISAILCLIENT_URI = "net.fortytwo.myotherbrain.rmiSailClientURI",
-            SAIL_CLASS = "net.fortytwo.myotherbrain.sailClass",
+            BASE_URI = "net.fortytwo.myotherbrain.baseURI",
             NAME = "net.fortytwo.myotherbrain.name",
             VERSION = "net.fortytwo.myotherbrain.version",
             REVISION = "net.fortytwo.myotherbrain.revision";
@@ -85,10 +80,6 @@ public class MyOtherBrain {
         return CONFIGURATION;
     }
 
-    public static void setConfiguration(final Properties properties) {
-        CONFIGURATION = new TypedProperties(properties);
-    }
-
     public static String getVersionInfo() {
         String name;
         String version;
@@ -116,25 +107,7 @@ public class MyOtherBrain {
         }
     }
 
-    // TODO: make this configurable
-    public static final String
-            BASE_URI = "http://myotherbrain.fortytwo.net/",
-            ATOM_BASEURI = BASE_URI + "atom/",
-            GRAPH_BASEURI = BASE_URI + "graph/";
-
     private static final Random random = new Random();
-
-    // TODO: move me
-    public static String randomAtomIdentifier() {
-        // TODO: improve me
-        return ATOM_BASEURI + random.nextInt(100000);
-    }
-
-    // TODO: move me
-    public static String randomGraphIdentifier() {
-        // TODO: improve me
-        return GRAPH_BASEURI + random.nextInt(100000);
-    }
 
     public static String sha1SumOf(final String key) {
         SHA1_DIGEST.update(key.getBytes());

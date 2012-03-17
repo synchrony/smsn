@@ -19,6 +19,7 @@
     </parent>
 
     <modules>
+	<module>opencalais</module>
         <module>qrcodes</module>
         <module>speech</module>
     </modules>
