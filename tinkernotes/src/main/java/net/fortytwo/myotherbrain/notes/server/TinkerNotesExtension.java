@@ -199,14 +199,17 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected float findMinAuthorizedSharability(final Principal user,
                                                  final float minSharability) {
         // TODO
-        float minAuth = null == user || !user.getName().equals("josh") ? 0.75f : 0;
+        float minAuth = (null == user)
+                ? 0.0f
+                : !user.getName().equals("josh")
+                ? 0.75f : 0;
 
         return Math.max(minSharability, minAuth);
     }
 
     protected boolean canWrite(final Principal user) {
         // TODO
-        return null != user && user.getName().equals("josh");
+        return null == user || user.getName().equals("josh");
     }
 
     private NotesHistory getNotesHistory(final RexsterResourceContext context) {

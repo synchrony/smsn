@@ -1,12 +1,16 @@
 package net.fortytwo.myotherbrain;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.tinkubator.idindex.IdIndexGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -62,5 +66,19 @@ public class MOBGraph {
         a.setWeight(filter.getDefaultWeight());
 
         return a;
+    }
+    
+    public Collection<Atom> getAtomsWithValue(final String value) {
+        Collection<Atom> results = new LinkedList<Atom>();
+        
+        Index<Vertex> vertices = graph.getIndex(Index.VERTICES, Vertex.class);
+        CloseableSequence<Vertex> i = vertices.get(MyOtherBrain.VALUE, value);
+        try {
+            results.add(getAtom(i.next()));
+        } finally {
+            i.close();
+        }
+
+        return results;
     }
 }

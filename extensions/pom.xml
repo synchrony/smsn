@@ -21,6 +21,7 @@
     <modules>
 	<module>opencalais</module>
         <module>qrcodes</module>
+	<module>rfid</module>
         <module>speech</module>
     </modules>
 

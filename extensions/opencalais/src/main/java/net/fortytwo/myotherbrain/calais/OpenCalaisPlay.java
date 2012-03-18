@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.calais;
 
 import mx.bigdata.jcalais.CalaisClient;
+import mx.bigdata.jcalais.CalaisConfig;
 import mx.bigdata.jcalais.CalaisObject;
 import mx.bigdata.jcalais.CalaisResponse;
 import mx.bigdata.jcalais.rest.CalaisRestClient;
@@ -32,8 +33,17 @@ public class OpenCalaisPlay {
 
         CalaisClient client = new CalaisRestClient(apiKey);
 
+        CalaisConfig config = new CalaisConfig();
+        config.set(CalaisConfig.ProcessingParam.CALCULATE_RELEVANCE_SCORE, "true");
+        config.set(CalaisConfig.ProcessingParam.DOC_RDFACCESSIBLE, "true");
+        config.set(CalaisConfig.UserParam.ALLOW_DISTRIBUTION, "true");
+        config.set(CalaisConfig.UserParam.ALLOW_SEARCH, "true");
+        //config.set(CalaisConfig.UserParam.EXTERNAL_ID, "User generated ID");
+
 //        CalaisResponse response = client.analyze(new URL("http://twitlogic.fortytwo.net"));
         CalaisResponse response = client.analyze(new URL("http://ripple.fortytwo.net"));
+//        CalaisResponse response = client.analyze(new URL("http://blog.fortytwo.net"));
+//        CalaisResponse response = client.analyze(new URL("http://en.wikipedia.org/wiki/Supply_chain"));
 
         System.out.println("recognized entities:");
         for (CalaisObject entity : response.getEntities()) {
