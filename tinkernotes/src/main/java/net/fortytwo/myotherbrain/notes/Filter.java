@@ -12,6 +12,10 @@ public class Filter {
 
     private final Float defaultSharability, defaultWeight;
 
+    public Filter() {
+        this(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+    }
+
     public Filter(final float minWeight,
                   final float maxWeight,
                   float defaultWeight,

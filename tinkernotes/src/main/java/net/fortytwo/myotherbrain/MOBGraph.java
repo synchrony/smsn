@@ -67,14 +67,37 @@ public class MOBGraph {
 
         return a;
     }
-    
+
     public Collection<Atom> getAtomsWithValue(final String value) {
         Collection<Atom> results = new LinkedList<Atom>();
-        
+
         Index<Vertex> vertices = graph.getIndex(Index.VERTICES, Vertex.class);
         CloseableSequence<Vertex> i = vertices.get(MyOtherBrain.VALUE, value);
         try {
-            results.add(getAtom(i.next()));
+            while (i.hasNext()) {
+                results.add(getAtom(i.next()));
+            }
+        } finally {
+            i.close();
+        }
+
+        return results;
+    }
+
+    public Collection<Atom> getAtomsByFulltextQuery(final String query,
+                                                    final Filter filter) {
+        Collection<Atom> results = new LinkedList<Atom>();
+
+        // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
+        CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
+        try {
+            while (i.hasNext()) {
+                Atom a = getAtom(i.next());
+
+                if (filter.isVisible(a)) {
+                    results.add(a);
+                }
+            }
         } finally {
             i.close();
         }

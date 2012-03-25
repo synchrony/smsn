@@ -1,7 +1,5 @@
 package net.fortytwo.myotherbrain.notes;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
@@ -201,19 +199,9 @@ public class NotesSemantics {
         Note result = new Note();
         result.setTargetValue("full text search results for \"" + query + "\"");
 
-        // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
-        CloseableSequence<Vertex> i = store.getGraph().getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
-        try {
-            while (i.hasNext()) {
-                Atom a = store.getAtom(i.next());
-
-                if (filter.isVisible(a)) {
-                    Note n = view(a, depth - 1, filter, style);
-                    result.addChild(n);
-                }
-            }
-        } finally {
-            i.close();
+        for (Atom a : store.getAtomsByFulltextQuery(query, filter)) {
+            Note n = view(a, depth - 1, filter, style);
+            result.addChild(n);
         }
 
         Collections.sort(result.getChildren(), new NoteComparator());
