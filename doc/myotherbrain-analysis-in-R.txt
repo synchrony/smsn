@@ -4,7 +4,8 @@
 
 v <- read.table(file("/tmp/tinkernotes-vertices.txt"), header=TRUE, sep="\t", quote="")
 
-# Make sure you have all rows.  R appears to skip rows when it becomes confused.
+# Make sure you have all rows (compare with wc -l).
+# R apparently skips rows when it becomes confused.
 nrow(v)
 
 mean(v$weight)
@@ -26,9 +27,7 @@ as.POSIXct(v$created/1000,  origin="1970-01-01", tz="GMT")
 
 library(igraph)
 
-//e <- read.table(file("/tmp/tinkernotes-edges.txt"), header=TRUE, sep="\t")
-
-g <- read.graph(file("/tmp/tinkernotes-edges.txt"), format="ncol", directed = FALSE, weights = FALSE, names = TRUE)
+g <- read.graph(file("/tmp/tinkernotes-edges.txt"), format="ncol", directed = TRUE, weights = FALSE, names = TRUE)
 
 ecount(g)
 vcount(g)
@@ -40,16 +39,13 @@ V(g)
 E(g)
 
 pg <- page.rank(g)
-pg$vector
 
-...
-
-tmp <- data.frame(key=V(g)$value, pg$vector)
-merged <- merge(tmp, brain, by="key")
-ordered <- merged[rev(order(merged[, "pg.vector"])),]
+tmp <- data.frame(id=V(g)$name, pg$vector)
+m <- merge(tmp, v, by="id")
+ranked <- m[rev(order(m[, "pg.vector"])),]
 
 # View PageRank results
-ordered[1:50,]
+ranked[1:50,]
 
 
 ################################################################################

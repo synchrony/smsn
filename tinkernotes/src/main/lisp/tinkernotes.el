@@ -533,6 +533,7 @@
 
 (defun tn-export ()
     (interactive)
+    (message "exporting")
     (do-export))
 
 
