@@ -45,9 +45,9 @@ public class NotesSemanticsTest extends TestCase {
         Atom root = createAtom("11111");
 
         Note rootNote = new Note();
-        rootNote.setTargetValue("foo");
+        rootNote.setValue("foo");
         Note child = new Note();
-        child.setTargetValue("cheval \u00e0 phynances");
+        child.setValue("cheval \u00e0 phynances");
         rootNote.addChild(child);
 
         //System.out.println(before.getTargetValue());

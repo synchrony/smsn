@@ -50,11 +50,11 @@ public class NotesSyntax {
 
         JSONObject target = new JSONObject();
         json.put("target", target);
-        target.put("key", n.getTargetKey());
-        target.put("weight", n.getTargetWeight());
-        target.put("sharability", n.getTargetSharability());
-        target.put("value", n.getTargetValue());
-        target.put("created", n.getTargetCreated());
+        target.put("key", n.getId());
+        target.put("weight", n.getWeight());
+        target.put("sharability", n.getSharability());
+        target.put("value", n.getValue());
+        target.put("created", n.getCreated());
 
         if (0 < n.getChildren().size()) {
             JSONArray c = new JSONArray();
@@ -161,7 +161,7 @@ public class NotesSyntax {
             }
             l = l.substring(j);
 
-            String targetValue = "";
+            String value = "";
             if (0 < l.length()) {
                 if (l.contains("{{{")) {
                     int start = lineNumber;
@@ -192,10 +192,10 @@ public class NotesSyntax {
                             continue;
                         }
 
-                        targetValue += l;
+                        value += l;
 
                         if (inside) {
-                            targetValue += "\n";
+                            value += "\n";
                             l = br.readLine();
                             if (null == l) {
                                 throw new NoteParsingException(start, "non-terminated verbatim block");
@@ -207,14 +207,18 @@ public class NotesSyntax {
                         }
                     }
                 } else {
-                    targetValue = l;
+                    value = l;
                 }
             }
 
-            Note n = new Note();
-            n.setTargetValue(targetValue);
+            if (0 == value.length()) {
+                throw new NoteParsingException(lineNumber, "empty note");
+            }
 
-            n.setTargetKey(targetKey);
+            Note n = new Note();
+            n.setValue(value);
+
+            n.setId(targetKey);
 
             if (0 < hierarchy.size()) {
                 hierarchy.get(hierarchy.size() - 1).addChild(n);
@@ -255,9 +259,9 @@ public class NotesSyntax {
                                   final int indent,
                                   final PrintStream p) {
 
-        if (null != n.getTargetKey()) {
-            if (null != n.getTargetKey()) {
-                p.print(padKey(n.getTargetKey()));
+        if (null != n.getId()) {
+            if (null != n.getId()) {
+                p.print(padKey(n.getId()));
             }
             p.print(": ");
         }
@@ -268,7 +272,7 @@ public class NotesSyntax {
 
         p.print("* ");
 
-        p.print(sanitizeValue(n.getTargetValue()));
+        p.print(sanitizeValue(n.getValue()));
 
         p.print("\n");
 

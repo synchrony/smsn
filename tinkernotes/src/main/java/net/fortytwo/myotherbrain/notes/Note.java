@@ -9,30 +9,30 @@ import java.util.List;
 public class Note {
     private final List<Note> children;
 
-    private String targetValue;
-    private String targetKey;
-    private Float targetWeight;
-    private Float targetSharability;
-    private Long targetCreated;
+    private String value;
+    private String id;
+    private Float weight;
+    private Float sharability;
+    private Long created;
 
     public Note() {
         children = new LinkedList<Note>();
     }
 
-    public String getTargetValue() {
-        return targetValue;
+    public String getValue() {
+        return value;
     }
 
-    public void setTargetValue(final String targetValue) {
-        this.targetValue = targetValue;
+    public void setValue(final String value) {
+        this.value = value;
     }
 
-    public String getTargetKey() {
-        return targetKey;
+    public String getId() {
+        return id;
     }
 
-    public void setTargetKey(final String targetKey) {
-        this.targetKey = targetKey;
+    public void setId(final String id) {
+        this.id = id;
     }
 
     public List<Note> getChildren() {
@@ -45,34 +45,34 @@ public class Note {
 
     @Override
     public String toString() {
-        String d = getTargetValue();
+        String d = getValue();
         if (null != d && d.length() > 20) {
             d = d.substring(0, 17) + "...";
         }
         return "note(" + d + ")";
     }
 
-    public Float getTargetWeight() {
-        return targetWeight;
+    public Float getWeight() {
+        return weight;
     }
 
-    public void setTargetWeight(Float targetWeight) {
-        this.targetWeight = targetWeight;
+    public void setWeight(Float weight) {
+        this.weight = weight;
     }
 
-    public Float getTargetSharability() {
-        return targetSharability;
+    public Float getSharability() {
+        return sharability;
     }
 
-    public void setTargetSharability(Float targetSharability) {
-        this.targetSharability = targetSharability;
+    public void setSharability(Float sharability) {
+        this.sharability = sharability;
     }
 
-    public Long getTargetCreated() {
-        return targetCreated;
+    public Long getCreated() {
+        return created;
     }
 
-    public void setTargetCreated(Long targetCreated) {
-        this.targetCreated = targetCreated;
+    public void setCreated(Long created) {
+        this.created = created;
     }
 }

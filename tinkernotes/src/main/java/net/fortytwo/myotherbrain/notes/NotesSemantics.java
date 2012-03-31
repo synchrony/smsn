@@ -132,15 +132,15 @@ public class NotesSemantics {
 
         Set<String> before = new HashSet<String>();
         for (Note n : view(root, 1, filter, style).getChildren()) {
-            before.add(n.getTargetKey());
+            before.add(n.getId());
         }
 
         Set<String> after = new HashSet<String>();
         for (Note n : children) {
-            String id = n.getTargetKey();
+            String id = n.getId();
 
             if (null != id) {
-                after.add(n.getTargetKey());
+                after.add(n.getId());
             }
         }
 
@@ -155,7 +155,7 @@ public class NotesSemantics {
         }
 
         for (Note n : children) {
-            String id = n.getTargetKey();
+            String id = n.getId();
 
             Atom target;
 
@@ -169,7 +169,7 @@ public class NotesSemantics {
                 }
             }
 
-            target.setValue(n.getTargetValue());
+            target.setValue(n.getValue());
 
             if (!before.contains(id)) {
                 style.link(root, target);
@@ -197,7 +197,7 @@ public class NotesSemantics {
                        final AdjacencyStyle style) {
 
         Note result = new Note();
-        result.setTargetValue("full text search results for \"" + query + "\"");
+        result.setValue("full text search results for \"" + query + "\"");
 
         for (Atom a : store.getAtomsByFulltextQuery(query, filter)) {
             Note n = view(a, depth - 1, filter, style);
@@ -226,7 +226,7 @@ public class NotesSemantics {
                             final AdjacencyStyle style) throws RippleException {
 
         Note result = new Note();
-        result.setTargetValue("Ripple results for \"" + query + "\"");
+        result.setValue("Ripple results for \"" + query + "\"");
 
         Collector<RippleList> results = new Collector<RippleList>();
         QueryPipe qp = new QueryPipe(rippleQueryEngine, results);
@@ -269,21 +269,21 @@ public class NotesSemantics {
     private Note toNote(final Atom a) {
         Note n = new Note();
 
-        n.setTargetValue(a.getValue());
-        n.setTargetKey((String) a.asVertex().getId());
-        n.setTargetWeight(a.getWeight());
-        n.setTargetSharability(a.getSharability());
-        n.setTargetCreated(a.getCreated());
+        n.setValue(a.getValue());
+        n.setId((String) a.asVertex().getId());
+        n.setWeight(a.getWeight());
+        n.setSharability(a.getSharability());
+        n.setCreated(a.getCreated());
 
         return n;
     }
 
     private class NoteComparator implements Comparator<Note> {
         public int compare(Note a, Note b) {
-            int cmp = b.getTargetWeight().compareTo(a.getTargetWeight());
+            int cmp = b.getWeight().compareTo(a.getWeight());
 
             if (0 == cmp) {
-                cmp = b.getTargetCreated().compareTo(a.getTargetCreated());
+                cmp = b.getCreated().compareTo(a.getCreated());
             }
 
             return cmp;

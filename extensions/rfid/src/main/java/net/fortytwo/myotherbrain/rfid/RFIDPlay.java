@@ -32,7 +32,7 @@ public class RFIDPlay {
         reader.setUsername("alien");
         reader.setPassword("password");
 
-        reader.setAntennaSequence("0 1");
+        reader.setAntennaSequence("0 1 2 3");
         reader.setTagType(16);
 
         //String readerName = reader.doReaderCommand("get ReaderName");
