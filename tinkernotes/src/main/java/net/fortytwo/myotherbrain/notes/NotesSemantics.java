@@ -64,9 +64,17 @@ public class NotesSemantics {
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
     public Note view(final Atom root,
-                      final int depth,
-                      final Filter filter,
-                      final AdjacencyStyle style) {
+                     final int depth,
+                     final Filter filter,
+                     final AdjacencyStyle style) {
+        return viewInternal(root, null, depth, filter, style);
+    }
+
+    private Note viewInternal(final Atom root,
+                              final Atom parent,
+                              final int depth,
+                              final Filter filter,
+                              final AdjacencyStyle style) {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -74,9 +82,9 @@ public class NotesSemantics {
         Note n = toNote(root);
 
         if (depth > 0) {
-            for (Atom target : style.getLinked(root)) {
+            for (Atom target : style.getLinked(root, parent)) {
                 if (filter.isVisible(target)) {
-                    Note cn = view(target, depth - 1, filter, style);
+                    Note cn = viewInternal(target, root, depth - 1, filter, style);
                     n.addChild(cn);
                 }
             }
@@ -97,7 +105,7 @@ public class NotesSemantics {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(view(a, 0, filter, FORWARD_DIRECTED_ADJACENCY));
+            n.addChild(viewInternal(a, null, 0, filter, FORWARD_DIRECTED_ADJACENCY));
         }
 
         return n;
@@ -121,6 +129,16 @@ public class NotesSemantics {
                        final Filter filter,
                        boolean destructive,
                        final AdjacencyStyle style) throws InvalidUpdateException {
+        updateInternal(root, null, children, depth, filter, destructive, style);
+    }
+
+    public void updateInternal(final Atom root,
+                               final Atom parent,
+                               final List<Note> children,
+                               final int depth,
+                               final Filter filter,
+                               boolean destructive,
+                               final AdjacencyStyle style) throws InvalidUpdateException {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -131,7 +149,7 @@ public class NotesSemantics {
         }
 
         Set<String> before = new HashSet<String>();
-        for (Note n : view(root, 1, filter, style).getChildren()) {
+        for (Note n : viewInternal(root, parent, 1, filter, style).getChildren()) {
             before.add(n.getId());
         }
 
@@ -174,9 +192,9 @@ public class NotesSemantics {
             if (!before.contains(id)) {
                 style.link(root, target);
 
-                update(target, n.getChildren(), depth - 1, filter, false, style);
+                updateInternal(target, root, n.getChildren(), depth - 1, filter, false, style);
             } else {
-                update(target, n.getChildren(), depth - 1, filter, destructive, style);
+                updateInternal(target, root, n.getChildren(), depth - 1, filter, destructive, style);
             }
         }
     }
@@ -200,7 +218,7 @@ public class NotesSemantics {
         result.setValue("full text search results for \"" + query + "\"");
 
         for (Atom a : store.getAtomsByFulltextQuery(query, filter)) {
-            Note n = view(a, depth - 1, filter, style);
+            Note n = viewInternal(a, null, depth - 1, filter, style);
             result.addChild(n);
         }
 
@@ -257,7 +275,7 @@ public class NotesSemantics {
             Atom a = store.getAtom(vx);
 
             if (filter.isVisible(a)) {
-                Note n = view(a, depth - 1, filter, style);
+                Note n = viewInternal(a, null, depth - 1, filter, style);
                 result.addChild(n);
             }
         }
@@ -299,7 +317,7 @@ public class NotesSemantics {
     public interface AdjacencyStyle {
         String getName();
 
-        Collection<Atom> getLinked(Atom root);
+        Collection<Atom> getLinked(Atom root, Atom parent);
 
         void link(Atom source, Atom target);
 
@@ -323,7 +341,7 @@ public class NotesSemantics {
             return "directed-forward";
         }
 
-        public Collection<Atom> getLinked(Atom root) {
+        public Collection<Atom> getLinked(Atom root, Atom parent) {
             return root.getOutNotes();
         }
 
@@ -341,7 +359,7 @@ public class NotesSemantics {
             return "directed-backward";
         }
 
-        public Collection<Atom> getLinked(Atom root) {
+        public Collection<Atom> getLinked(Atom root, Atom parent) {
             return root.getInNotes();
         }
 
@@ -359,15 +377,27 @@ public class NotesSemantics {
             return "undirected";
         }
 
-        public Collection<Atom> getLinked(Atom root) {
+        public Collection<Atom> getLinked(Atom root, Atom parent) {
             Collection<Atom> l = new LinkedList<Atom>();
-            l.addAll(root.getInNotes());
-            l.addAll(root.getOutNotes());
+            for (Atom a : root.getInNotes()) {
+                if (null == parent || !parent.equals(a)) {
+                    l.add(a);
+                }
+            }
+            for (Atom a : root.getOutNotes()) {
+                if (null == parent || !parent.equals(a)) {
+                    l.add(a);
+                }
+            }
             return l;
         }
 
         public void link(Atom source, Atom target) {
-            source.addOutNote(target);
+            // Do an extra check here in case a link is being added merely because it was
+            // ommitted from the view (due to symmetry).
+            if (!source.getOutNotes().contains(target)) {
+                source.addOutNote(target);
+            }
         }
 
         public void unlink(Atom source, Atom target) {

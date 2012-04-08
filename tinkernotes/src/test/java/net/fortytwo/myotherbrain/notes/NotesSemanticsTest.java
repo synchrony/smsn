@@ -5,26 +5,30 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramesManager;
-import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static junit.framework.Assert.assertEquals;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class NotesSemanticsTest extends TestCase {
+public class NotesSemanticsTest {
     private IndexableGraph graph;
     private FramesManager manager;
     private NotesSyntax syntax;
     private NotesSemantics semantics;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
         syntax = new NotesSyntax();
@@ -34,11 +38,12 @@ public class NotesSemanticsTest extends TestCase {
         semantics = new NotesSemantics(mobGraph);
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         graph.shutdown();
     }
 
+    @Test
     public void testEncoding() throws Exception {
         Filter f = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
 
@@ -63,6 +68,7 @@ public class NotesSemanticsTest extends TestCase {
         assertEquals("cheval \u00e0 phynances", j.getJSONObject("target").getString("value"));
     }
 
+    @Test
     public void testAll() throws Exception {
         /*
         String s = "" +
@@ -169,6 +175,7 @@ public class NotesSemanticsTest extends TestCase {
     }
 
     //public void main(final String[] args) throws Exception {
+    @Test
     public void testTmp() throws Exception {
         /*
         Graph g = new Neo4jGraph("/Users/josh/data/tinkernotes");
