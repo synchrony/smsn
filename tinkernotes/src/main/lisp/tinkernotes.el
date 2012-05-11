@@ -24,6 +24,9 @@
 ;; for visiting URLs in a browser
 (require 'goto-addr)
 
+;; for encryption of sensitive values
+(require 'aes)
+
 ;;(require 'ring)
 
 
