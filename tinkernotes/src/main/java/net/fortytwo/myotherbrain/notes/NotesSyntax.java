@@ -211,6 +211,8 @@ public class NotesSyntax {
                 }
             }
 
+            value = value.trim();
+
             if (0 == value.length()) {
                 throw new NoteParsingException(lineNumber, "empty note");
             }

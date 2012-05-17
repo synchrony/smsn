@@ -24,6 +24,7 @@
 like this.
 Use as many lines of text as you need.
 }}}
+            * 	 leading and trailing whitespace are ignored	 
 
             * blank lines don't matter
 

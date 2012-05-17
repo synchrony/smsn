@@ -31,6 +31,7 @@ public class NotesSyntaxTest {
     public void testReadNotes() throws Exception {
         List<Note> notes = syntax.readNotes(NotesSyntax.class.getResourceAsStream("example-notes.txt"));
         assertEquals(6, notes.size());
+
         Note indentation = notes.get(1);
         assertNull(indentation.getId());
         assertEquals("indentation", indentation.getValue());
@@ -39,12 +40,15 @@ public class NotesSyntaxTest {
                 .get(0).getChildren()
                 .get(0).getChildren()
                 .get(0).getValue());
+
         Note ws = notes.get(3);
-        assertEquals(4, ws.getChildren().size());
+        assertEquals(5, ws.getChildren().size());
         assertEquals("newlines can be preserved with triple braces {{{\n" +
                 "like this.\n" +
                 "Use as many lines of text as you need.\n" +
                 "}}}", ws.getChildren().get(2).getValue());
+        assertEquals("leading and trailing whitespace are ignored", ws.getChildren().get(3).getValue());
+
         Note ids = notes.get(4);
         assertEquals("ids", ids.getValue());
         assertEquals("0txXBm", ids.getChildren().get(0).getId());
