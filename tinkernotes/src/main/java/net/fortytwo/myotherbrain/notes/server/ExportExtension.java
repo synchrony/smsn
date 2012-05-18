@@ -112,6 +112,8 @@ public class ExportExtension extends TinkerNotesExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
+        p.graph.saveStats();
+
         OutputStream out = new FileOutputStream(new File("/tmp/tinkernotes-vertices.txt"));
         try {
             exportVertices(p.graph, new PrintStream(out));

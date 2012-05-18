@@ -24,6 +24,7 @@ public class MyOtherBrain {
     public static final String
             BASE_URI = "net.fortytwo.myotherbrain.baseURI",
             NAME = "net.fortytwo.myotherbrain.name",
+            STATS_DIRECTORY = "net.fortytwo.myotherbrain.statsDirectory",
             VERSION = "net.fortytwo.myotherbrain.version",
             REVISION = "net.fortytwo.myotherbrain.revision";
 

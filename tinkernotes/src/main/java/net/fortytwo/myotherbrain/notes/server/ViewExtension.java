@@ -45,6 +45,7 @@ public class ViewExtension extends TinkerNotesExtension {
         addView(n, p);
 
         addToHistory(p.rootId, p.context);
+        p.graph.registerVisit(p.root);
 
         return ExtensionResponse.ok(p.map);
     }

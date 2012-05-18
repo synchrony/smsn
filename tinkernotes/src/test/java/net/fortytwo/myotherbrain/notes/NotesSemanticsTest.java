@@ -32,7 +32,7 @@ public class NotesSemanticsTest {
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
         syntax = new NotesSyntax();
-        MOBGraph mobGraph = new MOBGraph(g);
+        MOBGraph mobGraph = MOBGraph.getInstance(g);
         graph = mobGraph.getGraph();
         manager = mobGraph.getManager();
         semantics = new NotesSemantics(mobGraph);

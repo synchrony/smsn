@@ -22,14 +22,14 @@ public class MOBGraphTest extends TestCase {
         g.setMaxBufferSize(1);
         g.clear();
         try {
-            MOBGraph m = new MOBGraph(g);
+            MOBGraph m = MOBGraph.getInstance(g);
             Filter f = new Filter();
-            
+
             Atom a = m.createAtom(f);
             a.setValue("Arthur Dent");
 
             Collection<Atom> result;
-            
+
             result = m.getAtomsByFulltextQuery("Arthur*", f);
             assertEquals(1, result.size());
             assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
