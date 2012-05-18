@@ -24,10 +24,16 @@
 ;; for visiting URLs in a browser
 (require 'goto-addr)
 
+;;(require 'ring)
+
+
 ;; for encryption of sensitive values
 (require 'aes)
 
-;;(require 'ring)
+;; LOCAL IMPORTS ;;;;;;;;;;;;;;;;;;;;;;;
+;; not required by this library ;;;;;;;;
+
+(require 'latex-math-preview)
 
 
 ;; HELPER CODE ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1011,6 +1017,13 @@
                         (kill-buffer buffer))))
             (no-target))))
 
+(defun tn-latex-math-preview ()
+    (interactive)
+    (end-of-line)
+    (backward-word)
+    (latex-math-preview-expression))
+
+
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-duplicates)
 (global-set-key (kbd "C-c e")           'tn-export)
@@ -1073,6 +1086,7 @@
 (global-set-key (kbd "C-c C-t C-b w")   'tn-browse-target-value-in-wikipedia)
 (global-set-key (kbd "C-c C-t C-b y")   'tn-browse-target-value-in-youtube)
 (global-set-key (kbd "C-c C-t i")       'tn-target-info)
+(global-set-key (kbd "C-c C-t l")       'tn-latex-math-preview)
 (global-set-key (kbd "C-c C-t C-s 1")   'tn-set-target-sharability-1)
 (global-set-key (kbd "C-c C-t C-s 2")   'tn-set-target-sharability-2)
 (global-set-key (kbd "C-c C-t C-s 3")   'tn-set-target-sharability-3)
@@ -1152,7 +1166,6 @@
 
 
 ;; Uncomment only when debugging
-;;(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
-
+(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'tinkernotes)
