@@ -14,19 +14,29 @@ public class ActivityLog {
     }
 
     public void logCreate(final Atom a) {
-        log(a, "create");
+        log("create", a);
     }
 
     public void logView(final Atom a) {
-        log(a, "view");
+        log("view", a);
     }
 
     public void logUpdate(final Atom a) {
-        log(a, "change-value");
+        log("change-value", a);
     }
 
     public void logSetProperties(final Atom a) {
-        log(a, "set-props");
+        log("set-props", a);
+    }
+
+    public void logLink(final Atom tail,
+                        final Atom head) {
+        log("link", tail, head);
+    }
+
+    public void logUnlink(final Atom tail,
+                          final Atom head) {
+        log("unlink", tail, head);
     }
 
     public void flush() {
@@ -41,15 +51,17 @@ public class ActivityLog {
         out.close();
     }
 
-    private void log(final Atom a,
-                     final String action) {
+    private void log(final String action, final Atom... a) {
         try {
             out.append("")
                     .append("" + System.currentTimeMillis())
-                    .append("\t")
-                    .append(a.asVertex().getId().toString())
-                    .append("\t").append(action)
-                    .append("\n");
+                    .append("\t").append(action);
+
+            for (Atom atom : a) {
+                out.append("\t").append(atom.asVertex().getId().toString());
+            }
+
+            out.append("\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

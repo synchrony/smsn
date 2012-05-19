@@ -175,7 +175,7 @@ public class NotesSemantics {
                 if (!after.contains(id)) {
                     Atom target = store.getAtom(id);
 
-                    style.unlink(root, target);
+                    style.unlink(root, target, log);
                 }
             }
         }
@@ -198,7 +198,7 @@ public class NotesSemantics {
             setValue(target, n.getValue(), log);
 
             if (!before.contains(id)) {
-                style.link(root, target);
+                style.link(root, target, log);
 
                 updateInternal(target, root, n.getChildren(), depth - 1, filter, false, style, log);
             } else {
@@ -351,9 +351,9 @@ public class NotesSemantics {
 
         Collection<Atom> getLinked(Atom root, Atom parent);
 
-        void link(Atom source, Atom target);
+        void link(Atom source, Atom target, ActivityLog log);
 
-        void unlink(Atom source, Atom target);
+        void unlink(Atom source, Atom target, ActivityLog log);
     }
 
     public static AdjacencyStyle lookupStyle(final String name) {
@@ -368,6 +368,38 @@ public class NotesSemantics {
         }
     }
 
+    private static void addOutNote(final Atom root,
+                                   final Atom other,
+                                   final ActivityLog log) {
+        root.addOutNote(other);
+
+        if (null != log) {
+            log.logLink(root, other);
+        }
+    }
+
+    private static void removeOutNote(final Atom root,
+                                      final Atom other,
+                                      final ActivityLog log) {
+        root.removeOutNote(other);
+
+        if (null != log) {
+            log.logUnlink(root, other);
+        }
+    }
+
+    private static void addInNote(final Atom root,
+                                  final Atom other,
+                                  final ActivityLog log) {
+        addOutNote(other, root, log);
+    }
+
+    private static void removeInNote(final Atom root,
+                                     final Atom other,
+                                     final ActivityLog log) {
+        removeOutNote(other, root, log);
+    }
+
     public static final AdjacencyStyle FORWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
         public String getName() {
             return "directed-forward";
@@ -377,12 +409,12 @@ public class NotesSemantics {
             return root.getOutNotes();
         }
 
-        public void link(Atom source, Atom target) {
-            source.addOutNote(target);
+        public void link(Atom source, Atom target, ActivityLog log) {
+            addOutNote(source, target, log);
         }
 
-        public void unlink(Atom source, Atom target) {
-            source.removeOutNote(target);
+        public void unlink(Atom source, Atom target, ActivityLog log) {
+            removeOutNote(source, target, log);
         }
     };
 
@@ -395,12 +427,12 @@ public class NotesSemantics {
             return root.getInNotes();
         }
 
-        public void link(Atom source, Atom target) {
-            source.addInNote(target);
+        public void link(Atom source, Atom target, ActivityLog log) {
+            addInNote(source, target, log);
         }
 
-        public void unlink(Atom source, Atom target) {
-            source.removeInNote(target);
+        public void unlink(Atom source, Atom target, ActivityLog log) {
+            removeInNote(source, target, log);
         }
     };
 
@@ -424,17 +456,17 @@ public class NotesSemantics {
             return l;
         }
 
-        public void link(Atom source, Atom target) {
+        public void link(Atom source, Atom target, ActivityLog log) {
             // Do an extra check here in case a link is being added merely because it was
             // ommitted from the view (due to symmetry).
             if (!source.getOutNotes().contains(target)) {
-                source.addOutNote(target);
+                addOutNote(source, target, log);
             }
         }
 
-        public void unlink(Atom source, Atom target) {
-            source.removeInNote(target);
-            source.removeOutNote(target);
+        public void unlink(Atom source, Atom target, ActivityLog log) {
+            removeInNote(source, target, log);
+            removeOutNote(source, target, log);
         }
     };
 }
