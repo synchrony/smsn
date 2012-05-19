@@ -4,7 +4,7 @@
 
 v <- read.table(file("/tmp/tinkernotes-vertices.txt"), header=TRUE, sep="\t", quote="")
 
-# Make sure you have all rows (compare with wc -l).
+# Make sure you have all rows (compare with "wc -l /tmp/tinkernotes-vertices.txt").
 # R apparently skips rows when it becomes confused.
 nrow(v)
 
@@ -13,7 +13,6 @@ mean(v$sharability)
 
 hist(v$weight)
 hist(v$sharability)
-plot(h$counts, log="xy")
 
 
 ################################################################################
@@ -52,19 +51,6 @@ plot(counts, log="x")
 
 
 ################################################################################
-# degree distribution
-
-# Out-degree follows a power law, for the most part
-plot(degree.distribution(g, mode="out"), log="xy")
-
-# In-degree follows a distribution vaguely resembling a power-law after degree=1
-plot(degree.distribution(g, mode="in"), log="xy", xlab="in-degree + 1", y="number of notes")
-
-# Total degree is dominated by out-degree
-plot(degree.distribution(g, mode="total"), log="xy")
-
-
-################################################################################
 # PageRank
 
 library(igraph)
@@ -74,7 +60,7 @@ g <- read.graph(file("/tmp/tinkernotes-edges.txt"), format="ncol", directed = TR
 ecount(g)
 vcount(g)
 
-# Just over 1 edge per vertex
+# Only 7% more edges than vertices (at last count)
 ecount(g) / vcount(g)
 
 V(g)
@@ -89,6 +75,19 @@ ranked <- m[rev(order(m[, "pg.vector"])),]
 
 # View PageRank results
 ranked[1:50,]
+
+
+################################################################################
+# degree distribution
+
+# Out-degree follows a power law, for the most part
+plot(degree.distribution(g, mode="out"), log="xy")
+
+# In-degree follows a distribution vaguely resembling a power-law after degree=1
+plot(degree.distribution(g, mode="in"), log="xy", xlab="in-degree + 1", ylab="number of notes")
+
+# Total degree is dominated by out-degree
+plot(degree.distribution(g, mode="total"), log="xy")
 
 
 ################################################################################

@@ -148,6 +148,13 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             try {
                 ExtensionResponse r = performTransaction(p);
                 normal = true;
+
+                // Note: currently, all activities are logged, but the log is not immediately flushed
+                //       unless the transaction succeeds.
+                if (null != p.graph.getActivityLog()) {
+                    p.graph.getActivityLog().flush();
+                }
+
                 return r;
             } finally {
                 if (doesWrite()) {

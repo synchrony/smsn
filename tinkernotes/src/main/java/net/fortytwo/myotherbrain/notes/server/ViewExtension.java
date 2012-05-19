@@ -41,11 +41,10 @@ public class ViewExtension extends TinkerNotesExtension {
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
 
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style);
+        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style, p.graph.getActivityLog());
         addView(n, p);
 
         addToHistory(p.rootId, p.context);
-        p.graph.registerVisit(p.root);
 
         return ExtensionResponse.ok(p.map);
     }

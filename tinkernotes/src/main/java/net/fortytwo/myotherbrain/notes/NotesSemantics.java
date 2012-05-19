@@ -3,6 +3,7 @@ package net.fortytwo.myotherbrain.notes;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
+import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.ripple.Ripple;
@@ -66,7 +67,12 @@ public class NotesSemantics {
     public Note view(final Atom root,
                      final int depth,
                      final Filter filter,
-                     final AdjacencyStyle style) {
+                     final AdjacencyStyle style,
+                     final ActivityLog log) {
+        if (null != log) {
+            log.logView(root);
+        }
+
         return viewInternal(root, null, depth, filter, style);
     }
 
@@ -128,8 +134,9 @@ public class NotesSemantics {
                        final int depth,
                        final Filter filter,
                        boolean destructive,
-                       final AdjacencyStyle style) throws InvalidUpdateException {
-        updateInternal(root, null, children, depth, filter, destructive, style);
+                       final AdjacencyStyle style,
+                       final ActivityLog log) throws InvalidUpdateException {
+        updateInternal(root, null, children, depth, filter, destructive, style, log);
     }
 
     public void updateInternal(final Atom root,
@@ -138,7 +145,8 @@ public class NotesSemantics {
                                final int depth,
                                final Filter filter,
                                boolean destructive,
-                               final AdjacencyStyle style) throws InvalidUpdateException {
+                               final AdjacencyStyle style,
+                               final ActivityLog log) throws InvalidUpdateException {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -178,7 +186,7 @@ public class NotesSemantics {
             Atom target;
 
             if (null == id) {
-                target = store.createAtom(filter);
+                target = createAtom(filter, log);
             } else {
                 target = store.getAtom(id);
 
@@ -187,14 +195,14 @@ public class NotesSemantics {
                 }
             }
 
-            target.setValue(n.getValue());
+            setValue(target, n.getValue(), log);
 
             if (!before.contains(id)) {
                 style.link(root, target);
 
-                updateInternal(target, root, n.getChildren(), depth - 1, filter, false, style);
+                updateInternal(target, root, n.getChildren(), depth - 1, filter, false, style, log);
             } else {
-                updateInternal(target, root, n.getChildren(), depth - 1, filter, destructive, style);
+                updateInternal(target, root, n.getChildren(), depth - 1, filter, destructive, style, log);
             }
         }
     }
@@ -282,6 +290,30 @@ public class NotesSemantics {
 
         Collections.sort(result.getChildren(), new NoteComparator());
         return result;
+    }
+
+    private Atom createAtom(final Filter filter,
+                            final ActivityLog log) {
+        Atom a = store.createAtom(filter);
+
+        if (null != log) {
+            log.logCreate(a);
+        }
+
+        return a;
+    }
+
+    private void setValue(final Atom target,
+                          final String value,
+                          final ActivityLog log) {
+        if (null != log) {
+            String prev = target.getValue();
+            if (null == prev ? null != value : (null == value || !prev.equals(value))) {
+                log.logUpdate(target);
+            }
+        }
+
+        target.setValue(value);
     }
 
     private Note toNote(final Atom a) {

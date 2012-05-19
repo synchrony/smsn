@@ -8,15 +8,8 @@ import com.tinkerpop.frames.FramesManager;
 import com.tinkerpop.tinkubator.idindex.IdIndexGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,8 +24,7 @@ public class MOBGraph {
 
     private final FramesManager manager;
 
-    private final Map<Object, Integer> attention;
-    private final File statsDir;
+    private final ActivityLog activityLog;
 
     private static final Map<IndexableGraph, MOBGraph> graphs = new HashMap<IndexableGraph, MOBGraph>();
 
@@ -52,61 +44,18 @@ public class MOBGraph {
 
         manager = new FramesManager(graph);
 
-        statsDir = MyOtherBrain.getConfiguration().getFile(MyOtherBrain.STATS_DIRECTORY, null);
-        if (null == statsDir) {
-            attention = null;
+        File logFile = MyOtherBrain.getConfiguration().getFile(MyOtherBrain.ACTIVITY_LOG, null);
+
+        if (null == logFile) {
+            activityLog = null;
         } else {
-            attention = new HashMap<Object, Integer>();
-            loadStats();
+            System.out.println("will append to activity log at " + logFile.getPath());
+            activityLog = new ActivityLog(new FileWriter(logFile, true));
         }
     }
 
-    private void loadStats() throws IOException {
-        File f = new File(statsDir, "attention");
-        if (f.exists()) {
-            InputStream in = new FileInputStream(f);
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-                String line;
-                while (null != (line = br.readLine())) {
-                    String[] a = line.split(",");
-                    String id = a[0];
-                    Integer count = Integer.valueOf(a[1]);
-                    attention.put(id, count);
-                }
-            } finally {
-                in.close();
-            }
-        }
-    }
-
-    public void saveStats() throws IOException {
-        if (null != attention) {
-            OutputStream out = new FileOutputStream(new File(statsDir, "attention"));
-            PrintStream ps = new PrintStream(out);
-            try {
-                for (Map.Entry<Object, Integer> e : attention.entrySet()) {
-                    ps.println("" + e.getKey() + "," + e.getValue());
-                }
-            } finally {
-                out.close();
-            }
-        }
-    }
-
-    public void registerVisit(final Atom a) {
-        if (null != attention) {
-            Object id = a.asVertex().getId();
-
-            Integer count = attention.get(id);
-            if (null == count) {
-                count = 0;
-            }
-
-            //System.out.println("putting: " + id + ", " + (count + 1));
-            attention.put(id, count + 1);
-        }
+    public ActivityLog getActivityLog() {
+        return activityLog;
     }
 
     public IndexableGraph getGraph() {

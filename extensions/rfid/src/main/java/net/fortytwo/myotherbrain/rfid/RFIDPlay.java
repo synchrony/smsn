@@ -22,7 +22,7 @@ public class RFIDPlay {
 
         RexsterGraph g = new RexsterGraph("http://localhost:8182/graphs/tinkernotes");
 
-        MOBGraph graph = new MOBGraph(g);
+        MOBGraph graph = MOBGraph.getInstance(g);
 
         RFIDListener l = new RFIDListener();
 

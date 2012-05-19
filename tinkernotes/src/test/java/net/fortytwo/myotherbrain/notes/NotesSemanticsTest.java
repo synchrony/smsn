@@ -58,9 +58,9 @@ public class NotesSemanticsTest {
         //System.out.println(before.getTargetValue());
 
         NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_DIRECTED_ADJACENCY;
-        semantics.update(root, rootNote.getChildren(), 1, f, true, style);
+        semantics.update(root, rootNote.getChildren(), 1, f, true, style, null);
 
-        Note after = semantics.view(root, 1, f, style);
+        Note after = semantics.view(root, 1, f, style, null);
 
         JSONObject json = syntax.toJSON(after);
         //System.out.println(json.toString());

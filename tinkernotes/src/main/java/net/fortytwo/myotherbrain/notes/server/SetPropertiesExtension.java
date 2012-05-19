@@ -54,6 +54,8 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         p.map.put("weight", "" + p.newWeight);
         p.map.put("sharability", "" + p.newSharability);
 
+        p.graph.getActivityLog().logSetProperties(p.root);
+
         return ExtensionResponse.ok(p.map);
     }
 
