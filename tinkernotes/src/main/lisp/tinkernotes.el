@@ -1023,11 +1023,18 @@
     (backward-word)
     (latex-math-preview-expression))
 
+(defun tn-new-note ()
+    (interactive)
+    (beginning-of-buffer)
+    (kill-new "         * \n")(yank)
+    (beginning-of-buffer)(end-of-line))
+
 
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-duplicates)
 (global-set-key (kbd "C-c e")           'tn-export)
 (global-set-key (kbd "C-c h")           'tn-history)
+(global-set-key (kbd "C-c n")           'tn-new-note)
 (global-set-key (kbd "C-c p")           'tn-push-view)
 (global-set-key (kbd "C-c r")           'tn-ripple-query)
 (global-set-key (kbd "C-c s")           'tn-search)
