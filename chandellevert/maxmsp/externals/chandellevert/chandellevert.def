@@ -1,0 +1,4 @@
+LIBRARY chandellevert.mxe
+
+EXPORTS
+	main

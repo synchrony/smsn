@@ -1,0 +1,4 @@
+LIBRARY chand_autocorr.mxe
+
+EXPORTS
+	main
