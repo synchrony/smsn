@@ -1,5 +1,5 @@
 function useTab(tab) {
-    var text = "* " + tab.title + "\n"
+    var text = "* " + tab.title + " (web page)\n"
         + "    * " + tab.url;
 
     var pre = document.getElementById("clipboard-view");

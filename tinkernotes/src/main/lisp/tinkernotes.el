@@ -1025,6 +1025,7 @@
 
 (defun tn-new-note ()
     (interactive)
+    (tn-enter-edit-view)
     (beginning-of-buffer)
     (kill-new "         * \n")(yank)
     (beginning-of-buffer)(end-of-line))
@@ -1173,6 +1174,6 @@
 
 
 ;; Uncomment only when debugging
-(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
+;;(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'tinkernotes)

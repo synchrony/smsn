@@ -70,7 +70,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         String styleName = p.styleName;
 
         try {
-            p.map = new HashMap<String, String>();
+            p.map = new HashMap<String, Object>();
 
             if (!(p.baseGraph instanceof IndexableGraph)) {
                 return ExtensionResponse.error("graph must be an instance of IndexableGraph");
@@ -200,7 +200,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         } catch (JSONException e) {
             throw new IOException(e);
         }
-        p.map.put("view", json.toString());
+
+        p.map.put("view", json);
     }
 
     protected float findMinAuthorizedSharability(final Principal user,
@@ -256,7 +257,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected class Params {
         public RexsterResourceContext context;
         public Principal user;
-        public Map<String, String> map;
+        public Map<String, Object> map;
         public Graph baseGraph;
         public MOBGraph graph;
         public FramesManager manager;

@@ -28,7 +28,7 @@ public class Speaker {
         this(KEVIN);
     }
 
-    synchronized void speak(final String s) {
+    public synchronized void speak(final String s) {
         System.out.println(voice.getName() + ": " + s);
         voice.speak(s);
     }
