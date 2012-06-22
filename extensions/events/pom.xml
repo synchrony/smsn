@@ -5,13 +5,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>tinkernotes</artifactId>
+    <artifactId>events</artifactId>
     <packaging>jar</packaging>
-    <name>TinkerNotes</name>
+    <name>MyOtherBrain Events</name>
 
     <parent>
         <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-all</artifactId>
+        <artifactId>myotherbrain-extensions</artifactId>
         <version>0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -26,14 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.myotherbrain</groupId>
-            <artifactId>myotherbrain-core</artifactId>
-            <version>${myotherbrain.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>frames</artifactId>
-            <version>${frames.version}</version>
+            <groupId>net.fortytwo.rdfagents</groupId>
+            <artifactId>rdfagents-core</artifactId>
+            <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>
@@ -41,35 +36,14 @@
             <version>${rexster.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.fortytwo.ripple</groupId>
-            <artifactId>ripple-demo</artifactId>
-            <version>${ripple.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.tinkubator</groupId>
-            <artifactId>property-graph-sail</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.tinkubator</groupId>
-            <artifactId>id-index-graph</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>replay</artifactId>
-            <version>${sesametools.version}</version>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-sail-graph</artifactId>
+            <version>${blueprints.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-neo4j-graph</artifactId>
-            <version>${blueprints.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -113,7 +87,7 @@
                     <descriptors>
                         <descriptor>src/assembly/standalone.xml</descriptor>
                     </descriptors>
-                    <finalName>tinkernotes-${project.version}</finalName>
+                    <finalName>myotherbrain-events-${project.version}</finalName>
                     <outputDirectory>target</outputDirectory>
                     <workDirectory>target/assembly/work</workDirectory>
                     <tarLongFileMode>warn</tarLongFileMode>

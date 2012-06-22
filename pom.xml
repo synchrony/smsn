@@ -16,18 +16,19 @@
         <module>flashcards</module>
         <module>tinkernotes</module>
         <module>android</module>
-	<module>extensions</module>
+        <module>extensions</module>
     </modules>
 
     <properties>
         <myotherbrain.version>0.2-SNAPSHOT</myotherbrain.version>
-        <sesame.version>2.6.4</sesame.version>
         <blueprints.version>1.2</blueprints.version>
         <frames.version>0.7</frames.version>
-        <rexster.version>0.8</rexster.version>
-        <ripple.version>0.8-SNAPSHOT</ripple.version>
-        <sesametools.version>1.6</sesametools.version>
         <junit.version>4.5</junit.version>
+        <rexster.version>0.8</rexster.version>
+        <rdfagents.version>0.2</rdfagents.version>
+        <ripple.version>0.8-SNAPSHOT</ripple.version>
+        <sesame.version>2.6.4</sesame.version>
+        <sesametools.version>1.6</sesametools.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>

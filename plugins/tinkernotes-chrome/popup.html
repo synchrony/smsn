@@ -18,6 +18,7 @@
     </style>
 
     <!-- JavaScript and HTML must be in separate files for security. -->
+    <script src="lib/md5.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
@@ -26,6 +27,7 @@
         <pre id="clipboard-view"></pre>
         <!-- Note: if you make the textarea hidden, the Copy command doesn't work -->
         <textarea rows="1" cols="1" id="clipboard-input" style="visibility:hidden"></textarea>
+        <input type="button" id="cache-button" value="Add to cache"/>
     </div>
   </body>
 </html>
