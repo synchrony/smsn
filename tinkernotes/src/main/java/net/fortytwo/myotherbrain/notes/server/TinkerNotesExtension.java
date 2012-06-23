@@ -246,12 +246,12 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected void logInfo(final String message) {
         LOGGER.info(message);
-        System.err.println(message);
+        //System.err.println(message);
     }
 
     protected void logWarning(final String message) {
         LOGGER.warning(message);
-        System.err.println(message);
+        //System.err.println(message);
     }
 
     protected class Params {

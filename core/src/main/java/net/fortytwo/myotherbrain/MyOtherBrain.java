@@ -5,12 +5,16 @@ import net.fortytwo.myotherbrain.util.properties.PropertyException;
 import net.fortytwo.myotherbrain.util.properties.TypedProperties;
 
 import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -51,13 +55,37 @@ public class MyOtherBrain {
     private static TypedProperties CONFIGURATION;
 
     static {
-        LOGGER = getLogger(MyOtherBrain.class);
-
-        CONFIGURATION = new TypedProperties();
-        VERSION_PROPERTIES = new TypedProperties();
         try {
+            {
+                InputStream in = MyOtherBrain.class.getResourceAsStream("logging.properties");
+                try {
+                    LogManager.getLogManager().readConfiguration(in);
+                } finally {
+                    in.close();
+                }
+            }
+
+            LOGGER = getLogger(MyOtherBrain.class);
+
+            CONFIGURATION = new TypedProperties();
+            VERSION_PROPERTIES = new TypedProperties();
+
             CONFIGURATION.load(MyOtherBrain.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
             VERSION_PROPERTIES.load(MyOtherBrain.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
+
+            // Attempt to load additional properties from a user-provided file
+            File f = new File(CONFIG_PROPERTIES_FILE);
+            if (f.exists()) {
+                LOGGER.info("loading MyOtherBrain configuration at " + f);
+                InputStream in = new FileInputStream(f);
+                try {
+                    CONFIGURATION.load(in);
+                } finally {
+                    in.close();
+                }
+            } else {
+                LOGGER.info("using default MyOtherBrain configuration");
+            }
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
