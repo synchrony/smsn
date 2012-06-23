@@ -15,11 +15,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class MOBGraph {
+    private static final Logger LOGGER = MyOtherBrain.getLogger(MOBGraph.class);
+
     private final IdIndexGraph graph;
 
     private final FramesManager manager;
@@ -47,9 +50,10 @@ public class MOBGraph {
         File logFile = MyOtherBrain.getConfiguration().getFile(MyOtherBrain.ACTIVITY_LOG, null);
 
         if (null == logFile) {
+            LOGGER.info("no activity log specified");
             activityLog = null;
         } else {
-            System.out.println("will append to activity log at " + logFile.getPath());
+            LOGGER.info("will use activity log at " + logFile.getPath());
             activityLog = new ActivityLog(new FileWriter(logFile, true));
         }
     }

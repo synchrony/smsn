@@ -59,6 +59,7 @@ public class MyOtherBrain {
             {
                 InputStream in = MyOtherBrain.class.getResourceAsStream("logging.properties");
                 try {
+                    LogManager.getLogManager().reset();
                     LogManager.getLogManager().readConfiguration(in);
                 } finally {
                     in.close();
