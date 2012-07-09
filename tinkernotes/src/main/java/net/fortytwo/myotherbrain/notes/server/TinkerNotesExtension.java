@@ -1,9 +1,8 @@
 package net.fortytwo.myotherbrain.notes.server;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.frames.FramesManager;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
@@ -41,7 +40,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     protected abstract boolean doesWrite();
 
     protected Params createParams(final RexsterResourceContext context,
-                                  final Graph graph) {
+                                  final KeyIndexableGraph graph) {
         Params p = new Params();
         p.baseGraph = graph;
         p.context = context;
@@ -72,7 +71,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         try {
             p.map = new HashMap<String, Object>();
 
-            if (!(p.baseGraph instanceof IndexableGraph)) {
+            if (!(p.baseGraph instanceof KeyIndexableGraph)) {
                 return ExtensionResponse.error("graph must be an instance of IndexableGraph");
             }
 
@@ -83,8 +82,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 p.view = new String(p.view.getBytes("UTF-8"));
             }
 
-            p.manager = new FramesManager(p.baseGraph);
-            p.graph = MOBGraph.getInstance((IndexableGraph) p.baseGraph);
+            p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
+            p.graph = MOBGraph.getInstance((KeyIndexableGraph) p.baseGraph);
             p.semantics = new NotesSemantics(p.graph);
             p.syntax = new NotesSyntax();
 
@@ -133,12 +132,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             boolean manual;
             // Force manual transaction mode (provided that the graph is transactional)
             if (doesWrite() && p.baseGraph instanceof TransactionalGraph) {
-                if (0 >= ((TransactionalGraph) p.baseGraph).getCurrentBufferSize()) {
-                    ((TransactionalGraph) p.baseGraph).setMaxBufferSize(-1);
-                }
                 manual = true;
-
-                ((TransactionalGraph) p.baseGraph).startTransaction();
             } else {
                 manual = false;
             }
@@ -258,9 +252,9 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public RexsterResourceContext context;
         public Principal user;
         public Map<String, Object> map;
-        public Graph baseGraph;
+        public KeyIndexableGraph baseGraph;
         public MOBGraph graph;
-        public FramesManager manager;
+        public FramedGraph<KeyIndexableGraph> manager;
         public NotesSemantics semantics;
         public NotesSyntax syntax;
         public Atom root;

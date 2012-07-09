@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.notes.server;
 
-import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
@@ -40,7 +41,7 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         logInfo("tinkernotes update " + rootId + " (depth " + depth + ")");
 
-        Params p = createParams(context, graph);
+        Params p = createParams(context, (KeyIndexableGraph) graph);
         p.depth = depth;
         p.rootId = rootId;
         p.styleName = styleName;

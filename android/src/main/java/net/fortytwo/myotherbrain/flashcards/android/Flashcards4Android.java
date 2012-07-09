@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Flashcards4Android extends Activity {
-    public static final String INFO = "flashcards_info_layout";
+    public static final String INFO = "net.fortytwo.myotherbrain.flashcards.android.info";
 
     public static final String HTML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
             "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n" +

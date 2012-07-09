@@ -285,7 +285,11 @@
                     (make-local-variable 'tn-current-line)
                     (make-local-variable 'tn-mode)
                     (setq tn-root root)
-                    (if depth (setq tn-depth (string-to-number depth)))
+                    (if (equal mode tn-search-mode)
+                        ;; Always leave a search view with depth 1, rather than that of the last view.
+                        ;; The user experience is a little unpredictable otherwise.
+                        (setq tn-depth 1)
+                        (if depth (setq tn-depth (string-to-number depth))))
                     (setq tn-min-sharability min-sharability)
                     (setq tn-max-sharability max-sharability)
                     (setq tn-default-sharability tn-future-sharability)

@@ -1,11 +1,9 @@
 package net.fortytwo.myotherbrain;
 
-import com.tinkerpop.frames.Direction;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.Relation;
 import com.tinkerpop.frames.VertexFrame;
-
-import java.util.Collection;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -36,21 +34,21 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.WEIGHT)
     void setWeight(Float weight);
 
-    @Relation(label = MyOtherBrain.NOTE)
-    Collection<Atom> getOutNotes();
+    @Adjacency(label = MyOtherBrain.NOTE)
+    Iterable<Atom> getOutNotes();
 
-    @Relation(label = MyOtherBrain.NOTE)
+    @Adjacency(label = MyOtherBrain.NOTE)
     void addOutNote(Atom other);
 
-    @Relation(label = MyOtherBrain.NOTE)
+    @Adjacency(label = MyOtherBrain.NOTE)
     void removeOutNote(Atom other);
 
-    @Relation(label = MyOtherBrain.NOTE, direction = Direction.INVERSE)
-    Collection<Atom> getInNotes();
+    @Adjacency(label = MyOtherBrain.NOTE, direction = Direction.IN)
+    Iterable<Atom> getInNotes();
 
-    @Relation(label = MyOtherBrain.NOTE, direction = Direction.INVERSE)
+    @Adjacency(label = MyOtherBrain.NOTE, direction = Direction.IN)
     void addInNote(Atom other);
 
-    @Relation(label = MyOtherBrain.NOTE, direction = Direction.INVERSE)
+    @Adjacency(label = MyOtherBrain.NOTE, direction = Direction.IN)
     void removeInNote(Atom other);
 }

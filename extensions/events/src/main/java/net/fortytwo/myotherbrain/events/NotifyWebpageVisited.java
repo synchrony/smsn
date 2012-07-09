@@ -71,7 +71,12 @@ public class NotifyWebpageVisited extends AbstractRexsterExtension {
 
         Collection<Statement> s = new LinkedList<Statement>();
         URI event = f.randomURI();
-        URI page = vf.createURI(url);
+        URI page;
+        try {
+            page = vf.createURI(url);
+        } catch (Exception e) {
+            return ExtensionResponse.error("'url' parameter is not a valid URI: " + url);
+        }
         s.add(vf.createStatement(event, RDF_TYPE, WEBPAGE_VISIT));
         s.add(vf.createStatement(event, PAGE, page));
 

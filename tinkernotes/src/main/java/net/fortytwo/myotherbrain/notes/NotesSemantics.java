@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.notes;
 
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
 import net.fortytwo.myotherbrain.ActivityLog;
@@ -314,6 +314,7 @@ public class NotesSemantics {
         }
 
         target.setValue(value);
+        store.indexForSearch(target, value);
     }
 
     private Note toNote(final Atom a) {
@@ -349,7 +350,7 @@ public class NotesSemantics {
     public interface AdjacencyStyle {
         String getName();
 
-        Collection<Atom> getLinked(Atom root, Atom parent);
+        Iterable<Atom> getLinked(Atom root, Atom parent);
 
         void link(Atom source, Atom target, ActivityLog log);
 
@@ -405,7 +406,7 @@ public class NotesSemantics {
             return "directed-forward";
         }
 
-        public Collection<Atom> getLinked(Atom root, Atom parent) {
+        public Iterable<Atom> getLinked(Atom root, Atom parent) {
             return root.getOutNotes();
         }
 
@@ -423,7 +424,7 @@ public class NotesSemantics {
             return "directed-backward";
         }
 
-        public Collection<Atom> getLinked(Atom root, Atom parent) {
+        public Iterable<Atom> getLinked(Atom root, Atom parent) {
             return root.getInNotes();
         }
 
@@ -441,7 +442,7 @@ public class NotesSemantics {
             return "undirected";
         }
 
-        public Collection<Atom> getLinked(Atom root, Atom parent) {
+        public Iterable<Atom> getLinked(Atom root, Atom parent) {
             Collection<Atom> l = new LinkedList<Atom>();
             for (Atom a : root.getInNotes()) {
                 if (null == parent || !parent.equals(a)) {
@@ -459,9 +460,20 @@ public class NotesSemantics {
         public void link(Atom source, Atom target, ActivityLog log) {
             // Do an extra check here in case a link is being added merely because it was
             // ommitted from the view (due to symmetry).
-            if (!source.getOutNotes().contains(target)) {
+            if (!contains(source.getOutNotes(), target)) {
                 addOutNote(source, target, log);
             }
+        }
+
+        private boolean contains(Iterable<Atom> i,
+                                 final Atom a) {
+            for (Atom b : i) {
+                if (b.equals(a)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void unlink(Atom source, Atom target, ActivityLog log) {

@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.notes.server;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
@@ -14,6 +14,7 @@ import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.ripple.StringUtils;
+import org.openrdf.model.Graph;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,7 +39,7 @@ public class DuplicatesExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
         logInfo("tinkernotes duplicates");
 
-        Params p = createParams(context, graph);
+        Params p = createParams(context, (KeyIndexableGraph) graph);
         p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
 
         return handleRequestInternal(p);

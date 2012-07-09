@@ -1,10 +1,10 @@
 package net.fortytwo.myotherbrain.notes;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.frames.FramesManager;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.frames.FramedGraph;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import org.json.JSONObject;
@@ -23,8 +23,8 @@ import static junit.framework.Assert.assertEquals;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NotesSemanticsTest {
-    private IndexableGraph graph;
-    private FramesManager manager;
+    private KeyIndexableGraph graph;
+    private FramedGraph<KeyIndexableGraph> manager;
     private NotesSyntax syntax;
     private NotesSemantics semantics;
 
@@ -34,7 +34,7 @@ public class NotesSemanticsTest {
         syntax = new NotesSyntax();
         MOBGraph mobGraph = MOBGraph.getInstance(g);
         graph = mobGraph.getGraph();
-        manager = mobGraph.getManager();
+        manager = mobGraph.getFramedGraph();
         semantics = new NotesSemantics(mobGraph);
     }
 

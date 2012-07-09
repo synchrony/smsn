@@ -1,7 +1,10 @@
 package net.fortytwo.myotherbrain;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import net.fortytwo.myotherbrain.events.EventLocationListener;
+import net.fortytwo.myotherbrain.events.EventsActivity;
 import net.fortytwo.myotherbrain.flashcards.android.Flashcards4Android;
 import net.fortytwo.myotherbrain.ping.BrainPingPopup;
 import net.fortytwo.myotherbrain.ping.BrainPingSettings;
@@ -39,11 +44,17 @@ public class Main extends Activity {
         findViewById(R.id.back).setOnClickListener(backListener);
         findViewById(R.id.clear).setOnClickListener(clearListener);
         findViewById(R.id.flashcards).setOnClickListener(flashcardsListener);
+        findViewById(R.id.events).setOnClickListener(eventsListener);
 
-        editor.setText("foo");//getText(R.string.main_label));
+        editor.setText("testing");//getText(R.string.main_label));
 
         // Force the service to start.
         //     startService(new Intent(this, BrainPingService.class));
+
+        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener l = new EventLocationListener();
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, l);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, l);
     }
 
     /**
@@ -121,4 +132,9 @@ public class Main extends Activity {
         }
     };
 
+    private OnClickListener eventsListener = new OnClickListener() {
+        public void onClick(View v) {
+            startActivity(new Intent(thisActivity, EventsActivity.class));
+        }
+    };
 }

@@ -1,8 +1,10 @@
 package net.fortytwo.myotherbrain.notes.server;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
@@ -36,7 +38,7 @@ public class ExportExtension extends TinkerNotesExtension {
 
         // TODO: any security restrictions here?
 
-        Params p = createParams(context, graph);
+        Params p = createParams(context, (KeyIndexableGraph) graph);
 
         return handleRequestInternal(p);
     }
@@ -68,9 +70,9 @@ public class ExportExtension extends TinkerNotesExtension {
                              final PrintStream p) throws IOException {
         p.println("from\tto");
         for (Edge e : g.getGraph().getEdges()) {
-            p.print(e.getOutVertex().getId());
+            p.print(e.getVertex(Direction.OUT).getId());
             p.print('\t');
-            p.print(e.getInVertex().getId());
+            p.print(e.getVertex(Direction.IN).getId());
             p.print('\n');
         }
     }

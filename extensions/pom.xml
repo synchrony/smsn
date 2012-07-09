@@ -6,7 +6,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.myotherbrain</groupId>
     <artifactId>myotherbrain-extensions</artifactId>
-    <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>MyOtherBrain Extensions</name>
     <description>Other cool functionality for MyOtherBrain</description>
@@ -14,12 +13,13 @@
     <parent>
         <groupId>net.fortytwo.myotherbrain</groupId>
         <artifactId>myotherbrain-all</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modules>
         <module>events</module>
+	<module>music</module>
         <module>opencalais</module>
         <module>qrcodes</module>
         <module>rfid</module>

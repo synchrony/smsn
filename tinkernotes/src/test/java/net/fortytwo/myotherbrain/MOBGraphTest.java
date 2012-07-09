@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain;
 
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.notes.Filter;
 
@@ -19,28 +19,35 @@ public class MOBGraphTest extends TestCase {
 
         //System.out.println("path: " + dir.getPath());
         Neo4jGraph g = new Neo4jGraph(dir.getPath());
-        g.setMaxBufferSize(1);
-        g.clear();
+        //g.setMaxBufferSize(1);
+        //g.clear();
         try {
             MOBGraph m = MOBGraph.getInstance(g);
             Filter f = new Filter();
 
             Atom a = m.createAtom(f);
             a.setValue("Arthur Dent");
+            m.indexForSearch(a, "Arthur Dent");
+            //a.setValue("Arthur");
 
             Collection<Atom> result;
 
+            // Partial searches don't work
+            result = m.getAtomsByFulltextQuery("Arthur", f);
+            assertEquals(0, result.size());
+
+            // Currently no ability to search on multiple keywords
+            result = m.getAtomsByFulltextQuery("Arthur Dent", f);
+            assertEquals(0, result.size());
+
+            // Wildcards are supported
             result = m.getAtomsByFulltextQuery("Arthur*", f);
             assertEquals(1, result.size());
             assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
 
-            // Full-text search is currently case sensitive (although case insensitivity would be preferable)
+            // Search is case-insensitive
             result = m.getAtomsByFulltextQuery("arthur*", f);
-            assertEquals(0, result.size());
-
-            // Currently ability to search on multiple keywords
-            result = m.getAtomsByFulltextQuery("Arthur Dent", f);
-            assertEquals(0, result.size());
+            assertEquals(1, result.size());
 
             // Exact matches in quotes
             result = m.getAtomsByFulltextQuery("\"Arthur Dent\"", f);

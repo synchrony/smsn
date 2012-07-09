@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.notes.server;
 
-import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
@@ -28,7 +29,7 @@ public class HistoryExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
         logInfo("tinkernotes history");
 
-        Params p = createParams(context, graph);
+        Params p = createParams(context, (KeyIndexableGraph) graph);
         p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
 
         return handleRequestInternal(p);

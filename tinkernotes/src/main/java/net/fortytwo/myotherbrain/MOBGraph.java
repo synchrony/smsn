@@ -1,12 +1,13 @@
 package net.fortytwo.myotherbrain;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.frames.FramesManager;
-import com.tinkerpop.tinkubator.idindex.IdIndexGraph;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
+import com.tinkerpop.frames.FramedGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
+import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,15 +24,17 @@ import java.util.logging.Logger;
 public class MOBGraph {
     private static final Logger LOGGER = MyOtherBrain.getLogger(MOBGraph.class);
 
-    private final IdIndexGraph graph;
+    private final IdGraph<KeyIndexableGraph> graph;
 
-    private final FramesManager manager;
+    private final FramedGraph<KeyIndexableGraph> framedGraph;
 
     private final ActivityLog activityLog;
 
-    private static final Map<IndexableGraph, MOBGraph> graphs = new HashMap<IndexableGraph, MOBGraph>();
+    private Index<Vertex> searchIndex;
 
-    public static MOBGraph getInstance(final IndexableGraph baseGraph) throws Exception {
+    private static final Map<KeyIndexableGraph, MOBGraph> graphs = new HashMap<KeyIndexableGraph, MOBGraph>();
+
+    public static MOBGraph getInstance(final KeyIndexableGraph baseGraph) throws Exception {
         MOBGraph g = graphs.get(baseGraph);
 
         if (null == g) {
@@ -42,10 +45,16 @@ public class MOBGraph {
         return g;
     }
 
-    private MOBGraph(final IndexableGraph baseGraph) throws Exception {
-        graph = new IdIndexGraph(baseGraph, new MOBIdFactory());
+    private MOBGraph(final KeyIndexableGraph baseGraph) throws Exception {
+        graph = new IdGraph<KeyIndexableGraph>(baseGraph, new MOBIdFactory());
 
-        manager = new FramesManager(graph);
+        framedGraph = new FramedGraph<KeyIndexableGraph>(graph);
+
+        searchIndex = graph.getIndex("search", Vertex.class);
+        if (null == searchIndex) {
+            LOGGER.info("creating fulltext search index");
+            searchIndex = graph.createIndex("search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+        }
 
         File logFile = MyOtherBrain.getConfiguration().getFile(MyOtherBrain.ACTIVITY_LOG, null);
 
@@ -62,19 +71,19 @@ public class MOBGraph {
         return activityLog;
     }
 
-    public IndexableGraph getGraph() {
+    public KeyIndexableGraph getGraph() {
         return graph;
     }
 
-    public FramesManager getManager() {
-        return manager;
+    public FramedGraph<KeyIndexableGraph> getFramedGraph() {
+        return framedGraph;
     }
 
     public static String getId(final Atom a) {
         return (String) a.asVertex().getId();
     }
 
-    private static class MOBIdFactory implements IdIndexGraph.IdFactory {
+    private static class MOBIdFactory implements IdGraph.IdFactory {
         public String createId() {
             return MyOtherBrain.createRandomKey();
         }
@@ -91,11 +100,11 @@ public class MOBGraph {
             throw new IllegalArgumentException("null vertex");
         }
 
-        return manager.frame(v, Atom.class);
+        return framedGraph.frame(v, Atom.class);
     }
 
     public Atom createAtom(final Filter filter) {
-        Atom a = manager.frame(this.getGraph().addVertex(null), Atom.class);
+        Atom a = framedGraph.frame(this.getGraph().addVertex(null), Atom.class);
         a.setCreated(new Date().getTime());
 
         a.setSharability(filter.getDefaultSharability());
@@ -107,35 +116,28 @@ public class MOBGraph {
     public Collection<Atom> getAtomsWithValue(final String value) {
         Collection<Atom> results = new LinkedList<Atom>();
 
-        Index<Vertex> vertices = graph.getIndex(Index.VERTICES, Vertex.class);
-        CloseableSequence<Vertex> i = vertices.get(MyOtherBrain.VALUE, value);
-        try {
-            while (i.hasNext()) {
-                results.add(getAtom(i.next()));
-            }
-        } finally {
-            i.close();
+        for (Vertex v : graph.getVertices(MyOtherBrain.VALUE, value)) {
+            results.add(getAtom(v));
         }
 
         return results;
+    }
+
+    public void indexForSearch(final Atom a,
+                               final String value) {
+        searchIndex.put(MyOtherBrain.VALUE, value, a.asVertex());
     }
 
     public Collection<Atom> getAtomsByFulltextQuery(final String query,
                                                     final Filter filter) {
         Collection<Atom> results = new LinkedList<Atom>();
 
-        // TODO: this relies on a temporary Blueprints hack which only works with Neo4j
-        CloseableSequence<Vertex> i = graph.getIndex(Index.VERTICES, Vertex.class).get("value", "%query%" + query);
-        try {
-            while (i.hasNext()) {
-                Atom a = getAtom(i.next());
+        for (Vertex v : searchIndex.query(MyOtherBrain.VALUE, query)) {
+            Atom a = getAtom(v);
 
-                if (filter.isVisible(a)) {
-                    results.add(a);
-                }
+            if (filter.isVisible(a)) {
+                results.add(a);
             }
-        } finally {
-            i.close();
         }
 
         return results;
