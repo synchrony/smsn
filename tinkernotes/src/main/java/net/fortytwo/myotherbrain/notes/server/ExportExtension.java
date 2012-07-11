@@ -46,7 +46,7 @@ public class ExportExtension extends TinkerNotesExtension {
     private void exportVertices(final MOBGraph g,
                                 final PrintStream p) throws IOException {
 
-        p.println("created\tid\tweight\tsharability\tvalue");
+        p.println("created\tid\tweight\tsharability\tvalue\talias");
 
         for (Vertex v : g.getGraph().getVertices()) {
             p.print(v.getProperty(MyOtherBrain.CREATED));
@@ -58,10 +58,14 @@ public class ExportExtension extends TinkerNotesExtension {
             p.print(v.getProperty(MyOtherBrain.SHARABILITY));
             p.print('\t');
 
-            String value = (String) v.getProperty(MyOtherBrain.VALUE);
-            if (null != value) {
-                p.print(escapeValue(value));
+            p.print(escapeValue((String) v.getProperty(MyOtherBrain.VALUE)));
+            p.print('\t');
+
+            String alias = (String) v.getProperty(MyOtherBrain.ALIAS);
+            if (null != alias) {
+                p.print(escapeValue(alias));
             }
+
             p.print('\n');
         }
     }
@@ -80,7 +84,7 @@ public class ExportExtension extends TinkerNotesExtension {
     private void exportTimeline(final MOBGraph g,
                                 final PrintStream p) throws IOException {
 
-        p.println("date\tid\tweight\tsharability\tvalue");
+        p.println("date\tid\tweight\tsharability\tvalue\talias");
 
         for (Vertex v : g.getGraph().getVertices()) {
             Atom d = g.getAtom(v);
@@ -97,10 +101,14 @@ public class ExportExtension extends TinkerNotesExtension {
                     p.print(a.getSharability());
                     p.print('\t');
 
-                    String value = a.getValue();
-                    if (null != value) {
-                        p.print(escapeValue(value));
+                    p.print(escapeValue((String) v.getProperty(MyOtherBrain.VALUE)));
+                    p.print('\t');
+
+                    String alias = (String) v.getProperty(MyOtherBrain.ALIAS);
+                    if (null != alias) {
+                        p.print(escapeValue(alias));
                     }
+
                     p.print('\n');
                 }
             }
