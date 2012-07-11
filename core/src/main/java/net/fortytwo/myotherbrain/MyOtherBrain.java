@@ -33,6 +33,7 @@ public class MyOtherBrain {
             REVISION = "net.fortytwo.myotherbrain.revision";
 
     public static final String
+            ALIAS = "alias",
             CREATED = "created",
             NOTE = "note",
             SHARABILITY = "sharability",

@@ -14,6 +14,7 @@ public class Note {
     private Float weight;
     private Float sharability;
     private Long created;
+    private String alias = null;
 
     public Note() {
         children = new LinkedList<Note>();
@@ -74,5 +75,13 @@ public class Note {
 
     public void setCreated(Long created) {
         this.created = created;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 }

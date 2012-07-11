@@ -325,6 +325,7 @@ public class NotesSemantics {
         n.setWeight(a.getWeight());
         n.setSharability(a.getSharability());
         n.setCreated(a.getCreated());
+        n.setAlias(a.getAlias());
 
         return n;
     }

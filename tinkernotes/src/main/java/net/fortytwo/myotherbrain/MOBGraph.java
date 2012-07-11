@@ -56,6 +56,11 @@ public class MOBGraph {
             searchIndex = graph.createIndex("search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
         }
 
+        if (!graph.getIndexedKeys(Vertex.class).contains(MyOtherBrain.ALIAS)) {
+            LOGGER.info("creating key index for 'alias' property");
+            graph.createKeyIndex(MyOtherBrain.ALIAS, Vertex.class);
+        }
+
         File logFile = MyOtherBrain.getConfiguration().getFile(MyOtherBrain.ACTIVITY_LOG, null);
 
         if (null == logFile) {

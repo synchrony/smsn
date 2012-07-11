@@ -55,6 +55,9 @@ public class NotesSyntax {
         target.put("sharability", n.getSharability());
         target.put("value", n.getValue());
         target.put("created", n.getCreated());
+        if (null != n.getAlias()) {
+            target.put("alias", n.getAlias());
+        }
 
         if (0 < n.getChildren().size()) {
             JSONArray c = new JSONArray();

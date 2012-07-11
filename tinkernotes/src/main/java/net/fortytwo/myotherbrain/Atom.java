@@ -10,6 +10,12 @@ import com.tinkerpop.frames.VertexFrame;
  */
 public interface Atom extends VertexFrame {
 
+    @Property(MyOtherBrain.ALIAS)
+    String getAlias();
+
+    @Property(MyOtherBrain.ALIAS)
+    void setAlias(String alias);
+
     @Property(MyOtherBrain.CREATED)
     Long getCreated();
 
