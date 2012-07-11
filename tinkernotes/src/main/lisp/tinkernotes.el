@@ -172,6 +172,9 @@
 (defun get-key (atom)
     (cdr (assoc 'key atom)))
 
+(defun get-created (atom)
+    (cdr (assoc 'created atom)))
+
 (defun get-value (atom)
     (cdr (assoc 'value atom)))
 
@@ -180,6 +183,10 @@
 
 (defun get-sharability (atom)
     (cdr (assoc 'sharability atom)))
+
+(defun get-alias (atom)
+    (let ((x (assoc 'alias atom)))
+        (if x (cdr x) nil)))
 
 (defun view-name (root-id json)
     (let ((title (cdr (assoc 'title json))))
@@ -202,6 +209,11 @@
         (if g
             (get-value g))))
 
+(defun current-target-alias ()
+    (let ((g (current-target)))
+        (if g
+            (get-alias g))))
+
 (defun current-target-sharability ()
     (let ((g (current-target)))
         (if g
@@ -223,15 +235,17 @@
 
 (defun show-info (atom)
     (let (
-        (created (cdr (assoc 'created atom)))
-        (value (cdr (assoc 'value atom)))
-        (weight (cdr (assoc 'weight atom)))
-        (sharability (cdr (assoc 'sharability atom))))
+        (created (get-created atom))
+        (value (get-value atom))
+        (weight (get-weight atom))
+        (sharability (get-sharability atom))
+        (alias (get-alias atom)))
             (message (concat
                  "weight: " (number-to-string weight)
                  " sharability: " (number-to-string sharability)
                  " created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
-                 " value: " value))))
+                 " value: " value
+                 (if alias (concat " alias: " alias) "")))))
 
 (defun tn-target-info()
     (interactive)
@@ -323,6 +337,8 @@
                         (error-message msg)))
             (info-message "exported successfully"))))
 
+(setq purple "#660066")
+
 (setq base-colors '("#660000" "#604000" "#005000" "#000066"))
 
 (setq reduced-colors '("red" "red" "blue" "blue"))
@@ -345,8 +361,10 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability)
-    (let ((s (elt base-colors (- (ceiling (* sharability 4)) 1))))
+(defun find-color (weight sharability alias)
+    (let ((s (if (and alias (= 1.0 sharability))
+            purple
+            (elt base-colors (- (ceiling (* sharability 4)) 1)))))
         (color-string
             (fade-color (color-part-red s) weight)
             (fade-color (color-part-green s) weight)
@@ -354,11 +372,11 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability bold background)
+(defun colorize (text weight sharability alias bold background)
     (let ((i (- (ceiling (* sharability 4)) 1)))
             (let ((color
                 (if full-colors-supported
-                    (find-color weight sharability)
+                    (find-color weight sharability alias)
                     (elt reduced-colors (- (ceiling (* sharability 4)) 1)))))
 	    (if bold
             (propertize text 'face (list 'bold :foreground color :background background))
@@ -398,7 +416,8 @@
                 (target-key (get-key target))
                 (target-value (get-value target))
 		        (target-weight (get-weight target))
-		        (target-sharability (get-sharability target)))
+		        (target-sharability (get-sharability target))
+		        (target-alias (get-alias target)))
 		            (if target-key (puthash target-key target tn-atoms))
 		            (if (not target-key) (error "missing target key"))
 		            (if (not target-value) (error (concat "missing value for target with key " target-key)))
@@ -412,9 +431,9 @@
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
 					    (setq line (concat line
-					        (colorize "\u25ba" target-weight target-sharability t "white")))
+					        (colorize "\u25ba" target-weight target-sharability target-alias t "white")))
                         (setq line (concat line
-                            (colorize (concat " " target-value "\n") target-weight target-sharability nil "white")))
+                            (colorize (concat " " target-value "\n") target-weight target-sharability target-alias nil "white")))
                         (insert (propertize line
                             ;;'invisible t
 			                    'target-key target-key)))
@@ -946,6 +965,13 @@
     (browse-target-value (lambda (value)
         value)))
 
+(defun tn-browse-target-alias ()
+    (interactive)
+    (let ((alias (current-target-alias)))
+        (if alias
+            (browse-url alias)
+            (no-target))))
+
 (defun tn-browse-target-value-in-amazon ()
     (interactive)
     (browse-target-value (lambda (value)
@@ -1088,6 +1114,7 @@
 (global-set-key (kbd "C-c C-s C-] f")   'tn-set-max-sharability-4)
 (global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
 (global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
+(global-set-key (kbd "C-c C-t C-a b")   'tn-browse-target-alias)
 (global-set-key (kbd "C-c C-t C-b a")   'tn-browse-target-value-in-amazon)
 (global-set-key (kbd "C-c C-t C-b e")   'tn-browse-target-value-in-ebay)
 (global-set-key (kbd "C-c C-t C-b d")   'tn-browse-target-value-in-delicious)
@@ -1178,6 +1205,6 @@
 
 
 ;; Uncomment only when debugging
-;;(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
+(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'tinkernotes)
