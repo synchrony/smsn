@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,7 +22,7 @@ public class NotesSyntax {
     // Regex of valid id prefixes, including parentheses, colon and trailing space
     public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:");
 
-    private static final int MAX_BULLET_LENGTH = 2;
+    private static final int MAX_BULLET_LENGTH = 1;
 
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
@@ -44,9 +43,6 @@ public class NotesSyntax {
 
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
-
-        JSONObject link = new JSONObject();
-        json.put("link", link);
 
         JSONObject target = new JSONObject();
         json.put("target", target);
@@ -72,14 +68,9 @@ public class NotesSyntax {
         return json;
     }
 
-    public List<Note> readNotes(final InputStream in) throws IOException, NoteParsingException {
-        List<Note> notes = new LinkedList<Note>();
-        parseInternal(in, notes);
-        return notes;
-    }
+    public Note readNotes(final InputStream in) throws IOException, NoteParsingException {
+        Note root = new Note();
 
-    private void parseInternal(final InputStream in,
-                               final Collection<Note> notes) throws IOException, NoteParsingException {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
         LinkedList<Integer> indentHierarachy = new LinkedList<Integer>();
 
@@ -131,7 +122,7 @@ public class NotesSyntax {
             }
 
             if (0 == l.length()) {
-                throw new NoteParsingException(lineNumber, "missing key value");
+                throw new NoteParsingException(lineNumber, "missing bullet and value");
             }
 
             while (0 < hierarchy.size() && indentHierarachy.getLast() >= indent) {
@@ -139,26 +130,32 @@ public class NotesSyntax {
                 indentHierarachy.removeLast();
             }
 
-            boolean esc = false;
             int j = -1;
             for (int i = 0; i < l.length(); i++) {
                 char c = l.charAt(i);
                 if (' ' == c) {
-                    if (!esc) {
-                        j = i;
-                        break;
-                    }
-                } else esc = '\\' == c && !esc;
+                    j = i;
+                    break;
+                }
             }
 
             if (j < 0) {
                 j = l.length();
             }
 
+            boolean isAttribute;
             String bullet = l.substring(0, j);
-            if (bullet.length() > MAX_BULLET_LENGTH) {
-                throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
+            if (bullet.startsWith("@") && bullet.length() > 1) {
+                isAttribute = true;
+            } else {
+                isAttribute = false;
+
+                if (bullet.length() > MAX_BULLET_LENGTH) {
+                    throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
+                }
             }
+
+            // Skip white space between bullet and value
             while (j < l.length() && ' ' == l.charAt(j)) {
                 j++;
             }
@@ -166,7 +163,7 @@ public class NotesSyntax {
 
             String value = "";
             if (0 < l.length()) {
-                if (l.contains("{{{")) {
+                if (!isAttribute && l.contains("{{{")) {
                     int start = lineNumber;
                     boolean inside = false;
                     int index = 0;
@@ -217,24 +214,59 @@ public class NotesSyntax {
             value = value.trim();
 
             if (0 == value.length()) {
-                throw new NoteParsingException(lineNumber, "empty note");
+                if (isAttribute) {
+                    throw new NoteParsingException(lineNumber, "empty attribute value");
+                } else {
+                    throw new NoteParsingException(lineNumber, "empty note");
+                }
             }
 
-            Note n = new Note();
-            n.setValue(value);
+            if (isAttribute) {
+                Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
-            n.setId(targetKey);
-
-            if (0 < hierarchy.size()) {
-                hierarchy.get(hierarchy.size() - 1).addChild(n);
+                if (bullet.equals("@alias")) {
+                    if (value.length() > 0) {
+                        n.setAlias(value);
+                    } else {
+                        throw new NoteParsingException(lineNumber, "missing @alias value");
+                    }
+                } else if (bullet.equals("@weight")) {
+                    float val;
+                    try {
+                        val = Float.valueOf(value);
+                    } catch (NumberFormatException e) {
+                        throw new NoteParsingException(lineNumber, "invalid @weight value: " + value);
+                    }
+                    n.setWeight(val);
+                } else if (bullet.equals("@sharability")) {
+                    float val;
+                    try {
+                        val = Float.valueOf(value);
+                    } catch (NumberFormatException e) {
+                        throw new NoteParsingException(lineNumber, "invalid @sharability value: " + value);
+                    }
+                    n.setSharability(val);
+                } else {
+                    throw new NoteParsingException(lineNumber, "unknown attribute: " + bullet);
+                }
             } else {
-                notes.add(n);
+                Note n = new Note();
+                n.setValue(value);
+
+                n.setId(targetKey);
+
+                if (0 < hierarchy.size()) {
+                    hierarchy.get(hierarchy.size() - 1).addChild(n);
+                } else {
+                    root.addChild(n);
+                }
+
+                hierarchy.add(n);
+                indentHierarachy.add(indent);
             }
-
-            hierarchy.add(n);
-            indentHierarachy.add(indent);
-
         }
+
+        return root;
     }
 
     public class NoteParsingException extends Exception {

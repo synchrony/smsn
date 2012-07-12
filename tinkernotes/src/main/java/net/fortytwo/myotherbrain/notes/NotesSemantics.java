@@ -55,17 +55,17 @@ public class NotesSemantics {
      * Generates a view of the graph.
      *
      * @param root   the key of the root atom of the view
-     * @param depth  the depth of the view.
-     *               A view of depth 0 contains only the root,
-     *               while a view of depth 1 also contains all children of the root,
-     *               a view of depth 2 all grandchildren, etc.
+     * @param height the height of the view.
+     *               A view of height 0 contains only the root,
+     *               while a view of height 1 also contains all children of the root,
+     *               a view of height 2 all grandchildren, etc.
      * @param filter a collection of criteria for atoms and links.
      *               Atoms and links which do not meet the criteria are not to appear in the view.
      * @param style  the adjacency style of the view
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
     public Note view(final Atom root,
-                     final int depth,
+                     final int height,
                      final Filter filter,
                      final AdjacencyStyle style,
                      final ActivityLog log) {
@@ -73,12 +73,12 @@ public class NotesSemantics {
             log.logView(root);
         }
 
-        return viewInternal(root, null, depth, filter, style);
+        return viewInternal(root, null, height, filter, style);
     }
 
     private Note viewInternal(final Atom root,
                               final Atom parent,
-                              final int depth,
+                              final int height,
                               final Filter filter,
                               final AdjacencyStyle style) {
         if (null == root) {
@@ -87,10 +87,10 @@ public class NotesSemantics {
 
         Note n = toNote(root);
 
-        if (depth > 0) {
+        if (height > 0) {
             for (Atom target : style.getLinked(root, parent)) {
                 if (filter.isVisible(target)) {
-                    Note cn = viewInternal(target, root, depth - 1, filter, style);
+                    Note cn = viewInternal(target, root, height - 1, filter, style);
                     n.addChild(cn);
                 }
             }
@@ -121,8 +121,10 @@ public class NotesSemantics {
      * Updates the graph.
      *
      * @param root        the root of the subgraph to be updated
-     * @param children    the children of the root atom
-     * @param depth       the minimum depth to which the graph will be updated
+     * @param rootNote    the root of the note tree
+     * @param depth       the minimum depth to which the graph will be updated.
+     *                    If depth is 0, only the root node will be affected,
+     *                    while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
      * @param filter      a collection of criteria for atoms and links.
      *                    Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param destructive whether to remove items which do not appear in the update view
@@ -130,31 +132,33 @@ public class NotesSemantics {
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
-                       final List<Note> children,
+                       final Note rootNote,
                        final int depth,
                        final Filter filter,
                        boolean destructive,
                        final AdjacencyStyle style,
                        final ActivityLog log) throws InvalidUpdateException {
-        updateInternal(root, null, children, depth, filter, destructive, style, log);
+        if (null == root) {
+            throw new IllegalStateException("null view root");
+        }
+
+        updateInternal(root, null, rootNote, depth, filter, destructive, style, log);
     }
 
     public void updateInternal(final Atom root,
                                final Atom parent,
-                               final List<Note> children,
+                               final Note rootNote,
                                final int depth,
                                final Filter filter,
                                boolean destructive,
                                final AdjacencyStyle style,
                                final ActivityLog log) throws InvalidUpdateException {
-        if (null == root) {
-            throw new IllegalStateException("null view root");
-        }
-
         // Keep adding items beyond the depth of the view, but don't delete items.
         if (0 >= depth) {
             destructive = false;
         }
+
+        setProperties(root, rootNote, log);
 
         Set<String> before = new HashSet<String>();
         for (Note n : viewInternal(root, parent, 1, filter, style).getChildren()) {
@@ -162,7 +166,7 @@ public class NotesSemantics {
         }
 
         Set<String> after = new HashSet<String>();
-        for (Note n : children) {
+        for (Note n : rootNote.getChildren()) {
             String id = n.getId();
 
             if (null != id) {
@@ -180,7 +184,7 @@ public class NotesSemantics {
             }
         }
 
-        for (Note n : children) {
+        for (Note n : rootNote.getChildren()) {
             String id = n.getId();
 
             Atom target;
@@ -195,14 +199,12 @@ public class NotesSemantics {
                 }
             }
 
-            setValue(target, n.getValue(), log);
-
             if (!before.contains(id)) {
                 style.link(root, target, log);
 
-                updateInternal(target, root, n.getChildren(), depth - 1, filter, false, style, log);
+                updateInternal(target, root, n, depth - 1, filter, false, style, log);
             } else {
-                updateInternal(target, root, n.getChildren(), depth - 1, filter, destructive, style, log);
+                updateInternal(target, root, n, depth - 1, filter, destructive, style, log);
             }
         }
     }
@@ -265,7 +267,7 @@ public class NotesSemantics {
         Set<Vertex> vertices = new HashSet<Vertex>();
 
         for (RippleList l : results) {
-            System.out.println("result list: " + l);
+            //System.out.println("result list: " + l);
             if (1 == l.length()) {
                 Value v = l.getFirst().toRDF(qp.getConnection()).sesameValue();
                 if (v instanceof URI && v.stringValue().startsWith(PropertyGraphSail.VERTEX_NS)) {
@@ -303,18 +305,59 @@ public class NotesSemantics {
         return a;
     }
 
-    private void setValue(final Atom target,
-                          final String value,
-                          final ActivityLog log) {
-        if (null != log) {
-            String prev = target.getValue();
-            if (null == prev ? null != value : (null == value || !prev.equals(value))) {
-                log.logUpdate(target);
+    private void setProperties(final Atom target,
+                               final Note note,
+                               final ActivityLog log) {
+        String value = note.getValue();
+
+        // TODO: is this the best way to handle values of "fake" root nodes?
+        if (null != value) {
+            if (null != log) {
+                String prev = target.getValue();
+                // Note: assumes value is not null
+                if (null == prev || (!prev.equals(value))) {
+                    log.logUpdate(target);
+                }
+            }
+
+            target.setValue(value);
+            store.indexForSearch(target, value);
+        }
+
+        boolean propsSet = false;
+
+        String alias = note.getAlias();
+
+        // Note: you currently can't remove an alias, only replace it.
+        if (null != alias) {
+            String prev = target.getAlias();
+            if (null == prev || !prev.equals(alias)) {
+                target.setAlias(alias);
+                propsSet = true;
             }
         }
 
-        target.setValue(value);
-        store.indexForSearch(target, value);
+        Float weight = note.getWeight();
+        if (null != weight) {
+            Float p = target.getWeight();
+            if (null == p ? null != weight : (null == weight || !p.equals(weight))) {
+                target.setWeight(weight);
+                propsSet = true;
+            }
+        }
+
+        Float sharability = note.getSharability();
+        if (null != sharability) {
+            Float p = target.getSharability();
+            if (null == p ? null != sharability : (null == sharability || !p.equals(sharability))) {
+                target.setSharability(sharability);
+                propsSet = true;
+            }
+        }
+
+        if (propsSet && null != log) {
+            log.logSetProperties(target);
+        }
     }
 
     private Note toNote(final Atom a) {

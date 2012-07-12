@@ -25,6 +25,10 @@ public class Note {
     }
 
     public void setValue(final String value) {
+        if (null != value && 0 == value.length()) {
+            throw new IllegalArgumentException("empty value is not valid");
+        }
+
         this.value = value;
     }
 
@@ -33,24 +37,11 @@ public class Note {
     }
 
     public void setId(final String id) {
-        this.id = id;
-    }
-
-    public List<Note> getChildren() {
-        return children;
-    }
-
-    public void addChild(Note child) {
-        children.add(child);
-    }
-
-    @Override
-    public String toString() {
-        String d = getValue();
-        if (null != d && d.length() > 20) {
-            d = d.substring(0, 17) + "...";
+        if (null != id && 0 == id.length()) {
+            throw new IllegalArgumentException("empty id is not valid");
         }
-        return "note(" + d + ")";
+
+        this.id = id;
     }
 
     public Float getWeight() {
@@ -58,6 +49,10 @@ public class Note {
     }
 
     public void setWeight(Float weight) {
+        if (null != weight && (weight < 0 || weight > 1.0))  {
+            throw new IllegalArgumentException("weight is out of range: " + weight);
+        }
+
         this.weight = weight;
     }
 
@@ -66,6 +61,10 @@ public class Note {
     }
 
     public void setSharability(Float sharability) {
+        if (null != sharability && (sharability < 0 || sharability > 1.0))  {
+            throw new IllegalArgumentException("sharability is out of range: " + sharability);
+        }
+
         this.sharability = sharability;
     }
 
@@ -82,6 +81,31 @@ public class Note {
     }
 
     public void setAlias(String alias) {
+        if (null != alias && 0 == alias.length()) {
+            throw new IllegalArgumentException("empty alias is not valid");
+        }
+
         this.alias = alias;
+    }
+
+    public List<Note> getChildren() {
+        return children;
+    }
+
+    public void addChild(Note child) {
+        if (null == child) {
+            throw new IllegalArgumentException("null child is not valid");
+        }
+
+        children.add(child);
+    }
+
+    @Override
+    public String toString() {
+        String d = getValue();
+        if (null != d && d.length() > 20) {
+            d = d.substring(0, 17) + "...";
+        }
+        return "note(" + d + ")";
     }
 }

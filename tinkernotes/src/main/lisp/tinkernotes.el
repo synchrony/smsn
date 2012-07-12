@@ -337,9 +337,10 @@
                         (error-message msg)))
             (info-message "exported successfully"))))
 
-(setq purple "#660066")
+(setq alias-color "#000066")
+;;(setq alias-color "#660066")
 
-(setq base-colors '("#660000" "#604000" "#005000" "#000066"))
+(setq base-colors '("#660000" "#604000" "#005000" "#005000"))
 
 (setq reduced-colors '("red" "red" "blue" "blue"))
 
@@ -363,7 +364,7 @@
 
 (defun find-color (weight sharability alias)
     (let ((s (if (and alias (= 1.0 sharability))
-            purple
+            alias-color
             (elt base-colors (- (ceiling (* sharability 4)) 1)))))
         (color-string
             (fade-color (color-part-red s) weight)

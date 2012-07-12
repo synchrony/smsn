@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramedGraph;
+import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import org.json.JSONObject;
@@ -12,12 +13,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -45,22 +42,34 @@ public class NotesSemanticsTest {
 
     @Test
     public void testEncoding() throws Exception {
-        Filter f = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_DIRECTED_ADJACENCY;
+        ActivityLog log = null;
 
         Atom root = createAtom("11111");
+        assertEquals("11111", root.asVertex().getId());
 
+        //Note superRoot = new Note();
         Note rootNote = new Note();
+        //superRoot.addChild(rootNote);
         rootNote.setValue("foo");
         Note child = new Note();
         child.setValue("cheval \u00e0 phynances");
         rootNote.addChild(child);
-
+        assertNull(child.getWeight());
+        assertNull(child.getSharability());
+        assertNull(child.getCreated());
         //System.out.println(before.getTargetValue());
 
-        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_DIRECTED_ADJACENCY;
-        semantics.update(root, rootNote.getChildren(), 1, f, true, style, null);
+        semantics.update(root, rootNote, 1, filter, true, style, log);
 
-        Note after = semantics.view(root, 1, f, style, null);
+        //new GraphMLWriter(graph).outputGraph(System.out);
+
+        Note after = semantics.view(root, 1, filter, style, log);
+
+        assertEquals("11111", after.getId());
+        assertEquals("foo", after.getValue());
+        assertEquals(1, after.getChildren().size());
 
         JSONObject json = syntax.toJSON(after);
         //System.out.println(json.toString());
@@ -155,23 +164,6 @@ public class NotesSemanticsTest {
         a.setWeight(0.5f);
         a.setSharability(0.5f);
         return a;
-    }
-
-    private Atom getAtom(final String id) {
-        return manager.frame(graph.getVertex(id), Atom.class);
-    }
-
-    private Atom getAtom(final Vertex v) {
-        return manager.frame(v, Atom.class);
-    }
-
-    private List<Note> parse(final String s) throws IOException, NotesSyntax.NoteParsingException {
-        InputStream in = new ByteArrayInputStream(s.getBytes());
-        try {
-            return syntax.readNotes(in);
-        } finally {
-            in.close();
-        }
     }
 
     //public void main(final String[] args) throws Exception {

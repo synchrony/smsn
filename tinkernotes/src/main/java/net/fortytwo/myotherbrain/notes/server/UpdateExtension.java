@@ -52,18 +52,18 @@ public class UpdateExtension extends TinkerNotesExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        List<Note> children;
+        Note rootNote;
 
         InputStream in = new ByteArrayInputStream(p.view.getBytes());
         try {
-            children = p.syntax.readNotes(in);
+            rootNote = p.syntax.readNotes(in);
         } finally {
             in.close();
         }
 
         // Apply the update
         try {
-            p.semantics.update(p.root, children, p.depth, p.filter, true, p.style, p.graph.getActivityLog());
+            p.semantics.update(p.root, rootNote, p.depth, p.filter, true, p.style, p.graph.getActivityLog());
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
