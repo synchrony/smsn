@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.oupls.jung.GraphJung;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
@@ -12,6 +14,7 @@ import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import edu.uci.ics.jung.algorithms.scoring.PageRank;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
@@ -115,6 +118,30 @@ public class ExportExtension extends TinkerNotesExtension {
         }
     }
 
+    private void exportPageRank(final MOBGraph g,
+                                final PrintStream p) {
+        TinkerGraph g2 = new TinkerGraph();
+        for (Vertex v : g.getGraph().getVertices()) {
+            g2.addVertex(v.getId());
+        }
+        for (Edge e : g.getGraph().getEdges()) {
+            g2.addEdge(null,
+                    g2.getVertex(e.getVertex(Direction.OUT).getId()),
+                    g2.getVertex(e.getVertex(Direction.IN).getId()),
+                    "link");
+        }
+
+        PageRank<Vertex, Edge> pr = new PageRank<Vertex, Edge>(new GraphJung(g2), 0.15d);
+        pr.evaluate();
+
+        p.println("id\tscore");
+        for (Vertex v : g2.getVertices()) {
+            p.println(v.getId() + "\t" + pr.getVertexScore(v));
+        }
+
+        g2.shutdown();
+    }
+
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
     // Otherwise, R becomes confused and skips rows.
     private String escapeValue(final String value) {
@@ -142,6 +169,14 @@ public class ExportExtension extends TinkerNotesExtension {
         } finally {
             out.close();
         }
+
+        /* This takes a disproportionate amount of time.
+        out = new FileOutputStream(new File("/tmp/tinkernotes-pagerank.txt"));
+        try {
+            exportPageRank(p.graph, new PrintStream(out));
+        } finally {
+            out.close();
+        }//*/
 
         return ExtensionResponse.ok(p.map);
     }
