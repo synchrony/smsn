@@ -1,6 +1,27 @@
 function copyTabToClipboard(tab, cachingId) {
-    var text = "* " + tab.title + " (web page)\n"
-        + "    * " + tab.url;
+    var text = "";
+
+    if (0 == tab.url.indexOf("http://en.wikipedia.org/wiki/")) {
+        var title = tab.title;
+        var i = title.indexOf(" - ");
+        if (i > 0) {
+            title = title.substring(0, i);
+        }
+
+        var url = "http://dbpedia.org/resource/" + tab.url.substring(29);
+        var j = url.indexOf("#");
+        if (j > 0) {
+            url = url.substring(0, j);
+        }
+
+        text += "* " + title + "\n"
+            + "    @sharability 1\n"
+            + "    @alias " + url;
+    } else {
+        text += "* " + tab.title + " (web page)\n"
+            + "    * " + tab.url;
+    }
+
     if (null != cachingId) {
         text += "\n    * cached as " + cachingId;
     }

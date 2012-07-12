@@ -1,7 +1,7 @@
 package net.fortytwo.myotherbrain.events;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
