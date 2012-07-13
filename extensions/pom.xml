@@ -18,6 +18,7 @@
     </parent>
 
     <modules>
+	<module>dbpedia-spotlight</module>
         <module>events</module>
 	<module>music</module>
         <module>opencalais</module>

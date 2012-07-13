@@ -337,11 +337,9 @@
                         (error-message msg)))
             (info-message "exported successfully"))))
 
-(setq alias-color "#000066")
-;;(setq alias-color "#660066")
-
-(setq base-colors '("#660000" "#604000" "#005000" "#005000"))
-
+;; unused colors: black/gray, purple, cyan, orange
+(setq base-colors  '("#660000" "#604000" "#005000" "#000066"))
+(setq bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
 (setq reduced-colors '("red" "red" "blue" "blue"))
 
 (defun color-part-red (color)
@@ -362,9 +360,10 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability alias)
-    (let ((s (if (and alias (= 1.0 sharability))
-            alias-color
+(defun find-color (weight sharability bright)
+    (let ((s
+        (if bright
+            (elt bright-colors (- (ceiling (* sharability 4)) 1))
             (elt base-colors (- (ceiling (* sharability 4)) 1)))))
         (color-string
             (fade-color (color-part-red s) weight)
@@ -373,15 +372,14 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability alias bold background)
-    (let ((i (- (ceiling (* sharability 4)) 1)))
-            (let ((color
-                (if full-colors-supported
-                    (find-color weight sharability alias)
-                    (elt reduced-colors (- (ceiling (* sharability 4)) 1)))))
-	    (if bold
-            (propertize text 'face (list 'bold :foreground color :background background))
-            (propertize text 'face (list :foreground color :background background))))))
+(defun colorize (text weight sharability underline bold bright background)
+    (let ((color (if full-colors-supported
+            (find-color weight sharability bright)
+            (elt reduced-colors (- (ceiling (* sharability 4)) 1)))))
+        (setq l (list :foreground color :background background))
+        (if bold (setq l (cons 'bold l)))
+        (if underline (setq l (cons 'underline l)))
+        (propertize text 'face l)))
 
 (defun light-gray (text background)
     (propertize text
@@ -432,9 +430,9 @@
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
 					    (setq line (concat line
-					        (colorize "\u25ba" target-weight target-sharability target-alias t "white")))
+					        (colorize "\u25ba" target-weight target-sharability nil t target-alias "white")))
                         (setq line (concat line
-                            (colorize (concat " " target-value "\n") target-weight target-sharability target-alias nil "white")))
+                            " " (colorize target-value target-weight target-sharability nil nil target-alias "white") "\n"))
                         (insert (propertize line
                             ;;'invisible t
 			                    'target-key target-key)))
