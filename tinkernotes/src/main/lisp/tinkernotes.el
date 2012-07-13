@@ -430,7 +430,8 @@
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
 					    (setq line (concat line
-					        (colorize "\u25ba" target-weight target-sharability nil t target-alias "white")))
+					        (propertize "\u25ba" 'face (list 'bold :foreground "#808080" :background "white"))))
+					        ;;(colorize "\u25ba" target-weight target-sharability nil t target-alias "white")))
                         (setq line (concat line
                             " " (colorize target-value target-weight target-sharability nil nil target-alias "white") "\n"))
                         (insert (propertize line
