@@ -19,7 +19,7 @@ function copyTabToClipboard(tab, cachingId) {
             + "    @alias " + url;
     } else {
         text += "* " + tab.title + " (web page)\n"
-            + "    * " + tab.url;
+            + "    @alias " + tab.url;
     }
 
     if (null != cachingId) {

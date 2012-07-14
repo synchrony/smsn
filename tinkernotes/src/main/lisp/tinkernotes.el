@@ -501,6 +501,20 @@
             "&maxWeight=" (number-to-string maxw)
             "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
 
+(defun request-find-roots-results (style minv maxv defaultv minw maxw defaultw)
+    (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
+    (http-get
+        (concat (base-url) "find-roots"
+            "?depth=1"
+            "&style=" style
+            "&minSharability=" (number-to-string minv)
+            "&maxSharability=" (number-to-string maxv)
+            "&defaultSharability=" (number-to-string defaultv)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)
+            "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
+
 (defun request-ripple-results (query style minv maxv defaultv minw maxw defaultw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
@@ -552,6 +566,12 @@
                 query
                 tn-style
                 tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight))))
+
+(defun tn-find-roots ()
+    (interactive)
+        (request-find-roots-results
+            tn-style
+            tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight))
 
 (defun tn-ripple-query ()
     (interactive)
@@ -1064,6 +1084,7 @@
 (global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'tn-duplicates)
 (global-set-key (kbd "C-c e")           'tn-export)
+(global-set-key (kbd "C-c f")           'tn-find-roots)
 (global-set-key (kbd "C-c h")           'tn-history)
 (global-set-key (kbd "C-c n")           'tn-new-note)
 (global-set-key (kbd "C-c p")           'tn-push-view)

@@ -1,5 +1,6 @@
 net.fortytwo.myotherbrain.notes.server.DuplicatesExtension
 net.fortytwo.myotherbrain.notes.server.ExportExtension
+net.fortytwo.myotherbrain.notes.server.FindRootsExtension
 net.fortytwo.myotherbrain.notes.server.HistoryExtension
 net.fortytwo.myotherbrain.notes.server.RippleExtension
 net.fortytwo.myotherbrain.notes.server.SearchExtension

@@ -1,5 +1,7 @@
 package net.fortytwo.myotherbrain.notes;
 
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
@@ -230,6 +232,23 @@ public class NotesSemantics {
         for (Atom a : store.getAtomsByFulltextQuery(query, filter)) {
             Note n = viewInternal(a, null, depth - 1, filter, style);
             result.addChild(n);
+        }
+
+        Collections.sort(result.getChildren(), new NoteComparator());
+        return result;
+    }
+
+    public Note findRoots(final Filter filter,
+                          final AdjacencyStyle style) {
+
+        Note result = new Note();
+
+        for (Vertex v : store.getGraph().getVertices()) {
+            Iterable<Edge> inEdges = v.getEdges(Direction.IN);
+            if (!inEdges.iterator().hasNext()) {
+                Note n = viewInternal(store.getAtom(v), null, 0, filter, style);
+                result.addChild(n);
+            }
         }
 
         Collections.sort(result.getChildren(), new NoteComparator());
