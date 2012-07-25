@@ -1,7 +1,0 @@
-
-
-
-v2 <- data.frame(created=v$created, id=v$id, weight=v$weight, sharability=v$sharability, value=substr(v$value, 1, 50), alias=v$alias, l=nchar(as.vector(v2$alias)))
-
-
-
