@@ -1,9 +1,21 @@
 #include <Wire.h>
 
-#define TIMER_OSC_PREFIX         "/eddie/head/timer"
-#define PHOTO_OSC_PREFIX         "/eddie/head/sensor/photo"
-#define DHT22_OSC_PREFIX         "/eddie/head/sensor/dht22"
+////////////////////////////////////////
+
+#define AUDIO_PIN A0
+#define VIBRO_PIN A1
+#define PHOTO_PIN A2
+// A4 is reserved for I2C
+// A5 is reserved for I2C
+
+////////////////////////////////////////
+
+#define AUDIO_OSC_PREFIX         "/eddie/head/sensor/phone"
 #define BMP085_OSC_PREFIX        "/eddie/head/sensor/BMP085"
+#define DHT22_OSC_PREFIX         "/eddie/head/sensor/dht22"
+#define PHOTO_OSC_PREFIX         "/eddie/head/sensor/photo"
+#define TIMER_OSC_PREFIX         "/eddie/head/timer"
+#define VIBRO_OSC_PREFIX         "/eddie/head/sensor/piezo"
 
 // Each sampling cycle must take at least this long.
 // If a cycle is finished sooner, we will wait before starting the next cycle.
@@ -12,6 +24,14 @@
 // A sampling cycle may take at most this long.
 // If the sample runs over, an error message will be generated
 #define CYCLE_MILLIS_MAX  5000
+
+////////////////////////////////////////
+
+#include <AnalogSampler.h>
+
+AnalogSampler audioSampler(AUDIO_PIN);
+AnalogSampler vibroSampler(VIBRO_PIN);
+AnalogSampler photoSampler(PHOTO_PIN);
 
 ////////////////////////////////////////
 
@@ -30,18 +50,17 @@ BMP085 bmp085;
 
 ////////////////////////////////////////
 
-#define PHOTO_PIN A2
+#include "eh_timer.h"
+#include "eh_rgb_led.h"
+#include "eh_vibration.h"
 
 ////////////////////////////////////////
-
-#include "eh-timer.h"
-
-////////////////////////////////////////
-
 
 void setup() {
     Serial.begin(9600);
     bmp085.setup();
+    
+    rgb_led_setup();
     
     //lastCycle_highBits = 0;
     //lastCycle_lowBits = millis();
@@ -49,15 +68,43 @@ void setup() {
 
 void loop()
 {    
+    writeColor(GREEN);
+    
     startCycle();
     
-    samplePhotoresistor();
+    //samplePhotoresistor();
+    sampleAnalog(10000);
     sampleDHT22();
     sampleBMP085();
  
     //rateTest();
     
     endCycle();
+}
+
+void sampleAnalog(unsigned long iterations)
+{
+    int len = 3;
+    AnalogSampler samplers[] = {audioSampler, vibroSampler, photoSampler};
+    char* prefixes[] = {AUDIO_OSC_PREFIX, VIBRO_OSC_PREFIX, PHOTO_OSC_PREFIX};
+    
+    for (unsigned long i = 0; i < iterations; i++)
+    {
+        for (int j = 0; j < len; j++)
+        {
+            samplers[j].sample();
+        }
+    }
+    
+    for (int j = 0; j < len; j++)
+    {
+        Serial.print(prefixes[j]);
+        Serial.print("/data "); 
+        Serial.print(samplers[j].getMinValue());
+        Serial.print(" ");
+        Serial.println(samplers[j].getMaxValue()); 
+        samplers[j].reset();
+    }
 }
 
 void samplePhotoresistor()
