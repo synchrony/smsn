@@ -35,7 +35,10 @@ public class MyOtherBrain {
     public static final String
             ALIAS = "alias",
             CREATED = "created",
+            FIRST = "first",
             NOTE = "note",
+            NOTES = "notes",
+            REST = "rest",
             SHARABILITY = "sharability",
             VALUE = "value",
             WEIGHT = "weight";

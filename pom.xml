@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.myotherbrain</groupId>
     <artifactId>myotherbrain-all</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>MyOtherBrain</name>
     <description>This is your brain. This is your brain on the Web. Any questions?</description>
@@ -20,7 +20,7 @@
     </modules>
 
     <properties>
-        <myotherbrain.version>1.0-SNAPSHOT</myotherbrain.version>
+        <myotherbrain.version>1.1-SNAPSHOT</myotherbrain.version>
         <blueprints.version>2.1.0-SNAPSHOT</blueprints.version>
         <frames.version>2.1.0-SNAPSHOT</frames.version>
         <rexster.version>2.1.0-SNAPSHOT</rexster.version>
