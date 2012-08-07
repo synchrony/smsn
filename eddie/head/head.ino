@@ -5,14 +5,31 @@
 #define AUDIO_PIN A0
 #define VIBRO_PIN A1
 #define PHOTO_PIN A2
-// A4 is reserved for I2C
-// A5 is reserved for I2C
+#define DUST_PIN  A3
+// analog pin 4 is reserved for I2C
+// analog pin 5 is reserved for I2C
+// A6
+// A7
+
+// digital pin 0 is reserved for RX
+// digital pin 1 is reserved for TX
+#define SPEAKER_PIN  2
+#define DUST_LED_PIN 3
+// 4 -- light sensor LED
+// 5
+// 6
+#define DHT22_PIN    7
+// 7 -- PIR motion sensor
+// 9, 10, 11 -- RGB LED
+// 12
+// 13 - LED
 
 ////////////////////////////////////////
 
 #define AUDIO_OSC_PREFIX         "/eddie/head/sensor/phone"
 #define BMP085_OSC_PREFIX        "/eddie/head/sensor/BMP085"
 #define DHT22_OSC_PREFIX         "/eddie/head/sensor/dht22"
+#define DUST_OSC_PREFIX          "/eddie/head/sensor/dust"
 #define PHOTO_OSC_PREFIX         "/eddie/head/sensor/photo"
 #define TIMER_OSC_PREFIX         "/eddie/head/timer"
 #define VIBRO_OSC_PREFIX         "/eddie/head/sensor/piezo"
@@ -37,19 +54,20 @@ AnalogSampler photoSampler(PHOTO_PIN);
 
 #include <DHT22.h>
 
-#define DHT22_PIN 7
-
-// Setup a DHT22 instance
+// DHT22 instance
 DHT22 dht22(DHT22_PIN);
 
 ////////////////////////////////////////
 
 #include <BMP085.h>
 
+// BMP085 instance
 BMP085 bmp085;
 
 ////////////////////////////////////////
 
+#include "eh_droidspeak.h"
+#include "eh_dust.h"
 #include "eh_timer.h"
 #include "eh_rgb_led.h"
 #include "eh_vibration.h"
@@ -57,6 +75,9 @@ BMP085 bmp085;
 ////////////////////////////////////////
 
 void setup() {
+    pinMode(SPEAKER_PIN, OUTPUT);
+    pinMode(DUST_LED_PIN, OUTPUT);
+ 
     Serial.begin(9600);
     bmp085.setup();
     
@@ -64,6 +85,8 @@ void setup() {
     
     //lastCycle_highBits = 0;
     //lastCycle_lowBits = millis();
+    
+    speakStartupPhrase(); 
 }
 
 void loop()
@@ -76,10 +99,90 @@ void loop()
     sampleAnalog(10000);
     sampleDHT22();
     sampleBMP085();
- 
+    sampleDustSensor();
+    
     //rateTest();
     
     endCycle();
+    tick();
+}
+
+void testTone(unsigned long duration, int frequency)
+{
+    unsigned long hwl = 500000 / frequency;
+    unsigned long dur = 1000 * duration;
+    unsigned long start = micros();
+    
+    // Just bail if the timer is about to roll over
+    if (start + dur < start) {
+        return;
+    }
+    
+    unsigned long now;
+    do
+    {
+        now = micros() - start;
+
+        if ((now / hwl) % 2)
+            digitalWrite(SPEAKER_PIN, LOW);
+        else
+            digitalWrite(SPEAKER_PIN, HIGH);  
+    } while (now < dur);
+}
+
+void testGlide(unsigned long duration, int frequency1, int frequency2)
+{
+    //double freq1 = frequency1 / 1000000.0;
+    //double freq2 = frequency2 / 1000000.0;
+  
+    long hwl1 = 500000 / frequency1;
+    long hwl2 = 500000 / frequency2;
+    Serial.print("hwl1: ");
+    Serial.println(hwl1);
+    unsigned long dur = 1000 * duration;
+    unsigned long start = micros();
+    
+    // Just bail if the timer is about to roll over
+    if (start + dur < start) {
+        return;
+    }
+    
+    unsigned long now;
+    int prev = 0;
+    int count = 0;
+    do
+    {
+        now = micros() - start;
+/*
+        double hwl = hwl1 + (now * (hwl2 - hwl1)) / (double) dur;
+          
+        //double m = now / hwl
+        int cur = ((int) (now / hwl)) % 2;
+        if (cur != prev) {
+            if (cur)
+                digitalWrite(SPEAKER_PIN, HIGH);
+            else
+                digitalWrite(SPEAKER_PIN, LOW);  
+                
+            prev = cur;
+        }
+*/
+count++;
+    } while (now < dur);
+    
+    Serial.print("count: ");
+    Serial.println(count);
+}
+
+// Note: a single-cycle tick is barely audible (using the Sanco EMB-3008A speaker),
+// just enough to hear with your ear next to the device.
+// Ten cycles produces a more noticeable, though still quiet, click.
+void tick()
+{
+    for (int i = 0; i < 10; i++) {
+        digitalWrite(SPEAKER_PIN, HIGH);
+        digitalWrite(SPEAKER_PIN, LOW);
+    }
 }
 
 void sampleAnalog(unsigned long iterations)
