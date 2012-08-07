@@ -77,6 +77,8 @@ BMP085 bmp085;
 void setup() {
     pinMode(SPEAKER_PIN, OUTPUT);
     pinMode(DUST_LED_PIN, OUTPUT);
+
+    randomSeed(analogRead(PHOTO_PIN));
  
     Serial.begin(9600);
     bmp085.setup();
