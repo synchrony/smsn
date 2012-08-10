@@ -1,4 +1,21 @@
-void speakGlide(unsigned long duration, long startFrequency, long endFrequency)
+#include "math.h"
+
+// Note: a single-cycle tick is barely audible (using the Sanco EMB-3008A speaker),
+// just enough to hear with your ear next to the device.
+// Ten cycles produces a more noticeable, though still quiet, click.
+void tick()
+{
+    //for (int i = 0; i < 10; i++) {
+    //    digitalWrite(SPEAKER_PIN, HIGH);
+    //    digitalWrite(SPEAKER_PIN, LOW);
+    //}
+    
+    tone(SPEAKER_PIN, 440);
+    delayMicroseconds(10);
+    noTone(SPEAKER_PIN);
+}
+
+void glideLinear(unsigned long duration, long startFrequency, long endFrequency)
 {
     long diff = endFrequency - startFrequency;
     long steps = 100;
@@ -9,6 +26,23 @@ void speakGlide(unsigned long duration, long startFrequency, long endFrequency)
       tone(SPEAKER_PIN, t);
       delayMicroseconds(inc);
     }  
+    
+    noTone(SPEAKER_PIN);
+}
+
+void glideLog(unsigned long duration, long startFrequency, long endFrequency)
+{
+    long steps = 100;
+    unsigned long inc = (duration * 1000) / steps;
+    double base = pow((double) endFrequency / (double) startFrequency, 1 / (double) (duration * 1000));
+  
+    for (long i = 0; i < steps; i++)
+    {
+        double t = i * inc;
+        double f = startFrequency * pow(base, t);
+        tone(SPEAKER_PIN, (int) f);
+        delayMicroseconds(inc);
+    }
     
     noTone(SPEAKER_PIN);
 }
@@ -30,18 +64,41 @@ void speakRandomSequence()
     }
   
     tone(SPEAKER_PIN, (int) t);
-    delay(100);  
+    delay(90); 
+    noTone(SPEAKER_PIN);
+    delay(10);
   }
-  noTone(SPEAKER_PIN);
 }
 
-void speakStartupPhrase()
+void speakOK()
 {
-    speakGlide(200, 1760, 440);
+  /*
+    tone(SPEAKER_PIN, 330);
     delay(100);
-    speakGlide(400, 440, 880);
+    tone(SPEAKER_PIN, 262);
+    delay(300);
+    noTone(SPEAKER_PIN);
+    delay(50);
+    */
     
-    delay(100);
+    glideLog(50, 196, 784);
+    delay(20);
+    glideLog(300, 1568, 49);
+    delay(50);
+}
+
+void speakPowerUpPhrase()
+{
+    glideLog(1000, 55, 14080);
+    delay(50);
+}
+
+void speakSetupCompletedPhrase()
+{
+    //delay(100);
+    speakOK();
+
     speakRandomSequence();
+    delay(50);
 }
 

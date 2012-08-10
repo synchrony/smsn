@@ -22,6 +22,7 @@ void sampleDustSensor() {
     if (firstReading) {
         firstReading = false;
     } else {
+        tick();
         Serial.print(DUST_OSC_PREFIX);
         Serial.print("/data "); 
         Serial.println(dustVal);

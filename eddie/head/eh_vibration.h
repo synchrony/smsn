@@ -26,6 +26,7 @@ void vibro_reportAndReset()
     double relMin = vibro_min / 1024.0; 
     double relMax = vibro_max / 1024.0;
     
+    tick();
     Serial.print(VIBRO_OSC_PREFIX);
     Serial.print("/data "); 
     Serial.print(relMin);

@@ -22,7 +22,7 @@
 // 7 -- PIR motion sensor
 // 9, 10, 11 -- RGB LED
 // 12
-// 13 - LED
+#define LED_PIN      13
 
 ////////////////////////////////////////
 
@@ -76,8 +76,12 @@ BMP085 bmp085;
 
 void setup() {
     pinMode(SPEAKER_PIN, OUTPUT);
+    speakPowerUpPhrase();
+    //tone(SPEAKER_PIN, 110);
+    
     pinMode(DUST_LED_PIN, OUTPUT);
-
+    pinMode(LED_PIN, OUTPUT);
+    
     randomSeed(analogRead(PHOTO_PIN));
  
     Serial.begin(9600);
@@ -88,7 +92,7 @@ void setup() {
     //lastCycle_highBits = 0;
     //lastCycle_lowBits = millis();
     
-    speakStartupPhrase(); 
+    speakSetupCompletedPhrase(); 
 }
 
 void loop()
@@ -96,6 +100,7 @@ void loop()
     writeColor(GREEN);
     
     startCycle();
+    digitalWrite(LED_PIN, HIGH);
     
     //samplePhotoresistor();
     sampleAnalog(10000);
@@ -105,86 +110,8 @@ void loop()
     
     //rateTest();
     
+    digitalWrite(LED_PIN, LOW);
     endCycle();
-    tick();
-}
-
-void testTone(unsigned long duration, int frequency)
-{
-    unsigned long hwl = 500000 / frequency;
-    unsigned long dur = 1000 * duration;
-    unsigned long start = micros();
-    
-    // Just bail if the timer is about to roll over
-    if (start + dur < start) {
-        return;
-    }
-    
-    unsigned long now;
-    do
-    {
-        now = micros() - start;
-
-        if ((now / hwl) % 2)
-            digitalWrite(SPEAKER_PIN, LOW);
-        else
-            digitalWrite(SPEAKER_PIN, HIGH);  
-    } while (now < dur);
-}
-
-void testGlide(unsigned long duration, int frequency1, int frequency2)
-{
-    //double freq1 = frequency1 / 1000000.0;
-    //double freq2 = frequency2 / 1000000.0;
-  
-    long hwl1 = 500000 / frequency1;
-    long hwl2 = 500000 / frequency2;
-    Serial.print("hwl1: ");
-    Serial.println(hwl1);
-    unsigned long dur = 1000 * duration;
-    unsigned long start = micros();
-    
-    // Just bail if the timer is about to roll over
-    if (start + dur < start) {
-        return;
-    }
-    
-    unsigned long now;
-    int prev = 0;
-    int count = 0;
-    do
-    {
-        now = micros() - start;
-/*
-        double hwl = hwl1 + (now * (hwl2 - hwl1)) / (double) dur;
-          
-        //double m = now / hwl
-        int cur = ((int) (now / hwl)) % 2;
-        if (cur != prev) {
-            if (cur)
-                digitalWrite(SPEAKER_PIN, HIGH);
-            else
-                digitalWrite(SPEAKER_PIN, LOW);  
-                
-            prev = cur;
-        }
-*/
-count++;
-    } while (now < dur);
-    
-    Serial.print("count: ");
-    Serial.println(count);
-}
-
-// Note: a single-cycle tick is barely audible (using the Sanco EMB-3008A speaker),
-// just enough to hear with your ear next to the device.
-// Ten cycles produces a more noticeable, though still quiet, click.
-void tick()
-{
-    for (int i = 0; i < 10; i++) {
-        digitalWrite(SPEAKER_PIN, HIGH);
-        digitalWrite(SPEAKER_PIN, LOW);
-    }
 }
 
 void sampleAnalog(unsigned long iterations)
@@ -203,6 +130,7 @@ void sampleAnalog(unsigned long iterations)
     
     for (int j = 0; j < len; j++)
     {
+        tick();
         Serial.print(prefixes[j]);
         Serial.print("/data "); 
         Serial.print(samplers[j].getMinValue());
@@ -216,7 +144,8 @@ void samplePhotoresistor()
 {
     int v = analogRead(PHOTO_PIN); 
     double rel = v / 1024.0; 
-   
+    
+    tick();
     Serial.print(PHOTO_OSC_PREFIX);
     Serial.print("/data "); 
     Serial.println(rel);     
@@ -232,6 +161,7 @@ void sampleDHT22()
   //delay(2000);
   errorCode = dht22.readData();
   
+  tick();
   Serial.print(DHT22_OSC_PREFIX);
   
   switch(errorCode)
@@ -273,6 +203,7 @@ void sampleBMP085()
     // this has been found to take around 12ms (on Arduino Nano)
     bmp085.sample();
 
+    tick();
     Serial.print(BMP085_OSC_PREFIX);
     Serial.print("/data ");
     Serial.print(bmp085.getLastTemperature(), DEC);
@@ -290,6 +221,8 @@ void rateTest()
       dht22.readData();
   }
   long duration = millis() - before;
+  
+  tick();
   Serial.print(n);
   Serial.print(" iterations in ");
   Serial.print(duration);
