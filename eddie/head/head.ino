@@ -2,10 +2,10 @@
 
 ////////////////////////////////////////
 
-#define AUDIO_PIN A0
-#define VIBRO_PIN A1
-#define PHOTO_PIN A2
-#define DUST_PIN  A3
+#define AUDIO_PIN         A0
+#define VIBRO_PIN         A1
+#define PHOTO_PIN         A2
+#define DUST_PIN          A3
 // analog pin 4 is reserved for I2C
 // analog pin 5 is reserved for I2C
 // A6
@@ -13,16 +13,18 @@
 
 // digital pin 0 is reserved for RX
 // digital pin 1 is reserved for TX
-#define SPEAKER_PIN  2
-#define DUST_LED_PIN 3
+#define SPEAKER_PIN       2
+#define DUST_LED_PIN      3
 // 4 -- light sensor LED
 // 5
 // 6
-#define DHT22_PIN    7
+#define DHT22_PIN         7
 // 7 -- PIR motion sensor
-// 9, 10, 11 -- RGB LED
+#define RGB_LED_GREEN_PIN 9
+#define RGB_LED_BLUE_PIN  10
+#define RGB_LED_RED_PIN   11
 // 12
-#define LED_PIN      13
+#define LED_PIN           13
 
 ////////////////////////////////////////
 
@@ -54,14 +56,12 @@ AnalogSampler photoSampler(PHOTO_PIN);
 
 #include <DHT22.h>
 
-// DHT22 instance
 DHT22 dht22(DHT22_PIN);
 
 ////////////////////////////////////////
 
 #include <BMP085.h>
 
-// BMP085 instance
 BMP085 bmp085;
 
 ////////////////////////////////////////
@@ -75,30 +75,33 @@ BMP085 bmp085;
 ////////////////////////////////////////
 
 void setup() {
-    pinMode(SPEAKER_PIN, OUTPUT);
-    speakPowerUpPhrase();
-    //tone(SPEAKER_PIN, 110);
-    
+    pinMode(SPEAKER_PIN, OUTPUT);    
     pinMode(DUST_LED_PIN, OUTPUT);
     pinMode(LED_PIN, OUTPUT);
+    
+    rgb_led_setup();
+    
+    // TODO: why is this white immediately overridden by red?
+    pushColor(WHITE);
+
+    speakPowerUpPhrase();
     
     randomSeed(analogRead(PHOTO_PIN));
  
     Serial.begin(9600);
     bmp085.setup();
-    
-    rgb_led_setup();
-    
+        
     //lastCycle_highBits = 0;
     //lastCycle_lowBits = millis();
     
     speakSetupCompletedPhrase(); 
+    
+    popColor();
+    pushColor(GREEN);
 }
 
 void loop()
-{    
-    writeColor(GREEN);
-    
+{        
     startCycle();
     digitalWrite(LED_PIN, HIGH);
     
@@ -114,12 +117,34 @@ void loop()
     endCycle();
 }
 
+void beginSample()
+{
+    pushColor(YELLOW);
+}
+
+void endSample()
+{
+    popColor();
+}
+
+void beginOSCWrite()
+{
+    pushColor(BLUE);
+    tick();
+}
+
+void endOSCWrite()
+{
+    popColor();
+}
+
 void sampleAnalog(unsigned long iterations)
 {
     int len = 3;
     AnalogSampler samplers[] = {audioSampler, vibroSampler, photoSampler};
     char* prefixes[] = {AUDIO_OSC_PREFIX, VIBRO_OSC_PREFIX, PHOTO_OSC_PREFIX};
     
+    beginSample();
     for (unsigned long i = 0; i < iterations; i++)
     {
         for (int j = 0; j < len; j++)
@@ -127,28 +152,34 @@ void sampleAnalog(unsigned long iterations)
             samplers[j].sample();
         }
     }
+    endSample();
     
     for (int j = 0; j < len; j++)
     {
-        tick();
+        beginOSCWrite();
         Serial.print(prefixes[j]);
         Serial.print("/data "); 
         Serial.print(samplers[j].getMinValue());
         Serial.print(" ");
         Serial.println(samplers[j].getMaxValue()); 
         samplers[j].reset();
+        endOSCWrite();
     }
 }
 
 void samplePhotoresistor()
 {
+    beginSample();
     int v = analogRead(PHOTO_PIN); 
+    endSample();
+    
     double rel = v / 1024.0; 
     
-    tick();
+    beginOSCWrite();
     Serial.print(PHOTO_OSC_PREFIX);
     Serial.print("/data "); 
     Serial.println(rel);     
+    endOSCWrite();
 }
 
 // output temperature (C) and humidity (%)
@@ -158,10 +189,11 @@ void sampleDHT22()
 {
   DHT22_ERROR_t errorCode;
 
-  //delay(2000);
+  beginSample();
   errorCode = dht22.readData();
+  endSample();
   
-  tick();
+  beginOSCWrite();
   Serial.print(DHT22_OSC_PREFIX);
   
   switch(errorCode)
@@ -194,22 +226,27 @@ void sampleDHT22()
     case DHT_ERROR_TOOQUICK:
       Serial.println("/error polled-too-quick");
       break;
-  }  
+  } 
+ 
+    endOSCWrite(); 
 }
 
 // output temperature (0.1 deg C) and pressure (Pa)
 void sampleBMP085()
 {
     // this has been found to take around 12ms (on Arduino Nano)
+    beginSample();
     bmp085.sample();
-
-    tick();
+    endSample();
+    
+    beginOSCWrite();
     Serial.print(BMP085_OSC_PREFIX);
     Serial.print("/data ");
     Serial.print(bmp085.getLastTemperature(), DEC);
     Serial.print(" ");
     Serial.print(bmp085.getLastPressure(), DEC);
     Serial.println();
+    endOSCWrite();
 }
 
 void rateTest()
@@ -222,10 +259,11 @@ void rateTest()
   }
   long duration = millis() - before;
   
-  tick();
+  //beginOSCWrite();
   Serial.print(n);
   Serial.print(" iterations in ");
   Serial.print(duration);
   Serial.println(" ms");
+  //endOSCWrite();
 }
 //*/
