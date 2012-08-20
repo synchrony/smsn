@@ -1,3 +1,5 @@
+// TODO: add program code for the PIR motion sensor
+
 #include <Wire.h>
 
 ////////////////////////////////////////
@@ -19,7 +21,7 @@
 // 5
 // 6
 #define DHT22_PIN         7
-// 7 -- PIR motion sensor
+// 8 -- PIR motion sensor
 #define RGB_LED_GREEN_PIN 9
 #define RGB_LED_BLUE_PIN  10
 #define RGB_LED_RED_PIN   11
@@ -119,7 +121,7 @@ void loop()
 
 void beginSample()
 {
-    pushColor(YELLOW);
+    pushColor(BLUE);
 }
 
 void endSample()
@@ -129,7 +131,7 @@ void endSample()
 
 void beginOSCWrite()
 {
-    pushColor(BLUE);
+    pushColor(WHITE);
     tick();
 }
 

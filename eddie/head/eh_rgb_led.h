@@ -10,7 +10,7 @@ const unsigned long PURPLE = 0xff00ff;
 const unsigned long BLACK = 0x000000;
 
 // prevents red (which otherwise requires a higher resistance) from dominating
-const unsigned int RED_FACTOR = 60;
+const unsigned int RED_FACTOR = 100;
 
 int color_stack[3];
 int color_stack_index = 0;

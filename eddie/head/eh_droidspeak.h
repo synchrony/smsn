@@ -96,7 +96,7 @@ void speakPowerUpPhrase()
 void speakSetupCompletedPhrase()
 {
     //delay(100);
-    speakOK();
+    //speakOK();
 
     speakRandomSequence();
     delay(50);
