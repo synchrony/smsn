@@ -68,11 +68,11 @@ BMP085 bmp085;
 
 ////////////////////////////////////////
 
-#include "eh_droidspeak.h"
-#include "eh_dust.h"
-#include "eh_timer.h"
-#include "eh_rgb_led.h"
-#include "eh_vibration.h"
+#include "om_droidspeak.h"
+#include "om_dust.h"
+#include "om_timer.h"
+#include "om_rgb_led.h"
+#include "om_vibration.h"
 
 ////////////////////////////////////////
 
