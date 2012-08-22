@@ -30,13 +30,13 @@
 
 ////////////////////////////////////////
 
-#define AUDIO_OSC_PREFIX         "/eddie/head/sensor/phone"
-#define BMP085_OSC_PREFIX        "/eddie/head/sensor/BMP085"
-#define DHT22_OSC_PREFIX         "/eddie/head/sensor/dht22"
-#define DUST_OSC_PREFIX          "/eddie/head/sensor/dust"
-#define PHOTO_OSC_PREFIX         "/eddie/head/sensor/photo"
-#define TIMER_OSC_PREFIX         "/eddie/head/timer"
-#define VIBRO_OSC_PREFIX         "/eddie/head/sensor/piezo"
+#define AUDIO_OSC_PREFIX         "/om/sensor/phone"
+#define BMP085_OSC_PREFIX        "/om/sensor/BMP085"
+#define DHT22_OSC_PREFIX         "/om/sensor/dht22"
+#define DUST_OSC_PREFIX          "/om/sensor/dust"
+#define PHOTO_OSC_PREFIX         "/om/sensor/photo"
+#define TIMER_OSC_PREFIX         "/om/timer"
+#define VIBRO_OSC_PREFIX         "/om/sensor/piezo"
 
 // Each sampling cycle must take at least this long.
 // If a cycle is finished sooner, we will wait before starting the next cycle.
@@ -108,7 +108,7 @@ void loop()
     digitalWrite(LED_PIN, HIGH);
     
     //samplePhotoresistor();
-    sampleAnalog(10000);
+    sampleAnalog(100000);
     sampleDHT22();
     sampleBMP085();
     sampleDustSensor();
@@ -158,12 +158,18 @@ void sampleAnalog(unsigned long iterations)
     
     for (int j = 0; j < len; j++)
     {
+        AnalogSampler s = samplers[j];
+        
         beginOSCWrite();
         Serial.print(prefixes[j]);
         Serial.print("/data "); 
-        Serial.print(samplers[j].getMinValue());
+        Serial.print(s.getMinValue());
         Serial.print(" ");
-        Serial.println(samplers[j].getMaxValue()); 
+        Serial.print(s.getMaxValue()); 
+        Serial.print(" ");
+        Serial.print(s.getMean());
+        Serial.print(" ");
+        Serial.println(s.getVariance());
         samplers[j].reset();
         endOSCWrite();
     }

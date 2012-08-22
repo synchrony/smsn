@@ -19,11 +19,16 @@ class AnalogSampler
     
     double getMinValue();
     double getMaxValue();
+    double getMean();
+    double getVariance();
     
   private:
     uint8_t _pin;
-    unsigned int _minValue;
-    unsigned int _maxValue;
+    double _minValue;
+    double _maxValue;
+    double _sumOfValues;
+    double _sumOfSquares;
+    unsigned int _n;
 };
 
 #endif
