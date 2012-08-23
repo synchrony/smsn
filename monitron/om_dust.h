@@ -22,10 +22,11 @@ void sampleDustSensor() {
     if (firstReading) {
         firstReading = false;
     } else {
-        tick();
+        beginOSCWrite();
         Serial.print(DUST_OSC_PREFIX);
         Serial.print("/data "); 
         Serial.println(dustVal);
+        endOSCWrite();
     }
     
     // Note: it is assumed that the rest of the sampling cycle will take at

@@ -21,7 +21,7 @@
 // 5
 // 6
 #define DHT22_PIN         7
-// 8 -- PIR motion sensor
+#define MOTION_PIN        8
 #define RGB_LED_GREEN_PIN 9
 #define RGB_LED_BLUE_PIN  10
 #define RGB_LED_RED_PIN   11
@@ -34,6 +34,7 @@
 #define BMP085_OSC_PREFIX        "/om/sensor/BMP085"
 #define DHT22_OSC_PREFIX         "/om/sensor/dht22"
 #define DUST_OSC_PREFIX          "/om/sensor/dust"
+#define MOTION_OSC_PREFIX        "/om/sensor/motion"
 #define PHOTO_OSC_PREFIX         "/om/sensor/photo"
 #define TIMER_OSC_PREFIX         "/om/timer"
 #define VIBRO_OSC_PREFIX         "/om/sensor/piezo"
@@ -68,8 +69,12 @@ BMP085 bmp085;
 
 ////////////////////////////////////////
 
+//void beginOscWrite();
+//void endOSCWrite();
+
 #include "om_droidspeak.h"
 #include "om_dust.h"
+#include "om_motion.h"
 #include "om_timer.h"
 #include "om_rgb_led.h"
 #include "om_vibration.h"
@@ -80,6 +85,7 @@ void setup() {
     pinMode(SPEAKER_PIN, OUTPUT);    
     pinMode(DUST_LED_PIN, OUTPUT);
     pinMode(LED_PIN, OUTPUT);
+    pinMode(MOTION_PIN, INPUT);
     
     rgb_led_setup();
     
@@ -107,11 +113,17 @@ void loop()
     startCycle();
     digitalWrite(LED_PIN, HIGH);
     
+    resetMotionDetector();
+    sampleMotionDetector();
+    
     //samplePhotoresistor();
-    sampleAnalog(100000);
+    sampleAnalog(10000);
     sampleDHT22();
     sampleBMP085();
     sampleDustSensor();
+    
+    sampleMotionDetector();
+    reportMotionDetectorResults();
     
     //rateTest();
     
@@ -163,14 +175,14 @@ void sampleAnalog(unsigned long iterations)
         beginOSCWrite();
         Serial.print(prefixes[j]);
         Serial.print("/data "); 
-        Serial.print(s.getMinValue());
+        Serial.print(s.getMinValue(), 3);
         Serial.print(" ");
-        Serial.print(s.getMaxValue()); 
+        Serial.print(s.getMaxValue(), 3); 
         Serial.print(" ");
-        Serial.print(s.getMean());
+        Serial.print(s.getMean(), 3);
         Serial.print(" ");
-        Serial.println(s.getVariance());
-        samplers[j].reset();
+        Serial.println(s.getVariance(), 6);
+        s.reset();
         endOSCWrite();
     }
 }

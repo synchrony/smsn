@@ -28,7 +28,7 @@ class AnalogSampler
     double _maxValue;
     double _sumOfValues;
     double _sumOfSquares;
-    unsigned int _n;
+    unsigned long _n;
 };
 
 #endif
