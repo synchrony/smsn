@@ -18,6 +18,27 @@ void startCycle()
     Serial.println(startTime, HEX);    
 }
 
+unsigned long errorReportIndex = 0;
+unsigned long cyclesBetweenErrorReports = 1;
+
+void error(char *message)
+{
+    beginOSCErrorMessage();
+    Serial.print(OM_SYSTEM_ERROR);
+    Serial.print(" ");
+    Serial.println(message);
+    delay(50);
+    
+    errorReportIndex++;
+    if (errorReportIndex == cyclesBetweenErrorReports)
+    {
+        speakWarningPhrase();
+        cyclesBetweenErrorReports *= 2;
+        errorReportIndex = 0;
+    }
+    endOSCErrorMessage();     
+}
+
 void endCycle()
 {
     unsigned long duration;
@@ -38,8 +59,8 @@ void endCycle()
     }
     else if (duration > CYCLE_MILLIS_MAX)
     {
-        Serial.print(OM_SYSTEM_ERROR);
-        Serial.println(" cycle-too-long");            
+        error("cycle-too-long");            
     }
 }
+
 

@@ -83,10 +83,11 @@ BMP085 bmp085;
 ////////////////////////////////////////
 
 #include "om_droidspeak.h"
+#include "om_rgb_led.h"
+
 #include "om_dust.h"
 #include "om_motion.h"
 #include "om_timer.h"
-#include "om_rgb_led.h"
 
 ////////////////////////////////////////
 
@@ -98,14 +99,15 @@ void setup() {
     
     rgb_led_setup();
     
-    // TODO: why is this white immediately overridden by red?
-    pushColor(WHITE);
-
+    // TODO: why is this immediately replaced by another color?
+    //replaceColor(RGB_CYAN);
+    //delay(3000);
+    
     speakPowerUpPhrase();
     
     randomSeed(analogRead(LIGHT_PIN));
  
-    Serial.begin(9600);
+    Serial.begin(115200);
     bmp085.setup();
         
     //lastCycle_highBits = 0;
@@ -113,8 +115,7 @@ void setup() {
     
     speakSetupCompletedPhrase(); 
     
-    popColor();
-    pushColor(GREEN);
+    replaceColor(RGB_GREEN);
 }
 
 void loop()
@@ -142,7 +143,7 @@ void loop()
 
 void beginSample()
 {
-    pushColor(BLUE);
+    pushColor(RGB_BLUE);
 }
 
 void endSample()
@@ -152,12 +153,27 @@ void endSample()
 
 void beginOSCWrite()
 {
-    pushColor(WHITE);
+    pushColor(RGB_CYAN);
     tick();
+    //tone(SPEAKER_PIN, 55);
 }
 
 void endOSCWrite()
 {
+    //noTone(SPEAKER_PIN);
+    popColor();
+}
+
+void beginOSCErrorMessage()
+{
+    pushColor(RGB_RED);
+    tick();
+    //tone(SPEAKER_PIN, 110);
+}
+
+void endOSCErrorMessage()
+{
+    //noTone(SPEAKER_PIN);
     popColor();
 }
 
@@ -165,10 +181,10 @@ void finishAnalogObservation(AnalogSampler s, char* prefix)
 {
     beginOSCWrite();
     Serial.print(prefix);
-    Serial.print(" ");
-    Serial.print(s.getStartTime());
-    Serial.print(" ");
-    Serial.print(s.getEndTime());
+    Serial.print(" 0x");
+    Serial.print(s.getStartTime(), HEX);
+    Serial.print(" 0x");
+    Serial.print(s.getEndTime(), HEX);
     Serial.print(" ");
     Serial.print(s.getNumberOfMeasurements());
     Serial.print(" ");
@@ -217,46 +233,58 @@ void sampleDHT22()
         sampler_rht03_temp.addMeasurement(dht22.getTemperatureC(), now);
     }  
     endSample();
-  
-  beginOSCWrite();
-  
+    
   switch(errorCode)
   {
     case DHT_ERROR_NONE:
+        beginOSCWrite();
         finishAnalogObservation(sampler_rht03_humid, OM_SENSOR_RHT03_HUMID);
         finishAnalogObservation(sampler_rht03_temp, OM_SENSOR_RHT03_TEMP);
+        endOSCWrite();
         break;
     case DHT_ERROR_CHECKSUM:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" checksum-error");
+      endOSCErrorMessage();
       break;
     case DHT_BUS_HUNG:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" bus-hung");
+      endOSCErrorMessage();
       break;
     case DHT_ERROR_NOT_PRESENT:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" not-present");
+      endOSCErrorMessage();
       break;
     case DHT_ERROR_ACK_TOO_LONG:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" ack-timeout");
+      endOSCErrorMessage();
       break;
     case DHT_ERROR_SYNC_TIMEOUT:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" sync-timeout");
+      endOSCErrorMessage();
       break;
     case DHT_ERROR_DATA_TIMEOUT:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" data-timeout");
+      endOSCErrorMessage();
       break;
     case DHT_ERROR_TOOQUICK:
+      beginOSCErrorMessage();
       Serial.print(OM_SENSOR_RHT03_ERROR);
       Serial.println(" polled-too-quick");
+      endOSCErrorMessage();
       break;
-  } 
- 
-    endOSCWrite(); 
+  }  
 }
 
 void sampleBMP085()
