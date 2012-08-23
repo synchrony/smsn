@@ -18,22 +18,22 @@ void sampleMotionDetector() {
     
     int v = digitalRead(MOTION_PIN);
     if (v == LOW) {
-        motionDetected = 1;
+        motionDetected++;
     }
     
     endSample();
 }
 
 void reportMotionDetectorResults() {
-  beginOSCWrite();
+    beginOSCWrite();
  
-        Serial.print(MOTION_OSC_PREFIX);
-        Serial.print("/data "); 
-        Serial.print(firstSampleTime, HEX);
-        Serial.print(" ");
-        Serial.print(lastSampleTime, HEX);
-        Serial.print(" ");
-        Serial.println(motionDetected);
+    Serial.print(OM_SENSOR_SE10_MOTION);
+    Serial.print(" "); 
+    Serial.print(firstSampleTime, HEX);
+    Serial.print(" ");
+    Serial.print(lastSampleTime, HEX);
+    Serial.print(" 1 ");
+    Serial.println(motionDetected);
         
-  endOSCWrite();
+    endOSCWrite();
 }

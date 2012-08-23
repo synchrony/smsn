@@ -6,11 +6,20 @@ AnalogSampler::AnalogSampler(uint8_t pin)
     reset();
 }
 
-void AnalogSampler::sample()
+void AnalogSampler::measure(unsigned long now)
+{
+    double v = analogRead(_pin) / 1024.0;
+    addMeasurement(v, now);
+}
+
+void AnalogSampler::addMeasurement(double v, unsigned long now)
 {
     _n++;
-
-    double v = analogRead(_pin) / 1024.0;
+    _endTime = now;
+    if (0 == _startTime)
+    {
+        _startTime = now;
+    }
     
     if (v < _minValue)
     {
@@ -23,7 +32,7 @@ void AnalogSampler::sample()
     }
     
     _sumOfValues += v;
-    _sumOfSquares += (v * v);
+    _sumOfSquares += (v * v);	
 }
 
 void AnalogSampler::reset()
@@ -33,8 +42,25 @@ void AnalogSampler::reset()
     _sumOfValues = 0;
     _sumOfSquares = 0;
     _n = 0;
+    _startTime = 0;
+    _endTime = 0;
 }
     
+unsigned long AnalogSampler::getStartTime() 
+{
+	return _startTime;
+}
+
+unsigned long AnalogSampler::getEndTime()
+{
+	return _endTime;
+}
+
+unsigned long AnalogSampler::getNumberOfMeasurements()
+{
+	return _n;
+}
+
 double AnalogSampler::getMinValue()
 {
     return _minValue;
@@ -47,7 +73,7 @@ double AnalogSampler::getMaxValue()
 
 double AnalogSampler::getMean()
 {
-    return _sumOfValues / _n;
+    return (_n > 0) ? _sumOfValues / _n : 0;
 }
 
 double AnalogSampler::getVariance()

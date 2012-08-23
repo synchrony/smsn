@@ -1,12 +1,10 @@
-// TODO: add program code for the PIR motion sensor
-
 #include <Wire.h>
 
 ////////////////////////////////////////
 
-#define AUDIO_PIN         A0
-#define VIBRO_PIN         A1
-#define PHOTO_PIN         A2
+#define SOUND_PIN         A0
+#define VIBR_PIN          A1
+#define LIGHT_PIN         A2
 #define DUST_PIN          A3
 // analog pin 4 is reserved for I2C
 // analog pin 5 is reserved for I2C
@@ -30,14 +28,21 @@
 
 ////////////////////////////////////////
 
-#define AUDIO_OSC_PREFIX         "/om/sensor/phone"
-#define BMP085_OSC_PREFIX        "/om/sensor/BMP085"
-#define DHT22_OSC_PREFIX         "/om/sensor/dht22"
-#define DUST_OSC_PREFIX          "/om/sensor/dust"
-#define MOTION_OSC_PREFIX        "/om/sensor/motion"
-#define PHOTO_OSC_PREFIX         "/om/sensor/photo"
-#define TIMER_OSC_PREFIX         "/om/timer"
-#define VIBRO_OSC_PREFIX         "/om/sensor/piezo"
+#define OM_SENSOR_7BB206L0_VIBRN      "/om/sensor/7bb206l0/vibr"
+#define OM_SENSOR_ADJDS311CR999_BLUE  "/om/sensor/adjds311cr999/blue"
+#define OM_SENSOR_ADJDS311CR999_GREEN "/om/sensor/adjds311cr999/green"
+#define OM_SENSOR_ADJDS311CR999_RED   "/om/sensor/adjds311cr999/red"
+#define OM_SENSOR_BMP085_PRESSURE     "/om/sensor/bmp085/press"
+#define OM_SENSOR_BMP085_TEMP         "/om/sensor/bmp085/temp"
+#define OM_SENSOR_GP2Y1010AU0F_DUST   "/om/sensor/gp2y1010au0f/dust"
+#define OM_SENSOR_MD9745APZF_SOUND    "/om/sensor/md9745apzf/sound"
+#define OM_SENSOR_PHOTO_LIGHT         "/om/sensor/photo/light"
+#define OM_SENSOR_RHT03_ERROR         "/om/sensor/rht03/error"
+#define OM_SENSOR_RHT03_HUMID         "/om/sensor/rht03/humid"
+#define OM_SENSOR_RHT03_TEMP          "/om/sensor/rht03/temp"
+#define OM_SENSOR_SE10_MOTION         "/om/sensor/se10/motion"
+#define OM_SYSTEM_ERROR               "/om/system/error"
+#define OM_SYSTEM_TIME                "/om/system/time"
 
 // Each sampling cycle must take at least this long.
 // If a cycle is finished sooner, we will wait before starting the next cycle.
@@ -51,9 +56,17 @@
 
 #include <AnalogSampler.h>
 
-AnalogSampler audioSampler(AUDIO_PIN);
-AnalogSampler vibroSampler(VIBRO_PIN);
-AnalogSampler photoSampler(PHOTO_PIN);
+AnalogSampler sampler_7bb206l0_vibr(VIBR_PIN);
+AnalogSampler sampler_adjds311cr999_blue(0);
+AnalogSampler sampler_adjds311cr999_green(0);
+AnalogSampler sampler_adjds311cr999_red(0);
+AnalogSampler sampler_bmp085_press(0);
+AnalogSampler sampler_bmp085_temp(0);
+AnalogSampler sampler_gp2y1010au0f_dust(0);
+AnalogSampler sampler_md9745apzf_sound(SOUND_PIN);
+AnalogSampler sampler_photo_light(LIGHT_PIN);
+AnalogSampler sampler_rht03_humid(0);
+AnalogSampler sampler_rht03_temp(0);
 
 ////////////////////////////////////////
 
@@ -69,15 +82,11 @@ BMP085 bmp085;
 
 ////////////////////////////////////////
 
-//void beginOscWrite();
-//void endOSCWrite();
-
 #include "om_droidspeak.h"
 #include "om_dust.h"
 #include "om_motion.h"
 #include "om_timer.h"
 #include "om_rgb_led.h"
-#include "om_vibration.h"
 
 ////////////////////////////////////////
 
@@ -94,7 +103,7 @@ void setup() {
 
     speakPowerUpPhrase();
     
-    randomSeed(analogRead(PHOTO_PIN));
+    randomSeed(analogRead(LIGHT_PIN));
  
     Serial.begin(9600);
     bmp085.setup();
@@ -117,7 +126,7 @@ void loop()
     sampleMotionDetector();
     
     //samplePhotoresistor();
-    sampleAnalog(10000);
+    sampleAnalog();
     sampleDHT22();
     sampleBMP085();
     sampleDustSensor();
@@ -152,120 +161,117 @@ void endOSCWrite()
     popColor();
 }
 
-void sampleAnalog(unsigned long iterations)
+void finishAnalogObservation(AnalogSampler s, char* prefix)
 {
-    int len = 3;
-    AnalogSampler samplers[] = {audioSampler, vibroSampler, photoSampler};
-    char* prefixes[] = {AUDIO_OSC_PREFIX, VIBRO_OSC_PREFIX, PHOTO_OSC_PREFIX};
-    
-    beginSample();
-    for (unsigned long i = 0; i < iterations; i++)
-    {
-        for (int j = 0; j < len; j++)
-        {
-            samplers[j].sample();
-        }
-    }
-    endSample();
-    
-    for (int j = 0; j < len; j++)
-    {
-        AnalogSampler s = samplers[j];
-        
-        beginOSCWrite();
-        Serial.print(prefixes[j]);
-        Serial.print("/data "); 
-        Serial.print(s.getMinValue(), 3);
-        Serial.print(" ");
-        Serial.print(s.getMaxValue(), 3); 
-        Serial.print(" ");
-        Serial.print(s.getMean(), 3);
-        Serial.print(" ");
-        Serial.println(s.getVariance(), 6);
-        s.reset();
-        endOSCWrite();
-    }
-}
-
-void samplePhotoresistor()
-{
-    beginSample();
-    int v = analogRead(PHOTO_PIN); 
-    endSample();
-    
-    double rel = v / 1024.0; 
-    
     beginOSCWrite();
-    Serial.print(PHOTO_OSC_PREFIX);
-    Serial.print("/data "); 
-    Serial.println(rel);     
-    endOSCWrite();
+    Serial.print(prefix);
+    Serial.print(" ");
+    Serial.print(s.getStartTime());
+    Serial.print(" ");
+    Serial.print(s.getEndTime());
+    Serial.print(" ");
+    Serial.print(s.getNumberOfMeasurements());
+    Serial.print(" ");
+    Serial.print(s.getMinValue(), 3);
+    Serial.print(" ");
+    Serial.print(s.getMaxValue(), 3); 
+    Serial.print(" ");
+    Serial.print(s.getMean(), 3);
+    Serial.print(" ");
+    Serial.println(s.getVariance(), 6);
+    endOSCWrite();  
+    
+    s.reset();
 }
 
-// output temperature (C) and humidity (%)
+const unsigned long analogIterations = 10000;
+
+void sampleAnalog()
+{    
+    beginSample();
+    unsigned long now = millis();
+    for (unsigned long i = 0; i < analogIterations; i++)
+    {
+        sampler_7bb206l0_vibr.measure(now);
+        sampler_md9745apzf_sound.measure(now);
+        sampler_photo_light.measure(now);
+    }
+    endSample();
+    
+    finishAnalogObservation(sampler_7bb206l0_vibr, OM_SENSOR_7BB206L0_VIBRN);
+    finishAnalogObservation(sampler_md9745apzf_sound, OM_SENSOR_MD9745APZF_SOUND);
+    finishAnalogObservation(sampler_photo_light, OM_SENSOR_PHOTO_LIGHT);
+}
+
 // needs 2s between readings
 // however, the actual readData operation takes only 0.03ms on Arduino Nano
 void sampleDHT22()
 {
-  DHT22_ERROR_t errorCode;
+    DHT22_ERROR_t errorCode;
 
-  beginSample();
-  errorCode = dht22.readData();
-  endSample();
+    beginSample();
+    unsigned long now = millis();
+    errorCode = dht22.readData();
+    if (DHT_ERROR_NONE == errorCode) {
+        sampler_rht03_humid.addMeasurement(dht22.getHumidity() / 100.0, now);
+        sampler_rht03_temp.addMeasurement(dht22.getTemperatureC(), now);
+    }  
+    endSample();
   
   beginOSCWrite();
-  Serial.print(DHT22_OSC_PREFIX);
   
   switch(errorCode)
   {
     case DHT_ERROR_NONE:
-      Serial.print("/data ");
-      Serial.print(dht22.getTemperatureC());
-      Serial.print(" ");
-      Serial.print(dht22.getHumidity());
-      Serial.println();
-      break;
+        finishAnalogObservation(sampler_rht03_humid, OM_SENSOR_RHT03_HUMID);
+        finishAnalogObservation(sampler_rht03_temp, OM_SENSOR_RHT03_TEMP);
+        break;
     case DHT_ERROR_CHECKSUM:
-      Serial.println("/error checksum-error");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" checksum-error");
       break;
     case DHT_BUS_HUNG:
-      Serial.println("/error bus-hung");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" bus-hung");
       break;
     case DHT_ERROR_NOT_PRESENT:
-      Serial.println("/error not-present");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" not-present");
       break;
     case DHT_ERROR_ACK_TOO_LONG:
-      Serial.println("/error ack-timeout");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" ack-timeout");
       break;
     case DHT_ERROR_SYNC_TIMEOUT:
-      Serial.println("/error sync-timeout");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" sync-timeout");
       break;
     case DHT_ERROR_DATA_TIMEOUT:
-      Serial.println("/error data-timeout");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" data-timeout");
       break;
     case DHT_ERROR_TOOQUICK:
-      Serial.println("/error polled-too-quick");
+      Serial.print(OM_SENSOR_RHT03_ERROR);
+      Serial.println(" polled-too-quick");
       break;
   } 
  
     endOSCWrite(); 
 }
 
-// output temperature (0.1 deg C) and pressure (Pa)
 void sampleBMP085()
 {
     // this has been found to take around 12ms (on Arduino Nano)
     beginSample();
+    unsigned long now = millis();
     bmp085.sample();
+    sampler_bmp085_press.addMeasurement(bmp085.getLastPressure(), now);
+    sampler_bmp085_temp.addMeasurement(bmp085.getLastTemperature() / 10.0, now);
     endSample();
     
     beginOSCWrite();
-    Serial.print(BMP085_OSC_PREFIX);
-    Serial.print("/data ");
-    Serial.print(bmp085.getLastTemperature(), DEC);
-    Serial.print(" ");
-    Serial.print(bmp085.getLastPressure(), DEC);
-    Serial.println();
+    finishAnalogObservation(sampler_bmp085_press, OM_SENSOR_BMP085_PRESSURE);
+    finishAnalogObservation(sampler_bmp085_temp, OM_SENSOR_BMP085_TEMP);
     endOSCWrite();
 }
 

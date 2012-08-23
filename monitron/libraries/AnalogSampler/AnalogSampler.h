@@ -14,8 +14,13 @@ class AnalogSampler
   public:
     AnalogSampler(uint8_t pin);
     
-    void sample();
+    void measure(unsigned long now);
+    void addMeasurement(double v, unsigned long now);
     void reset();
+    
+    unsigned long getStartTime();
+    unsigned long getEndTime();
+    unsigned long getNumberOfMeasurements();
     
     double getMinValue();
     double getMaxValue();
@@ -24,11 +29,13 @@ class AnalogSampler
     
   private:
     uint8_t _pin;
+    unsigned long _startTime;
+    unsigned long _endTime;
+    unsigned long _n;
     double _minValue;
     double _maxValue;
     double _sumOfValues;
     double _sumOfSquares;
-    unsigned long _n;
 };
 
 #endif
