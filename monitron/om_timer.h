@@ -1,13 +1,13 @@
 
 const unsigned long maxLong = 0xffffffff;
-unsigned long startTime;
+unsigned long timerStartTime;
 unsigned long timerHighBits = 0;
 
 // TODO: the other functions which print times must also deal with the high bits
 
 void startCycle()
 {
-    startTime = millis();
+    timerStartTime = millis();
 
     Serial.print(OM_SYSTEM_TIME);
     Serial.print(" ");
@@ -15,7 +15,7 @@ void startCycle()
     {
         Serial.print(timerHighBits, HEX);
     }
-    Serial.println(startTime, HEX);    
+    Serial.println(timerStartTime, HEX);    
 }
 
 unsigned long errorReportIndex = 0;

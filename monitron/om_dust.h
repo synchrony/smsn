@@ -9,7 +9,7 @@ int firstReading = true;
 
 void sampleDustSensor() {
     beginSample();
-    unsigned long now = millis();
+    sampler_gp2y1010au0f_dust.beginSample();
     
     digitalWrite(DUST_LED_PIN, LOW); // power on the LED
     delayMicroseconds(dustSensorDelay1);
@@ -20,8 +20,9 @@ void sampleDustSensor() {
     digitalWrite(DUST_LED_PIN, HIGH); // turn the LED off
     delayMicroseconds(dustSensorDelay3);  // just to make it an even 10ms, apparently
     
-    sampler_gp2y1010au0f_dust.addMeasurement(dustVal / 1024.0, now);
+    sampler_gp2y1010au0f_dust.addMeasurement(dustVal / 1024.0);
     
+    sampler_gp2y1010au0f_dust.endSample();
     endSample();
     
     // Don't output the first reading.  For some reason, in this application, the

@@ -14,8 +14,10 @@ class AnalogSampler
   public:
     AnalogSampler(uint8_t pin);
     
-    void measure(unsigned long now);
-    void addMeasurement(double v, unsigned long now);
+    void beginSample();
+    void endSample();
+    void measure();
+    void addMeasurement(double v);
     void reset();
     
     unsigned long getStartTime();

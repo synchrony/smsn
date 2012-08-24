@@ -205,13 +205,18 @@ const unsigned long analogIterations = 10000;
 void sampleAnalog()
 {    
     beginSample();
-    unsigned long now = millis();
+    sampler_7bb206l0_vibr.beginSample();
+    sampler_md9745apzf_sound.beginSample();
+    sampler_photo_light.beginSample();
     for (unsigned long i = 0; i < analogIterations; i++)
     {
-        sampler_7bb206l0_vibr.measure(now);
-        sampler_md9745apzf_sound.measure(now);
-        sampler_photo_light.measure(now);
+        sampler_7bb206l0_vibr.measure();
+        sampler_md9745apzf_sound.measure();
+        sampler_photo_light.measure();
     }
+    sampler_7bb206l0_vibr.endSample();
+    sampler_md9745apzf_sound.endSample();
+    sampler_photo_light.endSample();    
     endSample();
     
     finishAnalogObservation(sampler_7bb206l0_vibr, OM_SENSOR_7BB206L0_VIBRN);
@@ -226,12 +231,15 @@ void sampleDHT22()
     DHT22_ERROR_t errorCode;
 
     beginSample();
-    unsigned long now = millis();
+    sampler_rht03_humid.beginSample();
+    sampler_rht03_temp.beginSample();
     errorCode = dht22.readData();
     if (DHT_ERROR_NONE == errorCode) {
-        sampler_rht03_humid.addMeasurement(dht22.getHumidity() / 100.0, now);
-        sampler_rht03_temp.addMeasurement(dht22.getTemperatureC(), now);
-    }  
+        sampler_rht03_humid.addMeasurement(dht22.getHumidity() / 100.0);
+        sampler_rht03_temp.addMeasurement(dht22.getTemperatureC());
+    }
+    sampler_rht03_humid.endSample();
+    sampler_rht03_temp.endSample();
     endSample();
     
   switch(errorCode)
@@ -291,10 +299,13 @@ void sampleBMP085()
 {
     // this has been found to take around 12ms (on Arduino Nano)
     beginSample();
-    unsigned long now = millis();
+    sampler_bmp085_press.beginSample();
+    sampler_bmp085_temp.beginSample();
     bmp085.sample();
-    sampler_bmp085_press.addMeasurement(bmp085.getLastPressure(), now);
-    sampler_bmp085_temp.addMeasurement(bmp085.getLastTemperature() / 10.0, now);
+    sampler_bmp085_press.addMeasurement(bmp085.getLastPressure());
+    sampler_bmp085_temp.addMeasurement(bmp085.getLastTemperature() / 10.0);
+    sampler_bmp085_press.endSample();
+    sampler_bmp085_temp.endSample();
     endSample();
     
     beginOSCWrite();

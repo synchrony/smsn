@@ -6,20 +6,28 @@ AnalogSampler::AnalogSampler(uint8_t pin)
     reset();
 }
 
-void AnalogSampler::measure(unsigned long now)
+void AnalogSampler::beginSample()
 {
-    double v = analogRead(_pin) / 1024.0;
-    addMeasurement(v, now);
-}
-
-void AnalogSampler::addMeasurement(double v, unsigned long now)
-{
-    _n++;
-    _endTime = now;
     if (0 == _startTime)
     {
-        _startTime = now;
+        _startTime = millis();
     }
+}
+
+void AnalogSampler::endSample()
+{
+    _endTime = millis();
+}
+
+void AnalogSampler::measure()
+{
+    double v = analogRead(_pin) / 1024.0;
+    addMeasurement(v);
+}
+
+void AnalogSampler::addMeasurement(double v)
+{
+    _n++;
     
     if (v < _minValue)
     {

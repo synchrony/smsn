@@ -1,19 +1,17 @@
 int motionDetected = 0;
-unsigned long firstSampleTime;
-unsigned long lastSampleTime;
+unsigned long startTime;
+unsigned long endTime;
 
 void resetMotionDetector() {
     motionDetected = 0;
-    firstSampleTime = 0;
-    lastSampleTime = 0;
+    startTime = 0;
+    endTime = 0;
 }
 
 void sampleMotionDetector() {
-    beginSample();
-  
-    lastSampleTime = millis();
-    if (0 == firstSampleTime) {
-        firstSampleTime = lastSampleTime;
+    beginSample();  
+    if (0 == startTime) {
+        startTime = millis();
     }
     
     int v = digitalRead(MOTION_PIN);
@@ -21,6 +19,7 @@ void sampleMotionDetector() {
         motionDetected++;
     }
     
+    endTime = millis();   
     endSample();
 }
 
@@ -29,9 +28,9 @@ void reportMotionDetectorResults() {
  
     Serial.print(OM_SENSOR_SE10_MOTION);
     Serial.print(" "); 
-    Serial.print(firstSampleTime, HEX);
+    Serial.print(startTime, HEX);
     Serial.print(" ");
-    Serial.print(lastSampleTime, HEX);
+    Serial.print(endTime, HEX);
     Serial.print(" 1 ");
     Serial.println(motionDetected);
         
