@@ -10,7 +10,7 @@ void startCycle()
     startTime = millis();
 
     Serial.print(OM_SYSTEM_TIME);
-    Serial.print(" 0x");
+    Serial.print(" ");
     if (timerHighBits > 0)
     {
         Serial.print(timerHighBits, HEX);

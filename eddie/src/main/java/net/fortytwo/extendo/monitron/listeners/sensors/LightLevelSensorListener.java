@@ -1,33 +1,22 @@
 package net.fortytwo.extendo.monitron.listeners.sensors;
 
-import net.fortytwo.extendo.monitron.EventHandler;
+import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.events.Event;
 import net.fortytwo.extendo.monitron.events.LightLevelObservation;
-import net.fortytwo.extendo.monitron.data.AnalogData;
-import net.fortytwo.extendo.monitron.data.IntensityData;
 import org.openrdf.model.URI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class LightLevelSensorListener extends AnalogSensorListener {
+public class LightLevelSensorListener extends GaussianSensorListener {
 
-    protected LightLevelSensorListener(final EventHandler context,
+    public LightLevelSensorListener(final MonitronEventHandler context,
                                        final URI sensor) {
         super(context, sensor);
     }
 
-    protected Event handleSample(AnalogData as) {
-        IntensityData is = new IntensityData();
-
-        is.setOverallIntensity(as.getMean());
-        is.setMinIntensity(as.getMinValue());
-        is.setMaxIntensity(as.getMaxValue());
-
-        return handleSample(is);
-    }
-
-    protected Event handleSample(IntensityData s) {
-        return new LightLevelObservation(s, )
+    protected Event handleSample(final GaussianData data) {
+        return new LightLevelObservation(context, sensor, data);
     }
 }

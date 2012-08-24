@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.monitron.events;
 
-import net.fortytwo.extendo.monitron.EventHandler;
+import net.fortytwo.extendo.monitron.MonitronEventHandler;
 import net.fortytwo.extendo.ontologies.Universe;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -31,11 +31,11 @@ public abstract class Event {
         }
     }
 
-    protected final EventHandler context;
+    protected final MonitronEventHandler context;
     protected final ValueFactory vf;
     protected final Dataset d;
 
-    public Event(final EventHandler context) {
+    public Event(final MonitronEventHandler context) {
         this.context = context;
         this.vf = context.getValueFactory();
         d = new Dataset(new LinkedList<Statement>());
@@ -46,7 +46,7 @@ public abstract class Event {
     }
 
     protected URI coinEventURI() {
-        return vf.createURI(Universe.NAMESPACE + "-event-" + MyOtherBrain.createRandomKey());
+        return vf.createURI(Universe.NAMESPACE + "event-" + MyOtherBrain.createRandomKey());
     }
 
     protected Literal toLiteral(final Date d) {

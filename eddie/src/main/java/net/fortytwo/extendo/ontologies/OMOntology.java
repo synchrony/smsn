@@ -17,8 +17,10 @@ public interface OMOntology {
             OBSERVED_PROPERTY = new URIImpl(NAMESPACE + "observedProperty"),
             PROCEDURE = new URIImpl(NAMESPACE + "Procedure"),
             RESULT = new URIImpl(NAMESPACE + "result"),
+            RESULT_DATA = new URIImpl(NAMESPACE + "ResultData"),
             SAMPLING_TIME = new URIImpl(NAMESPACE + "samplingTime"),
-            UOM = new URIImpl(NAMESPACE + "uom");
+            UOM = new URIImpl(NAMESPACE + "uom"),
+            VALUE = new URIImpl(NAMESPACE + "value");
 
 
 

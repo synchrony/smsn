@@ -28,9 +28,9 @@ void reportMotionDetectorResults() {
     beginOSCWrite();
  
     Serial.print(OM_SENSOR_SE10_MOTION);
-    Serial.print(" 0x"); 
+    Serial.print(" "); 
     Serial.print(firstSampleTime, HEX);
-    Serial.print(" 0x");
+    Serial.print(" ");
     Serial.print(lastSampleTime, HEX);
     Serial.print(" 1 ");
     Serial.println(motionDetected);

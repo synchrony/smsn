@@ -1,19 +1,21 @@
 package net.fortytwo.extendo.monitron.listeners.sensors;
 
-import net.fortytwo.extendo.monitron.EventHandler;
-import net.fortytwo.extendo.monitron.data.AnalogData;
+import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.data.GaussianData;
+import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.SoundLevelObservation;
+import org.openrdf.model.URI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class SoundLevelSensorListener extends AnalogSensorListener {
+public class SoundLevelSensorListener extends GaussianSensorListener {
 
-    protected SoundLevelSensorListener(final EventHandler context) {
-        super(context);
+    public SoundLevelSensorListener(final MonitronEventHandler context, final URI sensor) {
+        super(context, sensor);
     }
 
-    protected void handleSample(final AnalogData s) {
-
+    protected Event handleSample(final GaussianData data) {
+            return new SoundLevelObservation(context, sensor, data);
     }
-
 }

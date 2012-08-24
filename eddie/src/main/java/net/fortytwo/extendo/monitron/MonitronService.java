@@ -3,8 +3,19 @@ package net.fortytwo.extendo.monitron;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.utility.OSCPacketDispatcher;
-import net.fortytwo.extendo.monitron.listeners.MicrophoneListener;
-import net.fortytwo.extendo.monitron.listeners.GenericErrorListener;
+import net.fortytwo.extendo.monitron.listeners.SystemErrorListener;
+import net.fortytwo.extendo.monitron.listeners.SystemTimerListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.BarometerListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.ColorLightLevelSensorListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.HygrometerListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.LightLevelSensorListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.OpticalDustSensorListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.PassiveInfraredSensorListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.SoundLevelSensorListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.ThermometerListener;
+import net.fortytwo.extendo.monitron.listeners.sensors.VibrationLevelSensorListener;
+import net.fortytwo.extendo.ontologies.MonitronOntology;
+import net.fortytwo.extendo.ontologies.Universe;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,19 +34,6 @@ sudo cu -l /dev/cu.usbserial-A600HFHJ -s 9600 | tee /tmp/arduino.out
  */
 public class MonitronService {
 
-    public static final String
-            AUDIO_OSC_PREFIX = "/om/sensor/phone",
-            BMP085_OSC_PREFIX = "/om/sensor/BMP085",
-            DHT22_OSC_PREFIX = "/om/sensor/dht22",
-            DUST_OSC_PREFIX = "/om/sensor/dust",
-            PHOTO_OSC_PREFIX = "/om/sensor/photo",
-            TIMER_OSC_PREFIX = "/om/timer",
-            VIBRO_OSC_PREFIX = "/om/sensor/piezo";
-
-    private static final String
-            DATA_OSC_SUFFIX = "/data",
-            ERROR_OSC_SUFFIX = "/error";
-
     private final File inputFile;
     private final OSCPacketDispatcher dispatcher;
 
@@ -46,11 +44,41 @@ public class MonitronService {
 
         dispatcher = new OSCPacketDispatcher();
 
-        OSCListener errorListener = new GenericErrorListener();
+        MonitronEventHandler c = new MonitronEventHandler();
 
-        dispatcher.addListener(AUDIO_OSC_PREFIX + DATA_OSC_SUFFIX, new MicrophoneListener());
-        dispatcher.addListener(AUDIO_OSC_PREFIX + ERROR_OSC_SUFFIX, errorListener);
+        OSCListener errorListener = new SystemErrorListener(c);
 
+        dispatcher.addListener(Universe.OM_SENSOR_7BB206L0_VIBRN,
+                new VibrationLevelSensorListener(c, Universe.MURATA_7BB_20_6L0_1));
+        dispatcher.addListener(Universe.OM_SENSOR_ADJDS311CR999_BLUE,
+                new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.BLUE_LIGHT_LEVEL));
+        dispatcher.addListener(Universe.OM_SENSOR_ADJDS311CR999_GREEN,
+                new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.GREEN_LIGHT_LEVEL));
+        dispatcher.addListener(Universe.OM_SENSOR_ADJDS311CR999_RED,
+                new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.RED_LIGHT_LEVEL));
+        dispatcher.addListener(Universe.OM_SENSOR_BMP085_PRESSURE,
+                new BarometerListener(c, Universe.BOSCH_BMP085_1_BAROMETER));
+        dispatcher.addListener(Universe.OM_SENSOR_BMP085_TEMP,
+                new ThermometerListener(c, Universe.BOSCH_BMP085_1_THERMOMETER));
+        dispatcher.addListener(Universe.OM_SENSOR_GP2Y1010AU0F_DUST,
+                new OpticalDustSensorListener(c, Universe.SHARP_GP2Y101AU0F_1));
+        dispatcher.addListener(Universe.OM_SENSOR_MD9745APZF_SOUND,
+                new SoundLevelSensorListener(c, Universe.KNOWLES_MD9745APZ_F_1));
+        dispatcher.addListener(Universe.OM_SENSOR_PHOTO_LIGHT,
+                new LightLevelSensorListener(c, Universe.GENERIC_PHOTORESISTOR_1));
+        dispatcher.addListener(Universe.OM_SENSOR_RHT03_ERROR,
+                errorListener);  // TODO
+        dispatcher.addListener(Universe.OM_SENSOR_RHT03_HUMID,
+                new HygrometerListener(c, Universe.MAXDETECT_RHT03_1_HYGROMETER));
+        dispatcher.addListener(Universe.OM_SENSOR_RHT03_TEMP,
+                new ThermometerListener(c, Universe.MAXDETECT_RHT03_1_THERMOMETER));
+        dispatcher.addListener(Universe.OM_SENSOR_SE10_MOTION,
+                new PassiveInfraredSensorListener(c, Universe.HANSE_SE10_1));
+
+        dispatcher.addListener(Universe.OM_SYSTEM_ERROR,
+                errorListener);
+        dispatcher.addListener(Universe.OM_SYSTEM_TIME,
+                new SystemTimerListener(c));
     }
 
     public void run() throws IOException {
@@ -88,6 +116,16 @@ public class MonitronService {
             return new OSCMessage(address, Arrays.copyOfRange(parts, 1, parts.length));
         } else {
             return new OSCMessage(address);
+        }
+    }
+
+    public static void main(final String[] args) {
+        try {
+            MonitronService s = new MonitronService(new File("/tmp/arduino.out"));
+            s.run();
+        } catch (Throwable t) {
+            t.printStackTrace(System.err);
+            System.exit(1);
         }
     }
 }

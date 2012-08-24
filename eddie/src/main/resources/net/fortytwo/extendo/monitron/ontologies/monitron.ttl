@@ -222,6 +222,12 @@
 
 
 
+###  http://fortytwo.net/2012/08/monitron#Property
+
+<http://fortytwo.net/2012/08/monitron#Property> rdf:type owl:Class .
+
+
+
 ###  http://fortytwo.net/2012/08/monitron#RelativeHumidityObservation
 
 <http://fortytwo.net/2012/08/monitron#RelativeHumidityObservation> rdf:type owl:Class ;
@@ -268,6 +274,12 @@
 
 
 
+###  http://fortytwo.net/2012/08/monitron#UnitOfMeasurement
+
+<http://fortytwo.net/2012/08/monitron#UnitOfMeasurement> rdf:type owl:Class .
+
+
+
 ###  http://fortytwo.net/2012/08/monitron#VibrationLevelObservation
 
 <http://fortytwo.net/2012/08/monitron#VibrationLevelObservation> rdf:type owl:Class ;
@@ -289,6 +301,106 @@
 <http://fortytwo.net/2012/08/monitron#XBandDopplerMotionSensor> rdf:type owl:Class ;
                                                                 
                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+
+
+#################################################################
+#
+#    Individuals
+#
+#################################################################
+
+
+###  http://fortytwo.net/2012/08/monitron#airTemperature
+
+<http://fortytwo.net/2012/08/monitron#airTemperature> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                               owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#atmosphericPressure
+
+<http://fortytwo.net/2012/08/monitron#atmosphericPressure> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                    owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#blueLightLevel
+
+<http://fortytwo.net/2012/08/monitron#blueLightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                               owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#degreesCelsius
+
+<http://fortytwo.net/2012/08/monitron#degreesCelsius> rdf:type <http://fortytwo.net/2012/08/monitron#UnitOfMeasurement> ,
+                                                               owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#greenLightLevel
+
+<http://fortytwo.net/2012/08/monitron#greenLightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#isMovement
+
+<http://fortytwo.net/2012/08/monitron#isMovement> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                           owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#lightLevel
+
+<http://fortytwo.net/2012/08/monitron#lightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                           owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#opticalDustLevel
+
+<http://fortytwo.net/2012/08/monitron#opticalDustLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                 owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#pascals
+
+<http://fortytwo.net/2012/08/monitron#pascals> rdf:type <http://fortytwo.net/2012/08/monitron#UnitOfMeasurement> ,
+                                                        owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#redLightLevel
+
+<http://fortytwo.net/2012/08/monitron#redLightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                              owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#relativeHumidity
+
+<http://fortytwo.net/2012/08/monitron#relativeHumidity> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                 owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#soundLevel
+
+<http://fortytwo.net/2012/08/monitron#soundLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                           owl:NamedIndividual .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#vibrationLevel
+
+<http://fortytwo.net/2012/08/monitron#vibrationLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                               owl:NamedIndividual .
 
 
 

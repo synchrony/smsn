@@ -181,9 +181,9 @@ void finishAnalogObservation(AnalogSampler s, char* prefix)
 {
     beginOSCWrite();
     Serial.print(prefix);
-    Serial.print(" 0x");
+    Serial.print(" ");
     Serial.print(s.getStartTime(), HEX);
-    Serial.print(" 0x");
+    Serial.print(" ");
     Serial.print(s.getEndTime(), HEX);
     Serial.print(" ");
     Serial.print(s.getNumberOfMeasurements());

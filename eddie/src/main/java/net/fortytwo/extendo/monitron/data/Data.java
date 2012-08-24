@@ -4,25 +4,25 @@ package net.fortytwo.extendo.monitron.data;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Data {
-    private long startTime;
-    private long endTime;
+    private long sampleIntervalBeginning;
+    private long sampleIntervalEnd;
 
     private long totalMeasurements;
 
-    public long getStartTime() {
-        return startTime;
+    public long getSampleIntervalBeginning() {
+        return sampleIntervalBeginning;
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+    public void setSampleIntervalBeginning(long time) {
+        this.sampleIntervalBeginning = time;
     }
 
-    public long getEndTime() {
-        return endTime;
+    public long getSampleIntervalEnd() {
+        return sampleIntervalEnd;
     }
 
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
+    public void setSampleIntervalEnd(long time) {
+        this.sampleIntervalEnd = time;
     }
 
     public long getTotalMeasurements() {

@@ -33,4 +33,21 @@ public interface Universe {
             BOSCH_BMP085_1_THERMOMETER = new URIImpl(NAMESPACE + "bosch-bmp085_1_thermometer"),
             MAXDETECT_RHT03_1_THERMOMETER = new URIImpl(NAMESPACE + "maxdetect-rht03_1_thermometer"),
             MURATA_7BB_20_6L0_1 = new URIImpl(NAMESPACE + "murata-7bb-20-6l0_1");
+
+    public static final String
+            OM_SENSOR_7BB206L0_VIBRN = "/om/sensor/7bb206l0/vibr",
+            OM_SENSOR_ADJDS311CR999_BLUE = "/om/sensor/adjds311cr999/blue",
+            OM_SENSOR_ADJDS311CR999_GREEN = "/om/sensor/adjds311cr999/green",
+            OM_SENSOR_ADJDS311CR999_RED = "/om/sensor/adjds311cr999/red",
+            OM_SENSOR_BMP085_PRESSURE = "/om/sensor/bmp085/press",
+            OM_SENSOR_BMP085_TEMP = "/om/sensor/bmp085/temp",
+            OM_SENSOR_GP2Y1010AU0F_DUST = "/om/sensor/gp2y1010au0f/dust",
+            OM_SENSOR_MD9745APZF_SOUND = "/om/sensor/md9745apzf/sound",
+            OM_SENSOR_PHOTO_LIGHT = "/om/sensor/photo/light",
+            OM_SENSOR_RHT03_ERROR = "/om/sensor/rht03/error",
+            OM_SENSOR_RHT03_HUMID = "/om/sensor/rht03/humid",
+            OM_SENSOR_RHT03_TEMP = "/om/sensor/rht03/temp",
+            OM_SENSOR_SE10_MOTION = "/om/sensor/se10/motion",
+            OM_SYSTEM_ERROR = "/om/system/error",
+            OM_SYSTEM_TIME = "/om/system/time";
 }

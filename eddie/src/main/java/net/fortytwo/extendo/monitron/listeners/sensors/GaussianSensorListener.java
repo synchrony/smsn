@@ -2,35 +2,36 @@ package net.fortytwo.extendo.monitron.listeners.sensors;
 
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.monitron.MonitronEventHandler;
-import net.fortytwo.extendo.monitron.data.BooleanData;
+import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.events.Event;
-import net.fortytwo.extendo.monitron.events.MotionObservation;
 import org.openrdf.model.URI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class PassiveInfraredSensorListener extends SensorListener {
+public abstract class GaussianSensorListener extends SensorListener {
 
-    public PassiveInfraredSensorListener(final MonitronEventHandler context,
-                                            final URI sensor) {
+    protected GaussianSensorListener(final MonitronEventHandler context,
+                                     final URI sensor) {
         super(context, sensor);
     }
 
+    protected abstract Event handleSample(GaussianData s);
+
     protected Event handleMessage(final OSCMessage m) throws MessageParseException {
-        BooleanData s = new BooleanData();
+
+        GaussianData s = new GaussianData();
 
         int i = 0;
 
         s.setSampleIntervalBeginning(hexLongArg(m, i++));
         s.setSampleIntervalEnd(hexLongArg(m, i++));
         s.setTotalMeasurements(longArg(m, i++));
-        s.setResult(booleanArg(m, i));
+        s.setMinValue(doubleArg(m, i++));
+        s.setMaxValue(doubleArg(m, i++));
+        s.setMean(doubleArg(m, i++));
+        s.setVariance(doubleArg(m, i));
 
         return handleSample(s);
-    }
-
-    protected Event handleSample(final BooleanData data) {
-        return new MotionObservation(context, sensor, data);
     }
 }

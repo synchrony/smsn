@@ -3,7 +3,7 @@ package net.fortytwo.extendo.monitron.data;
 /**
 * @author Joshua Shinavier (http://fortytwo.net)
 */
-public class AnalogData extends Data {
+public class GaussianData extends Data {
 
     private double minValue;
     private double maxValue;
