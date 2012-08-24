@@ -177,7 +177,7 @@ void endOSCErrorMessage()
     popColor();
 }
 
-void finishAnalogObservation(AnalogSampler s, char* prefix)
+void finishAnalogObservation(AnalogSampler &s, char* prefix)
 {
     beginOSCWrite();
     Serial.print(prefix);

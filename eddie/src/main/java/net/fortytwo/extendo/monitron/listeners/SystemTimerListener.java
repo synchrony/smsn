@@ -4,6 +4,8 @@ import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.monitron.MonitronEventHandler;
 import net.fortytwo.extendo.monitron.events.Event;
 
+import java.util.Date;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -19,6 +21,8 @@ public class SystemTimerListener extends MonitronListener {
         long now = System.currentTimeMillis();
 
         context.setTimerStart(now - time);
+
+        //System.out.println("time: " + new Date(time) + ", set to " + new Date(now - time));
 
         return null;  // TODO
     }

@@ -22,8 +22,8 @@ public class PassiveInfraredSensorListener extends SensorListener {
 
         int i = 0;
 
-        s.setSampleIntervalBeginning(hexLongArg(m, i++));
-        s.setSampleIntervalEnd(hexLongArg(m, i++));
+        s.setSampleIntervalBeginning(timeArg(m, i++));
+        s.setSampleIntervalEnd(timeArg(m, i++));
         s.setTotalMeasurements(longArg(m, i++));
         s.setResult(booleanArg(m, i));
 

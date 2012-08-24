@@ -38,8 +38,8 @@ public class MonitronEventHandler {
         System.err.println("exception thrown: " + e);
     }
 
-    public void setTimerStart(final long offset) {
-        timerStart = offset;
+    public void setTimerStart(final long time) {
+        timerStart = time;
     }
 
     public long getTimerStart() {

@@ -16,6 +16,7 @@ import net.fortytwo.extendo.monitron.listeners.sensors.ThermometerListener;
 import net.fortytwo.extendo.monitron.listeners.sensors.VibrationLevelSensorListener;
 import net.fortytwo.extendo.ontologies.MonitronOntology;
 import net.fortytwo.extendo.ontologies.Universe;
+import org.apache.commons.cli.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,13 +35,13 @@ sudo cu -l /dev/cu.usbserial-A600HFHJ -s 9600 | tee /tmp/arduino.out
  */
 public class MonitronService {
 
-    private final File inputFile;
+    private final InputStream input;
     private final OSCPacketDispatcher dispatcher;
 
     private boolean stopped = false;
 
-    public MonitronService(final File inputFile) {
-        this.inputFile = inputFile;
+    public MonitronService(final InputStream input) {
+        this.input = input;
 
         dispatcher = new OSCPacketDispatcher();
 
@@ -84,8 +85,7 @@ public class MonitronService {
     public void run() throws IOException {
         stopped = false;
 
-        InputStream is = new FileInputStream(inputFile);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        BufferedReader br = new BufferedReader(new InputStreamReader(input));
         try {
             String line;
             while (!stopped && null != (line = br.readLine())) {
@@ -96,7 +96,7 @@ public class MonitronService {
                 }
             }
         } finally {
-            is.close();
+            input.close();
         }
     }
 
@@ -119,9 +119,19 @@ public class MonitronService {
         }
     }
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws ParseException {
+        Options options = new Options();
+
+        Option fileOpt = new Option("f", "file", true, "a file from which to load sensor data");
+        fileOpt.setRequired(false);
+        options.addOption(fileOpt);
+
+        CommandLine cmd = new PosixParser().parse(options, args);
+        String fileName = cmd.getOptionValue("file");
+
         try {
-            MonitronService s = new MonitronService(new File("/tmp/arduino.out"));
+            InputStream input = null == fileName ? System.in : new FileInputStream(new File(fileName));
+            MonitronService s = new MonitronService(input);
             s.run();
         } catch (Throwable t) {
             t.printStackTrace(System.err);

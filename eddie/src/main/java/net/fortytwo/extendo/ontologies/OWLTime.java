@@ -15,6 +15,7 @@ public interface OWLTime {
             HAS_BEGINNING = new URIImpl(NAMESPACE + "hasBeginning"),
             HAS_END = new URIImpl(NAMESPACE + "hasEnd"),
             INSIDE = new URIImpl(NAMESPACE + "inside"),
+            INSTANT = new URIImpl(NAMESPACE + "Instant"),
             INTERVAL = new URIImpl(NAMESPACE + "Interval"),
             IN_XSD_DATE_TIME = new URIImpl(NAMESPACE + "inXSDDateTime");
 }

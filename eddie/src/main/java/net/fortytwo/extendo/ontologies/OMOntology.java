@@ -8,7 +8,7 @@ import org.openrdf.model.impl.URIImpl;
  */
 public interface OMOntology {
     // TODO: this namespace is a placeholder
-    public static final String NAMESPACE = "http://www.opengis.net/spec/OMXML/2.0/conf/";
+    public static final String NAMESPACE = "http://schemas.opengis.net/om/2.0/";
 
     public static final URI
             FEATURE_OF_INTEREST = new URIImpl(NAMESPACE + "featureOfInterest"),

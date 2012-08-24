@@ -42,7 +42,9 @@ public abstract class Observation extends Event {
         addStatement(d, samplingTime, RDF.TYPE, OWLTime.INTERVAL);
         addStatement(d, event, OMOntology.SAMPLING_TIME, samplingTime);
         beginning = vf.createBNode();
+        addStatement(d, beginning, RDF.TYPE, OWLTime.INSTANT);
         end = vf.createBNode();
+        addStatement(d, end, RDF.TYPE, OWLTime.INSTANT);
         addStatement(d, beginning, OWLTime.IN_XSD_DATE_TIME, toLiteral(new Date(data.getSampleIntervalBeginning())));
         addStatement(d, end, OWLTime.IN_XSD_DATE_TIME, toLiteral(new Date(data.getSampleIntervalEnd())));
         addStatement(d, samplingTime, OWLTime.HAS_BEGINNING, beginning);
