@@ -1,9 +1,9 @@
 package net.fortytwo.extendo.monitron.events;
 
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
-import net.fortytwo.extendo.ontologies.MonitronOntology;
-import net.fortytwo.extendo.ontologies.OMOntology;
+import net.fortytwo.extendo.monitron.ontologies.MonitronOntology;
+import net.fortytwo.extendo.monitron.ontologies.OMOntology;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
@@ -12,7 +12,7 @@ import org.openrdf.model.vocabulary.RDF;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class LightLevelObservation extends Observation {
-    public LightLevelObservation(final MonitronEventHandler context,
+    public LightLevelObservation(final Context context,
                                  final URI sensor,
                                  final GaussianData data) {
         super(context, sensor, data);

@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.monitron.events;
 
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
-import net.fortytwo.extendo.ontologies.Universe;
+import net.fortytwo.extendo.monitron.Context;
+import net.fortytwo.extendo.monitron.ontologies.Universe;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.rdfagents.model.Dataset;
 import org.openrdf.model.Literal;
@@ -31,11 +31,11 @@ public abstract class Event {
         }
     }
 
-    protected final MonitronEventHandler context;
+    protected final Context context;
     protected final ValueFactory vf;
     protected final Dataset d;
 
-    public Event(final MonitronEventHandler context) {
+    public Event(final Context context) {
         this.context = context;
         this.vf = context.getValueFactory();
         d = new Dataset(new LinkedList<Statement>());

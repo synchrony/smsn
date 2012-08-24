@@ -174,10 +174,11 @@ void beginOSCErrorMessage()
 void endOSCErrorMessage()
 {
     //noTone(SPEAKER_PIN);
+    delay(50);
     popColor();
 }
 
-void finishAnalogObservation(AnalogSampler &s, char* prefix)
+void finishAnalogObservation(AnalogSampler s, char* prefix)
 {
     beginOSCWrite();
     Serial.print(prefix);

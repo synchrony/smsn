@@ -1,17 +1,15 @@
 package net.fortytwo.extendo.monitron.listeners;
 
 import com.illposed.osc.OSCMessage;
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.events.Event;
-
-import java.util.Date;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SystemTimerListener extends MonitronListener {
 
-    public SystemTimerListener(final MonitronEventHandler context) {
+    public SystemTimerListener(final Context context) {
         super(context);
     }
 

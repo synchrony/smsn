@@ -11,27 +11,23 @@ import org.openrdf.rio.RDFWriter;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class MonitronEventHandler {
+public class Context {
 
     private final ValueFactory valueFactory = new ValueFactoryImpl();
+    private final EventHandler eventHandler;
+
     private long timerStart;
+
+    public Context(EventHandler eventHandler) {
+        this.eventHandler = eventHandler;
+    }
 
     public ValueFactory getValueFactory() {
         return valueFactory;
     }
 
-    public void handleEvent(final Event e) throws EventHandlingException {
-        System.out.println("\nreceived dataset:\t\n\n");
-        RDFWriter w = new NQuadsWriter(System.out);
-        try {
-            w.startRDF();
-            for (Statement s : e.getDataset().getStatements()) {
-                w.handleStatement(s);
-            }
-            w.endRDF();
-        } catch (RDFHandlerException e1) {
-            throw new EventHandlingException(e1);
-        }
+    public void handleEvent(final Event e) throws EventHandler.EventHandlingException {
+        eventHandler.handleEvent(e);
     }
 
     public void handleException(final Exception e) {
@@ -46,9 +42,4 @@ public class MonitronEventHandler {
         return timerStart;
     }
 
-    public static class EventHandlingException extends Exception {
-        public EventHandlingException(final Throwable cause) {
-            super(cause);
-        }
-    }
 }

@@ -14,13 +14,10 @@ import net.fortytwo.extendo.monitron.listeners.sensors.PassiveInfraredSensorList
 import net.fortytwo.extendo.monitron.listeners.sensors.SoundLevelSensorListener;
 import net.fortytwo.extendo.monitron.listeners.sensors.ThermometerListener;
 import net.fortytwo.extendo.monitron.listeners.sensors.VibrationLevelSensorListener;
-import net.fortytwo.extendo.ontologies.MonitronOntology;
-import net.fortytwo.extendo.ontologies.Universe;
-import org.apache.commons.cli.*;
+import net.fortytwo.extendo.monitron.ontologies.MonitronOntology;
+import net.fortytwo.extendo.monitron.ontologies.Universe;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,12 +37,13 @@ public class MonitronService {
 
     private boolean stopped = false;
 
-    public MonitronService(final InputStream input) {
+    public MonitronService(final InputStream input,
+                           final EventHandler handler) {
         this.input = input;
 
         dispatcher = new OSCPacketDispatcher();
 
-        MonitronEventHandler c = new MonitronEventHandler();
+        Context c = new Context(handler);
 
         OSCListener errorListener = new SystemErrorListener(c);
 
@@ -116,26 +114,6 @@ public class MonitronService {
             return new OSCMessage(address, Arrays.copyOfRange(parts, 1, parts.length));
         } else {
             return new OSCMessage(address);
-        }
-    }
-
-    public static void main(final String[] args) throws ParseException {
-        Options options = new Options();
-
-        Option fileOpt = new Option("f", "file", true, "a file from which to load sensor data");
-        fileOpt.setRequired(false);
-        options.addOption(fileOpt);
-
-        CommandLine cmd = new PosixParser().parse(options, args);
-        String fileName = cmd.getOptionValue("file");
-
-        try {
-            InputStream input = null == fileName ? System.in : new FileInputStream(new File(fileName));
-            MonitronService s = new MonitronService(input);
-            s.run();
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-            System.exit(1);
         }
     }
 }

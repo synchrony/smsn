@@ -27,7 +27,6 @@ void error(char *message)
     Serial.print(OM_SYSTEM_ERROR);
     Serial.print(" ");
     Serial.println(message);
-    delay(50);
     
     errorReportIndex++;
     if (errorReportIndex == cyclesBetweenErrorReports)

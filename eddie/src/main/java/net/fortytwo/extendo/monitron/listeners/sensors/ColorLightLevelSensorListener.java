@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.monitron.listeners.sensors;
 
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.events.ColorLightLevelObservation;
 import net.fortytwo.extendo.monitron.events.Event;
@@ -13,7 +13,7 @@ public class ColorLightLevelSensorListener extends GaussianSensorListener {
 
     protected final URI colorProperty;
 
-    public ColorLightLevelSensorListener(final MonitronEventHandler context,
+    public ColorLightLevelSensorListener(final Context context,
                                          final URI sensor,
                                          final URI colorProperty) {
         super(context, sensor);

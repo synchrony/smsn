@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.monitron.listeners;
 
 import com.illposed.osc.OSCMessage;
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.events.Event;
 
 /**
@@ -9,7 +9,7 @@ import net.fortytwo.extendo.monitron.events.Event;
 */
 public class SystemErrorListener extends MonitronListener {
 
-    public SystemErrorListener(final MonitronEventHandler context) {
+    public SystemErrorListener(final Context context) {
         super(context);
     }
 

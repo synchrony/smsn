@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.ontologies;
+package net.fortytwo.extendo.monitron.ontologies;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;

@@ -1,9 +1,9 @@
 package net.fortytwo.extendo.monitron.events;
 
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.BooleanData;
-import net.fortytwo.extendo.ontologies.MonitronOntology;
-import net.fortytwo.extendo.ontologies.OMOntology;
+import net.fortytwo.extendo.monitron.ontologies.MonitronOntology;
+import net.fortytwo.extendo.monitron.ontologies.OMOntology;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
@@ -13,7 +13,7 @@ import org.openrdf.model.vocabulary.RDF;
  */
 public class MotionObservation extends Observation {
 
-    public MotionObservation(final MonitronEventHandler context,
+    public MotionObservation(final Context context,
                              final URI sensor,
                              final BooleanData data) {
         super(context, sensor, data);

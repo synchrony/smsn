@@ -2,7 +2,8 @@ package net.fortytwo.extendo.monitron.listeners;
 
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
+import net.fortytwo.extendo.monitron.EventHandler;
 import net.fortytwo.extendo.monitron.events.Event;
 
 import java.util.Date;
@@ -11,9 +12,9 @@ import java.util.Date;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class MonitronListener implements OSCListener {
-    protected final MonitronEventHandler context;
+    protected final Context context;
 
-    protected MonitronListener(MonitronEventHandler context) {
+    protected MonitronListener(Context context) {
         this.context = context;
     }
 
@@ -28,7 +29,7 @@ public abstract class MonitronListener implements OSCListener {
             }
         } catch (MessageParseException e) {
             handleParseError(e);
-        } catch (MonitronEventHandler.EventHandlingException e) {
+        } catch (EventHandler.EventHandlingException e) {
             handleEventHandlingError(e);
         }
     }
@@ -111,7 +112,7 @@ public abstract class MonitronListener implements OSCListener {
         context.handleException(e);
     }
 
-    protected void handleEventHandlingError(final MonitronEventHandler.EventHandlingException e) {
+    protected void handleEventHandlingError(final EventHandler.EventHandlingException e) {
         context.handleException(e);
     }
 

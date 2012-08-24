@@ -29,13 +29,12 @@
     </repositories>
 
     <properties>
-        <junit.version>4.5</junit.version>
         <sesame.version>2.6.9</sesame.version>
         <sesametools.version>1.7-SNAPSHOT</sesametools.version>
+        <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>
         <myotherbrain.version>1.0-SNAPSHOT</myotherbrain.version>
-        <rdfagents.version>0.2</rdfagents.version>
-        <ripple.version>0.8-SNAPSHOT</ripple.version>
-        <blueprints.version>2.1.0</blueprints.version>
+        <rdfagents.version>0.3-SNAPSHOT</rdfagents.version>
+        <junit.version>4.5</junit.version>
     </properties>
 
     <dependencies>
@@ -48,6 +47,11 @@
             <groupId>net.fortytwo.rdfagents</groupId>
             <artifactId>rdfagents-jade</artifactId>
             <version>${rdfagents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.laboratory</groupId>
+            <artifactId>sesamestream</artifactId>
+            <version>${sesamestream.version}</version>
         </dependency>
         <dependency>
             <groupId>com.illposed.osc</groupId>

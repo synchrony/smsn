@@ -1,10 +1,10 @@
 package net.fortytwo.extendo.monitron.events;
 
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.Data;
-import net.fortytwo.extendo.ontologies.OMOntology;
-import net.fortytwo.extendo.ontologies.OWLTime;
-import net.fortytwo.extendo.ontologies.Universe;
+import net.fortytwo.extendo.monitron.ontologies.OMOntology;
+import net.fortytwo.extendo.monitron.ontologies.OWLTime;
+import net.fortytwo.extendo.monitron.ontologies.Universe;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
@@ -22,7 +22,7 @@ public abstract class Observation extends Event {
     protected final URI sensor;
     protected final Resource result;
 
-    public Observation(final MonitronEventHandler context,
+    public Observation(final Context context,
                        final URI sensor,
                        final Data data) {
         super(context);

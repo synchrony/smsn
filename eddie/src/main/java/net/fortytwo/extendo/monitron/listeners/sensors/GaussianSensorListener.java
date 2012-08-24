@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.monitron.listeners.sensors;
 
 import com.illposed.osc.OSCMessage;
-import net.fortytwo.extendo.monitron.MonitronEventHandler;
+import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.events.Event;
 import org.openrdf.model.URI;
@@ -11,7 +11,7 @@ import org.openrdf.model.URI;
  */
 public abstract class GaussianSensorListener extends SensorListener {
 
-    protected GaussianSensorListener(final MonitronEventHandler context,
+    protected GaussianSensorListener(final Context context,
                                      final URI sensor) {
         super(context, sensor);
     }

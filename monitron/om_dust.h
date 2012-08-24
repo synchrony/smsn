@@ -1,4 +1,4 @@
- // This dust sensor code was adapted from Paul Deng's tutorial:
+// This dust sensor code was adapted from Paul Deng's tutorial:
 //    http://sensorapp.net/?p=479
 
 const int dustSensorDelay1 = 280;
