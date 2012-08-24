@@ -34,7 +34,7 @@ void AnalogSampler::addMeasurement(double v)
         _minValue = v;
     }
     
-    else if (v > _maxValue)
+    if (v > _maxValue)
     {
         _maxValue = v;
     }

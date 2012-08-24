@@ -14,14 +14,17 @@
     geo:latitude "42.741081"^^xsd:double ;
     geo:longitude "-73.66917"^^xsd:double ;
     geo:alt "79"^^xsd:double ;
+    rdfs:label "100 Nyroy" ;
     rdfs:comment "our Nyroy Dr. apartment building" .
 
-:apartment_1 a m:Apartment ;
+:apartment_12 a m:Apartment ;
     m:containedIn :building_1 ;
+    rdfs:lable "apartment #12" ;
     rdfs:comment "our Nyroy Dr. apartment" .
 
 :room_1 a m:Room ;
-    m:containedIn :apartment_1 ;
+    m:containedIn :apartment_12 ;
+    rdfs:label "living room" ;
     rdfs:comment "the living room of our Nyroy Dr. apartment" .
 
 
@@ -52,7 +55,7 @@
     rdfs:comment "an Avago Technologies ADJD-S311-CR999 miniature surface mount RGB digital color sensor which has been calibrated to output red, green, and blue color values from 0 to 1" .
 
 :maxdetect-rht03_1_hygrometer a m:Hygrometer ;
-    rdfs:label "humidity and temperature sensor of Monitron #1" ;
+    rdfs:label "hygrometer of Monitron #1" ;
     rdfs:comment "a Maxdêtect RHT03 digital relative humidity and temperature sensor which has been calibrated to output relative humidity values from 0 to 1" .
 
 :generic-photoresistor_1 a m:LightLevelSensor ;
