@@ -40,21 +40,12 @@ public interface Atom extends VertexFrame {
     @Property(MyOtherBrain.WEIGHT)
     void setWeight(Float weight);
 
-    @Adjacency(label = MyOtherBrain.NOTE)
-    Iterable<Atom> getOutNotes();
+    @Adjacency(label = MyOtherBrain.NOTES)
+    AtomList getNotes();
 
-    @Adjacency(label = MyOtherBrain.NOTE)
-    void addOutNote(Atom other);
+    @Adjacency(label = MyOtherBrain.NOTES)
+    void setNotes(AtomList notes);
 
-    @Adjacency(label = MyOtherBrain.NOTE)
-    void removeOutNote(Atom other);
-
-    @Adjacency(label = MyOtherBrain.NOTE, direction = Direction.IN)
-    Iterable<Atom> getInNotes();
-
-    @Adjacency(label = MyOtherBrain.NOTE, direction = Direction.IN)
-    void addInNote(Atom other);
-
-    @Adjacency(label = MyOtherBrain.NOTE, direction = Direction.IN)
-    void removeInNote(Atom other);
+    @Adjacency(label = MyOtherBrain.FIRST, direction = Direction.IN)
+    AtomList getFirstOf();
 }

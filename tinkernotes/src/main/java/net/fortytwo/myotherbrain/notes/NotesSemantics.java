@@ -7,6 +7,7 @@ import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
 import net.fortytwo.flow.Collector;
 import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.AtomList;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.ripple.Ripple;
 import net.fortytwo.ripple.RippleException;
@@ -432,10 +433,14 @@ public class NotesSemantics {
         }
     }
 
+    private static void destroyList(final AtomList list) {
+
+    }
+
     private static void addOutNote(final Atom root,
                                    final Atom other,
                                    final ActivityLog log) {
-        root.addOutNote(other);
+        //TODO root.addOutNote(other);
 
         if (null != log) {
             log.logLink(root, other);
@@ -445,7 +450,7 @@ public class NotesSemantics {
     private static void removeOutNote(final Atom root,
                                       final Atom other,
                                       final ActivityLog log) {
-        root.removeOutNote(other);
+        //TODO root.removeOutNote(other);
 
         if (null != log) {
             log.logUnlink(root, other);
@@ -470,7 +475,7 @@ public class NotesSemantics {
         }
 
         public Iterable<Atom> getLinked(Atom root, Atom parent) {
-            return root.getOutNotes();
+            return null;//TODO root.getOutNotes();
         }
 
         public void link(Atom source, Atom target, ActivityLog log) {
@@ -488,7 +493,7 @@ public class NotesSemantics {
         }
 
         public Iterable<Atom> getLinked(Atom root, Atom parent) {
-            return root.getInNotes();
+            return null; //TODO root.getInNotes();
         }
 
         public void link(Atom source, Atom target, ActivityLog log) {
@@ -507,6 +512,7 @@ public class NotesSemantics {
 
         public Iterable<Atom> getLinked(Atom root, Atom parent) {
             Collection<Atom> l = new LinkedList<Atom>();
+            /*TODO
             for (Atom a : root.getInNotes()) {
                 if (null == parent || !parent.equals(a)) {
                     l.add(a);
@@ -516,16 +522,17 @@ public class NotesSemantics {
                 if (null == parent || !parent.equals(a)) {
                     l.add(a);
                 }
-            }
+            }     */
             return l;
         }
 
         public void link(Atom source, Atom target, ActivityLog log) {
             // Do an extra check here in case a link is being added merely because it was
             // ommitted from the view (due to symmetry).
+            /* TODO
             if (!contains(source.getOutNotes(), target)) {
                 addOutNote(source, target, log);
-            }
+            } */
         }
 
         private boolean contains(Iterable<Atom> i,

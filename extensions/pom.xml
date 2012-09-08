@@ -20,7 +20,6 @@
     <modules>
 	<module>dbpedia-spotlight</module>
         <module>events</module>
-	<module>music</module>
         <module>opencalais</module>
         <module>qrcodes</module>
         <module>rfid</module>

@@ -94,6 +94,7 @@ public class ExportExtension extends TinkerNotesExtension {
             String date = d.getValue();
 
             if (DATE_PATTERN.matcher(date).matches()) {
+                /* TODO
                 for (Atom a : d.getInNotes()) {
                     p.print(date);
                     p.print('\t');
@@ -113,7 +114,7 @@ public class ExportExtension extends TinkerNotesExtension {
                     }
 
                     p.print('\n');
-                }
+                } */
             }
         }
     }
