@@ -86,13 +86,11 @@
 
 (setq tn-forward-view-style "directed-forward")
 (setq tn-backward-view-style "directed-backward")
-(setq tn-undirected-view-style "undirected")
 
 ;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
 (setq tn-depth 3)
 (setq tn-root nil)
 (setq tn-title nil)
-(setq tn-style tn-undirected-view-style)
 ;; "private" atoms are hidden to begin with
 (setq tn-min-sharability 0.25)
 (setq tn-max-sharability 1)
@@ -636,11 +634,6 @@
     (interactive)
     (if (in-view)
         (request-view nil tn-mode tn-root (+ tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
-
-(defun tn-refresh-to-undirected-view ()
-    (interactive)
-    (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth "undirected" tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-refresh-to-forward-view ()
     (interactive)
@@ -1209,7 +1202,6 @@
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
 (global-set-key (kbd "C-c C-v r")       'tn-enter-readonly-view)
-(global-set-key (kbd "C-c C-v u")       'tn-refresh-to-undirected-view)
 (global-set-key (kbd "C-c C-w ,")       'tn-decrease-default-weight)
 (global-set-key (kbd "C-c C-w .")       'tn-increase-default-weight)
 (global-set-key (kbd "C-c C-w 1")       'tn-set-default-weight-1)

@@ -21,7 +21,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.sail.Sail;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -494,8 +493,6 @@ public class NotesSemantics {
             return FORWARD_DIRECTED_ADJACENCY;
         } else if (name.equals(BACKWARD_DIRECTED_ADJACENCY.getName())) {
             return BACKWARD_DIRECTED_ADJACENCY;
-        } else if (name.equals(UNDIRECTED_ADJACENCY.getName())) {
-            return UNDIRECTED_ADJACENCY;
         } else {
             throw new IllegalArgumentException("unknown view style: " + name);
         }
@@ -529,28 +526,6 @@ public class NotesSemantics {
 
         public Iterable<Atom> getLinked(Atom root, Atom parent) {
             return null; //TODO root.getInNotes();
-        }
-    };
-
-    public static final AdjacencyStyle UNDIRECTED_ADJACENCY = new AdjacencyStyle() {
-        public String getName() {
-            return "undirected";
-        }
-
-        public Iterable<Atom> getLinked(Atom root, Atom parent) {
-            Collection<Atom> l = new LinkedList<Atom>();
-            /*TODO
-            for (Atom a : root.getInNotes()) {
-                if (null == parent || !parent.equals(a)) {
-                    l.add(a);
-                }
-            }
-            for (Atom a : root.getOutNotes()) {
-                if (null == parent || !parent.equals(a)) {
-                    l.add(a);
-                }
-            }     */
-            return l;
         }
     };
 }
