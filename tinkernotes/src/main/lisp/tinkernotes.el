@@ -84,13 +84,14 @@
 (setq tn-search-mode "search")
 (setq tn-history-mode "history")
 
-(setq tn-forward-view-style "directed-forward")
-(setq tn-backward-view-style "directed-backward")
+(setq tn-forward-view-style "forward")
+(setq tn-backward-view-style "backward")
 
 ;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
 (setq tn-depth 3)
 (setq tn-root nil)
 (setq tn-title nil)
+(setq tn-style tn-forward-view-style)
 ;; "private" atoms are hidden to begin with
 (setq tn-min-sharability 0.25)
 (setq tn-max-sharability 1)

@@ -47,5 +47,5 @@ public interface Atom extends VertexFrame {
     void setNotes(AtomList notes);
 
     @Adjacency(label = MyOtherBrain.FIRST, direction = Direction.IN)
-    AtomList getFirstOf();
+    Iterable<AtomList> getFirstOf();
 }

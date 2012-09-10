@@ -50,7 +50,7 @@ public class NotesSemanticsTest {
     @Test
     public void testEncoding() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_DIRECTED_ADJACENCY;
+        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
         ActivityLog log = null;
 
         Atom root = createAtom("11111");
@@ -87,7 +87,7 @@ public class NotesSemanticsTest {
     @Test
     public void testUpdates() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_DIRECTED_ADJACENCY;
+        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
         ActivityLog log = null;
         Atom root = createAtom("wXu5g4v");
         String s;

@@ -91,7 +91,7 @@ public class NotesSemantics {
         Note n = toNote(root);
 
         if (height > 0) {
-            for (Atom target : style.getLinked(root, parent)) {
+            for (Atom target : style.getLinked(root, parent, filter)) {
                 int h = filter.isVisible(target) ? height - 1 : 0;
                 Note cn = viewInternal(target, root, h, filter, style);
                 n.addChild(cn);
@@ -111,7 +111,7 @@ public class NotesSemantics {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(viewInternal(a, null, 0, filter, FORWARD_DIRECTED_ADJACENCY));
+            n.addChild(viewInternal(a, null, 0, filter, FORWARD_ADJACENCY));
         }
 
         return n;
@@ -138,6 +138,10 @@ public class NotesSemantics {
                        final ActivityLog log) throws InvalidUpdateException {
         if (null == root) {
             throw new IllegalStateException("null view root");
+        }
+
+        if (style != FORWARD_ADJACENCY) {
+            throw new IllegalStateException("can't update in style " + style);
         }
 
         updateInternal(root, null, rootNote, depth, filter, style, log);
@@ -254,8 +258,8 @@ public class NotesSemantics {
         ListDiff.applyDiff(before, after, lcs, noteComparator, ed);
 
         for (Note n : rootNote.getChildren()) {
-            System.out.println("recursing to note: " + n);
-            System.out.flush();
+            //System.out.println("recursing to note: " + n);
+            //System.out.flush();
             int d = added.contains(n.getId()) ? 0 : depth - 1;
 
             updateInternal(store.getAtom(n.getId()), root, n, d, filter, style, log);
@@ -278,7 +282,7 @@ public class NotesSemantics {
             }
         }
 
-        System.out.println(a.asVertex().getId());
+        //System.out.println(a.asVertex().getId());
         return a;
     }
 
@@ -485,14 +489,14 @@ public class NotesSemantics {
     public interface AdjacencyStyle {
         String getName();
 
-        Iterable<Atom> getLinked(Atom root, Atom parent);
+        Iterable<Atom> getLinked(Atom root, Atom parent, Filter filter);
     }
 
     public static AdjacencyStyle lookupStyle(final String name) {
-        if (name.equals(FORWARD_DIRECTED_ADJACENCY.getName())) {
-            return FORWARD_DIRECTED_ADJACENCY;
-        } else if (name.equals(BACKWARD_DIRECTED_ADJACENCY.getName())) {
-            return BACKWARD_DIRECTED_ADJACENCY;
+        if (name.equals(FORWARD_ADJACENCY.getName())) {
+            return FORWARD_ADJACENCY;
+        } else if (name.equals(BACKWARD_ADJACENCY.getName())) {
+            return BACKWARD_ADJACENCY;
         } else {
             throw new IllegalArgumentException("unknown view style: " + name);
         }
@@ -509,23 +513,42 @@ public class NotesSemantics {
         return ll;
     }
 
-    public static final AdjacencyStyle FORWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
+    public static final AdjacencyStyle FORWARD_ADJACENCY = new AdjacencyStyle() {
         public String getName() {
-            return "directed-forward";
+            return "forward";
         }
 
-        public Iterable<Atom> getLinked(Atom root, Atom parent) {
+        public Iterable<Atom> getLinked(final Atom root,
+                                        final Atom parent,
+                                        final Filter filter) {
             return toIterable(root.getNotes());
         }
     };
 
-    public static final AdjacencyStyle BACKWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
+    public static final AdjacencyStyle BACKWARD_ADJACENCY = new AdjacencyStyle() {
         public String getName() {
-            return "directed-backward";
+            return "backward";
         }
 
-        public Iterable<Atom> getLinked(Atom root, Atom parent) {
-            return null; //TODO root.getInNotes();
+        public Iterable<Atom> getLinked(final Atom root,
+                                        final Atom parent,
+                                        final Filter filter) {
+            List<Atom> results = new LinkedList<Atom>();
+            for (AtomList l : root.getFirstOf()) {
+                AtomList cur = l;
+                AtomList prev = null;
+                while (null != cur) {
+                    prev = cur;
+                    cur = cur.getRestOf();
+                }
+
+                Atom a = prev.getNotesOf();
+                if (filter.isVisible(a)) {
+                    results.add(a);
+                }
+            }
+
+            return results;
         }
     };
 }
