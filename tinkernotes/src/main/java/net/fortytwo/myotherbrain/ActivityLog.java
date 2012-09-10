@@ -2,12 +2,13 @@ package net.fortytwo.myotherbrain;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ActivityLog {
-    private final FileWriter out;
+    private final OutputStreamWriter out;
 
     public ActivityLog(FileWriter out) {
         this.out = out;

@@ -1,24 +1,17 @@
 package net.fortytwo.myotherbrain.notes;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class NotesSyntax {
+public class NoteParser {
     // Regex of valid id prefixes, including parentheses, colon and trailing space
     public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:");
 
@@ -27,48 +20,16 @@ public class NotesSyntax {
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
 
-    public void writeNotes(final List<Note> notes,
-                           final OutputStream out) {
-        PrintStream p;
+    public Note parse(final String s) throws IOException, NoteParsingException {
+        InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            p = new PrintStream(out, false, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
-
-        for (Note n : notes) {
-            printNote(n, 0, p);
+            return parse(in);
+        } finally {
+            in.close();
         }
     }
 
-    public JSONObject toJSON(final Note n) throws JSONException {
-        JSONObject json = new JSONObject();
-
-        JSONObject target = new JSONObject();
-        json.put("target", target);
-        target.put("key", n.getId());
-        target.put("weight", n.getWeight());
-        target.put("sharability", n.getSharability());
-        target.put("value", n.getValue());
-        target.put("created", n.getCreated());
-        if (null != n.getAlias()) {
-            target.put("alias", n.getAlias());
-        }
-
-        if (0 < n.getChildren().size()) {
-            JSONArray c = new JSONArray();
-            json.put("children", c);
-            int i = 0;
-            for (Note child : n.getChildren()) {
-                c.put(i, toJSON(child));
-                i++;
-            }
-        }
-
-        return json;
-    }
-
-    public Note readNotes(final InputStream in) throws IOException, NoteParsingException {
+    public Note parse(final InputStream in) throws IOException, NoteParsingException {
         Note root = new Note();
 
         LinkedList<Note> hierarchy = new LinkedList<Note>();
@@ -102,11 +63,11 @@ public class NotesSyntax {
             }
 
             // Extract keys
-            String targetKey = null;
+            String id = null;
             int k = l.indexOf(" ");
             if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k)).matches()) {
                 int i = l.indexOf(":");
-                targetKey = l.substring(0, i);
+                id = l.substring(0, i);
 
                 l = l.substring(k);
                 indent += k;
@@ -253,7 +214,7 @@ public class NotesSyntax {
                 Note n = new Note();
                 n.setValue(value);
 
-                n.setId(targetKey);
+                n.setId(id);
 
                 if (0 < hierarchy.size()) {
                     hierarchy.get(hierarchy.size() - 1).addChild(n);
@@ -269,60 +230,10 @@ public class NotesSyntax {
         return root;
     }
 
-    public class NoteParsingException extends Exception {
+    public static class NoteParsingException extends Exception {
         public NoteParsingException(final int lineNumber,
                                     final String message) {
             super("line " + lineNumber + ": " + message);
         }
-    }
-
-    private static boolean isValidValue(final String value) {
-        for (char c : value.toCharArray()) {
-            if (Character.isISOControl(c)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static String sanitizeValue(final String value) {
-        return null == value || 0 == value.length() || !isValidValue(value)
-                ? "???"
-                : value;
-    }
-
-    private static void printNote(final Note n,
-                                  final int indent,
-                                  final PrintStream p) {
-
-        if (null != n.getId()) {
-            if (null != n.getId()) {
-                p.print(padKey(n.getId()));
-            }
-            p.print(": ");
-        }
-
-        for (int i = 0; i < indent; i++) {
-            p.print("    ");
-        }
-
-        p.print("* ");
-
-        p.print(sanitizeValue(n.getValue()));
-
-        p.print("\n");
-
-        for (Note child : n.getChildren()) {
-            printNote(child, indent + 1, p);
-        }
-    }
-
-    private static String padKey(String id) {
-        while (id.length() < 5) {
-            id = "0" + id;
-        }
-
-        return id;
     }
 }

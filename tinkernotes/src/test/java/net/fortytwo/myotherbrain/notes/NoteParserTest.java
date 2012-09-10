@@ -15,12 +15,12 @@ import static junit.framework.Assert.assertNull;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class NotesSyntaxTest {
-    private NotesSyntax syntax;
+public class NoteParserTest {
+    private NoteParser syntax;
 
     @Before
     public void setUp() throws Exception {
-        syntax = new NotesSyntax();
+        syntax = new NoteParser();
     }
 
     @After
@@ -29,7 +29,7 @@ public class NotesSyntaxTest {
 
     @Test
     public void testExample1() throws Exception {
-        List<Note> notes = syntax.readNotes(NotesSyntax.class.getResourceAsStream("tinkernotes-example-1.txt")).getChildren();
+        List<Note> notes = syntax.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
         Note indentation = notes.get(1);
@@ -61,7 +61,7 @@ public class NotesSyntaxTest {
 
     @Test
     public void testExample2() throws Exception {
-        Note root = syntax.readNotes(NotesSyntax.class.getResourceAsStream("tinkernotes-example-2.txt"));
+        Note root = syntax.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-2.txt"));
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());
@@ -71,20 +71,20 @@ public class NotesSyntaxTest {
         assertEquals(1, root.getChildren().get(0).getChildren().size());
     }
 
-    @Test(expected = NotesSyntax.NoteParsingException.class)
+    @Test(expected = NoteParser.NoteParsingException.class)
     public void testEmptyNotesNotAllowed() throws Exception {
         readNotes("* ");
     }
 
-    @Test(expected = NotesSyntax.NoteParsingException.class)
+    @Test(expected = NoteParser.NoteParsingException.class)
     public void testEmptyAttributesNoteAllowed() throws Exception {
         readNotes("@alias ");
     }
 
-    private List<Note> readNotes(final String s) throws IOException, NotesSyntax.NoteParsingException {
+    private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return syntax.readNotes(in).getChildren();
+            return syntax.parse(in).getChildren();
         } finally {
             in.close();
         }

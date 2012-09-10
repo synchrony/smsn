@@ -16,7 +16,6 @@ import net.fortytwo.myotherbrain.notes.NotesSemantics;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -56,14 +55,14 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         InputStream in = new ByteArrayInputStream(p.view.getBytes());
         try {
-            rootNote = p.syntax.readNotes(in);
+            rootNote = p.parser.parse(in);
         } finally {
             in.close();
         }
 
         // Apply the update
         try {
-            p.semantics.update(p.root, rootNote, p.depth, p.filter, true, p.style, p.graph.getActivityLog());
+            p.semantics.update(p.root, rootNote, p.depth, p.filter, p.style, p.graph.getActivityLog());
         } catch (NotesSemantics.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }

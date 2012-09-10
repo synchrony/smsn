@@ -108,14 +108,23 @@ public class MOBGraph {
         return framedGraph.frame(v, Atom.class);
     }
 
-    public Atom createAtom(final Filter filter) {
-        Atom a = framedGraph.frame(this.getGraph().addVertex(null), Atom.class);
+    public Atom createAtom(final Filter filter,
+                           final String id) {
+        Atom a = framedGraph.frame(this.getGraph().addVertex(id), Atom.class);
         a.setCreated(new Date().getTime());
 
         a.setSharability(filter.getDefaultSharability());
         a.setWeight(filter.getDefaultWeight());
 
         return a;
+    }
+
+    public AtomList createAtomList() {
+        return framedGraph.frame(this.getGraph().addVertex(null), AtomList.class);
+    }
+
+    public void remove(final AtomList l) {
+        this.getGraph().removeVertex(l.asVertex());
     }
 
     public Collection<Atom> getAtomsWithValue(final String value) {

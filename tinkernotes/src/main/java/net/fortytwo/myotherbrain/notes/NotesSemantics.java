@@ -9,6 +9,7 @@ import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.AtomList;
 import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.notes.util.ListDiff;
 import net.fortytwo.ripple.Ripple;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.Model;
@@ -92,13 +93,10 @@ public class NotesSemantics {
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, parent)) {
-                if (filter.isVisible(target)) {
-                    Note cn = viewInternal(target, root, height - 1, filter, style);
-                    n.addChild(cn);
-                }
+                int h = filter.isVisible(target) ? height - 1 : 0;
+                Note cn = viewInternal(target, root, h, filter, style);
+                n.addChild(cn);
             }
-
-            Collections.sort(n.getChildren(), new NoteComparator());
         }
 
         return n;
@@ -123,29 +121,52 @@ public class NotesSemantics {
     /**
      * Updates the graph.
      *
-     * @param root        the root of the subgraph to be updated
-     * @param rootNote    the root of the note tree
-     * @param depth       the minimum depth to which the graph will be updated.
-     *                    If depth is 0, only the root node will be affected,
-     *                    while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
-     * @param filter      a collection of criteria for atoms and links.
-     *                    Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param destructive whether to remove items which do not appear in the update view
-     * @param style       the adjacency style of the view
+     * @param root     the root of the subgraph to be updated
+     * @param rootNote the root of the note tree
+     * @param depth    the minimum depth to which the graph will be updated.
+     *                 If depth is 0, only the root node will be affected,
+     *                 while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
+     * @param filter   a collection of criteria for atoms and links.
+     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param style    the adjacency style of the view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
                        final Note rootNote,
                        final int depth,
                        final Filter filter,
-                       boolean destructive,
                        final AdjacencyStyle style,
                        final ActivityLog log) throws InvalidUpdateException {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
 
-        updateInternal(root, null, rootNote, depth, filter, destructive, style, log);
+        updateInternal(root, null, rootNote, depth, filter, style, log);
+    }
+
+    private final Comparator<Note> noteComparator = new Comparator<Note>() {
+        public int compare(final Note a,
+                           final Note b) {
+            return null == a.getId()
+                    ? (null == b.getId() ? 0 : -1)
+                    : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
+        }
+    };
+
+    private String toString(final List<Note> notes) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Note n : notes) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(", ");
+            }
+
+            sb.append(n.getValue());
+        }
+
+        return sb.toString();
     }
 
     public void updateInternal(final Atom root,
@@ -153,63 +174,125 @@ public class NotesSemantics {
                                final Note rootNote,
                                final int depth,
                                final Filter filter,
-                               boolean destructive,
                                final AdjacencyStyle style,
                                final ActivityLog log) throws InvalidUpdateException {
-        // Keep adding items beyond the depth of the view, but don't delete items.
-        if (0 >= depth) {
-            destructive = false;
-        }
 
         setProperties(root, rootNote, log);
 
-        Set<String> before = new HashSet<String>();
-        for (Note n : viewInternal(root, parent, 1, filter, style).getChildren()) {
-            before.add(n.getId());
+        if (0 >= depth || !filter.isVisible(root)) {
+            return;
         }
 
-        Set<String> after = new HashSet<String>();
-        for (Note n : rootNote.getChildren()) {
-            String id = n.getId();
+        final Set<String> added = new HashSet<String>();
 
-            if (null != id) {
-                after.add(n.getId());
-            }
-        }
+        List<Note> before = viewInternal(root, parent, 1, filter, style).getChildren();
+        List<Note> after = rootNote.getChildren();
+        List<Note> lcs = ListDiff.leastCommonSubsequence(before, after, noteComparator);
 
-        if (destructive) {
-            for (String id : before) {
-                if (!after.contains(id)) {
-                    Atom target = store.getAtom(id);
+        //System.out.println("for root " + rootNote.getValue() + ":");
+        //System.out.println("    before: " + showChildren(before));
+        //System.out.println("    after: " + showChildren(after));
+        //System.out.println("    lcs: " + showChildren(lcs));
 
-                    style.unlink(root, target, log);
+        ListDiff.DiffEditor<Note> ed = new ListDiff.DiffEditor<Note>() {
+            public void add(final int position,
+                            final Note letter) throws InvalidUpdateException {
+                //System.out.println("adding at " + position + ": " + letter);
+
+                Atom a = getOrCreateAtom(letter, filter, log);
+                added.add((String) a.asVertex().getId());
+                if (null == letter.getId()) {
+                    letter.setId((String) a.asVertex().getId());
+                }
+                AtomList l = store.createAtomList();
+                l.setFirst(a);
+
+                if (0 == position) {
+                    l.setRest(root.getNotes());
+                    root.setNotes(l);
+                } else {
+                    AtomList prev = root.getNotes();
+                    for (int i = 1; i < position; i++) {
+                        prev = prev.getRest();
+                    }
+
+                    l.setRest(prev.getRest());
+                    prev.setRest(l);
+                }
+
+                if (null != log) {
+                    log.logLink(root, a);
                 }
             }
-        }
 
-        for (Note n : rootNote.getChildren()) {
-            String id = n.getId();
+            public void delete(final int position,
+                               final Note letter) {
+                System.out.println("deleting at " + position + ": " + letter);
+                AtomList n = root.getNotes();
 
-            Atom target;
+                if (0 == position) {
+                    root.setNotes(n.getRest());
 
-            if (null == id) {
-                target = createAtom(filter, log);
-            } else {
-                target = store.getAtom(id);
+                    store.remove(n);
+                } else {
+                    AtomList prev = n;
+                    for (int i = 1; i < position; i++) {
+                        prev = prev.getRest();
+                    }
 
-                if (null == target) {
-                    throw new IllegalStateException("atom with given id '" + id + "' does not exist");
+                    AtomList l = prev.getRest();
+                    prev.setRest(l.getRest());
+                    store.remove(l);
+                }
+
+                if (null != log) {
+                    Atom a = store.getAtom(letter.getId());
+                    log.logUnlink(root, a);
                 }
             }
+        };
 
-            if (!before.contains(id)) {
-                style.link(root, target, log);
+        ListDiff.applyDiff(before, after, lcs, noteComparator, ed);
 
-                updateInternal(target, root, n, depth - 1, filter, false, style, log);
-            } else {
-                updateInternal(target, root, n, depth - 1, filter, destructive, style, log);
+        for (Note n : rootNote.getChildren()) {
+            System.out.println("recursing to note: " + n);
+            System.out.flush();
+            int d = added.contains(n.getId()) ? 0 : depth - 1;
+
+            updateInternal(store.getAtom(n.getId()), root, n, d, filter, style, log);
+        }
+    }
+
+    private Atom getOrCreateAtom(final Note n,
+                                 final Filter filter,
+                                 final ActivityLog log) {
+        String id = n.getId();
+        Atom a;
+
+        if (null == id) {
+            a = createAtom(null, filter, log);
+        } else {
+            a = store.getAtom(id);
+
+            if (null == a) {
+                a = createAtom(id, filter, log);
             }
         }
+
+        System.out.println(a.asVertex().getId());
+        return a;
+    }
+
+    private Atom createAtom(final String id,
+                            final Filter filter,
+                            final ActivityLog log) {
+        Atom a = store.createAtom(filter, id);
+
+        if (null != log) {
+            log.logCreate(a);
+        }
+
+        return a;
     }
 
     /**
@@ -314,17 +397,6 @@ public class NotesSemantics {
         return result;
     }
 
-    private Atom createAtom(final Filter filter,
-                            final ActivityLog log) {
-        Atom a = store.createAtom(filter);
-
-        if (null != log) {
-            log.logCreate(a);
-        }
-
-        return a;
-    }
-
     private void setProperties(final Atom target,
                                final Note note,
                                final ActivityLog log) {
@@ -415,10 +487,6 @@ public class NotesSemantics {
         String getName();
 
         Iterable<Atom> getLinked(Atom root, Atom parent);
-
-        void link(Atom source, Atom target, ActivityLog log);
-
-        void unlink(Atom source, Atom target, ActivityLog log);
     }
 
     public static AdjacencyStyle lookupStyle(final String name) {
@@ -433,40 +501,15 @@ public class NotesSemantics {
         }
     }
 
-    private static void destroyList(final AtomList list) {
-
-    }
-
-    private static void addOutNote(final Atom root,
-                                   final Atom other,
-                                   final ActivityLog log) {
-        //TODO root.addOutNote(other);
-
-        if (null != log) {
-            log.logLink(root, other);
+    // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
+    private static Iterable<Atom> toIterable(AtomList l) {
+        List<Atom> ll = new LinkedList<Atom>();
+        while (null != l) {
+            ll.add(l.getFirst());
+            l = l.getRest();
         }
-    }
 
-    private static void removeOutNote(final Atom root,
-                                      final Atom other,
-                                      final ActivityLog log) {
-        //TODO root.removeOutNote(other);
-
-        if (null != log) {
-            log.logUnlink(root, other);
-        }
-    }
-
-    private static void addInNote(final Atom root,
-                                  final Atom other,
-                                  final ActivityLog log) {
-        addOutNote(other, root, log);
-    }
-
-    private static void removeInNote(final Atom root,
-                                     final Atom other,
-                                     final ActivityLog log) {
-        removeOutNote(other, root, log);
+        return ll;
     }
 
     public static final AdjacencyStyle FORWARD_DIRECTED_ADJACENCY = new AdjacencyStyle() {
@@ -475,15 +518,7 @@ public class NotesSemantics {
         }
 
         public Iterable<Atom> getLinked(Atom root, Atom parent) {
-            return null;//TODO root.getOutNotes();
-        }
-
-        public void link(Atom source, Atom target, ActivityLog log) {
-            addOutNote(source, target, log);
-        }
-
-        public void unlink(Atom source, Atom target, ActivityLog log) {
-            removeOutNote(source, target, log);
+            return toIterable(root.getNotes());
         }
     };
 
@@ -494,14 +529,6 @@ public class NotesSemantics {
 
         public Iterable<Atom> getLinked(Atom root, Atom parent) {
             return null; //TODO root.getInNotes();
-        }
-
-        public void link(Atom source, Atom target, ActivityLog log) {
-            addInNote(source, target, log);
-        }
-
-        public void unlink(Atom source, Atom target, ActivityLog log) {
-            removeInNote(source, target, log);
         }
     };
 
@@ -524,31 +551,6 @@ public class NotesSemantics {
                 }
             }     */
             return l;
-        }
-
-        public void link(Atom source, Atom target, ActivityLog log) {
-            // Do an extra check here in case a link is being added merely because it was
-            // ommitted from the view (due to symmetry).
-            /* TODO
-            if (!contains(source.getOutNotes(), target)) {
-                addOutNote(source, target, log);
-            } */
-        }
-
-        private boolean contains(Iterable<Atom> i,
-                                 final Atom a) {
-            for (Atom b : i) {
-                if (b.equals(a)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void unlink(Atom source, Atom target, ActivityLog log) {
-            removeInNote(source, target, log);
-            removeOutNote(source, target, log);
         }
     };
 }

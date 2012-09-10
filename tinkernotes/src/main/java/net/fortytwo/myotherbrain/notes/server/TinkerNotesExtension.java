@@ -10,9 +10,10 @@ import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
+import net.fortytwo.myotherbrain.notes.NoteParser;
+import net.fortytwo.myotherbrain.notes.NoteWriter;
 import net.fortytwo.myotherbrain.notes.NotesHistory;
 import net.fortytwo.myotherbrain.notes.NotesSemantics;
-import net.fortytwo.myotherbrain.notes.NotesSyntax;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,7 +86,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
             p.graph = MOBGraph.getInstance((KeyIndexableGraph) p.baseGraph);
             p.semantics = new NotesSemantics(p.graph);
-            p.syntax = new NotesSyntax();
+            p.parser = new NoteParser();
+            p.writer = new NoteWriter();
 
             if (null != p.depth) {
                 if (p.depth < 1) {
@@ -190,7 +192,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         JSONObject json;
 
         try {
-            json = p.syntax.toJSON(n);
+            json = p.writer.toJSON(n);
         } catch (JSONException e) {
             throw new IOException(e);
         }
@@ -256,7 +258,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public MOBGraph graph;
         public FramedGraph<KeyIndexableGraph> manager;
         public NotesSemantics semantics;
-        public NotesSyntax syntax;
+        public NoteParser parser;
+        public NoteWriter writer;
         public Atom root;
         public Integer depth;
         public String view;

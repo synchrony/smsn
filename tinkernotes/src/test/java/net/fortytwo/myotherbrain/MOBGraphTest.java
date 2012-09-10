@@ -25,7 +25,7 @@ public class MOBGraphTest extends TestCase {
             MOBGraph m = MOBGraph.getInstance(g);
             Filter f = new Filter();
 
-            Atom a = m.createAtom(f);
+            Atom a = m.createAtom(f, null);
             a.setValue("Arthur Dent");
             m.indexForSearch(a, "Arthur Dent");
             //a.setValue("Arthur");

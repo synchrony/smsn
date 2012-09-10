@@ -7,13 +7,18 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramedGraph;
 import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.AtomList;
 import net.fortytwo.myotherbrain.MOBGraph;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -21,18 +26,20 @@ import static org.junit.Assert.assertNull;
  */
 public class NotesSemanticsTest {
     private KeyIndexableGraph graph;
+    private MOBGraph store;
     private FramedGraph<KeyIndexableGraph> manager;
-    private NotesSyntax syntax;
+    private NoteParser parser;
+    private NoteWriter writer = new NoteWriter();
     private NotesSemantics semantics;
 
     @Before
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
-        syntax = new NotesSyntax();
-        MOBGraph mobGraph = MOBGraph.getInstance(g);
-        graph = mobGraph.getGraph();
-        manager = mobGraph.getFramedGraph();
-        semantics = new NotesSemantics(mobGraph);
+        parser = new NoteParser();
+        store = MOBGraph.getInstance(g);
+        graph = store.getGraph();
+        manager = store.getFramedGraph();
+        semantics = new NotesSemantics(store);
     }
 
     @After
@@ -61,7 +68,7 @@ public class NotesSemanticsTest {
         assertNull(child.getCreated());
         //System.out.println(before.getTargetValue());
 
-        semantics.update(root, rootNote, 1, filter, true, style, log);
+        semantics.update(root, rootNote, 1, filter, style, log);
 
         //new GraphMLWriter(graph).outputGraph(System.out);
 
@@ -71,10 +78,125 @@ public class NotesSemanticsTest {
         assertEquals("foo", after.getValue());
         assertEquals(1, after.getChildren().size());
 
-        JSONObject json = syntax.toJSON(after);
+        JSONObject json = writer.toJSON(after);
         //System.out.println(json.toString());
         JSONObject j = json.getJSONArray("children").getJSONObject(0);
         assertEquals("cheval \u00e0 phynances", j.getJSONObject("target").getString("value"));
+    }
+
+    @Test
+    public void testUpdates() throws Exception {
+        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_DIRECTED_ADJACENCY;
+        ActivityLog log = null;
+        Atom root = createAtom("wXu5g4v");
+        String s;
+        System.out.println("=============1");
+
+        s = "" +
+                "N5KBOAq: ► one\n" +
+                "v8EuMtl: ► two\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        assertNotesEqual(root, "one", "two", "three");
+
+        Atom one = store.getAtom("N5KBOAq");
+        Atom two = store.getAtom("v8EuMtl");
+        Atom three = store.getAtom("tOpwKho");
+        //*
+
+        System.out.println("=============2");
+
+        s = "" +
+                "N5KBOAq: ► one\n" +
+                "r4zU45R:     ► ten\n" +
+                "             ► yellow\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        // "two" has been removed
+        assertNotesEqual(root, "one", "three");
+        // grandchildren have been added
+        assertNotesEqual(one, "ten", "yellow");
+        Atom ten = store.getAtom("r4zU45R");
+
+        System.out.println("=============3");
+
+        s = "" +
+                "N5KBOAq: ► one\n" +
+                "r4zU45R:     ► ten\n" +
+                "                 ► rabbit\n" +
+                "             ► green\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        // depth is only two, so "rabbit" is not reachable
+        assertNotesEqual(ten);
+
+        s = "" +
+                "v8EuMtl: ► two\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        // "one" has been removed...
+        assertNotesEqual(root, "two", "three");
+        // but "one" still exists and has its previous notes
+        assertNotesEqual(one, "ten", "green");
+
+        s = "" +
+                "v8EuMtl: ► two\n" +
+                "             ► elephant\n" +
+                "v8EuMtl: ► two\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        // duplicates are possible...
+        assertNotesEqual(root, "two", "two", "three");
+        // ...but when a duplicate is added, children of any matching duplicate will be ignored
+        assertNotesEqual(two);
+
+        s = "" +
+                "v8EuMtl: ► two\n" +
+                "             ► elephant\n" +
+                "v8EuMtl: ► two\n" +
+                "             ► gorilla\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        assertNotesEqual(root, "two", "two", "three");
+        // when duplicates already exist, children of duplicates follow the last-occuring instance
+        assertNotesEqual(two, "gorilla");
+    }
+
+    private void assertNotesEqual(final Atom a,
+                                  final String... expected) {
+        String[] actual = new String[countNotes(a)];
+
+        int i = 0;
+        AtomList cur = a.getNotes();
+        while (null != cur) {
+            actual[i++] = cur.getFirst().getValue();
+            cur = cur.getRest();
+        }
+
+        assertArrayEquals(expected, actual);
+    }
+
+    private int countNotes(final Atom a) {
+        AtomList cur = a.getNotes();
+        int count = 0;
+        while (cur != null) {
+            count++;
+            cur = cur.getRest();
+        }
+
+        return count;
+    }
+
+    private List<Atom> getNotes(Atom a) {
+        List<Atom> l = new LinkedList<Atom>();
+        AtomList cur = a.getNotes();
+        while (null != cur) {
+            l.add(cur.getFirst());
+            cur = cur.getRest();
+        }
+
+        return l;
     }
 
     @Test

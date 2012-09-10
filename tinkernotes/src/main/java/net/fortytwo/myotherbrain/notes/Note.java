@@ -37,7 +37,10 @@ public class Note {
     }
 
     public void setId(final String id) {
-        if (null != id && 0 == id.length()) {
+        if (null == id) {
+            // TODO: probably unnecessary
+            //this.id = MyOtherBrain.createRandomKey();
+        } else if (0 == id.length()) {
             throw new IllegalArgumentException("empty id is not valid");
         }
 
@@ -49,7 +52,7 @@ public class Note {
     }
 
     public void setWeight(Float weight) {
-        if (null != weight && (weight < 0 || weight > 1.0))  {
+        if (null != weight && (weight < 0 || weight > 1.0)) {
             throw new IllegalArgumentException("weight is out of range: " + weight);
         }
 
@@ -61,7 +64,7 @@ public class Note {
     }
 
     public void setSharability(Float sharability) {
-        if (null != sharability && (sharability < 0 || sharability > 1.0))  {
+        if (null != sharability && (sharability < 0 || sharability > 1.0)) {
             throw new IllegalArgumentException("sharability is out of range: " + sharability);
         }
 

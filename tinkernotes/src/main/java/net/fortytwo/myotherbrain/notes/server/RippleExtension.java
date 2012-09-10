@@ -65,7 +65,7 @@ public class RippleExtension extends TinkerNotesExtension {
         JSONObject json;
 
         try {
-            json = p.syntax.toJSON(n);
+            json = p.writer.toJSON(n);
         } catch (JSONException e) {
             throw new IOException(e);
         }
