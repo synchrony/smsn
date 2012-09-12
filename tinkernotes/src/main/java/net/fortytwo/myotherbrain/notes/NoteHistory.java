@@ -11,13 +11,13 @@ import java.util.List;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class NotesHistory {
+public class NoteHistory {
     private static final int CAPACITY = 1000;
 
     private final String[] visitedAtoms;
     private int totalVisits;
 
-    public NotesHistory() {
+    public NoteHistory() {
         this.visitedAtoms = new String[CAPACITY];
         totalVisits = 0;
     }

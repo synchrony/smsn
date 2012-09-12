@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.notes.util;
 
-import net.fortytwo.myotherbrain.notes.NotesSemantics;
+import net.fortytwo.myotherbrain.notes.NoteQueries;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -79,7 +79,7 @@ public class ListDiff {
                                      final List<T> b,
                                      final List<T> l,
                                      final Comparator<T> cmp,
-                                     final DiffEditor<T> ed) throws NotesSemantics.InvalidUpdateException {
+                                     final DiffEditor<T> ed) throws NoteQueries.InvalidUpdateException {
         int acur = 0;
         int bcur = 0;
         int lcur = 0;
@@ -116,7 +116,7 @@ public class ListDiff {
     }
 
     public static interface DiffEditor<T> {
-        void add(int position, T letter) throws NotesSemantics.InvalidUpdateException;
+        void add(int position, T letter) throws NoteQueries.InvalidUpdateException;
 
         void delete(int position, T letter);
     }

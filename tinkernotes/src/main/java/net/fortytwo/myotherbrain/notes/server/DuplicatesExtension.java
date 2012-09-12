@@ -48,7 +48,7 @@ public class DuplicatesExtension extends TinkerNotesExtension {
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         List<String> ids = getDuplicates(p.graph, p.filter);
 
-        addView(p.semantics.customView(ids, p.filter), p);
+        addView(p.queries.customView(ids, p.filter), p);
 
         return ExtensionResponse.ok(p.map);
     }

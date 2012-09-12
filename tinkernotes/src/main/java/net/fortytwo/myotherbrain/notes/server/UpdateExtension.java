@@ -12,7 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Note;
-import net.fortytwo.myotherbrain.notes.NotesSemantics;
+import net.fortytwo.myotherbrain.notes.NoteQueries;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -62,12 +62,12 @@ public class UpdateExtension extends TinkerNotesExtension {
 
         // Apply the update
         try {
-            p.semantics.update(p.root, rootNote, p.depth, p.filter, p.style, p.graph.getActivityLog());
-        } catch (NotesSemantics.InvalidUpdateException e) {
+            p.queries.update(p.root, rootNote, p.depth, p.filter, p.style, p.graph.getActivityLog());
+        } catch (NoteQueries.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        Note n = p.semantics.view(p.root, p.depth, p.filter, p.style, p.graph.getActivityLog());
+        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.graph.getActivityLog());
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);

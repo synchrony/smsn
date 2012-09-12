@@ -31,12 +31,12 @@ import java.util.Set;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class NotesSemantics {
+public class NoteQueries {
 
     private final MOBGraph store;
     private final QueryEngine rippleQueryEngine;
 
-    public NotesSemantics(final MOBGraph store) {
+    public NoteQueries(final MOBGraph store) {
         this.store = store;
 
         try {

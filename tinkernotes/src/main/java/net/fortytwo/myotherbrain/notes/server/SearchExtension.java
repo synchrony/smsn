@@ -68,7 +68,7 @@ public class SearchExtension extends TinkerNotesExtension {
     }
 
     protected void addSearchResults(final Params p) throws IOException {
-        Note n = p.semantics.search(p.query, p.depth, p.filter, p.style);
+        Note n = p.queries.search(p.query, p.depth, p.filter, p.style);
         JSONObject json;
 
         try {

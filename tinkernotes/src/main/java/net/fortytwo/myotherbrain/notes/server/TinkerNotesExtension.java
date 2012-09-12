@@ -10,10 +10,10 @@ import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
+import net.fortytwo.myotherbrain.notes.NoteHistory;
 import net.fortytwo.myotherbrain.notes.NoteParser;
+import net.fortytwo.myotherbrain.notes.NoteQueries;
 import net.fortytwo.myotherbrain.notes.NoteWriter;
-import net.fortytwo.myotherbrain.notes.NotesHistory;
-import net.fortytwo.myotherbrain.notes.NotesSemantics;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,7 +85,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
             p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
             p.graph = MOBGraph.getInstance((KeyIndexableGraph) p.baseGraph);
-            p.semantics = new NotesSemantics(p.graph);
+            p.queries = new NoteQueries(p.graph);
             p.parser = new NoteParser();
             p.writer = new NoteWriter();
 
@@ -127,7 +127,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             p.map.put("title", null == p.root || null == p.root.getValue() || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
 
             if (null != styleName) {
-                p.style = NotesSemantics.lookupStyle(styleName);
+                p.style = NoteQueries.lookupStyle(styleName);
                 p.map.put("style", p.style.getName());
             }
 
@@ -216,11 +216,11 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         return null == user || user.getName().equals("josh");
     }
 
-    private NotesHistory getNotesHistory(final RexsterResourceContext context) {
+    private NoteHistory getNotesHistory(final RexsterResourceContext context) {
         HttpSession session = context.getRequest().getSession();
-        NotesHistory h = (NotesHistory) session.getAttribute(HISTORY_ATTR);
+        NoteHistory h = (NoteHistory) session.getAttribute(HISTORY_ATTR);
         if (null == h) {
-            h = new NotesHistory();
+            h = new NoteHistory();
             session.setAttribute(HISTORY_ATTR, h);
         }
 
@@ -229,14 +229,14 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
 
     protected void addToHistory(final String rootId,
                                 final RexsterResourceContext context) {
-        NotesHistory h = getNotesHistory(context);
+        NoteHistory h = getNotesHistory(context);
         h.visit(rootId);
     }
 
     protected List<String> getHistory(final RexsterResourceContext context,
                                       final MOBGraph graph,
                                       final Filter filter) {
-        NotesHistory h = getNotesHistory(context);
+        NoteHistory h = getNotesHistory(context);
         return h.getHistory(100, true, graph, filter);
     }
 
@@ -257,13 +257,13 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public KeyIndexableGraph baseGraph;
         public MOBGraph graph;
         public FramedGraph<KeyIndexableGraph> manager;
-        public NotesSemantics semantics;
+        public NoteQueries queries;
         public NoteParser parser;
         public NoteWriter writer;
         public Atom root;
         public Integer depth;
         public String view;
-        public NotesSemantics.AdjacencyStyle style;
+        public NoteQueries.AdjacencyStyle style;
         public Filter filter;
         public String query;
         public Float newWeight;

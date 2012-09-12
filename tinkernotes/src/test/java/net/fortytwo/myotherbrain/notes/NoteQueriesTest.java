@@ -24,13 +24,13 @@ import static org.junit.Assert.assertNull;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class NotesSemanticsTest {
+public class NoteQueriesTest {
     private KeyIndexableGraph graph;
     private MOBGraph store;
     private FramedGraph<KeyIndexableGraph> manager;
     private NoteParser parser;
     private NoteWriter writer = new NoteWriter();
-    private NotesSemantics semantics;
+    private NoteQueries semantics;
     private ActivityLog log = null;
 
     @Before
@@ -40,7 +40,7 @@ public class NotesSemanticsTest {
         store = MOBGraph.getInstance(g);
         graph = store.getGraph();
         manager = store.getFramedGraph();
-        semantics = new NotesSemantics(store);
+        semantics = new NoteQueries(store);
     }
 
     @After
@@ -51,7 +51,7 @@ public class NotesSemanticsTest {
     @Test
     public void testEncoding() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
+        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
         ActivityLog log = null;
 
         Atom root = createAtom("11111");
@@ -88,7 +88,7 @@ public class NotesSemanticsTest {
     @Test
     public void testUpdateRecursion() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
+        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
         Atom root = createAtom("wXu5g4v");
         String s;
 
@@ -159,7 +159,7 @@ public class NotesSemanticsTest {
     @Test
     public void testPropertySetting() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
+        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
         Atom root = createAtom("wXu5g4v");
         String s;
 

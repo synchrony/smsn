@@ -56,7 +56,7 @@ public class FindRootsExtension extends TinkerNotesExtension {
     }
 
     protected void addRoots(final Params p) throws IOException {
-        Note n = p.semantics.findRoots(p.filter, p.style);
+        Note n = p.queries.findRoots(p.filter, p.style);
 
         JSONObject json;
 

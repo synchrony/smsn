@@ -1,6 +1,6 @@
 package net.fortytwo.myotherbrain.notes.util;
 
-import net.fortytwo.myotherbrain.notes.NotesSemantics;
+import net.fortytwo.myotherbrain.notes.NoteQueries;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class ListDiffTest {
 
     private String applyDiff(final String before,
                              final String after,
-                             final String diff) throws NotesSemantics.InvalidUpdateException {
+                             final String diff) throws NoteQueries.InvalidUpdateException {
         additions = 0;
         removals = 0;
 
