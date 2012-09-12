@@ -15,6 +15,11 @@ public class NoteParser {
     // Regex of valid id prefixes, including parentheses, colon and trailing space
     public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:");
 
+    private static final String
+            ALIAS_ATTR = "@alias",
+            SHARABILITY_ATTR = "@sharability",
+            WEIGHT_ATTR = "@weight";
+
     private static final int MAX_BULLET_LENGTH = 1;
 
     // Tabs count as four spaces each.
@@ -176,7 +181,9 @@ public class NoteParser {
 
             if (0 == value.length()) {
                 if (isAttribute) {
-                    throw new NoteParsingException(lineNumber, "empty attribute value");
+                    if (!bullet.equals(ALIAS_ATTR)) {
+                        throw new NoteParsingException(lineNumber, "empty attribute value");
+                    }
                 } else {
                     throw new NoteParsingException(lineNumber, "empty note");
                 }
@@ -185,13 +192,14 @@ public class NoteParser {
             if (isAttribute) {
                 Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
-                if (bullet.equals("@alias")) {
+                if (bullet.equals(ALIAS_ATTR)) {
                     if (value.length() > 0) {
                         n.setAlias(value);
                     } else {
-                        throw new NoteParsingException(lineNumber, "missing @alias value");
+                        n.setAlias(Note.CLEAR_ALIAS);
+                        //throw new NoteParsingException(lineNumber, "missing @alias value");
                     }
-                } else if (bullet.equals("@weight")) {
+                } else if (bullet.equals(WEIGHT_ATTR)) {
                     float val;
                     try {
                         val = Float.valueOf(value);
@@ -199,7 +207,7 @@ public class NoteParser {
                         throw new NoteParsingException(lineNumber, "invalid @weight value: " + value);
                     }
                     n.setWeight(val);
-                } else if (bullet.equals("@sharability")) {
+                } else if (bullet.equals(SHARABILITY_ATTR)) {
                     float val;
                     try {
                         val = Float.valueOf(value);

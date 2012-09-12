@@ -187,6 +187,7 @@ public class NotesSemantics {
         }
 
         final Set<String> added = new HashSet<String>();
+        //final Set<String> created = new HashSet<String>();
 
         List<Note> before = viewInternal(root, parent, 1, filter, style).getChildren();
         List<Note> after = rootNote.getChildren();
@@ -199,13 +200,13 @@ public class NotesSemantics {
 
         ListDiff.DiffEditor<Note> ed = new ListDiff.DiffEditor<Note>() {
             public void add(final int position,
-                            final Note letter) throws InvalidUpdateException {
-                //System.out.println("adding at " + position + ": " + letter);
+                            final Note note) throws InvalidUpdateException {
+                System.out.println("adding at " + position + ": " + note);
 
-                Atom a = getOrCreateAtom(letter, filter, log);
+                Atom a = getOrCreateAtom(note, filter, log);
                 added.add((String) a.asVertex().getId());
-                if (null == letter.getId()) {
-                    letter.setId((String) a.asVertex().getId());
+                if (null == note.getId()) {
+                    note.setId((String) a.asVertex().getId());
                 }
                 AtomList l = store.createAtomList();
                 l.setFirst(a);
@@ -423,19 +424,26 @@ public class NotesSemantics {
 
         String alias = note.getAlias();
 
-        // Note: you currently can't remove an alias, only replace it.
         if (null != alias) {
-            String prev = target.getAlias();
-            if (null == prev || !prev.equals(alias)) {
-                target.setAlias(alias);
-                propsSet = true;
+            if (alias.equals(Note.CLEAR_ALIAS)) {
+                String prev = target.getAlias();
+                if (null != prev) {
+                    target.setAlias(null);
+                    propsSet = true;
+                }
+            } else {
+                String prev = target.getAlias();
+                if (null == prev || !prev.equals(alias)) {
+                    target.setAlias(alias);
+                    propsSet = true;
+                }
             }
         }
 
         Float weight = note.getWeight();
         if (null != weight) {
             Float p = target.getWeight();
-            if (null == p ? null != weight : (null == weight || !p.equals(weight))) {
+            if (null == p || (!p.equals(weight))) {
                 target.setWeight(weight);
                 propsSet = true;
             }
@@ -444,7 +452,7 @@ public class NotesSemantics {
         Float sharability = note.getSharability();
         if (null != sharability) {
             Float p = target.getSharability();
-            if (null == p ? null != sharability : (null == sharability || !p.equals(sharability))) {
+            if (null == p || (!p.equals(sharability))) {
                 target.setSharability(sharability);
                 propsSet = true;
             }

@@ -76,9 +76,19 @@ public class NoteParserTest {
         readNotes("* ");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
-    public void testEmptyAttributesNoteAllowed() throws Exception {
+    @Test
+    public void testEmptyAliasAttributeIsAllowed() throws Exception {
         readNotes("@alias ");
+    }
+
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testEmptyWeightAttributeNotAllowed() throws Exception {
+        readNotes("@weight ");
+    }
+
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testEmptySharabilityAttributeNotAllowed() throws Exception {
+        readNotes("@sharability ");
     }
 
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {

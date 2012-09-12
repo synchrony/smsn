@@ -7,6 +7,9 @@ import java.util.List;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Note {
+    // A special value, for incoming notes only, which tells the
+    public static final String CLEAR_ALIAS = "_";
+
     private final List<Note> children;
 
     private String value;

@@ -31,6 +31,7 @@ public class NotesSemanticsTest {
     private NoteParser parser;
     private NoteWriter writer = new NoteWriter();
     private NotesSemantics semantics;
+    private ActivityLog log = null;
 
     @Before
     public void setUp() throws Exception {
@@ -85,27 +86,21 @@ public class NotesSemanticsTest {
     }
 
     @Test
-    public void testUpdates() throws Exception {
+    public void testUpdateRecursion() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
-        ActivityLog log = null;
         Atom root = createAtom("wXu5g4v");
         String s;
-        System.out.println("=============1");
 
         s = "" +
                 "N5KBOAq: ► one\n" +
                 "v8EuMtl: ► two\n" +
                 "tOpwKho: ► three\n";
-        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
         assertNotesEqual(root, "one", "two", "three");
 
         Atom one = store.getAtom("N5KBOAq");
         Atom two = store.getAtom("v8EuMtl");
-        Atom three = store.getAtom("tOpwKho");
-        //*
-
-        System.out.println("=============2");
 
         s = "" +
                 "N5KBOAq: ► one\n" +
@@ -118,8 +113,6 @@ public class NotesSemanticsTest {
         // grandchildren have been added
         assertNotesEqual(one, "ten", "yellow");
         Atom ten = store.getAtom("r4zU45R");
-
-        System.out.println("=============3");
 
         s = "" +
                 "N5KBOAq: ► one\n" +
@@ -159,8 +152,40 @@ public class NotesSemanticsTest {
                 "tOpwKho: ► three\n";
         semantics.update(root, parser.parse(s), 3, filter, style, log);
         assertNotesEqual(root, "two", "two", "three");
-        // when duplicates already exist, children of duplicates follow the last-occuring instance
+        // when duplicates already exist, children of duplicates follow the last-occurring instance
         assertNotesEqual(two, "gorilla");
+    }
+
+    @Test
+    public void testPropertySetting() throws Exception {
+        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        NotesSemantics.AdjacencyStyle style = NotesSemantics.FORWARD_ADJACENCY;
+        Atom root = createAtom("wXu5g4v");
+        String s;
+
+        s = "" +
+                "N5KBOAq: ► one\n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        Atom one = store.getAtom("N5KBOAq");
+        assertEquals(0.5f, one.getWeight());
+        assertEquals(0.5f, one.getSharability());
+        assertNull(one.getAlias());
+
+        s = "" +
+                "N5KBOAq: ► one\n" +
+                "             @weight 0.75\n" +
+                "             @sharability 0.25\n" +
+                "             @alias http://example.org/ns/one\n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        assertEquals(0.75f, one.getWeight());
+        assertEquals(0.25f, one.getSharability());
+        assertEquals("http://example.org/ns/one", one.getAlias());
+
+        s = "" +
+                "N5KBOAq: ► one\n" +
+                "             @alias \n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        assertNull(one.getAlias());
     }
 
     private void assertNotesEqual(final Atom a,
@@ -197,72 +222,6 @@ public class NotesSemanticsTest {
         }
 
         return l;
-    }
-
-    @Test
-    public void testAll() throws Exception {
-        /*
-        String s = "" +
-                ".  a\n" +
-                "    .  b\n" +
-                "    .  c\n" +
-                "V  d\n" +
-                ".  e\n";
-
-        graph.clear();
-        Atom root = createAtom("1331");
-        root.setType(".");
-        root.setText("the root");
-
-        List<Note> n = parse(s);
-        views.toGraph(n, root);
-        Atom r = getAtom("1331");
-        assertEquals("the root", r.getText());
-        assertEquals(".", r.getType());
-        Set<Atom> as = getAssociatedAtoms(r);
-        assertEquals(3, as.size());
-        assertEquals(11, countVertices());
-        assertEquals(10, countEdges());
-        assertEquals("c", getAtom("6").getText());
-
-        //Note o = views.toNote((String) root.element().getId(), null, 4);
-        //io.writeChildren(o, System.out);
-        //GraphMLWriter.outputGraph(graph, System.out);
-        //System.out.println();
-
-        String update = "" +
-                "(00009:00000) .  a\n" +
-                "(00001:00002)     .  b\n" +
-                "(00005:00006)     .  c\n" +
-                "(00017:00016) .  e\n" +
-                "(00013:00012) V  d";
-        List<Note> u = parse(update);
-        //io.writeNotes(u, System.out);
-        views.applyUpdate(u, (String) root.element().getId(), null, 4);
-        //o = views.toNote((String) root.element().getId(), null, 4);
-        //io.writeChildren(o, System.out);
-        //System.out.println("############");
-        assertEquals(11, countVertices());
-        assertEquals(10, countEdges());
-        assertEquals("c", getAtom("6").getText());
-
-        update = "" +
-                "(00009:00000) .  a\n" +
-                "(00005:00006)     .  changed!\n" +
-                "(00017:00016) .  e\n" +
-                "    !  new child here\n" +
-                "        .  new grandchild\n" +
-                "(00013:00012) V  d";
-        u = parse(update);
-        //io.writeNotes(u, System.out);
-        views.applyUpdate(u, (String) root.element().getId(), null, 4);
-        //o = views.toNote((String) root.element().getId(), null, 4);
-        //io.writeChildren(o, System.out);
-        //System.out.println("############");
-        assertEquals(14, countVertices());
-        assertEquals(12, countEdges());
-        assertEquals("changed!", getAtom("6").getText());
-        */
     }
 
     private int countVertices() {
