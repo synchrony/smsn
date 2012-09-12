@@ -44,13 +44,13 @@ public class ListDiffTest {
 
         ListDiff.DiffEditor<String> ed = new ListDiff.DiffEditor<String>() {
             public void add(int position, String letter) {
-                System.out.println("" + position + ": +" + letter);
+                //System.out.println("" + position + ": +" + letter);
                 work.add(position, letter);
                 additions++;
             }
 
             public void delete(int position, String letter) {
-                System.out.println("" + position + ": -" + letter);
+                //System.out.println("" + position + ": -" + letter);
                 work.remove(position);
                 removals++;
             }

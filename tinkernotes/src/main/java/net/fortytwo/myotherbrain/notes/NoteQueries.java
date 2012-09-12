@@ -187,7 +187,7 @@ public class NoteQueries {
         }
 
         final Set<String> added = new HashSet<String>();
-        //final Set<String> created = new HashSet<String>();
+        final Set<String> created = new HashSet<String>();
 
         List<Note> before = viewInternal(root, parent, 1, filter, style).getChildren();
         List<Note> after = rootNote.getChildren();
@@ -203,11 +203,16 @@ public class NoteQueries {
                             final Note note) throws InvalidUpdateException {
                 System.out.println("adding at " + position + ": " + note);
 
-                Atom a = getOrCreateAtom(note, filter, log);
+                Atom a = getAtom(note);
+                if (null == a) {
+                    a = createAtom(note.getId(), filter, log);
+                    created.add((String) a.asVertex().getId());
+                }
                 added.add((String) a.asVertex().getId());
                 if (null == note.getId()) {
                     note.setId((String) a.asVertex().getId());
                 }
+
                 AtomList l = store.createAtomList();
                 l.setFirst(a);
 
@@ -230,8 +235,8 @@ public class NoteQueries {
             }
 
             public void delete(final int position,
-                               final Note letter) {
-                System.out.println("deleting at " + position + ": " + letter);
+                               final Note note) {
+                System.out.println("deleting at " + position + ": " + note);
                 AtomList n = root.getNotes();
 
                 if (0 == position) {
@@ -250,7 +255,7 @@ public class NoteQueries {
                 }
 
                 if (null != log) {
-                    Atom a = store.getAtom(letter.getId());
+                    Atom a = store.getAtom(note.getId());
                     log.logUnlink(root, a);
                 }
             }
@@ -261,30 +266,15 @@ public class NoteQueries {
         for (Note n : rootNote.getChildren()) {
             //System.out.println("recursing to note: " + n);
             //System.out.flush();
-            int d = added.contains(n.getId()) ? 0 : depth - 1;
+            int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : depth - 1;
 
             updateInternal(store.getAtom(n.getId()), root, n, d, filter, style, log);
         }
     }
 
-    private Atom getOrCreateAtom(final Note n,
-                                 final Filter filter,
-                                 final ActivityLog log) {
+    private Atom getAtom(final Note n) {
         String id = n.getId();
-        Atom a;
-
-        if (null == id) {
-            a = createAtom(null, filter, log);
-        } else {
-            a = store.getAtom(id);
-
-            if (null == a) {
-                a = createAtom(id, filter, log);
-            }
-        }
-
-        //System.out.println(a.asVertex().getId());
-        return a;
+        return null == id ? null : store.getAtom(id);
     }
 
     private Atom createAtom(final String id,

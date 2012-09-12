@@ -118,27 +118,52 @@ public class NoteQueriesTest {
                 "N5KBOAq: ► one\n" +
                 "r4zU45R:     ► ten\n" +
                 "                 ► rabbit\n" +
-                "             ► green\n" +
+                "             ► purple\n" +
                 "tOpwKho: ► three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         // depth is only two, so "rabbit" is not reachable
         assertNotesEqual(ten);
 
         s = "" +
+                "N5KBOAq: ► one\n" +
+                "r4zU45R:     ► ten\n" +
+                "             ► green\n" +
+                "                 ► rabbit\n" +
+                "                 ► kangaroo\n" +
+                "tOpwKho: ► three\n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        Atom green = one.getNotes().getRest().getFirst();
+        // "rabbit" and "kangaroo" are added beneath "green" even though they're
+        // deeper than 2 steps in the tree, because "green" is a new note
+        assertNotesEqual(green, "rabbit", "kangaroo");
+
+        s = "" +
                 "v8EuMtl: ► two\n" +
                 "tOpwKho: ► three\n";
-        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
         // "one" has been removed...
         assertNotesEqual(root, "two", "three");
         // but "one" still exists and has its previous notes
         assertNotesEqual(one, "ten", "green");
 
         s = "" +
+                "tOpwKho: ► three\n" +
+                "             ► red\n" +
+                "v8EuMtl: ► two\n";
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
+        // we swapped the order of "two" and "three"...
+        assertNotesEqual(root, "three", "two");
+        Atom three = store.getAtom("tOpwKho");
+        // ...therefore, the children of "three" can't be modified in this update operation
+        // (so "red" has been ignored)
+        assertNotesEqual(three);
+
+        s = "" +
                 "v8EuMtl: ► two\n" +
                 "             ► elephant\n" +
                 "v8EuMtl: ► two\n" +
                 "tOpwKho: ► three\n";
-        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
         // duplicates are possible...
         assertNotesEqual(root, "two", "two", "three");
         // ...but when a duplicate is added, children of any matching duplicate will be ignored
@@ -150,7 +175,7 @@ public class NoteQueriesTest {
                 "v8EuMtl: ► two\n" +
                 "             ► gorilla\n" +
                 "tOpwKho: ► three\n";
-        semantics.update(root, parser.parse(s), 3, filter, style, log);
+        semantics.update(root, parser.parse(s), 2, filter, style, log);
         assertNotesEqual(root, "two", "two", "three");
         // when duplicates already exist, children of duplicates follow the last-occurring instance
         assertNotesEqual(two, "gorilla");
