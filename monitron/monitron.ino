@@ -50,7 +50,7 @@
 
 // A sampling cycle may take at most this long.
 // If the sample runs over, an error message will be generated
-#define CYCLE_MILLIS_MAX  5000
+#define CYCLE_MILLIS_MAX  4000
 
 ////////////////////////////////////////
 
@@ -178,7 +178,7 @@ void endOSCErrorMessage()
     popColor();
 }
 
-void finishAnalogObservation(AnalogSampler s, char* prefix)
+void finishAnalogObservation(AnalogSampler &s, char* prefix)
 {
     beginOSCWrite();
     Serial.print(prefix);
