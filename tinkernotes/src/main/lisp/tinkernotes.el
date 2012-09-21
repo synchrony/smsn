@@ -431,14 +431,9 @@
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
-                        (let ((bullet
-                                (if target-has-children "+" "-")))   ;; "\u25ba"
+                        (let ((bullet (if target-has-children "+" "-")))   ;; "\u25ba"
                             (setq line (concat line
                                 (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white") "\n")))
-
-;;					        (setq line (concat line
-;;					            (propertize bullet 'face (list 'bold (not tn-emacspeak-mode) :foreground "#808080" :background "white")))))
-
                         (insert (propertize line 'target-key target-key)))
                     (write-view editable children key-indent (+ tree-indent 4))))))
 

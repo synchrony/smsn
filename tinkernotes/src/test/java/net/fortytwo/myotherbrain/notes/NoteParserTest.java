@@ -16,11 +16,11 @@ import static junit.framework.Assert.assertNull;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteParserTest {
-    private NoteParser syntax;
+    private NoteParser parser;
 
     @Before
     public void setUp() throws Exception {
-        syntax = new NoteParser();
+        parser = new NoteParser();
     }
 
     @After
@@ -29,7 +29,7 @@ public class NoteParserTest {
 
     @Test
     public void testExample1() throws Exception {
-        List<Note> notes = syntax.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-1.txt")).getChildren();
+        List<Note> notes = parser.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
         Note indentation = notes.get(1);
@@ -61,7 +61,7 @@ public class NoteParserTest {
 
     @Test
     public void testExample2() throws Exception {
-        Note root = syntax.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-2.txt"));
+        Note root = parser.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-2.txt"));
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());
@@ -91,10 +91,17 @@ public class NoteParserTest {
         readNotes("@sharability ");
     }
 
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testLineTruncationSequenceNotAllowed() throws Exception {
+        readNotes("" +
+                "* this is a note whose value was truncated for readability [...]\n" +
+                "   * you wouldn't want to lose the actual value because of a careless copy and paste, would you?");
+    }
+
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return syntax.parse(in).getChildren();
+            return parser.parse(in).getChildren();
         } finally {
             in.close();
         }

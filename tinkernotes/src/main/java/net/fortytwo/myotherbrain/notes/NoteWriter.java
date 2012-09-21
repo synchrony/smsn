@@ -14,7 +14,9 @@ import java.util.List;
  */
 public class NoteWriter {
 
-    private static final String
+    public static final String VALUE_TRUNCATOR = " [...]";
+
+    public static final String
             ALIAS = "alias",
             CHILDREN = "children",
             CREATED = "created",
@@ -25,6 +27,9 @@ public class NoteWriter {
             VALUE = "value",
             WEIGHT = "weight";
 
+    private int valueLengthCutoff = -1;
+
+    // TODO: revise/update JSON note syntax
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
 
@@ -33,9 +38,14 @@ public class NoteWriter {
         target.put(KEY, n.getId());
         target.put(WEIGHT, n.getWeight());
         target.put(SHARABILITY, n.getSharability());
-        target.put(VALUE, n.getValue());
         target.put(CREATED, n.getCreated());
         target.put(HAS_CHILDREN, n.getHasChildren());
+
+        String value = n.getValue();
+        if (value != null && valueLengthCutoff > 0 && value.length() > valueLengthCutoff) {
+            value = value.substring(0, valueLengthCutoff) + VALUE_TRUNCATOR;
+        }
+        target.put(VALUE, value);
 
         if (null != n.getAlias()) {
             target.put(ALIAS, n.getAlias());
@@ -116,5 +126,13 @@ public class NoteWriter {
         }
 
         return true;
+    }
+
+    public int getValueLengthCutoff() {
+        return valueLengthCutoff;
+    }
+
+    public void setValueLengthCutoff(int valueLengthCutoff) {
+        this.valueLengthCutoff = valueLengthCutoff;
     }
 }

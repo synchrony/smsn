@@ -23,6 +23,8 @@ import java.io.UnsupportedEncodingException;
 @ExtensionNaming(namespace = "tinkernotes", name = "search")
 public class SearchExtension extends TinkerNotesExtension {
 
+    private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 200;
+
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
@@ -53,6 +55,8 @@ public class SearchExtension extends TinkerNotesExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
+        p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
+
         addSearchResults(p);
 
         p.map.put("title", p.query);

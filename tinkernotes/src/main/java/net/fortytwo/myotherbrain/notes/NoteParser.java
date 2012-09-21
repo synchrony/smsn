@@ -58,6 +58,11 @@ public class NoteParser {
                 continue;
             }
 
+            if (l.endsWith(NoteWriter.VALUE_TRUNCATOR)) {
+                throw new NoteParsingException(lineNumber,
+                        "line ends with the reserved truncation sequence \"" + NoteWriter.VALUE_TRUNCATOR + "\"");
+            }
+
             // Find indent level
             int indent = 0;
             if (l.length() > 0) {
