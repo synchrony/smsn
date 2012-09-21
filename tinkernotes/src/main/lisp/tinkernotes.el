@@ -107,6 +107,8 @@
 (setq tn-current-line 1)
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
 
+(setq tn-emacspeak-mode nil)
+
 
 ;; NAVIGATION ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -429,7 +431,7 @@
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
 					    (setq line (concat line
-					        (propertize "\u25ba" 'face (list 'bold :foreground "#808080" :background "white"))))
+					        (propertize "\u25ba" 'face (list 'bold :foreground "#808080" :background "white") 'invisible tn-emacspeak-mode)))
 					        ;;(colorize "\u25ba" target-weight target-sharability nil t target-alias "white")))
                         (setq line (concat line
                             " " (colorize target-value target-weight target-sharability nil nil target-alias "white") "\n"))
@@ -1237,6 +1239,14 @@
 (global-set-key (kbd "C-c C-w C-] s")   'tn-set-max-weight-2)
 (global-set-key (kbd "C-c C-w C-] d")   'tn-set-max-weight-3)
 (global-set-key (kbd "C-c C-w C-] f")   'tn-set-max-weight-4)
+
+;; new bindings (not yet recorded in mob-data)
+(global-set-key (kbd "C-c C-v s")       'tn-toggle-emacspeak)
+
+(defun tn-toggle-emacspeak ()
+    (interactive)
+    (setq tn-emacspeak-mode (not tn-emacspeak-mode))
+    (tn-refresh-view))
 
 (defun toggle-linum-mode ()
     (interactive)
