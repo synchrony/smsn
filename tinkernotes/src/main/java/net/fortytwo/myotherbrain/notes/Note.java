@@ -11,6 +11,7 @@ public class Note {
     public static final String CLEAR_ALIAS = "_";
 
     private final List<Note> children;
+    private boolean hasChildren;
 
     private String value;
     private String id;
@@ -104,6 +105,7 @@ public class Note {
         }
 
         children.add(child);
+        hasChildren = true;
     }
 
     @Override
@@ -113,5 +115,13 @@ public class Note {
             d = d.substring(0, 17) + "...";
         }
         return "note(" + d + ")";
+    }
+
+    public boolean getHasChildren() {
+        return hasChildren;
+    }
+
+    public void setHasChildren() {
+        hasChildren = true;
     }
 }

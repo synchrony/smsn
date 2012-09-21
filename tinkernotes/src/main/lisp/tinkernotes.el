@@ -417,6 +417,7 @@
                 (target-value (get-value target))
 		        (target-weight (get-weight target))
 		        (target-sharability (get-sharability target))
+                (target-has-children (not (equal json-false (cdr (assoc 'hasChildren target)))))
 		        (target-alias (get-alias target)))
 		            (if target-key (puthash target-key target tn-atoms))
 		            (if (not target-key) (error "missing target key"))
@@ -430,14 +431,15 @@
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line (light-gray space "white") " ")))
-					    (setq line (concat line
-					        (propertize "\u25ba" 'face (list 'bold :foreground "#808080" :background "white") 'invisible tn-emacspeak-mode)))
-					        ;;(colorize "\u25ba" target-weight target-sharability nil t target-alias "white")))
-                        (setq line (concat line
-                            " " (colorize target-value target-weight target-sharability nil nil target-alias "white") "\n"))
-                        (insert (propertize line
-                            ;;'invisible t
-			                    'target-key target-key)))
+                        (let ((bullet
+                                (if target-has-children "+" "-")))   ;; "\u25ba"
+                            (setq line (concat line
+                                (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white") "\n")))
+
+;;					        (setq line (concat line
+;;					            (propertize bullet 'face (list 'bold (not tn-emacspeak-mode) :foreground "#808080" :background "white")))))
+
+                        (insert (propertize line 'target-key target-key)))
                     (write-view editable children key-indent (+ tree-indent 4))))))
 
 

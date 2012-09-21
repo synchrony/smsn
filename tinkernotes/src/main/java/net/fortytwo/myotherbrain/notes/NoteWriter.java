@@ -14,23 +14,36 @@ import java.util.List;
  */
 public class NoteWriter {
 
+    private static final String
+            ALIAS = "alias",
+            CHILDREN = "children",
+            CREATED = "created",
+            HAS_CHILDREN = "hasChildren",
+            KEY = "key",
+            SHARABILITY = "sharability",
+            TARGET = "target",
+            VALUE = "value",
+            WEIGHT = "weight";
+
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
 
         JSONObject target = new JSONObject();
-        json.put("target", target);
-        target.put("key", n.getId());
-        target.put("weight", n.getWeight());
-        target.put("sharability", n.getSharability());
-        target.put("value", n.getValue());
-        target.put("created", n.getCreated());
+        json.put(TARGET, target);
+        target.put(KEY, n.getId());
+        target.put(WEIGHT, n.getWeight());
+        target.put(SHARABILITY, n.getSharability());
+        target.put(VALUE, n.getValue());
+        target.put(CREATED, n.getCreated());
+        target.put(HAS_CHILDREN, n.getHasChildren());
+
         if (null != n.getAlias()) {
-            target.put("alias", n.getAlias());
+            target.put(ALIAS, n.getAlias());
         }
 
         if (0 < n.getChildren().size()) {
             JSONArray c = new JSONArray();
-            json.put("children", c);
+            json.put(CHILDREN, c);
             int i = 0;
             for (Note child : n.getChildren()) {
                 c.put(i, toJSON(child));

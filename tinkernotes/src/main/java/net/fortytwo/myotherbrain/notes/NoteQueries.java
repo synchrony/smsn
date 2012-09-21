@@ -96,9 +96,23 @@ public class NoteQueries {
                 Note cn = viewInternal(target, root, h, filter, style);
                 n.addChild(cn);
             }
+        } else {
+            if (hasChildren(root, parent, filter, style)) {
+                n.setHasChildren();
+            }
         }
 
         return n;
+    }
+
+    // Note: currently it is possible to see all children of a note as long as that note is visible.
+    // If this policy changes (hiding invisible children), this method will also need to change.
+    private boolean hasChildren(final Atom root,
+                                final Atom parent,
+                                final Filter filter,
+                                final AdjacencyStyle style) {
+        Iterable<Atom> children = style.getLinked(root, parent, filter);
+        return children.iterator().hasNext();
     }
 
     public Note customView(final List<String> atomIds,
