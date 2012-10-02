@@ -149,6 +149,10 @@ public class MOBGraph {
         for (Vertex v : searchIndex.query(MyOtherBrain.VALUE, query)) {
             Atom a = getAtom(v);
 
+            if (null == a) {
+                throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
+            }
+
             if (filter.isVisible(a)) {
                 results.add(a);
             }

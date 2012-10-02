@@ -27,6 +27,7 @@ import java.util.Map;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "duplicates")
+//@ExtensionDescriptor(description = "identify atoms with duplicate values")
 public class DuplicatesExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)

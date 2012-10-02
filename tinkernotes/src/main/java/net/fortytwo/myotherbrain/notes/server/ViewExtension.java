@@ -13,9 +13,12 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Note;
 
 /**
+ * A service for retrieving hierarchical views of TinkerNotes graphs
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "view")
+//@ExtensionDescriptor(description = "retrieve a hierarchical view of a TinkerNotes graph")
 public class ViewExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)

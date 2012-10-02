@@ -17,9 +17,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
+ * A service for finding root nodes of a TinkerNotes graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "find-roots")
+//@ExtensionDescriptor(description = "find root nodes of a TinkerNotes graph")
 public class FindRootsExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)

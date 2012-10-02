@@ -83,6 +83,10 @@ public class Filter {
     }
 
     public boolean isVisible(final Atom atom) {
+        if (null == atom) {
+            throw new IllegalArgumentException();
+        }
+
         float sharability = atom.getSharability();
         float weight = atom.getWeight();
 

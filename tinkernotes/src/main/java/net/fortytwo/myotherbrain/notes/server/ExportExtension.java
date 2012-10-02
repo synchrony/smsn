@@ -27,9 +27,12 @@ import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 /**
+ * A service for exporting/serializing a TinkerNotes graph
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "export")
+//@ExtensionDescriptor(description = "export/serialize a TinkerNotes graph")
 public class ExportExtension extends TinkerNotesExtension {
     private static final Pattern DATE_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
 

@@ -18,13 +18,16 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
+ * A service for updating a TinkerNotes graph
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "update")
+//@ExtensionDescriptor(description = "update a TinkerNotes graph")
 public class UpdateExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "an extension for updating a portion of a MyOtherBrain graph using the MOB Notes format")
+    @ExtensionDescriptor(description = "update a TinkerNotes graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
@@ -45,6 +48,15 @@ public class UpdateExtension extends TinkerNotesExtension {
         p.rootId = rootId;
         p.styleName = styleName;
         p.view = view;
+
+        // TODO: remove these; they're only for debugging a Rexster issue
+        if (minWeight > 1000) minWeight = 1000f;
+        if (maxWeight > 1000) maxWeight = 1000f;
+        if (defaultWeight > 1000) defaultWeight = 1000f;
+        if (minSharability > 1000) minSharability = 1000f;
+        if (maxSharability > 1000) maxSharability = 1000f;
+        if (defaultSharability > 1000) defaultSharability = 1000f;
+
         p.filter = createFilter(p.user, minWeight, maxWeight, defaultWeight, minSharability, maxSharability, defaultSharability);
 
         return handleRequestInternal(p);

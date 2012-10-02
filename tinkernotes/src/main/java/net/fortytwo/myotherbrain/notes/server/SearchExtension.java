@@ -18,9 +18,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
+ * A service for executing keyword search over a TinkerNotes graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "search")
+//@ExtensionDescriptor(description = "execute keyword search over a TinkerNotes graph")
 public class SearchExtension extends TinkerNotesExtension {
 
     private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 200;

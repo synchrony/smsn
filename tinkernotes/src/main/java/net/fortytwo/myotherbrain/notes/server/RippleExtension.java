@@ -18,9 +18,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
+ * A service for executing Ripple queries over TinkerNotes graphs
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "ripple")
+//@ExtensionDescriptor(description = "execute a Ripple query over a TinkerNotes graph")
 public class RippleExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)

@@ -14,9 +14,12 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import java.util.List;
 
 /**
+ * A service for finding recently visited atoms
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "history")
+//@ExtensionDescriptor(description = "find recently visited atoms")
 public class HistoryExtension extends TinkerNotesExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)

@@ -21,9 +21,9 @@
 
     <properties>
         <myotherbrain.version>1.1-SNAPSHOT</myotherbrain.version>
-        <blueprints.version>2.1.0-SNAPSHOT</blueprints.version>
-        <frames.version>2.1.0-SNAPSHOT</frames.version>
-        <rexster.version>2.1.0-SNAPSHOT</rexster.version>
+        <blueprints.version>2.1.0</blueprints.version>
+        <frames.version>2.1.0</frames.version>
+        <rexster.version>2.1.0</rexster.version>
         <rdfagents.version>0.2</rdfagents.version>
         <ripple.version>0.8-SNAPSHOT</ripple.version>
         <sesame.version>2.6.4</sesame.version>

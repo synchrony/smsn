@@ -15,9 +15,11 @@ import net.fortytwo.myotherbrain.MOBGraph;
 import java.util.logging.Logger;
 
 /**
+ * A service for setting the properties of an atom
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "tinkernotes", name = "set")
+//@ExtensionDescriptor(description = "set the properties of an atom")
 public class SetPropertiesExtension extends TinkerNotesExtension {
     protected static final Logger LOGGER = Logger.getLogger(SetPropertiesExtension.class.getName());
 
