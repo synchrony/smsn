@@ -87,6 +87,7 @@ public class Filter {
             throw new IllegalArgumentException();
         }
 
+
         float sharability = atom.getSharability();
         float weight = atom.getWeight();
 
