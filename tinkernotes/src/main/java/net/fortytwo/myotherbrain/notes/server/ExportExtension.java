@@ -16,6 +16,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
 import net.fortytwo.myotherbrain.Atom;
+import net.fortytwo.myotherbrain.AtomList;
 import net.fortytwo.myotherbrain.MOBGraph;
 import net.fortytwo.myotherbrain.MyOtherBrain;
 
@@ -55,35 +56,46 @@ public class ExportExtension extends TinkerNotesExtension {
         p.println("created\tid\tweight\tsharability\tvalue\talias");
 
         for (Vertex v : g.getGraph().getVertices()) {
-            p.print(v.getProperty(MyOtherBrain.CREATED));
-            p.print('\t');
-            p.print(v.getId());
-            p.print('\t');
-            p.print(v.getProperty(MyOtherBrain.WEIGHT));
-            p.print('\t');
-            p.print(v.getProperty(MyOtherBrain.SHARABILITY));
-            p.print('\t');
+            Object c = v.getProperty(MyOtherBrain.CREATED);
+            if (null != c) {
+                p.print(c);
+                p.print('\t');
+                p.print(v.getId());
+                p.print('\t');
+                p.print(v.getProperty(MyOtherBrain.WEIGHT));
+                p.print('\t');
+                p.print(v.getProperty(MyOtherBrain.SHARABILITY));
+                p.print('\t');
 
-            p.print(escapeValue((String) v.getProperty(MyOtherBrain.VALUE)));
-            p.print('\t');
+                p.print(escapeValue((String) v.getProperty(MyOtherBrain.VALUE)));
+                p.print('\t');
 
-            String alias = (String) v.getProperty(MyOtherBrain.ALIAS);
-            if (null != alias) {
-                p.print(escapeValue(alias));
+                String alias = (String) v.getProperty(MyOtherBrain.ALIAS);
+                if (null != alias) {
+                    p.print(escapeValue(alias));
+                }
+
+                p.print('\n');
             }
-
-            p.print('\n');
         }
     }
 
     private void exportEdges(final MOBGraph g,
                              final PrintStream p) throws IOException {
         p.println("from\tto");
-        for (Edge e : g.getGraph().getEdges()) {
-            p.print(e.getVertex(Direction.OUT).getId());
-            p.print('\t');
-            p.print(e.getVertex(Direction.IN).getId());
-            p.print('\n');
+
+        for (Vertex v : g.getGraph().getVertices()) {
+            Atom a = g.getAtom(v);
+            if (null != a) {
+                AtomList l = a.getNotes();
+                while (null != l) {
+                    p.print(v.getId());
+                    p.print('\t');
+                    p.print(l.getFirst().asVertex().getId());
+                    p.print('\n');
+                    l = l.getRest();
+                }
+            }
         }
     }
 
