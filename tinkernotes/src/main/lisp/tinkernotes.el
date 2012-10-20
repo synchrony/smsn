@@ -397,7 +397,7 @@
     (let ((max 0))
         (let (
             (children (cdr (assoc 'children json)))
-            (target-id (get-id (cdr (assoc 'target json)))))
+            (target-id (get-id json)))
                 (let ((length (+ (length target-id) 1)))
                     (if (> length max) (setq max length)))
                 (loop for child across children do
@@ -409,20 +409,19 @@
     (loop for json across children do
     (let (
         (link (cdr (assoc 'link json)))
-        (target (cdr (assoc 'target json)))
         (children (cdr (assoc 'children json))))
             (let (
-                (target-id (get-id target))
-                (target-value (get-value target))
-		        (target-weight (get-weight target))
-		        (target-sharability (get-sharability target))
-                (target-has-children (not (equal json-false (cdr (assoc 'hasChildren target)))))
-		        (target-alias (get-alias target)))
-		            (if target-id (puthash target-id target tn-atoms))
-		            (if (not target-id) (error "missing target key"))
-		            (if (not target-value) (error (concat "missing value for target with key " target-id)))
-		            (if (not target-weight) (error (concat "missing weight for target with key " target-id)))
-		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-id)))
+                (target-id (get-id json))
+                (target-value (get-value json))
+		        (target-weight (get-weight json))
+		        (target-sharability (get-sharability json))
+                (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
+		        (target-alias (get-alias json)))
+		            (if target-id (puthash target-id json tn-atoms))
+		            (if (not target-id) (error "missing target id"))
+		            (if (not target-value) (error (concat "missing value for target with id " target-id)))
+		            (if (not target-weight) (error (concat "missing weight for target with id " target-id)))
+		            (if (not target-sharability) (error (concat "missing sharability for target with id " target-id)))
 		            (let ((line "") (key (concat target-id ":")))
 		                (loop for i from 1 to (- key-indent (length key)) do (setq key (concat key " ")))
                         (setq line (concat line

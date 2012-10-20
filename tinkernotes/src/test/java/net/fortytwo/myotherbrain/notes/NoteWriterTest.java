@@ -34,28 +34,24 @@ public class NoteWriterTest {
 
         //System.out.println(j);
 
-        JSONObject t = j.getJSONObject(NoteWriter.TARGET);
-        assertTrue(t.getBoolean(NoteWriter.HAS_CHILDREN));
+        assertTrue(j.getBoolean(NoteWriter.HAS_CHILDREN));
         JSONArray c = j.getJSONArray(NoteWriter.CHILDREN);
         assertEquals(1, c.length());
 
         JSONObject n1 = c.getJSONObject(0);
-        JSONObject t1 = n1.getJSONObject(NoteWriter.TARGET);
-        assertTrue(t1.getBoolean(NoteWriter.HAS_CHILDREN));
-        assertEquals("foo", t1.getString(NoteWriter.VALUE));
+        assertTrue(n1.getBoolean(NoteWriter.HAS_CHILDREN));
+        assertEquals("foo", n1.getString(NoteWriter.VALUE));
         JSONArray c1 = n1.getJSONArray(NoteWriter.CHILDREN);
         assertEquals(2, c1.length());
 
         JSONObject n2 = c1.getJSONObject(0);
-        JSONObject t2 = n2.getJSONObject(NoteWriter.TARGET);
-        assertFalse(t2.getBoolean(NoteWriter.HAS_CHILDREN));
-        assertEquals("bar", t2.getString(NoteWriter.VALUE));
+        assertFalse(n2.getBoolean(NoteWriter.HAS_CHILDREN));
+        assertEquals("bar", n2.getString(NoteWriter.VALUE));
         assertNull(n2.optJSONArray(NoteWriter.CHILDREN));
 
         JSONObject n3 = c1.getJSONObject(1);
-        JSONObject t3 = n3.getJSONObject(NoteWriter.TARGET);
-        assertFalse(t3.getBoolean(NoteWriter.HAS_CHILDREN));
-        assertEquals("quux", t3.getString(NoteWriter.VALUE));
+        assertFalse(n3.getBoolean(NoteWriter.HAS_CHILDREN));
+        assertEquals("quux", n3.getString(NoteWriter.VALUE));
         assertNull(n3.optJSONArray(NoteWriter.CHILDREN));
     }
 
@@ -71,7 +67,7 @@ public class NoteWriterTest {
             JSONObject j = writer.toJSON(n);
 
             assertEquals("this is a  [...]",
-                    j.getJSONArray(NoteWriter.CHILDREN).getJSONObject(0).getJSONObject(NoteWriter.TARGET).getString(NoteWriter.VALUE));
+                    j.getJSONArray(NoteWriter.CHILDREN).getJSONObject(0).getString(NoteWriter.VALUE));
         } finally {
             writer.setValueLengthCutoff(before);
         }

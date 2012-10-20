@@ -82,7 +82,7 @@ public class NoteQueriesTest {
         JSONObject json = writer.toJSON(after);
         //System.out.println(json.toString());
         JSONObject j = json.getJSONArray("children").getJSONObject(0);
-        assertEquals("cheval \u00e0 phynances", j.getJSONObject("target").getString("value"));
+        assertEquals("cheval \u00e0 phynances", j.getString("value"));
     }
 
     @Test
@@ -93,9 +93,9 @@ public class NoteQueriesTest {
         String s;
 
         s = "" +
-                "N5KBOAq: ► one\n" +
-                "v8EuMtl: ► two\n" +
-                "tOpwKho: ► three\n";
+                "N5KBOAq: * one\n" +
+                "v8EuMtl: * two\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         assertNotesEqual(root, "one", "two", "three");
 
@@ -103,10 +103,10 @@ public class NoteQueriesTest {
         Atom two = store.getAtom("v8EuMtl");
 
         s = "" +
-                "N5KBOAq: ► one\n" +
-                "r4zU45R:     ► ten\n" +
-                "             ► yellow\n" +
-                "tOpwKho: ► three\n";
+                "N5KBOAq: * one\n" +
+                "r4zU45R:     * ten\n" +
+                "             * yellow\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         // "two" has been removed
         assertNotesEqual(root, "one", "three");
@@ -115,22 +115,22 @@ public class NoteQueriesTest {
         Atom ten = store.getAtom("r4zU45R");
 
         s = "" +
-                "N5KBOAq: ► one\n" +
-                "r4zU45R:     ► ten\n" +
-                "                 ► rabbit\n" +
-                "             ► purple\n" +
-                "tOpwKho: ► three\n";
+                "N5KBOAq: * one\n" +
+                "r4zU45R:     * ten\n" +
+                "                 * rabbit\n" +
+                "             * purple\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         // depth is only two, so "rabbit" is not reachable
         assertNotesEqual(ten);
 
         s = "" +
-                "N5KBOAq: ► one\n" +
-                "r4zU45R:     ► ten\n" +
-                "             ► green\n" +
-                "                 ► rabbit\n" +
-                "                 ► kangaroo\n" +
-                "tOpwKho: ► three\n";
+                "N5KBOAq: * one\n" +
+                "r4zU45R:     * ten\n" +
+                "             * green\n" +
+                "                 * rabbit\n" +
+                "                 * kangaroo\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         Atom green = one.getNotes().getRest().getFirst();
         // "rabbit" and "kangaroo" are added beneath "green" even though they're
@@ -138,8 +138,8 @@ public class NoteQueriesTest {
         assertNotesEqual(green, "rabbit", "kangaroo");
 
         s = "" +
-                "v8EuMtl: ► two\n" +
-                "tOpwKho: ► three\n";
+                "v8EuMtl: * two\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         // "one" has been removed...
         assertNotesEqual(root, "two", "three");
@@ -147,9 +147,9 @@ public class NoteQueriesTest {
         assertNotesEqual(one, "ten", "green");
 
         s = "" +
-                "tOpwKho: ► three\n" +
-                "             ► red\n" +
-                "v8EuMtl: ► two\n";
+                "tOpwKho: * three\n" +
+                "             * red\n" +
+                "v8EuMtl: * two\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
@@ -159,10 +159,10 @@ public class NoteQueriesTest {
         assertNotesEqual(three);
 
         s = "" +
-                "v8EuMtl: ► two\n" +
-                "             ► elephant\n" +
-                "v8EuMtl: ► two\n" +
-                "tOpwKho: ► three\n";
+                "v8EuMtl: * two\n" +
+                "             * elephant\n" +
+                "v8EuMtl: * two\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         // duplicates are possible...
         assertNotesEqual(root, "two", "two", "three");
@@ -170,11 +170,11 @@ public class NoteQueriesTest {
         assertNotesEqual(two);
 
         s = "" +
-                "v8EuMtl: ► two\n" +
-                "             ► elephant\n" +
-                "v8EuMtl: ► two\n" +
-                "             ► gorilla\n" +
-                "tOpwKho: ► three\n";
+                "v8EuMtl: * two\n" +
+                "             * elephant\n" +
+                "v8EuMtl: * two\n" +
+                "             * gorilla\n" +
+                "tOpwKho: * three\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         assertNotesEqual(root, "two", "two", "three");
         // when duplicates already exist, children of duplicates follow the last-occurring instance
@@ -189,7 +189,7 @@ public class NoteQueriesTest {
         String s;
 
         s = "" +
-                "N5KBOAq: ► one\n";
+                "N5KBOAq: * one\n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         Atom one = store.getAtom("N5KBOAq");
         assertEquals(0.5f, one.getWeight());
@@ -197,7 +197,7 @@ public class NoteQueriesTest {
         assertNull(one.getAlias());
 
         s = "" +
-                "N5KBOAq: ► one\n" +
+                "N5KBOAq: * one\n" +
                 "             @weight 0.75\n" +
                 "             @sharability 0.25\n" +
                 "             @alias http://example.org/ns/one\n";
@@ -207,7 +207,7 @@ public class NoteQueriesTest {
         assertEquals("http://example.org/ns/one", one.getAlias());
 
         s = "" +
-                "N5KBOAq: ► one\n" +
+                "N5KBOAq: * one\n" +
                 "             @alias \n";
         semantics.update(root, parser.parse(s), 2, filter, style, log);
         assertNull(one.getAlias());

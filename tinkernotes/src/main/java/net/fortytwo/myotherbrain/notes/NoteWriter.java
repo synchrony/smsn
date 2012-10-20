@@ -23,32 +23,28 @@ public class NoteWriter {
             HAS_CHILDREN = "hasChildren",
             ID = "id",
             SHARABILITY = "sharability",
-            TARGET = "target",
             VALUE = "value",
             WEIGHT = "weight";
 
     private int valueLengthCutoff = -1;
 
-    // TODO: revise/update JSON note syntax
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
 
-        JSONObject target = new JSONObject();
-        json.put(TARGET, target);
-        target.put(ID, n.getId());
-        target.put(WEIGHT, n.getWeight());
-        target.put(SHARABILITY, n.getSharability());
-        target.put(CREATED, n.getCreated());
-        target.put(HAS_CHILDREN, n.getHasChildren());
+        json.put(ID, n.getId());
+        json.put(WEIGHT, n.getWeight());
+        json.put(SHARABILITY, n.getSharability());
+        json.put(CREATED, n.getCreated());
+        json.put(HAS_CHILDREN, n.getHasChildren());
 
         String value = n.getValue();
         if (value != null && valueLengthCutoff > 0 && value.length() > valueLengthCutoff) {
             value = value.substring(0, valueLengthCutoff) + VALUE_TRUNCATOR;
         }
-        target.put(VALUE, value);
+        json.put(VALUE, value);
 
         if (null != n.getAlias()) {
-            target.put(ALIAS, n.getAlias());
+            json.put(ALIAS, n.getAlias());
         }
 
         if (0 < n.getChildren().size()) {
