@@ -99,41 +99,6 @@ public class ExportExtension extends TinkerNotesExtension {
         }
     }
 
-    private void exportTimeline(final MOBGraph g,
-                                final PrintStream p) throws IOException {
-
-        p.println("date\tid\tweight\tsharability\tvalue\talias");
-
-        for (Vertex v : g.getGraph().getVertices()) {
-            Atom d = g.getAtom(v);
-            String date = d.getValue();
-
-            if (DATE_PATTERN.matcher(date).matches()) {
-                /* TODO
-                for (Atom a : d.getInNotes()) {
-                    p.print(date);
-                    p.print('\t');
-                    p.print(a.asVertex().getId());
-                    p.print('\t');
-                    p.print(a.getWeight());
-                    p.print('\t');
-                    p.print(a.getSharability());
-                    p.print('\t');
-
-                    p.print(escapeValue((String) v.getProperty(MyOtherBrain.VALUE)));
-                    p.print('\t');
-
-                    String alias = (String) v.getProperty(MyOtherBrain.ALIAS);
-                    if (null != alias) {
-                        p.print(escapeValue(alias));
-                    }
-
-                    p.print('\n');
-                } */
-            }
-        }
-    }
-
     private void exportPageRank(final MOBGraph g,
                                 final PrintStream p) {
         TinkerGraph g2 = new TinkerGraph();
@@ -175,13 +140,6 @@ public class ExportExtension extends TinkerNotesExtension {
         out = new FileOutputStream(new File("/tmp/tinkernotes-edges.txt"));
         try {
             exportEdges(p.graph, new PrintStream(out));
-        } finally {
-            out.close();
-        }
-
-        out = new FileOutputStream(new File("/tmp/tinkernotes-timeline.txt"));
-        try {
-            exportTimeline(p.graph, new PrintStream(out));
         } finally {
             out.close();
         }
