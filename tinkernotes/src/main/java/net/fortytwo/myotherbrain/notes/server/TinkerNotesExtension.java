@@ -188,7 +188,8 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                 m, maxSharability, defaultSharability);
     }
 
-    protected void addView(Note n, Params p) throws IOException {
+    protected void addView(final Note n,
+                           final Params p) throws IOException {
         JSONObject json;
 
         try {
@@ -197,7 +198,14 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             throw new IOException(e);
         }
 
-        p.map.put("view", json);
+        org.codehaus.jettison.json.JSONObject j;
+        try {
+            j = new org.codehaus.jettison.json.JSONObject(json.toString());
+        } catch (org.codehaus.jettison.json.JSONException e) {
+            throw new IOException(e);
+        }
+
+        p.map.put("view", j);
     }
 
     protected float findMinAuthorizedSharability(final Principal user,

@@ -11,8 +11,6 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.notes.Note;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -75,13 +73,6 @@ public class SearchExtension extends TinkerNotesExtension {
 
     protected void addSearchResults(final Params p) throws IOException {
         Note n = p.queries.search(p.query, p.depth, p.filter, p.style);
-        JSONObject json;
-
-        try {
-            json = p.writer.toJSON(n);
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
-        p.map.put("view", json.toString());
+        addView(n, p);
     }
 }

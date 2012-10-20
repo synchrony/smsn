@@ -317,8 +317,7 @@
                     (setq tn-mode mode)
                     (setq buffer-read-only nil)
                     (erase-buffer)
-                    (let ((view-json (json-read-from-string view)))
-                        (write-view editable (cdr (assoc 'children view-json)) (longest-key view-json) 0))
+                    (write-view editable (cdr (assoc 'children view)) (longest-key view) 0)
                     (beginning-of-buffer)
                     (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
