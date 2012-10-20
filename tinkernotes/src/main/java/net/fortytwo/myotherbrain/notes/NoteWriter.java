@@ -21,7 +21,7 @@ public class NoteWriter {
             CHILDREN = "children",
             CREATED = "created",
             HAS_CHILDREN = "hasChildren",
-            KEY = "key",
+            ID = "id",
             SHARABILITY = "sharability",
             TARGET = "target",
             VALUE = "value",
@@ -35,7 +35,7 @@ public class NoteWriter {
 
         JSONObject target = new JSONObject();
         json.put(TARGET, target);
-        target.put(KEY, n.getId());
+        target.put(ID, n.getId());
         target.put(WEIGHT, n.getWeight());
         target.put(SHARABILITY, n.getSharability());
         target.put(CREATED, n.getCreated());

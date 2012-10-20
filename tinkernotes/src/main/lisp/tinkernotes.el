@@ -167,11 +167,11 @@
                         (assoc-id nil)
                         (atom-id (if (< 0 (length s2)) s2 nil)))
                         (list assoc-id atom-id))))
-            (list nil (get-text-property (line-beginning-position) 'target-key))
+            (list nil (get-text-property (line-beginning-position) 'target-id))
             )))
 
-(defun get-key (atom)
-    (cdr (assoc 'key atom)))
+(defun get-id (atom)
+    (cdr (assoc 'id atom)))
 
 (defun get-created (atom)
     (cdr (assoc 'created atom)))
@@ -199,11 +199,11 @@
                 (concat name " [" root-id "]"))
             title)))
 
-(defun current-target-key ()
+(defun current-target-id ()
     (car (last (find-id))))
 
 (defun current-target ()
-    (get-atom (current-target-key)))
+    (get-atom (current-target-id)))
 
 (defun current-target-value ()
     (let ((g (current-target)))
@@ -397,8 +397,8 @@
     (let ((max 0))
         (let (
             (children (cdr (assoc 'children json)))
-            (target-key (get-key (cdr (assoc 'target json)))))
-                (let ((length (+ (length target-key) 1)))
+            (target-id (get-id (cdr (assoc 'target json)))))
+                (let ((length (+ (length target-id) 1)))
                     (if (> length max) (setq max length)))
                 (loop for child across children do
                     (let ((length (longest-key child)))
@@ -412,18 +412,18 @@
         (target (cdr (assoc 'target json)))
         (children (cdr (assoc 'children json))))
             (let (
-                (target-key (get-key target))
+                (target-id (get-id target))
                 (target-value (get-value target))
 		        (target-weight (get-weight target))
 		        (target-sharability (get-sharability target))
                 (target-has-children (not (equal json-false (cdr (assoc 'hasChildren target)))))
 		        (target-alias (get-alias target)))
-		            (if target-key (puthash target-key target tn-atoms))
-		            (if (not target-key) (error "missing target key"))
-		            (if (not target-value) (error (concat "missing value for target with key " target-key)))
-		            (if (not target-weight) (error (concat "missing weight for target with key " target-key)))
-		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-key)))
-		            (let ((line "") (key (concat target-key ":")))
+		            (if target-id (puthash target-id target tn-atoms))
+		            (if (not target-id) (error "missing target key"))
+		            (if (not target-value) (error (concat "missing value for target with key " target-id)))
+		            (if (not target-weight) (error (concat "missing weight for target with key " target-id)))
+		            (if (not target-sharability) (error (concat "missing sharability for target with key " target-id)))
+		            (let ((line "") (key (concat target-id ":")))
 		                (loop for i from 1 to (- key-indent (length key)) do (setq key (concat key " ")))
                         (setq line (concat line
                             (propertize (light-gray key "white") 'invisible (not editable))))
@@ -433,7 +433,7 @@
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
                                 (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white") "\n")))
-                        (insert (propertize line 'target-key target-key)))
+                        (insert (propertize line 'target-id target-id)))
                     (write-view editable children key-indent (+ tree-indent 4))))))
 
 
@@ -538,7 +538,7 @@
 
 (defun tn-visit-target ()
     (interactive)
-    (let ((key (current-target-key)))
+    (let ((key (current-target-id)))
         (if key
             (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight)
             (no-target))))
@@ -900,7 +900,7 @@
         (let ((target (current-target)))
             (if target
                 (let (
-                    (key (get-key target))
+                    (key (get-id target))
                     (weight (get-weight target))
                     (sharability (get-sharability target)))
 	                    (set-properties key v sharability))
@@ -929,7 +929,7 @@
         (let ((target (current-target)))
             (if target
                 (let (
-                    (key (get-key target))
+                    (key (get-id target))
                     (weight (get-weight target))
                     (sharability (get-sharability target)))
 	                    (set-properties key weight v))
