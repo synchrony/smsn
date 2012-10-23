@@ -2,9 +2,11 @@ package net.fortytwo.myotherbrain.rfid;
 
 import com.alien.enterpriseRFID.reader.AlienClass1Reader;
 import com.alien.enterpriseRFID.tags.Tag;
-import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterGraph;
+import com.tinkerpop.blueprints.impls.rexster.RexsterGraph;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.notes.Filter;
+import net.fortytwo.myotherbrain.notes.NoteQueries;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -38,6 +40,8 @@ public class RFIDPlay {
         //String readerName = reader.doReaderCommand("get ReaderName");
         //LOGGER.info("reader name: " + readerName);
 
+        Filter f = new Filter();
+
         BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             // This avoids "broken pipe" errors
@@ -59,7 +63,7 @@ public class RFIDPlay {
 
                         for (Atom a : atoms) {
                             System.out.println(a.asVertex().getId() + ": * " + a.getValue());
-                            for (Atom n : getNeighbors(a)) {
+                            for (Atom n : getNeighbors(a, f)) {
                                 System.out.println(n.asVertex().getId() + ":     * " + n.getValue());
                             }
                         }
@@ -76,10 +80,18 @@ public class RFIDPlay {
         }
     }
 
-    private static Collection<Atom> getNeighbors(final Atom a) {
+    private static Collection<Atom> getNeighbors(final Atom a,
+                                                 final Filter f) {
         Collection<Atom> n = new LinkedList<Atom>();
-        n.addAll(a.getInNotes());
-        n.addAll(a.getOutNotes());
+
+        for (Atom at : NoteQueries.FORWARD_ADJACENCY.getLinked(a, f)) {
+            n.add(at);
+        }
+
+        for (Atom at : NoteQueries.BACKWARD_ADJACENCY.getLinked(a, f)) {
+            n.add(at);
+        }
+
         return n;
     }
 

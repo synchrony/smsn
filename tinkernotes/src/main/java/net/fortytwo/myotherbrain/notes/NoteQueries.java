@@ -76,11 +76,10 @@ public class NoteQueries {
             log.logView(root);
         }
 
-        return viewInternal(root, null, height, filter, style);
+        return viewInternal(root, height, filter, style);
     }
 
     private Note viewInternal(final Atom root,
-                              final Atom parent,
                               final int height,
                               final Filter filter,
                               final AdjacencyStyle style) {
@@ -91,13 +90,13 @@ public class NoteQueries {
         Note n = toNote(root);
 
         if (height > 0) {
-            for (Atom target : style.getLinked(root, parent, filter)) {
+            for (Atom target : style.getLinked(root, filter)) {
                 int h = filter.isVisible(target) ? height - 1 : 0;
-                Note cn = viewInternal(target, root, h, filter, style);
+                Note cn = viewInternal(target, h, filter, style);
                 n.addChild(cn);
             }
         } else {
-            if (hasChildren(root, parent, filter, style)) {
+            if (hasChildren(root, filter, style)) {
                 n.setHasChildren();
             }
         }
@@ -108,10 +107,9 @@ public class NoteQueries {
     // Note: currently it is possible to see all children of a note as long as that note is visible.
     // If this policy changes (hiding invisible children), this method will also need to change.
     private boolean hasChildren(final Atom root,
-                                final Atom parent,
                                 final Filter filter,
                                 final AdjacencyStyle style) {
-        Iterable<Atom> children = style.getLinked(root, parent, filter);
+        Iterable<Atom> children = style.getLinked(root, filter);
         return children.iterator().hasNext();
     }
 
@@ -125,7 +123,7 @@ public class NoteQueries {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(viewInternal(a, null, 0, filter, FORWARD_ADJACENCY));
+            n.addChild(viewInternal(a, 0, filter, FORWARD_ADJACENCY));
         }
 
         return n;
@@ -158,7 +156,7 @@ public class NoteQueries {
             throw new IllegalStateException("can't update in style " + style);
         }
 
-        updateInternal(root, null, rootNote, depth, filter, style, log);
+        updateInternal(root, rootNote, depth, filter, style, log);
     }
 
     private final Comparator<Note> noteComparator = new Comparator<Note>() {
@@ -170,6 +168,7 @@ public class NoteQueries {
         }
     };
 
+    /*
     private String toString(final List<Note> notes) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
@@ -184,10 +183,9 @@ public class NoteQueries {
         }
 
         return sb.toString();
-    }
+    }*/
 
     public void updateInternal(final Atom root,
-                               final Atom parent,
                                final Note rootNote,
                                final int depth,
                                final Filter filter,
@@ -203,7 +201,7 @@ public class NoteQueries {
         final Set<String> added = new HashSet<String>();
         final Set<String> created = new HashSet<String>();
 
-        List<Note> before = viewInternal(root, parent, 1, filter, style).getChildren();
+        List<Note> before = viewInternal(root, 1, filter, style).getChildren();
         List<Note> after = rootNote.getChildren();
         List<Note> lcs = ListDiff.leastCommonSubsequence(before, after, noteComparator);
 
@@ -282,7 +280,7 @@ public class NoteQueries {
             //System.out.flush();
             int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : depth - 1;
 
-            updateInternal(store.getAtom(n.getId()), root, n, d, filter, style, log);
+            updateInternal(store.getAtom(n.getId()), n, d, filter, style, log);
         }
     }
 
@@ -322,7 +320,7 @@ public class NoteQueries {
         result.setValue("full text search results for \"" + query + "\"");
 
         for (Atom a : store.getAtomsByFulltextQuery(query, filter)) {
-            Note n = viewInternal(a, null, depth - 1, filter, style);
+            Note n = viewInternal(a, depth - 1, filter, style);
             result.addChild(n);
         }
 
@@ -338,7 +336,7 @@ public class NoteQueries {
         for (Vertex v : store.getGraph().getVertices()) {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
-                Note n = viewInternal(store.getAtom(v), null, 0, filter, style);
+                Note n = viewInternal(store.getAtom(v), 0, filter, style);
                 result.addChild(n);
             }
         }
@@ -396,7 +394,7 @@ public class NoteQueries {
             Atom a = store.getAtom(vx);
 
             if (filter.isVisible(a)) {
-                Note n = viewInternal(a, null, depth - 1, filter, style);
+                Note n = viewInternal(a, depth - 1, filter, style);
                 result.addChild(n);
             }
         }
@@ -501,7 +499,7 @@ public class NoteQueries {
     public interface AdjacencyStyle {
         String getName();
 
-        Iterable<Atom> getLinked(Atom root, Atom parent, Filter filter);
+        Iterable<Atom> getLinked(Atom root, Filter filter);
     }
 
     public static AdjacencyStyle lookupStyle(final String name) {
@@ -515,7 +513,7 @@ public class NoteQueries {
     }
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
-    private static Iterable<Atom> toIterable(AtomList l) {
+    public static Iterable<Atom> toIterable(AtomList l) {
         List<Atom> ll = new LinkedList<Atom>();
         while (null != l) {
             ll.add(l.getFirst());
@@ -531,7 +529,6 @@ public class NoteQueries {
         }
 
         public Iterable<Atom> getLinked(final Atom root,
-                                        final Atom parent,
                                         final Filter filter) {
             return toIterable(root.getNotes());
         }
@@ -543,7 +540,6 @@ public class NoteQueries {
         }
 
         public Iterable<Atom> getLinked(final Atom root,
-                                        final Atom parent,
                                         final Filter filter) {
             List<Atom> results = new LinkedList<Atom>();
             for (AtomList l : root.getFirstOf()) {
