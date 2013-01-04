@@ -2,6 +2,34 @@
 function pythag(a, b) = sqrt(a*a + b*b);
 function angle(a, b) = atan(a/b);
 
+includeInternalComponents = true;
+
+// this is the accuracy value for Shapeways' "Strong & Flexible Plastics" option
+error = 0.15;
+
+// note: AFAIK, "clearance" is a minimum gap in printed parts.  Here, however, it is used
+// as a lesser/safer accuracy for gaps between the printed part and foreign objects such as
+// circuit boards, which may not have been cut or measured with the same degree of precision.
+clearance = 0.5;
+
+containmentWallThick = 1;
+
+nanoLength = 43.2;
+nanoWidth = 18.0;
+nanoHeightWithoutUsb = 5.4;
+nanoHeightToUsbBase = 3.3;
+nanoUsbWidth = 7.6;
+nanoUsbHeight = 3.9;
+nanoLeftMargin = 5;
+
+chargerHeaderLength = 5.10;
+chargerHeaderWidth = 2.56;
+
+powerSwitchLength = 11.6;
+powerSwitchWidth = 4.0;
+powerSwitchDepth = 7.5;
+powerSwitchOffset = 12;
+
 caseWidth = 70;
 caseLength = 130;
 caseHeight = 11;
@@ -9,7 +37,7 @@ caseHeight = 11;
 wallThick = caseHeight/2;
 lidThick = 1.5;
 floorThick = 1.5;
-lidMargin = 1.5;
+lidMargin = 1;
 
 fingerHeightOffset = 5;
 fingerWellDepth = 10;
@@ -23,7 +51,7 @@ pushButtonLegLength = 4;
 pushButtonRadius = 3.5/2;
 pushButtonLegProtrusion = pushButtonLegLength - pushButtonBaseThick;
 buttonThick = 8;
-buttonPressDepth = 1;
+buttonPressDepth = 0.3;
 buttonWidth = pushButtonWellWidth;
 buttonLength = 25;
 buttonStabilizerWellWidth = 3;
@@ -34,8 +62,8 @@ totalThumbWellDepth = thumbWellDepth + buttonThick/2 + buttonPressDepth + pushBu
 ledDomeRadius = 2.6;
 ledRimRadius = 3.1;
 
-thumbBevelLength = 50;
-thumbBevelWidth = 35;
+thumbBevelLength = 48;
+thumbBevelWidth = 31;
 
 thumbBevelAngle = angle(thumbBevelLength-wallThick,thumbBevelWidth-wallThick);
 thumbBevelStretch = pythag(thumbBevelLength-wallThick, thumbBevelWidth-wallThick);
@@ -101,6 +129,9 @@ module fingerWell(depth, radius) {
     }
 }
 
+// create the lid
+// buffer: hyper-extends the lid, for better rendering
+// shrinkage: clearance around the edges of the lid
 module lid(buffer, shrinkage) {
     translate([0,0,-buffer]) {
         translate([wallThick-lidMargin+shrinkage,wallThick-lidMargin+shrinkage,0]) {
@@ -134,8 +165,8 @@ module lid(buffer, shrinkage) {
 }
 
 module screwHoles() {
-    translate([-1,0,0]) {
-        translate([17,caseLength-thumbBevelLength-wallThick+9,0]) { cylinder(h=caseHeight+2,r=1.5); }
+    translate([0,0,-1]) {
+        translate([15,caseLength-thumbBevelLength-wallThick+9,0]) { cylinder(h=caseHeight+2,r=1.5); }
 
         translate([wallThick+cavityWidth+3.5,caseLength-fingerHeightOffset-fingerRad*2,0]) { cylinder(h=caseHeight+2,r=1.5); }
         translate([wallThick+cavityWidth+3.5,caseLength-fingerHeightOffset-fingerRad*4,0]) { cylinder(h=caseHeight+2,r=1.5); }
@@ -269,34 +300,44 @@ difference() {
     }
 
     // hole for battery charger headers
-	translate([wallThick+cavityWidth-3,-1,wallThick]) {
-        translate([-2,0,-3.5]) { cube([4,wallThick+2,7]); }
+	translate([wallThick,0,caseHeight-floorThick-chargerHeaderLength-2*error]) {
+        cube([chargerHeaderWidth+2*error,wallThick,chargerHeaderLength+2*error]);
+    }
+
+    // hole for SPDT Mini Power Switch
+    translate([powerSwitchOffset,0,wallThick-powerSwitchWidth/2-error]) {
+        cube([powerSwitchLength+2*error,wallThick,powerSwitchWidth+2*error]);
     }
 
     // hole for USB port
-    translate([31,0,wallThick-2.5]) {
-        cube([8,wallThick,5]);
+    translate([wallThick+cavityWidth-nanoLeftMargin-nanoWidth/2-nanoUsbWidth/2-clearance,0,caseHeight-floorThick-nanoHeightToUsbBase-nanoUsbHeight-clearance]) {
+        cube([nanoUsbWidth+2*clearance,wallThick,nanoUsbHeight+clearance]);
     }
-
-    // socket for SPDT slide switch
-    translate([10,0,wallThick-2.25]) {
-        cube([12,wallThick,4.5]);
+    // trim off the thin remainder above the USB port which would be problematic to print,
+    // and make it harder to get the Nano into its socket anyway
+    translate([wallThick+cavityWidth-nanoLeftMargin-nanoWidth/2-nanoUsbWidth/2-clearance,wallThick-lidMargin,0]) {
+        cube([nanoUsbWidth+2*clearance,lidMargin,2]);
     }
 }
 
 // lid
-translate([0,0,50]) {
+translate([0,0,caseHeight + 2]) {
     difference() {
-       lid(0,0.5);
+       // the gap of 0.4 was determined by taking into account the 0.15mm accuracy of
+       // the device and the 0.15% error by longest axis of the material, keeping in mind
+	   // that there are always a pair of gaps across the lid from each other.
+       // 0.4mm is actually larger than necessary in the horizontal (narrower) dimension.
+       lid(0,0.4);
 
        screwHoles();
     }
 }
 
 // buttons
-translate([caseWidth+30,wallThick,wallThick]) {
+// Note: the buttons are oriented so as to make the longest surfaces the most smooth
+translate([-5,0,10]) {
     for (i = [0:4]) {
-        translate([0,i*2*fingerRad,0]) { rotate([0,-90,0]) { rotate([0,0,90]) {
+        translate([0,i*(buttonLength+2),0]) { rotate([90,180,-90]) {
             //cube([10,20,40]);
 
             difference() {
@@ -318,30 +359,65 @@ translate([caseWidth+30,wallThick,wallThick]) {
 		            }
                 }
 
-                translate([buttonLength/2,buttonWidth/2,buttonThick-1]) {
-                    cylinder(h=2,r=pushButtonRadius);
+                translate([buttonLength/2,buttonWidth/2,buttonThick-0.5]) {
+                    cylinder(h=1,r=pushButtonRadius);
                 }
             }
-        }}}     
+        }}     
     }
 }
 
-// electronic components (for visualization only; comment out before printing!)
-translate([wallThick,wallThick,lidThick]) {
+// electronic components
+translate([wallThick,wallThick,0]) {
+    // power switch
+    translate([powerSwitchOffset-wallThick,0,wallThick-powerSwitchWidth/2-error]) {
+        translate([-containmentWallThick,0,0]) {
+            cube([containmentWallThick,powerSwitchDepth-wallThick+error+containmentWallThick,caseHeight-floorThick-wallThick+powerSwitchWidth/2+error]);
+        }
+        translate([powerSwitchLength+2*error,0,0]) {
+            cube([containmentWallThick,powerSwitchDepth-wallThick+error+containmentWallThick,caseHeight-floorThick-wallThick+powerSwitchWidth/2+error]);
+        }
+        translate([-containmentWallThick,0,powerSwitchWidth+2*error]) {
+            cube([powerSwitchLength+2*(containmentWallThick+error),powerSwitchDepth-wallThick+error+containmentWallThick,caseHeight-floorThick-wallThick-powerSwitchWidth/2-error]);
+        }
+        translate([-containmentWallThick,powerSwitchDepth-wallThick+error,powerSwitchWidth+2*error-1]) {
+            cube([powerSwitchLength+2*(containmentWallThick+error),containmentWallThick,1]);
+        }
+    }
+
     // Arduino Nano v3.0
-    translate([22,1,0]) { cube([18.5,43.2,1]); }
-    // Bluetooth Modem - BlueSMiRF Silver
-    translate([1,1,0]) { cube([16.6,45,3.9]); }
+    translate([cavityWidth-nanoLeftMargin-nanoWidth,0,0]) {
+        if (includeInternalComponents) {
+            translate([0,0,-10]) {
+                cube([nanoWidth,nanoLength,nanoHeightWithoutUsb]);
+            }
+        }
+
+        translate([0,0,caseHeight-floorThick-nanoHeightToUsbBase-error]) {
+            translate([-containmentWallThick-clearance,0,0]) {
+                cube([containmentWallThick,nanoLength+clearance+containmentWallThick,nanoHeightToUsbBase+error]);
+            }
+            translate([nanoWidth+clearance,0,0]) {
+                cube([containmentWallThick,nanoLength+clearance+containmentWallThick,nanoHeightToUsbBase+error]);
+            }
+            translate([-containmentWallThick-clearance,nanoLength+clearance,0]) {
+                cube([nanoWidth+2*(clearance+containmentWallThick),containmentWallThick,nanoHeightToUsbBase+error]);
+            }
+        }
+    }
+
+    if (includeInternalComponents) {
     // Surface Transducer - Small
-    translate([1,50,0]) { cube([14.5,21.5,7.9]); }
+    translate([thumbBevelWidth-wallThick+4,caseLength-2*wallThick-21.4-4,-10]) {
+       cube([13.8,21.4,7.9]);
+    }
+    // Bluetooth Modem - BlueSMiRF Silver -- 42.0 x 16.0 x 3.9
+    translate([1,31,-10]) { cube([16,42,3.9]); }
     // Polymer Lithium Ion Battery - 110mAh
-    translate([-40,3,0]) { cube([12,28,5.7]); }
+    translate([-40,3,-10]) { cube([12,28,5.7]); }
     // Polymer Lithium Ion Battery - 400mAh
-	translate([18,47,0]) { cube([25,35,5]); }
-
-    // TODO: MPU-6050 breakout board
+	translate([18,47,-10]) { cube([25,35,5]); }
+    // Triple Axis Accelerometer & Gyro Breakout - MPU-6050
+    translate([1,4,-10]) { cube([15.5, 25.7, 2.5]); }
+    }
 }
-    
-
-
-
