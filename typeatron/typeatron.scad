@@ -2,7 +2,7 @@
 function pythag(a, b) = sqrt(a*a + b*b);
 function angle(a, b) = atan(a/b);
 
-includeInternalComponents = true;
+visualizeInternalComponents = false;
 
 // this is the accuracy value for Shapeways' "Strong & Flexible Plastics" option
 error = 0.15;
@@ -30,6 +30,9 @@ powerSwitchWidth = 4.0;
 powerSwitchDepth = 7.5;
 powerSwitchOffset = 12;
 
+ledDomeRadius = 2.5;
+ledRimRadius = 2.9;
+
 caseWidth = 70;
 caseLength = 130;
 caseHeight = 11;
@@ -48,19 +51,19 @@ pushButtonWellWidth = 7;
 pushButtonWellDepth = 4;
 pushButtonBaseThick = 1;
 pushButtonLegLength = 4;
-pushButtonRadius = 3.5/2;
+pushButtonHeight = 5.0;
+pushButtonPressDepth = 0.3;
+//pushButtonRadius = 3.5/2;
 pushButtonLegProtrusion = pushButtonLegLength - pushButtonBaseThick;
 buttonThick = 8;
-buttonPressDepth = 0.3;
 buttonWidth = pushButtonWellWidth;
 buttonLength = 25;
 buttonStabilizerWellWidth = 3;
-buttonStabilizerRodHeight = pushButtonWellDepth - 1;
-totalFingerWellDepth = fingerWellDepth + buttonThick/2 + buttonPressDepth + pushButtonWellDepth;
-totalThumbWellDepth = thumbWellDepth + buttonThick/2 + buttonPressDepth + pushButtonWellDepth;
+buttonStabilizerRodHeight = pushButtonHeight - (pushButtonPressDepth + 0.5 + error);
+totalFingerWellDepth = fingerWellDepth + buttonThick/2 + pushButtonPressDepth + pushButtonWellDepth;
+totalThumbWellDepth = thumbWellDepth + buttonThick/2 + pushButtonPressDepth + pushButtonWellDepth;
 
-ledDomeRadius = 2.6;
-ledRimRadius = 3.1;
+buttonClearance = 0.3;
 
 thumbBevelLength = 48;
 thumbBevelWidth = 31;
@@ -103,7 +106,7 @@ module pushButtonWell(depth) {
 
     // rectangular well for button body, and stabilizer wells
     translate([-buttonLength/2,-buttonWidth/2,pushButtonWellDepth]) {
-        cube([buttonLength,buttonWidth,buttonThick+buttonPressDepth+10]);
+        cube([buttonLength,buttonWidth,buttonThick+pushButtonPressDepth+10]);
 
         translate([0,0,-pushButtonWellDepth]) {
             cube([buttonStabilizerWellWidth, buttonWidth, pushButtonWellDepth]);
@@ -164,19 +167,50 @@ module lid(buffer, shrinkage) {
     }
 }
 
+module button() {
+    difference() {
+        union() {
+                    translate([buttonClearance,buttonWidth/2,buttonWidth/2]) {
+                        rotate([0,90,0]) { cylinder(h=buttonLength-2*buttonClearance,r=buttonWidth/2-buttonClearance); }
+                    }
+
+                    translate([buttonClearance,buttonClearance,buttonWidth/2]) {
+                        cube([buttonLength-2*buttonClearance,buttonWidth-2*buttonClearance,buttonThick-buttonWidth/2]);
+                    }
+
+                    translate([buttonClearance,buttonClearance,buttonThick]) {
+                        cube([buttonStabilizerWellWidth-2*buttonClearance, buttonWidth-2*buttonClearance, buttonStabilizerRodHeight]);
+		            }
+
+                    translate([buttonLength-buttonStabilizerWellWidth+buttonClearance,buttonClearance,buttonThick]) {
+                        cube([buttonStabilizerWellWidth-2*buttonClearance, buttonWidth-2*buttonClearance, buttonStabilizerRodHeight]);
+		            }
+        }
+
+        translate([buttonClearance+1,0,0]) { cube([1,buttonWidth,2]); }
+        translate([buttonLength-buttonClearance-2,0,0]) { cube([1,buttonWidth,2]); }
+
+        //translate([0,buttonWidth/2,buttonWidth/2]) {
+        //    rotate([0,90,0]) { cylinder(h=buttonLength+1,r=buttonWidth/3); }
+        //}
+
+        //translate([buttonLength/2,buttonWidth/2,buttonThick-0.5]) {
+        //    cylinder(h=1,r=pushButtonRadius);
+        //}
+    }
+}
+
 module screwHoles() {
     translate([0,0,-1]) {
         translate([15,caseLength-thumbBevelLength-wallThick+9,0]) { cylinder(h=caseHeight+2,r=1.5); }
 
-        translate([wallThick+cavityWidth+3.5,caseLength-fingerHeightOffset-fingerRad*2,0]) { cylinder(h=caseHeight+2,r=1.5); }
-        translate([wallThick+cavityWidth+3.5,caseLength-fingerHeightOffset-fingerRad*4,0]) { cylinder(h=caseHeight+2,r=1.5); }
-        translate([wallThick+cavityWidth+3.5,caseLength-fingerHeightOffset-fingerRad*6,0]) { cylinder(h=caseHeight+2,r=1.5); }
+        translate([wallThick+cavityWidth+2.5,caseLength-fingerHeightOffset-fingerRad*2,0]) { cylinder(h=caseHeight+2,r=1.5); }
+        translate([wallThick+cavityWidth+2.5,caseLength-fingerHeightOffset-fingerRad*4,0]) { cylinder(h=caseHeight+2,r=1.5); }
+        translate([wallThick+cavityWidth+2.5,caseLength-fingerHeightOffset-fingerRad*6,0]) { cylinder(h=caseHeight+2,r=1.5); }
     }
 }
 
-difference() {
-    // basic shape of the case
-    union() {
+module caseConvexHull() {
 		// box with thumb bevel
         difference() {
             translate([wallThick, wallThick,0]) {
@@ -225,18 +259,24 @@ difference() {
                 }
             }
         }
-    }
+}
+
+module basicCase() {
+  difference() {
+    caseConvexHull();
 
     // inner compartment
-    translate([wallThick,wallThick,0]) {
-        cube([cavityWidth,caseLength-thumbBevelLength-wallThick,caseHeight-floorThick]);
+    translate([wallThick,wallThick,lidThick]) {
+        cube([cavityWidth,caseLength-thumbBevelLength-wallThick,caseHeight-floorThick-lidThick]);
     }
-    translate([thumbBevelWidth+2,wallThick,0]) {
-        cube([cavityWidth-thumbBevelWidth+wallThick-2,cavityLength,caseHeight-floorThick]);
+    translate([thumbBevelWidth+2,wallThick,lidThick]) {
+        cube([cavityWidth-thumbBevelWidth+wallThick-2,cavityLength,caseHeight-floorThick-lidThick]);
     }
 
+    /*
     // depression for lid
     lid(1,0);
+    */
 
     screwHoles();
 
@@ -276,9 +316,9 @@ difference() {
                             pushButtonWell(pushButtonWellDepth+100);
 
                             rotate([180,0,0]) {
-                                translate([-27,-wallThick-1,pushButtonBaseThick]) {
-                                    cube([39,caseHeight-floorThick+1,15]);
-                                    cube([22,caseHeight-floorThick+1,20]);
+                                translate([-27,-wallThick+lidThick,pushButtonBaseThick]) {
+                                    cube([39,caseHeight-floorThick-lidThick,15]);
+                                    cube([22,caseHeight-floorThick-lidThick,20]);
                                 }
                             }
                         }
@@ -291,10 +331,12 @@ difference() {
     // hole for status LED
     translate([cavityWidth+wallThick-ledRimRadius-3,caseLength+1,wallThick]) {
     	    rotate(a=[90,0,0]) {
-            cylinder(h=wallThick+2,r=ledDomeRadius);
+            cylinder(h=wallThick+2,r=ledDomeRadius+error);
 
+            // note: the rim depression uses a larger error/clearance, since it doesn't need
+            // to fit tightly and can't be filed down
             translate([0,0,wallThick]) {
-                cylinder(h=10+1,r=ledRimRadius);
+                cylinder(h=10+1,r=ledRimRadius+clearance);
             }
         }  
     }
@@ -318,8 +360,24 @@ difference() {
     translate([wallThick+cavityWidth-nanoLeftMargin-nanoWidth/2-nanoUsbWidth/2-clearance,wallThick-lidMargin,0]) {
         cube([nanoUsbWidth+2*clearance,lidMargin,2]);
     }
+  }
 }
 
+difference() {
+    basicCase();
+    cube([caseWidth, caseLength, (caseHeight-buttonWidth)/2+0.0001]);
+}
+
+translate([caseWidth + 10, 0, 0]) {
+    difference() {
+        basicCase();
+        translate([0,0,(caseHeight-buttonWidth)/2]) {
+            cube([caseWidth, caseLength, caseHeight]);
+        }
+    }
+}
+
+/*
 // lid
 translate([0,0,caseHeight + 2]) {
     difference() {
@@ -332,6 +390,7 @@ translate([0,0,caseHeight + 2]) {
        screwHoles();
     }
 }
+*/
 
 // buttons
 // Note: the buttons are oriented so as to make the longest surfaces the most smooth
@@ -340,29 +399,7 @@ translate([-5,0,10]) {
         translate([0,i*(buttonLength+2),0]) { rotate([90,180,-90]) {
             //cube([10,20,40]);
 
-            difference() {
-                union() {
-                    translate([0,buttonWidth/2,buttonWidth/2]) {
-                        rotate([0,90,0]) { cylinder(h=buttonLength,r=buttonWidth/2); }
-                    }
-
-                    translate([0,0,buttonWidth/2]) {
-                        cube([buttonLength,buttonWidth,buttonThick-buttonWidth/2]);
-                    }
-
-                    translate([0,0,buttonThick]) {
-                        cube([buttonStabilizerWellWidth, buttonWidth, buttonStabilizerRodHeight]);
-		            }
-
-                    translate([buttonLength-buttonStabilizerWellWidth,0,buttonThick]) {
-                        cube([buttonStabilizerWellWidth, buttonWidth, buttonStabilizerRodHeight]);
-		            }
-                }
-
-                translate([buttonLength/2,buttonWidth/2,buttonThick-0.5]) {
-                    cylinder(h=1,r=pushButtonRadius);
-                }
-            }
+            button();
         }}     
     }
 }
@@ -385,14 +422,8 @@ translate([wallThick,wallThick,0]) {
         }
     }
 
-    // Arduino Nano v3.0
+    // container for Arduino Nano v3.0
     translate([cavityWidth-nanoLeftMargin-nanoWidth,0,0]) {
-        if (includeInternalComponents) {
-            translate([0,0,-10]) {
-                cube([nanoWidth,nanoLength,nanoHeightWithoutUsb]);
-            }
-        }
-
         translate([0,0,caseHeight-floorThick-nanoHeightToUsbBase-error]) {
             translate([-containmentWallThick-clearance,0,0]) {
                 cube([containmentWallThick,nanoLength+clearance+containmentWallThick,nanoHeightToUsbBase+error]);
@@ -406,18 +437,23 @@ translate([wallThick,wallThick,0]) {
         }
     }
 
-    if (includeInternalComponents) {
-    // Surface Transducer - Small
-    translate([thumbBevelWidth-wallThick+4,caseLength-2*wallThick-21.4-4,-10]) {
-       cube([13.8,21.4,7.9]);
-    }
-    // Bluetooth Modem - BlueSMiRF Silver -- 42.0 x 16.0 x 3.9
-    translate([1,31,-10]) { cube([16,42,3.9]); }
-    // Polymer Lithium Ion Battery - 110mAh
-    translate([-40,3,-10]) { cube([12,28,5.7]); }
-    // Polymer Lithium Ion Battery - 400mAh
-	translate([18,47,-10]) { cube([25,35,5]); }
-    // Triple Axis Accelerometer & Gyro Breakout - MPU-6050
-    translate([1,4,-10]) { cube([15.5, 25.7, 2.5]); }
+    if (visualizeInternalComponents) {
+        // Arduino Nano v3.0
+        translate([0,0,-10]) {
+            cube([nanoWidth,nanoLength,nanoHeightWithoutUsb]);
+        }
+
+        // Surface Transducer - Small
+        translate([thumbBevelWidth-wallThick+4,caseLength-2*wallThick-21.4-4,-10]) {
+           cube([13.8,21.4,7.9]);
+        }
+        // Bluetooth Modem - BlueSMiRF Silver -- 42.0 x 16.0 x 3.9
+        translate([1,31,-10]) { cube([16,42,3.9]); }
+        // Polymer Lithium Ion Battery - 110mAh
+        translate([-40,3,-10]) { cube([12,28,5.7]); }
+        // Polymer Lithium Ion Battery - 400mAh
+	    translate([18,47,-10]) { cube([25,35,5]); }
+        // Triple Axis Accelerometer & Gyro Breakout - MPU-6050
+        translate([1,4,-10]) { cube([15.5, 25.7, 2.5]); }
     }
 }
