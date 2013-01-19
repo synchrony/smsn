@@ -16,9 +16,9 @@ clearance = 0.5;
 
 pinHoleRes = 10;
 /*
-cornerRoundingRes = 50;
-connectorPinRes = 50;
-ledHoleRes = 50;
+cornerRoundingRes = 100;
+connectorPinRes = 100;
+ledHoleRes = 100;
 //*/
 //*
 cornerRoundingRes = 10;
@@ -391,17 +391,17 @@ difference() {
 
     for (i = [0:4]) {
         translate([wallThick+cavityWidth+10,caseLength-fingerHeightOffset-fingerRad*i*2,0]) {
-            cylinder(h=caseHeight*2/3, r=1.5+error2, $fn=connectorPinRes);
+            cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
         }
     }
     translate([thumbBevelWidth-3, caseLength-wallThick-6, 0]) {
-        cylinder(h=caseHeight*2/3, r=1.5+error2, $fn=connectorPinRes);
+        cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
     }
     translate([wallThick+2, caseLength-thumbBevelLength+3, 0]) {
-        cylinder(h=caseHeight*2/3, r=1.5+error2, $fn=connectorPinRes);
+        cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
     }
     translate([wallThick, wallThick, 0]) {
-        cylinder(h=caseHeight*2/3, r=1.5+error2, $fn=connectorPinRes);
+        cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
     }
 
     // screwdriver/leverage slots
