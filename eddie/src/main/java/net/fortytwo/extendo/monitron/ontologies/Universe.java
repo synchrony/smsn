@@ -12,7 +12,7 @@ public interface Universe {
 
     // environment
     public static final URI
-            BUILDING_1 = new URIImpl(NAMESPACE + "building_1"),
+            BUILDING_1 = new URIImpl(NAMESPACE + "winslowBuilding"),
             APARTMENT_1 = new URIImpl(NAMESPACE + "apartment_1"),
             ROOM_1 = new URIImpl(NAMESPACE + "room_1");
 

@@ -2,10 +2,13 @@
 cd /Users/josh/projects/fortytwo/laboratory/net/fortytwo/extendo/eddie
 sudo cu -l /dev/cu.usbserial-A600HFHJ -s 115200  | ./monitron-rdfizer-demo.sh | tee /tmp/eddie-rdfizer.out
 
+tail -f /tmp/eddie-rdfizer.out
+
+
 cd /Users/josh/projects/fortytwo/laboratory/net/fortytwo/extendo/eddie
 sudo cu -l /dev/cu.usbserial-A600HFHJ -s 115200  | ./monitron-continuous-query-demo.sh -d queries | tee /tmp/eddie-continuous-queries.out
 
-
+tail -f /tmp/eddie-continuous-queries.out
 
 
 
