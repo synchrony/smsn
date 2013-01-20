@@ -47,7 +47,7 @@
 
 :maxdetect-rht03_1_hygrometer a m:Hygrometer ;
     rdfs:label "hygrometer of Monitron #1" ;
-    rdfs:comment "a Maxd�tect RHT03 digital relative humidity and temperature sensor which has been calibrated to output relative humidity values from 0 to 1" .
+    rdfs:comment "a Maxdetect RHT03 digital relative humidity and temperature sensor which has been calibrated to output relative humidity values from 0 to 1" .
 
 :generic-photoresistor_1 a m:LightLevelSensor ;
     rdfs:label "light level sensor of Monitron #1" ;
