@@ -1313,7 +1313,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "chandellevert 16",
+					"text" : "autotactile 16",
 					"outlettype" : [ "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int", "int" ],
 					"patching_rect" : [ 65.0, 491.0, 267.0, 19.0 ],
 					"fontname" : "Verdana",

@@ -1,6 +1,6 @@
 /**
 	@file
-	chandellevert - a max object shell
+	autotactile - a max object shell
 	jeremy bernstein - jeremy@bootsquad.com	
 
 	@ingroup	examples	
@@ -13,7 +13,7 @@
 #define MAX_SAMPLE_SIZE 256
 
 ////////////////////////// object struct
-typedef struct _chandellevert 
+typedef struct _autotactile 
 {
 	t_object	ob;			// the object itself (must be first)
 	int			sample_size;
@@ -21,51 +21,51 @@ typedef struct _chandellevert
 	void**		outputs;
 	//void*		m_proxy;
 	//long		m_proxy_inletnum;          // space for the inlet number used by all the proxies
-} t_chandellevert;
+} t_autotactile;
 
 ///////////////////////// function prototypes
 //// standard set
-void *chandellevert_new(t_symbol *s, long argc, t_atom *argv);
-void chandellevert_free(t_chandellevert *x);
-void chandellevert_assist(t_chandellevert *x, void *b, long m, long a, char *s);
-void chandellevert_inletinfo(t_chandellevert *x, void *b, long a, char *t);
-void chandellevert_handle_sample_old(t_chandellevert *x, int data);
-void chandellevert_handle_sample(t_chandellevert *x, int data);
-void chandellevert_handle_sample_new(t_chandellevert *x, t_symbol *s, long argc, t_atom *argv);
+void *autotactile_new(t_symbol *s, long argc, t_atom *argv);
+void autotactile_free(t_autotactile *x);
+void autotactile_assist(t_autotactile *x, void *b, long m, long a, char *s);
+void autotactile_inletinfo(t_autotactile *x, void *b, long a, char *t);
+void autotactile_handle_sample_old(t_autotactile *x, int data);
+void autotactile_handle_sample(t_autotactile *x, int data);
+void autotactile_handle_sample_new(t_autotactile *x, t_symbol *s, long argc, t_atom *argv);
 
 // global class pointer variable
-void *chandellevert_class;
+void *autotactile_class;
 
 
 int main(void)
 {	
 	// object initialization, OLD STYLE
-	// setup((t_messlist **)&chandellevert_class, (method)chandellevert_new, (method)chandellevert_free, (short)sizeof(t_chandellevert), 
+	// setup((t_messlist **)&autotactile_class, (method)autotactile_new, (method)autotactile_free, (short)sizeof(t_autotactile), 
 	//		0L, A_GIMME, 0);
-    // addmess((method)chandellevert_assist,			"assist",		A_CANT, 0);  
+    // addmess((method)autotactile_assist,			"assist",		A_CANT, 0);  
 	
 	// object initialization, NEW STYLE
 	t_class *c;
 	
-	c = class_new("chandellevert", (method)chandellevert_new, (method)chandellevert_free, (long)sizeof(t_chandellevert), 
+	c = class_new("autotactile", (method)autotactile_new, (method)autotactile_free, (long)sizeof(t_autotactile), 
 				  0L /* leave NULL!! */, A_GIMME, 0);
 	
 	/* you CAN'T call this from the patcher */
-    class_addmethod(c, (method)chandellevert_assist,	"assist",		A_CANT, 0);  
-	class_addmethod(c, (method)chandellevert_inletinfo, "inletinfo", A_CANT, 0);
+    class_addmethod(c, (method)autotactile_assist,	"assist",		A_CANT, 0);  
+	class_addmethod(c, (method)autotactile_inletinfo, "inletinfo", A_CANT, 0);
 
-	//class_addmethod(c, (method)chandellevert_handle_sample_old, "int", A_LONG, 0);
-	//class_addmethod(c, (method)chandellevert_handle_sample, "int", A_LONG, 0);
-	class_addmethod(c, (method)chandellevert_handle_sample_new, "data", A_GIMME, 0);
+	//class_addmethod(c, (method)autotactile_handle_sample_old, "int", A_LONG, 0);
+	//class_addmethod(c, (method)autotactile_handle_sample, "int", A_LONG, 0);
+	class_addmethod(c, (method)autotactile_handle_sample_new, "data", A_GIMME, 0);
 
 	class_register(CLASS_BOX, c); /* CLASS_NOBOX */
-	chandellevert_class = c;
+	autotactile_class = c;
 
 	post("Merdre! De par ma chandelle verte!");
 	return 0;
 }
 
-void chandellevert_assist(t_chandellevert *x, void *b, long m, long a, char *s)
+void autotactile_assist(t_autotactile *x, void *b, long m, long a, char *s)
 {
 	if (ASSIST_INLET == m) { // inlet
 		if (0 == a) {
@@ -94,14 +94,14 @@ void chandellevert_assist(t_chandellevert *x, void *b, long m, long a, char *s)
 }
 
 // TODO: copied from another external.  What does it do?
-void chandellevert_inletinfo(t_chandellevert *x, void *b, long a, char *t)
+void autotactile_inletinfo(t_autotactile *x, void *b, long a, char *t)
 {
 	if (a) {
 		*t = 1;
 	}
 }
 
-void chandellevert_free(t_chandellevert *x)
+void autotactile_free(t_autotactile *x)
 {
 	/*if (x->m_args) {
 		sysmem_freeptr(x->m_args);
@@ -125,13 +125,13 @@ void chandellevert_free(t_chandellevert *x)
 		t_object *s_thing;
 	}
 */
-void *chandellevert_new(t_symbol *s, long argc, t_atom *argv)
+void *autotactile_new(t_symbol *s, long argc, t_atom *argv)
 {
-	t_chandellevert *x = NULL;
+	t_autotactile *x = NULL;
 	int i;
 	
 	// object instantiation, NEW STYLE
-	if (x = (t_chandellevert *)object_alloc(chandellevert_class)) {
+	if (x = (t_autotactile *)object_alloc(autotactile_class)) {
         object_post((t_object *)x, "a new %s object was instantiated: 0x%X", s->s_name, x);
         object_post((t_object *)x, "it has %ld arguments", argc);
 		
@@ -177,7 +177,7 @@ void *chandellevert_new(t_symbol *s, long argc, t_atom *argv)
 	return (x);
 }
 
-void chandellevert_handle_sample_old(t_chandellevert *x, int data)
+void autotactile_handle_sample_old(t_autotactile *x, int data)
 {
 	object_post((t_object *) x, "received a sample: %ld", data);
 
@@ -186,7 +186,7 @@ void chandellevert_handle_sample_old(t_chandellevert *x, int data)
 }
 
 // TODO: --> char *data
-void chandellevert_handle_sample(t_chandellevert *x, int data)
+void autotactile_handle_sample(t_autotactile *x, int data)
 {
 	long inlet = proxy_getinlet((t_object *) x);
 	switch (inlet) {
@@ -199,7 +199,7 @@ void chandellevert_handle_sample(t_chandellevert *x, int data)
 	}
 }
 
-void chandellevert_handle_sample_new(t_chandellevert *x, t_symbol *s, long argc, t_atom *argv) {
+void autotactile_handle_sample_new(t_autotactile *x, t_symbol *s, long argc, t_atom *argv) {
 	long i;
 	t_atom *ap;
 	char *data;
@@ -240,7 +240,7 @@ void chandellevert_handle_sample_new(t_chandellevert *x, t_symbol *s, long argc,
 	}*/	
 }
 
-//void chandellevert_handle_sample_newerstill(t_chandellevert *x, t_symbol *data) {
+//void autotactile_handle_sample_newerstill(t_autotactile *x, t_symbol *data) {
 //	post("got data: %s", atom_getsym(data)
 //}
 

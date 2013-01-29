@@ -1,5 +1,5 @@
 /*
- * ChandelleVert test program
+ * Autotactile test program
  */
 
 #include <stdlib.h>

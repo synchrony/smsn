@@ -166,7 +166,7 @@
 , 			{
 				"box" : 				{
 					"maxclass" : "newobj",
-					"text" : "ChandelleVert 115200 h",
+					"text" : "Autotactile 115200 h",
 					"numoutlets" : 1,
 					"outlettype" : [ "int" ],
 					"patching_rect" : [ 73.0, 268.0, 138.0, 20.0 ],

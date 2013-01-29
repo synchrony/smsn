@@ -204,7 +204,7 @@
 				<key>PBXProjectModuleGUID</key>
 				<string>03B86A42116E4754004C8ED3</string>
 				<key>PBXProjectModuleLabel</key>
-				<string>chandellevert.c</string>
+				<string>autotactile.c</string>
 				<key>PBXSplitModuleInNavigatorKey</key>
 				<dict>
 					<key>Split0</key>
@@ -212,7 +212,7 @@
 						<key>PBXProjectModuleGUID</key>
 						<string>03B86A43116E4754004C8ED3</string>
 						<key>PBXProjectModuleLabel</key>
-						<string>chandellevert.c</string>
+						<string>autotactile.c</string>
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
@@ -349,7 +349,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>chandellevert.c</string>
+								<string>autotactile.c</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -357,7 +357,7 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>chandellevert.c</string>
+										<string>autotactile.c</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
@@ -566,7 +566,7 @@
 	<array>
 		<string>03B86A42116E4754004C8ED3</string>
 		<string>03C37D0211519F3600815753</string>
-		<string>/Users/josh/projects/fortytwo/laboratory/chandellevert/maxmsp/externals/chandellevert/chandellevert.xcodeproj</string>
+		<string>/Users/josh/projects/fortytwo/laboratory/autotactile/maxmsp/externals/autotactile/autotactile.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>274 208 1006 670 0 0 1440 878 </string>

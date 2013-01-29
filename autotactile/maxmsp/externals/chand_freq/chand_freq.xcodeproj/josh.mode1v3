@@ -566,7 +566,7 @@
 	<array>
 		<string>03C37D0211519F3600815753</string>
 		<string>03900313115BD358004C9EF2</string>
-		<string>/Users/josh/projects/fortytwo/laboratory/chandellevert/maxmsp/externals/chand_freq/chand_freq.xcodeproj</string>
+		<string>/Users/josh/projects/fortytwo/laboratory/autotactile/maxmsp/externals/chand_freq/chand_freq.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>274 208 1006 670 0 0 1440 878 </string>

@@ -1,5 +1,5 @@
 /*
- * ChandelleVert parallel-mux test program
+ * Autotactile parallel-mux test program
  */
 
 #include <stdlib.h>
