@@ -10,22 +10,14 @@
 ################################################################################
 # environment
 
-:building_1 a m:Building ;
-    geo:latitude "42.741081"^^xsd:double ;
-    geo:longitude "-73.66917"^^xsd:double ;
-    geo:alt "79"^^xsd:double ;
-    rdfs:label "100 Nyroy" ;
-    rdfs:comment "our Nyroy Dr. apartment building" .
-
-:apartment_12 a m:Apartment ;
-    m:containedIn :building_1 ;
-    rdfs:lable "apartment #12" ;
-    rdfs:comment "our Nyroy Dr. apartment" .
+:winslowBuilding a m:Building ;
+    rdfs:label "Winslow Building" ;
+    rdfs:comment "the Winslow Building of Rensselaer Polytechnic Institute" .
 
 :room_1 a m:Room ;
-    m:containedIn :apartment_12 ;
-    rdfs:label "living room" ;
-    rdfs:comment "the living room of our Nyroy Dr. apartment" .
+    m:containedIn :winslowBuilding ;
+    rdfs:label "Winslow 1st floor" ;
+    rdfs:comment "Winslow 1st floor conference room" .
 
 
 ################################################################################
