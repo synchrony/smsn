@@ -50,12 +50,14 @@ public class UpdateExtension extends TinkerNotesExtension {
         p.view = view;
 
         // TODO: remove these; they're only for debugging a Rexster issue
+        /*
         if (minWeight > 1000) minWeight = 1000f;
         if (maxWeight > 1000) maxWeight = 1000f;
         if (defaultWeight > 1000) defaultWeight = 1000f;
         if (minSharability > 1000) minSharability = 1000f;
         if (maxSharability > 1000) maxSharability = 1000f;
         if (defaultSharability > 1000) defaultSharability = 1000f;
+        */
 
         p.filter = createFilter(p.user, minWeight, maxWeight, defaultWeight, minSharability, maxSharability, defaultSharability);
 

@@ -447,42 +447,42 @@
          " :weight [" (number-to-string tn-min-weight) ", " (number-to-string tn-default-weight) ", " (number-to-string tn-max-weight) "]"
          " :value \"" tn-title "\")"))  ;; TODO: actuallly escape the title string
 
-(defun request-view (preserve-line mode root depth style minv maxv defaultv minw maxw)
+(defun request-view (preserve-line mode root depth style mins maxs defaults minw maxw)
     (setq tn-current-line (if preserve-line (line-number-at-pos) 1))
-    (setq tn-future-sharability defaultv)
-    (http-get (request-view-url root depth style minv maxv minw maxw) (receive-view mode)))
+    (setq tn-future-sharability defaults)
+    (http-get (request-view-url root depth style mins maxs minw maxw) (receive-view mode)))
 
-(defun request-view-url  (root depth style minv maxv minw maxw)
+(defun request-view-url  (root depth style mins maxs minw maxw)
 	(concat (base-url) "view"
             "?root=" (w3m-url-encode-string root)
             "&depth=" (number-to-string depth)
-            "&minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
+            "&minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)
             "&style=" style))
 
-(defun request-history (minv maxv minw maxw)
+(defun request-history (mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
         (concat (base-url) "history"
-            "?minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
+            "?minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
-(defun request-duplicates (minv maxv minw maxw)
+(defun request-duplicates (mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
         (concat (base-url) "duplicates"
-            "?minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
+            "?minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
-(defun request-search-results (query style minv maxv defaultv minw maxw defaultw)
+(defun request-search-results (query style mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
@@ -490,28 +490,24 @@
             "?query=" (w3m-url-encode-string query)
             "&depth=1"
             "&style=" style
-            "&minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
-            "&defaultSharability=" (number-to-string defaultv)
+            "&minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)
-            "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
+            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
-(defun request-find-roots-results (style minv maxv defaultv minw maxw defaultw)
+(defun request-find-roots-results (style mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
         (concat (base-url) "find-roots"
             "?depth=1"
             "&style=" style
-            "&minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
-            "&defaultSharability=" (number-to-string defaultv)
+            "&minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)
-            "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
+            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
-(defun request-ripple-results (query style minv maxv defaultv minw maxw defaultw)
+(defun request-ripple-results (query style mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
@@ -519,12 +515,10 @@
             "?query=" (w3m-url-encode-string query)
             "&depth=1"
             "&style=" style
-            "&minSharability=" (number-to-string minv)
-            "&maxSharability=" (number-to-string maxv)
-            "&defaultSharability=" (number-to-string defaultv)
+            "&minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)
-            "&defaultWeight=" (number-to-string defaultw)) (receive-view tn-search-mode)))
+            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
 
 (defun do-export ()
     (http-get
@@ -558,26 +552,24 @@
     (let ((query (read-from-minibuffer "query: ")))
         (if (> (length query) 0)
             (request-search-results
-                ;;(concat "*" query "*")
                 query
                 tn-style
-                tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight))))
+                tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))))
 
 (defun tn-find-roots ()
     (interactive)
         (request-find-roots-results
             tn-style
-            tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight))
+            tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
 
 (defun tn-ripple-query ()
     (interactive)
     (let ((query (read-from-minibuffer "query: ")))
         (if (> (length query) 0)
             (request-ripple-results
-                ;;(concat "*" query "*")
                 query
                 tn-style
-                tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight))))
+                tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))))
 
 (defun tn-export ()
     (interactive)
@@ -592,6 +584,7 @@
 
 (defun in-view ()
     (if (or
+;;            (equal tn-mode tn-search-mode)
             (equal tn-mode tn-readonly-mode)
             (equal tn-mode tn-edit-mode))
         t
@@ -1084,7 +1077,7 @@
                         (kill-buffer buffer))))
             (no-target))))
 
-(defun tn-latex-math-preview ()
+(defun tn-preview-target-latex-math ()
     (interactive)
     (end-of-line)
     (backward-word)
@@ -1132,6 +1125,24 @@
 (global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
 (global-set-key (kbd "C-c C-f")         'tn-push-point)
 (global-set-key (kbd "C-c C-l")         'tn-goto-line)
+
+;; copied verbatim from the "C-c C-t" section
+;; TODO: deduplicate this code in some way
+;;(global-set-key (kbd "C-c C-r a")       'tn-browse-root-value-as-url)
+;;(global-set-key (kbd "C-c C-r c")       'tn-copy-root-value-to-clipboard)
+;;(global-set-key (kbd "C-c C-r C-a b")   'tn-browse-root-alias)
+;;(global-set-key (kbd "C-c C-r C-b a")   'tn-browse-root-value-in-amazon)
+;;(global-set-key (kbd "C-c C-r C-b e")   'tn-browse-root-value-in-ebay)
+;;(global-set-key (kbd "C-c C-r C-b d")   'tn-browse-root-value-in-delicious)
+;;(global-set-key (kbd "C-c C-r C-b g")   'tn-browse-root-value-in-google)
+;;(global-set-key (kbd "C-c C-r C-b m")   'tn-browse-root-value-in-google-maps)
+;;(global-set-key (kbd "C-c C-r C-b s")   'tn-browse-root-value-in-google-scholar)
+;;(global-set-key (kbd "C-c C-r C-b t")   'tn-browse-root-value-in-twitter)
+;;(global-set-key (kbd "C-c C-r C-b w")   'tn-browse-root-value-in-wikipedia)
+;;(global-set-key (kbd "C-c C-r C-b y")   'tn-browse-root-value-in-youtube)
+;;(global-set-key (kbd "C-c C-r i")       'tn-root-info)
+;;(global-set-key (kbd "C-c C-r l")       'tn-preview-root-latex-math)
+
 (global-set-key (kbd "C-c C-s ,")       'tn-decrease-default-sharability)
 (global-set-key (kbd "C-c C-s .")       'tn-increase-default-sharability)
 (global-set-key (kbd "C-c C-s 1")       'tn-set-default-sharability-1)
@@ -1179,7 +1190,7 @@
 (global-set-key (kbd "C-c C-t C-b w")   'tn-browse-target-value-in-wikipedia)
 (global-set-key (kbd "C-c C-t C-b y")   'tn-browse-target-value-in-youtube)
 (global-set-key (kbd "C-c C-t i")       'tn-target-info)
-(global-set-key (kbd "C-c C-t l")       'tn-latex-math-preview)
+(global-set-key (kbd "C-c C-t l")       'tn-preview-target-latex-math)
 (global-set-key (kbd "C-c C-t C-s 1")   'tn-set-target-sharability-1)
 (global-set-key (kbd "C-c C-t C-s 2")   'tn-set-target-sharability-2)
 (global-set-key (kbd "C-c C-t C-s 3")   'tn-set-target-sharability-3)

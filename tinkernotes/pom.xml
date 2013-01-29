@@ -44,16 +44,19 @@
             <groupId>net.fortytwo.ripple</groupId>
             <artifactId>ripple-demo</artifactId>
             <version>${ripple.version}</version>
+            <exclusions>
+                <!-- this was necessary (as of 2013-01-24) to avoid a logging conflict with a
+                     Neo4j dependency which manifests in the unit tests -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.tinkubator</groupId>
             <artifactId>property-graph-sail</artifactId>
             <version>${tinkerpop.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>replay</artifactId>
-            <version>${sesametools.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -66,21 +69,17 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <version>1.8.M06</version>
-        </dependency>-->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-lucene-index</artifactId>
-            <version>1.8.M06</version>
-        </dependency>
+
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
             <version>${tinkerpop.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-lucene-index</artifactId>
+            <version>${neo4j.version}</version>
         </dependency>
     </dependencies>
 

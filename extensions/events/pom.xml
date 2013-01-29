@@ -33,12 +33,12 @@
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>
             <artifactId>rexster-server</artifactId>
-            <version>${rexster.version}</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-sail-graph</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -87,7 +87,7 @@
                     <descriptors>
                         <descriptor>src/assembly/standalone.xml</descriptor>
                     </descriptors>
-                    <finalName>myotherbrain-events-${project.version}</finalName>
+                    <finalName>events-${project.version}</finalName>
                     <outputDirectory>target</outputDirectory>
                     <workDirectory>target/assembly/work</workDirectory>
                     <tarLongFileMode>warn</tarLongFileMode>
