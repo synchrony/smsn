@@ -72,6 +72,11 @@ public class NoteParser {
                 l = l.substring(indent);
             }
 
+            // line may not begin with a colon, as this is more likely a missing id than a bullet
+            if ( ':' == l.charAt(0)) {
+                throw new NoteParsingException(lineNumber, "empty note id");
+            }
+
             // Extract keys
             String id = null;
             int k = l.indexOf(" ");
@@ -189,8 +194,12 @@ public class NoteParser {
                     if (!bullet.equals(ALIAS_ATTR)) {
                         throw new NoteParsingException(lineNumber, "empty attribute value");
                     }
+                } else if (null == id) {
+                    throw new NoteParsingException(lineNumber, "empty value for new note");
                 } else {
-                    throw new NoteParsingException(lineNumber, "empty note");
+                    // Empty note values are allowed for existing notes.
+                    // They signify that an existing note's value should not be overwritten.
+                    value = null;
                 }
             }
 

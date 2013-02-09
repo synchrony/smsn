@@ -72,12 +72,21 @@ public class NoteParserTest {
     }
 
     @Test(expected = NoteParser.NoteParsingException.class)
-    public void testEmptyNotesNotAllowed() throws Exception {
+    public void testEmptyIdsNotAllowed() throws Exception {
+        readNotes(": * forty-two");
+    }
+
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testEmptyValuesNotAllowedForNewNotes() throws Exception {
         readNotes("* ");
     }
 
+    public void testEmptyValuesAllowedForExistingNotes() throws Exception {
+        readNotes("1234567:  *");
+    }
+
     @Test
-    public void testEmptyAliasAttributeIsAllowed() throws Exception {
+    public void testEmptyAliasAttributeAllowed() throws Exception {
         readNotes("@alias ");
     }
 

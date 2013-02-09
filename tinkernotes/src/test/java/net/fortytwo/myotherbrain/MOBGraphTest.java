@@ -3,6 +3,7 @@ package net.fortytwo.myotherbrain;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import junit.framework.TestCase;
 import net.fortytwo.myotherbrain.notes.Filter;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.Collection;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class MOBGraphTest extends TestCase {
+    @Test
     public void testFulltextSearch() throws Exception {
         File dir = File.createTempFile("mob", "test");
         dir.delete();

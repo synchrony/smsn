@@ -87,7 +87,7 @@ public class NoteQueries {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = toNote(root);
+        Note n = toNote(root, filter.isVisible(root));
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
@@ -104,11 +104,16 @@ public class NoteQueries {
         return n;
     }
 
-    // Note: currently it is possible to see all children of a note as long as that note is visible.
-    // If this policy changes (hiding invisible children), this method will also need to change.
     private boolean hasChildren(final Atom root,
                                 final Filter filter,
                                 final AdjacencyStyle style) {
+        // If the note is invisible, we can't see whether it has children.
+        if (!filter.isVisible(root)) {
+            return false;
+        }
+
+        // If the note is visible, we can see its children (although we will not be able to read the values of any
+        // children which are themselves invisible).
         Iterable<Atom> children = style.getLinked(root, filter);
         return children.iterator().hasNext();
     }
@@ -408,6 +413,7 @@ public class NoteQueries {
                                final ActivityLog log) {
         String value = note.getValue();
 
+        // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null values.
         // TODO: is this the best way to handle values of "fake" root nodes?
         if (null != value) {
             if (null != log) {
@@ -465,15 +471,21 @@ public class NoteQueries {
         }
     }
 
-    private Note toNote(final Atom a) {
+    private Note toNote(final Atom a,
+                        final boolean isVisible) {
         Note n = new Note();
 
-        n.setValue(a.getValue());
         n.setId((String) a.asVertex().getId());
         n.setWeight(a.getWeight());
         n.setSharability(a.getSharability());
         n.setCreated(a.getCreated());
         n.setAlias(a.getAlias());
+
+        // The convention for "invisible" notes is to leave the value blank,
+        // as well as to avoid displaying any child notes.
+        if (isVisible) {
+            n.setValue(a.getValue());
+        }
 
         return n;
     }

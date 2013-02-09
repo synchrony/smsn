@@ -101,7 +101,8 @@ public class NoteWriter {
     }
 
     private static String sanitizeValue(final String value) {
-        return null == value || 0 == value.length() || !isValidValue(value)
+        return null == value ? ""
+                : !isValidValue(value)
                 ? "???"
                 : value;
     }

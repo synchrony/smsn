@@ -72,4 +72,11 @@ public class NoteWriterTest {
             writer.setValueLengthCutoff(before);
         }
     }
+
+    /*
+    @Test
+    public void testHideNonSharable() throws Exception {
+        List<Note> notes = parser.parse(NoteParser.class.getResourceAsStream("tinkernotes-example-3.txt")).getChildren();
+        writer.writeNotes(notes, System.out);
+    }*/
 }
