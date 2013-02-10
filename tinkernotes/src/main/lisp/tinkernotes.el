@@ -107,8 +107,6 @@
 (setq tn-current-line 1)
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
 
-(setq tn-emacspeak-mode nil)
-
 
 ;; NAVIGATION ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1211,6 +1209,8 @@
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
 (global-set-key (kbd "C-c C-v r")       'tn-enter-readonly-view)
+;; new bindings (not yet recorded in mob-data)
+(global-set-key (kbd "C-c C-v s")       'tn-toggle-emacspeak)
 (global-set-key (kbd "C-c C-w ,")       'tn-decrease-default-weight)
 (global-set-key (kbd "C-c C-w .")       'tn-increase-default-weight)
 (global-set-key (kbd "C-c C-w 1")       'tn-set-default-weight-1)
@@ -1246,13 +1246,9 @@
 (global-set-key (kbd "C-c C-w C-] d")   'tn-set-max-weight-3)
 (global-set-key (kbd "C-c C-w C-] f")   'tn-set-max-weight-4)
 
-;; new bindings (not yet recorded in mob-data)
-(global-set-key (kbd "C-c C-v s")       'tn-toggle-emacspeak)
-
 (defun tn-toggle-emacspeak ()
     (interactive)
-    (setq tn-emacspeak-mode (not tn-emacspeak-mode))
-    (tn-refresh-view))
+    (dtk-toggle-quiet))
 
 (defun toggle-linum-mode ()
     (interactive)
