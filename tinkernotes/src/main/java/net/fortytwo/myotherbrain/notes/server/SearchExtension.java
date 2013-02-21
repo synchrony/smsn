@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 //@ExtensionDescriptor(description = "execute keyword search over a TinkerNotes graph")
 public class SearchExtension extends TinkerNotesExtension {
 
-    private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 200;
+    private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 100;
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")

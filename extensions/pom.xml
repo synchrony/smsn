@@ -18,7 +18,6 @@
     </parent>
 
     <modules>
-	<module>dbpedia-spotlight</module>
         <module>events</module>
         <module>opencalais</module>
         <module>qrcodes</module>
