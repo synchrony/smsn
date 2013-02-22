@@ -20,14 +20,17 @@
         <module>extendo-qrcodes</module>
         <module>extendo-rfid</module>
         <module>extendo-speech</module>
+        <module>monitron-server</module>
     </modules>
 
     <properties>
         <extendo.version>1.0-SNAPSHOT</extendo.version>
-        <tinkerpop.version>2.3.0-SNAPSHOT</tinkerpop.version>
-        <neo4j.version>1.9.M03</neo4j.version>
         <rdfagents.version>1.0-SNAPSHOT</rdfagents.version>
         <ripple.version>1.0-SNAPSHOT</ripple.version>
+        <sesametools.version>1.7-SNAPSHOT</sesametools.version>
+        <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>
+        <tinkerpop.version>2.3.0-SNAPSHOT</tinkerpop.version>
+        <neo4j.version>1.9.M03</neo4j.version>
         <sesame.version>2.6.10</sesame.version>
         <junit.version>4.5</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

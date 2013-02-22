@@ -4,12 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.extendo</groupId>
-    <artifactId>eddie</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>monitron-server</artifactId>
     <packaging>jar</packaging>
-    <name>Eddie</name>
-    <description>Your Friendly Household Computer</description>
+    <name>Monitron Server</name>
+
+    <parent>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-all</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <repositories>
         <repository>
@@ -28,20 +31,11 @@
         </repository>
     </repositories>
 
-    <properties>
-        <sesame.version>2.6.9</sesame.version>
-        <sesametools.version>1.7-SNAPSHOT</sesametools.version>
-        <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>
-        <myotherbrain.version>1.0-SNAPSHOT</myotherbrain.version>
-        <rdfagents.version>0.3-SNAPSHOT</rdfagents.version>
-        <junit.version>4.5</junit.version>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.myotherbrain</groupId>
-            <artifactId>myotherbrain-core</artifactId>
-            <version>${myotherbrain.version}</version>
+            <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-core</artifactId>
+            <version>${extendo.version}</version>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
@@ -49,7 +43,7 @@
             <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.fortytwo.laboratory</groupId>
+            <groupId>edu.rpi.twc</groupId>
             <artifactId>sesamestream</artifactId>
             <version>${sesamestream.version}</version>
         </dependency>
