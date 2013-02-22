@@ -1,0 +1,487 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix : <http://fortytwo.net/2012/08/monitron##> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://fortytwo.net/2012/08/monitron#> .
+
+<http://fortytwo.net/2012/08/monitron#> rdf:type owl:Ontology ;
+                                        
+                                        owl:imports <http://purl.org/NET/c4dm/event.owl> .
+
+
+#################################################################
+#
+#    Annotation properties
+#
+#################################################################
+
+
+
+
+#################################################################
+#
+#    Datatypes
+#
+#################################################################
+
+
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://fortytwo.net/2012/08/monitron#containedIn
+
+<http://fortytwo.net/2012/08/monitron#containedIn> rdf:type owl:FunctionalProperty ,
+                                                            owl:ObjectProperty ;
+                                                   
+                                                   rdfs:domain <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
+                                                   
+                                                   rdfs:range <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://fortytwo.net/2012/08/monitron#AirTemperatureObservation
+
+<http://fortytwo.net/2012/08/monitron#AirTemperatureObservation> rdf:type owl:Class ;
+                                                                 
+                                                                 rdfs:label "air temperature observation" ;
+                                                                 
+                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#AlcoholGasDetector
+
+<http://fortytwo.net/2012/08/monitron#AlcoholGasDetector> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#GasDetector> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Apartment
+
+<http://fortytwo.net/2012/08/monitron#Apartment> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:label "apartment" ;
+                                                 
+                                                 rdfs:subClassOf <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#AtmosphericPressureObservation
+
+<http://fortytwo.net/2012/08/monitron#AtmosphericPressureObservation> rdf:type owl:Class ;
+                                                                      
+                                                                      rdfs:label "atmospheric pressure observation" ;
+                                                                      
+                                                                      rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Barometer
+
+<http://fortytwo.net/2012/08/monitron#Barometer> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:label "barometer" ;
+                                                 
+                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Building
+
+<http://fortytwo.net/2012/08/monitron#Building> rdf:type owl:Class ;
+                                                
+                                                rdfs:label "building" ;
+                                                
+                                                rdfs:subClassOf <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#CarbonMonoxideGasDetector
+
+<http://fortytwo.net/2012/08/monitron#CarbonMonoxideGasDetector> rdf:type owl:Class ;
+                                                                 
+                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#GasDetector> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#ColorLightLevelObservation
+
+<http://fortytwo.net/2012/08/monitron#ColorLightLevelObservation> rdf:type owl:Class ;
+                                                                  
+                                                                  rdfs:label "color light level observation" ;
+                                                                  
+                                                                  rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#ColorLightLevelSensor
+
+<http://fortytwo.net/2012/08/monitron#ColorLightLevelSensor> rdf:type owl:Class ;
+                                                             
+                                                             rdfs:label "color light level sensor" ;
+                                                             
+                                                             rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#DustLevelObservation
+
+<http://fortytwo.net/2012/08/monitron#DustLevelObservation> rdf:type owl:Class ;
+                                                            
+                                                            rdfs:label "dust level observation" ;
+                                                            
+                                                            rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#GasDetector
+
+<http://fortytwo.net/2012/08/monitron#GasDetector> rdf:type owl:Class ;
+                                                   
+                                                   rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#HydrogenGasDetector
+
+<http://fortytwo.net/2012/08/monitron#HydrogenGasDetector> rdf:type owl:Class ;
+                                                           
+                                                           rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#GasDetector> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Hygrometer
+
+<http://fortytwo.net/2012/08/monitron#Hygrometer> rdf:type owl:Class ;
+                                                  
+                                                  rdfs:label "hygrometer" ;
+                                                  
+                                                  rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#IonizationSmokeDetector
+
+<http://fortytwo.net/2012/08/monitron#IonizationSmokeDetector> rdf:type owl:Class ;
+                                                               
+                                                               rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#LightLevelObservation
+
+<http://fortytwo.net/2012/08/monitron#LightLevelObservation> rdf:type owl:Class ;
+                                                             
+                                                             rdfs:label "light level observation" ;
+                                                             
+                                                             rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#LightLevelSensor
+
+<http://fortytwo.net/2012/08/monitron#LightLevelSensor> rdf:type owl:Class ;
+                                                        
+                                                        rdfs:label "light level sensor" ;
+                                                        
+                                                        rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#MotionObservation
+
+<http://fortytwo.net/2012/08/monitron#MotionObservation> rdf:type owl:Class ;
+                                                         
+                                                         rdfs:label "motion observation" ;
+                                                         
+                                                         rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#NaturalGasDetector
+
+<http://fortytwo.net/2012/08/monitron#NaturalGasDetector> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#GasDetector> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Observation
+
+<http://fortytwo.net/2012/08/monitron#Observation> rdf:type owl:Class ;
+                                                   
+                                                   rdfs:subClassOf <http://purl.org/NET/c4dm/event.owl#Event> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#OpticalDustSensor
+
+<http://fortytwo.net/2012/08/monitron#OpticalDustSensor> rdf:type owl:Class ;
+                                                         
+                                                         rdfs:label "optical dust sensor" ;
+                                                         
+                                                         rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#PassiveInfraredSensor
+
+<http://fortytwo.net/2012/08/monitron#PassiveInfraredSensor> rdf:type owl:Class ;
+                                                             
+                                                             rdfs:label "passive infrared sensor" ;
+                                                             
+                                                             rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#PetroleumGasDetector
+
+<http://fortytwo.net/2012/08/monitron#PetroleumGasDetector> rdf:type owl:Class ;
+                                                            
+                                                            rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#GasDetector> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Property
+
+<http://fortytwo.net/2012/08/monitron#Property> rdf:type owl:Class .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#RelativeHumidityObservation
+
+<http://fortytwo.net/2012/08/monitron#RelativeHumidityObservation> rdf:type owl:Class ;
+                                                                   
+                                                                   rdfs:label "relative humidity observation" ;
+                                                                   
+                                                                   rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Room
+
+<http://fortytwo.net/2012/08/monitron#Room> rdf:type owl:Class ;
+                                            
+                                            rdfs:label "room" ;
+                                            
+                                            rdfs:subClassOf <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Sensor
+
+<http://fortytwo.net/2012/08/monitron#Sensor> rdf:type owl:Class .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#SoundLevelObservation
+
+<http://fortytwo.net/2012/08/monitron#SoundLevelObservation> rdf:type owl:Class ;
+                                                             
+                                                             rdfs:label "sound level observation" ;
+                                                             
+                                                             rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#SoundLevelSensor
+
+<http://fortytwo.net/2012/08/monitron#SoundLevelSensor> rdf:type owl:Class ;
+                                                        
+                                                        rdfs:label "sound level sensor" ;
+                                                        
+                                                        rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#Thermometer
+
+<http://fortytwo.net/2012/08/monitron#Thermometer> rdf:type owl:Class ;
+                                                   
+                                                   rdfs:label "thermometer" ;
+                                                   
+                                                   rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#UnitOfMeasurement
+
+<http://fortytwo.net/2012/08/monitron#UnitOfMeasurement> rdf:type owl:Class .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#VibrationLevelObservation
+
+<http://fortytwo.net/2012/08/monitron#VibrationLevelObservation> rdf:type owl:Class ;
+                                                                 
+                                                                 rdfs:label "vibration level observation" ;
+                                                                 
+                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#VibrationLevelSensor
+
+<http://fortytwo.net/2012/08/monitron#VibrationLevelSensor> rdf:type owl:Class ;
+                                                            
+                                                            rdfs:label "vibration level sensor" ;
+                                                            
+                                                            rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#XBandDopplerMotionSensor
+
+<http://fortytwo.net/2012/08/monitron#XBandDopplerMotionSensor> rdf:type owl:Class ;
+                                                                
+                                                                rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+
+
+#################################################################
+#
+#    Individuals
+#
+#################################################################
+
+
+###  http://fortytwo.net/2012/08/monitron#airTemperature
+
+<http://fortytwo.net/2012/08/monitron#airTemperature> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                               owl:NamedIndividual ;
+                                                      
+                                                      rdfs:label "air temperature" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#atmosphericPressure
+
+<http://fortytwo.net/2012/08/monitron#atmosphericPressure> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                    owl:NamedIndividual ;
+                                                           
+                                                           rdfs:label "atmospheric pressure" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#blueLightLevel
+
+<http://fortytwo.net/2012/08/monitron#blueLightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                               owl:NamedIndividual ;
+                                                      
+                                                      rdfs:label "blue light level" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#degreesCelsius
+
+<http://fortytwo.net/2012/08/monitron#degreesCelsius> rdf:type <http://fortytwo.net/2012/08/monitron#UnitOfMeasurement> ,
+                                                               owl:NamedIndividual ;
+                                                      
+                                                      rdfs:label "degrees Celsius" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#greenLightLevel
+
+<http://fortytwo.net/2012/08/monitron#greenLightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                owl:NamedIndividual ;
+                                                       
+                                                       rdfs:label "green light level" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#isMotion
+
+<http://fortytwo.net/2012/08/monitron#isMotion> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                         owl:NamedIndividual ;
+                                                
+                                                rdfs:label "motion detected" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#lightLevel
+
+<http://fortytwo.net/2012/08/monitron#lightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                           owl:NamedIndividual ;
+                                                  
+                                                  rdfs:label "light level" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#opticalDustLevel
+
+<http://fortytwo.net/2012/08/monitron#opticalDustLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                 owl:NamedIndividual ;
+                                                        
+                                                        rdfs:label "optical dust level" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#pascals
+
+<http://fortytwo.net/2012/08/monitron#pascals> rdf:type <http://fortytwo.net/2012/08/monitron#UnitOfMeasurement> ,
+                                                        owl:NamedIndividual ;
+                                               
+                                               rdfs:label "pascals" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#redLightLevel
+
+<http://fortytwo.net/2012/08/monitron#redLightLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                              owl:NamedIndividual ;
+                                                     
+                                                     rdfs:label "red light level" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#relativeHumidity
+
+<http://fortytwo.net/2012/08/monitron#relativeHumidity> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                                 owl:NamedIndividual ;
+                                                        
+                                                        rdfs:label "relative humidity" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#soundLevel
+
+<http://fortytwo.net/2012/08/monitron#soundLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                           owl:NamedIndividual ;
+                                                  
+                                                  rdfs:label "sound level" .
+
+
+
+###  http://fortytwo.net/2012/08/monitron#vibrationLevel
+
+<http://fortytwo.net/2012/08/monitron#vibrationLevel> rdf:type <http://fortytwo.net/2012/08/monitron#Property> ,
+                                                               owl:NamedIndividual ;
+                                                      
+                                                      rdfs:label "vibration level" .
+
+
+
+
+###  Generated by the OWL API (version 3.2.3.22702) http://owlapi.sourceforge.net
+

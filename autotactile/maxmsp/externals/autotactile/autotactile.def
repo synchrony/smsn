@@ -1,0 +1,4 @@
+LIBRARY autotactile.mxe
+
+EXPORTS
+	main

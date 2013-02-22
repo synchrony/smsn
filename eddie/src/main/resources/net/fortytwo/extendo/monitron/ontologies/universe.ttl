@@ -1,0 +1,78 @@
+@prefix :     <http://fortytwo.net/2012/08/universe#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geo:  <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix m:    <http://fortytwo.net/2012/08/monitron#> .
+@prefix om:   <http://www.opengis.net/spec/OMXML/2.0/conf/> .   # TODO: this namespace is a placeholder
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+
+################################################################################
+# environment
+
+:winslowBuilding a m:Building ;
+    rdfs:label "Winslow Building" ;
+    rdfs:comment "the Winslow Building of Rensselaer Polytechnic Institute" .
+
+:room_1 a m:Room ;
+    m:containedIn :winslowBuilding ;
+    rdfs:label "Winslow 1st floor" ;
+    rdfs:comment "Winslow 1st floor conference room" .
+
+
+################################################################################
+# machines
+
+:monitron_1 a foaf:Agent ;
+    foaf:mbox <mailto:monitron1@fortytwo.net> ;
+    rdfs:label "Monitron #1" ;
+    rdfs:comment "an Omnisensory Monitron for use in our apartment" .
+
+:eddie_4 a foaf:Agent ;
+    foaf:mbox <mailto:eddie4@fortytwo.net> ;
+    rdfs:label "Eddie #4" ;
+    rdfs:comment "our house-control computer" .
+
+
+################################################################################
+# sensors
+
+:bosch-bmp085_1_barometer a m:Barometer ;
+    rdfs:label "barometer of Monitron #1" ;
+    rdfs:comment "a Bosch BMP085 digital (barometric) pressure sensor which has been calibrated to output pressure values in pascals" .
+
+:avago-adjd-s311-cr999_1 a m:ColorLightLevelSensor ;
+    rdfs:label "color light level sensor of Monitron #1" ;
+    rdfs:comment "an Avago Technologies ADJD-S311-CR999 miniature surface mount RGB digital color sensor which has been calibrated to output red, green, and blue color values from 0 to 1" .
+
+:maxdetect-rht03_1_hygrometer a m:Hygrometer ;
+    rdfs:label "hygrometer of Monitron #1" ;
+    rdfs:comment "a Maxdetect RHT03 digital relative humidity and temperature sensor which has been calibrated to output relative humidity values from 0 to 1" .
+
+:generic-photoresistor_1 a m:LightLevelSensor ;
+    rdfs:label "light level sensor of Monitron #1" ;
+    rdfs:comment "a generic photoresistor which has been calibrated to output light level values from 0 to 1" .
+
+:sharp-gp2y1010au0f_1 a m:OpticalDustSensor ;
+    rdfs:label "optical dust sensor of Monitron #1" ;
+    rdfs:comment "a Sharp GP2Y1010AU0F compact optical dust sensor which has been calibrated to output dust level values from 0 to 1" .
+
+:hanse-se10_1 a m:PassiveInfraredSensor ;
+    rdfs:label "passive infrared sensor of Monitron #1" ;
+    rdfs:comment "a Hanse Electronics SE-10 PIR motion sensor which outputs a true or false value depending on whether motion has been detected during the sampling interval" .
+
+:knowles-md9745apz-f_1 a m:SoundLevelSensor ;
+    rdfs:label "sound level sensor of Monitron #1" ;
+    rdfs:comment "a Knowles Acoustics MD9745APZ-F electret condenser microphone which has been calibrated to output momentary sound intensity values from -1 to 1" .
+
+:bosch-bmp085_1_thermometer a m:Thermometer ;
+    rdfs:label "thermometer #1 of Monitron #1" ;
+    rdfs:comment "a Bosch BMP085 digital (barometric) pressure sensor which has been calibrated to output temperature values in degrees Celsius" .
+
+:maxdetect-rht03_1_thermometer a m:Thermometer ;
+    rdfs:label "thermometer #2 of Monitron #1" ;
+    rdfs:comment "a Maxd�tect RHT03 digital relative humidity and temperature sensor which has been calibrated to output temperature values in degrees Celsius" .
+
+:murata-7bb-20-6l0_1 a m:VibrationLevelSensor ;
+    rdfs:label "vibration level sensor of Monitron #1" ;
+    rdfs:comment "a Murata 7BB-20-6L0 piezo element which has been calibrated to output momentary vibration intensity values from -1 to 1" .

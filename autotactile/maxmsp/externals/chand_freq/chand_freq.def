@@ -1,0 +1,4 @@
+LIBRARY chand_freq.mxe
+
+EXPORTS
+	main

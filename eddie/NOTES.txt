@@ -1,0 +1,92 @@
+
+cd /Users/josh/projects/fortytwo/laboratory/net/fortytwo/extendo/eddie
+sudo cu -l /dev/cu.usbserial-A600HFHJ -s 115200  | ./monitron-rdfizer-demo.sh | tee /tmp/eddie-rdfizer.out
+
+tail -f /tmp/eddie-rdfizer.out
+
+
+cd /Users/josh/projects/fortytwo/laboratory/net/fortytwo/extendo/eddie
+sudo cu -l /dev/cu.usbserial-A600HFHJ -s 115200  | ./monitron-continuous-query-demo.sh -d queries | tee /tmp/eddie-continuous-queries.out
+
+tail -f /tmp/eddie-continuous-queries.out
+
+
+
+sudo cu -l /dev/cu.usbserial-A600HFHJ -s 115200 | tee /tmp/arduino.out
+vim /tmp/arduino.out
+mkdir /tmp/data
+mv /tmp/arduino.out /tmp/data/silence
+#mv /tmp/arduino.out /tmp/data/speech
+
+
+
+
+silence <- as.vector(read.table(file("/tmp/data/silence"))$V1)
+speech <- as.vector(read.table(file("/tmp/data/speech"))$V1)
+
+plot(silence, type="l")
+plot(speech, type="l")
+
+plot(density(silence))
+abline(v=mean(silence))
+abline(v=(mean(silence)-sd(silence)), col="blue")
+abline(v=(mean(silence)+sd(silence)), col="blue")
+mean(silence)
+
+plot(density(speech))
+abline(v=mean(speech))
+abline(v=(mean(speech)-sd(speech)), col="blue")
+abline(v=(mean(speech)+sd(speech)), col="blue")
+mean(speech)
+
+
+peak <- function(v) { m <- mean(v); max(max(v) - m, m - min(v))}
+
+silence.mag <- abs(silence - mean(silence))
+speech.mag <- abs(speech - mean(speech))
+
+plot(density(silence.mag))
+abline(v=mean(silence.mag))
+abline(v=(mean(silence.mag)+sd(silence.mag)), col="blue")
+abline(v=(mean(silence.mag)-sd(silence.mag)), col="blue")
+
+plot(density(speech.mag))
+abline(v=mean(silence.mag))
+abline(v=(mean(speech.mag)+sd(speech.mag)), col="blue")
+abline(v=(mean(speech.mag)-sd(speech.mag)), col="blue")
+
+fitnormal <- function(v) { z <- (v - mean(v)) / sd(v); qqnorm(z); abline(0,1); }
+
+# it's quite close to a normal distribution
+fitnormal(silence.mag)
+# …but speech is not
+fitnormal(speech.mag)
+# neither are close to a log-normal distribution
+fitnormal(log(silence.mag))
+fitnormal(log(speech.mag))
+# FWIW, the raw silence data is not normally distributed
+fitnormal(silence)
+# …although the raw speech data could pass for normally distributed
+fitnormal(speech)
+
+# for now, for simplicity, treat electret microphone output as normally distributed
+
+
+vibro <- as.vector(read.table(file("/tmp/data/vibro"))$V1)
+
+plot(vibro, type="l")
+
+plot(density(vibro))
+abline(v=mean(vibro))
+abline(v=(mean(vibro)-sd(vibro)), col="blue")
+abline(v=(mean(vibro)+sd(vibro)), col="blue")
+mean(vibro)
+
+# vibration output is neither normally nor log-normally distributed
+fitnormal(vibro)
+fitnormal(log(vibro+1))
+
+# for now, use mean and max vibro values
+mean(vibro) / 1023
+max(vibro) / 1023
+
