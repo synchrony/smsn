@@ -12,14 +12,14 @@
     <description>Extendo Project</description>
 
     <modules>
-        <module>core</module>
+        <module>extendo-core</module>
         <module>flashcards</module>
-        <module>tinkernotes</module>
-        <module>events</module>
-        <module>opencalais</module>
-        <module>qrcodes</module>
-        <module>rfid</module>
-        <module>speech</module>
+        <module>extendo-brain</module>
+        <module>extendo-events</module>
+        <module>extendo-opencalais</module>
+        <module>extendo-qrcodes</module>
+        <module>extendo-rfid</module>
+        <module>extendo-speech</module>
     </modules>
 
     <properties>
