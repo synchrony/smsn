@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>myotherbrain-core</artifactId>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-core</artifactId>
     <packaging>jar</packaging>
-    <name>MyOtherBrain Core</name>
+    <name>Extendo Core</name>
 
     <parent>
-        <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-all</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-parent</artifactId>
+        <version>1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

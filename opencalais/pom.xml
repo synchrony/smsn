@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>qrcodes</artifactId>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-opencalais</artifactId>
     <packaging>jar</packaging>
-    <name>MyOtherBrain QR Code utilities</name>
+    <name>Extendo OpenCalais extension</name>
 
     <parent>
-        <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-extensions</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-parent</artifactId>
+        <version>1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -22,24 +22,18 @@
             <name>fortytwo.net Maven repository</name>
             <url>http://fortytwo.net/maven2</url>
         </repository>
-        <!-- temporary, for zxing -->
-        <repository>
-            <id>mvn-adamgent</id>
-            <url>http://mvn-adamgent.googlecode.com/svn/maven/release</url>
-            <name>Adam Gent Maven Repository</name>
-        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.myotherbrain</groupId>
-            <artifactId>myotherbrain-core</artifactId>
-            <version>${myotherbrain.version}</version>
+            <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-core</artifactId>
+            <version>${extendo.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>1.6</version>
+            <groupId>mx.bigdata.jcalais</groupId>
+            <artifactId>j-calais</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

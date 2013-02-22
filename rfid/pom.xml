@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>opencalais</artifactId>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-rfid</artifactId>
     <packaging>jar</packaging>
-    <name>MyOtherBrain OpenCalais add-on</name>
+    <name>Extendo RFID extension</name>
 
     <parent>
-        <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-extensions</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-parent</artifactId>
+        <version>1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -26,14 +26,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.myotherbrain</groupId>
-            <artifactId>myotherbrain-core</artifactId>
-            <version>${myotherbrain.version}</version>
+            <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-brain</artifactId>
+            <version>${extendo.version}</version>
         </dependency>
         <dependency>
-            <groupId>mx.bigdata.jcalais</groupId>
-            <artifactId>j-calais</artifactId>
-            <version>1.0</version>
+            <groupId>com.alientechnology</groupId>
+            <artifactId>alien-rfid</artifactId>
+            <version>2.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-rexster-graph</artifactId>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

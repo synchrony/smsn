@@ -4,17 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>myotherbrain-android</artifactId>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-android</artifactId>
+    <version>1.2-SNAPSHOT</version>
     <packaging>apk</packaging>
-    <name>MyOtherBrain-Android</name>
-
-    <parent>
-        <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-all</artifactId>
-        <version>1.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+    <name>Extend-o-Brain for Android</name>
 
     <repositories>
         <repository>
@@ -24,11 +18,17 @@
         </repository>
     </repositories>
 
+    <properties>
+        <extendo.version>1.2-SNAPSHOT</extendo.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.myotherbrain</groupId>
+            <groupId>net.fortytwo.extendo</groupId>
             <artifactId>flashcards</artifactId>
-            <version>${myotherbrain.version}</version>
+            <version>${extendo.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>

@@ -4,26 +4,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>myotherbrain-all</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-parent</artifactId>
+    <version>1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>MyOtherBrain</name>
-    <description>This is your brain. This is your brain on the Web. Any questions?</description>
+    <name>Extendo</name>
+    <description>Extendo Project</description>
 
     <modules>
         <module>core</module>
         <module>flashcards</module>
         <module>tinkernotes</module>
-        <module>android</module>
-        <module>extensions</module>
+        <module>events</module>
+        <module>opencalais</module>
+        <module>qrcodes</module>
+        <module>rfid</module>
+        <module>speech</module>
     </modules>
 
     <properties>
-        <myotherbrain.version>1.1-SNAPSHOT</myotherbrain.version>
+        <extendo.version>1.2-SNAPSHOT</extendo.version>
         <tinkerpop.version>2.3.0-SNAPSHOT</tinkerpop.version>
         <neo4j.version>1.9.M03</neo4j.version>
-        <rdfagents.version>0.2</rdfagents.version>
+        <rdfagents.version>1.0-SNAPSHOT</rdfagents.version>
         <ripple.version>0.8-SNAPSHOT</ripple.version>
         <sesame.version>2.6.10</sesame.version>
         <junit.version>4.5</junit.version>

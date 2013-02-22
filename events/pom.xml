@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>events</artifactId>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-events</artifactId>
     <packaging>jar</packaging>
-    <name>MyOtherBrain Events</name>
+    <name>Extendo Events</name>
 
     <parent>
-        <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-extensions</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-parent</artifactId>
+        <version>1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -87,7 +87,7 @@
                     <descriptors>
                         <descriptor>src/assembly/standalone.xml</descriptor>
                     </descriptors>
-                    <finalName>events-${project.version}</finalName>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
                     <outputDirectory>target</outputDirectory>
                     <workDirectory>target/assembly/work</workDirectory>
                     <tarLongFileMode>warn</tarLongFileMode>

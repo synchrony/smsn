@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo.myotherbrain</groupId>
-    <artifactId>tinkernotes</artifactId>
+    <groupId>net.fortytwo.extendo</groupId>
+    <artifactId>extendo-brain</artifactId>
     <packaging>jar</packaging>
-    <name>TinkerNotes</name>
+    <name>Extend-o-Brain</name>
 
     <parent>
-        <groupId>net.fortytwo.myotherbrain</groupId>
-        <artifactId>myotherbrain-all</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-parent</artifactId>
+        <version>1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -26,9 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.myotherbrain</groupId>
-            <artifactId>myotherbrain-core</artifactId>
-            <version>${myotherbrain.version}</version>
+            <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-core</artifactId>
+            <version>${extendo.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop</groupId>
@@ -122,7 +122,7 @@
                     <descriptors>
                         <descriptor>src/assembly/standalone.xml</descriptor>
                     </descriptors>
-                    <finalName>tinkernotes-${project.version}</finalName>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
                     <outputDirectory>target</outputDirectory>
                     <workDirectory>target/assembly/work</workDirectory>
                     <tarLongFileMode>warn</tarLongFileMode>
