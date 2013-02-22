@@ -4,12 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.fortytwo</groupId>
     <artifactId>droidspeak</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Droidspeak</name>
-    <description>...</description>
+
+    <parent>
+        <groupId>net.fortytwo.extendo</groupId>
+        <artifactId>extendo-all</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <repositories>
         <repository>
@@ -18,15 +21,6 @@
             <url>http://fortytwo.net/maven2</url>
         </repository>
     </repositories>
-
-    <properties>
-        <junit.version>4.5</junit.version>
-        <sesame.version>2.6.4</sesame.version>
-        <sesametools.version>1.6</sesametools.version>
-        <ripple.version>0.8-SNAPSHOT</ripple.version>
-        <blueprints.version>1.2</blueprints.version>
-        <gremlin.version>1.5</gremlin.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -39,7 +33,6 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
         <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
@@ -63,37 +56,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <!-- Note: plugin versions are the most recent (in repo1.maven.org) as of 2011-04-05 -->
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <configLocation>${basedir}/ripple-demo/src/site/checkstyle.xml</configLocation>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
 </project>
