@@ -6,7 +6,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.fortytwo.extendo</groupId>
     <artifactId>extendo-android</artifactId>
-    <version>1.2-SNAPSHOT</version>
     <packaging>apk</packaging>
     <name>Extend-o-Brain for Android</name>
 
@@ -19,7 +18,7 @@
     </repositories>
 
     <properties>
-        <extendo.version>1.2-SNAPSHOT</extendo.version>
+        <extendo.version>1.0-SNAPSHOT</extendo.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
