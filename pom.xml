@@ -2,27 +2,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <groupId>net.fortytwo.extendo</groupId>
     <artifactId>extendo-all</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Extendo</name>
     <description>Extendo Project</description>
+    <url>https://github.com/joshsh/extendo</url>
 
-    <modules>
-        <module>extendo-core</module>
-        <module>extendo-brain</module>
-        <module>extendo-events</module>
-        <module>extendo-opencalais</module>
-        <module>extendo-qrcodes</module>
-        <module>extendo-rfid</module>
-        <module>extendo-speech</module>
-        <module>droidspeak</module>
-        <module>flashcards</module>
-        <module>monitron-server</module>
-    </modules>
+    <issueManagement>
+        <url>https://github.com/joshsh/extendo/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>git@github.com:joshsh/extendo.git</url>
+        <connection>scm:git:git@github.com:joshsh/extendo.git</connection>
+        <developerConnection>scm:git:git@github.com:joshsh/extendo.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <email>josh@fortytwo.net</email>
+            <name>Joshua Shinavier</name>
+            <url>https://fortytwo.net</url>
+            <id>joshsh</id>
+        </developer>
+    </developers>
 
     <properties>
         <extendo.version>1.0-SNAPSHOT</extendo.version>
@@ -37,6 +58,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+
+    <modules>
+        <module>extendo-core</module>
+        <module>extendo-brain</module>
+        <module>extendo-events</module>
+        <module>extendo-opencalais</module>
+        <module>extendo-qrcodes</module>
+        <module>extendo-rfid</module>
+        <module>extendo-speech</module>
+        <module>droidspeak</module>
+        <module>flashcards</module>
+        <module>monitron-server</module>
+    </modules>
 
     <build>
         <directory>${basedir}/target</directory>

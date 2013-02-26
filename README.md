@@ -1,22 +1,21 @@
 Extendo is a collection of knowledge-based, wearable, and ubiquitous computing components which bring together the principles of [Humanistic Intelligence](http://en.wikipedia.org/wiki/Humanistic_intelligence) and the [Semantic Web](http://en.wikipedia.org/wiki/Semantic_Web).
-
 It is a personal and research-oriented project,
 and there currently isn't much documentation other than my PhD thesis (in progress).
 However, here is an overview of the important stuff:
 
-* **Extend-o-Brain**: a personal knowledge base with a wiki-like interface.  Includes an Emacs client (think [Org-mode](http://en.wikipedia.org/wiki/Org-mode) with graph-based instead of a tree-based structure for notes).  Extend-o-Brain is the heart and soul of Extendo.  Or at least the brain.
-* **Extendo Events**: an event-handling framework for piping user actions into Semantic Web workflows, e.g. a SPARQL-based complex event processor
+* **Extend-o-Brain**: a [personal knowledge base](http://en.wikipedia.org/wiki/Personal_knowledge_base) with a wiki interface.  It runs as a [Rexster](https://github.com/tinkerpop/rexster) extension which connects to a [Blueprints](https://github.com/tinkerpop/blueprints) graph database, and includes an Emacs front-end (think [Org-mode](http://en.wikipedia.org/wiki/Org-mode) with a [graph](http://en.wikipedia.org/wiki/Graph_%28mathematics%29)  of notes instead of a hierarchy).  Extend-o-Brain is the heart and soul of Extendo.  Or at least the brain.
+* **Extendo Events**: an event-handling framework for piping user actions into Semantic Web workflows, e.g. a [SPARQL](http://en.wikipedia.org/wiki/SPARQL)-based complex event processor
 * **Extendo Chrome Plugin**: bookmarks web pages into Extend-o-Brain and (optionally) logs web page visits into Extendo Events
-* **Monomanual Typeatron**: firmware for a particularly nifty wireless [chorded keyer](http://en.wikipedia.org/wiki/Chorded_keyboard) which is used in connection with Extend-o-Brain
-* **Omnisensory Monitron** and Monitron Server: a ubiquitous computing framework which combines Arduino hacking and sensor-based time series data with the Semantic Web.  See my presentation, [Semantics and Sensors](http://www.slideshare.net/joshsh/semantics-and-sensors).
+* **Omnisensory Monitron** and **Monitron Server**: a ubiquitous computing framework which combines sensor-based time series data (via [Arduino](http://www.arduino.cc/)) with the Semantic Web.  See my presentation, [Semantics and Sensors](http://www.slideshare.net/joshsh/semantics-and-sensors).
+* **Monomanual Typeatron**: a particularly nifty wireless [chorded keyer](http://en.wikipedia.org/wiki/Chorded_keyboard) currently under development.  Part of the **Extend-o-Body** wearable computing platform.
 
 Other stuff:
 
 * **Extendo Android App**: for the moment, it provides a graphical Flashcards (see below) interface.  No more, no less.
 * **Extend-o-Hand**: a simple glove-based gestural interface
 * **Extendo OpenCalais extension**: adds [OpenCalais](http://www.opencalais.com/) entity recognition powers
-* **Extendo QR code extension**: adds QR code powers
-* **Extendo RFID extension**: adds UHF RFID tag recognition powers via [Alien Technology](http://www.alientechnology.com/) readers
+* **Extendo QR code extension**: adds [QR code](http://en.wikipedia.org/wiki/QR_code) powers
+* **Extendo RFID extension**: adds UHF [RFID](http://en.wikipedia.org/wiki/Radio-frequency_identification) tag recognition powers via [Alien Technology](http://www.alientechnology.com/) readers
 * **Extendo speech extension**: adds speech recognition powers
 * **Ardreamo**: placeholder for a sleep and dreaming wearable
 * **Autotactile Fabric**: a gestural interface which acts as a "second skin", responding to the same touch sensations perceived by the wearer.  Used in an RPI research project, Intelligent Sensory Substitution.
