@@ -7,8 +7,8 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
-import net.fortytwo.extendo.ExtendoBrain;
-import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.myotherbrain.ExtendoGraph;
 
 import java.io.File;
@@ -51,15 +51,15 @@ public class ListGraphMigrator {
                     Vertex cur = target.addVertex(null);
 
                     if (i > 0) {
-                        target.addEdge(null, last, cur, ExtendoBrain.REST);
+                        target.addEdge(null, last, cur, Extendo.REST);
                     } else {
-                        target.addEdge(null, vt, cur, ExtendoBrain.NOTES);
+                        target.addEdge(null, vt, cur, Extendo.NOTES);
                     }
 
                     Vertex v2s = list.get(i);
                     Vertex v2t = target.getVertex(v2s.getId());
 
-                    target.addEdge(null, cur, v2t, ExtendoBrain.FIRST);
+                    target.addEdge(null, cur, v2t, Extendo.FIRST);
                     last = cur;
                 }
             }
@@ -69,7 +69,7 @@ public class ListGraphMigrator {
     private class VertexTimestampComparator implements Comparator<Vertex> {
         public int compare(final Vertex v1,
                            final Vertex v2) {
-            return ((Long) v1.getProperty(ExtendoBrain.CREATED)).compareTo((Long) v2.getProperty(ExtendoBrain.CREATED));
+            return ((Long) v1.getProperty(Extendo.CREATED)).compareTo((Long) v2.getProperty(Extendo.CREATED));
         }
     }
 

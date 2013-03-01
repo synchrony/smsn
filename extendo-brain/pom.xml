@@ -135,7 +135,7 @@
                     <tarLongFileMode>warn</tarLongFileMode>
                     <archive>
                         <manifest>
-                            <mainClass>net.fortytwo.extendo.ExtendoBrain</mainClass>
+                            <mainClass>net.fortytwo.extendo.Extendo</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

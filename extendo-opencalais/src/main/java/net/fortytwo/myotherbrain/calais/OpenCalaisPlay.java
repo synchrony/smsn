@@ -5,8 +5,8 @@ import mx.bigdata.jcalais.CalaisConfig;
 import mx.bigdata.jcalais.CalaisObject;
 import mx.bigdata.jcalais.CalaisResponse;
 import mx.bigdata.jcalais.rest.CalaisRestClient;
-import net.fortytwo.extendo.ExtendoBrain;
-import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Extendo;
 
 import java.io.FileInputStream;
 import java.net.URL;
@@ -27,9 +27,9 @@ public class OpenCalaisPlay {
     }
 
     private static void play() throws Exception {
-        ExtendoBrain.getConfiguration().load(new FileInputStream("/tmp/open-calais-play.props"));
+        Extendo.getConfiguration().load(new FileInputStream("/tmp/open-calais-play.props"));
 
-        String apiKey = ExtendoBrain.getConfiguration().getString(API_KEY);
+        String apiKey = Extendo.getConfiguration().getString(API_KEY);
         System.out.println("key: " + apiKey);
 
         CalaisClient client = new CalaisRestClient(apiKey);

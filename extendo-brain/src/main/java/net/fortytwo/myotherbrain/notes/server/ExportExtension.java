@@ -15,8 +15,8 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
-import net.fortytwo.extendo.ExtendoBrain;
-import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.AtomList;
 import net.fortytwo.myotherbrain.ExtendoGraph;
@@ -57,21 +57,21 @@ public class ExportExtension extends TinkerNotesExtension {
         p.println("created\tid\tweight\tsharability\tvalue\talias");
 
         for (Vertex v : g.getGraph().getVertices()) {
-            Object c = v.getProperty(ExtendoBrain.CREATED);
+            Object c = v.getProperty(Extendo.CREATED);
             if (null != c) {
                 p.print(c);
                 p.print('\t');
                 p.print(v.getId());
                 p.print('\t');
-                p.print(v.getProperty(ExtendoBrain.WEIGHT));
+                p.print(v.getProperty(Extendo.WEIGHT));
                 p.print('\t');
-                p.print(v.getProperty(ExtendoBrain.SHARABILITY));
-                p.print('\t');
-
-                p.print(escapeValue((String) v.getProperty(ExtendoBrain.VALUE)));
+                p.print(v.getProperty(Extendo.SHARABILITY));
                 p.print('\t');
 
-                String alias = (String) v.getProperty(ExtendoBrain.ALIAS);
+                p.print(escapeValue((String) v.getProperty(Extendo.VALUE)));
+                p.print('\t');
+
+                String alias = (String) v.getProperty(Extendo.ALIAS);
                 if (null != alias) {
                     p.print(escapeValue(alias));
                 }
@@ -127,7 +127,7 @@ public class ExportExtension extends TinkerNotesExtension {
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
     // Otherwise, R becomes confused and skips rows.
     private String escapeValue(final String value) {
-        return ExtendoBrain.unicodeEscape(value);
+        return Extendo.unicodeEscape(value);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {

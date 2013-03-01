@@ -5,8 +5,8 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import net.fortytwo.extendo.ExtendoBrain;
-import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Extendo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -134,7 +134,7 @@ public class QRCodesStuff {
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                String key = ExtendoBrain.createRandomKey();
+                String key = Extendo.createRandomKey();
                 Image img = stuff.toQRCode(key);
                 showImage(img);
             }

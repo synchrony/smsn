@@ -3,29 +3,29 @@ package net.fortytwo.myotherbrain;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.VertexFrame;
-import net.fortytwo.extendo.ExtendoBrain;
-import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Extendo;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface AtomList extends VertexFrame {
 
-    @Adjacency(label = ExtendoBrain.FIRST)
+    @Adjacency(label = Extendo.FIRST)
     Atom getFirst();
 
-    @Adjacency(label = ExtendoBrain.FIRST)
+    @Adjacency(label = Extendo.FIRST)
     void setFirst(Atom first);
 
-    @Adjacency(label = ExtendoBrain.REST)
+    @Adjacency(label = Extendo.REST)
     AtomList getRest();
 
-    @Adjacency(label = ExtendoBrain.REST)
+    @Adjacency(label = Extendo.REST)
     void setRest(AtomList rest);
 
-    @Adjacency(label = ExtendoBrain.REST, direction = Direction.IN)
+    @Adjacency(label = Extendo.REST, direction = Direction.IN)
     AtomList getRestOf();
 
-    @Adjacency(label = ExtendoBrain.NOTES, direction = Direction.IN)
+    @Adjacency(label = Extendo.NOTES, direction = Direction.IN)
     Atom getNotesOf();
 }
