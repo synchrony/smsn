@@ -7,8 +7,9 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
-import net.fortytwo.myotherbrain.MOBGraph;
-import net.fortytwo.myotherbrain.MyOtherBrain;
+import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,15 +51,15 @@ public class ListGraphMigrator {
                     Vertex cur = target.addVertex(null);
 
                     if (i > 0) {
-                        target.addEdge(null, last, cur, MyOtherBrain.REST);
+                        target.addEdge(null, last, cur, ExtendoBrain.REST);
                     } else {
-                        target.addEdge(null, vt, cur, MyOtherBrain.NOTES);
+                        target.addEdge(null, vt, cur, ExtendoBrain.NOTES);
                     }
 
                     Vertex v2s = list.get(i);
                     Vertex v2t = target.getVertex(v2s.getId());
 
-                    target.addEdge(null, cur, v2t, MyOtherBrain.FIRST);
+                    target.addEdge(null, cur, v2t, ExtendoBrain.FIRST);
                     last = cur;
                 }
             }
@@ -68,7 +69,7 @@ public class ListGraphMigrator {
     private class VertexTimestampComparator implements Comparator<Vertex> {
         public int compare(final Vertex v1,
                            final Vertex v2) {
-            return ((Long) v1.getProperty(MyOtherBrain.CREATED)).compareTo((Long) v2.getProperty(MyOtherBrain.CREATED));
+            return ((Long) v1.getProperty(ExtendoBrain.CREATED)).compareTo((Long) v2.getProperty(ExtendoBrain.CREATED));
         }
     }
 
@@ -86,7 +87,7 @@ public class ListGraphMigrator {
         //System.out.println("loading original data into database at " + dirIn);
         //KeyIndexableGraph graphIn = new Neo4jGraph(dirIn);
         KeyIndexableGraph graphIn = new TinkerGraph();
-        MOBGraph source = MOBGraph.getInstance(graphIn);
+        ExtendoGraph source = ExtendoGraph.getInstance(graphIn);
 
         String fileIn = "/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml";
         System.out.println("reading graph from " + fileIn);
@@ -102,7 +103,7 @@ public class ListGraphMigrator {
         //System.out.println("migrating graph into database at " + dirOut);
         //KeyIndexableGraph graphOut = new Neo4jGraph(dirOut);
         KeyIndexableGraph graphOut = new TinkerGraph();
-        MOBGraph target = MOBGraph.getInstance(graphOut);
+        ExtendoGraph target = ExtendoGraph.getInstance(graphOut);
 
         new ListGraphMigrator().migrate(source.getGraph(), target.getGraph());
         source.getGraph().shutdown();

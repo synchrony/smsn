@@ -7,7 +7,8 @@ import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.myotherbrain.Atom;
-import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.myotherbrain.notes.Note;
 import net.fortytwo.myotherbrain.notes.NoteHistory;
@@ -84,7 +85,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
             }
 
             p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
-            p.graph = MOBGraph.getInstance(p.baseGraph);
+            p.graph = ExtendoGraph.getInstance(p.baseGraph);
             p.queries = new NoteQueries(p.graph);
             p.parser = new NoteParser();
             p.writer = new NoteWriter();
@@ -243,7 +244,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
     }
 
     protected List<String> getHistory(final RexsterResourceContext context,
-                                      final MOBGraph graph,
+                                      final ExtendoGraph graph,
                                       final Filter filter) {
         NoteHistory h = getNotesHistory(context);
         return h.getHistory(100, true, graph, filter);
@@ -264,7 +265,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
         public Principal user;
         public Map<String, Object> map;
         public KeyIndexableGraph baseGraph;
-        public MOBGraph graph;
+        public ExtendoGraph graph;
         public FramedGraph<KeyIndexableGraph> manager;
         public NoteQueries queries;
         public NoteParser parser;

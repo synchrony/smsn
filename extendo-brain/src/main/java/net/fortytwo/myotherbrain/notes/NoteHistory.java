@@ -1,7 +1,8 @@
 package net.fortytwo.myotherbrain.notes;
 
 import net.fortytwo.myotherbrain.Atom;
-import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -29,7 +30,7 @@ public class NoteHistory {
 
     public List<String> getHistory(final int maxlen,
                                    final boolean dedup,
-                                   final MOBGraph graph,
+                                   final ExtendoGraph graph,
                                    final Filter filter) {
         Collection<String> r = dedup
                 ? new LinkedHashSet<String>()

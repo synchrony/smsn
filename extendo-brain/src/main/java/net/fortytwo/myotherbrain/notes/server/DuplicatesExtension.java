@@ -11,7 +11,8 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.myotherbrain.Atom;
-import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 import net.fortytwo.myotherbrain.notes.Filter;
 import net.fortytwo.ripple.StringUtils;
 import org.openrdf.model.Graph;
@@ -64,7 +65,7 @@ public class DuplicatesExtension extends TinkerNotesExtension {
 
     protected static final int MAX_DUPLICATES = 1000;
 
-    private List<String> getDuplicates(final MOBGraph graph,
+    private List<String> getDuplicates(final ExtendoGraph graph,
                                        final Filter filter) throws Exception {
         Map<String, List<String>> m = new HashMap<String, List<String>>();
         List<List<String>> dups = new LinkedList<List<String>>();

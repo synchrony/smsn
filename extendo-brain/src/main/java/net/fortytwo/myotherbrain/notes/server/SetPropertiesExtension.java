@@ -10,7 +10,8 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 
 import java.util.logging.Logger;
 
@@ -53,7 +54,7 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         p.root.setWeight(p.newWeight);
         p.root.setSharability(p.newSharability);
 
-        p.map.put("key", MOBGraph.getId(p.root));
+        p.map.put("key", ExtendoGraph.getId(p.root));
         p.map.put("weight", "" + p.newWeight);
         p.map.put("sharability", "" + p.newSharability);
 

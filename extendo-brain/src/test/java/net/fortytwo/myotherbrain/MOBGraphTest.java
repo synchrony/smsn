@@ -24,7 +24,7 @@ public class MOBGraphTest extends TestCase {
         //g.setMaxBufferSize(1);
         //g.clear();
         try {
-            MOBGraph m = MOBGraph.getInstance(g);
+            ExtendoGraph m = ExtendoGraph.getInstance(g);
             Filter f = new Filter();
 
             Atom a = m.createAtom(f, null);

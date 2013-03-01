@@ -8,7 +8,8 @@ import com.tinkerpop.frames.FramedGraph;
 import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.AtomList;
-import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertNull;
  */
 public class NoteQueriesTest {
     private KeyIndexableGraph graph;
-    private MOBGraph store;
+    private ExtendoGraph store;
     private FramedGraph<KeyIndexableGraph> manager;
     private NoteParser parser;
     private NoteWriter writer = new NoteWriter();
@@ -39,7 +40,7 @@ public class NoteQueriesTest {
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
         parser = new NoteParser();
-        store = MOBGraph.getInstance(g);
+        store = ExtendoGraph.getInstance(g);
         graph = store.getGraph();
         manager = store.getFramedGraph();
         queries = new NoteQueries(store);

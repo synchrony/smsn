@@ -1,6 +1,7 @@
 package net.fortytwo.myotherbrain.flashcards;
 
-import net.fortytwo.myotherbrain.MyOtherBrain;
+import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.ExtendoBrain;
 
 /**
  * User: josh
@@ -59,6 +60,6 @@ public abstract class Card<Q, A> {
     }
 
     public static String findCardName(final String norm) {
-        return MyOtherBrain.unicodeEscape(norm);
+        return ExtendoBrain.unicodeEscape(norm);
     }
 }

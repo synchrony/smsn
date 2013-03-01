@@ -8,7 +8,8 @@ import net.fortytwo.flow.Collector;
 import net.fortytwo.myotherbrain.ActivityLog;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.AtomList;
-import net.fortytwo.myotherbrain.MOBGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 import net.fortytwo.myotherbrain.notes.util.ListDiff;
 import net.fortytwo.ripple.Ripple;
 import net.fortytwo.ripple.RippleException;
@@ -33,10 +34,10 @@ import java.util.Set;
  */
 public class NoteQueries {
 
-    private final MOBGraph store;
+    private final ExtendoGraph store;
     private final QueryEngine rippleQueryEngine;
 
-    public NoteQueries(final MOBGraph store) {
+    public NoteQueries(final ExtendoGraph store) {
         this.store = store;
 
         try {

@@ -35,7 +35,8 @@ public class SearchExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
+                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName,
+                                           @ExtensionRequestParameter(name = "valueCutoff", description = "cutoff for long values") Integer valueCutoff) {
         try {
             // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
             query = new String(query.getBytes(), "UTF-8");
@@ -51,12 +52,16 @@ public class SearchExtension extends TinkerNotesExtension {
         p.styleName = styleName;
         p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
 
+        if (null == valueCutoff || valueCutoff <= 0) {
+            p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
+        } else {
+            p.writer.setValueLengthCutoff(valueCutoff);
+        }
+
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
-
         addSearchResults(p);
 
         p.map.put("title", p.query);

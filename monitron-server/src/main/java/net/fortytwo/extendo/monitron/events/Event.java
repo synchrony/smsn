@@ -1,8 +1,8 @@
 package net.fortytwo.extendo.monitron.events;
 
+import net.fortytwo.extendo.ExtendoBrain;
 import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.ontologies.Universe;
-import net.fortytwo.myotherbrain.MyOtherBrain;
 import net.fortytwo.rdfagents.model.Dataset;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -46,7 +46,7 @@ public abstract class Event {
     }
 
     protected URI coinEventURI() {
-        return vf.createURI(Universe.NAMESPACE + "event-" + MyOtherBrain.createRandomKey());
+        return vf.createURI(Universe.NAMESPACE + "event-" + ExtendoBrain.createRandomKey());
     }
 
     protected Literal toLiteral(final Date d) {

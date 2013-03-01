@@ -4,48 +4,50 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
+import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.ExtendoBrain;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface Atom extends VertexFrame {
 
-    @Property(MyOtherBrain.ALIAS)
+    @Property(ExtendoBrain.ALIAS)
     String getAlias();
 
-    @Property(MyOtherBrain.ALIAS)
+    @Property(ExtendoBrain.ALIAS)
     void setAlias(String alias);
 
-    @Property(MyOtherBrain.CREATED)
+    @Property(ExtendoBrain.CREATED)
     Long getCreated();
 
-    @Property(MyOtherBrain.CREATED)
+    @Property(ExtendoBrain.CREATED)
     void setCreated(Long created);
 
-    @Property(MyOtherBrain.VALUE)
+    @Property(ExtendoBrain.VALUE)
     String getValue();
 
-    @Property(MyOtherBrain.VALUE)
+    @Property(ExtendoBrain.VALUE)
     void setValue(String description);
 
-    @Property(MyOtherBrain.SHARABILITY)
+    @Property(ExtendoBrain.SHARABILITY)
     Float getSharability();
 
-    @Property(MyOtherBrain.SHARABILITY)
+    @Property(ExtendoBrain.SHARABILITY)
     void setSharability(Float sharability);
 
-    @Property(MyOtherBrain.WEIGHT)
+    @Property(ExtendoBrain.WEIGHT)
     Float getWeight();
 
-    @Property(MyOtherBrain.WEIGHT)
+    @Property(ExtendoBrain.WEIGHT)
     void setWeight(Float weight);
 
-    @Adjacency(label = MyOtherBrain.NOTES)
+    @Adjacency(label = ExtendoBrain.NOTES)
     AtomList getNotes();
 
-    @Adjacency(label = MyOtherBrain.NOTES)
+    @Adjacency(label = ExtendoBrain.NOTES)
     void setNotes(AtomList notes);
 
-    @Adjacency(label = MyOtherBrain.FIRST, direction = Direction.IN)
+    @Adjacency(label = ExtendoBrain.FIRST, direction = Direction.IN)
     Iterable<AtomList> getFirstOf();
 }

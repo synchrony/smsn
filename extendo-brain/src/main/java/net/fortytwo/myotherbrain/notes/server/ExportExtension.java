@@ -15,10 +15,11 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
+import net.fortytwo.extendo.ExtendoBrain;
+import net.fortytwo.extendo.ExtendoBrain;
 import net.fortytwo.myotherbrain.Atom;
 import net.fortytwo.myotherbrain.AtomList;
-import net.fortytwo.myotherbrain.MOBGraph;
-import net.fortytwo.myotherbrain.MyOtherBrain;
+import net.fortytwo.myotherbrain.ExtendoGraph;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,27 +51,27 @@ public class ExportExtension extends TinkerNotesExtension {
         return handleRequestInternal(p);
     }
 
-    private void exportVertices(final MOBGraph g,
+    private void exportVertices(final ExtendoGraph g,
                                 final PrintStream p) throws IOException {
 
         p.println("created\tid\tweight\tsharability\tvalue\talias");
 
         for (Vertex v : g.getGraph().getVertices()) {
-            Object c = v.getProperty(MyOtherBrain.CREATED);
+            Object c = v.getProperty(ExtendoBrain.CREATED);
             if (null != c) {
                 p.print(c);
                 p.print('\t');
                 p.print(v.getId());
                 p.print('\t');
-                p.print(v.getProperty(MyOtherBrain.WEIGHT));
+                p.print(v.getProperty(ExtendoBrain.WEIGHT));
                 p.print('\t');
-                p.print(v.getProperty(MyOtherBrain.SHARABILITY));
-                p.print('\t');
-
-                p.print(escapeValue((String) v.getProperty(MyOtherBrain.VALUE)));
+                p.print(v.getProperty(ExtendoBrain.SHARABILITY));
                 p.print('\t');
 
-                String alias = (String) v.getProperty(MyOtherBrain.ALIAS);
+                p.print(escapeValue((String) v.getProperty(ExtendoBrain.VALUE)));
+                p.print('\t');
+
+                String alias = (String) v.getProperty(ExtendoBrain.ALIAS);
                 if (null != alias) {
                     p.print(escapeValue(alias));
                 }
@@ -80,7 +81,7 @@ public class ExportExtension extends TinkerNotesExtension {
         }
     }
 
-    private void exportEdges(final MOBGraph g,
+    private void exportEdges(final ExtendoGraph g,
                              final PrintStream p) throws IOException {
         p.println("from\tto");
 
@@ -99,7 +100,7 @@ public class ExportExtension extends TinkerNotesExtension {
         }
     }
 
-    private void exportPageRank(final MOBGraph g,
+    private void exportPageRank(final ExtendoGraph g,
                                 final PrintStream p) {
         TinkerGraph g2 = new TinkerGraph();
         for (Vertex v : g.getGraph().getVertices()) {
@@ -126,7 +127,7 @@ public class ExportExtension extends TinkerNotesExtension {
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
     // Otherwise, R becomes confused and skips rows.
     private String escapeValue(final String value) {
-        return MyOtherBrain.unicodeEscape(value);
+        return ExtendoBrain.unicodeEscape(value);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
