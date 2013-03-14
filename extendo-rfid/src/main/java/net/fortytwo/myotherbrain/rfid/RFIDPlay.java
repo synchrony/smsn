@@ -3,11 +3,11 @@ package net.fortytwo.myotherbrain.rfid;
 import com.alien.enterpriseRFID.reader.AlienClass1Reader;
 import com.alien.enterpriseRFID.tags.Tag;
 import com.tinkerpop.blueprints.impls.rexster.RexsterGraph;
-import net.fortytwo.myotherbrain.Atom;
-import net.fortytwo.myotherbrain.ExtendoGraph;
-import net.fortytwo.myotherbrain.ExtendoGraph;
-import net.fortytwo.myotherbrain.notes.Filter;
-import net.fortytwo.myotherbrain.notes.NoteQueries;
+import net.fortytwo.extendo.brain.Atom;
+import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.Filter;
+import net.fortytwo.extendo.brain.NoteQueries;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,7 +25,7 @@ public class RFIDPlay {
 
         RexsterGraph g = new RexsterGraph("http://localhost:8182/graphs/tinkernotes");
 
-        ExtendoGraph graph = ExtendoGraph.getInstance(g);
+        BrainGraph graph = BrainGraph.getInstance(g);
 
         RFIDListener l = new RFIDListener();
 

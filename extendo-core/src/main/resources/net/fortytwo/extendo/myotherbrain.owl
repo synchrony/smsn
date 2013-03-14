@@ -1,0 +1,520 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY myotherbrain "http://fortytwo.net/2009/05/myotherbrain#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://fortytwo.net/2009/05/myotherbrain#"
+     xml:base="http://fortytwo.net/2009/05/myotherbrain"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:myotherbrain="http://fortytwo.net/2009/05/myotherbrain#">
+    <owl:Ontology rdf:about="">
+        <rdfs:comment
+            >Ontology for MyOtherBrain knowledge bases.
+
+Note: it has been a design decision not to re-use elements from other, previously existing ontologies, even where these might seem appropriate.  For instance, this ontology introduces its own title (&quot;name&quot;) and description properties rather than re-using existing Dublin Core properties.  This allows more precise modeling of the domain (for instance, this ontology requires that names and descriptions are string-valued), which is expedient for application development.  However, this does not preclude mapping to and from widely-used community ontologies when integrating data with other sources.</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#alias -->
+
+    <owl:ObjectProperty rdf:about="#alias">
+        <rdfs:comment
+            >Indicates an alias for an atom (for instance, the DBpedia resource for Paris may be an alias for a MOB concept of Paris). This property is similar to owl:sameAs.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#creationPlaceStamp -->
+
+    <owl:ObjectProperty rdf:about="#creationPlaceStamp">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Provisional.  Indicates the geospatial position at which an atom was created.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="#GeoPoint"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#icon -->
+
+    <owl:ObjectProperty rdf:about="#icon">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates an image which may serve as a symbol for an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="#WebResource"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#markerTag -->
+
+    <owl:ObjectProperty rdf:about="#markerTag">
+        <rdfs:comment
+            >Indicates a simple tag which describes or draws attention to an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="#Marker"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#object -->
+
+    <owl:ObjectProperty rdf:about="#object">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the object of an association, analogous to the object of an RDF triple.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Association"/>
+        <rdfs:range rdf:resource="#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#personalGraph -->
+
+    <owl:ObjectProperty rdf:about="#personalGraph">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the unique named graph associated with an account.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Account"/>
+        <rdfs:range rdf:resource="#Graph"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#sensitivity -->
+
+    <owl:ObjectProperty rdf:about="#sensitivity">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the sensitivity level of an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="#SensitivityLevel"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#subject -->
+
+    <owl:ObjectProperty rdf:about="#subject">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the subject of an association, analogous to the subject of an RDF triple.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Association"/>
+        <rdfs:range rdf:resource="#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#contactEmailAddress -->
+
+    <owl:DatatypeProperty rdf:about="#contactEmailAddress">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the preferred contact email address for the user associated with an account.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Account"/>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#creationTimeStamp -->
+
+    <owl:DatatypeProperty rdf:about="#creationTimeStamp">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Provisional.  Indicates the date and time at which an atom was created. Perusing my photo collection in Picasa indicates that knowing when an atom originated can be very enlightening.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#datatypeURI -->
+
+    <owl:DatatypeProperty rdf:about="#datatypeURI">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the datatype URI of a typed literal. Note that it would have been possible to make this an ObjectProperty rather than reifying the URI of the datatype. The current choice has been made on the basis that XML Schema data types are generally not described on the Semantic Web (if they are, what is their rdf:type?).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Literal"/>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#description -->
+
+    <owl:DatatypeProperty rdf:about="#description">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates a textual description of an atom.  Similar to dc:description, but constrained to string values.  Like a wiki page, the first paragraph (better yet, the first sentence) of a description value should be representative of the subject.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#emphasis -->
+
+    <owl:DatatypeProperty rdf:about="#emphasis">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the non-negative weight or significance of an atom.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#languageTag -->
+
+    <owl:DatatypeProperty rdf:about="#languageTag">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the language tag of a plain literal.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Literal"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#latitude -->
+
+    <owl:DatatypeProperty rdf:about="#latitude">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >The latitude value, in degrees, of a geospatial point.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GeoPoint"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#lexicalForm -->
+
+    <owl:DatatypeProperty rdf:about="#lexicalForm">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the lexical form of a literal.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Literal"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#longitude -->
+
+    <owl:DatatypeProperty rdf:about="#longitude">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >The longitude value, in degrees, of a geospatial point.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GeoPoint"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#name -->
+
+    <owl:DatatypeProperty rdf:about="#name">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates a textual identifier for an atom.  Similar to dc:title, but constrained to string values.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#passwordSha1Sum -->
+
+    <owl:DatatypeProperty rdf:about="#passwordSha1Sum">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the hashed password associated with an account.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Account"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#representationMediaType -->
+
+    <owl:DatatypeProperty rdf:about="#representationMediaType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the media type of a Web resource.</rdfs:comment>
+        <rdfs:domain rdf:resource="#WebResource"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#representationSha1Sum -->
+
+    <owl:DatatypeProperty rdf:about="#representationSha1Sum">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates a hash of the contents of a particular Web resource.  This may be used to check whether those contents have changed since this metadata was generated.</rdfs:comment>
+        <rdfs:domain rdf:resource="#WebResource"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#richTextDescription -->
+
+    <owl:DatatypeProperty rdf:about="#richTextDescription">
+        <rdfs:comment
+            >A rich-text (constrained HTML) formatted description of an atom.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#description"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#score -->
+
+    <owl:DatatypeProperty rdf:about="#score">
+        <rdfs:comment
+            >Parent property for any number of metrics such as PageRank which assign a float-valued score to each atom in the knowledge base.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Atom"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#userName -->
+
+    <owl:DatatypeProperty rdf:about="#userName">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment
+            >Indicates the unique user name associated with an account.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Account"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Account -->
+
+    <owl:Class rdf:about="#Account">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >An identifier for a user which serves attribution and access control purposes.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Association -->
+
+    <owl:Class rdf:about="#Association">
+        <rdfs:subClassOf rdf:resource="#Atom"/>
+        <rdfs:comment
+            >A subject-object pair linking two atoms.  As atoms themselves, associations may be referred to by other associations.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Atom -->
+
+    <owl:Class rdf:about="#Atom">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A first-class resource which may be the subject or object of associations.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#GeoPoint -->
+
+    <owl:Class rdf:about="#GeoPoint">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A point on the Earth&#39;s surface, specified in terms of longitude and latitude.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Graph -->
+
+    <owl:Class rdf:about="#Graph">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A named graph in the sense of the Named Graphs extension to RDF. See http://www.w3.org/2004/03/trix/rdfg-1/Graph.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Literal -->
+
+    <owl:Class rdf:about="#Literal">
+        <rdfs:subClassOf rdf:resource="#Atom"/>
+        <rdfs:comment
+            >A reified RDF literal.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Marker -->
+
+    <owl:Class rdf:about="#Marker">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >A simple tag for atoms.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#SensitivityLevel -->
+
+    <owl:Class rdf:about="#SensitivityLevel">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >The degree of sensitivity of an atom, in terms of whether the information contained in the item should be shared with individuals other than its owner.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#WebResource -->
+
+    <owl:Class rdf:about="#WebResource">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:comment
+            >An alias for a Web information resource.  Such a resource is expected to have an associated Web-accessible representation.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Broken -->
+
+    <Marker rdf:about="#Broken">
+        <rdfs:comment
+            >An example marker. Indicates that an atom (for instance, a query which is no longer in agreement with the schema) is no longer valid and needs to be repaired.</rdfs:comment>
+    </Marker>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#MOBAdminGraph -->
+
+    <Graph rdf:about="#MOBAdminGraph">
+        <rdfs:comment
+            >A special named graph for the storage of secure administrative information for MOB applications, such as user account metadata.</rdfs:comment>
+    </Graph>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#MOBOntologyGraph -->
+
+    <Graph rdf:about="#MOBOntologyGraph">
+        <rdfs:comment
+            >A special named graph for the storage of immutable ontology data for MOB applications.</rdfs:comment>
+    </Graph>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Personal -->
+
+    <SensitivityLevel rdf:about="#Personal">
+        <rdfs:comment
+            >Indicates that an atom should not be visible to everyone, but that it may be visible to someone other than its owner.</rdfs:comment>
+    </SensitivityLevel>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Private -->
+
+    <SensitivityLevel rdf:about="#Private">
+        <rdfs:comment
+            >Indicates that an atom should not be visible to anyone apart from its owner.</rdfs:comment>
+    </SensitivityLevel>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Public -->
+
+    <SensitivityLevel rdf:about="#Public">
+        <rdfs:comment
+            >Indicates that an atom should be visible to everyone.</rdfs:comment>
+    </SensitivityLevel>
+    
+
+
+    <!-- http://fortytwo.net/2009/05/myotherbrain#Starred -->
+
+    <Marker rdf:about="#Starred">
+        <rdfs:comment
+            >An example marker.</rdfs:comment>
+    </Marker>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 2.2.1.842) http://owlapi.sourceforge.net -->
+

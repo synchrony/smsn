@@ -13,6 +13,9 @@
 ;;         (defvar tinkernotes-rexster-port "8182")
 ;;         (defvar tinkernotes-rexster-graph "tinkernotes"))
 
+;; Uncomment only when debugging
+(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
+
 (eval-when-compile (require 'cl))
 
 ;; for JSON-formatted messages to and from Rexster
@@ -106,7 +109,7 @@
 (setq tn-atoms nil)
 (setq tn-current-line 1)
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
-
+(setq tn-value-truncation-length 100)
 
 ;; NAVIGATION ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -177,11 +180,14 @@
 (defun get-value (atom)
     (cdr (assoc 'value atom)))
 
-(defun get-weight (atom)
-    (cdr (assoc 'weight atom)))
+(defun get-priority (atom)
+    (cdr (assoc 'priority atom)))
 
 (defun get-sharability (atom)
     (cdr (assoc 'sharability atom)))
+
+(defun get-weight (atom)
+    (cdr (assoc 'weight atom)))
 
 (defun get-alias (atom)
     (let ((x (assoc 'alias atom)))
@@ -238,10 +244,12 @@
         (value (get-value atom))
         (weight (get-weight atom))
         (sharability (get-sharability atom))
+        (priority (get-priority atom))
         (alias (get-alias atom)))
             (message (concat
                  "weight: " (number-to-string weight)
                  " sharability: " (number-to-string sharability)
+                 (if priority (concat " priority: " (number-to-string priority)) "")
                  " created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
                  " value: " value
                  (if alias (concat " alias: " alias) "")))))
@@ -297,6 +305,7 @@
                     (make-local-variable 'tn-atoms)
                     (make-local-variable 'tn-current-line)
                     (make-local-variable 'tn-mode)
+                    (make-local-variable 'tn-value-truncation-length)
                     (setq tn-root root)
                     (if (equal mode tn-search-mode)
                         ;; Always leave a search view with depth 1, rather than that of the last view.
@@ -486,8 +495,20 @@
     (http-get
         (concat (base-url) "search"
             "?query=" (w3m-url-encode-string query)
+            "&valueCutoff=" (number-to-string tn-value-truncation-length)
             "&depth=1"
             "&style=" style
+            "&minSharability=" (number-to-string mins)
+            "&maxSharability=" (number-to-string maxs)
+            "&minWeight=" (number-to-string minw)
+            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+
+(defun request-priorities-results (mins maxs minw maxw)
+    (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
+    (http-get
+        (concat (base-url) "priorities"
+            "?maxResults=100"
             "&minSharability=" (number-to-string mins)
             "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
@@ -554,6 +575,11 @@
                 tn-style
                 tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))))
 
+(defun tn-priorities ()
+    (interactive)
+    (request-priorities-results
+        tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
+
 (defun tn-find-roots ()
     (interactive)
         (request-find-roots-results
@@ -573,7 +599,6 @@
     (interactive)
     (message "exporting")
     (do-export))
-
 
 (defun current-view-mode-is-atom-view ()
     (or
@@ -643,14 +668,6 @@
         (error-message
             (concat "weight " (number-to-string s) " is outside of range (0, 1]"))))
 
-(defun tn-decrease-default-weight ()
-    (interactive)
-    (set-default-weight (- tn-default-weight 0.25)))
-
-(defun tn-increase-default-weight ()
-    (interactive)
-    (set-default-weight (+ tn-default-weight 0.25)))
-
 (defun tn-set-default-weight-1 ()
     (interactive)
     (set-default-weight 0.25))
@@ -672,14 +689,6 @@
         (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
-
-(defun tn-decrease-min-weight ()
-    (interactive)
-    (set-min-weight (- tn-min-weight 0.25)))
-
-(defun tn-increase-min-weight ()
-    (interactive)
-    (set-min-weight (+ tn-min-weight 0.25)))
 
 (defun tn-set-min-weight-0 ()
     (interactive)
@@ -706,14 +715,6 @@
         (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight s)
         (error-message
             (concat "max weight " (number-to-string s) " is outside of range [0, 1]"))))
-
-(defun tn-decrease-max-weight ()
-    (interactive)
-    (set-max-weight (- tn-max-weight 0.25)))
-
-(defun tn-increase-max-weight ()
-    (interactive)
-    (set-max-weight (+ tn-max-weight 0.25)))
 
 (defun tn-set-max-weight-0 ()
     (interactive)
@@ -743,14 +744,6 @@
         (error-message
             (concat "sharability " (number-to-string s) " is outside of range (0, 1]"))))
 
-(defun tn-decrease-default-sharability ()
-    (interactive)
-    (set-default-sharability (- tn-default-sharability 0.25)))
-
-(defun tn-increase-default-sharability ()
-    (interactive)
-    (set-default-sharability (+ tn-default-sharability 0.25)))
-
 (defun tn-set-default-sharability-1 ()
     (interactive)
     (set-default-sharability 0.25))
@@ -772,14 +765,6 @@
         (request-view t tn-mode tn-root tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
-
-(defun tn-decrease-min-sharability ()
-    (interactive)
-    (set-min-sharability (- tn-min-sharability 0.25)))
-
-(defun tn-increase-min-sharability ()
-    (interactive)
-    (set-min-sharability (+ tn-min-sharability 0.25)))
 
 (defun tn-set-min-sharability-0 ()
     (interactive)
@@ -806,14 +791,6 @@
         (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability s tn-default-sharability tn-min-weight tn-max-weight)
         (error-message
             (concat "max sharability " (number-to-string s) " is outside of range [0, 1]"))))
-
-(defun tn-decrease-max-sharability ()
-    (interactive)
-    (set-max-sharability (- tn-max-sharability 0.25)))
-
-(defun tn-increase-max-sharability ()
-    (interactive)
-    (set-max-sharability (+ tn-max-sharability 0.25)))
 
 (defun tn-set-max-sharability-0 ()
     (interactive)
@@ -862,7 +839,7 @@
                 (list "depth" (number-to-string tn-depth)))
             (receive-view tn-edit-mode)))))
 
-(defun set-properties (key weight sharability)
+(defun set-property (id name value)
     (interactive)
     (if (in-view)
         (lexical-let (
@@ -872,9 +849,9 @@
             (setq tn-future-sharability tn-default-sharability)
             (http-get
                 (concat (base-url) "set"
-                    "?key=" (w3m-url-encode-string key)
-                    "&weight=" (number-to-string weight)
-                    "&sharability=" (number-to-string sharability))
+                    "?id=" (w3m-url-encode-string id)
+                    "&name=" name
+                    "&value=" (number-to-string value))
 	(lambda (status)
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
             (if status
@@ -885,44 +862,44 @@
                             (error-message msg)))
                  (url-retrieve url (receive-view mode)))))))))
 
-(defun set-target-weight (v)
-    (if (and (> v 0) (<= v 1))
+(defun set-target-priority (v)
+    (if (and (>= v 0) (<= v 1))
         (let ((target (current-target)))
             (if target
                 (let (
-                    (key (get-id target))
-                    (weight (get-weight target))
-                    (sharability (get-sharability target)))
-	                    (set-properties key v sharability))
+                    (id (get-id target)))
+	                    (set-property id "priority" v))
 	            (no-target)))
         (error-message
-            (concat "weight " (number-to-string v) " is outside of range (0, 1]"))))
+            (concat "priority " (number-to-string v) " is outside of range [0, 1]"))))
 
-(defun tn-set-target-weight-1 ()
+(defun tn-set-target-priority-0 ()
     (interactive)
-    (set-target-weight 0.25))
+    (set-target-priority 0))
 
-(defun tn-set-target-weight-2 ()
+(defun tn-set-target-priority-1 ()
     (interactive)
-    (set-target-weight 0.5))
+    (set-target-priority 0.25))
 
-(defun tn-set-target-weight-3 ()
+(defun tn-set-target-priority-2 ()
     (interactive)
-    (set-target-weight 0.75))
+    (set-target-priority 0.5))
 
-(defun tn-set-target-weight-4 ()
+(defun tn-set-target-priority-3 ()
     (interactive)
-    (set-target-weight 1.0))
+    (set-target-priority 0.75))
+
+(defun tn-set-target-priority-4 ()
+    (interactive)
+    (set-target-priority 1.0))
 
 (defun set-target-sharability (v)
     (if (and (> v 0) (<= v 1))
         (let ((target (current-target)))
             (if target
                 (let (
-                    (key (get-id target))
-                    (weight (get-weight target))
-                    (sharability (get-sharability target)))
-	                    (set-properties key weight v))
+                    (id (get-id target)))
+	                    (set-property id "sharability" v))
 	            (no-target)))
         (error-message
             (concat "sharability " (number-to-string v) " is outside of range (0, 1]"))))
@@ -942,6 +919,33 @@
 (defun tn-set-target-sharability-4 ()
     (interactive)
     (set-target-sharability 1.0))
+
+(defun set-target-weight (v)
+    (if (and (> v 0) (<= v 1))
+        (let ((target (current-target)))
+            (if target
+                (let (
+                    (id (get-id target)))
+	                    (set-property id "weight" v))
+	            (no-target)))
+        (error-message
+            (concat "weight " (number-to-string v) " is outside of range (0, 1]"))))
+
+(defun tn-set-target-weight-1 ()
+    (interactive)
+    (set-target-weight 0.25))
+
+(defun tn-set-target-weight-2 ()
+    (interactive)
+    (set-target-weight 0.5))
+
+(defun tn-set-target-weight-3 ()
+    (interactive)
+    (set-target-weight 0.75))
+
+(defun tn-set-target-weight-4 ()
+    (interactive)
+    (set-target-weight 1.0))
 
 
 ;; INTERFACE ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1096,6 +1100,7 @@
 (global-set-key (kbd "C-c h")           'tn-history)
 (global-set-key (kbd "C-c n")           'tn-new-note)
 (global-set-key (kbd "C-c p")           'tn-push-view)
+(global-set-key (kbd "C-c P")           'tn-priorities)
 (global-set-key (kbd "C-c r")           'tn-ripple-query)
 (global-set-key (kbd "C-c s")           'tn-search)
 (global-set-key (kbd "C-c t")           'tn-visit-target)
@@ -1141,8 +1146,6 @@
 ;;(global-set-key (kbd "C-c C-r i")       'tn-root-info)
 ;;(global-set-key (kbd "C-c C-r l")       'tn-preview-root-latex-math)
 
-(global-set-key (kbd "C-c C-s ,")       'tn-decrease-default-sharability)
-(global-set-key (kbd "C-c C-s .")       'tn-increase-default-sharability)
 (global-set-key (kbd "C-c C-s 1")       'tn-set-default-sharability-1)
 (global-set-key (kbd "C-c C-s 2")       'tn-set-default-sharability-2)
 (global-set-key (kbd "C-c C-s 3")       'tn-set-default-sharability-3)
@@ -1151,8 +1154,6 @@
 (global-set-key (kbd "C-c C-s s")       'tn-set-default-sharability-2)
 (global-set-key (kbd "C-c C-s d")       'tn-set-default-sharability-3)
 (global-set-key (kbd "C-c C-s f")       'tn-set-default-sharability-4)
-(global-set-key (kbd "C-c C-s C-[ ,")   'tn-decrease-min-sharability)
-(global-set-key (kbd "C-c C-s C-[ .")   'tn-increase-min-sharability)
 (global-set-key (kbd "C-c C-s C-[ 0")   'tn-set-min-sharability-0)
 (global-set-key (kbd "C-c C-s C-[ 1")   'tn-set-min-sharability-1)
 (global-set-key (kbd "C-c C-s C-[ 2")   'tn-set-min-sharability-2)
@@ -1163,8 +1164,6 @@
 (global-set-key (kbd "C-c C-s C-[ s")   'tn-set-min-sharability-2)
 (global-set-key (kbd "C-c C-s C-[ d")   'tn-set-min-sharability-3)
 (global-set-key (kbd "C-c C-s C-[ f")   'tn-set-min-sharability-4)
-(global-set-key (kbd "C-c C-s C-] ,")   'tn-decrease-max-sharability)
-(global-set-key (kbd "C-c C-s C-] .")   'tn-increase-max-sharability)
 (global-set-key (kbd "C-c C-s C-] 0")   'tn-set-max-sharability-0)
 (global-set-key (kbd "C-c C-s C-] 1")   'tn-set-max-sharability-1)
 (global-set-key (kbd "C-c C-s C-] 2")   'tn-set-max-sharability-2)
@@ -1189,6 +1188,16 @@
 (global-set-key (kbd "C-c C-t C-b y")   'tn-browse-target-value-in-youtube)
 (global-set-key (kbd "C-c C-t i")       'tn-target-info)
 (global-set-key (kbd "C-c C-t l")       'tn-preview-target-latex-math)
+(global-set-key (kbd "C-c C-t C-p 0")   'tn-set-target-priority-0)
+(global-set-key (kbd "C-c C-t C-p 1")   'tn-set-target-priority-1)
+(global-set-key (kbd "C-c C-t C-p 2")   'tn-set-target-priority-2)
+(global-set-key (kbd "C-c C-t C-p 3")   'tn-set-target-priority-3)
+(global-set-key (kbd "C-c C-t C-p 4")   'tn-set-target-priority-4)
+(global-set-key (kbd "C-c C-t C-p z")   'tn-set-target-priority-0)
+(global-set-key (kbd "C-c C-t C-p a")   'tn-set-target-priority-1)
+(global-set-key (kbd "C-c C-t C-p s")   'tn-set-target-priority-2)
+(global-set-key (kbd "C-c C-t C-p d")   'tn-set-target-priority-3)
+(global-set-key (kbd "C-c C-t C-p f")   'tn-set-target-priority-4)
 (global-set-key (kbd "C-c C-t C-s 1")   'tn-set-target-sharability-1)
 (global-set-key (kbd "C-c C-t C-s 2")   'tn-set-target-sharability-2)
 (global-set-key (kbd "C-c C-t C-s 3")   'tn-set-target-sharability-3)
@@ -1211,8 +1220,7 @@
 (global-set-key (kbd "C-c C-v r")       'tn-enter-readonly-view)
 ;; new bindings (not yet recorded in mob-data)
 (global-set-key (kbd "C-c C-v s")       'tn-toggle-emacspeak)
-(global-set-key (kbd "C-c C-w ,")       'tn-decrease-default-weight)
-(global-set-key (kbd "C-c C-w .")       'tn-increase-default-weight)
+(global-set-key (kbd "C-c C-v t")       'tn-set-value-truncation-length)
 (global-set-key (kbd "C-c C-w 1")       'tn-set-default-weight-1)
 (global-set-key (kbd "C-c C-w 2")       'tn-set-default-weight-2)
 (global-set-key (kbd "C-c C-w 3")       'tn-set-default-weight-3)
@@ -1221,8 +1229,6 @@
 (global-set-key (kbd "C-c C-w s")       'tn-set-default-weight-2)
 (global-set-key (kbd "C-c C-w d")       'tn-set-default-weight-3)
 (global-set-key (kbd "C-c C-w f")       'tn-set-default-weight-4)
-(global-set-key (kbd "C-c C-w C-[ ,")   'tn-decrease-min-weight)
-(global-set-key (kbd "C-c C-w C-[ .")   'tn-increase-min-weight)
 (global-set-key (kbd "C-c C-w C-[ 0")   'tn-set-min-weight-0)
 (global-set-key (kbd "C-c C-w C-[ 1")   'tn-set-min-weight-1)
 (global-set-key (kbd "C-c C-w C-[ 2")   'tn-set-min-weight-2)
@@ -1233,8 +1239,6 @@
 (global-set-key (kbd "C-c C-w C-[ s")   'tn-set-min-weight-2)
 (global-set-key (kbd "C-c C-w C-[ d")   'tn-set-min-weight-3)
 (global-set-key (kbd "C-c C-w C-[ f")   'tn-set-min-weight-4)
-(global-set-key (kbd "C-c C-w C-] ,")   'tn-decrease-max-weight)
-(global-set-key (kbd "C-c C-w C-] .")   'tn-increase-max-weight)
 (global-set-key (kbd "C-c C-w C-] 0")   'tn-set-max-weight-0)
 (global-set-key (kbd "C-c C-w C-] 1")   'tn-set-max-weight-1)
 (global-set-key (kbd "C-c C-w C-] 2")   'tn-set-max-weight-2)
@@ -1255,6 +1259,11 @@
     (setq tn-enable-linum (not tn-enable-linum))
     (linum-mode tn-enable-linum))
 
+(defun tn-set-value-truncation-length ()
+    (interactive)
+    (let ((n (string-to-number (read-from-minibuffer "value truncation length: "))))
+        (setq tn-value-truncation-length n)))
+
 ;; Note: these should perhaps be local settings
 (global-set-key (kbd "C-c C-v ;") 'toggle-truncate-lines)
 (global-set-key (kbd "C-c C-g l") 'toggle-linum-mode)
@@ -1271,8 +1280,5 @@
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
-
-;; Uncomment only when debugging
-(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'tinkernotes)
