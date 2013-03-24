@@ -48,7 +48,10 @@ public class BrainGraph {
     }
 
     private BrainGraph(final KeyIndexableGraph baseGraph) throws Exception {
-        graph = new IdGraph<KeyIndexableGraph>(baseGraph, new MOBIdFactory());
+        IdGraph.IdFactory f = new MOBIdFactory();
+        graph = new IdGraph<KeyIndexableGraph>(baseGraph);
+        graph.setVertexIdFactory(f);
+        graph.setEdgeIdFactory(f);
 
         framedGraph = new FramedGraph<KeyIndexableGraph>(graph);
 

@@ -144,8 +144,8 @@ public class NoteParser {
             if (0 < l.length()) {
                 if (!isAttribute && l.contains("{{{")) {
                     int start = lineNumber;
-                    boolean inside = false;
-                    int index = 0;
+                    boolean inside = true;
+                    int index = l.indexOf("{{{") + 3;
                     while (true) {
                         // Check for the closing symbol before the opening symbol
                         int b2 = l.indexOf("}}}", index);

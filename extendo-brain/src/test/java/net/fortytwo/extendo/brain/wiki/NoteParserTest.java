@@ -115,6 +115,14 @@ public class NoteParserTest {
                 "   * you wouldn't want to lose the actual value because of a careless copy and paste, would you?");
     }
 
+    @Test
+    public void testVerbatimBlocks() throws Exception {
+        List<Note> notes = readNotes("* here is a verbatim block {{{\n" +
+                "which spans two lines}}}");
+
+        notes = readNotes("* here is a verbatim block {{{ all in one line}}} (pointless, but permitted)");
+    }
+
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {

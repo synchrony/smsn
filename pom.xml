@@ -50,7 +50,7 @@
         <ripple.version>1.0</ripple.version>
         <sesametools.version>1.7</sesametools.version>
         <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>
-        <tinkerpop.version>2.3.0-SNAPSHOT</tinkerpop.version>
+        <tinkerpop.version>2.3.0</tinkerpop.version>
         <neo4j.version>1.9.M05</neo4j.version>
         <sesame.version>2.6.10</sesame.version>
         <junit.version>4.11</junit.version>

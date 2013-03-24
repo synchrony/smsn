@@ -63,8 +63,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop.tinkubator</groupId>
-            <artifactId>property-graph-sail</artifactId>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-graph-sail</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>

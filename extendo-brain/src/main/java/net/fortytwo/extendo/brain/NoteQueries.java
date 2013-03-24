@@ -3,7 +3,7 @@ package net.fortytwo.extendo.brain;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.tinkubator.pgsail.PropertyGraphSail;
+import com.tinkerpop.blueprints.oupls.sail.pg.PropertyGraphSail;
 import net.fortytwo.extendo.brain.util.ListDiff;
 import net.fortytwo.flow.Collector;
 import net.fortytwo.ripple.Ripple;
