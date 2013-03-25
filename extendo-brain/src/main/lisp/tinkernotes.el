@@ -403,6 +403,9 @@
 		    (list :foreground "grey50" :background background)
 			(list :foreground "black"))))
 
+(defun create-id-suffix (id)
+    (concat " " (light-gray (concat ":" (propertize id 'invisible t) ":") "white") (black " ")))
+
 (defun write-view (editable children tree-indent)
     (loop for json across children do
     (let (
@@ -421,13 +424,12 @@
 		            (if (not target-weight) (error (concat "missing weight for target with id " target-id)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with id " target-id)))
 		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
-		            (let ((line "") (id-suffix (concat " " (light-gray (concat ":" (propertize target-id 'invisible t) ":") "white") (black " "))))
+		            (let ((line "") (id-suffix (create-id-suffix target-id)))
 		                (if (not editable)
                             (setq id-suffix (propertize id-suffix 'invisible t)))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
-                            ;; extra space keeps top-level bullets away from line numbers, avoiding visual clutter
-                            (setq line (concat line space " ")))
+                            (setq line (concat line space)))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
                                 (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white")
@@ -1060,17 +1062,28 @@
     (interactive)
     (insert "\n                @weight 1.0\n"))
 
+(defun copy-to-clipboard (g)
+    (let ((buffer (get-buffer-create "*temp*")))
+        (with-current-buffer buffer
+            (unwind-protect
+                 (insert g)
+                 (let ((beg 1) (end (+ (length g) 1)))
+                    (clipboard-kill-ring-save beg end))
+                (kill-buffer buffer)))))
+
+;; note: for some reason, the id doesn't stay invisible when you paste it, although it stays light gray
+(defun tn-copy-target-reference-to-clipboard ()
+    (interactive)
+    (let ((id (current-target-id)))
+        (if id
+            (copy-to-clipboard (concat "*" (create-id-suffix id)))
+            (no-target))))
+
 (defun tn-copy-target-value-to-clipboard ()
     (interactive)
-    (let ((g (current-target-value)))
-        (if g
-            (let ((buffer (get-buffer-create "*temp*")))
-                (with-current-buffer buffer
-                    (unwind-protect
-                         (insert g)
-                         (let ((beg 1) (end (+ (length g) 1)))
-                            (clipboard-kill-ring-save beg end))
-                        (kill-buffer buffer))))
+    (let ((value (current-target-value)))
+        (if value
+            (copy-to-clipboard value)
             (no-target))))
 
 (defun tn-preview-target-latex-math ()
@@ -1169,6 +1182,7 @@
 (global-set-key (kbd "C-c C-s C-] d")   'tn-set-max-sharability-3)
 (global-set-key (kbd "C-c C-s C-] f")   'tn-set-max-sharability-4)
 (global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
+(global-set-key (kbd "C-c C-t r")       'tn-copy-target-reference-to-clipboard)
 (global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
 (global-set-key (kbd "C-c C-t C-a b")   'tn-browse-target-alias)
 (global-set-key (kbd "C-c C-t C-b a")   'tn-browse-target-value-in-amazon)
