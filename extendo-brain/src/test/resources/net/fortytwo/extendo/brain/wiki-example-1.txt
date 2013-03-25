@@ -1,41 +1,41 @@
-        * basic syntax
-            * TinkerNotes uses a slight variant of wiki list syntax
-            * basically, you have nested notes with bullets, values, and attribute-value pairs
-        * indentation
-            * all white space before the bullet is indentation
-            * it determines the degree of nesting
-            * notes can be nested to any degree
-                * like this...
-                    * and this...
-                        * and this
-            * a child must be indented more than its parent
-              * and identically to its siblings
-              * but it can be indented differently than its cousins
-        * bullets
-            * the asterisk is the default bullet, but
-            - other single characters can also be bullets
-            *  at least one space is required between bullet and value
-            *        but more spaces are OK, too
-        * attributes
-            @alias http://example.org/ns/attributes
-            @weight 0.75
-            * three attributes are allowed: @alias, @weight, and @sharability
-            * the @alias attribute defines an alternative URI for the topic of the note, while
-            * @weight and @sharability expect numeric values
-        * white space
-            * tab characters are converted to four spaces each: "    "
-            * all other whitespace characters count as single spaces: " "
-            * newlines can be preserved with triple braces {{{
+    * basic syntax
+        * TinkerNotes uses a slight variant of wiki list syntax
+        * basically, you have nested notes with bullets, values, and attribute-value pairs
+    * indentation
+        * all white space before the bullet is indentation
+        * it determines the degree of nesting
+        * notes can be nested to any degree
+            * like this...
+                * and this...
+                    * and this
+        * a child must be indented more than its parent
+          * and identically to its siblings
+          * but it can be indented differently than its cousins
+    * bullets
+        * the asterisk is the default bullet, but
+        - other single characters can also be bullets
+        *  at least one space is required between bullet and value
+        *        but more spaces are OK, too
+    * attributes
+        @alias http://example.org/ns/attributes
+        @weight 0.75
+        * three attributes are allowed: @alias, @weight, and @sharability
+        * the @alias attribute defines an alternative URI for the topic of the note, while
+        * @weight and @sharability expect numeric values
+    * white space
+        * tab characters are converted to four spaces each: "    "
+        * all other whitespace characters count as single spaces: " "
+        * newlines can be preserved with triple braces {{{
 like this.
 Use as many lines of text as you need.
 }}}
-            * 	 leading and trailing whitespace are ignored	 
+        * 	 leading and trailing whitespace are ignored
 
-            * blank lines don't matter
+        * blank lines don't matter
 
-        * ids
-0txXBm:     * each note has a base-64 id, which is indicated with a prefix
-cE85nD:     * the id prefix is optional, and it is treated as white space
+    * ids
+        * each note has a base-64 id, which is indicated with a suffix :0txXBm:
+        * the id is optional, and it is treated as trailing white space     :cE85nD:
 
-69qkF3:     * blank lines still don't matter
-        * got it?
+        * blank lines still don't matter :69qkF3:
+    * got it?

@@ -75,11 +75,6 @@ public class NoteParserTest {
     }
 
     @Test(expected = NoteParser.NoteParsingException.class)
-    public void testEmptyIdsNotAllowed() throws Exception {
-        readNotes(": * forty-two");
-    }
-
-    @Test(expected = NoteParser.NoteParsingException.class)
     public void testEmptyValuesNotAllowedForNewNotes() throws Exception {
         readNotes("* ");
     }
@@ -121,6 +116,11 @@ public class NoteParserTest {
                 "which spans two lines}}}");
 
         notes = readNotes("* here is a verbatim block {{{ all in one line}}} (pointless, but permitted)");
+
+        notes = readNotes("* here is a verbatim block {{{\n" +
+                "with an id on the second line }}} :0001:");
+        assertEquals(1, notes.size());
+        assertEquals("0001", notes.get(0).getId());
     }
 
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {

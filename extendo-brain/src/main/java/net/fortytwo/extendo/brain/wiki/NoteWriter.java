@@ -80,13 +80,6 @@ public class NoteWriter {
                                   final int indent,
                                   final PrintStream p) {
 
-        if (null != n.getId()) {
-            if (null != n.getId()) {
-                p.print(padKey(n.getId()));
-            }
-            p.print(": ");
-        }
-
         for (int i = 0; i < indent; i++) {
             p.print("    ");
         }
@@ -94,6 +87,12 @@ public class NoteWriter {
         p.print("* ");
 
         p.print(sanitizeValue(n.getValue()));
+
+        if (null != n.getId()) {
+            p.print(" :");
+            p.print(padKey(n.getId()));
+            p.print(":");
+        }
 
         p.print("\n");
 

@@ -324,7 +324,7 @@
                     (setq tn-mode mode)
                     (setq buffer-read-only nil)
                     (erase-buffer)
-                    (write-view editable (cdr (assoc 'children view)) (longest-key view) 0)
+                    (write-view editable (cdr (assoc 'children view)) 0)
                     (beginning-of-buffer)
                     (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
@@ -388,6 +388,9 @@
         (if underline (setq l (cons 'underline l)))
         (propertize text 'face l)))
 
+(defun black (text)
+    (propertize text 'face (list :foreground "black")))
+
 (defun light-gray (text background)
     (propertize text
 	    'face (if full-colors-supported
@@ -400,19 +403,7 @@
 		    (list :foreground "grey50" :background background)
 			(list :foreground "black"))))
 
-(defun longest-key (json)
-    (let ((max 0))
-        (let (
-            (children (cdr (assoc 'children json)))
-            (target-id (get-id json)))
-                (let ((length (+ (length target-id) 1)))
-                    (if (> length max) (setq max length)))
-                (loop for child across children do
-                    (let ((length (longest-key child)))
-                        (if (> length max) (setq max length))))
-                max)))
-
-(defun write-view (editable children key-indent tree-indent)
+(defun write-view (editable children tree-indent)
     (loop for json across children do
     (let (
         (link (cdr (assoc 'link json)))
@@ -429,18 +420,21 @@
 		            ;;(if (not target-value) (error (concat "missing value for target with id " target-id)))
 		            (if (not target-weight) (error (concat "missing weight for target with id " target-id)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with id " target-id)))
-		            (let ((line "") (key (concat target-id ":")))
-		                (loop for i from 1 to (- key-indent (length key)) do (setq key (concat key " ")))
-                        (setq line (concat line
-                            (propertize (light-gray key "white") 'invisible (not editable))))
+		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
+		            (let ((line "") (id-suffix (concat " " (light-gray (concat ":" (propertize target-id 'invisible t) ":") "white") (black " "))))
+		                (if (not editable)
+                            (setq id-suffix (propertize id-suffix 'invisible t)))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
-                            (setq line (concat line (light-gray space "white") " ")))
+                            ;; extra space keeps top-level bullets away from line numbers, avoiding visual clutter
+                            (setq line (concat line space " ")))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white") "\n")))
+                                (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white")
+                                id-suffix
+                                 "\n")))
                         (insert (propertize line 'target-id target-id)))
-                    (write-view editable children key-indent (+ tree-indent 4))))))
+                    (write-view editable children (+ tree-indent 4))))))
 
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

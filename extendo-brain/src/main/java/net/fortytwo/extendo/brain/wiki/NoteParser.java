@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteParser {
-    // Regex of valid id prefixes, including parentheses, colon and trailing space
-    public static final Pattern KEY_PREFIX = Pattern.compile("[a-zA-Z0-9@&]+:");
+    // regex of valid id suffixes
+    public static final Pattern ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9@&]+:");
 
     private static final String
             ALIAS_ATTR = "@alias",
@@ -49,15 +49,14 @@ public class NoteParser {
         int lineNumber = 0;
         while ((line = br.readLine()) != null) {
             lineNumber++;
-            //System.out.println("" + lineNumber + ") " + line);
 
             String l = line;
 
-            // Tabs count as four spaces.
+            // Tabs count as four spaces each.
             l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
 
-            if (0 == l.trim().length()) {
-                // empty lines are simply ignored
+            if (0 == l.length()) {
+                // Empty lines are simply ignored.
                 continue;
             }
 
@@ -66,38 +65,13 @@ public class NoteParser {
                         "line ends with the reserved truncation sequence \"" + NoteWriter.VALUE_TRUNCATOR + "\"");
             }
 
-            // Find indent level
+            // find indent level
             int indent = 0;
             if (l.length() > 0) {
                 while (' ' == l.charAt(indent)) {
                     indent++;
                 }
                 l = l.substring(indent);
-            }
-
-            // line may not begin with a colon, as this is more likely a missing id than a bullet
-            if ( ':' == l.charAt(0)) {
-                throw new NoteParsingException(lineNumber, "empty note id");
-            }
-
-            // Extract keys
-            String id = null;
-            int k = l.indexOf(" ");
-            if (k > 0 && KEY_PREFIX.matcher(l.substring(0, k)).matches()) {
-                int i = l.indexOf(":");
-                id = l.substring(0, i);
-
-                l = l.substring(k);
-                indent += k;
-
-                k = 0;
-                while (k < l.length() && ' ' == l.charAt(k)) {
-                    k++;
-                    indent++;
-                }
-                if (k > 0) {
-                    l = l.substring(k);
-                }
             }
 
             if (0 == l.length()) {
@@ -109,6 +83,7 @@ public class NoteParser {
                 indentHierarachy.removeLast();
             }
 
+            // parse bullet or attribute name
             int j = -1;
             for (int i = 0; i < l.length(); i++) {
                 char c = l.charAt(i);
@@ -117,7 +92,6 @@ public class NoteParser {
                     break;
                 }
             }
-
             if (j < 0) {
                 j = l.length();
             }
@@ -134,7 +108,7 @@ public class NoteParser {
                 }
             }
 
-            // Skip white space between bullet and value
+            // skip white space between bullet and value
             while (j < l.length() && ' ' == l.charAt(j)) {
                 j++;
             }
@@ -191,6 +165,19 @@ public class NoteParser {
             }
 
             value = value.trim();
+
+            // find id, if present
+            String id = null;
+            int k = value.lastIndexOf(':');
+            if (k >= 0) {
+                k = value.substring(0, k).lastIndexOf(':');
+                if (k >= 0) {
+                    if (ID_SUFFIX.matcher(value.substring(k, value.length())).matches()) {
+                        id = value.substring(k + 1, value.length() - 1);
+                        value = value.substring(0, k).trim();
+                    }
+                }
+            }
 
             if (0 == value.length()) {
                 if (isAttribute) {
