@@ -93,9 +93,9 @@ public class NoteQueriesTest {
         String s;
 
         s = "" +
-                "* one :N5KBOAq:\n" +
-                "* two :v8EuMtl:\n" +
-                "* three :tOpwKho:\n";
+                "* :N5KBOAq: one\n" +
+                "* :v8EuMtl: two\n" +
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         assertNotesEqual(root, "one", "two", "three");
 
@@ -103,10 +103,10 @@ public class NoteQueriesTest {
         Atom two = store.getAtom("v8EuMtl");
 
         s = "" +
-                "* one :N5KBOAq:\n" +
-                "    * ten :r4zU45R:\n" +
+                "* :N5KBOAq: one\n" +
+                "    * :r4zU45R: ten\n" +
                 "    * yellow\n" +
-                "* three :tOpwKho:\n";
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         // "two" has been removed
         assertNotesEqual(root, "one", "three");
@@ -115,22 +115,22 @@ public class NoteQueriesTest {
         Atom ten = store.getAtom("r4zU45R");
 
         s = "" +
-                "* one :N5KBOAq:\n" +
-                "    * ten :r4zU45R:\n" +
+                "* :N5KBOAq: one\n" +
+                "    * :r4zU45R: ten\n" +
                 "        * rabbit\n" +
                 "    * purple\n" +
-                "* three :tOpwKho:\n";
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         // depth is only two, so "rabbit" is not reachable
         assertNotesEqual(ten);
 
         s = "" +
-                "* one :N5KBOAq:\n" +
-                "    * ten :r4zU45R:\n" +
+                "* :N5KBOAq: one\n" +
+                "    * :r4zU45R: ten\n" +
                 "    * green\n" +
                 "        * rabbit\n" +
                 "        * kangaroo\n" +
-                "* three :tOpwKho:\n";
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         Atom green = one.getNotes().getRest().getFirst();
         // "rabbit" and "kangaroo" are added beneath "green" even though they're
@@ -138,8 +138,8 @@ public class NoteQueriesTest {
         assertNotesEqual(green, "rabbit", "kangaroo");
 
         s = "" +
-                "* two :v8EuMtl:\n" +
-                "* three :tOpwKho:\n";
+                "* :v8EuMtl: two\n" +
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         // "one" has been removed...
         assertNotesEqual(root, "two", "three");
@@ -147,9 +147,9 @@ public class NoteQueriesTest {
         assertNotesEqual(one, "ten", "green");
 
         s = "" +
-                "* three :tOpwKho:\n" +
+                "* :tOpwKho: three\n" +
                 "    * red\n" +
-                "* two :v8EuMtl:\n";
+                "* :v8EuMtl: two\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
@@ -159,10 +159,10 @@ public class NoteQueriesTest {
         assertNotesEqual(three);
 
         s = "" +
-                "* two :v8EuMtl:\n" +
+                "* :v8EuMtl: two\n" +
                 "    * elephant\n" +
-                "* two :v8EuMtl:\n" +
-                "* three :tOpwKho:\n";
+                "* :v8EuMtl: two\n" +
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         // duplicates are possible...
         assertNotesEqual(root, "two", "two", "three");
@@ -170,11 +170,11 @@ public class NoteQueriesTest {
         assertNotesEqual(two);
 
         s = "" +
-                "* two :v8EuMtl:\n" +
+                "* :v8EuMtl: two\n" +
                 "    * elephant\n" +
-                "* two :v8EuMtl:\n" +
+                "* :v8EuMtl: two\n" +
                 "    * gorilla\n" +
-                "* three :tOpwKho:\n";
+                "* :tOpwKho: three\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         assertNotesEqual(root, "two", "two", "three");
         // when duplicates already exist, children of duplicates follow the last-occurring instance
@@ -189,14 +189,14 @@ public class NoteQueriesTest {
         String s;
 
         s = "" +
-                "* one :N5KBOAq:\n";
+                "* :N5KBOAq: one\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         Atom one = store.getAtom("N5KBOAq");
         assertEquals(0.5f, one.getWeight());
         assertEquals(0.5f, one.getSharability());
 
         s = "" +
-                "* one :N5KBOAq:\n" +
+                "* :N5KBOAq: one\n" +
                 "    @weight 0.75\n" +
                 "    @sharability 0.25\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
@@ -212,14 +212,14 @@ public class NoteQueriesTest {
         String s;
 
         s = "" +
-                "* one :N5KBOAq:\n" +
+                "* :N5KBOAq: one\n" +
                 "    @alias http://example.org/ns/one\n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         Atom one = store.getAtom("N5KBOAq");
         assertEquals("http://example.org/ns/one", one.getAlias());
 
         s = "" +
-                "* one :N5KBOAq:\n" +
+                "* :N5KBOAq: one\n" +
                 "    @alias \n";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         assertNull(one.getAlias());
@@ -234,7 +234,7 @@ public class NoteQueriesTest {
         Atom one;
 
         s = "" +
-                "* one :0000001:\n" +
+                "* :0000001: one\n" +
                 "    @priority 0.5";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         one = store.getAtom("0000001");
@@ -242,7 +242,7 @@ public class NoteQueriesTest {
 
         // setting priority to 0 has the effect of removing the priority property from the note
         s = "" +
-                "* one :0000001:\n" +
+                "* :0000001: one\n" +
                 "    @priority 0";
         queries.update(root, parser.parse(s), 2, filter, style, log);
         one = store.getAtom("0000001");
@@ -300,12 +300,12 @@ public class NoteQueriesTest {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
 
-        String before = "* one :001:\n" +
-                "* two :002:\n" +
-                "* three :003:";
-        String after = "* ONE :001:\n" +
+        String before = "* :001: one\n" +
+                "* :002: two\n" +
+                "* :003: three";
+        String after = "* :001: ONE\n" +
                 "* :002:\n" +
-                "* THREE :003:";
+                "* :003: THREE";
 
         Note b = parser.parse(before);
         Note a = parser.parse(after);

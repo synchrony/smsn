@@ -117,8 +117,8 @@ public class NoteParserTest {
 
         notes = readNotes("* here is a verbatim block {{{ all in one line}}} (pointless, but permitted)");
 
-        notes = readNotes("* here is a verbatim block {{{\n" +
-                "with an id on the second line }}} :0001:");
+        notes = readNotes("* :0001: here is a verbatim block {{{\n" +
+                "with an id }}}");
         assertEquals(1, notes.size());
         assertEquals("0001", notes.get(0).getId());
     }

@@ -34,8 +34,8 @@ Use as many lines of text as you need.
         * blank lines don't matter
 
     * ids
-        * each note has a base-64 id, which is indicated with a suffix :0txXBm:
-        * the id is optional, and it is treated as trailing white space     :cE85nD:
+        * :0txXBm: each note has a base-64 id, which is indicated with an infix after the bullet
+        *    :cE85nD:    the id is optional, and it is treated as white space
 
-        * blank lines still don't matter :69qkF3:
+        * :69qkF3: blank lines still don't matter
     * got it?

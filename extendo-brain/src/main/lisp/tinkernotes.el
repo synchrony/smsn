@@ -403,8 +403,8 @@
 		    (list :foreground "grey50" :background background)
 			(list :foreground "black"))))
 
-(defun create-id-suffix (id)
-    (concat " " (light-gray (concat ":" (propertize id 'invisible t) ":") "white") (black " ")))
+(defun create-id-infix (id)
+    (light-gray (concat (propertize (concat " :" id) 'invisible t) ":") "white"))
 
 (defun write-view (editable children tree-indent)
     (loop for json across children do
@@ -424,16 +424,18 @@
 		            (if (not target-weight) (error (concat "missing weight for target with id " target-id)))
 		            (if (not target-sharability) (error (concat "missing sharability for target with id " target-id)))
 		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
-		            (let ((line "") (id-suffix (create-id-suffix target-id)))
+		            (let ((line "") (id-infix (create-id-infix target-id)))
 		                (if (not editable)
-                            (setq id-suffix (propertize id-suffix 'invisible t)))
+                            (setq id-infix (propertize id-infix 'invisible t)))
                         (let ((space ""))
                             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
                             (setq line (concat line space)))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize (concat bullet " " target-value) target-weight target-sharability nil nil target-alias "white")
-                                id-suffix
+                                (colorize bullet target-weight target-sharability nil nil target-alias "white")
+                                id-infix
+                                " "
+                                (colorize target-value target-weight target-sharability nil nil target-alias "white")
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
                     (write-view editable children (+ tree-indent 4))))))
@@ -1076,7 +1078,7 @@
     (interactive)
     (let ((id (current-target-id)))
         (if id
-            (copy-to-clipboard (concat "*" (create-id-suffix id)))
+            (copy-to-clipboard (concat "*" (create-id-infix id)))
             (no-target))))
 
 (defun tn-copy-target-value-to-clipboard ()

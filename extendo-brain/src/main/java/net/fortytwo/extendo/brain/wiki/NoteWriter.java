@@ -86,13 +86,13 @@ public class NoteWriter {
 
         p.print("* ");
 
-        p.print(sanitizeValue(n.getValue()));
-
         if (null != n.getId()) {
-            p.print(" :");
-            p.print(padKey(n.getId()));
             p.print(":");
+            p.print(padKey(n.getId()));
+            p.print(": ");
         }
+
+        p.print(sanitizeValue(n.getValue()));
 
         p.print("\n");
 

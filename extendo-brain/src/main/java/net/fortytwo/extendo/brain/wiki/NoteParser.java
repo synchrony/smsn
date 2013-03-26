@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -114,6 +115,16 @@ public class NoteParser {
             }
             l = l.substring(j);
 
+            // find id, if present
+            String id = null;
+            if (!isAttribute) {
+                Matcher m = ID_SUFFIX.matcher(l);
+                if (m.find() && 0 == m.start()) {
+                    id = l.substring(1, m.end() - 1);
+                    l = l.substring(m.end()).trim();
+                }
+            }
+
             String value = "";
             if (0 < l.length()) {
                 if (!isAttribute && l.contains("{{{")) {
@@ -165,19 +176,6 @@ public class NoteParser {
             }
 
             value = value.trim();
-
-            // find id, if present
-            String id = null;
-            int k = value.lastIndexOf(':');
-            if (k >= 0) {
-                k = value.substring(0, k).lastIndexOf(':');
-                if (k >= 0) {
-                    if (ID_SUFFIX.matcher(value.substring(k, value.length())).matches()) {
-                        id = value.substring(k + 1, value.length() - 1);
-                        value = value.substring(0, k).trim();
-                    }
-                }
-            }
 
             if (0 == value.length()) {
                 if (isAttribute) {
