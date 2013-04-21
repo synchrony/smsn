@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.brain.ActivityLog;
 import net.fortytwo.extendo.brain.BrainGraph;
 
 import java.util.logging.Logger;
@@ -74,7 +75,10 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
         p.map.put("name", "" + p.propertyName);
         p.map.put("value", "" + p.propertyValue);
 
-        p.graph.getActivityLog().logSetProperties(p.root);
+        ActivityLog log = p.graph.getActivityLog();
+        if (null != log) {
+            log.logSetProperties(p.root);
+        }
 
         return ExtensionResponse.ok(p.map);
     }
