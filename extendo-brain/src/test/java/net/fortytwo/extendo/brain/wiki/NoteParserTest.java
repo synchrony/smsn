@@ -74,13 +74,25 @@ public class NoteParserTest {
         assertEquals(1, root.getChildren().get(0).getChildren().size());
     }
 
+    @Test
+    public void testEmptyLinesIgnored() throws Exception {
+        List<Note> notes = readNotes(
+                "* one\n" +
+                "   \n" +     // empty line with additional whitespace
+                "* two" +
+                "\n" +        // empty line without additional whitespace
+                "* three");
+        assertEquals(3, notes.size());
+    }
+
     @Test(expected = NoteParser.NoteParsingException.class)
     public void testEmptyValuesNotAllowedForNewNotes() throws Exception {
         readNotes("* ");
     }
 
+    @Test
     public void testEmptyValuesAllowedForExistingNotes() throws Exception {
-        readNotes("1234567:  *");
+        readNotes("* :1234567: ");
     }
 
     @Test

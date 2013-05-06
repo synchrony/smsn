@@ -183,8 +183,7 @@ public abstract class TinkerNotesExtension extends AbstractRexsterExtension {
                                   final float defaultSharability) {
 
         float m = findMinAuthorizedSharability(user, minSharability);
-        return new Filter(minWeight, maxWeight, defaultWeight,
-                m, maxSharability, defaultSharability);
+        return new Filter(minWeight, maxWeight, defaultWeight, m, maxSharability, defaultSharability);
     }
 
     protected org.codehaus.jettison.json.JSONObject toJettison(JSONObject j) throws IOException {

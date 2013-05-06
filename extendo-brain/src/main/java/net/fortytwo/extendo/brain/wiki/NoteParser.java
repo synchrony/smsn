@@ -56,7 +56,7 @@ public class NoteParser {
             // Tabs count as four spaces each.
             l = l.replaceAll("[\\t]", TAB_REPLACEMENT);
 
-            if (0 == l.length()) {
+            if (0 == l.trim().length()) {
                 // Empty lines are simply ignored.
                 continue;
             }
