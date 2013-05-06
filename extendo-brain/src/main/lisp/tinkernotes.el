@@ -79,6 +79,15 @@
     (let ((i (string-match "\n\n" entity)))
             (decode-coding-string (substring entity (+ i 2)) 'utf-8)))
 
+(setq fast-numbers '(
+    (?0 0) (?1 1) (?2 2) (?3 3) (?4 4) (?5 5) (?6 6) (?7 7) (?8 8) (?9 9)
+    (?z 0) (?a 1) (?s 2) (?d 3) (?f 4) (?g 5) (?h 6) (?j 7) (?k 8) (?l 9) (?; 10)))
+
+(defun tn-number-shorthand-to-number (c)
+    (interactive)
+    (let ((l (assoc c fast-numbers)))
+        (if l (car (cdr l)) (error-message (concat "no number associated with character " (char-to-string c))))))
+
 
 ;; BUFFERS / VARIABLES ;;;;;;;;;;;;;;;;;
 
@@ -637,15 +646,13 @@
     (if (and (in-view) (equal tn-mode tn-edit-mode))
         (request-view t tn-readonly-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
-(defun tn-decrease-depth ()
+(defun tn-choose-depth ()
     (interactive)
-    (if (in-view)
-        (request-view nil tn-mode tn-root (- tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
-
-(defun tn-increase-depth ()
-    (interactive)
-    (if (in-view)
-        (request-view nil tn-mode tn-root (+ tn-depth 1) tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+    (let ((c (read-char)))
+        (let ((depth (tn-number-shorthand-to-number c)))
+            (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
+                (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
+                    (request-view nil tn-mode tn-root depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight))))))
 
 (defun tn-refresh-to-forward-view ()
     (interactive)
@@ -1133,8 +1140,7 @@
 (global-set-key (kbd "C-c C-a d")       'insert-current-date)
 (global-set-key (kbd "C-c C-a s")       'insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'insert-current-time)
-(global-set-key (kbd "C-c C-d ,")       'tn-decrease-depth)
-(global-set-key (kbd "C-c C-d .")       'tn-increase-depth)
+(global-set-key (kbd "C-c C-d")         'tn-choose-depth)
 (global-set-key (kbd "C-c C-f")         'tn-push-point)
 (global-set-key (kbd "C-c C-l")         'tn-goto-line)
 
