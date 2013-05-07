@@ -106,7 +106,7 @@
 
 ;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
 (setq tn-depth 3)
-(setq tn-root nil)
+(setq tn-root-id nil)
 (setq tn-title nil)
 (setq tn-style tn-forward-view-style)
 ;; "private" atoms are hidden to begin with
@@ -217,8 +217,22 @@
                 (concat name " [" root-id "]"))
             title)))
 
+(defun current-root-id ()
+    tn-root-id)
+
+(defun current-root-value ()
+    tn-title)
+
+(defun current-target ()
+    (get-atom (current-root-id)))
+
 (defun current-target-id ()
     (car (last (find-id))))
+
+(defun current-target-value ()
+    (let ((g (current-root)))
+        (if g
+            (get-value g))))
 
 (defun current-target ()
     (get-atom (current-target-id)))
@@ -268,12 +282,13 @@
                  " value: " value
                  (if alias (concat " alias: " alias) "")))))
 
-(defun tn-target-info()
-    (interactive)
-    (let ((target (current-target)))
-        (if target
-            (show-info target)
-            (no-target))))
+(defun tn-atom-info (atom-selector)
+    (lexical-let ((as atom-selector))
+        (lambda () (interactive)
+            (let ((atom (funcall as)))
+                (if atom
+                    (show-info atom)
+                    (no-target))))))
 
 
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
@@ -306,7 +321,7 @@
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root json))
-                    (make-local-variable 'tn-root)
+                    (make-local-variable 'tn-root-id)
                     (make-local-variable 'tn-depth)
                     (make-local-variable 'tn-style)
                     (make-local-variable 'tn-title)
@@ -320,7 +335,7 @@
                     (make-local-variable 'tn-current-line)
                     (make-local-variable 'tn-mode)
                     (make-local-variable 'tn-value-truncation-length)
-                    (setq tn-root root)
+                    (setq tn-root-id root)
                     (if (equal mode tn-search-mode)
                         ;; Always leave a search view with depth 1, rather than that of the last view.
                         ;; The user experience is a little unpredictable otherwise.
@@ -459,7 +474,7 @@
 
 (defun view-info ()
     (concat
-        "(root: " tn-root
+        "(root: " tn-root-id
          " :depth " (number-to-string tn-depth)
          " :style " tn-style
          " :sharability [" (number-to-string tn-min-sharability) ", " (number-to-string tn-default-sharability) ", " (number-to-string tn-max-sharability) "]"
@@ -639,34 +654,34 @@
 (defun tn-refresh-view ()
     (interactive)
     (if (in-view)
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view t tn-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-enter-edit-view ()
     (interactive)
     (if (and (in-view) (equal tn-mode tn-readonly-mode))
-        (request-view t tn-edit-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view t tn-edit-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-enter-readonly-view ()
     (interactive)
     (if (and (in-view) (equal tn-mode tn-edit-mode))
-        (request-view t tn-readonly-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view t tn-readonly-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-choose-depth ()
     (interactive)
     (let ((depth (read-character-as-number)))
             (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
                 (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
-                    (request-view nil tn-mode tn-root depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))))
+                    (request-view nil tn-mode tn-root-id depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))))
 
 (defun tn-refresh-to-forward-view ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth tn-forward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view nil tn-mode tn-root-id tn-depth tn-forward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 (defun tn-refresh-to-backward-view ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root tn-depth tn-backward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view nil tn-mode tn-root-id tn-depth tn-backward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
 
 
 ;; set weight ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -680,18 +695,18 @@
 (defun tn-set-default-weight ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-default-weight (/ r 4))))
+        (set-default-weight (/ r 4.0))))
 
 (defun set-min-weight (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight)
+        (request-view t tn-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun tn-set-min-weight ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-min-weight (/ r 4))))
+        (set-min-weight (/ r 4.0))))
 
 
 ;; set sharability ;;;;;;;;;;;;;;;;;;;;;
@@ -705,18 +720,18 @@
 (defun tn-set-default-sharability ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-default-sharability (/ r 4))))
+        (set-default-sharability (/ r 4.0))))
 
 (defun set-min-sharability (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)
+        (request-view t tn-mode tn-root-id tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun tn-set-min-sharability ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-min-sharability (/ r 4))))
+        (set-min-sharability (/ r 4.0))))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -733,7 +748,7 @@
         (http-post
             (concat (base-url) "update")
             (list
-                (list "root" tn-root)
+                (list "root" tn-root-id)
                 (list "view" entity)
                 (list "style" tn-style)
                 (list "minSharability" (number-to-string tn-min-sharability))
@@ -750,7 +765,7 @@
     (if (in-view)
         (lexical-let (
                 (mode tn-mode)
-                (url (request-view-url tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight)))
+                (url (request-view-url tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight)))
             (setq tn-current-line (line-number-at-pos))
             (setq tn-future-sharability tn-default-sharability)
             (http-get
@@ -782,7 +797,7 @@
 (defun tn-set-target-priority ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-target-priority (/ r 4))))
+        (set-target-priority (/ r 4.0))))
 
 (defun set-target-sharability (v)
     (if (and (> v 0) (<= v 1))
@@ -798,7 +813,7 @@
 (defun tn-set-target-sharability ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-target-sharability (/ r 4))))
+        (set-target-sharability (/ r 4.0))))
 
 (defun set-target-weight (v)
     (if (and (> v 0) (<= v 1))
@@ -814,7 +829,7 @@
 (defun tn-set-target-weight ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (set-target-weight (/ r 4))))
+        (set-target-weight (/ r 4.0))))
 
 
 ;; INTERFACE ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -829,11 +844,13 @@
     (interactive)
     (goto-address-at-point))  ;; defined in Emacs goto-addr.el
 
-(defun browse-target-value (value-to-url)
-    (let ((value (current-target-value)))
-        (if value
-            (browse-url (funcall value-to-url value))
-            (no-target))))
+(defun browse-target-value (value-selector value-to-url)
+    (lexical-let ((vs value-selector) (vu value-to-url))
+        (lambda () (interactive)
+            (let ((value (funcall vs)))
+                (if value
+                    (browse-url (funcall vu value))
+                    (no-target))))))
 
 (defun tn-browse-target-value-as-url ()
     (interactive)
@@ -847,49 +864,40 @@
             (browse-url alias)
             (no-target))))
 
-(defun tn-browse-target-value-in-amazon ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-amazon (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://www.amazon.com/s?ie=UTF8&index=blended&link_code=qs&field-keywords=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-ebay ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-ebay (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://www.ebay.com/sch/i.html?_nkw=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-delicious ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-delicious (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://www.delicious.com/search?p=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-google ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-google (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://www.google.com/search?ie=UTF-8&q=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-google-scholar ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-google-scholar (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://scholar.google.com/scholar?q=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-google-maps ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-google-maps (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://maps.google.com/maps?q=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-twitter ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-twitter (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://twitter.com/#!/search/" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-wikipedia ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-wikipedia (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
 
-(defun tn-browse-target-value-in-youtube ()
-    (interactive)
-    (browse-target-value (lambda (value)
+(defun tn-browse-value-in-youtube (value-selector)
+    (browse-target-value value-selector (lambda (value)
         (concat "http://www.youtube.com/results?search_query=" (w3m-url-encode-string value)))))
 
 (defvar tn-date-format "%Y-%m-%d")
@@ -912,12 +920,12 @@
 (defun insert-attr-sharability ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (insert (concat "\n                @sharability " (number-to-string (/ r 4)) "\n"))))
+        (insert (concat "\n                @sharability " (number-to-string (/ r 4.0)) "\n"))))
 
 (defun insert-attr-weight ()
     (interactive)
     (let ((r (read-character-as-number)))
-        (insert (concat "\n                @weight " (number-to-string (/ r 4)) "\n"))))
+        (insert (concat "\n                @weight " (number-to-string (/ r 4.0)) "\n"))))
 
 (defun copy-to-clipboard (g)
     (let ((buffer (get-buffer-create "*temp*")))
@@ -977,26 +985,40 @@
 (global-set-key (kbd "C-c C-d")         'tn-choose-depth)
 (global-set-key (kbd "C-c C-f")         'tn-push-point)
 (global-set-key (kbd "C-c C-l")         'tn-goto-line)
+
+(global-set-key (kbd "C-c C-t C-b a")   (tn-browse-value-in-amazon 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b e")   (tn-browse-value-in-ebay 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b d")   (tn-browse-value-in-delicious 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b g")   (tn-browse-value-in-google 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b m")   (tn-browse-value-in-google-maps 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b s")   (tn-browse-value-in-google-scholar 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b t")   (tn-browse-value-in-twitter 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b w")   (tn-browse-value-in-wikipedia 'current-root-value))
+(global-set-key (kbd "C-c C-t C-b y")   (tn-browse-value-in-youtube 'current-root-value))
+
 (global-set-key (kbd "C-c C-s C-d")     'tn-set-default-sharability)
 (global-set-key (kbd "C-c C-s C-m")     'tn-set-min-sharability)
+
+;; TODO: finish generalizing these functions to root vs. target
 (global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
 (global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
-(global-set-key (kbd "C-c C-t i")       'tn-target-info)
+(global-set-key (kbd "C-c C-t i")       (tn-atom-info 'current-target))
 (global-set-key (kbd "C-c C-t l")       'tn-preview-target-latex-math)
 (global-set-key (kbd "C-c C-t r")       'tn-copy-target-reference-to-clipboard)
 (global-set-key (kbd "C-c C-t C-a b")   'tn-browse-target-alias)
-(global-set-key (kbd "C-c C-t C-b a")   'tn-browse-target-value-in-amazon)
-(global-set-key (kbd "C-c C-t C-b e")   'tn-browse-target-value-in-ebay)
-(global-set-key (kbd "C-c C-t C-b d")   'tn-browse-target-value-in-delicious)
-(global-set-key (kbd "C-c C-t C-b g")   'tn-browse-target-value-in-google)
-(global-set-key (kbd "C-c C-t C-b m")   'tn-browse-target-value-in-google-maps)
-(global-set-key (kbd "C-c C-t C-b s")   'tn-browse-target-value-in-google-scholar)
-(global-set-key (kbd "C-c C-t C-b t")   'tn-browse-target-value-in-twitter)
-(global-set-key (kbd "C-c C-t C-b w")   'tn-browse-target-value-in-wikipedia)
-(global-set-key (kbd "C-c C-t C-b y")   'tn-browse-target-value-in-youtube)
+(global-set-key (kbd "C-c C-t C-b a")   (tn-browse-value-in-amazon 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b e")   (tn-browse-value-in-ebay 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b d")   (tn-browse-value-in-delicious 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b g")   (tn-browse-value-in-google 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b m")   (tn-browse-value-in-google-maps 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b s")   (tn-browse-value-in-google-scholar 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b t")   (tn-browse-value-in-twitter 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b w")   (tn-browse-value-in-wikipedia 'current-target-value))
+(global-set-key (kbd "C-c C-t C-b y")   (tn-browse-value-in-youtube 'current-target-value))
 (global-set-key (kbd "C-c C-t C-p")     'tn-set-target-priority)
 (global-set-key (kbd "C-c C-t C-s")     'tn-set-target-sharability)
 (global-set-key (kbd "C-c C-t C-w")     'tn-set-target-weight)
+
 (global-set-key (kbd "C-c C-v b")       'tn-refresh-to-backward-view)
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
@@ -1005,24 +1027,6 @@
 (global-set-key (kbd "C-c C-v t")       'tn-set-value-truncation-length)
 (global-set-key (kbd "C-c C-w C-d")     'tn-set-default-weight)
 (global-set-key (kbd "C-c C-w C-m")     'tn-set-min-weight)
-
-;; copied verbatim from the "C-c C-t" section
-;; TODO: deduplicate this code in some way
-;;(global-set-key (kbd "C-c C-r a")       'tn-browse-root-value-as-url)
-;;(global-set-key (kbd "C-c C-r c")       'tn-copy-root-value-to-clipboard)
-;;(global-set-key (kbd "C-c C-r C-a b")   'tn-browse-root-alias)
-;;(global-set-key (kbd "C-c C-r C-b a")   'tn-browse-root-value-in-amazon)
-;;(global-set-key (kbd "C-c C-r C-b e")   'tn-browse-root-value-in-ebay)
-;;(global-set-key (kbd "C-c C-r C-b d")   'tn-browse-root-value-in-delicious)
-;;(global-set-key (kbd "C-c C-r C-b g")   'tn-browse-root-value-in-google)
-;;(global-set-key (kbd "C-c C-r C-b m")   'tn-browse-root-value-in-google-maps)
-;;(global-set-key (kbd "C-c C-r C-b s")   'tn-browse-root-value-in-google-scholar)
-;;(global-set-key (kbd "C-c C-r C-b t")   'tn-browse-root-value-in-twitter)
-;;(global-set-key (kbd "C-c C-r C-b w")   'tn-browse-root-value-in-wikipedia)
-;;(global-set-key (kbd "C-c C-r C-b y")   'tn-browse-root-value-in-youtube)
-;;(global-set-key (kbd "C-c C-r i")       'tn-root-info)
-;;(global-set-key (kbd "C-c C-r l")       'tn-preview-root-latex-math)
-
 
 (defun tn-toggle-emacspeak ()
     (interactive)
