@@ -69,7 +69,7 @@ public class BrainGraph {
         File logFile = Extendo.getConfiguration().getFile(Extendo.ACTIVITY_LOG, null);
 
         if (null == logFile) {
-            LOGGER.info("no activity log specified");
+            LOGGER.warning("no activity log specified");
             activityLog = null;
         } else {
             LOGGER.info("will use activity log at " + logFile.getPath());
