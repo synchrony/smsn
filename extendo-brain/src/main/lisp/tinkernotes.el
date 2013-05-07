@@ -693,17 +693,6 @@
     (let ((r (read-character-as-number)))
         (set-min-weight (/ r 4))))
 
-(defun set-max-weight (s)
-    (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight s)
-        (error-message
-            (concat "max weight " (number-to-string s) " is outside of range [0, 1]"))))
-
-(defun tn-set-max-weight ()
-    (interactive)
-    (let ((r (read-character-as-number)))
-        (set-max-weight (/ r 4))))
-
 
 ;; set sharability ;;;;;;;;;;;;;;;;;;;;;
 
@@ -728,17 +717,6 @@
     (interactive)
     (let ((r (read-character-as-number)))
         (set-min-sharability (/ r 4))))
-
-(defun set-max-sharability (s)
-    (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root tn-depth tn-style tn-min-sharability s tn-default-sharability tn-min-weight tn-max-weight)
-        (error-message
-            (concat "max sharability " (number-to-string s) " is outside of range [0, 1]"))))
-
-(defun tn-set-max-sharability ()
-    (interactive)
-    (let ((r (read-character-as-number)))
-        (set-max-sharability (/ r 4))))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -979,9 +957,28 @@
     (beginning-of-buffer)(end-of-line))
 
 
-(global-set-key (kbd "C-c C-s")         'tn-set-default-sharability)
-(global-set-key (kbd "C-c C-s C-[")     'tn-set-min-sharability)
-(global-set-key (kbd "C-c C-s C-]")     'tn-set-max-sharability)
+(global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
+(global-set-key (kbd "C-c d")           'tn-duplicates)
+(global-set-key (kbd "C-c e")           'tn-export)
+(global-set-key (kbd "C-c f")           'tn-find-roots)
+(global-set-key (kbd "C-c h")           'tn-history)
+(global-set-key (kbd "C-c n")           'tn-new-note)
+(global-set-key (kbd "C-c P")           'tn-priorities)
+(global-set-key (kbd "C-c p")           'tn-push-view)
+(global-set-key (kbd "C-c r")           'tn-ripple-query)
+(global-set-key (kbd "C-c s")           'tn-search)
+(global-set-key (kbd "C-c t")           'tn-visit-target)
+(global-set-key (kbd "C-c u")           'tn-refresh-view)
+(global-set-key (kbd "C-c C-a d")       'insert-current-date)
+(global-set-key (kbd "C-c C-a s")       'insert-current-time-with-seconds)
+(global-set-key (kbd "C-c C-a t")       'insert-current-time)
+(global-set-key (kbd "C-c C-a C-s")     'insert-attr-sharability)
+(global-set-key (kbd "C-c C-a C-w")     'insert-attr-weight)
+(global-set-key (kbd "C-c C-d")         'tn-choose-depth)
+(global-set-key (kbd "C-c C-f")         'tn-push-point)
+(global-set-key (kbd "C-c C-l")         'tn-goto-line)
+(global-set-key (kbd "C-c C-s C-d")     'tn-set-default-sharability)
+(global-set-key (kbd "C-c C-s C-m")     'tn-set-min-sharability)
 (global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
 (global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
 (global-set-key (kbd "C-c C-t i")       'tn-target-info)
@@ -1004,12 +1001,28 @@
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
 (global-set-key (kbd "C-c C-v r")       'tn-enter-readonly-view)
-;; new bindings (not yet recorded in mob-data)
 (global-set-key (kbd "C-c C-v s")       'tn-toggle-emacspeak)
 (global-set-key (kbd "C-c C-v t")       'tn-set-value-truncation-length)
-(global-set-key (kbd "C-c C-w")         'tn-set-default-weight)
-(global-set-key (kbd "C-c C-w C-[")     'tn-set-min-weight)
-(global-set-key (kbd "C-c C-w C-]")     'tn-set-max-weight)
+(global-set-key (kbd "C-c C-w C-d")     'tn-set-default-weight)
+(global-set-key (kbd "C-c C-w C-m")     'tn-set-min-weight)
+
+;; copied verbatim from the "C-c C-t" section
+;; TODO: deduplicate this code in some way
+;;(global-set-key (kbd "C-c C-r a")       'tn-browse-root-value-as-url)
+;;(global-set-key (kbd "C-c C-r c")       'tn-copy-root-value-to-clipboard)
+;;(global-set-key (kbd "C-c C-r C-a b")   'tn-browse-root-alias)
+;;(global-set-key (kbd "C-c C-r C-b a")   'tn-browse-root-value-in-amazon)
+;;(global-set-key (kbd "C-c C-r C-b e")   'tn-browse-root-value-in-ebay)
+;;(global-set-key (kbd "C-c C-r C-b d")   'tn-browse-root-value-in-delicious)
+;;(global-set-key (kbd "C-c C-r C-b g")   'tn-browse-root-value-in-google)
+;;(global-set-key (kbd "C-c C-r C-b m")   'tn-browse-root-value-in-google-maps)
+;;(global-set-key (kbd "C-c C-r C-b s")   'tn-browse-root-value-in-google-scholar)
+;;(global-set-key (kbd "C-c C-r C-b t")   'tn-browse-root-value-in-twitter)
+;;(global-set-key (kbd "C-c C-r C-b w")   'tn-browse-root-value-in-wikipedia)
+;;(global-set-key (kbd "C-c C-r C-b y")   'tn-browse-root-value-in-youtube)
+;;(global-set-key (kbd "C-c C-r i")       'tn-root-info)
+;;(global-set-key (kbd "C-c C-r l")       'tn-preview-root-latex-math)
+
 
 (defun tn-toggle-emacspeak ()
     (interactive)
