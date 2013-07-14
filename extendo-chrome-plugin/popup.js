@@ -1,14 +1,14 @@
 function copyTabToClipboard(tab, cachingId) {
     var text = "";
 
-    if (0 == tab.url.indexOf("http://en.wikipedia.org/wiki/")) {
+    if (0 == tab.url.indexOf("http://en.wikipedia.org/wiki/") || 0 == tab.url.indexOf("https://en.wikipedia.org/wiki/")) {
         var title = tab.title;
         var i = title.indexOf(" - ");
         if (i > 0) {
             title = title.substring(0, i);
         }
 
-        var url = "http://dbpedia.org/resource/" + tab.url.substring(29);
+        var url = "http://dbpedia.org/resource/" + tab.url.substring(tab.url.indexOf("/wiki/") + 6);
         var j = url.indexOf("#");
         if (j > 0) {
             url = url.substring(0, j);

@@ -19,7 +19,6 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
-import net.fortytwo.extendo.brain.BrainGraph;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,7 +67,12 @@ public class ExportExtension extends TinkerNotesExtension {
                 p.print(v.getProperty(Extendo.SHARABILITY));
                 p.print('\t');
 
-                p.print(escapeValue((String) v.getProperty(Extendo.VALUE)));
+                String value = (String) v.getProperty(Extendo.VALUE);
+                if (null == value) {
+                    LOGGER.warning("note has null @value: " + v.getId());
+                } else {
+                    p.print(escapeValue((String) v.getProperty(Extendo.VALUE)));
+                }
                 p.print('\t');
 
                 String alias = (String) v.getProperty(Extendo.ALIAS);

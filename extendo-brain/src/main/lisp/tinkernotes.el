@@ -852,10 +852,8 @@
                     (browse-url (funcall vu value))
                     (no-target))))))
 
-(defun tn-browse-target-value-as-url ()
-    (interactive)
-    (browse-target-value (lambda (value)
-        value)))
+(defun tn-browse-value-as-url (value-selector)
+    (browse-target-value value-selector (lambda (value) value)))
 
 (defun tn-browse-target-alias ()
     (interactive)
@@ -965,46 +963,28 @@
     (beginning-of-buffer)(end-of-line))
 
 
-(global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
-(global-set-key (kbd "C-c d")           'tn-duplicates)
-(global-set-key (kbd "C-c e")           'tn-export)
-(global-set-key (kbd "C-c f")           'tn-find-roots)
-(global-set-key (kbd "C-c h")           'tn-history)
-(global-set-key (kbd "C-c n")           'tn-new-note)
-(global-set-key (kbd "C-c P")           'tn-priorities)
-(global-set-key (kbd "C-c p")           'tn-push-view)
-(global-set-key (kbd "C-c r")           'tn-ripple-query)
-(global-set-key (kbd "C-c s")           'tn-search)
-(global-set-key (kbd "C-c t")           'tn-visit-target)
-(global-set-key (kbd "C-c u")           'tn-refresh-view)
+;; Note: when updating this list of mappings, also update the PKB
+(global-set-key (kbd "C-c C-a C-s")     'insert-attr-sharability)
+(global-set-key (kbd "C-c C-a C-w")     'insert-attr-weight)
 (global-set-key (kbd "C-c C-a d")       'insert-current-date)
 (global-set-key (kbd "C-c C-a s")       'insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'insert-current-time)
-(global-set-key (kbd "C-c C-a C-s")     'insert-attr-sharability)
-(global-set-key (kbd "C-c C-a C-w")     'insert-attr-weight)
 (global-set-key (kbd "C-c C-d")         'tn-choose-depth)
 (global-set-key (kbd "C-c C-f")         'tn-push-point)
+;; Note: this should perhaps be a local setting
+(global-set-key (kbd "C-c C-g l")       'toggle-linum-mode)
 (global-set-key (kbd "C-c C-l")         'tn-goto-line)
-
-(global-set-key (kbd "C-c C-t C-b a")   (tn-browse-value-in-amazon 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b e")   (tn-browse-value-in-ebay 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b d")   (tn-browse-value-in-delicious 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b g")   (tn-browse-value-in-google 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b m")   (tn-browse-value-in-google-maps 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b s")   (tn-browse-value-in-google-scholar 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b t")   (tn-browse-value-in-twitter 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b w")   (tn-browse-value-in-wikipedia 'current-root-value))
-(global-set-key (kbd "C-c C-t C-b y")   (tn-browse-value-in-youtube 'current-root-value))
-
+(global-set-key (kbd "C-c C-r C-b a")   (tn-browse-value-in-amazon 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b e")   (tn-browse-value-in-ebay 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b d")   (tn-browse-value-in-delicious 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b g")   (tn-browse-value-in-google 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b m")   (tn-browse-value-in-google-maps 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b s")   (tn-browse-value-in-google-scholar 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b t")   (tn-browse-value-in-twitter 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b w")   (tn-browse-value-in-wikipedia 'current-root-value))
+(global-set-key (kbd "C-c C-r C-b y")   (tn-browse-value-in-youtube 'current-root-value))
 (global-set-key (kbd "C-c C-s C-d")     'tn-set-default-sharability)
 (global-set-key (kbd "C-c C-s C-m")     'tn-set-min-sharability)
-
-;; TODO: finish generalizing these functions to root vs. target
-(global-set-key (kbd "C-c C-t a")       'tn-browse-target-value-as-url)
-(global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
-(global-set-key (kbd "C-c C-t i")       (tn-atom-info 'current-target))
-(global-set-key (kbd "C-c C-t l")       'tn-preview-target-latex-math)
-(global-set-key (kbd "C-c C-t r")       'tn-copy-target-reference-to-clipboard)
 (global-set-key (kbd "C-c C-t C-a b")   'tn-browse-target-alias)
 (global-set-key (kbd "C-c C-t C-b a")   (tn-browse-value-in-amazon 'current-target-value))
 (global-set-key (kbd "C-c C-t C-b e")   (tn-browse-value-in-ebay 'current-target-value))
@@ -1018,7 +998,14 @@
 (global-set-key (kbd "C-c C-t C-p")     'tn-set-target-priority)
 (global-set-key (kbd "C-c C-t C-s")     'tn-set-target-sharability)
 (global-set-key (kbd "C-c C-t C-w")     'tn-set-target-weight)
-
+;; TODO: finish generalizing these "C-c C-t x" functions to root vs. target
+(global-set-key (kbd "C-c C-t a")       (tn-browse-value-as-url 'current-target-value))
+(global-set-key (kbd "C-c C-t c")       'tn-copy-target-value-to-clipboard)
+(global-set-key (kbd "C-c C-t i")       (tn-atom-info 'current-target))
+(global-set-key (kbd "C-c C-t l")       'tn-preview-target-latex-math)
+(global-set-key (kbd "C-c C-t r")       'tn-copy-target-reference-to-clipboard)
+;; Note: this should perhaps be a local setting
+(global-set-key (kbd "C-c C-v ;")       'toggle-truncate-lines)
 (global-set-key (kbd "C-c C-v b")       'tn-refresh-to-backward-view)
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
@@ -1027,6 +1014,19 @@
 (global-set-key (kbd "C-c C-v t")       'tn-set-value-truncation-length)
 (global-set-key (kbd "C-c C-w C-d")     'tn-set-default-weight)
 (global-set-key (kbd "C-c C-w C-m")     'tn-set-min-weight)
+(global-set-key (kbd "C-c a")           'tn-visit-url-at-point)
+(global-set-key (kbd "C-c d")           'tn-duplicates)
+(global-set-key (kbd "C-c e")           'tn-export)
+(global-set-key (kbd "C-c f")           'tn-find-roots)
+(global-set-key (kbd "C-c h")           'tn-history)
+(global-set-key (kbd "C-c n")           'tn-new-note)
+(global-set-key (kbd "C-c P")           'tn-priorities)
+(global-set-key (kbd "C-c p")           'tn-push-view)
+(global-set-key (kbd "C-c r")           'tn-ripple-query)
+(global-set-key (kbd "C-c s")           'tn-search)
+(global-set-key (kbd "C-c t")           'tn-visit-target)
+(global-set-key (kbd "C-c u")           'tn-refresh-view)
+
 
 (defun tn-toggle-emacspeak ()
     (interactive)
@@ -1042,9 +1042,7 @@
     (let ((n (string-to-number (read-from-minibuffer "value truncation length: "))))
         (setq tn-value-truncation-length n)))
 
-;; Note: these should perhaps be local settings
-(global-set-key (kbd "C-c C-v ;") 'toggle-truncate-lines)
-(global-set-key (kbd "C-c C-g l") 'toggle-linum-mode)
+
 (setq-default truncate-lines t)
 (if full-colors-supported
     (let ()
