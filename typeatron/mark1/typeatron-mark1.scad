@@ -58,6 +58,7 @@ caseHeight = lidThick + floorThick + thickestComponent + 1;
 wallThick = caseHeight/2;
 
 echo("caseHeight: ", caseHeight);
+echo("wallThick: ", wallThick);
 
 pushButtonWellWidth = 7;
 pushButtonHeight = 5.0;
