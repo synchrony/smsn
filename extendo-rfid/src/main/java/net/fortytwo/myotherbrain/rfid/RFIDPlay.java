@@ -5,7 +5,6 @@ import com.alien.enterpriseRFID.tags.Tag;
 import com.tinkerpop.blueprints.impls.rexster.RexsterGraph;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
-import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.NoteQueries;
 

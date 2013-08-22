@@ -37,6 +37,7 @@ joystickWidth = 18.5;
 joystickBodyHeight = 5.4;
 
 joystickWellDepth = joystickBodyHeight;
+fingerJoystickWellLength = 90;
 
 nanoLength = 43.2;
 nanoWidth = 18.0;
@@ -74,6 +75,7 @@ thickestComponent = 7.9;
 //caseHeight = lidThick + floorThick + thickestComponent + 1;
 //caseHeight = joystickWidth;
 caseHeight = max(joystickWidth, joystickWellDepth + dividerThick + thickestComponent + lidThick + 1);
+cavityDepth = caseHeight - joystickWellDepth - dividerThick;
 
 wallThick = caseHeight/2;
 //wallThick = min(6, caseHeight/2);
@@ -285,26 +287,26 @@ module basicCase() {
     caseConvexHull();
 
 	// well for finger joysticks
-    translate([wallThick, wallThick, caseHeight - joystickWellDepth]) {
-        cube([caseWidth - wallThick + 1, caseLength - 2*wallThick, joystickWellDepth + 1]);
+    translate([caseCornerRadius, caseCornerRadius, caseHeight - joystickWellDepth]) {
+        cube([caseWidth - caseCornerRadius + 1, fingerJoystickWellLength, joystickWellDepth + 1]);
     }   
 
     pinHoles();
 
     // hole for status LED
-	translate([thumbCurveRadius, caseLength - thumbCurveRadius, 0]) {
+	translate([thumbCurveRadius, caseLength - thumbCurveRadius, cavityDepth - ledRimRadius/2.0]) {
+        rotate([0, 0, 45]) { translate([0, thumbCurveRadius, 0]) {
+            rotate(a=[90,0,0]) {
 
-    }
-    translate([cavityWidth+wallThick-ledRimRadius-3,caseLength+1,wallThick]) {
-    	    rotate(a=[90,0,0]) {
-            cylinder(h=caseCornerRadius+2,r=ledDomeRadius+error, $fn=ledHoleRes);
+                cylinder(h=caseCornerRadius+2,r=ledDomeRadius+error, $fn=ledHoleRes);
 
-            // note: the rim depression uses a larger error/clearance, since it doesn't need
-            // to fit tightly and can't be filed down
-            translate([0,0,-1+caseCornerRadius+ledRimThick]) {
-                cylinder(h=10,r=ledRimRadius+clearance, $fn=20);
+                // note: the rim depression uses a larger error/clearance, since it doesn't need
+                // to fit tightly and can't be filed down
+                translate([0,0,-1+caseCornerRadius+ledRimThick]) {
+                    cylinder(h=10,r=ledRimRadius+clearance, $fn=20);
+                }
             }
-        }  
+        }} 
     }
 
     // hole for battery charger headers
@@ -328,10 +330,12 @@ module basicCase() {
 difference() {
     union() {
         basicCase();
-        translate([wallThick, wallThick, 0]) {
+        // receiver for stabilizer pin
+        translate([caseWidth - caseCornerRadius, caseLength - caseCornerRadius, 0]) {
             cylinder(h=caseHeight-floorThick+0.001, r=3);
         }
     }
+
     cube([caseWidth, caseLength, (caseHeight-buttonWidth)/2+0.0001]);
 
     for (i = [0:4]) {
