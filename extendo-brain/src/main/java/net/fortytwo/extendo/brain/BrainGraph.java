@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -135,6 +136,28 @@ public class BrainGraph {
         return framedGraph.frame(this.getGraph().addVertex(null), AtomList.class);
     }
 
+    public AtomList createAtomList(Atom... elements) {
+        if (0 == elements.length) {
+            throw new IllegalArgumentException("empty list");
+        }
+
+        AtomList last = null;
+        AtomList head = null;
+        for (Atom a : elements) {
+            AtomList cur = createAtomList();
+            if (null == head) {
+                head = cur;
+            }
+            if (last != null) {
+                last.setRest(cur);
+            }
+            cur.setFirst(a);
+            last = cur;
+        }
+
+        return head;
+    }
+
     public void remove(final AtomList l) {
         this.getGraph().removeVertex(l.asVertex());
     }
@@ -152,6 +175,50 @@ public class BrainGraph {
     public void indexForSearch(final Atom a,
                                final String value) {
         searchIndex.put(Extendo.VALUE, value, a.asVertex());
+    }
+
+    /**
+     * @return an Iterable of all atoms in the knowledge base, as opposed to all vertices
+     * (many of which are list nodes rather than atoms)
+     */
+    public Iterable<Atom> getAtoms() {
+        return new Iterable<Atom>() {
+            public Iterator<Atom> iterator() {
+                return new Iterator<Atom>() {
+                    private Iterator<Vertex> iter = graph.getVertices().iterator();
+                    private Atom next = null;
+
+                    public boolean hasNext() {
+                        if (null == next) {
+                            while (iter.hasNext()) {
+                                Vertex v = iter.next();
+
+                                // Here, a vertex is considered an atom if it has a creation timestamp
+                                if (null != v.getProperty(Extendo.CREATED)) {
+                                    next = getAtom(v);
+                                    break;
+                                }
+                            }
+
+                            return null != next;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    public Atom next() {
+                        hasNext();
+                        Atom tmp = next;
+                        next = null;
+                        return tmp;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
     }
 
     public Collection<Atom> getAtomsByFulltextQuery(final String query,

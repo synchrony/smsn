@@ -1,7 +1,12 @@
+// The origin is at the "bottom right" of the case (in the empty space where the lid goes),
+// with the thumb to the north (the y axis), the fingers of the left hand to the left
+// (the x axis) and pointing away, and the finger joystick well on the opposite side of the
+// case pointing down (the z axis) away from the palm.
 
 function pythag(a, b) = sqrt(a*a + b*b);
 function angle(a, b) = atan(a/b);
 
+// toggle this variable to see the ICs in position and make sure they fit inside the case
 visualizeInternalComponents = false;
 
 // this is the accuracy value for Shapeways' "Strong & Flexible Plastics" option
@@ -26,6 +31,13 @@ connectorPinRes = 10;
 ledHoleRes = 10;
 //*/
 containmentWallThick = 1;
+
+thumbCurveRadius = 39.0;
+caseCornerRadius = 6;  // TODO: replace cylindrical edges with rounded-rectangle edges (which use caseCornerRadius)
+offsetFromTopEdgeToFirstFingerWell = 15.0;
+fingerWidth = 84 / 4;  // 21 -- 82mm was measured, but this seemed a little cramped
+horizontalOffsetBeforeThumbWell = 25.0;
+buttonBodySeparation = 1.5;
 
 nanoLength = 43.2;
 nanoWidth = 18.0;
@@ -68,13 +80,13 @@ pushButtonWellDepth = 4.0;
 pushButtonBaseThick = 1.5;
 
 fingerHeightOffset = 5;
-fingerWellDepth = 10;
+fingerWellDepth = 5;
 fingerRad = 15;
 thumbWellDepth = wallThick;
 thumbWellRadius = 30;
 buttonThick = 8;
 buttonWidth = pushButtonWellWidth;
-fingerButtonLength = 25;
+fingerButtonLength = fingerWidth - buttonBodySeparation;
 thumbButtonLength = 30;
 buttonStabilizerWellWidth = 3;
 buttonClearance = 0.3;  // horizontal clearance between button and walls
@@ -82,7 +94,9 @@ buttonLip = 2.5;
 buttonSlack = 0.5;  // minimum vertical clearance between button and floor/retainers
 buttonRetainerThick = 1.0;
 buttonStabilizerRodHeight = pushButtonHeight - (pushButtonPressDepth + buttonSlack + error2);
-totalFingerWellDepth = fingerWellDepth + buttonThick/2 + pushButtonPressDepth + pushButtonWellDepth;
+
+// buttons are inset by only 1/3 of the depth of the finger well
+totalFingerWellDepth = fingerWellDepth/3 + buttonThick + pushButtonHeight;
 totalThumbWellDepth = thumbWellDepth + buttonThick/2 + pushButtonPressDepth + pushButtonWellDepth;
 
 pinHoleRadius = 0.8;
@@ -181,7 +195,11 @@ module pushButtonWell(length, depth) {
     }
 }
 
-module fingerWell(depth, radius) {
+module fingerWell(depth, innerWidth) {
+    x = innerWidth / 2;
+    y = depth;
+    radius = (x*x + y*y) / (2*y);
+
     translate([radius - depth,0,0]) {
         cylinder(h=caseHeight,r=radius, $fn=cornerRoundingRes);
     }
@@ -189,10 +207,69 @@ module fingerWell(depth, radius) {
     translate([radius - depth, 0, wallThick]) {
         cylinder(h=wallThick+.001, r1=radius-wallThick/2, r2=radius+wallThick/2, $fn=cornerRoundingRes);    
     }
-
+ 
     translate([radius - depth,0,0]) {
         cylinder(h=wallThick+.001, r2=radius-wallThick/2, r1=radius+wallThick/2, $fn=cornerRoundingRes);    
     }
+}
+
+// for the thumb rest
+module roundedCylinder(height, radius, cornerRadius) {
+    cylinder(r=(thumbCurveRadius - caseCornerRadius), h=caseHeight);
+        translate([0, 0, caseCornerRadius]) {
+            rotate_extrude(convexity = 10) {
+                translate([thumbCurveRadius - caseCornerRadius, 0, 0]) {
+                    circle(r = caseCornerRadius);
+                }
+            }
+        cylinder(r=thumbCurveRadius, h=(caseHeight - 2*caseCornerRadius));
+    }
+    translate([0, 0, caseHeight - caseCornerRadius]) {
+        rotate_extrude(convexity = 10) {
+            translate([thumbCurveRadius - caseCornerRadius, 0, 0]) {
+                circle(r = caseCornerRadius);
+            }
+        }
+    } 
+}
+
+// for the rounded flat edges of the case
+module roundedEdge(length, height, cornerRadius) {
+    rem = height - 2*cornerRadius;
+    intersection() {
+        translate([-height/2, 0, 0]) {
+            cube([height, cornerRadius, length]);
+        }
+        union() {
+            translate([-rem/2.0, 0, 0]) {
+                cylinder(h=length, r=cornerRadius);
+            }
+            translate([rem/2.0, 0, 0]) {
+                cylinder(h=length, r=cornerRadius);
+            }
+            translate([-rem/2.0, -cornerRadius, 0]) {
+                cube([rem, 2 * cornerRadius, length]);
+            }
+        }
+    }
+}
+
+// for the intersections between rounded edges
+module roundedCorner(height, cornerRadius) {
+    difference() {
+        union() {
+            translate([0, 0, -height/2.0 + cornerRadius]) {
+                sphere(r=cornerRadius);
+                cylinder(r=cornerRadius, h=(height - 2*cornerRadius));
+            }
+            translate([0, 0, height/2.0 - cornerRadius]) {
+                sphere(r=cornerRadius);
+            } 
+        }
+        translate([0, 0, -height/2]) {
+            cube([cornerRadius, cornerRadius, height]);
+        }
+    }  
 }
 
 module pinHole() {
@@ -202,25 +279,14 @@ module pinHole() {
 module pinHoles() {
     translate([0,0,-1]) {
 
-        for (i = [0:4]) {
-            translate([wallThick+cavityWidth+3,caseLength-fingerHeightOffset-fingerRad*i*2,0]) { pinHole(); }
-            //translate([wallThick+cavityWidth+10,caseLength-fingerHeightOffset-fingerRad*i*2,0]) { pinHole(); }
-
-        }
+        //for (i = [0:4]) {
+        //    translate([wallThick+cavityWidth+3,caseLength-fingerHeightOffset-fingerRad*i*2,0]) { pinHole(); }
+        //}
 
         for (i = [1:4]) {
-            translate([wallThick*2/3,wallThick*2/3 + i*(caseLength-thumbBevelLength - wallThick*2/3)/4,0]) {
+            translate([wallThick*2/3,wallThick*2/3 + i*(caseLength-thumbCurveRadius - wallThick*2/3)/4,0]) {
                 pinHole();
             }
-        }
-        translate([12,caseLength-thumbBevelLength+2,0]) {
-            pinHole();
-        }
-        translate([thumbBevelWidth, caseLength-wallThick*2/3,0]) {
-            pinHole();
-        }
-        translate([thumbBevelWidth, caseLength-15, 0]) {
-            pinHole();
         }
         translate([wallThick*2/3,10,0]) {
             pinHole();
@@ -238,16 +304,30 @@ module pinHoles() {
 }
 
 module caseConvexHull() {
-		// box with thumb bevel
+		// box with cutout for thumb cylinder
         difference() {
             translate([wallThick, wallThick,0]) {
                 cube([caseWidth-caseHeight,caseLength-caseHeight,caseHeight]);
             }
-            translate([thumbBevelWidth,caseLength-wallThick,-1]) {
-                rotate([0,0,thumbBevelAngle]) {
-                    rotate([0,-90,0]) { 
-                        cube([caseHeight+1, 100, thumbBevelStretch]);
-                    }
+            translate([0, caseLength - thumbCurveRadius, -1]) {
+                cube([thumbCurveRadius, thumbCurveRadius, caseHeight + 2]);
+            }
+        }
+
+        // thumb cylinder
+        difference() {
+	        translate([thumbCurveRadius, caseLength - thumbCurveRadius, 0]) {
+		        intersection() {
+                     roundedCylinder(caseHeight, thumbCurveRadius, caseCornerRadius);
+                     translate([-thumbCurveRadius, 0, 0]) {
+			            cube([thumbCurveRadius, thumbCurveRadius, caseHeight]);
+			        }
+	            }
+	        }
+	        translate([thumbCurveRadius, caseLength - thumbCurveRadius, lidThick]) {
+                intersection() {
+                    cylinder(r=(thumbCurveRadius - caseCornerRadius), h=(caseHeight - lidThick - floorThick));
+                    translate([-thumbCurveRadius, 0, 0]) { cube([thumbCurveRadius, thumbCurveRadius, caseHeight]); }
                 }
             }
         }
@@ -255,7 +335,7 @@ module caseConvexHull() {
         translate([wallThick,wallThick,wallThick]) {
             sphere(wallThick, $fn=cornerRoundingRes);
             rotate([-90,0,0]) {
-                cylinder(h=caseLength-thumbBevelLength-wallThick, r=wallThick, $fn=cornerRoundingRes);
+                cylinder(h=caseLength-thumbCurveRadius-wallThick, r=wallThick, $fn=cornerRoundingRes);
             }
             rotate([0,90,0]) {
                 cylinder(h=caseWidth-caseHeight, r=wallThick, $fn=cornerRoundingRes);
@@ -270,34 +350,18 @@ module caseConvexHull() {
         translate([caseWidth-wallThick,caseLength-wallThick,wallThick]) {
             sphere(wallThick, $fn=cornerRoundingRes);
         }
-
-		// thumb bevel
-		translate([wallThick,caseLength-thumbBevelLength,wallThick]) {
-            sphere(wallThick, $fn=cornerRoundingRes);
-        }
-        translate([thumbBevelWidth,caseLength-wallThick,wallThick]) {
-            sphere(wallThick, $fn=cornerRoundingRes);
-            rotate([0,90,0]) {
-                cylinder(h=caseWidth-thumbBevelWidth-wallThick, r=wallThick, $fn=cornerRoundingRes);
-            }
-            rotate([0,0,180+thumbBevelAngle]) {
-                rotate([0,90,0]) { 
-                    cylinder(h=thumbBevelStretch, r=wallThick, $fn=cornerRoundingRes);
-                }
-            }
-        }
 }
-
+ 
 module basicCase() {
   difference() {
     caseConvexHull();
 
     // inner compartment
     translate([wallThick,wallThick,lidThick]) {
-        cube([cavityWidth,caseLength-thumbBevelLength-wallThick,caseHeight-floorThick-lidThick]);
+        cube([cavityWidth,caseLength-thumbCurveRadius-wallThick+0.001,caseHeight-floorThick-lidThick]);
     }
-    translate([thumbBevelWidth+thumbBevelBuffer,wallThick,lidThick]) {
-        cube([cavityWidth-thumbBevelWidth+wallThick-thumbBevelBuffer,cavityLength,caseHeight-floorThick-lidThick]);
+    translate([thumbCurveRadius,wallThick,lidThick]) {
+        cube([cavityWidth+wallThick-thumbCurveRadius,cavityLength,caseHeight-floorThick-lidThick]);
     }
 
     pinHoles();
@@ -306,10 +370,10 @@ module basicCase() {
     for (i = [0:3]) {
         translate([
             caseWidth,
-            caseLength - fingerHeightOffset - fingerRad * (1 + 2 * i),
+            caseLength - offsetFromTopEdgeToFirstFingerWell - fingerWidth * (i + 0.5),
         0]) {
 
-            fingerWell(fingerWellDepth, fingerRad);
+            fingerWell(fingerWellDepth, fingerWidth);
 
             // well and channels for push button switch and wires
             translate([-totalFingerWellDepth,0,caseHeight/2]) {
@@ -321,6 +385,7 @@ module basicCase() {
     }
 
     // thumb button well
+/*
     translate([thumbBevelWidth,caseLength-wallThick,caseHeight]) {
         rotate([0,0,180+thumbBevelAngle]) {
             rotate([0,90,0]) {
@@ -349,15 +414,17 @@ module basicCase() {
             }
         }
     }
+*/
 
     // hole for status LED
-    translate([cavityWidth+wallThick-ledRimRadius-3,caseLength+1,wallThick]) {
-    	    rotate(a=[90,0,0]) {
-            cylinder(h=wallThick+2,r=ledDomeRadius+error, $fn=ledHoleRes);
+    translate([0,40,caseHeight/2]) {
+    	    rotate(a=[0,90,0]) {
+            cylinder(h=wallThick,r=ledDomeRadius+error, $fn=ledHoleRes);
 
             // note: the rim depression uses a larger error/clearance, since it doesn't need
             // to fit tightly and can't be filed down
-            translate([0,0,-1+wallThick+ledRimThick]) {
+            translate([0,0,-2+wallThick]) {
+//            translate([0,0,-1+wallThick+ledRimThick]) {
                 cylinder(h=10,r=ledRimRadius+clearance, $fn=20);
             }
         }  
@@ -390,17 +457,17 @@ difference() {
     }
     cube([caseWidth, caseLength, (caseHeight-buttonWidth)/2+0.0001]);
 
-    for (i = [0:4]) {
-        translate([wallThick+cavityWidth+10,caseLength-fingerHeightOffset-fingerRad*i*2,0]) {
-            cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
-        }
-    }
-    translate([thumbBevelWidth-3, caseLength-wallThick-6, 0]) {
-        cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
-    }
-    translate([wallThick+2, caseLength-thumbBevelLength+3, 0]) {
-        cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
-    }
+    //for (i = [0:4]) {
+    //    translate([wallThick+cavityWidth+10,caseLength-fingerHeightOffset-fingerRad*i*2,0]) {
+    //        cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
+    //    }
+    //}
+    //translate([thumbBevelWidth-3, caseLength-wallThick-6, 0]) {
+    //    cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
+    //}
+    //translate([wallThick+2, caseLength-thumbBevelLength+3, 0]) {
+    //    cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
+    //}
     translate([wallThick, wallThick, 0]) {
         cylinder(h=caseHeight*2/3, r=1.5+error, $fn=connectorPinRes);
     }
@@ -426,17 +493,17 @@ translate([caseWidth + 10, 0, 0]) {
         }
     }
 
-    for (i = [0:4]) {
-        translate([wallThick+cavityWidth+10,caseLength-fingerHeightOffset-fingerRad*i*2,lidThick]) {
-            cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
-        }
-    }
-    translate([thumbBevelWidth-3, caseLength-wallThick-6, lidThick]) {
-        cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
-    }
-    translate([wallThick+2, caseLength-thumbBevelLength+3, lidThick]) {
-        cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
-    }
+    //for (i = [0:4]) {
+    //    translate([wallThick+cavityWidth+10,caseLength-fingerHeightOffset-fingerRad*i*2,lidThick]) {
+    //        cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
+    //    }
+    //}
+    //translate([thumbBevelWidth-3, caseLength-wallThick-6, lidThick]) {
+    //    cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
+    //}
+    //translate([wallThick+2, caseLength-thumbBevelLength+3, lidThick]) {
+    //    cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
+    //}
     translate([wallThick, wallThick, lidThick]) {
         cylinder(h=caseHeight/3, r=1.5, $fn=connectorPinRes);
     }
@@ -451,7 +518,7 @@ translate([-10,0,10]) {
         }}     
     }
 }
-translate([5,caseLength-35,10]) {
+translate([-2,caseLength-35,10]) {
     rotate([90,180,-90]) {
         button(thumbButtonLength);
     } 
