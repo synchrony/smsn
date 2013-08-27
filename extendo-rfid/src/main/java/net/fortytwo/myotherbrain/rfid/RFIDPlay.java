@@ -62,10 +62,11 @@ public class RFIDPlay {
                         }
 
                         for (Atom a : atoms) {
-                            System.out.println(a.asVertex().getId() + ": * " + a.getValue());
-                            for (Atom n : getNeighbors(a, f)) {
-                                System.out.println(n.asVertex().getId() + ":     * " + n.getValue());
+                            System.out.println("* :" + a.asVertex().getId() + ": " + a.getValue());
+                            for (Atom n : getParents(a, f)) {
+                                System.out.println("* :" + n.asVertex().getId() + ": " + n.getValue());
                             }
+                            System.out.println("");
                         }
                     }
                 }
@@ -80,13 +81,13 @@ public class RFIDPlay {
         }
     }
 
-    private static Collection<Atom> getNeighbors(final Atom a,
-                                                 final Filter f) {
+    private static Collection<Atom> getParents(final Atom a,
+                                               final Filter f) {
         Collection<Atom> n = new LinkedList<Atom>();
 
-        for (Atom at : NoteQueries.FORWARD_ADJACENCY.getLinked(a, f)) {
-            n.add(at);
-        }
+        //for (Atom at : NoteQueries.FORWARD_ADJACENCY.getLinked(a, f)) {
+        //    n.add(at);
+        //}
 
         for (Atom at : NoteQueries.BACKWARD_ADJACENCY.getLinked(a, f)) {
             n.add(at);
