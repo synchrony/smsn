@@ -1,181 +1,260 @@
-// The origin is at the "bottom right" of the case (in the empty space where the lid goes),
-// with the thumb to the north (the y axis), the fingers of the left hand to the left
-// (the x axis) and pointing away, and the bottom of the case pointing down (the z axis)
-// away from the palm.
+/*
+OpenSCAD design for Typeatron Mark 1
+Copyright 2013 by Joshua Shinavier
 
-function pythag(a, b) = sqrt(a*a + b*b);
-function angle(a, b) = atan(a/b);
+Note: the origin is at the "bottom right" of the case (in the empty space where the lid goes),
+with the thumb to the north (the y axis), the fingers of the left hand to the left
+(the x axis) and pointing away, and the bottom of the case pointing down (the z axis)
+away from the palm.
+*/
+
+function sq(x) = x*x;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// rendering settings
 
 // toggle this variable to see the ICs in position and make sure they fit inside the case
 visualizeInternalComponents = false;
+buttonsInSitu = false;
 
-// this is the accuracy value for Shapeways' "Strong & Flexible Plastics" option
-error = 0.15;
+simpleEdges = true;
 
-error2 = error * 2;
+/*
+cornerRoundingRes = 100;
+ledDomeRes = 100;
+thumbCurveRes = 50;
+//*/
+//*
+cornerRoundingRes = 10;
+ledDomeRes = 10;
+thumbCurveRes = 10;
+//*/
+
+ledRimRes = 20;
+lightSensorWellRes = 20;
+pinHoleRes = 10;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// printer parameters
+
+// the following values are for Shapeways' "Strong & Flexible Plastics" material
+shapewaysAccuracy = 0.15;  // then 0.15% of longest axis
+
+accuracy = 0.178;
+
+ratio = accuracy / shapewaysAccuracy;
+
+// Additional figures from Shapeways, but adjusted for the resolution of whatever printer we have.
+// Assumed to be more or less analogous.
+clearance = 0.5 * ratio;
+minWallSupported = 0.7 * ratio;
+minWallFree = 0.7 * ratio;
+minWireSupported = 0.9 * ratio;
+minWireFree = 1.0 * ratio;
+minEmbossedDetail = 0.2 * ratio;
+minEmbossedText = 0.5 * ratio;
+minEngravedDetail = 0.2 * ratio;
+minEngravedText = 0.5 * ratio;
+//Min Bounding Box: x+y+z ≥ 7.5mm
+//Max Bounding Box: 650x350x550mm (White) · 230x180x320mm (Black) · 150x150x150mm (Polished & Dyed)
+
+accuracy2 = accuracy * 2;
 
 // A safe gap between the printed part and each side of a foreign object such as a circuit board.
 // We assume these have been directly measured with digital calipers (as opposed to relying on product specifications),
 // with an accuracy of no less than 0.1mm.
-foreignPartClearance = error + 0.1;
+foreignPartClearance = accuracy + 0.1;
 
-pinHoleRes = 10;
-/*
-cornerRoundingRes = 100;
-connectorPinRes = 100;
-ledHoleRes = 100;
-//*/
-//*
-cornerRoundingRes = 10;
-connectorPinRes = 10;
-ledHoleRes = 10;
-//*/
-containmentWallThick = 1;
-containmentShelfThick = 1;
 
-thumbCurveRadius = 39.0;
-offsetFromTopEdgeToFirstFingerWell = 15.0;
-fingerWidth = 84 / 4;  // 21 -- 82mm was measured, but this seemed a little cramped
-thumbWidth = 25;
-horizontalOffsetBeforeThumbWell = 25.0;
-buttonBodySeparation = 1.5;
+////////////////////////////////////////////////////////////////////////////////
+// dimensions of foreign parts
 
-nanoLength = 43.2;
-nanoWidth = 18.0;
-nanoHeightWithoutUsb = 5.4;
-nanoHeightToUsbBase = 3.3;
-nanoUsbWidth = 7.6;
-nanoUsbHeight = 3.9;
-nanoUsbCableWidth = 9.7;
-nanoUsbCableHeight = 6.7;
-nanoUsbCableOffsetFromPerfboard = 3.4;
+batteryWidth = 25;
+batteryLength = 36;
+batteryHeight = 5.4;
 
 chargerHeaderLength = 5.1;
 chargerHeaderWidth = 2.6;
 
-powerSwitchLength = 11.6;
-powerSwitchWidth = 4.0;
-powerSwitchDepth = 7.5;
+laserWidth = 10.3;
+laserThick = 3.3;
+
+ledDomeRadius = 5.0 / 2;
+ledRimRadius = 5.9 / 2;
+ledRimThick = 1.0;
 
 lightSensorRadius = 5.0 / 2;
 lightSensorThick = 2.0;
 lightSensorWireThick = 0.6;
 
-// horizontal offset of components with ports/controls on the bottom edge
-nanoOffset = 0;
-nanoOuterWallOffset = nanoOffset + nanoWidth + 2*foreignPartClearance;
-chargerHeaderOffset = nanoOuterWallOffset + containmentWallThick;
-// place the power switch a reasonable distance past the charger header
-powerSwitchOffset = chargerHeaderOffset + chargerHeaderWidth + error2 + 5;
+modemWidth = 16.8;
+modemLength = 42.8;
+modemHeight = 4.1;
 
-ledDomeRadius = 2.50;
-ledRimRadius = 2.95;
-ledRimThick = 1.10;
+motionSensorWidth = 15.4;
+motionSensorLength = 25.8;
+motionSensorHeight = 2.5;
 
-laserWidth = 10.3;
-laserThick = 3.3;
+powerSwitchLength = 11.7;
+powerSwitchWidth = 4.0;
+powerSwitchDepth = 7.7;
 
-lidThick = 1.5;
-floorThick = 1.5;
-
-caseWidth = 70;
-caseLength = 120;
-thickestComponent = 7.9;
-caseHeight = lidThick + floorThick + thickestComponent + 1;
-
-wallThick = caseHeight/2;
-caseCornerRadius = wallThick;  // TODO: give the case a square profile by making caseCornerRadius less than half of the case height
-
-topYOfFingerWells = caseLength - offsetFromTopEdgeToFirstFingerWell + buttonBodySeparation/2;
-bottomYOfFingerWells = caseLength - offsetFromTopEdgeToFirstFingerWell - 4*fingerWidth - buttonBodySeparation/2;
-
-alignmentPegWidth = 2;
-alignmentPegHeight = 2;
+pressureSensorWidth = 7.2;  // max value, from the data sheet
+pressureSensorThick = 0.35;  // from the data sheet
 
 pushButtonWellWidth = 7;
 pushButtonHeight = 5.0;
 pushButtonLegLength = 3.4;
 pushButtonPressDepth = 0.25;
-pushButtonWellDepth = 4.0;
+pushButtonWellDepth = 4.0;  // this is the height of the body of the push button (without the actual button)
 pushButtonBaseThick = 1.5;
 
+nanoLength = 43.2;
+nanoWidth = 18.0;
+nanoHeightWithoutUsb = 5.4;  // used only for visualization
+nanoHeightToUsbBase = 3.4;
+nanoUsbWidth = 7.7;
+nanoUsbHeight = 3.8;
+nanoUsbCableWidth = 9.6;
+nanoUsbCableHeight = 6.6;
+nanoUsbCableOffsetFromPerfboard = 3.3;
+
+transducerWidth = 14.5;
+transducerLength = 21.5;
+transducerHeight = 7.9;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// parameters of the printed part
+
+// measurements taken from the clay model
+thumbCurveRadius = 39.0;
+offsetFromTopEdgeToFirstFinger = 15.0;
+fingerWidth = 84 / 4;  // 21 -- 82mm was measured, but this seemed a little cramped
+thumbWidth = 25;
+thumbUpperRightX = 25.0;
 fingerWellDepth = 5;
 thumbWellDepth = 5;
-buttonThick = 8;
+
+// reasonably chosen values
+caseWidth = 70;
+caseLength = 120;
+lidThick = 1.5;
+floorThick = 1.5;
+
+dividerThick = minWallSupported * 1.5;
+
+// horizontal offset of components with ports/controls on the bottom edge
+nanoOffset = 0;
+chargerHeaderOffset = nanoOffset + nanoWidth + foreignPartClearance + dividerThick;
+// place the power switch a reasonable distance past the charger header
+powerSwitchOffset = chargerHeaderOffset + chargerHeaderWidth + foreignPartClearance + 5;
+
+thickestComponent = transducerHeight;
+cavityHeight = thickestComponent + foreignPartClearance;
+caseHeight = lidThick + floorThick + cavityHeight;
+
+rimThick = caseHeight/2;
+// TODO: give the case a square profile by making caseCornerRadius less than half of the case height
+caseCornerRadius = rimThick;
+
+topYOfFingers = caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2;
+bottomYOfFingers = caseLength - offsetFromTopEdgeToFirstFinger - 4*fingerWidth - dividerThick/2;
+
+alignmentPegWidth = 2;
+alignmentPegHeight = 2;
+
+buttonHeight = 8;
 buttonWidth = pushButtonWellWidth;
-fingerButtonLength = fingerWidth - buttonBodySeparation;
-thumbButtonLength = thumbWidth - buttonBodySeparation;
-buttonStabilizerWellWidth = 3;
-buttonClearance = error;  // horizontal clearance between button and walls
+fingerButtonLength = fingerWidth - dividerThick;
+thumbButtonLength = thumbWidth - dividerThick;
+buttonClearance = accuracy;  // clearance between button and walls (on all four sides)
 buttonLip = 2.5;
-buttonSlack = 0.5;  // minimum vertical clearance between button and floor/retainers
-buttonRetainerThick = 1.0;
-buttonStabilizerRodHeight = pushButtonHeight - (pushButtonPressDepth + buttonSlack + error2);
+buttonSlack = pushButtonPressDepth * 2;  // minimum vertical clearance between button and floor/retainers
+buttonStabilizerThick = 1.75; // vertical bars on buttons and case
+buttonRetainerThick = 1.0; // horizontal bars on buttons and case
+buttonRetainerGap = 1.0;
+buttonRetainerHookHeight = pushButtonHeight - (pushButtonPressDepth + buttonSlack + accuracy2);
 
 // buttons are inset by only 1/3 of the depth of the finger or thumb well
-totalFingerWellDepth = fingerWellDepth/3 + buttonThick + pushButtonHeight;
-totalThumbWellDepth = thumbWellDepth/3 + buttonThick + pushButtonHeight;
+totalFingerWellDepth = fingerWellDepth/3 + buttonHeight + pushButtonHeight;
+totalThumbWellDepth = thumbWellDepth/3 + buttonHeight + pushButtonHeight;
 
-pinHoleRadius = 0.8;
+// this keeps the edges of the thumb container from protruding out of the case
+thumbWellDepression = 2;
 
-thumbBevelLength = 48;
-thumbBevelWidth = 31;
-thumbBevelBuffer = 2;
+thumbUpperRightY = caseLength - thumbCurveRadius + sqrt(sq(thumbCurveRadius) - sq(thumbCurveRadius - thumbUpperRightX)) - thumbWellDepression;
 
-thumbBevelAngle = angle(thumbBevelLength-wallThick,thumbBevelWidth-wallThick);
-thumbBevelStretch = pythag(thumbBevelLength-wallThick, thumbBevelWidth-wallThick);
+pinHoleRadius = 0.9;
+pinHoleBlockWidth = 3.0;
 
-cavityWidth = caseWidth - wallThick - totalFingerWellDepth - pushButtonBaseThick;
-cavityLength = caseLength - (2 * wallThick);
-cavityHeight = caseHeight-floorThick-lidThick;
+// just to be on the safe side, we overestimate the necessary clearance
+pressureSensorChannelHeight = clearance * 1.5;
 
-echo("caseWidth: ", caseWidth);
-echo("caseLength: ", caseLength);
-echo("caseHeight: ", caseHeight);
-echo("wallThick: ", wallThick);
-echo("cavityWidth: ", cavityWidth);
-echo("cavityLength: ", cavityLength);
-echo("cavityHeight: ", cavityHeight);
+cavityWidth = caseWidth - rimThick - totalFingerWellDepth - pushButtonBaseThick;
+cavityLength = caseLength - 2*rimThick;
+
+buttonLidHeight = (caseHeight-buttonWidth)/2;
 
 // for visualization only
 nanoVizOffsetX = 1;
 nanoVizOffsetY = 1;
 modemVizOffsetX = cavityWidth - 2 - 16;
-modemVizOffsetY = nanoLength + containmentWallThick + 2;
-motionSensorVizOffsetX = nanoOffset + nanoWidth + containmentWallThick + 3;
+modemVizOffsetY = nanoLength + dividerThick + 2;
+motionSensorVizOffsetX = nanoOffset + nanoWidth + dividerThick + 3;
 motionSensorVizOffsetY = 3;
 batteryVizOffsetX = modemVizOffsetX - 1 - 25;
 batteryVizOffsetY = modemVizOffsetY;
 transducerVizOffsetX = motionSensorVizOffsetX;
 transducerVizOffsetY = motionSensorVizOffsetY + 1 + 26;
-        
+
+
+////////////////////////////////////////////////////////////////////////////////
+// modules
+
 // creates a button of the given length.  Clearance on all sides of the button is subtracted.
+// the long axis of the button is x.  y is side-to-side.  z is up and down (as you press the button).
 module button(length) {
+    innerRetainerWellWidth = (length - pushButtonWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+    retainerLength = innerRetainerWellWidth - buttonClearance - buttonRetainerGap;
+
+    // this measurement is crucial
+    stabilizerHeight
+        = 2*buttonRetainerThick
+        + (pushButtonHeight-pushButtonWellDepth+foreignPartClearance)
+        + pressureSensorThick + 0.15  // TODO: improve this estimate when you have the sensor in hand
+        + 0.1; // "a little extra" which can be easily corrected with tape or paint
+
     difference() {
         union() {
             // rounded cap
             translate([buttonClearance,buttonWidth/2,buttonWidth/2]) {
-                rotate([0,90,0]) { cylinder(h=length-2*buttonClearance,r=buttonWidth/2-buttonClearance, $fn=cornerRoundingRes); }
+                rotate([0,90,0]) {
+                    cylinder(h=length-2*buttonClearance,r=buttonWidth/2-buttonClearance, $fn=cornerRoundingRes);
+                }
             }
 
             // button body
             translate([buttonClearance,buttonClearance,buttonWidth/2]) {
-                cube([length-2*buttonClearance,buttonWidth-2*buttonClearance,buttonThick-buttonWidth/2]);
+                cube([length-2*buttonClearance,buttonWidth-2*buttonClearance,buttonHeight-buttonWidth/2]);
             }
 
-            // stabilizer rods
-            translate([buttonClearance,buttonClearance,buttonThick]) {
-                cube([buttonStabilizerWellWidth-2*buttonClearance, buttonWidth-2*buttonClearance, buttonStabilizerRodHeight]);
+            // stabilizer bars
+            translate([buttonClearance,buttonClearance,buttonHeight]) {
+                cube([buttonStabilizerThick, buttonWidth-2*buttonClearance, stabilizerHeight]);
             }
-            translate([length-buttonStabilizerWellWidth+buttonClearance,buttonClearance,buttonThick]) {
-                cube([buttonStabilizerWellWidth-2*buttonClearance, buttonWidth-2*buttonClearance, buttonStabilizerRodHeight]);
+            translate([length-buttonStabilizerThick-buttonClearance,buttonClearance,buttonHeight]) {
+                cube([buttonStabilizerThick, buttonWidth-2*buttonClearance, stabilizerHeight]);
             }
-            // retainer rods
-            translate([buttonClearance,buttonClearance,buttonThick+pushButtonHeight-pushButtonWellDepth+buttonRetainerThick+buttonSlack+error2]) {
-                cube([buttonStabilizerWellWidth+buttonLip-2*buttonClearance,buttonWidth-2*buttonClearance, 1]);
+
+            // retainer bars
+            translate([buttonClearance,buttonClearance,buttonHeight+stabilizerHeight-buttonRetainerThick]) {
+                cube([retainerLength,buttonWidth-2*buttonClearance, buttonRetainerThick]);
             }
-            translate([length-buttonStabilizerWellWidth-buttonLip+buttonClearance,buttonClearance,buttonThick+pushButtonHeight-pushButtonWellDepth+buttonRetainerThick+buttonSlack+error2]) {
-                cube([buttonStabilizerWellWidth+buttonLip-2*buttonClearance,buttonWidth-2*buttonClearance, 1]);
+            translate([length-buttonClearance-retainerLength,buttonClearance,buttonHeight+stabilizerHeight-buttonRetainerThick]) {
+                cube([retainerLength,buttonWidth-2*buttonClearance, buttonRetainerThick]);
             }
         }
 
@@ -189,43 +268,69 @@ module button(length) {
 // button well with origin at the center of the base of the switch
 // legs of the switch run along the x axis
 module pushButtonWell(length, depth) {
-    translate([-pushButtonWellWidth/2, -pushButtonWellWidth/2, 0]) {
+    w = pushButtonWellWidth + foreignPartClearance;
+    l = 1.5; // width of leg holes
+
+    outerRetainerWellWidth = buttonStabilizerThick + buttonRetainerGap;
+    innerRetainerWellWidth = (length - pushButtonWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+
+    // the pressure sensor channels extend slightly past the push button well
+    fsrChannelDepth = pushButtonLegLength + pushButtonHeight;
+
+    translate([-w/2, -w/2, 0]) {
 
 		// square well for body of switch
-        cube([pushButtonWellWidth,pushButtonWellWidth, depth]);
+        cube([w, w, depth]);
 
-		// channels for legs/wires of switch
         translate([0,0,-pushButtonLegLength]) {
-                translate([0,0,0]) {
-                    cube([1.5,1.5,depth+pushButtonLegLength]);
-                }
-                translate([pushButtonWellWidth-1.5,0, 0]) {
-                    cube([1.5,1.5,depth+pushButtonLegLength]);
-                } 
-                translate([0,pushButtonWellWidth-1.5, 0]) {
-                    cube([1.5,1.5,depth+pushButtonLegLength]);
-                } 
-                translate([pushButtonWellWidth-1.5,pushButtonWellWidth-1.5, 0]) {
-                    cube([1.5,1.5,depth+pushButtonLegLength]);
-                }
-        }		
+            // channels for legs/wires of switch
+            translate([0,0,0]) {
+                cube([l,l,depth+pushButtonLegLength]);
+            }
+            translate([w-l,0, 0]) {
+                cube([l,l,depth+pushButtonLegLength]);
+            }
+            translate([0,w-l, 0]) {
+                cube([l,l,depth+pushButtonLegLength]);
+            }
+            translate([w-l,w-l, 0]) {
+                cube([l,l,depth+pushButtonLegLength]);
+            }
+        }
     }
 
-    // rectangular well for button body, and stabilizer wells
+    // channels for pressure sensor
+    // note: the slight 0.001 overlap prevents a confusing "film" in the STL
+    translate([-(pressureSensorWidth+foreignPartClearance)/2,-w/2,-pushButtonLegLength]) {
+        translate([0, -pressureSensorChannelHeight, 0]) {
+            cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight+0.001, fsrChannelDepth]);
+        }
+        translate([0, w-0.001, 0]) {
+            cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight, fsrChannelDepth]);
+        }
+    }
+
+    // rim to allow the pressure sensor to wrap around
+    translate([-(pressureSensorWidth+foreignPartClearance)/2, -w/2-pressureSensorChannelHeight, depth]) {
+        cube([pressureSensorWidth+foreignPartClearance, w+2*pressureSensorChannelHeight, pushButtonHeight - pushButtonWellDepth]);
+    }
+
     translate([-length/2,-buttonWidth/2,pushButtonWellDepth]) {
-        cube([length,buttonWidth,buttonThick+10]);
+        // rectangular well for button body
+        cube([length,buttonWidth,buttonHeight+10]);
 
+        // retainer wells
         translate([0,0,-pushButtonWellDepth]) {
-            cube([buttonStabilizerWellWidth, buttonWidth, pushButtonWellDepth]);
+            cube([outerRetainerWellWidth, buttonWidth, pushButtonWellDepth]);
 
-            cube([buttonStabilizerWellWidth+buttonLip, buttonWidth, pushButtonWellDepth-buttonRetainerThick]);
-		}
+            cube([innerRetainerWellWidth, buttonWidth, pushButtonWellDepth - buttonRetainerThick]);
 
-        translate([length-buttonStabilizerWellWidth,0,-pushButtonWellDepth]) {
-            cube([buttonStabilizerWellWidth, buttonWidth, pushButtonWellDepth]);
+            translate([length-outerRetainerWellWidth,0,0]) {
+                cube([outerRetainerWellWidth, buttonWidth, pushButtonWellDepth]);
+            }
 
-            translate([-buttonLip,0,0]) {
-                cube([buttonStabilizerWellWidth+buttonLip, buttonWidth, pushButtonWellDepth-buttonRetainerThick]);
+            translate([length-innerRetainerWellWidth,0,0]) {
+                cube([innerRetainerWellWidth, buttonWidth, pushButtonWellDepth - buttonRetainerThick]);
             }
 		}
     }
@@ -244,12 +349,12 @@ module fingerWell(depth, width, totalWellDepth, buttonLength) {
         cylinder(h=caseHeight,r=radius, $fn=cornerRoundingRes);
     }
 
-    translate([radius - depth, 0, wallThick]) {
-        cylinder(h=wallThick+.001, r1=radius-wallThick/2, r2=radius+wallThick/2, $fn=cornerRoundingRes);    
+    translate([radius - depth, 0, rimThick]) {
+        cylinder(h=rimThick+.001, r1=radius-rimThick/2, r2=radius+rimThick/2, $fn=cornerRoundingRes);
     }
  
     translate([radius - depth,0,0]) {
-        cylinder(h=wallThick+.001, r2=radius-wallThick/2, r1=radius+wallThick/2, $fn=cornerRoundingRes);    
+        cylinder(h=rimThick+.001, r2=radius-rimThick/2, r1=radius+rimThick/2, $fn=cornerRoundingRes);
     }
 
     // well and channels for push button switch and wires
@@ -261,28 +366,64 @@ module fingerWell(depth, width, totalWellDepth, buttonLength) {
 }
 
 module fingerContainer(totalWellDepth, buttonLength) {
-//    translate([-totalWellDepth-pushButtonBaseThick, -buttonLength-buttonBodySeparation, lidThick]) {
-//    translate([-totalWellDepth-pushButtonBaseThick, 0, lidThick]) {
-    translate([-totalWellDepth-pushButtonBaseThick, -buttonLength/2-buttonBodySeparation, lidThick]) {
-        cube([totalWellDepth+pushButtonBaseThick, buttonLength + 2*buttonBodySeparation, caseHeight-lidThick]);
+    translate([-totalWellDepth-pushButtonBaseThick, -buttonLength/2-dividerThick, lidThick]) {
+        cube([totalWellDepth+pushButtonBaseThick, buttonLength + 2*dividerThick, caseHeight-lidThick]);
+    }
+}
+
+module buttons() {
+    fingerButtonsPrintable = [caseWidth + 15,bottomYOfFingers+dividerThick,10];
+    fingerButtonsInSitu = [caseWidth - fingerWellDepth * 1/3,bottomYOfFingers + dividerThick,buttonLidHeight + buttonWidth];
+    thumbButtonPrintable = [thumbUpperRightX+thumbButtonLength+dividerThick,caseLength+12,10];
+    thumbButtonInSitu = [thumbUpperRightX + thumbWidth - dividerThick/2,thumbUpperRightY - fingerWellDepth * 1/3, buttonLidHeight + buttonWidth];
+
+    // TODO: simplify this ridiculous if..then
+    if (buttonsInSitu) {
+        // Note: the buttons are oriented so as to make the longest surfaces the smoothest
+        translate(fingerButtonsInSitu) {
+            for (i = [0:3]) {
+                translate([0,i*fingerWidth,0]) { rotate([90,180,-90]) {
+                    button(fingerButtonLength);
+                }}
+            }
+        }
+        translate(thumbButtonInSitu) {
+            rotate([90,180,0]) {
+                button(thumbButtonLength);
+            }
+        }
+    } else {
+        // Note: the buttons are oriented so as to make the longest surfaces the smoothest
+        translate(fingerButtonsPrintable) {
+            for (i = [0:3]) {
+                translate([0,i*fingerWidth,0]) { rotate([90,180,-90]) {
+                    button(fingerButtonLength);
+                }}
+            }
+        }
+        translate(thumbButtonPrintable) {
+            rotate([90,180,0]) {
+                button(thumbButtonLength);
+            }
+        }
     }
 }
 
 // for the thumb rest
 module roundedCylinder(height, radius, cornerRadius) {
     cylinder(r=(thumbCurveRadius - caseCornerRadius), h=caseHeight);
-        translate([0, 0, caseCornerRadius]) {
-            rotate_extrude(convexity = 10) {
-                translate([thumbCurveRadius - caseCornerRadius, 0, 0]) {
-                    circle(r = caseCornerRadius);
-                }
+    translate([0, 0, caseCornerRadius]) {
+        rotate_extrude($fn=thumbCurveRes) {
+            translate([thumbCurveRadius - caseCornerRadius, 0, 0]) {
+                circle(r = caseCornerRadius, $fn=cornerRoundingRes);
             }
-        cylinder(r=thumbCurveRadius, h=(caseHeight - 2*caseCornerRadius));
+        }
+        cylinder(r=thumbCurveRadius, h=(caseHeight - 2*caseCornerRadius), $fn=cornerRoundingRes);
     }
     translate([0, 0, caseHeight - caseCornerRadius]) {
-        rotate_extrude(convexity = 10) {
+        rotate_extrude() {
             translate([thumbCurveRadius - caseCornerRadius, 0, 0]) {
-                circle(r = caseCornerRadius);
+                circle(r = caseCornerRadius, $fn=cornerRoundingRes);
             }
         }
     } 
@@ -291,19 +432,24 @@ module roundedCylinder(height, radius, cornerRadius) {
 // for the rounded flat edges of the case
 module roundedEdge(length, height, cornerRadius) {
     rem = height - 2*cornerRadius;
-    intersection() {
-        translate([-height/2, 0, 0]) {
-            cube([height, cornerRadius, length]);
-        }
-        union() {
-            translate([-rem/2.0, 0, 0]) {
-                cylinder(h=length, r=cornerRadius);
+
+    if (simpleEdges) {
+        cylinder(r=cornerRadius, h=length, $fn=cornerRoundingRes);
+    } else {
+        intersection() {
+            translate([-height/2, 0, 0]) {
+                cube([height, cornerRadius, length]);
             }
-            translate([rem/2.0, 0, 0]) {
-                cylinder(h=length, r=cornerRadius);
-            }
-            translate([-rem/2.0, -cornerRadius, 0]) {
-                cube([rem, 2 * cornerRadius, length]);
+            union() {
+                translate([-rem/2.0, 0, 0]) {
+                    cylinder(h=length, r=cornerRadius, $fn=cornerRoundingRes);
+                }
+                translate([rem/2.0, 0, 0]) {
+                    cylinder(h=length, r=cornerRadius, $fn=cornerRoundingRes);
+                }
+                translate([-rem/2.0, -cornerRadius, 0]) {
+                    cube([rem, 2 * cornerRadius, length]);
+                }
             }
         }
     }
@@ -311,104 +457,143 @@ module roundedEdge(length, height, cornerRadius) {
 
 // for the intersections between rounded edges
 module roundedCorner(height, cornerRadius) {
-    difference() {
-        union() {
-            translate([0, 0, -height/2.0 + cornerRadius]) {
-                sphere(r=cornerRadius);
-                cylinder(r=cornerRadius, h=(height - 2*cornerRadius));
-            }
-            translate([0, 0, height/2.0 - cornerRadius]) {
-                sphere(r=cornerRadius);
-            } 
-        }
-        translate([0, 0, -height/2]) {
-            cube([cornerRadius, cornerRadius, height]);
-        }
-    }  
-}
-
-module pinHole() {
-    cylinder(h=caseHeight+2,r=pinHoleRadius, $fn=pinHoleRes);
-}
-
-module pinHoles() {
-    translate([0,0,-1]) {
-        // pinholes on the straight portion of the right edge
-        for (i = [1:4]) {
-            translate([wallThick*2/3,wallThick*2/3 + i*(caseLength-thumbCurveRadius - wallThick*2/3)/4,0]) {
-                pinHole();
-            }
-        }
-
-        // pinholes close to the corners
-        translate([wallThick*2/3,wallThick+pinHoleRadius,0]) {
-            pinHole();
-        }
-        translate([caseWidth-wallThick*2/3,wallThick+pinHoleRadius,0]) {
-            pinHole();
-        }
-        translate([caseWidth-wallThick-pinHoleRadius,caseLength-wallThick*2/3,0]) {
-            pinHole();
-        }
-        translate([caseWidth-wallThick*2/3,caseLength-wallThick-pinHoleRadius,0]) {
-            pinHole();
-        }
-        translate([caseWidth-wallThick-pinHoleRadius,wallThick*2/3,0]) {
-            pinHole();
-        }
-
-        // pinholes on the bottom edge which avoid interfering with the battery charger port, power switch, and USB port
-        translate([wallThick,0,0]) {
-            translate([nanoOffset+pinHoleRadius,wallThick*2/3,0]) {
-                pinHole();
-            }
-            translate([nanoOffset+nanoWidth-pinHoleRadius,wallThick*2/3,0]) {
-                pinHole();
-            }
-            translate([powerSwitchOffset-pinHoleRadius,wallThick*2/3,0]) {
-                pinHole();
-            }
-            translate([powerSwitchOffset+powerSwitchLength+2*containmentWallThick+2*foreignPartClearance+pinHoleRadius,wallThick*2/3,0]) {
-                pinHole();
-            }
-        }
-
-        // pinholes on curved surface of thumb rest
-        translate([thumbCurveRadius, caseLength-thumbCurveRadius, 0]) {
-            rotate([0,0,-20]) {
-                translate([-thumbCurveRadius+wallThick*2/3,0,0]) {
-                    pinHole();
+    if (simpleEdges) {
+        sphere(r=cornerRadius, $fn=cornerRoundingRes);
+    } else {
+        difference() {
+            union() {
+                translate([0, 0, -height/2.0 + cornerRadius]) {
+                    sphere(r=cornerRadius, $fn=cornerRoundingRes);
+                    cylinder(r=cornerRadius, h=(height - 2*cornerRadius), $fn=cornerRoundingRes);
+                }
+                translate([0, 0, height/2.0 - cornerRadius]) {
+                    sphere(r=cornerRadius, $fn=cornerRoundingRes);
                 }
             }
-            rotate([0,0,-40]) {
-                translate([-thumbCurveRadius+wallThick*2/3,0,0]) {
-                    pinHole();
-                }
-            }
-            rotate([0,0,-60]) {
-                translate([-thumbCurveRadius+wallThick*2/3,0,0]) {
-                    pinHole();
-                }
+            translate([0, 0, -height/2]) {
+                cube([cornerRadius, cornerRadius, height]);
             }
         }
     }
 }
 
+module pinHole() {
+    translate([0,0,-1]) {
+        cylinder(h=caseHeight+2,r=pinHoleRadius, $fn=pinHoleRes);
+    }
+}
+
+module pinHoles() {
+    // pinholes on the straight portion of the right edge
+    for (i = [1:4]) {
+        translate([rimThick*2/3, rimThick*2/3 + i*(caseLength-thumbCurveRadius - rimThick*2/3)/4, 0]) {
+            pinHole();
+        }
+    }
+
+    // pinholes close to the corners
+    translate([rimThick*2/3,rimThick+pinHoleRadius,0]) {
+        pinHole();
+    }
+    translate([caseWidth-rimThick*2/3,rimThick+pinHoleRadius,0]) {
+        pinHole();
+    }
+    translate([caseWidth-rimThick-pinHoleRadius,caseLength-rimThick*2/3,0]) {
+        pinHole();
+    }
+    translate([caseWidth-rimThick*2/3,caseLength-rimThick-pinHoleRadius,0]) {
+        pinHole();
+    }
+    translate([caseWidth-rimThick-pinHoleRadius,rimThick*2/3,0]) {
+        pinHole();
+    }
+
+    // pinholes on the bottom edge which avoid interfering with the battery charger port, power switch, and USB port
+    translate([rimThick,0,0]) {
+        translate([nanoOffset+pinHoleRadius,rimThick*2/3,0]) {
+            pinHole();
+        }
+        translate([nanoOffset+nanoWidth-pinHoleRadius,rimThick*2/3,0]) {
+            pinHole();
+        }
+        translate([powerSwitchOffset-pinHoleRadius,rimThick*2/3,0]) {
+            pinHole();
+        }
+        translate([powerSwitchOffset+powerSwitchLength+2*dividerThick+2*foreignPartClearance+pinHoleRadius,rimThick*2/3,0]) {
+            pinHole();
+        }
+    }
+
+    // pinholes on curved surface of thumb rest
+    translate([thumbCurveRadius, caseLength-thumbCurveRadius, 0]) {
+        rotate([0,0,-20]) {
+            translate([-thumbCurveRadius+rimThick*2/3,0,0]) {
+                pinHole();
+            }
+        }
+        rotate([0,0,-40]) {
+            translate([-thumbCurveRadius+rimThick*2/3,0,0]) {
+                pinHole();
+            }
+        }
+        rotate([0,0,-60]) {
+            translate([-thumbCurveRadius+rimThick*2/3,0,0]) {
+                pinHole();
+            }
+        }
+    }
+
+    // finger pinholes
+    for (i = [0:3]) {
+        translate([
+            rimThick + cavityWidth,
+            caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i,
+            0]) {
+            pinHole();
+        }
+        translate([rimThick+cavityWidth, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4 + 1.5, 0]) {
+            pinHole();
+        }
+    }
+
+    // thumb pinholes
+    translate([thumbUpperRightX+1.5, thumbUpperRightY-totalFingerWellDepth-1.5, 0]) {
+        pinHole();
+    }
+    translate([thumbUpperRightX+thumbWidth-1.5, thumbUpperRightY-totalFingerWellDepth-1.5, 0]) {
+        pinHole();
+    }
+}
+
 module lightSensorWell() {
-    translate([caseWidth + 1, ((caseLength - wallThick) + topYOfFingerWells) / 2, caseHeight / 2]) {
+    translate([caseWidth + 1, ((caseLength - rimThick) + topYOfFingers) / 2, caseHeight / 2]) {
         rotate([0,-90,0]) { rotate([0,0,90]) {
-            cylinder(r=(lightSensorRadius+foreignPartClearance), h=(lightSensorThick+foreignPartClearance + 1));
-            translate([-lightSensorRadius, -(lightSensorWireThick + error)/2, 0]) {
-                cube([lightSensorRadius*2, lightSensorWireThick + error, wallThick + 2]);
+            cylinder(r=(lightSensorRadius+foreignPartClearance), h=(lightSensorThick+foreignPartClearance + 1), $fn=lightSensorWellRes);
+            translate([-lightSensorRadius, -(lightSensorWireThick + foreignPartClearance)/2, 0]) {
+                cube([lightSensorRadius*2, lightSensorWireThick + foreignPartClearance, rimThick + 2]);
             }
         }}
+    }
+}
+
+module statusLEDHole() {
+    translate([caseWidth - rimThick - 5.5, caseLength, caseHeight/2]) {
+        rotate(a=[90,0,0]) {
+            cylinder(h=rimThick,r=ledDomeRadius+foreignPartClearance, $fn=ledDomeRes);
+
+            // note: the rim depression uses a larger accuracy/clearance, since it doesn't need
+            // to fit tightly and can't be filed down
+            translate([0,0,-2+rimThick]) {
+                cylinder(h=10,r=ledRimRadius+foreignPartClearance, $fn=ledRimRes);
+            }
+        }
     }
 }
 
 module caseConvexHull() {
     // box with cutout for thumb cylinder
     difference() {
-        translate([wallThick, wallThick,0]) {
+        translate([rimThick, rimThick,0]) {
             cube([caseWidth-caseHeight,caseLength-caseHeight,caseHeight]);
         }
         translate([0, caseLength - thumbCurveRadius, -1]) {
@@ -428,7 +613,7 @@ module caseConvexHull() {
         }
         translate([thumbCurveRadius, caseLength - thumbCurveRadius, lidThick]) {
             intersection() {
-                cylinder(r=(thumbCurveRadius - caseCornerRadius), h=(caseHeight - lidThick - floorThick));
+                cylinder(r=(thumbCurveRadius - caseCornerRadius), h=cavityHeight);
                 translate([-thumbCurveRadius, 0, 0]) { cube([thumbCurveRadius, thumbCurveRadius, caseHeight]); }
             }
         }
@@ -463,15 +648,10 @@ module caseConvexHull() {
     }
 }
 
-thumbWellDepression = 2;
-
 module thumbButtonContainer() {
-    r = thumbCurveRadius;
-    x = r - horizontalOffsetBeforeThumbWell;
-    y = sqrt(r*r - x*x);
-    translate([horizontalOffsetBeforeThumbWell, caseLength - r + y - thumbWellDepression, 0]) {
+    translate([thumbUpperRightX, thumbUpperRightY, 0]) {
         rotate([0,0,90]) {
-            translate([0,-(thumbButtonLength+buttonBodySeparation)/2],0){
+            translate([0,-(thumbButtonLength+dividerThick)/2],0){
                 fingerContainer(totalFingerWellDepth, thumbButtonLength);
             }
         }
@@ -479,15 +659,17 @@ module thumbButtonContainer() {
 }
 
 module thumbButtonWell() {
-    r = thumbCurveRadius;
-    x = r - horizontalOffsetBeforeThumbWell;
-    y = sqrt(r*r - x*x);
-    translate([horizontalOffsetBeforeThumbWell, caseLength - r + y - thumbWellDepression, 0]) {
+    translate([thumbUpperRightX, thumbUpperRightY, 0]) {
         rotate([0,0,90]) {
-            translate([0,-(thumbButtonLength+buttonBodySeparation)/2],0){
+            translate([0,-(thumbButtonLength+dividerThick)/2],0){
                 fingerWell(thumbWellDepth, thumbWidth, totalFingerWellDepth, thumbButtonLength);
             }
         }
+    }
+
+    // take an extra "bite" out of the cusp to the right of the thumb button, which would otherwise get in the way
+    translate([thumbUpperRightX - 10, thumbUpperRightY + thumbWellDepression -1, 0]) {
+        cube([12, 5, caseHeight]);
     }
 }
 
@@ -499,22 +681,43 @@ module basicCase() {
 
                 // inner cavity
                 translate([0,0,lidThick]) {
-                    translate([wallThick,wallThick,0]) {
-                        cube([cavityWidth,caseLength-thumbCurveRadius-wallThick+0.001,cavityHeight]);
+                    translate([rimThick,rimThick,0]) {
+                        cube([cavityWidth,caseLength-thumbCurveRadius-rimThick+0.001,cavityHeight]);
                     }
-                    translate([thumbCurveRadius,wallThick,0]) {
-                        cube([cavityWidth+wallThick-thumbCurveRadius,cavityLength,cavityHeight]);
+                    translate([thumbCurveRadius,rimThick,0]) {
+                        cube([cavityWidth+rimThick-thumbCurveRadius,cavityLength,cavityHeight]);
                     }
-                    translate([wallThick+cavityWidth - 0.001,topYOfFingerWells,0]) {
-                        cube([caseWidth - 2*wallThick - cavityWidth, offsetFromTopEdgeToFirstFingerWell - wallThick - buttonBodySeparation/2, cavityHeight]);
+                    translate([rimThick+cavityWidth - 0.001,topYOfFingers,0]) {
+                        cube([caseWidth - 2*rimThick - cavityWidth, caseLength - rimThick - topYOfFingers, cavityHeight]);
                     }
-                    translate([wallThick+cavityWidth - 0.001,wallThick,0]) {
-                        cube([caseWidth - 2*wallThick - cavityWidth, bottomYOfFingerWells - wallThick, cavityHeight]);
+                    translate([rimThick+cavityWidth - 0.001,rimThick,0]) {
+                        cube([caseWidth - 2*rimThick - cavityWidth, bottomYOfFingers - rimThick, cavityHeight]);
                     }
                 }
             }
 
             thumbButtonContainer();
+
+            // blocks for finger pinholes
+            for (i = [0:3]) {
+                translate([
+                    rimThick + cavityWidth - pinHoleBlockWidth/2,
+                    caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i - pinHoleBlockWidth/2,
+                    0]) {
+                    cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+                }
+            }
+            translate([rimThick+cavityWidth - pinHoleBlockWidth/2, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4, 0]) {
+                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+            }
+
+            // blocks for thumb pinholes
+            translate([thumbUpperRightX, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
+                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+            }
+            translate([thumbUpperRightX+thumbWidth-pinHoleBlockWidth, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
+                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+            }
         }
 
         pinHoles();
@@ -523,7 +726,7 @@ module basicCase() {
         for (i = [0:3]) {
             translate([
                 caseWidth,
-                caseLength - offsetFromTopEdgeToFirstFingerWell - fingerWidth * (i + 0.5),
+                caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * (i + 0.5),
                 0]) {
                     fingerWell(fingerWellDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength);
             }
@@ -533,63 +736,67 @@ module basicCase() {
 
         lightSensorWell();
 
-        // hole for status LED
-        translate([caseWidth - wallThick - 5.5, caseLength, caseHeight/2]) {
-            rotate(a=[90,0,0]) {
-                cylinder(h=wallThick,r=ledDomeRadius+foreignPartClearance, $fn=ledHoleRes);
-
-                // note: the rim depression uses a larger error/clearance, since it doesn't need
-                // to fit tightly and can't be filed down
-                translate([0,0,-2+wallThick]) {
-                    cylinder(h=10,r=ledRimRadius+foreignPartClearance, $fn=20);
-                }
-            }
-        }
+        statusLEDHole();
 
         // holes for ports/controls on bottom edge
-        translate([wallThick, 0, 0]) {
+        translate([rimThick, 0, 0]) {
             // hole for Arduino USB port
-            translate([nanoOffset+foreignPartClearance+nanoWidth/2-nanoUsbWidth/2,0,caseHeight-floorThick-nanoHeightToUsbBase-nanoUsbHeight-foreignPartClearance]) {
-                cube([nanoUsbWidth+2*foreignPartClearance,wallThick+1,nanoUsbHeight+foreignPartClearance]);
+            translate([nanoOffset+(nanoWidth+foreignPartClearance-nanoUsbWidth)/2,0,caseHeight-floorThick-nanoHeightToUsbBase-nanoUsbHeight-foreignPartClearance]) {
+                cube([nanoUsbWidth+foreignPartClearance,rimThick+1,nanoUsbHeight+foreignPartClearance]);
             }
 
-            translate([nanoOffset+foreignPartClearance+nanoWidth/2-nanoUsbCableWidth/2,0,caseHeight-floorThick-nanoHeightToUsbBase-nanoUsbHeight/2-nanoUsbCableHeight/2-foreignPartClearance]) {
-                cube([nanoUsbCableWidth+2*foreignPartClearance,wallThick-nanoUsbCableOffsetFromPerfboard,nanoUsbCableHeight+foreignPartClearance]);
+            translate([nanoOffset+(nanoWidth+foreignPartClearance-nanoUsbCableWidth)/2,0,caseHeight-floorThick-nanoHeightToUsbBase-(nanoUsbHeight+nanoUsbCableHeight+foreignPartClearance)/2]) {
+                cube([nanoUsbCableWidth+foreignPartClearance,rimThick-nanoUsbCableOffsetFromPerfboard,nanoUsbCableHeight+foreignPartClearance]);
             }
 
             // hole for battery charger headers
-            translate([chargerHeaderOffset,0,(caseHeight-chargerHeaderLength-error2)/2]) {
-                cube([chargerHeaderWidth+error2,wallThick+1,chargerHeaderLength+error2]);
+            translate([chargerHeaderOffset,0,(caseHeight-chargerHeaderLength-foreignPartClearance)/2]) {
+                cube([chargerHeaderWidth+foreignPartClearance,rimThick+1,chargerHeaderLength+foreignPartClearance]);
             }
 
             // hole for SPDT Mini Power Switch
-            translate([powerSwitchOffset+containmentWallThick,0,wallThick-powerSwitchWidth/2-error]) {
-                cube([powerSwitchLength+error2,wallThick+1,powerSwitchWidth+error2]);
+            translate([powerSwitchOffset+dividerThick,0,(caseHeight-powerSwitchWidth-foreignPartClearance)/2]) {
+                cube([powerSwitchLength+foreignPartClearance,rimThick+1,powerSwitchWidth+foreignPartClearance]);
             }
         }
 
         // cutaway for laser shelf
-        translate([caseWidth - wallThick - 1, bottomYOfFingerWells - laserWidth - foreignPartClearance*2, lidThick]) {
-            cube([wallThick + 2, laserWidth + foreignPartClearance*2, laserThick + foreignPartClearance*2]);
+        translate([caseWidth - rimThick - 1, bottomYOfFingers - laserWidth - foreignPartClearance, lidThick]) {
+            cube([rimThick + 2, laserWidth + foreignPartClearance, laserThick + foreignPartClearance]);
         }
     }
 }
 
 module alignmentPeg() {
-    cube([alignmentPegWidth,alignmentPegWidth,(caseHeight-buttonWidth)/2 - lidThick]);
-    translate([error, error, 0]) {
-        cube([alignmentPegWidth-error2,alignmentPegWidth-error2,alignmentPegHeight]);
+    cube([alignmentPegWidth,alignmentPegWidth,buttonLidHeight - lidThick]);
+    translate([accuracy, accuracy, 0]) {
+        cube([alignmentPegWidth-accuracy2,alignmentPegWidth-accuracy2,alignmentPegHeight]);
     }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// main
+
+echo("accuracy: ", accuracy);
+echo("clearance: ", clearance);
+echo("foreignPartClearance ", foreignPartClearance);
+echo("caseWidth: ", caseWidth);
+echo("caseLength: ", caseLength);
+echo("caseHeight: ", caseHeight);
+echo("rimThick: ", rimThick);
+echo("cavityWidth: ", cavityWidth);
+echo("cavityLength: ", cavityLength);
+echo("cavityHeight: ", cavityHeight);
 
 // body
 difference() {
     basicCase();
 
-    cube([caseWidth, caseLength, (caseHeight-buttonWidth)/2+0.0001]);
+    cube([caseWidth, caseLength, buttonLidHeight+0.0001]);
 
     // screwdriver/leverage slot(s)
-    translate([wallThick+cavityWidth,wallThick/2,(caseHeight-buttonWidth)/2]) {
+    translate([rimThick+cavityWidth,rimThick/2,buttonLidHeight]) {
         rotate([150,0,0]) { cube([5,10,10]); }
     }
 }
@@ -599,65 +806,56 @@ translate([-5, 0, 8]) {
     rotate([0,180,0]) {
         difference() {
             basicCase();
-            translate([0,0,(caseHeight-buttonWidth)/2]) {
+            translate([0,0,buttonLidHeight]) {
                 cube([caseWidth, caseLength, caseHeight]);
             }
         }
 
         // alignment pegs
-        translate([wallThick, wallThick, lidThick]) { alignmentPeg(); }
-        translate([caseWidth-wallThick-alignmentPegWidth, wallThick, lidThick]) { alignmentPeg(); }
-        translate([caseWidth-wallThick-alignmentPegWidth, caseLength-wallThick-alignmentPegWidth, lidThick]) { alignmentPeg(); }
+        translate([rimThick, rimThick, lidThick]) { alignmentPeg(); }
+        translate([caseWidth-rimThick-alignmentPegWidth, rimThick, lidThick]) { alignmentPeg(); }
+        translate([caseWidth-rimThick-alignmentPegWidth, caseLength-rimThick-alignmentPegWidth, lidThick]) { alignmentPeg(); }
     }
 }
 
-// buttons
-// Note: the buttons are oriented so as to make the longest surfaces the smoothest
-translate([caseWidth + 15,bottomYOfFingerWells+buttonBodySeparation,10]) {
-    for (i = [0:3]) {
-        translate([0,i*(fingerButtonLength+buttonBodySeparation),0]) { rotate([90,180,-90]) {
-            button(fingerButtonLength);
-        }}     
-    }
-}
-translate([horizontalOffsetBeforeThumbWell+thumbButtonLength+buttonBodySeparation,caseLength+12,10]) {
-    rotate([90,180,0]) {
-        button(thumbButtonLength);
-    }
-}
+buttons();
 
 // electronic components
-translate([wallThick,wallThick,0]) {
+translate([rimThick,rimThick,0]) {
 
     // container for Arduino Nano v3.0
-    translate([nanoOffset,0,0]) {
-        translate([0,0,caseHeight-floorThick-nanoHeightToUsbBase-error]) {
-            translate([nanoWidth+2*foreignPartClearance,0,0]) {
-                cube([containmentWallThick,nanoLength+2*foreignPartClearance+containmentWallThick,nanoHeightToUsbBase+error]);
-            }
-            translate([0,nanoLength+2*foreignPartClearance,0]) {
-                cube([nanoWidth+2*foreignPartClearance+containmentWallThick,containmentWallThick,nanoHeightToUsbBase+error]);
-            }
+    translate([nanoOffset,0,caseHeight-floorThick-nanoHeightToUsbBase]) {
+        // vertical wall
+        translate([nanoWidth+foreignPartClearance,0,0]) {
+            cube([dividerThick,nanoLength+foreignPartClearance+dividerThick,nanoHeightToUsbBase]);
+        }
+        // horizontal wall
+        translate([0,nanoLength+foreignPartClearance,0]) {
+            cube([nanoWidth+foreignPartClearance+dividerThick,dividerThick,nanoHeightToUsbBase]);
         }
     }
 
     // container for power switch
-    translate([powerSwitchOffset,0,wallThick-powerSwitchWidth/2-error]) {
-        cube([containmentWallThick,powerSwitchDepth-wallThick+error+containmentWallThick,caseHeight-floorThick-wallThick+powerSwitchWidth/2+error]);
-        translate([containmentWallThick+powerSwitchLength+error2,0,0]) {
-            cube([containmentWallThick,powerSwitchDepth-wallThick+error+containmentWallThick,caseHeight-floorThick-wallThick+powerSwitchWidth/2+error]);
+    translate([powerSwitchOffset,-0.1,(caseHeight-powerSwitchWidth-foreignPartClearance)/2]) {
+        // right vertical wall
+        cube([dividerThick,powerSwitchDepth-rimThick+foreignPartClearance+dividerThick+0.1,(caseHeight+powerSwitchWidth+foreignPartClearance)/2-floorThick]);
+        // left vertical wall
+        translate([dividerThick+powerSwitchLength+foreignPartClearance,0,0]) {
+            cube([dividerThick,powerSwitchDepth-rimThick+foreignPartClearance+dividerThick+0.1,(caseHeight+powerSwitchWidth+foreignPartClearance)/2-floorThick]);
         }
-        translate([0,0,powerSwitchWidth+2*error]) {
-            cube([powerSwitchLength+2*(containmentWallThick+error),powerSwitchDepth-wallThick+error+containmentWallThick,caseHeight-floorThick-wallThick-powerSwitchWidth/2-error]);
+        // base
+        translate([0,0,powerSwitchWidth+foreignPartClearance]) {
+            cube([powerSwitchLength+foreignPartClearance+2*dividerThick,powerSwitchDepth-rimThick+foreignPartClearance+dividerThick+0.1,(caseHeight-powerSwitchWidth-foreignPartClearance)/2-floorThick]);
         }
-        translate([0,powerSwitchDepth-wallThick+error,powerSwitchWidth+2*error-1]) {
-            cube([powerSwitchLength+2*(containmentWallThick+error),containmentWallThick,1]);
+        // rear support
+        translate([0,powerSwitchDepth-rimThick+foreignPartClearance+0.1,powerSwitchWidth+foreignPartClearance-1]) {
+            cube([powerSwitchLength+foreignPartClearance+2*dividerThick,dividerThick,1]);
         }
     }
 
     // shelf for the laser
-    translate([cavityWidth, bottomYOfFingerWells - laserWidth - 2*foreignPartClearance - wallThick, lidThick + laserThick + 2 * foreignPartClearance]) {
-        cube([caseWidth-2*wallThick-cavityWidth, laserWidth + 2*foreignPartClearance, containmentShelfThick]);
+    translate([cavityWidth, bottomYOfFingers - laserWidth - foreignPartClearance - rimThick, lidThick + laserThick + foreignPartClearance]) {
+        cube([caseWidth-2*rimThick-cavityWidth, laserWidth + foreignPartClearance, dividerThick]);
     }
 
     if (visualizeInternalComponents) {
@@ -668,15 +866,15 @@ translate([wallThick,wallThick,0]) {
 
         // Surface Transducer - Small
         translate([transducerVizOffsetX,transducerVizOffsetY,-10]) {
-           cube([21.4,13.8,7.9]);
+           cube([transducerLength,transducerWidth,transducerHeight]);
         }
-        // Bluetooth Modem - BlueSMiRF Silver -- 42.0 x 16.0 x 3.9
-        translate([modemVizOffsetX,modemVizOffsetY,-10]) { cube([16,42,3.9]); }
+        // Bluetooth Modem - BlueSMiRF Silver
+        translate([modemVizOffsetX,modemVizOffsetY,-10]) { cube([modemWidth,modemLength,modemHeight]); }
         // Polymer Lithium Ion Battery - 110mAh
         //translate([-40,0,-10]) { cube([12,28,5.7]); }
         // Polymer Lithium Ion Battery - 400mAh
-	    translate([batteryVizOffsetX,batteryVizOffsetY,-10]) { cube([25,35,5]); }
+	    translate([batteryVizOffsetX,batteryVizOffsetY,-10]) { cube([batteryWidth,batteryLength,batteryHeight]); }
         // Triple Axis Accelerometer & Gyro Breakout - MPU-6050
-        translate([motionSensorVizOffsetX,motionSensorVizOffsetY,-10]) { cube([15.5, 25.7, 2.5]); }
+        translate([motionSensorVizOffsetX,motionSensorVizOffsetY,-10]) { cube([motionSensorWidth, motionSensorLength, motionSensorHeight]); }
     }
 }
