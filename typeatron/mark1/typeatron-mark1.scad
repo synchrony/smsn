@@ -42,21 +42,22 @@ pinHoleRes = 10;
 // the following values are for Shapeways' "Strong & Flexible Plastics" material
 shapewaysAccuracy = 0.15;  // then 0.15% of longest axis
 
-accuracy = 0.178;
+//accuracy = 0.178;  // for Stratasys Dimension Elite
+accuracy = 0.254;  // for Stratasys uPrint
 
-ratio = accuracy / shapewaysAccuracy;
+accuracyRatio = accuracy / shapewaysAccuracy;
 
 // Additional figures from Shapeways, but adjusted for the resolution of whatever printer we have.
 // Assumed to be more or less analogous.
-clearance = 0.5 * ratio;
-minWallSupported = 0.7 * ratio;
-minWallFree = 0.7 * ratio;
-minWireSupported = 0.9 * ratio;
-minWireFree = 1.0 * ratio;
-minEmbossedDetail = 0.2 * ratio;
-minEmbossedText = 0.5 * ratio;
-minEngravedDetail = 0.2 * ratio;
-minEngravedText = 0.5 * ratio;
+clearance = 0.5 * accuracyRatio;
+minWallSupported = 0.7 * accuracyRatio;
+minWallFree = 0.7 * accuracyRatio;
+minWireSupported = 0.9 * accuracyRatio;
+minWireFree = 1.0 * accuracyRatio;
+minEmbossedDetail = 0.2 * accuracyRatio;
+minEmbossedText = 0.5 * accuracyRatio;
+minEngravedDetail = 0.2 * accuracyRatio;
+minEngravedText = 0.5 * accuracyRatio;
 //Min Bounding Box: x+y+z ≥ 7.5mm
 //Max Bounding Box: 650x350x550mm (White) · 230x180x320mm (Black) · 150x150x150mm (Polished & Dyed)
 
@@ -187,8 +188,8 @@ thumbWellDepression = 2;
 
 thumbUpperRightY = caseLength - thumbCurveRadius + sqrt(sq(thumbCurveRadius) - sq(thumbCurveRadius - thumbUpperRightX)) - thumbWellDepression;
 
-pinHoleRadius = 0.9;
-pinHoleBlockWidth = 3.0;
+pinHoleRadius = 0.7 * sqrt(accuracyRatio);
+pinHoleBlockWidth = 2 * (pinHoleRadius + clearance*1.5);
 
 // just to be on the safe side, we overestimate the necessary clearance
 pressureSensorChannelHeight = clearance * 1.5;
@@ -544,23 +545,26 @@ module pinHoles() {
     }
 
     // finger pinholes
-    for (i = [0:3]) {
+    translate([rimThick + cavityWidth + pinHoleBlockWidth/2,caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2,0]) {
+        pinHole();
+    }
+    for (i = [1:3]) {
         translate([
             rimThick + cavityWidth,
             caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i,
             0]) {
             pinHole();
         }
-        translate([rimThick+cavityWidth, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4 + 1.5, 0]) {
-            pinHole();
-        }
+    }
+    translate([rimThick+cavityWidth, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4 + pinHoleBlockWidth/2, 0]) {
+        pinHole();
     }
 
     // thumb pinholes
-    translate([thumbUpperRightX+1.5, thumbUpperRightY-totalFingerWellDepth-1.5, 0]) {
+    translate([thumbUpperRightX+1.5, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth/2, 0]) {
         pinHole();
     }
-    translate([thumbUpperRightX+thumbWidth-1.5, thumbUpperRightY-totalFingerWellDepth-1.5, 0]) {
+    translate([thumbUpperRightX+thumbWidth-1.5, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth/2, 0]) {
         pinHole();
     }
 }
@@ -584,7 +588,7 @@ module statusLEDHole() {
             // note: the rim depression uses a larger accuracy/clearance, since it doesn't need
             // to fit tightly and can't be filed down
             translate([0,0,-2+rimThick]) {
-                cylinder(h=10,r=ledRimRadius+foreignPartClearance, $fn=ledRimRes);
+                cylinder(h=5,r=ledRimRadius+foreignPartClearance, $fn=ledRimRes);
             }
         }
     }
@@ -699,7 +703,10 @@ module basicCase() {
             thumbButtonContainer();
 
             // blocks for finger pinholes
-            for (i = [0:3]) {
+            translate([rimThick + cavityWidth,caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2 - pinHoleBlockWidth/2,0]) {
+                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+            }
+            for (i = [1:3]) {
                 translate([
                     rimThick + cavityWidth - pinHoleBlockWidth/2,
                     caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i - pinHoleBlockWidth/2,
@@ -788,6 +795,8 @@ echo("rimThick: ", rimThick);
 echo("cavityWidth: ", cavityWidth);
 echo("cavityLength: ", cavityLength);
 echo("cavityHeight: ", cavityHeight);
+echo("pinHoleRadius: ", pinHoleRadius);
+echo("pinHoleBlockWidth: ", pinHoleBlockWidth);
 
 // body
 difference() {
