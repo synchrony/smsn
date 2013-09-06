@@ -176,7 +176,7 @@ buttonLip = 2.5;
 buttonSlack = pushButtonPressDepth * 2;  // minimum vertical clearance between button and floor/retainers
 buttonStabilizerThick = 1.75; // vertical bars on buttons and case
 buttonRetainerThick = 1.0; // horizontal bars on buttons and case
-buttonRetainerGap = 1.0;
+buttonRetainerGap = 0.75;
 buttonRetainerHookHeight = pushButtonHeight - (pushButtonPressDepth + buttonSlack + accuracy2);
 
 // buttons are inset by only 1/3 of the depth of the finger or thumb well
