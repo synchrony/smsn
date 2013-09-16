@@ -48,7 +48,7 @@
         <extendo.version>1.0-SNAPSHOT</extendo.version>
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <junit.version>4.11</junit.version>
-        <neo4j.version>1.9.M05</neo4j.version>
+        <neo4j.version>1.9.2</neo4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <rdfagents.version>1.0-SNAPSHOT</rdfagents.version>
@@ -57,7 +57,7 @@
         <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>
         <sesametools.version>1.7</sesametools.version>
         <slf4j.log4j12.version>1.5.11</slf4j.log4j12.version>
-        <tinkerpop.version>2.3.0</tinkerpop.version>
+        <tinkerpop.version>2.4.0</tinkerpop.version>
     </properties>
 
     <modules>
