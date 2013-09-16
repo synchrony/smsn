@@ -15,15 +15,15 @@ import net.fortytwo.extendo.brain.Note;
 import java.io.IOException;
 
 /**
- * A service for finding root nodes of a TinkerNotes graph
+ * A service for finding root nodes of an Extend-o-Brain graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "find-roots")
-//@ExtensionDescriptor(description = "find root nodes of a TinkerNotes graph")
-public class FindRootsExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "find-roots")
+//@ExtensionDescriptor(description = "find root nodes of an Extend-o-Brain graph")
+public class FindRootsExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
+    @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
@@ -31,7 +31,7 @@ public class FindRootsExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        logInfo("tinkernotes find-roots");
+        logInfo("extendo find-roots");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         p.styleName = styleName;

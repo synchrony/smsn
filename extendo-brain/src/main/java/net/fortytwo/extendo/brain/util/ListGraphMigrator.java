@@ -9,7 +9,6 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.BrainGraph;
-import net.fortytwo.extendo.brain.BrainGraph;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,8 +73,8 @@ public class ListGraphMigrator {
     }
 
     public static void main(final String[] args) throws Exception {
-        File dirs = new File("/tmp/tinkernotes-migration/source");
-        File dirt = new File("/tmp/tinkernotes-migration/target");
+        File dirs = new File("/tmp/extendo-migration/source");
+        File dirt = new File("/tmp/extendo-migration/target");
         if (dirs.exists()) {
             dirs.delete();
         }
@@ -89,7 +88,7 @@ public class ListGraphMigrator {
         KeyIndexableGraph graphIn = new TinkerGraph();
         BrainGraph source = BrainGraph.getInstance(graphIn);
 
-        String fileIn = "/Volumes/encrypted/mob-data/tinkernotes/tinkernotes.xml";
+        String fileIn = "/tmp/brain.xml";
         System.out.println("reading graph from " + fileIn);
         GraphMLReader r = new GraphMLReader(source.getGraph());
         InputStream in = new FileInputStream(fileIn);
@@ -108,7 +107,7 @@ public class ListGraphMigrator {
         new ListGraphMigrator().migrate(source.getGraph(), target.getGraph());
         source.getGraph().shutdown();
 
-        String fileOut = "/tmp/tinkernotes-migrated.xml";
+        String fileOut = "/tmp/brain-migrated.xml";
         System.out.println("writing graph to " + fileOut);
         GraphMLWriter w = new GraphMLWriter(target.getGraph());
         w.setNormalize(true);

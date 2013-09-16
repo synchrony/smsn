@@ -1,17 +1,17 @@
-;; TinkerNotes Emacs client
+;; Brain-mode: the Extend-o-Brain Emacs UI
 ;;
 ;; Required global variables:
 ;;
-;;     tinkernotes-rexster-host: IP of the rexster server
-;;     tinkernotes-rexster-port: port of the Rexster server
-;;     tinkernotes-rexster-graph: name of the Rexster graph
+;;     extendo-rexster-host: IP of the rexster server
+;;     extendo-rexster-port: port of the Rexster server
+;;     extendo-rexster-graph: name of Extend-o-Brain graph served by Rexster
 ;;
 ;; For example:
 ;;
-;;     (defun tinkernotes ()
-;;         (defvar tinkernotes-rexster-host "localhost")
-;;         (defvar tinkernotes-rexster-port "8182")
-;;         (defvar tinkernotes-rexster-graph "tinkernotes"))
+;;     (defun brain-mode ()
+;;         (defvar extendo-rexster-host "localhost")
+;;         (defvar extendo-rexster-port "8182")
+;;         (defvar extendo-rexster-graph "joshkb"))
 
 ;; Uncomment only when debugging
 (add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
@@ -294,7 +294,7 @@
 ;; COMMUNICATION ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun base-url ()
-    (concat "http://" tinkernotes-rexster-host ":" tinkernotes-rexster-port "/graphs/" tinkernotes-rexster-graph "/tinkernotes/"))
+    (concat "http://" extendo-rexster-host ":" extendo-rexster-port "/graphs/" extendo-rexster-graph "/extendo/"))
 
 (defun receive-view (mode)
     (lexical-let ((m mode))
@@ -1057,4 +1057,4 @@
 (prefer-coding-system 'utf-8)
 
 
-(provide 'tinkernotes)
+(provide 'brain-mode)

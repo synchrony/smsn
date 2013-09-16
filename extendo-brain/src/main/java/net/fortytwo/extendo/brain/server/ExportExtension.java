@@ -28,20 +28,20 @@ import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 /**
- * A service for exporting/serializing a TinkerNotes graph
+ * A service for exporting/serializing an Extend-o-Brain graph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "export")
-//@ExtensionDescriptor(description = "export/serialize a TinkerNotes graph")
-public class ExportExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "export")
+//@ExtensionDescriptor(description = "export/serialize a Extend-o-Brain graph")
+public class ExportExtension extends ExtendoExtension {
     private static final Pattern DATE_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain graph for analysis in R")
+    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph for analysis in R")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
-        logInfo("tinkernotes export");
+        logInfo("extendo export");
 
         // TODO: any security restrictions here?
 
@@ -135,14 +135,14 @@ public class ExportExtension extends TinkerNotesExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        OutputStream out = new FileOutputStream(new File("/tmp/tinkernotes-vertices.txt"));
+        OutputStream out = new FileOutputStream(new File("/tmp/extendo-vertices.txt"));
         try {
             exportVertices(p.graph, new PrintStream(out));
         } finally {
             out.close();
         }
 
-        out = new FileOutputStream(new File("/tmp/tinkernotes-edges.txt"));
+        out = new FileOutputStream(new File("/tmp/extendo-edges.txt"));
         try {
             exportEdges(p.graph, new PrintStream(out));
         } finally {
@@ -150,7 +150,7 @@ public class ExportExtension extends TinkerNotesExtension {
         }
 
         /* This takes a disproportionate amount of time.
-        out = new FileOutputStream(new File("/tmp/tinkernotes-pagerank.txt"));
+        out = new FileOutputStream(new File("/tmp/extendo-pagerank.txt"));
         try {
             exportPageRank(p.graph, new PrintStream(out));
         } finally {

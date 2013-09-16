@@ -18,16 +18,16 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
- * A service for executing Ripple queries over TinkerNotes graphs
+ * A service for executing Ripple queries over Extend-o-Brain graphs
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "ripple")
-//@ExtensionDescriptor(description = "execute a Ripple query over a TinkerNotes graph")
-public class RippleExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "ripple")
+//@ExtensionDescriptor(description = "execute a Ripple query over an Extend-o-Brain graph")
+public class RippleExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
+    @ExtensionDescriptor(description = "an extension for performing Ripple queries over Extend-o-Brain graphs")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "Ripple query") String query,
@@ -37,7 +37,7 @@ public class RippleExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        logInfo("tinkernotes ripple \"" + query + "\"");
+        logInfo("extendo ripple \"" + query + "\"");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         p.depth = depth;

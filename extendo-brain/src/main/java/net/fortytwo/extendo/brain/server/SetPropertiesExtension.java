@@ -20,9 +20,9 @@ import java.util.logging.Logger;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "set")
+@ExtensionNaming(namespace = "extendo", name = "set")
 //@ExtensionDescriptor(description = "set the properties of an atom")
-public class SetPropertiesExtension extends TinkerNotesExtension {
+public class SetPropertiesExtension extends ExtendoExtension {
     protected static final Logger LOGGER = Logger.getLogger(SetPropertiesExtension.class.getName());
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
@@ -32,7 +32,7 @@ public class SetPropertiesExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "id", description = "id of the atom to be changed") String id,
                                            @ExtensionRequestParameter(name = "name", description = "name of the property to be changed") String name,
                                            @ExtensionRequestParameter(name = "value", description = "value of the property to be changed") Float value) {
-        logInfo("tinkernotes set properties " + id);
+        logInfo("extendo set " + id);
 
         if (name.equals("weight")) {
             // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views

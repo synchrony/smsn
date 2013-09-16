@@ -13,16 +13,16 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 
 /**
- * A service for retrieving hierarchical views of TinkerNotes graphs
+ * A service for retrieving hierarchical views of Extend-o-Brain graphs
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "view")
-//@ExtensionDescriptor(description = "retrieve a hierarchical view of a TinkerNotes graph")
-public class ViewExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "view")
+//@ExtensionDescriptor(description = "retrieve a hierarchical view of an Extend-o-Brain graph")
+public class ViewExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph in the TinkerNotes format")
+    @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph in the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
@@ -32,7 +32,7 @@ public class ViewExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        logInfo("tinkernotes view " + rootId + " (depth " + depth + ")");
+        logInfo("extendo view " + rootId + " (depth " + depth + ")");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         p.depth = depth;

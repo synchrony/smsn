@@ -16,17 +16,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * A service for executing keyword search over a TinkerNotes graph
+ * A service for executing keyword search over an Extend-o-Brain graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "search")
-//@ExtensionDescriptor(description = "execute keyword search over a TinkerNotes graph")
-public class SearchExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "search")
+//@ExtensionDescriptor(description = "execute keyword search over an Extend-o-Brain graph")
+public class SearchExtension extends ExtendoExtension {
 
     private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 100;
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing full text search over MyOtherBrain using TinkerNotes")
+    @ExtensionDescriptor(description = "an extension for performing full text search over an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
@@ -44,7 +44,7 @@ public class SearchExtension extends TinkerNotesExtension {
             throw new IllegalStateException(e);
         }
 
-        logInfo("tinkernotes search \"" + query + "\"");
+        logInfo("extendo search \"" + query + "\"");
 
 
         Params p = createParams(context, (KeyIndexableGraph) graph);

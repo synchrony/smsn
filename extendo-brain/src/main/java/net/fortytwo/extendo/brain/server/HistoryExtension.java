@@ -18,19 +18,19 @@ import java.util.List;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "history")
+@ExtensionNaming(namespace = "extendo", name = "history")
 //@ExtensionDescriptor(description = "find recently visited atoms")
-public class HistoryExtension extends TinkerNotesExtension {
+public class HistoryExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing TinkerNotes browsing history")
+    @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
-        logInfo("tinkernotes history");
+        logInfo("extendo history");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);

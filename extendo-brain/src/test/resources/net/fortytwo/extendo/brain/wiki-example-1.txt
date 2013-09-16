@@ -1,5 +1,5 @@
     * basic syntax
-        * TinkerNotes uses a slight variant of wiki list syntax
+        * Extendo uses a slight variant of wiki list syntax
         * basically, you have nested notes with bullets, values, and attribute-value pairs
     * indentation
         * all white space before the bullet is indentation

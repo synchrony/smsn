@@ -17,8 +17,8 @@ import net.fortytwo.extendo.brain.Note;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "priorities")
-public class PrioritiesExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "priorities")
+public class PrioritiesExtension extends ExtendoExtension {
 
     private static final int DEFAULT_MAX_RESULTS = 100;
 
@@ -31,7 +31,7 @@ public class PrioritiesExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
                                            @ExtensionRequestParameter(name = "maxResults", description = "maximum number of results to display") Integer maxResults) {
-        logInfo("tinkernotes priorities");
+        logInfo("extendo priorities");
         Params p;
 
         try {

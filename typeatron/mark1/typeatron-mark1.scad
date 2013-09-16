@@ -42,6 +42,7 @@ pinHoleRes = 10;
 // the following values are for Shapeways' "Strong & Flexible Plastics" material
 shapewaysAccuracy = 0.15;  // then 0.15% of longest axis
 
+//accuracy = shapewaysAccuracy;
 //accuracy = 0.178;  // for Stratasys Dimension Elite
 accuracy = 0.254;  // for Stratasys uPrint
 

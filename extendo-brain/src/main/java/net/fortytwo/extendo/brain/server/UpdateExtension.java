@@ -18,16 +18,16 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * A service for updating a TinkerNotes graph
+ * A service for updating an Extend-o-Brain graph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "tinkernotes", name = "update")
-//@ExtensionDescriptor(description = "update a TinkerNotes graph")
-public class UpdateExtension extends TinkerNotesExtension {
+@ExtensionNaming(namespace = "extendo", name = "update")
+//@ExtensionDescriptor(description = "update an Extend-o-Brain graph")
+public class UpdateExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "update a TinkerNotes graph")
+    @ExtensionDescriptor(description = "update an Extend-o-Brain graph using the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
@@ -41,7 +41,7 @@ public class UpdateExtension extends TinkerNotesExtension {
                                            @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
                                            @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
 
-        logInfo("tinkernotes update " + rootId + " (depth " + depth + ")");
+        logInfo("extendo update " + rootId + " (depth " + depth + ")");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         p.depth = depth;
