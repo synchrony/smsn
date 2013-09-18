@@ -22,7 +22,7 @@ public class RFIDPlay {
 
     public RFIDPlay() throws Exception {
 
-        RexsterGraph g = new RexsterGraph("http://localhost:8182/graphs/tinkernotes");
+        RexsterGraph g = new RexsterGraph("http://localhost:8182/graphs/joshkb");
 
         BrainGraph graph = BrainGraph.getInstance(g);
 

@@ -48,8 +48,9 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         SecurityContext security = p.context.getSecurityContext();
         p.user = null == security ? null : security.getUserPrincipal();
 
+        // TODO: reconsider security
         if (null == p.user) {
-            logWarning("no security");
+        //    logWarning("no security");
         }
 
         return p;

@@ -63,7 +63,6 @@
     <modules>
         <module>extendo-core</module>
         <module>extendo-brain</module>
-        <module>extendo-brain-rdf</module>
         <module>extendo-events</module>
         <module>extendo-opencalais</module>
         <module>extendo-qrcodes</module>
