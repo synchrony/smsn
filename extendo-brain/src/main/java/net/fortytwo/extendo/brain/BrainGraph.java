@@ -49,7 +49,7 @@ public class BrainGraph {
     }
 
     private BrainGraph(final KeyIndexableGraph baseGraph) throws Exception {
-        IdGraph.IdFactory f = new MOBIdFactory();
+        IdGraph.IdFactory f = new ExtendoIdFactory();
         graph = new IdGraph<KeyIndexableGraph>(baseGraph);
         graph.setVertexIdFactory(f);
         graph.setEdgeIdFactory(f);
@@ -101,7 +101,7 @@ public class BrainGraph {
         return (String) a.asVertex().getId();
     }
 
-    private static class MOBIdFactory implements IdGraph.IdFactory {
+    private static class ExtendoIdFactory implements IdGraph.IdFactory {
         public String createId() {
             return Extendo.createRandomKey();
         }

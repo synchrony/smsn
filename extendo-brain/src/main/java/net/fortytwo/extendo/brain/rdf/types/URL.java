@@ -15,7 +15,7 @@ public class URL extends SimpleType {
         return Pattern.compile("http(s)?://.+");
     }
 
-    public boolean fulfillsAdditionalConstraints(final String value) {
+    public boolean additionalConstraintsSatisfied(final String value) {
         return true;
     }
 }

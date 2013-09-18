@@ -11,7 +11,10 @@ import java.util.regex.Pattern;
 public class OpenCollection implements BottomUpType {
     public static final OpenCollection INSTANCE = new OpenCollection();
 
-    private final Field[] fields = new Field[] {};
+    private final Field[] fields = new Field[]{};
+
+    private OpenCollection() {
+    }
 
     public Field[] getFields() {
         return fields;
@@ -19,6 +22,10 @@ public class OpenCollection implements BottomUpType {
 
     public Pattern getValueRegex() {
         return Pattern.compile("some .+");
+    }
+
+    public boolean additionalConstraintsSatisfied(final String value) {
+        return true;
     }
 
     public boolean childrenRequired() {

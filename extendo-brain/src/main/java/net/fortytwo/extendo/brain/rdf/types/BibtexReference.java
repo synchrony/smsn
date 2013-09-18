@@ -15,7 +15,7 @@ public class BibtexReference extends SimpleType {
         return Pattern.compile("bibtex: (.|\\s)+");
     }
 
-    public boolean fulfillsAdditionalConstraints(final String value) {
+    public boolean additionalConstraintsSatisfied(final String value) {
         return true;
     }
 }

@@ -13,9 +13,12 @@ import java.util.regex.Pattern;
 public class TimeStampedEvent implements BottomUpType {
     public static final TimeStampedEvent INSTANCE = new TimeStampedEvent();
 
-    private Field[] fields = new Field[] {
+    private Field[] fields = new Field[]{
             new Field(null, Date.INSTANCE, null, new EventDateMapper())
     };
+
+    private TimeStampedEvent() {
+    }
 
     public Field[] getFields() {
         return fields;
@@ -23,6 +26,10 @@ public class TimeStampedEvent implements BottomUpType {
 
     public Pattern getValueRegex() {
         return null;
+    }
+
+    public boolean additionalConstraintsSatisfied(final String value) {
+        return true;
     }
 
     public boolean childrenRequired() {

@@ -15,7 +15,7 @@ public class RFID extends SimpleType {
         return Pattern.compile("RFID: [0-9A-F]{4} [0-9A-F]{4} [0-9A-F]{4} [0-9A-F]{4} [0-9A-F]{4} [0-9A-F]{4}");
     }
 
-    public boolean fulfillsAdditionalConstraints(final String value) {
+    public boolean additionalConstraintsSatisfied(final String value) {
         return true;
     }
 }

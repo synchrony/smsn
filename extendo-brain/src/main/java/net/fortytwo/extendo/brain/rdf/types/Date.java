@@ -8,6 +8,13 @@ import java.util.regex.Pattern;
 public class Date extends SimpleType {
     public static final Date INSTANCE = new Date();
 
+    private Date() {
+    }
+
+    public boolean additionalConstraintsSatisfied(final String value) {
+        return true;
+    }
+
     public Pattern getValueRegex() {
         return Pattern.compile("[12][0-9][0-9][0-9]-[012][0-9]-[0123][0-9]");
     }

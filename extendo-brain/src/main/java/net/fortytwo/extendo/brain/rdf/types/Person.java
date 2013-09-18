@@ -11,10 +11,12 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Person implements BottomUpType {
-    private Field[] fields = new Field[] {
+    public static final Person INSTANCE = new Person();
+
+    private Field[] fields = new Field[]{
             new Field(null, AKA.INSTANCE, null, new NicknameMapper()),
             new Field(null, WebPage.INSTANCE, null, new HomepageMapper()),
-            new Field(".+ was born on .+", TimeStampedEvent.INSTANCE, null, new BirthdayMapper())
+            new Field(Pattern.compile(".+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper())
             // TODO: when the person passed away
             // TODO: the person's contact information
             // TODO: the person's email
@@ -28,6 +30,13 @@ public class Person implements BottomUpType {
             // TODO: my memories of the person
             // TODO: my relationship with the person
     };
+
+    private Person() {
+    }
+
+    public boolean additionalConstraintsSatisfied(final String value) {
+        return true;
+    }
 
     public Field[] getFields() {
         return fields;

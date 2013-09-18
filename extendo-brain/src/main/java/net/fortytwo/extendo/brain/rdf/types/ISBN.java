@@ -20,7 +20,7 @@ public class ISBN extends SimpleType {
         return Pattern.compile("ISBN: .+");
     }
 
-    public boolean fulfillsAdditionalConstraints(final String value) {
+    public boolean additionalConstraintsSatisfied(final String value) {
         // assuming exact "ISBN: " prefix
         String code = value.substring(6).trim();
 

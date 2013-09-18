@@ -15,6 +15,8 @@ public interface BottomUpType {
      */
     Pattern getValueRegex();
 
+    boolean additionalConstraintsSatisfied(String value);
+
     boolean aliasRequired();
 
     boolean childrenRequired();

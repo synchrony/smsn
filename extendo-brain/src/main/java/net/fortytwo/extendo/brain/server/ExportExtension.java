@@ -38,7 +38,7 @@ public class ExportExtension extends ExtendoExtension {
     private static final Pattern DATE_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph for analysis in R")
+    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph for analysis in tools such as R")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
         logInfo("extendo export");

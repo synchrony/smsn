@@ -1,15 +1,17 @@
 package net.fortytwo.extendo.brain.rdf;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Field {
-    private final String valueRegex;
+    private final Pattern valueRegex;
     private final BottomUpType dataType;
     private final BottomUpType containedDataType;
     private final Mapper mapper;
 
-    public Field(final String valueRegex,
+    public Field(final Pattern valueRegex,
                  final BottomUpType dataType,
                  final BottomUpType containedDataType,
                  final Mapper mapper) {
@@ -19,7 +21,7 @@ public class Field {
         this.mapper = mapper;
     }
 
-    public String getValueRegex() {
+    public Pattern getValueRegex() {
         return valueRegex;
     }
 

@@ -11,7 +11,14 @@ import java.util.regex.Pattern;
 public class WebPage implements BottomUpType {
     public static final WebPage INSTANCE = new WebPage();
 
-    private final Field[] fields = new Field[] {};
+    private final Field[] fields = new Field[]{};
+
+    private WebPage() {
+    }
+
+    public boolean additionalConstraintsSatisfied(final String value) {
+        return true;
+    }
 
     public Field[] getFields() {
         return fields;
