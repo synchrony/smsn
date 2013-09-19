@@ -14,10 +14,11 @@ public class ArticleOrBook implements BottomUpType {
     public static final ArticleOrBook INSTANCE = new ArticleOrBook();
 
     private Field[] fields = new Field[]{
-            new Field(null, ISBN.INSTANCE, null, new ISBNMapper()),
-            new Field(null, RFID.INSTANCE, null, new RFIDMapper()),
-            new Field(null, BibtexReference.INSTANCE, null, new BibtexReferenceMapper()),
-            new Field(null, OpenCollection.INSTANCE, null, new SomeNotesFromTheDocumentMapper())};
+            new Field(true, null, ISBN.INSTANCE, null, new ISBNMapper()),
+            new Field(false, null, RFID.INSTANCE, null, new RFIDMapper()),
+            new Field(true, null, BibtexReference.INSTANCE, null, new BibtexReferenceMapper()),
+            new Field(true, Pattern.compile("the authors of .+"), OpenCollection.INSTANCE, Person.INSTANCE, new AuthorCollectionMapper()),
+            new Field(true, Pattern.compile("some notes from .+"), OpenCollection.INSTANCE, null, new SomeNotesFromTheDocumentMapper())};
 
     private ArticleOrBook() {
     }
@@ -56,6 +57,12 @@ public class ArticleOrBook implements BottomUpType {
     }
 
     private class BibtexReferenceMapper implements Mapper {
+        public void mapToRDF(Atom parent, Atom child) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class AuthorCollectionMapper implements Mapper {
         public void mapToRDF(Atom parent, Atom child) {
             //To change body of implemented methods use File | Settings | File Templates.
         }

@@ -75,18 +75,20 @@ public class KnowledgeBase {
 
         for (Atom a : graph.getAtoms()) {
             total++;
-            BottomUpType t = firstMatchingSimpleType(a);
+            if (null == typeOfAtom.get(a)) {
+                BottomUpType t = firstMatchingSimpleType(a);
 
-            if (null == t) {
-                //System.out.println("" + BrainGraph.getId(a) + "\t" + a.getValue());
-            } else {
-                //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
-                typeOfAtom.put(a, t);
-                mapped++;
+                if (null == t) {
+                    //System.out.println("" + BrainGraph.getId(a) + "\t" + a.getValue());
+                } else {
+                    //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
+                    typeOfAtom.put(a, t);
+                    mapped++;
+                }
             }
         }
 
-        LOGGER.info("" + typeOfAtom.size() + " of " + total + " atoms mapped to simple types");
+        LOGGER.info("" + mapped + " of " + total + " atoms mapped to simple types");
     }
 
     public void matchCompoundTypes() {
@@ -109,9 +111,10 @@ public class KnowledgeBase {
         LOGGER.info("" + mapped + " of " + total + " atoms mapped to compound types");
     }
 
-
+    // note: we assume for now that there is no overlap among simple types
+    // i.e. that there is no atom which will be matched by more than one simple type
     public BottomUpType firstMatchingSimpleType(final Atom a) {
-        String value = valueOf(a); if (null == value) return null;
+        String value = valueOf(a);
 
         // TODO: in future, perhaps an optimized matcher (by regex) can be written, so that each type does not need to be tested in series
         for (BottomUpType t : vocabulary.getSimpleTypes()) {
@@ -124,32 +127,38 @@ public class KnowledgeBase {
     }
 
     public BottomUpType firstMatchingCompoundType(final Atom a) {
-        String value = valueOf(a); if (null == value) return null;
-
         for (BottomUpType t : vocabulary.getCompoundTypes()) {
-            if (!simpleConstraintsSatisfied(a, value, t)) {
-                continue;
-            }
-
-            AtomList cur = a.getNotes();
-            int fieldIndex = 0;
-            Field[] fields = t.getFields();
-            long matchingFields = 0;
-            while (cur != null && fieldIndex < fields.length) {
-                if (fieldMatches(cur.getFirst(), fields[fieldIndex])) {
-                    matchingFields++;
-                    cur = cur.getRest();
-                }
-                fieldIndex++;
-            }
-
-            // for now, if any fields match, it's an overall match
-            if (matchingFields > 0) {
+            if (compoundTypeMatches(a, t)) {
                 return t;
             }
         }
 
         return null;
+    }
+
+    private boolean compoundTypeMatches(final Atom a,
+                                        final BottomUpType type) {
+        if (!simpleConstraintsSatisfied(a, a.getValue(), type)) {
+            return false;
+        }
+
+        AtomList cur = a.getNotes();
+        int fieldIndex = 0;
+        Field[] fields = type.getFields();
+        long matchingUniqueFields = 0;
+        while (cur != null && fieldIndex < fields.length) {
+            if (fieldMatches(cur.getFirst(), fields[fieldIndex])) {
+                // this field matches, but it may or may not be a field which uniquely identifies the type
+                if (fields[fieldIndex].getIsUnique()) {
+                    matchingUniqueFields++;
+                }
+                cur = cur.getRest();
+            }
+            fieldIndex++;
+        }
+
+        // for now, if any *unique* fields match, it's an overall match
+        return matchingUniqueFields > 0;
     }
 
     private boolean fieldMatches(final Atom a,
@@ -163,9 +172,25 @@ public class KnowledgeBase {
             }
         }
 
-        // TODO: contained type constraint
+        BottomUpType containedType = field.getContainedDataType();
+        if (null != containedType) {
+            AtomList cur = a.getNotes();
 
-        String value = valueOf(a); if (null == value) return false;
+            // If any child has a type other than the contained data type, this constraint is not satisfied.
+            // However, not-yet-typed children are simply ignored until they are mapped.
+            while (null != cur) {
+                Atom child = cur.getFirst();
+                BottomUpType t = typeOfAtom.get(child);
+                if (null == t) {
+                    // do nothing until mapping...
+                } else if (t != containedType) {
+                    return false;
+                }
+                cur = cur.getRest();
+            }
+        }
+
+        String value = valueOf(a);
 
         // value regex constraint
         if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
@@ -207,7 +232,6 @@ public class KnowledgeBase {
         String value = a.getValue();
         if (null == value) {
             LOGGER.warning("atom with id '" + BrainGraph.getId(a) + "' has null value");
-            return null;
         }
 
         return value;

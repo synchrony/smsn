@@ -14,7 +14,7 @@ public class TimeStampedEvent implements BottomUpType {
     public static final TimeStampedEvent INSTANCE = new TimeStampedEvent();
 
     private Field[] fields = new Field[]{
-            new Field(null, Date.INSTANCE, null, new EventDateMapper())
+            new Field(true, null, Date.INSTANCE, null, new EventDateMapper())
     };
 
     private TimeStampedEvent() {

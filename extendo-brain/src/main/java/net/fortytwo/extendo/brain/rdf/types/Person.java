@@ -14,17 +14,17 @@ public class Person implements BottomUpType {
     public static final Person INSTANCE = new Person();
 
     private Field[] fields = new Field[]{
-            new Field(null, AKA.INSTANCE, null, new NicknameMapper()),
-            new Field(null, WebPage.INSTANCE, null, new HomepageMapper()),
-            new Field(Pattern.compile(".+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper())
+            new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
+            new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
+            new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
             // TODO: when the person passed away
             // TODO: the person's contact information
             // TODO: the person's email
             // TODO: the person's mailing address
-            // TODO: the person's family
-            // TODO: the person's friends
-            // TODO: some things the person likes
-            // TODO: the person's writings or research
+            new Field(true, Pattern.compile("[A-Z].+s family( and relations)?"), OpenCollection.INSTANCE, Person.INSTANCE, new FamilyMembersMapper()),
+            new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.INSTANCE, Person.INSTANCE, new FriendsMapper()),
+            new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.INSTANCE, null, new InterestsMapper()),
+            new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper())
             // TODO: some things I like about the person
             // TODO: some things I learned about from the person
             // TODO: my memories of the person
@@ -56,7 +56,6 @@ public class Person implements BottomUpType {
     }
 
     private class NicknameMapper implements Mapper {
-        @Override
         public void mapToRDF(final Atom parent,
                              final Atom child) {
             //To change body of implemented methods use File | Settings | File Templates.
@@ -64,7 +63,6 @@ public class Person implements BottomUpType {
     }
 
     private class HomepageMapper implements Mapper {
-        @Override
         public void mapToRDF(final Atom parent,
                              final Atom child) {
             //To change body of implemented methods use File | Settings | File Templates.
@@ -72,7 +70,34 @@ public class Person implements BottomUpType {
     }
 
     private class BirthdayMapper implements Mapper {
-        @Override
+        public void mapToRDF(final Atom parent,
+                             final Atom child) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class FamilyMembersMapper implements Mapper {
+        public void mapToRDF(final Atom parent,
+                             final Atom child) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class FriendsMapper implements Mapper {
+        public void mapToRDF(final Atom parent,
+                             final Atom child) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class InterestsMapper implements Mapper {
+        public void mapToRDF(final Atom parent,
+                             final Atom child) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class PublicationsMapper implements Mapper {
         public void mapToRDF(final Atom parent,
                              final Atom child) {
             //To change body of implemented methods use File | Settings | File Templates.
