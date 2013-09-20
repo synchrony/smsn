@@ -4,13 +4,19 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.BottomUpType;
 import net.fortytwo.extendo.brain.rdf.Field;
 import net.fortytwo.extendo.brain.rdf.Mapper;
+import net.fortytwo.extendo.brain.rdf.vocab.FOAF;
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Person implements BottomUpType {
+public class Person extends BottomUpType {
     public static final Person INSTANCE = new Person();
 
     private Field[] fields = new Field[]{
@@ -53,6 +59,18 @@ public class Person implements BottomUpType {
 
     public boolean aliasRequired() {
         return false;
+    }
+
+    public void translateToRDF(final Atom a,
+                               final ValueFactory vf,
+                               final RDFHandler handler) throws RDFHandlerException {
+        URI self = translateTypeAndAlias(a, vf, handler, FOAF.PERSON);
+
+        if (a.getSharability() > 0.5) {
+            handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getValue())));
+        } else {
+            handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
+        }
     }
 
     private class NicknameMapper implements Mapper {

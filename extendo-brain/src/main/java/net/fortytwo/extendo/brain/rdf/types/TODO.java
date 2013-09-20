@@ -1,5 +1,13 @@
 package net.fortytwo.extendo.brain.rdf.types;
 
+import net.fortytwo.extendo.brain.Atom;
+import net.fortytwo.extendo.brain.rdf.vocab.ExtendoVocab;
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+
 import java.util.regex.Pattern;
 
 /**
@@ -17,5 +25,15 @@ public class TODO extends SimpleType {
 
     public Pattern getValueRegex() {
         return Pattern.compile("TODO: .+");
+    }
+
+    public void translateToRDF(final Atom a,
+                               final ValueFactory vf,
+                               final RDFHandler handler) throws RDFHandlerException {
+        URI self = translateTypeAndAlias(a, vf, handler, ExtendoVocab.TODO);
+
+        // assumes the prefix "TODO:"
+        String d = a.getValue().substring(5).trim();
+        handler.handleStatement(vf.createStatement(self, RDFS.COMMENT, vf.createLiteral(d)));
     }
 }

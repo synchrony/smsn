@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class ISBN extends SimpleType {
+public class ISBN extends SimpleSecondClassType {
     public static final ISBN INSTANCE = new ISBN();
 
     private static final ISBNValidator VALIDATOR = new ISBNValidator();

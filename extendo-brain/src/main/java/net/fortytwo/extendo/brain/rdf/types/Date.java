@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Date extends SimpleType {
+public class Date extends SimpleSecondClassType {
     public static final Date INSTANCE = new Date();
 
     private Date() {

@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class URL extends SimpleType {
+public class URL extends SimpleSecondClassType {
     public static final URL INSTANCE = new URL();
 
     private URL() {

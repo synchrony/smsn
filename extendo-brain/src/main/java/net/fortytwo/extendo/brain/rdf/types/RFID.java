@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class RFID extends SimpleType {
+public class RFID extends SimpleSecondClassType {
     public static final RFID INSTANCE = new RFID();
 
     private RFID() {

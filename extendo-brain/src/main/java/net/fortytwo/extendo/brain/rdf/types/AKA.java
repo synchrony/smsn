@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class AKA extends SimpleType {
+public class AKA extends SimpleSecondClassType {
     public static final AKA INSTANCE = new AKA();
 
     private AKA() {

@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import com.tinkerpop.frames.FramedGraph;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.util.properties.PropertyException;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
@@ -36,6 +37,15 @@ public class BrainGraph {
     private final Priorities priorities;
 
     private static final Map<KeyIndexableGraph, BrainGraph> graphs = new HashMap<KeyIndexableGraph, BrainGraph>();
+    private static final String atomNs;
+
+    static {
+        try {
+            atomNs = Extendo.getConfiguration().getString(Extendo.BASE_URI) + "atom/";
+        } catch (PropertyException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     public static BrainGraph getInstance(final KeyIndexableGraph baseGraph) throws Exception {
         BrainGraph g = graphs.get(baseGraph);
@@ -99,6 +109,10 @@ public class BrainGraph {
 
     public static String getId(final Atom a) {
         return (String) a.asVertex().getId();
+    }
+
+    public static String uriOf(final Atom a) {
+        return atomNs + getId(a);
     }
 
     private static class ExtendoIdFactory implements IdGraph.IdFactory {

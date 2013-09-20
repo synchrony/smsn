@@ -17,6 +17,9 @@ import net.fortytwo.extendo.brain.rdf.types.TimeStampedEvent;
 import net.fortytwo.extendo.brain.rdf.types.URL;
 import net.fortytwo.extendo.brain.rdf.types.VocabularyTerm;
 import net.fortytwo.extendo.brain.rdf.types.WebPage;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -111,9 +114,26 @@ public class KnowledgeBase {
         LOGGER.info("" + mapped + " of " + total + " atoms mapped to compound types");
     }
 
+    public void generateRDF(final RDFHandler handler,
+                            final ValueFactory vf) throws RDFHandlerException {
+        LOGGER.info("generating RDF data from knowledge base");
+        LOGGER.warning("no sharability restrictions have been enforced");
+
+        handler.startRDF();
+
+        for (Atom a : graph.getAtoms()) {
+            BottomUpType t = typeOfAtom.get(a);
+            if (null != t) {
+                t.translateToRDF(a, vf, handler);
+            }
+        }
+
+        handler.endRDF();
+    }
+
     // note: we assume for now that there is no overlap among simple types
     // i.e. that there is no atom which will be matched by more than one simple type
-    public BottomUpType firstMatchingSimpleType(final Atom a) {
+    private BottomUpType firstMatchingSimpleType(final Atom a) {
         String value = valueOf(a);
 
         // TODO: in future, perhaps an optimized matcher (by regex) can be written, so that each type does not need to be tested in series
@@ -126,7 +146,7 @@ public class KnowledgeBase {
         return null;
     }
 
-    public BottomUpType firstMatchingCompoundType(final Atom a) {
+    private BottomUpType firstMatchingCompoundType(final Atom a) {
         for (BottomUpType t : vocabulary.getCompoundTypes()) {
             if (compoundTypeMatches(a, t)) {
                 return t;
