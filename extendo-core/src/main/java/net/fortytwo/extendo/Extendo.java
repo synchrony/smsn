@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 public class Extendo {
     public static final String DEFAULT_BASEURI = "http://example.org/replaceThisBaseURI#";
     public static final String MOB_ONTOLOGY_FILE = "myotherbrain.owl";
+    public static final boolean SAFE_MODE = true;
 
     // Configuration properties.
     public static final String

@@ -27,7 +27,7 @@ public class TODO extends SimpleType {
         return Pattern.compile("TODO: .+");
     }
 
-    public void translateToRDF(final Atom a,
+    public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {
         URI self = translateTypeAndAlias(a, vf, handler, ExtendoVocab.TODO);
@@ -35,5 +35,7 @@ public class TODO extends SimpleType {
         // assumes the prefix "TODO:"
         String d = a.getValue().substring(5).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.COMMENT, vf.createLiteral(d)));
+
+        return self;
     }
 }

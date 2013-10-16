@@ -22,9 +22,13 @@ public class RDFMappingTest extends TestCase {
     public void testAKASyntax() throws Exception {
         BottomUpType t = AKA.INSTANCE;
         assertTrue(t.getValueRegex().matcher("aka \"Ix\"").matches());
+        assertFalse(t.getValueRegex().matcher("aka \"\"Ix\"").matches());
         assertFalse(t.getValueRegex().matcher("aka Ix").matches());
         assertFalse(t.getValueRegex().matcher("AKA \"Ix\"").matches());
         assertFalse(t.getValueRegex().matcher("AKA\"Ix\"").matches());
+
+        assertTrue(t.getValueRegex().matcher("aka \"Foo\", \"Bar\"").matches());
+        assertFalse(t.getValueRegex().matcher("aka \"Foo\",\"Bar\"").matches());
     }
 
     @Test

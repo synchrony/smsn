@@ -51,41 +51,43 @@ public class ArticleOrBook extends BottomUpType {
         return false;
     }
 
-    public void translateToRDF(final Atom a,
+    public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {
         // TODO: a more specific type than foaf:Document may be appropriate (WebPage also uses foaf:Document)
         URI self = translateTypeAndAlias(a, vf, handler, FOAF.DOCUMENT);
 
         handler.handleStatement(vf.createStatement(self, DCTerms.TITLE, vf.createLiteral(a.getValue())));
+
+        return self;
     }
 
     private class ISBNMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class RFIDMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class BibtexReferenceMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class AuthorCollectionMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class SomeNotesFromTheDocumentMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }

@@ -27,7 +27,7 @@ public class VocabularyTerm extends SimpleType {
         return true;
     }
 
-    public void translateToRDF(final Atom a,
+    public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {
         URI self = translateTypeAndAlias(a, vf, handler, ExtendoVocab.WORDORPHRASE);
@@ -35,5 +35,7 @@ public class VocabularyTerm extends SimpleType {
         // note: a few atoms currently break this pattern, e.g. an atom with the value: "one", "two"
         String d = a.getValue().substring(1, a.getValue().length() - 1).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(d)));
+
+        return self;
     }
 }

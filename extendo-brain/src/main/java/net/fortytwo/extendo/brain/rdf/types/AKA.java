@@ -12,7 +12,8 @@ public class AKA extends SimpleSecondClassType {
     }
 
     public Pattern getValueRegex() {
-        return Pattern.compile("aka \\\".+\\\"");
+        return Pattern.compile("aka \\\"[^\\\"]+\\\"(, \\\"[^\\\"]+\\\")*");
+        //return Pattern.compile("aka \\\"[^\\\"]+\\\"");
     }
 
     public boolean additionalConstraintsSatisfied(final String value) {

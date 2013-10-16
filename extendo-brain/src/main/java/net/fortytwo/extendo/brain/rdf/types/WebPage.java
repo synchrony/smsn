@@ -43,7 +43,7 @@ public class WebPage extends BottomUpType {
         return true;
     }
 
-    public void translateToRDF(final Atom a,
+    public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {
         URI self = translateTypeAndAlias(a, vf, handler, FOAF.DOCUMENT);
@@ -52,5 +52,7 @@ public class WebPage extends BottomUpType {
         int i = a.getValue().lastIndexOf("(");
         String d = a.getValue().substring(0, i).trim();
         handler.handleStatement(vf.createStatement(self, DCTerms.TITLE, vf.createLiteral(d)));
+
+        return self;
     }
 }

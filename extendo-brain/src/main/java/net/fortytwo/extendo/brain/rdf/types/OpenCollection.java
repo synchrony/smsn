@@ -3,6 +3,7 @@ package net.fortytwo.extendo.brain.rdf.types;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.BottomUpType;
 import net.fortytwo.extendo.brain.rdf.Field;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -40,9 +41,10 @@ public class OpenCollection extends BottomUpType {
         return false;
     }
 
-    public void translateToRDF(final Atom a,
+    public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {
-        // do nothing; the rdfization of collections is context-specific, and collection values are discarded
+        // do not reify; the rdfization of collections is context-specific, and collection values are discarded
+        return null;
     }
 }

@@ -51,7 +51,7 @@
         </dependency>
         <dependency>
             <groupId>net.fortytwo.ripple</groupId>
-            <artifactId>ripple-demo</artifactId>
+            <artifactId>ripple-core</artifactId>
             <version>${ripple.version}</version>
             <exclusions>
                 <!-- this was necessary (as of 2013-01-24) to avoid a logging conflict with a

@@ -17,11 +17,15 @@ import net.fortytwo.extendo.brain.rdf.types.TimeStampedEvent;
 import net.fortytwo.extendo.brain.rdf.types.URL;
 import net.fortytwo.extendo.brain.rdf.types.VocabularyTerm;
 import net.fortytwo.extendo.brain.rdf.types.WebPage;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -66,10 +70,10 @@ public class KnowledgeBase {
         v.add(TimeStampedEvent.INSTANCE);
 
         // TODO
-        // Account
-        // ManufacturedPart
-        // Place
-        // SoftwareProject
+        // * Account
+        // * ManufacturedPart
+        // * Place
+        // * SoftwareProject
     }
 
     public void matchSimpleTypes() {
@@ -94,7 +98,7 @@ public class KnowledgeBase {
         LOGGER.info("" + mapped + " of " + total + " atoms mapped to simple types");
     }
 
-    public void matchCompoundTypes() {
+    public void matchCompoundTypes() throws RDFHandlerException {
         long total = 0;
         long mapped = 0;
 
@@ -104,7 +108,7 @@ public class KnowledgeBase {
             if (null == typeOfAtom.get(a)) {
                 BottomUpType t = firstMatchingCompoundType(a);
                 if (null != t) {
-                    System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
+                    //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
                     typeOfAtom.put(a, t);
                     mapped++;
                 }
@@ -116,15 +120,23 @@ public class KnowledgeBase {
 
     public void generateRDF(final RDFHandler handler,
                             final ValueFactory vf) throws RDFHandlerException {
+
         LOGGER.info("generating RDF data from knowledge base");
         LOGGER.warning("no sharability restrictions have been enforced");
 
         handler.startRDF();
 
+        MappingContext mc = new MappingContext();
+        mc.handler = handler;
+        mc.valueFactory = vf;
+
         for (Atom a : graph.getAtoms()) {
             BottomUpType t = typeOfAtom.get(a);
             if (null != t) {
-                t.translateToRDF(a, vf, handler);
+                mc.reference = a;
+                mc.referenceUri = vf.createURI(BrainGraph.uriOf(a));
+                //t.translateToRDF(a, vf, handler);
+                matchCompoundType(a, t, mc);
             }
         }
 
@@ -146,9 +158,9 @@ public class KnowledgeBase {
         return null;
     }
 
-    private BottomUpType firstMatchingCompoundType(final Atom a) {
+    private BottomUpType firstMatchingCompoundType(final Atom a) throws RDFHandlerException {
         for (BottomUpType t : vocabulary.getCompoundTypes()) {
-            if (compoundTypeMatches(a, t)) {
+            if (matchCompoundType(a, t, null)) {
                 return t;
             }
         }
@@ -156,8 +168,17 @@ public class KnowledgeBase {
         return null;
     }
 
-    private boolean compoundTypeMatches(final Atom a,
-                                        final BottomUpType type) {
+    /**
+     * @param a    an atom to match against
+     * @param type a type to match
+     * @param mc   a context for mapping matched fields to RDF.  If null, no mapping is performed
+     * @return whether the type successfully matched
+     */
+    private boolean matchCompoundType(final Atom a,
+                                      final BottomUpType type,
+                                      final MappingContext mc) throws RDFHandlerException {
+        RDFBuffer buffer = null == mc ? null : new RDFBuffer(mc.handler);
+
         if (!simpleConstraintsSatisfied(a, a.getValue(), type)) {
             return false;
         }
@@ -167,7 +188,13 @@ public class KnowledgeBase {
         Field[] fields = type.getFields();
         long matchingUniqueFields = 0;
         while (cur != null && fieldIndex < fields.length) {
-            if (fieldMatches(cur.getFirst(), fields[fieldIndex])) {
+            Atom fa = cur.getFirst();
+            Field f = fields[fieldIndex];
+            if (matchField(fa, f)) {
+                if (null != mc) {
+                    mapField(fa, f, mc);
+                }
+
                 // this field matches, but it may or may not be a field which uniquely identifies the type
                 if (fields[fieldIndex].getIsUnique()) {
                     matchingUniqueFields++;
@@ -177,12 +204,20 @@ public class KnowledgeBase {
             fieldIndex++;
         }
 
-        // for now, if any *unique* fields match, it's an overall match
-        return matchingUniqueFields > 0;
+        // for now, it's an overall match if and only if any *unique* fields match
+        boolean matched = matchingUniqueFields > 0;
+
+        if (matched && null != mc) {
+            type.translateToRDF(a, mc.valueFactory, buffer);
+
+            buffer.flush();
+        }
+
+        return matched;
     }
 
-    private boolean fieldMatches(final Atom a,
-                                 final Field field) {
+    private boolean matchField(final Atom a,
+                               final Field field) {
         // type constraint
         BottomUpType expectedType = field.getDataType();
         if (null != expectedType) {
@@ -191,6 +226,15 @@ public class KnowledgeBase {
                 return false;
             }
         }
+
+        String value = valueOf(a);
+
+        // value regex constraint
+        if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
+            return false;
+        }
+
+        // TODO: value additional constraints for fields?
 
         BottomUpType containedType = field.getContainedDataType();
         if (null != containedType) {
@@ -210,16 +254,36 @@ public class KnowledgeBase {
             }
         }
 
-        String value = valueOf(a);
-
-        // value regex constraint
-        if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
-            return false;
-        }
-
-        // TODO: value additional constraints for fields?
-
         return true;
+    }
+
+    private void mapField(final Atom a,
+                          final Field field,
+                          final MappingContext mc) throws RDFHandlerException {
+        field.getMapper().mapToRDF(mc.reference, a, mc.referenceUri, mc.valueFactory, mc.handler);
+
+        // TODO: generalize this type check
+        if (field.getDataType() == OpenCollection.INSTANCE) {
+            BottomUpType type = field.getContainedDataType();
+
+            AtomList cur = a.getNotes();
+
+            // If any child has a type other than the contained data type, this constraint is not satisfied.
+            // However, not-yet-typed children are simply ignored until they are mapped.
+            while (null != cur) {
+                Atom child = cur.getFirst();
+                BottomUpType t = typeOfAtom.get(child);
+
+                // coercing the type of contained atoms for the purpose of mapping
+                if (null == t) {
+                    t = type;
+                }
+
+                // TODO: the context-specific mapping of the collection...
+
+                cur = cur.getRest();
+            }
+        }
     }
 
     private boolean simpleConstraintsSatisfied(final Atom a,
@@ -255,5 +319,55 @@ public class KnowledgeBase {
         }
 
         return value;
+    }
+
+    private class MappingContext {
+        public Atom reference;
+        public URI referenceUri;
+        public ValueFactory valueFactory;
+        public RDFHandler handler;
+    }
+
+    private class RDFBuffer implements RDFHandler {
+        private final RDFHandler wrappedHandler;
+        private final Collection<Statement> buffer = new LinkedList<Statement>();
+
+        private RDFBuffer(final RDFHandler wrappedHandler) {
+            this.wrappedHandler = wrappedHandler;
+        }
+
+        public void startRDF() throws RDFHandlerException {
+            wrappedHandler.startRDF();
+        }
+
+        public void endRDF() throws RDFHandlerException {
+            wrappedHandler.endRDF();
+        }
+
+        public void handleNamespace(String s, String s2) throws RDFHandlerException {
+            wrappedHandler.handleNamespace(s, s2);
+        }
+
+        public void handleStatement(final Statement statement) throws RDFHandlerException {
+            buffer.add(statement);
+        }
+
+        public void handleComment(String s) throws RDFHandlerException {
+            wrappedHandler.handleComment(s);
+        }
+
+        public void flush() throws RDFHandlerException {
+            try {
+                for (Statement s : buffer) {
+                    wrappedHandler.handleStatement(s);
+                }
+            } finally {
+                buffer.clear();
+            }
+        }
+
+        public void clear() {
+            buffer.clear();
+        }
     }
 }

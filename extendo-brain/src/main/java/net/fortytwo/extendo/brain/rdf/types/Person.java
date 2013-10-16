@@ -22,6 +22,7 @@ public class Person extends BottomUpType {
     private Field[] fields = new Field[]{
             new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
             new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
+            new Field(true, Pattern.compile("some quotes by .+]"), OpenCollection.INSTANCE, null, new QuotationMapper()),
             new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
             // TODO: when the person passed away
             // TODO: the person's contact information
@@ -31,10 +32,10 @@ public class Person extends BottomUpType {
             new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.INSTANCE, Person.INSTANCE, new FriendsMapper()),
             new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.INSTANCE, null, new InterestsMapper()),
             new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper())
-            // TODO: some things I like about the person
-            // TODO: some things I learned about from the person
-            // TODO: my memories of the person
-            // TODO: my relationship with the person
+            // TODO: some things liked about the person
+            // TODO: some things learned about from the person
+            // TODO: memories of the person
+            // TODO: relationship with the person
     };
 
     private Person() {
@@ -61,7 +62,7 @@ public class Person extends BottomUpType {
         return false;
     }
 
-    public void translateToRDF(final Atom a,
+    public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {
         URI self = translateTypeAndAlias(a, vf, handler, FOAF.PERSON);
@@ -71,54 +72,55 @@ public class Person extends BottomUpType {
         } else {
             handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
         }
-    }
 
-    private class NicknameMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-    }
-
-    private class HomepageMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        return self;
     }
 
     private class BirthdayMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class FamilyMembersMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class FriendsMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class HomepageMapper implements Mapper {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class InterestsMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class NicknameMapper implements Mapper {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class PublicationsMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom child) {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    private class QuotationMapper implements Mapper {
+        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+            System.out.println("quotation!");
         }
     }
 }

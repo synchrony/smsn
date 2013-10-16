@@ -34,7 +34,7 @@ public abstract class BottomUpType {
 
     public abstract boolean childrenRequired();
 
-    public abstract void translateToRDF(Atom a,
+    public abstract URI translateToRDF(Atom a,
                                         ValueFactory vf,
                                         RDFHandler handler) throws RDFHandlerException;
 
@@ -64,5 +64,11 @@ public abstract class BottomUpType {
         }
 
         return self;
+    }
+
+    protected void mapFields(final URI self,
+                             final ValueFactory vf,
+                             final RDFHandler handler) {
+
     }
 }
