@@ -18,7 +18,6 @@ import net.fortytwo.extendo.brain.rdf.types.URL;
 import net.fortytwo.extendo.brain.rdf.types.VocabularyTerm;
 import net.fortytwo.extendo.brain.rdf.types.WebPage;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -127,14 +126,14 @@ public class KnowledgeBase {
         handler.startRDF();
 
         MappingContext mc = new MappingContext();
-        mc.handler = handler;
-        mc.valueFactory = vf;
+        mc.setHandler(handler);
+        mc.setValueFactory(vf);
 
         for (Atom a : graph.getAtoms()) {
             BottomUpType t = typeOfAtom.get(a);
             if (null != t) {
-                mc.reference = a;
-                mc.referenceUri = vf.createURI(BrainGraph.uriOf(a));
+                mc.setReference(a);
+                mc.setReferenceUri(vf.createURI(BrainGraph.uriOf(a)));
                 //t.translateToRDF(a, vf, handler);
                 matchCompoundType(a, t, mc);
             }
@@ -177,7 +176,7 @@ public class KnowledgeBase {
     private boolean matchCompoundType(final Atom a,
                                       final BottomUpType type,
                                       final MappingContext mc) throws RDFHandlerException {
-        RDFBuffer buffer = null == mc ? null : new RDFBuffer(mc.handler);
+        RDFBuffer buffer = null == mc ? null : new RDFBuffer(mc.getHandler());
 
         if (!simpleConstraintsSatisfied(a, a.getValue(), type)) {
             return false;
@@ -208,7 +207,7 @@ public class KnowledgeBase {
         boolean matched = matchingUniqueFields > 0;
 
         if (matched && null != mc) {
-            type.translateToRDF(a, mc.valueFactory, buffer);
+            type.translateToRDF(a, mc.getValueFactory(), buffer);
 
             buffer.flush();
         }
@@ -234,25 +233,21 @@ public class KnowledgeBase {
             return false;
         }
 
-        // TODO: value additional constraints for fields?
+        // TODO: additional value constraints for fields?
 
-        BottomUpType containedType = field.getContainedDataType();
-        if (null != containedType) {
-            AtomList cur = a.getNotes();
-
-            // If any child has a type other than the contained data type, this constraint is not satisfied.
-            // However, not-yet-typed children are simply ignored until they are mapped.
-            while (null != cur) {
-                Atom child = cur.getFirst();
-                BottomUpType t = typeOfAtom.get(child);
-                if (null == t) {
-                    // do nothing until mapping...
-                } else if (t != containedType) {
-                    return false;
-                }
-                cur = cur.getRest();
-            }
-        }
+        // Note: for containers, we do not check that the children of the
+        // container are of the expected type.  Instead, we will use the
+        // expected type to coerce any still-untyped children when mapping to
+        // RDF.
+        // Badly-typed children of containers are simply tolerated and ignored.
+        // If, on the contrary, a strict type check for children were enforced
+        // here, many otherwise recognizable instances of types would be
+        // excluded on the basis of a single list item which does not conform.
+        // For example, if Confucius is primarily identified by as a person by
+        // his long list of quotations, and one of those quotations is not
+        // properly enclosed in quotation marks, it shouldn't cause Confucius to
+        // disappear entirely from the mapping; only that invalid quote will be
+        // missing.
 
         return true;
     }
@@ -260,7 +255,7 @@ public class KnowledgeBase {
     private void mapField(final Atom a,
                           final Field field,
                           final MappingContext mc) throws RDFHandlerException {
-        field.getMapper().mapToRDF(mc.reference, a, mc.referenceUri, mc.valueFactory, mc.handler);
+        field.getMapper().mapToRDF(a, mc);
 
         // TODO: generalize this type check
         if (field.getDataType() == OpenCollection.INSTANCE) {
@@ -319,13 +314,6 @@ public class KnowledgeBase {
         }
 
         return value;
-    }
-
-    private class MappingContext {
-        public Atom reference;
-        public URI referenceUri;
-        public ValueFactory valueFactory;
-        public RDFHandler handler;
     }
 
     private class RDFBuffer implements RDFHandler {

@@ -4,6 +4,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.BottomUpType;
 import net.fortytwo.extendo.brain.rdf.Field;
 import net.fortytwo.extendo.brain.rdf.Mapper;
+import net.fortytwo.extendo.brain.rdf.MappingContext;
 import net.fortytwo.extendo.brain.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -22,7 +23,7 @@ public class Person extends BottomUpType {
     private Field[] fields = new Field[]{
             new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
             new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
-            new Field(true, Pattern.compile("some quotes by .+]"), OpenCollection.INSTANCE, null, new QuotationMapper()),
+            new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.INSTANCE, VocabularyTerm.INSTANCE, new QuotationMapper()),
             new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
             // TODO: when the person passed away
             // TODO: the person's contact information
@@ -77,49 +78,61 @@ public class Person extends BottomUpType {
     }
 
     private class BirthdayMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
-            //To change body of implemented methods use File | Settings | File Templates.
+        public void mapToRDF(Atom birthdayEvent, MappingContext context) throws RDFHandlerException {
+            System.out.println("birthday!");
+
+            // technically, this is a misuse of foaf:birthday, which expects
+            // string values of the form mm-dd, eg. '12-31', as opposed to
+            // Extend-o-Brain's structured date values, which are represented
+            // using the Event Ontology.
+            // Nevertheless, foaf:birthday is used here because of its
+            // appropriateness for the "birthday" meaning and its association with
+            // foaf:Person, the RDF type associated with the EoB Person type.
+
+            context.getHandler().handleStatement(
+                    context.getValueFactory().createStatement(
+                            context.getReferenceUri(), FOAF.BIRTHDAY, context.uriOf(birthdayEvent)));
         }
     }
 
     private class FamilyMembersMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class FriendsMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class HomepageMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class InterestsMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class NicknameMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 
     private class PublicationsMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
-            //To change body of implemented methods use File | Settings | File Templates.
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
+            System.out.println("publication!");
         }
     }
 
     private class QuotationMapper implements Mapper {
-        public void mapToRDF(Atom parent, Atom child, URI parentUri, ValueFactory vf, RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
             System.out.println("quotation!");
         }
     }

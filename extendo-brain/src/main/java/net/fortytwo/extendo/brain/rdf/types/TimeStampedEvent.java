@@ -5,6 +5,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.BottomUpType;
 import net.fortytwo.extendo.brain.rdf.Field;
 import net.fortytwo.extendo.brain.rdf.Mapper;
+import net.fortytwo.extendo.brain.rdf.MappingContext;
 import net.fortytwo.extendo.brain.rdf.vocab.Event;
 import net.fortytwo.extendo.brain.rdf.vocab.Timeline;
 import org.openrdf.model.Literal;
@@ -63,11 +64,10 @@ public class TimeStampedEvent extends BottomUpType {
     }
 
     private class EventDateMapper implements Mapper {
-        public void mapToRDF(final Atom parent,
-                             final Atom eventDate,
-                             final URI parentURI,
-                             final ValueFactory vf,
-                             final RDFHandler handler) throws RDFHandlerException {
+        public void mapToRDF(Atom eventDate, MappingContext context) throws RDFHandlerException {
+
+            ValueFactory vf = context.getValueFactory();
+            RDFHandler h = context.getHandler();
 
             String dateStr = eventDate.getValue();
 
@@ -79,10 +79,10 @@ public class TimeStampedEvent extends BottomUpType {
             Literal dateValue = vf.createLiteral(dateStr, XMLSchema.DATE);
 
             Resource interval = vf.createBNode();
-            handler.handleStatement(vf.createStatement(interval, RDF.TYPE, Timeline.Interval));
-            handler.handleStatement(vf.createStatement(interval, Timeline.at, dateValue));
+            h.handleStatement(vf.createStatement(interval, RDF.TYPE, Timeline.Interval));
+            h.handleStatement(vf.createStatement(interval, Timeline.at, dateValue));
 
-            handler.handleStatement(vf.createStatement(parentURI, Event.time, interval));
+            h.handleStatement(vf.createStatement(context.getReferenceUri(), Event.time, interval));
         }
     }
 }
