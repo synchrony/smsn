@@ -20,18 +20,22 @@ import java.util.regex.Pattern;
 public class ArticleOrBook extends BottomUpType {
     public static final ArticleOrBook INSTANCE = new ArticleOrBook();
 
-    private Field[] fields = new Field[]{
-            new Field(true, null, ISBN.INSTANCE, null, new ISBNMapper()),
-            new Field(false, null, RFID.INSTANCE, null, new RFIDMapper()),
-            new Field(true, null, BibtexReference.INSTANCE, null, new BibtexReferenceMapper()),
-            new Field(true, Pattern.compile("the authors of .+"), OpenCollection.INSTANCE, Person.INSTANCE, new AuthorCollectionMapper()),
-            // "some notes from" is not unique, since movies, conversations, and other types also have this field
-            new Field(false, Pattern.compile("some notes from .+"), OpenCollection.INSTANCE, null, new SomeNotesFromTheDocumentMapper())};
+    private Field[] fields = null;
 
     private ArticleOrBook() {
     }
 
     public Field[] getFields() {
+        if (null == fields) {
+            fields = new Field[]{
+                    new Field(true, null, ISBN.INSTANCE, null, new ISBNMapper()),
+                    new Field(false, null, RFID.INSTANCE, null, new RFIDMapper()),
+                    new Field(true, null, BibtexReference.INSTANCE, null, new BibtexReferenceMapper()),
+                    new Field(true, Pattern.compile("the authors of .+"), OpenCollection.INSTANCE, Person.INSTANCE, new AuthorCollectionMapper()),
+                    // "some notes from" is not unique, since movies, conversations, and other types also have this field
+                    new Field(false, Pattern.compile("some notes from .+"), OpenCollection.INSTANCE, null, new SomeNotesFromTheDocumentMapper())};
+        }
+
         return fields;
     }
 

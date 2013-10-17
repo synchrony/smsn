@@ -31,22 +31,68 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
+/*
+typical steps in the mapping process:
+1) identify simple types
+2) identify compound types
+3) return to (2) until no more compound types are found
+4) coerce not-yet-typed container members
+5) map to RDF
+ */
 public class KnowledgeBase {
     private static final Logger LOGGER = Extendo.getLogger(KnowledgeBase.class);
 
     private final BrainGraph graph;
     private final BottomUpVocabulary vocabulary;
 
+    // the type of an atom as determined by its properties and the local tree of which it is the root
     private final Map<Atom, BottomUpType> typeOfAtom;
+    // the type of an atom as determined by local trees in which it is not the root
+    private final Map<Atom, BottomUpType> inferredTypeOfAtom;
+
+    public static boolean isCollectionType(final BottomUpType type) {
+        // TODO: generalize this
+        return type == OpenCollection.INSTANCE;
+    }
 
     public KnowledgeBase(final BrainGraph graph) {
         this.graph = graph;
         this.vocabulary = new BottomUpVocabulary();
         this.typeOfAtom = new HashMap<Atom, BottomUpType>();
+        this.inferredTypeOfAtom = new HashMap<Atom, BottomUpType>();
     }
 
     public BottomUpVocabulary getVocabulary() {
         return vocabulary;
+    }
+
+    public BottomUpType getTypeOf(final Atom a) {
+        return typeOfAtom.get(a);
+    }
+
+    private void setTypeOf(final Atom a,
+                           final BottomUpType type) {
+        typeOfAtom.put(a, type);
+    }
+
+    public BottomUpType getInferredTypeOf(final Atom a) {
+        return inferredTypeOfAtom.get(a);
+    }
+
+    /**
+     * Provisionally associates an inferred type with an atom.
+     * If, in a subsequent phase, the atom is found to be valid with respect to the type,
+     * it will be mapped to RDF as an instance of that type.
+     */
+    public void setInferredTypeOf(final Atom a,
+                                  final BottomUpType type) {
+        BottomUpType existingType = inferredTypeOfAtom.get(a);
+        if (null != existingType && existingType != type) {
+            LOGGER.warning("conflicting inferred types for atom " + a.asVertex().getId() + ": {"
+                    + existingType.getClass().getSimpleName() + ", " + type.getClass().getSimpleName() + "}. Only the former will be tried.");
+        } else {
+            inferredTypeOfAtom.put(a, type);
+        }
     }
 
     public void addDefaultTypes() {
@@ -81,14 +127,14 @@ public class KnowledgeBase {
 
         for (Atom a : graph.getAtoms()) {
             total++;
-            if (null == typeOfAtom.get(a)) {
+            if (null == getTypeOf(a)) {
                 BottomUpType t = firstMatchingSimpleType(a);
 
                 if (null == t) {
                     //System.out.println("" + BrainGraph.getId(a) + "\t" + a.getValue());
                 } else {
                     //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
-                    typeOfAtom.put(a, t);
+                    setTypeOf(a, t);
                     mapped++;
                 }
             }
@@ -98,23 +144,53 @@ public class KnowledgeBase {
     }
 
     public void matchCompoundTypes() throws RDFHandlerException {
-        long total = 0;
-        long mapped = 0;
+        long total;
+        long mapped;
+        int pass = 1;
+
+        do {
+            total = 0;
+            mapped = 0;
+
+            for (Atom a : graph.getAtoms()) {
+                total++;
+
+                if (null == getTypeOf(a)) {
+                    BottomUpType t = firstMatchingCompoundType(a);
+                    if (null != t) {
+                        //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
+                        setTypeOf(a, t);
+                        mapped++;
+                    }
+                }
+            }
+
+            LOGGER.info("pass #" + pass + ": " + mapped + " of " + total + " atoms mapped to compound types");
+            pass++;
+        } while (mapped > 0);
+    }
+
+    public void coerceUntypedAtoms() throws RDFHandlerException {
+        long inferred = 0;
+        long coerced = 0;
 
         for (Atom a : graph.getAtoms()) {
-            total++;
-
-            if (null == typeOfAtom.get(a)) {
-                BottomUpType t = firstMatchingCompoundType(a);
-                if (null != t) {
-                    //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
-                    typeOfAtom.put(a, t);
-                    mapped++;
+            BottomUpType it = getInferredTypeOf(a);
+            if (null != it) {
+                inferred++;
+                BottomUpType t = getTypeOf(a);
+                if (null == t) {
+                    LOGGER.info("attempting to coerce to an inferred type");
+                    if (matchCompoundType(a, it, null, false)) {
+                        // from this point on, the inferred type is also the actual type
+                        setTypeOf(a, it);
+                        coerced++;
+                    }
                 }
             }
         }
 
-        LOGGER.info("" + mapped + " of " + total + " atoms mapped to compound types");
+        LOGGER.info("" + coerced + " of " + inferred + " untyped atoms coerced to their inferred types");
     }
 
     public void generateRDF(final RDFHandler handler,
@@ -125,17 +201,17 @@ public class KnowledgeBase {
 
         handler.startRDF();
 
-        MappingContext mc = new MappingContext();
+        MappingContext mc = new MappingContext(this);
         mc.setHandler(handler);
         mc.setValueFactory(vf);
 
         for (Atom a : graph.getAtoms()) {
-            BottomUpType t = typeOfAtom.get(a);
+            BottomUpType t = getTypeOf(a);
             if (null != t) {
                 mc.setReference(a);
                 mc.setReferenceUri(vf.createURI(BrainGraph.uriOf(a)));
                 //t.translateToRDF(a, vf, handler);
-                matchCompoundType(a, t, mc);
+                matchCompoundType(a, t, mc, false);
             }
         }
 
@@ -159,7 +235,9 @@ public class KnowledgeBase {
 
     private BottomUpType firstMatchingCompoundType(final Atom a) throws RDFHandlerException {
         for (BottomUpType t : vocabulary.getCompoundTypes()) {
-            if (matchCompoundType(a, t, null)) {
+            // strict checking is required here; we are identifying instances based on their properties and
+            // children alone, as opposed to their inbound connections
+            if (matchCompoundType(a, t, null, true)) {
                 return t;
             }
         }
@@ -168,14 +246,17 @@ public class KnowledgeBase {
     }
 
     /**
-     * @param a    an atom to match against
-     * @param type a type to match
-     * @param mc   a context for mapping matched fields to RDF.  If null, no mapping is performed
+     * @param a      an atom to match against
+     * @param type   a type to match
+     * @param mc     a context for mapping matched fields to RDF.  If null, no mapping is performed
+     * @param strict whether this atom requires strict matching (i.e. can't be accepted as an instance of the type
+     *               unless it contains some uniquely-qualifying fields, in addition to being syntactically valid)
      * @return whether the type successfully matched
      */
     private boolean matchCompoundType(final Atom a,
                                       final BottomUpType type,
-                                      final MappingContext mc) throws RDFHandlerException {
+                                      final MappingContext mc,
+                                      final boolean strict) throws RDFHandlerException {
         RDFBuffer buffer = null == mc ? null : new RDFBuffer(mc.getHandler());
 
         if (!simpleConstraintsSatisfied(a, a.getValue(), type)) {
@@ -204,7 +285,7 @@ public class KnowledgeBase {
         }
 
         // for now, it's an overall match if and only if any *unique* fields match
-        boolean matched = matchingUniqueFields > 0;
+        boolean matched = !strict || matchingUniqueFields > 0;
 
         if (matched && null != mc) {
             type.translateToRDF(a, mc.getValueFactory(), buffer);
@@ -215,18 +296,18 @@ public class KnowledgeBase {
         return matched;
     }
 
-    private boolean matchField(final Atom a,
+    private boolean matchField(final Atom fa,
                                final Field field) {
         // type constraint
         BottomUpType expectedType = field.getDataType();
         if (null != expectedType) {
-            BottomUpType t = typeOfAtom.get(a);
+            BottomUpType t = getTypeOf(fa);
             if (null == t || t != expectedType) {
                 return false;
             }
         }
 
-        String value = valueOf(a);
+        String value = valueOf(fa);
 
         // value regex constraint
         if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
@@ -235,8 +316,8 @@ public class KnowledgeBase {
 
         // TODO: additional value constraints for fields?
 
-        // Note: for containers, we do not check that the children of the
-        // container are of the expected type.  Instead, we will use the
+        // Note: for containers, we do not demand that the children of the
+        // container are of the expected type.  Instead, we use the
         // expected type to coerce any still-untyped children when mapping to
         // RDF.
         // Badly-typed children of containers are simply tolerated and ignored.
@@ -248,6 +329,21 @@ public class KnowledgeBase {
         // properly enclosed in quotation marks, it shouldn't cause Confucius to
         // disappear entirely from the mapping; only that invalid quote will be
         // missing.
+        if (isCollectionType(field.getDataType())) {
+
+            BottomUpType type = field.getContainedDataType();
+            if (null != type) {
+                for (Atom child : contentsOfCollection(fa)) {
+                    BottomUpType t = getTypeOf(child);
+
+                    // If any child has a type other than the contained data type, the child is ignored.
+                    // However, not-yet-typed children are to be coerced if they are valid instances of the type.
+                    if (null == t) {
+                        setInferredTypeOf(child, type);
+                    }
+                }
+            }
+        }
 
         return true;
     }
@@ -256,29 +352,6 @@ public class KnowledgeBase {
                           final Field field,
                           final MappingContext mc) throws RDFHandlerException {
         field.getMapper().mapToRDF(a, mc);
-
-        // TODO: generalize this type check
-        if (field.getDataType() == OpenCollection.INSTANCE) {
-            BottomUpType type = field.getContainedDataType();
-
-            AtomList cur = a.getNotes();
-
-            // If any child has a type other than the contained data type, this constraint is not satisfied.
-            // However, not-yet-typed children are simply ignored until they are mapped.
-            while (null != cur) {
-                Atom child = cur.getFirst();
-                BottomUpType t = typeOfAtom.get(child);
-
-                // coercing the type of contained atoms for the purpose of mapping
-                if (null == t) {
-                    t = type;
-                }
-
-                // TODO: the context-specific mapping of the collection...
-
-                cur = cur.getRest();
-            }
-        }
     }
 
     private boolean simpleConstraintsSatisfied(final Atom a,
@@ -314,6 +387,30 @@ public class KnowledgeBase {
         }
 
         return value;
+    }
+
+    // note: the top-level atom is assumed to be a collection
+    public Collection<Atom> contentsOfCollection(final Atom collection) {
+        Collection<Atom> result = new LinkedList<Atom>();
+        contentsOfCollectionRecursive(collection, result);
+        return result;
+    }
+
+    private void contentsOfCollectionRecursive(final Atom a,
+                                               final Collection<Atom> result) {
+        BottomUpType t = getTypeOf(a);
+        if (null == t || !isCollectionType(t)) {
+            result.add(a);
+        } else {
+            AtomList cur = a.getNotes();
+
+            while (null != cur) {
+                Atom child = cur.getFirst();
+                contentsOfCollectionRecursive(child, result);
+
+                cur = cur.getRest();
+            }
+        }
     }
 
     private class RDFBuffer implements RDFHandler {

@@ -7,9 +7,13 @@ import net.fortytwo.extendo.brain.rdf.Field;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class SimpleType extends BottomUpType {
-    private final Field[] fields = new Field[] {};
+    private Field[] fields = null;
 
     public Field[] getFields() {
+        if (null == fields) {
+            fields = new Field[] {};
+        }
+
         return fields;
     }
 

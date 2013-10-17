@@ -19,4 +19,10 @@ public class AKA extends SimpleSecondClassType {
     public boolean additionalConstraintsSatisfied(final String value) {
         return true;
     }
+
+    public static String extractAlias(final String value) {
+        int i = value.indexOf('\"');
+        int j = value.lastIndexOf('\"');
+        return value.substring(i + 1, j);
+    }
 }

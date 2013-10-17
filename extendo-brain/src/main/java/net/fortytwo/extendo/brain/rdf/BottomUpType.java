@@ -65,10 +65,4 @@ public abstract class BottomUpType {
 
         return self;
     }
-
-    protected void mapFields(final URI self,
-                             final ValueFactory vf,
-                             final RDFHandler handler) {
-
-    }
 }

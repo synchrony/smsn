@@ -26,14 +26,18 @@ import java.util.regex.Pattern;
 public class TimeStampedEvent extends BottomUpType {
     public static final TimeStampedEvent INSTANCE = new TimeStampedEvent();
 
-    private Field[] fields = new Field[]{
-            new Field(true, null, Date.INSTANCE, null, new EventDateMapper())
-    };
+    private Field[] fields = null;
 
     private TimeStampedEvent() {
     }
 
     public Field[] getFields() {
+        if (null == fields) {
+            fields = new Field[]{
+                    new Field(true, null, Date.INSTANCE, null, new EventDateMapper())
+            };
+        }
+
         return fields;
     }
 

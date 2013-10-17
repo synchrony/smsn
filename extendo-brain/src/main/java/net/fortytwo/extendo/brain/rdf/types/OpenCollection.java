@@ -16,12 +16,16 @@ import java.util.regex.Pattern;
 public class OpenCollection extends BottomUpType {
     public static final OpenCollection INSTANCE = new OpenCollection();
 
-    private final Field[] fields = new Field[]{};
+    private Field[] fields = null;
 
     private OpenCollection() {
     }
 
     public Field[] getFields() {
+        if (null == fields) {
+            fields = new Field[]{};
+        }
+
         return fields;
     }
 

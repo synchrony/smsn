@@ -20,24 +20,7 @@ import java.util.regex.Pattern;
 public class Person extends BottomUpType {
     public static final Person INSTANCE = new Person();
 
-    private Field[] fields = new Field[]{
-            new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
-            new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
-            new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.INSTANCE, VocabularyTerm.INSTANCE, new QuotationMapper()),
-            new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
-            // TODO: when the person passed away
-            // TODO: the person's contact information
-            // TODO: the person's email
-            // TODO: the person's mailing address
-            new Field(true, Pattern.compile("[A-Z].+s family( and relations)?"), OpenCollection.INSTANCE, Person.INSTANCE, new FamilyMembersMapper()),
-            new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.INSTANCE, Person.INSTANCE, new FriendsMapper()),
-            new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.INSTANCE, null, new InterestsMapper()),
-            new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper())
-            // TODO: some things liked about the person
-            // TODO: some things learned about from the person
-            // TODO: memories of the person
-            // TODO: relationship with the person
-    };
+    private Field[] fields = null;
 
     private Person() {
     }
@@ -47,6 +30,27 @@ public class Person extends BottomUpType {
     }
 
     public Field[] getFields() {
+        if (null == fields) {
+            fields = new Field[]{
+                    new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
+                    new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
+                    new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.INSTANCE, VocabularyTerm.INSTANCE, new QuotationMapper()),
+                    new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
+                    // TODO: when the person passed away
+                    // TODO: the person's contact information
+                    // TODO: the person's email
+                    // TODO: the person's mailing address
+                    new Field(true, Pattern.compile("[A-Z].+s family( and relations)?"), OpenCollection.INSTANCE, Person.INSTANCE, new FamilyMembersMapper()),
+                    new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.INSTANCE, Person.INSTANCE, new FriendsMapper()),
+                    new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.INSTANCE, null, new InterestsMapper()),
+                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper())
+                    // TODO: some things liked about the person
+                    // TODO: some things learned about from the person
+                    // TODO: memories of the person
+                    // TODO: relationship with the person
+            };
+        }
+
         return fields;
     }
 
@@ -64,8 +68,8 @@ public class Person extends BottomUpType {
     }
 
     public URI translateToRDF(final Atom a,
-                               final ValueFactory vf,
-                               final RDFHandler handler) throws RDFHandlerException {
+                              final ValueFactory vf,
+                              final RDFHandler handler) throws RDFHandlerException {
         URI self = translateTypeAndAlias(a, vf, handler, FOAF.PERSON);
 
         if (a.getSharability() > 0.5) {
@@ -96,14 +100,31 @@ public class Person extends BottomUpType {
     }
 
     private class FamilyMembersMapper implements Mapper {
-        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
-            //To change body of implemented methods use File | Settings | File Templates.
+        public void mapToRDF(Atom coll, MappingContext context) throws RDFHandlerException {
+            System.out.println("family!");
+
+            // for now, family and relations other than friends are just more foaf:knows
+            for (Atom fam : context.getKnowledgeBase().contentsOfCollection(coll)) {
+                if (context.getKnowledgeBase().getTypeOf(fam) == Person.INSTANCE) {
+                    context.getHandler().handleStatement(
+                            context.getValueFactory().createStatement(
+                                    context.getReferenceUri(), FOAF.KNOWS, context.uriOf(fam)));
+                }
+            }
         }
     }
 
     private class FriendsMapper implements Mapper {
-        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
-            //To change body of implemented methods use File | Settings | File Templates.
+        public void mapToRDF(Atom coll, MappingContext context) throws RDFHandlerException {
+            System.out.println("friends!");
+
+            for (Atom friend : context.getKnowledgeBase().contentsOfCollection(coll)) {
+                if (context.getKnowledgeBase().getTypeOf(friend) == Person.INSTANCE) {
+                    context.getHandler().handleStatement(
+                            context.getValueFactory().createStatement(
+                                    context.getReferenceUri(), FOAF.KNOWS, context.uriOf(friend)));
+                }
+            }
         }
     }
 
@@ -121,19 +142,35 @@ public class Person extends BottomUpType {
 
     private class NicknameMapper implements Mapper {
         public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
-            //To change body of implemented methods use File | Settings | File Templates.
+            ValueFactory vf = context.getValueFactory();
+
+            // TODO: this is an abuse of foaf:nick even when the domain is foaf:Person as it is here...
+            // foaf:nick is supposed to be used for online handles, not aliases in general
+            context.getHandler().handleStatement(
+                    vf.createStatement(
+                            context.getReferenceUri(), FOAF.NICK, vf.createLiteral(AKA.extractAlias(child.getValue()))));
         }
     }
 
     private class PublicationsMapper implements Mapper {
-        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
-            System.out.println("publication!");
+        public void mapToRDF(Atom coll, MappingContext context) throws RDFHandlerException {
+            System.out.println("publications!");
+
+            for (Atom publication : context.getKnowledgeBase().contentsOfCollection(coll)) {
+                //System.out.println("\tpub: " + publication.getValue());
+                if (context.getKnowledgeBase().getTypeOf(publication) == ArticleOrBook.INSTANCE) {
+                    context.getHandler().handleStatement(
+                            context.getValueFactory().createStatement(
+                                    context.getReferenceUri(), FOAF.MADE, context.uriOf(publication)));
+                }
+            }
         }
     }
 
     private class QuotationMapper implements Mapper {
-        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
-            System.out.println("quotation!");
+        public void mapToRDF(Atom coll, MappingContext context) throws RDFHandlerException {
+            System.out.println("quotations!");
+            //...
         }
     }
 }

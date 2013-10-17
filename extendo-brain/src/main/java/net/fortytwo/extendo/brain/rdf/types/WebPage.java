@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class WebPage extends BottomUpType {
     public static final WebPage INSTANCE = new WebPage();
 
-    private final Field[] fields = new Field[]{};
+    private Field[] fields = null;
 
     private WebPage() {
     }
@@ -28,6 +28,10 @@ public class WebPage extends BottomUpType {
     }
 
     public Field[] getFields() {
+        if (null == fields) {
+            fields = new Field[]{};
+        }
+
         return fields;
     }
 

@@ -14,6 +14,11 @@ public class MappingContext {
     private URI referenceUri;
     private ValueFactory valueFactory;
     private RDFHandler handler;
+    private final KnowledgeBase knowledgeBase;
+
+    public MappingContext(final KnowledgeBase knowledgeBase) {
+        this.knowledgeBase = knowledgeBase;
+    }
 
     public Atom getReference() {
         return reference;
@@ -49,5 +54,9 @@ public class MappingContext {
 
     public URI uriOf(final Atom a) {
         return valueFactory.createURI(BrainGraph.uriOf(a));
+    }
+
+    public KnowledgeBase getKnowledgeBase() {
+        return knowledgeBase;
     }
 }
