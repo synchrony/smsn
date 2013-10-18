@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MyOtherBrain</string>
+    <string name="app_name">Extendo Brainstem</string>
 
     <!-- Simple strings. -->
     <string name="skeleton_app">Skeleton App</string>
@@ -8,5 +8,5 @@
     <string name="clear">Clear</string>
 
     <!-- This is a complex string containing style runs. -->
-    <string name="main_label">Hello from your other brain!</string>
+    <string name="main_label">Hello from your brainstem!</string>
 </resources>
