@@ -34,6 +34,7 @@ public class Person extends BottomUpType {
             fields = new Field[]{
                     new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
                     new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
+                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper()),
                     new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.INSTANCE, VocabularyTerm.INSTANCE, new QuotationMapper()),
                     new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
                     // TODO: when the person passed away
@@ -43,7 +44,6 @@ public class Person extends BottomUpType {
                     new Field(true, Pattern.compile("[A-Z].+s family( and relations)?"), OpenCollection.INSTANCE, Person.INSTANCE, new FamilyMembersMapper()),
                     new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.INSTANCE, Person.INSTANCE, new FriendsMapper()),
                     new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.INSTANCE, null, new InterestsMapper()),
-                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper())
                     // TODO: some things liked about the person
                     // TODO: some things learned about from the person
                     // TODO: memories of the person
@@ -129,8 +129,10 @@ public class Person extends BottomUpType {
     }
 
     private class HomepageMapper implements Mapper {
-        public void mapToRDF(Atom child, MappingContext context) throws RDFHandlerException {
-            //To change body of implemented methods use File | Settings | File Templates.
+        public void mapToRDF(Atom page, MappingContext context) throws RDFHandlerException {
+            context.getHandler().handleStatement(
+                    context.getValueFactory().createStatement(
+                            context.getReferenceUri(), FOAF.HOMEPAGE, context.uriOf(page)));
         }
     }
 

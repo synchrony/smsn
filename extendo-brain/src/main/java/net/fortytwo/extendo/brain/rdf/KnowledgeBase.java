@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 typical steps in the mapping process:
 1) identify simple types
 2) identify compound types
+    "strict" matching is used to find independent instances of types
+    non-strict matching is used for fields of potential independent instances
 3) return to (2) until no more compound types are found
 4) coerce not-yet-typed container members
 5) map to RDF
@@ -60,10 +62,6 @@ public class KnowledgeBase {
         this.vocabulary = new BottomUpVocabulary();
         this.typeOfAtom = new HashMap<Atom, BottomUpType>();
         this.inferredTypeOfAtom = new HashMap<Atom, BottomUpType>();
-    }
-
-    public BottomUpVocabulary getVocabulary() {
-        return vocabulary;
     }
 
     public BottomUpType getTypeOf(final Atom a) {
@@ -126,8 +124,8 @@ public class KnowledgeBase {
         long mapped = 0;
 
         for (Atom a : graph.getAtoms()) {
-            total++;
             if (null == getTypeOf(a)) {
+                total++;
                 BottomUpType t = firstMatchingSimpleType(a);
 
                 if (null == t) {
@@ -140,7 +138,7 @@ public class KnowledgeBase {
             }
         }
 
-        LOGGER.info("" + mapped + " of " + total + " atoms mapped to simple types");
+        LOGGER.info("" + mapped + " of " + total + " untyped atoms mapped to simple types");
     }
 
     public void matchCompoundTypes() throws RDFHandlerException {
@@ -153,9 +151,10 @@ public class KnowledgeBase {
             mapped = 0;
 
             for (Atom a : graph.getAtoms()) {
-                total++;
 
                 if (null == getTypeOf(a)) {
+                    total++;
+
                     BottomUpType t = firstMatchingCompoundType(a);
                     if (null != t) {
                         //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
@@ -165,7 +164,7 @@ public class KnowledgeBase {
                 }
             }
 
-            LOGGER.info("pass #" + pass + ": " + mapped + " of " + total + " atoms mapped to compound types");
+            LOGGER.info("pass #" + pass + ": " + mapped + " of " + total + " untyped atoms mapped to compound types");
             pass++;
         } while (mapped > 0);
     }
@@ -180,7 +179,6 @@ public class KnowledgeBase {
                 inferred++;
                 BottomUpType t = getTypeOf(a);
                 if (null == t) {
-                    LOGGER.info("attempting to coerce to an inferred type");
                     if (matchCompoundType(a, it, null, false)) {
                         // from this point on, the inferred type is also the actual type
                         setTypeOf(a, it);
@@ -263,29 +261,28 @@ public class KnowledgeBase {
             return false;
         }
 
+        boolean matched = !strict;
+
         AtomList cur = a.getNotes();
         int fieldIndex = 0;
         Field[] fields = type.getFields();
-        long matchingUniqueFields = 0;
         while (cur != null && fieldIndex < fields.length) {
             Atom fa = cur.getFirst();
             Field f = fields[fieldIndex];
             if (matchField(fa, f)) {
+                // if any fields are found which are distinct to the candidate type, it is a match
+                if (fields[fieldIndex].getIsDistinctive()) {
+                    matched = true;
+                }
+
                 if (null != mc) {
                     mapField(fa, f, mc);
                 }
 
-                // this field matches, but it may or may not be a field which uniquely identifies the type
-                if (fields[fieldIndex].getIsUnique()) {
-                    matchingUniqueFields++;
-                }
                 cur = cur.getRest();
             }
             fieldIndex++;
         }
-
-        // for now, it's an overall match if and only if any *unique* fields match
-        boolean matched = !strict || matchingUniqueFields > 0;
 
         if (matched && null != mc) {
             type.translateToRDF(a, mc.getValueFactory(), buffer);
@@ -298,6 +295,15 @@ public class KnowledgeBase {
 
     private boolean matchField(final Atom fa,
                                final Field field) {
+        String value = valueOf(fa);
+
+        // field-specific value regex constraint
+        if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
+            return false;
+        }
+
+        // TODO: additional value constraints for fields?
+
         // type constraint
         BottomUpType expectedType = field.getDataType();
         if (null != expectedType) {
@@ -306,15 +312,6 @@ public class KnowledgeBase {
                 return false;
             }
         }
-
-        String value = valueOf(fa);
-
-        // value regex constraint
-        if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
-            return false;
-        }
-
-        // TODO: additional value constraints for fields?
 
         // Note: for containers, we do not demand that the children of the
         // container are of the expected type.  Instead, we use the
