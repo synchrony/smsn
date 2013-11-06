@@ -113,11 +113,12 @@ void loop()
           state = STATE_ONE;
           
           // gesture event
-          Serial.print(micros()); Serial.print(","); Serial.print(amax);
-          Serial.print(": ("); Serial.print(ax_max);
-          Serial.print(","); Serial.print(ay_max);
-          Serial.print(","); Serial.print(az_max);
-          Serial.println(")");          
+          Serial.print(micros());
+          Serial.print(" "); Serial.print(amax);
+          Serial.print(" "); Serial.print(ax_max);
+          Serial.print(" "); Serial.print(ay_max);
+          Serial.print(" "); Serial.print(az_max);
+          Serial.print("\r");          
         }
         break;
     }    
