@@ -60,17 +60,22 @@ int state;
 double amax;
 double ax_max, ay_max, az_max;
 
+char print_str[100];
+
 void setup()  
 {
   // use the baud rate your bluetooth module is configured to 
   // not all baud rates work well, i.e. ATMEGA168 works best with 57600
-  Serial.begin(115200); 
+  // JJS note: the Amarino receiver appears to be flexible w.r.t. baud rate; 115200 is my choice, and it works well
+  Serial.begin(115200);
   
   state = STATE_ONE;
 }
 
 void loop()
 {
+    //* gesture mode
+    
     double ax, ay, az;
     double a;
     
@@ -113,27 +118,44 @@ void loop()
           state = STATE_ONE;
           
           // gesture event
+          
+          // since Arduino doesn't implement %f for printf/sprintf,
+          // we turn the acceleration values into integers
+          sprintf(print_str, "%ld %d %d %d %d",
+            micros(),
+            (int) (amax * 100),
+            (int) (ax_max * 100),
+            (int) (ay_max * 100),
+            (int) (az_max * 100));
+          //Serial.println(print_str);
+          meetAndroid.receive();  
+          meetAndroid.send(print_str);
+          
+          /*
           Serial.print(micros());
           Serial.print(" "); Serial.print(amax);
           Serial.print(" "); Serial.print(ax_max);
           Serial.print(" "); Serial.print(ay_max);
           Serial.print(" "); Serial.print(az_max);
-          Serial.print("\r");          
+          Serial.print("\r");  
+          //*/        
         }
         break;
-    }    
+    }
+    //*/    
   
-    /*
+    /* sensor mode
+    
     int xraw = analogRead(pinX);
     int yraw = analogRead(pinY);
     int zraw = analogRead(pinZ);
     
-    Serial.print(micros());
-    Serial.print(","); Serial.print(xraw);
-    Serial.print(","); Serial.print(yraw);
-    Serial.print(","); Serial.print(zraw);
-    Serial.println("");
-  
+    //Serial.print(micros());
+    //Serial.print(","); Serial.print(xraw);
+    //Serial.print(","); Serial.print(yraw);
+    //Serial.print(","); Serial.print(zraw);
+    //Serial.println("");
+    
     meetAndroid.receive(); // you need to keep this in your loop() to receive events
   
     meetAndroid.send(xraw);

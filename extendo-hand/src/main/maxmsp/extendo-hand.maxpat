@@ -63,8 +63,8 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "bang" ],
-					"patching_rect" : [ 182.5, 155.0, 63.0, 20.0 ],
-					"text" : "delay 100"
+					"patching_rect" : [ 182.5, 155.0, 56.0, 20.0 ],
+					"text" : "delay 50"
 				}
 
 			}
