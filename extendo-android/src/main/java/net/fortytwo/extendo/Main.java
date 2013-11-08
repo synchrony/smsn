@@ -1,6 +1,7 @@
 package net.fortytwo.extendo;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +31,7 @@ public class Main extends Activity {
     private static final String TAG = "Brainstem";
 
     // change this to your Bluetooth device address
-    private static final String DEVICE_ADDRESS =  "00:06:66:46:C3:42"; // BlueSMIRF Silver #1
+    private static final String DEVICE_ADDRESS = "00:06:66:46:C3:42"; // BlueSMIRF Silver #1
 
     private ArduinoReceiver arduinoReceiver = new ArduinoReceiver();
 
@@ -62,6 +63,7 @@ public class Main extends Activity {
         findViewById(R.id.events).setOnClickListener(eventsListener);
 
         editor.setText("testing");//getText(R.string.main_label));
+        checkForEmacs();
 
         // Force the service to start.
         //     startService(new Intent(this, BrainPingService.class));
@@ -190,11 +192,35 @@ public class Main extends Activity {
         tg.startTone(ToneGenerator.TONE_PROP_BEEP);
     }
 
+    // experimental method
+    /*
+    private void simulateKeypress() {
+        editor.getCurrentInputConnection().sendKeyEvent(
+
+                new KeyEvent(KeyEvent.ACTION_DOWN, a));
+    }*/
+
+    private void checkForEmacs() {
+        ActivityManager.RunningAppProcessInfo emacs = null;
+        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo p : am.getRunningAppProcesses()) {
+            if (p.processName.equals("com.zielm.emacs")) {
+                emacs = p;
+                break;
+            }
+        }
+
+        if (null != emacs) {
+            editor.setText("Emacs is running");
+        } else {
+            editor.setText("Emacs is not running");
+        }
+    }
 
     /**
      * ArduinoReceiver is responsible for catching broadcasted Amarino
      * events.
-     *
+     * <p/>
      * It extracts data from the intent and updates the graph accordingly.
      */
     public class ArduinoReceiver extends BroadcastReceiver {
@@ -215,20 +241,21 @@ public class Main extends Activity {
             // we only expect String data though, but it is better to check if really string was sent
             // later Amarino will support differnt data types, so far data comes always as string and
             // you have to parse the data to the type you have sent from Arduino, like it is shown below
-            if (dataType == AmarinoIntent.STRING_EXTRA){
+            if (dataType == AmarinoIntent.STRING_EXTRA) {
                 data = intent.getStringExtra(AmarinoIntent.EXTRA_DATA);
 
-                if (data != null){
+                if (data != null) {
                     Log.i(TAG, "received Extend-o-Hand data: " + data);
                     editor.setText(data);
                     try {
                         // since we know that our string value is an int number we can parse it to an integer
                         //final int sensorReading = Integer.parseInt(data);
                         //mGraph.addDataPoint(sensorReading);
-                    }
-                    catch (NumberFormatException e) { /* oh data was not an integer */ }
+                    } catch (NumberFormatException e) { /* oh data was not an integer */ }
                 }
             }
+
+
         }
     }
 }
