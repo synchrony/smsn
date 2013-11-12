@@ -1,21 +1,23 @@
 package net.fortytwo.extendo;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import net.fortytwo.extendo.brainstem.Brainstem;
 import net.fortytwo.extendo.events.EventLocationListener;
 import net.fortytwo.extendo.events.EventsActivity;
 import net.fortytwo.extendo.flashcards.android.Flashcards4Android;
-import net.fortytwo.extendo.ping.BrainPingPopup;
 import net.fortytwo.extendo.ping.BrainPingSettings;
 
 public class Main extends Activity {
@@ -23,7 +25,10 @@ public class Main extends Activity {
 
     private final Activity thisActivity = this;
 
-    public Main() {
+    private final Brainstem brainstem;
+
+    public Main() throws Brainstem.BrainstemException {
+        brainstem = new Brainstem();
     }
 
     /**
@@ -33,20 +38,24 @@ public class Main extends Activity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(Brainstem.TAG, "Brainstem create()");
+
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.main_layout);
 
         // Find the text editor view inside the layout, because we
         // want to do various programmatic things with it.
         editor = (EditText) findViewById(R.id.editor);
+        brainstem.setTextEditor(editor);
 
         // Hook up button presses to the appropriate event handler.
         findViewById(R.id.back).setOnClickListener(backListener);
-        findViewById(R.id.clear).setOnClickListener(clearListener);
+        findViewById(R.id.tryme).setOnClickListener(trymeListener);
         findViewById(R.id.flashcards).setOnClickListener(flashcardsListener);
         findViewById(R.id.events).setOnClickListener(eventsListener);
 
         editor.setText("testing");//getText(R.string.main_label));
+        checkForEmacs();
 
         // Force the service to start.
         //     startService(new Intent(this, BrainPingService.class));
@@ -57,12 +66,30 @@ public class Main extends Activity {
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, l);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Log.i(Brainstem.TAG, "Brainstem start()");
+
+        brainstem.connect(this);
+    }
+
     /**
      * Called when the activity is about to start interacting with the user.
      */
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Log.i(Brainstem.TAG, "Brainstem stop()");
+
+        brainstem.disconnect(this);
     }
 
     /**
@@ -116,13 +143,15 @@ public class Main extends Activity {
     };
 
     /**
-     * A call-back for when the user presses the clear button.
+     * A call-back for when the user presses the "try me" button.
      */
-    private OnClickListener clearListener = new OnClickListener() {
+    private OnClickListener trymeListener = new OnClickListener() {
         public void onClick(View v) {
-            editor.setText("foo\nbar");
+            editor.setText("you pressed\na button");
 
-            startActivity(new Intent(thisActivity, BrainPingPopup.class));
+            //playEventNotificationTone();
+
+            //startActivity(new Intent(thisActivity, BrainPingPopup.class));
         }
     };
 
@@ -137,4 +166,41 @@ public class Main extends Activity {
             startActivity(new Intent(thisActivity, EventsActivity.class));
         }
     };
+
+    // experimental method
+    /*
+    private void simulateKeypress() {
+        editor.getCurrentInputConnection().sendKeyEvent(
+
+                new KeyEvent(KeyEvent.ACTION_DOWN, a));
+    }*/
+
+    private void checkForEmacs() {
+        ActivityManager.RunningAppProcessInfo emacs = null;
+        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo p : am.getRunningAppProcesses()) {
+            if (p.processName.equals("com.zielm.emacs")) {
+                emacs = p;
+                break;
+            }
+        }
+
+        if (null != emacs) {
+            editor.setText("Emacs is running");
+        } else {
+            editor.setText("Emacs is not running");
+        }
+
+
+
+        /*
+        List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
+
+        Log.d("topActivity", "CURRENT Activity ::"
+                + taskInfo.get(0).topActivity.getClassName());
+
+        ComponentName ci = taskInfo.get(0).topActivity;
+        ci.getPackageName();
+        */
+    }
 }

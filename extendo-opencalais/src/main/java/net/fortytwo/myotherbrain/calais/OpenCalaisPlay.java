@@ -6,16 +6,14 @@ import mx.bigdata.jcalais.CalaisObject;
 import mx.bigdata.jcalais.CalaisResponse;
 import mx.bigdata.jcalais.rest.CalaisRestClient;
 import net.fortytwo.extendo.Extendo;
-import net.fortytwo.extendo.Extendo;
 
 import java.io.FileInputStream;
-import java.net.URL;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class OpenCalaisPlay {
-    public static final String API_KEY = "net.fortytwo.myotherbrain.calais.apiKey";
+    public static final String API_KEY = "net.fortytwo.extendo.calais.apiKey";
     
     public static void main(final String[] args) {
         try {
@@ -27,7 +25,7 @@ public class OpenCalaisPlay {
     }
 
     private static void play() throws Exception {
-        Extendo.getConfiguration().load(new FileInputStream("/tmp/open-calais-play.props"));
+        Extendo.getConfiguration().load(new FileInputStream("/tmp/opencalais-play.props"));
 
         String apiKey = Extendo.getConfiguration().getString(API_KEY);
         System.out.println("key: " + apiKey);
@@ -42,9 +40,15 @@ public class OpenCalaisPlay {
         //config.set(CalaisConfig.UserParam.EXTERNAL_ID, "User generated ID");
 
 //        CalaisResponse response = client.analyze(new URL("http://twitlogic.fortytwo.net"));
-        CalaisResponse response = client.analyze(new URL("http://ripple.fortytwo.net"));
+//        CalaisResponse response = client.analyze(new URL("http://ripple.fortytwo.net"));
 //        CalaisResponse response = client.analyze(new URL("http://blog.fortytwo.net"));
 //        CalaisResponse response = client.analyze(new URL("http://en.wikipedia.org/wiki/Supply_chain"));
+
+        //CalaisResponse response = client.analyze("Diabetes mellitus, or simply diabetes, is a group of metabolic diseases in which a person has high blood sugar, either because the pancreas does not produce enough insulin, or because cells do not respond to the insulin that is produced");
+
+        long before = System.currentTimeMillis();
+        CalaisResponse response = client.analyze("The common cause of all forms of otitis media is blockage of the Eustachian tube. This is usually due to swelling of the mucous membranes in the nasopharynx, which in turn can be caused by a viral upper respiratory infection or by allergies.");
+        long after = System.currentTimeMillis();
 
         System.out.println("recognized entities:");
         for (CalaisObject entity : response.getEntities()) {
@@ -65,5 +69,9 @@ public class OpenCalaisPlay {
             System.out.println("\t" + tags.getField("_typeGroup") + ":"
                     + tags.getField("name"));
         }
+
+        long allDone = System.currentTimeMillis();
+
+        System.out.println("finished in " + (after - before) + "ms (" + (allDone - before) + "ms incuding output)");
     }
 }
