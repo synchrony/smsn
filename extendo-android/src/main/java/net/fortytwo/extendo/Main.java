@@ -190,5 +190,17 @@ public class Main extends Activity {
         } else {
             editor.setText("Emacs is not running");
         }
+
+
+
+        /*
+        List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
+
+        Log.d("topActivity", "CURRENT Activity ::"
+                + taskInfo.get(0).topActivity.getClassName());
+
+        ComponentName ci = taskInfo.get(0).topActivity;
+        ci.getPackageName();
+        */
     }
 }

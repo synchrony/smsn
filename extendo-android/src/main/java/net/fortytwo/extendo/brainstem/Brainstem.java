@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brainstem;
 
+import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.EditText;
 import at.abraxas.amarino.AmarinoIntent;
 import com.illposed.osc.OSCMessage;
@@ -128,6 +130,10 @@ public class Brainstem {
         //startActivity(new Intent(thisActivity, PlaySound.class));
 
         tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+
+
+        Instrumentation m_Instrumentation = new Instrumentation();
+        m_Instrumentation.sendKeyDownUpSync( KeyEvent.KEYCODE_B );
     }
 
     /**
