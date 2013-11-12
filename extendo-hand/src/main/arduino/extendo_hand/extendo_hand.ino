@@ -51,6 +51,7 @@ const double zmid = (zmin + zmax) / 2.0;
 
 const double lowerBound = 1.25;
 const double upperBound = 1.75;
+
 const int STATE_ONE = 1;
 const int STATE_TWO = 2;
 const int STATE_THREE = 3;
@@ -64,9 +65,8 @@ char print_str[100];
 
 void setup()  
 {
-  // use the baud rate your bluetooth module is configured to 
-  // not all baud rates work well, i.e. ATMEGA168 works best with 57600
-  // JJS note: the Amarino receiver appears to be flexible w.r.t. baud rate; 115200 is my choice, and it works well
+  // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
+  // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
   Serial.begin(115200);
   
   state = STATE_ONE;
@@ -119,9 +119,11 @@ void loop()
           
           // gesture event
           
+          //* Bluetooth mode
+          
           // since Arduino doesn't implement %f for printf/sprintf,
           // we turn the acceleration values into integers
-          sprintf(print_str, "%ld %d %d %d %d",
+          sprintf(print_str, "/exo/hand/raw %ld %d %d %d %d",
             micros(),
             (int) (amax * 100),
             (int) (ax_max * 100),
@@ -130,8 +132,11 @@ void loop()
           //Serial.println(print_str);
           meetAndroid.receive();  
           meetAndroid.send(print_str);
+          //*/
           
-          /*
+                    
+          /* serial mode
+          
           Serial.print(micros());
           Serial.print(" "); Serial.print(amax);
           Serial.print(" "); Serial.print(ax_max);
@@ -142,26 +147,5 @@ void loop()
         }
         break;
     }
-    //*/    
-  
-    /* sensor mode
-    
-    int xraw = analogRead(pinX);
-    int yraw = analogRead(pinY);
-    int zraw = analogRead(pinZ);
-    
-    //Serial.print(micros());
-    //Serial.print(","); Serial.print(xraw);
-    //Serial.print(","); Serial.print(yraw);
-    //Serial.print(","); Serial.print(zraw);
-    //Serial.println("");
-    
-    meetAndroid.receive(); // you need to keep this in your loop() to receive events
-  
-    meetAndroid.send(xraw);
-  
-    // add a little delay otherwise the phone is pretty busy
-    delay(100);
-    //*/
 }
 
