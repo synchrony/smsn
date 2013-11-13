@@ -5,6 +5,10 @@
  * Connect the piezo buzzer to pin 7 and GND
  */
 
+#include <MeetAndroid.h>
+
+MeetAndroid meetAndroid;
+
 const int keyPin1 = 2;
 const int keyPin2 = 3;
 const int keyPin3 = 4;
@@ -24,10 +28,19 @@ void setup() {
     pinMode(speakerPin, OUTPUT); 
     pinMode(ledPin, OUTPUT);
   
+    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
+    // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
     Serial.begin(115200);  
 }
 
 unsigned int lastInputState = 0;
+
+char print_str[100];
+
+// TODO: tailor the bounce interval to the switch being used.
+// This 2ms value is a conservative estimate based on an average over many kinds of switches.
+// See "A Guide to Debouncing" by Jack G. Ganssle
+unsigned int debounceMicros = 2000;
 
 void loop() {  
     unsigned int input[5];
@@ -42,17 +55,8 @@ void loop() {
     for (int i = 0; i < 5; i++) {
       inputState |= input[i] << i;  
     }
- 
-    if (inputState != lastInputState) {
-        Serial.print("/exo/tt/keys ");
-        for (int i = 0; i < 5; i++) {
-            Serial.print(input[i] ? "1" : "0");
-        } 
-        Serial.println("");
-    }
-  
-    lastInputState = inputState;
-
+    
+    // bells and whistles
     if (input[0] == HIGH) {     
         digitalWrite(ledPin, HIGH); 
         tone(speakerPin, 440); 
@@ -60,4 +64,31 @@ void loop() {
         digitalWrite(ledPin, LOW);
         noTone(speakerPin);
     }
+    
+    if (inputState != lastInputState) {
+        unsigned int before = micros();
+        
+        sprintf(print_str, "/exo/tt/keys %c%c%c%c%c",
+            input[0] + 48, input[1] + 48, input[2] + 48, input[3] + 48, input[4] + 48, input[5] + 48);
+
+        //Serial.println(print_str);    
+
+        meetAndroid.receive(); meetAndroid.send(print_str);
+
+        unsigned int after = micros();
+        
+        if (after - before < debounceMicros) {
+            delayMicroseconds(debounceMicros - (after - before));
+        }
+        
+        /*
+        Serial.print("/exo/tt/keys ");
+        for (int i = 0; i < 5; i++) {
+            Serial.print(input[i] ? "1" : "0");
+        } 
+        Serial.println("");
+        */
+    }
+  
+    lastInputState = inputState;
 }

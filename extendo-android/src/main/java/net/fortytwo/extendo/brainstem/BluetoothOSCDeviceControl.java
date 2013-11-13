@@ -6,11 +6,14 @@ import at.abraxas.amarino.Amarino;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class BluetoothDeviceControl {
+public abstract class BluetoothOSCDeviceControl {
     private final String address;
+    private final String oscPrefix;
 
-    public BluetoothDeviceControl(String address) {
+    public BluetoothOSCDeviceControl(final String address,
+                                     final String oscPrefix) {
         this.address = address;
+        this.oscPrefix = oscPrefix;
     }
 
     public void connect(final Context context) {
@@ -22,4 +25,10 @@ public class BluetoothDeviceControl {
         // if you connect in onStart() you must not forget to disconnect when your app is closed
         Amarino.disconnect(context, address);
     }
+
+    public String getOSCPrefix() {
+        return oscPrefix;
+    }
+
+    public abstract void handleOSCStyleMessage(String message);
 }

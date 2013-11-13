@@ -1,6 +1,5 @@
 package net.fortytwo.extendo.brainstem;
 
-import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.widget.EditText;
 import at.abraxas.amarino.AmarinoIntent;
 import com.illposed.osc.OSCMessage;
@@ -18,10 +16,11 @@ import com.illposed.osc.utility.OSCByteArrayToJavaConverter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -29,20 +28,24 @@ import java.util.logging.Logger;
 public class Brainstem {
     public static final String TAG = "Brainstem";
 
-    private static final Logger LOGGER = Logger.getLogger(Brainstem.class.getName());
-
     private static final String PROPS_PATH = "/sdcard/brainstem.props";
 
     private static final String
-            PROP_EXTENDOHAND_ADDRESS = "net.fortytwo.extendo.hand.address";
+            PROP_EXTENDOHAND_ADDRESS = "net.fortytwo.extendo.hand.address",
+            PROP_TYPEATRON_ADDRESS = "net.fortytwo.extendo.typeatron.address";
 
-    private final List<BluetoothDeviceControl> devices = new LinkedList<BluetoothDeviceControl>();
+    private final List<BluetoothOSCDeviceControl> devices;
+
+    private final Map<String, BluetoothOSCDeviceControl> deviceByOSCPrefix;
 
     private EditText textEditor;
 
     private final ArduinoReceiver arduinoReceiver = new ArduinoReceiver();
 
     public Brainstem() throws BrainstemException {
+        devices  = new LinkedList<BluetoothOSCDeviceControl>();
+        deviceByOSCPrefix = new HashMap<String, BluetoothOSCDeviceControl>();
+
         loadConfiguration();
     }
 
@@ -50,17 +53,17 @@ public class Brainstem {
         // in order to receive broadcasted intents we need to register our receiver
         context.registerReceiver(arduinoReceiver, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
 
-        for (BluetoothDeviceControl d : devices) {
+        for (BluetoothOSCDeviceControl d : devices) {
             d.connect(context);
         }
     }
 
     public void disconnect(final Context context) {
-        for (BluetoothDeviceControl d : devices) {
+        for (BluetoothOSCDeviceControl d : devices) {
             d.disconnect(context);
         }
 
-        // do never forget to unregister a registered receiver
+        // don't forget to unregister a registered receiver
         context.unregisterReceiver(arduinoReceiver);
     }
 
@@ -83,8 +86,16 @@ public class Brainstem {
 
         String extendoHandAddress = props.getProperty(PROP_EXTENDOHAND_ADDRESS);
         if (null != extendoHandAddress) {
-            BluetoothDeviceControl extendoHand = new ExtendoHandControl(extendoHandAddress);
-            devices.add(extendoHand);
+            Log.i(TAG, "loading Extend-o-Hand device at address " + extendoHandAddress);
+            BluetoothOSCDeviceControl extendoHand = new ExtendoHandControl(extendoHandAddress);
+            addBluetoothOSCDevice(extendoHand);
+        }
+
+        String typeatronAddress = props.getProperty(PROP_EXTENDOHAND_ADDRESS);
+        if (null != typeatronAddress) {
+            Log.i(TAG, "loading Typeatron device at address " + typeatronAddress);
+            BluetoothOSCDeviceControl typeatron = new TypeatronControl(typeatronAddress);
+            addBluetoothOSCDevice(typeatron);
         }
     }
 
@@ -93,6 +104,26 @@ public class Brainstem {
         // TODO
         // handle various continuous SPARQL results from facilitator
 
+    }
+
+    private void addBluetoothOSCDevice(final BluetoothOSCDeviceControl dc) {
+        devices.add(dc);
+        deviceByOSCPrefix.put(dc.getOSCPrefix(), dc);
+    }
+
+    // TODO: temporary stand-in for "real" OSC messages
+    private void handleOSCStyleMessage(final String message) {
+        int i = message.indexOf(" ");
+        if (i > 0) {
+            String prefix = message.substring(i);
+
+            BluetoothOSCDeviceControl dc = deviceByOSCPrefix.get(prefix);
+            if (null == dc) {
+                Log.w(TAG, "no control matching OSC address " + prefix);
+            } else {
+                dc.handleOSCStyleMessage(message);
+            }
+        }
     }
 
     private void receiveOSCMessage(final String data,
@@ -105,7 +136,7 @@ public class Brainstem {
         if (p instanceof OSCMessage) {
             handler.handle((OSCMessage) p);
         } else {
-            LOGGER.warning("OSC packet is of non-message type " + p.getClass().getSimpleName() + ": " + p);
+            Log.w(TAG, "OSC packet is of non-message type " + p.getClass().getSimpleName() + ": " + p);
         }
     }
 
@@ -132,8 +163,8 @@ public class Brainstem {
         tg.startTone(ToneGenerator.TONE_PROP_BEEP);
 
 
-        Instrumentation m_Instrumentation = new Instrumentation();
-        m_Instrumentation.sendKeyDownUpSync( KeyEvent.KEYCODE_B );
+        //Instrumentation m_Instrumentation = new Instrumentation();
+        //m_Instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_B);
     }
 
     /**
@@ -145,31 +176,31 @@ public class Brainstem {
     private class ArduinoReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String data;
+        public void onReceive(final Context context,
+                              final Intent intent) {
 
             // the device address from which the data was sent, we don't need it here but to demonstrate how you retrieve it
-            final String address = intent.getStringExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS);
+            String address = intent.getStringExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS);
 
             //Log.i(TAG, "received from address: " + address);
             playEventNotificationTone();
 
             // the type of data which is added to the intent
-            final int dataType = intent.getIntExtra(AmarinoIntent.EXTRA_DATA_TYPE, -1);
+            int dataType = intent.getIntExtra(AmarinoIntent.EXTRA_DATA_TYPE, -1);
 
             // we only expect String data though, but it is better to check if really string was sent
             // later Amarino will support differnt data types, so far data comes always as string and
             // you have to parse the data to the type you have sent from Arduino, like it is shown below
             if (dataType == AmarinoIntent.STRING_EXTRA) {
-                data = intent.getStringExtra(AmarinoIntent.EXTRA_DATA);
+                String data = intent.getStringExtra(AmarinoIntent.EXTRA_DATA);
 
                 if (data != null) {
                     Log.i(TAG, "received Extend-o-Hand data: " + data);
-                    textEditor.setText("/exo/ " + data);
+                    textEditor.setText("OSC: " + data);
+
+                    handleOSCStyleMessage(data);
                 }
             }
-
-
         }
     }
 }
