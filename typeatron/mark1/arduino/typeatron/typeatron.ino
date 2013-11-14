@@ -29,8 +29,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// if defined, use straightforward serial output rather than Bluetooth
+// if defined, use more straightforward serial output
 #define DEBUG
+
+// send and receive messages using Bluetooth/Amarino as opposed to plain serial
+#define USE_BLUETOOTH
 
 #ifdef DEBUG
 #define EOL '@'
@@ -44,6 +47,22 @@
 #include <MeetAndroid.h>
 
 MeetAndroid meetAndroid;
+
+const char ack = 19;
+const char startFlag = 18;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <OSCMessage.h>
+
+#ifdef BOARD_HAS_USB_SERIAL
+#include <SLIPEncodedUSBSerial.h>
+SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
+#else
+#include <SLIPEncodedSerial.h>
+ SLIPEncodedSerial SLIPSerial(Serial);
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,8 +91,6 @@ unsigned int lastInputState = 0;
 char serialInputStr[256];
 
 unsigned int serialInputPtr = 0;
-
-char printStr[128];
 
 // TODO: tailor the bounce interval to the switch being used.
 // This 2ms value is a conservative estimate based on an average over many kinds of switches.
@@ -136,7 +153,13 @@ void setup() {
 
     // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
     // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
-    Serial.begin(115200); 
+    //Serial.begin(115200); 
+
+    // OSCuino: begin SLIPSerial just like Serial
+    SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
+#if ARDUINO >= 100
+    while(!Serial) ; // Leonardo "feature"
+#endif
    
     serialInputPtr = 0; 
    
@@ -164,6 +187,8 @@ void handleCommand(char *command) {
 
     if (!strcmp(address, "/exo/tt/photo")) {
         handlePhotoResistorCommand(args);  
+    } else if (!strcmp(address, "/exo/tt/rgb")) {
+      
     }
     /*
     Serial.print("got command at address ");
@@ -217,15 +242,35 @@ void loop() {
     
     if (inputState != lastInputState) {
         unsigned int before = micros();
-        
-        sprintf(printStr, "/exo/tt/keys %c%c%c%c%c",
-            input[0] + 48, input[1] + 48, input[2] + 48, input[3] + 48, input[4] + 48, input[5] + 48);
 
-#ifdef DEBUG
-        Serial.println(printStr);
-#else
+        char keys[6];
+        for (int i = 0; i < 5; i++) {
+            keys[i] = input[i] + 48;
+        }
+        keys[5] = 0;
+
+        OSCMessage msg("/exo/tt/keys");
+        msg.add(keys);
+
+#ifdef USE_BLUETOOTH
+        // TODO: receive() just once per key press, or once per loop() iteration?
         meetAndroid.receive();
-        meetAndroid.send(printStr);
+
+        // "manually" begin Bluetooth/Amarino message
+        SLIPSerial.print(startFlag);
+#endif
+
+        SLIPSerial.beginPacket();  
+        msg.send(SLIPSerial); // send the bytes to the SLIP stream
+        SLIPSerial.endPacket(); // mark the end of the OSC Packet
+        msg.empty(); // free space occupied by message
+        
+#ifdef USE_BLUETOOTH
+        // "manually" end Bluetooth/Amarino message
+        SLIPSerial.print(ack);
+#elif defined(DEBUG)
+        // put OSC messages on separate lines so as to make them more readable
+        SLIPSerial.println("");
 #endif
 
         unsigned int after = micros();

@@ -57,7 +57,7 @@ public class Main extends Activity {
         findViewById(R.id.flashcards).setOnClickListener(flashcardsListener);
         findViewById(R.id.events).setOnClickListener(eventsListener);
 
-        editor.setText("testing");//getText(R.string.main_label));
+        editor.setText("testing");
         checkForEmacs();
 
         // Force the service to start.
@@ -67,6 +67,12 @@ public class Main extends Activity {
         LocationListener l = new EventLocationListener();
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, l);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, l);
+
+        try {
+            brainstem.initialize();
+        } catch (Brainstem.BrainstemException e) {
+            Log.e(Brainstem.TAG, "exception in Brainstem initialization: " + e.getMessage());
+        }
     }
 
     @Override

@@ -16,10 +16,9 @@ import com.illposed.osc.utility.OSCByteArrayToJavaConverter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -34,32 +33,42 @@ public class Brainstem {
             PROP_EXTENDOHAND_ADDRESS = "net.fortytwo.extendo.hand.address",
             PROP_TYPEATRON_ADDRESS = "net.fortytwo.extendo.typeatron.address";
 
-    private final List<BluetoothOSCDeviceControl> devices;
+    private final List<BluetoothDeviceControl> devices;
 
-    private final Map<String, BluetoothOSCDeviceControl> deviceByOSCPrefix;
+    private final OSCDispatcher oscDispatcher;
 
     private EditText textEditor;
 
     private final ArduinoReceiver arduinoReceiver = new ArduinoReceiver();
 
-    public Brainstem() throws BrainstemException {
-        devices  = new LinkedList<BluetoothOSCDeviceControl>();
-        deviceByOSCPrefix = new HashMap<String, BluetoothOSCDeviceControl>();
+    public Brainstem() {
+        devices = new LinkedList<BluetoothDeviceControl>();
+        oscDispatcher = new OSCDispatcher();
+    }
 
+    /**
+     * Load and configure resources with dependencies which cannot be resolved at construction time,
+     * such as (currently) the text editor
+     */
+    public void initialize() throws BrainstemException {
         loadConfiguration();
+    }
+
+    public void setTextEditor(EditText textEditor) {
+        this.textEditor = textEditor;
     }
 
     public void connect(final Context context) {
         // in order to receive broadcasted intents we need to register our receiver
         context.registerReceiver(arduinoReceiver, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
 
-        for (BluetoothOSCDeviceControl d : devices) {
+        for (BluetoothDeviceControl d : devices) {
             d.connect(context);
         }
     }
 
     public void disconnect(final Context context) {
-        for (BluetoothOSCDeviceControl d : devices) {
+        for (BluetoothDeviceControl d : devices) {
             d.disconnect(context);
         }
 
@@ -84,18 +93,22 @@ public class Brainstem {
             throw new BrainstemException(e);
         }
 
+        // note: currently, setTextEditor() must be called before passing textEditor to the device controls
+
         String extendoHandAddress = props.getProperty(PROP_EXTENDOHAND_ADDRESS);
         if (null != extendoHandAddress) {
             Log.i(TAG, "loading Extend-o-Hand device at address " + extendoHandAddress);
-            BluetoothOSCDeviceControl extendoHand = new ExtendoHandControl(extendoHandAddress);
-            addBluetoothOSCDevice(extendoHand);
+            BluetoothDeviceControl extendoHand
+                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, textEditor);
+            addBluetoothDevice(extendoHand);
         }
 
-        String typeatronAddress = props.getProperty(PROP_EXTENDOHAND_ADDRESS);
+        String typeatronAddress = props.getProperty(PROP_TYPEATRON_ADDRESS);
         if (null != typeatronAddress) {
             Log.i(TAG, "loading Typeatron device at address " + typeatronAddress);
-            BluetoothOSCDeviceControl typeatron = new TypeatronControl(typeatronAddress);
-            addBluetoothOSCDevice(typeatron);
+            BluetoothDeviceControl typeatron
+                    = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor);
+            addBluetoothDevice(typeatron);
         }
     }
 
@@ -106,13 +119,34 @@ public class Brainstem {
 
     }
 
-    private void addBluetoothOSCDevice(final BluetoothOSCDeviceControl dc) {
+    private void addBluetoothDevice(final BluetoothDeviceControl dc) {
         devices.add(dc);
-        deviceByOSCPrefix.put(dc.getOSCPrefix(), dc);
     }
 
-    // TODO: temporary stand-in for "real" OSC messages
-    private void handleOSCStyleMessage(final String message) {
+    private void handleOSCData(final String data) {
+
+        OSCByteArrayToJavaConverter c = new OSCByteArrayToJavaConverter();
+
+        // TODO: is the array length all that is expected for the second argument?
+        OSCPacket p = c.convert(data.getBytes(), data.getBytes().length);
+
+        if (p instanceof OSCMessage) {
+            if (!oscDispatcher.dispatch((OSCMessage) p)) {
+                Log.w(TAG, "no OSC handler at address " + ((OSCMessage) p).getAddress());
+
+                // TODO: temporary debugging code
+                String address = ((OSCMessage) p).getAddress();
+                StringBuilder sb = new StringBuilder("address bytes:");
+                for (byte b : address.getBytes()) {
+                    sb.append(" ").append((int) b);
+                }
+                Log.w(TAG, sb.toString());
+            }
+        } else {
+            Log.w(TAG, "OSC packet is of non-message type " + p.getClass().getSimpleName() + ": " + p);
+        }
+
+        /*
         int i = message.indexOf(" ");
         if (i > 0) {
             String prefix = message.substring(i);
@@ -124,24 +158,7 @@ public class Brainstem {
                 dc.handleOSCStyleMessage(message);
             }
         }
-    }
-
-    private void receiveOSCMessage(final String data,
-                                   final OSCMessageHandler handler) {
-        OSCByteArrayToJavaConverter c = new OSCByteArrayToJavaConverter();
-
-        // TODO: is the array length all that is expected for the second argument?
-        OSCPacket p = c.convert(data.getBytes(), data.getBytes().length);
-
-        if (p instanceof OSCMessage) {
-            handler.handle((OSCMessage) p);
-        } else {
-            Log.w(TAG, "OSC packet is of non-message type " + p.getClass().getSimpleName() + ": " + p);
-        }
-    }
-
-    public void setTextEditor(EditText textEditor) {
-        this.textEditor = textEditor;
+        */
     }
 
     public class BrainstemException extends Exception {
@@ -195,10 +212,31 @@ public class Brainstem {
                 String data = intent.getStringExtra(AmarinoIntent.EXTRA_DATA);
 
                 if (data != null) {
-                    Log.i(TAG, "received Extend-o-Hand data: " + data);
+                    byte[] bytes = data.getBytes();
+
+                    // strip off the odd 0xEF 0xBF 0xBD three-byte sequence which sometimes encloses the message
+                    // I haven't quite grokked it.  It's like a UTF byte order mark, but not quite, and it appears
+                    // both at the end and the beginning.
+                    // It appears only when Amarino *and* OSCuino are used to send the OSC data over Bluetooth
+                    if (bytes.length >= 6) {
+                        //Log.i(TAG, "bytes[0] = " + (int) bytes[0] + ", " + "bytes[bytes.length - 3] = " + bytes[bytes.length - 3]);
+
+                        if (-17 == bytes[0] && -17 == bytes[bytes.length - 3]) {
+                            data = new String(Arrays.copyOfRange(bytes, 3, bytes.length - 3));
+                        }
+                    }
+
+                    Log.i(TAG, "data from Arduino: " + data);
                     textEditor.setText("OSC: " + data);
 
-                    handleOSCStyleMessage(data);
+                    // TODO: temporary debugging code
+                    StringBuilder sb = new StringBuilder("data:");
+                    for (byte b : data.getBytes()) {
+                        sb.append(" ").append((int) b);
+                    }
+                    Log.i(TAG, sb.toString());
+
+                    handleOSCData(data);
                 }
             }
         }
