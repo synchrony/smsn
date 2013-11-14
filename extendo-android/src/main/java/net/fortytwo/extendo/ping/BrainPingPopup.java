@@ -11,9 +11,7 @@ import android.util.Log;
 import net.fortytwo.extendo.R;
 
 /**
- * User: josh
- * Date: 1/12/11
- * Time: 5:05 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainPingPopup extends Activity {
     private static final String LOG_TAG = BrainPingPopup.class.getName();

@@ -18,9 +18,7 @@ import java.util.LinkedList;
 
 
 /**
- * User: josh
- * Date: 1/12/11
- * Time: 5:40 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainPingService extends IntentService {
     public static final int BRAINPING_ID = 1;

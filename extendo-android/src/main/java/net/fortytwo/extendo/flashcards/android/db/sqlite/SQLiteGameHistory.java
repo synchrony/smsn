@@ -14,9 +14,7 @@ import java.io.IOException;
 /**
  * Note: in ordering results by increasing HISTORY__ID instead of HISTORY__TIME, it is assumed that these have the same order.
  *
- * User: josh
- * Date: 3/14/11
- * Time: 6:48 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SQLiteGameHistory extends GameHistory {
     public static final String

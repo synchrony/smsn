@@ -5,9 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * User: josh
- * Date: 3/5/11
- * Time: 7:13 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SQLiteFlashcardsHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "flashcards.db";

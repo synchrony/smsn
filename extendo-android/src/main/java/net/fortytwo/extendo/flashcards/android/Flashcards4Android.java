@@ -38,6 +38,9 @@ import net.fortytwo.extendo.flashcards.games.AsynchronousGame;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Joshua Shinavier (http://fortytwo.net)
+ */
 public class Flashcards4Android extends Activity {
     public static final String INFO = "net.fortytwo.extendo.flashcards.android.info";
 

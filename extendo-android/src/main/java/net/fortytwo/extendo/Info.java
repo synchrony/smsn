@@ -5,10 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
-import net.fortytwo.extendo.R;
 
 import java.util.Map;
 
+/**
+ * @author Joshua Shinavier (http://fortytwo.net)
+ */
 public class Info extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {

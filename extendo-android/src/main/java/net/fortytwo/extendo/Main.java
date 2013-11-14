@@ -20,6 +20,9 @@ import net.fortytwo.extendo.events.EventsActivity;
 import net.fortytwo.extendo.flashcards.android.Flashcards4Android;
 import net.fortytwo.extendo.ping.BrainPingSettings;
 
+/**
+ * @author Joshua Shinavier (http://fortytwo.net)
+ */
 public class Main extends Activity {
     private EditText editor;
 
@@ -190,8 +193,6 @@ public class Main extends Activity {
         } else {
             editor.setText("Emacs is not running");
         }
-
-
 
         /*
         List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);

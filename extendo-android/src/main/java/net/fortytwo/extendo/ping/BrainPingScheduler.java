@@ -5,16 +5,11 @@ import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
- * User: josh
- * Date: 1/12/11
- * Time: 2:09 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainPingScheduler {
     public static final String

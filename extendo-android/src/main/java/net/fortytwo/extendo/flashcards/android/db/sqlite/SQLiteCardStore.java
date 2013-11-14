@@ -12,9 +12,7 @@ import net.fortytwo.extendo.flashcards.db.CloseableIterator;
 import java.io.IOException;
 
 /**
- * User: josh
- * Date: 3/29/11
- * Time: 8:21 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SQLiteCardStore<Q, A> implements CardStore<Q, A> {
     private final SQLiteDatabase database;

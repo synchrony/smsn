@@ -3,9 +3,11 @@ package net.fortytwo.extendo.flashcards.android;
 import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
-import android.widget.TextView;
 import net.fortytwo.extendo.R;
 
+/**
+ * @author Joshua Shinavier (http://fortytwo.net)
+ */
 public class FlashcardsInfo extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {

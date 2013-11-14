@@ -6,7 +6,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import net.fortytwo.extendo.R;
 
-
+/**
+ * @author Joshua Shinavier (http://fortytwo.net)
+ */
 public class BrainPingSettings extends PreferenceActivity {
 
     @Override

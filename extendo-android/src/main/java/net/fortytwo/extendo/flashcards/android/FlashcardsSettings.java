@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import net.fortytwo.extendo.R;
 
-
+/**
+ * @author Joshua Shinavier (http://fortytwo.net)
+ */
 public class FlashcardsSettings extends PreferenceActivity {
 
     @Override

@@ -5,9 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 /**
- * User: josh
- * Date: 4/17/11
- * Time: 3:09 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class Pinger {
     private static final float DEFAULT_FREQUENCY = 1.0f;
