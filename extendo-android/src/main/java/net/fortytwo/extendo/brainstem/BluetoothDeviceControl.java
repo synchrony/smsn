@@ -13,6 +13,10 @@ public abstract class BluetoothDeviceControl {
         this.address = address;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
     public void connect(final Context context) {
         // this is how you tell Amarino to connect to a specific BT device from within your own code
         Amarino.connect(context, address);

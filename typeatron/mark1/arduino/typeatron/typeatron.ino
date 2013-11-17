@@ -30,7 +30,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // if defined, use more straightforward serial output
-#define DEBUG
+//#define DEBUG
 
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
 #define USE_BLUETOOTH
@@ -44,24 +44,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <MeetAndroid.h>
+//#include <MeetAndroid.h>
 
-MeetAndroid meetAndroid;
+//MeetAndroid meetAndroid;
 
 const char ack = 19;
 const char startFlag = 18;
+//const char abord = 27;
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <OSCMessage.h>
+#include <OSCBundle.h>
 
 #ifdef BOARD_HAS_USB_SERIAL
 #include <SLIPEncodedUSBSerial.h>
 SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
 #else
 #include <SLIPEncodedSerial.h>
- SLIPEncodedSerial SLIPSerial(Serial);
+SLIPEncodedSerial SLIPSerial(Serial);
 #endif
 
 
@@ -128,7 +130,6 @@ void writeRGBColor(unsigned long color)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
 void startupSequence() {
     writeRGBColor(RED);
     digitalWrite(vibrationMotorPin, HIGH);
@@ -161,9 +162,26 @@ void setup() {
     while(!Serial) ; // Leonardo "feature"
 #endif
    
+//#ifdef USE_BLUETOOTH
+//    meetAndroid.registerFunction(receiveBluetoothOSC, 'e');
+//#endif
+
     serialInputPtr = 0; 
    
     startupSequence();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void RGBLEDcontrol(class OSCMessage &m) {
+  error("we made it into the RGB control!");
+    if (m.isInt(0)) {
+        unsigned long color = (unsigned long) m.getInt(0);
+        writeRGBColor(color);
+    } else {
+        error("expected integer argument to RGB LED control");
+    }
 }
 
 void handlePhotoResistorCommand(char *args) {
@@ -201,7 +219,160 @@ void handleCommand(char *command) {
     }*/
 }
 
-void loop() {  
+
+////////////////////////////////////////////////////////////////////////////////
+
+const int STATE_START = 0;
+const int STATE_PACKET_BODY = 1;
+const int STATE_WAITING_FOR_ACK = 2;
+
+int readState = STATE_START;
+
+OSCBundle bundleIN;
+
+const char amarinoFlag = 'e';
+
+const unsigned int readBufferLength = 1024;
+int readBuffer[readBufferLength];
+int readBufferPos = 0;
+
+int readBuffer2[readBufferLength];
+
+
+const int delimiter = ';';
+
+int getArrayLength()
+{
+        if (readBufferPos == 1) return 0; // only a flag and ack was sent, not data attached
+        int numberOfValues = 1;
+        // find the amount of values we got
+        for (int a=1; a<readBufferPos;a++){
+                if (readBuffer[a]==delimiter) numberOfValues++;
+        }
+        return numberOfValues;
+}
+
+void getIntValues(int values[])
+{
+        int t = 0; // counter for each char based array
+        int pos = 0;
+
+        int start = 1; // start of first value
+        for (int end=1; end<readBufferPos;end++){
+                // find end of value
+                if (readBuffer[end]==delimiter) {
+                        // now we know start and end of a value
+                        char b[(end-start)+1]; // create container for one value plus '\0'
+                        t = 0;
+                        for(int i = start;i < end;i++){
+                                b[t++] = (char)readBuffer[i];
+                        }
+                        b[t] = '\0';
+                        values[pos++] = atoi(b);
+                        start = end+1;
+                }
+        }
+        // get the last value
+        char b[(readBufferPos-start)+1]; // create container for one value plus '\0'
+        t = 0;
+        for(int i = start;i < readBufferPos;i++){
+                b[t++] = (char)readBuffer[i];
+        }
+        b[t] = '\0';
+        values[pos] = atoi(b);
+}
+
+
+void readSerial() {
+    int ch;
+    char errstr[128];
+
+    while (SLIPSerial.available() > 0) {
+        ch = SLIPSerial.read();
+
+#ifdef USE_BLUETOOTH
+        if (ack == ch) {
+            for (int i = 0; i < readBufferPos; i++) {
+                readBufferPos++;
+                
+                int l = getArrayLength();
+
+                getIntValues(readBuffer2);
+sprintf(errstr, "received a string of length %d", l);
+error(errstr);              
+                for (int i = 0; i < l; i++) {
+                    bundleIN.fill(readBuffer2[i]);
+                }                
+            }          
+        } else {
+            // note: soft fail on buffer overrun may result in invalid, truncated messages
+            if (readBufferPos < readBufferLength) {
+                readBuffer[readBufferPos++] = ch;
+            }
+        }
+#else
+        bundleIN.fill(ch);
+        
+        if (SLIPSerial.endofPacket()) {
+            if (bundleIN.hasError()) {
+                error("OSC bundle hasError");
+            } else {
+                bundleIN.dispatch("/exo/tt/rgb", RGBLEDcontrol);
+            }
+
+            bundleIN.empty();
+        }
+#endif
+    }
+}
+
+void receiveBluetoothOSC(byte flag, byte numOfValues)
+{
+  // TODO: read arguments
+  //int state = meetAndroid.getInt();
+ 
+    writeRGBColor(GREEN);
+}
+
+void sendOSC(class OSCMessage &m) {
+#ifdef USE_BLUETOOTH
+    // "manually" begin Bluetooth/Amarino message
+    SLIPSerial.print(startFlag);
+#endif
+
+    SLIPSerial.beginPacket();  
+    m.send(SLIPSerial); // send the bytes to the SLIP stream
+    SLIPSerial.endPacket(); // mark the end of the OSC Packet
+    m.empty(); // free space occupied by message
+        
+#ifdef USE_BLUETOOTH
+    // "manually" end Bluetooth/Amarino message
+    SLIPSerial.print(ack);
+#elif defined(DEBUG)
+    // put OSC messages on separate lines so as to make them more readable
+    SLIPSerial.println("");
+#endif  
+}
+
+void error(char *message) {
+    OSCMessage m("/exo/tt/error");
+    m.add(message);
+
+    sendOSC(m);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void loop() {
+    readSerial();
+    
+//#ifdef USE_BLUETOOTH
+    // this must be kept in loop() to receive events via Amarino
+//    meetAndroid.receive();  
+//#endif
+
+#ifdef DEBUG
     if (Serial.available() > 0) {            
         int c = Serial.read();
         //Serial.print("I received: ");
@@ -217,7 +388,8 @@ void loop() {
             serialInputStr[serialInputPtr++] = c;  
         }
     }
-    
+#endif
+
     unsigned int input[5];
     unsigned inputState = 0;
       
@@ -249,29 +421,10 @@ void loop() {
         }
         keys[5] = 0;
 
-        OSCMessage msg("/exo/tt/keys");
-        msg.add(keys);
+        OSCMessage m("/exo/tt/keys");
+        m.add(keys);
 
-#ifdef USE_BLUETOOTH
-        // TODO: receive() just once per key press, or once per loop() iteration?
-        meetAndroid.receive();
-
-        // "manually" begin Bluetooth/Amarino message
-        SLIPSerial.print(startFlag);
-#endif
-
-        SLIPSerial.beginPacket();  
-        msg.send(SLIPSerial); // send the bytes to the SLIP stream
-        SLIPSerial.endPacket(); // mark the end of the OSC Packet
-        msg.empty(); // free space occupied by message
-        
-#ifdef USE_BLUETOOTH
-        // "manually" end Bluetooth/Amarino message
-        SLIPSerial.print(ack);
-#elif defined(DEBUG)
-        // put OSC messages on separate lines so as to make them more readable
-        SLIPSerial.println("");
-#endif
+        sendOSC(m);
 
         unsigned int after = micros();
         
@@ -282,3 +435,4 @@ void loop() {
   
     lastInputState = inputState;
 }
+

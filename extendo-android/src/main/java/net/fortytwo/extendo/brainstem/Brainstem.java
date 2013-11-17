@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.util.Log;
 import android.widget.EditText;
+import at.abraxas.amarino.Amarino;
 import at.abraxas.amarino.AmarinoIntent;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
@@ -34,6 +35,8 @@ public class Brainstem {
             PROP_TYPEATRON_ADDRESS = "net.fortytwo.extendo.typeatron.address";
 
     private final List<BluetoothDeviceControl> devices;
+
+    private BluetoothDeviceControl typeatron;
 
     private final OSCDispatcher oscDispatcher;
 
@@ -106,7 +109,7 @@ public class Brainstem {
         String typeatronAddress = props.getProperty(PROP_TYPEATRON_ADDRESS);
         if (null != typeatronAddress) {
             Log.i(TAG, "loading Typeatron device at address " + typeatronAddress);
-            BluetoothDeviceControl typeatron
+            typeatron
                     = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor);
             addBluetoothDevice(typeatron);
         }
@@ -174,7 +177,7 @@ public class Brainstem {
     // Note: is it possible to generate a tone with lower latency than this default generator's?
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
 
-    private void playEventNotificationTone() {
+    public void playEventNotificationTone() {
         //startActivity(new Intent(thisActivity, PlaySound.class));
 
         tg.startTone(ToneGenerator.TONE_PROP_BEEP);
@@ -182,6 +185,15 @@ public class Brainstem {
 
         //Instrumentation m_Instrumentation = new Instrumentation();
         //m_Instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_B);
+    }
+
+    // TODO: temporary
+    public void sendTestMessageToTypeatron(final Context context) {
+        OSCMessage m = new OSCMessage();
+        m.setAddress("/exo/tt/rgb");
+        m.addArgument(0xff0000);
+
+        Amarino.sendDataToArduino(context, typeatron.getAddress(), 'e', m.getByteArray());
     }
 
     /**
@@ -215,8 +227,8 @@ public class Brainstem {
                     byte[] bytes = data.getBytes();
 
                     // strip off the odd 0xEF 0xBF 0xBD three-byte sequence which sometimes encloses the message
-                    // I haven't quite grokked it.  It's like a UTF byte order mark, but not quite, and it appears
-                    // both at the end and the beginning.
+                    // I haven't quite grokked it.  It's like a UTF-8 byte order mark, but not quite, and it appears
+                    // both at the end and the beginning of the message.
                     // It appears only when Amarino *and* OSCuino are used to send the OSC data over Bluetooth
                     if (bytes.length >= 6) {
                         //Log.i(TAG, "bytes[0] = " + (int) bytes[0] + ", " + "bytes[bytes.length - 3] = " + bytes[bytes.length - 3]);
@@ -227,14 +239,16 @@ public class Brainstem {
                     }
 
                     Log.i(TAG, "data from Arduino: " + data);
-                    textEditor.setText("OSC: " + data);
+                    //textEditor.setText("OSC: " + data);
 
+                    /*
                     // TODO: temporary debugging code
                     StringBuilder sb = new StringBuilder("data:");
                     for (byte b : data.getBytes()) {
                         sb.append(" ").append((int) b);
                     }
                     Log.i(TAG, sb.toString());
+                    */
 
                     handleOSCData(data);
                 }

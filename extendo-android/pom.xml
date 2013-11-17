@@ -32,6 +32,12 @@
             <artifactId>android</artifactId>
             <version>2.2.1</version>
             <scope>provided</scope>
+            <!--<exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
@@ -39,20 +45,23 @@
             <version>${sesame.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.illposed.osc</groupId>
-            <artifactId>javaosc</artifactId>
-            <version>20060402</version>
-        </dependency>
-        <dependency>
             <groupId>at.abraxas</groupId>
             <artifactId>amarino</artifactId>
             <version>2.0</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
             <artifactId>rdfagents-jade</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>-->
+            <exclusions>
+                <!-- exclude the XMPP MTP, which is currently not used
+                     and which contains a Crimson XML dependency which is incompatible with Android -->
+                <exclusion>
+                    <groupId>com.tilab.jade</groupId>
+                    <artifactId>xmpp-mtp</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.illposed.osc</groupId>
             <artifactId>javaosc</artifactId>
@@ -101,6 +110,21 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            <!-- Use this for inspecting/debugging dependencies
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
         </plugins>
     </build>
 

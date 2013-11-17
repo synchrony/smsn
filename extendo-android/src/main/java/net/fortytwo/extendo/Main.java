@@ -151,14 +151,20 @@ public class Main extends Activity {
         }
     };
 
+    private final Context context = this;
+
     /**
      * A call-back for when the user presses the "try me" button.
      */
     private OnClickListener trymeListener = new OnClickListener() {
-        public void onClick(View v) {
-            editor.setText("you pressed\na button");
 
-            //playEventNotificationTone();
+        public void onClick(View v) {
+            editor.setText("");
+            editor.setText("sending a message\nto the Typeatron");
+
+            brainstem.playEventNotificationTone();
+
+            brainstem.sendTestMessageToTypeatron(context);
 
             //startActivity(new Intent(thisActivity, BrainPingPopup.class));
         }

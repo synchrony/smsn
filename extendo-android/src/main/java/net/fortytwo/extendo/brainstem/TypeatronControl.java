@@ -18,7 +18,18 @@ public class TypeatronControl extends BluetoothDeviceControl {
                 if (1 == args.length) {
                     textEditor.setText("Typeatron keys: " + args[0]);
                 } else {
-                    textEditor.setText("Typeatron error (wrong # of args)");
+                    textEditor.setText("Typeatron control error (wrong # of args)");
+                }
+            }
+        });
+
+        oscDispatcher.register("/exo/tt/error", new OSCMessageHandler() {
+            public void handle(OSCMessage message) {
+                Object[] args = message.getArguments();
+                if (1 == args.length) {
+                    textEditor.append("\nTypeatron device error: " + args[0]);
+                } else {
+                    textEditor.setText("Typeatron control error (wrong # of args)");
                 }
             }
         });
