@@ -70,7 +70,7 @@
         <module>extendo-rdf</module>
         <module>extendo-rfid</module>
         <module>extendo-speech</module>
-        <module>extendo-webdav</module>
+        <!--<module>extendo-webdav</module>-->
         <module>droidspeak</module>
         <module>flashcards</module>
         <module>monitron-server</module>
