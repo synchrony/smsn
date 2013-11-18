@@ -67,6 +67,7 @@
         <module>extendo-events</module>
         <module>extendo-opencalais</module>
         <module>extendo-qrcodes</module>
+        <module>extendo-rdf</module>
         <module>extendo-rfid</module>
         <module>extendo-speech</module>
         <module>extendo-webdav</module>

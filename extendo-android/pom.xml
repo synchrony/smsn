@@ -24,6 +24,11 @@
     <dependencies>
         <dependency>
             <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-rdf</artifactId>
+            <version>${extendo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.extendo</groupId>
             <artifactId>flashcards</artifactId>
             <version>${extendo.version}</version>
         </dependency>
@@ -32,12 +37,6 @@
             <artifactId>android</artifactId>
             <version>2.2.1</version>
             <scope>provided</scope>
-            <!--<exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
-                </exclusion>
-            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>

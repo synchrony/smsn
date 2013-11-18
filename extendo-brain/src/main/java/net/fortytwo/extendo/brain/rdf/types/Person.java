@@ -5,7 +5,7 @@ import net.fortytwo.extendo.brain.rdf.BottomUpType;
 import net.fortytwo.extendo.brain.rdf.Field;
 import net.fortytwo.extendo.brain.rdf.Mapper;
 import net.fortytwo.extendo.brain.rdf.MappingContext;
-import net.fortytwo.extendo.brain.rdf.vocab.FOAF;
+import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDFS;

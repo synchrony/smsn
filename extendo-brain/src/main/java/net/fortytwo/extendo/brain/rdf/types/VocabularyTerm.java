@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.brain.rdf.types;
 
 import net.fortytwo.extendo.brain.Atom;
-import net.fortytwo.extendo.brain.rdf.vocab.ExtendoVocab;
+import net.fortytwo.extendo.rdf.vocab.ExtendoVocab;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDFS;

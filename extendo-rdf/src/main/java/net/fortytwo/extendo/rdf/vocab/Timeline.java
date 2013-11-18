@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.rdf.vocab;
+package net.fortytwo.extendo.rdf.vocab;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
