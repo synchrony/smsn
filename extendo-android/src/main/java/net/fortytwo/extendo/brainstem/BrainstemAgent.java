@@ -28,6 +28,16 @@ public class BrainstemAgent {
 
     private final DatasetFactory factory;
 
+    public static final String QUERY_FOR_ALL_GB_GESTURES =
+            "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
+                    "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
+                    "SELECT ?person ?time WHERE {\n" +
+                    "?gesture a gesture:GenericBatonGesture .\n" +
+                    "?gesture gesture:expressedBy ?person .\n" +
+                    "?gesture gesture:recognizedAt ?instant .\n" +
+                    "?instant tl:at ?time .\n" +
+                    "}";
+
     public BrainstemAgent(final String agentUri) {
         factory = new DatasetFactory();
         vf = factory.getValueFactory();
