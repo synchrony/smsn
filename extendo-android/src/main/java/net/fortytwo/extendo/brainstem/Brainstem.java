@@ -30,7 +30,8 @@ public class Brainstem {
 
     private static final String PROPS_PATH = "/sdcard/brainstem.props";
 
-    private static final String
+    public static final String
+            PROP_AGENTURI = "net.fortytwo.extendo.agentUri",
             PROP_EXTENDOHAND_ADDRESS = "net.fortytwo.extendo.hand.address",
             PROP_TYPEATRON_ADDRESS = "net.fortytwo.extendo.typeatron.address";
 
@@ -44,9 +45,22 @@ public class Brainstem {
 
     private final ArduinoReceiver arduinoReceiver = new ArduinoReceiver();
 
+    private Properties configuration;
+
+    private BrainstemAgent agent;
+
     public Brainstem() {
         devices = new LinkedList<BluetoothDeviceControl>();
         oscDispatcher = new OSCDispatcher();
+    }
+
+    /**
+     * Supplies a Brainstem configuration.
+     * Otherwise, the configuration will be loaded from the default location on disk: /sdcard/brainstem.props
+     * @param conf the configuration properties
+     */
+    public void setConfiguration(final Properties conf) {
+        configuration = conf;
     }
 
     /**
@@ -55,6 +69,10 @@ public class Brainstem {
      */
     public void initialize() throws BrainstemException {
         loadConfiguration();
+    }
+
+    public BrainstemAgent getAgent() {
+        return agent;
     }
 
     public void setTextEditor(EditText textEditor) {
@@ -84,21 +102,30 @@ public class Brainstem {
     // Ideally, this file will go away entirely once the Brainstem becomes reusable software rather than a
     // special-purpose component of a demo.
     private void loadConfiguration() throws BrainstemException {
-        File conf = new File(PROPS_PATH);
-        if (!conf.exists()) {
-            throw new BrainstemException("configuration properties not found: " + PROPS_PATH);
-        }
+        if (null == configuration) {
+            File f = new File(PROPS_PATH);
+            if (!f.exists()) {
+                throw new BrainstemException("configuration properties not found: " + PROPS_PATH);
+            }
 
-        Properties props = new Properties();
-        try {
-            props.load(new FileInputStream(conf));
-        } catch (IOException e) {
-            throw new BrainstemException(e);
+            configuration = new Properties();
+            try {
+                configuration.load(new FileInputStream(f));
+            } catch (IOException e) {
+                throw new BrainstemException(e);
+            }
         }
 
         // note: currently, setTextEditor() must be called before passing textEditor to the device controls
 
-        String extendoHandAddress = props.getProperty(PROP_EXTENDOHAND_ADDRESS);
+        String u = configuration.getProperty(PROP_AGENTURI);
+        if (null == u) {
+            throw new BrainstemException("who are you? Missing value for " + PROP_AGENTURI);
+        } else {
+            agent = new BrainstemAgent(u);
+        }
+
+        String extendoHandAddress = configuration.getProperty(PROP_EXTENDOHAND_ADDRESS);
         if (null != extendoHandAddress) {
             Log.i(TAG, "loading Extend-o-Hand device at address " + extendoHandAddress);
             BluetoothDeviceControl extendoHand
@@ -106,7 +133,7 @@ public class Brainstem {
             addBluetoothDevice(extendoHand);
         }
 
-        String typeatronAddress = props.getProperty(PROP_TYPEATRON_ADDRESS);
+        String typeatronAddress = configuration.getProperty(PROP_TYPEATRON_ADDRESS);
         if (null != typeatronAddress) {
             Log.i(TAG, "loading Typeatron device at address " + typeatronAddress);
             typeatron

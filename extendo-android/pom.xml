@@ -66,10 +66,17 @@
             <artifactId>javaosc</artifactId>
             <version>20060402</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
