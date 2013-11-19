@@ -101,6 +101,20 @@ public class NoteQueries {
         return n;
     }
 
+    public Note view(final List<Atom> atoms,
+                     final int height,
+                     final Filter filter) {
+        Note result = new Note();
+        // note: text value of result is not set here
+
+        for (Atom a : atoms) {
+            Note n = viewInternal(a, height - 1, filter, FORWARD_ADJACENCY);
+            result.addChild(n);
+        }
+
+        return result;
+    }
+
     private boolean hasChildren(final Atom root,
                                 final Filter filter,
                                 final AdjacencyStyle style) {
@@ -215,7 +229,7 @@ public class NoteQueries {
         ListDiff.DiffEditor<Note> ed = new ListDiff.DiffEditor<Note>() {
             public void add(final int position,
                             final Note note) throws InvalidUpdateException {
-                System.out.println("adding at " + position + ": " + note);
+                //System.out.println("adding at " + position + ": " + note);
 
                 Atom a = getAtom(note);
                 if (null == a) {
@@ -250,13 +264,13 @@ public class NoteQueries {
 
             public void delete(final int position,
                                final Note note) {
-                System.out.println("deleting at " + position + ": " + note);
+                //System.out.println("deleting at " + position + ": " + note);
                 AtomList n = root.getNotes();
 
                 if (0 == position) {
                     root.setNotes(n.getRest());
 
-                    store.remove(n);
+                    store.deleteListNode(n);
                 } else {
                     AtomList prev = n;
                     for (int i = 1; i < position; i++) {
@@ -265,7 +279,7 @@ public class NoteQueries {
 
                     AtomList l = prev.getRest();
                     prev.setRest(l.getRest());
-                    store.remove(l);
+                    store.deleteListNode(l);
                 }
 
                 if (null != log) {
@@ -282,6 +296,7 @@ public class NoteQueries {
             //System.out.flush();
             int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : depth - 1;
 
+            // TODO: verify that this can result in multiple log events per call to update()
             updateInternal(store.getAtom(n.getId()), n, d, filter, style, log);
         }
     }

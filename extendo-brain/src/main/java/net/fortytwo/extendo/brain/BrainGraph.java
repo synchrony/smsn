@@ -12,11 +12,13 @@ import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -47,7 +49,7 @@ public class BrainGraph {
         }
     }
 
-    public static BrainGraph getInstance(final KeyIndexableGraph baseGraph) throws Exception {
+    public static BrainGraph getInstance(final KeyIndexableGraph baseGraph) throws BrainGraphException {
         BrainGraph g = graphs.get(baseGraph);
 
         if (null == g) {
@@ -58,7 +60,7 @@ public class BrainGraph {
         return g;
     }
 
-    private BrainGraph(final KeyIndexableGraph baseGraph) throws Exception {
+    private BrainGraph(final KeyIndexableGraph baseGraph) throws BrainGraphException {
         IdGraph.IdFactory f = new ExtendoIdFactory();
         graph = new IdGraph<KeyIndexableGraph>(baseGraph);
         graph.setVertexIdFactory(f);
@@ -77,14 +79,23 @@ public class BrainGraph {
             graph.createKeyIndex(Extendo.ALIAS, Vertex.class);
         }
 
-        File logFile = Extendo.getConfiguration().getFile(Extendo.ACTIVITY_LOG, null);
+        File logFile = null;
+        try {
+            logFile = Extendo.getConfiguration().getFile(Extendo.ACTIVITY_LOG, null);
+        } catch (PropertyException e) {
+            throw new BrainGraphException(e);
+        }
 
         if (null == logFile) {
             LOGGER.warning("no activity log specified");
             activityLog = null;
         } else {
             LOGGER.info("will use activity log at " + logFile.getPath());
-            activityLog = new ActivityLog(new FileWriter(logFile, true));
+            try {
+                activityLog = new ActivityLog(new FileWriter(logFile, true));
+            } catch (IOException e) {
+                throw new BrainGraphException(e);
+            }
         }
 
         priorities = new Priorities();
@@ -150,7 +161,7 @@ public class BrainGraph {
         return framedGraph.frame(this.getGraph().addVertex(null), AtomList.class);
     }
 
-    public AtomList createAtomList(Atom... elements) {
+    public AtomList createAtomList(final Atom... elements) {
         if (0 == elements.length) {
             throw new IllegalArgumentException("empty list");
         }
@@ -172,8 +183,38 @@ public class BrainGraph {
         return head;
     }
 
-    public void remove(final AtomList l) {
-        this.getGraph().removeVertex(l.asVertex());
+    public void deleteAtom(final Atom a) {
+        graph.removeVertex(a.asVertex());
+    }
+
+    public void deleteListNode(final AtomList l) {
+        graph.removeVertex(l.asVertex());
+    }
+
+    public void deleteListNodesRecursively(final AtomList l) {
+        AtomList cur = l;
+        while (null != cur) {
+            AtomList rest = cur.getRest();
+            graph.removeVertex(cur.asVertex());
+            cur = rest;
+        }
+    }
+
+    public void deleteListNodesAndChildrenRecursively(final AtomList l) {
+        AtomList cur = l;
+        while (null != cur) {
+            AtomList rest = cur.getRest();
+            Atom child = cur.getFirst();
+            graph.removeVertex(cur.asVertex());
+            cur = rest;
+
+            AtomList grandChildren = child.getNotes();
+            if (null != grandChildren) {
+                // delete the list of grandchildren non-recursively
+                deleteListNodesRecursively(grandChildren);
+            }
+            deleteAtom(child);
+        }
     }
 
     public Collection<Atom> getAtomsWithValue(final String value) {
@@ -235,9 +276,9 @@ public class BrainGraph {
         };
     }
 
-    public Collection<Atom> getAtomsByFulltextQuery(final String query,
+    public List<Atom> getAtomsByFulltextQuery(final String query,
                                                     final Filter filter) {
-        Collection<Atom> results = new LinkedList<Atom>();
+        List<Atom> results = new LinkedList<Atom>();
 
         for (Vertex v : searchIndex.query(Extendo.VALUE, query)) {
             Atom a = getAtom(v);
@@ -252,5 +293,11 @@ public class BrainGraph {
         }
 
         return results;
+    }
+
+    public class BrainGraphException extends Exception {
+        public BrainGraphException(final Throwable cause) {
+            super(cause);
+        }
     }
 }
