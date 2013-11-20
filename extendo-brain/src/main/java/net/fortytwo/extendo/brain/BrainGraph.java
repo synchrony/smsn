@@ -10,19 +10,16 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
+ * A graph of atoms and lists conforming to the Extend-o-Brain data model
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainGraph {
@@ -32,13 +29,8 @@ public class BrainGraph {
 
     private final FramedGraph<KeyIndexableGraph> framedGraph;
 
-    private final ActivityLog activityLog;
-
     private Index<Vertex> searchIndex;
 
-    private final Priorities priorities;
-
-    private static final Map<KeyIndexableGraph, BrainGraph> graphs = new HashMap<KeyIndexableGraph, BrainGraph>();
     private static final String atomNs;
 
     static {
@@ -49,18 +41,7 @@ public class BrainGraph {
         }
     }
 
-    public static BrainGraph getInstance(final KeyIndexableGraph baseGraph) throws BrainGraphException {
-        BrainGraph g = graphs.get(baseGraph);
-
-        if (null == g) {
-            g = new BrainGraph(baseGraph);
-            graphs.put(baseGraph, g);
-        }
-
-        return g;
-    }
-
-    private BrainGraph(final KeyIndexableGraph baseGraph) throws BrainGraphException {
+    public BrainGraph(final KeyIndexableGraph baseGraph) {
         IdGraph.IdFactory f = new ExtendoIdFactory();
         graph = new IdGraph<KeyIndexableGraph>(baseGraph);
         graph.setVertexIdFactory(f);
@@ -78,32 +59,6 @@ public class BrainGraph {
             LOGGER.info("creating key index for 'alias' property");
             graph.createKeyIndex(Extendo.ALIAS, Vertex.class);
         }
-
-        File logFile = null;
-        try {
-            logFile = Extendo.getConfiguration().getFile(Extendo.ACTIVITY_LOG, null);
-        } catch (PropertyException e) {
-            throw new BrainGraphException(e);
-        }
-
-        if (null == logFile) {
-            LOGGER.warning("no activity log specified");
-            activityLog = null;
-        } else {
-            LOGGER.info("will use activity log at " + logFile.getPath());
-            try {
-                activityLog = new ActivityLog(new FileWriter(logFile, true));
-            } catch (IOException e) {
-                throw new BrainGraphException(e);
-            }
-        }
-
-        priorities = new Priorities();
-        priorities.refreshQueue(this);
-    }
-
-    public ActivityLog getActivityLog() {
-        return activityLog;
     }
 
     public KeyIndexableGraph getGraph() {
@@ -112,10 +67,6 @@ public class BrainGraph {
 
     public FramedGraph<KeyIndexableGraph> getFramedGraph() {
         return framedGraph;
-    }
-
-    public Priorities getPriorities() {
-        return priorities;
     }
 
     public static String getId(final Atom a) {

@@ -76,12 +76,12 @@ public class UpdateExtension extends ExtendoExtension {
 
         // Apply the update
         try {
-            p.queries.update(p.root, rootNote, p.depth, p.filter, p.style, p.graph.getActivityLog());
+            p.queries.update(p.root, rootNote, p.depth, p.filter, p.style, p.brain.getActivityLog(), p.brain.getPriorities());
         } catch (NoteQueries.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.graph.getActivityLog());
+        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog());
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);

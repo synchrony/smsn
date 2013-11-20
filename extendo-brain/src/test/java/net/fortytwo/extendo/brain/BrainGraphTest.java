@@ -25,7 +25,7 @@ public class BrainGraphTest extends TestCase {
 
         g = new Neo4jGraph(dir.getPath());
 
-        bg = BrainGraph.getInstance(g);
+        bg = new BrainGraph(g);
     }
 
     @After

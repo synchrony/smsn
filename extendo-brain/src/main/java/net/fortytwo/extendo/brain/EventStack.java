@@ -33,7 +33,7 @@ public class EventStack {
 
         this.filter = filter;
         KeyIndexableGraph tg = new TinkerGraph();
-        this.graph = BrainGraph.getInstance(tg);
+        this.graph = new BrainGraph(tg);
     }
 
     public BrainGraph getInMemoryGraph() {

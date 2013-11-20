@@ -163,7 +163,8 @@ public class NoteQueries {
                        final int depth,
                        final Filter filter,
                        final AdjacencyStyle style,
-                       final ActivityLog log) throws InvalidUpdateException {
+                       final ActivityLog log,
+                       final Priorities priorities) throws InvalidUpdateException {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -172,7 +173,7 @@ public class NoteQueries {
             throw new IllegalStateException("can't update in style " + style);
         }
 
-        updateInternal(root, rootNote, depth, filter, style, log);
+        updateInternal(root, rootNote, depth, filter, style, log, priorities);
     }
 
     private final Comparator<Note> noteComparator = new Comparator<Note>() {
@@ -206,9 +207,10 @@ public class NoteQueries {
                                final int depth,
                                final Filter filter,
                                final AdjacencyStyle style,
-                               final ActivityLog log) throws InvalidUpdateException {
+                               final ActivityLog log,
+                               final Priorities priorities) throws InvalidUpdateException {
 
-        setProperties(root, rootNote, log);
+        setProperties(root, rootNote, log, priorities);
 
         if (0 >= depth || !filter.isVisible(root)) {
             return;
@@ -297,7 +299,7 @@ public class NoteQueries {
             int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : depth - 1;
 
             // TODO: verify that this can result in multiple log events per call to update()
-            updateInternal(store.getAtom(n.getId()), n, d, filter, style, log);
+            updateInternal(store.getAtom(n.getId()), n, d, filter, style, log, priorities);
         }
     }
 
@@ -428,12 +430,13 @@ public class NoteQueries {
      * @return a prioritized list of notes
      */
     public Note priorityView(final Filter filter,
-                             final int maxResults) {
+                             final int maxResults,
+                             final Priorities priorities) {
 
         Note result = new Note();
         result.setValue("priority queue with up to " + maxResults + " results");
 
-        Queue<Atom> queue = store.getPriorities().getQueue();
+        Queue<Atom> queue = priorities.getQueue();
         int i = 0;
         for (Atom a : queue) {
             if (filter.isVisible(a)) {
@@ -450,7 +453,8 @@ public class NoteQueries {
 
     private void setProperties(final Atom target,
                                final Note note,
-                               final ActivityLog log) {
+                               final ActivityLog log,
+                               final Priorities priorities) {
         String value = note.getValue();
 
         // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null values.
@@ -494,13 +498,13 @@ public class NoteQueries {
             if (0 == priority) {
                 if (null != p) {
                     target.setPriority(null);
-                    store.getPriorities().updatePriority(target);
+                    priorities.updatePriority(target);
                     propsSet = true;
                 }
             } else {
                 if (null == p || (!p.equals(priority))) {
                     target.setPriority(priority);
-                    store.getPriorities().updatePriority(target);
+                    priorities.updatePriority(target);
                     propsSet = true;
                 }
             }

@@ -32,15 +32,18 @@ public class NoteQueriesTest {
     private NoteWriter writer = new NoteWriter();
     private NoteQueries queries;
     private ActivityLog log = null;
+    private Priorities priorities;
 
     @Before
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
         parser = new NoteParser();
-        store = BrainGraph.getInstance(g);
+        store = new BrainGraph(g);
         graph = store.getGraph();
         manager = store.getFramedGraph();
         queries = new NoteQueries(store);
+        ExtendoBrain brain = new ExtendoBrain(store);
+        priorities = brain.getPriorities();
     }
 
     @After
@@ -69,7 +72,7 @@ public class NoteQueriesTest {
         assertNull(child.getCreated());
         //System.out.println(before.getTargetValue());
 
-        queries.update(root, rootNote, 1, filter, style, log);
+        queries.update(root, rootNote, 1, filter, style, log, priorities);
 
         //new GraphMLWriter(graph).outputGraph(System.out);
 
@@ -96,7 +99,7 @@ public class NoteQueriesTest {
                 "* :N5KBOAq: one\n" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         assertNotesEqual(root, "one", "two", "three");
 
         Atom one = store.getAtom("N5KBOAq");
@@ -107,7 +110,7 @@ public class NoteQueriesTest {
                 "    * :r4zU45R: ten\n" +
                 "    * yellow\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         // "two" has been removed
         assertNotesEqual(root, "one", "three");
         // grandchildren have been added
@@ -120,7 +123,7 @@ public class NoteQueriesTest {
                 "        * rabbit\n" +
                 "    * purple\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         // depth is only two, so "rabbit" is not reachable
         assertNotesEqual(ten);
 
@@ -131,7 +134,7 @@ public class NoteQueriesTest {
                 "        * rabbit\n" +
                 "        * kangaroo\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         Atom green = one.getNotes().getRest().getFirst();
         // "rabbit" and "kangaroo" are added beneath "green" even though they're
         // deeper than 2 steps in the tree, because "green" is a new note
@@ -140,7 +143,7 @@ public class NoteQueriesTest {
         s = "" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         // "one" has been removed...
         assertNotesEqual(root, "two", "three");
         // but "one" still exists and has its previous notes
@@ -150,7 +153,7 @@ public class NoteQueriesTest {
                 "* :tOpwKho: three\n" +
                 "    * red\n" +
                 "* :v8EuMtl: two\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
         Atom three = store.getAtom("tOpwKho");
@@ -163,7 +166,7 @@ public class NoteQueriesTest {
                 "    * elephant\n" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         // duplicates are possible...
         assertNotesEqual(root, "two", "two", "three");
         // ...but when a duplicate is added, children of any matching duplicate will be ignored
@@ -175,7 +178,7 @@ public class NoteQueriesTest {
                 "* :v8EuMtl: two\n" +
                 "    * gorilla\n" +
                 "* :tOpwKho: three\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         assertNotesEqual(root, "two", "two", "three");
         // when duplicates already exist, children of duplicates follow the last-occurring instance
         assertNotesEqual(two, "gorilla");
@@ -190,7 +193,7 @@ public class NoteQueriesTest {
 
         s = "" +
                 "* :N5KBOAq: one\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         Atom one = store.getAtom("N5KBOAq");
         assertEquals(0.5f, one.getWeight());
         assertEquals(0.5f, one.getSharability());
@@ -199,7 +202,7 @@ public class NoteQueriesTest {
                 "* :N5KBOAq: one\n" +
                 "    @weight 0.75\n" +
                 "    @sharability 0.25\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         assertEquals(0.75f, one.getWeight());
         assertEquals(0.25f, one.getSharability());
     }
@@ -214,14 +217,14 @@ public class NoteQueriesTest {
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @alias http://example.org/ns/one\n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         Atom one = store.getAtom("N5KBOAq");
         assertEquals("http://example.org/ns/one", one.getAlias());
 
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @alias \n";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         assertNull(one.getAlias());
     }
 
@@ -236,7 +239,7 @@ public class NoteQueriesTest {
         s = "" +
                 "* :0000001: one\n" +
                 "    @priority 0.5";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         one = store.getAtom("0000001");
         assertEquals(0.5f, one.getPriority());
 
@@ -244,7 +247,7 @@ public class NoteQueriesTest {
         s = "" +
                 "* :0000001: one\n" +
                 "    @priority 0";
-        queries.update(root, parser.parse(s), 2, filter, style, log);
+        queries.update(root, parser.parse(s), 2, filter, style, log, priorities);
         one = store.getAtom("0000001");
         assertNull(one.getPriority());
     }
@@ -259,7 +262,7 @@ public class NoteQueriesTest {
         Note note = parser.parse(BrainGraph.class.getResourceAsStream("wiki-example-3.txt"));
         Atom root = createAtom("0000000");
         root.setSharability(1.0f);
-        queries.update(root, note, 2, writeFilter, style, log);
+        queries.update(root, note, 2, writeFilter, style, log, priorities);
 
         Atom a1 = store.getAtom("0000001");
         assertEquals(1f, a1.getSharability());
@@ -317,7 +320,7 @@ public class NoteQueriesTest {
 
         Atom root = store.createAtom(filter, "000");
 
-        queries.update(root, b, 2, filter, style, log);
+        queries.update(root, b, 2, filter, style, log, priorities);
 
         Atom a1 = store.getAtom("001");
         Atom a2 = store.getAtom("002");
@@ -327,7 +330,7 @@ public class NoteQueriesTest {
         assertEquals("two", a2.getValue());
         assertEquals("three", a3.getValue());
 
-        queries.update(root, a, 2, filter, style, log);
+        queries.update(root, a, 2, filter, style, log, priorities);
 
         // 002's value was unaffected by the update
         assertEquals("ONE", a1.getValue());

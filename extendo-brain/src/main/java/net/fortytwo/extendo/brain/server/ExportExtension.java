@@ -137,14 +137,14 @@ public class ExportExtension extends ExtendoExtension {
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         OutputStream out = new FileOutputStream(new File("/tmp/extendo-vertices.txt"));
         try {
-            exportVertices(p.graph, new PrintStream(out));
+            exportVertices(p.brain.getBrainGraph(), new PrintStream(out));
         } finally {
             out.close();
         }
 
         out = new FileOutputStream(new File("/tmp/extendo-edges.txt"));
         try {
-            exportEdges(p.graph, new PrintStream(out));
+            exportEdges(p.brain.getBrainGraph(), new PrintStream(out));
         } finally {
             out.close();
         }

@@ -39,7 +39,7 @@ public class HistoryExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        List<String> ids = getHistory(p.context, p.graph, p.filter);
+        List<String> ids = getHistory(p.context, p.brain.getBrainGraph(), p.filter);
 
         addView(p.queries.customView(ids, p.filter), p);
 

@@ -66,7 +66,7 @@ public class SetPropertiesExtension extends ExtendoExtension {
             p.root.setSharability(p.propertyValue);
         } else if (p.propertyName.equals("priority")) {
             p.root.setPriority(p.propertyValue);
-            p.graph.getPriorities().updatePriority(p.root);
+            p.brain.getPriorities().updatePriority(p.root);
         } else {
             throw new IllegalStateException();
         }
@@ -75,7 +75,7 @@ public class SetPropertiesExtension extends ExtendoExtension {
         p.map.put("name", "" + p.propertyName);
         p.map.put("value", "" + p.propertyValue);
 
-        ActivityLog log = p.graph.getActivityLog();
+        ActivityLog log = p.brain.getActivityLog();
         if (null != log) {
             log.logSetProperties(p.root);
         }

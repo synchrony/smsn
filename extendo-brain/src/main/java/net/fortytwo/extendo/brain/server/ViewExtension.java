@@ -45,7 +45,7 @@ public class ViewExtension extends ExtendoExtension {
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
 
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.graph.getActivityLog());
+        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog());
         addView(n, p);
 
         addToHistory(p.rootId, p.context);

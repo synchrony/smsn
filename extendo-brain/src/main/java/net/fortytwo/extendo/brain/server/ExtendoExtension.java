@@ -8,6 +8,7 @@ import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteHistory;
@@ -39,6 +40,20 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
     protected abstract boolean doesRead();
 
     protected abstract boolean doesWrite();
+
+    private static final Map<KeyIndexableGraph, ExtendoBrain> brains = new HashMap<KeyIndexableGraph, ExtendoBrain>();
+
+    public static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph) throws ExtendoBrain.ExtendoBrainException {
+        ExtendoBrain b = brains.get(baseGraph);
+
+        if (null == b) {
+            BrainGraph bg = new BrainGraph(baseGraph);
+            b = new ExtendoBrain(bg);
+            brains.put(baseGraph, b);
+        }
+
+        return b;
+    }
 
     protected Params createParams(final RexsterResourceContext context,
                                   final KeyIndexableGraph graph) {
@@ -84,8 +99,8 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
             }
 
             p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
-            p.graph = BrainGraph.getInstance(p.baseGraph);
-            p.queries = new NoteQueries(p.graph);
+            p.brain = getBrain(p.baseGraph);
+            p.queries = new NoteQueries(p.brain.getBrainGraph());
             p.parser = new NoteParser();
             p.writer = new NoteWriter();
 
@@ -111,7 +126,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
             }
 
             if (null != rootKey) {
-                p.root = p.graph.getAtom(rootKey);
+                p.root = p.brain.getBrainGraph().getAtom(rootKey);
 
                 if (null == p.root) {
                     return ExtensionResponse.error("root of view does not exist: " + rootKey);
@@ -142,8 +157,8 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
 
                 // Note: currently, all activities are logged, but the log is not immediately flushed
                 //       unless the transaction succeeds.
-                if (null != p.graph.getActivityLog()) {
-                    p.graph.getActivityLog().flush();
+                if (null != p.brain.getActivityLog()) {
+                    p.brain.getActivityLog().flush();
                 }
 
                 return r;
@@ -263,7 +278,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public Principal user;
         public Map<String, Object> map;
         public KeyIndexableGraph baseGraph;
-        public BrainGraph graph;
+        public ExtendoBrain brain;
         public FramedGraph<KeyIndexableGraph> manager;
         public NoteQueries queries;
         public NoteParser parser;

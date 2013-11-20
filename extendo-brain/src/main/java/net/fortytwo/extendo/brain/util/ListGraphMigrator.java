@@ -86,7 +86,7 @@ public class ListGraphMigrator {
         //System.out.println("loading original data into database at " + dirIn);
         //KeyIndexableGraph graphIn = new Neo4jGraph(dirIn);
         KeyIndexableGraph graphIn = new TinkerGraph();
-        BrainGraph source = BrainGraph.getInstance(graphIn);
+        BrainGraph source = new BrainGraph(graphIn);
 
         String fileIn = "/tmp/brain.xml";
         System.out.println("reading graph from " + fileIn);
@@ -102,7 +102,7 @@ public class ListGraphMigrator {
         //System.out.println("migrating graph into database at " + dirOut);
         //KeyIndexableGraph graphOut = new Neo4jGraph(dirOut);
         KeyIndexableGraph graphOut = new TinkerGraph();
-        BrainGraph target = BrainGraph.getInstance(graphOut);
+        BrainGraph target = new BrainGraph(graphOut);
 
         new ListGraphMigrator().migrate(source.getGraph(), target.getGraph());
         source.getGraph().shutdown();

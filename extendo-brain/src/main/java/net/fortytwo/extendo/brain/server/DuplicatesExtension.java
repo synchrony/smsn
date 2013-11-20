@@ -47,7 +47,7 @@ public class DuplicatesExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        List<String> ids = getDuplicates(p.graph, p.filter);
+        List<String> ids = getDuplicates(p.brain.getBrainGraph(), p.filter);
 
         addView(p.queries.customView(ids, p.filter), p);
 

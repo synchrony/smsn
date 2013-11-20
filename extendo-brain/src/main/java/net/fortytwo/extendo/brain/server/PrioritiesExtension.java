@@ -55,7 +55,7 @@ public class PrioritiesExtension extends ExtendoExtension {
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
 
-        Note n = p.queries.priorityView(p.filter, p.maxResults);
+        Note n = p.queries.priorityView(p.filter, p.maxResults, p.brain.getPriorities());
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);
