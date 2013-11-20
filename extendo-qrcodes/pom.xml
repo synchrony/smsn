@@ -28,25 +28,6 @@
         </repository>
     </repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.fortytwo.extendo</groupId>
-            <artifactId>extendo-core</artifactId>
-            <version>${extendo.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -71,5 +52,24 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-core</artifactId>
+            <version>${extendo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>

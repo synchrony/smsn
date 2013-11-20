@@ -14,25 +14,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>fortytwo</id>
-            <name>fortytwo.net Maven repository</name>
-            <url>http://fortytwo.net/maven2</url>
-        </repository>
-	<repository>
-		<id>sonatype-nexus-snapshots</id>
-		<name>Sonatype Nexus Snapshots</name>
-		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		<releases>
-			<enabled>false</enabled>
-		</releases>
-		<snapshots>
-			<enabled>true</enabled>
-		</snapshots>
-	</repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>net.fortytwo.extendo</groupId>
@@ -42,11 +23,6 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>frames</artifactId>
-            <version>${tinkerpop.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.rexster</groupId>
-            <artifactId>rexster-server</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
@@ -79,13 +55,6 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
             <version>${tinkerpop.version}</version>
@@ -96,6 +65,14 @@
             <artifactId>neo4j-lucene-index</artifactId>
             <version>${neo4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -130,34 +107,28 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/standalone.xml</descriptor>
-                    </descriptors>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
-                    <outputDirectory>target</outputDirectory>
-                    <workDirectory>target/assembly/work</workDirectory>
-                    <tarLongFileMode>warn</tarLongFileMode>
-                    <archive>
-                        <manifest>
-                            <mainClass>net.fortytwo.extendo.Extendo</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>fortytwo</id>
+            <name>fortytwo.net Maven repository</name>
+            <url>http://fortytwo.net/maven2</url>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <profiles>
         <!-- This profile can be activated in order to run integration tests, e.g. `mvn clean test -Pintegration-test` -->
         <profile>
@@ -171,4 +142,5 @@
             </properties>
         </profile>
     </profiles>
+
 </project>
