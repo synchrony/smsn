@@ -14,15 +14,19 @@ import java.util.logging.Logger;
 public class ExtendoBrain {
     private static final Logger LOGGER = Extendo.getLogger(ExtendoBrain.class);
 
+    // TODO: make this configurable
+    private static final int STACK_SIZE = 50;
+
     private final BrainGraph brainGraph;
 
     private final ActivityLog activityLog;
 
     private final Priorities priorities;
 
+    private final EventStack eventStack;
+
     public ExtendoBrain(final BrainGraph brainGraph) throws ExtendoBrainException {
         this.brainGraph = brainGraph;
-
 
         File logFile;
         try {
@@ -45,6 +49,9 @@ public class ExtendoBrain {
 
         priorities = new Priorities();
         priorities.refreshQueue(brainGraph);
+
+        Filter filter = new Filter();
+        eventStack = new EventStack(STACK_SIZE, filter);
     }
 
     public BrainGraph getBrainGraph() {
@@ -57,6 +64,10 @@ public class ExtendoBrain {
 
     public Priorities getPriorities() {
         return priorities;
+    }
+
+    public EventStack getEventStack() {
+        return eventStack;
     }
 
     public class ExtendoBrainException extends Exception {

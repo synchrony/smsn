@@ -26,12 +26,17 @@
             <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-api</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <!--<dependency>
             <groupId>net.fortytwo.ripple</groupId>
-            <artifactId>ripple-core</artifactId>
+            <artifactId>ripple-flow-rdf</artifactId>
             <version>${ripple.version}</version>
             <exclusions>
-                <!-- this was necessary (as of 2013-01-24) to avoid a logging conflict with a
-                     Neo4j dependency which manifests in the unit tests -->
+                - this was necessary (as of 2013-01-24) to avoid a logging conflict with a
+                     Neo4j dependency which manifests in the unit tests -
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -42,12 +47,7 @@
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-graph-sail</artifactId>
             <version>${tinkerpop.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-graph-jung</artifactId>
-            <version>${tinkerpop.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>

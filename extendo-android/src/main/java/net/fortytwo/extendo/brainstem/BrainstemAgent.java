@@ -44,6 +44,10 @@ public class BrainstemAgent {
         this.agentUri = vf.createURI(agentUri);
     }
 
+    public URI getAgentUri() {
+        return agentUri;
+    }
+
     public DatasetFactory getDatasetFactory() {
         return factory;
     }

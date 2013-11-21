@@ -13,9 +13,11 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
-import net.fortytwo.ripple.StringUtils;
 import org.openrdf.model.Graph;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +66,18 @@ public class DuplicatesExtension extends ExtendoExtension {
 
     protected static final int MAX_DUPLICATES = 1000;
 
+    private static final String UTF_8 = "UTF-8";
+
+    private static final MessageDigest MD5_DIGEST;
+
+    static {
+        try {
+            MD5_DIGEST = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     private List<String> getDuplicates(final BrainGraph graph,
                                        final Filter filter) throws Exception {
         Map<String, List<String>> m = new HashMap<String, List<String>>();
@@ -76,7 +90,7 @@ public class DuplicatesExtension extends ExtendoExtension {
             if (filter.isVisible(a)) {
                 String value = a.getValue();
                 if (null != value && 0 < value.length()) {
-                    String hash = StringUtils.md5SumOf(value);
+                    String hash = md5SumOf(value);
                     List<String> ids = m.get(hash);
                     if (null == ids) {
                         ids = new LinkedList<String>();
@@ -105,5 +119,29 @@ public class DuplicatesExtension extends ExtendoExtension {
         }
 
         return allDups;
+    }
+
+    // copied from Ripple's StringUtils so as to avoid a dependency
+    private static String md5SumOf(final String plaintext) throws UnsupportedEncodingException {
+        synchronized (MD5_DIGEST) {
+            MD5_DIGEST.update(plaintext.getBytes(UTF_8));
+        }
+
+        byte[] digest = MD5_DIGEST.digest();
+
+        String coded = "";
+
+        for (byte b : digest) {
+            String hex = Integer.toHexString(b);
+
+            if (hex.length() == 1) {
+                hex = "0" + hex;
+            }
+
+            hex = hex.substring(hex.length() - 2);
+            coded += hex;
+        }
+
+        return coded;
     }
 }

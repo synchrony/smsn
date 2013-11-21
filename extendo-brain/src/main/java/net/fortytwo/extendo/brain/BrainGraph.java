@@ -245,10 +245,4 @@ public class BrainGraph {
 
         return results;
     }
-
-    public class BrainGraphException extends Exception {
-        public BrainGraphException(final Throwable cause) {
-            super(cause);
-        }
-    }
 }

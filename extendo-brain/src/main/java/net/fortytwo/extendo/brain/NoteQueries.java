@@ -3,19 +3,7 @@ package net.fortytwo.extendo.brain;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.oupls.sail.pg.PropertyGraphSail;
 import net.fortytwo.extendo.brain.util.ListDiff;
-import net.fortytwo.flow.Collector;
-import net.fortytwo.ripple.Ripple;
-import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.Model;
-import net.fortytwo.ripple.model.RippleList;
-import net.fortytwo.ripple.model.impl.sesame.SesameModel;
-import net.fortytwo.ripple.query.QueryEngine;
-import net.fortytwo.ripple.query.QueryPipe;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.sail.Sail;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,11 +19,12 @@ import java.util.Set;
 public class NoteQueries {
 
     private final BrainGraph store;
-    private final QueryEngine rippleQueryEngine;
+    //private final QueryEngine rippleQueryEngine;
 
     public NoteQueries(final BrainGraph store) {
         this.store = store;
 
+        /*
         try {
             Ripple.initialize();
 
@@ -48,7 +37,7 @@ public class NoteQueries {
             rippleQueryEngine = new QueryEngine(rippleModel);
         } catch (Exception e) {
             throw new IllegalStateException(e);
-        }
+        }*/
     }
 
     /**
@@ -376,6 +365,7 @@ public class NoteQueries {
      * @throws net.fortytwo.ripple.RippleException
      *          if the query fails in Ripple
      */
+    /*     // TODO: restore Ripple support in such a way as to avoid Android/Dalvik issues
     public Note rippleQuery(final String query,
                             final int depth,
                             final Filter filter,
@@ -421,6 +411,7 @@ public class NoteQueries {
         Collections.sort(result.getChildren(), new NoteComparator());
         return result;
     }
+    */
 
     /**
      * Generates a prioritized list of notes

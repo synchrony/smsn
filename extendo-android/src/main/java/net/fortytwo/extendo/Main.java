@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.brainstem.Brainstem;
 import net.fortytwo.extendo.events.EventLocationListener;
 import net.fortytwo.extendo.events.EventsActivity;
@@ -30,7 +31,7 @@ public class Main extends Activity {
 
     private final Brainstem brainstem;
 
-    public Main() throws Brainstem.BrainstemException {
+    public Main() throws ExtendoBrain.ExtendoBrainException {
         brainstem = new Brainstem();
     }
 

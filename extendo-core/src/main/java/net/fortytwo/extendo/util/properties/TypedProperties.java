@@ -13,7 +13,7 @@ import java.util.Properties;
 
 /**
  * FIXME: this class is nearly identical to RippleProperties, only slightly
- * better.  It may be worthwhile to let Ripple and MyOtherBrain inherit a
+ * better.  It may be worthwhile to let Ripple and Extendo inherit a
  * common dependency.
  *
  *

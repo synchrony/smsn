@@ -24,8 +24,42 @@
     <dependencies>
         <dependency>
             <groupId>net.fortytwo.extendo</groupId>
-            <artifactId>extendo-rdf</artifactId>
+            <artifactId>extendo-brain</artifactId>
             <version>${extendo.version}</version>
+            <exclusions>
+                <!-- exclude Neo4j, with its non-Androidy dependencies. We will include neo4j-android when we need it -->
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-lucene-index</artifactId>
+                </exclusion>
+                <!-- via blueprints-core.  Excluded due to incompatibility with Android.  No GraphML operations supported -->
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+                <!-- via Frames. Gremlin and its dependencies are full of dangling class references which make things
+                     interesting for ProGuard.  Exclude it until needed -->
+                <exclusion>
+                    <groupId>com.tinkerpop.gremlin</groupId>
+                    <artifactId>gremlin-groovy</artifactId>
+                </exclusion>
+                <!-- commons-beanutils cause dex to emit "already added" errors, as they include a small number of
+                    apache.commons.collections classes, which are also included elsewhere.
+                    Fingers crossed that excluding beanutils doesn't cause runtime errors -->
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-android</artifactId>
+            <version>${neo4j.android.version}</version>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.extendo</groupId>
@@ -53,11 +87,16 @@
             <artifactId>rdfagents-jade</artifactId>
             <version>1.0-SNAPSHOT</version>
             <exclusions>
-                <!-- exclude the XMPP MTP, which is currently not used
+                <!-- exclude the XMPP MTP, which is currently not used by Brainstem
                      and which contains a Crimson XML dependency which is incompatible with Android -->
                 <exclusion>
                     <groupId>com.tilab.jade</groupId>
                     <artifactId>xmpp-mtp</artifactId>
+                </exclusion>
+                <!-- via sesame-sail-memory. The Brainstem doesn't need a SPARQL repository -->
+                <exclusion>
+                    <groupId>org.openrdf.sesame</groupId>
+                    <artifactId>sesame-repository-sparql</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -109,6 +148,16 @@
                         <!-- the name of the avd device to use for starting the emulator -->
                         <avd>16</avd>
                     </emulator>
+                    <!-- default dex settings are currently sufficient; ProGuard does all of the heavy lifting
+                    <dex>
+                        <jvmArguments>
+                            <jvmArgument>-Xms1g</jvmArgument>
+                            <jvmArgument>-Xmx2g</jvmArgument>
+                        </jvmArguments>
+                    </dex>-->
+                    <proguard>
+                        <skip>false</skip>
+                    </proguard>
                     <undeployBeforeDeploy>true</undeployBeforeDeploy>
                 </configuration>
                 <extensions>true</extensions>
@@ -122,7 +171,7 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <!-- Use this for inspecting/debugging dependencies
+            <!-- Use this for inspecting/debugging dependencies  -->
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -136,7 +185,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 

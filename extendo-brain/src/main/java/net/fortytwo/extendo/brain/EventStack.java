@@ -28,7 +28,7 @@ public class EventStack {
     private final RoutineNamer personNames = new RoutineNamer("person");
 
     public EventStack(final int capacity,
-                      final Filter filter) throws BrainGraph.BrainGraphException {
+                      final Filter filter) {
         this.capacity = capacity;
 
         this.filter = filter;

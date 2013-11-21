@@ -49,6 +49,7 @@
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <junit.version>4.11</junit.version>
         <neo4j.version>1.9.2</neo4j.version>
+        <neo4j.android.version>1.5-M02</neo4j.android.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <rdfagents.version>1.0-SNAPSHOT</rdfagents.version>

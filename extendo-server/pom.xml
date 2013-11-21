@@ -25,6 +25,11 @@
             <artifactId>rexster-server</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-graph-jung</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

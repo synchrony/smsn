@@ -13,6 +13,10 @@ import at.abraxas.amarino.AmarinoIntent;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
 import com.illposed.osc.utility.OSCByteArrayToJavaConverter;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.ExtendoBrain;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,8 +52,14 @@ public class Brainstem {
     private Properties configuration;
 
     private BrainstemAgent agent;
+    private final ExtendoBrain brain;
 
-    public Brainstem() {
+    public Brainstem() throws ExtendoBrain.ExtendoBrainException {
+        // TODO: this TinkerGraph is a temporary solution
+        KeyIndexableGraph g = new TinkerGraph();
+        BrainGraph bg = new BrainGraph(g);
+        brain = new ExtendoBrain(bg);
+
         devices = new LinkedList<BluetoothDeviceControl>();
         oscDispatcher = new OSCDispatcher();
     }
@@ -129,7 +139,7 @@ public class Brainstem {
         if (null != extendoHandAddress) {
             Log.i(TAG, "loading Extend-o-Hand device at address " + extendoHandAddress);
             BluetoothDeviceControl extendoHand
-                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, textEditor);
+                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, brain, agent.getAgentUri().stringValue(), textEditor);
             addBluetoothDevice(extendoHand);
         }
 

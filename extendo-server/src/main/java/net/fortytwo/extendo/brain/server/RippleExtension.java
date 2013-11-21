@@ -11,7 +11,6 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
-import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,8 +62,10 @@ public class RippleExtension extends ExtendoExtension {
         return false;
     }
 
-    protected void addSearchResults(final Params p) throws IOException, RippleException {
-        Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
+    protected void addSearchResults(final Params p) throws IOException {
+        // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
+        Note n = new Note();
+        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
         JSONObject json;
 
         try {
