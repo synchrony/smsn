@@ -1,5 +1,6 @@
 /*
- * Monomanual Typeatron breadboard prototyping sketch
+ * Monomanual Typeatron firmware, copyright 2013 by Joshua Shinavier
+ * See: https://github.com/joshsh/extendo
  *
  * Connect the push button switches to pins 2-6 in a pulldown configuration
  * Connect the piezo buzzer to pin 7 and GND
@@ -282,7 +283,6 @@ void getIntValues(int values[])
         values[pos] = atoi(b);
 }
 
-
 void readSerial() {
     int ch;
     char errstr[128];
@@ -365,7 +365,8 @@ void error(char *message) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-    readSerial();
+  // TODO: restore me
+    //readSerial();
     
 //#ifdef USE_BLUETOOTH
     // this must be kept in loop() to receive events via Amarino

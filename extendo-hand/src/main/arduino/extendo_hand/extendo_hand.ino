@@ -1,12 +1,45 @@
-
-#include <MeetAndroid.h>
-
-MeetAndroid meetAndroid;
-
+/*
+ * Extend-o-Hand firmware, copyright 2013 by Joshua Shinavier
+ * See: https://github.com/joshsh/extendo
+ *
+ */
 
 const int pinX = A0;
 const int pinY = A1;
 const int pinZ = A2;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// if defined, use more straightforward serial output
+//#define DEBUG
+
+// send and receive messages using Bluetooth/Amarino as opposed to plain serial
+#define USE_BLUETOOTH
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+//#include <MeetAndroid.h>
+
+//MeetAndroid meetAndroid;
+
+const char ack = 19;
+const char startFlag = 18;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <OSCMessage.h>
+#include <OSCBundle.h>
+
+#ifdef BOARD_HAS_USB_SERIAL
+#include <SLIPEncodedUSBSerial.h>
+SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
+#else
+#include <SLIPEncodedSerial.h>
+SLIPEncodedSerial SLIPSerial(Serial);
+#endif
 
 
 ////////////////////////////////////////
@@ -65,12 +98,51 @@ char print_str[100];
 
 void setup()  
 {
-  // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
-  // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
-  Serial.begin(115200);
-  
+    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
+    // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
+    //Serial.begin(115200);
+
+    // OSCuino: begin SLIPSerial just like Serial
+    SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
+#if ARDUINO >= 100
+    while(!Serial) ; // Leonardo "feature"
+#endif
+     
   state = STATE_ONE;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void sendOSC(class OSCMessage &m) {
+#ifdef USE_BLUETOOTH
+    // "manually" begin Bluetooth/Amarino message
+    SLIPSerial.print(startFlag);
+#endif
+
+    SLIPSerial.beginPacket();  
+    m.send(SLIPSerial); // send the bytes to the SLIP stream
+    SLIPSerial.endPacket(); // mark the end of the OSC Packet
+    m.empty(); // free space occupied by message
+        
+#ifdef USE_BLUETOOTH
+    // "manually" end Bluetooth/Amarino message
+    SLIPSerial.print(ack);
+#elif defined(DEBUG)
+    // put OSC messages on separate lines so as to make them more readable
+    SLIPSerial.println("");
+#endif  
+}
+
+void error(char *message) {
+    OSCMessage m("/exo/hand/error");
+    m.add(message);
+
+    sendOSC(m);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 void loop()
 {
@@ -118,32 +190,13 @@ void loop()
           state = STATE_ONE;
           
           // gesture event
-          
-          //* Bluetooth mode
-          
-          // since Arduino doesn't implement %f for printf/sprintf,
-          // we turn the acceleration values into integers
-          sprintf(print_str, "/exo/hand/raw %ld %d %d %d %d",
-            micros(),
-            (int) (amax * 100),
-            (int) (ax_max * 100),
-            (int) (ay_max * 100),
-            (int) (az_max * 100));
-          //Serial.println(print_str);
-          meetAndroid.receive();  
-          meetAndroid.send(print_str);
-          //*/
-          
-                    
-          /* serial mode
-          
-          Serial.print(micros());
-          Serial.print(" "); Serial.print(amax);
-          Serial.print(" "); Serial.print(ax_max);
-          Serial.print(" "); Serial.print(ay_max);
-          Serial.print(" "); Serial.print(az_max);
-          Serial.print("\r");  
-          //*/        
+          OSCMessage m("/exo/hand/raw");
+          m.add((int32_t) micros());
+          m.add((int) (amax * 100));
+          m.add((int) (ax_max * 100));
+          m.add((int) (ay_max * 100));
+          m.add((int) (az_max * 100));
+          sendOSC(m);       
         }
         break;
     }

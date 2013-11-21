@@ -6,6 +6,11 @@ Note: the origin is at the "bottom right" of the case (in the empty space where 
 with the thumb to the north (the y axis), the fingers of the left hand to the left
 (the x axis) and pointing away, and the bottom of the case pointing down (the z axis)
 away from the palm.
+
+Some details to double-check before printing:
+  * channel for index finger's pressure sensor does not intersect thumb button structure
+    Ideally, let it be entirely below, so that the sensor can lie flat on the case floor
+
 */
 
 function sq(x) = x*x;
