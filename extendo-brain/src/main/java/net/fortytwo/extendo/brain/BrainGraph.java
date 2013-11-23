@@ -47,7 +47,7 @@ public class BrainGraph {
         graph.setVertexIdFactory(f);
         graph.setEdgeIdFactory(f);
 
-        framedGraph = new FramedGraph<KeyIndexableGraph>(graph);
+        framedGraph = new FramedGraph(graph);
 
         searchIndex = graph.getIndex("search", Vertex.class);
         if (null == searchIndex) {
