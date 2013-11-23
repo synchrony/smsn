@@ -12,7 +12,6 @@ public class Note {
 
     private final List<Note> children;
     private boolean hasChildren;
-
     private String value;
     private String id;
     private Float weight;
@@ -23,6 +22,25 @@ public class Note {
 
     public Note() {
         children = new LinkedList<Note>();
+    }
+
+    public Note(final Note copy) {
+        this();
+
+        this.hasChildren = copy.hasChildren;
+        this.value = copy.value;
+        this.id = copy.id;
+        this.weight = copy.weight;
+        this.sharability = copy.sharability;
+        this.priority = copy.priority;
+        this.created = copy.created;
+        this.alias = copy.alias;
+
+        if (null != copy.children) {
+            for (Note c : copy.children) {
+                children.add(new Note(c));
+            }
+        }
     }
 
     public String getValue() {
@@ -136,5 +154,16 @@ public class Note {
 
     public void setHasChildren() {
         hasChildren = true;
+    }
+
+    // note: deliberately leaves hasChildren unaffected
+    public void truncate(final int depth) {
+        if (depth <= 1) {
+            children.clear();
+        } else {
+            for (Note c : children) {
+                c.truncate(depth - 1);
+            }
+        }
     }
 }

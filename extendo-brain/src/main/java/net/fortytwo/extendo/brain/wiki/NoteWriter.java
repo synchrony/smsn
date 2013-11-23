@@ -25,6 +25,14 @@ public class NoteWriter {
 
     private int valueLengthCutoff = -1;
 
+    public int getValueLengthCutoff() {
+        return valueLengthCutoff;
+    }
+
+    public void setValueLengthCutoff(int valueLengthCutoff) {
+        this.valueLengthCutoff = valueLengthCutoff;
+    }
+
     public JSONObject toJSON(final Note n) throws JSONException {
         JSONObject json = new JSONObject();
 
@@ -62,7 +70,7 @@ public class NoteWriter {
         return json;
     }
 
-    public void writeNotes(final List<Note> notes,
+    public void toWikiText(final List<Note> notes,
                            final OutputStream out) {
         PrintStream p;
         try {
@@ -124,13 +132,5 @@ public class NoteWriter {
         }
 
         return true;
-    }
-
-    public int getValueLengthCutoff() {
-        return valueLengthCutoff;
-    }
-
-    public void setValueLengthCutoff(int valueLengthCutoff) {
-        this.valueLengthCutoff = valueLengthCutoff;
     }
 }

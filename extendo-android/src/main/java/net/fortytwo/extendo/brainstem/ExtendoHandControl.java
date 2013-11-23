@@ -13,6 +13,7 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
     public ExtendoHandControl(final String address,
                               final OSCDispatcher oscDispatcher,
                               final ExtendoBrain brain,
+                              final EventStackProxy proxy,
                               final String agentUri,
                               final EditText textEditor) {
         super(address);
@@ -30,7 +31,10 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
                     textEditor.setText("Extend-o-Hand error (wrong # of args)");
                 }
 
-                brain.getEventStack().pushGestureEvent(agentUri, recognizedAt);
+                if (null != proxy) {
+                    proxy.push(
+                        brain.getEventStack().createGestureEvent(agentUri, recognizedAt));
+                }
             }
         });
     }

@@ -1,7 +1,5 @@
 package net.fortytwo.extendo.brain;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.extendo.Extendo;
 
 import java.text.SimpleDateFormat;
@@ -15,88 +13,75 @@ import java.util.Map;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class EventStack {
-    private static final SimpleDateFormat EVENT_TIME_FORMAT
+    public static final SimpleDateFormat EVENT_TIME_FORMAT
             = new SimpleDateFormat("HH:mm:ss' on 'yyyy-MM-dd' 'Z");
 
     private final int capacity;
 
-    private final Filter filter;
-    private final BrainGraph graph;
-
-    private final LinkedList<Atom> stack = new LinkedList<Atom>();
+    private final LinkedList<Note> stack = new LinkedList<Note>();
 
     private final RoutineNamer personNames = new RoutineNamer("person");
 
-    public EventStack(final int capacity,
-                      final Filter filter) {
+    public EventStack(final int capacity) {
         this.capacity = capacity;
-
-        this.filter = filter;
-        KeyIndexableGraph tg = new TinkerGraph();
-        this.graph = new BrainGraph(tg);
     }
 
-    public BrainGraph getInMemoryGraph() {
-        return graph;
-    }
-
-    public List<Atom> getEvents() {
+    public List<Note> getEvents() {
         return stack;
     }
 
     public void clear() {
-        for (Atom event : stack) {
-            deleteEvent(event);
-        }
+        stack.clear();
+        //for (Atom event : stack) {
+        //    deleteEvent(event);
+        //}
     }
 
-    public void pushGestureEvent(final String expressedBy,
-                                 final Date recognizedAt) {
+    public Note createGestureEvent(final String expressedBy,
+                                   final Date recognizedAt) {
         // TODO: use personal knowledge and Linked Data to find the person's name
         // Use this temporary name only if no actual name is discoverable
         String personName = personNames.getRoutineName(expressedBy);
 
-        Atom gesture = createAtom();
+        //Atom gesture = createAtom();
+        Note gesture = new Note();
         gesture.setValue(personName + " did something");
 
         // note: there will be duplicate people atoms in the in-memory graph
-        Atom person = createAtom();
+        Note person = new Note();
         person.setValue(personName);
         person.setAlias(expressedBy);
 
-        Atom time = createAtom();
+        Note time = new Note();
         time.setValue(EVENT_TIME_FORMAT.format(recognizedAt));
 
-        gesture.setNotes(graph.createAtomList(person, time));
+        gesture.addChild(person);
+        gesture.addChild(time);
 
-        push(gesture);
+        return gesture;
     }
 
-    private void push(final Atom a) {
-        while (stack.size() >= capacity) {
-            Atom event = stack.removeLast();
-            deleteEvent(event);
+    public void push(final Note n) {
+        if (null == n.getId()) {
+            n.setId(Extendo.createRandomKey());
         }
 
-        stack.push(a);
+        while (stack.size() >= capacity) {
+            stack.removeLast();
+            //Atom event = stack.removeLast();
+            //deleteEvent(event);
+        }
+
+        stack.push(n);
     }
 
-    private void deleteEvent(final Atom event) {
-        // TODO: in future, we will need to check for the presence of the stack item and its children in a registry before deletion, unless the registry atoms are created by copying
-        graph.deleteListNodesAndChildrenRecursively(event.getNotes());
-        graph.deleteAtom(event);
-    }
-
-    private Atom createAtom() {
-        return graph.createAtom(filter, Extendo.createRandomKey());
-    }
-
+    // note: instances of this class currently grow without bound
     private class RoutineNamer {
         private final String type;
         private final Map<String, Long> numberByName;
         private long count;
 
-        public RoutineNamer(String type) {
+        public RoutineNamer(final String type) {
             this.type = type;
             numberByName = new HashMap<String, Long>();
         }

@@ -99,7 +99,8 @@
 (setq tn-readonly-mode "readonly")
 (setq tn-edit-mode "readwrite")
 (setq tn-search-mode "search")
-(setq tn-history-mode "history")
+;;(setq tn-history-mode "history")
+;;(setq tn-event-mode "events")
 
 (setq tn-forward-view-style "forward")
 (setq tn-backward-view-style "backward")
@@ -300,6 +301,10 @@
     (lexical-let ((m mode))
         (lambda (status) (receive-view-internal status m))))
 
+(defun numeric-value (json prop)
+    (let ((v (assoc prop json)))
+        (if v (string-to-number (cdr v)) nil)))
+
 (defun receive-view-internal (status mode)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
           (editable (equal mode tn-edit-mode)))
@@ -312,12 +317,13 @@
             (let (
                 (root (cdr (assoc 'root json)))
                 (view (cdr (assoc 'view json)))
-                (depth (cdr (assoc 'depth json)))
-                (min-sharability (string-to-number (cdr (assoc 'minSharability json))))
-                (max-sharability (string-to-number (cdr (assoc 'maxSharability json))))
-                (min-weight (string-to-number (cdr (assoc 'minWeight json))))
-                (max-weight (string-to-number (cdr (assoc 'maxWeight json))))
-                (default-weight (string-to-number (cdr (assoc 'defaultWeight json))))
+                (depth (numeric-value json 'depth))
+                (min-sharability (numeric-value json 'minSharability))
+                (max-sharability (numeric-value json 'maxSharability))
+                (default-sharability (numeric-value json 'defaultSharability))
+                (min-weight (numeric-value json 'minWeight))
+                (max-weight (numeric-value json 'maxWeight))
+                (default-weight (numeric-value json 'defaultWeight))
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root json))
@@ -340,7 +346,7 @@
                         ;; Always leave a search view with depth 1, rather than that of the last view.
                         ;; The user experience is a little unpredictable otherwise.
                         (setq tn-depth 1)
-                        (if depth (setq tn-depth (string-to-number depth))))
+                        (if depth (setq tn-depth depth)))
                     (setq tn-min-sharability min-sharability)
                     (setq tn-max-sharability max-sharability)
                     (setq tn-default-sharability tn-future-sharability)
@@ -472,14 +478,17 @@
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun num-or-nil-to-string (n)
+    (if n (number-to-string n) "nil"))
+
 (defun view-info ()
     (concat
         "(root: " tn-root-id
-         " :depth " (number-to-string tn-depth)
+         " :depth " (num-or-nil-to-string tn-depth)
          " :style " tn-style
-         " :sharability [" (number-to-string tn-min-sharability) ", " (number-to-string tn-default-sharability) ", " (number-to-string tn-max-sharability) "]"
-         " :weight [" (number-to-string tn-min-weight) ", " (number-to-string tn-default-weight) ", " (number-to-string tn-max-weight) "]"
-         " :value \"" tn-title "\")"))  ;; TODO: actuallly escape the title string
+         " :sharability [" (num-or-nil-to-string tn-min-sharability) ", " (num-or-nil-to-string tn-default-sharability) ", " (num-or-nil-to-string tn-max-sharability) "]"
+         " :weight [" (num-or-nil-to-string tn-min-weight) ", " (num-or-nil-to-string tn-default-weight) ", " (num-or-nil-to-string tn-max-weight) "]"
+         " :value \"" tn-title "\")"))  ;; TODO: actually escape the title string
 
 (defun request-view (preserve-line mode root depth style mins maxs defaults minw maxw)
     (setq tn-current-line (if preserve-line (line-number-at-pos) 1))
@@ -505,6 +514,13 @@
             "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+
+(defun request-events (depth)
+    (setq tn-current-line 1)
+    (setq tn-future-sharability tn-default-sharability)
+    (http-get
+        (concat (base-url) "get-events"
+            "?depth=" (number-to-string depth)) (receive-view tn-search-mode)))
 
 (defun request-duplicates (mins maxs minw maxw)
     (setq tn-current-line 1)
@@ -587,6 +603,9 @@
     (request-history
         tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
 
+(defun tn-events ()
+    (interactive)
+    (request-events 2))
 
 (defun tn-duplicates ()
     (interactive)
@@ -1026,6 +1045,7 @@
 (global-set-key (kbd "C-c s")           'tn-search)
 (global-set-key (kbd "C-c t")           'tn-visit-target)
 (global-set-key (kbd "C-c u")           'tn-refresh-view)
+(global-set-key (kbd "C-c v")           'tn-events)
 
 
 (defun tn-toggle-emacspeak ()

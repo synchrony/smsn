@@ -1,8 +1,10 @@
 net.fortytwo.extendo.brain.server.DuplicatesExtension
 net.fortytwo.extendo.brain.server.ExportExtension
 net.fortytwo.extendo.brain.server.FindRootsExtension
+net.fortytwo.extendo.brain.server.GetEventsExtension
 net.fortytwo.extendo.brain.server.HistoryExtension
 net.fortytwo.extendo.brain.server.PrioritiesExtension
+net.fortytwo.extendo.brain.server.PushEventExtension
 net.fortytwo.extendo.brain.server.RippleExtension
 net.fortytwo.extendo.brain.server.SearchExtension
 net.fortytwo.extendo.brain.server.SetPropertiesExtension

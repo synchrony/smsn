@@ -51,7 +51,7 @@ public class ExtendoBrain {
         priorities.refreshQueue(brainGraph);
 
         Filter filter = new Filter();
-        eventStack = new EventStack(STACK_SIZE, filter);
+        eventStack = new EventStack(STACK_SIZE);
     }
 
     public BrainGraph getBrainGraph() {
