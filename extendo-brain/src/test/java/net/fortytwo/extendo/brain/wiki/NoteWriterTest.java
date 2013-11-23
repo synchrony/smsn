@@ -27,7 +27,7 @@ public class NoteWriterTest {
 
     @Test
     public void testNormal() throws Exception {
-        Note n = parser.parse("" +
+        Note n = parser.fromWikiText("" +
                 "* foo\n" +
                 "   * bar\n" +
                 "   * quux\n");
@@ -59,7 +59,7 @@ public class NoteWriterTest {
 
     @Test
     public void testTruncateLongValues() throws Exception {
-        Note n = parser.parse("" +
+        Note n = parser.fromWikiText("" +
                 "* this is a long line (well, not really)\n");
 
         int before = writer.getValueLengthCutoff();

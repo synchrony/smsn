@@ -1,6 +1,10 @@
 package net.fortytwo.extendo.brain.wiki;
 
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -29,16 +33,16 @@ public class NoteParser {
     // Tabs count as four spaces each.
     private static final String TAB_REPLACEMENT = "    ";
 
-    public Note parse(final String s) throws IOException, NoteParsingException {
+    public Note fromWikiText(final String s) throws IOException, NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return parse(in);
+            return fromWikiText(in);
         } finally {
             in.close();
         }
     }
 
-    public Note parse(final InputStream in) throws IOException, NoteParsingException {
+    public Note fromWikiText(final InputStream in) throws IOException, NoteParsingException {
         Note root = new Note();
 
         LinkedList<Note> hierarchy = new LinkedList<Note>();
@@ -246,6 +250,45 @@ public class NoteParser {
         }
 
         return root;
+    }
+
+    public Note fromJSON(final JSONObject j) throws JSONException {
+        Note n = new Note();
+
+        if (j.has(NoteWriter.ID)) {
+            n.setId(j.getString(NoteWriter.ID));
+        }
+        if (j.has(Extendo.VALUE)) {
+            n.setValue(j.getString(Extendo.VALUE));
+        }
+        if (j.has(Extendo.ALIAS)) {
+            n.setAlias(j.getString(Extendo.ALIAS));
+        }
+        if (j.has(Extendo.SHARABILITY)) {
+            n.setSharability((float) j.getDouble(Extendo.SHARABILITY));
+        }
+        if (j.has(Extendo.WEIGHT)) {
+            n.setWeight((float) j.getDouble(Extendo.WEIGHT));
+        }
+        if (j.has(Extendo.PRIORITY)) {
+            n.setPriority((float) j.getDouble(Extendo.PRIORITY));
+        }
+        if (j.has(Extendo.CREATED)) {
+            n.setCreated(j.getLong(Extendo.CREATED));
+        }
+        if (j.has(NoteWriter.HAS_CHILDREN)) {
+            n.setHasChildren(j.optBoolean(NoteWriter.HAS_CHILDREN));
+        }
+
+        JSONArray a = j.optJSONArray(NoteWriter.CHILDREN);
+        if (null != a) {
+            for (int i = 0; i < a.length(); i++) {
+                JSONObject jc = a.getJSONObject(i);
+                n.addChild(fromJSON(jc));
+            }
+        }
+
+        return n;
     }
 
     public static class NoteParsingException extends Exception {

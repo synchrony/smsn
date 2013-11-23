@@ -196,13 +196,16 @@
     (cdr (assoc 'value atom)))
 
 (defun get-priority (atom)
-    (cdr (assoc 'priority atom)))
+    (let ((v (assoc 'priority atom)))
+        (if v (cdr v) nil)))
 
 (defun get-sharability (atom)
-    (cdr (assoc 'sharability atom)))
+    (let ((v (assoc 'sharability atom)))
+        (if v (cdr v) tn-default-sharability)))
 
 (defun get-weight (atom)
-    (cdr (assoc 'weight atom)))
+    (let ((v (assoc 'weight atom)))
+        (if v (cdr v) tn-default-weight)))
 
 (defun get-alias (atom)
     (let ((x (assoc 'alias atom)))
@@ -301,9 +304,9 @@
     (lexical-let ((m mode))
         (lambda (status) (receive-view-internal status m))))
 
-(defun numeric-value (json prop)
+(defun numeric-value (json prop default)
     (let ((v (assoc prop json)))
-        (if v (string-to-number (cdr v)) nil)))
+        (if v (string-to-number (cdr v)) default)))
 
 (defun receive-view-internal (status mode)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
@@ -317,13 +320,16 @@
             (let (
                 (root (cdr (assoc 'root json)))
                 (view (cdr (assoc 'view json)))
-                (depth (numeric-value json 'depth))
-                (min-sharability (numeric-value json 'minSharability))
-                (max-sharability (numeric-value json 'maxSharability))
-                (default-sharability (numeric-value json 'defaultSharability))
-                (min-weight (numeric-value json 'minWeight))
-                (max-weight (numeric-value json 'maxWeight))
-                (default-weight (numeric-value json 'defaultWeight))
+                (depth (numeric-value json 'depth nil))
+
+                ;; if the service doesn't specify these values, they will carry over from the previous buffer state
+                (min-sharability (numeric-value json 'minSharability tn-min-sharability))
+                (max-sharability (numeric-value json 'maxSharability tn-max-sharability))
+                (default-sharability (numeric-value json 'defaultSharability tn-default-sharability))
+                (min-weight (numeric-value json 'minWeight tn-min-weight))
+                (max-weight (numeric-value json 'maxWeight tn-max-weight))
+                (default-weight (numeric-value json 'defaultWeight tn-default-weight))
+
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root json))
@@ -336,7 +342,6 @@
                     (make-local-variable 'tn-default-sharability)
                     (make-local-variable 'tn-min-weight)
                     (make-local-variable 'tn-max-weight)
-                    (make-local-variable 'tn-default-weight)
                     (make-local-variable 'tn-atoms)
                     (make-local-variable 'tn-current-line)
                     (make-local-variable 'tn-mode)
@@ -455,9 +460,6 @@
 		        (target-alias (get-alias json)))
 		            (if target-id (puthash target-id json tn-atoms))
 		            (if (not target-id) (error "missing target id"))
-		            ;;(if (not target-value) (error (concat "missing value for target with id " target-id)))
-		            (if (not target-weight) (error (concat "missing weight for target with id " target-id)))
-		            (if (not target-sharability) (error (concat "missing sharability for target with id " target-id)))
 		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
 		            (let ((line "") (id-infix (create-id-infix target-id)))
 		                (if (not editable)

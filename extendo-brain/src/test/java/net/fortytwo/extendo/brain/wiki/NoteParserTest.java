@@ -31,7 +31,7 @@ public class NoteParserTest {
 
     @Test
     public void testExample1() throws Exception {
-        List<Note> notes = parser.parse(BrainGraph.class.getResourceAsStream("wiki-example-1.txt")).getChildren();
+        List<Note> notes = parser.fromWikiText(BrainGraph.class.getResourceAsStream("wiki-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
         Note indentation = notes.get(1);
@@ -63,7 +63,7 @@ public class NoteParserTest {
 
     @Test
     public void testExample2() throws Exception {
-        Note root = parser.parse(BrainGraph.class.getResourceAsStream("wiki-example-2.txt"));
+        Note root = parser.fromWikiText(BrainGraph.class.getResourceAsStream("wiki-example-2.txt"));
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());
@@ -138,7 +138,7 @@ public class NoteParserTest {
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
         InputStream in = new ByteArrayInputStream(s.getBytes());
         try {
-            return parser.parse(in).getChildren();
+            return parser.fromWikiText(in).getChildren();
         } finally {
             in.close();
         }

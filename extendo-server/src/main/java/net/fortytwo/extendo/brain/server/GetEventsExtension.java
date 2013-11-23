@@ -62,6 +62,7 @@ public class GetEventsExtension extends ExtendoExtension {
     }
 
     protected boolean doesRead() {
+        // getting events is currently not considered reading... from the graph
         return false;
     }
 

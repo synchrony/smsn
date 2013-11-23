@@ -4,6 +4,9 @@
           android:versionCode="1"
           android:versionName="1.0">
 
+    <!-- make calls to external services, such as Extendo's Rexster -->
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- necessary for sending Typeatron key events to Emacs. Requires root access -->

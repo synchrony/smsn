@@ -83,7 +83,7 @@ public class NoteQueries {
             }
         } else {
             if (hasChildren(root, filter, style)) {
-                n.setHasChildren();
+                n.setHasChildren(true);
             }
         }
 

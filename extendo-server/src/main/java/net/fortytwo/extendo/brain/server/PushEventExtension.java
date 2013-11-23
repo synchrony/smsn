@@ -12,6 +12,8 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -28,7 +30,7 @@ public class PushEventExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for receiving and internalizing events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "event", description = "the event to push") String event) {
+                                           @ExtensionRequestParameter(name = "view", description = "the view of the event to push") String event) {
         logInfo("extendo push-event");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
@@ -38,15 +40,9 @@ public class PushEventExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        Note event;
-
         InputStream in = new ByteArrayInputStream(p.view.getBytes());
-        try {
-            // TODO: validation of this event?  Anything goes as long as it follows Extendo-wiki syntax?
-            event = p.parser.parse(in);
-        } finally {
-            in.close();
-        }
+        JSONObject j = new JSONObject(IOUtils.toString(in, "UTF-8"));
+        Note event = p.parser.fromJSON(j);
 
         p.brain.getEventStack().push(event);
 
@@ -54,10 +50,11 @@ public class PushEventExtension extends ExtendoExtension {
     }
 
     protected boolean doesRead() {
-        return true;
+        return false;
     }
 
     protected boolean doesWrite() {
+        // pushing of events is currently not considered writing... to the graph
         return false;
     }
 }

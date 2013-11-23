@@ -5,16 +5,20 @@ import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.wiki.NoteWriter;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -23,11 +27,14 @@ public class EventStackProxy {
     private final String endpointUrl;
     private final NoteWriter writer = new NoteWriter();
 
+    private final HttpClient httpclient = new DefaultHttpClient();
+
     public EventStackProxy(final String serviceUrl) {
         this.endpointUrl = serviceUrl;
     }
 
     public void push(final Note event) {
+
         JSONObject j;
         try {
             j = writer.toJSON(event);
@@ -36,10 +43,17 @@ public class EventStackProxy {
             return;
         }
 
+        Log.i(Brainstem.TAG, "pushing event to endpoint " + endpointUrl + " with data " + j);
+
         try {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPut request = new HttpPut(endpointUrl);
-            request.setEntity(new StringEntity(j.toString()));
+            HttpPost request = new HttpPost(endpointUrl);
+
+            //request.setEntity(new StringEntity(j.toString()));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("view", j.toString()));
+            request.setEntity(new UrlEncodedFormEntity(params));
+
             HttpResponse response = httpclient.execute(request);
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == HttpStatus.SC_OK) {

@@ -69,7 +69,7 @@ public class UpdateExtension extends ExtendoExtension {
 
         InputStream in = new ByteArrayInputStream(p.view.getBytes());
         try {
-            rootNote = p.parser.parse(in);
+            rootNote = p.parser.fromWikiText(in);
         } finally {
             in.close();
         }

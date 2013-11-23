@@ -62,9 +62,7 @@ public class EventStack {
     }
 
     public void push(final Note n) {
-        if (null == n.getId()) {
-            n.setId(Extendo.createRandomKey());
-        }
+        setIds(n);
 
         while (stack.size() >= capacity) {
             stack.removeLast();
@@ -73,6 +71,17 @@ public class EventStack {
         }
 
         stack.push(n);
+    }
+
+    // make the note look like it came from a graph (so it is compatible with Brain-mode views) by giving it an ID
+    private void setIds(final Note n) {
+        if (null == n.getId()) {
+            n.setId(Extendo.createRandomKey());
+        }
+
+        for (Note c : n.getChildren()) {
+            setIds(c);
+        }
     }
 
     // note: instances of this class currently grow without bound
