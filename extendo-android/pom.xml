@@ -39,10 +39,10 @@
                 </exclusion>
                 <!-- via Frames. Gremlin and its dependencies are full of dangling class references which make things
                      interesting for ProGuard.  Exclude it until needed -->
-                <!--<exclusion>
+                <exclusion>
                     <groupId>com.tinkerpop.gremlin</groupId>
                     <artifactId>gremlin-groovy</artifactId>
-                </exclusion>-->
+                </exclusion>
                 <!-- commons-beanutils cause dex to emit "already added" errors, as they include a small number of
                     apache.commons.collections classes, which are also included elsewhere.
                     Fingers crossed that excluding beanutils doesn't cause runtime errors -->

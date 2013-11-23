@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.frames.FramedGraphFactory;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
@@ -47,7 +48,7 @@ public class BrainGraph {
         graph.setVertexIdFactory(f);
         graph.setEdgeIdFactory(f);
 
-        framedGraph = new FramedGraph(graph);
+        framedGraph = createFramedGraph(graph);
 
         searchIndex = graph.getIndex("search", Vertex.class);
         if (null == searchIndex) {
@@ -59,6 +60,13 @@ public class BrainGraph {
             LOGGER.info("creating key index for 'alias' property");
             graph.createKeyIndex(Extendo.ALIAS, Vertex.class);
         }
+    }
+
+    private FramedGraph createFramedGraph(final KeyIndexableGraph baseGraph) {
+        // Currently, creating a FramedGraph, rather than via the FramedGraph public constructor,
+        // does *not* add GremlinGroovyAnnotationHandler, which is incompatible with Android (due to missing javax.script)
+        FramedGraphFactory f = new FramedGraphFactory();
+        return f.create(baseGraph);
     }
 
     public KeyIndexableGraph getGraph() {
@@ -185,7 +193,7 @@ public class BrainGraph {
 
     /**
      * @return an Iterable of all atoms in the knowledge base, as opposed to all vertices
-     * (many of which are list nodes rather than atoms)
+     *         (many of which are list nodes rather than atoms)
      */
     public Iterable<Atom> getAtoms() {
         return new Iterable<Atom>() {
@@ -228,7 +236,7 @@ public class BrainGraph {
     }
 
     public List<Atom> getAtomsByFulltextQuery(final String query,
-                                                    final Filter filter) {
+                                              final Filter filter) {
         List<Atom> results = new LinkedList<Atom>();
 
         for (Vertex v : searchIndex.query(Extendo.VALUE, query)) {
