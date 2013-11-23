@@ -52,8 +52,14 @@ public class BrainGraph {
 
         searchIndex = graph.getIndex("search", Vertex.class);
         if (null == searchIndex) {
-            LOGGER.info("creating fulltext search index");
-            searchIndex = graph.createIndex("search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+            try {
+                Class.forName("org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer");
+
+                LOGGER.info("creating fulltext search index");
+                searchIndex = graph.createIndex("search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+            } catch (ClassNotFoundException e) {
+                LOGGER.warning("fulltext search not available");
+            }
         }
 
         if (!graph.getIndexedKeys(Vertex.class).contains(Extendo.ALIAS)) {
@@ -188,7 +194,9 @@ public class BrainGraph {
 
     public void indexForSearch(final Atom a,
                                final String value) {
-        searchIndex.put(Extendo.VALUE, value, a.asVertex());
+        if (null != searchIndex) {
+            searchIndex.put(Extendo.VALUE, value, a.asVertex());
+        }
     }
 
     /**
@@ -239,15 +247,17 @@ public class BrainGraph {
                                               final Filter filter) {
         List<Atom> results = new LinkedList<Atom>();
 
-        for (Vertex v : searchIndex.query(Extendo.VALUE, query)) {
-            Atom a = getAtom(v);
+        if (null != searchIndex) {
+            for (Vertex v : searchIndex.query(Extendo.VALUE, query)) {
+                Atom a = getAtom(v);
 
-            if (null == a) {
-                throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
-            }
+                if (null == a) {
+                    throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
+                }
 
-            if (filter.isVisible(a)) {
-                results.add(a);
+                if (filter.isVisible(a)) {
+                    results.add(a);
+                }
             }
         }
 
