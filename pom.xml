@@ -52,7 +52,7 @@
         <neo4j.android.version>1.5-M02</neo4j.android.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <rdfagents.version>1.0-SNAPSHOT</rdfagents.version>
+        <rdfagents.version>1.0</rdfagents.version>
         <ripple.version>1.0</ripple.version>
         <sesame.version>2.6.10</sesame.version>
         <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>

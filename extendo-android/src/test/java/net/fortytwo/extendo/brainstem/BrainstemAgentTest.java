@@ -12,9 +12,12 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.memory.MemoryStore;
+
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,25 +30,26 @@ public class BrainstemAgentTest {
     @Test
     public void testDatasetForGestureEvent() throws Exception {
         String agentUri = "http://example.org/ns#bob";
-        BrainstemAgent a = new BrainstemAgent(agentUri);
+        Properties config = new Properties();
+        BrainstemAgent a = new BrainstemAgent(agentUri, config, null);
 
         DatasetFactory f = a.getDatasetFactory();
 
         //System.out.println("available RDF content languages:");
-        RDFContentLanguage turtle = null;
+        RDFContentLanguage format = null;
         for (RDFContentLanguage l : f.getSupportedLanguages()) {
-            if ("rdf-turtle".equals(l.getFipaName())) {
-                turtle = l;
+            if (RDFFormat.NTRIPLES.equals(l.getFormat())) {
+                format = l;
             }
-            //    System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
+            //System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
         }
 
         Dataset ds = a.datasetForGestureEvent(System.currentTimeMillis());
 
         assertEquals(5, ds.getStatements().size());
 
-        if (null != turtle) {
-            f.write(System.out, ds, turtle);
+        if (null != format) {
+            f.write(System.out, ds, format);
         }
 
         Sail sail = new MemoryStore();

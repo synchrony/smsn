@@ -12,6 +12,9 @@
     <!-- necessary for sending Typeatron key events to Emacs. Requires root access -->
     <uses-permission android:name="android.permission.INJECT_EVENTS" />
 
+    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
+
+
     <application android:label="@string/app_name" android:icon="@drawable/icon">
 
         <!-- Main -->

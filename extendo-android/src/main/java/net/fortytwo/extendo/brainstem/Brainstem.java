@@ -17,6 +17,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
+import net.fortytwo.extendo.util.properties.TypedProperties;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,6 +53,10 @@ public class Brainstem {
 
     private final ArduinoReceiver arduinoReceiver = new ArduinoReceiver();
 
+    private SparqlNotificationListener notificationListener;
+
+    final NotificationToneGenerator toneGenerator = new NotificationToneGenerator();
+
     private Properties configuration;
 
     private BrainstemAgent agent;
@@ -70,6 +75,7 @@ public class Brainstem {
     /**
      * Supplies a Brainstem configuration.
      * Otherwise, the configuration will be loaded from the default location on disk: /sdcard/brainstem.props
+     *
      * @param conf the configuration properties
      */
     public void setConfiguration(final Properties conf) {
@@ -115,19 +121,39 @@ public class Brainstem {
     // Ideally, this file will go away entirely once the Brainstem becomes reusable software rather than a
     // special-purpose component of a demo.
     private void loadConfiguration() throws BrainstemException {
+        // this configuration is currently separate from the main Extendo configuration, which reads from
+        // ./extendo.properties.  On Android, this path may be an inaccessible location (in the file system root)
         if (null == configuration) {
             File f = new File(PROPS_PATH);
             if (!f.exists()) {
                 throw new BrainstemException("configuration properties not found: " + PROPS_PATH);
             }
 
-            configuration = new Properties();
+            configuration = new TypedProperties();
             try {
                 configuration.load(new FileInputStream(f));
             } catch (IOException e) {
                 throw new BrainstemException(e);
             }
         }
+
+        // temporary code to investigate merging brainstem.props with extendo.properties
+        /*
+        Log.i(TAG, "creating extendo.properties");
+        try {
+            File f = new File("extendo.properties");
+            Log.i(TAG, "f.getAbsolutePath(): " + f.getAbsolutePath());
+            Log.i(TAG, "f.exists(): " + f.exists());
+            if (!f.exists()) {
+                f.createNewFile();
+                OutputStream fout = new FileOutputStream(f);
+                fout.write("foo".getBytes());
+                fout.close();
+            }
+        } catch (IOException e) {
+            throw new BrainstemException(e);
+        }
+        */
 
         String rexsterHost = configuration.getProperty(PROP_REXSTER_HOST);
         String rexsterPort = configuration.getProperty(PROP_REXSTER_PORT);
@@ -143,18 +169,27 @@ public class Brainstem {
 
         // note: currently, setTextEditor() must be called before passing textEditor to the device controls
 
+        // TODO: temporary
+        int notificationPort = 1331;
+        notificationListener = new SparqlNotificationListener(rexsterHost, notificationPort, toneGenerator);
+        notificationListener.start();
+
         String u = configuration.getProperty(PROP_AGENTURI);
         if (null == u) {
             throw new BrainstemException("who are you? Missing value for " + PROP_AGENTURI);
         } else {
-            agent = new BrainstemAgent(u);
+            try {
+                agent = new BrainstemAgent(u, configuration, endpoint + "broadcast-rdf");
+            } catch (IOException e) {
+                throw new BrainstemException(e);
+            }
         }
 
         String extendoHandAddress = configuration.getProperty(PROP_EXTENDOHAND_ADDRESS);
         if (null != extendoHandAddress) {
             Log.i(TAG, "loading Extend-o-Hand device at address " + extendoHandAddress);
             BluetoothDeviceControl extendoHand
-                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, brain, proxy, agent.getAgentUri().stringValue(), textEditor);
+                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, brain, proxy, agent, textEditor);
             addBluetoothDevice(extendoHand);
         }
 
@@ -226,17 +261,18 @@ public class Brainstem {
         }
     }
 
-    // Note: is it possible to generate a tone with lower latency than this default generator's?
-    final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+    public class NotificationToneGenerator {
+        // Note: is it possible to generate a tone with lower latency than this default generator's?
+        private final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
 
-    public void playEventNotificationTone() {
-        //startActivity(new Intent(thisActivity, PlaySound.class));
+        public void play() {
+            //startActivity(new Intent(thisActivity, PlaySound.class));
 
-        tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+            tg.startTone(ToneGenerator.TONE_PROP_BEEP);
 
-
-        //Instrumentation m_Instrumentation = new Instrumentation();
-        //m_Instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_B);
+            //Instrumentation m_Instrumentation = new Instrumentation();
+            //m_Instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_B);
+        }
     }
 
     // TODO: temporary
@@ -264,7 +300,8 @@ public class Brainstem {
             String address = intent.getStringExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS);
 
             //Log.i(TAG, "received from address: " + address);
-            playEventNotificationTone();
+
+            //toneGenerator.play();
 
             // the type of data which is added to the intent
             int dataType = intent.getIntExtra(AmarinoIntent.EXTRA_DATA_TYPE, -1);
@@ -302,7 +339,12 @@ public class Brainstem {
                     Log.i(TAG, sb.toString());
                     */
 
-                    handleOSCData(data);
+                    // TODO: catching ArrayIndexOutOfBoundsException is temporary; fix the problem in the Arduino
+                    try {
+                        handleOSCData(data);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        Log.e(Brainstem.TAG, "array index out of bounds when reading from Arduino");
+                    }
                 }
             }
         }

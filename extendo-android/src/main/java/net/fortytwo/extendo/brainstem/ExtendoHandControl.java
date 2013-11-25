@@ -1,8 +1,10 @@
 package net.fortytwo.extendo.brainstem;
 
+import android.util.Log;
 import android.widget.EditText;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.brain.ExtendoBrain;
+import net.fortytwo.rdfagents.model.Dataset;
 
 import java.util.Date;
 
@@ -14,7 +16,7 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
                               final OSCDispatcher oscDispatcher,
                               final ExtendoBrain brain,
                               final EventStackProxy proxy,
-                              final String agentUri,
+                              final BrainstemAgent agent,
                               final EditText textEditor) {
         super(address);
 
@@ -31,9 +33,18 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
                     textEditor.setText("Extend-o-Hand error (wrong # of args)");
                 }
 
+                /*
                 if (null != proxy) {
                     proxy.push(
-                        brain.getEventStack().createGestureEvent(agentUri, recognizedAt));
+                        brain.getEventStack().createGestureEvent(agent.getAgentUri().stringValue(), recognizedAt));
+                }*/
+
+                Dataset d = agent.datasetForGestureEvent(recognizedAt.getTime());
+                try {
+                    agent.sendDataset(d);
+                } catch (Exception e) {
+                    Log.e(Brainstem.TAG, "failed to send event RDF to endpoint: " + e.getMessage());
+                    e.printStackTrace(System.err);
                 }
             }
         });

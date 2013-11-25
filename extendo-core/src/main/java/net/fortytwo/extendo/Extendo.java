@@ -4,15 +4,10 @@ package net.fortytwo.extendo;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.extendo.util.properties.TypedProperties;
 
-import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -21,8 +16,6 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Extendo {
-    public static final String DEFAULT_BASEURI = "http://example.org/replaceThisBaseURI#";
-    public static final String MOB_ONTOLOGY_FILE = "myotherbrain.owl";
     public static final boolean SAFE_MODE = true;
 
     // Configuration properties.
@@ -33,6 +26,7 @@ public class Extendo {
             VERSION = "net.fortytwo.extendo.version",
             REVISION = "net.fortytwo.extendo.revision";
 
+    // schema constants
     public static final String
             ALIAS = "alias",
             CREATED = "created",
@@ -47,9 +41,7 @@ public class Extendo {
 
     public static final int KEY_DIGITS = 7;
 
-    private static final char[] HEX_CHARS = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-    };
+    private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 
     private static final Random RANDOM = new Random();
 
@@ -98,16 +90,6 @@ public class Extendo {
         }
     }
 
-    private static final MessageDigest SHA1_DIGEST;
-
-    static {
-        try {
-            SHA1_DIGEST = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-
     public static Logger getLogger(final Class c) {
         return Logger.getLogger(c.getName());
     }
@@ -130,33 +112,6 @@ public class Extendo {
         }
 
         return name + " " + version + ", revision #" + revision;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // temporary stuff /////////////////////////////////////////////////////////
-
-    public static URI toURI(final QName q) {
-        try {
-            return new URI(q.getNamespaceURI() + q.getLocalPart());
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private static final Random random = new Random();
-
-    public static String sha1SumOf(final String key) {
-        SHA1_DIGEST.update(key.getBytes());
-        String hash = "";
-        byte[] digest = SHA1_DIGEST.digest();
-        for (byte b : digest) {
-            String hex = Integer.toHexString(b);
-            if (hex.length() == 1)
-                hex = "0" + hex;
-            hex = hex.substring(hex.length() - 2);
-            hash = hash + hex;
-        }
-        return hash;
     }
 
     /*

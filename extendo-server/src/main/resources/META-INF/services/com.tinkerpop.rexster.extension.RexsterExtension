@@ -10,3 +10,7 @@ net.fortytwo.extendo.brain.server.SearchExtension
 net.fortytwo.extendo.brain.server.SetPropertiesExtension
 net.fortytwo.extendo.brain.server.UpdateExtension
 net.fortytwo.extendo.brain.server.ViewExtension
+
+
+net.fortytwo.extendo.brain.server.BroadcastRdfService
+

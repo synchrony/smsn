@@ -30,6 +30,16 @@
             <artifactId>blueprints-graph-jung</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.fortytwo.rdfagents</groupId>
+            <artifactId>rdfagents-core</artifactId>
+            <version>${rdfagents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.rpi.twc</groupId>
+            <artifactId>sesamestream</artifactId>
+            <version>${sesamestream.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

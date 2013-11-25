@@ -163,7 +163,7 @@ public class Main extends Activity {
             editor.setText("");
             editor.setText("sending a message\nto the Typeatron");
 
-            brainstem.playEventNotificationTone();
+            //brainstem.playEventNotificationTone();
 
             brainstem.sendTestMessageToTypeatron(context);
 

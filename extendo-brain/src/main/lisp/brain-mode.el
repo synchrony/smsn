@@ -126,6 +126,7 @@
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
 (setq tn-value-truncation-length 100)
 
+
 ;; NAVIGATION ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq tn-enable-linum t)

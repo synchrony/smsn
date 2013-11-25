@@ -38,7 +38,8 @@ public class GetEventsExtension extends ExtendoExtension {
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         List<Note> events = p.brain.getEventStack().getEvents();
 
-        // TODO: temporary, for debugging
+        /*
+        // temporary, for debugging
         if (0 == events.size()) {
             Note debugNote = new Note();
             debugNote.setValue("test event");
@@ -46,6 +47,7 @@ public class GetEventsExtension extends ExtendoExtension {
             debugNote.setSharability(0.5f);
             p.brain.getEventStack().push(debugNote);
         }
+        */
 
         Note view = new Note();
         view.setValue("event stack");
