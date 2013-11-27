@@ -142,5 +142,4 @@ public class BrainstemAgent {
             Log.e(Brainstem.TAG, "failed to push gestural event RDF: " + statusLine.getReasonPhrase());
         }
     }
-
 }
