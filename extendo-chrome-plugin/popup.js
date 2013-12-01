@@ -14,7 +14,7 @@ function copyTabToClipboard(tab, cachingId) {
             url = url.substring(0, j);
         }
 
-        // Note: the extra indent saves on keystrokes when pasting the text into TinkerNotes
+        // Note: the extra indent saves on keystrokes when pasting the text into Brain-mode
         //       (when it is pasted to an indented position in the tree)
         text += "* " + title + "\n"
             + "                @sharability 1\n"
