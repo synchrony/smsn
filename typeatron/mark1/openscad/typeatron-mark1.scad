@@ -19,9 +19,12 @@ function sq(x) = x*x;
 ////////////////////////////////////////////////////////////////////////////////
 // rendering settings
 
-// toggle this variable to see the ICs in position and make sure they fit inside the case
+// toggle this variable to see the ICs and buttons in position and make sure they fit inside the case
 visualizeInternalComponents = false;
 buttonsInSitu = false;
+
+// hollow out buttons to save plastic/money (possible only with thick buttons)
+hollowButtons = false;
 
 simpleEdges = true;
 
@@ -142,8 +145,8 @@ offsetFromTopEdgeToFirstFinger = 15.0;
 fingerWidth = 84 / 4;  // 21 -- 82mm was measured, but this seemed a little cramped
 thumbWidth = 25;
 thumbUpperRightX = 25.0;
-fingerWellDepth = 5;
-thumbWellDepth = 5;
+fingerNotchDepth = 5;  // curve in which fingers rest
+thumbNotchDepth = 5;   // curve in which the thumb would rest, in the absence of a button
 
 // reasonably chosen values
 caseWidth = 70;
@@ -173,11 +176,12 @@ bottomYOfFingers = caseLength - offsetFromTopEdgeToFirstFinger - 4*fingerWidth -
 alignmentPegWidth = 2;
 alignmentPegHeight = 2;
 
-buttonHeight = 8;
+buttonHeight = 5;
 buttonWidth = tactileSwitchWellWidth;
 fingerButtonLength = fingerWidth - dividerThick;
 thumbButtonLength = thumbWidth - dividerThick;
-buttonClearance = accuracy;  // clearance between button and walls (on all four sides)
+// clearance between button and walls (on all four sides).  We take the risk of a low tolerance for the sake of a snug fit
+buttonClearance = accuracy / 2;
 buttonLip = 2.5;
 buttonSlack = tactileSwitchPressDepth * 2;  // minimum vertical clearance between button and floor/retainers
 buttonStabilizerThick = 1.75; // vertical bars on buttons and case
@@ -185,9 +189,14 @@ buttonRetainerThick = 1.0; // horizontal bars on buttons and case
 buttonRetainerGap = 0.75;
 buttonRetainerHookHeight = tactileSwitchHeight - (tactileSwitchPressDepth + buttonSlack + accuracy2);
 
-// buttons are inset by only 1/3 of the depth of the finger or thumb well
-totalFingerWellDepth = fingerWellDepth/3 + buttonHeight + tactileSwitchHeight;
-totalThumbWellDepth = thumbWellDepth/3 + buttonHeight + tactileSwitchHeight;
+// buttons are inset by 2/3 of the depth of the finger or thumb notch, making most of the contact of the finger
+// with the case rather than the button.  This should make the Typeatron easy to grip while typing.  Direct inward
+// pressure must be exerted on the button in order to close the switch.
+fingerButtonInsetDepth = fingerNotchDepth * 2/3;
+thumbButtonInsetDepth = thumbNotchDepth * 2/3;
+
+totalFingerWellDepth = fingerButtonInsetDepth + buttonHeight + tactileSwitchHeight;
+totalThumbWellDepth = thumbButtonInsetDepth + buttonHeight + tactileSwitchHeight;
 
 // this keeps the edges of the thumb container from protruding out of the case
 thumbWellDepression = 2;
@@ -265,14 +274,19 @@ module button(length) {
             }
         }
 
-	    // hollow out the button to save plastic/money
-        translate([0,buttonWidth/2,buttonWidth/2]) {
-            rotate([0,90,0]) { cylinder(h=length+1,r=buttonWidth/3); }
+	    if (hollowButtons) {
+            translate([0,buttonWidth/2,buttonWidth/2]) {
+                rotate([0,90,0]) { cylinder(h=length+1,r=buttonWidth/3); }
+            }
         }
     }
 }
 
+// a complex well which houses a finger button and prevents it from detaching from the Typeatron
 module fingerButtonWell(length) {
+    outerRetainerWellWidth = buttonStabilizerThick + buttonRetainerGap;
+    innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+
     translate([-length/2,-buttonWidth/2,tactileSwitchWellDepth]) {
         // rectangular well for button body
         cube([length,buttonWidth,buttonHeight+10]);  // clearance of 10 is more than enough
@@ -299,9 +313,6 @@ module fingerButtonWell(length) {
 module tactileSwitchWell(length, depth) {
     w = tactileSwitchWellWidth + foreignPartClearance;
     l = 1.5; // width of leg holes
-
-    outerRetainerWellWidth = buttonStabilizerThick + buttonRetainerGap;
-    innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
 
     // the pressure sensor channels extend slightly past the well for the tactile switch
     fsrChannelDepth = tactileSwitchLegLength + tactileSwitchHeight;
@@ -345,28 +356,28 @@ module tactileSwitchWell(length, depth) {
     }
 }
 
-// depth: depth of circular well for the finger
+// notchDepth: depth of semi-circular rest for the finger
 // width: width of the entire construction
 // totalWellDepth: depth to base of tactile switch
 // buttonLength: length of the moving part
-module fingerWell(depth, width, totalWellDepth, buttonLength) {
+module fingerWell(notchDepth, width, totalWellDepth, buttonLength) {
     x = width / 2;
-    y = depth;
+    y = notchDepth;
     radius = (x*x + y*y) / (2*y);
 
-    translate([radius - depth,0,0]) {
+    translate([radius - notchDepth,0,0]) {
         cylinder(h=caseHeight,r=radius, $fn=cornerRoundingRes);
     }
 
-    translate([radius - depth, 0, rimThick]) {
+    translate([radius - notchDepth, 0, rimThick]) {
         cylinder(h=rimThick+.001, r1=radius-rimThick/2, r2=radius+rimThick/2, $fn=cornerRoundingRes);
     }
  
-    translate([radius - depth,0,0]) {
+    translate([radius - notchDepth,0,0]) {
         cylinder(h=rimThick+.001, r2=radius-rimThick/2, r1=radius+rimThick/2, $fn=cornerRoundingRes);
     }
 
-    // well and channels for tactile switch, wires, and pressure sensor
+    // well and channels for finger button, tactile switch, wires, and pressure sensor
     translate([-totalWellDepth,0,caseHeight/2]) {
         rotate([0,90,0]) { rotate([0,0,90]) {
             fingerButtonWell(buttonLength);
@@ -383,9 +394,9 @@ module fingerContainer(totalWellDepth, buttonLength) {
 
 module buttons() {
     fingerButtonsPrintable = [caseWidth + 15,bottomYOfFingers+dividerThick,10];
-    fingerButtonsInSitu = [caseWidth - fingerWellDepth * 1/3,bottomYOfFingers + dividerThick,buttonLidHeight + buttonWidth];
+    fingerButtonsInSitu = [caseWidth - fingerButtonInsetDepth,bottomYOfFingers + dividerThick,buttonLidHeight + buttonWidth];
     thumbButtonPrintable = [thumbUpperRightX+thumbButtonLength+dividerThick,caseLength+12,10];
-    thumbButtonInSitu = [thumbUpperRightX + thumbWidth - dividerThick/2,thumbUpperRightY - fingerWellDepth * 1/3, buttonLidHeight + buttonWidth];
+    thumbButtonInSitu = [thumbUpperRightX + thumbWidth - dividerThick/2,thumbUpperRightY - thumbButtonInsetDepth, buttonLidHeight + buttonWidth];
 
     // TODO: simplify this ridiculous if..then
     if (buttonsInSitu) {
@@ -675,7 +686,7 @@ module thumbButtonWell() {
     translate([thumbUpperRightX, thumbUpperRightY, 0]) {
         rotate([0,0,90]) {
             translate([0,-(thumbButtonLength+dividerThick)/2],0){
-                fingerWell(thumbWellDepth, thumbWidth, totalFingerWellDepth, thumbButtonLength);
+                fingerWell(thumbNotchDepth, thumbWidth, totalFingerWellDepth, thumbButtonLength);
             }
         }
     }
@@ -744,7 +755,7 @@ module basicCase() {
                 caseWidth,
                 caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * (i + 0.5),
                 0]) {
-                    fingerWell(fingerWellDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength);
+                    fingerWell(fingerNotchDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength);
             }
         }
 
@@ -811,7 +822,9 @@ echo("pinHoleBlockWidth: ", pinHoleBlockWidth);
 difference() {
     basicCase();
 
-    cube([caseWidth, caseLength, buttonLidHeight+0.0001]);
+    translate([0,0,-1]) {
+        cube([caseWidth, caseLength, buttonLidHeight+1.0001]);
+    }
 
     // screwdriver/leverage slot(s)
     translate([rimThick+cavityWidth,rimThick/2,buttonLidHeight]) {
