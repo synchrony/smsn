@@ -53,7 +53,7 @@ accuracy = 0.254;  // for Stratasys uPrint
 
 accuracyRatio = accuracy / shapewaysAccuracy;
 
-// Additional figures from Shapeways, but adjusted for the resolution of whatever printer we have.
+// Additional figures from Shapeways, but adjusted for the resolution of the particular printer
 // Assumed to be more or less analogous.
 clearance = 0.5 * accuracyRatio;
 minWallSupported = 0.7 * accuracyRatio;
@@ -108,15 +108,15 @@ powerSwitchLength = 11.7;
 powerSwitchWidth = 4.0;
 powerSwitchDepth = 7.7;
 
-pressureSensorWidth = 7.2;  // max value, from the data sheet
-pressureSensorThick = 0.35;  // from the data sheet
+pressureSensorWidth = 7.8;  // by direct measurement of the wide "head". The data sheet says 7.2mm
+pressureSensorThick = 0.40;  // by direct measurement, without removing the adhesive backing. The data sheet says 0.35mm
 
-pushButtonWellWidth = 7;
-pushButtonHeight = 5.0;
-pushButtonLegLength = 3.4;
-pushButtonPressDepth = 0.25;
-pushButtonWellDepth = 4.0;  // this is the height of the body of the push button (without the actual button)
-pushButtonBaseThick = 1.5;
+tactileSwitchWellWidth = 7;
+tactileSwitchHeight = 5.0;
+tactileSwitchLegLength = 3.4;
+tactileSwitchPressDepth = 0.25;
+tactileSwitchWellDepth = 4.0;  // this is the height of the body of the tactile switch (without the push button)
+tactileSwitchBaseThick = 1.5;
 
 nanoLength = 43.2;
 nanoWidth = 18.0;
@@ -174,20 +174,20 @@ alignmentPegWidth = 2;
 alignmentPegHeight = 2;
 
 buttonHeight = 8;
-buttonWidth = pushButtonWellWidth;
+buttonWidth = tactileSwitchWellWidth;
 fingerButtonLength = fingerWidth - dividerThick;
 thumbButtonLength = thumbWidth - dividerThick;
 buttonClearance = accuracy;  // clearance between button and walls (on all four sides)
 buttonLip = 2.5;
-buttonSlack = pushButtonPressDepth * 2;  // minimum vertical clearance between button and floor/retainers
+buttonSlack = tactileSwitchPressDepth * 2;  // minimum vertical clearance between button and floor/retainers
 buttonStabilizerThick = 1.75; // vertical bars on buttons and case
 buttonRetainerThick = 1.0; // horizontal bars on buttons and case
 buttonRetainerGap = 0.75;
-buttonRetainerHookHeight = pushButtonHeight - (pushButtonPressDepth + buttonSlack + accuracy2);
+buttonRetainerHookHeight = tactileSwitchHeight - (tactileSwitchPressDepth + buttonSlack + accuracy2);
 
 // buttons are inset by only 1/3 of the depth of the finger or thumb well
-totalFingerWellDepth = fingerWellDepth/3 + buttonHeight + pushButtonHeight;
-totalThumbWellDepth = thumbWellDepth/3 + buttonHeight + pushButtonHeight;
+totalFingerWellDepth = fingerWellDepth/3 + buttonHeight + tactileSwitchHeight;
+totalThumbWellDepth = thumbWellDepth/3 + buttonHeight + tactileSwitchHeight;
 
 // this keeps the edges of the thumb container from protruding out of the case
 thumbWellDepression = 2;
@@ -200,7 +200,7 @@ pinHoleBlockWidth = 2 * (pinHoleRadius + clearance*1.5);
 // just to be on the safe side, we overestimate the necessary clearance
 pressureSensorChannelHeight = clearance * 1.5;
 
-cavityWidth = caseWidth - rimThick - totalFingerWellDepth - pushButtonBaseThick;
+cavityWidth = caseWidth - rimThick - totalFingerWellDepth - tactileSwitchBaseThick;
 cavityLength = caseLength - 2*rimThick;
 
 buttonLidHeight = (caseHeight-buttonWidth)/2;
@@ -224,15 +224,15 @@ transducerVizOffsetY = motionSensorVizOffsetY + 1 + 26;
 // creates a button of the given length.  Clearance on all sides of the button is subtracted.
 // the long axis of the button is x.  y is side-to-side.  z is up and down (as you press the button).
 module button(length) {
-    innerRetainerWellWidth = (length - pushButtonWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+    innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
     retainerLength = innerRetainerWellWidth - buttonClearance - buttonRetainerGap;
 
     // this measurement is crucial
     stabilizerHeight
-        = 2*buttonRetainerThick
-        + (pushButtonHeight-pushButtonWellDepth+foreignPartClearance)
-        + pressureSensorThick + 0.15  // TODO: improve this estimate when you have the sensor in hand
-        + 0.1; // "a little extra" which can be easily corrected with tape or paint
+        = 2 * buttonRetainerThick
+        + (tactileSwitchHeight - tactileSwitchWellDepth + foreignPartClearance)
+        + pressureSensorThick
+        + 0.15;
 
     difference() {
         union() {
@@ -272,43 +272,65 @@ module button(length) {
     }
 }
 
-// button well with origin at the center of the base of the switch
+module fingerButtonWell(length) {
+    translate([-length/2,-buttonWidth/2,tactileSwitchWellDepth]) {
+        // rectangular well for button body
+        cube([length,buttonWidth,buttonHeight+10]);  // clearance of 10 is more than enough
+
+        // retainer wells
+        translate([0,0,-tactileSwitchWellDepth]) {
+            cube([outerRetainerWellWidth, buttonWidth, tactileSwitchWellDepth]);
+
+            cube([innerRetainerWellWidth, buttonWidth, tactileSwitchWellDepth - buttonRetainerThick]);
+
+            translate([length-outerRetainerWellWidth,0,0]) {
+                cube([outerRetainerWellWidth, buttonWidth, tactileSwitchWellDepth]);
+            }
+
+            translate([length-innerRetainerWellWidth,0,0]) {
+                cube([innerRetainerWellWidth, buttonWidth, tactileSwitchWellDepth - buttonRetainerThick]);
+            }
+		}
+    }
+}
+
+// well for four-legged through-hole tactile push button switch with origin at the center of the base of the switch
 // legs of the switch run along the x axis
-module pushButtonWell(length, depth) {
-    w = pushButtonWellWidth + foreignPartClearance;
+module tactileSwitchWell(length, depth) {
+    w = tactileSwitchWellWidth + foreignPartClearance;
     l = 1.5; // width of leg holes
 
     outerRetainerWellWidth = buttonStabilizerThick + buttonRetainerGap;
-    innerRetainerWellWidth = (length - pushButtonWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+    innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
 
-    // the pressure sensor channels extend slightly past the push button well
-    fsrChannelDepth = pushButtonLegLength + pushButtonHeight;
+    // the pressure sensor channels extend slightly past the well for the tactile switch
+    fsrChannelDepth = tactileSwitchLegLength + tactileSwitchHeight;
 
     translate([-w/2, -w/2, 0]) {
 
 		// square well for body of switch
         cube([w, w, depth]);
 
-        translate([0,0,-pushButtonLegLength]) {
+        translate([0,0,-tactileSwitchLegLength]) {
             // channels for legs/wires of switch
             translate([0,0,0]) {
-                cube([l,l,depth+pushButtonLegLength]);
+                cube([l,l,depth+tactileSwitchLegLength]);
             }
             translate([w-l,0, 0]) {
-                cube([l,l,depth+pushButtonLegLength]);
+                cube([l,l,depth+tactileSwitchLegLength]);
             }
             translate([0,w-l, 0]) {
-                cube([l,l,depth+pushButtonLegLength]);
+                cube([l,l,depth+tactileSwitchLegLength]);
             }
             translate([w-l,w-l, 0]) {
-                cube([l,l,depth+pushButtonLegLength]);
+                cube([l,l,depth+tactileSwitchLegLength]);
             }
         }
     }
 
     // channels for pressure sensor
     // note: the slight 0.001 overlap prevents a confusing "film" in the STL
-    translate([-(pressureSensorWidth+foreignPartClearance)/2,-w/2,-pushButtonLegLength]) {
+    translate([-(pressureSensorWidth+foreignPartClearance)/2,-w/2,-tactileSwitchLegLength]) {
         translate([0, -pressureSensorChannelHeight, 0]) {
             cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight+0.001, fsrChannelDepth]);
         }
@@ -319,33 +341,13 @@ module pushButtonWell(length, depth) {
 
     // rim to allow the pressure sensor to wrap around
     translate([-(pressureSensorWidth+foreignPartClearance)/2, -w/2-pressureSensorChannelHeight, depth]) {
-        cube([pressureSensorWidth+foreignPartClearance, w+2*pressureSensorChannelHeight, pushButtonHeight - pushButtonWellDepth]);
-    }
-
-    translate([-length/2,-buttonWidth/2,pushButtonWellDepth]) {
-        // rectangular well for button body
-        cube([length,buttonWidth,buttonHeight+10]);
-
-        // retainer wells
-        translate([0,0,-pushButtonWellDepth]) {
-            cube([outerRetainerWellWidth, buttonWidth, pushButtonWellDepth]);
-
-            cube([innerRetainerWellWidth, buttonWidth, pushButtonWellDepth - buttonRetainerThick]);
-
-            translate([length-outerRetainerWellWidth,0,0]) {
-                cube([outerRetainerWellWidth, buttonWidth, pushButtonWellDepth]);
-            }
-
-            translate([length-innerRetainerWellWidth,0,0]) {
-                cube([innerRetainerWellWidth, buttonWidth, pushButtonWellDepth - buttonRetainerThick]);
-            }
-		}
+        cube([pressureSensorWidth+foreignPartClearance, w+2*pressureSensorChannelHeight, tactileSwitchHeight - tactileSwitchWellDepth]);
     }
 }
 
 // depth: depth of circular well for the finger
 // width: width of the entire construction
-// totalWellDepth: depth to base of push button switch
+// totalWellDepth: depth to base of tactile switch
 // buttonLength: length of the moving part
 module fingerWell(depth, width, totalWellDepth, buttonLength) {
     x = width / 2;
@@ -364,17 +366,18 @@ module fingerWell(depth, width, totalWellDepth, buttonLength) {
         cylinder(h=rimThick+.001, r2=radius-rimThick/2, r1=radius+rimThick/2, $fn=cornerRoundingRes);
     }
 
-    // well and channels for push button switch and wires
+    // well and channels for tactile switch, wires, and pressure sensor
     translate([-totalWellDepth,0,caseHeight/2]) {
         rotate([0,90,0]) { rotate([0,0,90]) {
-            pushButtonWell(buttonLength, pushButtonWellDepth);
+            fingerButtonWell(buttonLength);
+            tactileSwitchWell(buttonLength, tactileSwitchWellDepth);
         }}
     }
 }
 
 module fingerContainer(totalWellDepth, buttonLength) {
-    translate([-totalWellDepth-pushButtonBaseThick, -buttonLength/2-dividerThick, lidThick]) {
-        cube([totalWellDepth+pushButtonBaseThick, buttonLength + 2*dividerThick, caseHeight-lidThick]);
+    translate([-totalWellDepth-tactileSwitchBaseThick, -buttonLength/2-dividerThick, lidThick]) {
+        cube([totalWellDepth+tactileSwitchBaseThick, buttonLength + 2*dividerThick, caseHeight-lidThick]);
     }
 }
 
