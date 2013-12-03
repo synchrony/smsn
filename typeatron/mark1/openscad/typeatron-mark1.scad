@@ -26,6 +26,11 @@ buttonsInSitu = false;
 // hollow out buttons to save plastic/money (possible only with thick buttons)
 hollowButtons = false;
 
+// put pinholes in strategic locations where there is insuficient solid material for a hole;
+// this requires a column to be built around the hole.  The columns take up valuable space,
+// but better coverage with pinholes makes it possible to secure the lid more firmly to the case
+floatingPinHoles = false;
+
 simpleEdges = true;
 
 /*
@@ -154,7 +159,7 @@ caseLength = 120;
 lidThick = 1.5;
 floorThick = 1.5;
 
-dividerThick = minWallSupported * 1.5;
+dividerThick = minWallSupported;
 
 // horizontal offset of components with ports/controls on the bottom edge
 nanoOffset = 0;
@@ -564,28 +569,30 @@ module pinHoles() {
         }
     }
 
-    // finger pinholes
-    translate([rimThick + cavityWidth + pinHoleBlockWidth/2,caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2,0]) {
-        pinHole();
-    }
-    for (i = [1:3]) {
-        translate([
-            rimThick + cavityWidth,
-            caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i,
-            0]) {
+    if (floatingPinHoles) {
+        // finger pinholes
+        translate([rimThick + cavityWidth + pinHoleBlockWidth/2,caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2,0]) {
             pinHole();
         }
-    }
-    translate([rimThick+cavityWidth, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4 + pinHoleBlockWidth/2, 0]) {
-        pinHole();
-    }
+        for (i = [1:3]) {
+            translate([
+                rimThick + cavityWidth,
+                caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i,
+                0]) {
+                pinHole();
+            }
+        }
+        translate([rimThick+cavityWidth, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4 + pinHoleBlockWidth/2, 0]) {
+            pinHole();
+        }
 
-    // thumb pinholes
-    translate([thumbUpperRightX+1.5, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth/2, 0]) {
-        pinHole();
-    }
-    translate([thumbUpperRightX+thumbWidth-1.5, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth/2, 0]) {
-        pinHole();
+        // thumb pinholes
+        translate([thumbUpperRightX+1.5, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth/2, 0]) {
+            pinHole();
+        }
+        translate([thumbUpperRightX+thumbWidth-1.5, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth/2, 0]) {
+            pinHole();
+        }
     }
 }
 
@@ -722,28 +729,30 @@ module basicCase() {
 
             thumbButtonContainer();
 
-            // blocks for finger pinholes
-            translate([rimThick + cavityWidth,caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2 - pinHoleBlockWidth/2,0]) {
-                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
-            }
-            for (i = [1:3]) {
-                translate([
-                    rimThick + cavityWidth - pinHoleBlockWidth/2,
-                    caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i - pinHoleBlockWidth/2,
-                    0]) {
+            if (floatingPinHoles) {
+                // columns for finger pinholes
+                translate([rimThick + cavityWidth,caseLength - offsetFromTopEdgeToFirstFinger + dividerThick/2 - pinHoleBlockWidth/2,0]) {
                     cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
                 }
-            }
-            translate([rimThick+cavityWidth - pinHoleBlockWidth/2, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4, 0]) {
-                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
-            }
+                for (i = [1:3]) {
+                    translate([
+                        rimThick + cavityWidth - pinHoleBlockWidth/2,
+                        caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * i - pinHoleBlockWidth/2,
+                        0]) {
+                        cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+                    }
+                }
+                translate([rimThick+cavityWidth - pinHoleBlockWidth/2, caseLength-offsetFromTopEdgeToFirstFinger - fingerWidth*4, 0]) {
+                    cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+                }
 
-            // blocks for thumb pinholes
-            translate([thumbUpperRightX, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
-                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
-            }
-            translate([thumbUpperRightX+thumbWidth-pinHoleBlockWidth, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
-                cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+                // columns for thumb pinholes
+                translate([thumbUpperRightX, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
+                    cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+                }
+                translate([thumbUpperRightX+thumbWidth-pinHoleBlockWidth, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
+                    cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
+                }
             }
         }
 
