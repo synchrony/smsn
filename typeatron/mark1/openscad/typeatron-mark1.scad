@@ -48,6 +48,9 @@ ledRimRes = 20;
 lightSensorWellRes = 20;
 pinHoleRes = 10;
 
+// a slight overestimate of the sizes of subtracted objects which prevents a confusing "film" in the STL
+overkill = 0.001;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // printer parameters
@@ -149,12 +152,12 @@ thumbCurveRadius = 39.0;
 offsetFromTopEdgeToFirstFinger = 15.0;
 fingerWidth = 84 / 4;  // 21 -- 82mm was measured, but this seemed a little cramped
 thumbWidth = 25;
-thumbUpperRightX = 25.0;
+thumbUpperRightX = 22.0;  // originally 25mm in Typeatron #2, based on the model; this was a bit too high
 fingerNotchDepth = 5;  // curve in which fingers rest
 thumbNotchDepth = 5;   // curve in which the thumb would rest, in the absence of a button
 
 // reasonably chosen values
-caseWidth = 70;
+caseWidth = 67;  // Typeatron #1 and #2 were both 70mm wide
 caseLength = 120;
 lidThick = 1.5;
 floorThick = 1.5;
@@ -181,7 +184,8 @@ bottomYOfFingers = caseLength - offsetFromTopEdgeToFirstFinger - 4*fingerWidth -
 alignmentPegWidth = 2;
 alignmentPegHeight = 2;
 
-buttonHeight = 5;
+fingerButtonHeight = 5;
+thumbButtonHeight = 8; // thumb button is a little taller because it is not deeply inset like the finger buttons
 buttonWidth = tactileSwitchWellWidth;
 fingerButtonLength = fingerWidth - dividerThick;
 thumbButtonLength = thumbWidth - dividerThick;
@@ -198,10 +202,10 @@ buttonRetainerHookHeight = tactileSwitchHeight - (tactileSwitchPressDepth + butt
 // with the case rather than the button.  This should make the Typeatron easy to grip while typing.  Direct inward
 // pressure must be exerted on the button in order to close the switch.
 fingerButtonInsetDepth = fingerNotchDepth * 2/3;
-thumbButtonInsetDepth = thumbNotchDepth * 2/3;
+thumbButtonInsetDepth = 0;
 
-totalFingerWellDepth = fingerButtonInsetDepth + buttonHeight + tactileSwitchHeight;
-totalThumbWellDepth = thumbButtonInsetDepth + buttonHeight + tactileSwitchHeight;
+totalFingerWellDepth = fingerButtonInsetDepth + fingerButtonHeight + tactileSwitchHeight;
+totalThumbWellDepth = thumbButtonInsetDepth + thumbButtonHeight + tactileSwitchHeight;
 
 // this keeps the edges of the thumb container from protruding out of the case
 thumbWellDepression = 2;
@@ -237,7 +241,7 @@ transducerVizOffsetY = motionSensorVizOffsetY + 1 + 26;
 
 // creates a button of the given length.  Clearance on all sides of the button is subtracted.
 // the long axis of the button is x.  y is side-to-side.  z is up and down (as you press the button).
-module button(length) {
+module button(length, buttonHeight) {
     innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
     retainerLength = innerRetainerWellWidth - buttonClearance - buttonRetainerGap;
 
@@ -251,9 +255,15 @@ module button(length) {
     difference() {
         union() {
             // rounded cap
-            translate([buttonClearance,buttonWidth/2,buttonWidth/2]) {
-                rotate([0,90,0]) {
-                    cylinder(h=length-2*buttonClearance,r=buttonWidth/2-buttonClearance, $fn=cornerRoundingRes);
+            difference() {
+                translate([buttonClearance,buttonWidth/2,buttonWidth/2]) {
+                    rotate([0,90,0]) {
+                        cylinder(h=length-2*buttonClearance,r=buttonWidth/2-buttonClearance, $fn=cornerRoundingRes);
+                    }
+                }
+                // remove the bottom half of the cylinder, which could protrude below the button body
+                translate([0, 0, buttonWidth/2]) {
+                    cube(length, buttonWidth, buttonWidth/2 + overkill);
                 }
             }
 
@@ -288,7 +298,7 @@ module button(length) {
 }
 
 // a complex well which houses a finger button and prevents it from detaching from the Typeatron
-module fingerButtonWell(length) {
+module fingerButtonWell(length, buttonHeight) {
     outerRetainerWellWidth = buttonStabilizerThick + buttonRetainerGap;
     innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
 
@@ -345,12 +355,11 @@ module tactileSwitchWell(length, depth) {
     }
 
     // channels for pressure sensor
-    // note: the slight 0.001 overlap prevents a confusing "film" in the STL
     translate([-(pressureSensorWidth+foreignPartClearance)/2,-w/2,-tactileSwitchLegLength]) {
         translate([0, -pressureSensorChannelHeight, 0]) {
-            cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight+0.001, fsrChannelDepth]);
+            cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight+overkill, fsrChannelDepth]);
         }
-        translate([0, w-0.001, 0]) {
+        translate([0, w-overkill, 0]) {
             cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight, fsrChannelDepth]);
         }
     }
@@ -365,7 +374,7 @@ module tactileSwitchWell(length, depth) {
 // width: width of the entire construction
 // totalWellDepth: depth to base of tactile switch
 // buttonLength: length of the moving part
-module fingerWell(notchDepth, width, totalWellDepth, buttonLength) {
+module fingerWell(notchDepth, width, totalWellDepth, buttonLength, buttonHeight) {
     x = width / 2;
     y = notchDepth;
     radius = (x*x + y*y) / (2*y);
@@ -375,17 +384,17 @@ module fingerWell(notchDepth, width, totalWellDepth, buttonLength) {
     }
 
     translate([radius - notchDepth, 0, rimThick]) {
-        cylinder(h=rimThick+.001, r1=radius-rimThick/2, r2=radius+rimThick/2, $fn=cornerRoundingRes);
+        cylinder(h=rimThick+overkill, r1=radius-rimThick/2, r2=radius+rimThick/2, $fn=cornerRoundingRes);
     }
  
     translate([radius - notchDepth,0,0]) {
-        cylinder(h=rimThick+.001, r2=radius-rimThick/2, r1=radius+rimThick/2, $fn=cornerRoundingRes);
+        cylinder(h=rimThick+overkill, r2=radius-rimThick/2, r1=radius+rimThick/2, $fn=cornerRoundingRes);
     }
 
     // well and channels for finger button, tactile switch, wires, and pressure sensor
     translate([-totalWellDepth,0,caseHeight/2]) {
         rotate([0,90,0]) { rotate([0,0,90]) {
-            fingerButtonWell(buttonLength);
+            fingerButtonWell(buttonLength, buttonHeight);
             tactileSwitchWell(buttonLength, tactileSwitchWellDepth);
         }}
     }
@@ -409,13 +418,13 @@ module buttons() {
         translate(fingerButtonsInSitu) {
             for (i = [0:3]) {
                 translate([0,i*fingerWidth,0]) { rotate([90,180,-90]) {
-                    button(fingerButtonLength);
+                    button(fingerButtonLength, fingerButtonHeight);
                 }}
             }
         }
         translate(thumbButtonInSitu) {
             rotate([90,180,0]) {
-                button(thumbButtonLength);
+                button(thumbButtonLength, thumbButtonHeight);
             }
         }
     } else {
@@ -423,13 +432,13 @@ module buttons() {
         translate(fingerButtonsPrintable) {
             for (i = [0:3]) {
                 translate([0,i*fingerWidth,0]) { rotate([90,180,-90]) {
-                    button(fingerButtonLength);
+                    button(fingerButtonLength, fingerButtonHeight);
                 }}
             }
         }
         translate(thumbButtonPrintable) {
             rotate([90,180,0]) {
-                button(thumbButtonLength);
+                button(thumbButtonLength, thumbButtonHeight);
             }
         }
     }
@@ -683,7 +692,7 @@ module thumbButtonContainer() {
     translate([thumbUpperRightX, thumbUpperRightY, 0]) {
         rotate([0,0,90]) {
             translate([0,-(thumbButtonLength+dividerThick)/2],0){
-                fingerContainer(totalFingerWellDepth, thumbButtonLength);
+                fingerContainer(totalThumbWellDepth, thumbButtonLength);
             }
         }
     }
@@ -693,7 +702,7 @@ module thumbButtonWell() {
     translate([thumbUpperRightX, thumbUpperRightY, 0]) {
         rotate([0,0,90]) {
             translate([0,-(thumbButtonLength+dividerThick)/2],0){
-                fingerWell(thumbNotchDepth, thumbWidth, totalFingerWellDepth, thumbButtonLength);
+                fingerWell(thumbNotchDepth, thumbWidth, totalThumbWellDepth, thumbButtonLength, thumbButtonHeight);
             }
         }
     }
@@ -713,15 +722,15 @@ module basicCase() {
                 // inner cavity
                 translate([0,0,lidThick]) {
                     translate([rimThick,rimThick,0]) {
-                        cube([cavityWidth,caseLength-thumbCurveRadius-rimThick+0.001,cavityHeight]);
+                        cube([cavityWidth,caseLength-thumbCurveRadius-rimThick+overkill,cavityHeight]);
                     }
                     translate([thumbCurveRadius,rimThick,0]) {
                         cube([cavityWidth+rimThick-thumbCurveRadius,cavityLength,cavityHeight]);
                     }
-                    translate([rimThick+cavityWidth - 0.001,topYOfFingers,0]) {
+                    translate([rimThick+cavityWidth - overkill,topYOfFingers,0]) {
                         cube([caseWidth - 2*rimThick - cavityWidth, caseLength - rimThick - topYOfFingers, cavityHeight]);
                     }
-                    translate([rimThick+cavityWidth - 0.001,rimThick,0]) {
+                    translate([rimThick+cavityWidth - overkill,rimThick,0]) {
                         cube([caseWidth - 2*rimThick - cavityWidth, bottomYOfFingers - rimThick, cavityHeight]);
                     }
                 }
@@ -747,10 +756,10 @@ module basicCase() {
                 }
 
                 // columns for thumb pinholes
-                translate([thumbUpperRightX, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
+                translate([thumbUpperRightX, thumbUpperRightY-totalThumbWellDepth-pinHoleBlockWidth, 0]) {
                     cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
                 }
-                translate([thumbUpperRightX+thumbWidth-pinHoleBlockWidth, thumbUpperRightY-totalFingerWellDepth-pinHoleBlockWidth, 0]) {
+                translate([thumbUpperRightX+thumbWidth-pinHoleBlockWidth, thumbUpperRightY-totalThumbWellDepth-pinHoleBlockWidth, 0]) {
                     cube([pinHoleBlockWidth,pinHoleBlockWidth,caseHeight]);
                 }
             }
@@ -764,7 +773,7 @@ module basicCase() {
                 caseWidth,
                 caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * (i + 0.5),
                 0]) {
-                    fingerWell(fingerNotchDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength);
+                    fingerWell(fingerNotchDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength, fingerButtonHeight);
             }
         }
 
@@ -832,7 +841,7 @@ difference() {
     basicCase();
 
     translate([0,0,-1]) {
-        cube([caseWidth, caseLength, buttonLidHeight+1.0001]);
+        cube([caseWidth, caseLength, buttonLidHeight+1+overkill]);
     }
 
     // screwdriver/leverage slot(s)
