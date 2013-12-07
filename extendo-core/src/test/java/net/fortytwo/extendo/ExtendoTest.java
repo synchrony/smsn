@@ -7,6 +7,7 @@ import java.net.URI;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -27,7 +28,10 @@ public class ExtendoTest {
     }
     
     @Test
-    public void testVersionInfo() {
-        assertEquals("Extendo 1.0-SNAPSHOT, revision #-1", Extendo.getVersionInfo());
+    public void testVersionInfo() throws Exception {
+        String version = Extendo.getConfiguration().getString(Extendo.VERSION);
+        int i = version.indexOf('.');
+        int majorVersion = Integer.valueOf(version.substring(0, i));
+        assertTrue(majorVersion >= 1);
     }
 }

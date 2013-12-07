@@ -1,7 +1,6 @@
 package net.fortytwo.extendo;
 
 
-import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.extendo.util.properties.TypedProperties;
 
 import java.io.File;
@@ -21,10 +20,8 @@ public class Extendo {
     // Configuration properties.
     public static final String
             BASE_URI = "net.fortytwo.extendo.baseURI",
-            NAME = "net.fortytwo.extendo.name",
             ACTIVITY_LOG = "net.fortytwo.extendo.activityLog",
-            VERSION = "net.fortytwo.extendo.version",
-            REVISION = "net.fortytwo.extendo.revision";
+            VERSION = "net.fortytwo.extendo.version";
 
     // schema constants
     public static final String
@@ -39,6 +36,13 @@ public class Extendo {
             VALUE = "value",
             WEIGHT = "weight";
 
+    // facilitator broadcast constants
+    public static final int BROADCAST_PORT = 4200;
+    public static final String
+            BROADCAST_ENDPOINT = "endpoint",
+            BROADCAST_TIME = "time",
+            BROADCAST_VERSION = "version";
+
     public static final int KEY_DIGITS = 7;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
@@ -46,8 +50,6 @@ public class Extendo {
     private static final Random RANDOM = new Random();
 
     private static final String CONFIG_PROPERTIES_FILE = "extendo.properties";
-    private static final String VERSION_PROPERTIES_FILE = "version.properties";
-    private static final TypedProperties VERSION_PROPERTIES;
     private static final Logger LOGGER;
 
     private static TypedProperties CONFIGURATION;
@@ -67,10 +69,8 @@ public class Extendo {
             LOGGER = getLogger(Extendo.class);
 
             CONFIGURATION = new TypedProperties();
-            VERSION_PROPERTIES = new TypedProperties();
 
             CONFIGURATION.load(Extendo.class.getResourceAsStream(CONFIG_PROPERTIES_FILE));
-            VERSION_PROPERTIES.load(Extendo.class.getResourceAsStream(VERSION_PROPERTIES_FILE));
 
             // Attempt to load additional properties from a user-provided file in the current directory
             File f = new File(CONFIG_PROPERTIES_FILE);
@@ -96,22 +96,6 @@ public class Extendo {
 
     public static TypedProperties getConfiguration() {
         return CONFIGURATION;
-    }
-
-    public static String getVersionInfo() {
-        String name;
-        String version;
-        int revision;
-
-        try {
-            name = VERSION_PROPERTIES.getString(NAME);
-            version = VERSION_PROPERTIES.getString(VERSION);
-            revision = VERSION_PROPERTIES.getInt(REVISION);
-        } catch (PropertyException e) {
-            throw new IllegalStateException(e);
-        }
-
-        return name + " " + version + ", revision #" + revision;
     }
 
     /*
