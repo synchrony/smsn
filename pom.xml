@@ -67,6 +67,7 @@
         <module>extendo-brain</module>
         <module>extendo-events</module>
         <module>extendo-opencalais</module>
+	<module>extendo-p2p</module>
         <module>extendo-qrcodes</module>
         <module>extendo-rdf</module>
         <module>extendo-rfid</module>

@@ -64,6 +64,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>net.fortytwo.extendo</groupId>
+            <artifactId>extendo-p2p</artifactId>
+            <version>${extendo.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-android</artifactId>
             <version>${neo4j.android.version}</version>

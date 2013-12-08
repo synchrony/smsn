@@ -17,11 +17,17 @@ import java.util.logging.Logger;
 public class Extendo {
     public static final boolean SAFE_MODE = true;
 
-    // Configuration properties.
+    // Configuration properties
     public static final String
             BASE_URI = "net.fortytwo.extendo.baseURI",
             ACTIVITY_LOG = "net.fortytwo.extendo.activityLog",
             VERSION = "net.fortytwo.extendo.version";
+
+    // P2P configuration properties
+    public static final String
+            P2P_BROADCAST_PORT = "net.fortytwo.extendo.p2p.broadcastPort",
+            P2P_BROADCAST_INTERVAL = "net.fortytwo.extendo.p2p.broadcastInterval",
+            P2P_PUBSUB_PORT = "net.fortytwo.extendo.p2p.pubsubPort";
 
     // schema constants
     public static final String
@@ -36,14 +42,7 @@ public class Extendo {
             VALUE = "value",
             WEIGHT = "weight";
 
-    // facilitator broadcast constants
-    public static final int BROADCAST_PORT = 4200;
-    public static final String
-            BROADCAST_ENDPOINT = "endpoint",
-            BROADCAST_TIME = "time",
-            BROADCAST_VERSION = "version";
-
-    public static final int KEY_DIGITS = 7;
+    private static final int KEY_DIGITS = 7;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 

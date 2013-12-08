@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.util.properties.PropertyException;
 
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ public class BroadcastRdfService extends ExtendoExtension {
 
     private final FacilitatorService facilitator;
 
-    public BroadcastRdfService() throws IOException {
+    public BroadcastRdfService() throws IOException, PropertyException {
         facilitator =  FacilitatorService.getInstance();
     }
 

@@ -3,8 +3,12 @@ package net.fortytwo.extendo.brain.server;
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.Query;
 import edu.rpi.twc.sesamestream.QueryEngine;
+import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.p2p.ServiceBroadcaster;
+import net.fortytwo.extendo.p2p.ServiceDescription;
 import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
 import net.fortytwo.extendo.rdf.vocab.Timeline;
+import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.RDFContentLanguage;
 import org.openrdf.model.Statement;
@@ -50,13 +54,16 @@ public class FacilitatorService {
                     "?instant tl:at ?time .\n" +
                     "}";
 
+    // TODO
+    private String broadcastEndpoint = "/graphs/joshkb/extendo/";
+
     private final DatasetFactory dsFactory = new DatasetFactory();
     private RDFContentLanguage lang;
 
     private OutputStream notificationStream;
     private QueryEngine queryEngine;
 
-    public static FacilitatorService getInstance() throws IOException {
+    public static FacilitatorService getInstance() throws IOException, PropertyException {
         if (null == INSTANCE) {
             INSTANCE = new FacilitatorService();
         }
@@ -64,7 +71,7 @@ public class FacilitatorService {
         return INSTANCE;
     }
 
-    private FacilitatorService() throws IOException {
+    private FacilitatorService() throws IOException, PropertyException {
         for (RDFContentLanguage l : dsFactory.getSupportedLanguages()) {
             if (l.getFormat().equals(RDFFormat.NTRIPLES)) {
                 lang = l;
@@ -90,6 +97,14 @@ public class FacilitatorService {
                 }
             }
         }).start();
+
+        int port = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
+
+        ServiceDescription d = new ServiceDescription(Extendo.getConfiguration().getProperty(Extendo.VERSION),
+                broadcastEndpoint,
+                port);
+        // TODO: stop the broadcaster when this object is destroyed
+        new ServiceBroadcaster(d).start();
     }
 
     private void startContinuousQueryEngine() throws Query.IncompatibleQueryException, MalformedQueryException {

@@ -19,11 +19,14 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
+import net.fortytwo.extendo.p2p.ServiceBroadcastListener;
+import net.fortytwo.extendo.p2p.ServiceDescription;
 import net.fortytwo.extendo.util.properties.TypedProperties;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +60,9 @@ public class Brainstem {
 
     private SparqlNotificationListener notificationListener;
 
-    final NotificationToneGenerator toneGenerator = new NotificationToneGenerator();
+    private final NotificationToneGenerator toneGenerator = new NotificationToneGenerator();
+
+    private final ServiceBroadcastListener serviceBroadcastListener;
 
     private Properties configuration;
 
@@ -72,6 +77,18 @@ public class Brainstem {
 
         devices = new LinkedList<BluetoothDeviceControl>();
         oscDispatcher = new OSCDispatcher();
+
+        serviceBroadcastListener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
+            public void receivedServiceDescription(final InetAddress address,
+                                                   final ServiceDescription description) {
+                toneGenerator.play();
+
+                Log.d(TAG, "received broadcast message from " + address.getHostAddress()
+                        + ": version=" + description.getVersion()
+                        + ", endpoint=" + description.getEndpoint()
+                        + ", pub/sub port=" + description.getPubsubPort());
+            }
+        });
     }
 
     /**
@@ -101,6 +118,8 @@ public class Brainstem {
     }
 
     public void connect(final Context context) {
+        serviceBroadcastListener.start();
+
         // in order to receive broadcasted intents we need to register our receiver
         context.registerReceiver(arduinoReceiver, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
 
@@ -116,6 +135,8 @@ public class Brainstem {
 
         // don't forget to unregister a registered receiver
         context.unregisterReceiver(arduinoReceiver);
+
+        serviceBroadcastListener.stop();
     }
 
     // note: in Android, SharedPreferences are preferred to properties files.  This file specifically contains those
