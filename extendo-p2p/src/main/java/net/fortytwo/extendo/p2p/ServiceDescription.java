@@ -39,12 +39,6 @@ public class ServiceDescription {
         }
     }
 
-    public class InvalidServiceDescriptionException extends Exception {
-        public InvalidServiceDescriptionException(final String message) {
-            super(message);
-        }
-    }
-
     public String getEndpoint() {
         return endpoint;
     }
@@ -63,5 +57,11 @@ public class ServiceDescription {
         j.put(PROP_ENDPOINT, endpoint);
         j.put(PROP_PUBSUB_PORT, pubsubPort);
         return j;
+    }
+
+    public class InvalidServiceDescriptionException extends Exception {
+        public InvalidServiceDescriptionException(final String message) {
+            super(message);
+        }
     }
 }

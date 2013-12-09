@@ -17,8 +17,6 @@ import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.memory.MemoryStore;
 
-import java.util.Properties;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,10 +28,9 @@ public class BrainstemAgentTest {
     @Test
     public void testDatasetForGestureEvent() throws Exception {
         String agentUri = "http://example.org/ns#bob";
-        Properties config = new Properties();
-        BrainstemAgent a = new BrainstemAgent(agentUri, config, null);
+        BrainstemAgent agent = new BrainstemAgent(agentUri);
 
-        DatasetFactory f = a.getDatasetFactory();
+        DatasetFactory f = agent.getDatasetFactory();
 
         //System.out.println("available RDF content languages:");
         RDFContentLanguage format = null;
@@ -44,7 +41,7 @@ public class BrainstemAgentTest {
             //System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
         }
 
-        Dataset ds = a.datasetForGestureEvent(System.currentTimeMillis());
+        Dataset ds = agent.datasetForGestureEvent(System.currentTimeMillis());
 
         assertEquals(5, ds.getStatements().size());
 

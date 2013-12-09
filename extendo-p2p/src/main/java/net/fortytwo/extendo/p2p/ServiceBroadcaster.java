@@ -52,12 +52,14 @@ public class ServiceBroadcaster {
     }
 
     private void sendBroadcastMessages() {
-        long broadcastInterval;
+        String address;
         int port;
+        long broadcastInterval;
 
         try {
-            broadcastInterval = Extendo.getConfiguration().getLong(Extendo.P2P_BROADCAST_INTERVAL);
+            address = Extendo.getConfiguration().getString(Extendo.P2P_BROADCAST_ADDRESS);
             port = Extendo.getConfiguration().getInt(Extendo.P2P_BROADCAST_PORT);
+            broadcastInterval = Extendo.getConfiguration().getLong(Extendo.P2P_BROADCAST_INTERVAL);
         } catch (PropertyException e) {
             LOGGER.severe("error accessing config properties when sending broadcast message: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -79,11 +81,8 @@ public class ServiceBroadcaster {
         // outer loop recovers from IO errors
         while (!stopped) {
             try {
-                // TODO: temporary
-                InetAddress broadcastAddress = InetAddress.getByName("10.0.2.255");
-
                 DatagramPacket packet;
-                packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, port);
+                packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(address), port);
 
                 DatagramSocket socket = new DatagramSocket();
                 socket.setBroadcast(true);

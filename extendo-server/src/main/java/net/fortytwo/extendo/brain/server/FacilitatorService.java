@@ -54,8 +54,11 @@ public class FacilitatorService {
                     "?instant tl:at ?time .\n" +
                     "}";
 
+    private static final String BASE_URI = "http://example.org/baseURI";
+
     // TODO
-    private String broadcastEndpoint = "/graphs/joshkb/extendo/";
+    private final String broadcastEndpoint = "/graphs/joshkb/extendo/";
+    private final int pubsubPort;
 
     private final DatasetFactory dsFactory = new DatasetFactory();
     private RDFContentLanguage lang;
@@ -98,11 +101,11 @@ public class FacilitatorService {
             }
         }).start();
 
-        int port = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
+        pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
 
         ServiceDescription d = new ServiceDescription(Extendo.getConfiguration().getProperty(Extendo.VERSION),
                 broadcastEndpoint,
-                port);
+                pubsubPort);
         // TODO: stop the broadcaster when this object is destroyed
         new ServiceBroadcaster(d).start();
     }
@@ -136,11 +139,10 @@ public class FacilitatorService {
         });
     }
 
-    private void manageNotificationStream() throws IOException, InterruptedException {
+    private void manageNotificationStream() throws IOException, InterruptedException, PropertyException {
 
-        final int portNumber = 1331;
-        LOGGER.info("instantiating facilitator service on port " + portNumber);
-        ServerSocket serverSocket = new ServerSocket(portNumber);
+        LOGGER.info("instantiating facilitator service on port " + pubsubPort);
+        ServerSocket serverSocket = new ServerSocket(pubsubPort);
         while (true) {
             LOGGER.info("opening SPARQL notification socket for writing");
             Socket socket = serverSocket.accept();
@@ -163,7 +165,9 @@ public class FacilitatorService {
                 socket.close();
                 */
             } finally {
+                LOGGER.info("closing SPARQL notification socket");
                 notificationStream = null;
+                socket.close();
             }
         }
     }
@@ -194,8 +198,6 @@ public class FacilitatorService {
 
         sendNotification("received a dataset with " + count + " statements");
     }
-
-    private static final String BASE_URI = "http://example.org/baseURI";
 
     // synchronized because the query engine is not thread-safe
     private long parseRdfContent(final InputStream content) throws RDFParseException, IOException, RDFHandlerException {

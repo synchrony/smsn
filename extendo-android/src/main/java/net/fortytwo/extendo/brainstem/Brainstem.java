@@ -17,16 +17,15 @@ import com.illposed.osc.OSCPacket;
 import com.illposed.osc.utility.OSCByteArrayToJavaConverter;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
-import net.fortytwo.extendo.p2p.ServiceBroadcastListener;
-import net.fortytwo.extendo.p2p.ServiceDescription;
+import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.extendo.util.properties.TypedProperties;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,8 +61,6 @@ public class Brainstem {
 
     private final NotificationToneGenerator toneGenerator = new NotificationToneGenerator();
 
-    private final ServiceBroadcastListener serviceBroadcastListener;
-
     private Properties configuration;
 
     private BrainstemAgent agent;
@@ -77,18 +74,6 @@ public class Brainstem {
 
         devices = new LinkedList<BluetoothDeviceControl>();
         oscDispatcher = new OSCDispatcher();
-
-        serviceBroadcastListener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
-            public void receivedServiceDescription(final InetAddress address,
-                                                   final ServiceDescription description) {
-                toneGenerator.play();
-
-                Log.d(TAG, "received broadcast message from " + address.getHostAddress()
-                        + ": version=" + description.getVersion()
-                        + ", endpoint=" + description.getEndpoint()
-                        + ", pub/sub port=" + description.getPubsubPort());
-            }
-        });
     }
 
     /**
@@ -106,7 +91,11 @@ public class Brainstem {
      * such as (currently) the text editor
      */
     public void initialize() throws BrainstemException {
-        loadConfiguration();
+        try {
+            loadConfiguration();
+        } catch (PropertyException e) {
+            throw new BrainstemException(e);
+        }
     }
 
     public BrainstemAgent getAgent() {
@@ -118,8 +107,6 @@ public class Brainstem {
     }
 
     public void connect(final Context context) {
-        serviceBroadcastListener.start();
-
         // in order to receive broadcasted intents we need to register our receiver
         context.registerReceiver(arduinoReceiver, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
 
@@ -135,15 +122,13 @@ public class Brainstem {
 
         // don't forget to unregister a registered receiver
         context.unregisterReceiver(arduinoReceiver);
-
-        serviceBroadcastListener.stop();
     }
 
     // note: in Android, SharedPreferences are preferred to properties files.  This file specifically contains those
     // settings which change more frequently than the APK is loaded, such as network settings.
     // Ideally, this file will go away entirely once the Brainstem becomes reusable software rather than a
     // special-purpose component of a demo.
-    private void loadConfiguration() throws BrainstemException {
+    private void loadConfiguration() throws BrainstemException, PropertyException {
         // this configuration is currently separate from the main Extendo configuration, which reads from
         // ./extendo.properties.  On Android, this path may be an inaccessible location (in the file system root)
         if (null == configuration) {
@@ -192,8 +177,9 @@ public class Brainstem {
 
         // note: currently, setTextEditor() must be called before passing textEditor to the device controls
 
-        // TODO: temporary
-        int notificationPort = 1331;
+        // TODO: temporary.  This should be gotten from the service description
+        int notificationPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
+
         notificationListener = new SparqlNotificationListener(rexsterHost, notificationPort, toneGenerator);
         notificationListener.start();
 
@@ -202,7 +188,7 @@ public class Brainstem {
             throw new BrainstemException("who are you? Missing value for " + PROP_AGENTURI);
         } else {
             try {
-                agent = new BrainstemAgent(u, configuration, endpoint + "broadcast-rdf");
+                agent = new BrainstemAgent(u);
             } catch (IOException e) {
                 throw new BrainstemException(e);
             }

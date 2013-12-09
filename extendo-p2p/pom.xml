@@ -25,6 +25,30 @@
             <artifactId>sesame-rio-api</artifactId>
             <version>${sesame.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.fortytwo.rdfagents</groupId>
+            <artifactId>rdfagents-jade</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <!-- exclude the XMPP MTP, which is currently not used by Brainstem
+                     and which contains a Crimson XML dependency which is incompatible with Android -->
+                <exclusion>
+                    <groupId>com.tilab.jade</groupId>
+                    <artifactId>xmpp-mtp</artifactId>
+                </exclusion>
+                <!-- via sesame-sail-memory. The Brainstem doesn't need a SPARQL repository -->
+                <exclusion>
+                    <groupId>org.openrdf.sesame</groupId>
+                    <artifactId>sesame-repository-sparql</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- this is the HTTP client available in Android, so we begin using it here -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.0.1</version>
+        </dependency>
         <!-- temporary; only for the example subscriber and broadcaster -->
         <dependency>
             <groupId>commons-httpclient</groupId>

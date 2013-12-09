@@ -25,6 +25,7 @@ public class Extendo {
 
     // P2P configuration properties
     public static final String
+            P2P_BROADCAST_ADDRESS = "net.fortytwo.extendo.p2p.broadcastAddress",
             P2P_BROADCAST_PORT = "net.fortytwo.extendo.p2p.broadcastPort",
             P2P_BROADCAST_INTERVAL = "net.fortytwo.extendo.p2p.broadcastInterval",
             P2P_PUBSUB_PORT = "net.fortytwo.extendo.p2p.pubsubPort";
