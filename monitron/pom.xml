@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>monitron</artifactId>
     <packaging>jar</packaging>
-    <name>Monitron Server</name>
+    <name>Omnisensory Monitron</name>
 
     <parent>
         <groupId>net.fortytwo.extendo</groupId>
@@ -26,8 +26,8 @@
             <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc</groupId>
-            <artifactId>sesamestream</artifactId>
+            <groupId>edu.rpi.twc.sesamestream</groupId>
+            <artifactId>sesamestream-impl</artifactId>
             <version>${sesamestream.version}</version>
         </dependency>
         <dependency>

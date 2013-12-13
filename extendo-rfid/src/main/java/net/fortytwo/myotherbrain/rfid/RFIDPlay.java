@@ -24,7 +24,7 @@ public class RFIDPlay {
 
         RexsterGraph g = new RexsterGraph("http://localhost:8182/graphs/joshkb");
 
-        BrainGraph graph = BrainGraph.getInstance(g);
+        BrainGraph graph = new BrainGraph(g);
 
         RFIDListener l = new RFIDListener();
 

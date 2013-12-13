@@ -2,7 +2,8 @@ package net.fortytwo.extendo.monitron.demos;
 
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
-import edu.rpi.twc.sesamestream.util.QueryEngineAdder;
+import edu.rpi.twc.sesamestream.etc.QueryEngineAdder;
+import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.monitron.EventHandler;
 import net.fortytwo.extendo.monitron.MonitronService;
@@ -15,9 +16,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.openrdf.model.Statement;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.parser.ParsedQuery;
-import org.openrdf.query.parser.QueryParser;
-import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFParser;
@@ -25,6 +23,7 @@ import org.openrdf.rio.Rio;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -37,8 +36,7 @@ public class ContinuousQueryDemo {
             throw new IllegalArgumentException();
         }
 
-        final QueryEngine engine = new QueryEngine();
-        QueryParser queryParser = new SPARQLParser();
+        final QueryEngine engine = new QueryEngineImpl();
         String baseUri = "http://example.org/base-uri/";
 
         for (final File f : dir.listFiles()) {
@@ -65,9 +63,8 @@ public class ContinuousQueryDemo {
             InputStream in = new FileInputStream(f);
             try {
                 String query = IOUtil.readString(in);
-                ParsedQuery pq = queryParser.parseQuery(query, baseUri);
 
-                engine.addQuery(pq.getTupleExpr(), bsh);
+                engine.addQuery(query, bsh);
             } finally {
                 in.close();
             }
@@ -84,7 +81,11 @@ public class ContinuousQueryDemo {
         EventHandler handler = new EventHandler() {
             public void handleEvent(Event e) throws EventHandlingException {
                 for (Statement st : e.getDataset().getStatements()) {
-                    engine.addStatement(st);
+                    try {
+                        engine.addStatement(st);
+                    } catch (IOException e1) {
+                        throw new EventHandlingException(e1);
+                    }
                 }
             }
         };
