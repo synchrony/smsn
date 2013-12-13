@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brainstem;
 
+import edu.rpi.twc.sesamestream.QueryEngine;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
 import net.fortytwo.extendo.rdf.vocab.Timeline;
@@ -33,7 +34,7 @@ public class BrainstemAgent extends ExtendoAgent {
                     "?instant tl:at ?time .\n" +
                     "}";
 
-    public BrainstemAgent(final String agentUri) throws IOException {
+    public BrainstemAgent(final String agentUri) throws QueryEngine.InvalidQueryException, IOException, QueryEngine.IncompatibleQueryException {
         super(agentUri, true);
     }
 

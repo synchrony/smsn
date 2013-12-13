@@ -17,11 +17,13 @@ import com.illposed.osc.OSCPacket;
 import com.illposed.osc.utility.OSCByteArrayToJavaConverter;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import net.fortytwo.extendo.Extendo;
+import edu.rpi.twc.sesamestream.BindingSetHandler;
+import edu.rpi.twc.sesamestream.QueryEngine;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.extendo.util.properties.TypedProperties;
+import org.openrdf.query.BindingSet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,8 +58,6 @@ public class Brainstem {
     private EditText textEditor;
 
     private final ArduinoReceiver arduinoReceiver = new ArduinoReceiver();
-
-    private SparqlNotificationListener notificationListener;
 
     private final NotificationToneGenerator toneGenerator = new NotificationToneGenerator();
 
@@ -177,19 +177,26 @@ public class Brainstem {
 
         // note: currently, setTextEditor() must be called before passing textEditor to the device controls
 
-        // TODO: temporary.  This should be gotten from the service description
-        int notificationPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
-
-        notificationListener = new SparqlNotificationListener(rexsterHost, notificationPort, toneGenerator);
-        notificationListener.start();
-
         String u = configuration.getProperty(PROP_AGENTURI);
         if (null == u) {
             throw new BrainstemException("who are you? Missing value for " + PROP_AGENTURI);
         } else {
             try {
                 agent = new BrainstemAgent(u);
+
+                final BindingSetHandler queryAnswerHandler = new BindingSetHandler() {
+                    public void handle(final BindingSet bindings) {
+                        toneGenerator.play();
+                        Log.i(Brainstem.TAG, "received SPARQL query result: " + bindings);
+                    }
+                };
+
+                agent.getQueryEngine().addQuery(BrainstemAgent.QUERY_FOR_ALL_GB_GESTURES, queryAnswerHandler);
+            } catch (QueryEngine.InvalidQueryException e) {
+                throw new BrainstemException(e);
             } catch (IOException e) {
+                throw new BrainstemException(e);
+            } catch (QueryEngine.IncompatibleQueryException e) {
                 throw new BrainstemException(e);
             }
         }

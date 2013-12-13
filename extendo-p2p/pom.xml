@@ -26,6 +26,11 @@
             <version>${sesame.version}</version>
         </dependency>
         <dependency>
+            <groupId>edu.rpi.twc.sesamestream</groupId>
+            <artifactId>sesamestream-api</artifactId>
+            <version>${sesamestream.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
             <artifactId>rdfagents-jade</artifactId>
             <version>1.0-SNAPSHOT</version>

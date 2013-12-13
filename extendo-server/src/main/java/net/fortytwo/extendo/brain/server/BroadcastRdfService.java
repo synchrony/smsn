@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.util.properties.PropertyException;
+import org.openrdf.rio.RDFFormat;
 
 import java.io.IOException;
 
@@ -43,7 +44,10 @@ public class BroadcastRdfService extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        facilitator.pushUpdate(p.data);
+        // TODO: take RDF format as an input parameter
+        RDFFormat format = RDFFormat.NTRIPLES;
+
+        facilitator.pushUpdate(p.data, format);
 
         return ExtensionResponse.ok(p.map);
     }

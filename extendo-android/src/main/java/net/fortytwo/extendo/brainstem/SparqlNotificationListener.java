@@ -13,17 +13,22 @@ import java.net.Socket;
 public class SparqlNotificationListener {
 
     private boolean started = false;
+    private boolean stopped = false;
 
-    private final String host;
-    private final int port;
+    private String host;
+    private int port;
     private final Brainstem.NotificationToneGenerator toneGenerator;
 
-    public SparqlNotificationListener(final String host,
-                                      final int port,
-                                      final Brainstem.NotificationToneGenerator toneGenerator) {
-        this.host = host;
-        this.port = port;
+    public SparqlNotificationListener(final Brainstem.NotificationToneGenerator toneGenerator) {
         this.toneGenerator = toneGenerator;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public void start() {
@@ -44,10 +49,14 @@ public class SparqlNotificationListener {
         }
     }
 
+    public void stop() {
+        stopped = true;
+    }
+
     private void listenForNotifications() throws IOException {
         Log.i(Brainstem.TAG, "creating socket to '" + host + "' on port " + port);
 
-        while (true) {
+        while (!stopped) {
             Log.i(Brainstem.TAG, "opening SPARQL notification socket for reading");
 
             Socket socket = new Socket(host, port);

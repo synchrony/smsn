@@ -41,9 +41,10 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
 
                 Dataset d = agent.datasetForGestureEvent(recognizedAt.getTime());
                 try {
-                    agent.broadcastDataset(d);
+                    agent.getQueryEngine().addStatements(d.getStatements());
+                    //agent.broadcastDataset(d);
                 } catch (Exception e) {
-                    Log.e(Brainstem.TAG, "failed to send event RDF to endpoint: " + e.getMessage());
+                    Log.e(Brainstem.TAG, "failed to broadcast RDF dataset: " + e.getMessage());
                     e.printStackTrace(System.err);
                 }
             }

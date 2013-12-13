@@ -41,8 +41,8 @@
             <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc</groupId>
-            <artifactId>sesamestream</artifactId>
+            <groupId>edu.rpi.twc.sesamestream</groupId>
+            <artifactId>sesamestream-impl</artifactId>
             <version>${sesamestream.version}</version>
         </dependency>
     </dependencies>

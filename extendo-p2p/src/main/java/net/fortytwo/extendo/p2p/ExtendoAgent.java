@@ -1,5 +1,7 @@
 package net.fortytwo.extendo.p2p;
 
+import edu.rpi.twc.sesamestream.QueryEngine;
+import net.fortytwo.extendo.p2p.sparql.QueryEngineProxy;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
 import org.apache.http.HttpResponse;
@@ -22,15 +24,21 @@ import org.openrdf.rio.Rio;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendoAgent {
     protected static final Logger LOGGER = Logger.getLogger(ExtendoAgent.class.getName());
+
+    public static final String
+        PROP_BODY = "body",
+        PROP_TAG = "tag";
 
     protected final URI agentUri;
     protected final DatasetFactory factory = new DatasetFactory();
@@ -42,9 +50,16 @@ public class ExtendoAgent {
 
     private final HttpClient httpclient = new DefaultHttpClient();
 
+    private QueryEngine queryEngine;
+
+    private final Connection facilitatorConnection;
+
     public ExtendoAgent(final String agentUri,
                         final boolean listenForServices) {
         this.agentUri = vf.createURI(agentUri);
+
+        facilitatorConnection = new Connection();
+        queryEngine = new QueryEngineProxy(facilitatorConnection);
 
         if (listenForServices) {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
@@ -61,6 +76,16 @@ public class ExtendoAgent {
                         service = new Service();
                         service.address = address;
                         service.description = description;
+
+                        Socket socket = null;
+                        try {
+                            socket = new Socket(address, service.description.getPubsubPort());
+                        } catch (IOException e) {
+                            LOGGER.severe("failed to create socket connection to facilitator: " + e.getMessage());
+                            e.printStackTrace(System.err);
+                            return;
+                        }
+                        facilitatorConnection.start(socket);
                     }
                 }
             });
@@ -70,6 +95,10 @@ public class ExtendoAgent {
 
     public URI getAgentUri() {
         return agentUri;
+    }
+
+    public QueryEngine getQueryEngine() {
+        return queryEngine;
     }
 
     public DatasetFactory getDatasetFactory() {

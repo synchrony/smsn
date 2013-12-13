@@ -27,7 +27,7 @@ public class ExampleSubscriber {
 
     private void listenForNotifications() throws IOException {
         final String host = "localhost";
-        final int portNumber = 1331;
+        final int portNumber = 4201;
         LOGGER.info("creating socket to '" + host + "' on port " + portNumber);
 
         while (true) {
