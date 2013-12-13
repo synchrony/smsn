@@ -102,6 +102,9 @@
 ;;(setq tn-history-mode "history")
 ;;(setq tn-event-mode "events")
 
+(setq tn-sharability-viewstyle "sharability")
+(setq tn-inference-viewstyle "inference")
+
 (setq tn-forward-view-style "forward")
 (setq tn-backward-view-style "backward")
 
@@ -124,6 +127,7 @@
 (setq tn-atoms nil)
 (setq tn-current-line 1)
 (setq tn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
+(setq tn-viewstyle tn-sharability-viewstyle)
 (setq tn-value-truncation-length 100)
 
 
@@ -173,6 +177,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun using-inference ()
+    (equal tn-viewstyle tn-inference-viewstyle))
+
 (defun find-id ()
     (let ((line (current-line)))
         (if (string-match "^[0-9A-Za-z@&]*: " line)
@@ -210,6 +217,10 @@
 
 (defun get-alias (atom)
     (let ((x (assoc 'alias atom)))
+        (if x (cdr x) nil)))
+
+(defun get-type (atom)
+    (let ((x (assoc 'type atom)))
         (if x (cdr x) nil)))
 
 (defun view-name (root-id json)
@@ -278,14 +289,16 @@
         (weight (get-weight atom))
         (sharability (get-sharability atom))
         (priority (get-priority atom))
-        (alias (get-alias atom)))
+        (alias (get-alias atom))
+        (type (get-type atom)))
             (message (concat
+                 (if type (concat "type: " type ", "))
                  "weight: " (number-to-string weight)
-                 " sharability: " (number-to-string sharability)
-                 (if priority (concat " priority: " (number-to-string priority)) "")
-                 " created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
-                 " value: " value
-                 (if alias (concat " alias: " alias) "")))))
+                 ", sharability: " (number-to-string sharability)
+                 (if priority (concat ", priority: " (number-to-string priority)) "")
+                 ", created: " (format-time-string "%Y-%m-%dT%H:%M:%S%z" (seconds-to-time (/ created 1000.0)))
+                 ", value: " value
+                 (if alias (concat ", alias: " alias) "")))))
 
 (defun tn-atom-info (atom-selector)
     (lexical-let ((as atom-selector))
@@ -395,10 +408,12 @@
                         (error-message msg)))
             (info-message "type inference completed successfully"))))
 
-;; unused colors: black/gray, purple, cyan, orange
-(setq base-colors  '("#660000" "#604000" "#005000" "#000066"))
-(setq bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
-(setq reduced-colors '("red" "red" "blue" "blue"))
+;; unused colors: black/gray, orange
+(setq sharability-base-colors  '("#660000" "#604000" "#005000" "#000066"))
+(setq sharability-bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
+(setq sharability-reduced-colors '("red" "red" "blue" "blue"))
+(setq inference-base-colors '("#660066" "#006666"))
+(setq inference-bright-colors '("#FF00FF" "#00FFFF"))
 
 (defun color-part-red (color)
     (string-to-number (substring color 1 3) 16))
@@ -418,11 +433,11 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability bright)
+(defun find-color (weight sharability bright type)
     (let ((s
-        (if bright
-            (elt bright-colors (- (ceiling (* sharability 4)) 1))
-            (elt base-colors (- (ceiling (* sharability 4)) 1)))))
+        (if (using-inference)
+            (elt (if bright inference-bright-colors inference-base-colors) (if type 0 1))
+            (elt (if bright sharability-bright-colors sharability-base-colors) (- (ceiling (* sharability 4)) 1)))))
         (color-string
             (fade-color (color-part-red s) weight)
             (fade-color (color-part-green s) weight)
@@ -430,10 +445,10 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability underline bold bright background)
+(defun colorize (text weight sharability underline bold bright type background)
     (let ((color (if full-colors-supported
-            (find-color weight sharability bright)
-            (elt reduced-colors (- (ceiling (* sharability 4)) 1)))))
+            (find-color weight sharability bright type)
+            (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
         (setq l (list :foreground color :background background))
         (if bold (setq l (cons 'bold l)))
         (if underline (setq l (cons 'underline l)))
@@ -468,7 +483,8 @@
 		        (target-weight (get-weight json))
 		        (target-sharability (get-sharability json))
                 (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
-		        (target-alias (get-alias json)))
+		        (target-alias (get-alias json))
+		        (target-type (get-type json)))
 		            (if target-id (puthash target-id json tn-atoms))
 		            (if (not target-id) (error "missing target id"))
 		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
@@ -480,10 +496,10 @@
                             (setq line (concat line space)))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability nil nil target-alias "white")
+                                (colorize bullet target-weight target-sharability nil nil target-alias target-type "white")
                                 id-infix
                                 " "
-                                (colorize target-value target-weight target-sharability nil nil target-alias "white")
+                                (colorize target-value target-weight target-sharability nil nil target-alias target-type "white")
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
                     (write-view editable children (+ tree-indent 4))))))
@@ -516,7 +532,8 @@
             "&maxSharability=" (number-to-string maxs)
             "&minWeight=" (number-to-string minw)
             "&maxWeight=" (number-to-string maxw)
-            "&style=" style))
+            "&style=" style
+            "&includeTypes=" (if (using-inference) "true" "false")))
 
 (defun request-history (mins maxs minw maxw)
     (setq tn-current-line 1)
@@ -1050,6 +1067,7 @@
 (global-set-key (kbd "C-c C-v b")       'tn-refresh-to-backward-view)
 (global-set-key (kbd "C-c C-v e")       'tn-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'tn-refresh-to-forward-view)
+(global-set-key (kbd "C-c C-v i")       'tn-toggle-inference-viewstyle)
 (global-set-key (kbd "C-c C-v r")       'tn-enter-readonly-view)
 (global-set-key (kbd "C-c C-v s")       'tn-toggle-emacspeak)
 (global-set-key (kbd "C-c C-v t")       'tn-set-value-truncation-length)
@@ -1074,6 +1092,14 @@
 (defun tn-toggle-emacspeak ()
     (interactive)
     (dtk-toggle-quiet))
+
+(defun tn-toggle-inference-viewstyle ()
+    (interactive)
+    (setq tn-viewstyle (if (equal tn-viewstyle tn-sharability-viewstyle)
+        tn-inference-viewstyle
+        tn-sharability-viewstyle))
+    (tn-refresh-view)
+    (message (concat "switched to " tn-viewstyle " view style")))
 
 (defun toggle-linum-mode ()
     (interactive)

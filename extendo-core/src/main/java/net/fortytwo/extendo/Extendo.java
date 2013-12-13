@@ -40,6 +40,7 @@ public class Extendo {
             PRIORITY = "priority",
             REST = "rest",
             SHARABILITY = "sharability",
+            TYPE = "type",
             VALUE = "value",
             WEIGHT = "weight";
 

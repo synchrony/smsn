@@ -3,6 +3,8 @@ package net.fortytwo.extendo.brain;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.extendo.brain.rdf.BottomUpType;
+import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import net.fortytwo.extendo.brain.util.ListDiff;
 
 import java.util.Collections;
@@ -57,28 +59,30 @@ public class NoteQueries {
                      final int height,
                      final Filter filter,
                      final AdjacencyStyle style,
-                     final ActivityLog log) {
+                     final ActivityLog log,
+                     final KnowledgeBase kb) {
         if (null != log) {
             log.logView(root);
         }
 
-        return viewInternal(root, height, filter, style);
+        return viewInternal(root, height, filter, style, kb);
     }
 
     private Note viewInternal(final Atom root,
                               final int height,
                               final Filter filter,
-                              final AdjacencyStyle style) {
+                              final AdjacencyStyle style,
+                              final KnowledgeBase kb) {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = toNote(root, filter.isVisible(root));
+        Note n = toNote(root, filter.isVisible(root), kb);
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
                 int h = filter.isVisible(target) ? height - 1 : 0;
-                Note cn = viewInternal(target, h, filter, style);
+                Note cn = viewInternal(target, h, filter, style, kb);
                 n.addChild(cn);
             }
         } else {
@@ -97,7 +101,7 @@ public class NoteQueries {
         // note: text value of result is not set here
 
         for (Atom a : atoms) {
-            Note n = viewInternal(a, height - 1, filter, FORWARD_ADJACENCY);
+            Note n = viewInternal(a, height - 1, filter, FORWARD_ADJACENCY, null);
             result.addChild(n);
         }
 
@@ -128,7 +132,7 @@ public class NoteQueries {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(viewInternal(a, 0, filter, FORWARD_ADJACENCY));
+            n.addChild(viewInternal(a, 0, filter, FORWARD_ADJACENCY, null));
         }
 
         return n;
@@ -208,7 +212,7 @@ public class NoteQueries {
         final Set<String> added = new HashSet<String>();
         final Set<String> created = new HashSet<String>();
 
-        List<Note> before = viewInternal(root, 1, filter, style).getChildren();
+        List<Note> before = viewInternal(root, 1, filter, style, null).getChildren();
         List<Note> after = rootNote.getChildren();
         List<Note> lcs = ListDiff.leastCommonSubsequence(before, after, noteComparator);
 
@@ -328,7 +332,7 @@ public class NoteQueries {
         result.setValue("full text search results for \"" + query + "\"");
 
         for (Atom a : store.getAtomsByFulltextQuery(query, filter)) {
-            Note n = viewInternal(a, depth - 1, filter, style);
+            Note n = viewInternal(a, depth - 1, filter, style, null);
             result.addChild(n);
         }
 
@@ -344,7 +348,7 @@ public class NoteQueries {
         for (Vertex v : store.getGraph().getVertices()) {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
-                Note n = viewInternal(store.getAtom(v), 0, filter, style);
+                Note n = viewInternal(store.getAtom(v), 0, filter, style, null);
                 result.addChild(n);
             }
         }
@@ -431,7 +435,7 @@ public class NoteQueries {
         int i = 0;
         for (Atom a : queue) {
             if (filter.isVisible(a)) {
-                result.addChild(toNote(a, true));
+                result.addChild(toNote(a, true, null));
 
                 if (++i >= maxResults) {
                     break;
@@ -525,7 +529,8 @@ public class NoteQueries {
     }
 
     private Note toNote(final Atom a,
-                        final boolean isVisible) {
+                        final boolean isVisible,
+                        final KnowledgeBase kb) {
         Note n = new Note();
 
         n.setId((String) a.asVertex().getId());
@@ -539,6 +544,13 @@ public class NoteQueries {
         // as well as to avoid displaying any child notes.
         if (isVisible) {
             n.setValue(a.getValue());
+        }
+
+        if (null != kb) {
+            BottomUpType type = kb.getTypeOf(a);
+            if (null != type) {
+                n.setType(type.getName());
+            }
         }
 
         return n;

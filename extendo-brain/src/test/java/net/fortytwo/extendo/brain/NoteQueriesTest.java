@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramedGraph;
+import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
 import net.fortytwo.extendo.brain.wiki.NoteWriter;
 import org.json.JSONObject;
@@ -32,6 +33,7 @@ public class NoteQueriesTest {
     private NoteWriter writer = new NoteWriter();
     private NoteQueries queries;
     private ActivityLog log = null;
+    private KnowledgeBase kb = null;
     private Priorities priorities;
 
     @Before
@@ -76,7 +78,7 @@ public class NoteQueriesTest {
 
         //new GraphMLWriter(graph).outputGraph(System.out);
 
-        Note after = queries.view(root, 1, filter, style, log);
+        Note after = queries.view(root, 1, filter, style, log, kb);
 
         assertEquals("11111", after.getId());
         assertEquals("foo", after.getValue());
@@ -269,7 +271,7 @@ public class NoteQueriesTest {
         Atom a2 = store.getAtom("0000002");
         assertEquals(0.5f, a2.getSharability());
 
-        Note after = queries.view(root, 2, readFilter, style, log);
+        Note after = queries.view(root, 2, readFilter, style, log, kb);
         //writer.writeNotes(after.getChildren(), System.out);
         assertTrue(after.getHasChildren());
         List<Note> children = after.getChildren();

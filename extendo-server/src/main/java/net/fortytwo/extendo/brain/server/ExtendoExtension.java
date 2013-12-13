@@ -296,5 +296,6 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public Integer valueCutoff;
         public Integer maxResults;
         public String data;
+        public boolean includeTypes;
     }
 }

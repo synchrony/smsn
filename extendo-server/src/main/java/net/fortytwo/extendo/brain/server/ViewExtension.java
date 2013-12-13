@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 
 /**
  * A service for retrieving hierarchical views of Extend-o-Brain graphs
@@ -31,7 +32,8 @@ public class ViewExtension extends ExtendoExtension {
                                            @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
                                            @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
                                            @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
+                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName,
+                                           @ExtensionRequestParameter(name = "includeTypes", defaultValue = "false", description = "whether to include inferred types in the view") Boolean includeTypes) {
         logInfo("extendo view " + rootId + " (depth " + depth + ")");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
@@ -39,13 +41,15 @@ public class ViewExtension extends ExtendoExtension {
         p.rootId = rootId;
         p.styleName = styleName;
         p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
+        p.includeTypes = includeTypes;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
 
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog());
+        KnowledgeBase kb = p.includeTypes ? p.brain.getKnowledgeBase() : null;
+        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog(), kb);
         addView(n, p);
 
         addToHistory(p.rootId, p.context);

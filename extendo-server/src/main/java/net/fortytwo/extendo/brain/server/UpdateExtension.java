@@ -81,7 +81,7 @@ public class UpdateExtension extends ExtendoExtension {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog());
+        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog(), null);
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);
