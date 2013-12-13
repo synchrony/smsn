@@ -9,6 +9,7 @@ public class URL extends SimpleSecondClassType {
     public static final URL INSTANCE = new URL();
 
     private URL() {
+        super("url");
     }
 
     public Pattern getValueRegex() {

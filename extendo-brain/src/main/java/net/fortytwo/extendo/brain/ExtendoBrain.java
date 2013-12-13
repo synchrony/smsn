@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.brain;
 
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import net.fortytwo.extendo.util.properties.PropertyException;
 
 import java.io.File;
@@ -19,6 +20,8 @@ public class ExtendoBrain {
 
     private final BrainGraph brainGraph;
 
+    private final KnowledgeBase knowledgeBase;
+
     private final ActivityLog activityLog;
 
     private final Priorities priorities;
@@ -27,6 +30,11 @@ public class ExtendoBrain {
 
     public ExtendoBrain(final BrainGraph brainGraph) throws ExtendoBrainException {
         this.brainGraph = brainGraph;
+
+        knowledgeBase = new KnowledgeBase(brainGraph);
+
+        // just for now
+        knowledgeBase.addDefaultTypes();
 
         File logFile;
         try {
@@ -56,6 +64,10 @@ public class ExtendoBrain {
 
     public BrainGraph getBrainGraph() {
         return brainGraph;
+    }
+
+    public KnowledgeBase getKnowledgeBase() {
+        return knowledgeBase;
     }
 
     public ActivityLog getActivityLog() {

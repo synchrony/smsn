@@ -10,6 +10,10 @@ import org.openrdf.rio.RDFHandlerException;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class SimpleSecondClassType extends SimpleType {
+    protected SimpleSecondClassType(String name) {
+        super(name);
+    }
+
     public URI translateToRDF(final Atom a,
                                final ValueFactory vf,
                                final RDFHandler handler) throws RDFHandlerException {

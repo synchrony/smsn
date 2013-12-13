@@ -9,6 +9,7 @@ public class BibtexReference extends SimpleSecondClassType {
     public static final BibtexReference INSTANCE = new BibtexReference();
 
     private BibtexReference() {
+        super("bibtex-reference");
     }
 
     public Pattern getValueRegex() {

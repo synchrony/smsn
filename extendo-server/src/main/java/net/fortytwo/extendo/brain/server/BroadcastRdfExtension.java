@@ -22,11 +22,11 @@ import java.io.IOException;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "extendo", name = "broadcast-rdf")
-public class BroadcastRdfService extends ExtendoExtension {
+public class BroadcastRdfExtension extends ExtendoExtension {
 
     private final FacilitatorService facilitator;
 
-    public BroadcastRdfService() throws IOException, PropertyException {
+    public BroadcastRdfExtension() throws IOException, PropertyException {
         facilitator =  FacilitatorService.getInstance();
     }
 

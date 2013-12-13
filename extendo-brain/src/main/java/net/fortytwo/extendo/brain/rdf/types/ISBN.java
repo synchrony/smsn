@@ -14,6 +14,7 @@ public class ISBN extends SimpleSecondClassType {
     private static final ISBNValidator VALIDATOR = new ISBNValidator();
 
     private ISBN() {
+        super("isbn");
     }
 
     public Pattern getValueRegex() {

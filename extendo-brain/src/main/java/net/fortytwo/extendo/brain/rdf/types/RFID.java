@@ -9,6 +9,7 @@ public class RFID extends SimpleSecondClassType {
     public static final RFID INSTANCE = new RFID();
 
     private RFID() {
+        super("rfid");
     }
 
     public Pattern getValueRegex() {

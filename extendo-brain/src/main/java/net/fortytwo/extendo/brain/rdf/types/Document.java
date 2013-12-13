@@ -17,12 +17,13 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class ArticleOrBook extends BottomUpType {
-    public static final ArticleOrBook INSTANCE = new ArticleOrBook();
+public class Document extends BottomUpType {
+    public static final Document INSTANCE = new Document();
 
     private Field[] fields = null;
 
-    private ArticleOrBook() {
+    private Document() {
+        super("document");
     }
 
     public Field[] getFields() {

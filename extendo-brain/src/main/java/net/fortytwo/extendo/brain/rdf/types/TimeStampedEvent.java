@@ -29,6 +29,7 @@ public class TimeStampedEvent extends BottomUpType {
     private Field[] fields = null;
 
     private TimeStampedEvent() {
+        super("timestamped-event");
     }
 
     public Field[] getFields() {

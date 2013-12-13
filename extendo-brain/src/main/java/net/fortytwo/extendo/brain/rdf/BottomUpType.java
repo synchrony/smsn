@@ -19,6 +19,16 @@ import java.util.regex.Pattern;
 public abstract class BottomUpType {
     private static final Logger LOGGER = Extendo.getLogger(BottomUpType.class);
 
+    private final String name;
+
+    protected BottomUpType(final String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public abstract Field[] getFields();
 
     /**

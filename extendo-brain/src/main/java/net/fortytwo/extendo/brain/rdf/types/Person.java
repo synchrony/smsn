@@ -23,6 +23,7 @@ public class Person extends BottomUpType {
     private Field[] fields = null;
 
     private Person() {
+        super("person");
     }
 
     public boolean additionalConstraintsSatisfied(final String value) {
@@ -34,7 +35,7 @@ public class Person extends BottomUpType {
             fields = new Field[]{
                     new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
                     new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
-                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, ArticleOrBook.INSTANCE, new PublicationsMapper()),
+                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, Document.INSTANCE, new PublicationsMapper()),
                     new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.INSTANCE, VocabularyTerm.INSTANCE, new QuotationMapper()),
                     new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
                     // TODO: when the person passed away
@@ -160,7 +161,7 @@ public class Person extends BottomUpType {
 
             for (Atom publication : context.getKnowledgeBase().contentsOfCollection(coll)) {
                 //System.out.println("\tpub: " + publication.getValue());
-                if (context.getKnowledgeBase().getTypeOf(publication) == ArticleOrBook.INSTANCE) {
+                if (context.getKnowledgeBase().getTypeOf(publication) == Document.INSTANCE) {
                     context.getHandler().handleStatement(
                             context.getValueFactory().createStatement(
                                     context.getReferenceUri(), FOAF.MADE, context.uriOf(publication)));

@@ -9,6 +9,7 @@ public class AKA extends SimpleSecondClassType {
     public static final AKA INSTANCE = new AKA();
 
     private AKA() {
+        super("aka");
     }
 
     public Pattern getValueRegex() {

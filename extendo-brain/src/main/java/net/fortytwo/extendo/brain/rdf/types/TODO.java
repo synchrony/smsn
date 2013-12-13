@@ -17,6 +17,7 @@ public class TODO extends SimpleType {
     public static final TODO INSTANCE = new TODO();
 
     private TODO() {
+        super("todo");
     }
 
     public boolean additionalConstraintsSatisfied(final String value) {

@@ -9,6 +9,7 @@ public class Date extends SimpleSecondClassType {
     public static final Date INSTANCE = new Date();
 
     private Date() {
+        super("date");
     }
 
     public boolean additionalConstraintsSatisfied(final String value) {

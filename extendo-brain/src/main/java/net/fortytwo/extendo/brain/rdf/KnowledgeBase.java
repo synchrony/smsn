@@ -5,7 +5,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.rdf.types.AKA;
-import net.fortytwo.extendo.brain.rdf.types.ArticleOrBook;
+import net.fortytwo.extendo.brain.rdf.types.Document;
 import net.fortytwo.extendo.brain.rdf.types.BibtexReference;
 import net.fortytwo.extendo.brain.rdf.types.Date;
 import net.fortytwo.extendo.brain.rdf.types.ISBN;
@@ -64,6 +64,12 @@ public class KnowledgeBase {
         this.inferredTypeOfAtom = new HashMap<Atom, BottomUpType>();
     }
 
+    // note: graph and vocabulary are not affected by this operation
+    public void reset() {
+        typeOfAtom.clear();
+        inferredTypeOfAtom.clear();
+    }
+
     public BottomUpType getTypeOf(final Atom a) {
         return typeOfAtom.get(a);
     }
@@ -107,7 +113,7 @@ public class KnowledgeBase {
         v.add(WebPage.INSTANCE);
 
         // types with the most inclusive regex are last
-        v.add(ArticleOrBook.INSTANCE);
+        v.add(Document.INSTANCE);
         v.add(OpenCollection.INSTANCE);
         v.add(Person.INSTANCE);
         v.add(TimeStampedEvent.INSTANCE);

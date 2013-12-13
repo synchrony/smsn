@@ -21,6 +21,7 @@ public class WebPage extends BottomUpType {
     private Field[] fields = null;
 
     private WebPage() {
+        super("webpage");
     }
 
     public boolean additionalConstraintsSatisfied(final String value) {

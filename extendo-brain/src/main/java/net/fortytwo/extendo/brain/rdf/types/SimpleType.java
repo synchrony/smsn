@@ -9,6 +9,10 @@ import net.fortytwo.extendo.brain.rdf.Field;
 public abstract class SimpleType extends BottomUpType {
     private Field[] fields = null;
 
+    protected SimpleType(String name) {
+        super(name);
+    }
+
     public Field[] getFields() {
         if (null == fields) {
             fields = new Field[] {};

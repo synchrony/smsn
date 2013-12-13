@@ -17,6 +17,7 @@ public class VocabularyTerm extends SimpleType {
     public static final VocabularyTerm INSTANCE = new VocabularyTerm();
 
     private VocabularyTerm() {
+        super("vocabulary-term");
     }
 
     public Pattern getValueRegex() {

@@ -385,6 +385,16 @@
                         (error-message msg)))
             (info-message "exported successfully"))))
 
+(defun receive-inference-results (status)
+    (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
+        (if status
+            (let ((msg (cdr (assoc 'message json)))
+                (error (cdr (assoc 'error json))))
+                    (if error
+                        (error-message error)
+                        (error-message msg)))
+            (info-message "type inference completed successfully"))))
+
 ;; unused colors: black/gray, purple, cyan, orange
 (setq base-colors  '("#660000" "#604000" "#005000" "#000066"))
 (setq bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
@@ -589,6 +599,10 @@
     (http-get
         (concat (base-url) "export") 'receive-export-results))
 
+(defun do-infer-types ()
+    (http-get
+        (concat (base-url) "infer-types") 'receive-inference-results))
+
 (defun mode-for-visit ()
     (if (or (equal tn-mode tn-edit-mode) (equal tn-mode tn-readonly-mode))
         tn-mode
@@ -648,6 +662,11 @@
     (interactive)
     (message "exporting")
     (do-export))
+
+(defun tn-infer-types ()
+    (interactive)
+    (message "performing type inference")
+    (do-infer-types))
 
 (defun current-view-mode-is-atom-view ()
     (or
@@ -1041,6 +1060,7 @@
 (global-set-key (kbd "C-c e")           'tn-export)
 (global-set-key (kbd "C-c f")           'tn-find-roots)
 (global-set-key (kbd "C-c h")           'tn-history)
+(global-set-key (kbd "C-c i")           'tn-infer-types)
 (global-set-key (kbd "C-c n")           'tn-new-note)
 (global-set-key (kbd "C-c P")           'tn-priorities)
 (global-set-key (kbd "C-c p")           'tn-push-view)

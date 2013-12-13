@@ -18,7 +18,8 @@ public class Note {
     private Float sharability;
     private Float priority;
     private Long created;
-    private String alias = null;
+    private String alias;
+    private String type;
 
     public Note() {
         children = new LinkedList<Note>();
@@ -27,7 +28,6 @@ public class Note {
     public Note(final Note copy) {
         this();
 
-        this.hasChildren = copy.hasChildren;
         this.value = copy.value;
         this.id = copy.id;
         this.weight = copy.weight;
@@ -35,6 +35,9 @@ public class Note {
         this.priority = copy.priority;
         this.created = copy.created;
         this.alias = copy.alias;
+
+        this.hasChildren = copy.hasChildren;
+        this.type = copy.type;
 
         if (null != copy.children) {
             for (Note c : copy.children) {
@@ -60,10 +63,8 @@ public class Note {
     }
 
     public void setId(final String id) {
-        if (null == id) {
-            // TODO: probably unnecessary
-            //this.id = MyOtherBrain.createRandomKey();
-        } else if (0 == id.length()) {
+        // null ids are frequently used, but empty ids would be likely to cause confusion
+        if (null != id && 0 == id.length()) {
             throw new IllegalArgumentException("empty id is not valid");
         }
 
@@ -124,6 +125,14 @@ public class Note {
         }
 
         this.alias = alias;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
     }
 
     public List<Note> getChildren() {

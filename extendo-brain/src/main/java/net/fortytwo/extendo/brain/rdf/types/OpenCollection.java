@@ -19,6 +19,7 @@ public class OpenCollection extends BottomUpType {
     private Field[] fields = null;
 
     private OpenCollection() {
+        super("open-collection");
     }
 
     public Field[] getFields() {

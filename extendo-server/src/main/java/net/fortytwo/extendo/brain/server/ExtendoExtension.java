@@ -43,7 +43,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
 
     private static final Map<KeyIndexableGraph, ExtendoBrain> brains = new HashMap<KeyIndexableGraph, ExtendoBrain>();
 
-    public static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph) throws ExtendoBrain.ExtendoBrainException {
+    public synchronized static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph) throws ExtendoBrain.ExtendoBrainException {
         ExtendoBrain b = brains.get(baseGraph);
 
         if (null == b) {
@@ -78,7 +78,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         }
 
         if (doesRead() && null == p.filter) {
-            return ExtensionResponse.error("weight and sharability filter is not set");
+            return ExtensionResponse.error("service reads from graph, but weight and sharability filter is not set");
         }
 
         String rootKey = p.rootId;

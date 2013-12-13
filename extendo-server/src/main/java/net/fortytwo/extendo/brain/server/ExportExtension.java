@@ -67,7 +67,7 @@ public class ExportExtension extends ExtendoExtension {
                 p.print(v.getProperty(Extendo.SHARABILITY));
                 p.print('\t');
 
-                String value = (String) v.getProperty(Extendo.VALUE);
+                String value = v.getProperty(Extendo.VALUE);
                 if (null == value) {
                     LOGGER.warning("note has null @value: " + v.getId());
                 } else {
@@ -75,7 +75,7 @@ public class ExportExtension extends ExtendoExtension {
                 }
                 p.print('\t');
 
-                String alias = (String) v.getProperty(Extendo.ALIAS);
+                String alias = v.getProperty(Extendo.ALIAS);
                 if (null != alias) {
                     p.print(escapeValue(alias));
                 }
@@ -161,6 +161,7 @@ public class ExportExtension extends ExtendoExtension {
     }
 
     protected boolean doesRead() {
+        // doesn't read, in that no data is returned by the service (data is only written to the file system)
         return false;
     }
 
