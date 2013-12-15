@@ -29,12 +29,12 @@ public class Document extends BottomUpType {
     public Field[] getFields() {
         if (null == fields) {
             fields = new Field[]{
-                    new Field(true, null, ISBN.INSTANCE, null, new ISBNMapper()),
-                    new Field(false, null, RFID.INSTANCE, null, new RFIDMapper()),
-                    new Field(true, null, BibtexReference.INSTANCE, null, new BibtexReferenceMapper()),
-                    new Field(true, Pattern.compile("the authors of .+"), OpenCollection.INSTANCE, Person.INSTANCE, new AuthorCollectionMapper()),
+                    new Field(true, null, ISBN.INSTANCE, new ISBNMapper()),
+                    new Field(false, null, RFID.INSTANCE, new RFIDMapper()),
+                    new Field(true, null, BibtexReference.INSTANCE, new BibtexReferenceMapper()),
+                    new Field(true, Pattern.compile("the authors of .+"), OpenCollection.PERSON_INSTANCE, new AuthorCollectionMapper()),
                     // "some notes from" is not unique, since movies, conversations, and other types also have this field
-                    new Field(false, Pattern.compile("some notes from .+"), OpenCollection.INSTANCE, null, new SomeNotesFromTheDocumentMapper())};
+                    new Field(false, Pattern.compile("some notes from .+"), OpenCollection.GENERIC_INSTANCE, new SomeNotesFromTheDocumentMapper())};
         }
 
         return fields;

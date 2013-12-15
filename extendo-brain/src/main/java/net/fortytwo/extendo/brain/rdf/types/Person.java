@@ -33,18 +33,18 @@ public class Person extends BottomUpType {
     public Field[] getFields() {
         if (null == fields) {
             fields = new Field[]{
-                    new Field(false, null, AKA.INSTANCE, null, new NicknameMapper()),
-                    new Field(false, null, WebPage.INSTANCE, null, new HomepageMapper()),
-                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.INSTANCE, Document.INSTANCE, new PublicationsMapper()),
-                    new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.INSTANCE, VocabularyTerm.INSTANCE, new QuotationMapper()),
-                    new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, null, new BirthdayMapper()),
+                    new Field(false, null, AKA.INSTANCE, new NicknameMapper()),
+                    new Field(false, null, WebPage.INSTANCE, new HomepageMapper()),
+                    new Field(true, Pattern.compile("some of [A-Z].+s papers"), OpenCollection.DOCUMENT_INSTANCE, new PublicationsMapper()),
+                    new Field(true, Pattern.compile("some quotes by [A-Z].+"), OpenCollection.VOCABULARY_TERM_INSTANCE, new QuotationMapper()),
+                    new Field(true, Pattern.compile("[A-Z].+ was born on .+"), TimeStampedEvent.INSTANCE, new BirthdayMapper()),
                     // TODO: when the person passed away
                     // TODO: the person's contact information
                     // TODO: the person's email
                     // TODO: the person's mailing address
-                    new Field(true, Pattern.compile("[A-Z].+s family( and relations)?"), OpenCollection.INSTANCE, Person.INSTANCE, new FamilyMembersMapper()),
-                    new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.INSTANCE, Person.INSTANCE, new FriendsMapper()),
-                    new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.INSTANCE, null, new InterestsMapper()),
+                    new Field(true, Pattern.compile("[A-Z].+s family( and relations)?"), OpenCollection.PERSON_INSTANCE, new FamilyMembersMapper()),
+                    new Field(true, Pattern.compile("some of [A-Z].+s friends"), OpenCollection.PERSON_INSTANCE, new FriendsMapper()),
+                    new Field(true, Pattern.compile("some things [A-Z].+ like[sd]"), OpenCollection.GENERIC_INSTANCE, new InterestsMapper()),
                     // TODO: some things liked about the person
                     // TODO: some things learned about from the person
                     // TODO: memories of the person

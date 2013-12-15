@@ -35,7 +35,7 @@ public class TimeStampedEvent extends BottomUpType {
     public Field[] getFields() {
         if (null == fields) {
             fields = new Field[]{
-                    new Field(true, null, Date.INSTANCE, null, new EventDateMapper())
+                    new Field(true, null, Date.INSTANCE, new EventDateMapper())
             };
         }
 

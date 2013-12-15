@@ -86,7 +86,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testOpenCollectionSyntax() throws Exception {
-        BottomUpType t = OpenCollection.INSTANCE;
+        BottomUpType t = OpenCollection.GENERIC_INSTANCE;
         assertTrue(t.getValueRegex().matcher("some things I like about fish").matches());
         assertFalse(t.getValueRegex().matcher("things I like about fish").matches());
         assertFalse(t.getValueRegex().matcher("something I like about fish").matches());

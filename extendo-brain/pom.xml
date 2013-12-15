@@ -36,6 +36,12 @@
             <version>${sesame.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-rexster-graph</artifactId>
+            <version>${tinkerpop.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!--<dependency>
             <groupId>net.fortytwo.ripple</groupId>
             <artifactId>ripple-flow-rdf</artifactId>

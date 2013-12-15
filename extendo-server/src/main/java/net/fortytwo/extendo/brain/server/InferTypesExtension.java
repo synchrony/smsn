@@ -33,9 +33,7 @@ public class InferTypesExtension extends ExtendoExtension {
         kb.reset();
         long timeBefore = System.currentTimeMillis();
 
-        kb.matchSimpleTypes();
-        kb.matchCompoundTypes();
-        kb.coerceUntypedAtoms();
+        kb.inferTypes();
 
         long timeAfter = System.currentTimeMillis();
         LOGGER.info("completed type inference in " + (timeAfter - timeBefore) + "ms");

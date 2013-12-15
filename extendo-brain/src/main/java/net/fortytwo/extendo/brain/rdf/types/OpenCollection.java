@@ -14,12 +14,19 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class OpenCollection extends BottomUpType {
-    public static final OpenCollection INSTANCE = new OpenCollection();
+    public static final OpenCollection
+            GENERIC_INSTANCE = new OpenCollection(null),
+            DOCUMENT_INSTANCE = new OpenCollection(Document.INSTANCE),
+            PERSON_INSTANCE = new OpenCollection(Person.INSTANCE),
+            VOCABULARY_TERM_INSTANCE = new OpenCollection(VocabularyTerm.INSTANCE);
 
     private Field[] fields = null;
 
-    private OpenCollection() {
+    private final BottomUpType containedType;
+
+    private OpenCollection(final BottomUpType containedType) {
         super("open-collection");
+        this.containedType = containedType;
     }
 
     public Field[] getFields() {
@@ -51,5 +58,9 @@ public class OpenCollection extends BottomUpType {
                                final RDFHandler handler) throws RDFHandlerException {
         // do not reify; the rdfization of collections is context-specific, and collection values are discarded
         return null;
+    }
+
+    public BottomUpType getContainedType() {
+        return containedType;
     }
 }
