@@ -119,10 +119,12 @@ powerSwitchLength = 11.7;
 powerSwitchWidth = 4.0;
 powerSwitchDepth = 7.7;
 
-pressureSensorWidth = 7.8;  // by direct measurement of the wide "head". The data sheet says 7.2mm
-pressureSensorThick = 0.40;  // by direct measurement, without removing the adhesive backing. The data sheet says 0.35mm
+pressureSensorHeadWidth = 7.8;  // by direct measurement of the wide "head". The data sheet says 7.2mm
+pressureSensorHeadThick = 0.40;  // by direct measurement, without removing the adhesive backing. The data sheet says 0.35mm
+pressureSensorTailWidth = 6.3; // by direct measurement
+pressureSensorTailThick = 0.90; // by direct measurement; this is the thick segment of the sensor with the electrical contacts
 
-tactileSwitchWellWidth = 7;
+tactileSwitchWidth = 6.0;
 tactileSwitchHeight = 5.0;
 tactileSwitchLegLength = 3.4;
 tactileSwitchPressDepth = 0.25;
@@ -186,7 +188,7 @@ alignmentPegHeight = 2;
 
 fingerButtonHeight = 5;
 thumbButtonHeight = 8; // thumb button is a little taller because it is not deeply inset like the finger buttons
-buttonWidth = tactileSwitchWellWidth;
+buttonWidth = tactileSwitchWidth;
 fingerButtonLength = fingerWidth - dividerThick;
 thumbButtonLength = thumbWidth - dividerThick;
 // clearance between button and walls (on all four sides).  We take the risk of a low tolerance for the sake of a snug fit
@@ -216,7 +218,7 @@ pinHoleRadius = 0.7 * sqrt(accuracyRatio);
 pinHoleBlockWidth = 2 * (pinHoleRadius + clearance*1.5);
 
 // just to be on the safe side, we overestimate the necessary clearance
-pressureSensorChannelHeight = clearance * 1.5;
+pressureSensorChannelHeight = pressureSensorTailThick + foreignPartClearance;
 
 cavityWidth = caseWidth - rimThick - totalFingerWellDepth - tactileSwitchBaseThick;
 cavityLength = caseLength - 2*rimThick;
@@ -242,14 +244,14 @@ transducerVizOffsetY = motionSensorVizOffsetY + 1 + 26;
 // creates a button of the given length.  Clearance on all sides of the button is subtracted.
 // the long axis of the button is x.  y is side-to-side.  z is up and down (as you press the button).
 module button(length, buttonHeight) {
-    innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+    innerRetainerWellWidth = (length - tactileSwitchWidth - foreignPartClearance)/2 - buttonStabilizerThick;
     retainerLength = innerRetainerWellWidth - buttonClearance - buttonRetainerGap;
 
     // this measurement is crucial
     stabilizerHeight
         = 2 * buttonRetainerThick
         + (tactileSwitchHeight - tactileSwitchWellDepth + foreignPartClearance)
-        + pressureSensorThick
+        + pressureSensorHeadThick
         + 0.15;
 
     difference() {
@@ -300,7 +302,7 @@ module button(length, buttonHeight) {
 // a complex well which houses a finger button and prevents it from detaching from the Typeatron
 module fingerButtonWell(length, buttonHeight) {
     outerRetainerWellWidth = buttonStabilizerThick + buttonRetainerGap;
-    innerRetainerWellWidth = (length - tactileSwitchWellWidth - foreignPartClearance)/2 - buttonStabilizerThick;
+    innerRetainerWellWidth = (length - tactileSwitchWidth - foreignPartClearance)/2 - buttonStabilizerThick;
 
     translate([-length/2,-buttonWidth/2,tactileSwitchWellDepth]) {
         // rectangular well for button body
@@ -326,7 +328,7 @@ module fingerButtonWell(length, buttonHeight) {
 // well for four-legged through-hole tactile push button switch with origin at the center of the base of the switch
 // legs of the switch run along the x axis
 module tactileSwitchWell(length, depth) {
-    w = tactileSwitchWellWidth + foreignPartClearance;
+    w = tactileSwitchWidth + foreignPartClearance;
     l = 1.5; // width of leg holes
 
     // the pressure sensor channels extend slightly past the well for the tactile switch
@@ -355,18 +357,13 @@ module tactileSwitchWell(length, depth) {
     }
 
     // channels for pressure sensor
-    translate([-(pressureSensorWidth+foreignPartClearance)/2,-w/2,-tactileSwitchLegLength]) {
-        translate([0, -pressureSensorChannelHeight, 0]) {
-            cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight+overkill, fsrChannelDepth]);
+    translate([-(pressureSensorTailWidth+foreignPartClearance)/2,0,-tactileSwitchLegLength]) {
+        translate([0, -w/2, 0]) {
+            cube([pressureSensorTailWidth+foreignPartClearance, pressureSensorChannelHeight+overkill, fsrChannelDepth]);
         }
-        translate([0, w-overkill, 0]) {
-            cube([pressureSensorWidth+foreignPartClearance, pressureSensorChannelHeight, fsrChannelDepth]);
+        translate([0, w/2-pressureSensorChannelHeight, 0]) {
+            cube([pressureSensorTailWidth+foreignPartClearance, pressureSensorChannelHeight, fsrChannelDepth]);
         }
-    }
-
-    // rim to allow the pressure sensor to wrap around
-    translate([-(pressureSensorWidth+foreignPartClearance)/2, -w/2-pressureSensorChannelHeight, depth]) {
-        cube([pressureSensorWidth+foreignPartClearance, w+2*pressureSensorChannelHeight, tactileSwitchHeight - tactileSwitchWellDepth]);
     }
 }
 
