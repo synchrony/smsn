@@ -558,17 +558,12 @@ module pinHoles() {
 
     // pinholes on curved surface of thumb rest
     translate([thumbCurveRadius, caseLength-thumbCurveRadius, 0]) {
-        rotate([0,0,-20]) {
+        rotate([0,0,-25]) {
             translate([-thumbCurveRadius+rimThick*2/3,0,0]) {
                 pinHole();
             }
         }
-        rotate([0,0,-40]) {
-            translate([-thumbCurveRadius+rimThick*2/3,0,0]) {
-                pinHole();
-            }
-        }
-        rotate([0,0,-60]) {
+        rotate([0,0,-50]) {
             translate([-thumbCurveRadius+rimThick*2/3,0,0]) {
                 pinHole();
             }
@@ -614,7 +609,7 @@ module lightSensorWell() {
 }
 
 module statusLEDHole() {
-    translate([caseWidth - rimThick - 5.5, caseLength, caseHeight/2]) {
+    translate([caseWidth - rimThick - 5.5, caseLength, caseHeight - floorThick - ledRimRadius - foreignPartClearance]) {
         rotate(a=[90,0,0]) {
             cylinder(h=rimThick,r=ledDomeRadius+foreignPartClearance, $fn=ledDomeRes);
 
@@ -686,10 +681,18 @@ module caseConvexHull() {
 }
 
 module thumbButtonContainer() {
-    translate([thumbUpperRightX, thumbUpperRightY, 0]) {
+    // extra material is required if the button starts below the rim of the case
+    depth = (thumbUpperRightY < caseLength - rimThick) ?
+        totalThumbWellDepth + (caseLength - rimThick - thumbUpperRightY)
+        : totalThumbWellDepth;
+    y = (thumbUpperRightY < caseLength - rimThick) ?
+        caseLength - rimThick
+        : thumbUpperRightY;
+
+    translate([thumbUpperRightX, y, 0]) {
         rotate([0,0,90]) {
             translate([0,-(thumbButtonLength+dividerThick)/2],0){
-                fingerContainer(totalThumbWellDepth, thumbButtonLength);
+                fingerContainer(depth, thumbButtonLength);
             }
         }
     }
