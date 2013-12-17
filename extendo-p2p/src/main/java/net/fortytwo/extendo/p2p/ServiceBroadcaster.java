@@ -38,11 +38,11 @@ public class ServiceBroadcaster {
                 try {
                     sendBroadcastMessages();
                 } catch (Throwable t) {
-                    LOGGER.severe("service broadcaster thread failed: " + t.getMessage());
+                    LOGGER.severe("service broadcaster thread failed with error: " + t.getMessage());
                     t.printStackTrace(System.err);
+                } finally {
+                    LOGGER.info("service broadcaster thread stopped");
                 }
-
-                LOGGER.info("service broadcaster thread stopped");
             }
         }).start();
     }

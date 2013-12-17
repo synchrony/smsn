@@ -30,16 +30,16 @@ public class ServiceBroadcastListener {
 
         new Thread(new Runnable() {
             public void run() {
-                LOGGER.fine("listening for facilitator broadcast messages");
+                LOGGER.info("starting listener thread for facilitator broadcast messages");
 
                 try {
                     listenForFacilitatorBroadcast();
                 } catch (Throwable t) {
-                    LOGGER.severe("broadcast message listener thread failed: " + t.getMessage());
+                    LOGGER.severe("listener thread for facilitator broadcast messages failed with error: " + t.getMessage());
                     t.printStackTrace(System.err);
+                } finally {
+                    LOGGER.info("listener thread for facilitator broadcast messages stopped");
                 }
-
-                LOGGER.fine("broadcast message listener stopped");
             }
         }).start();
     }

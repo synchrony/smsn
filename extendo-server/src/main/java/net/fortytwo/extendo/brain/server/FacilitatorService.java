@@ -105,6 +105,7 @@ public class FacilitatorService {
 
         ConnectionHost ch = new ConnectionHost(pubsubPort);
         ch.addNotifier(wrapper.getNotifier());
+        ch.start();
 
         // begin advertising the service now that the query engine is available
         ServiceDescription d = new ServiceDescription(Extendo.getConfiguration().getProperty(Extendo.VERSION),

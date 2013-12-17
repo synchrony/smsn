@@ -56,6 +56,8 @@ public class ExtendoAgent {
 
     public ExtendoAgent(final String agentUri,
                         final boolean listenForServices) {
+        LOGGER.info("creating Extendo agent with URI " + agentUri);
+
         this.agentUri = vf.createURI(agentUri);
 
         facilitatorConnection = new Connection();
@@ -77,11 +79,12 @@ public class ExtendoAgent {
                         service.address = address;
                         service.description = description;
 
-                        Socket socket = null;
+                        Socket socket;
                         try {
+                            LOGGER.info("opening socket connection to facilitator");
                             socket = new Socket(address, service.description.getPubsubPort());
                         } catch (IOException e) {
-                            LOGGER.severe("failed to create socket connection to facilitator: " + e.getMessage());
+                            LOGGER.severe("failed to open socket connection to facilitator: " + e.getMessage());
                             e.printStackTrace(System.err);
                             return;
                         }

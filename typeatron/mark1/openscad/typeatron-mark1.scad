@@ -371,21 +371,22 @@ module tactileSwitchWell(length, depth) {
 // width: width of the entire construction
 // totalWellDepth: depth to base of tactile switch
 // buttonLength: length of the moving part
-module fingerWell(notchDepth, width, totalWellDepth, buttonLength, buttonHeight) {
+module fingerWell(notchDepth, width, totalWellDepth, buttonLength, buttonHeight, bevelFactor) {
     x = width / 2;
     y = notchDepth;
     radius = (x*x + y*y) / (2*y);
+    bevel = bevelFactor * rimThick;
 
     translate([radius - notchDepth,0,0]) {
         cylinder(h=caseHeight,r=radius, $fn=cornerRoundingRes);
     }
 
     translate([radius - notchDepth, 0, rimThick]) {
-        cylinder(h=rimThick+overkill, r1=radius-rimThick/2, r2=radius+rimThick/2, $fn=cornerRoundingRes);
+        cylinder(h=rimThick+overkill, r1=radius-bevel/2, r2=radius+bevel/2, $fn=cornerRoundingRes);
     }
- 
+
     translate([radius - notchDepth,0,0]) {
-        cylinder(h=rimThick+overkill, r2=radius-rimThick/2, r1=radius+rimThick/2, $fn=cornerRoundingRes);
+        cylinder(h=rimThick+overkill, r2=radius-bevel/2, r1=radius+bevel/2, $fn=cornerRoundingRes);
     }
 
     // well and channels for finger button, tactile switch, wires, and pressure sensor
@@ -623,7 +624,7 @@ module statusLEDHole() {
 }
 
 module caseConvexHull() {
-    // box with cutout for thumb cylinder
+    // box with cutout for thumb rest
     difference() {
         translate([rimThick, rimThick,0]) {
             cube([caseWidth-caseHeight,caseLength-caseHeight,caseHeight]);
@@ -634,19 +635,11 @@ module caseConvexHull() {
     }
 
     // thumb rest
-    difference() {
-        translate([thumbCurveRadius, caseLength - thumbCurveRadius, 0]) {
-            intersection() {
-                 roundedCylinder(caseHeight, thumbCurveRadius, caseCornerRadius);
-                 translate([-thumbCurveRadius, 0, 0]) {
-                    cube([thumbCurveRadius, thumbCurveRadius, caseHeight]);
-                }
-            }
-        }
-        translate([thumbCurveRadius, caseLength - thumbCurveRadius, lidThick]) {
-            intersection() {
-                cylinder(r=(thumbCurveRadius - caseCornerRadius), h=cavityHeight);
-                translate([-thumbCurveRadius, 0, 0]) { cube([thumbCurveRadius, thumbCurveRadius, caseHeight]); }
+    translate([thumbCurveRadius, caseLength - thumbCurveRadius, 0]) {
+        intersection() {
+            roundedCylinder(caseHeight, thumbCurveRadius, caseCornerRadius);
+            translate([-thumbCurveRadius, 0, 0]) {
+                cube([thumbCurveRadius, thumbCurveRadius, caseHeight]);
             }
         }
     }
@@ -702,7 +695,8 @@ module thumbButtonWell() {
     translate([thumbUpperRightX, thumbUpperRightY, 0]) {
         rotate([0,0,90]) {
             translate([0,-(thumbButtonLength+dividerThick)/2],0){
-                fingerWell(thumbNotchDepth, thumbWidth, totalThumbWellDepth, thumbButtonLength, thumbButtonHeight);
+                // note: smaller side bevels for the thumb button, which is pressed with the thumb parallel to the button
+                fingerWell(thumbNotchDepth, thumbWidth, totalThumbWellDepth, thumbButtonLength, thumbButtonHeight, 0.5);
             }
         }
     }
@@ -720,23 +714,33 @@ module basicCase() {
                 caseConvexHull();
 
                 // inner cavity
-                translate([0,0,lidThick]) {
-                    translate([rimThick,rimThick,0]) {
-                        cube([cavityWidth,caseLength-thumbCurveRadius-rimThick+overkill,cavityHeight]);
+                difference() {
+                    translate([0,0,lidThick]) {
+                        translate([rimThick,rimThick,0]) {
+                            cube([cavityWidth,caseLength-thumbCurveRadius-rimThick+overkill,cavityHeight]);
+                        }
+                        translate([thumbCurveRadius,rimThick,0]) {
+                            cube([cavityWidth+rimThick-thumbCurveRadius,cavityLength,cavityHeight]);
+                        }
+                        translate([rimThick+cavityWidth - overkill,topYOfFingers,0]) {
+                            cube([caseWidth - 2*rimThick - cavityWidth, caseLength - rimThick - topYOfFingers, cavityHeight]);
+                        }
+                        translate([rimThick+cavityWidth - overkill,rimThick,0]) {
+                            cube([caseWidth - 2*rimThick - cavityWidth, bottomYOfFingers - rimThick, cavityHeight]);
+                        }
+
+                        translate([thumbCurveRadius, caseLength - thumbCurveRadius, 0]) {
+                            intersection() {
+                                cylinder(r=(thumbCurveRadius - caseCornerRadius), h=cavityHeight);
+                                translate([-thumbCurveRadius, 0, 0]) { cube([thumbCurveRadius, thumbCurveRadius, cavityHeight]); }
+                            }
+                        }
                     }
-                    translate([thumbCurveRadius,rimThick,0]) {
-                        cube([cavityWidth+rimThick-thumbCurveRadius,cavityLength,cavityHeight]);
-                    }
-                    translate([rimThick+cavityWidth - overkill,topYOfFingers,0]) {
-                        cube([caseWidth - 2*rimThick - cavityWidth, caseLength - rimThick - topYOfFingers, cavityHeight]);
-                    }
-                    translate([rimThick+cavityWidth - overkill,rimThick,0]) {
-                        cube([caseWidth - 2*rimThick - cavityWidth, bottomYOfFingers - rimThick, cavityHeight]);
-                    }
+
+                    thumbButtonContainer();
                 }
             }
 
-            thumbButtonContainer();
 
             if (floatingPinHoles) {
                 // columns for finger pinholes
@@ -773,7 +777,7 @@ module basicCase() {
                 caseWidth,
                 caseLength - offsetFromTopEdgeToFirstFinger - fingerWidth * (i + 0.5),
                 0]) {
-                    fingerWell(fingerNotchDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength, fingerButtonHeight);
+                    fingerWell(fingerNotchDepth, fingerWidth, totalFingerWellDepth, fingerButtonLength, fingerButtonHeight, 1.0);
             }
         }
 

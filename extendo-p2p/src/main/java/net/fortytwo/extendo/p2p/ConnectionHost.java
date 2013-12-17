@@ -41,11 +41,15 @@ public class ConnectionHost {
 
         new Thread(new Runnable() {
             public void run() {
+                LOGGER.info("starting connection listener thread");
+
                 try {
                     listenForNewConnections();
                 } catch (Throwable e) {
                     LOGGER.severe("connection listener thread failed with error: " + e.getMessage());
                     e.printStackTrace(System.err);
+                } finally {
+                    LOGGER.info("connection listener thread stopped");
                 }
             }
         }).start();
@@ -66,6 +70,7 @@ public class ConnectionHost {
         LOGGER.info("listening for new connections on port " + port);
         // TODO: recover from network failure (IO errors)
         ServerSocket serverSocket = new ServerSocket(port);
+        //ServerSocket serverSocket = new ServerSocket(port, 0, InetAddress.getByName("192.168.1.136"));
         while (!stopped) {
             // wait here for the next connection
             Socket socket = serverSocket.accept();

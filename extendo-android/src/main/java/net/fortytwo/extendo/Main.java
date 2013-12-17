@@ -160,12 +160,16 @@ public class Main extends Activity {
     private OnClickListener trymeListener = new OnClickListener() {
 
         public void onClick(View v) {
+
+            editor.setText("simulating gesture event");
+            brainstem.simulateGestureEvent();
+
+            /*
             editor.setText("");
             editor.setText("sending a message\nto the Typeatron");
-
             //brainstem.playEventNotificationTone();
-
             brainstem.sendTestMessageToTypeatron(context);
+            //*/
 
             //startActivity(new Intent(thisActivity, BrainPingPopup.class));
         }

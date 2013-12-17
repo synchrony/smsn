@@ -67,12 +67,16 @@ public class Connection {
 
         new Thread(new Runnable() {
             public void run() {
+                LOGGER.info("starting message handler thread");
+
                 try {
                     // TODO: recover from IO errors (e.g. due to temporary network issues)
                     handleIncomingMessages();
                 } catch (Throwable e) {
                     LOGGER.severe("message handler thread failed with error: " + e.getMessage());
                     e.printStackTrace(System.err);
+                } finally {
+                    LOGGER.info("message handler thread stopped");
                 }
             }
         }).start();

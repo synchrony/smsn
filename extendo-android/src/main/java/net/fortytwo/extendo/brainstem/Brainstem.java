@@ -23,12 +23,14 @@ import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.extendo.util.properties.TypedProperties;
+import net.fortytwo.rdfagents.model.Dataset;
 import org.openrdf.query.BindingSet;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -183,6 +185,7 @@ public class Brainstem {
         } else {
             try {
                 agent = new BrainstemAgent(u);
+                Log.i(TAG, "just created BrainstemAgent with URI " + u);
 
                 final BindingSetHandler queryAnswerHandler = new BindingSetHandler() {
                     public void handle(final BindingSet bindings) {
@@ -340,6 +343,19 @@ public class Brainstem {
         m.addArgument(0xff0000);
 
         Amarino.sendDataToArduino(context, typeatron.getAddress(), 'e', m.getByteArray());
+    }
+
+    public void simulateGestureEvent() {
+        Date recognizedAt = new Date();
+
+        Dataset d = agent.datasetForGestureEvent(recognizedAt.getTime());
+        try {
+            agent.getQueryEngine().addStatements(d.getStatements());
+            //agent.broadcastDataset(d);
+        } catch (Exception e) {
+            Log.e(Brainstem.TAG, "failed to broadcast RDF dataset: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 
     /**
