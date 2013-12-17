@@ -89,6 +89,8 @@ public class ExtendoAgent {
                             return;
                         }
                         facilitatorConnection.start(socket);
+                    } else {
+                        LOGGER.info("ignoring broadcast message due to existing service at " + service.address.getHostAddress());
                     }
                 }
             });
