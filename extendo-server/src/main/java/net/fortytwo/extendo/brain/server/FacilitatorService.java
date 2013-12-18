@@ -31,32 +31,10 @@ public class FacilitatorService {
 
     private static FacilitatorService INSTANCE;
 
-    /*
-    // TODO: copied from BrainstemAgent; deduplicate
-    private static final String QUERY_FOR_ALL_GB_GESTURES =
-            "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
-                    "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
-                    "SELECT ?person ?time WHERE {\n" +
-                    "?gesture a gesture:GenericBatonGesture .\n" +
-                    "?gesture gesture:expressedBy ?person .\n" +
-                    "?gesture gesture:recognizedAt ?instant .\n" +
-                    "?instant tl:at ?time .\n" +
-                    "}";
-    */
-
     private static final String BASE_URI = "http://example.org/baseURI";
 
     // TODO
     private final String broadcastEndpoint = "/graphs/joshkb/extendo/";
-    //private final int pubsubPort;
-
-    //private final DatasetFactory dsFactory = new DatasetFactory();
-    //private RDFContentLanguage lang;
-
-    /*
-    // TODO: support multiple concurrent connections (one per SesameStream client, with multiple subscriptions per connection)
-    private PubSubConnection singleConnection;
-    */
 
     private final QueryEngine queryEngine;
 
@@ -69,41 +47,12 @@ public class FacilitatorService {
     }
 
     private FacilitatorService() throws IOException, PropertyException {
-        /*
-        for (RDFContentLanguage l : dsFactory.getSupportedLanguages()) {
-            if (l.getFormat().equals(RDFFormat.NTRIPLES)) {
-                lang = l;
-                break;
-            }
-        }
-
-        if (null == lang) {
-            throw new IllegalStateException("facilitator requires the N-Triples format, but it is not supported as an RDF content language");
-        }
-        */
-
-        /*
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    startContinuousQueryEngine();
-
-                    // this executes indefinitely in the nested thread, keeping both the socket connection
-                    // and the query engine alive
-                    managePubSubConnection();
-                } catch (Throwable e) {
-                    LOGGER.severe("SPARQL notification stream closed with error: " + e.getMessage());
-                    e.printStackTrace(System.err);
-                }
-            }
-        }).start();
-        */
-
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
 
-        // TODO: temporary, for development and debugging
-        SesameStream.setDoPerformanceMetrics(true);
-        SesameStream.setDoUseCompactLogFormat(false);
+        if (Extendo.VERBOSE) {
+            SesameStream.setDoPerformanceMetrics(true);
+            SesameStream.setDoUseCompactLogFormat(false);
+        }
 
         queryEngine = new QueryEngineImpl();
         QueryEngineWrapper wrapper = new QueryEngineWrapper(queryEngine);
@@ -120,80 +69,12 @@ public class FacilitatorService {
         new ServiceBroadcaster(d).start();
     }
 
-    /*
-    private void startContinuousQueryEngine() throws QueryEngine.IncompatibleQueryException, QueryEngine.InvalidQueryException {
-        // TODO: temporary; in future, queries will be supplied by the client
-        String singleQuery = QUERY_FOR_ALL_GB_GESTURES;
-
-        queryEngine = new QueryEngineImpl();
-        queryEngine.addQuery(singleQuery, new BindingSetHandler() {
-            public void handle(final BindingSet bindings) {
-                LOGGER.info("found a result for the continuous query");
-                boolean first = true;
-                StringBuilder sb = new StringBuilder();
-                for (Binding b : bindings) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        sb.append("\t");
-                    }
-
-                    sb.append(b.getName()).append("\t").append(b.getValue().stringValue());
-                }
-
-                try {
-                    sendNotification(sb.toString());
-                } catch (IOException e) {
-                    LOGGER.warning("failed to push SPARQL notification: " + e.getMessage());
-                }
-            }
-        });
-    }
-    */
-
-    /*
-    private void managePubSubConnection() throws IOException, InterruptedException, PropertyException {
-
-        LOGGER.info("instantiating facilitator service on port " + pubsubPort);
-        ServerSocket serverSocket = new ServerSocket(pubsubPort);
-        while (true) {
-            LOGGER.info("opening SPARQL pub/sub connection");
-            Socket socket = serverSocket.accept();
-            singleConnection = new PubSubConnection(socket);
-            LOGGER.info("SPARQL pub/sub connection opened to " + socket.getRemoteSocketAddress() + " (" + socket.getInetAddress() + ")");
-            try {
-                //PrintWriter pw = new PrintWriter(notificationStream, true);
-                //pw.println("What's you name?");
-
-                // wait indefinitely in this thread
-                Object m = "";
-                synchronized (m) {
-                    m.wait();
-                }
-            } finally {
-                LOGGER.info("closing SPARQL pub/sub connection");
-                singleConnection = null;
-                socket.close();
-            }
-        }
-    }*/
-
-    /*
-    private TupleExpr parseQuery(final String queryStr) throws MalformedQueryException {
-        ParsedQuery q = QueryParserUtil.parseQuery(
-                QueryLanguage.SPARQL,
-                queryStr,
-                "http://example.org/baseURI");
-        return q.getTupleExpr();
-    }*/
-
     public void pushUpdate(final String rdfData,
                            final RDFFormat format) throws IOException {
         long count;
 
         InputStream in = new ByteArrayInputStream(rdfData.getBytes());
         try {
-            LOGGER.info("parsing...");
             count = parseRdfContent(in, format);
             //ds = dsFactory.parse(in, lang);
         } catch (RDFHandlerException e) {
@@ -204,7 +85,9 @@ public class FacilitatorService {
             in.close();
         }
 
-        System.out.println("received a dataset with " + count + " statements");
+        if (Extendo.VERBOSE) {
+            LOGGER.info("received a dataset with " + count + " statements");
+        }
     }
 
     // synchronized because the query engine is not thread-safe
@@ -222,17 +105,6 @@ public class FacilitatorService {
         parser.parse(content, BASE_URI);
         return parsedRDFHandler.getCount();
     }
-
-    /*
-    private void sendNotification(final String content) throws IOException {
-        if (null == singleConnection) {
-            LOGGER.severe("can't send notification: no pub/sub connection");
-        } else {
-            OutputStream out = singleConnection.getSocket().getOutputStream();
-            out.write(content.getBytes());
-            out.write('\n');
-        }
-    }*/
 
     private class ParsedRDFHandler implements RDFHandler {
         private long count = 0;
@@ -269,18 +141,5 @@ public class FacilitatorService {
             count = 0;
         }
     }
-
-    /*
-    private class PubSubConnection {
-        private final Socket socket;
-
-        public PubSubConnection(Socket socket) {
-            this.socket = socket;
-        }
-
-        public Socket getSocket() {
-            return socket;
-        }
-    }*/
 }
 

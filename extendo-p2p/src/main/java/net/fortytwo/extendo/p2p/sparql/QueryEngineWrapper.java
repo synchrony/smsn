@@ -3,6 +3,7 @@ package net.fortytwo.extendo.p2p.sparql;
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import edu.rpi.twc.sesamestream.Subscription;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.Connection;
 import net.fortytwo.extendo.p2p.ConnectionHost;
 import org.json.JSONArray;
@@ -70,7 +71,9 @@ public class QueryEngineWrapper {
     private void newConnection(final Connection c) {
         c.registerHandler(QueryEngineProxy.TAG_SPARQL_QUERY, new Connection.JSONHandler() {
             public void handle(final JSONObject message) {
-                System.out.println("received query message from " + c.getSocket().getRemoteSocketAddress() + ": " + message);
+                if (Extendo.VERBOSE) {
+                    LOGGER.info("received query message from " + c.getSocket().getRemoteSocketAddress() + ": " + message);
+                }
 
                 try {
                     handleQueryMessage(c, message);
@@ -138,14 +141,18 @@ public class QueryEngineWrapper {
         j.put(QueryEngineProxy.QUERY_ID, queryId);
         j.put(QueryEngineProxy.BINDINGS, bindings);
 
-        System.out.println("sending query result message to " + c.getSocket().getRemoteSocketAddress() + ": " + j);
+        if (Extendo.VERBOSE) {
+            LOGGER.info("sending query result message to " + c.getSocket().getRemoteSocketAddress() + ": " + j);
+        }
 
         // send SPARQL results immediately or not at all; don't buffer
         c.sendNow(QueryEngineProxy.TAG_SPARQL_RESULT, j);
     }
 
     private void handleDatasetMessage(final JSONObject message) throws SimpleJSONRDFFormat.ParseError, IOException {
-        System.out.println("received dataset message: " + message);
+        if (Extendo.VERBOSE) {
+            LOGGER.info("received dataset message: " + message);
+        }
 
         try {
             JSONArray dataset = message.getJSONArray(QueryEngineProxy.DATASET);

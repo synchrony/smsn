@@ -77,7 +77,7 @@ public class TimeStampedEvent extends BottomUpType {
             String dateStr = eventDate.getValue();
 
             // this is a precaution against bugs which creep into the code; it should never happen
-            if (Extendo.SAFE_MODE && !Date.INSTANCE.getValueRegex().matcher(dateStr).matches()) {
+            if (Extendo.SAFE && !Date.INSTANCE.getValueRegex().matcher(dateStr).matches()) {
                 throw new IllegalStateException("timestamp of event expected to be a date: " + dateStr);
             }
 

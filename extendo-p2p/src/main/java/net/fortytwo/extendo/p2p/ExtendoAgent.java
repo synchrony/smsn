@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.p2p;
 
 import edu.rpi.twc.sesamestream.QueryEngine;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineProxy;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -30,15 +31,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendoAgent {
     protected static final Logger LOGGER = Logger.getLogger(ExtendoAgent.class.getName());
 
     public static final String
-        PROP_BODY = "body",
-        PROP_TAG = "tag";
+            PROP_BODY = "body",
+            PROP_TAG = "tag";
 
     protected final URI agentUri;
     protected final DatasetFactory factory = new DatasetFactory();
@@ -66,10 +66,12 @@ public class ExtendoAgent {
         if (listenForServices) {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
                 public void receivedServiceDescription(InetAddress address, ServiceDescription description) {
-                    LOGGER.info("received broadcast message from " + address.getHostAddress()
-                            + ": version=" + description.getVersion()
-                            + ", endpoint=" + description.getEndpoint()
-                            + ", pub/sub port=" + description.getPubsubPort());
+                    if (Extendo.VERBOSE) {
+                        LOGGER.info("received broadcast message from " + address.getHostAddress()
+                                + ": version=" + description.getVersion()
+                                + ", endpoint=" + description.getEndpoint()
+                                + ", pub/sub port=" + description.getPubsubPort());
+                    }
 
                     // currently, the first broadcast message is used to discover the service,
                     // which is assumed to remain available indefinitely.
@@ -90,7 +92,9 @@ public class ExtendoAgent {
                         }
                         facilitatorConnection.start(socket);
                     } else {
-                        LOGGER.info("ignoring broadcast message due to existing service at " + service.address.getHostAddress());
+                        if (Extendo.VERBOSE) {
+                            LOGGER.info("ignoring broadcast message due to existing service at " + service.address.getHostAddress());
+                        }
                     }
                 }
             });
@@ -130,7 +134,9 @@ public class ExtendoAgent {
 
         String endpoint = protocolPrefix + ip + ":" + rexsterPort + service.description.getEndpoint() + "broadcast-rdf";
 
-        LOGGER.info("broadcasting RDF dataset to endpoint at " + endpoint);
+        if (Extendo.VERBOSE) {
+            LOGGER.info("broadcasting RDF dataset to endpoint at " + endpoint);
+        }
 
         //String endpoint = "http://localhost:8182/graphs/joshkb/extendo/broadcast-rdf";
 
@@ -166,7 +172,9 @@ public class ExtendoAgent {
             out.close();
             String responseString = out.toString();
             //..more logic
-            LOGGER.info("successfully pushed gestural event RDF");
+            if (Extendo.VERBOSE) {
+                LOGGER.info("successfully pushed gestural event RDF");
+            }
         } else {
             //Closes the connection.
             response.getEntity().getContent().close();

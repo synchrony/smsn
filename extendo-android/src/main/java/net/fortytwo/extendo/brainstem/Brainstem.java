@@ -19,6 +19,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.util.properties.PropertyException;
@@ -401,7 +402,9 @@ public class Brainstem {
                         }
                     }
 
-                    Log.i(TAG, "data from Arduino: " + data);
+                    if (Extendo.VERBOSE) {
+                        Log.i(TAG, "data from Arduino: " + data);
+                    }
                     //textEditor.setText("OSC: " + data);
 
                     /*

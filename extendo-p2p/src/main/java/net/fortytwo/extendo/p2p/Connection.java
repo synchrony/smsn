@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.p2p;
 
+import net.fortytwo.extendo.Extendo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -125,7 +126,9 @@ public class Connection {
 
         String s = message.toString();
 
-        System.out.println("sending message to " + socket.getRemoteSocketAddress() + ": " + s);
+        if (Extendo.VERBOSE) {
+            LOGGER.info("sending message to " + socket.getRemoteSocketAddress() + ": " + s);
+        }
 
         socket.getOutputStream().write(s.getBytes());
         socket.getOutputStream().write(10);
@@ -149,7 +152,9 @@ public class Connection {
                 break;
             }
 
-            System.out.println("received message from " + socket.getRemoteSocketAddress() + ": " + line);
+            if (Extendo.VERBOSE) {
+                LOGGER.info("received message from " + socket.getRemoteSocketAddress() + ": " + line);
+            }
 
             JSONObject message;
             try {

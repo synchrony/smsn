@@ -15,7 +15,9 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Extendo {
-    public static final boolean SAFE_MODE = true;
+    public static final boolean
+            SAFE = true,
+            VERBOSE = false;
 
     // Configuration properties
     public static final String
