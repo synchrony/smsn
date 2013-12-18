@@ -128,6 +128,8 @@ public class Connection {
         System.out.println("sending message to " + socket.getRemoteSocketAddress() + ": " + s);
 
         socket.getOutputStream().write(s.getBytes());
+        socket.getOutputStream().write(10);
+        socket.getOutputStream().flush();
     }
 
     private void close() throws IOException {
@@ -141,6 +143,11 @@ public class Connection {
 
         while (!stopped) {
             String line = br.readLine();
+
+            if (null == line) {
+                LOGGER.info("connection to " + socket.getRemoteSocketAddress() + " closed remotely");
+                break;
+            }
 
             System.out.println("received message from " + socket.getRemoteSocketAddress() + ": " + line);
 

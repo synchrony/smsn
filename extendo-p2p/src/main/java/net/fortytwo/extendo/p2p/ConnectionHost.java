@@ -39,6 +39,8 @@ public class ConnectionHost {
             return;
         }
 
+        stopped = false;
+
         new Thread(new Runnable() {
             public void run() {
                 LOGGER.info("starting connection listener thread");

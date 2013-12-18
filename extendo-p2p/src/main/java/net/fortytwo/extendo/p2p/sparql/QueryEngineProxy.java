@@ -129,14 +129,16 @@ public class QueryEngineProxy implements QueryEngine {
         j.put(QUERY_ID, queryId);
         j.put(QUERY, query);
 
-        connection.sendNow(TAG_SPARQL_QUERY, j);
+        // queries are of central importance and should be buffered to ensure that they are received
+        connection.sendBuffered(TAG_SPARQL_QUERY, j);
     }
 
     private void sendDatasetMessage(final JSONArray statements) throws JSONException, IOException {
         JSONObject j = new JSONObject();
         j.put(DATASET, statements);
 
-        connection.sendBuffered(TAG_RDF_DATA, j);
+        // send RDF data immediately or not at all; don't buffer
+        connection.sendNow(TAG_RDF_DATA, j);
     }
 
     private static long maxQueryId = 0;

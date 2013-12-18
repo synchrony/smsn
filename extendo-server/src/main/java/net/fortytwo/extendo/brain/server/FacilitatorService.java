@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.brain.server;
 
 import edu.rpi.twc.sesamestream.QueryEngine;
+import edu.rpi.twc.sesamestream.SesameStream;
 import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.ConnectionHost;
@@ -99,6 +100,10 @@ public class FacilitatorService {
         */
 
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
+
+        // TODO: temporary, for development and debugging
+        SesameStream.setDoPerformanceMetrics(true);
+        SesameStream.setDoUseCompactLogFormat(false);
 
         queryEngine = new QueryEngineImpl();
         QueryEngineWrapper wrapper = new QueryEngineWrapper(queryEngine);
