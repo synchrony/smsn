@@ -4,6 +4,7 @@ import android.util.Log;
 import android.widget.EditText;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Main;
 import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.rdfagents.model.Dataset;
 
@@ -18,8 +19,16 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
                               final ExtendoBrain brain,
                               final EventStackProxy proxy,
                               final BrainstemAgent agent,
-                              final EditText textEditor) {
+                              final EditText textEditor,
+                              final Main.Toaster toaster) {
         super(address);
+
+        oscDispatcher.register("/exo/hand/ping-reply", new OSCMessageHandler() {
+            public void handle(final OSCMessage message) {
+                long delay = System.currentTimeMillis() - agent.timeOfLastEvent;
+                toaster.makeText("bluetooth delay: " + delay + "ms");
+            }
+        });
 
         oscDispatcher.register("/exo/hand/raw", new OSCMessageHandler() {
             public void handle(final OSCMessage message) {

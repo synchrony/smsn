@@ -5,8 +5,9 @@
     <!-- Simple strings. -->
     <string name="skeleton_app">Skeleton App</string>
     <string name="back">Back</string>
-    <string name="tryme">Try me!</string>
-    <string name="ping">Ping!</string>
+    <string name="tryme">Test</string>
+    <string name="ping">Ping</string>
+    <string name="btPing">BTPing</string>
 
     <!-- This is a complex string containing style runs. -->
     <string name="main_label">Hello from your brainstem!</string>

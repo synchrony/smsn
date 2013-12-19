@@ -51,6 +51,8 @@
             android:text="@string/tryme" android:textColor="@color/red" />
         <Button android:id="@+id/ping" style="@style/ActionButton"
             android:text="@string/ping" android:textColor="@color/red" />
+        <Button android:id="@+id/btPing" style="@style/ActionButton"
+            android:text="@string/btPing" android:textColor="@color/red" />
 
         <Button android:id="@+id/flashcards" style="@style/ActionButton"
                 android:text="Flashcards" />

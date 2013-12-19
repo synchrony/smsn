@@ -59,6 +59,7 @@ public class Main extends Activity {
         findViewById(R.id.back).setOnClickListener(backListener);
         findViewById(R.id.tryme).setOnClickListener(trymeListener);
         findViewById(R.id.ping).setOnClickListener(pingListener);
+        findViewById(R.id.btPing).setOnClickListener(bluetoothPingListener);
         findViewById(R.id.flashcards).setOnClickListener(flashcardsListener);
         findViewById(R.id.events).setOnClickListener(eventsListener);
 
@@ -158,9 +159,6 @@ public class Main extends Activity {
 
     private final Context context = this;
 
-    /**
-     * A call-back for when the user presses the "try me" button.
-     */
     private OnClickListener trymeListener = new OnClickListener() {
 
         public void onClick(View v) {
@@ -179,14 +177,19 @@ public class Main extends Activity {
         }
     };
 
-    /**
-     * A call-back for when the user presses the "ping" button.
-     */
     private OnClickListener pingListener = new OnClickListener() {
 
         public void onClick(View v) {
             editor.setText("pinging facilitator connection");
             brainstem.pingFacilitatorConnection();
+        }
+    };
+
+    private OnClickListener bluetoothPingListener = new OnClickListener() {
+
+        public void onClick(View v) {
+            editor.setText("pinging bluetooth device");
+            brainstem.pingBluetooth();
         }
     };
 

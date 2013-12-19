@@ -56,6 +56,7 @@ public class Brainstem {
 
     private final List<BluetoothDeviceControl> devices;
 
+    private BluetoothDeviceControl extendoHand;
     private BluetoothDeviceControl typeatron;
 
     private final OSCDispatcher oscDispatcher;
@@ -218,8 +219,8 @@ public class Brainstem {
         String extendoHandAddress = configuration.getProperty(PROP_EXTENDOHAND_ADDRESS);
         if (null != extendoHandAddress) {
             Log.i(TAG, "loading Extend-o-Hand device at address " + extendoHandAddress);
-            BluetoothDeviceControl extendoHand
-                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, brain, proxy, agent, textEditor);
+            extendoHand
+                    = new ExtendoHandControl(extendoHandAddress, oscDispatcher, brain, proxy, agent, textEditor, toaster);
             addBluetoothDevice(extendoHand);
         }
 
@@ -230,13 +231,6 @@ public class Brainstem {
                     = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor);
             addBluetoothDevice(typeatron);
         }
-    }
-
-    public void addComplexEventHandler(final String query,
-                                       final ComplexEventHandler handler) {
-        // TODO
-        // handle various continuous SPARQL results from facilitator
-
     }
 
     private void addBluetoothDevice(final BluetoothDeviceControl dc) {
@@ -382,6 +376,12 @@ public class Brainstem {
             Log.e(TAG, "error pinging connection: " + t.getMessage());
             t.printStackTrace(System.err);
         }
+    }
+
+    public void pingBluetooth() {
+        agent.timeOfLastEvent = System.currentTimeMillis();
+        // note the timestamp argument is not yet used
+        Amarino.sendDataToArduino(context, extendoHand.getAddress(), 'p', agent.timeOfLastEvent);
     }
 
     /**

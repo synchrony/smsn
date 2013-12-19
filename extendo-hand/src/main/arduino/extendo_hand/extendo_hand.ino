@@ -1,7 +1,7 @@
 /*
  * Extend-o-Hand firmware, copyright 2013 by Joshua Shinavier
+ * 
  * See: https://github.com/joshsh/extendo
- *
  */
 
 const int pinX = A0;
@@ -20,9 +20,10 @@ const int pinZ = A2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#include <MeetAndroid.h>
-
-//MeetAndroid meetAndroid;
+// This is only necessary for communication *to* the Arduino
+// For communication from the Arduino to the Android phone, we use a modified OSCuino
+#include <MeetAndroid.h>
+MeetAndroid meetAndroid;
 
 const char ack = 19;
 const char startFlag = 18;
@@ -107,7 +108,9 @@ void setup()
 #if ARDUINO >= 100
     while(!Serial) ; // Leonardo "feature"
 #endif
-     
+
+  meetAndroid.registerFunction(ping, 'p');
+
   state = STATE_ONE;
 }
 
@@ -137,7 +140,6 @@ void sendOSC(class OSCMessage &m) {
 void error(char *message) {
     OSCMessage m("/exo/hand/error");
     m.add(message);
-
     sendOSC(m);
 }
 
@@ -146,7 +148,9 @@ void error(char *message) {
 
 void loop()
 {
-    //* gesture mode
+    // TODO: temporary.  This will slow down gesture recognition
+    // you need to keep this in your loop() to receive events
+    meetAndroid.receive();
     
     double ax, ay, az;
     double a;
@@ -200,5 +204,15 @@ void loop()
         }
         break;
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Amarino-formatted function
+void ping(byte flag, byte numOfValues)
+{
+    OSCMessage m("/exo/hand/ping-reply");
+    m.add((int32_t) micros());
+    sendOSC(m);
 }
 
