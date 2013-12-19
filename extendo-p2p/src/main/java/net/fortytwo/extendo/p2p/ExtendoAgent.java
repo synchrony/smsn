@@ -54,6 +54,8 @@ public class ExtendoAgent {
 
     private final Connection facilitatorConnection;
 
+    private final Pinger pinger;
+
     public ExtendoAgent(final String agentUri,
                         final boolean listenForServices) {
         LOGGER.info("creating Extendo agent with URI " + agentUri);
@@ -61,6 +63,9 @@ public class ExtendoAgent {
         this.agentUri = vf.createURI(agentUri);
 
         facilitatorConnection = new Connection();
+
+        pinger = new Pinger(facilitatorConnection);
+
         queryEngine = new QueryEngineProxy(facilitatorConnection);
 
         if (listenForServices) {
@@ -104,6 +109,10 @@ public class ExtendoAgent {
 
     public URI getAgentUri() {
         return agentUri;
+    }
+
+    public Pinger getPinger() {
+        return pinger;
     }
 
     public QueryEngine getQueryEngine() {

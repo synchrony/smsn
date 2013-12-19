@@ -24,6 +24,9 @@ public class BrainstemAgent extends ExtendoAgent {
 
     private static final SimpleDateFormat XSD_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
+    // TODO: temporary debugging/development item
+    public long timeOfLastEvent;
+
     public static final String QUERY_FOR_ALL_GB_GESTURES =
             "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
                     "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.Toast;
 import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.brainstem.Brainstem;
 import net.fortytwo.extendo.events.EventLocationListener;
@@ -31,8 +32,10 @@ public class Main extends Activity {
 
     private final Brainstem brainstem;
 
+    private final Toaster toaster = new Toaster();
+
     public Main() throws ExtendoBrain.ExtendoBrainException {
-        brainstem = new Brainstem();
+        brainstem = new Brainstem(toaster);
     }
 
     /**
@@ -55,6 +58,7 @@ public class Main extends Activity {
         // Hook up button presses to the appropriate event handler.
         findViewById(R.id.back).setOnClickListener(backListener);
         findViewById(R.id.tryme).setOnClickListener(trymeListener);
+        findViewById(R.id.ping).setOnClickListener(pingListener);
         findViewById(R.id.flashcards).setOnClickListener(flashcardsListener);
         findViewById(R.id.events).setOnClickListener(eventsListener);
 
@@ -175,6 +179,17 @@ public class Main extends Activity {
         }
     };
 
+    /**
+     * A call-back for when the user presses the "ping" button.
+     */
+    private OnClickListener pingListener = new OnClickListener() {
+
+        public void onClick(View v) {
+            editor.setText("pinging facilitator connection");
+            brainstem.pingFacilitatorConnection();
+        }
+    };
+
     private OnClickListener flashcardsListener = new OnClickListener() {
         public void onClick(View v) {
             startActivity(new Intent(thisActivity, Flashcards4Android.class));
@@ -220,5 +235,16 @@ public class Main extends Activity {
         ComponentName ci = taskInfo.get(0).topActivity;
         ci.getPackageName();
         */
+    }
+
+    // a helper object which allows Toasts to be displayed from non-UI threads
+    public class Toaster {
+        public void makeText(final String message) {
+            Main.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(Main.this, message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

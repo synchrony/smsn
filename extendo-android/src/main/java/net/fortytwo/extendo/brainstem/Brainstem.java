@@ -20,8 +20,10 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.Main;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
+import net.fortytwo.extendo.p2p.Pinger;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.extendo.util.properties.TypedProperties;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -69,7 +71,12 @@ public class Brainstem {
     private BrainstemAgent agent;
     private final ExtendoBrain brain;
 
-    public Brainstem() throws ExtendoBrain.ExtendoBrainException {
+    private Context context;
+    private final Main.Toaster toaster;
+
+    public Brainstem(final Main.Toaster toaster) throws ExtendoBrain.ExtendoBrainException {
+        this.toaster = toaster;
+
         // TODO: this TinkerGraph is a temporary solution
         KeyIndexableGraph g = new TinkerGraph();
         BrainGraph bg = new BrainGraph(g);
@@ -101,15 +108,13 @@ public class Brainstem {
         }
     }
 
-    public BrainstemAgent getAgent() {
-        return agent;
-    }
-
-    public void setTextEditor(EditText textEditor) {
+    public void setTextEditor(final EditText textEditor) {
         this.textEditor = textEditor;
     }
 
     public void connect(final Context context) {
+        this.context = context;
+
         // in order to receive broadcasted intents we need to register our receiver
         context.registerReceiver(arduinoReceiver, new IntentFilter(AmarinoIntent.ACTION_RECEIVED));
 
@@ -190,7 +195,12 @@ public class Brainstem {
 
                 final BindingSetHandler queryAnswerHandler = new BindingSetHandler() {
                     public void handle(final BindingSet bindings) {
+                        long delay = System.currentTimeMillis() - agent.timeOfLastEvent;
+
                         toneGenerator.play();
+
+                        toaster.makeText("latency (before tone) = " + delay + "ms");
+
                         Log.i(Brainstem.TAG, "received SPARQL query result: " + bindings);
                     }
                 };
@@ -347,6 +357,8 @@ public class Brainstem {
     }
 
     public void simulateGestureEvent() {
+        agent.timeOfLastEvent = System.currentTimeMillis();
+
         Date recognizedAt = new Date();
 
         Dataset d = agent.datasetForGestureEvent(recognizedAt.getTime());
@@ -356,6 +368,19 @@ public class Brainstem {
         } catch (Exception e) {
             Log.e(Brainstem.TAG, "failed to broadcast RDF dataset: " + e.getMessage());
             e.printStackTrace(System.err);
+        }
+    }
+
+    public void pingFacilitatorConnection() {
+        try {
+            agent.getPinger().ping(new Pinger.PingResultHandler() {
+                public void handleResult(long delay) {
+                    toaster.makeText("ping delay: " + delay + "ms");
+                }
+            });
+        } catch (Throwable t) {
+            Log.e(TAG, "error pinging connection: " + t.getMessage());
+            t.printStackTrace(System.err);
         }
     }
 

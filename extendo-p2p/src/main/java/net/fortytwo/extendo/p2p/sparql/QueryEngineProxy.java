@@ -4,6 +4,7 @@ import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import edu.rpi.twc.sesamestream.Subscription;
 import net.fortytwo.extendo.p2p.Connection;
+import net.fortytwo.extendo.p2p.MessageHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +50,7 @@ public class QueryEngineProxy implements QueryEngine {
 
         handlers = new HashMap<String, BindingSetHandler>();
 
-        connection.registerHandler(TAG_SPARQL_RESULT, new Connection.JSONHandler() {
+        connection.registerHandler(TAG_SPARQL_RESULT, new MessageHandler() {
             public void handle(final JSONObject result) {
                 try {
                     handleSparqlResultJSON(result);

@@ -6,6 +6,7 @@ import edu.rpi.twc.sesamestream.Subscription;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.Connection;
 import net.fortytwo.extendo.p2p.ConnectionHost;
+import net.fortytwo.extendo.p2p.MessageHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +28,7 @@ public class QueryEngineWrapper {
     private final QueryEngine queryEngine;
 
     // currently, there is a single handler for all incoming RDF data, regardless of source
-    private final Connection.JSONHandler datasetHandler;
+    private final MessageHandler datasetHandler;
 
     private final SimpleJSONRDFFormat jsonrdfFormat;
 
@@ -42,7 +43,7 @@ public class QueryEngineWrapper {
 
         connectionsByQueryId = new HashMap<String, Connection>();
 
-        datasetHandler = new Connection.JSONHandler() {
+        datasetHandler = new MessageHandler() {
             public void handle(final JSONObject message) {
                 try {
                     handleDatasetMessage(message);
@@ -69,7 +70,7 @@ public class QueryEngineWrapper {
     }
 
     private void newConnection(final Connection c) {
-        c.registerHandler(QueryEngineProxy.TAG_SPARQL_QUERY, new Connection.JSONHandler() {
+        c.registerHandler(QueryEngineProxy.TAG_SPARQL_QUERY, new MessageHandler() {
             public void handle(final JSONObject message) {
                 if (Extendo.VERBOSE) {
                     LOGGER.info("received query message from " + c.getSocket().getRemoteSocketAddress() + ": " + message);

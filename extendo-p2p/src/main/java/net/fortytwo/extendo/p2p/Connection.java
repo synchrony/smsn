@@ -22,14 +22,14 @@ public class Connection {
 
     private Socket socket;
 
-    private final Map<String, JSONHandler> handlers;
+    private final Map<String, MessageHandler> handlers;
 
     private final List<BufferedMessage> buffer;
 
     private boolean stopped = false;
 
     public Connection() {
-        handlers = new HashMap<String, JSONHandler>();
+        handlers = new HashMap<String, MessageHandler>();
         buffer = new LinkedList<BufferedMessage>();
     }
 
@@ -92,7 +92,11 @@ public class Connection {
     }
 
     public void registerHandler(final String tag,
-                                final JSONHandler handler) {
+                                final MessageHandler handler) {
+        if (null != handlers.get(tag)) {
+            throw new IllegalStateException("a '" + tag + "' handler is already registered with this connection");
+        }
+
         handlers.put(tag, handler);
     }
 
@@ -180,16 +184,18 @@ public class Connection {
                 continue;
             }
 
-            JSONHandler handler = handlers.get(tag);
+            MessageHandler handler = handlers.get(tag);
 
             if (null == handler) {
                 LOGGER.warning("no handler for message with tag '" + tag + "'");
             } else {
                 try {
                     handler.handle(body);
+                } catch (MessageHandler.MessageHandlerException e) {
+                    LOGGER.severe("JSON message handler failed with error: " + e.getMessage());
                 } catch (Throwable t) {
-                    // don't allow handler errors to kill this loop/thread
-                    LOGGER.severe("JSON message handler failed with error: " + t.getMessage());
+                    // don't allow otherwise uncaught handler errors to kill this loop/thread
+                    LOGGER.severe("JSON message handler failed with unexpected error: " + t.getMessage());
                     t.printStackTrace(System.err);
                 }
             }
@@ -203,7 +209,4 @@ public class Connection {
         public JSONObject body;
     }
 
-    public interface JSONHandler {
-        void handle(JSONObject j);
-    }
 }

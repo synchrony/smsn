@@ -4,7 +4,9 @@ import edu.rpi.twc.sesamestream.QueryEngine;
 import edu.rpi.twc.sesamestream.SesameStream;
 import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.p2p.Connection;
 import net.fortytwo.extendo.p2p.ConnectionHost;
+import net.fortytwo.extendo.p2p.PingAnswerer;
 import net.fortytwo.extendo.p2p.ServiceBroadcaster;
 import net.fortytwo.extendo.p2p.ServiceDescription;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineWrapper;
@@ -59,6 +61,12 @@ public class FacilitatorService {
 
         ConnectionHost ch = new ConnectionHost(pubsubPort);
         ch.addNotifier(wrapper.getNotifier());
+        ch.addNotifier(new ConnectionHost.Notifier() {
+            public void connectionCreated(final Connection c) {
+                // add a ping answerer to each new connection
+                new PingAnswerer(c);
+            }
+        });
         ch.start();
 
         // begin advertising the service now that the query engine is available

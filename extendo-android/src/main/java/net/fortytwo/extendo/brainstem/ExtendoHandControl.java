@@ -23,6 +23,7 @@ public class ExtendoHandControl extends BluetoothDeviceControl {
 
         oscDispatcher.register("/exo/hand/raw", new OSCMessageHandler() {
             public void handle(final OSCMessage message) {
+                agent.timeOfLastEvent = System.currentTimeMillis();
 
                 // TODO: the recognition instant should be inferred from the timestamp supplied by the device
                 Date recognizedAt = new Date();
