@@ -1677,38 +1677,6 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 </deviceset>
 </devicesets>
 </library>
-<library name="SparkFun-Aesthetics">
-<description>&lt;h3&gt;SparkFun Electronics' preferred foot prints&lt;/h3&gt;
-In this library you'll find non-functional items- supply symbols, logos, notations, frame blocks, etc.&lt;br&gt;&lt;br&gt;
-We've spent an enormous amount of time creating and checking these footprints and parts, but it is the end user's responsibility to ensure correctness and suitablity for a given componet or application. If you enjoy using this library, please buy one of our products at www.sparkfun.com.
-&lt;br&gt;&lt;br&gt;
-&lt;b&gt;Licensing:&lt;/b&gt; CC v3.0 Share-Alike You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
-<packages>
-</packages>
-<symbols>
-<symbol name="GND">
-<pin name="3.3V" x="0" y="2.54" visible="off" length="short" direction="sup" rot="R270"/>
-<wire x1="-2.032" y1="0" x2="2.032" y2="0" width="0.254" layer="94"/>
-<wire x1="-1.27" y1="-0.762" x2="1.27" y2="-0.762" width="0.254" layer="94"/>
-<wire x1="-0.508" y1="-1.524" x2="0.508" y2="-1.524" width="0.254" layer="94"/>
-<text x="2.54" y="0" size="1.778" layer="94">&gt;NAME</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="GND2" prefix="GND">
-<gates>
-<gate name="G$1" symbol="GND" x="2.54" y="0"/>
-</gates>
-<devices>
-<device name="">
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="SparkFun-RF">
 <description>&lt;h3&gt;SparkFun Electronics' preferred foot prints&lt;/h3&gt;
 In this library you'll find things that send or receive RF- GPS, cellular modules, Bluetooth, WiFi, etc.&lt;br&gt;&lt;br&gt;
@@ -2497,7 +2465,6 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <part name="R3" library="SparkFun-Resistors" deviceset="10KOHM1/6W5%(PTH)" device="KIT" value="10k"/>
 <part name="R4" library="SparkFun-Resistors" deviceset="10KOHM1/6W5%(PTH)" device="KIT" value="10k"/>
 <part name="R5" library="SparkFun-Resistors" deviceset="10KOHM1/6W5%(PTH)" device="KIT" value="10k"/>
-<part name="GND1" library="SparkFun-Aesthetics" deviceset="GND2" device=""/>
 <part name="S1" library="SparkFun-Electromechanical" deviceset="SWITCH-SPDT" device="SMD2"/>
 <part name="SG1" library="SparkFun-Electromechanical" deviceset="BUZZER" device="NS"/>
 <part name="U$2" library="SparkFun-Electromechanical" deviceset="MOTOR" device="10MM"/>
@@ -2508,8 +2475,8 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <part name="R7" library="SparkFun-Resistors" deviceset="100OHM1/10W1%(0603)" device="" value="100"/>
 <part name="U1" library="SparkFun-Sensors" deviceset="MPU-9150" device="QFN-24-NP"/>
 <part name="R8" library="SparkFun-Resistors" deviceset="10KOHM1/6W5%(PTH)" device="KIT" value="10k"/>
-<part name="D2" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="PTH"/>
 <part name="D3" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="PTH"/>
+<part name="D2" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="PTH"/>
 </parts>
 <sheets>
 <sheet>
@@ -2527,19 +2494,18 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <instance part="R3" gate="G$1" x="7.62" y="40.64"/>
 <instance part="R4" gate="G$1" x="7.62" y="27.94"/>
 <instance part="R5" gate="G$1" x="7.62" y="15.24"/>
-<instance part="GND1" gate="G$1" x="25.4" y="-12.7"/>
-<instance part="S1" gate="1" x="83.82" y="106.68"/>
+<instance part="S1" gate="1" x="93.98" y="106.68"/>
 <instance part="SG1" gate="G$1" x="30.48" y="114.3"/>
 <instance part="U$2" gate="G$1" x="40.64" y="104.14"/>
 <instance part="U$3" gate="G$1" x="134.62" y="76.2"/>
-<instance part="BAT1" gate="G$1" x="73.66" y="106.68" rot="R180"/>
+<instance part="BAT1" gate="G$1" x="76.2" y="106.68" rot="R180"/>
 <instance part="R6" gate="G$1" x="93.98" y="66.04"/>
 <instance part="D1" gate="G$1" x="86.36" y="27.94"/>
 <instance part="R7" gate="G$1" x="101.6" y="27.94"/>
 <instance part="U1" gate="G$1" x="53.34" y="5.08"/>
 <instance part="R8" gate="G$1" x="86.36" y="55.88" rot="R90"/>
-<instance part="D2" gate="G$1" x="68.58" y="114.3" rot="R90"/>
-<instance part="D3" gate="G$1" x="78.74" y="114.3" rot="R270"/>
+<instance part="D3" gate="G$1" x="86.36" y="106.68"/>
+<instance part="D2" gate="G$1" x="63.5" y="106.68"/>
 </instances>
 <busses>
 </busses>
@@ -2711,21 +2677,24 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <segment>
 <pinref part="BAT1" gate="G$1" pin="+"/>
 <pinref part="S1" gate="1" pin="P"/>
-<wire x1="81.28" y1="106.68" x2="78.74" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="106.68" x2="81.28" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="119.38" x2="81.28" y2="106.68" width="0.1524" layer="91"/>
+<junction x="81.28" y="106.68"/>
+<pinref part="D3" gate="G$1" pin="A"/>
 <pinref part="D3" gate="G$1" pin="C"/>
-<wire x1="78.74" y1="111.76" x2="78.74" y2="106.68" width="0.1524" layer="91"/>
-<junction x="78.74" y="106.68"/>
+<wire x1="83.82" y1="106.68" x2="88.9" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="106.68" x2="91.44" y2="106.68" width="0.1524" layer="91"/>
+<junction x="81.28" y="119.38"/>
 </segment>
 </net>
 <net name="N$10" class="0">
 <segment>
 <pinref part="S1" gate="1" pin="S"/>
 <pinref part="U$1" gate="G$1" pin="RAW"/>
-<wire x1="73.66" y1="81.28" x2="88.9" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="88.9" y1="81.28" x2="88.9" y2="104.14" width="0.1524" layer="91"/>
-<wire x1="88.9" y1="104.14" x2="114.3" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="81.28" x2="99.06" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="81.28" x2="99.06" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="104.14" x2="114.3" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="U$3" gate="G$1" pin="VDD"/>
-<junction x="88.9" y="104.14"/>
 </segment>
 </net>
 <net name="N$21" class="0">
@@ -2747,22 +2716,6 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <wire x1="111.76" y1="93.98" x2="45.72" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="93.98" x2="45.72" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="81.28" x2="53.34" y2="81.28" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="CHARGE+" class="0">
-<segment>
-<pinref part="D3" gate="G$1" pin="A"/>
-<wire x1="78.74" y1="116.84" x2="78.74" y2="119.38" width="0.1524" layer="91"/>
-<wire x1="78.74" y1="119.38" x2="101.6" y2="119.38" width="0.1524" layer="91"/>
-<junction x="101.6" y="119.38"/>
-</segment>
-</net>
-<net name="CHARGE-" class="0">
-<segment>
-<pinref part="D2" gate="G$1" pin="C"/>
-<wire x1="68.58" y1="116.84" x2="68.58" y2="121.92" width="0.1524" layer="91"/>
-<wire x1="68.58" y1="121.92" x2="101.6" y2="121.92" width="0.1524" layer="91"/>
-<junction x="101.6" y="121.92"/>
 </segment>
 </net>
 <net name="N$23" class="0">
@@ -2793,7 +2746,7 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <wire x1="48.26" y1="48.26" x2="50.8" y2="48.26" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="3.3V" class="0">
+<net name="N$3" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="GND@15"/>
 <wire x1="35.56" y1="-7.62" x2="33.02" y2="-7.62" width="0.1524" layer="91"/>
@@ -2827,23 +2780,22 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <pinref part="SG1" gate="G$1" pin="1"/>
 <wire x1="30.48" y1="111.76" x2="30.48" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="96.52" x2="40.64" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="40.64" y1="96.52" x2="63.5" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="D2" gate="G$1" pin="A"/>
+<wire x1="40.64" y1="96.52" x2="58.42" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="BAT1" gate="G$1" pin="-"/>
-<wire x1="68.58" y1="111.76" x2="68.58" y2="106.68" width="0.1524" layer="91"/>
-<junction x="68.58" y="106.68"/>
-<wire x1="68.58" y1="106.68" x2="63.5" y2="106.68" width="0.1524" layer="91"/>
-<wire x1="63.5" y1="96.52" x2="63.5" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="119.38" x2="71.12" y2="106.68" width="0.1524" layer="91"/>
+<junction x="71.12" y="106.68"/>
+<wire x1="71.12" y1="106.68" x2="66.04" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="66.04" y1="106.68" x2="60.96" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="106.68" x2="58.42" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="96.52" x2="58.42" y2="106.68" width="0.1524" layer="91"/>
 <junction x="40.64" y="96.52"/>
 <wire x1="157.48" y1="38.1" x2="157.48" y2="60.96" width="0.1524" layer="91"/>
 <pinref part="U$3" gate="G$1" pin="GND"/>
 <wire x1="157.48" y1="60.96" x2="154.94" y2="60.96" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="38.1" x2="25.4" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="25.4" y1="38.1" x2="25.4" y2="15.24" width="0.1524" layer="91"/>
-<pinref part="GND1" gate="G$1" pin="3.3V"/>
 <junction x="33.02" y="38.1"/>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="25.4" y1="15.24" x2="25.4" y2="-10.16" width="0.1524" layer="91"/>
 <wire x1="12.7" y1="66.04" x2="12.7" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="2"/>
 <wire x1="12.7" y1="53.34" x2="12.7" y2="40.64" width="0.1524" layer="91"/>
@@ -2857,7 +2809,9 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="12.7" y1="15.24" x2="25.4" y2="15.24" width="0.1524" layer="91"/>
 <junction x="12.7" y="15.24"/>
-<junction x="25.4" y="15.24"/>
+<pinref part="D2" gate="G$1" pin="A"/>
+<pinref part="D2" gate="G$1" pin="C"/>
+<junction x="71.12" y="119.38"/>
 </segment>
 </net>
 </nets>
