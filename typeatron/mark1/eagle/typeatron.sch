@@ -2477,6 +2477,7 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <part name="R8" library="SparkFun-Resistors" deviceset="10KOHM1/6W5%(PTH)" device="KIT" value="10k"/>
 <part name="D3" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="PTH"/>
 <part name="D2" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="PTH"/>
+<part name="D4" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="PTH"/>
 </parts>
 <sheets>
 <sheet>
@@ -2506,6 +2507,7 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <instance part="R8" gate="G$1" x="86.36" y="55.88" rot="R90"/>
 <instance part="D3" gate="G$1" x="86.36" y="106.68"/>
 <instance part="D2" gate="G$1" x="63.5" y="106.68"/>
+<instance part="D4" gate="G$1" x="86.36" y="81.28" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -2691,10 +2693,14 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <segment>
 <pinref part="S1" gate="1" pin="S"/>
 <pinref part="U$1" gate="G$1" pin="RAW"/>
-<wire x1="73.66" y1="81.28" x2="99.06" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="81.28" x2="88.9" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="81.28" x2="83.82" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="83.82" y1="81.28" x2="99.06" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="81.28" x2="99.06" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="104.14" x2="114.3" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="U$3" gate="G$1" pin="VDD"/>
+<pinref part="D4" gate="G$1" pin="A"/>
+<pinref part="D4" gate="G$1" pin="C"/>
 </segment>
 </net>
 <net name="N$21" class="0">
