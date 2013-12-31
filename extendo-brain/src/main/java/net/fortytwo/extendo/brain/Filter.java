@@ -1,7 +1,5 @@
 package net.fortytwo.extendo.brain;
 
-import net.fortytwo.extendo.brain.Atom;
-
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -86,7 +84,6 @@ public class Filter {
         if (null == atom) {
             throw new IllegalArgumentException();
         }
-
 
         float sharability = atom.getSharability();
         float weight = atom.getWeight();

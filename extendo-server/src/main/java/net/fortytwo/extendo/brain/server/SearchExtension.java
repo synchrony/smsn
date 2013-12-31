@@ -11,9 +11,10 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
+import org.json.JSONException;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 
 /**
  * A service for executing keyword search over an Extend-o-Brain graph
@@ -29,30 +30,22 @@ public class SearchExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for performing full text search over an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "query", description = "full-text query") String query,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName,
-                                           @ExtensionRequestParameter(name = "valueCutoff", description = "cutoff for long values") Integer valueCutoff) {
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+        Params p = createParams(context, (KeyIndexableGraph) graph);
+        SearchRequest r;
         try {
-            // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
-            query = new String(query.getBytes(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
+            r = new SearchRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
         }
 
-        logInfo("extendo search \"" + query + "\"");
+        //logInfo("extendo search \"" + query + "\"");
 
-
-        Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.depth = depth;
-        p.query = query;
-        p.styleName = styleName;
-        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
-        p.valueCutoff = valueCutoff;
+        p.depth = r.depth;
+        p.query = r.query;
+        p.styleName = r.styleName;
+        p.filter = r.filter;
+        p.valueCutoff = r.valueCutoff;
 
         return handleRequestInternal(p);
     }
@@ -81,5 +74,15 @@ public class SearchExtension extends ExtendoExtension {
     protected void addSearchResults(final Params p) throws IOException {
         Note n = p.queries.search(p.query, p.depth, p.filter, p.style);
         addView(n, p);
+    }
+
+    protected class SearchRequest extends BasicSearchRequest {
+        public final int valueCutoff;
+
+        public SearchRequest(String jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            valueCutoff = json.getInt(VALUE_CUTOFF);
+        }
     }
 }

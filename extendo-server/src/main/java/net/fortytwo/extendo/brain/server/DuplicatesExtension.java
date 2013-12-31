@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
+import org.json.JSONException;
 import org.openrdf.model.Graph;
 
 import java.io.UnsupportedEncodingException;
@@ -36,14 +37,18 @@ public class DuplicatesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability) {
-        logInfo("extendo duplicates");
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
+        FilteredResultsRequest r;
+        try {
+            r = new FilteredResultsRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+        //logInfo("extendo duplicates");
+
+        p.filter = r.filter;
 
         return handleRequestInternal(p);
     }

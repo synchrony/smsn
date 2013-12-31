@@ -12,7 +12,9 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.ActivityLog;
 import net.fortytwo.extendo.brain.BrainGraph;
+import org.json.JSONException;
 
+import java.security.Principal;
 import java.util.logging.Logger;
 
 /**
@@ -29,32 +31,37 @@ public class SetPropertiesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for setting properties of given atoms")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "id", description = "id of the atom to be changed") String id,
-                                           @ExtensionRequestParameter(name = "name", description = "name of the property to be changed") String name,
-                                           @ExtensionRequestParameter(name = "value", description = "value of the property to be changed") Float value) {
-        logInfo("extendo set " + id);
-
-        if (name.equals("weight")) {
-            // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
-            if (value <= 0 || value > 1.0) {
-                return ExtensionResponse.error("weight is outside of range (0, 1]: " + value);
-            }
-        } else if (name.equals("sharability")) {
-            if (value <= 0 || value > 1.0) {
-                return ExtensionResponse.error("sharability is outside of range (0, 1]: " + value);
-            }
-        } else if (name.equals("priority")) {
-            if (value < 0 || value > 1.0) {
-                return ExtensionResponse.error("priority is outside of range [0, 1]: " + value);
-            }
-        } else {
-            return ExtensionResponse.error("unknown property: " + name);
-        }
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+        //logInfo("extendo view: " + request);
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.propertyName = name;
-        p.propertyValue = value;
-        p.rootId = id;
+        SetPropertiesRequest r;
+        try {
+            r = new SetPropertiesRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+        if (r.name.equals("weight")) {
+            // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
+            if (r.value <= 0 || r.value > 1.0) {
+                return ExtensionResponse.error("weight is outside of range (0, 1]: " + r.value);
+            }
+        } else if (r.name.equals("sharability")) {
+            if (r.value <= 0 || r.value > 1.0) {
+                return ExtensionResponse.error("sharability is outside of range (0, 1]: " + r.value);
+            }
+        } else if (r.name.equals("priority")) {
+            if (r.value < 0 || r.value > 1.0) {
+                return ExtensionResponse.error("priority is outside of range [0, 1]: " + r.value);
+            }
+        } else {
+            return ExtensionResponse.error("unknown property: " + r.name);
+        }
+
+        p.propertyName = r.name;
+        p.propertyValue = r.value;
+        p.rootId = r.id;
 
         return handleRequestInternal(p);
     }
@@ -89,5 +96,19 @@ public class SetPropertiesExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return true;
+    }
+
+    protected class SetPropertiesRequest extends Request {
+        public final String id;
+        public final String name;
+        public final float value;
+
+        public SetPropertiesRequest(String jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            id = json.getString(ID);
+            name = json.getString(NAME);
+            value = (float) json.getDouble(VALUE);
+        }
     }
 }

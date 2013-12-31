@@ -519,98 +519,80 @@
          " :weight [" (num-or-nil-to-string tn-min-weight) ", " (num-or-nil-to-string tn-default-weight) ", " (num-or-nil-to-string tn-max-weight) "]"
          " :value \"" tn-title "\")"))  ;; TODO: actually escape the title string
 
-(defun request-view (preserve-line mode root depth style mins maxs defaults minw maxw)
+(defun request-view (preserve-line mode root depth style mins maxs defaults minw maxw defaultw)
     (setq tn-current-line (if preserve-line (line-number-at-pos) 1))
     (setq tn-future-sharability defaults)
-    (http-get (request-view-url root depth style mins maxs minw maxw) (receive-view mode)))
+    (http-get (request-view-url root depth style mins maxs defaults minw maxw defaultw) (receive-view mode)))
 
-(defun request-view-url  (root depth style mins maxs minw maxw)
-	(concat (base-url) "view"
-            "?root=" (w3m-url-encode-string root)
-            "&depth=" (number-to-string depth)
-            "&minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)
-            "&style=" style
-            "&includeTypes=" (if (using-inference) "true" "false")))
+(defun prop (key value)
+    (cons key (cons value nil)))
+
+(defun filter-json (mins maxs defaults minw maxw defaultw)
+    (list :minSharability mins :maxSharability maxs :defaultSharability defaults :minWeight minw :maxWeight maxw :defaultWeight defaultw))
+
+(defun request-view-url (root depth style mins maxs defaults minw maxw defaultw)
+    (concat (base-url) "view?request=" (w3m-url-encode-string (json-encode
+        (list :root root :depth depth :style style :includeTypes (if (using-inference) "true" "false") :filter (filter-json mins maxs defaults minw maxw defaultw))))))
 
 (defun request-history (mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "history"
-            "?minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+        (concat (base-url) "history?request=" (w3m-url-encode-string (json-encode
+            (list :filter (filter-json mins maxs tn-default-sharability minw maxw tn-default-weight)))))
+        (receive-view tn-search-mode)))
 
 (defun request-events (depth)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "get-events"
-            "?depth=" (number-to-string depth)) (receive-view tn-search-mode)))
+        (concat (base-url) "get-events?request=" (w3m-url-encode-string (json-encode
+            (list :depth depth))))
+        (receive-view tn-search-mode)))
 
 (defun request-duplicates (mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "duplicates"
-            "?minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+        (concat (base-url) "duplicates?request=" (w3m-url-encode-string (json-encode
+            (list :filter (filter-json mins maxs tn-default-sharability minw maxw tn-default-weight)))))
+        (receive-view tn-search-mode)))
 
 (defun request-search-results (query style mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "search"
-            "?query=" (w3m-url-encode-string query)
-            "&valueCutoff=" (number-to-string tn-value-truncation-length)
-            "&depth=1"
-            "&style=" style
-            "&minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+        (concat (base-url) "search?request=" (w3m-url-encode-string (json-encode
+            (list :query query :valueCutoff tn-value-truncation-length :depth 1 :style style
+                :filter (filter-json mins maxs tn-default-sharability minw maxw tn-default-weight)))))
+        (receive-view tn-search-mode)))
 
 (defun request-priorities-results (mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "priorities"
-            "?maxResults=100"
-            "&minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+        (concat (base-url) "priorities?request=" (w3m-url-encode-string (json-encode
+            (list :maxResults 100
+                :filter (filter-json mins maxs tn-default-sharability minw maxw tn-default-weight)))))
+        (receive-view tn-search-mode)))
 
 (defun request-find-roots-results (style mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "find-roots"
-            "?depth=1"
-            "&style=" style
-            "&minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+        (concat (base-url) "find-roots?request=" (w3m-url-encode-string (json-encode
+            (list :style style :depth 1
+                :filter (filter-json mins maxs tn-default-sharability minw maxw tn-default-weight)))))
+        (receive-view tn-search-mode)))
 
 (defun request-ripple-results (query style mins maxs minw maxw)
     (setq tn-current-line 1)
     (setq tn-future-sharability tn-default-sharability)
     (http-get
-        (concat (base-url) "ripple"
-            "?query=" (w3m-url-encode-string query)
-            "&depth=1"
-            "&style=" style
-            "&minSharability=" (number-to-string mins)
-            "&maxSharability=" (number-to-string maxs)
-            "&minWeight=" (number-to-string minw)
-            "&maxWeight=" (number-to-string maxw)) (receive-view tn-search-mode)))
+        (concat (base-url) "ripple?request=" (w3m-url-encode-string (json-encode
+            (list :query query :depth 1 :style style
+                :filter (filter-json mins maxs tn-default-sharability minw maxw tn-default-weight)))))
+             (receive-view tn-search-mode)))
 
 (defun do-export ()
     (http-get
@@ -629,7 +611,7 @@
     (interactive)
     (let ((key (current-target-id)))
         (if key
-            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight)
+            (request-view nil (mode-for-visit) key tn-depth tn-style tn-min-sharability tn-max-sharability (future-sharability (current-target-sharability)) tn-min-weight tn-max-weight tn-default-weight)
             (no-target))))
 
 (defun tn-history ()
@@ -712,34 +694,34 @@
 (defun tn-refresh-view ()
     (interactive)
     (if (in-view)
-        (request-view t tn-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view t tn-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
 (defun tn-enter-edit-view ()
     (interactive)
     (if (and (in-view) (equal tn-mode tn-readonly-mode))
-        (request-view t tn-edit-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view t tn-edit-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
 (defun tn-enter-readonly-view ()
     (interactive)
     (if (and (in-view) (equal tn-mode tn-edit-mode))
-        (request-view t tn-readonly-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view t tn-readonly-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
 (defun tn-choose-depth ()
     (interactive)
     (let ((depth (read-character-as-number)))
             (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
                 (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
-                    (request-view nil tn-mode tn-root-id depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))))
+                    (request-view nil tn-mode tn-root-id depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))))
 
 (defun tn-refresh-to-forward-view ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root-id tn-depth tn-forward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view nil tn-mode tn-root-id tn-depth tn-forward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
 (defun tn-refresh-to-backward-view ()
     (interactive)
     (if (in-view)
-        (request-view nil tn-mode tn-root-id tn-depth tn-backward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)))
+        (request-view nil tn-mode tn-root-id tn-depth tn-backward-view-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
 
 
 ;; set weight ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -757,7 +739,7 @@
 
 (defun set-min-weight (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight)
+        (request-view t tn-mode tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability s tn-max-weight tn-default-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -782,7 +764,7 @@
 
 (defun set-min-sharability (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t tn-mode tn-root-id tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight)
+        (request-view t tn-mode tn-root-id tn-depth tn-style s tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -806,16 +788,12 @@
         (http-post
             (concat (base-url) "update")
             (list
-                (list "root" tn-root-id)
-                (list "view" entity)
-                (list "style" tn-style)
-                (list "minSharability" (number-to-string tn-min-sharability))
-                (list "maxSharability" (number-to-string tn-max-sharability))
-                (list "defaultSharability" (number-to-string tn-default-sharability))
-                (list "minWeight" (number-to-string tn-min-weight))
-                (list "maxWeight" (number-to-string tn-max-weight))
-                (list "defaultWeight" (number-to-string tn-default-weight))
-                (list "depth" (number-to-string tn-depth)))
+                (list "request" (json-encode (list
+                    :root tn-root-id
+                    :depth (number-to-string tn-depth)
+                    :style tn-style
+                    :view entity
+                    :filter (filter-json tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))))
             (receive-view tn-edit-mode)))))
 
 (defun set-property (id name value)
@@ -823,14 +801,12 @@
     (if (in-view)
         (lexical-let (
                 (mode tn-mode)
-                (url (request-view-url tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight)))
+                (url (request-view-url tn-root-id tn-depth tn-style tn-min-sharability tn-max-sharability tn-default-sharability tn-min-weight tn-max-weight tn-default-weight)))
             (setq tn-current-line (line-number-at-pos))
             (setq tn-future-sharability tn-default-sharability)
             (http-get
-                (concat (base-url) "set"
-                    "?id=" (w3m-url-encode-string id)
-                    "&name=" name
-                    "&value=" (number-to-string value))
+                (concat (base-url) "set?request=" (w3m-url-encode-string (json-encode
+                    (list :id id :name name :value value))))
 	(lambda (status)
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
             (if status

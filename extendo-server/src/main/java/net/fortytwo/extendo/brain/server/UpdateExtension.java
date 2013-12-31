@@ -13,9 +13,11 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteQueries;
+import org.json.JSONException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.security.Principal;
 
 /**
  * A service for updating an Extend-o-Brain graph
@@ -30,36 +32,22 @@ public class UpdateExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "update an Extend-o-Brain graph using the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "defaultWeight", description = "weight of new atoms added to the view") Float defaultWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "defaultSharability", description = "sharability of new atoms added to the view") Float defaultSharability,
-                                           @ExtensionRequestParameter(name = "view", description = "the updated view") String view,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
 
-        logInfo("extendo update " + rootId + " (depth " + depth + ")");
+        //logInfo("extendo update: " + request);
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.depth = depth;
-        p.rootId = rootId;
-        p.styleName = styleName;
-        p.view = view;
-
-        // TODO: remove these; they're only for debugging a Rexster issue
-        /*
-        if (minWeight > 1000) minWeight = 1000f;
-        if (maxWeight > 1000) maxWeight = 1000f;
-        if (defaultWeight > 1000) defaultWeight = 1000f;
-        if (minSharability > 1000) minSharability = 1000f;
-        if (maxSharability > 1000) maxSharability = 1000f;
-        if (defaultSharability > 1000) defaultSharability = 1000f;
-        */
-
-        p.filter = createFilter(p.user, minWeight, maxWeight, defaultWeight, minSharability, maxSharability, defaultSharability);
+        UpdateRequest r;
+        try {
+            r = new UpdateRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+        p.depth = r.depth;
+        p.rootId = r.rootId;
+        p.styleName = r.styleName;
+        p.wikiView = r.wikiView;
+        p.filter = r.filter;
 
         return handleRequestInternal(p);
     }
@@ -67,7 +55,7 @@ public class UpdateExtension extends ExtendoExtension {
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
         Note rootNote;
 
-        InputStream in = new ByteArrayInputStream(p.view.getBytes());
+        InputStream in = new ByteArrayInputStream(p.wikiView.getBytes());
         try {
             rootNote = p.parser.fromWikiText(in);
         } finally {
@@ -93,5 +81,16 @@ public class UpdateExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return true;
+    }
+
+    private class UpdateRequest extends RootedViewRequest {
+        public final String wikiView;
+
+        public UpdateRequest(final String jsonStr,
+                             final Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            wikiView = json.getString(VIEW);
+        }
     }
 }

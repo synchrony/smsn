@@ -11,7 +11,9 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
+import org.json.JSONException;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -26,11 +28,18 @@ public class GetEventsExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for retrieving the stack of recently pushed events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the event view") Integer depth) {
-        logInfo("extendo get-events");
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.depth = depth;
+        GetEventsRequest r;
+        try {
+            r = new GetEventsRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+        //logInfo("extendo get-events");
+
+        p.depth = r.depth;
 
         return handleRequestInternal(p);
     }
@@ -70,5 +79,15 @@ public class GetEventsExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return false;
+    }
+
+    protected class GetEventsRequest extends Request {
+        public final int depth;
+
+        public GetEventsRequest(String jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            depth = json.getInt(DEPTH);
+        }
     }
 }

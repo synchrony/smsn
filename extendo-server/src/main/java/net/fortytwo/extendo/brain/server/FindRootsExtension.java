@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
+import org.json.JSONException;
 
 import java.io.IOException;
 
@@ -26,16 +27,20 @@ public class FindRootsExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        logInfo("extendo find-roots");
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.styleName = styleName;
-        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
+        BasicViewRequest r;
+        try {
+            r = new BasicViewRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+        //logInfo("extendo find-roots");
+
+        p.depth = r.depth;
+        p.styleName = r.styleName;
+        p.filter = r.filter;
 
         return handleRequestInternal(p);
     }
@@ -56,7 +61,7 @@ public class FindRootsExtension extends ExtendoExtension {
     }
 
     protected void addRoots(final Params p) throws IOException {
-        Note n = p.queries.findRoots(p.filter, p.style);
+        Note n = p.queries.findRoots(p.filter, p.style, p.depth - 1);
         addView(n, p);
     }
 }

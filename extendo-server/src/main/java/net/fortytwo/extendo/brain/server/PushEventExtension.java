@@ -12,11 +12,8 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
-import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 /**
  * A service for receiving and internalizing events
@@ -34,15 +31,17 @@ public class PushEventExtension extends ExtendoExtension {
         logInfo("extendo push-event");
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.view = event;
+        try {
+            p.jsonView = new JSONObject(event);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e);
+        }
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        InputStream in = new ByteArrayInputStream(p.view.getBytes());
-        JSONObject j = new JSONObject(IOUtils.toString(in, "UTF-8"));
-        Note event = p.parser.fromJSON(j);
+        Note event = p.parser.fromJSON(p.jsonView);
 
         p.brain.getEventStack().push(event);
 

@@ -29,20 +29,21 @@ public class RippleExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for performing Ripple queries over Extend-o-Brain graphs")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "query", description = "Ripple query") String query,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName) {
-        logInfo("extendo ripple \"" + query + "\"");
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.depth = depth;
-        p.query = query;
-        p.styleName = styleName;
-        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
+        BasicSearchRequest r;
+        try {
+            r = new BasicSearchRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+//        logInfo("extendo ripple \"" + query + "\"");
+
+        p.depth = r.depth;
+        p.query = r.query;
+        p.styleName = r.styleName;
+        p.filter = r.filter;
 
         return handleRequestInternal(p);
     }

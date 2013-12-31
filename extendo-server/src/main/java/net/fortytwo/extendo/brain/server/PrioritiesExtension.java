@@ -11,6 +11,9 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
+import org.json.JSONException;
+
+import java.security.Principal;
 
 /**
  * A service for deriving a prioritized list of items in the knowledge base
@@ -26,29 +29,19 @@ public class PrioritiesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for deriving a prioritized list of items in the knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "maxResults", description = "maximum number of results to display") Integer maxResults) {
-        logInfo("extendo priorities");
-        Params p;
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+        Params p = createParams(context, (KeyIndexableGraph) graph);
+        PrioritiesRequest r;
         try {
-            p = createParams(context, (KeyIndexableGraph) graph);
-            p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
-
-            if (null == maxResults) {
-                maxResults = DEFAULT_MAX_RESULTS;
-            } else if (maxResults <= 0) {
-                return ExtensionResponse.error("maxResults parameter must be a positive integer");
-            }
-
-            p.maxResults = maxResults;
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            return ExtensionResponse.error(e);
+            r = new PrioritiesRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
         }
+
+        //logInfo("extendo priorities");
+
+        p.filter = r.filter;
+        p.maxResults = r.maxResults;
 
         return handleRequestInternal(p);
     }
@@ -67,5 +60,19 @@ public class PrioritiesExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return false;
+    }
+
+    protected class PrioritiesRequest extends FilteredResultsRequest {
+        public final int maxResults;
+
+        public PrioritiesRequest(String jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            maxResults = json.optInt(MAX_RESULTS, DEFAULT_MAX_RESULTS);
+
+            if (maxResults <= 0) {
+                throw new JSONException(MAX_RESULTS + " parameter must be a positive integer");
+            }
+        }
     }
 }

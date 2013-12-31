@@ -341,14 +341,15 @@ public class NoteQueries {
     }
 
     public Note findRoots(final Filter filter,
-                          final AdjacencyStyle style) {
+                          final AdjacencyStyle style,
+                          final int depth) {
 
         Note result = new Note();
 
         for (Vertex v : store.getGraph().getVertices()) {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
-                Note n = viewInternal(store.getAtom(v), 0, filter, style, null);
+                Note n = viewInternal(store.getAtom(v), depth, filter, style, null);
                 result.addChild(n);
             }
         }

@@ -12,6 +12,9 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
+import org.json.JSONException;
+
+import java.security.Principal;
 
 /**
  * A service for retrieving hierarchical views of Extend-o-Brain graphs
@@ -26,22 +29,22 @@ public class ViewExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph in the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "root", description = "root atom (vertex) of the view") String rootId,
-                                           @ExtensionRequestParameter(name = "depth", description = "depth of the view") Integer depth,
-                                           @ExtensionRequestParameter(name = "minWeight", description = "minimum-weight criterion for atoms in the view") Float minWeight,
-                                           @ExtensionRequestParameter(name = "maxWeight", description = "maximum-weight criterion for atoms in the view") Float maxWeight,
-                                           @ExtensionRequestParameter(name = "minSharability", description = "minimum-sharability criterion for atoms in the view") Float minSharability,
-                                           @ExtensionRequestParameter(name = "maxSharability", description = "maximum-sharability criterion for atoms in the view") Float maxSharability,
-                                           @ExtensionRequestParameter(name = "style", description = "the style of view to generate") String styleName,
-                                           @ExtensionRequestParameter(name = "includeTypes", defaultValue = "false", description = "whether to include inferred types in the view") Boolean includeTypes) {
-        logInfo("extendo view " + rootId + " (depth " + depth + ")");
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+        //logInfo("extendo view: " + request);
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.depth = depth;
-        p.rootId = rootId;
-        p.styleName = styleName;
-        p.filter = createFilter(p.user, minWeight, maxWeight, -1, minSharability, maxSharability, -1);
-        p.includeTypes = includeTypes;
+        ViewRequest r;
+        try {
+            r = new ViewRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+        p.depth = r.depth;
+        p.rootId = r.rootId;
+        p.styleName = r.styleName;
+        p.filter = r.filter;
+        p.includeTypes = r.includeTypes;
 
         return handleRequestInternal(p);
     }
@@ -63,5 +66,17 @@ public class ViewExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return false;
+    }
+
+    public class ViewRequest extends RootedViewRequest {
+        public final boolean includeTypes;
+
+        public ViewRequest(final String jsonStr,
+                           final Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            // this argument is optional; do not include types by default
+            includeTypes = json.optBoolean(INCLUDE_TYPES, false);
+        }
     }
 }
