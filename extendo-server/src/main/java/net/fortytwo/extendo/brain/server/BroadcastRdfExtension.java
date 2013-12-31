@@ -12,9 +12,11 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.util.properties.PropertyException;
+import org.json.JSONException;
 import org.openrdf.rio.RDFFormat;
 
 import java.io.IOException;
+import java.security.Principal;
 
 /**
  * A service for broadcasting events modeled in RDF to all peers in the environment
@@ -34,11 +36,18 @@ public class BroadcastRdfExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for broadcasting events modeled in RDF to all peers in the environment")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "dataset", description = "a dataset in the TRiG format") String dataset) {
-        logInfo("extendo broadcast-rdf");
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        p.data = dataset;
+        BroadcastRdfRequest r;
+        try {
+            r = new BroadcastRdfRequest(request, p.user);
+        } catch (JSONException e) {
+            return ExtensionResponse.error(e.getMessage());
+        }
+
+        //logInfo("extendo broadcast-rdf");
+
+        p.data = r.dataset;
 
         return handleRequestInternal(p);
     }
@@ -59,5 +68,15 @@ public class BroadcastRdfExtension extends ExtendoExtension {
     protected boolean doesWrite() {
         // pushing of events is currently not considered writing... to the graph
         return false;
+    }
+
+    protected class BroadcastRdfRequest extends Request {
+        public final String dataset;
+
+        public BroadcastRdfRequest(String jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            dataset = json.getString(DATASET);
+        }
     }
 }

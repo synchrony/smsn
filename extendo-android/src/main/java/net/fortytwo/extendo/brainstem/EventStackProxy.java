@@ -35,15 +35,17 @@ public class EventStackProxy {
 
     public void push(final Note event) {
 
-        JSONObject j;
+        JSONObject r;
         try {
-            j = writer.toJSON(event);
+            JSONObject view = writer.toJSON(event);
+            r = new JSONObject();
+            r.put("view", view);
         } catch (JSONException e) {
             Log.e(Brainstem.TAG, "failed to create event JSON: " + e.getMessage());
             return;
         }
 
-        Log.i(Brainstem.TAG, "pushing event to endpoint " + endpointUrl + " with data " + j);
+        Log.i(Brainstem.TAG, "pushing event to endpoint " + endpointUrl + " with data " + r);
 
         try {
             HttpPost request = new HttpPost(endpointUrl);
@@ -51,7 +53,7 @@ public class EventStackProxy {
             //request.setEntity(new StringEntity(j.toString()));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("view", j.toString()));
+            params.add(new BasicNameValuePair("request", r.toString()));
             request.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse response = httpclient.execute(request);

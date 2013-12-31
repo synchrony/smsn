@@ -4,30 +4,14 @@ import edu.rpi.twc.sesamestream.QueryEngine;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineProxy;
 import net.fortytwo.rdfagents.data.DatasetFactory;
-import net.fortytwo.rdfagents.model.Dataset;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.Rio;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -129,6 +113,7 @@ public class ExtendoAgent {
         }
     }
 
+    /*
     public void broadcastDataset(final Dataset d) throws RDFHandlerException, IOException {
         if (null == service) {
             LOGGER.info("can't broadcast dataset; no facilitator service has been discovered");
@@ -190,6 +175,7 @@ public class ExtendoAgent {
             LOGGER.severe("failed to push gestural event RDF: " + statusLine.getReasonPhrase());
         }
     }
+    */
 
     private class Service {
         public InetAddress address;

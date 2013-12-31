@@ -303,24 +303,25 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
 
     protected class Request {
         protected static final String
-                ROOT = "root",
+                DATASET = "dataset",
+                DEFAULT_SHARABILITY = "defaultSharability",
+                DEFAULT_WEIGHT = "defaultWeight",
                 DEPTH = "depth",
                 FILTER = "filter",
-                STYLE = "style",
-                INCLUDE_TYPES = "includeTypes",
-                MIN_WEIGHT = "minWeight",
-                MAX_WEIGHT = "maxWeight",
-                DEFAULT_WEIGHT = "defaultWeight",
-                MIN_SHARABILITY = "minSharability",
-                MAX_SHARABILITY = "maxSharability",
-                DEFAULT_SHARABILITY = "defaultSharability",
-                VIEW = "view",
                 ID = "id",
+                INCLUDE_TYPES = "includeTypes",
+                MAX_RESULTS = "maxResults",
+                MAX_SHARABILITY = "maxSharability",
+                MAX_WEIGHT = "maxWeight",
+                MIN_SHARABILITY = "minSharability",
+                MIN_WEIGHT = "minWeight",
                 NAME = "name",
-                VALUE = "value",
                 QUERY = "query",
+                ROOT = "root",
+                STYLE = "style",
+                VALUE = "value",
                 VALUE_CUTOFF = "valueCutoff",
-                MAX_RESULTS = "maxResults";
+                VIEW = "view";
 
         protected final JSONObject json;
         protected final Principal user;

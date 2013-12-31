@@ -15,6 +15,8 @@ import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.Principal;
+
 /**
  * A service for receiving and internalizing events
  *
@@ -27,15 +29,18 @@ public class PushEventExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for receiving and internalizing events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "view", description = "the view of the event to push") String event) {
-        logInfo("extendo push-event");
-
+                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
+        PushEventRequest r;
         try {
-            p.jsonView = new JSONObject(event);
+            r = new PushEventRequest(request, p.user);
         } catch (JSONException e) {
-            return ExtensionResponse.error(e);
+            return ExtensionResponse.error(e.getMessage());
         }
+
+        //logInfo("extendo push-event");
+
+        p.jsonView = r.jsonView;
 
         return handleRequestInternal(p);
     }
@@ -55,5 +60,15 @@ public class PushEventExtension extends ExtendoExtension {
     protected boolean doesWrite() {
         // pushing of events is currently not considered writing... to the graph
         return false;
+    }
+
+    protected class PushEventRequest extends Request {
+        public final JSONObject jsonView;
+
+        public PushEventRequest(String jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
+
+            jsonView = json.getJSONObject(VIEW);
+        }
     }
 }

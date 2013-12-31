@@ -2,6 +2,8 @@ package net.fortytwo.extendo.p2p;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
@@ -19,7 +21,7 @@ import java.io.IOException;
  */
 public class ExampleBroadcaster {
 
-    private void sendExampleDataset() throws RDFHandlerException, IOException {
+    private void sendExampleDataset() throws RDFHandlerException, IOException, JSONException {
         String endpoint = "http://localhost:8182/graphs/joshkb/extendo/broadcast-rdf";
 
         String content;
@@ -47,7 +49,10 @@ public class ExampleBroadcaster {
 
         //method.addRequestHeader("Content-Type", "application/json");
 
-        method.addParameter("dataset", content);
+        JSONObject r = new JSONObject();
+        r.put("dataset", content);
+
+        method.addParameter("request", r.toString());
         client.executeMethod(method);
         String responseBody = method.getResponseBodyAsString();
         System.out.println("response body: " + responseBody);
