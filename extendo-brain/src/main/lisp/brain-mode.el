@@ -628,14 +628,18 @@
     (request-duplicates
         tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))
 
-(defun tn-search ()
+;; non-interactive search, for use with emacsclient
+(defun tn-search (query)
+    (if (> (length query) 0)
+        (request-search-results
+            query
+            tn-style
+            tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight)))
+
+(defun tn-search-interactive ()
     (interactive)
     (let ((query (read-from-minibuffer "query: ")))
-        (if (> (length query) 0)
-            (request-search-results
-                query
-                tn-style
-                tn-min-sharability tn-max-sharability tn-min-weight tn-max-weight))))
+        (tn-search query)))
 
 (defun tn-priorities ()
     (interactive)
@@ -997,6 +1001,8 @@
     (beginning-of-buffer)(end-of-line))
 
 
+;; KEYBOARD MAPPINGS ;;;;;;;;;;;;;;;;;;;
+
 ;; Note: when updating this list of mappings, also update the PKB
 (global-set-key (kbd "C-c C-a C-s")     'insert-attr-sharability)
 (global-set-key (kbd "C-c C-a C-w")     'insert-attr-weight)
@@ -1059,11 +1065,26 @@
 (global-set-key (kbd "C-c P")           'tn-priorities)
 (global-set-key (kbd "C-c p")           'tn-push-view)
 (global-set-key (kbd "C-c r")           'tn-ripple-query)
-(global-set-key (kbd "C-c s")           'tn-search)
+(global-set-key (kbd "C-c s")           'tn-search-interactive)
 (global-set-key (kbd "C-c t")           'tn-visit-target)
 (global-set-key (kbd "C-c u")           'tn-refresh-view)
 (global-set-key (kbd "C-c v")           'tn-events)
 
+
+;; WRAPPERS FOR EMACSCLIENT ;;;;;;;;;;;;
+
+(defun do-in-current-buffer (f)
+    (set-buffer (window-buffer (selected-window)))
+    (funcall f))
+
+(defun tn-arrow-down ()
+    (do-in-current-buffer 'next-line))
+
+(defun tn-insert-char (ch)
+    (do-in-current-buffer (lambda () (insert-char ch))))
+
+
+;; OTHER ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun tn-toggle-emacspeak ()
     (interactive)
