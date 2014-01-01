@@ -77,6 +77,7 @@ const int keyPin4 = 8;
 const int keyPin5 = 12;
 const int vibrationMotorPin = 3;
 const int transducerPin = 5;  
+const int laserPin = 6;
 const int ledPin =  13;
 
 // note: blue and green pins were wired in reverse w.r.t. the BL-L515 datasheet
@@ -148,6 +149,7 @@ void setup() {
 
     pinMode(vibrationMotorPin, OUTPUT);
     pinMode(transducerPin, OUTPUT); 
+    pinMode(laserPin, OUTPUT);
     pinMode(ledPin, OUTPUT);
     pinMode(redPin, OUTPUT);
     pinMode(greenPin, OUTPUT);
@@ -411,6 +413,11 @@ void loop() {
     } else {
         digitalWrite(ledPin, LOW);
         noTone(transducerPin);
+    }
+    if (input[4] == HIGH) {
+        digitalWrite(laserPin, HIGH);
+    } else {
+        digitalWrite(laserPin, LOW);
     }
     
     if (inputState != lastInputState) {
