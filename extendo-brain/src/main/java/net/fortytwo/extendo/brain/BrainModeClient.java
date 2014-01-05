@@ -307,8 +307,8 @@ public class BrainModeClient {
                     if (cur.startsWith(command)) {
                         return State.COMMAND;
                     } else {
-                        System.err.println("state = " + state);
-                        System.err.println("comparing command " + command + " with " + cur);
+                        //System.err.println("state = " + state);
+                        //System.err.println("comparing command " + command + " with " + cur);
                         throw new IOException("unknown command: " + command);
                     }
                 } else {

@@ -1,9 +1,6 @@
 /*
  * Monomanual Typeatron firmware, copyright 2013 by Joshua Shinavier
- * See: https://github.com/joshsh/extendo
- *
- * Connect the push button switches to pins 2-6 in a pulldown configuration
- * Connect the piezo buzzer to pin 7 and GND
+ * See: https://github.com/joshsh/extendo and the Typeatron Mark 1 EAGLE schematic.
  *
  * D0:  Bluetooth RX 
  * D1:  Bluetooth TX
@@ -34,7 +31,7 @@
 //#define DEBUG
 
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
-#define USE_BLUETOOTH
+//#define USE_BLUETOOTH
 
 #ifdef DEBUG
 #define EOL '@'
@@ -90,8 +87,6 @@ const int photoresistorPin = A1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned int lastInputState = 0;
-
 char serialInputStr[256];
 
 unsigned int serialInputPtr = 0;
@@ -100,6 +95,8 @@ unsigned int serialInputPtr = 0;
 // This 2ms value is a conservative estimate based on an average over many kinds of switches.
 // See "A Guide to Debouncing" by Jack G. Ganssle
 unsigned int debounceMicros = 2000;
+
+char errstr[128];
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +124,173 @@ void writeRGBColor(unsigned long color)
   analogWrite(redPin, 255 - (unsigned int) red);
   analogWrite(greenPin, 255 - (unsigned int) green);
   analogWrite(bluePin, 255 - (unsigned int) blue);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct StateNode {
+    char *symbol;
+    StateNode *nextNodes[5];
+};
+
+struct StateNode *newStateNode() {
+    StateNode *n = (StateNode*) malloc(sizeof(StateNode));
+
+    n->symbol = NULL;
+
+    for (int i = 0; i < 5; i++) {
+        n->nextNodes[i] = NULL;
+    }
+
+    return n;
+}
+
+void destroyStateNode(StateNode *n) {
+    if (n->symbol) {
+        free(n->symbol);
+    }
+
+    for (int i = 0; i < 5; i++) {
+        StateNode *next = n->nextNodes[i];
+        if (next) {
+            destroyStateNode(next);
+        }
+    }
+
+    free(n);
+}
+
+StateNode *stateTree;
+StateNode *currentButtonState;
+int totalButtonsCurrentlyPressed;
+
+void addKeyMapping(const char *sequence, const char *symbol) {
+    StateNode *cur = stateTree;
+    int l = strlen(sequence);
+    for (int j = 0; j < l; j++) {
+//sprintf(errstr, "\t%d", sequence[j]-48);
+//SLIPSerial.println(errstr);
+        int index = sequence[j] - 49;
+        StateNode *next = cur->nextNodes[index];
+        if (!next) {
+            next = newStateNode();
+            cur->nextNodes[index] = next;
+        }
+
+        cur = next;
+    }
+
+    if (cur->symbol) {
+        sprintf(errstr, "conflicting symbols for sequence %s", sequence);
+//SLIPSerial.println(errstr);
+//            error(errstr);
+    } else {
+        cur->symbol = (char*) malloc(strlen(symbol) + 1);
+        strcpy(cur->symbol, symbol);  
+    }
+}
+
+void setupParser() {  
+    // TODO: shouldn't assume the device powers up with no buttons pressed, although this is likely
+    totalButtonsCurrentlyPressed = 0;
+
+    stateTree = newStateNode();
+    currentButtonState = stateTree;
+    
+    // map keys in individual calls, rather than wasting valuable SRAM on a temporary array
+    addKeyMapping("2112", "a");
+    //addKeyMapping("2121", ""},
+    addKeyMapping("2332", "e");
+    addKeyMapping("2323", "w");
+    addKeyMapping("2442", "i");
+    addKeyMapping("2424", "y");
+    addKeyMapping("2552", "o");
+    addKeyMapping("2525", "u");
+    addKeyMapping("3113", "p");
+    addKeyMapping("3131", "b");
+    addKeyMapping("3223", "t");
+    addKeyMapping("3232", "d");
+    addKeyMapping("3443", "k");
+    addKeyMapping("3434", "g");
+    addKeyMapping("3553", "q");
+    //addKeyMapping("3535", ""},
+    addKeyMapping("4114", "f");
+    addKeyMapping("4141", "v");
+// sacrifice some keys to save memory (otherwise, we run into the stack)
+/*
+    addKeyMapping("4224", "c");
+    addKeyMapping("4242", "j");
+*/
+    addKeyMapping("4334", "s");
+    addKeyMapping("4343", "z");
+    addKeyMapping("4554", "h");
+    addKeyMapping("4545", "x");
+    addKeyMapping("5115", "m");
+    //addKeyMapping("5151", ""},
+    addKeyMapping("5225", "n");
+    //addKeyMapping("5252", ""},
+    addKeyMapping("5335", "l");
+    //addKeyMapping("5353", ""},
+    addKeyMapping("5445", "r");
+    //addKeyMapping("5454", ""}
+
+//SLIPSerial.println("done setting up parser");
+}
+
+// note: provided on general principle, but never actually used, as loop() never exits
+void teardownParser() {
+    destroyStateNode(stateTree);
+}
+
+// buttonIndex: 0 (thumb) through 4 (pinky)
+void buttonEvent(int buttonIndex) {
+    if (currentButtonState) {
+        currentButtonState = currentButtonState->nextNodes[buttonIndex];
+    }
+}
+
+void buttonPressed(int buttonIndex) {
+//sprintf(errstr, "buttonPressed(%d)", buttonIndex);
+//SLIPSerial.println(errstr);
+    totalButtonsCurrentlyPressed++;
+
+    buttonEvent(buttonIndex);
+}
+
+void buttonReleased(int buttonIndex) {
+//sprintf(errstr, "buttonReleased(%d)", buttonIndex);
+//SLIPSerial.println(errstr);
+    totalButtonsCurrentlyPressed--;
+
+    buttonEvent(buttonIndex);
+
+    // at present, events are triggered when the last key of a sequence is released
+    if (0 == totalButtonsCurrentlyPressed) {
+//SLIPSerial.println("done");
+        if (currentButtonState) {
+//SLIPSerial.println("\tstate-non-null");          
+            // TODO
+            const char *symbol = currentButtonState->symbol;
+            if (symbol) {
+//sprintf("\t%s", symbol);
+SLIPSerial.println(symbol);      
+
+/*
+                OSCMessage m("/exo/tt/key");
+                m.add(symbol);
+                sendOSC(m);
+*/
+                //Serial.println(symbol);
+            }
+//else {
+//sprintf(errstr, "\tchildren: %d %d %d %d %d", currentButtonState->nextNodes[0], currentButtonState->nextNodes[1], currentButtonState->nextNodes[2], currentButtonState->nextNodes[3], currentButtonState->nextNodes[4]);
+//SLIPSerial.println(errstr);
+//}
+        }
+
+        currentButtonState = stateTree;
+    }
 }
 
 
@@ -170,7 +334,9 @@ void setup() {
 //#endif
 
     serialInputPtr = 0; 
-   
+
+    setupParser();
+
     startupSequence();
 }
 
@@ -287,7 +453,6 @@ void getIntValues(int values[])
 
 void readSerial() {
     int ch;
-    char errstr[128];
 
     while (SLIPSerial.available() > 0) {
         ch = SLIPSerial.read();
@@ -366,6 +531,8 @@ void error(char *message) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+unsigned int lastInput[5] = {0,0,0,0,0};
+
 void loop() {
   // TODO: restore me
     //readSerial();
@@ -401,11 +568,7 @@ void loop() {
     input[2] = digitalRead(keyPin3);
     input[3] = digitalRead(keyPin4);
     input[4] = digitalRead(keyPin5);
-  
-    for (int i = 0; i < 5; i++) {
-      inputState |= input[i] << i;  
-    }
-    
+
     // bells and whistles
     if (input[0] == HIGH) {     
         digitalWrite(ledPin, HIGH); 
@@ -419,28 +582,44 @@ void loop() {
     } else {
         digitalWrite(laserPin, LOW);
     }
-    
-    if (inputState != lastInputState) {
-        unsigned int before = micros();
 
-        char keys[6];
-        for (int i = 0; i < 5; i++) {
-            keys[i] = input[i] + 48;
+    int changed = 0;
+    unsigned int before;
+
+    for (int i = 0; i < 5; i++) {
+        // Generally, at most one button should change per time step
+        // However, if two buttons change state, it is an arbitrary choice w.r.t. which one changed first
+        if (input[i] != lastInput[i]) {
+            before = micros();
+            changed = true;
+            if (input[i]) {
+                buttonPressed(i);
+            } else {
+                buttonReleased(i);
+            }
         }
-        keys[5] = 0;
-
-        OSCMessage m("/exo/tt/keys");
-        m.add(keys);
-
-        sendOSC(m);
-
-        unsigned int after = micros();
         
+        lastInput[i] = input[i];
+    }
+
+//        char keys[6];
+//        for (int i = 0; i < 5; i++) {
+//            keys[i] = input[i] + 48;
+//        }
+//        keys[5] = 0;
+//
+//        OSCMessage m("/exo/tt/keys");
+//        m.add(keys);
+//
+//        sendOSC(m);
+
+    // artificial delay to prevent spurious button presses and releases due to bouncing switches
+    if (changed) {
+        unsigned int after = micros();
         if (after - before < debounceMicros) {
             delayMicroseconds(debounceMicros - (after - before));
         }
-    }
-  
-    lastInputState = inputState;
+    }   
 }
+
 
