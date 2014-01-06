@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.brain;
 
-import groovy.json.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

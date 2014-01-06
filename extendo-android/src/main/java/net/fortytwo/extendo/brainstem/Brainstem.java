@@ -228,7 +228,7 @@ public class Brainstem {
         if (null != typeatronAddress) {
             Log.i(TAG, "loading Typeatron device at address " + typeatronAddress);
             typeatron
-                    = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor);
+                    = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor, toaster);
             addBluetoothDevice(typeatron);
         }
     }
