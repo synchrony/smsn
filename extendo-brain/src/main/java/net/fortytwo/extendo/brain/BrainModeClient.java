@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brain;
 
+import net.fortytwo.extendo.Extendo;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.BufferedReader;
@@ -9,12 +10,15 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainModeClient {
-    private static final boolean DEBUG = true;
+    private static final Logger LOGGER = Extendo.getLogger(BrainModeClient.class);
+
+    private static final boolean DEBUG = false;
 
     private final InputStream inputstream;
 
@@ -35,6 +39,8 @@ public class BrainModeClient {
 
     private final EmacsFunction insertFunction = new EmacsFunction("insert", true);
 
+    private String executable = "emacsclient";
+
     private EmacsFunctionExecutor functionExecutor = new EmacsFunctionExecutor() {
         public Process execute(EmacsFunction function, String argument) throws InterruptedException, IOException {
             String expr = function.getRequiresArgument()
@@ -42,7 +48,7 @@ public class BrainModeClient {
                     : "(" + function.getName() + ")";
             expr = "(exo-emacsclient-eval (lambda () " + expr + "))";
 
-            Process p = Runtime.getRuntime().exec(new String[]{"emacsclient", "-e", expr});
+            Process p = Runtime.getRuntime().exec(new String[]{executable, "-e", expr});
             p.waitFor();
 
             if (DEBUG) {
@@ -89,6 +95,10 @@ public class BrainModeClient {
         functions.put("s-Z", new EmacsFunction("redo", false));
 
         functions.put("DEL", new EmacsFunction("delete-backward-char 1", false));
+        // TODO: ESC is currently a no-op...
+        functions.put("ESC", new EmacsFunction("+40 2", false));
+        //functions.put("RET", ...
+        //functions.put("SPACE", ...
         functions.put("up", new EmacsFunction("previous-line", false));
         functions.put("down", new EmacsFunction("next-line", false));
         functions.put("left", new EmacsFunction("backward-char", false));
@@ -164,6 +174,10 @@ public class BrainModeClient {
         Arrays.sort(shortcuts);
     }
 
+    public void setExecutable(final String executable) {
+        this.executable = executable;
+    }
+
     public void setFunctionExecutor(final EmacsFunctionExecutor executor) {
         this.functionExecutor = executor;
     }
@@ -232,7 +246,7 @@ public class BrainModeClient {
                         lastState = state;
                         state = State.ESCAPE;
                     } else if ('\n' == c) { // newline signals the end of an interactive argument
-                        functionExecutor.execute(currentFunction, textBuffer.toString());
+                        execute(currentFunction, textBuffer.toString());
                         reset();
                     } else {
                         textBuffer.append((char) c);
@@ -299,7 +313,7 @@ public class BrainModeClient {
 
                         return State.ARGUMENT;
                     } else {
-                        functionExecutor.execute(f, null);
+                        execute(f, null);
                         reset();
                         return State.TEXT;
                     }
@@ -318,28 +332,28 @@ public class BrainModeClient {
                     }
                 }
             }
-            /*
-            if (event.equals("up")) {
-                emacsClientCall("(exo-arrow-up)");
-            } else if (event.equals("down")) {
-                emacsClientCall("(exo-arrow-down)");
-            } else if (event.equals("left")) {
-                emacsClientCall("(exo-arrow-left)");
-            } else if (event.equals("right")) {
-                emacsClientCall("(exo-arrow-right)");
-            } else if (event.equals("C-c")) {
-                return State.COMMAND_OUT;
-            } else {
-                throw new IOException("unknown event type: " + event);
-            }
-            */
         } else {
             throw new IOException("empty event: <>");
         }
     }
 
     private void writeTextBuffer(final String text) throws IOException, InterruptedException {
-        functionExecutor.execute(insertFunction, text);
+        execute(insertFunction, text);
+    }
+
+    private void execute(final EmacsFunction f, final String text) throws IOException, InterruptedException {
+        Process p = functionExecutor.execute(f, text);
+
+        if (null != p && 0 != p.exitValue()) {
+            LOGGER.warning("failed to execute emacs function " + f.getName() + (f.requiresArgument ? " with argument " + text : "") + " (exit code = " + p.exitValue() + "). Output (if any) follows.");
+
+            InputStream in = p.getErrorStream();
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            String line;
+            while (null != (line = r.readLine())) {
+                System.err.println("\tout: " + line);
+            }
+        }
     }
 
 /*

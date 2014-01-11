@@ -26,4 +26,10 @@ public abstract class BluetoothDeviceControl {
         // if you connect in onStart() you must not forget to disconnect when your app is closed
         Amarino.disconnect(context, address);
     }
+
+    public class DeviceInitializationException extends Exception {
+        public DeviceInitializationException(final Throwable cause) {
+            super(cause);
+        }
+    }
 }

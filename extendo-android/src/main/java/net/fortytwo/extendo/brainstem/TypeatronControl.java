@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brainstem;
 
+import android.util.Log;
 import android.widget.EditText;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.Main;
@@ -49,10 +50,13 @@ public class TypeatronControl extends BluetoothDeviceControl {
     private StateNode currentButtonState;
     private int totalButtonsCurrentlyPressed;
 
+    private final BrainModeClientWrapper brainModeWrapper;
+
     public TypeatronControl(final String address,
                             final OSCDispatcher oscDispatcher,
                             final EditText textEditor,
-                            final Main.Toaster toaster) {
+                            final Main.Toaster toaster,
+                            final boolean emacsAvailable) throws DeviceInitializationException {
         super(address);
         this.toaster = toaster;
 
@@ -62,7 +66,12 @@ public class TypeatronControl extends BluetoothDeviceControl {
             public void handle(final OSCMessage message) {
                 Object[] args = message.getArguments();
                 if (1 == args.length) {
-                    inputReceived(((String) args[0]).getBytes());
+                    try {
+                        inputReceived(((String) args[0]).getBytes());
+                    } catch (IOException e) {
+                        Log.e(Brainstem.TAG, "failed to relay Typeatron input");
+                        e.printStackTrace(System.err);
+                    }
                     textEditor.setText("Typeatron keys: " + args[0] + " (" + totalButtonsCurrentlyPressed + " pressed)");
                 } else {
                     textEditor.setText("Typeatron control error (wrong # of args)");
@@ -80,16 +89,54 @@ public class TypeatronControl extends BluetoothDeviceControl {
                 }
             }
         });
+
+        // TODO: temporary... assume Emacs is available, even if we can't detect it...
+        boolean forceEmacsAvailable = true;  // emacsAvailable
+
+        try {
+            brainModeWrapper = forceEmacsAvailable ? new BrainModeClientWrapper() : null;
+        } catch (IOException e) {
+            throw new DeviceInitializationException(e);
+        }
     }
 
-    private void tryBrainmodeClient() throws IOException {
+    private class BrainModeClientWrapper {
+        private boolean isAlive;
+        private final PipedOutputStream source;
 
-        PipedOutputStream pout = new PipedOutputStream();
+        public BrainModeClientWrapper() throws IOException {
+            source = new PipedOutputStream();
 
-        PipedInputStream pin = new PipedInputStream();
-        pin.connect(pout);
+            PipedInputStream sink = new PipedInputStream(source);
 
-        BrainModeClient client = new BrainModeClient(pin);
+            final BrainModeClient client = new BrainModeClient(sink);
+            // since /usr/bin may not be in PATH
+            client.setExecutable("/usr/bin/emacsclient");
+
+            new Thread(new Runnable() {
+                public void run() {
+                    isAlive = true;
+
+                    try {
+                        client.run();
+                    } catch (Throwable t) {
+                        Log.e(Brainstem.TAG, "Brain-mode client thread died with error: " + t.getMessage());
+                        t.printStackTrace(System.err);
+                    } finally {
+                        isAlive = false;
+                    }
+                }
+            }).start();
+        }
+
+        public void write(final String symbol) throws IOException {
+            Log.i(Brainstem.TAG, (isAlive ? "" : "NOT ") + "writing '" + symbol + "' to Emacs");
+            source.write(symbol.getBytes());
+        }
+
+        public boolean isAlive() {
+            return isAlive;
+        }
     }
 
     private void addChord(final String sequence,
@@ -114,14 +161,14 @@ public class TypeatronControl extends BluetoothDeviceControl {
             if (null != cur.symbol && !cur.symbol.equals(outputSymbol)) {
                 throw new IllegalStateException("conflicting symbols for sequence " + sequence);
             }
-                cur.symbol = outputSymbol;
+            cur.symbol = outputSymbol;
         }
 
         if (null != outputMode) {
             if (null != cur.mode && cur.mode != outputMode) {
                 throw new IllegalArgumentException("conflicting output modes for sequence " + sequence);
             }
-                cur.mode = outputMode;
+            cur.mode = outputMode;
         }
 
         if (null != outputModifier) {
@@ -175,8 +222,10 @@ public class TypeatronControl extends BluetoothDeviceControl {
 
         // space, newline, delete, escape available in all of the text-entry modes
         for (Mode m : new Mode[]{Mode.LowercaseText, Mode.UppercaseText, Mode.Punctuation, Mode.Numeric}) {
-            addChord("22", null, null, "SPACE", m);
-            addChord("33", null, null, "RET", m);
+            addChord("22", null, null, " ", m);
+            //addChord("22", null, null, "SPACE", m);
+            addChord("33", null, null, "\n", m);
+            //addChord("33", null, null, "RET", m);
             addChord("44", null, null, "DEL", m);
             addChord("55", null, null, "ESC", m);
         }
@@ -311,18 +360,18 @@ public class TypeatronControl extends BluetoothDeviceControl {
         buttonEvent(buttonIndex);
     }
 
-    private String produceSymbol(final String symbol) {
+    private String modifySymbol(final String symbol) {
         switch (currentModifier) {
             case Control:
-                return symbol.length() == 1 ? "C-" + symbol : symbol;
+                return symbol.length() == 1 ? "<C-" + symbol + ">" : "<" + symbol + ">";
             case None:
-                return symbol;
+                return symbol.length() == 1 ? symbol : "<" + symbol + ">";
             default:
                 throw new IllegalStateException();
         }
     }
 
-    private void buttonReleased(int buttonIndex) {
+    private void buttonReleased(int buttonIndex) throws IOException {
         totalButtonsCurrentlyPressed--;
 
         buttonEvent(buttonIndex);
@@ -332,7 +381,11 @@ public class TypeatronControl extends BluetoothDeviceControl {
             if (null != currentButtonState) {
                 String symbol = currentButtonState.symbol;
                 if (null != symbol) {
-                    toaster.makeText("typed: " + produceSymbol(symbol));
+                    String mod = modifySymbol(symbol);
+                    toaster.makeText("typed: " + mod);
+                    if (null != brainModeWrapper) {
+                        brainModeWrapper.write(mod);
+                    }
                 } else {
                     Mode mode = currentButtonState.mode;
                     if (null != mode) {
@@ -351,7 +404,7 @@ public class TypeatronControl extends BluetoothDeviceControl {
         }
     }
 
-    private void inputReceived(byte[] input) {
+    private void inputReceived(byte[] input) throws IOException {
         for (int i = 0; i < 5; i++) {
             // Generally, at most one button should change per time step
             // However, if two buttons change state, it is an arbitrary choice w.r.t. which one changed first

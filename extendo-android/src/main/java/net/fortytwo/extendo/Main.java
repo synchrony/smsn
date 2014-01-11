@@ -64,7 +64,7 @@ public class Main extends Activity {
         findViewById(R.id.events).setOnClickListener(eventsListener);
 
         editor.setText("testing");
-        checkForEmacs();
+        boolean emacsAvailable = checkForEmacs();
 
         // Force the service to start.
         //     startService(new Intent(this, BrainPingService.class));
@@ -75,7 +75,7 @@ public class Main extends Activity {
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, l);
 
         try {
-            brainstem.initialize();
+            brainstem.initialize(emacsAvailable);
         } catch (Brainstem.BrainstemException e) {
             Log.e(Brainstem.TAG, "exception in Brainstem initialization: " + e.getMessage());
         }
@@ -213,7 +213,7 @@ public class Main extends Activity {
                 new KeyEvent(KeyEvent.ACTION_DOWN, a));
     }*/
 
-    private void checkForEmacs() {
+    private boolean checkForEmacs() {
         ActivityManager.RunningAppProcessInfo emacs = null;
         ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningAppProcessInfo p : am.getRunningAppProcesses()) {
@@ -223,7 +223,9 @@ public class Main extends Activity {
             }
         }
 
-        if (null != emacs) {
+        boolean emacsAvailable = null != emacs;
+
+        if (emacsAvailable) {
             editor.setText("Emacs is running");
         } else {
             editor.setText("Emacs is not running");
@@ -238,6 +240,8 @@ public class Main extends Activity {
         ComponentName ci = taskInfo.get(0).topActivity;
         ci.getPackageName();
         */
+
+        return emacsAvailable;
     }
 
     // a helper object which allows Toasts to be displayed from non-UI threads

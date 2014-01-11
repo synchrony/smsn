@@ -74,6 +74,7 @@ public class Brainstem {
 
     private Context context;
     private final Main.Toaster toaster;
+    private boolean emacsAvailable;
 
     public Brainstem(final Main.Toaster toaster) throws ExtendoBrain.ExtendoBrainException {
         this.toaster = toaster;
@@ -101,7 +102,9 @@ public class Brainstem {
      * Load and configure resources with dependencies which cannot be resolved at construction time,
      * such as (currently) the text editor
      */
-    public void initialize() throws BrainstemException {
+    public void initialize(boolean emacsAvailable) throws BrainstemException {
+        this.emacsAvailable = emacsAvailable;
+
         try {
             loadConfiguration();
         } catch (PropertyException e) {
@@ -227,8 +230,12 @@ public class Brainstem {
         String typeatronAddress = configuration.getProperty(PROP_TYPEATRON_ADDRESS);
         if (null != typeatronAddress) {
             Log.i(TAG, "loading Typeatron device at address " + typeatronAddress);
-            typeatron
-                    = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor, toaster);
+            try {
+                typeatron
+                        = new TypeatronControl(typeatronAddress, oscDispatcher, textEditor, toaster, emacsAvailable);
+            } catch (BluetoothDeviceControl.DeviceInitializationException e) {
+                throw new BrainstemException(e);
+            }
             addBluetoothDevice(typeatron);
         }
     }
