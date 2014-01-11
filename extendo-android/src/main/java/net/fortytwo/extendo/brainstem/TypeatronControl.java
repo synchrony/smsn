@@ -119,6 +119,8 @@ public class TypeatronControl extends BluetoothDeviceControl {
 
                     try {
                         client.run();
+                    } catch (BrainModeClient.ExecutionException e) {
+                        Log.e(Brainstem.TAG, "Brain-mode client giving up due to execution exception: " + e.getMessage());
                     } catch (Throwable t) {
                         Log.e(Brainstem.TAG, "Brain-mode client thread died with error: " + t.getMessage());
                         t.printStackTrace(System.err);
@@ -130,12 +132,8 @@ public class TypeatronControl extends BluetoothDeviceControl {
         }
 
         public void write(final String symbol) throws IOException {
-            Log.i(Brainstem.TAG, (isAlive ? "" : "NOT ") + "writing '" + symbol + "' to Emacs");
+            Log.i(Brainstem.TAG, (isAlive ? "" : "NOT ") + "writing '" + symbol + "' to Emacs...");
             source.write(symbol.getBytes());
-        }
-
-        public boolean isAlive() {
-            return isAlive;
         }
     }
 

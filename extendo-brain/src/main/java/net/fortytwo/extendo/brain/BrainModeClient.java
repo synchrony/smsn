@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brain;
 
+import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.Extendo;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -47,6 +48,7 @@ public class BrainModeClient {
                     ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
                     : "(" + function.getName() + ")";
             expr = "(exo-emacsclient-eval (lambda () " + expr + "))";
+//if (true) throw new IOException("evaluating this expression: " + expr);
 
             Process p = Runtime.getRuntime().exec(new String[]{executable, "-e", expr});
             p.waitFor();
@@ -182,7 +184,7 @@ public class BrainModeClient {
         this.functionExecutor = executor;
     }
 
-    public void run() throws IOException, InterruptedException {
+    public void run() throws IOException, InterruptedException, ExecutionException {
         // note: this call to reset() makes it unnecessary to reset() before throwing parse errors
         reset();
 
@@ -271,7 +273,7 @@ public class BrainModeClient {
         lastState = null;
     }
 
-    private void finishText() throws IOException, InterruptedException {
+    private void finishText() throws IOException, InterruptedException, ExecutionException {
         if (textBuffer.length() > 0) {
             String text = textBuffer.toString();
             textBuffer.setLength(0);
@@ -280,7 +282,7 @@ public class BrainModeClient {
         }
     }
 
-    private State matchCommand() throws IOException, InterruptedException {
+    private State matchCommand() throws IOException, InterruptedException, ExecutionException {
         if (textBuffer.length() > 0) {
             String event = textBuffer.toString();
             textBuffer.setLength(0);
@@ -337,22 +339,26 @@ public class BrainModeClient {
         }
     }
 
-    private void writeTextBuffer(final String text) throws IOException, InterruptedException {
+    private void writeTextBuffer(final String text) throws IOException, InterruptedException, ExecutionException {
         execute(insertFunction, text);
     }
 
-    private void execute(final EmacsFunction f, final String text) throws IOException, InterruptedException {
+    private void execute(final EmacsFunction f, final String text) throws IOException, InterruptedException, ExecutionException {
         Process p = functionExecutor.execute(f, text);
 
         if (null != p && 0 != p.exitValue()) {
-            LOGGER.warning("failed to execute emacs function " + f.getName() + (f.requiresArgument ? " with argument " + text : "") + " (exit code = " + p.exitValue() + "). Output (if any) follows.");
+            StringBuilder sb = new StringBuilder();
+            sb.append("failed to execute emacs function ")
+            .append(f.getName()).append(f.requiresArgument ? " with argument " + text : "")
+            .append(" (exit code = ").append(p.exitValue()).append(").");
 
-            InputStream in = p.getErrorStream();
-            BufferedReader r = new BufferedReader(new InputStreamReader(in));
-            String line;
-            while (null != (line = r.readLine())) {
-                System.err.println("\tout: " + line);
+            byte[] out = IOUtil.readBytes(p.getErrorStream());
+            if (out.length > 0) {
+                sb.append(" Output: ");
+                sb.append(new String(out));
             }
+
+            throw new ExecutionException(sb.toString());
         }
     }
 
@@ -385,5 +391,15 @@ public class BrainModeClient {
     public interface EmacsFunctionExecutor {
         Process execute(EmacsFunction function,
                         String argument) throws InterruptedException, IOException;
+    }
+
+    public class ExecutionException extends Exception {
+        public ExecutionException(final Throwable cause) {
+            super(cause);
+        }
+
+        public ExecutionException(final String message) {
+            super(message);
+        }
     }
 }

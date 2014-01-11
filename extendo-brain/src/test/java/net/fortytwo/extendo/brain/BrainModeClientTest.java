@@ -52,7 +52,7 @@ public class BrainModeClientTest extends TestCase {
     }
 
     private void assertExpected(final String input,
-                                final String... outputs) throws IOException, InterruptedException {
+                                final String... outputs) throws Exception {
         results.clear();
 
         InputStream in = new ByteArrayInputStream(input.getBytes());
