@@ -1,25 +1,18 @@
 package net.fortytwo.extendo.brain;
 
 import info.aduna.io.IOUtil;
-import net.fortytwo.extendo.Extendo;
 import org.apache.commons.lang.StringEscapeUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainModeClient {
-    private static final Logger LOGGER = Extendo.getLogger(BrainModeClient.class);
-
-    private static final boolean DEBUG = false;
 
     private final InputStream inputstream;
 
@@ -48,28 +41,9 @@ public class BrainModeClient {
                     ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
                     : "(" + function.getName() + ")";
             expr = "(exo-emacsclient-eval (lambda () " + expr + "))";
-//if (true) throw new IOException("evaluating this expression: " + expr);
 
             Process p = Runtime.getRuntime().exec(new String[]{executable, "-e", expr});
             p.waitFor();
-
-            if (DEBUG) {
-                System.out.println(expr);
-                InputStream in = p.getInputStream();
-                BufferedReader r = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while (null != (line = r.readLine())) {
-                    System.out.println("\tinput: " + line);
-                }
-
-                in = p.getErrorStream();
-                r = new BufferedReader(new InputStreamReader(in));
-                while (null != (line = r.readLine())) {
-                    System.out.println("\terror: " + line);
-                }
-
-                System.out.println("\texit value: " + p.exitValue());
-            }
 
             return p;
         }
@@ -323,8 +297,6 @@ public class BrainModeClient {
                     if (cur.startsWith(command)) {
                         return State.COMMAND;
                     } else {
-                        //System.err.println("state = " + state);
-                        //System.err.println("comparing command " + command + " with " + cur);
                         throw new IOException("unknown command: " + command);
                     }
                 } else {
@@ -352,22 +324,21 @@ public class BrainModeClient {
             .append(f.getName()).append(f.requiresArgument ? " with argument " + text : "")
             .append(" (exit code = ").append(p.exitValue()).append(").");
 
+            byte[] in = IOUtil.readBytes(p.getInputStream());
+            if (in.length > 0) {
+                sb.append("\nInput: ");
+                sb.append(new String(in));
+            }
+
             byte[] out = IOUtil.readBytes(p.getErrorStream());
             if (out.length > 0) {
-                sb.append(" Output: ");
+                sb.append("\nOutput: ");
                 sb.append(new String(out));
             }
 
             throw new ExecutionException(sb.toString());
         }
     }
-
-/*
-
-<C-c>ssandbox
-<C-c>t<down><down><down><down><down><C-c>t
-
-*/
 
     public class EmacsFunction {
         private final String name;
@@ -394,10 +365,6 @@ public class BrainModeClient {
     }
 
     public class ExecutionException extends Exception {
-        public ExecutionException(final Throwable cause) {
-            super(cause);
-        }
-
         public ExecutionException(final String message) {
             super(message);
         }

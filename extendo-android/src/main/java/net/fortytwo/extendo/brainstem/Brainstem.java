@@ -89,16 +89,6 @@ public class Brainstem {
     }
 
     /**
-     * Supplies a Brainstem configuration.
-     * Otherwise, the configuration will be loaded from the default location on disk: /sdcard/brainstem.props
-     *
-     * @param conf the configuration properties
-     */
-    public void setConfiguration(final Properties conf) {
-        configuration = conf;
-    }
-
-    /**
      * Load and configure resources with dependencies which cannot be resolved at construction time,
      * such as (currently) the text editor
      */
