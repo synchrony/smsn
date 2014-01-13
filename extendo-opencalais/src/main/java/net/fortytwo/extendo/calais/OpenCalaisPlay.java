@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.calais;
+package net.fortytwo.extendo.calais;
 
 import mx.bigdata.jcalais.CalaisClient;
 import mx.bigdata.jcalais.CalaisConfig;
