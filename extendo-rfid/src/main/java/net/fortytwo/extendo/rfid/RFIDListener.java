@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.rfid;
+package net.fortytwo.extendo.rfid;
 
 import com.alien.enterpriseRFID.discovery.AlienDiscoverySocketException;
 import com.alien.enterpriseRFID.discovery.AlienDiscoveryUnknownReaderException;
