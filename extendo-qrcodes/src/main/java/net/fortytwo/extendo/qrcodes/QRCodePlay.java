@@ -1,11 +1,10 @@
-package net.fortytwo.qrcodes;
+package net.fortytwo.extendo.qrcodes;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.Extendo;
 
 import javax.swing.*;
@@ -18,7 +17,7 @@ import java.util.Hashtable;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class QRCodesStuff {
+public class QRCodePlay {
     public enum Style {
         /**
          * Generates compact (Version 1) but not very application-friendly QR codes
@@ -43,7 +42,7 @@ public class QRCodesStuff {
     private final Style style;
     private final Hashtable<EncodeHintType, Object> hints;
 
-    public QRCodesStuff(final Style style) {
+    public QRCodePlay(final Style style) {
         writer = new QRCodeWriter();
         this.style = style;
         hints = new Hashtable<EncodeHintType, Object>();
@@ -130,7 +129,7 @@ public class QRCodesStuff {
         int rows = 1;// 11;
         int cols = 1;// 8;
 
-        QRCodesStuff stuff = new QRCodesStuff(Style.VERSION1_COMPACT);
+        QRCodePlay stuff = new QRCodePlay(Style.VERSION1_COMPACT);
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
