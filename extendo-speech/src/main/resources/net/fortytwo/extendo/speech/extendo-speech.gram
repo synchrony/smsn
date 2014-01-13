@@ -1,10 +1,10 @@
 #JSGF V1.0;
 
 /**
- * JSGF Grammar for MyOtherBrain
+ * JSGF Grammar for Extendo Speech
  */
 
-grammar mobspeech;
+grammar extendo-speech;
 
 public <command> = (Testing | Nonsense | Computer)
     ( Date

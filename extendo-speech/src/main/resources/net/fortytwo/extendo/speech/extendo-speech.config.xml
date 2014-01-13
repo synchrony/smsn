@@ -96,7 +96,7 @@
         <property name="dictionary" value="dictionary"/>
         <property name="grammarLocation"
              value="resource:/net/fortytwo/myotherbrain/speech/"/>
-        <property name="grammarName" value="mobspeech"/>
+        <property name="grammarName" value="extendo-speech"/>
 	<property name="logMath" value="logMath"/>
     </component>
 

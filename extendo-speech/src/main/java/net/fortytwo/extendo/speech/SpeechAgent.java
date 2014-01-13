@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.speech;
+package net.fortytwo.extendo.speech;
 
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
@@ -44,7 +44,7 @@ public class SpeechAgent {
     }
 
     private void doit() throws InterruptedException {
-        ConfigurationManager cm = new ConfigurationManager(SpeechAgent.class.getResource("mobspeech.config.xml"));
+        ConfigurationManager cm = new ConfigurationManager(SpeechAgent.class.getResource("extendo-speech.config.xml"));
 
         new Thread() {
             @Override

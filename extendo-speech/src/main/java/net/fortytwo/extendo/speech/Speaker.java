@@ -1,4 +1,4 @@
-package net.fortytwo.myotherbrain.speech;
+package net.fortytwo.extendo.speech;
 
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
