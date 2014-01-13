@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -11,44 +11,52 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.util.properties.PropertyException;
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.openrdf.rio.RDFFormat;
 
+import java.io.IOException;
 import java.security.Principal;
 
 /**
- * A service for receiving and internalizing events
+ * A service for broadcasting events modeled in RDF to all peers in the environment
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "push-event")
-public class PushEventExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "broadcast-rdf")
+public class BroadcastRdfExtension extends ExtendoExtension {
+
+    private final FacilitatorService facilitator;
+
+    public BroadcastRdfExtension() throws IOException, PropertyException {
+        facilitator =  FacilitatorService.getInstance();
+    }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "a service for receiving and internalizing events")
+    @ExtensionDescriptor(description = "a service for broadcasting events modeled in RDF to all peers in the environment")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        PushEventRequest r;
+        BroadcastRdfRequest r;
         try {
-            r = new PushEventRequest(request, p.user);
+            r = new BroadcastRdfRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo push-event");
+        //logInfo("extendo broadcast-rdf");
 
-        p.jsonView = r.jsonView;
+        p.data = r.dataset;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        Note event = p.parser.fromJSON(p.jsonView);
+        // TODO: take RDF format as an input parameter
+        RDFFormat format = RDFFormat.NTRIPLES;
 
-        p.brain.getEventStack().push(event);
+        facilitator.pushUpdate(p.data, format);
 
         return ExtensionResponse.ok(p.map);
     }
@@ -62,13 +70,13 @@ public class PushEventExtension extends ExtendoExtension {
         return false;
     }
 
-    protected class PushEventRequest extends Request {
-        public final JSONObject jsonView;
+    protected class BroadcastRdfRequest extends Request {
+        public final String dataset;
 
-        public PushEventRequest(String jsonStr, Principal user) throws JSONException {
+        public BroadcastRdfRequest(String jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
-            jsonView = json.getJSONObject(VIEW);
+            dataset = json.getString(DATASET);
         }
     }
 }

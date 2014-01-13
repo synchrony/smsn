@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -10,48 +10,44 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
- * A service for executing Ripple queries over Extend-o-Brain graphs
+ * A service for finding recently visited atoms
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "ripple")
-//@ExtensionDescriptor(description = "execute a Ripple query over an Extend-o-Brain graph")
-public class RippleExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "history")
+//@ExtensionDescriptor(description = "find recently visited atoms")
+public class HistoryExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing Ripple queries over Extend-o-Brain graphs")
+    @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        BasicSearchRequest r;
+        FilteredResultsRequest r;
         try {
-            r = new BasicSearchRequest(request, p.user);
+            r = new FilteredResultsRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-//        logInfo("extendo ripple \"" + query + "\"");
+        //logInfo("extendo history");
 
-        p.depth = r.depth;
-        p.query = r.query;
-        p.styleName = r.styleName;
         p.filter = r.filter;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        addSearchResults(p);
+        List<String> ids = getHistory(p.context, p.brain.getBrainGraph(), p.filter);
 
-        p.map.put("title", p.query);
+        addView(p.queries.customView(ids, p.filter), p);
+
         return ExtensionResponse.ok(p.map);
     }
 
@@ -61,19 +57,5 @@ public class RippleExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return false;
-    }
-
-    protected void addSearchResults(final Params p) throws IOException {
-        // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
-        Note n = new Note();
-        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
-        JSONObject json;
-
-        try {
-            json = p.writer.toJSON(n);
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
-        p.map.put("view", json.toString());
     }
 }

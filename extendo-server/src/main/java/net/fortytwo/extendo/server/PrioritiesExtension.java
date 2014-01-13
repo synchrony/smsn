@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -14,80 +14,65 @@ import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 
 import java.security.Principal;
-import java.util.List;
 
 /**
- * A service for retrieving the stack of recently pushed events
+ * A service for deriving a prioritized list of items in the knowledge base
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "get-events")
-public class GetEventsExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "priorities")
+public class PrioritiesExtension extends ExtendoExtension {
+
+    private static final int DEFAULT_MAX_RESULTS = 100;
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "a service for retrieving the stack of recently pushed events")
+    @ExtensionDescriptor(description = "an extension for deriving a prioritized list of items in the knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        GetEventsRequest r;
+        PrioritiesRequest r;
         try {
-            r = new GetEventsRequest(request, p.user);
+            r = new PrioritiesRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo get-events");
+        //logInfo("extendo priorities");
 
-        p.depth = r.depth;
+        p.filter = r.filter;
+        p.maxResults = r.maxResults;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        List<Note> events = p.brain.getEventStack().getEvents();
 
-        /*
-        // temporary, for debugging
-        if (0 == events.size()) {
-            Note debugNote = new Note();
-            debugNote.setValue("test event");
-            debugNote.setWeight(0.5f);
-            debugNote.setSharability(0.5f);
-            p.brain.getEventStack().push(debugNote);
-        }
-        */
-
-        Note view = new Note();
-        view.setValue("event stack");
-
-        for (Note n : events) {
-            Note e = new Note(n);
-            e.truncate(p.depth);
-            view.addChild(e);
-        }
-
-        addView(view, p);
+        Note n = p.queries.priorityView(p.filter, p.maxResults, p.brain.getPriorities());
+        addView(n, p);
 
         return ExtensionResponse.ok(p.map);
     }
 
     protected boolean doesRead() {
-        // getting events is currently not considered reading... from the graph
-        return false;
+        return true;
     }
 
     protected boolean doesWrite() {
         return false;
     }
 
-    protected class GetEventsRequest extends Request {
-        public final int depth;
+    protected class PrioritiesRequest extends FilteredResultsRequest {
+        public final int maxResults;
 
-        public GetEventsRequest(String jsonStr, Principal user) throws JSONException {
+        public PrioritiesRequest(String jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
-            depth = json.getInt(DEPTH);
+            maxResults = json.optInt(MAX_RESULTS, DEFAULT_MAX_RESULTS);
+
+            if (maxResults <= 0) {
+                throw new JSONException(MAX_RESULTS + " parameter must be a positive integer");
+            }
         }
     }
 }

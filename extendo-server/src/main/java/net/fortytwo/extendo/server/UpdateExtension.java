@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;

@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -13,44 +13,53 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.security.Principal;
 
 /**
- * A service for deriving a prioritized list of items in the knowledge base
- *
+ * A service for executing keyword search over an Extend-o-Brain graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "priorities")
-public class PrioritiesExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "search")
+//@ExtensionDescriptor(description = "execute keyword search over an Extend-o-Brain graph")
+public class SearchExtension extends ExtendoExtension {
 
-    private static final int DEFAULT_MAX_RESULTS = 100;
+    private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 100;
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for deriving a prioritized list of items in the knowledge base")
+    @ExtensionDescriptor(description = "an extension for performing full text search over an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        PrioritiesRequest r;
+        SearchRequest r;
         try {
-            r = new PrioritiesRequest(request, p.user);
+            r = new SearchRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo priorities");
+        //logInfo("extendo search \"" + query + "\"");
 
+        p.depth = r.depth;
+        p.query = r.query;
+        p.styleName = r.styleName;
         p.filter = r.filter;
-        p.maxResults = r.maxResults;
+        p.valueCutoff = r.valueCutoff;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
+        if (null == p.valueCutoff) {
+            p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
+        } else {
+            p.writer.setValueLengthCutoff(p.valueCutoff);
+        }
 
-        Note n = p.queries.priorityView(p.filter, p.maxResults, p.brain.getPriorities());
-        addView(n, p);
+        addSearchResults(p);
 
+        p.map.put("title", p.query);
         return ExtensionResponse.ok(p.map);
     }
 
@@ -62,17 +71,18 @@ public class PrioritiesExtension extends ExtendoExtension {
         return false;
     }
 
-    protected class PrioritiesRequest extends FilteredResultsRequest {
-        public final int maxResults;
+    protected void addSearchResults(final Params p) throws IOException {
+        Note n = p.queries.search(p.query, p.depth, p.filter, p.style);
+        addView(n, p);
+    }
 
-        public PrioritiesRequest(String jsonStr, Principal user) throws JSONException {
+    protected class SearchRequest extends BasicSearchRequest {
+        public final int valueCutoff;
+
+        public SearchRequest(String jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
-            maxResults = json.optInt(MAX_RESULTS, DEFAULT_MAX_RESULTS);
-
-            if (maxResults <= 0) {
-                throw new JSONException(MAX_RESULTS + " parameter must be a positive integer");
-            }
+            valueCutoff = json.getInt(VALUE_CUTOFF);
         }
     }
 }

@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -9,80 +9,66 @@ import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
+import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.IOException;
 import java.security.Principal;
 
 /**
- * A service for executing keyword search over an Extend-o-Brain graph
+ * A service for receiving and internalizing events
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "search")
-//@ExtensionDescriptor(description = "execute keyword search over an Extend-o-Brain graph")
-public class SearchExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "push-event")
+public class PushEventExtension extends ExtendoExtension {
 
-    private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 100;
-
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing full text search over an Extend-o-Brain graph")
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
+    @ExtensionDescriptor(description = "a service for receiving and internalizing events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        SearchRequest r;
+        PushEventRequest r;
         try {
-            r = new SearchRequest(request, p.user);
+            r = new PushEventRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo search \"" + query + "\"");
+        //logInfo("extendo push-event");
 
-        p.depth = r.depth;
-        p.query = r.query;
-        p.styleName = r.styleName;
-        p.filter = r.filter;
-        p.valueCutoff = r.valueCutoff;
+        p.jsonView = r.jsonView;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        if (null == p.valueCutoff) {
-            p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
-        } else {
-            p.writer.setValueLengthCutoff(p.valueCutoff);
-        }
+        Note event = p.parser.fromJSON(p.jsonView);
 
-        addSearchResults(p);
+        p.brain.getEventStack().push(event);
 
-        p.map.put("title", p.query);
         return ExtensionResponse.ok(p.map);
     }
 
     protected boolean doesRead() {
-        return true;
-    }
-
-    protected boolean doesWrite() {
         return false;
     }
 
-    protected void addSearchResults(final Params p) throws IOException {
-        Note n = p.queries.search(p.query, p.depth, p.filter, p.style);
-        addView(n, p);
+    protected boolean doesWrite() {
+        // pushing of events is currently not considered writing... to the graph
+        return false;
     }
 
-    protected class SearchRequest extends BasicSearchRequest {
-        public final int valueCutoff;
+    protected class PushEventRequest extends Request {
+        public final JSONObject jsonView;
 
-        public SearchRequest(String jsonStr, Principal user) throws JSONException {
+        public PushEventRequest(String jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
-            valueCutoff = json.getInt(VALUE_CUTOFF);
+            jsonView = json.getJSONObject(VIEW);
         }
     }
 }

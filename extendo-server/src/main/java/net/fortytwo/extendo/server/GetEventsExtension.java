@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.brain.server;
+package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -9,74 +9,85 @@ import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
-import org.openrdf.rio.RDFFormat;
 
-import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 /**
- * A service for broadcasting events modeled in RDF to all peers in the environment
+ * A service for retrieving the stack of recently pushed events
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "broadcast-rdf")
-public class BroadcastRdfExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "get-events")
+public class GetEventsExtension extends ExtendoExtension {
 
-    private final FacilitatorService facilitator;
-
-    public BroadcastRdfExtension() throws IOException, PropertyException {
-        facilitator =  FacilitatorService.getInstance();
-    }
-
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "a service for broadcasting events modeled in RDF to all peers in the environment")
+    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
+    @ExtensionDescriptor(description = "a service for retrieving the stack of recently pushed events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        BroadcastRdfRequest r;
+        GetEventsRequest r;
         try {
-            r = new BroadcastRdfRequest(request, p.user);
+            r = new GetEventsRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo broadcast-rdf");
+        //logInfo("extendo get-events");
 
-        p.data = r.dataset;
+        p.depth = r.depth;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        // TODO: take RDF format as an input parameter
-        RDFFormat format = RDFFormat.NTRIPLES;
+        List<Note> events = p.brain.getEventStack().getEvents();
 
-        facilitator.pushUpdate(p.data, format);
+        /*
+        // temporary, for debugging
+        if (0 == events.size()) {
+            Note debugNote = new Note();
+            debugNote.setValue("test event");
+            debugNote.setWeight(0.5f);
+            debugNote.setSharability(0.5f);
+            p.brain.getEventStack().push(debugNote);
+        }
+        */
+
+        Note view = new Note();
+        view.setValue("event stack");
+
+        for (Note n : events) {
+            Note e = new Note(n);
+            e.truncate(p.depth);
+            view.addChild(e);
+        }
+
+        addView(view, p);
 
         return ExtensionResponse.ok(p.map);
     }
 
     protected boolean doesRead() {
+        // getting events is currently not considered reading... from the graph
         return false;
     }
 
     protected boolean doesWrite() {
-        // pushing of events is currently not considered writing... to the graph
         return false;
     }
 
-    protected class BroadcastRdfRequest extends Request {
-        public final String dataset;
+    protected class GetEventsRequest extends Request {
+        public final int depth;
 
-        public BroadcastRdfRequest(String jsonStr, Principal user) throws JSONException {
+        public GetEventsRequest(String jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
-            dataset = json.getString(DATASET);
+            depth = json.getInt(DEPTH);
         }
     }
 }
