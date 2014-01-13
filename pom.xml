@@ -65,7 +65,6 @@
         <module>extendo-android</module>
         <module>extendo-core</module>
         <module>extendo-brain</module>
-        <module>extendo-events</module>
         <module>extendo-opencalais</module>
         <module>extendo-p2p</module>
         <module>extendo-qrcodes</module>

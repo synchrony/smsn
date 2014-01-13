@@ -12,3 +12,4 @@ net.fortytwo.extendo.server.SearchExtension
 net.fortytwo.extendo.server.SetPropertiesExtension
 net.fortytwo.extendo.server.UpdateExtension
 net.fortytwo.extendo.server.ViewExtension
+net.fortytwo.extendo.server.WebpageVisitedExtension

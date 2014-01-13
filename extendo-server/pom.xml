@@ -35,6 +35,12 @@
             <artifactId>blueprints-graph-jung</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
+        <!-- for the web page visit notification extension -->
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-sail-graph</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
             <artifactId>rdfagents-core</artifactId>

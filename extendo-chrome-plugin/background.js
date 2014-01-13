@@ -15,7 +15,7 @@ chrome.history.onVisited.addListener(function(result) {
     var url = result.url;
     var title = result.title;
 
-    var serviceCallUrl = "http://localhost:8182/graphs/logging/events/notify-webpage-visited"
+    var serviceCallUrl = "http://localhost:8182/graphs/logging/extendo/webpage-visited"
         + "?url=" + encodeURIComponent(url);
 
     if (null != title) {
