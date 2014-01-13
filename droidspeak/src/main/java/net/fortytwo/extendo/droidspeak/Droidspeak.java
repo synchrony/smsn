@@ -1,4 +1,4 @@
-package net.fortytwo.droidspeak;
+package net.fortytwo.extendo.droidspeak;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;

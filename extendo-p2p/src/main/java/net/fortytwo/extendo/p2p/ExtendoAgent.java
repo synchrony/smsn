@@ -32,8 +32,6 @@ public class ExtendoAgent {
 
     private Service service;
 
-    private final HttpClient httpclient = new DefaultHttpClient();
-
     private QueryEngine queryEngine;
 
     private final Connection facilitatorConnection;

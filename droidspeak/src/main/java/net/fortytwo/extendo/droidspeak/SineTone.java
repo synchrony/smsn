@@ -1,4 +1,4 @@
-package net.fortytwo.droidspeak;
+package net.fortytwo.extendo.droidspeak;
 
 /**
 * @author Joshua Shinavier (http://fortytwo.net)

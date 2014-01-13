@@ -1,4 +1,4 @@
-package net.fortytwo.droidspeak;
+package net.fortytwo.extendo.droidspeak;
 
 import java.io.IOException;
 import java.io.OutputStream;
