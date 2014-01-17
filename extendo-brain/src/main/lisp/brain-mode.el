@@ -2,15 +2,13 @@
 ;;
 ;; Required global variables:
 ;;
-;;     exo-rexster-host: IP of the rexster server
-;;     exo-rexster-port: port of the Rexster server
+;;     exo-rexster-url: IP, port, and local path to the rexster server
 ;;     exo-rexster-graph: name of Extend-o-Brain graph served by Rexster
 ;;
 ;; For example:
 ;;
 ;;     (defun brain-mode ()
-;;         (defvar exo-rexster-host "localhost")
-;;         (defvar exo-rexster-port "8182")
+;;         (defvar exo-rexster-url "http://localhost:8182")
 ;;         (defvar exo-rexster-graph "joshkb"))
 
 
@@ -299,7 +297,7 @@
             (decode-coding-string (substring entity (+ i 2)) 'utf-8)))
 
 (defun base-url ()
-    (concat "http://" exo-rexster-host ":" exo-rexster-port "/graphs/" exo-rexster-graph "/extendo/"))
+    (concat exo-rexster-url "/graphs/" exo-rexster-graph "/extendo/"))
 
 (defun receive-view (mode)
     (lexical-let ((m mode))
