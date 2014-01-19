@@ -1,5 +1,5 @@
 /*
- * Monomanual Typeatron firmware, copyright 2013 by Joshua Shinavier
+ * Monomanual Typeatron firmware, copyright 2013-2014 by Joshua Shinavier
  * See: https://github.com/joshsh/extendo and the Typeatron Mark 1 EAGLE schematic.
  *
  * D0:  Bluetooth RX 
@@ -15,7 +15,7 @@
  * D10: RGB LED green
  * D11: RGB LED blue
  * D12: push button 5
- * D13: LED
+ * D13: LED and Bluetooth power
  * A0:  piezo motion sensor
  * A1:  photoresistor
  * A2:  (unused)
@@ -75,7 +75,7 @@ const int keyPin5 = 12;
 const int vibrationMotorPin = 3;
 const int transducerPin = 5;  
 const int laserPin = 6;
-const int ledPin =  13;
+const int bluetoothPowerPin =  13;
 
 // note: blue and green pins were wired in reverse w.r.t. the BL-L515 datasheet
 const int redPin = 9;
@@ -129,6 +129,24 @@ void writeRGBColor(unsigned long color)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// these are global so that we can read from setup() as well as loop()
+unsigned int input[5];
+unsigned inputState = 0;
+    
+unsigned int lastInputState = 0;
+
+void readInput() {
+    input[0] = digitalRead(keyPin1);
+    input[1] = digitalRead(keyPin2);
+    input[2] = digitalRead(keyPin3);
+    input[3] = digitalRead(keyPin4);
+    input[4] = digitalRead(keyPin5);
+    
+    for (int i = 0; i < 5; i++) {
+      inputState |= input[i] << i;  
+    }  
+}
+
 void startupSequence() {
     writeRGBColor(RED);
     digitalWrite(vibrationMotorPin, HIGH);
@@ -147,7 +165,7 @@ void setup() {
     pinMode(vibrationMotorPin, OUTPUT);
     pinMode(transducerPin, OUTPUT); 
     pinMode(laserPin, OUTPUT);
-    pinMode(ledPin, OUTPUT);
+    pinMode(bluetoothPowerPin, OUTPUT);
     pinMode(redPin, OUTPUT);
     pinMode(greenPin, OUTPUT);
     pinMode(bluePin, OUTPUT);
@@ -161,13 +179,15 @@ void setup() {
 #if ARDUINO >= 100
     while(!Serial) ; // Leonardo "feature"
 #endif
-   
+       
 //#ifdef USE_BLUETOOTH
 //    meetAndroid.registerFunction(receiveBluetoothOSC, 'e');
 //#endif
 
     serialInputPtr = 0; 
 
+    initializeBluetooth();
+    
     startupSequence();
 }
 
@@ -217,6 +237,24 @@ void handleCommand(char *command) {
     } else {
         Serial.println("");
     }*/
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void initializeBluetooth() {
+#ifdef USE_BLUETOOTH
+    // to start the device with Bluetooth disabled, hold a key while powering up or resetting
+    readInput();
+    if (inputState) {
+        digitalWrite(bluetoothPowerPin, LOW);   
+    } else {
+        digitalWrite(bluetoothPowerPin, HIGH); 
+    }
+    inputState = 0;
+#else
+    digitalWrite(bluetoothPowerPin, LOW);       
+#endif
 }
 
 
@@ -362,8 +400,6 @@ void error(char *message) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned int lastInputState = 0;
-
 void loop() {
   // TODO: restore me
     //readSerial();
@@ -390,26 +426,15 @@ void loop() {
         }
     }
 #endif
-
-    unsigned int input[5];
-    unsigned inputState = 0;
       
-    input[0] = digitalRead(keyPin1);
-    input[1] = digitalRead(keyPin2);
-    input[2] = digitalRead(keyPin3);
-    input[3] = digitalRead(keyPin4);
-    input[4] = digitalRead(keyPin5);
-
-    for (int i = 0; i < 5; i++) {
-      inputState |= input[i] << i;  
-    }
+    readInput();
     
     // bells and whistles
     if (input[0] == HIGH) {     
-        digitalWrite(ledPin, HIGH); 
+        //digitalWrite(ledPin, HIGH); 
         tone(transducerPin, 440); 
     } else {
-        digitalWrite(ledPin, LOW);
+        //digitalWrite(ledPin, LOW);
         noTone(transducerPin);
     }
     if (input[4] == HIGH) {

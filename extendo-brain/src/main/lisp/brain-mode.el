@@ -14,13 +14,13 @@
 
 ;; DEPENDENCIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; for JSON-formatted messages to and from Extendo services
+;; for JSON-formatted messages to and from Extendo services (see json-read-from-string, json-encode)
 (require 'json)
 
-;; for line number annotations in buffers
+;; for line number annotations in buffers (see linum-mode)
 (require 'linum)
 
-;; for visiting URLs in a browser
+;; for visiting URLs in a browser (see goto-address-at-point)
 (require 'goto-addr)
 
 ;; for encryption of sensitive values
@@ -986,7 +986,7 @@
 
 (defun exo-visit-url-at-point ()
     (interactive)
-    (goto-address-at-point))  ;; defined in Emacs goto-addr.el
+    (goto-address-at-point))
 
 
 ;; KEYBOARD MAPPINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1083,8 +1083,5 @@
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-
-;; uncomment only when debugging
-;;(add-hook 'after-init-hook '(lambda () (setq debug-on-error t)))
 
 (provide 'brain-mode)
