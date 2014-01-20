@@ -73,18 +73,13 @@
 (defvar exo-time-format "%H:%M")
 (defvar exo-time-with-seconds-format "%H:%M:%S")
 
-(defun find-id ()
+(defun atom-id-at-point ()
     (let ((line (current-line)))
         (if (string-match "^[0-9A-Za-z@&]*: " line)
-            (let (
-                (i3 (string-match ": " line)))
-                (let (
-                    (s2 (substring line 0 i3)))
-                    (let (
-                        (assoc-id nil)
-                        (atom-id (if (< 0 (length s2)) s2 nil)))
-                        (list assoc-id atom-id))))
-            (list nil (get-text-property (line-beginning-position) 'target-id)))))
+            (let ((i3 (string-match ": " line)))
+                (let ((s2 (substring line 0 i3)))
+                    (if (< 0 (length s2)) s2 nil)))
+            (get-text-property (line-beginning-position) 'target-id))))
 
 (defun get-id (atom)
     (cdr (assoc 'id atom)))
@@ -121,18 +116,15 @@
 (defun current-root-value ()
     exo-title)
 
-(defun current-target ()
+(defun current-root ()
     (get-atom (current-root-id)))
-
-(defun current-target-id ()
-    (car (last (find-id))))
 
 (defun current-target-value ()
     (let ((g (current-root)))
         (if g (get-value g))))
 
 (defun current-target ()
-    (get-atom (current-target-id)))
+    (get-atom (atom-id-at-point)))
 
 (defun current-target-value ()
     (let ((g (current-target)))
@@ -153,10 +145,10 @@
         (if (<= s 0.75) s 0.75)
         0.5))
 
-(defun get-atom (key)
-    (if key
+(defun get-atom (id)
+    (if id
         (if exo-atoms
-            (gethash key exo-atoms)
+            (gethash id exo-atoms)
             nil)
         nil))
 
@@ -701,30 +693,26 @@
 
 ;; API FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun exo-atom-info (atom-selector)
-    (lexical-let ((as atom-selector))
+(defun exo-atom-info (selector)
+    "display, in the minibuffer, information about an atom produced by SELECTOR"
+    (lexical-let ((as selector))
         (lambda () (interactive)
             (let ((atom (funcall as)))
                 (if atom
                     (show-info atom)
                     (no-target))))))
 
-(defun exo-choose-depth (expr)
-    (interactive)
-    (let ((depth (number-shorthand-to-number expr)))
-        (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
-            (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
-                (request-view nil exo-mode exo-root-id depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
-
 ;; note: for some reason, the id doesn't stay invisible when you paste it, although it stays light gray
 (defun exo-copy-target-reference-to-clipboard ()
+    "copy a reference to the atom at point to the system clipboard"
     (interactive)
-    (let ((id (current-target-id)))
+    (let ((id (atom-id-at-point)))
         (if id
             (copy-to-clipboard (concat "*" (create-id-infix id)))
             (no-target))))
 
 (defun exo-copy-target-value-to-clipboard ()
+    "copy the value of the atom at point to the system clipboard"
     (interactive)
     (let ((value (current-target-value)))
         (if value
@@ -732,41 +720,48 @@
             (no-target))))
 
 (defun exo-duplicates ()
+    "retrieve a list of atoms with duplicate values"
     (interactive)
     (request-duplicates
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
-;; evaluates a function call from emacsclient as if a user had typed it into the current buffer
-(defun exo-emacsclient-eval (f)
+(defun exo-emacsclient-eval (function)
+    "evaluate FUNCTION from emacsclient as if a user had typed it into the current buffer"
     (set-buffer (window-buffer (selected-window)))
-    (funcall f))
+    (funcall function))
 
 (defun exo-enter-edit-view ()
+    "enter edit (read/write) mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-readonly-mode))
         (request-view t exo-edit-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-enter-readonly-view ()
+    "enter read-only mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-edit-mode))
         (request-view t exo-readonly-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-events ()
+    "retrieve the Extend-o-Brain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
     (interactive)
     (request-events 2))
 
 (defun exo-export ()
+    "export the Extend-o-Brain graph to the file system"
     (interactive)
     (message "exporting")
     (do-export))
 
 (defun exo-find-roots ()
+    "retrieve a list of roots (i.e. atoms with no parents) in the Extend-o-Brain graph"
     (interactive)
         (request-find-roots-results
             exo-style
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-goto-line (address)
+    "move point to the line represented by ADDRESS"
     (interactive)
     (let ((line (address-to-lineno (handle-changewindow address))))
         (if line
@@ -774,57 +769,65 @@
             (error-message "invalid line address"))))
 
 (defun exo-history ()
+    "retrieve a list of the most recently viewed or updated atoms, in decreasing order of recency"
     (interactive)
     (request-history
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-infer-types ()
+    "perform type inference on the Extend-o-Brain knowledge base, adding type annotations"
     (interactive)
     (message "performing type inference")
     (do-infer-types))
 
 (defun exo-insert-attr-priority (expr)
+    "insert a line to set the priority of an atom to the value given by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (insert (concat "\n                @priority " (number-to-string (/ n 4.0)) "\n")))))
 
 (defun exo-insert-attr-sharability (expr)
+    "insert a line to set the sharability of an atom to the value given by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (insert (concat "\n                @sharability " (number-to-string (/ n 4.0)) "\n")))))
 
 (defun exo-insert-attr-weight (expr)
+    "insert a line to set the weight of an atom to the value given by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (insert (concat "\n                @weight " (number-to-string (/ n 4.0)) "\n")))))
 
 (defun exo-insert-current-date ()
-  "insert the current date into the current buffer."
-       (interactive)
-       (insert (format-time-string exo-date-format (current-time))))
+    "insert the current date, in the format yyyy-mm-dd, into the current buffer"
+    (interactive)
+    (insert (format-time-string exo-date-format (current-time))))
 
 (defun exo-insert-current-time ()
-  "insert the current time into the current buffer."
-       (interactive)
-       (insert (format-time-string exo-time-format (current-time))))
+    "insert the current time, in the format hh:mm, into the current buffer"
+    (interactive)
+    (insert (format-time-string exo-time-format (current-time))))
 
 (defun exo-insert-current-time-with-seconds ()
-  "insert the current time into the current buffer."
-       (interactive)
-       (insert (format-time-string exo-time-with-seconds-format (current-time))))
+    "insert the current time with seconds, in the format hh:mm:ss, into the current buffer"
+    (interactive)
+    (insert (format-time-string exo-time-with-seconds-format (current-time))))
 
 (defun exo-preview-target-latex-math ()
+    "create a graphical preview of the value of the atom at point, which must be a LaTeX mathematical expression"
     (interactive)
     (end-of-line)
     (backward-word)
     (latex-math-preview-expression))
 
 (defun exo-priorities ()
+    "retrieve a list of atoms with nonzero priority values, ordered by decreasing priority"
     (interactive)
     (request-priorities-results
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-push-view ()
+    "push an up-to-date view into the Extend-o-Brain graph"
     (interactive)
     (if (in-edit-view)
     (let (
@@ -845,6 +848,7 @@
             (receive-view exo-edit-mode)))))
 
 (defun exo-ripple-query (query)
+    "evaluate Ripple expression QUERY"
     (interactive)
     (if (> (length query) 0)
         (request-ripple-results
@@ -853,6 +857,7 @@
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
 
 (defun exo-search (query)
+    "evaluate full-text search for QUERY, yielding a ranked list of search results in a new buffer"
     (interactive)
     (if (> (length query) 0)
         (request-search-results
@@ -861,50 +866,74 @@
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
 
 (defun exo-set-default-sharability (expr)
+    "set the default @sharability (for atoms created in update operations) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-default-sharability (/ n 4.0)))))
 
 (defun exo-set-default-weight (expr)
+    "set the default @weight (for atoms created in update operations) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-default-weight (/ n 4.0)))))
 
 (defun exo-set-min-sharability (expr)
+    "set the minimum @sharability (for atoms visible in the current view) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-min-sharability (/ n 4.0)))))
 
 (defun exo-set-min-weight (expr)
+    "set the minimum @weight (for atoms visible in the current view) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-min-weight (/ n 4.0)))))
 
 (defun exo-set-target-priority (expr)
+    "set the @priority of the atom at point to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-target-priority (/ n 4.0)))))
 
 (defun exo-set-target-sharability (expr)
+    "set the @sharability of the atom at point to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-target-sharability (/ n 4.0)))))
 
 (defun exo-set-target-weight (expr)
+    "set the @weight of the atom at point to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-target-weight (/ n 4.0)))))
 
 (defun exo-set-value-truncation-length (length-str)
+    "set the value truncation length to the number represented by LENGTH-STR.
+Longer values are truncated, for efficiency and readability, when they appear in views.
+A value of -1 indicates that values should not be truncated."
     (interactive)
     (let ((n (string-to-number length-str)))
         (setq exo-value-truncation-length n)))
 
+(defun exo-set-view-depth (expr)
+    "set the depth of the current view to the number of levels represented by EXPR"
+    (interactive)
+    (let ((depth (number-shorthand-to-number expr)))
+        (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
+            (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
+                (request-view nil exo-mode exo-root-id depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
+
 (defun exo-toggle-emacspeak ()
+    "turn Emacspeak on or off"
     (interactive)
     (dtk-toggle-quiet))
 
 (defun exo-toggle-inference-viewstyle ()
+    "toggle between the sharability view style and the type inference view style.
+In the sharability view style, colors are assigned to atoms based on the sharability of each atom
+(for example, private atoms are red, while public atoms are green).
+However, in the type inference view style, an atom is either cyan or magenta depending on whether
+a type has been assigned to it by the inference engine."
     (interactive)
     (setq exo-viewstyle (if (equal exo-viewstyle exo-sharability-viewstyle)
         exo-inference-viewstyle
@@ -913,68 +942,83 @@
     (message (concat "switched to " exo-viewstyle " view style")))
 
 (defun exo-toggle-truncate-lines ()
+    "toggle line wrap mode"
     (interactive)
     (toggle-truncate-lines))
 
 (defun exo-update-to-backward-view ()
+    "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
     (interactive)
     (if (in-view)
         (request-view nil exo-mode exo-root-id exo-depth exo-backward-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-update-to-forward-view ()
+    "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
     (interactive)
     (if (in-view)
         (request-view nil exo-mode exo-root-id exo-depth exo-forward-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-update-view ()
+    "refresh the current view from the data store"
     (interactive)
     (if (in-view)
         (request-view t exo-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-visit-in-amazon (value-selector)
+    "search Amazon.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.amazon.com/s?ie=UTF8&index=blended&link_code=qs&field-keywords=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-delicious (value-selector)
+    "search delicious.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.delicious.com/search?p=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-ebay (value-selector)
+    "search ebay.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.ebay.com/sch/i.html?_nkw=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-google (value-selector)
+    "search google.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.google.com/search?ie=UTF-8&q=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-google-maps (value-selector)
+    "search Google Maps for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://maps.google.com/maps?q=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-google-scholar (value-selector)
+    "search Google Scholar for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://scholar.google.com/scholar?q=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-twitter (value-selector)
+    "search twitter.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://twitter.com/#!/search/" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-wikipedia (value-selector)
+    "search en.wikipedia.org for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-in-youtube (value-selector)
+    "search youtube.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.youtube.com/results?search_query=" (w3m-url-encode-string value)))))
 
 (defun exo-visit-target ()
+    "navigate to the atom at point, opening a new view with that atom as root"
     (interactive)
-    (let ((key (current-target-id)))
-        (if key
-            (request-view nil (mode-for-visit) key exo-depth exo-style exo-min-sharability exo-max-sharability (future-sharability (current-target-sharability)) exo-min-weight exo-max-weight exo-default-weight)
+    (let ((id (atom-id-at-point)))
+        (if id
+            (request-view nil (mode-for-visit) id exo-depth exo-style exo-min-sharability exo-max-sharability (future-sharability (current-target-sharability)) exo-min-weight exo-max-weight exo-default-weight)
             (no-target))))
 
 (defun exo-visit-target-alias ()
+    "visit the @alias of the atom at point (normally a URL) in a browser"
     (interactive)
     (let ((alias (current-target-alias)))
         (if alias
@@ -982,9 +1026,11 @@
             (no-target))))
 
 (defun exo-visit-as-url (value-selector)
+    "visit the URL generated by VALUE-SELECTOR in a browser"
     (visit-target-value value-selector (lambda (value) value)))
 
 (defun exo-visit-url-at-point ()
+    "visit the URL at point in a browser"
     (interactive)
     (goto-address-at-point))
 
@@ -1012,7 +1058,7 @@
 (global-set-key (kbd "C-c C-a d")       'exo-insert-current-date)
 (global-set-key (kbd "C-c C-a s")       'exo-insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'exo-insert-current-time)
-(global-set-key (kbd "C-c C-d")         (char-arg 'exo-choose-depth "depth = ?"))
+(global-set-key (kbd "C-c C-d")         (char-arg 'exo-set-view-depth "depth = ?"))
 (global-set-key (kbd "C-c C-l")         (minibuffer-arg 'exo-goto-line "line: "))
 (global-set-key (kbd "C-c C-r C-b a")   (exo-visit-in-amazon 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b e")   (exo-visit-in-ebay 'current-root-value))

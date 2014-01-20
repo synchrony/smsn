@@ -87,7 +87,7 @@ public class BrainModeClient {
         functions.put("C-c C-a d", new EmacsFunction("exo-insert-current-date", false));
         functions.put("C-c C-a s", new EmacsFunction("exo-insert-current-time-with-seconds", false));
         functions.put("C-c C-a t", new EmacsFunction("exo-insert-current-time", false));
-        functions.put("C-c C-d", new EmacsFunction("exo-choose-depth", true));
+        functions.put("C-c C-d", new EmacsFunction("exo-set-view-depth", true));
         functions.put("C-c C-l", new EmacsFunction("exo-goto-line", true));
         functions.put("C-c C-r C-b a", new EmacsFunction("exo-visit-in-amazon 'current-root-value", false));
         functions.put("C-c C-r C-b e", new EmacsFunction("exo-visit-in-ebay 'current-root-value", false));
