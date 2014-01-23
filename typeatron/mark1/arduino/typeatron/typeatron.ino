@@ -17,9 +17,9 @@
  * D12: push button 5
  * D13: LED and Bluetooth power
  * A0:  piezo motion sensor
- * A1:  photoresistor
+ * A1:  (unused)
  * A2:  (unused)
- * A3:  (unused)
+ * A3:  photoresistor
  * A4:  I2C SDA for MPU-6050
  * A5:  I2C SCL for MPU-6050
  */
