@@ -126,41 +126,69 @@ void writeRGBColor(unsigned long color)
   analogWrite(bluePin, 255 - (unsigned int) blue);
 }
 
+int colorToggle = 0;
+
+void colorDebug() {
+    if (colorToggle) {
+        writeRGBColor(RED);
+    } else {
+        writeRGBColor(BLUE);
+    }
+    colorToggle = !colorToggle;  
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // these are global so that we can read from setup() as well as loop()
 unsigned int input[5];
-unsigned inputState = 0;
+unsigned inputState;
     
 unsigned int lastInputState = 0;
 
 void readInput() {
-    input[0] = digitalRead(keyPin1);
-    input[1] = digitalRead(keyPin2);
-    input[2] = digitalRead(keyPin3);
-    input[3] = digitalRead(keyPin4);
-    input[4] = digitalRead(keyPin5);
+    input[0] = !digitalRead(keyPin1);
+    input[1] = !digitalRead(keyPin2);
+    input[2] = !digitalRead(keyPin3);
+    input[3] = !digitalRead(keyPin4);
+    input[4] = !digitalRead(keyPin5);
+    
+    inputState = 0;
     
     for (int i = 0; i < 5; i++) {
       inputState |= input[i] << i;  
     }  
 }
 
+// note: tones may not be played (via the Typeatron's transducer) in parallel with the reading of button input,
+// as the vibration causes the push button switches to oscillate when depressed
 void startupSequence() {
+    tone(transducerPin, 220);
     writeRGBColor(RED);
     digitalWrite(vibrationMotorPin, HIGH);
-    delay(300);
+    delay(200);
+    tone(transducerPin, 440);
+    writeRGBColor(GREEN);
+    delay(200);
+    tone(transducerPin, 880);
     writeRGBColor(BLUE);
     digitalWrite(vibrationMotorPin, LOW); 
+    delay(200);
+    noTone(transducerPin);
 }
 
 void setup() {
-    pinMode(keyPin1, INPUT);     
+    pinMode(keyPin1, INPUT);
     pinMode(keyPin2, INPUT);     
     pinMode(keyPin3, INPUT);     
     pinMode(keyPin4, INPUT);     
     pinMode(keyPin5, INPUT);     
+    // take advantage of the Arduino's internal pullup resistors
+    digitalWrite(keyPin1, HIGH);    
+    digitalWrite(keyPin2, HIGH);    
+    digitalWrite(keyPin3, HIGH);    
+    digitalWrite(keyPin4, HIGH);    
+    digitalWrite(keyPin5, HIGH);    
 
     pinMode(vibrationMotorPin, OUTPUT);
     pinMode(transducerPin, OUTPUT); 
@@ -429,21 +457,18 @@ void loop() {
       
     readInput();
     
-    // bells and whistles
-    if (input[0] == HIGH) {     
-        //digitalWrite(ledPin, HIGH); 
-        tone(transducerPin, 440); 
-    } else {
-        //digitalWrite(ledPin, LOW);
-        noTone(transducerPin);
-    }
-    if (input[4] == HIGH) {
-        digitalWrite(laserPin, HIGH);
-    } else {
-        digitalWrite(laserPin, LOW);
-    }
-
     if (inputState != lastInputState) {
+        colorDebug();
+sprintf(errstr, "input changed from %d to %d\n", lastInputState, inputState);
+error(errstr);  
+        
+        // bells and whistles
+        if (input[4] == LOW) {
+            digitalWrite(laserPin, HIGH);
+        } else {
+            digitalWrite(laserPin, LOW);
+        }
+      
         unsigned int before = micros();
 
         char keys[6];
