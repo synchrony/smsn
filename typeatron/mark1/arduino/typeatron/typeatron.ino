@@ -82,7 +82,7 @@ const int redPin = 9;
 const int greenPin = 10;
 const int bluePin = 11;
 
-const int photoresistorPin = A1;
+const int photoresistorPin = A3;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +97,13 @@ unsigned int serialInputPtr = 0;
 unsigned int debounceMicros = 2000;
 
 char errstr[128];
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <AnalogSampler.h>
+
+AnalogSampler sampler_photoresistor(photoresistorPin);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,22 +148,22 @@ void colorDebug() {
 ////////////////////////////////////////////////////////////////////////////////
 
 // these are global so that we can read from setup() as well as loop()
-unsigned int input[5];
-unsigned inputState;
+unsigned int keys[5];
+unsigned keyState;
     
-unsigned int lastInputState = 0;
+unsigned int lastKeyState = 0;
 
-void readInput() {
-    input[0] = !digitalRead(keyPin1);
-    input[1] = !digitalRead(keyPin2);
-    input[2] = !digitalRead(keyPin3);
-    input[3] = !digitalRead(keyPin4);
-    input[4] = !digitalRead(keyPin5);
+void readKeys() {
+    keys[0] = !digitalRead(keyPin1);
+    keys[1] = !digitalRead(keyPin2);
+    keys[2] = !digitalRead(keyPin3);
+    keys[3] = !digitalRead(keyPin4);
+    keys[4] = !digitalRead(keyPin5);
     
-    inputState = 0;
+    keyState = 0;
     
     for (int i = 0; i < 5; i++) {
-      inputState |= input[i] << i;  
+      keyState |= keys[i] << i;  
     }  
 }
 
@@ -223,12 +230,12 @@ void setup() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void RGBLEDcontrol(class OSCMessage &m) {
-  error("we made it into the RGB control!");
+  sendInfo("we made it into the RGB control!");
     if (m.isInt(0)) {
         unsigned long color = (unsigned long) m.getInt(0);
         writeRGBColor(color);
     } else {
-        error("expected integer argument to RGB LED control");
+        sendError("expected integer argument to RGB LED control");
     }
 }
 
@@ -273,13 +280,13 @@ void handleCommand(char *command) {
 void initializeBluetooth() {
 #ifdef USE_BLUETOOTH
     // to start the device with Bluetooth disabled, hold a key while powering up or resetting
-    readInput();
-    if (inputState) {
+    readKeys();
+    if (keyState) {
         digitalWrite(bluetoothPowerPin, LOW);   
     } else {
         digitalWrite(bluetoothPowerPin, HIGH); 
     }
-    inputState = 0;
+    keyState = 0;
 #else
     digitalWrite(bluetoothPowerPin, LOW);       
 #endif
@@ -363,7 +370,7 @@ void readSerial() {
 
                 getIntValues(readBuffer2);
 sprintf(errstr, "received a string of length %d", l);
-error(errstr);              
+sendInfo(errstr);              
                 for (int i = 0; i < l; i++) {
                     bundleIN.fill(readBuffer2[i]);
                 }                
@@ -379,7 +386,7 @@ error(errstr);
         
         if (SLIPSerial.endofPacket()) {
             if (bundleIN.hasError()) {
-                error("OSC bundle hasError");
+                sendError("OSC bundle hasError");
             } else {
                 bundleIN.dispatch("/exo/tt/rgb", RGBLEDcontrol);
             }
@@ -418,11 +425,74 @@ void sendOSC(class OSCMessage &m) {
 #endif  
 }
 
-void error(char *message) {
+
+////////////////////////////////////////////////////////////////////////////////
+
+void sendAnalogObservation(class AnalogSampler &s, char* address) {
+    OSCMessage m(address);
+    m.add((uint64_t) s.getStartTime());
+    m.add((uint64_t) s.getEndTime());
+    m.add((int) s.getNumberOfMeasurements());
+    m.add(s.getMinValue());
+    m.add(s.getMaxValue());
+    m.add(s.getMean());
+    m.add(s.getVariance());
+ 
+    sendOSC(m);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void receiveLightLevelRequest(byte flag, byte numOfValues) {
+    sampler_photoresistor.reset();
+    sampler_photoresistor.beginSample();
+    sampler_photoresistor.measure();
+    sampler_photoresistor.endSample();
+    
+    sendLightLevel();
+}
+
+void receivePing(byte flag, byte numOfValues) {
+    sendPingReply();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void sendError(char *message) {
     OSCMessage m("/exo/tt/error");
     m.add(message);
 
     sendOSC(m);
+}
+
+void sendInfo(char *message) {
+    OSCMessage m("/exo/tt/info");
+    m.add(message);
+
+    sendOSC(m);
+}
+
+void sendKeyEvent(char *keys) {
+    OSCMessage m("/exo/tt/keys");
+    m.add(keys);
+
+    sendOSC(m);  
+}
+
+void sendLightLevel() {
+    sendAnalogObservation(sampler_photoresistor, "/exo/tt/photo/data"); 
+    //Serial.println("");
+    //Serial.print(sampler_photoresistor.getMean());
+    //Serial.println("");
+}
+
+void sendPingReply() {
+    OSCMessage m("/exo/tt/ping/reply");
+    m.add((int32_t) micros());
+    
+    sendOSC(m);  
 }
 
 
@@ -455,32 +525,32 @@ void loop() {
     }
 #endif
       
-    readInput();
+    readKeys();
     
-    if (inputState != lastInputState) {
+    if (keyState != lastKeyState) {
         colorDebug();
-sprintf(errstr, "input changed from %d to %d\n", lastInputState, inputState);
-error(errstr);  
+//sprintf(errstr, "input changed from %d to %d\n", lastKeyState, keyState);
+//ƒsendInfo(errstr);  
         
         // bells and whistles
-        if (input[4] == LOW) {
+        if (keys[4] == HIGH) {
             digitalWrite(laserPin, HIGH);
         } else {
             digitalWrite(laserPin, LOW);
         }
+        if (keys[3] == HIGH) {
+            receiveLightLevelRequest(0, 0);  
+        }
       
         unsigned int before = micros();
 
-        char keys[6];
+        char keyStr[6];
         for (int i = 0; i < 5; i++) {
-            keys[i] = input[i] + 48;
+            keyStr[i] = keys[i] + 48;
         }
-        keys[5] = 0;
+        keyStr[5] = 0;
 
-        OSCMessage m("/exo/tt/keys");
-        m.add(keys);
-
-        sendOSC(m);
+        sendKeyEvent(keyStr);
 
         unsigned int after = micros();
         
@@ -489,7 +559,7 @@ error(errstr);
         }
     }
   
-    lastInputState = inputState;  
+    lastKeyState = keyState;  
 }
 
 
