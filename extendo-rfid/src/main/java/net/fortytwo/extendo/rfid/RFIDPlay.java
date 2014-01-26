@@ -1,7 +1,5 @@
 package net.fortytwo.extendo.rfid;
 
-import com.alien.enterpriseRFID.reader.AlienClass1Reader;
-import com.alien.enterpriseRFID.tags.Tag;
 import com.tinkerpop.blueprints.impls.rexster.RexsterGraph;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
@@ -20,22 +18,15 @@ import java.util.logging.Logger;
 public class RFIDPlay {
     private static final Logger LOGGER = Logger.getLogger(RFIDPlay.class.getName());
 
-    public RFIDPlay() throws Exception {
+    public RFIDPlay(final String graphUri) throws Exception {
 
-        RexsterGraph g = new RexsterGraph("http://localhost:8182/graphs/joshkb");
+        RexsterGraph g = new RexsterGraph(graphUri);
 
         BrainGraph graph = new BrainGraph(g);
 
         RFIDListener l = new RFIDListener();
 
-        AlienClass1Reader reader = l.firstReader();
-
-        LOGGER.info("reader: " + reader);
-        reader.setUsername("alien");
-        reader.setPassword("password");
-
-        reader.setAntennaSequence("0 1 2 3");
-        reader.setTagType(16);
+        RFIDReader reader = new RFIDReader(l.firstReader(), 4, System.out);
 
         //String readerName = reader.doReaderCommand("get ReaderName");
         //LOGGER.info("reader name: " + readerName);
@@ -44,30 +35,29 @@ public class RFIDPlay {
 
         BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
-            // This avoids "broken pipe" errors
-            reader.close();
-            reader.open();
+            reader.clear();
 
-            Tag[] tagList = reader.getTagList();
-            if (null != tagList) {
-                //System.out.println("[tag list]");
-                for (Tag t : tagList) {
-                    String v = "RFID: " + t.getTagID();
-                    Collection<Atom> atoms = graph.getAtomsWithValue(v);
-                    if (0 == atoms.size()) {
-                        System.out.println("         * " + v);
-                    } else {
-                        if (atoms.size() > 1) {
-                            LOGGER.warning("multiple atoms with value: " + v);
-                        }
+            for (int i = 0; i < 10; i++) {
+            reader.readTags();
+            }
 
-                        for (Atom a : atoms) {
-                            System.out.println("* :" + a.asVertex().getId() + ": " + a.getValue());
-                            for (Atom n : getParents(a, f)) {
-                                System.out.println("* :" + n.asVertex().getId() + ": " + n.getValue());
-                            }
-                            System.out.println("");
+            //System.out.println("[tag list]");
+            for (String tagId : reader.getTagIds()) {
+                String v = "RFID: " + tagId;
+                Collection<Atom> atoms = graph.getAtomsWithValue(v);
+                if (0 == atoms.size()) {
+                    System.out.println("         * " + v);
+                } else {
+                    if (atoms.size() > 1) {
+                        LOGGER.warning("multiple atoms with value: " + v);
+                    }
+
+                    for (Atom a : atoms) {
+                        System.out.println("* :" + a.asVertex().getId() + ": " + a.getValue());
+                        for (Atom n : getParents(a, f)) {
+                            System.out.println("* :" + n.asVertex().getId() + ": " + n.getValue());
                         }
+                        System.out.println("");
                     }
                 }
             }
@@ -98,7 +88,7 @@ public class RFIDPlay {
 
     public static void main(final String args[]) {
         try {
-            new RFIDPlay();
+            new RFIDPlay("http://localhost:8182/graphs/joshkb");
         } catch (Throwable e) {
             e.printStackTrace(System.err);
             System.exit(1);
