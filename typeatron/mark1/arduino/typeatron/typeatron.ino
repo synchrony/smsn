@@ -42,9 +42,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#include <MeetAndroid.h>
+#include <MeetAndroid.h>
 
-//MeetAndroid meetAndroid;
+// needed for registerFunction
+MeetAndroid meetAndroid;
 
 const char ack = 19;
 const char startFlag = 18;
@@ -83,6 +84,11 @@ const int greenPin = 10;
 const int bluePin = 11;
 
 const int photoresistorPin = A3;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include "morse.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +188,8 @@ void startupSequence() {
     digitalWrite(vibrationMotorPin, LOW); 
     delay(200);
     noTone(transducerPin);
+    
+    //playAsMorseCode("hello, world!");
 }
 
 void setup() {
@@ -215,9 +223,9 @@ void setup() {
     while(!Serial) ; // Leonardo "feature"
 #endif
        
-//#ifdef USE_BLUETOOTH
-//    meetAndroid.registerFunction(receiveBluetoothOSC, 'e');
-//#endif
+#ifdef USE_BLUETOOTH
+    meetAndroid.registerFunction(receiveBluetoothOSC, 'o');  // 'o' for OSC
+#endif
 
     serialInputPtr = 0; 
 
@@ -397,12 +405,18 @@ sendInfo(errstr);
     }
 }
 
+// don't send large OSC messages to the Typeatron
+char incomingOscMessageBuffer[1024];
+
 void receiveBluetoothOSC(byte flag, byte numOfValues)
 {
-  // TODO: read arguments
-  //int state = meetAndroid.getInt();
- 
     writeRGBColor(GREEN);
+
+    meetAndroid.getString(incomingOscMessageBuffer);
+    
+    int l = strlen(incomingOscMessageBuffer);
+    sprintf(errstr, "%d", l);
+    playAsMorseCode(errstr);   
 }
 
 void sendOSC(class OSCMessage &m) {
@@ -424,9 +438,6 @@ void sendOSC(class OSCMessage &m) {
     SLIPSerial.println("");
 #endif  
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
 
 void sendAnalogObservation(class AnalogSampler &s, char* address) {
     OSCMessage m(address);
@@ -502,10 +513,10 @@ void loop() {
   // TODO: restore me
     //readSerial();
     
-//#ifdef USE_BLUETOOTH
+#ifdef USE_BLUETOOTH
     // this must be kept in loop() to receive events via Amarino
-//    meetAndroid.receive();  
-//#endif
+    meetAndroid.receive();  
+#endif
 
 #ifdef DEBUG
     if (Serial.available() > 0) {            
