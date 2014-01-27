@@ -15,7 +15,7 @@
  * D10: RGB LED green
  * D11: RGB LED blue
  * D12: push button 5
- * D13: LED and Bluetooth power
+ * D13: LED
  * A0:  piezo motion sensor
  * A1:  (unused)
  * A2:  (unused)
@@ -76,7 +76,7 @@ const int keyPin5 = 12;
 const int vibrationMotorPin = 3;
 const int transducerPin = 5;  
 const int laserPin = 6;
-const int bluetoothPowerPin =  13;
+const int ledPin =  13;
 
 // note: blue and green pins were wired in reverse w.r.t. the BL-L515 datasheet
 const int redPin = 9;
@@ -153,6 +153,22 @@ void colorDebug() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void laserOn() {
+    digitalWrite(laserPin, HIGH); 
+   
+    // also turn on the on-board LED, as a cue to the developer in USB mode (when the laser is powered off)
+    digitalWrite(ledPin, HIGH);
+}
+
+void laserOff() {
+    digitalWrite(laserPin, LOW); 
+   
+    digitalWrite(ledPin, LOW);  
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 // these are global so that we can read from setup() as well as loop()
 unsigned int keys[5];
 unsigned keyState;
@@ -208,7 +224,7 @@ void setup() {
     pinMode(vibrationMotorPin, OUTPUT);
     pinMode(transducerPin, OUTPUT); 
     pinMode(laserPin, OUTPUT);
-    pinMode(bluetoothPowerPin, OUTPUT);
+    pinMode(ledPin, OUTPUT);
     pinMode(redPin, OUTPUT);
     pinMode(greenPin, OUTPUT);
     pinMode(bluePin, OUTPUT);
@@ -228,8 +244,6 @@ void setup() {
 #endif
 
     serialInputPtr = 0; 
-
-    initializeBluetooth();
     
     startupSequence();
 }
@@ -280,24 +294,6 @@ void handleCommand(char *command) {
     } else {
         Serial.println("");
     }*/
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-void initializeBluetooth() {
-#ifdef USE_BLUETOOTH
-    // to start the device with Bluetooth disabled, hold a key while powering up or resetting
-    readKeys();
-    if (keyState) {
-        digitalWrite(bluetoothPowerPin, LOW);   
-    } else {
-        digitalWrite(bluetoothPowerPin, HIGH); 
-    }
-    keyState = 0;
-#else
-    digitalWrite(bluetoothPowerPin, LOW);       
-#endif
 }
 
 
@@ -535,7 +531,7 @@ void loop() {
         }
     }
 #endif
-      
+
     readKeys();
     
     if (keyState != lastKeyState) {
@@ -545,9 +541,9 @@ void loop() {
         
         // bells and whistles
         if (keys[4] == HIGH) {
-            digitalWrite(laserPin, HIGH);
+            laserOn();
         } else {
-            digitalWrite(laserPin, LOW);
+            laserOff();
         }
         if (keys[3] == HIGH) {
             receiveLightLevelRequest(0, 0);  
