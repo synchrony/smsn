@@ -132,11 +132,17 @@ void mediumGap() {
     delay(7 * timeUnit);
 }
 
-void endSequence() {
-    noTone(morsePin);
+void beginSequence() {
+    // insert a short gap at the beginning of the message, to separate it from any (non-Morse) tones which came before
+    interElementGap();      
 }
 
-void playAsMorseCode(const char* message) {
+void endSequence() {
+    // end the last tone and insert a gap after the message, in case another message follows it
+    mediumGap();
+}
+
+void playMorseString(const char* message) {
     int firstLetterInWord = true;
     
     const char *cur = message;
@@ -187,5 +193,10 @@ void playAsMorseCode(const char* message) {
     }
     
     endSequence();
+}
+
+void playMorseInt(int d) {
+    sprintf(errstr, "%d", d);
+    playMorseString(errstr);  
 }
 

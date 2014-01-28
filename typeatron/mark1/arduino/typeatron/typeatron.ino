@@ -27,17 +27,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// if defined, use more straightforward serial output
-//#define DEBUG
-
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
 #define USE_BLUETOOTH
 
-#ifdef DEBUG
-#define EOL '@'
-#else
-#define EOL '\n'
-#endif
+// if defined, make serial output more legible
+//#define DEBUG
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,21 +82,17 @@ const int photoresistorPin = A3;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "morse.h"
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-char serialInputStr[256];
-
-unsigned int serialInputPtr = 0;
-
 // TODO: tailor the bounce interval to the switch being used.
 // This 2ms value is a conservative estimate based on an average over many kinds of switches.
 // See "A Guide to Debouncing" by Jack G. Ganssle
 unsigned int debounceMicros = 2000;
 
 char errstr[128];
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include "morse.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +159,15 @@ void laserOff() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void vibrateForDuration(int ms) {
+    digitalWrite(vibrationMotorPin, HIGH);
+    delay(ms);
+    digitalWrite(vibrationMotorPin, LOW);  
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 // these are global so that we can read from setup() as well as loop()
 unsigned int keys[5];
 unsigned keyState;
@@ -189,6 +188,9 @@ void readKeys() {
     }  
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+
 // note: tones may not be played (via the Typeatron's transducer) in parallel with the reading of button input,
 // as the vibration causes the push button switches to oscillate when depressed
 void startupSequence() {
@@ -205,7 +207,7 @@ void startupSequence() {
     delay(200);
     noTone(transducerPin);
     
-    //playAsMorseCode("hello, world!");
+    //playMorseString("hello, world!");
 }
 
 void setup() {
@@ -242,8 +244,6 @@ void setup() {
 #ifdef USE_BLUETOOTH
     meetAndroid.registerFunction(receiveBluetoothOSC, 'o');  // 'o' for OSC
 #endif
-
-    serialInputPtr = 0; 
     
     startupSequence();
 }
@@ -251,168 +251,37 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void RGBLEDcontrol(class OSCMessage &m) {
-  sendInfo("we made it into the RGB control!");
-    if (m.isInt(0)) {
-        unsigned long color = (unsigned long) m.getInt(0);
-        writeRGBColor(color);
-    } else {
-        sendError("expected integer argument to RGB LED control");
-    }
-}
-
-void handlePhotoResistorCommand(char *args) {
-    if (!strcmp(args, "read")) {
-        int v = analogRead(photoresistorPin);
-        Serial.print("/exo/tt/photo/value ");
-        Serial.println(v);
-    }
-}
-
-void handleCommand(char *command) {
-    char *address = command, *args;
-    char *c = strstr(command, " ");
-
-    if (c) {
-        *c = 0;
-        args = c + 1;  
-    } else {
-        args = NULL;
-    }
-
-    if (!strcmp(address, "/exo/tt/photo")) {
-        handlePhotoResistorCommand(args);  
-    } else if (!strcmp(address, "/exo/tt/rgb")) {
-      
-    }
-    /*
-    Serial.print("got command at address ");
-    Serial.print(address);
-    if (args) {
-        Serial.print(" with args ");
-        Serial.println(args);
-    } else {
-        Serial.println("");
-    }*/
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-const int STATE_START = 0;
-const int STATE_PACKET_BODY = 1;
-const int STATE_WAITING_FOR_ACK = 2;
-
-int readState = STATE_START;
-
-OSCBundle bundleIN;
-
-const char amarinoFlag = 'e';
-
-const unsigned int readBufferLength = 1024;
-int readBuffer[readBufferLength];
-int readBufferPos = 0;
-
-int readBuffer2[readBufferLength];
-
-
-const int delimiter = ';';
-
-int getArrayLength()
-{
-        if (readBufferPos == 1) return 0; // only a flag and ack was sent, not data attached
-        int numberOfValues = 1;
-        // find the amount of values we got
-        for (int a=1; a<readBufferPos;a++){
-                if (readBuffer[a]==delimiter) numberOfValues++;
-        }
-        return numberOfValues;
-}
-
-void getIntValues(int values[])
-{
-        int t = 0; // counter for each char based array
-        int pos = 0;
-
-        int start = 1; // start of first value
-        for (int end=1; end<readBufferPos;end++){
-                // find end of value
-                if (readBuffer[end]==delimiter) {
-                        // now we know start and end of a value
-                        char b[(end-start)+1]; // create container for one value plus '\0'
-                        t = 0;
-                        for(int i = start;i < end;i++){
-                                b[t++] = (char)readBuffer[i];
-                        }
-                        b[t] = '\0';
-                        values[pos++] = atoi(b);
-                        start = end+1;
-                }
-        }
-        // get the last value
-        char b[(readBufferPos-start)+1]; // create container for one value plus '\0'
-        t = 0;
-        for(int i = start;i < readBufferPos;i++){
-                b[t++] = (char)readBuffer[i];
-        }
-        b[t] = '\0';
-        values[pos] = atoi(b);
-}
-
-void readSerial() {
-    int ch;
-
-    while (SLIPSerial.available() > 0) {
-        ch = SLIPSerial.read();
-
-#ifdef USE_BLUETOOTH
-        if (ack == ch) {
-            for (int i = 0; i < readBufferPos; i++) {
-                readBufferPos++;
-                
-                int l = getArrayLength();
-
-                getIntValues(readBuffer2);
-sprintf(errstr, "received a string of length %d", l);
-sendInfo(errstr);              
-                for (int i = 0; i < l; i++) {
-                    bundleIN.fill(readBuffer2[i]);
-                }                
-            }          
-        } else {
-            // note: soft fail on buffer overrun may result in invalid, truncated messages
-            if (readBufferPos < readBufferLength) {
-                readBuffer[readBufferPos++] = ch;
-            }
-        }
-#else
-        bundleIN.fill(ch);
-        
-        if (SLIPSerial.endofPacket()) {
-            if (bundleIN.hasError()) {
-                sendError("OSC bundle hasError");
-            } else {
-                bundleIN.dispatch("/exo/tt/rgb", RGBLEDcontrol);
-            }
-
-            bundleIN.empty();
-        }
-#endif
-    }
-}
-
-// don't send large OSC messages to the Typeatron
-char incomingOscMessageBuffer[1024];
-
 void receiveBluetoothOSC(byte flag, byte numOfValues)
 {
     writeRGBColor(GREEN);
 
-    meetAndroid.getString(incomingOscMessageBuffer);
+    // note: length includes the null terminator
+    int length = meetAndroid.stringLength();
     
-    int l = strlen(incomingOscMessageBuffer);
-    sprintf(errstr, "%d", l);
-    playAsMorseCode(errstr);   
+    char buffer[length];
+    meetAndroid.getString(buffer);
+        
+    sprintf(errstr, "received OSC message of length %d to %s", length, buffer);
+    sendInfo(errstr); 
+    
+    playMorseInt(length);  
+
+    OSCMessage messageIn;
+    
+    for (int i = 0; i < length - 1; i++) {
+        messageIn.fill(buffer[i]);
+    }
+    
+    if (messageIn.hasError()) {
+        sendError("OSC bundle hasError");
+    } else {
+        int called;
+        called = messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage);
+        called = messageIn.dispatch("/exo/tt/rgb/set", receiveRgbSetMessage);
+        called = messageIn.dispatch("/exo/tt/vibro", receiveVibroMessage);
+    }
+
+    messageIn.empty();
 }
 
 void sendOSC(class OSCMessage &m) {
@@ -424,7 +293,7 @@ void sendOSC(class OSCMessage &m) {
     SLIPSerial.beginPacket();  
     m.send(SLIPSerial); // send the bytes to the SLIP stream
     SLIPSerial.endPacket(); // mark the end of the OSC Packet
-    m.empty(); // free space occupied by message
+    m.empty(); // free the space occupied by the message
         
 #ifdef USE_BLUETOOTH
     // "manually" end Bluetooth/Amarino message
@@ -435,7 +304,7 @@ void sendOSC(class OSCMessage &m) {
 #endif  
 }
 
-void sendAnalogObservation(class AnalogSampler &s, char* address) {
+void sendAnalogObservation(class AnalogSampler &s, const char* address) {
     OSCMessage m(address);
     m.add((uint64_t) s.getStartTime());
     m.add((uint64_t) s.getEndTime());
@@ -445,23 +314,48 @@ void sendAnalogObservation(class AnalogSampler &s, char* address) {
     m.add(s.getMean());
     m.add(s.getVariance());
  
-    sendOSC(m);
+    sendOSC(m); 
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void receiveLightLevelRequest(byte flag, byte numOfValues) {
+void receivePhotoGetMessage(class OSCMessage &m) {
     sampler_photoresistor.reset();
     sampler_photoresistor.beginSample();
     sampler_photoresistor.measure();
     sampler_photoresistor.endSample();
-    
+   
     sendLightLevel();
 }
 
-void receivePing(byte flag, byte numOfValues) {
-    sendPingReply();
+void receiveRgbSetMessage(class OSCMessage &m) {
+    if (m.isInt(0)) {
+        unsigned long color = (unsigned long) m.getInt(0);
+        writeRGBColor(color);
+    } else {
+        sendError("expected integer argument to RGB LED control");
+    }
+}
+
+void receiveVibroMessage(class OSCMessage &m) {
+    writeRGBColor(PURPLE);
+  //sendInfo("we made it into the vibro control!");
+    if (m.isInt(0)) {
+        int d = m.getInt(0);
+        playMorseInt(d);
+        
+        writeRGBColor(YELLOW);
+        if (d <= 0) {
+            sendError("vibro duration must be a positive number");
+        } else if (d > 60000) {
+            sendError("exceeded artificial bound of one minute for vibration cue");
+        } else {
+            vibrateForDuration(d);  
+        }  
+    } else {
+        sendError("expected integer argument to vibro control");
+    }
 }
 
 
@@ -490,6 +384,7 @@ void sendKeyEvent(char *keys) {
 
 void sendLightLevel() {
     sendAnalogObservation(sampler_photoresistor, "/exo/tt/photo/data"); 
+  
     //Serial.println("");
     //Serial.print(sampler_photoresistor.getMean());
     //Serial.println("");
@@ -505,31 +400,10 @@ void sendPingReply() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void loop() {
-  // TODO: restore me
-    //readSerial();
-    
+void loop() {    
 #ifdef USE_BLUETOOTH
     // this must be kept in loop() to receive events via Amarino
     meetAndroid.receive();  
-#endif
-
-#ifdef DEBUG
-    if (Serial.available() > 0) {            
-        int c = Serial.read();
-        //Serial.print("I received: ");
-        //Serial.println(incomingByte, DEC);
-        if (EOL == c) {
-            serialInputStr[serialInputPtr] = 0;
-            //Serial.print("received input: ");
-            //Serial.println(serialInputStr);
-            
-            handleCommand(serialInputStr);
-            serialInputPtr = 0;
-        } else {
-            serialInputStr[serialInputPtr++] = c;  
-        }
-    }
 #endif
 
     readKeys();
@@ -544,9 +418,6 @@ void loop() {
             laserOn();
         } else {
             laserOff();
-        }
-        if (keys[3] == HIGH) {
-            receiveLightLevelRequest(0, 0);  
         }
       
         unsigned int before = micros();
