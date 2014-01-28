@@ -21,16 +21,22 @@ public abstract class BluetoothDeviceControl {
     }
 
     public void connect(final Context context) {
-        // this is how you tell Amarino to connect to a specific BT device from within your own code
+        // connect to the specific Bluetooth device
         Amarino.connect(context, address);
 
         // also keep this context for sending of messages (note: we assume the same context is used throughout)
         this.context = context;
+
+        onConnect();
     }
 
     public void disconnect(final Context context) {
         // if you connect in onStart() you must not forget to disconnect when your app is closed
         Amarino.disconnect(context, address);
+    }
+
+    // override this method
+    protected void onConnect() {
     }
 
     public void sendOSCMessage(OSCMessage message) {

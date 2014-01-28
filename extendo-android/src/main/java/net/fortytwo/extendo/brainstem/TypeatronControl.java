@@ -52,6 +52,8 @@ public class TypeatronControl extends BluetoothDeviceControl {
 
     private final BrainModeClientWrapper brainModeWrapper;
 
+    private long latestPing;
+
     public TypeatronControl(final String address,
                             final OSCDispatcher oscDispatcher,
                             final EditText textEditor,
@@ -61,23 +63,6 @@ public class TypeatronControl extends BluetoothDeviceControl {
         this.toaster = toaster;
 
         setupParser();
-
-        oscDispatcher.register("/exo/tt/keys", new OSCMessageHandler() {
-            public void handle(final OSCMessage message) {
-                Object[] args = message.getArguments();
-                if (1 == args.length) {
-                    try {
-                        inputReceived(((String) args[0]).getBytes());
-                    } catch (IOException e) {
-                        Log.e(Brainstem.TAG, "failed to relay Typeatron input");
-                        e.printStackTrace(System.err);
-                    }
-                    textEditor.setText("Typeatron keys: " + args[0] + " (" + totalButtonsCurrentlyPressed + " pressed)");
-                } else {
-                    textEditor.setText("Typeatron control error (wrong # of args)");
-                }
-            }
-        });
 
         oscDispatcher.register("/exo/tt/error", new OSCMessageHandler() {
             public void handle(OSCMessage message) {
@@ -103,6 +88,34 @@ public class TypeatronControl extends BluetoothDeviceControl {
             }
         });
 
+        oscDispatcher.register("/exo/tt/keys", new OSCMessageHandler() {
+            public void handle(final OSCMessage message) {
+                Object[] args = message.getArguments();
+                if (1 == args.length) {
+                    try {
+                        inputReceived(((String) args[0]).getBytes());
+                    } catch (IOException e) {
+                        Log.e(Brainstem.TAG, "failed to relay Typeatron input");
+                        e.printStackTrace(System.err);
+                    }
+                    textEditor.setText("Typeatron keys: " + args[0] + " (" + totalButtonsCurrentlyPressed + " pressed)");
+                } else {
+                    textEditor.setText("Typeatron control error (wrong # of args)");
+                }
+            }
+        });
+
+        oscDispatcher.register("/exo/tt/ping/reply", new OSCMessageHandler() {
+            public void handle(OSCMessage message) {
+                // note: argument is ignored for now; in future, it could be used to synchronize clocks
+
+                // we assume this reply is a response to the latest ping
+                long delay = System.currentTimeMillis() - latestPing;
+
+                Log.i(Brainstem.TAG, "ping reply received from Typeatron " + address + " in " + delay + "ms");
+            }
+        });
+
         // TODO: temporary... assume Emacs is available, even if we can't detect it...
         boolean forceEmacsAvailable = true;  // emacsAvailable
 
@@ -111,6 +124,12 @@ public class TypeatronControl extends BluetoothDeviceControl {
         } catch (IOException e) {
             throw new DeviceInitializationException(e);
         }
+    }
+
+    @Override
+    protected void onConnect() {
+        OSCMessage m = new OSCMessage("/exo/tt/ping");
+        sendOSCMessage(m);
     }
 
     private class BrainModeClientWrapper {
