@@ -83,9 +83,22 @@ public class TypeatronControl extends BluetoothDeviceControl {
             public void handle(OSCMessage message) {
                 Object[] args = message.getArguments();
                 if (1 == args.length) {
-                    textEditor.append("\nTypeatron device error: " + args[0]);
+                    textEditor.append("\nerror message from Typeatron: " + args[0]);
+                    Log.e(Brainstem.TAG, "error message from Typeatron " + address + ": " + args[0]);
                 } else {
-                    textEditor.setText("Typeatron control error (wrong # of args)");
+                    Log.e(Brainstem.TAG, "wrong number of arguments in Typeatron error message");
+                }
+            }
+        });
+
+        oscDispatcher.register("/exo/tt/info", new OSCMessageHandler() {
+            public void handle(OSCMessage message) {
+                Object[] args = message.getArguments();
+                if (1 == args.length) {
+                    textEditor.append("\ninfo message from Typeatron: " + args[0]);
+                    Log.i(Brainstem.TAG, "info message from Typeatron " + address + ": " + args[0]);
+                } else {
+                    Log.e(Brainstem.TAG, "wrong number of arguments in Typeatron info message");
                 }
             }
         });
@@ -383,6 +396,12 @@ public class TypeatronControl extends BluetoothDeviceControl {
                     toaster.makeText("typed: " + mod);
                     if (null != brainModeWrapper) {
                         brainModeWrapper.write(mod);
+                    }
+
+                    if ("v".equals(symbol)) {
+                        OSCMessage m = new OSCMessage("/exo/tt/vibro");
+                        m.addArgument(1000);
+                        sendOSCMessage(m);
                     }
                 } else {
                     Mode mode = currentButtonState.mode;

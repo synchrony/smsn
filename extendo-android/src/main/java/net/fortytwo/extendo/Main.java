@@ -189,7 +189,7 @@ public class Main extends Activity {
 
         public void onClick(View v) {
             editor.setText("pinging bluetooth device");
-            brainstem.pingBluetooth();
+            brainstem.pingExtendoHand();
         }
     };
 
