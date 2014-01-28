@@ -295,15 +295,18 @@
     (lexical-let ((m mode))
         (lambda (status) (receive-view-internal status m))))
 
+(defun show-http-response-status (status)
+    (let ((msg (cdr (assoc 'message json)))
+        (error (cdr (assoc 'error json))))
+            (if error
+                (error-message error)
+                (error-message msg))))
+
 (defun receive-view-internal (status mode)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
           (editable (equal mode exo-edit-mode)))
         (if status
-            (let ((msg (cdr (assoc 'message json)))
-                (error (cdr (assoc 'error json))))
-                    (if error
-                        (error-message error)
-                        (error-message msg)))
+            (show-http-response-status status json)
             (let (
                 (root (cdr (assoc 'root json)))
                 (view (cdr (assoc 'view json)))
@@ -436,6 +439,15 @@
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
 
+(defun request-find-isolated-atoms-results (mins maxs minw maxw)
+    (setq exo-current-line 1)
+    (setq exo-future-sharability exo-default-sharability)
+    (http-get
+        (concat (base-url) "find-isolated-atoms?request=" (w3m-url-encode-string (json-encode
+            (list
+                :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
+        (receive-view exo-search-mode)))
+
 (defun request-find-roots-results (style mins maxs minw maxw)
     (setq exo-current-line 1)
     (setq exo-future-sharability exo-default-sharability)
@@ -444,6 +456,20 @@
             (list :style style :depth 1
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
+
+(defun request-remove-isolated-atoms (mins maxs minw maxw)
+    (setq exo-current-line 1)
+    (setq exo-future-sharability exo-default-sharability)
+    (http-get
+        (concat (base-url) "remove-isolated-atoms?request=" (w3m-url-encode-string (json-encode
+            (list
+                :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
+        (lambda (status)
+            (interactive)
+            (if status
+                (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
+                    (show-http-response-status status json)))
+                (message "removed isolated atoms")))))
 
 (defun request-ripple-results (query style mins maxs minw maxw)
     (setq exo-current-line 1)
@@ -753,6 +779,18 @@
     (message "exporting")
     (do-export))
 
+(defun exo-find-isolated-atoms ()
+    "retrieve a list of isolated atoms (i.e. atoms with neither parents nor children) in the Extend-o-Brain graph"
+    (interactive)
+        (request-find-isolated-atoms-results
+            exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-remove-isolated-atoms ()
+    "remove all isolated atoms (i.e. atoms with neither parents nor children) from the Extend-o-Brain graph"
+    (interactive)
+        (request-remove-isolated-atoms
+            exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
 (defun exo-find-roots ()
     "retrieve a list of roots (i.e. atoms with no parents) in the Extend-o-Brain graph"
     (interactive)
@@ -1059,6 +1097,8 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-a s")       'exo-insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'exo-insert-current-time)
 (global-set-key (kbd "C-c C-d")         (char-arg 'exo-set-view-depth "depth = ?"))
+(global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
+(global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)
 (global-set-key (kbd "C-c C-l")         (minibuffer-arg 'exo-goto-line "line: "))
 (global-set-key (kbd "C-c C-r C-b a")   (exo-visit-in-amazon 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b e")   (exo-visit-in-ebay 'current-root-value))

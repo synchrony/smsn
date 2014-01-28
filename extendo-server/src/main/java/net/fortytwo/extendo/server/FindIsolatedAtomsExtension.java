@@ -14,40 +14,40 @@ import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 
 /**
- * A service for finding root nodes of an Extend-o-Brain graph
+ * A service for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "find-roots")
-//@ExtensionDescriptor(description = "find root nodes of an Extend-o-Brain graph")
-public class FindRootsExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "find-isolated-atoms")
+public class FindIsolatedAtomsExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+        logInfo("extendo find isolated atoms");
+
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        BasicViewRequest r;
+
+        FilteredResultsRequest r;
         try {
-            r = new BasicViewRequest(request, p.user);
+            r = new FilteredResultsRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo find-roots");
-
-        p.depth = r.depth;
-        p.styleName = r.styleName;
         p.filter = r.filter;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        Note n = p.queries.findRoots(p.filter, p.style, p.depth - 1);
+        Note n = p.queries.findIsolatedAtoms(p.filter);
         addView(n, p);
 
-        p.map.put("title", "all roots");
+        p.map.put("title", "isolated atoms");
+
         return ExtensionResponse.ok(p.map);
     }
 

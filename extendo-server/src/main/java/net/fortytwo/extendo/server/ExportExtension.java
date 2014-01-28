@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.regex.Pattern;
 
 /**
  * A service for exporting/serializing an Extend-o-Brain graph
@@ -35,7 +34,6 @@ import java.util.regex.Pattern;
 @ExtensionNaming(namespace = "extendo", name = "export")
 //@ExtensionDescriptor(description = "export/serialize a Extend-o-Brain graph")
 public class ExportExtension extends ExtendoExtension {
-    private static final Pattern DATE_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph for analysis in tools such as R")

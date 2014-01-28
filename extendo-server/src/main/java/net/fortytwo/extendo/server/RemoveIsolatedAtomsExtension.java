@@ -10,44 +10,40 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 
 /**
- * A service for finding root nodes of an Extend-o-Brain graph
+ * A service for removing isolated atoms (i.e. atoms with no parents or children) from an Extend-o-Brain graph
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "extendo", name = "find-roots")
-//@ExtensionDescriptor(description = "find root nodes of an Extend-o-Brain graph")
-public class FindRootsExtension extends ExtendoExtension {
+@ExtensionNaming(namespace = "extendo", name = "remove-isolated-atoms")
+public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for for removing isolated atoms (i.e. atoms with no parents or children) from an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+        logInfo("extendo remove isolated atoms");
+
         Params p = createParams(context, (KeyIndexableGraph) graph);
-        BasicViewRequest r;
+
+        FilteredResultsRequest r;
         try {
-            r = new BasicViewRequest(request, p.user);
+            r = new FilteredResultsRequest(request, p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo find-roots");
-
-        p.depth = r.depth;
-        p.styleName = r.styleName;
         p.filter = r.filter;
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        Note n = p.queries.findRoots(p.filter, p.style, p.depth - 1);
-        addView(n, p);
+        p.queries.removeIsolatedAtoms(p.filter);
 
-        p.map.put("title", "all roots");
         return ExtensionResponse.ok(p.map);
     }
 
@@ -56,6 +52,6 @@ public class FindRootsExtension extends ExtendoExtension {
     }
 
     protected boolean doesWrite() {
-        return false;
+        return true;
     }
 }

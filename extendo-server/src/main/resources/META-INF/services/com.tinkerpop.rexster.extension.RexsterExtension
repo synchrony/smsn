@@ -1,12 +1,14 @@
 net.fortytwo.extendo.server.BroadcastRdfExtension
 net.fortytwo.extendo.server.DuplicatesExtension
 net.fortytwo.extendo.server.ExportExtension
+net.fortytwo.extendo.server.FindIsolatedAtomsExtension
 net.fortytwo.extendo.server.FindRootsExtension
 net.fortytwo.extendo.server.GetEventsExtension
 net.fortytwo.extendo.server.HistoryExtension
 net.fortytwo.extendo.server.InferTypesExtension
 net.fortytwo.extendo.server.PrioritiesExtension
 net.fortytwo.extendo.server.PushEventExtension
+net.fortytwo.extendo.server.RemoveIsolatedAtomsExtension
 net.fortytwo.extendo.server.RippleExtension
 net.fortytwo.extendo.server.SearchExtension
 net.fortytwo.extendo.server.SetPropertiesExtension
