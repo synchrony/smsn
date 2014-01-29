@@ -68,7 +68,7 @@ public class ViewExtension extends ExtendoExtension {
         return false;
     }
 
-    public class ViewRequest extends RootedViewRequest {
+    private class ViewRequest extends RootedViewRequest {
         public final boolean includeTypes;
 
         public ViewRequest(final String jsonStr,

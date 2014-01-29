@@ -5,11 +5,21 @@
 ;;     exo-rexster-url: IP, port, and local path to the rexster server
 ;;     exo-rexster-graph: name of Extend-o-Brain graph served by Rexster
 ;;
+;; Optional global variables:
+;;
+;;     exo-default-graphml-file: file to which GraphML dumps will be exported by default
+;;     exo-default-vertices-file: file to which tab-separated vertex dumps will be exported by default
+;;     exo-default-edge-file: file to which tab-separated edge dumps will be exported by default
+;;     exo-default-pagerank-file: file to which PageRank results will be exported by default
+;;
 ;; For example:
 ;;
-;;     (defun brain-mode ()
-;;         (defvar exo-rexster-url "http://localhost:8182")
-;;         (defvar exo-rexster-graph "joshkb"))
+;;     (defvar exo-rexster-url "http://localhost:8182")
+;;     (defvar exo-rexster-graph "joshkb")
+;;     (defvar exo-default-graphml-file "/tmp/joshkb-graphml.xml")
+;;     (defvar exo-default-vertices-file "/tmp/joshkb-vertices.tsv")
+;;     (defvar exo-default-edges-file "/tmp/joshkb-edges.tsv")
+;;     (defvar exo-default-pagerank-file "/tmp/joshkb-pagerank.tsv")
 
 
 ;; DEPENDENCIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -295,12 +305,18 @@
     (lexical-let ((m mode))
         (lambda (status) (receive-view-internal status m))))
 
-(defun show-http-response-status (status)
+(defun show-http-response-status (status json)
     (let ((msg (cdr (assoc 'message json)))
         (error (cdr (assoc 'error json))))
             (if error
                 (error-message error)
                 (error-message msg))))
+
+(defun acknowledge-http-response (status success-message)
+    (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
+        (if status
+            (show-http-response-status status json)
+            (info-message success-message))))
 
 (defun receive-view-internal (status mode)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
@@ -366,24 +382,10 @@
                     (info-message (concat "updated to view " (view-info)))))))
 
 (defun receive-export-results (status)
-    (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
-        (if status
-            (let ((msg (cdr (assoc 'message json)))
-                (error (cdr (assoc 'error json))))
-                    (if error
-                        (error-message error)
-                        (error-message msg)))
-            (info-message "exported successfully"))))
+    (acknowledge-http-response status "exported successfully"))
 
 (defun receive-inference-results (status)
-    (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
-        (if status
-            (let ((msg (cdr (assoc 'message json)))
-                (error (cdr (assoc 'error json))))
-                    (if error
-                        (error-message error)
-                        (error-message msg)))
-            (info-message "type inference completed successfully"))))
+    (acknowledge-http-response status "type inference completed successfully"))
 
 (defun request-view (preserve-line mode root depth style mins maxs defaults minw maxw defaultw)
     (setq exo-current-line (if preserve-line (line-number-at-pos) 1))
@@ -467,9 +469,7 @@
         (lambda (status)
             (interactive)
             (if status
-                (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
-                    (show-http-response-status status json)))
-                (message "removed isolated atoms")))))
+                (acknowledge-http-response status "removed isolated atoms")))))
 
 (defun request-ripple-results (query style mins maxs minw maxw)
     (setq exo-current-line 1)
@@ -480,9 +480,12 @@
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
              (receive-view exo-search-mode)))
 
-(defun do-export ()
+(defun do-export (format file mins maxs minw maxw)
     (http-get
-        (concat (base-url) "export") 'receive-export-results))
+        (concat (base-url) "export?request=" (w3m-url-encode-string (json-encode
+            (list :format format :file file
+                :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
+         'receive-export-results))
 
 (defun do-infer-types ()
     (http-get
@@ -676,12 +679,8 @@
 	(lambda (status)
         (let ((json (json-read-from-string (strip-http-headers (buffer-string)))))
             (if status
-                (let ((msg (cdr (assoc 'message json)))
-				    (error (cdr (assoc 'error json))))
-                        (if error
-                            (error-message error)
-                            (error-message msg)))
-                 (url-retrieve url (receive-view mode)))))))))
+                (show-http-response-status status json)
+                (url-retrieve url (receive-view mode)))))))))
 
 (defun set-target-priority (v)
     (if (and (>= v 0) (<= v 1))
@@ -773,11 +772,33 @@
     (interactive)
     (request-events 2))
 
-(defun exo-export ()
-    "export the Extend-o-Brain graph to the file system"
+(defun exo-export-edges (file)
+    "export tab-separated dump of Extend-o-Brain parent-child edges to the file system"
     (interactive)
-    (message "exporting")
-    (do-export))
+    (message (concat "exporting edges to " file))
+    (do-export "Edges" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-graphml (file)
+    "export a GraphML dump of the Extend-o-Brain graph to the file system"
+    (interactive)
+    (message (concat "exporting GraphML to " file))
+    (do-export "GraphML" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-pagerank (file)
+    "export a tab-separated PageRank ranking of Extend-o-Brain atoms to the file system"
+    (interactive)
+    (message (concat "computing and exporting PageRank to " file))
+    (do-export "PageRank" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-vertices (file)
+    "export tab-separated dump of Extend-o-Brain vertices (atoms) to the file system"
+    (interactive)
+    (message (concat "exporting vertices to " file))
+    (do-export "Vertices" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-find-isolated-atoms ()
     "retrieve a list of isolated atoms (i.e. atoms with neither parents nor children) in the Extend-o-Brain graph"
@@ -1075,11 +1096,12 @@ a type has been assigned to it by the inference engine."
 
 ;; KEYBOARD MAPPINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun minibuffer-arg (function prompt)
-    (lexical-let ((f function) (p prompt))
+(defun minibuffer-arg (function prompt &optional initial)
+    (lexical-let ((f function) (p prompt) (i initial))
         (lambda ()
             (interactive)
-            (let ((arg (read-from-minibuffer p)))
+            ;; note: use of the INITIAL argument is discouraged, but here it makes sense
+            (let ((arg (read-from-minibuffer p i)))
                 (if arg (funcall f arg))))))
 
 (defun char-arg (function prompt)
@@ -1097,6 +1119,10 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-a s")       'exo-insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'exo-insert-current-time)
 (global-set-key (kbd "C-c C-d")         (char-arg 'exo-set-view-depth "depth = ?"))
+(global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'exo-export-edges "export edges to file: " exo-default-edges-file))
+(global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'exo-export-graphml "export GraphML to file: " exo-default-graphml-file))
+(global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'exo-export-pagerank "export PageRank results to file: " exo-default-pagerank-file))
+(global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
 (global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
 (global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)
 (global-set-key (kbd "C-c C-l")         (minibuffer-arg 'exo-goto-line "line: "))
@@ -1143,7 +1169,6 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-w C-m")     (char-arg 'exo-set-min-weight "minimun weight = ?"))
 (global-set-key (kbd "C-c a")           'exo-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'exo-duplicates)
-(global-set-key (kbd "C-c e")           'exo-export)
 (global-set-key (kbd "C-c f")           'exo-find-roots)
 (global-set-key (kbd "C-c h")           'exo-history)
 (global-set-key (kbd "C-c i")           'exo-infer-types)
