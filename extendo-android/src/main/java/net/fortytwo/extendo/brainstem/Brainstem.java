@@ -235,7 +235,6 @@ public class Brainstem {
     }
 
     private void handleOSCData(final String data) {
-
         OSCByteArrayToJavaConverter c = new OSCByteArrayToJavaConverter();
 
         // TODO: is the array length all that is expected for the second argument?
@@ -344,7 +343,7 @@ public class Brainstem {
         m.setAddress("/exo/tt/rgb");
         m.addArgument(0xff0000);
 
-        Amarino.sendDataToArduino(context, typeatron.getAddress(), 'e', m.getByteArray());
+        typeatron.sendOSCMessage(m);
     }
 
     public void simulateGestureEvent() {
@@ -375,9 +374,9 @@ public class Brainstem {
         }
     }
 
-    public void pingBluetooth() {
+    public void pingExtendoHand() {
         agent.timeOfLastEvent = System.currentTimeMillis();
-        // note the timestamp argument is not yet used
+        // note: the timestamp argument is not yet used
         Amarino.sendDataToArduino(context, extendoHand.getAddress(), 'p', agent.timeOfLastEvent);
     }
 
@@ -410,39 +409,48 @@ public class Brainstem {
                 String data = intent.getStringExtra(AmarinoIntent.EXTRA_DATA);
 
                 if (data != null) {
-                    byte[] bytes = data.getBytes();
-
-                    // strip off the odd 0xEF 0xBF 0xBD three-byte sequence which sometimes encloses the message
-                    // I haven't quite grokked it.  It's like a UTF-8 byte order mark, but not quite, and it appears
-                    // both at the end and the beginning of the message.
-                    // It appears only when Amarino *and* OSCuino are used to send the OSC data over Bluetooth
-                    if (bytes.length >= 6) {
-                        //Log.i(TAG, "bytes[0] = " + (int) bytes[0] + ", " + "bytes[bytes.length - 3] = " + bytes[bytes.length - 3]);
-
-                        if (-17 == bytes[0] && -17 == bytes[bytes.length - 3]) {
-                            data = new String(Arrays.copyOfRange(bytes, 3, bytes.length - 3));
+                    if (0 == data.length()) {
+                        Log.w(TAG, "received zero-length message from Arduino");
+                    } else {
+                        if (Extendo.VERBOSE) {
+                            Log.i(TAG, "data from Arduino: " + data);
                         }
-                    }
+                        //textEditor.setText("OSC: " + data);
 
-                    if (Extendo.VERBOSE) {
-                        Log.i(TAG, "data from Arduino: " + data);
-                    }
-                    //textEditor.setText("OSC: " + data);
+                        /*
+                        // TODO: temporary debugging code
+                        StringBuilder sb = new StringBuilder("data:");
+                        for (byte b : data.getBytes()) {
+                            sb.append(" ").append((int) b);
+                        }
+                        Log.i(TAG, sb.toString());
+                        //*/
 
-                    /*
-                    // TODO: temporary debugging code
-                    StringBuilder sb = new StringBuilder("data:");
-                    for (byte b : data.getBytes()) {
-                        sb.append(" ").append((int) b);
-                    }
-                    Log.i(TAG, sb.toString());
-                    */
+                        byte[] bytes = data.getBytes();
 
-                    // TODO: catching ArrayIndexOutOfBoundsException is temporary; fix the problem in the Arduino
-                    try {
-                        handleOSCData(data);
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        Log.e(Brainstem.TAG, "array index out of bounds when reading from Arduino");
+                        // strip off the odd 0xEF 0xBF 0xBD three-byte sequence which sometimes encloses the message
+                        // I haven't quite grokked it.  It's like a UTF-8 byte order mark, but not quite, and it appears
+                        // both at the end and the beginning of the message.
+                        // It appears only when Amarino *and* OSCuino are used to send the OSC data over Bluetooth
+                        if (bytes.length >= 6) {
+                            //Log.i(TAG, "bytes[0] = " + (int) bytes[0] + ", " + "bytes[bytes.length - 3] = " + bytes[bytes.length - 3]);
+
+                            if (-17 == bytes[0] && -17 == bytes[bytes.length - 3]) {
+                                data = new String(Arrays.copyOfRange(bytes, 3, bytes.length - 3));
+                            }
+
+                            if (0 == data.length()) {
+                                Log.w(TAG, "received empty message from Arduino");
+                                return;
+                            }
+                        }
+
+                        // TODO: catching ArrayIndexOutOfBoundsException is temporary; fix the problem in the Arduino
+                        try {
+                            handleOSCData(data);
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            Log.e(Brainstem.TAG, "array index out of bounds when reading from Arduino");
+                        }
                     }
                 }
             }

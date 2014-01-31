@@ -47,11 +47,11 @@ public class RFIDListener implements DiscoveryListener {
         readers.add(r);
     }
 
-    public void readerRenewed(DiscoveryItem item) {
+    public void readerRenewed(final DiscoveryItem item) {
         LOGGER.info("reader renewed: " + item);
     }
 
-    public void readerRemoved(DiscoveryItem item) {
+    public void readerRemoved(final DiscoveryItem item) {
         LOGGER.info("reader removed: " + item);
 
         try {

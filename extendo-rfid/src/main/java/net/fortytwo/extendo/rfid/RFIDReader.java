@@ -27,6 +27,17 @@ public class RFIDReader {
                       final PrintStream log) throws AlienReaderException {
         this.alienReader = alienReader;
 
+        /*
+        System.out.println("##### maxAntenna = " + this.alienReader.getMaxAntenna());
+        System.out.println("##### antennaSequence = " + this.alienReader.getAntennaSequence());
+        for (int i = 0; i < 4; i++) {
+            System.out.println("##### level " + i + ": " + this.alienReader.getRFLevel(i));
+            System.out.println("##### attenuation " + i + ": " + this.alienReader.getRFAttenuation(i));
+        }
+        System.out.println("##### info: " + this.alienReader.getInfo());
+        System.out.println("##### tag list + antenna: " + this.alienReader.getTagListAntennaCombine());
+        */
+
         if (1 > numberOfAntennas) {
             throw new IllegalArgumentException("can't have less than one antenna");
         } else if (1 == numberOfAntennas) {

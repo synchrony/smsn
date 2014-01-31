@@ -343,19 +343,59 @@ public class NoteQueries {
     public Note findRoots(final Filter filter,
                           final AdjacencyStyle style,
                           final int depth) {
-
         Note result = new Note();
 
         for (Vertex v : store.getGraph().getVertices()) {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
-                Note n = viewInternal(store.getAtom(v), depth, filter, style, null);
-                result.addChild(n);
+                Atom a = store.getAtom(v);
+                if (filter.isVisible(a)) {
+                    Note n = viewInternal(a, depth, filter, style, null);
+                    result.addChild(n);
+                }
             }
         }
 
         Collections.sort(result.getChildren(), new NoteComparator());
         return result;
+    }
+
+    public Note findIsolatedAtoms(final Filter filter) {
+        Note result = new Note();
+
+        for (Vertex v : store.getGraph().getVertices()) {
+            if (null != v.getProperty("value")
+                    && !v.getEdges(Direction.IN).iterator().hasNext()
+                    && !v.getEdges(Direction.OUT).iterator().hasNext()) {
+                Atom a = store.getAtom(v);
+                if (filter.isVisible(a)) {
+                    Note n = viewInternal(a, 1, filter, FORWARD_ADJACENCY, null);
+                    result.addChild(n);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void removeIsolatedAtoms(final Filter filter) {
+        List<Vertex> toRemove = new LinkedList<Vertex>();
+
+        for (Vertex v : store.getGraph().getVertices()) {
+            if (null != v.getProperty("value")
+                    && !v.getEdges(Direction.IN).iterator().hasNext()
+                    && !v.getEdges(Direction.OUT).iterator().hasNext()) {
+                Atom a = store.getAtom(v);
+                if (filter.isVisible(a)) {
+                    toRemove.add(v);
+                }
+            }
+        }
+
+        for (Vertex v : toRemove) {
+            // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
+            store.getGraph().removeVertex(v);
+        }
     }
 
     /**

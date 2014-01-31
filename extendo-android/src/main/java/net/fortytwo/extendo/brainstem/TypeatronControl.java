@@ -52,6 +52,8 @@ public class TypeatronControl extends BluetoothDeviceControl {
 
     private final BrainModeClientWrapper brainModeWrapper;
 
+    private long latestPing;
+
     public TypeatronControl(final String address,
                             final OSCDispatcher oscDispatcher,
                             final EditText textEditor,
@@ -61,6 +63,30 @@ public class TypeatronControl extends BluetoothDeviceControl {
         this.toaster = toaster;
 
         setupParser();
+
+        oscDispatcher.register("/exo/tt/error", new OSCMessageHandler() {
+            public void handle(OSCMessage message) {
+                Object[] args = message.getArguments();
+                if (1 == args.length) {
+                    textEditor.append("\nerror message from Typeatron: " + args[0]);
+                    Log.e(Brainstem.TAG, "error message from Typeatron " + address + ": " + args[0]);
+                } else {
+                    Log.e(Brainstem.TAG, "wrong number of arguments in Typeatron error message");
+                }
+            }
+        });
+
+        oscDispatcher.register("/exo/tt/info", new OSCMessageHandler() {
+            public void handle(OSCMessage message) {
+                Object[] args = message.getArguments();
+                if (1 == args.length) {
+                    textEditor.append("\ninfo message from Typeatron: " + args[0]);
+                    Log.i(Brainstem.TAG, "info message from Typeatron " + address + ": " + args[0]);
+                } else {
+                    Log.e(Brainstem.TAG, "wrong number of arguments in Typeatron info message");
+                }
+            }
+        });
 
         oscDispatcher.register("/exo/tt/keys", new OSCMessageHandler() {
             public void handle(final OSCMessage message) {
@@ -79,14 +105,14 @@ public class TypeatronControl extends BluetoothDeviceControl {
             }
         });
 
-        oscDispatcher.register("/exo/tt/error", new OSCMessageHandler() {
+        oscDispatcher.register("/exo/tt/ping/reply", new OSCMessageHandler() {
             public void handle(OSCMessage message) {
-                Object[] args = message.getArguments();
-                if (1 == args.length) {
-                    textEditor.append("\nTypeatron device error: " + args[0]);
-                } else {
-                    textEditor.setText("Typeatron control error (wrong # of args)");
-                }
+                // note: argument is ignored for now; in future, it could be used to synchronize clocks
+
+                // we assume this reply is a response to the latest ping
+                long delay = System.currentTimeMillis() - latestPing;
+
+                Log.i(Brainstem.TAG, "ping reply received from Typeatron " + address + " in " + delay + "ms");
             }
         });
 
@@ -98,6 +124,12 @@ public class TypeatronControl extends BluetoothDeviceControl {
         } catch (IOException e) {
             throw new DeviceInitializationException(e);
         }
+    }
+
+    @Override
+    protected void onConnect() {
+        OSCMessage m = new OSCMessage("/exo/tt/ping");
+        sendOSCMessage(m);
     }
 
     private class BrainModeClientWrapper {
@@ -383,6 +415,12 @@ public class TypeatronControl extends BluetoothDeviceControl {
                     toaster.makeText("typed: " + mod);
                     if (null != brainModeWrapper) {
                         brainModeWrapper.write(mod);
+                    }
+
+                    if ("v".equals(symbol)) {
+                        OSCMessage m = new OSCMessage("/exo/tt/vibro");
+                        m.addArgument(1000);
+                        sendOSCMessage(m);
                     }
                 } else {
                     Mode mode = currentButtonState.mode;

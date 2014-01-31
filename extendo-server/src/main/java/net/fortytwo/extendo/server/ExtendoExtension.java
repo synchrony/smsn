@@ -275,30 +275,32 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
     }
 
     protected class Params {
-        public RexsterResourceContext context;
-        public Principal user;
-        public Map<String, Object> map;
         public KeyIndexableGraph baseGraph;
         public ExtendoBrain brain;
-        public FramedGraph<KeyIndexableGraph> manager;
-        public NoteQueries queries;
-        public NoteParser parser;
-        public NoteWriter writer;
-        public Atom root;
+        public RexsterResourceContext context;
+        public String data;
         public Integer depth;
-        public JSONObject jsonView;
-        public String wikiView;
-        public NoteQueries.AdjacencyStyle style;
+        public String file;
         public Filter filter;
-        public String query;
+        public String format;
+        public boolean includeTypes;
+        public JSONObject jsonView;
+        public FramedGraph<KeyIndexableGraph> manager;
+        public Map<String, Object> map;
+        public Integer maxResults;
+        public NoteParser parser;
         public String propertyName;
         public Float propertyValue;
+        public NoteQueries queries;
+        public String query;
+        public Atom root;
         public String rootId;
+        public NoteQueries.AdjacencyStyle style;
         public String styleName;
+        public Principal user;
         public Integer valueCutoff;
-        public Integer maxResults;
-        public String data;
-        public boolean includeTypes;
+        public String wikiView;
+        public NoteWriter writer;
     }
 
     protected class Request {
@@ -307,7 +309,9 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                 DEFAULT_SHARABILITY = "defaultSharability",
                 DEFAULT_WEIGHT = "defaultWeight",
                 DEPTH = "depth",
+                FILE = "file",
                 FILTER = "filter",
+                FORMAT = "format",
                 ID = "id",
                 INCLUDE_TYPES = "includeTypes",
                 MAX_RESULTS = "maxResults",

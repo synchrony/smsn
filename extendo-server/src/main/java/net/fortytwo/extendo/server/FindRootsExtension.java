@@ -13,8 +13,6 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 
-import java.io.IOException;
-
 /**
  * A service for finding root nodes of an Extend-o-Brain graph
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -46,7 +44,8 @@ public class FindRootsExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
-        addRoots(p);
+        Note n = p.queries.findRoots(p.filter, p.style, p.depth - 1);
+        addView(n, p);
 
         p.map.put("title", "all roots");
         return ExtensionResponse.ok(p.map);
@@ -58,10 +57,5 @@ public class FindRootsExtension extends ExtendoExtension {
 
     protected boolean doesWrite() {
         return false;
-    }
-
-    protected void addRoots(final Params p) throws IOException {
-        Note n = p.queries.findRoots(p.filter, p.style, p.depth - 1);
-        addView(n, p);
     }
 }

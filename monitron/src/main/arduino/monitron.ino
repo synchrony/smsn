@@ -68,6 +68,7 @@ AnalogSampler sampler_photo_light(LIGHT_PIN);
 AnalogSampler sampler_rht03_humid(0);
 AnalogSampler sampler_rht03_temp(0);
 
+
 ////////////////////////////////////////
 
 #include <DHT22.h>

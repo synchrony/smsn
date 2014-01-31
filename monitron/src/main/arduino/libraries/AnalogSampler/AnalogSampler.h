@@ -1,6 +1,6 @@
 /*
-  analog_sampler.h - sampling of Arduino analog input pins
-  Created by Joshua Shinavier, 2012
+  AnalogSampler.h - sampling of Arduino analog input pins
+  Created by Joshua Shinavier, 2012-2014
   Released into the public domain.
 */
 
@@ -20,8 +20,8 @@ class AnalogSampler
     void addMeasurement(double v);
     void reset();
     
-    unsigned long getStartTime();
-    unsigned long getEndTime();
+    unsigned long getStartTime();  // in milliseconds
+    unsigned long getEndTime();    // in milliseconds
     unsigned long getNumberOfMeasurements();
     
     double getMinValue();
