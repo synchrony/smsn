@@ -264,7 +264,7 @@ void receiveBluetoothOSC(byte flag, byte numOfValues)
     sprintf(errstr, "received OSC message of length %d to %s", length, buffer);
     sendInfo(errstr); 
     
-    playMorseInt(length);  
+    //playMorseInt(length);  
 
     OSCMessage messageIn;
     
@@ -277,6 +277,7 @@ void receiveBluetoothOSC(byte flag, byte numOfValues)
     } else {
         int called;
         called = messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage);
+        called = messageIn.dispatch("/exo/tt/ping", receivePingMessage);
         called = messageIn.dispatch("/exo/tt/rgb/set", receiveRgbSetMessage);
         called = messageIn.dispatch("/exo/tt/vibro", receiveVibroMessage);
     }
@@ -327,6 +328,14 @@ void receivePhotoGetMessage(class OSCMessage &m) {
     sampler_photoresistor.endSample();
    
     sendLightLevel();
+}
+
+void receivePingMessage(class OSCMessage &m) {
+    // send reply as soon as possible
+    sendPingReply();
+    
+    writeRGBColor(GREEN);
+    playMorseString("p");    
 }
 
 void receiveRgbSetMessage(class OSCMessage &m) {
