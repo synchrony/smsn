@@ -4,6 +4,8 @@
  * See: https://github.com/joshsh/extendo
  */
 
+#include "gesture.h"
+
 const int pinX = A0;
 const int pinY = A1;
 const int pinZ = A2;
@@ -204,6 +206,12 @@ void loop()
         } else if (a < lowerBound) {
           state = STATE_ONE;
           
+          double gestureVector[3];
+          gestureVector[0] = ax_max;
+          gestureVector[1] = ay_max;
+          gestureVector[2] = az_max;
+          const char *gesture = classifyGestureVector(gestureVector);
+          
           // gesture event
 #ifdef DEBUG
           // tab-separated format for the gesture event, for ease of importing to R and similar tools
@@ -211,14 +219,16 @@ void loop()
           Serial.print(amax); Serial.print(",");
           Serial.print(ax_max); Serial.print(",");
           Serial.print(ay_max); Serial.print(",");
-          Serial.println(az_max);          
+          Serial.print(az_max); Serial.print(",");
+          Serial.println(gesture);        
 #else
-          OSCMessage m("/exo/hand/raw");
+          OSCMessage m("/exo/hand/gesture");
           m.add((int32_t) micros());
           m.add(amax);
           m.add(ax_max);
           m.add(ay_max);
           m.add(az_max);
+          m.add(gesture);
           sendOSC(m);   
 #endif    
         }
