@@ -1,5 +1,5 @@
 /*
- * Extend-o-Hand firmware, copyright 2013 by Joshua Shinavier
+ * Extend-o-Hand firmware, copyright 2013-2014 by Joshua Shinavier
  * 
  * See: https://github.com/joshsh/extendo
  */
@@ -11,11 +11,11 @@ const int pinZ = A2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// if defined, use more straightforward serial output
-//#define DEBUG
-
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
-#define USE_BLUETOOTH
+//#define USE_BLUETOOTH
+
+// if defined, make serial output more legible
+#define DEBUG
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,9 +137,20 @@ void sendOSC(class OSCMessage &m) {
 #endif  
 }
 
-void error(char *message) {
+
+////////////////////////////////////////////////////////////////////////////////
+
+void sendError(char *message) {
     OSCMessage m("/exo/hand/error");
     m.add(message);
+
+    sendOSC(m);
+}
+
+void sendInfo(char *message) {
+    OSCMessage m("/exo/hand/info");
+    m.add(message);
+
     sendOSC(m);
 }
 
@@ -194,17 +205,27 @@ void loop()
           state = STATE_ONE;
           
           // gesture event
+#ifdef DEBUG
+          // tab-separated format for the gesture event, for ease of importing to R and similar tools
+          Serial.print((int32_t) micros()); Serial.print(",");
+          Serial.print(amax); Serial.print(",");
+          Serial.print(ax_max); Serial.print(",");
+          Serial.print(ay_max); Serial.print(",");
+          Serial.println(az_max);          
+#else
           OSCMessage m("/exo/hand/raw");
           m.add((int32_t) micros());
-          m.add((int) (amax * 100));
-          m.add((int) (ax_max * 100));
-          m.add((int) (ay_max * 100));
-          m.add((int) (az_max * 100));
-          sendOSC(m);       
+          m.add(amax);
+          m.add(ax_max);
+          m.add(ay_max);
+          m.add(az_max);
+          sendOSC(m);   
+#endif    
         }
         break;
     }
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
