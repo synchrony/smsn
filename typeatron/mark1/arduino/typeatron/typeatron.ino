@@ -92,11 +92,6 @@ char errstr[128];
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "morse.h"
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 #include <AnalogSampler.h>
 
 AnalogSampler sampler_photoresistor(photoresistorPin);
@@ -116,17 +111,21 @@ const unsigned long BLUE = 0x0000ff;
 const unsigned long PURPLE = 0xff00ff;
 const unsigned long BLACK = 0x000000;
 
+unsigned long currentRGBColor = 0;
+
 void writeRGBColor(unsigned long color)
 {
-  unsigned long red = (color & RED) >> 16;
-  unsigned long green = (color & GREEN) >> 8;
-  unsigned long blue = (color & BLUE);
+    unsigned long red = (color & RED) >> 16;
+    unsigned long green = (color & GREEN) >> 8;
+    unsigned long blue = (color & BLUE);
 
-  red = (red * RED_FACTOR) / 255;
+    red = (red * RED_FACTOR) / 255;
 
-  analogWrite(redPin, 255 - (unsigned int) red);
-  analogWrite(greenPin, 255 - (unsigned int) green);
-  analogWrite(bluePin, 255 - (unsigned int) blue);
+    analogWrite(redPin, 255 - (unsigned int) red);
+    analogWrite(greenPin, 255 - (unsigned int) green);
+    analogWrite(bluePin, 255 - (unsigned int) blue);
+    
+    currentRGBColor = color;
 }
 
 int colorToggle = 0;
@@ -170,8 +169,9 @@ void vibrateForDuration(int ms) {
 
 // these are global so that we can read from setup() as well as loop()
 unsigned int keys[5];
-unsigned keyState;
-    
+unsigned int keyState;
+unsigned int totalKeysPressed;
+
 unsigned int lastKeyState = 0;
 
 void readKeys() {
@@ -182,10 +182,25 @@ void readKeys() {
     keys[4] = !digitalRead(keyPin5);
     
     keyState = 0;
+    totalKeysPressed = 0;
     
     for (int i = 0; i < 5; i++) {
-      keyState |= keys[i] << i;  
+        keyState |= keys[i] << i;  
+        
+        if (keys[i]) {
+            totalKeysPressed++;
+        }
     }  
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include "morse.h"
+
+int morseStopTest() {
+    // abort the playing of a Morse code sequence by pressing 3 or more keys at the same time
+    return totalKeysPressed >= 3; 
 }
 
 
@@ -207,7 +222,7 @@ void startupSequence() {
     delay(200);
     noTone(transducerPin);
     
-    //playMorseString("hello, world!");
+    //playMorseString("hello, world!", morseStopTest);
 }
 
 void setup() {
@@ -253,6 +268,7 @@ void setup() {
 
 void receiveBluetoothOSC(byte flag, byte numOfValues)
 {
+    unsigned long lastColor = currentRGBColor;
     writeRGBColor(GREEN);
 
     // note: length includes the null terminator
@@ -264,7 +280,7 @@ void receiveBluetoothOSC(byte flag, byte numOfValues)
     sprintf(errstr, "received OSC message of length %d to %s", length, buffer);
     sendInfo(errstr); 
     
-    //playMorseInt(length);  
+    //playMorseInt(length, morseStopTest);  
 
     OSCMessage messageIn;
     
@@ -276,6 +292,7 @@ void receiveBluetoothOSC(byte flag, byte numOfValues)
         sendError("OSC bundle hasError");
     } else {
         int called;
+        called = messageIn.dispatch("/exo/tt/morse", receiveMorseMessage);
         called = messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage);
         called = messageIn.dispatch("/exo/tt/ping", receivePingMessage);
         called = messageIn.dispatch("/exo/tt/rgb/set", receiveRgbSetMessage);
@@ -283,6 +300,7 @@ void receiveBluetoothOSC(byte flag, byte numOfValues)
     }
 
     messageIn.empty();
+    writeRGBColor(lastColor);
 }
 
 void sendOSC(class OSCMessage &m) {
@@ -321,6 +339,21 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void receiveMorseMessage(class OSCMessage &m) {
+    if (m.isString(0)) {
+        int length = m.getDataLength(0);
+        char buffer[length+1];
+        m.getString(0, buffer, length+1);   
+        
+        unsigned long lastColor = currentRGBColor;
+        writeRGBColor(YELLOW);
+        playMorseString(buffer, morseStopTest); 
+        writeRGBColor(lastColor);
+    } else {
+        sendError("expected string argument to Morse code control");
+    }  
+}
+
 void receivePhotoGetMessage(class OSCMessage &m) {
     sampler_photoresistor.reset();
     sampler_photoresistor.beginSample();
@@ -335,7 +368,7 @@ void receivePingMessage(class OSCMessage &m) {
     sendPingReply();
     
     writeRGBColor(GREEN);
-    playMorseString("p");    
+    playMorseString("p", morseStopTest);    
 }
 
 void receiveRgbSetMessage(class OSCMessage &m) {
@@ -352,7 +385,7 @@ void receiveVibroMessage(class OSCMessage &m) {
   //sendInfo("we made it into the vibro control!");
     if (m.isInt(0)) {
         int d = m.getInt(0);
-        playMorseInt(d);
+        playMorseInt(d, morseStopTest);
         
         writeRGBColor(YELLOW);
         if (d <= 0) {

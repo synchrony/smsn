@@ -142,7 +142,7 @@ void endSequence() {
     mediumGap();
 }
 
-void playMorseString(const char* message) {
+void playMorseString(const char* message, int (*stopTest)()) {    
     int firstLetterInWord = true;
     
     const char *cur = message;
@@ -195,8 +195,8 @@ void playMorseString(const char* message) {
     endSequence();
 }
 
-void playMorseInt(int d) {
+void playMorseInt(int d, int (*stopTest)()) {
     sprintf(errstr, "%d", d);
-    playMorseString(errstr);  
+    playMorseString(errstr, stopTest);  
 }
 
