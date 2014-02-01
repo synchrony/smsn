@@ -54,6 +54,8 @@ public class TypeatronControl extends BluetoothDeviceControl {
 
     private long latestPing;
 
+    private StringBuilder currentLineOfText = new StringBuilder();
+
     public TypeatronControl(final String address,
                             final OSCDispatcher oscDispatcher,
                             final EditText textEditor,
@@ -412,16 +414,29 @@ public class TypeatronControl extends BluetoothDeviceControl {
                 String symbol = currentButtonState.symbol;
                 if (null != symbol) {
                     String mod = modifySymbol(symbol);
-                    toaster.makeText("typed: " + mod);
+                    //toaster.makeText("typed: " + mod);
                     if (null != brainModeWrapper) {
                         brainModeWrapper.write(mod);
                     }
 
+                    if ("\n".equals(symbol)) {
+                        String text = currentLineOfText.toString();
+                        currentLineOfText = new StringBuilder();
+
+                        OSCMessage m = new OSCMessage("/exo/tt/morse");
+                        m.addArgument(text);
+                        sendOSCMessage(m);
+
+                        toaster.makeText("typed: " + text);
+                    } else {
+                        currentLineOfText.append(symbol);
+                    }
+                    /*
                     if ("v".equals(symbol)) {
                         OSCMessage m = new OSCMessage("/exo/tt/vibro");
                         m.addArgument(1000);
                         sendOSCMessage(m);
-                    }
+                    }*/
                 } else {
                     Mode mode = currentButtonState.mode;
                     if (null != mode) {
