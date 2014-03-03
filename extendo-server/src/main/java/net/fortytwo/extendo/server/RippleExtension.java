@@ -38,12 +38,12 @@ public class RippleExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-//        logInfo("extendo ripple \"" + query + "\"");
-
         p.depth = r.depth;
         p.query = r.query;
         p.styleName = r.styleName;
         p.filter = r.filter;
+
+        logInfo("extendo ripple: \"" + r.query + "\"");
 
         return handleRequestInternal(p);
     }

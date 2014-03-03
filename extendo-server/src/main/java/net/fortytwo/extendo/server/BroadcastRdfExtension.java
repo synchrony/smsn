@@ -45,9 +45,9 @@ public class BroadcastRdfExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo broadcast-rdf");
-
         p.data = r.dataset;
+
+        logInfo("extendo broadcast-rdf");
 
         return handleRequestInternal(p);
     }

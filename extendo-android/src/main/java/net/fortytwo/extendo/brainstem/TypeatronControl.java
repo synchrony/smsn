@@ -20,7 +20,7 @@ public class TypeatronControl extends BluetoothDeviceControl {
 
     private byte[] lastInput;
 
-    private enum Mode {LowercaseText, UppercaseText, Punctuation, Numeric, Mash}
+    private enum Mode {LowercaseText, UppercaseText, Punctuation, Numeric, Hardware, Mash}
 
     private enum Modifier {Control, None}
 
@@ -232,16 +232,9 @@ public class TypeatronControl extends BluetoothDeviceControl {
         currentModifier = Modifier.None;
         currentButtonState = rootStates.get(currentMode);
 
-        // how get back to default mode from anywhere other than mash mode
-        for (Mode m : Mode.values()) {
-            if (m != Mode.Mash) {
-                addChord("11", Mode.LowercaseText, Modifier.None, null, m);
-            }
-        }
-
         // mode entry from default mode
         addChord("1221", null, Modifier.Control, null, Mode.LowercaseText);
-        // 1212 unassigned
+        addChord("1212", Mode.Hardware, null, null, Mode.LowercaseText);
         addChord("1331", Mode.Punctuation, null, null, Mode.LowercaseText);
         addChord("1313", Mode.Numeric, null, null, Mode.LowercaseText);
         addChord("1441", Mode.UppercaseText, null, null, Mode.LowercaseText);
@@ -249,7 +242,14 @@ public class TypeatronControl extends BluetoothDeviceControl {
         addChord("1551", Mode.Mash, Modifier.None, null, Mode.LowercaseText);
         // 1515 unassigned
 
-        // break out of mash mode
+        // return to default mode from anywhere other than mash mode
+        for (Mode m : Mode.values()) {
+            if (m != Mode.Mash) {
+                addChord("11", Mode.LowercaseText, Modifier.None, null, m);
+            }
+        }
+
+        // return from mash mode
         addChord("1234554321", Mode.LowercaseText, Modifier.None, null, Mode.Mash);
 
         // space, newline, delete, escape available in all of the text-entry modes
@@ -441,6 +441,12 @@ public class TypeatronControl extends BluetoothDeviceControl {
                     Mode mode = currentButtonState.mode;
                     if (null != mode) {
                         currentMode = mode;
+
+                        // feedback to the Typeatron whenever mode changes
+                        OSCMessage m = new OSCMessage("/exo/tt/vibro/mode");
+                        m.addArgument(mode.name());
+                        sendOSCMessage(m);
+
                         toaster.makeText("entered mode: " + mode);
                     }
                     Modifier modifier = currentButtonState.modifier;

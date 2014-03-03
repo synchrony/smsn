@@ -38,9 +38,9 @@ public class PushEventExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo push-event");
-
         p.jsonView = r.jsonView;
+
+        logInfo("extendo push-event");
 
         return handleRequestInternal(p);
     }

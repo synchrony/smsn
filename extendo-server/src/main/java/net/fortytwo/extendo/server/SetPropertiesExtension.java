@@ -32,8 +32,6 @@ public class SetPropertiesExtension extends ExtendoExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
-        //logInfo("extendo view: " + request);
-
         Params p = createParams(context, (KeyIndexableGraph) graph);
         SetPropertiesRequest r;
         try {
@@ -62,6 +60,8 @@ public class SetPropertiesExtension extends ExtendoExtension {
         p.propertyName = r.name;
         p.propertyValue = r.value;
         p.rootId = r.id;
+
+        logInfo("extendo set-properties on " + r.id + ": " + r.name + " <- " + r.value);
 
         return handleRequestInternal(p);
     }

@@ -36,9 +36,9 @@ public class HistoryExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo history");
-
         p.filter = r.filter;
+
+        logInfo("extendo history");
 
         return handleRequestInternal(p);
     }

@@ -46,9 +46,9 @@ public class DuplicatesExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo duplicates");
-
         p.filter = r.filter;
+
+        logInfo("extendo duplicates");
 
         return handleRequestInternal(p);
     }

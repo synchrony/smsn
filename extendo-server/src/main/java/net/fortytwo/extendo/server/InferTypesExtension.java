@@ -21,9 +21,9 @@ public class InferTypesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for performing type inference on an Extend-o-Brain knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
-        logInfo("extendo history");
-
         Params p = createParams(context, (KeyIndexableGraph) graph);
+
+        logInfo("extendo infer-types");
 
         return handleRequestInternal(p);
     }

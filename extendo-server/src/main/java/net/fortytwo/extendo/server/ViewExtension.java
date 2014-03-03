@@ -30,10 +30,10 @@ public class ViewExtension extends ExtendoExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
-        //logInfo("extendo view: " + request);
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         ViewRequest r;
+
         try {
             r = new ViewRequest(request, p.user);
         } catch (JSONException e) {
@@ -45,6 +45,8 @@ public class ViewExtension extends ExtendoExtension {
         p.styleName = r.styleName;
         p.filter = r.filter;
         p.includeTypes = r.includeTypes;
+
+        logInfo("extendo view " + r.rootId);
 
         return handleRequestInternal(p);
     }

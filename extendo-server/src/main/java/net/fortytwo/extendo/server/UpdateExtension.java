@@ -34,8 +34,6 @@ public class UpdateExtension extends ExtendoExtension {
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
 
-        //logInfo("extendo update: " + request);
-
         Params p = createParams(context, (KeyIndexableGraph) graph);
         UpdateRequest r;
         try {
@@ -48,6 +46,8 @@ public class UpdateExtension extends ExtendoExtension {
         p.styleName = r.styleName;
         p.wikiView = r.wikiView;
         p.filter = r.filter;
+
+        logInfo("extendo update " + r.rootId);
 
         return handleRequestInternal(p);
     }

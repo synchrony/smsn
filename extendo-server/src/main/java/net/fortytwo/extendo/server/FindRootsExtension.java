@@ -34,11 +34,11 @@ public class FindRootsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo find-roots");
-
         p.depth = r.depth;
         p.styleName = r.styleName;
         p.filter = r.filter;
+
+        logInfo("extendo find-roots");
 
         return handleRequestInternal(p);
     }

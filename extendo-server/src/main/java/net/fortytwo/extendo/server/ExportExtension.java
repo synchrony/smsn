@@ -47,8 +47,6 @@ public class ExportExtension extends ExtendoExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
-        logInfo("extendo export");
-
         // TODO: any security restrictions here?
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
@@ -63,6 +61,8 @@ public class ExportExtension extends ExtendoExtension {
         p.filter = r.filter;
         p.file = r.file;
         p.format = r.format;
+
+        logInfo("extendo export " + r.format + " to " + r.file);
 
         return handleRequestInternal(p);
     }

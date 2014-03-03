@@ -37,9 +37,9 @@ public class GetEventsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo get-events");
-
         p.depth = r.depth;
+
+        logInfo("extendo get-events");
 
         return handleRequestInternal(p);
     }

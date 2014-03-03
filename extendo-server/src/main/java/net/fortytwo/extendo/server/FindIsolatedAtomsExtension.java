@@ -26,8 +26,6 @@ public class FindIsolatedAtomsExtension extends ExtendoExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
-        logInfo("extendo find isolated atoms");
-
         Params p = createParams(context, (KeyIndexableGraph) graph);
 
         FilteredResultsRequest r;
@@ -38,6 +36,8 @@ public class FindIsolatedAtomsExtension extends ExtendoExtension {
         }
 
         p.filter = r.filter;
+
+        logInfo("extendo find-isolated-atoms");
 
         return handleRequestInternal(p);
     }

@@ -38,10 +38,10 @@ public class PrioritiesExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        //logInfo("extendo priorities");
-
         p.filter = r.filter;
         p.maxResults = r.maxResults;
+
+        logInfo("extendo priorities");
 
         return handleRequestInternal(p);
     }
