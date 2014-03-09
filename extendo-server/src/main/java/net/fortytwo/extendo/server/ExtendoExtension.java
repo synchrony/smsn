@@ -101,7 +101,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
 
             p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
             p.brain = getBrain(p.baseGraph);
-            p.queries = new NoteQueries(p.brain.getBrainGraph());
+            p.queries = new NoteQueries(p.brain);
             p.parser = new NoteParser();
             p.writer = new NoteWriter();
 

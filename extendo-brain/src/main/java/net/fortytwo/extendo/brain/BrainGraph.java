@@ -75,7 +75,7 @@ public class BrainGraph {
         return f.create(baseGraph);
     }
 
-    public KeyIndexableGraph getGraph() {
+    public KeyIndexableGraph getPropertyGraph() {
         return graph;
     }
 
@@ -98,7 +98,7 @@ public class BrainGraph {
     }
 
     public Atom getAtom(final String key) {
-        Vertex v = this.getGraph().getVertex(key);
+        Vertex v = this.getPropertyGraph().getVertex(key);
 
         return null == v ? null : getAtom(v);
     }
@@ -113,7 +113,7 @@ public class BrainGraph {
 
     public Atom createAtom(final Filter filter,
                            final String id) {
-        Atom a = framedGraph.frame(this.getGraph().addVertex(id), Atom.class);
+        Atom a = framedGraph.frame(this.getPropertyGraph().addVertex(id), Atom.class);
         a.setCreated(new Date().getTime());
 
         a.setSharability(filter.getDefaultSharability());
@@ -123,7 +123,7 @@ public class BrainGraph {
     }
 
     public AtomList createAtomList() {
-        return framedGraph.frame(this.getGraph().addVertex(null), AtomList.class);
+        return framedGraph.frame(this.getPropertyGraph().addVertex(null), AtomList.class);
     }
 
     public AtomList createAtomList(final Atom... elements) {

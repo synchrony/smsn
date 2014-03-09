@@ -9,10 +9,8 @@ import java.io.InputStreamReader;
 
 /**
  * A number of static convenience methods for parsing vocabulary lists in different formats.
- * <p/>
- * User: josh
- * Date: 3/23/11
- * Time: 7:24 PM
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class VocabularyParsers {
     /**

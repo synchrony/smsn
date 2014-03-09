@@ -4,10 +4,8 @@ import net.fortytwo.extendo.flashcards.db.CloseableIterator;
 
 /**
  * A set of cards with a common theme.
- * <p/>
- * User: josh
- * Date: 3/5/11
- * Time: 6:59 PM
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class Deck<Q, A> {
     private final String name;

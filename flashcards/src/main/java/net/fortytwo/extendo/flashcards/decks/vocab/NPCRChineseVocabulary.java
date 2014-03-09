@@ -8,9 +8,7 @@ import java.io.InputStream;
 import java.util.Locale;
 
 /**
- * User: josh
- * Date: 3/9/11
- * Time: 6:04 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NPCRChineseVocabulary extends VocabularyDeck {
 

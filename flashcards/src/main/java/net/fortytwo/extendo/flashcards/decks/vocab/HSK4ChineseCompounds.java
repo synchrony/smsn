@@ -8,9 +8,7 @@ import java.io.InputStream;
 import java.util.Locale;
 
 /**
- * User: josh
- * Date: 3/19/11
- * Time: 8:20 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class HSK4ChineseCompounds extends VocabularyDeck {
 

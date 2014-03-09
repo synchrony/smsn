@@ -90,7 +90,7 @@ public class ListGraphMigrator {
 
         String fileIn = "/tmp/brain.xml";
         System.out.println("reading graph from " + fileIn);
-        GraphMLReader r = new GraphMLReader(source.getGraph());
+        GraphMLReader r = new GraphMLReader(source.getPropertyGraph());
         InputStream in = new FileInputStream(fileIn);
         try {
             r.inputGraph(in);
@@ -104,12 +104,12 @@ public class ListGraphMigrator {
         KeyIndexableGraph graphOut = new TinkerGraph();
         BrainGraph target = new BrainGraph(graphOut);
 
-        new ListGraphMigrator().migrate(source.getGraph(), target.getGraph());
-        source.getGraph().shutdown();
+        new ListGraphMigrator().migrate(source.getPropertyGraph(), target.getPropertyGraph());
+        source.getPropertyGraph().shutdown();
 
         String fileOut = "/tmp/brain-migrated.xml";
         System.out.println("writing graph to " + fileOut);
-        GraphMLWriter w = new GraphMLWriter(target.getGraph());
+        GraphMLWriter w = new GraphMLWriter(target.getPropertyGraph());
         w.setNormalize(true);
         OutputStream out = new FileOutputStream(fileOut);
         try {
@@ -118,6 +118,6 @@ public class ListGraphMigrator {
             out.close();
         }
 
-        target.getGraph().shutdown();
+        target.getPropertyGraph().shutdown();
     }
 }

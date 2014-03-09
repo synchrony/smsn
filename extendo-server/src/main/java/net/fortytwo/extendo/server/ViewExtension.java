@@ -53,8 +53,7 @@ public class ViewExtension extends ExtendoExtension {
 
     protected ExtensionResponse performTransaction(final Params p) throws Exception {
 
-        KnowledgeBase kb = p.includeTypes ? p.brain.getKnowledgeBase() : null;
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style, p.brain.getActivityLog(), kb);
+        Note n = p.queries.view(p.root, p.depth, p.filter, p.style);
         addView(n, p);
 
         addToHistory(p.rootId, p.context);

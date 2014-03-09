@@ -15,9 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * User: josh
- * Date: 4/3/11
- * Time: 12:33 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class HttpStatusCodes extends Deck<String, String> {
     /*

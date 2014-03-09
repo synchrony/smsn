@@ -12,9 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 3/29/11
- * Time: 11:22 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class VocabularySerializer implements CardSerializer<String, String> {
     private final VocabularyDeck.Format format;

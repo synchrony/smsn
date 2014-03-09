@@ -7,9 +7,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * User: josh
- * Date: 3/17/11
- * Time: 5:08 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class PriorityPile<Q, A> implements Pile<Q, A> {
     private static final Random RANDOM = new Random();

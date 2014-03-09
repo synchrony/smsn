@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: josh
- * Date: 3/9/11
- * Time: 6:04 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class USStateBorders extends Deck<String, String> {
     private final Map<String, String[]> borders;

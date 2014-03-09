@@ -5,10 +5,8 @@ import java.util.List;
 
 /**
  * A set of cards from one or more decks.
- * <p/>
- * User: josh
- * Date: 3/17/11
- * Time: 4:53 PM
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface Pile<Q, A> {
     /**

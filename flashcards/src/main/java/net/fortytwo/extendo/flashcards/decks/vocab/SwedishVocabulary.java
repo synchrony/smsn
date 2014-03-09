@@ -10,9 +10,7 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
- * User: josh
- * Date: 3/19/11
- * Time: 8:20 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SwedishVocabulary extends VocabularyDeck {
     private static final Logger LOGGER = Logger.getLogger(SwedishVocabulary.class.getName());

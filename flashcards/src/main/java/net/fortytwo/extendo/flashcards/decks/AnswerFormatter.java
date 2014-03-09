@@ -6,9 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 4/12/11
- * Time: 3:59 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class AnswerFormatter {
     private final Deck.Format format;

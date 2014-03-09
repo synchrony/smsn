@@ -11,9 +11,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * User: josh
- * Date: 3/28/11
- * Time: 11:27 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SimpleDeck extends Deck<String, String> {
     private final Map<String, Card<String, String>> cards;

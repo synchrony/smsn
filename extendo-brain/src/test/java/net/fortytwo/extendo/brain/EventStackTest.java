@@ -39,7 +39,7 @@ public class EventStackTest {
     public void testStack() throws Exception {
         List<Note> events = eventStack.getEvents();
         //BrainGraph bg = eventStack.getInMemoryGraph();
-        //KeyIndexableGraph g = bg.getGraph();
+        //KeyIndexableGraph g = bg.getPropertyGraph();
 
         assertEquals(0, events.size());
         //assertEquals(0, countAtoms(bg));

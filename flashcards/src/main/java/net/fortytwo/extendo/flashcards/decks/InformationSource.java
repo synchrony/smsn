@@ -5,9 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * User: josh
- * Date: 3/24/11
- * Time: 1:06 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class InformationSource {
     private static final String

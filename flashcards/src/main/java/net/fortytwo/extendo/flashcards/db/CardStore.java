@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * User: josh
- * Date: 3/26/11
- * Time: 7:35 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface CardStore<Q, A> {
     void add(Card<Q, A> card) throws IOException;

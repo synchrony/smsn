@@ -9,9 +9,7 @@ import net.fortytwo.extendo.flashcards.decks.QuestionFormatter;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 3/29/11
- * Time: 11:25 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 class VocabularyCard extends Card<String, String> {
     private final List<Term> definitions;

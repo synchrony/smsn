@@ -15,9 +15,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * User: josh
- * Date: 3/14/11
- * Time: 11:50 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class Game<Q, A> {
     private static final long

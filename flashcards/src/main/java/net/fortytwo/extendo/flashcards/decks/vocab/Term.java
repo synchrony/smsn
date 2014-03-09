@@ -12,10 +12,8 @@ import java.util.Locale;
 
 /**
  * The definition of a vocabulary term.
- * <p/>
- * User: josh
- * Date: 3/23/11
- * Time: 7:26 PM
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Term {//} implements Serializable {
     private static final String

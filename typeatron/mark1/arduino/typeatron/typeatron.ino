@@ -33,6 +33,9 @@
 // if defined, make serial output more legible
 //#define DEBUG
 
+// a simple mode for a mocked-up video demo
+#define DEMO
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -131,12 +134,15 @@ void writeRGBColor(unsigned long color)
 int colorToggle = 0;
 
 void colorDebug() {
+// don't toggle colors in demo mode
+#ifndef DEMO
     if (colorToggle) {
         writeRGBColor(RED);
     } else {
         writeRGBColor(BLUE);
     }
-    colorToggle = !colorToggle;  
+    colorToggle = !colorToggle; 
+#endif 
 }
 
 
@@ -147,12 +153,20 @@ void laserOn() {
    
     // also turn on the on-board LED, as a cue to the developer in USB mode (when the laser is powered off)
     digitalWrite(ledPin, HIGH);
+    
+#ifdef DEMO
+    writeRGBColor(RED);
+#endif
 }
 
 void laserOff() {
     digitalWrite(laserPin, LOW); 
    
     digitalWrite(ledPin, LOW);  
+    
+#ifdef DEMO
+    writeRGBColor(BLUE);
+#endif
 }
 
 

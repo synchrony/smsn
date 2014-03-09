@@ -8,9 +8,7 @@ import net.fortytwo.extendo.flashcards.Trial;
 import net.fortytwo.extendo.flashcards.db.GameHistory;
 
 /**
- * User: josh
- * Date: 3/29/11
- * Time: 2:31 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class AsynchronousGame<Q, A> extends Game<Q, A> {
     private Card<Q, A> current;

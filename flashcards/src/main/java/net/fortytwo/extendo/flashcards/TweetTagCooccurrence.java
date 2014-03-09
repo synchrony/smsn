@@ -17,9 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * User: josh
- * Date: 3/24/11
- * Time: 6:20 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TweetTagCooccurrence {
     public static void main(final String[] args) throws IOException {

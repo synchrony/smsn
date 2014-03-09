@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * User: josh
- * Date: 3/17/11
- * Time: 5:07 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SingleDeckPile<Q, A> implements Pile<Q, A> {
     private static final Logger LOGGER = Logger.getLogger(SingleDeckPile.class.getName());

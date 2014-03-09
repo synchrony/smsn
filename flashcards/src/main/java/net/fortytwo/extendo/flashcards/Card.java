@@ -3,9 +3,7 @@ package net.fortytwo.extendo.flashcards;
 import net.fortytwo.extendo.Extendo;
 
 /**
- * User: josh
- * Date: 3/5/11
- * Time: 7:01 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class Card<Q, A> {
 

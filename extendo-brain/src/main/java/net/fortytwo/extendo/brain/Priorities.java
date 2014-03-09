@@ -34,7 +34,7 @@ public class Priorities {
                 LOGGER.info("generating priority queue");
                 long startTime = System.currentTimeMillis();
 
-                for (Vertex v : graph.getGraph().getVertices()) {
+                for (Vertex v : graph.getPropertyGraph().getVertices()) {
                     if (null != v.getProperty(Extendo.PRIORITY)) {
                         Atom a = graph.getAtom(v);
                         updatePriority(a);

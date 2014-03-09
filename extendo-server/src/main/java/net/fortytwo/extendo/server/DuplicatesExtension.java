@@ -89,7 +89,7 @@ public class DuplicatesExtension extends ExtendoExtension {
         List<List<String>> dups = new LinkedList<List<String>>();
         int total = 0;
 
-        for (Vertex v : graph.getGraph().getVertices()) {
+        for (Vertex v : graph.getPropertyGraph().getVertices()) {
             Atom a = graph.getAtom(v);
 
             if (filter.isVisible(a)) {

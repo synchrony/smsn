@@ -1,9 +1,7 @@
 package net.fortytwo.extendo.flashcards;
 
 /**
-* User: josh
-* Date: 3/14/11
-* Time: 1:38 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class GameplayException extends Exception {
     public GameplayException(final Throwable cause) {

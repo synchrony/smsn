@@ -5,9 +5,7 @@ import net.fortytwo.extendo.flashcards.db.CloseableIterator;
 import java.util.Iterator;
 
 /**
-* User: josh
-* Date: 3/29/11
-* Time: 8:38 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class TrivialCloseableIterator<T> implements CloseableIterator<T> {
     private final Iterator<T> inner;

@@ -74,11 +74,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-android</artifactId>
             <version>${neo4j.android.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>net.fortytwo.extendo</groupId>
             <artifactId>flashcards</artifactId>

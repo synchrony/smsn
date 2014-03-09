@@ -11,10 +11,8 @@ import java.util.Locale;
 
 /**
  * A deck of vocabulary terms with pronunciation and meaning.
- * <p/>
- * User: josh
- * Date: 3/9/11
- * Time: 6:04 PM
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class VocabularyDeck extends Deck<String, String> {
 

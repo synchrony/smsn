@@ -72,7 +72,7 @@ public class ExportExtension extends ExtendoExtension {
 
         p.println("created\tid\tweight\tsharability\tvalue\talias");
 
-        for (Vertex v : g.getGraph().getVertices()) {
+        for (Vertex v : g.getPropertyGraph().getVertices()) {
             Object c = v.getProperty(Extendo.CREATED);
             if (null != c) {
                 p.print(c);
@@ -106,7 +106,7 @@ public class ExportExtension extends ExtendoExtension {
                              final PrintStream p) throws IOException {
         p.println("from\tto");
 
-        for (Vertex v : g.getGraph().getVertices()) {
+        for (Vertex v : g.getPropertyGraph().getVertices()) {
             Atom a = g.getAtom(v);
             if (null != a) {
                 AtomList l = a.getNotes();
@@ -124,10 +124,10 @@ public class ExportExtension extends ExtendoExtension {
     private void exportPageRank(final BrainGraph g,
                                 final PrintStream p) {
         TinkerGraph g2 = new TinkerGraph();
-        for (Vertex v : g.getGraph().getVertices()) {
+        for (Vertex v : g.getPropertyGraph().getVertices()) {
             g2.addVertex(v.getId());
         }
-        for (Edge e : g.getGraph().getEdges()) {
+        for (Edge e : g.getPropertyGraph().getEdges()) {
             g2.addEdge(null,
                     g2.getVertex(e.getVertex(Direction.OUT).getId()),
                     g2.getVertex(e.getVertex(Direction.IN).getId()),
@@ -147,8 +147,8 @@ public class ExportExtension extends ExtendoExtension {
 
     private void exportGraphML(final BrainGraph g,
                                final OutputStream out) throws IOException {
-        ((TransactionalGraph) g.getGraph()).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        GraphMLWriter w = new GraphMLWriter(g.getGraph());
+        ((TransactionalGraph) g.getPropertyGraph()).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        GraphMLWriter w = new GraphMLWriter(g.getPropertyGraph());
         w.setNormalize(true);
         w.outputGraph(out);
     }

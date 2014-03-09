@@ -3,9 +3,7 @@ package net.fortytwo.extendo.flashcards;
 import java.util.Date;
 
 /**
- * User: josh
- * Date: 3/5/11
- * Time: 10:18 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Trial {
     public enum Result {Correct, Incorrect, Cancelled}

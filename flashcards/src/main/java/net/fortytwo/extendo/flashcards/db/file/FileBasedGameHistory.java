@@ -19,9 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: josh
- * Date: 3/14/11
- * Time: 8:49 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FileBasedGameHistory extends GameHistory {
     private final List<Trial> trials;

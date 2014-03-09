@@ -4,9 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
-* User: josh
-* Date: 4/12/11
-* Time: 4:26 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class Answer {
     private final List<Form> forms = new LinkedList<Form>();

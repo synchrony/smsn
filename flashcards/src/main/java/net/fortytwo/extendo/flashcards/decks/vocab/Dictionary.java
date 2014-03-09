@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * User: josh
- * Date: 3/24/11
- * Time: 1:16 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Dictionary {
     private final Map<String, List<Term>> terms;

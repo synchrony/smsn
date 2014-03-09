@@ -16,7 +16,7 @@ public class ExtendoBrain {
     private static final Logger LOGGER = Extendo.getLogger(ExtendoBrain.class);
 
     // TODO: make this configurable
-    private static final int STACK_SIZE = 50;
+    private static final int EVENT_STACK_CAPACITY = 50;
 
     private final BrainGraph brainGraph;
 
@@ -58,8 +58,7 @@ public class ExtendoBrain {
         priorities = new Priorities();
         priorities.refreshQueue(brainGraph);
 
-        Filter filter = new Filter();
-        eventStack = new EventStack(STACK_SIZE);
+        eventStack = new EventStack(EVENT_STACK_CAPACITY);
     }
 
     public BrainGraph getBrainGraph() {

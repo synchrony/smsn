@@ -31,9 +31,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 /**
- * User: josh
- * Date: 3/14/11
- * Time: 11:58 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class CommandLineGame extends Game<String, String> {
     public CommandLineGame(final Pile<String, String> pile,

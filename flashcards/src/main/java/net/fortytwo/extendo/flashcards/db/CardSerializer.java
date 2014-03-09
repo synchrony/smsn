@@ -6,9 +6,7 @@ import net.fortytwo.extendo.flashcards.Deck;
 import java.io.IOException;
 
 /**
- * User: josh
- * Date: 3/29/11
- * Time: 5:00 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface CardSerializer<Q, A> {
     String serialize(Card<Q, A> card) throws IOException;

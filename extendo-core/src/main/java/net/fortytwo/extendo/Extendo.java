@@ -78,7 +78,7 @@ public class Extendo {
             // Attempt to load additional properties from a user-provided file in the current directory
             File f = new File(CONFIG_PROPERTIES_FILE);
             if (f.exists()) {
-                LOGGER.info("loading Extendo configuration at " + f);
+                LOGGER.info("loading Extendo configuration at " + f.getAbsoluteFile());
                 InputStream in = new FileInputStream(f);
                 try {
                     CONFIGURATION.load(in);

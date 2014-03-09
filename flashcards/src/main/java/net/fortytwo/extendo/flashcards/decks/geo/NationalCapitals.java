@@ -15,9 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: josh
- * Date: 3/14/11
- * Time: 11:50 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NationalCapitals extends Deck<String, String> {
     private final Map<String, Card<String, String>> cards = new HashMap<String, Card<String, String>>();

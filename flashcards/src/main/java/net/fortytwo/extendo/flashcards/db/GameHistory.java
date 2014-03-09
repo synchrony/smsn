@@ -7,9 +7,7 @@ import net.fortytwo.extendo.flashcards.Trial;
 import java.io.IOException;
 
 /**
- * User: josh
- * Date: 3/14/11
- * Time: 6:46 PM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class GameHistory {
     public abstract void log(Trial trial) throws IOException;
