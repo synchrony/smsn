@@ -41,13 +41,6 @@
             <version>1.2</version>
         </dependency>
 
-        <!-- temporary -->
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>nquads</artifactId>
-            <version>${sesametools.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

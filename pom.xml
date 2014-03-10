@@ -62,7 +62,6 @@
     </properties>
 
     <modules>
-        <module>extendo-android</module>
         <module>extendo-core</module>
         <module>extendo-brain</module>
         <module>extendo-opencalais</module>
