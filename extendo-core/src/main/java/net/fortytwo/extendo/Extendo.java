@@ -32,6 +32,10 @@ public class Extendo {
             P2P_BROADCAST_INTERVAL = "net.fortytwo.extendo.p2p.broadcastInterval",
             P2P_PUBSUB_PORT = "net.fortytwo.extendo.p2p.pubsubPort";
 
+    // other service properties
+    public static final String
+            BRAIN_PORT = "net.fortytwo.extendo.server.brainPort";
+
     // schema constants
     public static final String
             ALIAS = "alias",

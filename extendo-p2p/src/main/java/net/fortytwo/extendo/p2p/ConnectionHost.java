@@ -43,15 +43,15 @@ public class ConnectionHost {
 
         new Thread(new Runnable() {
             public void run() {
-                LOGGER.info("starting connection listener thread");
+                LOGGER.info("starting connection listener thread on port " + port);
 
                 try {
                     listenForNewConnections();
                 } catch (Throwable e) {
-                    LOGGER.severe("connection listener thread failed with error: " + e.getMessage());
+                    LOGGER.severe("connection listener thread on port " + port + " failed with error: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } finally {
-                    LOGGER.info("connection listener thread stopped");
+                    LOGGER.info("connection listener thread on port " + port + " has stopped");
                 }
             }
         }).start();
