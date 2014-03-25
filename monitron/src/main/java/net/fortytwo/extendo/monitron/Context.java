@@ -1,12 +1,8 @@
 package net.fortytwo.extendo.monitron;
 
 import net.fortytwo.extendo.monitron.events.Event;
-import net.fortytwo.sesametools.nquads.NQuadsWriter;
-import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFWriter;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

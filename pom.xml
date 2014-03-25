@@ -52,10 +52,10 @@
         <neo4j.android.version>1.5-M02</neo4j.android.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <rdfagents.version>1.0</rdfagents.version>
-        <ripple.version>1.1</ripple.version>
+        <rdfagents.version>1.1-SNAPSHOT</rdfagents.version>
+        <ripple.version>1.2-SNAPSHOT</ripple.version>
         <sesame.version>2.7.10</sesame.version>
-        <sesamestream.version>1.0-SNAPSHOT</sesamestream.version>
+        <sesamestream.version>1.0</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
         <slf4j.log4j12.version>1.5.11</slf4j.log4j12.version>
         <tinkerpop.version>2.5.0-SNAPSHOT</tinkerpop.version>
@@ -76,6 +76,115 @@
         <module>monitron</module>
         <module>extendo-server</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>net.fortytwo.rdfagents</groupId>
+                <artifactId>rdfagents-jade</artifactId>
+                <version>${rdfagents.version}</version>
+                <exclusions>
+                    <!-- exclude the XMPP MTP, which is currently not used by Brainstem
+                         and which contains a Crimson XML dependency which is incompatible with Android -->
+                    <exclusion>
+                        <groupId>com.tilab.jade</groupId>
+                        <artifactId>xmpp-mtp</artifactId>
+                    </exclusion>
+                    <!-- via sesame-sail-memory. The Brainstem doesn't need a SPARQL repository -->
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-repository-sparql</artifactId>
+                    </exclusion>
+                    <!-- conflict with HttpComponents -->
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                    <!-- conflict with SesameStream -->
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.tinkerpop.blueprints</groupId>
+                <artifactId>blueprints-sail-graph</artifactId>
+                <version>${tinkerpop.version}</version>
+                <exclusions>
+                    <!-- conflict with extendo-p2p -->
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                    <!-- temporary; Ripple no longer includes a log4j dependency -->
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.tinkerpop</groupId>
+                <artifactId>frames</artifactId>
+                <version>${tinkerpop.version}</version>
+                <exclusions>
+                    <!-- conflict with extendo-brain -->
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.tinkerpop.blueprints</groupId>
+                <artifactId>blueprints-neo4j-graph</artifactId>
+                <version>${tinkerpop.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <!-- conflict with Sesame -->
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.tinkerpop.blueprints</groupId>
+                <artifactId>blueprints-rexster-graph</artifactId>
+                <version>${tinkerpop.version}</version>
+                <exclusions>
+                    <!-- conflict with own dependency -->
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.tinkerpop.rexster</groupId>
+                <artifactId>rexster-server</artifactId>
+                <version>${tinkerpop.version}</version>
+                <exclusions>
+                    <!-- conflict with Frames -->
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                    <!-- conflict with extendo-brain -->
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                    <!-- conflict with SesameStream -->
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <directory>${basedir}/target</directory>
@@ -101,7 +210,7 @@
                             </goals>
                             <configuration>
                                 <rules>
-                                    <DependencyConvergence />
+                                    <DependencyConvergence/>
                                 </rules>
                             </configuration>
                         </execution>

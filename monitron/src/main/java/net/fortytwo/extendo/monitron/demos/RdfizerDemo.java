@@ -3,15 +3,16 @@ package net.fortytwo.extendo.monitron.demos;
 import net.fortytwo.extendo.monitron.EventHandler;
 import net.fortytwo.extendo.monitron.MonitronService;
 import net.fortytwo.extendo.monitron.events.Event;
-import net.fortytwo.sesametools.nquads.NQuadsWriter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.openrdf.model.Statement;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.Rio;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +35,7 @@ public class RdfizerDemo {
         EventHandler handler = new EventHandler() {
             public void handleEvent(Event e) throws EventHandlingException {
                 System.out.println("\nreceived dataset:\t\n");
-                RDFWriter w = new NQuadsWriter(System.out);
+                RDFWriter w = Rio.createWriter(RDFFormat.NQUADS, System.out);
                 try {
                     w.startRDF();
                     for (Statement s : e.getDataset().getStatements()) {
