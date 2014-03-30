@@ -25,6 +25,10 @@
  */
 
 
+// forward declaration for morse.h
+void sendError(const char *message);
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
@@ -35,18 +39,6 @@
 
 // a simple mode for a mocked-up video demo
 #define DEMO
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-#include <MeetAndroid.h>
-
-// needed for registerFunction
-MeetAndroid meetAndroid;
-
-const char ack = 19;
-const char startFlag = 18;
-//const char abord = 27;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -260,51 +252,30 @@ void setup() {
     pinMode(greenPin, OUTPUT);
     pinMode(bluePin, OUTPUT);
 
-    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
-    // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
-    //Serial.begin(115200); 
-
     // OSCuino: begin SLIPSerial just like Serial
-    SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
+    // set this as high as you can reliably run on your platform
+    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
+    SLIPSerial.begin(115200);
 #if ARDUINO >= 100
-    while(!Serial) ; // Leonardo "feature"
+    while(!Serial); // Leonardo "feature"
 #endif
-       
-#ifdef USE_BLUETOOTH
-    meetAndroid.registerFunction(receiveBluetoothOSC, 'o');  // 'o' for OSC
-#endif
-    
+
     startupSequence();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void receiveBluetoothOSC(byte flag, byte numOfValues)
-{
-    unsigned long lastColor = currentRGBColor;
-    writeRGBColor(GREEN);
+void receiveOSCMessage(class OSCMessage &messageIn) {
+    writeRGBColor(CYAN);
 
-    // note: length includes the null terminator
-    int length = meetAndroid.stringLength();
-    
-    char buffer[length];
-    meetAndroid.getString(buffer);
-        
-    sprintf(errstr, "received OSC message of length %d to %s", length, buffer);
-    sendInfo(errstr); 
-    
-    //playMorseInt(length, morseStopTest);  
-
-    OSCMessage messageIn;
-    
-    for (int i = 0; i < length - 1; i++) {
-        messageIn.fill(buffer[i]);
-    }
-    
     if (messageIn.hasError()) {
-        sendError("OSC bundle hasError");
+        sendError("OSC message hasError");
     } else {
+//char addrBuffer[100];
+//messageIn.getAddress(addrBuffer, 0);
+//sprintf(errstr, "address of message: %s", addrBuffer);
+//sendInfo(errstr);
         int called;
         called = messageIn.dispatch("/exo/tt/morse", receiveMorseMessage);
         called = messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage);
@@ -314,27 +285,14 @@ void receiveBluetoothOSC(byte flag, byte numOfValues)
     }
 
     messageIn.empty();
-    writeRGBColor(lastColor);
+    writeRGBColor(GREEN);  
 }
 
-void sendOSC(class OSCMessage &m) {
-#ifdef USE_BLUETOOTH
-    // "manually" begin Bluetooth/Amarino message
-    SLIPSerial.print(startFlag);
-#endif
-
+void sendOSC(class OSCMessage &messageOut) {
     SLIPSerial.beginPacket();  
-    m.send(SLIPSerial); // send the bytes to the SLIP stream
+    messageOut.send(SLIPSerial); // send the bytes to the SLIP stream
     SLIPSerial.endPacket(); // mark the end of the OSC Packet
-    m.empty(); // free the space occupied by the message
-        
-#ifdef USE_BLUETOOTH
-    // "manually" end Bluetooth/Amarino message
-    SLIPSerial.print(ack);
-#elif defined(DEBUG)
-    // put OSC messages on separate lines so as to make them more readable
-    SLIPSerial.println("");
-#endif  
+    messageOut.empty(); // free the space occupied by the message
 }
 
 void sendAnalogObservation(class AnalogSampler &s, const char* address) {
@@ -354,6 +312,7 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void receiveMorseMessage(class OSCMessage &m) {
+  sendInfo("received morse message");
     if (m.isString(0)) {
         int length = m.getDataLength(0);
         char buffer[length+1];
@@ -378,6 +337,10 @@ void receivePhotoGetMessage(class OSCMessage &m) {
 }
 
 void receivePingMessage(class OSCMessage &m) {
+//char addrBuffer[100];
+//m.getAddress(addrBuffer, 0);
+//sprintf(errstr, "address of ping message: %s", addrBuffer);
+//sendInfo(errstr);
     // send reply as soon as possible
     sendPingReply();
     
@@ -417,21 +380,21 @@ void receiveVibroMessage(class OSCMessage &m) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void sendError(char *message) {
+void sendError(const char *message) {
     OSCMessage m("/exo/tt/error");
     m.add(message);
 
     sendOSC(m);
 }
 
-void sendInfo(char *message) {
+void sendInfo(const char *message) {
     OSCMessage m("/exo/tt/info");
     m.add(message);
 
     sendOSC(m);
 }
 
-void sendKeyEvent(char *keys) {
+void sendKeyEvent(const char *keys) {
     OSCMessage m("/exo/tt/keys");
     m.add(keys);
 
@@ -456,10 +419,23 @@ void sendPingReply() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+OSCMessage messageIn;
+
 void loop() {    
 #ifdef USE_BLUETOOTH
     // this must be kept in loop() to receive events via Amarino
-    meetAndroid.receive();  
+    //meetAndroid.receive();  
+
+    if (int size = SLIPSerial.available() > 0) {
+        while (size--) {
+            messageIn.fill(SLIPSerial.read());
+            
+            // note: we may start writing before we are done reading available bytes
+            if (SLIPSerial.endofPacket()) {
+                receiveOSCMessage(messageIn);
+            }
+        }
+    }
 #endif
 
     readKeys();
