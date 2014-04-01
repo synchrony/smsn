@@ -48,17 +48,17 @@
         <extendo.version>1.0-SNAPSHOT</extendo.version>
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <junit.version>4.11</junit.version>
-        <neo4j.version>1.9.5</neo4j.version>
-        <neo4j.android.version>1.5-M02</neo4j.android.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <rdfagents.version>1.1-SNAPSHOT</rdfagents.version>
-        <ripple.version>1.2-SNAPSHOT</ripple.version>
+        <neo4j.version>1.9.2</neo4j.version>
+        <rdfagents.version>1.1</rdfagents.version>
+        <ripple.version>1.1</ripple.version>
         <sesame.version>2.7.10</sesame.version>
         <sesamestream.version>1.0</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
         <slf4j.log4j12.version>1.5.11</slf4j.log4j12.version>
-        <tinkerpop.version>2.5.0-SNAPSHOT</tinkerpop.version>
+        <tinkerpop.version>2.4.0</tinkerpop.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <modules>
@@ -79,6 +79,23 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>edu.rpi.twc.sesamestream</groupId>
+                <artifactId>sesamestream-impl</artifactId>
+                <version>${sesamestream.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <!-- this is the version used by Android 2.2.1 -->
+                <version>20080701</version>
+            </dependency>
             <dependency>
                 <groupId>net.fortytwo.rdfagents</groupId>
                 <artifactId>rdfagents-jade</artifactId>
@@ -122,6 +139,83 @@
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>net.fortytwo</groupId>
+                        <artifactId>linked-data-sail</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>net.fortytwo.sesametools</groupId>
+                        <artifactId>common</artifactId>
+                    </exclusion>
+                    <!-- Sesame conflicts -->
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-model</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-sail-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-sail-memory</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-sail-inferencer</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-queryparser-sparql</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-util</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-query</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-queryalgebra-model</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-queryalgebra-evaluation</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-repository-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-turtle</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-ntriples</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-rdfxml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-n3</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-trig</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.openrdf.sesame</groupId>
+                        <artifactId>sesame-rio-trix</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -129,10 +223,19 @@
                 <artifactId>frames</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- conflict with extendo-brain -->
+                    <!-- temporary, in 2.4.0: self-conflict -->
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
+                    </exclusion>
+                    <!-- conflicts with extendo-brain -->
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -154,10 +257,14 @@
                 <artifactId>blueprints-rexster-graph</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- conflict with own dependency -->
+                    <!-- temporary self-conflicts -->
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -166,6 +273,22 @@
                 <artifactId>rexster-server</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
                     <!-- conflict with Frames -->
                     <exclusion>
                         <groupId>org.javassist</groupId>
@@ -181,6 +304,28 @@
                         <groupId>com.fasterxml.jackson.core</groupId>
                         <artifactId>jackson-core</artifactId>
                     </exclusion>
+                    <!-- conflict with Gremlin -->
+                    <exclusion>
+                        <groupId>asm</groupId>
+                        <artifactId>asm</artifactId>
+                    </exclusion>
+                    <!-- self-conflicts -->
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jettison</groupId>
+                        <artifactId>jettison</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-core-asl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-server</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
         </dependencies>
@@ -195,8 +340,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.5.1</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.6</source>
+                        <target>1.6</target>
                     </configuration>
                 </plugin>
                 <plugin>
