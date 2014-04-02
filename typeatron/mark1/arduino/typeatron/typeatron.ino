@@ -99,12 +99,14 @@ const unsigned int RED_FACTOR = 100;
 
 const unsigned long WHITE = 0xffffff;
 const unsigned long RED = 0xff0000;
+const unsigned long ORANGE = 0xff8000;
 const unsigned long YELLOW = 0xffff00;
 const unsigned long GREEN = 0x00ff00;
 const unsigned long CYAN = 0x00ffff;
 const unsigned long BLUE = 0x0000ff;
 const unsigned long PURPLE = 0xff00ff;
 const unsigned long BLACK = 0x000000;
+const unsigned long GRAY = 0x808080;
 
 unsigned long currentRGBColor = 0;
 
@@ -260,32 +262,60 @@ void setup() {
     while(!Serial); // Leonardo "feature"
 #endif
 
-    startupSequence();
+    startupSequence();    
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
+const char *BUFFER_FULL_msg = "BUFFER_FULL",
+    *INVALID_OSC_msg = "INVALID_OSC",
+    *ALLOCFAILED_msg = "ALLOCFAILED",
+    *INDEX_OUT_OF_BOUNDS_msg = "INDEX_OUT_OF_BOUNDS",
+    *unknown_msg = "unknown";
+
+void sendOSCMessageError(class OSCMessage &message) {
+    OSCErrorCode code = message.getError();
+    const char *name;
+
+    switch(code) {
+      case BUFFER_FULL:
+          name = BUFFER_FULL_msg;
+          break;
+      case INVALID_OSC:
+         name = INVALID_OSC_msg;
+         break;
+      case ALLOCFAILED:
+         name = ALLOCFAILED_msg;
+         break;
+      case INDEX_OUT_OF_BOUNDS:
+         name = INDEX_OUT_OF_BOUNDS_msg;
+         break;
+      default:
+         name = unknown_msg;
+    } 
+    
+    sprintf(errstr, "OSC message hasError (error type: %s)", name);
+    sendError(errstr);
+}
+
+
 void receiveOSCMessage(class OSCMessage &messageIn) {
-    writeRGBColor(CYAN);
+    writeRGBColor(WHITE);        
 
     if (messageIn.hasError()) {
-        sendError("OSC message hasError");
+        sendOSCMessageError(messageIn);
     } else {
-//char addrBuffer[100];
-//messageIn.getAddress(addrBuffer, 0);
-//sprintf(errstr, "address of message: %s", addrBuffer);
-//sendInfo(errstr);
-        int called;
-        called = messageIn.dispatch("/exo/tt/morse", receiveMorseMessage);
-        called = messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage);
-        called = messageIn.dispatch("/exo/tt/ping", receivePingMessage);
-        called = messageIn.dispatch("/exo/tt/rgb/set", receiveRgbSetMessage);
-        called = messageIn.dispatch("/exo/tt/vibro", receiveVibroMessage);
-    }
+        writeRGBColor(GREEN);  
 
-    messageIn.empty();
-    writeRGBColor(GREEN);  
+        boolean called = 0
+        || messageIn.dispatch("/exo/tt/morse", receiveMorseMessage)
+        || messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage)
+        || messageIn.dispatch("/exo/tt/ping", receivePingMessage)
+        || messageIn.dispatch("/exo/tt/rgb/set", receiveRgbSetMessage)
+        || messageIn.dispatch("/exo/tt/vibro", receiveVibroMessage)
+        ;
+    }
 }
 
 void sendOSC(class OSCMessage &messageOut) {
@@ -312,22 +342,23 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void receiveMorseMessage(class OSCMessage &m) {
-  sendInfo("received morse message");
+  //sendInfo("received morse message");
     if (m.isString(0)) {
+        writeRGBColor(YELLOW);
+        
         int length = m.getDataLength(0);
         char buffer[length+1];
         m.getString(0, buffer, length+1);   
         
-        unsigned long lastColor = currentRGBColor;
-        writeRGBColor(YELLOW);
         playMorseString(buffer, morseStopTest); 
-        writeRGBColor(lastColor);
     } else {
         sendError("expected string argument to Morse code control");
     }  
 }
 
 void receivePhotoGetMessage(class OSCMessage &m) {
+    writeRGBColor(WHITE);    
+    
     sampler_photoresistor.reset();
     sampler_photoresistor.beginSample();
     sampler_photoresistor.measure();
@@ -337,15 +368,13 @@ void receivePhotoGetMessage(class OSCMessage &m) {
 }
 
 void receivePingMessage(class OSCMessage &m) {
-//char addrBuffer[100];
-//m.getAddress(addrBuffer, 0);
-//sprintf(errstr, "address of ping message: %s", addrBuffer);
-//sendInfo(errstr);
+    writeRGBColor(PURPLE);        
+
     // send reply as soon as possible
     sendPingReply();
     
-    writeRGBColor(GREEN);
-    playMorseString("p", morseStopTest);    
+    playMorseString("p", morseStopTest);  
+    writeRGBColor(GREEN);          
 }
 
 void receiveRgbSetMessage(class OSCMessage &m) {
@@ -359,6 +388,7 @@ void receiveRgbSetMessage(class OSCMessage &m) {
 
 void receiveVibroMessage(class OSCMessage &m) {
     writeRGBColor(PURPLE);
+    
   //sendInfo("we made it into the vibro control!");
     if (m.isInt(0)) {
         int d = m.getInt(0);
@@ -381,24 +411,32 @@ void receiveVibroMessage(class OSCMessage &m) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void sendError(const char *message) {
+    writeRGBColor(ORANGE);    
+    
     OSCMessage m("/exo/tt/error");
     m.add(message);
 
     sendOSC(m);
+    
+    writeRGBColor(RED);        
 }
 
 void sendInfo(const char *message) {
+    writeRGBColor(BLUE);        
+
     OSCMessage m("/exo/tt/info");
     m.add(message);
 
     sendOSC(m);
+    
+    writeRGBColor(CYAN);        
 }
 
 void sendKeyEvent(const char *keys) {
     OSCMessage m("/exo/tt/keys");
     m.add(keys);
 
-    sendOSC(m);  
+    sendOSC(m);
 }
 
 void sendLightLevel() {
@@ -410,40 +448,52 @@ void sendLightLevel() {
 }
 
 void sendPingReply() {
+    writeRGBColor(YELLOW);        
+
     OSCMessage m("/exo/tt/ping/reply");
     m.add((int32_t) micros());
     
-    sendOSC(m);  
+    sendOSC(m);
+    
+    writeRGBColor(GREEN);        
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-
-OSCMessage messageIn;
-
+  
 void loop() {    
 #ifdef USE_BLUETOOTH
-    // this must be kept in loop() to receive events via Amarino
-    //meetAndroid.receive();  
+    int done = SLIPSerial.endofPacket();
+    
+    int size;
+    OSCMessage messageIn;
+    while ((size = SLIPSerial.available()) > 0) {
+        writeRGBColor(GRAY);
 
-    if (int size = SLIPSerial.available() > 0) {
         while (size--) {
-            messageIn.fill(SLIPSerial.read());
-            
-            // note: we may start writing before we are done reading available bytes
-            if (SLIPSerial.endofPacket()) {
-                receiveOSCMessage(messageIn);
-            }
+            int c = SLIPSerial.read();
+            messageIn.fill(c);
+            //sprintf(errstr, "received a byte: %d. bytes: %d, size: %d, hasError: %d", c, messageIn2.bytes(), messageIn2.size(), messageIn2.hasError());
+            //sendInfo(errstr);
         }
     }
+    done = done || SLIPSerial.endofPacket();
+    if (done) {
+        if (messageIn.hasError()) {
+            sendOSCMessageError(messageIn);
+        } else {
+            receiveOSCMessage(messageIn);       
+        }
+        
+        messageIn.empty();
+    }
 #endif
-
+    writeRGBColor(BLACK);
+    
     readKeys();
     
     if (keyState != lastKeyState) {
         colorDebug();
-//sprintf(errstr, "input changed from %d to %d\n", lastKeyState, keyState);
-//ƒsendInfo(errstr);  
         
         // bells and whistles
         if (keys[4] == HIGH) {
