@@ -48,14 +48,14 @@
         <extendo.version>1.1-SNAPSHOT</extendo.version>
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <junit.version>4.11</junit.version>
-        <neo4j.version>1.9.2</neo4j.version>
+        <neo4j.version>1.9.5</neo4j.version>
         <rdfagents.version>1.1</rdfagents.version>
         <ripple.version>1.1</ripple.version>
         <sesame.version>2.7.10</sesame.version>
         <sesamestream.version>1.0</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
         <slf4j.log4j12.version>1.5.11</slf4j.log4j12.version>
-        <tinkerpop.version>2.4.0</tinkerpop.version>
+        <tinkerpop.version>2.5.0-SNAPSHOT</tinkerpop.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -68,7 +68,6 @@
         <module>extendo-rdf</module>
         <module>monitron</module>
         <module>extendo-server</module>
-        <module>extras</module>
     </modules>
 
     <dependencyManagement>
@@ -217,11 +216,6 @@
                 <artifactId>frames</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- temporary, in 2.4.0: self-conflict -->
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-core</artifactId>
-                    </exclusion>
                     <!-- conflicts with extendo-brain -->
                     <exclusion>
                         <groupId>commons-lang</groupId>

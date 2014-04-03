@@ -1,7 +1,0 @@
-LIB=src/jsapi2/org.jvoicexml.jsapi2.jse.sphinx4/3rdparty/sphinx4/lib
-mvn install:install-file -DgroupId=edu.cmu.sphinx -DartifactId=sphinx -Dversion=4-jjs -Dpackaging=jar -DcreateChecksum=true -Dfile=$LIB/sphinx4.jar
-mvn install:install-file -DgroupId=edu.cmu.sphinx -DartifactId=WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz -Dversion=4-jjs -Dpackaging=jar -DcreateChecksum=true -Dfile=$LIB/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-#mvn install:install-file -DgroupId=edu.cmu.sphinx -DartifactId=TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz -Dversion=4-jjs -Dpackaging=jar -DcreateChecksum=true -Dfile=.../TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-#mvn install:install-file -DgroupId=edu.cmu.sphinx -DartifactId=WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz -Dversion=4-jjs -Dpackaging=jar -DcreateChecksum=true -Dfile=.../WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar
-
-
