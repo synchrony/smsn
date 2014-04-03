@@ -72,7 +72,6 @@
         <module>extendo-speech</module>
         <!--<module>extendo-webdav</module>-->
         <module>droidspeak</module>
-        <module>flashcards</module>
         <module>monitron</module>
         <module>extendo-server</module>
     </modules>
