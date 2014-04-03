@@ -64,16 +64,11 @@
     <modules>
         <module>extendo-core</module>
         <module>extendo-brain</module>
-        <module>extendo-opencalais</module>
         <module>extendo-p2p</module>
-        <module>extendo-qrcodes</module>
         <module>extendo-rdf</module>
-        <module>extendo-rfid</module>
-        <module>extendo-speech</module>
-        <!--<module>extendo-webdav</module>-->
-        <module>droidspeak</module>
         <module>monitron</module>
         <module>extendo-server</module>
+        <module>extras</module>
     </modules>
 
     <dependencyManagement>
