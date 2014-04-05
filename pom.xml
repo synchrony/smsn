@@ -46,11 +46,13 @@
 
     <properties>
         <extendo.version>1.1-SNAPSHOT</extendo.version>
+        <httpcomponents.version>4.0.1</httpcomponents.version>
+        <!-- goes with Android 2.2.1 -->
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <junit.version>4.11</junit.version>
-        <neo4j.version>1.9.5</neo4j.version>
+        <neo4j.version>1.9.6</neo4j.version>
         <rdfagents.version>1.1</rdfagents.version>
-        <ripple.version>1.1</ripple.version>
+        <ripple.version>1.2-SNAPSHOT</ripple.version>
         <sesame.version>2.7.10</sesame.version>
         <sesamestream.version>1.0</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
@@ -122,23 +124,14 @@
                 <artifactId>blueprints-sail-graph</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- conflict with extendo-p2p -->
+                    <!-- conflicts with extendo-p2p -->
                     <exclusion>
                         <groupId>commons-codec</groupId>
                         <artifactId>commons-codec</artifactId>
                     </exclusion>
-                    <!-- temporary; Ripple no longer includes a log4j dependency -->
                     <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.fortytwo</groupId>
-                        <artifactId>linked-data-sail</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.fortytwo.sesametools</groupId>
-                        <artifactId>common</artifactId>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
                     </exclusion>
                     <!-- Sesame conflicts -->
                     <exclusion>
@@ -276,6 +269,11 @@
                     <exclusion>
                         <groupId>commons-io</groupId>
                         <artifactId>commons-io</artifactId>
+                    </exclusion>
+                    <!-- Neo4j 2.x and its dependencies conflict with Neo4j 1.x -->
+                    <exclusion>
+                        <groupId>com.tinkerpop.blueprints</groupId>
+                        <artifactId>blueprints-neo4j2-graph</artifactId>
                     </exclusion>
                     <!-- conflict with Frames -->
                     <exclusion>
