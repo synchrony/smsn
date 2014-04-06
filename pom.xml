@@ -56,7 +56,6 @@
         <sesame.version>2.7.10</sesame.version>
         <sesamestream.version>1.0</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
-        <slf4j.log4j12.version>1.5.11</slf4j.log4j12.version>
         <tinkerpop.version>2.5.0-SNAPSHOT</tinkerpop.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

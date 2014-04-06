@@ -24,7 +24,6 @@
  * A5:  I2C SCL for MPU-6050
  */
 
-
 // forward declaration for morse.h
 void sendError(const char *message);
 
@@ -128,6 +127,9 @@ void writeRGBColor(unsigned long color)
 int colorToggle = 0;
 
 void colorDebug() {
+    long modeColor = getModeColor();
+    writeRGBColor(modeColor);
+/*
 // don't toggle colors in demo mode
 #ifndef DEMO
     if (colorToggle) {
@@ -137,6 +139,7 @@ void colorDebug() {
     }
     colorToggle = !colorToggle; 
 #endif 
+*/
 }
 
 
@@ -170,6 +173,62 @@ void vibrateForDuration(int ms) {
     digitalWrite(vibrationMotorPin, HIGH);
     delay(ms);
     digitalWrite(vibrationMotorPin, LOW);  
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+const int totalModes = 6;
+
+typedef enum { 
+    LowercaseText = 0,
+    UppercaseText,
+    Punctuation,
+    Numeric,
+    Hardware,
+    Mash
+} Mode;
+
+const char *modeNames[] = {
+    "LowercaseText",
+    "UppercaseText",
+    "Punctuation",
+    "Numeric",
+    "Hardware",
+    "Mash"
+};
+    
+const unsigned long modeColors[] = {
+    BLUE,   // LowercaseText
+    GREEN,  // UppsercaseText
+    PURPLE, // Punctuation
+    YELLOW, // Numeric
+    RED,    // Hardware
+    WHITE   // Mash
+};
+
+Mode mode;
+
+void setMode(int m) {
+    mode = (Mode) m;
+}
+
+unsigned long getModeColor() {
+    return modeColors[mode];      
+}
+
+int modeValueOf(const char *name) {
+    int i;
+    for (i = 0; i < totalModes; i++) {
+        if (!strcmp(name, modeNames[i])) {
+            return (Mode) i;
+        }
+    }
+    
+    sprintf(errstr, "no such mode: %s", name);
+    sendError(errstr);
+    
+    return LowercaseText;
 }
 
 
@@ -262,6 +321,8 @@ void setup() {
     while(!Serial); // Leonardo "feature"
 #endif
 
+    //setMode(LowercaseText);
+    
     startupSequence();    
 }
 
@@ -309,11 +370,11 @@ void receiveOSCMessage(class OSCMessage &messageIn) {
         writeRGBColor(GREEN);  
 
         boolean called = 0
+        || messageIn.dispatch("/exo/tt/mode", receiveModeMessage)
         || messageIn.dispatch("/exo/tt/morse", receiveMorseMessage)
         || messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage)
         || messageIn.dispatch("/exo/tt/ping", receivePingMessage)
-        || messageIn.dispatch("/exo/tt/rgb/set", receiveRgbSetMessage)
-        || messageIn.dispatch("/exo/tt/vibro", receiveVibroMessage)
+        || messageIn.dispatch("/exo/tt/vibr", receiveVibroMessage)
         ;
     }
 }
@@ -341,6 +402,18 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void receiveModeMessage(class OSCMessage &m) {
+    if (m.isString(0)) {
+        int length = m.getDataLength(0);
+        char buffer[length+1];
+        m.getString(0, buffer, length+1);
+        
+        setMode(modeValueOf(buffer));
+    } else {
+        sendError("expected string-valued mode name"); 
+    }
+}
+
 void receiveMorseMessage(class OSCMessage &m) {
   //sendInfo("received morse message");
     if (m.isString(0)) {
@@ -357,7 +430,7 @@ void receiveMorseMessage(class OSCMessage &m) {
 }
 
 void receivePhotoGetMessage(class OSCMessage &m) {
-    writeRGBColor(WHITE);    
+    //writeRGBColor(WHITE);    
     
     sampler_photoresistor.reset();
     sampler_photoresistor.beginSample();
@@ -377,24 +450,15 @@ void receivePingMessage(class OSCMessage &m) {
     writeRGBColor(GREEN);          
 }
 
-void receiveRgbSetMessage(class OSCMessage &m) {
-    if (m.isInt(0)) {
-        unsigned long color = (unsigned long) m.getInt(0);
-        writeRGBColor(color);
-    } else {
-        sendError("expected integer argument to RGB LED control");
-    }
-}
-
 void receiveVibroMessage(class OSCMessage &m) {
     writeRGBColor(PURPLE);
     
   //sendInfo("we made it into the vibro control!");
     if (m.isInt(0)) {
         int d = m.getInt(0);
-        playMorseInt(d, morseStopTest);
+        //playMorseInt(d, morseStopTest);
         
-        writeRGBColor(YELLOW);
+        //writeRGBColor(YELLOW);
         if (d <= 0) {
             sendError("vibro duration must be a positive number");
         } else if (d > 60000) {
@@ -441,10 +505,6 @@ void sendKeyEvent(const char *keys) {
 
 void sendLightLevel() {
     sendAnalogObservation(sampler_photoresistor, "/exo/tt/photo/data"); 
-  
-    //Serial.println("");
-    //Serial.print(sampler_photoresistor.getMean());
-    //Serial.println("");
 }
 
 void sendPingReply() {
