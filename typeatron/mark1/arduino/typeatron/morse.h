@@ -105,30 +105,40 @@ int morsePin = transducerPin;
 int morsePitch = 1760;
 long timeUnit = 50;
 
+void morseOn() {
+    tone(morsePin, morsePitch);
+    writeRGBColor(YELLOW);
+}
+
+void morseOff() {
+    noTone(morsePin);
+    writeRGBColor(BLACK);
+}
+
 void dit() {
-    tone(morsePin, morsePitch); 
+    morseOn(); 
     delay(timeUnit);    
 }
 
 void dah() {
-    tone(morsePin, morsePitch);
+    morseOn(); 
     delay(3 * timeUnit);
 }
 
 void interElementGap() {
-    noTone(morsePin);
+    morseOff();
     delay(timeUnit);
 }
 
 // gap between letters
 void shortGap() {
-    noTone(morsePin);
+    morseOff();
     delay(3 * timeUnit);
 }
 
 // gap between words
 void mediumGap() {
-    noTone(morsePin);
+    morseOff();
     delay(7 * timeUnit);
 }
 
