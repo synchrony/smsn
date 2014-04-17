@@ -128,6 +128,8 @@ int colorToggle = 0;
 
 void colorDebug() {
     long modeColor = getModeColor();
+    sprintf(errstr, "modeColor = %d", (int) modeColor);
+    sendInfo(errstr);
     writeRGBColor(modeColor);
 /*
 // don't toggle colors in demo mode
@@ -221,7 +223,9 @@ int modeValueOf(const char *name) {
     int i;
     for (i = 0; i < totalModes; i++) {
         if (!strcmp(name, modeNames[i])) {
-            return (Mode) i;
+            sprintf(errstr, "identified mode as %d", i);
+            sendInfo(errstr);
+            return i;
         }
     }
     
@@ -528,7 +532,7 @@ void loop() {
     int size;
     OSCMessage messageIn;
     while ((size = SLIPSerial.available()) > 0) {
-        writeRGBColor(GRAY);
+        //writeRGBColor(GRAY);
 
         while (size--) {
             int c = SLIPSerial.read();
@@ -539,12 +543,7 @@ void loop() {
     }
     done = done || SLIPSerial.endofPacket();
     if (done) {
-        if (messageIn.hasError()) {
-            sendOSCMessageError(messageIn);
-        } else {
-            receiveOSCMessage(messageIn);       
-        }
-        
+        receiveOSCMessage(messageIn);       
         messageIn.empty();
     }
 #endif

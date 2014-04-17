@@ -14,10 +14,10 @@ const int pinZ = A2;
 ////////////////////////////////////////////////////////////////////////////////
 
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
-#define USE_BLUETOOTH
+//#define USE_BLUETOOTH
 
-// if defined, make serial output more legible
-//#define DEBUG
+// if defined, make serial output more legible to a human eye
+#define DEBUG
 
 
 ////////////////////////////////////////////////////////////////////////////////
