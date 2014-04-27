@@ -56,7 +56,7 @@
         <sesame.version>2.7.10</sesame.version>
         <sesamestream.version>1.0</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
-        <tinkerpop.version>2.5.0-SNAPSHOT</tinkerpop.version>
+        <tinkerpop.version>2.5.0</tinkerpop.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -404,13 +404,5 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <repositories>
-        <repository>
-            <id>fortytwo</id>
-            <name>fortytwo.net Maven repository</name>
-            <url>http://fortytwo.net/maven2</url>
-        </repository>
-    </repositories>
 
 </project>

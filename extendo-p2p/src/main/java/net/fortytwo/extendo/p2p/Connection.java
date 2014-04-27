@@ -44,12 +44,16 @@ public class Connection {
         return null != socket;
     }
 
+    private void setSocket(final Socket socket) {
+        this.socket = socket;
+    }
+
     public synchronized void start(final Socket socket) {
         if (isActive()) {
             throw new IllegalStateException("connection is already active");
         }
 
-        this.socket = socket;
+        setSocket(socket);
 
         for (BufferedMessage bm : buffer) {
             try {
@@ -79,6 +83,9 @@ public class Connection {
                 } finally {
                     LOGGER.info("message handler thread stopped");
                 }
+
+                // make this connection inactive
+                setSocket(null);
             }
         }).start();
     }

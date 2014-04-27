@@ -49,6 +49,7 @@ public class FacilitatorService {
     }
 
     private FacilitatorService() throws IOException, PropertyException {
+        int oscPort = Extendo.getConfiguration().getInt(Extendo.P2P_OSC_PORT);
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
 
         if (Extendo.VERBOSE) {
@@ -72,6 +73,7 @@ public class FacilitatorService {
         // begin advertising the service now that the query engine is available
         ServiceDescription d = new ServiceDescription(Extendo.getConfiguration().getProperty(Extendo.VERSION),
                 broadcastEndpoint,
+                oscPort,
                 pubsubPort);
         // TODO: stop the broadcaster when this object is destroyed
         new ServiceBroadcaster(d).start();
