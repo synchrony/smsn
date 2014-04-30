@@ -83,7 +83,7 @@ public class SimpleJSONRDFFormat {
 
             if (null != l.getLanguage()) {
                 j.put(FIELD_LANG, l.getLanguage());
-            } else {
+            } else if (null != l.getDatatype()) {
                 j.put(FIELD_DATATYPE, l.getDatatype().stringValue());
             }
         } else if (v instanceof BNode) {

@@ -128,8 +128,8 @@ int colorToggle = 0;
 
 void colorDebug() {
     long modeColor = getModeColor();
-    sprintf(errstr, "modeColor = %d", (int) modeColor);
-    sendInfo(errstr);
+    //sprintf(errstr, "modeColor = %d", (int) modeColor);
+    //sendInfo(errstr);
     writeRGBColor(modeColor);
 /*
 // don't toggle colors in demo mode
@@ -183,29 +183,23 @@ void vibrateForDuration(int ms) {
 const int totalModes = 6;
 
 typedef enum { 
-    LowercaseText = 0,
-    UppercaseText,
-    Punctuation,
-    Numeric,
-    Hardware,
+    Text = 0,
+    LaserTrigger,
+    LaserPointer,
     Mash
 } Mode;
 
 const char *modeNames[] = {
-    "LowercaseText",
-    "UppercaseText",
-    "Punctuation",
-    "Numeric",
-    "Hardware",
+    "Text",
+    "LaserTrigger",
+    "LaserPointer",
     "Mash"
 };
     
 const unsigned long modeColors[] = {
-    BLUE,   // LowercaseText
-    GREEN,  // UppsercaseText
-    PURPLE, // Punctuation
-    YELLOW, // Numeric
-    RED,    // Hardware
+    BLUE,   // Text
+    BLACK,  // LaserTrigger
+    RED,    // LaserPointer
     WHITE   // Mash
 };
 
@@ -232,7 +226,7 @@ int modeValueOf(const char *name) {
     sprintf(errstr, "no such mode: %s", name);
     sendError(errstr);
     
-    return LowercaseText;
+    return Text;
 }
 
 
@@ -296,6 +290,8 @@ void startupSequence() {
     //playMorseString("hello, world!", morseStopTest);
 }
 
+OSCMessage *messageIn;
+
 void setup() {
     pinMode(keyPin1, INPUT);
     pinMode(keyPin2, INPUT);     
@@ -327,7 +323,9 @@ void setup() {
 
     //setMode(LowercaseText);
     
-    startupSequence();    
+    startupSequence(); 
+ 
+    messageIn = new OSCMessage();   
 }
 
 
@@ -370,10 +368,21 @@ void receiveOSCMessage(class OSCMessage &messageIn) {
 
     if (messageIn.hasError()) {
         sendOSCMessageError(messageIn);
+sprintf(errstr, "invalid message occupies %d bytes", messageIn.bytes());
+//messageIn.getAddress(errstr);
+sendInfo(errstr);
     } else {
-        writeRGBColor(GREEN);  
+        writeRGBColor(GREEN);
+/*
+char *address = new char[100];
+messageIn.getAddress(address);
+sprintf(errstr, "received message for %s", address);
+sendInfo(errstr);
+*/
+sendOSC(messageIn);
 
         boolean called = 0
+        || messageIn.dispatch("/exo/tt/laser/trigger", receiveLaserTriggerMessage)
         || messageIn.dispatch("/exo/tt/mode", receiveModeMessage)
         || messageIn.dispatch("/exo/tt/morse", receiveMorseMessage)
         || messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage)
@@ -406,6 +415,10 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void receiveLaserTriggerMessage(class OSCMessage &m) {
+    setMode(LaserTrigger); 
+}
+
 void receiveModeMessage(class OSCMessage &m) {
     if (m.isString(0)) {
         int length = m.getDataLength(0);
@@ -420,7 +433,7 @@ void receiveModeMessage(class OSCMessage &m) {
 
 void receiveMorseMessage(class OSCMessage &m) {
   //sendInfo("received morse message");
-    if (m.isString(0)) {
+    //if (m.isString(0)) {
         writeRGBColor(YELLOW);
         
         int length = m.getDataLength(0);
@@ -428,9 +441,9 @@ void receiveMorseMessage(class OSCMessage &m) {
         m.getString(0, buffer, length+1);   
         
         playMorseString(buffer, morseStopTest); 
-    } else {
-        sendError("expected string argument to Morse code control");
-    }  
+    //} else {
+    //    sendError("expected string argument to Morse code control");
+    //}  
 }
 
 void receivePhotoGetMessage(class OSCMessage &m) {
@@ -458,7 +471,7 @@ void receiveVibroMessage(class OSCMessage &m) {
     writeRGBColor(PURPLE);
     
   //sendInfo("we made it into the vibro control!");
-    if (m.isInt(0)) {
+    //if (m.isInt(0)) {
         int d = m.getInt(0);
         //playMorseInt(d, morseStopTest);
         
@@ -470,9 +483,10 @@ void receiveVibroMessage(class OSCMessage &m) {
         } else {
             vibrateForDuration(d);  
         }  
-    } else {
-        sendError("expected integer argument to vibro control");
-    }
+    //} else {
+    //    sprintf(errstr, "expected integer argument to vibro control, found type %c", m.getType(0));
+    //    sendError(errstr);
+   // }
 }
 
 
@@ -512,39 +526,48 @@ void sendLightLevel() {
 }
 
 void sendPingReply() {
-    writeRGBColor(YELLOW);        
+    //writeRGBColor(YELLOW);        
 
     OSCMessage m("/exo/tt/ping/reply");
     m.add((int32_t) micros());
     
     sendOSC(m);
     
-    writeRGBColor(GREEN);        
+    //writeRGBColor(GREEN);        
+}
+
+void sendLaserEvent() {
+    OSCMessage m("/exo/tt/laser/event");
+    m.add((int32_t) micros());
+    
+    sendOSC(m);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-  
+
 void loop() {    
 #ifdef USE_BLUETOOTH
     int done = SLIPSerial.endofPacket();
     
     int size;
-    OSCMessage messageIn;
     while ((size = SLIPSerial.available()) > 0) {
         //writeRGBColor(GRAY);
 
         while (size--) {
             int c = SLIPSerial.read();
-            messageIn.fill(c);
+            messageIn->fill(c);
             //sprintf(errstr, "received a byte: %d. bytes: %d, size: %d, hasError: %d", c, messageIn2.bytes(), messageIn2.size(), messageIn2.hasError());
             //sendInfo(errstr);
         }
     }
     done = done || SLIPSerial.endofPacket();
     if (done) {
-        receiveOSCMessage(messageIn);       
-        messageIn.empty();
+        receiveOSCMessage(*messageIn);       
+        messageIn->empty();
+        //messageIn.reset();
+        delete messageIn;
+        messageIn = new OSCMessage();
     }
 #endif
     writeRGBColor(BLACK);
@@ -554,27 +577,41 @@ void loop() {
     if (keyState != lastKeyState) {
         colorDebug();
         
-        // bells and whistles
-        if (keys[4] == HIGH) {
-            laserOn();
-        } else {
-            laserOff();
-        }
-      
-        unsigned int before = micros();
-
-        char keyStr[6];
-        for (int i = 0; i < 5; i++) {
-            keyStr[i] = keys[i] + 48;
-        }
-        keyStr[5] = 0;
-
-        sendKeyEvent(keyStr);
-
-        unsigned int after = micros();
-        
-        if (after - before < debounceMicros) {
-            delayMicroseconds(debounceMicros - (after - before));
+        if (LaserTrigger == mode) {
+            if (keyState) {
+                laserOn();
+                sendLaserEvent();
+                setMode(LaserPointer);
+            }      
+        } else if (LaserPointer == mode) {
+            if (!keyState) {
+                setMode(Text);
+                laserOff();
+            }
+        } else {       
+            /*
+            // bells and whistles
+            if (keys[4] == HIGH) {
+                laserOn();
+            } else {
+                laserOff();
+            }*/
+          
+            unsigned int before = micros();
+    
+            char keyStr[6];
+            for (int i = 0; i < 5; i++) {
+                keyStr[i] = keys[i] + 48;
+            }
+            keyStr[5] = 0;
+    
+            sendKeyEvent(keyStr);
+    
+            unsigned int after = micros();
+            
+            if (after - before < debounceMicros) {
+                delayMicroseconds(debounceMicros - (after - before));
+            }
         }
     }
   

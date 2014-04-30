@@ -11,6 +11,13 @@ import net.fortytwo.extendo.p2p.ServiceBroadcaster;
 import net.fortytwo.extendo.p2p.ServiceDescription;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineWrapper;
 import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.flow.NullSink;
+import net.fortytwo.flow.Sink;
+import net.fortytwo.flow.rdf.RDFSink;
+import net.fortytwo.linkeddata.LinkedDataCache;
+import net.fortytwo.linkeddata.sail.LinkedDataSail;
+import net.fortytwo.ripple.RippleException;
+import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.ParserConfig;
 import org.openrdf.rio.RDFFormat;
@@ -19,6 +26,9 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
+import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.SailException;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,9 +48,9 @@ public class FacilitatorService {
     // TODO
     private final String broadcastEndpoint = "/graphs/joshkb/extendo/";
 
-    private final QueryEngine queryEngine;
+    private final QueryEngineImpl queryEngine;
 
-    public static FacilitatorService getInstance() throws IOException, PropertyException {
+    public static FacilitatorService getInstance() throws IOException, PropertyException, RippleException, SailException {
         if (null == INSTANCE) {
             INSTANCE = new FacilitatorService();
         }
@@ -48,7 +58,7 @@ public class FacilitatorService {
         return INSTANCE;
     }
 
-    private FacilitatorService() throws IOException, PropertyException {
+    private FacilitatorService() throws IOException, PropertyException, RippleException, SailException {
         int oscPort = Extendo.getConfiguration().getInt(Extendo.P2P_OSC_PORT);
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
 
@@ -59,6 +69,34 @@ public class FacilitatorService {
 
         queryEngine = new QueryEngineImpl();
         QueryEngineWrapper wrapper = new QueryEngineWrapper(queryEngine);
+
+        // TODO: make the base Sail configurable (e.g. disable it, or make it a persistent NativeStore)
+        MemoryStore sail = new MemoryStore();
+        sail.initialize();
+        LinkedDataCache.DataStore store = new LinkedDataCache.DataStore() {
+            public RDFSink createInputSink(final SailConnection sc) {
+                return new RDFSink() {
+                    public Sink<Statement> statementSink() {
+                        return new Sink<Statement>() {
+                            public void put(final Statement s) throws RippleException {
+                                queryEngine.addStatement(s);
+                            }
+                        };
+                    }
+
+                    public Sink<Namespace> namespaceSink() {
+                        return new NullSink<Namespace>();
+                    }
+
+                    public Sink<String> commentSink() {
+                        return new NullSink<String>();
+                    }
+                };
+            }
+        };
+        LinkedDataCache cache = LinkedDataCache.createDefault(sail);
+        cache.setDataStore(store);
+        queryEngine.setLinkedDataCache(cache, sail);
 
         ConnectionHost ch = new ConnectionHost(pubsubPort);
         ch.addNotifier(wrapper.getNotifier());
@@ -133,11 +171,7 @@ public class FacilitatorService {
         public void handleStatement(Statement statement) throws RDFHandlerException {
             count++;
 
-            try {
-                queryEngine.addStatement(statement);
-            } catch (IOException e) {
-                throw new RDFHandlerException(e);
-            }
+            queryEngine.addStatement(statement);
         }
 
         public void handleComment(String s) throws RDFHandlerException {

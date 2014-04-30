@@ -46,7 +46,7 @@
 
     <properties>
         <extendo.version>1.1-SNAPSHOT</extendo.version>
-        <httpcomponents.version>4.0.1</httpcomponents.version>
+        <httpcomponents.version>4.3.3</httpcomponents.version>
         <!-- goes with Android 2.2.1 -->
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <junit.version>4.11</junit.version>
@@ -54,7 +54,7 @@
         <rdfagents.version>1.1</rdfagents.version>
         <ripple.version>1.2-SNAPSHOT</ripple.version>
         <sesame.version>2.7.10</sesame.version>
-        <sesamestream.version>1.0</sesamestream.version>
+        <sesamestream.version>1.1-SNAPSHOT</sesamestream.version>
         <sesametools.version>1.8</sesametools.version>
         <tinkerpop.version>2.5.0</tinkerpop.version>
 
@@ -123,6 +123,15 @@
                 <artifactId>blueprints-sail-graph</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
+                    <!-- conflicts with SesameStream -->
+                    <exclusion>
+                        <groupId>net.fortytwo</groupId>
+                        <artifactId>linked-data-sail</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>net.fortytwo.sesametools</groupId>
+                        <artifactId>common</artifactId>
+                    </exclusion>
                     <!-- conflicts with extendo-p2p -->
                     <exclusion>
                         <groupId>commons-codec</groupId>
@@ -310,6 +319,18 @@
                     <exclusion>
                         <groupId>com.sun.jersey</groupId>
                         <artifactId>jersey-server</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.4.0</version>
+                <exclusions>
+                    <!-- conflict with Apache HttpComponents -->
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

@@ -12,8 +12,10 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.sail.SailException;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -28,7 +30,7 @@ public class BroadcastRdfExtension extends ExtendoExtension {
 
     private final FacilitatorService facilitator;
 
-    public BroadcastRdfExtension() throws IOException, PropertyException {
+    public BroadcastRdfExtension() throws IOException, PropertyException, RippleException, SailException {
         facilitator =  FacilitatorService.getInstance();
     }
 
