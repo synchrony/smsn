@@ -158,8 +158,14 @@ public class QueryEngineWrapper {
         try {
             JSONArray dataset = message.getJSONArray(QueryEngineProxy.DATASET);
             int length = dataset.length();
+            //if (Extendo.VERBOSE) {
+            //    LOGGER.info("found " + length + " statements:");
+            //}
             for (int i = 0; i < length; i++) {
                 Statement s = jsonrdfFormat.toStatement(dataset.getJSONArray(i));
+                //if (Extendo.VERBOSE) {
+                //    LOGGER.info("\t" + s);
+                //}
                 queryEngine.addStatement(s);
             }
         } catch (JSONException e) {

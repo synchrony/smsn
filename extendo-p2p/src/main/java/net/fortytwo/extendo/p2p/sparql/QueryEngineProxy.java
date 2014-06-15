@@ -37,10 +37,10 @@ public class QueryEngineProxy implements QueryEngine {
             QUERY = "query",
             QUERY_ID = "id";
 
-
     private final Connection connection;
     private final SimpleJSONRDFFormat jsonrdfFormat;
 
+    private final Map<String, String> queriesById;
     private final Map<String, BindingSetHandler> handlers;
 
     public QueryEngineProxy(final Connection connection) {
@@ -48,6 +48,7 @@ public class QueryEngineProxy implements QueryEngine {
 
         jsonrdfFormat = new SimpleJSONRDFFormat(new ValueFactoryImpl());
 
+        queriesById = new HashMap<String, String>();
         handlers = new HashMap<String, BindingSetHandler>();
 
         connection.registerHandler(TAG_SPARQL_RESULT, new MessageHandler() {
@@ -66,14 +67,21 @@ public class QueryEngineProxy implements QueryEngine {
         throw new UnsupportedOperationException("don't have rights to clear remote query engine");
     }
 
+    public void notifyConnectionOpen() throws IOException {
+        // send all subscriptions, again if necessary
+        for (Map.Entry<String, String> e : queriesById.entrySet()) {
+            sendSubscriptionMessage(e.getValue(), e.getKey());
+        }
+    }
+
     public Subscription addQuery(final String query,
                                  final BindingSetHandler handler) throws IncompatibleQueryException, InvalidQueryException, IOException {
         Subscription sub = new SubscriptionImpl();
 
-        try {
+        queriesById.put(sub.getId(), query);
+
+        if (connection.isActive()) {
             sendSubscriptionMessage(query, sub.getId());
-        } catch (JSONException e) {
-            throw new IOException(e);
         }
 
         handlers.put(sub.getId(), handler);
@@ -125,13 +133,18 @@ public class QueryEngineProxy implements QueryEngine {
     }
 
     private void sendSubscriptionMessage(final String query,
-                                         final String queryId) throws JSONException, IOException {
-        JSONObject j = new JSONObject();
-        j.put(QUERY_ID, queryId);
-        j.put(QUERY, query);
+                                         final String queryId) throws IOException {
+        try {
+            JSONObject j = new JSONObject();
+            j.put(QUERY_ID, queryId);
+            j.put(QUERY, query);
 
-        // queries are of central importance and should be buffered to ensure that they are received
-        connection.sendBuffered(TAG_SPARQL_QUERY, j);
+            // TODO: confirmation of subscription receipt, retry in case of failure
+            // queries are of central importance and should be buffered to ensure that they are received
+            connection.sendBuffered(TAG_SPARQL_QUERY, j);
+        } catch (JSONException e) {
+            throw new IOException(e);
+        }
     }
 
     private void sendDatasetMessage(final JSONArray statements) throws JSONException, IOException {

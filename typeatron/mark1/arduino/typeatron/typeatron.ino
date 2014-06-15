@@ -364,21 +364,16 @@ void sendOSCMessageError(class OSCMessage &message) {
 
 
 void receiveOSCMessage(class OSCMessage &messageIn) {
-    writeRGBColor(WHITE);        
+//    writeRGBColor(WHITE);        
 
     if (messageIn.hasError()) {
         sendOSCMessageError(messageIn);
-sprintf(errstr, "invalid message occupies %d bytes", messageIn.bytes());
-//messageIn.getAddress(errstr);
-sendInfo(errstr);
+//sprintf(errstr, "invalid message occupies %d bytes", messageIn.bytes());
+//sendInfo(errstr);
     } else {
-        writeRGBColor(GREEN);
-/*
-char *address = new char[100];
-messageIn.getAddress(address);
-sprintf(errstr, "received message for %s", address);
-sendInfo(errstr);
-*/
+//        writeRGBColor(GREEN);
+
+// temporary: echo the received message
 sendOSC(messageIn);
 
         boolean called = 0
@@ -576,29 +571,21 @@ void loop() {
     
     if (keyState != lastKeyState) {
         colorDebug();
-        
+
         if (LaserTrigger == mode) {
             if (keyState) {
                 laserOn();
                 sendLaserEvent();
                 setMode(LaserPointer);
-            }      
+            }
         } else if (LaserPointer == mode) {
             if (!keyState) {
                 setMode(Text);
                 laserOff();
             }
         } else {       
-            /*
-            // bells and whistles
-            if (keys[4] == HIGH) {
-                laserOn();
-            } else {
-                laserOff();
-            }*/
-          
             unsigned int before = micros();
-    
+
             char keyStr[6];
             for (int i = 0; i < 5; i++) {
                 keyStr[i] = keys[i] + 48;

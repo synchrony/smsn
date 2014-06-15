@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class Extendo {
     public static final boolean
             SAFE = true,
-            VERBOSE = false;
+            VERBOSE = true;
 
     // Configuration properties
     public static final String

@@ -28,7 +28,7 @@ public class ExtendoAgent {
 
     private ServiceBroadcastListener listener;
 
-    private QueryEngine queryEngine;
+    private QueryEngineProxy queryEngine;
 
     private Service facilitatorService;
     private final Connection facilitatorConnection;
@@ -57,9 +57,8 @@ public class ExtendoAgent {
                                 + ", pub/sub port=" + description.getPubsubPort());
                     }
 
-                    // currently, the first broadcast message is used to discover the service,
-                    // which is assumed to remain available indefinitely.
-                    // Subsequent messages are received but disregarded.
+                    // The first broadcast message is used to discover the service and create a connection.
+                    // Subsequent messages are used only if the connection is lost.
                     if (!facilitatorConnection.isActive()) {
                         facilitatorService = new Service();
                         facilitatorService.address = address;
@@ -74,6 +73,15 @@ public class ExtendoAgent {
                             e.printStackTrace(System.err);
                             return;
                         }
+
+                        try {
+                            queryEngine.notifyConnectionOpen();
+                        } catch (IOException e) {
+                            LOGGER.warning("error on query engine notification: " + e.getMessage());
+                            e.printStackTrace(System.err);
+                            return;
+                        }
+
                         facilitatorConnection.start(socket);
                     } else {
                         if (Extendo.VERBOSE) {
