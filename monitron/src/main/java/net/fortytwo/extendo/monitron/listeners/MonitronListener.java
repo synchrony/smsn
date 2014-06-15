@@ -7,6 +7,7 @@ import net.fortytwo.extendo.monitron.EventHandler;
 import net.fortytwo.extendo.monitron.events.Event;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -40,13 +41,13 @@ public abstract class MonitronListener implements OSCListener {
             throw new IllegalArgumentException();
         }
 
-        Object[] args = m.getArguments();
+        List args = m.getArguments();
 
-        if (index >= args.length) {
+        if (index >= args.size()) {
             throw new MessageParseException("not enough arguments");
         }
 
-        Object a = args[index];
+        Object a = args.get(index);
 
         if (!(a instanceof String)) {
             throw new MessageParseException("string-typed arguments expected");

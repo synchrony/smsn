@@ -1,7 +1,9 @@
 package net.fortytwo.extendo.monitron;
 
+import com.illposed.osc.AddressSelector;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
+import com.illposed.osc.utility.JavaRegexAddressSelector;
 import com.illposed.osc.utility.OSCPacketDispatcher;
 import net.fortytwo.extendo.monitron.listeners.SystemErrorListener;
 import net.fortytwo.extendo.monitron.listeners.SystemTimerListener;
@@ -21,7 +23,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
 /*
 sudo cu -l /dev/cu.usbserial-A600HFHJ -s 9600 | tee /tmp/arduino.out
@@ -47,36 +53,36 @@ public class MonitronService {
 
         OSCListener errorListener = new SystemErrorListener(c);
 
-        dispatcher.addListener(Universe.OM_SENSOR_7BB206L0_VIBRN,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_7BB206L0_VIBRN),
                 new VibrationLevelSensorListener(c, Universe.MURATA_7BB_20_6L0_1));
-        dispatcher.addListener(Universe.OM_SENSOR_ADJDS311CR999_BLUE,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_ADJDS311CR999_BLUE),
                 new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.BLUE_LIGHT_LEVEL));
-        dispatcher.addListener(Universe.OM_SENSOR_ADJDS311CR999_GREEN,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_ADJDS311CR999_GREEN),
                 new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.GREEN_LIGHT_LEVEL));
-        dispatcher.addListener(Universe.OM_SENSOR_ADJDS311CR999_RED,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_ADJDS311CR999_RED),
                 new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.RED_LIGHT_LEVEL));
-        dispatcher.addListener(Universe.OM_SENSOR_BMP085_PRESSURE,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_BMP085_PRESSURE),
                 new BarometerListener(c, Universe.BOSCH_BMP085_1_BAROMETER));
-        dispatcher.addListener(Universe.OM_SENSOR_BMP085_TEMP,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_BMP085_TEMP),
                 new ThermometerListener(c, Universe.BOSCH_BMP085_1_THERMOMETER));
-        dispatcher.addListener(Universe.OM_SENSOR_GP2Y1010AU0F_DUST,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_GP2Y1010AU0F_DUST),
                 new OpticalDustSensorListener(c, Universe.SHARP_GP2Y101AU0F_1));
-        dispatcher.addListener(Universe.OM_SENSOR_MD9745APZF_SOUND,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_MD9745APZF_SOUND),
                 new SoundLevelSensorListener(c, Universe.KNOWLES_MD9745APZ_F_1));
-        dispatcher.addListener(Universe.OM_SENSOR_PHOTO_LIGHT,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_PHOTO_LIGHT),
                 new LightLevelSensorListener(c, Universe.GENERIC_PHOTORESISTOR_1));
-        dispatcher.addListener(Universe.OM_SENSOR_RHT03_ERROR,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_RHT03_ERROR),
                 errorListener);  // TODO
-        dispatcher.addListener(Universe.OM_SENSOR_RHT03_HUMID,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_RHT03_HUMID),
                 new HygrometerListener(c, Universe.MAXDETECT_RHT03_1_HYGROMETER));
-        dispatcher.addListener(Universe.OM_SENSOR_RHT03_TEMP,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_RHT03_TEMP),
                 new ThermometerListener(c, Universe.MAXDETECT_RHT03_1_THERMOMETER));
-        dispatcher.addListener(Universe.OM_SENSOR_SE10_MOTION,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_SE10_MOTION),
                 new PassiveInfraredSensorListener(c, Universe.HANSE_SE10_1));
 
-        dispatcher.addListener(Universe.OM_SYSTEM_ERROR,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SYSTEM_ERROR),
                 errorListener);
-        dispatcher.addListener(Universe.OM_SYSTEM_TIME,
+        dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SYSTEM_TIME),
                 new SystemTimerListener(c));
     }
 
@@ -111,7 +117,9 @@ public class MonitronService {
 
         String address = parts[0];
         if (parts.length > 1) {
-            return new OSCMessage(address, Arrays.copyOfRange(parts, 1, parts.length));
+            Collection<Object> args = new ArrayList<Object>();
+            args.addAll(Arrays.asList(parts).subList(1, parts.length));
+            return new OSCMessage(address, args);
         } else {
             return new OSCMessage(address);
         }
