@@ -214,7 +214,7 @@ void loop()
           
           // gesture event
 #ifdef DEBUG
-          // tab-separated format for the gesture event, for ease of importing to R and similar tools
+          // comma-separated format for the gesture event, for ease of importing to R and similar tools
           Serial.print((int32_t) micros()); Serial.print(",");
           Serial.print(amax); Serial.print(",");
           Serial.print(ax_max); Serial.print(",");
