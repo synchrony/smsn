@@ -83,8 +83,11 @@ BMP085 bmp085;
 
 ////////////////////////////////////////
 
+#include <RGBLED.h>
+
+RGBLED rgbled(RGB_LED_RED_PIN, RGB_LED_GREEN_PIN, RGB_LED_BLUE_PIN);
+
 #include "om_droidspeak.h"
-#include "om_rgb_led.h"
 
 #include "om_dust.h"
 #include "om_motion.h"
@@ -98,10 +101,10 @@ void setup() {
     pinMode(LED_PIN, OUTPUT);
     pinMode(MOTION_PIN, INPUT);
     
-    rgb_led_setup();
+    rgbled.setup();
     
     // TODO: why is this immediately replaced by another color?
-    //replaceColor(RGB_CYAN);
+    //rgbled.replaceColor(RGB_CYAN);
     //delay(3000);
     
     speakPowerUpPhrase();
@@ -116,7 +119,7 @@ void setup() {
     
     speakSetupCompletedPhrase(); 
     
-    replaceColor(RGB_GREEN);
+    rgbled.replaceColor(RGB_GREEN);
 }
 
 void loop()
@@ -144,17 +147,17 @@ void loop()
 
 void beginSample()
 {
-    pushColor(RGB_BLUE);
+    rgbled.pushColor(RGB_BLUE);
 }
 
 void endSample()
 {
-    popColor();
+    rgbled.popColor();
 }
 
 void beginOSCWrite()
 {
-    pushColor(RGB_CYAN);
+    rgbled.pushColor(RGB_CYAN);
     tick();
     //tone(SPEAKER_PIN, 55);
 }
@@ -162,12 +165,12 @@ void beginOSCWrite()
 void endOSCWrite()
 {
     //noTone(SPEAKER_PIN);
-    popColor();
+    rgbled.popColor();
 }
 
 void beginOSCErrorMessage()
 {
-    pushColor(RGB_RED);
+    rgbled.pushColor(RGB_RED);
     tick();
     //tone(SPEAKER_PIN, 110);
 }
@@ -176,7 +179,7 @@ void endOSCErrorMessage()
 {
     //noTone(SPEAKER_PIN);
     delay(50);
-    popColor();
+    rgbled.popColor();
 }
 
 void finishAnalogObservation(AnalogSampler &s, char* prefix)

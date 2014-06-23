@@ -4,7 +4,7 @@
  * See: https://github.com/joshsh/extendo
  */
 
-#include "MMA7361.h"
+#include <MMA7361.h>
 
 MMA7361 motionSensor(A0, A1, A2);
 

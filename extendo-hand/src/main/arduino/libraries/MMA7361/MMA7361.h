@@ -14,13 +14,13 @@ class MMA7361
   public:
     MMA7361(uint8_t xPin, uint8_t yPin, uint8_t zPin);
 
-    void calibrateX(int min, int max);
-    void calibrateY(int min, int max);
-    void calibrateZ(int min, int max);
+    void calibrateX(int min, int max);  // (min, max): the raw sensor outputs at a_x = -g, g
+    void calibrateY(int min, int max);  // (min, max): the raw sensor outputs at a_y = -g, g
+    void calibrateZ(int min, int max);  // (min, max): the raw sensor outputs at a_z = -g, g
 
-    double accelX();
-    double accelY();
-    double accelZ();
+    double accelX();  // call calibrateX() once before using accelX()
+    double accelY();  // call calibrateY() once before using accelY()
+    double accelZ();  // call calibrateZ() once before using accelZ()
 
     int rawX();
     int rawY();
