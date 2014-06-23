@@ -6,9 +6,12 @@
 
 #include "gesture.h"
 
-const int pinX = A0;
-const int pinY = A1;
-const int pinZ = A2;
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include "MMA7361.h"
+
+MMA7361 motionSensor(A0, A1, A2);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,45 +47,7 @@ SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
 SLIPEncodedSerial SLIPSerial(Serial);
 #endif
 
-
-////////////////////////////////////////
-// 1.5g constants
-
-//*
-const int xmin = 200;
-const int xmax = 565;
-const int ymin = 240;
-const int ymax = 610;
-const int zmin = 110;
-const int zmax = 500;
-//*/
-
-
-////////////////////////////////////////
-// 6g constants (independent of 1.5g constants; must be separately sampled)
-
-/*
-const int xmin = 320;
-const int xmax = 415;
-const int ymin = 340;
-const int ymax = 430;
-const int zmin = 290;
-const int zmax = 395;
-//*/
-
-
-// the "steadiness of hand" with which the sensor was moved to gather the max/min values.
-// If precision = 0.8, then 1g was overestimated by 20% due to a shaky hand.
-// Use 1.0 if static samples were taken.
-const double steadiness = 1.0;
-
-const double xrange = (xmax - xmin) * steadiness;
-const double yrange = (ymax - ymin) * steadiness;
-const double zrange = (zmax - zmin) * steadiness;
-
-const double xmid = (xmin + xmax) / 2.0;
-const double ymid = (ymin + ymax) / 2.0;
-const double zmid = (zmin + zmax) / 2.0;
+////////////////////////////////////////////////////////////////////////////////
 
 
 const double lowerBound = 1.25;
@@ -101,6 +66,11 @@ char print_str[100];
 
 void setup()  
 {
+    // 1.5g constants, sampled 2014-06-21
+    motionSensor.calibrateX(272, 794);
+    motionSensor.calibrateY(332, 841);
+    motionSensor.calibrateZ(175, 700);
+
     // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
     // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
     //Serial.begin(115200);
@@ -168,9 +138,9 @@ void loop()
     double ax, ay, az;
     double a;
     
-    ax = 2 * (analogRead(pinX) - xmid) / xrange;
-    ay = 2 * (analogRead(pinY) - ymid) / yrange;
-    az = 2 * (analogRead(pinZ) - zmid) / zrange;
+    ax = motionSensor.accelX();
+    ay = motionSensor.accelY();
+    az = motionSensor.accelZ();
     
     a = sqrt(ax*ax + ay*ay + az*az);
 

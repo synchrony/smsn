@@ -4,8 +4,8 @@
   Released into the public domain.
 */
 
-#ifndef ANALOG_SAMPLER_h
-#define ANALOG_SAMPLER_h
+#ifndef AnalogSampler_h
+#define AnalogSampler_h
 
 #include "Arduino.h"
 
@@ -40,5 +40,5 @@ class AnalogSampler
     double _sumOfSquares;
 };
 
-#endif
+#endif // AnalogSampler_h
 

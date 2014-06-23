@@ -1,61 +1,38 @@
-
-
-const int pinX = A0;
-const int pinY = A1;
-const int pinZ = A2;
-
-
-////////////////////////////////////////
-// 1.5g constants
-
-const int xmin = 272;
-const int xmax = 794;
-const int ymin = 332;
-const int ymax = 841;
-const int zmin = 175;
-const int zmax = 700;
-/* previous values
-const int xmin = 200;
-const int xmax = 565;
-const int ymin = 240;
-const int ymax = 610;
-const int zmin = 110;
-const int zmax = 500;
-//*/
-
-
-////////////////////////////////////////
-// 6g constants (independent of 1.5g constants; must be separately sampled)
-
 /*
-const int xmin = 320;
-const int xmax = 415;
-const int ymin = 340;
-const int ymax = 430;
-const int zmin = 290;
-const int zmax = 395;
-//*/
+ * Extend-o-Hand calibration and sampling, copyright 2013-2014 by Joshua Shinavier
+ * 
+ * See: https://github.com/joshsh/extendo
+ */
 
+#include "MMA7361.h"
 
-// the "steadiness of hand" with which the sensor was moved to gather the max/min values.
-// If precision = 0.8, then 1g was overestimated by 20% due to a shaky hand.
-// Use 1.0 if static samples were taken.
-const double steadiness = 1.0;
+MMA7361 motionSensor(A0, A1, A2);
 
-const double xrange = (xmax - xmin) * steadiness;
-const double yrange = (ymax - ymin) * steadiness;
-const double zrange = (zmax - zmin) * steadiness;
-
-const double xmid = (xmin + xmax) / 2.0;
-const double ymid = (ymin + ymax) / 2.0;
-const double zmid = (zmin + zmax) / 2.0;
 
 void setup() {
-    //pinMode(pinX, INPUT);
-    //pinMode(pinY, INPUT);
-    //pinMode(pinZ, INPUT);
-    
+
+    // 1.5g constants, sampled 2014-06-21
+    motionSensor.calibrateX(272, 794);
+    motionSensor.calibrateY(332, 841);
+    motionSensor.calibrateZ(175, 700);
+
+    /* previous 1.5g constants
+    motionSensor.calibrateX(200, 565);
+    motionSensor.calibrateY(240, 610);
+    motionSensor.calibrateZ(110, 500);
+    //*/
+
+    /* 6g constants (independent of 1.5g constants; must be separately sampled)
+    motionSensor.calibrateX(320, 415);
+    motionSensor.calibrateY(340, 430);
+    motionSensor.calibrateZ(290, 395);
+    //*/
+
     Serial.begin(115200);
+
+#if ARDUINO >= 100
+    while(!Serial) ;
+#endif
 }
 
 int xminn = 1000, yminn = 1000, zminn = 1000;
@@ -66,9 +43,9 @@ void loop() {
     double ax, ay, az;
     double a;
     
-    ax = 2 * (analogRead(pinX) - xmid) / xrange;
-    ay = 2 * (analogRead(pinY) - ymid) / yrange;
-    az = 2 * (analogRead(pinZ) - zmid) / zrange;
+    ax = motionSensor.accelX();
+    ay = motionSensor.accelY();
+    az = motionSensor.accelZ();
     
     a = sqrt(ax*ax + ay*ay + az*az);
     
@@ -82,11 +59,11 @@ void loop() {
     delay(300);
     //*/
     
-    /* simply output raw values.  Manually identify min/max values in major axes.  I have found this most effective
+    /* calibration: output raw values.  Manually identify min/max values in major axes
     
-    int xraw = analogRead(pinX);
-    int yraw = analogRead(pinY);
-    int zraw = analogRead(pinZ);
+    int xraw = motionSensor.rawX();
+    int yraw = motionSensor.rawY();
+    int zraw = motionSensor.rawZ();
     
     Serial.print(micros());
     Serial.print(","); Serial.print(xraw);
@@ -97,11 +74,11 @@ void loop() {
     delay(200);
     //*/
     
-    /* calibration: find extreme values.  Note: I have not found this method very effective
+    /* calibration: find extreme values.  Note: values may be misleading due to small jerks and twitches of the hand
     
-    int xraw = analogRead(pinX);
-    int yraw = analogRead(pinY);
-    int zraw = analogRead(pinZ);
+    int xraw = motionSensor.rawX();
+    int yraw = motionSensor.rawY();
+    int zraw = motionSensor.rawZ();
     
     if (xraw < xminn) xminn = xraw;
     if (xraw > xmaxn) xmaxn = xraw;
@@ -114,8 +91,7 @@ void loop() {
     Serial.print("] y: ["); Serial.print(yminn); Serial.print(", "); Serial.print(ymaxn);
     Serial.print("] z: ["); Serial.print(zminn); Serial.print(", "); Serial.print(zmaxn); Serial.println("]");
     //*/
-    
-    
+
     /* identify extremes of acceleration in gesture
     
     double ax, ay, az;
@@ -128,9 +104,9 @@ void loop() {
     start = micros();
     for (int i = 0; i < nsamples; i++) {
         
-        ax = 2 * (analogRead(pinX) - xmid) / xrange;
-        ay = 2 * (analogRead(pinY) - ymid) / yrange;
-        az = 2 * (analogRead(pinZ) - zmid) / zrange;
+        ax = motionSensor.accelX();
+        ay = motionSensor.accelY();
+        az = motionSensor.accelZ();
         
         a = sqrt(ax*ax + ay*ay + az*az);
         
@@ -149,21 +125,19 @@ void loop() {
         Serial.print(" -- "); Serial.print(1000000.0 * nsamples / (finish - start)); Serial.println(" /s");
     }
     //*/
-    
-    
+
     //* stream data over the serial port as quickly as possible
     
     double ax, ay, az;
     
-    ax = 2 * (analogRead(pinX) - xmid) / xrange;
-    ay = 2 * (analogRead(pinY) - ymid) / yrange;
-    az = 2 * (analogRead(pinZ) - zmid) / zrange;
-    
-    Serial.print(micros());
-    Serial.print(","); Serial.print(ax);
-    Serial.print(","); Serial.print(ay);
-    Serial.print(","); Serial.print(az);
-    Serial.println("");
-    
+    ax = motionSensor.accelX();
+    ay = motionSensor.accelY();
+    az = motionSensor.accelZ();
+
+    // use a commas rather than tabs, as they are easier to work with on the receiving end
+    Serial.print((int32_t) micros()); Serial.print(",");
+    Serial.print(ax); Serial.print(",");
+    Serial.print(ay); Serial.print(",");
+    Serial.print(az); Serial.print("\n");
     //*/
 }

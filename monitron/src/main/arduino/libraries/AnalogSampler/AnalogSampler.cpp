@@ -1,3 +1,9 @@
+/*
+  AnalogSampler.cpp
+  Created by Joshua Shinavier, 2012-2014
+  Released into the public domain.
+*/
+
 #include "AnalogSampler.h"
 
 AnalogSampler::AnalogSampler(uint8_t pin)
