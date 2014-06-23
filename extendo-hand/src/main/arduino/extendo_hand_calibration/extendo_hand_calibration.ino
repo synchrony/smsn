@@ -8,7 +8,13 @@ const int pinZ = A2;
 ////////////////////////////////////////
 // 1.5g constants
 
-//*
+const int xmin = 272;
+const int xmax = 794;
+const int ymin = 332;
+const int ymax = 841;
+const int zmin = 175;
+const int zmax = 700;
+/* previous values
 const int xmin = 200;
 const int xmax = 565;
 const int ymin = 240;
@@ -88,7 +94,7 @@ void loop() {
     Serial.print(","); Serial.print(zraw);
     Serial.println("");
     
-    //delay(500);
+    delay(200);
     //*/
     
     /* calibration: find extreme values.  Note: I have not found this method very effective
