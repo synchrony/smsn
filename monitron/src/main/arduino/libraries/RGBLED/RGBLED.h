@@ -9,14 +9,16 @@
 
 #include "Arduino.h"
 
-const unsigned long RGB_WHITE = 0xffffff;
-const unsigned long RGB_RED = 0xff0000;
-const unsigned long RGB_YELLOW = 0xffff00;
-const unsigned long RGB_GREEN = 0x00ff00;
-const unsigned long RGB_CYAN = 0x00ffff;
-const unsigned long RGB_BLUE = 0x0000ff;
-const unsigned long RGB_PURPLE = 0xff00ff;
-const unsigned long RGB_BLACK = 0x000000;
+const unsigned long
+    RGB_WHITE = 0xffffff,
+    RGB_RED = 0xff0000,
+    RGB_ORANGE = 0xff8000,
+    RGB_YELLOW = 0xffff00,
+    RGB_GREEN = 0x00ff00,
+    RGB_CYAN = 0x00ffff,
+    RGB_BLUE = 0x0000ff,
+    RGB_PURPLE = 0xff00ff,
+    RGB_BLACK = 0x000000;
 
 class RGBLED
 {
@@ -27,11 +29,10 @@ class RGBLED
     void pushColor(unsigned long color);
     void popColor();
     void replaceColor(unsigned long color);
-    void testSequence();
+    void testColorSequence();
 
   private:
     uint8_t _redPin, _greenPin, _bluePin;
 };
 
 #endif // RGBLED_h
-

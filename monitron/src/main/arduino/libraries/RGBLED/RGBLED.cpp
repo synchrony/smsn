@@ -57,7 +57,9 @@ void RGBLED::pushColor(unsigned long color)
 
 void RGBLED::popColor()
 {
-    colorStackIndex--;
+    if (colorStackIndex > 0) {
+        colorStackIndex--;
+    }
     writeColor();
 }
 
@@ -67,7 +69,7 @@ void RGBLED::replaceColor(unsigned long color)
     pushColor(color);
 }
 
-void RGBLED::testSequence()
+void RGBLED::testColorSequence()
 {
   for (int i=0; i < 10; i++) {
     replaceColor(RGB_WHITE);

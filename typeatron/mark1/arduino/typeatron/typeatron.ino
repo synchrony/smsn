@@ -93,56 +93,24 @@ AnalogSampler sampler_photoresistor(photoresistorPin);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// prevents red (which otherwise requires a higher resistance) from dominating the RGB LED
-const unsigned int RED_FACTOR = 100;
+#include <RGBLED.h>
 
-const unsigned long WHITE = 0xffffff;
-const unsigned long RED = 0xff0000;
-const unsigned long ORANGE = 0xff8000;
-const unsigned long YELLOW = 0xffff00;
-const unsigned long GREEN = 0x00ff00;
-const unsigned long CYAN = 0x00ffff;
-const unsigned long BLUE = 0x0000ff;
-const unsigned long PURPLE = 0xff00ff;
-const unsigned long BLACK = 0x000000;
-const unsigned long GRAY = 0x808080;
+RGBLED rgbled(redPin, greenPin, bluePin);
 
-unsigned long currentRGBColor = 0;
-
-void writeRGBColor(unsigned long color)
-{
-    unsigned long red = (color & RED) >> 16;
-    unsigned long green = (color & GREEN) >> 8;
-    unsigned long blue = (color & BLUE);
-
-    red = (red * RED_FACTOR) / 255;
-
-    analogWrite(redPin, 255 - (unsigned int) red);
-    analogWrite(greenPin, 255 - (unsigned int) green);
-    analogWrite(bluePin, 255 - (unsigned int) blue);
-    
-    currentRGBColor = color;
-}
 
 int colorToggle = 0;
 
 void colorDebug() {
     long modeColor = getModeColor();
-    //sprintf(errstr, "modeColor = %d", (int) modeColor);
-    //sendInfo(errstr);
-    writeRGBColor(modeColor);
-/*
-// don't toggle colors in demo mode
-#ifndef DEMO
-    if (colorToggle) {
-        writeRGBColor(RED);
-    } else {
-        writeRGBColor(BLUE);
-    }
-    colorToggle = !colorToggle; 
-#endif 
-*/
+    rgbled.replaceColor(modeColor);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <Droidspeak.h>
+
+Droidspeak droidspeak(transducerPin);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +122,7 @@ void laserOn() {
     digitalWrite(ledPin, HIGH);
     
 #ifdef DEMO
-    writeRGBColor(RED);
+    rgbled.pushColor(RGB_RED);
 #endif
 }
 
@@ -164,7 +132,7 @@ void laserOff() {
     digitalWrite(ledPin, LOW);  
     
 #ifdef DEMO
-    writeRGBColor(BLUE);
+    rgbled.popColor();
 #endif
 }
 
@@ -197,10 +165,10 @@ const char *modeNames[] = {
 };
     
 const unsigned long modeColors[] = {
-    BLUE,   // Text
-    BLACK,  // LaserTrigger
-    RED,    // LaserPointer
-    WHITE   // Mash
+    RGB_BLUE,   // Text
+    RGB_BLACK,  // LaserTrigger
+    RGB_RED,    // LaserPointer
+    RGB_WHITE   // Mash
 };
 
 Mode mode;
@@ -274,19 +242,15 @@ int morseStopTest() {
 // note: tones may not be played (via the Typeatron's transducer) in parallel with the reading of button input,
 // as the vibration causes the push button switches to oscillate when depressed
 void startupSequence() {
-    tone(transducerPin, 220);
-    writeRGBColor(RED);
+    rgbled.replaceColor(RGB_RED);
+    droidspeak.speakPowerUpPhrase();
+    rgbled.replaceColor(RGB_BLUE);
     digitalWrite(vibrationMotorPin, HIGH);
     delay(200);
-    tone(transducerPin, 440);
-    writeRGBColor(GREEN);
-    delay(200);
-    tone(transducerPin, 880);
-    writeRGBColor(BLUE);
-    digitalWrite(vibrationMotorPin, LOW); 
-    delay(200);
-    noTone(transducerPin);
-    
+    digitalWrite(vibrationMotorPin, LOW);
+    rgbled.replaceColor(RGB_GREEN);
+    droidspeak.speakSetupCompletedPhrase();
+
     //playMorseString("hello, world!", morseStopTest);
 }
 
@@ -309,9 +273,8 @@ void setup() {
     pinMode(transducerPin, OUTPUT); 
     pinMode(laserPin, OUTPUT);
     pinMode(ledPin, OUTPUT);
-    pinMode(redPin, OUTPUT);
-    pinMode(greenPin, OUTPUT);
-    pinMode(bluePin, OUTPUT);
+
+    rgbled.setup();
 
     // OSCuino: begin SLIPSerial just like Serial
     // set this as high as you can reliably run on your platform
@@ -364,14 +327,11 @@ void sendOSCMessageError(class OSCMessage &message) {
 
 
 void receiveOSCMessage(class OSCMessage &messageIn) {
-//    writeRGBColor(WHITE);        
-
     if (messageIn.hasError()) {
         sendOSCMessageError(messageIn);
 //sprintf(errstr, "invalid message occupies %d bytes", messageIn.bytes());
 //sendInfo(errstr);
     } else {
-//        writeRGBColor(GREEN);
 
 // temporary: echo the received message
 sendOSC(messageIn);
@@ -427,23 +387,14 @@ void receiveModeMessage(class OSCMessage &m) {
 }
 
 void receiveMorseMessage(class OSCMessage &m) {
-  //sendInfo("received morse message");
-    //if (m.isString(0)) {
-        writeRGBColor(YELLOW);
-        
-        int length = m.getDataLength(0);
-        char buffer[length+1];
-        m.getString(0, buffer, length+1);   
-        
-        playMorseString(buffer, morseStopTest); 
-    //} else {
-    //    sendError("expected string argument to Morse code control");
-    //}  
+    int length = m.getDataLength(0);
+    char buffer[length+1];
+    m.getString(0, buffer, length+1);
+
+    playMorseString(buffer, morseStopTest);
 }
 
 void receivePhotoGetMessage(class OSCMessage &m) {
-    //writeRGBColor(WHITE);    
-    
     sampler_photoresistor.reset();
     sampler_photoresistor.beginSample();
     sampler_photoresistor.measure();
@@ -453,60 +404,52 @@ void receivePhotoGetMessage(class OSCMessage &m) {
 }
 
 void receivePingMessage(class OSCMessage &m) {
-    writeRGBColor(PURPLE);        
-
     // send reply as soon as possible
     sendPingReply();
     
     playMorseString("p", morseStopTest);  
-    writeRGBColor(GREEN);          
 }
 
 void receiveVibroMessage(class OSCMessage &m) {
-    writeRGBColor(PURPLE);
-    
-  //sendInfo("we made it into the vibro control!");
-    //if (m.isInt(0)) {
-        int d = m.getInt(0);
-        //playMorseInt(d, morseStopTest);
-        
-        //writeRGBColor(YELLOW);
-        if (d <= 0) {
-            sendError("vibro duration must be a positive number");
-        } else if (d > 60000) {
-            sendError("exceeded artificial bound of one minute for vibration cue");
-        } else {
-            vibrateForDuration(d);  
-        }  
-    //} else {
-    //    sprintf(errstr, "expected integer argument to vibro control, found type %c", m.getType(0));
-    //    sendError(errstr);
-   // }
+    rgbled.pushColor(RGB_PURPLE);
+
+    int d = m.getInt(0);
+    //playMorseInt(d, morseStopTest);
+
+    if (d <= 0) {
+        sendError("vibro duration must be a positive number");
+    } else if (d > 60000) {
+        sendError("exceeded artificial bound of one minute for vibration cue");
+    } else {
+        vibrateForDuration(d);
+    }
+
+    rgbled.popColor();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void sendError(const char *message) {
-    writeRGBColor(ORANGE);    
+    rgbled.pushColor(RGB_ORANGE);
     
     OSCMessage m("/exo/tt/error");
     m.add(message);
 
     sendOSC(m);
     
-    writeRGBColor(RED);        
+    rgbled.popColor();
 }
 
 void sendInfo(const char *message) {
-    writeRGBColor(BLUE);        
+    rgbled.pushColor(RGB_BLUE);
 
     OSCMessage m("/exo/tt/info");
     m.add(message);
 
     sendOSC(m);
     
-    writeRGBColor(CYAN);        
+    rgbled.popColor();
 }
 
 void sendKeyEvent(const char *keys) {
@@ -521,14 +464,10 @@ void sendLightLevel() {
 }
 
 void sendPingReply() {
-    //writeRGBColor(YELLOW);        
-
     OSCMessage m("/exo/tt/ping/reply");
     m.add((int32_t) micros());
     
     sendOSC(m);
-    
-    //writeRGBColor(GREEN);        
 }
 
 void sendLaserEvent() {
@@ -547,8 +486,6 @@ void loop() {
     
     int size;
     while ((size = SLIPSerial.available()) > 0) {
-        //writeRGBColor(GRAY);
-
         while (size--) {
             int c = SLIPSerial.read();
             messageIn->fill(c);
@@ -565,7 +502,7 @@ void loop() {
         messageIn = new OSCMessage();
     }
 #endif
-    writeRGBColor(BLACK);
+    rgbled.replaceColor(RGB_BLACK);
     
     readKeys();
     

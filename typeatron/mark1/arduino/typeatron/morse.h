@@ -107,12 +107,12 @@ long timeUnit = 50;
 
 void morseOn() {
     tone(morsePin, morsePitch);
-    writeRGBColor(YELLOW);
+    rgbled.pushColor(RGB_YELLOW);
 }
 
 void morseOff() {
     noTone(morsePin);
-    writeRGBColor(BLACK);
+    rgbled.popColor();
 }
 
 void dit() {
