@@ -87,7 +87,9 @@ BMP085 bmp085;
 
 RGBLED rgbled(RGB_LED_RED_PIN, RGB_LED_GREEN_PIN, RGB_LED_BLUE_PIN);
 
-#include "om_droidspeak.h"
+#include <Droidspeak.h>
+
+Droidspeak droidspeak(SPEAKER_PIN);
 
 #include "om_dust.h"
 #include "om_motion.h"
@@ -107,7 +109,7 @@ void setup() {
     //rgbled.replaceColor(RGB_CYAN);
     //delay(3000);
     
-    speakPowerUpPhrase();
+    droidspeak.speakPowerUpPhrase();
     
     randomSeed(analogRead(LIGHT_PIN));
  
@@ -117,7 +119,7 @@ void setup() {
     //lastCycle_highBits = 0;
     //lastCycle_lowBits = millis();
     
-    speakSetupCompletedPhrase(); 
+    droidspeak.speakSetupCompletedPhrase(); 
     
     rgbled.replaceColor(RGB_GREEN);
 }
@@ -158,7 +160,7 @@ void endSample()
 void beginOSCWrite()
 {
     rgbled.pushColor(RGB_CYAN);
-    tick();
+    droidspeak.tick();
     //tone(SPEAKER_PIN, 55);
 }
 
@@ -171,7 +173,7 @@ void endOSCWrite()
 void beginOSCErrorMessage()
 {
     rgbled.pushColor(RGB_RED);
-    tick();
+    droidspeak.tick();
     //tone(SPEAKER_PIN, 110);
 }
 

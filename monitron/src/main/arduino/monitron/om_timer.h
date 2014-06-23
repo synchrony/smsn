@@ -31,7 +31,7 @@ void error(char *message)
     errorReportIndex++;
     if (errorReportIndex == cyclesBetweenErrorReports)
     {
-        speakWarningPhrase();
+        droidspeak.speakWarningPhrase();
         cyclesBetweenErrorReports *= 2;
         errorReportIndex = 0;
     }
