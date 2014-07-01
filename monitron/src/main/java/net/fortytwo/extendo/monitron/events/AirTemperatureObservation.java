@@ -4,6 +4,7 @@ import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.ontologies.MonitronOntology;
 import net.fortytwo.extendo.monitron.ontologies.OMOntology;
+import net.fortytwo.rdfagents.model.Dataset;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
@@ -17,12 +18,19 @@ public class AirTemperatureObservation extends Observation {
                                      final URI sensor,
                                      final GaussianData data) {
         super(context, sensor, data);
+    }
 
-        addStatement(d, event, RDF.TYPE, MonitronOntology.AIR_TEMPERATURE_OBSERVATION);
-        addStatement(d, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.AIR_TEMPERATURE);
+    @Override
+    public Dataset toRDF() {
+        Dataset dataset = super.toRDF();
 
-        Literal value = vf.createLiteral(data.getMean());
-        addStatement(d, result, OMOntology.VALUE, value);
-        addStatement(d, result, OMOntology.UOM, MonitronOntology.DEGREES_CELSIUS);
+        addStatement(dataset, event, RDF.TYPE, MonitronOntology.AIR_TEMPERATURE_OBSERVATION);
+        addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.AIR_TEMPERATURE);
+
+        Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
+        addStatement(dataset, result, OMOntology.VALUE, value);
+        addStatement(dataset, result, OMOntology.UOM, MonitronOntology.DEGREES_CELSIUS);
+
+        return dataset;
     }
 }

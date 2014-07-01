@@ -3,7 +3,7 @@ package net.fortytwo.extendo.monitron.listeners.sensors;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 import org.openrdf.model.URI;
 
 /**
@@ -16,9 +16,9 @@ public abstract class GaussianSensorListener extends SensorListener {
         super(context, sensor);
     }
 
-    protected abstract Event handleSample(GaussianData s);
+    protected abstract MonitronEvent handleSample(GaussianData s);
 
-    protected Event handleMessage(final OSCMessage m) throws MessageParseException {
+    protected MonitronEvent handleMessage(final OSCMessage m) throws MessageParseException {
 
         GaussianData s = new GaussianData();
 

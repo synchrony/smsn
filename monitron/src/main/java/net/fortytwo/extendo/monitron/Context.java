@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.monitron;
 
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 
@@ -14,7 +14,7 @@ public class Context {
 
     private long timerStart;
 
-    public Context(EventHandler eventHandler) {
+    public Context(final EventHandler eventHandler) {
         this.eventHandler = eventHandler;
     }
 
@@ -22,7 +22,7 @@ public class Context {
         return valueFactory;
     }
 
-    public void handleEvent(final Event e) throws EventHandler.EventHandlingException {
+    public void handleEvent(final MonitronEvent e) throws EventHandler.EventHandlingException {
         eventHandler.handleEvent(e);
     }
 

@@ -2,7 +2,7 @@ package net.fortytwo.extendo.monitron.listeners;
 
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.monitron.Context;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 
 /**
 * @author Joshua Shinavier (http://fortytwo.net)
@@ -13,7 +13,7 @@ public class SystemErrorListener extends MonitronListener {
         super(context);
     }
 
-    protected Event handleMessage(final OSCMessage m) throws MessageParseException {
+    protected MonitronEvent handleMessage(final OSCMessage m) throws MessageParseException {
         String message = arg(m, 0);
         System.err.println("monitron system error: " + message);
 

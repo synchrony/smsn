@@ -3,7 +3,7 @@ package net.fortytwo.extendo.monitron.listeners.sensors;
 import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.events.ColorLightLevelObservation;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 import org.openrdf.model.URI;
 
 /**
@@ -20,7 +20,7 @@ public class ColorLightLevelSensorListener extends GaussianSensorListener {
         this.colorProperty = colorProperty;
     }
 
-    protected Event handleSample(final GaussianData data) {
+    protected MonitronEvent handleSample(final GaussianData data) {
         return new ColorLightLevelObservation(context, sensor, data, colorProperty);
     }
 }

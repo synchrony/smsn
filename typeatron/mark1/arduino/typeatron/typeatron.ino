@@ -31,13 +31,7 @@ void sendError(const char *message);
 ////////////////////////////////////////////////////////////////////////////////
 
 // send and receive messages using Bluetooth/Amarino as opposed to plain serial
-#define USE_BLUETOOTH
-
-// if defined, make serial output more legible
-//#define DEBUG
-
-// a simple mode for a mocked-up video demo
-#define DEMO
+//#define USE_BLUETOOTH
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +82,7 @@ char errstr[128];
 
 #include <AnalogSampler.h>
 
-AnalogSampler sampler_photoresistor(photoresistorPin);
+AnalogSampler photoSampler(photoresistorPin);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,20 +114,12 @@ void laserOn() {
    
     // also turn on the on-board LED, as a cue to the developer in USB mode (when the laser is powered off)
     digitalWrite(ledPin, HIGH);
-    
-#ifdef DEMO
-    rgbled.pushColor(RGB_RED);
-#endif
 }
 
 void laserOff() {
     digitalWrite(laserPin, LOW); 
    
-    digitalWrite(ledPin, LOW);  
-    
-#ifdef DEMO
-    rgbled.popColor();
-#endif
+    digitalWrite(ledPin, LOW);
 }
 
 
@@ -395,10 +381,10 @@ void receiveMorseMessage(class OSCMessage &m) {
 }
 
 void receivePhotoGetMessage(class OSCMessage &m) {
-    sampler_photoresistor.reset();
-    sampler_photoresistor.beginSample();
-    sampler_photoresistor.measure();
-    sampler_photoresistor.endSample();
+    photoSampler.reset();
+    photoSampler.beginSample();
+    photoSampler.measure();
+    photoSampler.endSample();
    
     sendLightLevel();
 }
@@ -460,7 +446,7 @@ void sendKeyEvent(const char *keys) {
 }
 
 void sendLightLevel() {
-    sendAnalogObservation(sampler_photoresistor, "/exo/tt/photo/data"); 
+    sendAnalogObservation(photoSampler, "/exo/tt/photo/data");
 }
 
 void sendPingReply() {
@@ -539,7 +525,12 @@ void loop() {
         }
     }
   
-    lastKeyState = keyState;  
+    lastKeyState = keyState;
+
+
+    int l = analogRead(A3);
+    System.out.print("light level: ");
+    System.out.println(l);
 }
 
 

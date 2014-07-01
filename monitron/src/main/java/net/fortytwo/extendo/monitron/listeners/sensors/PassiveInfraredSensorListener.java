@@ -3,7 +3,7 @@ package net.fortytwo.extendo.monitron.listeners.sensors;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.BooleanData;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 import net.fortytwo.extendo.monitron.events.MotionObservation;
 import org.openrdf.model.URI;
 
@@ -17,7 +17,7 @@ public class PassiveInfraredSensorListener extends SensorListener {
         super(context, sensor);
     }
 
-    protected Event handleMessage(final OSCMessage m) throws MessageParseException {
+    protected MonitronEvent handleMessage(final OSCMessage m) throws MessageParseException {
         BooleanData s = new BooleanData();
 
         int i = 0;
@@ -30,7 +30,7 @@ public class PassiveInfraredSensorListener extends SensorListener {
         return handleSample(s);
     }
 
-    protected Event handleSample(final BooleanData data) {
+    protected MonitronEvent handleSample(final BooleanData data) {
         return new MotionObservation(context, sensor, data);
     }
 }

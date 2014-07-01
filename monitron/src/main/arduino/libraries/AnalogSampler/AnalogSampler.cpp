@@ -34,15 +34,23 @@ void AnalogSampler::measure()
 void AnalogSampler::addMeasurement(double v)
 {
     _n++;
-    
-    if (v < _minValue)
+
+    if (1 == _n)
     {
         _minValue = v;
-    }
-    
-    if (v > _maxValue)
-    {
         _maxValue = v;
+    }
+    else
+    {
+        if (v < _minValue)
+        {
+            _minValue = v;
+        }
+
+        if (v > _maxValue)
+        {
+            _maxValue = v;
+        }
     }
     
     _sumOfValues += v;
@@ -51,15 +59,16 @@ void AnalogSampler::addMeasurement(double v)
 
 void AnalogSampler::reset()
 {
-    _minValue = 1.0;
-    _maxValue = 0.0;
+    _n = 0;
     _sumOfValues = 0;
     _sumOfSquares = 0;
-    _n = 0;
+
+    _minValue = 0.0;
+    _maxValue = 0.0;
     _startTime = 0;
     _endTime = 0;
 }
-    
+
 unsigned long AnalogSampler::getStartTime() 
 {
 	return _startTime;
@@ -95,8 +104,8 @@ double AnalogSampler::getVariance()
     if (_n < 2) {
         return 0;
     } else {
-	double m = getMean();
-	return (_sumOfSquares - (_n * m * m)) / (_n - 1);
+	    double m = getMean();
+	    return (_sumOfSquares - (_n * m * m)) / (_n - 1);
     }	    
 }
 

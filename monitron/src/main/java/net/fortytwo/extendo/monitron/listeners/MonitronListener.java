@@ -4,7 +4,7 @@ import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.EventHandler;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 
 import java.util.Date;
 import java.util.List;
@@ -19,12 +19,12 @@ public abstract class MonitronListener implements OSCListener {
         this.context = context;
     }
 
-    protected abstract Event handleMessage(OSCMessage m) throws MessageParseException;
+    protected abstract MonitronEvent handleMessage(OSCMessage m) throws MessageParseException;
 
     public void acceptMessage(final Date date,
                               final OSCMessage m) {
         try {
-            Event event = handleMessage(m);
+            MonitronEvent event = handleMessage(m);
             if (null != event) {
                 context.handleEvent(event);
             }

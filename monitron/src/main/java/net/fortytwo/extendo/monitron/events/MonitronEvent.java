@@ -20,7 +20,7 @@ import java.util.LinkedList;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public abstract class Event {
+public abstract class MonitronEvent {
     private static final DatatypeFactory DATATYPE_FACTORY;
 
     static {
@@ -32,34 +32,32 @@ public abstract class Event {
     }
 
     protected final Context context;
-    protected final ValueFactory vf;
-    protected final Dataset d;
+    protected final ValueFactory valueFactory;
 
-    public Event(final Context context) {
+    public MonitronEvent(final Context context) {
         this.context = context;
-        this.vf = context.getValueFactory();
-        d = new Dataset(new LinkedList<Statement>());
+        this.valueFactory = context.getValueFactory();
     }
 
-    public Dataset getDataset() {
-        return d;
+    public Dataset toRDF() {
+        return new Dataset(new LinkedList<Statement>());
     }
 
     protected URI coinEventURI() {
-        return vf.createURI(Universe.NAMESPACE + "event-" + Extendo.createRandomKey());
+        return valueFactory.createURI(Universe.NAMESPACE + "event-" + Extendo.createRandomKey());
     }
 
     protected Literal toLiteral(final Date d) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(d);
-        return vf.createLiteral(DATATYPE_FACTORY.newXMLGregorianCalendar(c));
+        return valueFactory.createLiteral(DATATYPE_FACTORY.newXMLGregorianCalendar(c));
     }
 
     protected void addStatement(final Dataset d,
-                              final Resource subject,
-                              final URI predicate,
-                              final Value object) {
-        d.getStatements().add(vf.createStatement(subject, predicate, object));
+                                final Resource subject,
+                                final URI predicate,
+                                final Value object) {
+        d.getStatements().add(valueFactory.createStatement(subject, predicate, object));
     }
 
 }

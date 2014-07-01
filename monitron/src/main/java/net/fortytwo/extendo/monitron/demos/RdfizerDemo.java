@@ -2,7 +2,7 @@ package net.fortytwo.extendo.monitron.demos;
 
 import net.fortytwo.extendo.monitron.EventHandler;
 import net.fortytwo.extendo.monitron.MonitronService;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -33,12 +33,12 @@ public class RdfizerDemo {
         String fileName = cmd.getOptionValue("file");
 
         EventHandler handler = new EventHandler() {
-            public void handleEvent(Event e) throws EventHandlingException {
+            public void handleEvent(MonitronEvent e) throws EventHandlingException {
                 System.out.println("\nreceived dataset:\t\n");
                 RDFWriter w = Rio.createWriter(RDFFormat.NQUADS, System.out);
                 try {
                     w.startRDF();
-                    for (Statement s : e.getDataset().getStatements()) {
+                    for (Statement s : e.toRDF().getStatements()) {
                         w.handleStatement(s);
                     }
                     w.endRDF();

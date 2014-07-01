@@ -30,4 +30,3 @@ class BMP085
 };
 
 #endif
-

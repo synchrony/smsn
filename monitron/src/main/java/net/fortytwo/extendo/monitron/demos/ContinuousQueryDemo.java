@@ -7,7 +7,7 @@ import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.monitron.EventHandler;
 import net.fortytwo.extendo.monitron.MonitronService;
-import net.fortytwo.extendo.monitron.events.Event;
+import net.fortytwo.extendo.monitron.events.MonitronEvent;
 import net.fortytwo.extendo.monitron.ontologies.MonitronOntology;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -79,8 +79,8 @@ public class ContinuousQueryDemo {
 
         // ...then start the stream
         EventHandler handler = new EventHandler() {
-            public void handleEvent(Event e) throws EventHandlingException {
-                for (Statement st : e.getDataset().getStatements()) {
+            public void handleEvent(MonitronEvent e) throws EventHandlingException {
+                for (Statement st : e.toRDF().getStatements()) {
                     try {
                         engine.addStatement(st);
                     } catch (IOException e1) {

@@ -4,6 +4,7 @@ import net.fortytwo.extendo.monitron.Context;
 import net.fortytwo.extendo.monitron.data.GaussianData;
 import net.fortytwo.extendo.monitron.ontologies.MonitronOntology;
 import net.fortytwo.extendo.monitron.ontologies.OMOntology;
+import net.fortytwo.rdfagents.model.Dataset;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
@@ -13,18 +14,33 @@ import org.openrdf.model.vocabulary.RDF;
  */
 public class ColorLightLevelObservation extends Observation {
 
+    protected final URI colorProperty;
+
     public ColorLightLevelObservation(final Context context,
                                       final URI sensor,
                                       final GaussianData data,
                                       final URI colorProperty) {
         super(context, sensor, data);
 
-        addStatement(d, event, RDF.TYPE, MonitronOntology.COLOR_LIGHT_LEVEL_OBSERVATION);
+        this.colorProperty = colorProperty;
+    }
 
-        addStatement(d, event, OMOntology.OBSERVED_PROPERTY, colorProperty);
+    public URI getColorProperty() {
+        return colorProperty;
+    }
 
-        Literal value = vf.createLiteral(data.getMean());
-        addStatement(d, result, OMOntology.VALUE, value);
+    @Override
+    public Dataset toRDF() {
+        Dataset dataset = super.toRDF();
+
+        addStatement(dataset, event, RDF.TYPE, MonitronOntology.COLOR_LIGHT_LEVEL_OBSERVATION);
+
+        addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, colorProperty);
+
+        Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
+        addStatement(dataset, result, OMOntology.VALUE, value);
         // TODO: add units
+
+        return dataset;
     }
 }
