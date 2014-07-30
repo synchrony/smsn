@@ -4,6 +4,31 @@
  * See: https://github.com/joshsh/extendo
  */
 
+
+// send and receive messages using Bluetooth/Amarino as opposed to plain serial
+//#define USE_BLUETOOTH
+
+// if defined, make serial output more legible to a human eye
+#define DEBUG
+
+//#define GESTURE_MODE
+#define KEYBOARD_MODE
+
+// output raw accelerometer data in addition to gestures
+#define PRINT_SENSOR_DATA
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#define MOTION_X_PIN A0
+#define MOTION_Y_PIN A1
+#define MOTION_Z_PIN A2
+
+#define SPEAKER_PIN  8
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 #include "gesture.h"
 
 
@@ -11,16 +36,14 @@
 
 #include <MMA7361.h>
 
-MMA7361 motionSensor(A0, A1, A2);
+MMA7361 motionSensor(MOTION_X_PIN, MOTION_Y_PIN, MOTION_Z_PIN);
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// send and receive messages using Bluetooth/Amarino as opposed to plain serial
-//#define USE_BLUETOOTH
+#include <Droidspeak.h>
 
-// if defined, make serial output more legible to a human eye
-#define DEBUG
+Droidspeak droidspeak(SPEAKER_PIN);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,11 +70,18 @@ SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
 SLIPEncodedSerial SLIPSerial(Serial);
 #endif
 
+
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#ifdef GESTURE_MODE
 const double lowerBound = 1.25;
 const double upperBound = 1.75;
+#else
+#ifdef KEYBOARD_MODE
+const double lowerBound = 1.05;
+const double upperBound = 1.20;
+#endif
+#endif
 
 const int STATE_ONE = 1;
 const int STATE_TWO = 2;
@@ -59,13 +89,20 @@ const int STATE_THREE = 3;
 const int STATE_FOUR = 4;
 
 int state;
+
+// acceleration at last (potential) turning point
 double amax;
 double ax_max, ay_max, az_max;
+
+// time of last (potential) turning point
+int32_t tmax;
 
 char print_str[100];
 
 void setup()  
 {
+    droidspeak.speakPowerUpPhrase();
+
     // 1.5g constants, sampled 2014-06-21
     motionSensor.calibrateX(272, 794);
     motionSensor.calibrateY(332, 841);
@@ -84,6 +121,8 @@ void setup()
   meetAndroid.registerFunction(ping, 'p');
 
   state = STATE_ONE;
+  
+  droidspeak.speakSetupCompletedPhrase(); 
 }
 
 
@@ -135,6 +174,8 @@ void loop()
     // you need to keep this in your loop() to receive events
     meetAndroid.receive();
     
+    int32_t now = micros();
+
     double ax, ay, az;
     double a;
     
@@ -142,8 +183,15 @@ void loop()
     ay = motionSensor.accelY();
     az = motionSensor.accelZ();
     
+#ifdef PRINT_SENSOR_DATA
+    Serial.print(now); Serial.print(",");
+    Serial.print(ax); Serial.print(",");
+    Serial.print(ay); Serial.print(",");
+    Serial.print(az); Serial.print("\n");
+#endif
+    
     a = sqrt(ax*ax + ay*ay + az*az);
-
+    
     switch (state) {
       case STATE_ONE:
         if (a >= lowerBound) {
@@ -164,6 +212,7 @@ void loop()
            ax_max = ax;
            ay_max = ay;
            az_max = az;
+           tmax = now;
         }
         
         if (a < upperBound) {
@@ -180,27 +229,36 @@ void loop()
           gestureVector[0] = ax_max;
           gestureVector[1] = ay_max;
           gestureVector[2] = az_max;
-          const char *gesture = classifyGestureVector(gestureVector);
+          const char *gesture = classifyGestureVector(gestureVector, tmax, now);
           
-          // gesture event
+            // gesture event
 #ifdef DEBUG
-          // comma-separated format for the gesture event, for ease of importing to R and similar tools
-          Serial.print((int32_t) micros()); Serial.print(",");
-          Serial.print(amax); Serial.print(",");
-          Serial.print(ax_max); Serial.print(",");
-          Serial.print(ay_max); Serial.print(",");
-          Serial.print(az_max); Serial.print(",");
-          Serial.println(gesture);        
+            // comma-separated format for the gesture event, for ease of importing to R and similar tools
+            Serial.print(tmax); Serial.print(",");  // time of turning point
+            Serial.print(now); Serial.print(",");  // time of recognition
+            Serial.print(amax); Serial.print(",");
+            Serial.print(ax_max); Serial.print(",");
+            Serial.print(ay_max); Serial.print(",");
+            Serial.print(az_max); Serial.print(",");
+            Serial.println(gesture);        
 #else
-          OSCMessage m("/exo/hand/gesture");
-          m.add((int32_t) micros());
-          m.add(amax);
-          m.add(ax_max);
-          m.add(ay_max);
-          m.add(az_max);
-          m.add(gesture);
-          sendOSC(m);   
-#endif    
+            OSCMessage m("/exo/hand/gesture");
+            m.add(tmax);  // time of turning point
+            m.add(now);  // time of recognition
+            m.add(amax);
+            m.add(ax_max);
+            m.add(ay_max);
+            m.add(az_max);
+            m.add(gesture);
+            sendOSC(m);   
+#endif
+            // play short audio cues associated with gestures
+            if (gestureToneLength > 0) {
+                tone(SPEAKER_PIN, gestureTone);
+                delay(gestureToneLength);
+                noTone(SPEAKER_PIN);
+                gestureToneLength = 0;
+            }
         }
         break;
     }

@@ -1,6 +1,9 @@
 #include <math.h>
 #include <Arduino.h>  // for millis(), if nothing else
 
+int gestureTone = 0;
+int gestureToneLength = 0;
+
 double mag(const double *vin) {
     return sqrt(pow(vin[0], 2) + pow(vin[1], 2) + pow(vin[2], 2));  
 }
@@ -16,17 +19,26 @@ double distance(const double *v1, const double *v2) {
     return sqrt(pow(v1[0] - v2[0], 2) + pow(v1[1] - v2[1], 2) + pow(v1[2] - v2[2], 2));  
 }
 
-const double openPalmCenter[] = {0.3093581, -0.6281864, -0.7139183};
+const double openPalmCenter[] = {0.31, -0.63, -0.71};
 const double openPalmTolerance = 0.3;
 
-const double waveCenter1[] = {-0.8356163, 0.4055072, 0.3705529};
+const double waveCenter1[] = {-0.84, 0.41, 0.37};
 const double waveTolerance1 = 0.5;
 
-const double waveCenter2[] = {0.9125032, -0.1936484, -0.3603307};
+const double waveCenter2[] = {0.91, -0.19, -0.36};
 const double waveTolerance2 = 0.5;
 
+const double tapCenter[] = {0.16, -0.04, 0.98};
+const double tapTolerance = 0.5;  // generous; 0.15 *should* be sufficient
+
 // at most 300ms may pass between one extremum of a wave gesture and the other
-const unsigned long waveMaxDelay = 300;
+const unsigned long waveMaxDelay = 300000;
+
+// 500ms was found to be typical in the large-format keypad application
+const unsigned long tapMinDelay = 200000;
+const unsigned long tapMaxDelay = 800000;
+
+const unsigned long tapMaxWidth = 100000;
 
 const char
     *openPalm = "open-palm",
@@ -34,18 +46,23 @@ const char
     *wave2 = "wave-2",
     *wave1Complete = "wave-1-complete",
     *wave2Complete = "wave-2-complete",
+    *tap1 = "tap-1",
+    *tap2 = "tap-2",
     *none = "none";
     
-unsigned long lastWave1 = 0, lastWave2 = 0;
+int32_t lastWave1 = 0, lastWave2 = 0;
+int32_t lastTap1 = 0, lastTap2 = 0;
 
-const char *classifyGestureVector(double *v) {
+// note: overflow of millis() during a wave gesture may interfere with its recognition.  However, this is infrequent and unlikely.
+const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
     double normed[3];
     normalize(v, normed);
-    
-    // note: overflow of millis() during a wave gesture may interfere with its recognition.  However, this is infrequent and unlikely.
-    unsigned long now = millis();
+        
+    int32_t width = now - tmax;
     
     double d;
+    
+#ifdef GESTURE_MODE
     d = distance(normed, openPalmCenter);
     if (d <= openPalmTolerance) {
         return openPalm;
@@ -61,7 +78,28 @@ const char *classifyGestureVector(double *v) {
         lastWave2 = now;
         
         return (now - lastWave1 <= waveMaxDelay) ? wave2Complete : wave2;
-    }    
-    
+    }
+#else
+#ifdef KEYBOARD_MODE
+    d = distance(normed, tapCenter);
+    if (d <= tapTolerance && width < tapMaxWidth) {        
+        if (now - lastTap1 >= tapMinDelay && now - lastTap2 >= tapMinDelay) {
+            if (now - lastTap1 <= tapMaxDelay) {
+                lastTap1 = 0;
+                lastTap2 = now;
+                gestureTone = 1600;
+                gestureToneLength = 50;
+                return tap2;
+            } else {
+                lastTap1 = now;
+                gestureTone = 400;
+                gestureToneLength = 50;
+                return tap1;
+            }
+        }
+    }
+#endif
+#endif
+
     return none;    
 }
