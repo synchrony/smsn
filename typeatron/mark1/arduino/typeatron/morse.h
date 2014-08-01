@@ -206,7 +206,8 @@ void playMorseString(const char* message, int (*stopTest)()) {
 }
 
 void playMorseInt(int d, int (*stopTest)()) {
-    sprintf(errstr, "%d", d);
-    playMorseString(errstr, stopTest);  
+    char printStr[64];
+    sprintf(printStr, "%d", d);
+    playMorseString(printStr, stopTest);
 }
 

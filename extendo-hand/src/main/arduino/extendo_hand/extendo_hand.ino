@@ -9,7 +9,8 @@
 //#define USE_BLUETOOTH
 
 // if defined, make serial output more legible to a human eye
-#define DEBUG
+// also accept simple serial input
+#define SIMPLE_IO
 
 //#define GESTURE_MODE
 #define KEYBOARD_MODE
@@ -99,6 +100,9 @@ int32_t tmax;
 
 char print_str[100];
 
+// settable identifier which is prepended to each gestural output
+char contextName[32];
+
 void setup()  
 {
     droidspeak.speakPowerUpPhrase();
@@ -118,11 +122,13 @@ void setup()
     while(!Serial) ; // Leonardo "feature"
 #endif
 
-  meetAndroid.registerFunction(ping, 'p');
+    droidspeak.speakSerialOpenPhrase();
 
-  state = STATE_ONE;
-  
-  droidspeak.speakSetupCompletedPhrase(); 
+    meetAndroid.registerFunction(ping, 'p');
+
+    state = STATE_ONE;
+    
+    strcpy(contextName, "default");
 }
 
 
@@ -142,7 +148,7 @@ void sendOSC(class OSCMessage &m) {
 #ifdef USE_BLUETOOTH
     // "manually" end Bluetooth/Amarino message
     SLIPSerial.print(ack);
-#elif defined(DEBUG)
+#elif defined(SIMPLE_IO)
     // put OSC messages on separate lines so as to make them more readable
     SLIPSerial.println("");
 #endif  
@@ -168,12 +174,30 @@ void sendInfo(char *message) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef SIMPLE_IO
+#endif
+
 void loop()
 {
     // TODO: temporary.  This will slow down gesture recognition
     // you need to keep this in your loop() to receive events
-    meetAndroid.receive();
-    
+    //meetAndroid.receive();
+
+#ifdef SIMPLE_IO
+    if (SLIPSerial.available()) {
+        int inputPos = 0;
+        do {
+            contextName[inputPos++] = SLIPSerial.read();
+        } while (SLIPSerial.available());
+        
+        contextName[inputPos] = 0;
+        if (strlen(contextName))
+            droidspeak.speakOK();  
+        else
+            droidspeak.speakWarningPhrase();
+    }
+#endif
+
     int32_t now = micros();
 
     double ax, ay, az;
@@ -184,10 +208,11 @@ void loop()
     az = motionSensor.accelZ();
     
 #ifdef PRINT_SENSOR_DATA
-    Serial.print(now); Serial.print(",");
-    Serial.print(ax); Serial.print(",");
-    Serial.print(ay); Serial.print(",");
-    Serial.print(az); Serial.print("\n");
+    Serial.print(contextName); Serial.print(',');
+    Serial.print(now); Serial.print(',');
+    Serial.print(ax); Serial.print(',');
+    Serial.print(ay); Serial.print(',');
+    Serial.print(az); Serial.print('\n');
 #endif
     
     a = sqrt(ax*ax + ay*ay + az*az);
@@ -232,14 +257,15 @@ void loop()
           const char *gesture = classifyGestureVector(gestureVector, tmax, now);
           
             // gesture event
-#ifdef DEBUG
+#ifdef SIMPLE_IO
             // comma-separated format for the gesture event, for ease of importing to R and similar tools
-            Serial.print(tmax); Serial.print(",");  // time of turning point
-            Serial.print(now); Serial.print(",");  // time of recognition
-            Serial.print(amax); Serial.print(",");
-            Serial.print(ax_max); Serial.print(",");
-            Serial.print(ay_max); Serial.print(",");
-            Serial.print(az_max); Serial.print(",");
+            Serial.print(contextName); Serial.print(',');
+            Serial.print(tmax); Serial.print(',');  // time of turning point
+            Serial.print(now); Serial.print(',');  // time of recognition
+            Serial.print(amax); Serial.print(',');
+            Serial.print(ax_max); Serial.print(',');
+            Serial.print(ay_max); Serial.print(',');
+            Serial.print(az_max); Serial.print(',');
             Serial.println(gesture);        
 #else
             OSCMessage m("/exo/hand/gesture");

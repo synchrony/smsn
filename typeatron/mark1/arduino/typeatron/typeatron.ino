@@ -37,15 +37,9 @@ void sendError(const char *message);
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <OSCMessage.h>
-#include <OSCBundle.h>
+#include <ExtendOSC.h>
 
-#ifdef BOARD_HAS_USB_SERIAL
-#include <SLIPEncodedUSBSerial.h>
-SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
-#else
-#include <SLIPEncodedSerial.h>
-SLIPEncodedSerial SLIPSerial(Serial);
-#endif
+ExtendOSC osc("/exo/tt");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,8 +68,6 @@ const int photoresistorPin = A3;
 // This 2ms value is a conservative estimate based on an average over many kinds of switches.
 // See "A Guide to Debouncing" by Jack G. Ganssle
 unsigned int debounceMicros = 2000;
-
-char errstr[128];
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,14 +163,12 @@ int modeValueOf(const char *name) {
     int i;
     for (i = 0; i < totalModes; i++) {
         if (!strcmp(name, modeNames[i])) {
-            sprintf(errstr, "identified mode as %d", i);
-            sendInfo(errstr);
+            osc.sendInfo("identified mode as %d", i);
             return i;
         }
     }
     
-    sprintf(errstr, "no such mode: %s", name);
-    sendError(errstr);
+    osc.sendError("no such mode: %s", name);
     
     return Text;
 }
@@ -219,7 +209,7 @@ void readKeys() {
 
 int morseStopTest() {
     // abort the playing of a Morse code sequence by pressing 3 or more keys at the same time
-    return totalKeysPressed >= 3; 
+    return totalKeysPressed >= 3;
 }
 
 
@@ -227,7 +217,7 @@ int morseStopTest() {
 
 // note: tones may not be played (via the Typeatron's transducer) in parallel with the reading of button input,
 // as the vibration causes the push button switches to oscillate when depressed
-void startupSequence() {
+void powerUpSequence() {
     rgbled.replaceColor(RGB_RED);
     droidspeak.speakPowerUpPhrase();
     rgbled.replaceColor(RGB_BLUE);
@@ -235,9 +225,6 @@ void startupSequence() {
     delay(200);
     digitalWrite(vibrationMotorPin, LOW);
     rgbled.replaceColor(RGB_GREEN);
-    droidspeak.speakSetupCompletedPhrase();
-
-    //playMorseString("hello, world!", morseStopTest);
 }
 
 OSCMessage *messageIn;
@@ -247,33 +234,29 @@ void setup() {
     pinMode(keyPin2, INPUT);     
     pinMode(keyPin3, INPUT);     
     pinMode(keyPin4, INPUT);     
-    pinMode(keyPin5, INPUT);     
+    pinMode(keyPin5, INPUT);
+
+    pinMode(vibrationMotorPin, OUTPUT);
+    pinMode(transducerPin, OUTPUT);
+    pinMode(laserPin, OUTPUT);
+    pinMode(ledPin, OUTPUT);
+
     // take advantage of the Arduino's internal pullup resistors
     digitalWrite(keyPin1, HIGH);    
     digitalWrite(keyPin2, HIGH);    
     digitalWrite(keyPin3, HIGH);    
     digitalWrite(keyPin4, HIGH);    
-    digitalWrite(keyPin5, HIGH);    
-
-    pinMode(vibrationMotorPin, OUTPUT);
-    pinMode(transducerPin, OUTPUT); 
-    pinMode(laserPin, OUTPUT);
-    pinMode(ledPin, OUTPUT);
+    digitalWrite(keyPin5, HIGH);
 
     rgbled.setup();
 
-    // OSCuino: begin SLIPSerial just like Serial
-    // set this as high as you can reliably run on your platform
-    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
-    SLIPSerial.begin(115200);
-#if ARDUINO >= 100
-    while(!Serial); // Leonardo "feature"
-#endif
+    powerUpSequence();
+
+    osc.beginSerial();
+    droidspeak.speakSerialOpenPhrase();
 
     //setMode(LowercaseText);
-    
-    startupSequence(); 
- 
+
     messageIn = new OSCMessage();   
 }
 
@@ -307,37 +290,22 @@ void sendOSCMessageError(class OSCMessage &message) {
          name = unknown_msg;
     } 
     
-    sprintf(errstr, "OSC message hasError (error type: %s)", name);
-    sendError(errstr);
+    osc.sendError("OSC message hasError (error type: %s)", name);
 }
 
-
-void receiveOSCMessage(class OSCMessage &messageIn) {
+void handleOSCMessage(class OSCMessage &messageIn) {
     if (messageIn.hasError()) {
         sendOSCMessageError(messageIn);
-//sprintf(errstr, "invalid message occupies %d bytes", messageIn.bytes());
-//sendInfo(errstr);
     } else {
-
-// temporary: echo the received message
-sendOSC(messageIn);
-
         boolean called = 0
-        || messageIn.dispatch("/exo/tt/laser/trigger", receiveLaserTriggerMessage)
-        || messageIn.dispatch("/exo/tt/mode", receiveModeMessage)
-        || messageIn.dispatch("/exo/tt/morse", receiveMorseMessage)
-        || messageIn.dispatch("/exo/tt/photo/get", receivePhotoGetMessage)
-        || messageIn.dispatch("/exo/tt/ping", receivePingMessage)
-        || messageIn.dispatch("/exo/tt/vibr", receiveVibroMessage)
+        || messageIn.dispatch("/exo/tt/laser/trigger", handleLaserTriggerMessage)
+        || messageIn.dispatch("/exo/tt/mode", handleModeMessage)
+        || messageIn.dispatch("/exo/tt/morse", handleMorseMessage)
+        || messageIn.dispatch("/exo/tt/photo/get", handlePhotoGetMessage)
+        || messageIn.dispatch("/exo/tt/ping", handlePingMessage)
+        || messageIn.dispatch("/exo/tt/vibr", handleVibroMessage)
         ;
     }
-}
-
-void sendOSC(class OSCMessage &messageOut) {
-    SLIPSerial.beginPacket();  
-    messageOut.send(SLIPSerial); // send the bytes to the SLIP stream
-    SLIPSerial.endPacket(); // mark the end of the OSC Packet
-    messageOut.empty(); // free the space occupied by the message
 }
 
 void sendAnalogObservation(class AnalogSampler &s, const char* address) {
@@ -350,17 +318,14 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
     m.add(s.getMean());
     m.add(s.getVariance());
  
-    sendOSC(m); 
+    osc.sendOSC(m); 
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-void receiveLaserTriggerMessage(class OSCMessage &m) {
+void handleLaserTriggerMessage(class OSCMessage &m) {
     setMode(LaserTrigger); 
 }
 
-void receiveModeMessage(class OSCMessage &m) {
+void handleModeMessage(class OSCMessage &m) {
     if (m.isString(0)) {
         int length = m.getDataLength(0);
         char buffer[length+1];
@@ -372,7 +337,7 @@ void receiveModeMessage(class OSCMessage &m) {
     }
 }
 
-void receiveMorseMessage(class OSCMessage &m) {
+void handleMorseMessage(class OSCMessage &m) {
     int length = m.getDataLength(0);
     char buffer[length+1];
     m.getString(0, buffer, length+1);
@@ -380,7 +345,7 @@ void receiveMorseMessage(class OSCMessage &m) {
     playMorseString(buffer, morseStopTest);
 }
 
-void receivePhotoGetMessage(class OSCMessage &m) {
+void handlePhotoGetMessage(class OSCMessage &m) {
     photoSampler.reset();
     photoSampler.beginSample();
     photoSampler.measure();
@@ -389,14 +354,14 @@ void receivePhotoGetMessage(class OSCMessage &m) {
     sendLightLevel();
 }
 
-void receivePingMessage(class OSCMessage &m) {
+void handlePingMessage(class OSCMessage &m) {
     // send reply as soon as possible
     sendPingReply();
     
     playMorseString("p", morseStopTest);  
 }
 
-void receiveVibroMessage(class OSCMessage &m) {
+void handleVibroMessage(class OSCMessage &m) {
     rgbled.pushColor(RGB_PURPLE);
 
     int d = m.getInt(0);
@@ -413,36 +378,11 @@ void receiveVibroMessage(class OSCMessage &m) {
     rgbled.popColor();
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-void sendError(const char *message) {
-    rgbled.pushColor(RGB_ORANGE);
-    
-    OSCMessage m("/exo/tt/error");
-    m.add(message);
-
-    sendOSC(m);
-    
-    rgbled.popColor();
-}
-
-void sendInfo(const char *message) {
-    rgbled.pushColor(RGB_BLUE);
-
-    OSCMessage m("/exo/tt/info");
-    m.add(message);
-
-    sendOSC(m);
-    
-    rgbled.popColor();
-}
-
 void sendKeyEvent(const char *keys) {
     OSCMessage m("/exo/tt/keys");
     m.add(keys);
 
-    sendOSC(m);
+    osc.sendOSC(m);
 }
 
 void sendLightLevel() {
@@ -453,14 +393,14 @@ void sendPingReply() {
     OSCMessage m("/exo/tt/ping/reply");
     m.add((int32_t) micros());
     
-    sendOSC(m);
+    osc.sendOSC(m);
 }
 
 void sendLaserEvent() {
     OSCMessage m("/exo/tt/laser/event");
     m.add((int32_t) micros());
     
-    sendOSC(m);
+    osc.sendOSC(m);
 }
 
 
@@ -468,20 +408,8 @@ void sendLaserEvent() {
 
 void loop() {    
 #ifdef USE_BLUETOOTH
-    int done = SLIPSerial.endofPacket();
-    
-    int size;
-    while ((size = SLIPSerial.available()) > 0) {
-        while (size--) {
-            int c = SLIPSerial.read();
-            messageIn->fill(c);
-            //sprintf(errstr, "received a byte: %d. bytes: %d, size: %d, hasError: %d", c, messageIn2.bytes(), messageIn2.size(), messageIn2.hasError());
-            //sendInfo(errstr);
-        }
-    }
-    done = done || SLIPSerial.endofPacket();
-    if (done) {
-        receiveOSCMessage(*messageIn);       
+    if (osc.receiveOSC(*messageIn)) {
+        handleOSCMessage(*messageIn);
         messageIn->empty();
         //messageIn.reset();
         delete messageIn;
@@ -527,10 +455,9 @@ void loop() {
   
     lastKeyState = keyState;
 
-
-    int l = analogRead(A3);
-    System.out.print("light level: ");
-    System.out.println(l);
+    //int l = analogRead(A3);
+    //System.out.print("light level: ");
+    //System.out.println(l);
 }
 
 

@@ -92,7 +92,7 @@ void Droidspeak::speakPowerUpPhrase()
     delay(50);
 }
 
-void Droidspeak::speakSetupCompletedPhrase()
+void Droidspeak::speakSerialOpenPhrase()
 {
     //delay(100);
     //speakOK();

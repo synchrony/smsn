@@ -1,5 +1,5 @@
 /*
-  Droidspeak.h - a simple vocabulary of beeps and whistles for symbolic feedback without speech
+  Droidspeak.h - a simple vocabulary of beeps and whistles for symbolic auditory feedback without speech
   Created by Joshua Shinavier, 2012-2014
   Released into the public domain.
 */
@@ -19,7 +19,7 @@ class Droidspeak
     void speakRandomSequence();
     void speakOK();
     void speakPowerUpPhrase();
-    void speakSetupCompletedPhrase();
+    void speakSerialOpenPhrase();
     void speakShockPhrase();
     void speakWarningPhrase();
     void tick();

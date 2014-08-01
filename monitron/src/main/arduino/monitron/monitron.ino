@@ -112,15 +112,16 @@ void setup() {
     droidspeak.speakPowerUpPhrase();
     
     randomSeed(analogRead(LIGHT_PIN));
- 
-    Serial.begin(115200);
+
     bmp085.setup();
-        
+
+    Serial.begin(115200);
+
+    droidspeak.speakSerialOpenPhrase();
+
     //lastCycle_highBits = 0;
     //lastCycle_lowBits = millis();
-    
-    droidspeak.speakSetupCompletedPhrase(); 
-    
+
     rgbled.replaceColor(RGB_GREEN);
 }
 
