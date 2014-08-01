@@ -77,3 +77,4 @@ void ExtendOSC::sendError(const char *msg, ...)
     m.add(_messageBuffer);
     sendOSC(m);
 }
+

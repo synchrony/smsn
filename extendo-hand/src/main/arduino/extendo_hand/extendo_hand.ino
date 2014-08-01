@@ -157,19 +157,36 @@ void sendOSC(class OSCMessage &m) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void sendError(char *message) {
+void sendError(const char *message) {
     OSCMessage m("/exo/hand/error");
     m.add(message);
 
     sendOSC(m);
 }
 
-void sendInfo(char *message) {
+void sendInfo(const char *message) {
     OSCMessage m("/exo/hand/info");
     m.add(message);
 
     sendOSC(m);
 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <Morse.h>
+
+int morseStopTest() {
+    // no need to abort
+    return 0;
+}
+
+void morseSendError(const char *message) {
+   sendError(message); 
+}
+
+Morse morse(SPEAKER_PIN, morseStopTest, morseSendError);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +209,8 @@ void loop()
         
         contextName[inputPos] = 0;
         if (strlen(contextName))
-            droidspeak.speakOK();  
+            //droidspeak.speakOK();  
+            morse.playMorseString(contextName);
         else
             droidspeak.speakWarningPhrase();
     }
