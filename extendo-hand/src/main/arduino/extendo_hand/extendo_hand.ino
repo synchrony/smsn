@@ -16,7 +16,7 @@
 #define KEYBOARD_MODE
 
 // output raw accelerometer data in addition to gestures
-#define PRINT_SENSOR_DATA
+//#define PRINT_SENSOR_DATA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +102,7 @@ char print_str[100];
 
 // settable identifier which is prepended to each gestural output
 char contextName[32];
+char inputBuffer[32];
 
 void setup()  
 {
@@ -192,6 +193,7 @@ Morse morse(SPEAKER_PIN, morseStopTest, morseSendError);
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef SIMPLE_IO
+int inputPos = 0;
 #endif
 
 void loop()
@@ -201,18 +203,20 @@ void loop()
     //meetAndroid.receive();
 
 #ifdef SIMPLE_IO
-    if (SLIPSerial.available()) {
-        int inputPos = 0;
-        do {
-            contextName[inputPos++] = SLIPSerial.read();
-        } while (SLIPSerial.available());
-        
-        contextName[inputPos] = 0;
-        if (strlen(contextName))
-            //droidspeak.speakOK();  
-            morse.playMorseString(contextName);
-        else
-            droidspeak.speakWarningPhrase();
+    while (SLIPSerial.available()) {
+        int c = SLIPSerial.read();
+        if (13 == c) {
+            inputBuffer[inputPos] = 0;
+            if (strlen(inputBuffer)) {
+                strcpy(contextName, inputBuffer);
+                morse.playMorseString(contextName);
+            } else {
+                droidspeak.speakWarningPhrase();  
+            }      
+            inputPos = 0;      
+        } else {
+            inputBuffer[inputPos++] = c;
+        }
     }
 #endif
 

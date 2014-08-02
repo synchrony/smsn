@@ -31,6 +31,11 @@ const double waveTolerance2 = 0.5;
 const double tapCenter[] = {0.16, -0.04, 0.98};
 const double tapTolerance = 0.5;  // generous; 0.15 *should* be sufficient
 
+const double flipCenter[] = {0.9266487, 0.1260582, -0.303386};
+const double flipTolerance = 0.5;
+
+const unsigned long flipMinDelay = 200000;
+
 // at most 300ms may pass between one extremum of a wave gesture and the other
 const unsigned long waveMaxDelay = 300000;
 
@@ -41,17 +46,19 @@ const unsigned long tapMaxDelay = 800000;
 const unsigned long tapMaxWidth = 100000;
 
 const char
+    *flip = "flip",
     *openPalm = "open-palm",
+    *tap1 = "tap-1",
+    *tap2 = "tap-2",
     *wave1 = "wave-1",
     *wave2 = "wave-2",
     *wave1Complete = "wave-1-complete",
     *wave2Complete = "wave-2-complete",
-    *tap1 = "tap-1",
-    *tap2 = "tap-2",
     *none = "none";
     
 int32_t lastWave1 = 0, lastWave2 = 0;
 int32_t lastTap1 = 0, lastTap2 = 0;
+int32_t lastFlip = 0;
 
 // note: overflow of millis() during a wave gesture may interfere with its recognition.  However, this is infrequent and unlikely.
 const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
@@ -81,6 +88,14 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
     }
 #else
 #ifdef KEYBOARD_MODE
+    d = distance(normed, flipCenter);
+    if (d <= flipTolerance && now - lastFlip >= flipMinDelay) {
+        gestureTone = 1270;
+        gestureToneLength = 100;
+        lastFlip = now;
+        return flip;      
+    }
+    
     d = distance(normed, tapCenter);
     if (d <= tapTolerance && width < tapMaxWidth) {        
         if (now - lastTap1 >= tapMinDelay && now - lastTap2 >= tapMinDelay) {
