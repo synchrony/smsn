@@ -40,8 +40,10 @@ const unsigned long flipMinDelay = 200000;
 const unsigned long waveMaxDelay = 300000;
 
 // 500ms was found to be typical in the large-format keypad application
-const unsigned long tapMinDelay = 200000;
-const unsigned long tapMaxDelay = 800000;
+const unsigned long pairedTapMinDelay = 200000;
+const unsigned long pairedTapMaxDelay = 800000;
+
+const unsigned long tripleTapMaxDelay = 200000;
 
 const unsigned long tapMaxWidth = 100000;
 
@@ -50,6 +52,7 @@ const char
     *openPalm = "open-palm",
     *tap1 = "tap-1",
     *tap2 = "tap-2",
+    *tripleTap = "triple-tap",
     *wave1 = "wave-1",
     *wave2 = "wave-2",
     *wave1Complete = "wave-1-complete",
@@ -57,14 +60,15 @@ const char
     *none = "none";
     
 int32_t lastWave1 = 0, lastWave2 = 0;
-int32_t lastTap1 = 0, lastTap2 = 0;
+int32_t lastPairedTap1 = 0, lastPairedTap2 = 0, lastTripleTap1 = 0, lastTripleTap2 = 0;
 int32_t lastFlip = 0;
 
 // note: overflow of millis() during a wave gesture may interfere with its recognition.  However, this is infrequent and unlikely.
 const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
     double normed[3];
     normalize(v, normed);
-        
+
+    // delay between peak and fall-off point (where acceleration sinks below a threshold)
     int32_t width = now - tmax;
     
     double d;
@@ -97,16 +101,32 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
     }
     
     d = distance(normed, tapCenter);
-    if (d <= tapTolerance && width < tapMaxWidth) {        
-        if (now - lastTap1 >= tapMinDelay && now - lastTap2 >= tapMinDelay) {
-            if (now - lastTap1 <= tapMaxDelay) {
-                lastTap1 = 0;
-                lastTap2 = now;
+    if (d <= tapTolerance && width < tapMaxWidth) {
+        if (now - lastTripleTap2 <= tripleTapMaxDelay) {
+            gestureTone = 3200;
+            gestureToneLength = 200;
+            lastTripleTap1 = 0;
+            lastTripleTap2 = 0;
+            return tripleTap;
+        } else if (now - lastTripleTap1 <= tripleTapMaxDelay) {
+            lastTripleTap2 = now;
+            lastPairedTap1 = 0;
+            lastPairedTap2 = 0;
+            return none;
+        } else {
+            // this tap can double as a paired tap
+            lastTripleTap1 = now;
+        }
+
+        if (now - lastPairedTap1 >= pairedTapMinDelay && now - lastPairedTap2 >= pairedTapMinDelay) {
+            if (now - lastPairedTap1 <= pairedTapMaxDelay) {
+                lastPairedTap1 = 0;
+                lastPairedTap2 = now;
                 gestureTone = 1600;
                 gestureToneLength = 50;
                 return tap2;
             } else {
-                lastTap1 = now;
+                lastPairedTap1 = now;
                 gestureTone = 400;
                 gestureToneLength = 50;
                 return tap1;

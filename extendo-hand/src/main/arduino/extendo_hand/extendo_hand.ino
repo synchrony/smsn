@@ -16,7 +16,7 @@
 #define KEYBOARD_MODE
 
 // output raw accelerometer data in addition to gestures
-//#define PRINT_SENSOR_DATA
+#define PRINT_SENSOR_DATA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,8 +98,6 @@ double ax_max, ay_max, az_max;
 // time of last (potential) turning point
 int32_t tmax;
 
-char print_str[100];
-
 // settable identifier which is prepended to each gestural output
 char contextName[32];
 char inputBuffer[32];
@@ -113,11 +111,8 @@ void setup()
     motionSensor.calibrateY(332, 841);
     motionSensor.calibrateZ(175, 700);
 
-    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
-    // Note: the Amarino receiver appears to be compatible with a variety baud rates, as well
-    //Serial.begin(115200);
-
     // OSCuino: begin SLIPSerial just like Serial
+    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
     SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
 #if ARDUINO >= 100
     while(!Serial) ; // Leonardo "feature"
