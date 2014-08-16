@@ -18,6 +18,11 @@
 // output raw accelerometer data in addition to gestures
 #define PRINT_SENSOR_DATA
 
+#define NINEAXIS
+
+//#define SEP '\t'
+#define SEP ','
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -39,6 +44,17 @@
 
 MMA7361 motionSensor(MOTION_X_PIN, MOTION_Y_PIN, MOTION_Z_PIN);
 
+#ifdef NINEAXIS
+#include <Wire.h>
+#include <I2Cdev.h>
+#include <ADXL345.h>
+#include <ITG3200.h>
+#include <HMC5883L.h>
+
+ADXL345 accel;
+ITG3200 gyro;
+HMC5883L magnet;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -104,21 +120,43 @@ char inputBuffer[32];
 
 void setup()  
 {
+    randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
+
     droidspeak.speakPowerUpPhrase();
+
+    // OSCuino: begin SLIPSerial just like Serial
+    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
+    SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
+    //SLIPSerial.begin(38400);  // works equally well with 8MHz and 16MHz
+#if ARDUINO >= 100
+    while (!Serial); // for Arduino Leonardo
+#endif
+
+    droidspeak.speakSerialOpenPhrase();
 
     // 1.5g constants, sampled 2014-06-21
     motionSensor.calibrateX(272, 794);
     motionSensor.calibrateY(332, 841);
     motionSensor.calibrateZ(175, 700);
 
-    // OSCuino: begin SLIPSerial just like Serial
-    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
-    SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
-#if ARDUINO >= 100
-    while(!Serial) ; // Leonardo "feature"
+#ifdef NINEAXIS
+    // adjust the power settings after you call this method if you want the accelerometer
+    // to enter standby mode, or another less demanding mode of operation
+    accel.initialize();
+    if (!accel.testConnection()) {
+        SLIPSerial.println("ADXL345 connection failed");
+    }
+    
+    gyro.initialize();
+    if (!accel.testConnection()) {
+        SLIPSerial.println("ITG3200 connection failed");
+    }
+    
+    magnet.initialize();
+    if (!accel.testConnection()) {
+        SLIPSerial.println("HMC5883L connection failed");
+    }
 #endif
-
-    droidspeak.speakSerialOpenPhrase();
 
     meetAndroid.registerFunction(ping, 'p');
 
@@ -225,11 +263,35 @@ void loop()
     az = motionSensor.accelZ();
     
 #ifdef PRINT_SENSOR_DATA
-    Serial.print(contextName); Serial.print(',');
-    Serial.print(now); Serial.print(',');
-    Serial.print(ax); Serial.print(',');
-    Serial.print(ay); Serial.print(',');
-    Serial.print(az); Serial.print('\n');
+
+    Serial.print(contextName);
+    Serial.print(SEP); Serial.print(now);
+    Serial.print(SEP); Serial.print(ax);
+    Serial.print(SEP); Serial.print(ay);
+    Serial.print(SEP); Serial.print(az);
+   
+#ifdef NINEAXIS
+    int16_t ax2, ay2, az2;
+    accel.getAcceleration(&ax2, &ay2, &az2);
+    Serial.print(SEP); Serial.print("accel");
+    Serial.print(SEP); Serial.print(ax2);
+    Serial.print(SEP); Serial.print(ay2);
+    Serial.print(SEP); Serial.print(az2);
+    int16_t gx, gy, gz;
+    gyro.getRotation(&gx, &gy, &gz);
+    Serial.print(SEP); Serial.print("gyro");
+    Serial.print(SEP); Serial.print(gx);
+    Serial.print(SEP); Serial.print(gy);
+    Serial.print(SEP); Serial.print(gz);
+    int16_t mx, my, mz;
+    magnet.getHeading(&mx, &my, &mz);
+    Serial.print(SEP); Serial.print("magnet");
+    Serial.print(SEP); Serial.print(mx);
+    Serial.print(SEP); Serial.print(my);
+    Serial.print(SEP); Serial.print(mz);
+#endif
+   
+    Serial.print('\n');
 #endif
     
     a = sqrt(ax*ax + ay*ay + az*az);
