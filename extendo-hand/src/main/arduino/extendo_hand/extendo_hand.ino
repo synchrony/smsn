@@ -263,7 +263,6 @@ void loop()
     az = motionSensor.accelZ();
     
 #ifdef PRINT_SENSOR_DATA
-
     Serial.print(contextName);
     Serial.print(SEP); Serial.print(now);
     Serial.print(SEP); Serial.print(ax);

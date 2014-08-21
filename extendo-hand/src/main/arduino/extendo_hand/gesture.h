@@ -28,13 +28,21 @@ const double waveTolerance1 = 0.5;
 const double waveCenter2[] = {0.91, -0.19, -0.36};
 const double waveTolerance2 = 0.5;
 
-const double tapCenter[] = {0.16, -0.04, 0.98};
-const double tapTolerance = 0.5;  // generous; 0.15 *should* be sufficient
+/* of a large (n=344), heterogeneous set of taps gathered on 2014-08-21 and normalized
+   to unit vectors, 95% were within 0.7 of their normalized mean, (0.04, -0.22, 0.98) */
+const double tapCenter[] = {0.04, -0.22, 0.98};
+const double tapTolerance = 0.7;
+//const double tapCenter[] = {0.16, -0.04, 0.98};
+//const double tapTolerance = 0.5;
 
 const double flipCenter[] = {0.9266487, 0.1260582, -0.303386};
 const double flipTolerance = 0.5;
 
-const unsigned long flipMinDelay = 200000;
+const double twitchCenter[] = {0.5662381, 0.1734404, 0.7668633};
+const double twitchTolerance = 0.30;
+
+const unsigned long flipMinDelay = 800000;
+const unsigned long twitchMinDelay = 800000;
 
 // at most 300ms may pass between one extremum of a wave gesture and the other
 const unsigned long waveMaxDelay = 300000;
@@ -57,11 +65,13 @@ const char
     *wave2 = "wave-2",
     *wave1Complete = "wave-1-complete",
     *wave2Complete = "wave-2-complete",
+    *twitch = "twitch",
     *none = "none";
     
 int32_t lastWave1 = 0, lastWave2 = 0;
 int32_t lastPairedTap1 = 0, lastPairedTap2 = 0, lastTripleTap1 = 0, lastTripleTap2 = 0;
 int32_t lastFlip = 0;
+int32_t lastTwitch = 0;
 
 // note: overflow of millis() during a wave gesture may interfere with its recognition.  However, this is infrequent and unlikely.
 const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
@@ -100,8 +110,19 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
         return flip;      
     }
     
+    /* exclude "twitch" for now
+    d = distance(normed, twitchCenter);
+    if (d <= twitchTolerance && now - lastTwitch >= twitchMinDelay && now - lastFlip >= twitchMinDelay) {
+        gestureTone = 635;
+        gestureToneLength = 100;
+        lastTwitch = now;
+        return twitch;  
+    }
+    */
+    
     d = distance(normed, tapCenter);
     if (d <= tapTolerance && width < tapMaxWidth) {
+        /* exclude triple tap for now
         if (now - lastTripleTap2 <= tripleTapMaxDelay) {
             gestureTone = 3200;
             gestureToneLength = 200;
@@ -117,6 +138,7 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
             // this tap can double as a paired tap
             lastTripleTap1 = now;
         }
+        */
 
         if (now - lastPairedTap1 >= pairedTapMinDelay && now - lastPairedTap2 >= pairedTapMinDelay) {
             if (now - lastPairedTap1 <= pairedTapMaxDelay) {
