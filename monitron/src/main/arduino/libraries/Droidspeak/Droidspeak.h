@@ -14,8 +14,12 @@ class Droidspeak
   public:
     Droidspeak(uint8_t speakerPin);
 
-    void glideLinear(unsigned long duration, long startFrequency, long endFrequency);
-    void glideLog(unsigned long duration, long startFrequency, long endFrequency);
+    void glideLinear(unsigned long duration,
+                     unsigned int startFrequency,
+                     unsigned int endFrequency);
+    void glideLog(unsigned long duration,
+                  unsigned int startFrequency,
+                  unsigned int endFrequency);
     void speakRandomSequence();
     void speakOK();
     void speakPowerUpPhrase();
@@ -23,6 +27,9 @@ class Droidspeak
     void speakShockPhrase();
     void speakWarningPhrase();
     void tick();
+    void analogTone(unsigned long duration,
+                    unsigned int frequency,
+                    double volume);
 
   private:
     uint8_t _speakerPin;

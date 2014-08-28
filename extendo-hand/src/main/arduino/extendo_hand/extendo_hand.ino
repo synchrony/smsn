@@ -20,6 +20,7 @@
 
 #define NINEAXIS
 
+// comma-separated format eases importing to R and similar tools. Tabs are easier on the eye
 //#define SEP '\t'
 #define SEP ','
 
@@ -30,7 +31,7 @@
 #define MOTION_Y_PIN A1
 #define MOTION_Z_PIN A2
 
-#define SPEAKER_PIN  8
+#define SPEAKER_PIN  10  // requires PWM
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +55,11 @@ MMA7361 motionSensor(MOTION_X_PIN, MOTION_Y_PIN, MOTION_Z_PIN);
 ADXL345 accel;
 ITG3200 gyro;
 HMC5883L magnet;
+
+const int magnetBufferLength = 100;
+int16_t magnetBufferX[magnetBufferLength], magnetBufferY[magnetBufferLength], magnetBufferZ[magnetBufferLength];
+int32_t magnetSumX, magnetSumY, magnetSumZ;
+unsigned long lastMagnetRefTime;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +118,7 @@ double amax;
 double ax_max, ay_max, az_max;
 
 // time of last (potential) turning point
-int32_t tmax;
+unsigned long tmax;
 
 // settable identifier which is prepended to each gestural output
 char contextName[32];
@@ -229,6 +235,8 @@ Morse morse(SPEAKER_PIN, morseStopTest, morseSendError);
 int inputPos = 0;
 #endif
 
+unsigned long toneStop = 0;
+
 void loop()
 {
     // TODO: temporary.  This will slow down gesture recognition
@@ -253,7 +261,15 @@ void loop()
     }
 #endif
 
-    int32_t now = micros();
+    unsigned long now = micros();
+    unsigned long nowMillis = millis();
+    
+    // stopping the tone "asychronously" allows gesture recognition and serial
+    // communication to proceed while the speaker is beeping away
+    if (0 != toneStop && nowMillis > toneStop) {
+        noTone(SPEAKER_PIN);
+        toneStop = 0;    
+    }
 
     double ax, ay, az;
     double a;
@@ -268,7 +284,6 @@ void loop()
     Serial.print(SEP); Serial.print(ax);
     Serial.print(SEP); Serial.print(ay);
     Serial.print(SEP); Serial.print(az);
-   
 #ifdef NINEAXIS
     int16_t ax2, ay2, az2;
     accel.getAcceleration(&ax2, &ay2, &az2);
@@ -288,80 +303,84 @@ void loop()
     Serial.print(SEP); Serial.print(mx);
     Serial.print(SEP); Serial.print(my);
     Serial.print(SEP); Serial.print(mz);
-#endif
-   
+#endif // ifdef NINEAXIS
     Serial.print('\n');
-#endif
+#endif // ifdef PRINT_SENSOR_DATA
     
     a = sqrt(ax*ax + ay*ay + az*az);
     
     switch (state) {
-      case STATE_ONE:
-        if (a >= lowerBound) {
-          state = STATE_TWO; 
-        }
-        break;
-      case STATE_TWO:
-        if (a >= upperBound) {
-          state = STATE_THREE; 
-          amax = 0; 
-        } else if (a < lowerBound) {
-          state = STATE_ONE;
-        }
-        break;
-      case STATE_THREE:
-        if (a > amax) {
-           amax = a;
-           ax_max = ax;
-           ay_max = ay;
-           az_max = az;
-           tmax = now;
-        }
-        
-        if (a < upperBound) {
-           state = STATE_FOUR;
-        }
-        break;
+        case STATE_ONE:
+            if (a >= lowerBound) {
+                state = STATE_TWO;
+            }
+            break;
+        case STATE_TWO:
+            if (a >= upperBound) {
+                state = STATE_THREE;
+                amax = 0;
+            } else if (a < lowerBound) {
+                state = STATE_ONE;
+            }
+            break;
+        case STATE_THREE:
+            if (a > amax) {
+                amax = a;
+                ax_max = ax;
+                ay_max = ay;
+                az_max = az;
+                tmax = now;
+            }
+
+            if (a < upperBound) {
+                state = STATE_FOUR;
+            }
+            break;
       case STATE_FOUR:
-        if (a >= upperBound) {
-          state = STATE_THREE;  
-        } else if (a < lowerBound) {
-          state = STATE_ONE;
+          if (a >= upperBound) {
+              state = STATE_THREE;  
+          } else if (a < lowerBound) {
+            state = STATE_ONE;
           
-          double gestureVector[3];
-          gestureVector[0] = ax_max;
-          gestureVector[1] = ay_max;
-          gestureVector[2] = az_max;
-          const char *gesture = classifyGestureVector(gestureVector, tmax, now);
-          
-            // gesture event
+            double gestureVector[3];
+            gestureVector[0] = ax_max;
+            gestureVector[1] = ay_max;
+            gestureVector[2] = az_max;
+            const char *gesture = classifyGestureVector(gestureVector, tmax, now);
+
+            // output the gesture if non-null
+            if (gesture) {
+                // play short audio cues associated with gestures
+                // initiate the cue before dealing with serial communication, which involves a delay
+                if (gestureToneLength > 0) {
+                    //droidspeak.analogTone(gestureToneLength, gestureTone, gestureToneVolume);
+                    toneStop = nowMillis + gestureToneLength;
+                    tone(SPEAKER_PIN, gestureTone);
+                    gestureToneLength = 0;
+                    gestureToneVolume = 1.0;
+                }
+                
+                // gesture event
 #ifdef SIMPLE_IO
-            // comma-separated format for the gesture event, for ease of importing to R and similar tools
-            Serial.print(contextName); Serial.print(',');
-            Serial.print(tmax); Serial.print(',');  // time of turning point
-            Serial.print(now); Serial.print(',');  // time of recognition
-            Serial.print(amax); Serial.print(',');
-            Serial.print(ax_max); Serial.print(',');
-            Serial.print(ay_max); Serial.print(',');
-            Serial.print(az_max); Serial.print(',');
-            Serial.println(gesture);        
+                Serial.print(contextName); Serial.print(SEP);
+                Serial.print(tmax); Serial.print(SEP);  // time of turning point
+                Serial.print(now); Serial.print(SEP);  // time of recognition
+                Serial.print(amax); Serial.print(SEP);
+                Serial.print(ax_max); Serial.print(SEP);
+                Serial.print(ay_max); Serial.print(SEP);
+                Serial.print(az_max); Serial.print(SEP);
+                Serial.println(gesture);
 #else
-            OSCMessage m("/exo/hand/gesture");
-            m.add(tmax);  // time of turning point
-            m.add(now);  // time of recognition
-            m.add(amax);
-            m.add(ax_max);
-            m.add(ay_max);
-            m.add(az_max);
-            m.add(gesture);
-            sendOSC(m);   
+                OSCMessage m("/exo/hand/gesture");
+                m.add((uint64_t) tmax);  // time of turning point
+                m.add((uint64_t) now);  // time of recognition
+                m.add(amax);
+                m.add(ax_max);
+                m.add(ay_max);
+                m.add(az_max);
+                m.add(gesture);
+                sendOSC(m);
 #endif
-            // play short audio cues associated with gestures
-            if (gestureToneLength > 0) {
-                tone(SPEAKER_PIN, gestureTone);
-                delay(gestureToneLength);
-                noTone(SPEAKER_PIN);
-                gestureToneLength = 0;
             }
         }
         break;
@@ -378,4 +397,3 @@ void ping(byte flag, byte numOfValues)
     m.add((int32_t) micros());
     sendOSC(m);
 }
-

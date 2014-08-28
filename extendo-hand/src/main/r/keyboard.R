@@ -4,7 +4,7 @@
 cd /tmp
 script
 
-DEVICE=/dev/tty.usbmodemfd131
+DEVICE=/dev/tty.usbmodemfa141
 #DEVICE=/dev/tty.RN42-C342-SPP
 screen -S arduino $DEVICE 115200
 # exit screen with C-a k, enter 'y' at the prompt
@@ -14,7 +14,7 @@ kill `ps | grep script | grep "[0-9] script$" | sed 's/^[^0-9]*//' | sed 's/ .*/
 # edit to remove leading and trailing garbage
 vim /tmp/typescript
 
-cat /tmp/typescript | sed 's/^[^,]*[^0-9,tsx]//' | grep "," | sed 's/[^0-9A-Za-z]*$//' > /tmp/hand.csv
+cat /tmp/typescript | sed 's/^[^,]*[^0-9,a-z]//' | grep "," | sed 's/[^0-9A-Za-z]*$//' > /tmp/hand.csv
 
 # if you typed in contexts while collecting data, grep them out
 cat /tmp/hand.csv | grep s12
@@ -48,6 +48,9 @@ cat hand.csv | grep s95 > samples/9-5.csv
 cat hand.csv | grep s96 > samples/9-6.csv
 cat hand.csv | grep s97 > samples/9-7.csv
 cat hand.csv | grep s98 > samples/9-8.csv
+
+# make sure all are present
+wc -l samples/*
 
 
 ################################################################################
@@ -158,6 +161,7 @@ cat /tmp/data.csv | grep -v magnet > /tmp/gesture.csv
 
 motion <- read.csv(file("/tmp/motion.csv"), header=FALSE)
 gesture <- read.csv(file("/tmp/gesture.csv"), header=FALSE)
+gestures <- unique(gesture$V1)
 
 # for stick #1. See gyro.mean derived below
 gyro.cal <- data.frame(x=-110.996, y=105.5632, z=-37.2404)
@@ -236,15 +240,39 @@ lines(a$z*300, col="red")
 
 
 ########################################
-# animate time series in 3D (note: choose a small sub-series)
+# draw time series in 3D
+#
+# accelerometer is a comet-like ellipsoid with a tail in the direction of the taps
+# gyro is the superposition of a sort of ellipsoid (major axis in z) and oblate spheroid
+#     (axis of symmetry in z) at right angles to each other.
+#     The ellipsoid corresponds to rotation within a plane perpendicular to the typing surface,
+#     while the spheroid (which is biased to -x) seems to represent the tendency of the left hand
+#     to suddenly turn counterclockwise, more slowly returning to a palm-down orientation.
+# magnetometer is a shallow dish in which the sensor rolls around.
+#     Should be relatively easy to calculate the plane of the typing surface from this.
+
+#series <- accel; origin <- accel.mean
+#series <- gyro; origin <- data.frame(x=0,y=0,z=0)
+series <- magnet; origin <- magnet.mean
+
+m <- series
+plot3d(m$x, m$y, m$z, type="p", size=1)
+points3d(origin$x,origin$y,origin$z,col="green")
+
+
+########################################
+# animate time series in 3D
 
 #install.packages("rgl")
 library(rgl)
 
-totalTime <- 50
+#totalTime <- 60
+totalTime <- nrow(motion)*((motion$V2[1001]-motion$V2[1])/(1000*1000*1000))
+
 #series <- accel; origin <- accel.mean
-series <- gyro; origin <- gyro.cal
-#series <- magnet; origin <- magnet.mean
+#series <- gyro; origin <- gyro.cal
+#series <- gyro; origin <- data.frame(x=0,y=0,z=0)
+series <- magnet; origin <- magnet.mean
 color <- "black"
 xmin <- min(series$x); xmax <- max(series$x)
 ymin <- min(series$y); ymax <- max(series$y)
@@ -274,3 +302,68 @@ open3d()
 if (!rgl.useNULL()) {
    play3d(wave, totalTime)
 }
+
+
+########################################
+# cumulative average sensor values
+#
+
+#series <- accel; origin <- accel.mean
+series <- gyro; origin <- data.frame(x=0,y=0,z=0)
+#series <- magnet; origin <- magnet.mean
+
+# accelerometer wanders erratically, slowly settling into a disc-shaped neighborhood
+# gyro "wobbles" at first, then, quickly converges just beyond the origin
+# magnetometer immediately settles into a plane, and slowly approaches a vector within that plane
+m <- cumsum(series) / 1:nrow(series)
+
+plot3d(m$x, m$y, m$z, type="l", size=3)
+points3d(m$x[1], m$y[1], m$z[1], col="red")
+for (i in 1:10) {
+    index <- nrow(motion)*i/10
+    points3d(m$x[index], m$y[index], m$z[index], col="red")
+}
+points3d(origin$x,origin$y,origin$z,col="green")
+
+
+################################################################################
+# classify key pairs
+
+g <- gesture
+g1 <- rbind(g[1,], g, g[nrow(g),])
+l <- g1$V8[1:(nrow(g1)-1)]
+n <- g1$V8[2:nrow(g1)]
+g2 <- data.frame(g1[2:(nrow(g1)-1),], l=l[1:(length(l)-1)], n=n[2:length(n)])
+taps <- subset(g2, (V8=="tap-1" & n=="tap-2") | (V8=="tap-2" & l=="tap-1"))
+
+
+norm.timestamp <- function(t) {
+    if (t < 0) {
+       2^31 - t
+    } else t;
+}
+
+magnet.new <- data.frame(t=sapply(motion$V2, norm.timestamp), magnet)
+
+t1 <- sapply(taps$V2, norm.timestamp)
+t2 <- sapply(taps$V3, norm.timestamp)
+taps.new <- data.frame(context=taps$V1, t1=t1, t2=t2, gesture=taps$V8)
+
+motion.time <- motion$V2
+
+latest.motion <- function(time) {
+    max(subset(magnet.new, t < time)$t)
+}
+
+lm <- sapply(taps.new$t1, latest.motion)
+taps.newest <- merge(data.frame(taps.new, t=lm), magnet.new, by="t")
+
+tn <- taps.newest
+d <- dist(tn[1:(nrow(tn)-1),], tn[2:nrow(tn),])
+tmp <- subset(data.frame(tn[1:(nrow(tn)-1),], dist=d), gesture=="tap-1")
+
+mean(tmp$dist)
+sd(tmp$dist)
+
+mean(subset(tmp, context=="s12")$dist)
+sd(subset(tmp, context=="s12")$dist)

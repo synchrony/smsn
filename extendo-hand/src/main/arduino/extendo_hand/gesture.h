@@ -1,8 +1,14 @@
 #include <math.h>
 #include <Arduino.h>  // for millis(), if nothing else
 
-int gestureTone = 0;
-int gestureToneLength = 0;
+// don't output the "none" gesture in keyboard mode
+#ifdef GESTURE_MODE
+#define OUTPUT_NULL_GESTURE
+#endif
+
+unsigned int gestureTone = 0;
+unsigned int gestureToneLength = 0;
+double gestureToneVolume = 1.0;
 
 double mag(const double *vin) {
     return sqrt(pow(vin[0], 2) + pow(vin[1], 2) + pow(vin[2], 2));  
@@ -48,7 +54,8 @@ const unsigned long twitchMinDelay = 800000;
 const unsigned long waveMaxDelay = 300000;
 
 // 500ms was found to be typical in the large-format keypad application
-const unsigned long pairedTapMinDelay = 200000;
+// however, even 300ms clearly excludes some quick taps, and is frustrating as a threshold
+const unsigned long pairedTapMinDelay = 150000;
 const unsigned long pairedTapMaxDelay = 800000;
 
 const unsigned long tripleTapMaxDelay = 200000;
@@ -68,18 +75,43 @@ const char
     *twitch = "twitch",
     *none = "none";
     
-int32_t lastWave1 = 0, lastWave2 = 0;
-int32_t lastPairedTap1 = 0, lastPairedTap2 = 0, lastTripleTap1 = 0, lastTripleTap2 = 0;
-int32_t lastFlip = 0;
-int32_t lastTwitch = 0;
+unsigned long lastWave1 = 0, lastWave2 = 0;
+unsigned long lastPairedTap1 = 0, lastPairedTap2 = 0, lastTripleTap1 = 0, lastTripleTap2 = 0;
+unsigned long lastFlip = 0;
+unsigned long lastTwitch = 0;
+
+double varyVolumeWithDistance(double dist, double threshold) {
+    if (dist > threshold) dist = threshold;
+
+    const double minVol = 0.25, maxVol = 1.0;
+    return minVol + (threshold - dist) * ((maxVol - minVol)/threshold);
+}
+
+unsigned int varyPitchWithDistance(double basePitch, double dist, double threshold) {
+    if (dist > threshold) dist = threshold;
+   
+    // 5 octaves (6th is a limit which never occurs) makes the highest registers sound
+    // "brightest" without being too high and thin, while the lower registers
+    // are less audible on a piezo speaker
+    unsigned int p = (unsigned int) ((threshold - dist) * (6/threshold));
+    // only allow whole octaves
+    unsigned int f = (unsigned int) (basePitch * (int) pow(2, p));
+    return f;
+}
+
+unsigned int varyDurationWithDistance(unsigned int minDuration, unsigned int maxDuration, double dist, double threshold) {
+    if (dist > threshold) dist = threshold;
+ 
+    return (unsigned int) (minDuration + (maxDuration - minDuration) * (threshold - dist) / (1.0 * threshold));
+}
 
 // note: overflow of millis() during a wave gesture may interfere with its recognition.  However, this is infrequent and unlikely.
-const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
+const char *classifyGestureVector(double *v, unsigned long tmax, unsigned long now) {
     double normed[3];
     normalize(v, normed);
 
     // delay between peak and fall-off point (where acceleration sinks below a threshold)
-    int32_t width = now - tmax;
+    unsigned long width = now - tmax;
     
     double d;
     
@@ -104,8 +136,9 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
 #ifdef KEYBOARD_MODE
     d = distance(normed, flipCenter);
     if (d <= flipTolerance && now - lastFlip >= flipMinDelay) {
-        gestureTone = 1270;
-        gestureToneLength = 100;
+        gestureTone = 1109;
+        //gestureToneLength = 100;
+        gestureToneLength = varyDurationWithDistance(25, 150, d, flipTolerance);
         lastFlip = now;
         return flip;      
     }
@@ -122,9 +155,9 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
     
     d = distance(normed, tapCenter);
     if (d <= tapTolerance && width < tapMaxWidth) {
-        /* exclude triple tap for now
+        //gestureToneVolume = varyVolumeWithDistance(d, tapTolerance);
         if (now - lastTripleTap2 <= tripleTapMaxDelay) {
-            gestureTone = 3200;
+            gestureTone = 3520;
             gestureToneLength = 200;
             lastTripleTap1 = 0;
             lastTripleTap2 = 0;
@@ -133,30 +166,41 @@ const char *classifyGestureVector(double *v, int32_t tmax, int32_t now) {
             lastTripleTap2 = now;
             lastPairedTap1 = 0;
             lastPairedTap2 = 0;
-            return none;
+#ifdef OUTPUT_NULL_GESTURE
+            return none;    
+#else
+            return NULL;
+#endif
         } else {
             // this tap can double as a paired tap
             lastTripleTap1 = now;
         }
-        */
 
         if (now - lastPairedTap1 >= pairedTapMinDelay && now - lastPairedTap2 >= pairedTapMinDelay) {
             if (now - lastPairedTap1 <= pairedTapMaxDelay) {
                 lastPairedTap1 = 0;
                 lastPairedTap2 = now;
-                gestureTone = 1600;
-                gestureToneLength = 50;
+                //gestureTone = 1760;
+                gestureTone = varyPitchWithDistance(82.5, d, tapTolerance);
+                //gestureToneLength = 50;
+                gestureToneLength = varyDurationWithDistance(25, 150, d, tapTolerance);
                 return tap2;
             } else {
                 lastPairedTap1 = now;
-                gestureTone = 400;
-                gestureToneLength = 50;
+                //gestureTone = 440;
+                gestureTone = varyPitchWithDistance(55, d, tapTolerance);
+                //gestureToneLength = 50;
+                gestureToneLength = varyDurationWithDistance(25, 150, d, tapTolerance);
                 return tap1;
             }
         }
     }
-#endif
-#endif
+#endif // ifdef KEYBOARD_MODE
+#endif // ifdef GESTURE_MODE
 
+#ifdef OUTPUT_NULL_GESTURE
     return none;    
+#else
+    return NULL;
+#endif
 }

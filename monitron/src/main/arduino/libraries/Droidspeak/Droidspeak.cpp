@@ -14,14 +14,16 @@ Droidspeak::Droidspeak(uint8_t speakerPin)
     _speakerPin = speakerPin;
 }
 
-void Droidspeak::glideLinear(unsigned long duration, long startFrequency, long endFrequency)
+void Droidspeak::glideLinear(unsigned long duration,
+                             unsigned int startFrequency,
+                             unsigned int endFrequency)
 {
-    long diff = endFrequency - startFrequency;
+    unsigned int diff = endFrequency - startFrequency;
     long steps = 100;
     unsigned long inc = (duration * 1000) / steps;
     
     for (long i = 0; i < steps; i++) {
-      int t = startFrequency + (diff * i) / steps;
+      unsigned int t = startFrequency + (diff * i) / steps;
       tone(_speakerPin, t);
       delayMicroseconds(inc);
     }  
@@ -29,7 +31,9 @@ void Droidspeak::glideLinear(unsigned long duration, long startFrequency, long e
     noTone(_speakerPin);
 }
 
-void Droidspeak::glideLog(unsigned long duration, long startFrequency, long endFrequency)
+void Droidspeak::glideLog(unsigned long duration,
+                          unsigned int startFrequency,
+                          unsigned int endFrequency)
 {
     long steps = 100;
     unsigned long inc = (duration * 1000) / steps;
@@ -88,7 +92,7 @@ void Droidspeak::speakOK()
 
 void Droidspeak::speakPowerUpPhrase()
 {
-    glideLog(1000, 55, 14080);
+    glideLog(800, 55, 14080);
     delay(50);
 }
 
@@ -130,4 +134,22 @@ void Droidspeak::tick()
     //tone(_speakerPin, 440);
     //delayMicroseconds(10);
     //noTone(_speakerPin);
+}
+
+void Droidspeak::analogTone(unsigned long duration,
+                            unsigned int frequency,
+                            double volume) {
+    int level = (int) (volume * 255);
+    unsigned long c = (duration * frequency)/1000;
+
+    // note: small inaccuracies of timing will creep in thus without correction,
+    // e.g. up to 2ms / s for a=440, 4ms / s for a=880
+    unsigned int delay = 1000000 / (2 * frequency);
+    //unsigned int delay = 1136;
+    for (unsigned long i = 0; i < c; i++) {
+        analogWrite(_speakerPin, level);
+        delayMicroseconds(delay);
+        analogWrite(_speakerPin, 0);
+        delayMicroseconds(delay);
+    }
 }
