@@ -263,39 +263,9 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const char *BUFFER_FULL_msg = "BUFFER_FULL",
-    *INVALID_OSC_msg = "INVALID_OSC",
-    *ALLOCFAILED_msg = "ALLOCFAILED",
-    *INDEX_OUT_OF_BOUNDS_msg = "INDEX_OUT_OF_BOUNDS",
-    *unknown_msg = "unknown";
-
-void sendOSCMessageError(class OSCMessage &message) {
-    OSCErrorCode code = message.getError();
-    const char *name;
-
-    switch(code) {
-      case BUFFER_FULL:
-          name = BUFFER_FULL_msg;
-          break;
-      case INVALID_OSC:
-         name = INVALID_OSC_msg;
-         break;
-      case ALLOCFAILED:
-         name = ALLOCFAILED_msg;
-         break;
-      case INDEX_OUT_OF_BOUNDS:
-         name = INDEX_OUT_OF_BOUNDS_msg;
-         break;
-      default:
-         name = unknown_msg;
-    } 
-    
-    osc.sendError("OSC message hasError (error type: %s)", name);
-}
-
 void handleOSCMessage(class OSCMessage &messageIn) {
     if (messageIn.hasError()) {
-        sendOSCMessageError(messageIn);
+        osc.sendOSCMessageError(messageIn);
     } else {
         boolean called = 0
         || messageIn.dispatch("/exo/tt/laser/trigger", handleLaserTriggerMessage)

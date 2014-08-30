@@ -43,6 +43,19 @@ int ExtendOSC::receiveOSC(class OSCMessage &messageIn) {
     return done || SLIPSerial.endofPacket();
 }
 
+int ExtendOSC::receiveOSCBundle(class OSCBundle &bundleIn) {
+    int done = SLIPSerial.endofPacket();
+    int size;
+    while ((size = SLIPSerial.available()) > 0) {
+        while (size--) {
+            int c = SLIPSerial.read();
+            bundleIn.fill(c);
+        }
+    }
+    return done || SLIPSerial.endofPacket();
+}
+
+
 void ExtendOSC::sendOSC(class OSCMessage &messageOut) {
     SLIPSerial.beginPacket();
     messageOut.send(SLIPSerial); // send the bytes to the SLIP stream
@@ -78,3 +91,42 @@ void ExtendOSC::sendError(const char *msg, ...)
     sendOSC(m);
 }
 
+const char *BUFFER_FULL_msg = "BUFFER_FULL",
+    *INVALID_OSC_msg = "INVALID_OSC",
+    *ALLOCFAILED_msg = "ALLOCFAILED",
+    *INDEX_OUT_OF_BOUNDS_msg = "INDEX_OUT_OF_BOUNDS",
+    *unknown_msg = "unknown";
+
+
+void ExtendOSC::sendOSCError(OSCErrorCode code) {
+    const char *name;
+
+    switch(code) {
+      case BUFFER_FULL:
+          name = BUFFER_FULL_msg;
+          break;
+      case INVALID_OSC:
+         name = INVALID_OSC_msg;
+         break;
+      case ALLOCFAILED:
+         name = ALLOCFAILED_msg;
+         break;
+      case INDEX_OUT_OF_BOUNDS:
+         name = INDEX_OUT_OF_BOUNDS_msg;
+         break;
+      default:
+         name = unknown_msg;
+    }
+
+    sendError("OSC message hasError (error type: %s)", name);
+}
+
+void ExtendOSC::sendOSCMessageError(class OSCMessage &message) {
+    OSCErrorCode code = message.getError();
+    sendOSCError(code);
+}
+
+void ExtendOSC::sendOSCBundleError(class OSCBundle &bundle) {
+    OSCErrorCode code = bundle.getError();
+    sendOSCError(code);
+}
