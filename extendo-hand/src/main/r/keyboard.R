@@ -230,13 +230,13 @@ magnet.mean <- data.frame(x=mean(magnet$x), y=mean(magnet$y), z=mean(magnet$z))
 # compare accelerometers
 
 # the two accelerometers are very closely aligned,
-# only slightly offset (especially in z)
-plot(accel$x, type="l")
-lines(a$x*300, col="red")
-plot(accel$y, type="l")
-lines(a$y*300, col="red")
-plot(accel$z, type="l")
-lines(a$z*300, col="red")
+# only slightly offset in one dimension or another
+plot(a$x, type="l")
+lines(accel$x/230 - 0.05, col="red")
+plot(a$y, type="l")
+lines(accel$y/230, col="red")
+plot(a$z, type="l")
+lines(accel$z/230, col="red")
 
 
 ########################################

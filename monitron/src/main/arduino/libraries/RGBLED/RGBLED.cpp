@@ -14,11 +14,13 @@ const unsigned int RED_FACTOR = 100;
 unsigned long colorStack[10];
 int colorStackIndex = -1;
 
-RGBLED::RGBLED(uint8_t redPin, uint8_t greenPin, uint8_t bluePin)
+RGBLED::RGBLED(uint8_t redPin, uint8_t greenPin, uint8_t bluePin, void (*sendError)(const char*))
 {
     _redPin = redPin;
     _greenPin = greenPin;
     _bluePin = bluePin;
+
+    _sendError = sendError;
 }
 
 void RGBLED::setup()
@@ -50,6 +52,8 @@ void RGBLED::writeColor()
 
 void RGBLED::pushColor(unsigned long color)
 {
+    checkColor(color);
+
     colorStackIndex++;
     colorStack[colorStackIndex] = color;  
     writeColor();  
@@ -96,4 +100,9 @@ void RGBLED::testColorSequence()
   delay(1000);
 }
 
+void RGBLED::checkColor(unsigned long color) {
+     if (color > 0xffffff) {
+         _sendError("invalid color");
+     }
+}
 

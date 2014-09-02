@@ -27,6 +27,8 @@ class ExtendOSC
     void sendOSCMessageError(class OSCMessage &message);
     void sendOSCBundleError(class OSCBundle &bundle);
 
+    int validArgs(class OSCMessage &m, int totalExpected);
+
   private:
     const char* _addressPrefix;
     char _addressBuffer[32];

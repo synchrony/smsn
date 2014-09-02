@@ -24,22 +24,19 @@
  * A5:  I2C SCL for MPU-6050
  */
 
-// forward declaration for morse.h
-void sendError(const char *message);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// send and receive messages using Bluetooth/Amarino as opposed to plain serial
-//#define USE_BLUETOOTH
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-#include <OSCMessage.h>
+#include <OSCBundle.h>
 #include <ExtendOSC.h>
 
 ExtendOSC osc("/exo/tt");
+
+OSCBundle *bundleIn;
+
+void sendError(const char *message) {
+   osc.sendError(message);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,14 +78,19 @@ AnalogSampler photoSampler(photoresistorPin);
 
 #include <RGBLED.h>
 
-RGBLED rgbled(redPin, greenPin, bluePin);
-
+RGBLED rgbled(redPin, greenPin, bluePin, sendError);
 
 int colorToggle = 0;
 
 void colorDebug() {
     long modeColor = getModeColor();
     rgbled.replaceColor(modeColor);
+}
+
+void rgbForDuration(unsigned long color, unsigned long ms) {
+    rgbled.pushColor(color);
+    delay(ms);
+    rgbled.popColor();
 }
 
 
@@ -117,10 +119,10 @@ void laserOff() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void vibrateForDuration(int ms) {
+void vibrateForDuration(unsigned long ms) {
     digitalWrite(vibrationMotorPin, HIGH);
     delay(ms);
-    digitalWrite(vibrationMotorPin, LOW);  
+    digitalWrite(vibrationMotorPin, LOW);
 }
 
 
@@ -205,12 +207,14 @@ void readKeys() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "morse.h"
+#include <Morse.h>
 
 int morseStopTest() {
     // abort the playing of a Morse code sequence by pressing 3 or more keys at the same time
     return totalKeysPressed >= 3;
 }
+
+Morse morse(transducerPin, morseStopTest, sendError);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,8 +230,6 @@ void powerUpSequence() {
     digitalWrite(vibrationMotorPin, LOW);
     rgbled.replaceColor(RGB_GREEN);
 }
-
-OSCMessage *messageIn;
 
 void setup() {
     pinMode(keyPin1, INPUT);
@@ -257,24 +259,96 @@ void setup() {
 
     //setMode(LowercaseText);
 
-    messageIn = new OSCMessage();   
+    bundleIn = new OSCBundle();   
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void handleOSCMessage(class OSCMessage &messageIn) {
-    if (messageIn.hasError()) {
-        osc.sendOSCMessageError(messageIn);
+void handleOSCBundle(class OSCBundle &bundle) {
+    if (bundle.hasError()) {
+        osc.sendOSCBundleError(bundle);
+    } else if (!(0
+        || bundle.dispatch("/exo/tt/laser/trigger", handleLaserTriggerMessage)
+        || bundle.dispatch("/exo/tt/mode", handleModeMessage)
+        || bundle.dispatch("/exo/tt/morse", handleMorseMessage)
+        || bundle.dispatch("/exo/tt/photo/get", handlePhotoGetMessage)
+        || bundle.dispatch("/exo/tt/ping", handlePingMessage)
+        || bundle.dispatch("/exo/tt/rgb/test", handleRGBTestMessage)
+        || bundle.dispatch("/exo/tt/vibro", handleVibroMessage)
+        )) {
+        osc.sendError("no messages dispatched");
+    }
+}
+
+void handleLaserTriggerMessage(class OSCMessage &m) {
+    setMode(LaserTrigger); 
+}
+
+void handleModeMessage(class OSCMessage &m) {
+    if (m.isString(0)) {
+        int length = m.getDataLength(0);
+        char buffer[length+1];
+        m.getString(0, buffer, length+1);
+        
+        setMode(modeValueOf(buffer));
     } else {
-        boolean called = 0
-        || messageIn.dispatch("/exo/tt/laser/trigger", handleLaserTriggerMessage)
-        || messageIn.dispatch("/exo/tt/mode", handleModeMessage)
-        || messageIn.dispatch("/exo/tt/morse", handleMorseMessage)
-        || messageIn.dispatch("/exo/tt/photo/get", handlePhotoGetMessage)
-        || messageIn.dispatch("/exo/tt/ping", handlePingMessage)
-        || messageIn.dispatch("/exo/tt/vibr", handleVibroMessage)
-        ;
+        osc.sendError("expected string-valued mode name");
+    }
+}
+
+void handleMorseMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+
+    int length = m.getDataLength(0);
+    char buffer[length+1];
+    m.getString(0, buffer, length+1);
+
+    morse.playMorseString(buffer);
+}
+
+void handlePhotoGetMessage(class OSCMessage &m) {
+    photoSampler.reset();
+    photoSampler.beginSample();
+    photoSampler.measure();
+    photoSampler.endSample();
+   
+    sendLightLevel();
+}
+
+void handlePingMessage(class OSCMessage &m) {
+    sendPingReply();
+    //morse.playMorseString("p");
+}
+
+void handleRGBTestMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 2)) return;
+
+    int32_t color = m.getInt(0);
+    int32_t duration = m.getInt(1);
+
+    if (color < 0 || color > 0xffffff) {
+        osc.sendError("color out of range: %d", (long) color);
+    } else if (duration <= 0) {
+        osc.sendError("duration must be a positive number");
+    } else if (duration > 60000) {
+        osc.sendError("duration too long");
+    } else {
+        rgbForDuration((unsigned long) color, (unsigned long) duration);
+    }
+}
+
+void handleVibroMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+
+    int32_t d = m.getInt(0);
+
+    if (d <= 0) {
+        osc.sendError("duration must be a positive number");
+    } else if (d > 60000) {
+        osc.sendError("duration too long");
+    } else {
+        vibrateForDuration((unsigned long) d);
     }
 }
 
@@ -291,63 +365,6 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
     osc.sendOSC(m); 
 }
 
-void handleLaserTriggerMessage(class OSCMessage &m) {
-    setMode(LaserTrigger); 
-}
-
-void handleModeMessage(class OSCMessage &m) {
-    if (m.isString(0)) {
-        int length = m.getDataLength(0);
-        char buffer[length+1];
-        m.getString(0, buffer, length+1);
-        
-        setMode(modeValueOf(buffer));
-    } else {
-        sendError("expected string-valued mode name"); 
-    }
-}
-
-void handleMorseMessage(class OSCMessage &m) {
-    int length = m.getDataLength(0);
-    char buffer[length+1];
-    m.getString(0, buffer, length+1);
-
-    playMorseString(buffer, morseStopTest);
-}
-
-void handlePhotoGetMessage(class OSCMessage &m) {
-    photoSampler.reset();
-    photoSampler.beginSample();
-    photoSampler.measure();
-    photoSampler.endSample();
-   
-    sendLightLevel();
-}
-
-void handlePingMessage(class OSCMessage &m) {
-    // send reply as soon as possible
-    sendPingReply();
-    
-    playMorseString("p", morseStopTest);  
-}
-
-void handleVibroMessage(class OSCMessage &m) {
-    rgbled.pushColor(RGB_PURPLE);
-
-    int d = m.getInt(0);
-    //playMorseInt(d, morseStopTest);
-
-    if (d <= 0) {
-        sendError("vibro duration must be a positive number");
-    } else if (d > 60000) {
-        sendError("exceeded artificial bound of one minute for vibration cue");
-    } else {
-        vibrateForDuration(d);
-    }
-
-    rgbled.popColor();
-}
-
 void sendKeyEvent(const char *keys) {
     OSCMessage m("/exo/tt/keys");
     m.add(keys);
@@ -361,14 +378,14 @@ void sendLightLevel() {
 
 void sendPingReply() {
     OSCMessage m("/exo/tt/ping/reply");
-    m.add((int32_t) micros());
+    m.add((uint64_t) micros());
     
     osc.sendOSC(m);
 }
 
 void sendLaserEvent() {
     OSCMessage m("/exo/tt/laser/event");
-    m.add((int32_t) micros());
+    m.add((uint64_t) micros());
     
     osc.sendOSC(m);
 }
@@ -376,20 +393,19 @@ void sendLaserEvent() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void loop() {    
-#ifdef USE_BLUETOOTH
-    if (osc.receiveOSC(*messageIn)) {
-        handleOSCMessage(*messageIn);
-        messageIn->empty();
-        //messageIn.reset();
-        delete messageIn;
-        messageIn = new OSCMessage();
+void loop() {
+    // OSC serial input
+    if (osc.receiveOSCBundle(*bundleIn)) {
+        handleOSCBundle(*bundleIn);
+        bundleIn->empty();
+        delete bundleIn;
+        bundleIn = new OSCBundle();
     }
-#endif
+
     rgbled.replaceColor(RGB_BLACK);
     
-    readKeys();
-    
+    // keying action
+    readKeys();    
     if (keyState != lastKeyState) {
         colorDebug();
 
@@ -421,8 +437,7 @@ void loop() {
                 delayMicroseconds(debounceMicros - (after - before));
             }
         }
-    }
-  
+    } 
     lastKeyState = keyState;
 
     //int l = analogRead(A3);

@@ -5,24 +5,16 @@
  */
 
 
-// send and receive messages using Bluetooth/Amarino as opposed to plain serial
-//#define USE_BLUETOOTH
-
-// if defined, make serial output more legible to a human eye
-// also accept simple serial input
-#define SIMPLE_IO
-
 //#define GESTURE_MODE
 #define KEYBOARD_MODE
 
 // output raw accelerometer data in addition to gestures
-#define PRINT_SENSOR_DATA
+#define OUTPUT_SENSOR_DATA
 
+//#define THREEAXIS
 #define NINEAXIS
 
-// comma-separated format eases importing to R and similar tools. Tabs are easier on the eye
-//#define SEP '\t'
-#define SEP ','
+//#define HEARTBEAT_MS 1000
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +23,7 @@
 #define MOTION_Y_PIN A1
 #define MOTION_Z_PIN A2
 
-#define SPEAKER_PIN  10  // requires PWM
+#define SPEAKER_PIN  9  // PWM preferred
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,9 +33,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef THREEAXIS
 #include <MMA7361.h>
 
 MMA7361 motionSensor(MOTION_X_PIN, MOTION_Y_PIN, MOTION_Z_PIN);
+#endif
 
 #ifdef NINEAXIS
 #include <Wire.h>
@@ -62,6 +56,7 @@ int32_t magnetSumX, magnetSumY, magnetSumZ;
 unsigned long lastMagnetRefTime;
 #endif
 
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <Droidspeak.h>
@@ -71,27 +66,28 @@ Droidspeak droidspeak(SPEAKER_PIN);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// This is only necessary for communication *to* the Arduino
-// For communication from the Arduino to the Android phone, we use a modified OSCuino
-#include <MeetAndroid.h>
-MeetAndroid meetAndroid;
+#include <OSCBundle.h>
+#include <ExtendOSC.h>
 
-const char ack = 19;
-const char startFlag = 18;
+ExtendOSC osc("/exo/hand");
+
+OSCBundle *bundleIn;
+
+void error(const char *message) {
+    osc.sendError(message);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <OSCMessage.h>
-#include <OSCBundle.h>
+#include <Morse.h>
 
-#ifdef BOARD_HAS_USB_SERIAL
-#include <SLIPEncodedUSBSerial.h>
-SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
-#else
-#include <SLIPEncodedSerial.h>
-SLIPEncodedSerial SLIPSerial(Serial);
-#endif
+int morseStopTest() {
+    // no need to abort
+    return 0;
+}
+
+Morse morse(SPEAKER_PIN, morseStopTest, error);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,51 +116,47 @@ double ax_max, ay_max, az_max;
 // time of last (potential) turning point
 unsigned long tmax;
 
-// settable identifier which is prepended to each gestural output
+// settable identifier which is included with each gestural and sensor output
 char contextName[32];
-char inputBuffer[32];
 
 void setup()  
 {
+#ifdef THREEAXIS
+    // TODO: random seed using 9-axis sensor
     randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
-
-    droidspeak.speakPowerUpPhrase();
-
-    // OSCuino: begin SLIPSerial just like Serial
-    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
-    SLIPSerial.begin(115200);   // set this as high as you can reliably run on your platform
-    //SLIPSerial.begin(38400);  // works equally well with 8MHz and 16MHz
-#if ARDUINO >= 100
-    while (!Serial); // for Arduino Leonardo
-#endif
-
-    droidspeak.speakSerialOpenPhrase();
-
+    
     // 1.5g constants, sampled 2014-06-21
     motionSensor.calibrateX(272, 794);
     motionSensor.calibrateY(332, 841);
     motionSensor.calibrateZ(175, 700);
+#endif
+
+    droidspeak.speakPowerUpPhrase();
+
+    osc.beginSerial();
+
+    droidspeak.speakSerialOpenPhrase();
+
+    bundleIn = new OSCBundle();   
 
 #ifdef NINEAXIS
     // adjust the power settings after you call this method if you want the accelerometer
     // to enter standby mode, or another less demanding mode of operation
     accel.initialize();
     if (!accel.testConnection()) {
-        SLIPSerial.println("ADXL345 connection failed");
+        osc.sendError("ADXL345 connection failed");
     }
     
     gyro.initialize();
     if (!accel.testConnection()) {
-        SLIPSerial.println("ITG3200 connection failed");
+        osc.sendError("ITG3200 connection failed");
     }
     
     magnet.initialize();
     if (!accel.testConnection()) {
-        SLIPSerial.println("HMC5883L connection failed");
+        osc.sendError("HMC5883L connection failed");
     }
 #endif
-
-    meetAndroid.registerFunction(ping, 'p');
 
     state = STATE_ONE;
     
@@ -174,138 +166,148 @@ void setup()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void sendOSC(class OSCMessage &m) {
-#ifdef USE_BLUETOOTH
-    // "manually" begin Bluetooth/Amarino message
-    SLIPSerial.print(startFlag);
+void sendPingReply() {
+    OSCMessage m("/exo/hand/ping/reply");
+    m.add((uint64_t) micros());
+    
+    osc.sendOSC(m);
+}
+
+#ifdef HEARTBEAT_MS
+void sendHeartbeatMessage(unsigned long now) {
+    OSCMessage m("/exo/hand/heartbeat");
+    m.add((uint64_t) now);
+    osc.sendOSC(m); 
+}
 #endif
 
-    SLIPSerial.beginPacket();  
-    m.send(SLIPSerial); // send the bytes to the SLIP stream
-    SLIPSerial.endPacket(); // mark the end of the OSC Packet
-    m.empty(); // free space occupied by message
-        
-#ifdef USE_BLUETOOTH
-    // "manually" end Bluetooth/Amarino message
-    SLIPSerial.print(ack);
-#elif defined(SIMPLE_IO)
-    // put OSC messages on separate lines so as to make them more readable
-    SLIPSerial.println("");
-#endif  
+/*
+void handleAudioToneMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 2)) return;
+
+    int32_t frequency = m.getInt(0);
+    int32_t duration = m.getInt(1);
+
+    if (frequency <= 0 || frequency > 20000) {
+        osc.sendError("frequency out of range: %d", (int) frequency);
+    } else if (duration <= 0) {
+        osc.sendError("duration must be a positive number");
+    } else if (duration > 60000) {
+        osc.sendError("duration too long");
+    } else {
+        tone(SPEAKER_PIN, (int) frequency);
+        delay((unsigned long) duration);
+        noTone(SPEAKER_PIN);
+    }
+}
+*/
+
+void handleContextSetMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+
+    m.getString(0, contextName, m.getDataLength(0) + 1);
+}
+
+/*
+void handleMorseMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+
+    int length = m.getDataLength(0);
+    char buffer[length+1];
+    m.getString(0, buffer, length+1);
+
+    morse.playMorseString(buffer);
+}
+*/
+
+void handlePingMessage(class OSCMessage &m) {
+    sendPingReply();
+}
+
+void handleOSCBundle(class OSCBundle &bundle) {
+    if (bundle.hasError()) {
+        osc.sendOSCBundleError(bundle);
+    } else if (!(0
+//        || bundle.dispatch("/exo/hand/audio/tone", handleAudioToneMessage)
+        || bundle.dispatch("/exo/hand/context/set", handleContextSetMessage)
+        //|| bundle.dispatch("/exo/hand/morse", handleMorseMessage)
+        || bundle.dispatch("/exo/hand/ping", handlePingMessage)
+        )) {
+        osc.sendError("no messages dispatched");
+    }
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void sendError(const char *message) {
-    OSCMessage m("/exo/hand/error");
-    m.add(message);
+unsigned long toneStart = 0, toneStop = 0;
 
-    sendOSC(m);
-}
-
-void sendInfo(const char *message) {
-    OSCMessage m("/exo/hand/info");
-    m.add(message);
-
-    sendOSC(m);
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-#include <Morse.h>
-
-int morseStopTest() {
-    // no need to abort
-    return 0;
-}
-
-void morseSendError(const char *message) {
-   sendError(message); 
-}
-
-Morse morse(SPEAKER_PIN, morseStopTest, morseSendError);
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-#ifdef SIMPLE_IO
-int inputPos = 0;
-#endif
-
-unsigned long toneStop = 0;
+unsigned long lastHeartbeat = 0;
 
 void loop()
 {
-    // TODO: temporary.  This will slow down gesture recognition
-    // you need to keep this in your loop() to receive events
-    //meetAndroid.receive();
-
-#ifdef SIMPLE_IO
-    while (SLIPSerial.available()) {
-        int c = SLIPSerial.read();
-        if (13 == c) {
-            inputBuffer[inputPos] = 0;
-            if (strlen(inputBuffer)) {
-                strcpy(contextName, inputBuffer);
-                morse.playMorseString(contextName);
-            } else {
-                droidspeak.speakWarningPhrase();  
-            }      
-            inputPos = 0;      
-        } else {
-            inputBuffer[inputPos++] = c;
-        }
+  //*
+    if (osc.receiveOSCBundle(*bundleIn)) {
+        handleOSCBundle(*bundleIn);
+        bundleIn->empty();
+        delete bundleIn;
+        bundleIn = new OSCBundle();
     }
-#endif
+//*/
 
     unsigned long now = micros();
     unsigned long nowMillis = millis();
     
+#ifdef HEARTBEAT_MS
+    if (nowMillis - lastHeartbeat > HEARTBEAT_MS) {
+        sendHeartbeatMessage(nowMillis);
+        lastHeartbeat = nowMillis;  
+    }
+#endif
+
     // stopping the tone "asychronously" allows gesture recognition and serial
     // communication to proceed while the speaker is beeping away
-    if (0 != toneStop && nowMillis > toneStop) {
+    //*
+    if (toneStop && (nowMillis > toneStop || nowMillis < toneStart)) {
         noTone(SPEAKER_PIN);
+        toneStart = 0;
         toneStop = 0;    
     }
+    //*/
 
     double ax, ay, az;
     double a;
-    
+
+#ifdef THREEAXIS
     ax = motionSensor.accelX();
     ay = motionSensor.accelY();
     az = motionSensor.accelZ();
-    
-#ifdef PRINT_SENSOR_DATA
-    Serial.print(contextName);
-    Serial.print(SEP); Serial.print(now);
-    Serial.print(SEP); Serial.print(ax);
-    Serial.print(SEP); Serial.print(ay);
-    Serial.print(SEP); Serial.print(az);
-#ifdef NINEAXIS
+#else
     int16_t ax2, ay2, az2;
     accel.getAcceleration(&ax2, &ay2, &az2);
-    Serial.print(SEP); Serial.print("accel");
-    Serial.print(SEP); Serial.print(ax2);
-    Serial.print(SEP); Serial.print(ay2);
-    Serial.print(SEP); Serial.print(az2);
     int16_t gx, gy, gz;
     gyro.getRotation(&gx, &gy, &gz);
-    Serial.print(SEP); Serial.print("gyro");
-    Serial.print(SEP); Serial.print(gx);
-    Serial.print(SEP); Serial.print(gy);
-    Serial.print(SEP); Serial.print(gz);
     int16_t mx, my, mz;
     magnet.getHeading(&mx, &my, &mz);
-    Serial.print(SEP); Serial.print("magnet");
-    Serial.print(SEP); Serial.print(mx);
-    Serial.print(SEP); Serial.print(my);
-    Serial.print(SEP); Serial.print(mz);
+    
+    // approximate g values, per calibration with a specific sensor
+    ax = ax2 / 230.0 - 0.05;
+    ay = ay2 / 230.0;
+    az = az2 / 230.0;
+#endif
+
+#ifdef OUTPUT_SENSOR_DATA
+    OSCMessage mout("/exo/hand/motion");
+    mout.add(contextName);
+    mout.add((uint64_t) now);
+    //mout.add(ax); mout.add(ay); mout.add(az);
+#ifdef NINEAXIS
+    mout.add((int32_t) ax2); mout.add((int32_t) ay2); mout.add((int32_t) az2);
+    mout.add((int32_t) gx); mout.add((int32_t) gy); mout.add((int32_t) gz);
+    mout.add((int32_t) mx); mout.add((int32_t) my); mout.add((int32_t) mz);
 #endif // ifdef NINEAXIS
-    Serial.print('\n');
-#endif // ifdef PRINT_SENSOR_DATA
+    osc.sendOSC(mout);
+#endif // ifdef OUTPUT_SENSOR_DATA
     
     a = sqrt(ax*ax + ay*ay + az*az);
     
@@ -354,24 +356,26 @@ void loop()
                 // initiate the cue before dealing with serial communication, which involves a delay
                 if (gestureToneLength > 0) {
                     //droidspeak.analogTone(gestureToneLength, gestureTone, gestureToneVolume);
+                    /*
+                    toneStart = nowMillis;
                     toneStop = nowMillis + gestureToneLength;
+                    if (toneStop < toneStart) {
+                        toneStop = 0;
+                    }
+                    */
                     tone(SPEAKER_PIN, gestureTone);
+                    //*
+                    delay(gestureToneLength);
+                    noTone(SPEAKER_PIN);
+                    //*/
+                   
                     gestureToneLength = 0;
                     gestureToneVolume = 1.0;
                 }
                 
                 // gesture event
-#ifdef SIMPLE_IO
-                Serial.print(contextName); Serial.print(SEP);
-                Serial.print(tmax); Serial.print(SEP);  // time of turning point
-                Serial.print(now); Serial.print(SEP);  // time of recognition
-                Serial.print(amax); Serial.print(SEP);
-                Serial.print(ax_max); Serial.print(SEP);
-                Serial.print(ay_max); Serial.print(SEP);
-                Serial.print(az_max); Serial.print(SEP);
-                Serial.println(gesture);
-#else
                 OSCMessage m("/exo/hand/gesture");
+                m.add(contextName);
                 m.add((uint64_t) tmax);  // time of turning point
                 m.add((uint64_t) now);  // time of recognition
                 m.add(amax);
@@ -379,21 +383,9 @@ void loop()
                 m.add(ay_max);
                 m.add(az_max);
                 m.add(gesture);
-                sendOSC(m);
-#endif
+                osc.sendOSC(m);
             }
         }
         break;
     }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Amarino-formatted function
-void ping(byte flag, byte numOfValues)
-{
-    OSCMessage m("/exo/hand/ping-reply");
-    m.add((int32_t) micros());
-    sendOSC(m);
 }

@@ -23,7 +23,7 @@ const unsigned long
 class RGBLED
 {
   public:
-    RGBLED(uint8_t redPin, uint8_t greenPin, uint8_t bluePin);
+    RGBLED(uint8_t redPin, uint8_t greenPin, uint8_t bluePin, void (*sendError)(const char*));
     void setup();
     void writeColor();
     void pushColor(unsigned long color);
@@ -33,6 +33,8 @@ class RGBLED
 
   private:
     uint8_t _redPin, _greenPin, _bluePin;
+    void (*_sendError)(const char*);
+    void checkColor(unsigned long color);
 };
 
 #endif // RGBLED_h

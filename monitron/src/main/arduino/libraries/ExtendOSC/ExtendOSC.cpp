@@ -8,7 +8,7 @@
 
 #ifdef BOARD_HAS_USB_SERIAL
 #include <SLIPEncodedUSBSerial.h>
-SLIPEncodedUSBSerial SLIPSerial( thisBoardsSerialUSB );
+SLIPEncodedUSBSerial SLIPSerial(thisBoardsSerialUSB);
 #else
 #include <SLIPEncodedSerial.h>
 SLIPEncodedSerial SLIPSerial(Serial);
@@ -22,10 +22,18 @@ ExtendOSC::ExtendOSC(const char *prefix)
 void ExtendOSC::beginSerial() {
     // OSCuino: begin SLIPSerial just like Serial
     // set this as high as you can reliably run on your platform
-    // BlueSMiRF Silver is compatible with any baud rate from 2400-115200
     SLIPSerial.begin(115200);
+/*
 #if ARDUINO >= 100
-    while(!Serial); // Leonardo "feature"
+    while(!Serial); // for Arduino Leonardo
+#endif
+*/
+#if ARDUINO >= 100
+#ifdef BOARD_HAS_USB_SERIAL
+    while(!thisBoardsSerialUSB);
+#else
+    while(!Serial);
+#endif
 #endif
 }
 
@@ -54,7 +62,6 @@ int ExtendOSC::receiveOSCBundle(class OSCBundle &bundleIn) {
     }
     return done || SLIPSerial.endofPacket();
 }
-
 
 void ExtendOSC::sendOSC(class OSCMessage &messageOut) {
     SLIPSerial.beginPacket();
@@ -97,7 +104,6 @@ const char *BUFFER_FULL_msg = "BUFFER_FULL",
     *INDEX_OUT_OF_BOUNDS_msg = "INDEX_OUT_OF_BOUNDS",
     *unknown_msg = "unknown";
 
-
 void ExtendOSC::sendOSCError(OSCErrorCode code) {
     const char *name;
 
@@ -129,4 +135,13 @@ void ExtendOSC::sendOSCMessageError(class OSCMessage &message) {
 void ExtendOSC::sendOSCBundleError(class OSCBundle &bundle) {
     OSCErrorCode code = bundle.getError();
     sendOSCError(code);
+}
+
+int ExtendOSC::validArgs(class OSCMessage &m, int totalExpected) {
+    if (totalExpected != m.size()) {
+        sendError("got %d argument(s), expected %d", m.size(), totalExpected);
+        return 0;
+    } else {
+        return 1;
+    }
 }
