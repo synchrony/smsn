@@ -37,9 +37,7 @@ const double waveTolerance2 = 0.5;
 /* of a large (n=344), heterogeneous set of taps gathered on 2014-08-21 and normalized
    to unit vectors, 95% were within 0.7 of their normalized mean, (0.04, -0.22, 0.98) */
 const double tapCenter[] = {0.04, -0.22, 0.98};
-const double tapTolerance = 0.7;
-//const double tapCenter[] = {0.16, -0.04, 0.98};
-//const double tapTolerance = 0.5;
+const double tapTolerance = 0.6;
 
 const double flipCenter[] = {0.9266487, 0.1260582, -0.303386};
 const double flipTolerance = 0.5;

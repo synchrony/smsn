@@ -14,7 +14,23 @@
 //#define THREEAXIS
 #define NINEAXIS
 
+// if defined, output a heartbeat message every so many milliseconds
 //#define HEARTBEAT_MS 1000
+
+// if defined, emit info messages with the current sampling rate
+//#define OUTPUT_SAMPLING_RATE
+
+// OSC addresses
+const char *EXO_HAND             = "/exo/hand";
+const char *EXO_HAND_AUDIO_TONE  = "/exo/hand/audio/tone";
+const char *EXO_HAND_CONTEXT_SET = "/exo/hand/context/set";
+const char *EXO_HAND_GESTURE     = "/exo/hand/gesture";
+const char *EXO_HAND_HEARTBEAT   = "/exo/hand/heartbeat";
+const char *EXO_HAND_INFO        = "/exo/hand/info";
+const char *EXO_HAND_MORSE       = "/exo/hand/morse";
+const char *EXO_HAND_MOTION      = "/exo/hand/motion";
+const char *EXO_HAND_PING        = "/exo/hand/ping";
+const char *EXO_HAND_PING_REPLY  = "/exo/hand/ping/reply";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +85,7 @@ Droidspeak droidspeak(SPEAKER_PIN);
 #include <OSCBundle.h>
 #include <ExtendOSC.h>
 
-ExtendOSC osc("/exo/hand");
+ExtendOSC osc(EXO_HAND);
 
 OSCBundle *bundleIn;
 
@@ -97,8 +113,8 @@ const double lowerBound = 1.25;
 const double upperBound = 1.75;
 #else
 #ifdef KEYBOARD_MODE
-const double lowerBound = 1.05;
-const double upperBound = 1.20;
+const double lowerBound = 1.25;
+const double upperBound = 1.50;
 #endif
 #endif
 
@@ -129,6 +145,10 @@ void setup()
     motionSensor.calibrateX(272, 794);
     motionSensor.calibrateY(332, 841);
     motionSensor.calibrateZ(175, 700);
+#else
+#ifdef NINEAXIS
+    randomSeed(accel.getAccelerationX() - accel.getAccelerationY() + accel.getAccelerationZ());
+#endif
 #endif
 
     droidspeak.speakPowerUpPhrase();
@@ -167,7 +187,7 @@ void setup()
 ////////////////////////////////////////////////////////////////////////////////
 
 void sendPingReply() {
-    OSCMessage m("/exo/hand/ping/reply");
+    OSCMessage m(EXO_HAND_PING_REPLY);
     m.add((uint64_t) micros());
     
     osc.sendOSC(m);
@@ -175,13 +195,12 @@ void sendPingReply() {
 
 #ifdef HEARTBEAT_MS
 void sendHeartbeatMessage(unsigned long now) {
-    OSCMessage m("/exo/hand/heartbeat");
+    OSCMessage m(EXO_HAND_HEARTBEAT);
     m.add((uint64_t) now);
     osc.sendOSC(m); 
 }
 #endif
 
-/*
 void handleAudioToneMessage(class OSCMessage &m) {
     if (!osc.validArgs(m, 2)) return;
 
@@ -200,7 +219,6 @@ void handleAudioToneMessage(class OSCMessage &m) {
         noTone(SPEAKER_PIN);
     }
 }
-*/
 
 void handleContextSetMessage(class OSCMessage &m) {
     if (!osc.validArgs(m, 1)) return;
@@ -228,10 +246,10 @@ void handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
         osc.sendOSCBundleError(bundle);
     } else if (!(0
-//        || bundle.dispatch("/exo/hand/audio/tone", handleAudioToneMessage)
-        || bundle.dispatch("/exo/hand/context/set", handleContextSetMessage)
-        //|| bundle.dispatch("/exo/hand/morse", handleMorseMessage)
-        || bundle.dispatch("/exo/hand/ping", handlePingMessage)
+        || bundle.dispatch(EXO_HAND_AUDIO_TONE, handleAudioToneMessage)
+        || bundle.dispatch(EXO_HAND_CONTEXT_SET, handleContextSetMessage)
+        //|| bundle.dispatch(EXO_HAND_MORSE, handleMorseMessage)
+        || bundle.dispatch(EXO_HAND_PING, handlePingMessage)
         )) {
         osc.sendError("no messages dispatched");
     }
@@ -244,8 +262,16 @@ unsigned long toneStart = 0, toneStop = 0;
 
 unsigned long lastHeartbeat = 0;
 
+// the number of samples taken since the last output
+unsigned long samples = 0;
+unsigned long lastSampleOutput = 0;
+
 void loop()
 {
+#ifdef OUTPUT_SAMPLING_RATE
+    samples++;
+#endif
+
   //*
     if (osc.receiveOSCBundle(*bundleIn)) {
         handleOSCBundle(*bundleIn);
@@ -297,7 +323,7 @@ void loop()
 #endif
 
 #ifdef OUTPUT_SENSOR_DATA
-    OSCMessage mout("/exo/hand/motion");
+    OSCMessage mout(EXO_HAND_MOTION);
     mout.add(contextName);
     mout.add((uint64_t) now);
     //mout.add(ax); mout.add(ay); mout.add(az);
@@ -362,19 +388,19 @@ void loop()
                     if (toneStop < toneStart) {
                         toneStop = 0;
                     }
-                    */
+                    //*/
                     tone(SPEAKER_PIN, gestureTone);
                     //*
                     delay(gestureToneLength);
                     noTone(SPEAKER_PIN);
                     //*/
-                   
+                    
                     gestureToneLength = 0;
                     gestureToneVolume = 1.0;
                 }
                 
                 // gesture event
-                OSCMessage m("/exo/hand/gesture");
+                OSCMessage m(EXO_HAND_GESTURE);
                 m.add(contextName);
                 m.add((uint64_t) tmax);  // time of turning point
                 m.add((uint64_t) now);  // time of recognition
@@ -384,6 +410,17 @@ void loop()
                 m.add(az_max);
                 m.add(gesture);
                 osc.sendOSC(m);
+                
+#ifdef OUTPUT_SAMPLING_RATE
+                unsigned long freshNow = millis();
+                if (lastSampleOutput > 0 && freshNow > lastSampleOutput) {
+                    int rate = (samples * 1000) / (freshNow - lastSampleOutput); 
+                    osc.sendInfo("samping rate: %d Hz", rate);
+                }
+                
+                lastSampleOutput = freshNow;
+                samples = 0;
+#endif
             }
         }
         break;

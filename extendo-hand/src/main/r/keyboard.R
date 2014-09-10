@@ -79,6 +79,9 @@ dist <- function(a, b) {
     sqrt((a$x-b$x)^2 + (a$y-b$y)^2 + (a$z-b$z)^2)
 }
 
+mean.p <- function(p) {
+    data.frame(x=mean(p$x), y=mean(p$y), z=mean(p$z))
+}
 
 plot.normed <- function(p, color) {
     plot3d(p$x, p$y, p$z, col=color, size=3)
@@ -367,3 +370,20 @@ sd(tmp$dist)
 
 mean(subset(tmp, context=="s12")$dist)
 sd(subset(tmp, context=="s12")$dist)
+
+
+################################################################################
+# find direction of gravity
+
+l = 400  # around 4s seems to be a good balance
+cx <- cumsum(a$x)
+ax.g <- (cx[(l+1):length(cx)] - cx[1:(length(cx)-l)]) / l
+plot(ax.g, type="l")
+
+
+
+cz <- cumsum(a$z)
+az.g <- (cz[(l+1):length(cz)] - cz[1:(length(cz)-l)]) / l
+plot(az.g, type="l")
+
+
