@@ -14,6 +14,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.util.properties.PropertyException;
 import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.SailException;
 
@@ -42,7 +43,7 @@ public class BroadcastRdfExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         BroadcastRdfRequest r;
         try {
-            r = new BroadcastRdfRequest(request, p.user);
+            r = new BroadcastRdfRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -75,10 +76,10 @@ public class BroadcastRdfExtension extends ExtendoExtension {
     protected class BroadcastRdfRequest extends Request {
         public final String dataset;
 
-        public BroadcastRdfRequest(String jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
+        public BroadcastRdfRequest(JSONObject json, Principal user) throws JSONException {
+            super(json, user);
 
-            dataset = json.getString(DATASET);
+            dataset = this.json.getString(DATASET);
         }
     }
 }

@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.Principal;
 
@@ -33,7 +34,7 @@ public class PrioritiesExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         PrioritiesRequest r;
         try {
-            r = new PrioritiesRequest(request, p.user);
+            r = new PrioritiesRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -65,10 +66,10 @@ public class PrioritiesExtension extends ExtendoExtension {
     protected class PrioritiesRequest extends FilteredResultsRequest {
         public final int maxResults;
 
-        public PrioritiesRequest(String jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
+        public PrioritiesRequest(JSONObject json, Principal user) throws JSONException {
+            super(json, user);
 
-            maxResults = json.optInt(MAX_RESULTS, DEFAULT_MAX_RESULTS);
+            maxResults = this.json.optInt(MAX_RESULTS, DEFAULT_MAX_RESULTS);
 
             if (maxResults <= 0) {
                 throw new JSONException(MAX_RESULTS + " parameter must be a positive integer");

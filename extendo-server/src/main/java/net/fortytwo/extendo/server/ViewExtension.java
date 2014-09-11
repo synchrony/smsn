@@ -11,8 +11,8 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
-import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.Principal;
 
@@ -35,7 +35,7 @@ public class ViewExtension extends ExtendoExtension {
         ViewRequest r;
 
         try {
-            r = new ViewRequest(request, p.user);
+            r = new ViewRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -72,9 +72,9 @@ public class ViewExtension extends ExtendoExtension {
     private class ViewRequest extends RootedViewRequest {
         public final boolean includeTypes;
 
-        public ViewRequest(final String jsonStr,
+        public ViewRequest(final JSONObject json,
                            final Principal user) throws JSONException {
-            super(jsonStr, user);
+            super(json, user);
 
             // this argument is optional; do not include types by default
             includeTypes = json.optBoolean(INCLUDE_TYPES, false);

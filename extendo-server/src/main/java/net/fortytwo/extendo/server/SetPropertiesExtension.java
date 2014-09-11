@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.ActivityLog;
 import net.fortytwo.extendo.brain.BrainGraph;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.Principal;
 import java.util.logging.Logger;
@@ -35,7 +36,7 @@ public class SetPropertiesExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         SetPropertiesRequest r;
         try {
-            r = new SetPropertiesRequest(request, p.user);
+            r = new SetPropertiesRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -103,12 +104,12 @@ public class SetPropertiesExtension extends ExtendoExtension {
         public final String name;
         public final float value;
 
-        public SetPropertiesRequest(String jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
+        public SetPropertiesRequest(JSONObject json, Principal user) throws JSONException {
+            super(json, user);
 
-            id = json.getString(ID);
-            name = json.getString(NAME);
-            value = (float) json.getDouble(VALUE);
+            id = this.json.getString(ID);
+            name = this.json.getString(NAME);
+            value = (float) this.json.getDouble(VALUE);
         }
     }
 }

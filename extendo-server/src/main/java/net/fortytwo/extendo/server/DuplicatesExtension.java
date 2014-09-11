@@ -14,6 +14,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openrdf.model.Graph;
 
 import java.io.UnsupportedEncodingException;
@@ -41,7 +42,7 @@ public class DuplicatesExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         FilteredResultsRequest r;
         try {
-            r = new FilteredResultsRequest(request, p.user);
+            r = new FilteredResultsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }

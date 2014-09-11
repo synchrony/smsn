@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A service for finding root nodes of an Extend-o-Brain graph
@@ -29,7 +30,7 @@ public class FindRootsExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         BasicViewRequest r;
         try {
-            r = new BasicViewRequest(request, p.user);
+            r = new BasicViewRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }

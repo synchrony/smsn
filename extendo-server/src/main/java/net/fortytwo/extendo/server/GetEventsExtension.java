@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.Principal;
 import java.util.List;
@@ -32,7 +33,7 @@ public class GetEventsExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         GetEventsRequest r;
         try {
-            r = new GetEventsRequest(request, p.user);
+            r = new GetEventsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -84,10 +85,10 @@ public class GetEventsExtension extends ExtendoExtension {
     protected class GetEventsRequest extends Request {
         public final int depth;
 
-        public GetEventsRequest(String jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
+        public GetEventsRequest(JSONObject json, Principal user) throws JSONException {
+            super(json, user);
 
-            depth = json.getInt(DEPTH);
+            depth = this.json.getInt(DEPTH);
         }
     }
 }

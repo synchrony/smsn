@@ -33,7 +33,7 @@ public class RippleExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         BasicSearchRequest r;
         try {
-            r = new BasicSearchRequest(request, p.user);
+            r = new BasicSearchRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }

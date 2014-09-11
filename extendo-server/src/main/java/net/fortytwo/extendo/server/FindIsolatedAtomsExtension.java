@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A service for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph
@@ -30,7 +31,7 @@ public class FindIsolatedAtomsExtension extends ExtendoExtension {
 
         FilteredResultsRequest r;
         try {
-            r = new FilteredResultsRequest(request, p.user);
+            r = new FilteredResultsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }

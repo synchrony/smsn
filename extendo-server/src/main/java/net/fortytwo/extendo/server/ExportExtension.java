@@ -23,6 +23,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class ExportExtension extends ExtendoExtension {
 
         ExportRequest r;
         try {
-            r = new ExportRequest(request, p.user);
+            r = new ExportRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -205,12 +206,12 @@ public class ExportExtension extends ExtendoExtension {
         private final String format;
         private final String file;
 
-        public ExportRequest(final String jsonStr,
+        public ExportRequest(final JSONObject json,
                              final Principal user) throws JSONException {
-            super(jsonStr, user);
+            super(json, user);
 
-            format = json.getString(FORMAT);
-            file = json.getString(FILE);
+            format = this.json.getString(FORMAT);
+            file = this.json.getString(FILE);
         }
     }
 }

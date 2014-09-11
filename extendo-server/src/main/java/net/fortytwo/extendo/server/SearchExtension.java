@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -34,7 +35,7 @@ public class SearchExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         SearchRequest r;
         try {
-            r = new SearchRequest(request, p.user);
+            r = new SearchRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -79,10 +80,10 @@ public class SearchExtension extends ExtendoExtension {
     protected class SearchRequest extends BasicSearchRequest {
         public final int valueCutoff;
 
-        public SearchRequest(String jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
+        public SearchRequest(JSONObject json, Principal user) throws JSONException {
+            super(json, user);
 
-            valueCutoff = json.getInt(VALUE_CUTOFF);
+            valueCutoff = this.json.getInt(VALUE_CUTOFF);
         }
     }
 }

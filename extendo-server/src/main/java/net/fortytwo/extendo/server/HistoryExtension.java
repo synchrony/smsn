@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class HistoryExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         FilteredResultsRequest r;
         try {
-            r = new FilteredResultsRequest(request, p.user);
+            r = new FilteredResultsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }

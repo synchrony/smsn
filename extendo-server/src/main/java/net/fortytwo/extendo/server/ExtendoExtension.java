@@ -224,7 +224,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         p.map.put("view", toJettison(json));
     }
 
-    protected float findMinAuthorizedSharability(final Principal user,
+    public static float findMinAuthorizedSharability(final Principal user,
                                                  final float minSharability) {
         // TODO
         float minAuth = (null == user)
@@ -303,105 +303,4 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public NoteWriter writer;
     }
 
-    protected class Request {
-        protected static final String
-                DATASET = "dataset",
-                DEFAULT_SHARABILITY = "defaultSharability",
-                DEFAULT_WEIGHT = "defaultWeight",
-                DEPTH = "depth",
-                FILE = "file",
-                FILTER = "filter",
-                FORMAT = "format",
-                ID = "id",
-                INCLUDE_TYPES = "includeTypes",
-                MAX_RESULTS = "maxResults",
-                MAX_SHARABILITY = "maxSharability",
-                MAX_WEIGHT = "maxWeight",
-                MIN_SHARABILITY = "minSharability",
-                MIN_WEIGHT = "minWeight",
-                NAME = "name",
-                QUERY = "query",
-                ROOT = "root",
-                STYLE = "style",
-                VALUE = "value",
-                VALUE_CUTOFF = "valueCutoff",
-                VIEW = "view";
-
-        protected final JSONObject json;
-        protected final Principal user;
-
-        public Request(final String jsonStr,
-                       final Principal user) throws JSONException {
-            json = new JSONObject(jsonStr);
-            this.user = user;
-        }
-    }
-
-    protected class FilteredResultsRequest extends Request {
-        public final Filter filter;
-
-        public FilteredResultsRequest(final String jsonStr,
-                                      final Principal user) throws JSONException {
-            super(jsonStr, user);
-
-            filter = getFilter();
-        }
-
-        protected Filter getFilter() throws JSONException {
-            JSONObject f = json.getJSONObject(FILTER);
-
-            float defaultWeight = (float) f.optDouble(DEFAULT_WEIGHT, -1);
-            float defaultSharability = (float) f.optDouble(DEFAULT_SHARABILITY, -1);
-            float minWeight = (float) f.getDouble(MIN_WEIGHT);
-            float maxWeight = (float) f.optDouble(MAX_WEIGHT, 1.0);
-
-            float ms = (float) f.getDouble(MIN_SHARABILITY);
-            float minSharability = findMinAuthorizedSharability(user, ms);
-
-            float maxSharability = (float) f.optDouble(MAX_SHARABILITY, 1.0);
-
-            return new Filter(minWeight, maxWeight, defaultWeight, minSharability, maxSharability, defaultSharability);
-        }
-    }
-
-    protected class BasicViewRequest extends FilteredResultsRequest {
-        public final int depth;
-        public final String styleName;
-
-        public BasicViewRequest(final String jsonStr,
-                                final Principal user) throws JSONException {
-            super(jsonStr, user);
-
-            depth = json.getInt(DEPTH);
-            styleName = json.getString(STYLE);
-        }
-    }
-
-    protected class RootedViewRequest extends BasicViewRequest {
-        public final String rootId;
-
-        public RootedViewRequest(final String jsonStr,
-                                 final Principal user) throws JSONException {
-            super(jsonStr, user);
-
-            rootId = json.getString(ROOT);
-        }
-    }
-
-    protected class BasicSearchRequest extends BasicViewRequest {
-        public String query;
-
-        public BasicSearchRequest(String jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
-
-            query = json.getString(QUERY);
-
-            try {
-                // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
-                query = new String(query.getBytes(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    }
 }

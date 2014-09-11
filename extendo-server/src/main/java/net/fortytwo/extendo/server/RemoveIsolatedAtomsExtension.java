@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A service for removing isolated atoms (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph
@@ -30,7 +31,7 @@ public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
 
         FilteredResultsRequest r;
         try {
-            r = new FilteredResultsRequest(request, p.user);
+            r = new FilteredResultsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }

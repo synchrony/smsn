@@ -33,7 +33,7 @@ public class PushEventExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         PushEventRequest r;
         try {
-            r = new PushEventRequest(request, p.user);
+            r = new PushEventRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -65,7 +65,7 @@ public class PushEventExtension extends ExtendoExtension {
     protected class PushEventRequest extends Request {
         public final JSONObject jsonView;
 
-        public PushEventRequest(String jsonStr, Principal user) throws JSONException {
+        public PushEventRequest(JSONObject jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
             jsonView = json.getJSONObject(VIEW);

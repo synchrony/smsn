@@ -14,6 +14,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteQueries;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public class UpdateExtension extends ExtendoExtension {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         UpdateRequest r;
         try {
-            r = new UpdateRequest(request, p.user);
+            r = new UpdateRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
@@ -86,11 +87,11 @@ public class UpdateExtension extends ExtendoExtension {
     private class UpdateRequest extends RootedViewRequest {
         public final String wikiView;
 
-        public UpdateRequest(final String jsonStr,
+        public UpdateRequest(final JSONObject json,
                              final Principal user) throws JSONException {
-            super(jsonStr, user);
+            super(json, user);
 
-            wikiView = json.getString(VIEW);
+            wikiView = this.json.getString(VIEW);
         }
     }
 }
