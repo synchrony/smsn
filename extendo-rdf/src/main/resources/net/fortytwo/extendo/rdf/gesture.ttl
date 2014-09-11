@@ -21,15 +21,15 @@
 #################################################################
 
 
-###  http://fortytwo.net/2013/extendo/gesture#expressedBy
+###  http://fortytwo.net/2013/extendo/gesture#indicatedThing
 
-:expressedBy rdf:type owl:ObjectProperty ;
-             
-             rdfs:comment "The person who produces a gesture" ;
-             
-             rdfs:domain :Gesture ;
-             
-             rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+:indicatedThing rdf:type owl:ObjectProperty ;
+                
+                rdfs:comment "The object or concept to which the pointing gesture refers" ;
+                
+                rdfs:domain :Point ;
+                
+                rdfs:range owl:Thing .
 
 
 
@@ -40,18 +40,6 @@
               rdfs:domain :Gesture ;
               
               rdfs:range <http://www.w3.org/2006/time#Instant> .
-
-
-
-###  http://fortytwo.net/2013/extendo/gesture#thingPointedTo
-
-:thingPointedTo rdf:type owl:ObjectProperty ;
-                
-                rdfs:comment "The object or concept to which the pointing gesture refers" ;
-                
-                rdfs:domain :Point ;
-                
-                rdfs:range owl:Thing .
 
 
 
@@ -118,7 +106,7 @@
            
            rdfs:subClassOf :Gesture ;
            
-           rdfs:comment "A handshake gesture" .
+           rdfs:comment "A complete handshake ritual, including both participants' gestures" .
 
 
 
