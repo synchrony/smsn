@@ -426,4 +426,13 @@
         </pluginManagement>
     </build>
 
+    <repositories>
+        <!-- temporary, for SesameStream snapshots -->
+        <repository>
+            <id>fortytwo</id>
+            <name>fortytwo.net Maven repository</name>
+            <url>http://fortytwo.net/maven2</url>
+        </repository>
+    </repositories>
+
 </project>

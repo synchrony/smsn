@@ -169,12 +169,30 @@ gestures <- unique(gesture$V1)
 # for stick #1. See gyro.mean derived below
 gyro.cal <- data.frame(x=-110.996, y=105.5632, z=-37.2404)
 
-
+# from simple serial output
 a <- data.frame(x=motion$V3, y=motion$V4, z=motion$V5)
 accel <- data.frame(x=motion$V7, y=motion$V8, z=motion$V9)
 gyro <- data.frame(x=(motion$V11 - gyro.cal$x[1]), y=(motion$V12 - gyro.cal$y[1]), z=(motion$V13 - gyro.cal$z[1]))
 magnet <- data.frame(x=motion$V15, y=motion$V16, z=motion$V17)
+t <- motion$V2
 
+# from OSC->Python output
+accel <- data.frame(x=motion$V1, y=motion$V2, z=motion$V3)
+gyro <- data.frame(x=(motion$V4 - gyro.cal$x[1]), y=(motion$V5 - gyro.cal$y[1]), z=(motion$V6 - gyro.cal$z[1]))
+magnet <- data.frame(x=motion$V7, y=motion$V8, z=motion$V9)
+a <- data.frame(x=(accel$x/230 - 0.05), y=(accel$y/230), z=(accel$z/230))
+
+accel.mag <- mag(accel)
+gyro.mag <- mag(gyro)
+magnet.mag <- mag(magnet)
+a.mag <- mag(a)
+
+
+mn <- min(min(a$x), min(a$y), min(a$z))
+mx <- max(max(a$x), max(a$y), max(a$z))
+plot(x=t, a$x, col="red", type="l", ylim=c(mn, mx), xlab="time (ms)", ylab="acceleration / g")
+lines(x=t, a$y, col="green")
+lines(x=t, a$z, col="blue")
 
 
 plot(gyro$x, type="l")

@@ -8,8 +8,11 @@
 //#define GESTURE_MODE
 #define KEYBOARD_MODE
 
-// output raw accelerometer data in addition to gestures
+// if defined, emit raw motion (accelerometer/gyro/magnetometer) data
 #define OUTPUT_SENSOR_DATA
+
+// if defined, recognize and emit gestures
+#define OUTPUT_GESTURES
 
 //#define THREEAXIS
 #define NINEAXIS
@@ -258,8 +261,6 @@ void handleOSCBundle(class OSCBundle &bundle) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long toneStart = 0, toneStop = 0;
-
 unsigned long lastHeartbeat = 0;
 
 // the number of samples taken since the last output
@@ -290,16 +291,6 @@ void loop()
         lastHeartbeat = nowMillis;  
     }
 #endif
-
-    // stopping the tone "asychronously" allows gesture recognition and serial
-    // communication to proceed while the speaker is beeping away
-    //*
-    if (toneStop && (nowMillis > toneStop || nowMillis < toneStart)) {
-        noTone(SPEAKER_PIN);
-        toneStart = 0;
-        toneStop = 0;    
-    }
-    //*/
 
     double ax, ay, az;
     double a;
@@ -335,6 +326,7 @@ void loop()
     osc.sendOSC(mout);
 #endif // ifdef OUTPUT_SENSOR_DATA
     
+#ifdef OUTPUT_GESTURES
     a = sqrt(ax*ax + ay*ay + az*az);
     
     switch (state) {
@@ -381,16 +373,12 @@ void loop()
                 // play short audio cues associated with gestures
                 // initiate the cue before dealing with serial communication, which involves a delay
                 if (gestureToneLength > 0) {
-                    //droidspeak.analogTone(gestureToneLength, gestureTone, gestureToneVolume);
                     /*
-                    toneStart = nowMillis;
-                    toneStop = nowMillis + gestureToneLength;
-                    if (toneStop < toneStart) {
-                        toneStop = 0;
-                    }
+                    noTone(SPEAKER_PIN);
+                    tone(SPEAKER_PIN, gestureTone, gestureToneLength);
                     //*/
-                    tone(SPEAKER_PIN, gestureTone);
                     //*
+                    tone(SPEAKER_PIN, gestureTone);
                     delay(gestureToneLength);
                     noTone(SPEAKER_PIN);
                     //*/
@@ -420,9 +408,10 @@ void loop()
                 
                 lastSampleOutput = freshNow;
                 samples = 0;
-#endif
+#endif // OUTPUT_SAMPLING_RATE
             }
         }
         break;
     }
+#endif // OUTPUT_GESTURES
 }
