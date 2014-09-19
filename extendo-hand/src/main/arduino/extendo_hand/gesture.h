@@ -197,6 +197,7 @@ const char *classifyGestureVector(double *v, unsigned long tmax, unsigned long n
 #endif // ifdef GESTURE_MODE
 
 #ifdef OUTPUT_NULL_GESTURE
+    gestureToneLength = 0;
     return none;    
 #else
     return NULL;
