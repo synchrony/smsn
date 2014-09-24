@@ -12,7 +12,10 @@
 #define OUTPUT_SENSOR_DATA
 
 // if defined, recognize and emit gestures
-#define OUTPUT_GESTURES
+//#define OUTPUT_GESTURES
+
+// if defined, emit info messages with the current sampling rate
+//#define OUTPUT_SAMPLING_RATE
 
 //#define THREEAXIS
 #define NINEAXIS
@@ -20,8 +23,11 @@
 // if defined, output a heartbeat message every so many milliseconds
 //#define HEARTBEAT_MS 1000
 
-// if defined, emit info messages with the current sampling rate
-//#define OUTPUT_SAMPLING_RATE
+// if enabled, listen for incoming OSC messages.  Otherwise, do not wait for input,
+// which permits a higher sampling and output rate
+//#define INPUT_ENABLED
+
+#define SIMPLE_OUTPUT
 
 // OSC addresses
 const char *EXO_HAND             = "/exo/hand";
@@ -171,12 +177,12 @@ void setup()
     }
     
     gyro.initialize();
-    if (!accel.testConnection()) {
+    if (!gyro.testConnection()) {
         osc.sendError("ITG3200 connection failed");
     }
     
     magnet.initialize();
-    if (!accel.testConnection()) {
+    if (!magnet.testConnection()) {
         osc.sendError("HMC5883L connection failed");
     }
 #endif
@@ -273,14 +279,14 @@ void loop()
     samples++;
 #endif
 
-  //*
+#ifdef INPUT_ENABLED
     if (osc.receiveOSCBundle(*bundleIn)) {
         handleOSCBundle(*bundleIn);
         bundleIn->empty();
         delete bundleIn;
         bundleIn = new OSCBundle();
     }
-//*/
+#endif
 
     unsigned long now = micros();
     unsigned long nowMillis = millis();
@@ -314,16 +320,32 @@ void loop()
 #endif
 
 #ifdef OUTPUT_SENSOR_DATA
+#ifdef SIMPLE_OUTPUT
+    Serial.print(EXO_HAND_MOTION);
+    Serial.print(','); Serial.print(contextName);
+    Serial.print(','); Serial.print(now);
+#else
     OSCMessage mout(EXO_HAND_MOTION);
     mout.add(contextName);
     mout.add((uint64_t) now);
     //mout.add(ax); mout.add(ay); mout.add(az);
+#endif // ifdef SIMPLE_OUTPUT
 #ifdef NINEAXIS
+#ifdef SIMPLE_OUTPUT
+    Serial.print(','); Serial.print(ax2); Serial.print(','); Serial.print(ay2); Serial.print(','); Serial.print(az2);
+    Serial.print(','); Serial.print(gx); Serial.print(','); Serial.print(gy); Serial.print(','); Serial.print(gz);
+    Serial.print(','); Serial.print(mx); Serial.print(','); Serial.print(my); Serial.print(','); Serial.print(mz);
+#else
     mout.add((int32_t) ax2); mout.add((int32_t) ay2); mout.add((int32_t) az2);
     mout.add((int32_t) gx); mout.add((int32_t) gy); mout.add((int32_t) gz);
     mout.add((int32_t) mx); mout.add((int32_t) my); mout.add((int32_t) mz);
+#endif // ifdef SIMPLE_OUTPUT
 #endif // ifdef NINEAXIS
+#ifdef SIMPLE_OUTPUT
+    Serial.println("");
+#else
     osc.sendOSC(mout);
+#endif // ifdef SIMPLE_OUTPUT
 #endif // ifdef OUTPUT_SENSOR_DATA
     
 #ifdef OUTPUT_GESTURES
@@ -398,7 +420,7 @@ void loop()
                 m.add(az_max);
                 m.add(gesture);
                 osc.sendOSC(m);
-                
+
 #ifdef OUTPUT_SAMPLING_RATE
                 unsigned long freshNow = millis();
                 if (lastSampleOutput > 0 && freshNow > lastSampleOutput) {
