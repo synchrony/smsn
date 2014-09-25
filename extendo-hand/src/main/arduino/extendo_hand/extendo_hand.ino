@@ -8,26 +8,28 @@
 //#define GESTURE_MODE
 #define KEYBOARD_MODE
 
-// if defined, emit raw motion (accelerometer/gyro/magnetometer) data
-#define OUTPUT_SENSOR_DATA
+// if true, emit raw motion (accelerometer/gyro/magnetometer) data
+#define OUTPUT_SENSOR_DATA    1
 
-// if defined, recognize and emit gestures
-//#define OUTPUT_GESTURES
+// if true, recognize and emit gestures
+#define OUTPUT_GESTURES       0
 
-// if defined, emit info messages with the current sampling rate
-//#define OUTPUT_SAMPLING_RATE
+// if true, emit info messages with the current sampling rate
+#define OUTPUT_SAMPLING_RATE  0
 
-//#define THREEAXIS
-#define NINEAXIS
+// if true, listen for incoming OSC messages.  Otherwise, do not wait for input,
+// which permits a higher sampling and output rate
+#define INPUT_ENABLED         0
+
+// if true, use a minimal comma-separated format for output, rather than OSC
+// best used with OUTPUT_SENSOR_DATA=1, OUTPUT_GESTURES=0, INPUT_ENABLED=0
+#define SIMPLE_OUTPUT         1
+
+#define THREEAXIS             0
+#define NINEAXIS              1
 
 // if defined, output a heartbeat message every so many milliseconds
 //#define HEARTBEAT_MS 1000
-
-// if enabled, listen for incoming OSC messages.  Otherwise, do not wait for input,
-// which permits a higher sampling and output rate
-//#define INPUT_ENABLED
-
-#define SIMPLE_OUTPUT
 
 // OSC addresses
 const char *EXO_HAND             = "/exo/hand";
@@ -58,13 +60,13 @@ const char *EXO_HAND_PING_REPLY  = "/exo/hand/ping/reply";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef THREEAXIS
+#if THREEAXIS
 #include <MMA7361.h>
 
 MMA7361 motionSensor(MOTION_X_PIN, MOTION_Y_PIN, MOTION_Z_PIN);
-#endif
+#endif // THREEAXIS
 
-#ifdef NINEAXIS
+#if NINEAXIS
 #include <Wire.h>
 #include <I2Cdev.h>
 #include <ADXL345.h>
@@ -79,7 +81,7 @@ const int magnetBufferLength = 100;
 int16_t magnetBufferX[magnetBufferLength], magnetBufferY[magnetBufferLength], magnetBufferZ[magnetBufferLength];
 int32_t magnetSumX, magnetSumY, magnetSumZ;
 unsigned long lastMagnetRefTime;
-#endif
+#endif // NINEAXIS
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +148,7 @@ char contextName[32];
 
 void setup()  
 {
-#ifdef THREEAXIS
+#if THREEAXIS
     // TODO: random seed using 9-axis sensor
     randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
     
@@ -155,10 +157,10 @@ void setup()
     motionSensor.calibrateY(332, 841);
     motionSensor.calibrateZ(175, 700);
 #else
-#ifdef NINEAXIS
+#if NINEAXIS
     randomSeed(accel.getAccelerationX() - accel.getAccelerationY() + accel.getAccelerationZ());
-#endif
-#endif
+#endif // NINEAXIS
+#endif // THREEAXIS
 
     droidspeak.speakPowerUpPhrase();
 
@@ -168,24 +170,33 @@ void setup()
 
     bundleIn = new OSCBundle();   
 
-#ifdef NINEAXIS
+#if NINEAXIS
+    // this sketch, running on Arduino Nano v3, has been found to sample up to 250 Hz
+    // when streaming sensor data over serial, and up to 830 Hz when only outputting gestures
+    uint8_t sampleRate = OUTPUT_SENSOR_DATA
+        ? 0xc  // 400 Hz
+        : 0xe; // 1600 Hz
+
     // adjust the power settings after you call this method if you want the accelerometer
     // to enter standby mode, or another less demanding mode of operation
+    accel.setRate(sampleRate);
     accel.initialize();
     if (!accel.testConnection()) {
         osc.sendError("ADXL345 connection failed");
     }
-    
+
+    gyro.setRate(sampleRate);
     gyro.initialize();
     if (!gyro.testConnection()) {
         osc.sendError("ITG3200 connection failed");
     }
-    
+
+    magnet.setDataRate(sampleRate);
     magnet.initialize();
     if (!magnet.testConnection()) {
         osc.sendError("HMC5883L connection failed");
     }
-#endif
+#endif // NINEAXIS
 
     state = STATE_ONE;
     
@@ -275,23 +286,24 @@ unsigned long lastSampleOutput = 0;
 
 void loop()
 {
-#ifdef OUTPUT_SAMPLING_RATE
+#if OUTPUT_SAMPLING_RATE
     samples++;
 #endif
 
-#ifdef INPUT_ENABLED
+#if INPUT_ENABLED
     if (osc.receiveOSCBundle(*bundleIn)) {
         handleOSCBundle(*bundleIn);
         bundleIn->empty();
         delete bundleIn;
         bundleIn = new OSCBundle();
     }
-#endif
+#endif // INPUT_ENABLED
 
     unsigned long now = micros();
-    unsigned long nowMillis = millis();
-    
+
 #ifdef HEARTBEAT_MS
+    unsigned long nowMillis = millis();
+
     if (nowMillis - lastHeartbeat > HEARTBEAT_MS) {
         sendHeartbeatMessage(nowMillis);
         lastHeartbeat = nowMillis;  
@@ -301,11 +313,12 @@ void loop()
     double ax, ay, az;
     double a;
 
-#ifdef THREEAXIS
+#if THREEAXIS
     ax = motionSensor.accelX();
     ay = motionSensor.accelY();
     az = motionSensor.accelZ();
 #else
+#if NINEAXIS
     int16_t ax2, ay2, az2;
     accel.getAcceleration(&ax2, &ay2, &az2);
     int16_t gx, gy, gz;
@@ -317,21 +330,21 @@ void loop()
     ax = ax2 / 230.0 - 0.05;
     ay = ay2 / 230.0;
     az = az2 / 230.0;
-#endif
+#endif // NINEAXIS
+#endif // THREEAXIS
 
-#ifdef OUTPUT_SENSOR_DATA
-#ifdef SIMPLE_OUTPUT
-    Serial.print(EXO_HAND_MOTION);
-    Serial.print(','); Serial.print(contextName);
-    Serial.print(','); Serial.print(now);
+#if OUTPUT_SENSOR_DATA
+#if SIMPLE_OUTPUT
+    // do not print OSC address, nor context; these significantly reduce the output rate
+    Serial.print(now);
 #else
     OSCMessage mout(EXO_HAND_MOTION);
     mout.add(contextName);
     mout.add((uint64_t) now);
     //mout.add(ax); mout.add(ay); mout.add(az);
-#endif // ifdef SIMPLE_OUTPUT
-#ifdef NINEAXIS
-#ifdef SIMPLE_OUTPUT
+#endif // SIMPLE_OUTPUT
+#if NINEAXIS
+#if SIMPLE_OUTPUT
     Serial.print(','); Serial.print(ax2); Serial.print(','); Serial.print(ay2); Serial.print(','); Serial.print(az2);
     Serial.print(','); Serial.print(gx); Serial.print(','); Serial.print(gy); Serial.print(','); Serial.print(gz);
     Serial.print(','); Serial.print(mx); Serial.print(','); Serial.print(my); Serial.print(','); Serial.print(mz);
@@ -339,16 +352,16 @@ void loop()
     mout.add((int32_t) ax2); mout.add((int32_t) ay2); mout.add((int32_t) az2);
     mout.add((int32_t) gx); mout.add((int32_t) gy); mout.add((int32_t) gz);
     mout.add((int32_t) mx); mout.add((int32_t) my); mout.add((int32_t) mz);
-#endif // ifdef SIMPLE_OUTPUT
-#endif // ifdef NINEAXIS
-#ifdef SIMPLE_OUTPUT
+#endif // SIMPLE_OUTPUT
+#endif // NINEAXIS
+#if SIMPLE_OUTPUT
     Serial.println("");
 #else
     osc.sendOSC(mout);
-#endif // ifdef SIMPLE_OUTPUT
-#endif // ifdef OUTPUT_SENSOR_DATA
+#endif // SIMPLE_OUTPUT
+#endif // OUTPUT_SENSOR_DATA
     
-#ifdef OUTPUT_GESTURES
+#if OUTPUT_GESTURES
     a = sqrt(ax*ax + ay*ay + az*az);
     
     switch (state) {
@@ -421,7 +434,7 @@ void loop()
                 m.add(gesture);
                 osc.sendOSC(m);
 
-#ifdef OUTPUT_SAMPLING_RATE
+#if OUTPUT_SAMPLING_RATE
                 unsigned long freshNow = millis();
                 if (lastSampleOutput > 0 && freshNow > lastSampleOutput) {
                     int rate = (samples * 1000) / (freshNow - lastSampleOutput); 
