@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class NoteParser {
     // regex of valid id suffixes
-    public static final Pattern ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9@&]+:");
+    public static final Pattern ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
 
     private static final String
             ALIAS_ATTR = "@alias",

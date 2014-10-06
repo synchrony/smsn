@@ -148,7 +148,7 @@ public class ExportExtension extends ExtendoExtension {
 
     private void exportGraphML(final BrainGraph g,
                                final OutputStream out) throws IOException {
-        ((TransactionalGraph) g.getPropertyGraph()).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        ((TransactionalGraph) g.getPropertyGraph()).commit();
         GraphMLWriter w = new GraphMLWriter(g.getPropertyGraph());
         w.setNormalize(true);
         w.outputGraph(out);

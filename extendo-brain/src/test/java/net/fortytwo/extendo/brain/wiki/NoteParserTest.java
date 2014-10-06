@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 
 /**
@@ -78,10 +79,10 @@ public class NoteParserTest {
     public void testEmptyLinesIgnored() throws Exception {
         List<Note> notes = readNotes(
                 "* one\n" +
-                "   \n" +     // empty line with additional whitespace
-                "* two" +
-                "\n" +        // empty line without additional whitespace
-                "* three");
+                        "   \n" +     // empty line with additional whitespace
+                        "* two" +
+                        "\n" +        // empty line without additional whitespace
+                        "* three");
         assertEquals(3, notes.size());
     }
 
@@ -133,6 +134,35 @@ public class NoteParserTest {
                 "with an id }}}");
         assertEquals(1, notes.size());
         assertEquals("0001", notes.get(0).getId());
+    }
+
+    @Test
+    public void testLegalIds() throws Exception {
+        List<Note> notes = readNotes("+ :LTWrf62: courage\n" +
+                "+ :COAZgCU: justice\n" +
+                "+ :g20vP2u: prudence\n" +
+                "+ :Ifkv0cj: temperance\n" +
+                "+ :rAr-qLh: detachment\n" +
+                "+ :pXOAO_S: sincerity\n");
+        assertEquals(6, notes.size());
+        assertEquals("LTWrf62", notes.get(0).getId());
+        assertEquals("rAr-qLh", notes.get(4).getId());
+
+        notes = readNotes("" +
+                "* :a:        short IDs are OK, although 7-byte IDs are 'standard'\n" +
+                "* :aaaaaaaa: longer IDs are OK, too");
+        assertEquals(2, notes.size());
+        assertEquals("a", notes.get(0).getId());
+        assertEquals("aaaaaaaa", notes.get(1).getId());
+    }
+
+    @Test
+    public void testInvalidIdCharacters() throws Exception {
+        List<Note> notes = readNotes("" +
+                "* :123@456: the 'ID' of this note contains a character not in [A-Za-z0-9-_]\n" +
+                "* it does not actually become an ID; just more value text");
+        assertEquals(2, notes.size());
+        assertNotSame("123@456", notes.get(0).getId());
     }
 
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
