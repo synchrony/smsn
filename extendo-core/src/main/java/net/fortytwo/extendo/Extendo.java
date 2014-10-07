@@ -128,7 +128,7 @@ public class Extendo {
                     : n < 62
                     ? '0' + n - 52
                     : n < 63
-                    ? '@' : '&';
+                    ? '-' : '_';
             bytes[i] = (byte) b;
         }
 
