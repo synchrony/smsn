@@ -9,10 +9,10 @@
 #define KEYBOARD_MODE
 
 // if true, emit raw motion (accelerometer/gyro/magnetometer) data
-#define OUTPUT_SENSOR_DATA    1
+#define OUTPUT_SENSOR_DATA    0
 
 // if true, recognize and emit gestures
-#define OUTPUT_GESTURES       0
+#define OUTPUT_GESTURES       1
 
 // if true, emit info messages with the current sampling rate
 #define OUTPUT_SAMPLING_RATE  0
@@ -23,7 +23,7 @@
 
 // if true, use a minimal comma-separated format for output, rather than OSC
 // best used with OUTPUT_SENSOR_DATA=1, OUTPUT_GESTURES=0, INPUT_ENABLED=0
-#define SIMPLE_OUTPUT         1
+#define SIMPLE_OUTPUT         0
 
 #define THREEAXIS             0
 #define NINEAXIS              1
@@ -51,6 +51,7 @@ const char *EXO_HAND_PING_REPLY  = "/exo/hand/ping/reply";
 #define MOTION_Z_PIN A2
 
 #define SPEAKER_PIN  9  // PWM preferred
+#define RGB_LED_PIN  13
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +120,19 @@ Morse morse(SPEAKER_PIN, morseStopTest, error);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <RGBLED.h>
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel leds = Adafruit_NeoPixel(1, RGB_LED_PIN, NEO_GRB + NEO_KHZ800);
+
+void setColor(unsigned long color) {
+    leds.setPixelColor(0, (uint32_t) color);
+    leds.show();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 #ifdef GESTURE_MODE
 const double lowerBound = 1.25;
 const double upperBound = 1.75;
@@ -148,6 +162,10 @@ char contextName[32];
 
 void setup()  
 {
+    leds.begin();
+    setColor(RGB_YELLOW);
+    droidspeak.speakPowerUpPhrase();
+
 #if THREEAXIS
     // TODO: random seed using 9-axis sensor
     randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
@@ -162,10 +180,8 @@ void setup()
 #endif // NINEAXIS
 #endif // THREEAXIS
 
-    droidspeak.speakPowerUpPhrase();
-
     osc.beginSerial();
-
+    setColor(RGB_GREEN);
     droidspeak.speakSerialOpenPhrase();
 
     bundleIn = new OSCBundle();   
@@ -201,6 +217,7 @@ void setup()
     state = STATE_ONE;
     
     strcpy(contextName, "default");
+    setColor(RGB_BLACK);
 }
 
 

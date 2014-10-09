@@ -64,11 +64,6 @@ int ExtendOSC::receiveOSCBundle(class OSCBundle &bundleIn) {
 }
 
 void ExtendOSC::sendOSC(class OSCMessage &messageOut) {
-    // 128 bytes is the maximum payload capacity of Bluetooth SPP (Serial Port Profile)
-    if (messageOut.bytes() > 128) {
-        sendError("message is %d bytes long, exceeding limit of 128 bytes")
-    }
-
     SLIPSerial.beginPacket();
     messageOut.send(SLIPSerial); // send the bytes to the SLIP stream
     SLIPSerial.endPacket(); // mark the end of the OSC Packet
