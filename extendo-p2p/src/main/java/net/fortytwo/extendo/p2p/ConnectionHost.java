@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.p2p;
 
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.util.TypedProperties;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -68,7 +68,7 @@ public class ConnectionHost {
         stopped = true;
     }
 
-    private void listenForNewConnections() throws PropertyException, IOException {
+    private void listenForNewConnections() throws TypedProperties.PropertyException, IOException {
         LOGGER.info("listening for new connections on port " + port);
         // TODO: recover from network failure (IO errors)
         ServerSocket serverSocket = new ServerSocket(port);

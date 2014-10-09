@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.util.properties;
+package net.fortytwo.extendo.util;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -345,6 +345,40 @@ public class TypedProperties extends Properties {
             remove(name);
         } else {
             setProperty(name, "" + dateFormat.format(value));
+        }
+    }
+
+    /**
+     * @author Joshua Shinavier (http://fortytwo.net)
+     */
+    public static class PropertyException extends Exception {
+
+        public PropertyException(final String propertyName) {
+            super("for property '" + propertyName + "'");
+        }
+
+        public PropertyException(final String propertyName,
+                                 final Throwable cause) {
+            super("for property '" + propertyName + "'", cause);
+        }
+    }
+
+    /**
+     * @author Joshua Shinavier (http://fortytwo.net)
+     */
+    public static class InvalidPropertyValueException extends PropertyException {
+        public InvalidPropertyValueException(final String propertyName,
+                                             final Throwable cause) {
+            super(propertyName, cause);
+        }
+    }
+
+    /**
+     * @author Joshua Shinavier (http://fortytwo.net)
+     */
+    public static class PropertyValueNotFoundException extends PropertyException {
+        public PropertyValueNotFoundException(final String propertyName) {
+            super(propertyName);
         }
     }
 }

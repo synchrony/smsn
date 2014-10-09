@@ -1,6 +1,5 @@
 package net.fortytwo.extendo.server;
 
-import edu.rpi.twc.sesamestream.QueryEngine;
 import edu.rpi.twc.sesamestream.SesameStream;
 import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import net.fortytwo.extendo.Extendo;
@@ -10,12 +9,11 @@ import net.fortytwo.extendo.p2p.PingAnswerer;
 import net.fortytwo.extendo.p2p.ServiceBroadcaster;
 import net.fortytwo.extendo.p2p.ServiceDescription;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineWrapper;
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.util.TypedProperties;
 import net.fortytwo.flow.NullSink;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.flow.rdf.RDFSink;
 import net.fortytwo.linkeddata.LinkedDataCache;
-import net.fortytwo.linkeddata.sail.LinkedDataSail;
 import net.fortytwo.ripple.RippleException;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
@@ -50,7 +48,7 @@ public class FacilitatorService {
 
     private final QueryEngineImpl queryEngine;
 
-    public static FacilitatorService getInstance() throws IOException, PropertyException, RippleException, SailException {
+    public static FacilitatorService getInstance() throws IOException, TypedProperties.PropertyException, RippleException, SailException {
         if (null == INSTANCE) {
             INSTANCE = new FacilitatorService();
         }
@@ -58,7 +56,7 @@ public class FacilitatorService {
         return INSTANCE;
     }
 
-    private FacilitatorService() throws IOException, PropertyException, RippleException, SailException {
+    private FacilitatorService() throws IOException, TypedProperties.PropertyException, RippleException, SailException {
         int oscPort = Extendo.getConfiguration().getInt(Extendo.P2P_OSC_PORT);
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
 

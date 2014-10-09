@@ -33,7 +33,7 @@
         <dependency>
             <groupId>com.illposed.osc</groupId>
             <artifactId>javaosc-core</artifactId>
-            <version>0.3</version>
+            <version>${javaosc.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

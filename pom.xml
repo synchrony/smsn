@@ -49,6 +49,7 @@
         <httpcomponents.version>4.3.3</httpcomponents.version>
         <!-- goes with Android 2.2.1 -->
         <jackrabbit.version>2.7.0</jackrabbit.version>
+        <javaosc.version>0.3</javaosc.version>
         <junit.version>4.11</junit.version>
         <neo4j.version>1.9.6</neo4j.version>
         <rdfagents.version>1.1</rdfagents.version>

@@ -1,7 +1,7 @@
 package net.fortytwo.extendo;
 
 
-import net.fortytwo.extendo.util.properties.TypedProperties;
+import net.fortytwo.extendo.util.TypedProperties;
 
 import java.io.File;
 import java.io.FileInputStream;

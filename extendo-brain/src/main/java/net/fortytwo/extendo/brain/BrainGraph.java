@@ -8,7 +8,7 @@ import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import net.fortytwo.extendo.Extendo;
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.util.TypedProperties;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.util.Collection;
@@ -37,7 +37,7 @@ public class BrainGraph {
     static {
         try {
             atomNs = Extendo.getConfiguration().getString(Extendo.BASE_URI) + "atom/";
-        } catch (PropertyException e) {
+        } catch (TypedProperties.PropertyException e) {
             throw new ExceptionInInitializerError(e);
         }
     }

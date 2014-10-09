@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.p2p;
 
 import net.fortytwo.extendo.Extendo;
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.util.TypedProperties;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,7 +60,7 @@ public class ServiceBroadcaster {
             address = Extendo.getConfiguration().getString(Extendo.P2P_BROADCAST_ADDRESS);
             port = Extendo.getConfiguration().getInt(Extendo.P2P_BROADCAST_PORT);
             broadcastInterval = Extendo.getConfiguration().getLong(Extendo.P2P_BROADCAST_INTERVAL);
-        } catch (PropertyException e) {
+        } catch (TypedProperties.PropertyException e) {
             LOGGER.severe("error accessing config properties when sending broadcast message: " + e.getMessage());
             e.printStackTrace(System.err);
             return;

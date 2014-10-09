@@ -1,6 +1,6 @@
 package net.fortytwo.extendo;
 
-import net.fortytwo.extendo.util.properties.TypedProperties;
+import net.fortytwo.extendo.util.TypedProperties;
 import org.junit.Test;
 
 import java.net.URI;

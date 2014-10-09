@@ -2,7 +2,7 @@ package net.fortytwo.extendo.brain;
 
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.util.TypedProperties;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -39,7 +39,7 @@ public class ExtendoBrain {
         File logFile;
         try {
             logFile = Extendo.getConfiguration().getFile(Extendo.ACTIVITY_LOG, null);
-        } catch (PropertyException e) {
+        } catch (TypedProperties.PropertyException e) {
             throw new ExtendoBrainException(e);
         }
 

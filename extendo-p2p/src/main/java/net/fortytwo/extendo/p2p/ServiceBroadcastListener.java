@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.p2p;
 
 import net.fortytwo.extendo.Extendo;
-import net.fortytwo.extendo.util.properties.PropertyException;
+import net.fortytwo.extendo.util.TypedProperties;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -48,7 +48,7 @@ public class ServiceBroadcastListener {
         stopped = true;
     }
 
-    private void listenForFacilitatorBroadcast() throws PropertyException {
+    private void listenForFacilitatorBroadcast() throws TypedProperties.PropertyException {
         int port = Extendo.getConfiguration().getInt(Extendo.P2P_BROADCAST_PORT);
 
         byte[] buffer = new byte[BROADCAST_MAX_LENGTH];
