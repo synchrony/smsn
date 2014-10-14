@@ -24,6 +24,25 @@
  * A5:  I2C SCL for MPU-6050
  */
 
+// OSC addresses
+const char *EXO_TT_KEYS          = "/exo/tt/keys";
+const char *EXO_TT_LASER_EVENT   = "/exo/tt/laser/event";
+const char *EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger";
+const char *EXO_TT_MODE          = "/exo/tt/mode";
+const char *EXO_TT_MORSE         = "/exo/tt/morse";
+const char *EXO_TT_PHOTO_DATA    = "/exo/tt/photo/data";
+const char *EXO_TT_PHOTO_GET     = "/exo/tt/photo/get";
+const char *EXO_TT_PING          = "/exo/tt/ping";
+const char *EXO_TT_PING_REPLY    = "/exo/tt/ping/reply";
+const char *EXO_TT_RGB_SET       = "/exo/tt/rgb/set";
+const char *EXO_TT_VIBRO         = "/exo/tt/vibro";
+
+// these are global so that we can read from setup() as well as loop()
+unsigned int keys[5];
+unsigned int keyState;
+unsigned int totalKeysPressed;
+unsigned int lastKeyState = 0;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -83,8 +102,12 @@ RGBLED rgbled(redPin, greenPin, bluePin, sendError);
 int colorToggle = 0;
 
 void colorDebug() {
-    long modeColor = getModeColor();
-    rgbled.replaceColor(modeColor);
+    if (keyState) {
+        long modeColor = getModeColor();
+        rgbled.replaceColor(modeColor);
+    } else {
+        rgbled.replaceColor(RGB_BLACK);
+    }
 }
 
 void rgbForDuration(unsigned long color, unsigned long ms) {
@@ -178,13 +201,6 @@ int modeValueOf(const char *name) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// these are global so that we can read from setup() as well as loop()
-unsigned int keys[5];
-unsigned int keyState;
-unsigned int totalKeysPressed;
-
-unsigned int lastKeyState = 0;
-
 void readKeys() {
     keys[0] = !digitalRead(keyPin1);
     keys[1] = !digitalRead(keyPin2);
@@ -260,6 +276,9 @@ void setup() {
     //setMode(LowercaseText);
 
     bundleIn = new OSCBundle();   
+    
+    //morse.playMorseString("foo");
+    rgbled.replaceColor(RGB_BLACK);
 }
 
 
@@ -269,13 +288,13 @@ void handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
         osc.sendOSCBundleError(bundle);
     } else if (!(0
-        || bundle.dispatch("/exo/tt/laser/trigger", handleLaserTriggerMessage)
-        || bundle.dispatch("/exo/tt/mode", handleModeMessage)
-        || bundle.dispatch("/exo/tt/morse", handleMorseMessage)
-        || bundle.dispatch("/exo/tt/photo/get", handlePhotoGetMessage)
-        || bundle.dispatch("/exo/tt/ping", handlePingMessage)
-        || bundle.dispatch("/exo/tt/rgb/test", handleRGBTestMessage)
-        || bundle.dispatch("/exo/tt/vibro", handleVibroMessage)
+        || bundle.dispatch(EXO_TT_LASER_TRIGGER, handleLaserTriggerMessage)
+        || bundle.dispatch(EXO_TT_MODE, handleModeMessage)
+        || bundle.dispatch(EXO_TT_MORSE, handleMorseMessage)
+        || bundle.dispatch(EXO_TT_PHOTO_GET, handlePhotoGetMessage)
+        || bundle.dispatch(EXO_TT_PING, handlePingMessage)
+        || bundle.dispatch(EXO_TT_RGB_SET, handleRGBSetMessage)
+        || bundle.dispatch(EXO_TT_VIBRO, handleVibroMessage)
         )) {
         osc.sendError("no messages dispatched");
     }
@@ -286,6 +305,8 @@ void handleLaserTriggerMessage(class OSCMessage &m) {
 }
 
 void handleModeMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+
     if (m.isString(0)) {
         int length = m.getDataLength(0);
         char buffer[length+1];
@@ -297,14 +318,24 @@ void handleModeMessage(class OSCMessage &m) {
     }
 }
 
+const int morseBufferLength = 32;
+char morseBuffer[morseBufferLength];
+
 void handleMorseMessage(class OSCMessage &m) {
     if (!osc.validArgs(m, 1)) return;
 
     int length = m.getDataLength(0);
-    char buffer[length+1];
-    m.getString(0, buffer, length+1);
-
-    morse.playMorseString(buffer);
+    if (length >= morseBufferLength) {
+        osc.sendError("Morse message is too long");
+        return;
+    } else {
+        m.getString(0, morseBuffer, length+1);
+osc.sendInfo("handle morse here: %s", morseBuffer);
+        //morse.playMorseString((const char*) morseBuffer);  
+    }
+    //char buffer[length+1];
+    //m.getString(0, buffer, length+1);
+    //morse.playMorseString(buffer);
 }
 
 void handlePhotoGetMessage(class OSCMessage &m) {
@@ -318,23 +349,17 @@ void handlePhotoGetMessage(class OSCMessage &m) {
 
 void handlePingMessage(class OSCMessage &m) {
     sendPingReply();
-    //morse.playMorseString("p");
 }
 
-void handleRGBTestMessage(class OSCMessage &m) {
-    if (!osc.validArgs(m, 2)) return;
-
+void handleRGBSetMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+  
     int32_t color = m.getInt(0);
-    int32_t duration = m.getInt(1);
 
     if (color < 0 || color > 0xffffff) {
         osc.sendError("color out of range: %d", (long) color);
-    } else if (duration <= 0) {
-        osc.sendError("duration must be a positive number");
-    } else if (duration > 60000) {
-        osc.sendError("duration too long");
     } else {
-        rgbForDuration((unsigned long) color, (unsigned long) duration);
+        rgbled.replaceColor(color);
     }
 }
 
@@ -366,25 +391,25 @@ void sendAnalogObservation(class AnalogSampler &s, const char* address) {
 }
 
 void sendKeyEvent(const char *keys) {
-    OSCMessage m("/exo/tt/keys");
+    OSCMessage m(EXO_TT_KEYS);
     m.add(keys);
 
     osc.sendOSC(m);
 }
 
 void sendLightLevel() {
-    sendAnalogObservation(photoSampler, "/exo/tt/photo/data");
+    sendAnalogObservation(photoSampler, EXO_TT_PHOTO_DATA);
 }
 
 void sendPingReply() {
-    OSCMessage m("/exo/tt/ping/reply");
+    OSCMessage m(EXO_TT_PING_REPLY);
     m.add((uint64_t) micros());
     
     osc.sendOSC(m);
 }
 
 void sendLaserEvent() {
-    OSCMessage m("/exo/tt/laser/event");
+    OSCMessage m(EXO_TT_LASER_EVENT);
     m.add((uint64_t) micros());
     
     osc.sendOSC(m);
@@ -401,11 +426,9 @@ void loop() {
         delete bundleIn;
         bundleIn = new OSCBundle();
     }
-
-    rgbled.replaceColor(RGB_BLACK);
     
     // keying action
-    readKeys();    
+    readKeys(); 
     if (keyState != lastKeyState) {
         colorDebug();
 

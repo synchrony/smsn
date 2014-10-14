@@ -70,8 +70,7 @@ void ExtendOSC::sendOSC(class OSCMessage &messageOut) {
     messageOut.empty(); // free the space occupied by the message
 }
 
-void ExtendOSC::sendInfo(const char *msg, ...)
-{
+void ExtendOSC::sendInfo(const char *msg, ...) {
     va_list argptr;
     va_start(argptr, msg);
     vsprintf(_messageBuffer, msg, argptr);
@@ -84,8 +83,7 @@ void ExtendOSC::sendInfo(const char *msg, ...)
     sendOSC(m);
 }
 
-void ExtendOSC::sendError(const char *msg, ...)
-{
+void ExtendOSC::sendError(const char *msg, ...) {
     va_list argptr;
     va_start(argptr, msg);
     vsprintf(_messageBuffer, msg, argptr);
@@ -98,7 +96,8 @@ void ExtendOSC::sendError(const char *msg, ...)
     sendOSC(m);
 }
 
-const char *BUFFER_FULL_msg = "BUFFER_FULL",
+const char *OSC_OK_msg = "OSC_OK",
+    *BUFFER_FULL_msg = "BUFFER_FULL",
     *INVALID_OSC_msg = "INVALID_OSC",
     *ALLOCFAILED_msg = "ALLOCFAILED",
     *INDEX_OUT_OF_BOUNDS_msg = "INDEX_OUT_OF_BOUNDS",
@@ -108,6 +107,9 @@ void ExtendOSC::sendOSCError(OSCErrorCode code) {
     const char *name;
 
     switch(code) {
+      case OSC_OK:
+          name = OSC_OK_msg;
+          break;
       case BUFFER_FULL:
           name = BUFFER_FULL_msg;
           break;

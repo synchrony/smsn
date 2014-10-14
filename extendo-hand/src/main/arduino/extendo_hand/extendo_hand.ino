@@ -19,7 +19,7 @@
 
 // if true, listen for incoming OSC messages.  Otherwise, do not wait for input,
 // which permits a higher sampling and output rate
-#define INPUT_ENABLED         0
+#define INPUT_ENABLED         1
 
 // if true, use a minimal comma-separated format for output, rather than OSC
 // best used with OUTPUT_SENSOR_DATA=1, OUTPUT_GESTURES=0, INPUT_ENABLED=0
@@ -42,6 +42,7 @@ const char *EXO_HAND_MORSE       = "/exo/hand/morse";
 const char *EXO_HAND_MOTION      = "/exo/hand/motion";
 const char *EXO_HAND_PING        = "/exo/hand/ping";
 const char *EXO_HAND_PING_REPLY  = "/exo/hand/ping/reply";
+const char *EXO_HAND_RGB_SET     = "/exo/hand/rgb/set";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,6 +197,8 @@ void setup()
     // adjust the power settings after you call this method if you want the accelerometer
     // to enter standby mode, or another less demanding mode of operation
     accel.setRate(sampleRate);
+    accel.setRange(1); // 4g
+    accel.setFullResolution(1); // maintain 4mg/LSB scale factor (irrespective of range)
     accel.initialize();
     if (!accel.testConnection()) {
         osc.sendError("ADXL345 connection failed");
@@ -218,6 +221,8 @@ void setup()
     
     strcpy(contextName, "default");
     setColor(RGB_BLACK);
+    
+    osc.sendInfo("Extend-o-Hand is ready");
 }
 
 
@@ -239,6 +244,7 @@ void sendHeartbeatMessage(unsigned long now) {
 #endif
 
 void handleAudioToneMessage(class OSCMessage &m) {
+  /*
     if (!osc.validArgs(m, 2)) return;
 
     int32_t frequency = m.getInt(0);
@@ -255,6 +261,7 @@ void handleAudioToneMessage(class OSCMessage &m) {
         delay((unsigned long) duration);
         noTone(SPEAKER_PIN);
     }
+    */
 }
 
 void handleContextSetMessage(class OSCMessage &m) {
@@ -279,6 +286,18 @@ void handlePingMessage(class OSCMessage &m) {
     sendPingReply();
 }
 
+void handleRGBSetMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+  
+    int32_t color = m.getInt(0);
+
+    if (color < 0 || color > 0xffffff) {
+        osc.sendError("color out of range: %d", (long) color);
+    } else {
+        setColor(color);
+    }
+}
+
 void handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
         osc.sendOSCBundleError(bundle);
@@ -287,6 +306,7 @@ void handleOSCBundle(class OSCBundle &bundle) {
         || bundle.dispatch(EXO_HAND_CONTEXT_SET, handleContextSetMessage)
         //|| bundle.dispatch(EXO_HAND_MORSE, handleMorseMessage)
         || bundle.dispatch(EXO_HAND_PING, handlePingMessage)
+        || bundle.dispatch(EXO_HAND_RGB_SET, handleRGBSetMessage)
         )) {
         osc.sendError("no messages dispatched");
     }
