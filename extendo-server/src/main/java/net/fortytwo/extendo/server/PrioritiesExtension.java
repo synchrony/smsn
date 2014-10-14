@@ -39,7 +39,7 @@ public class PrioritiesExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.filter = r.filter;
+        p.filter = r.getFilter();
         p.maxResults = r.maxResults;
 
         logInfo("extendo priorities");

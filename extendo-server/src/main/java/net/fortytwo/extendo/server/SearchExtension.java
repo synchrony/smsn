@@ -40,13 +40,13 @@ public class SearchExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.depth;
-        p.query = r.query;
-        p.styleName = r.styleName;
-        p.filter = r.filter;
+        p.depth = r.getDepth();
+        p.query = r.getQuery();
+        p.styleName = r.getStyleName();
+        p.filter = r.getFilter();
         p.valueCutoff = r.valueCutoff;
 
-        logInfo("extendo search: \"" + r.query + "\"");
+        logInfo("extendo search: \"" + r.getQuery() + "\"");
 
         return handleRequestInternal(p);
     }

@@ -35,9 +35,9 @@ public class FindRootsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.depth;
-        p.styleName = r.styleName;
-        p.filter = r.filter;
+        p.depth = r.getDepth();
+        p.styleName = r.getStyleName();
+        p.filter = r.getFilter();
 
         logInfo("extendo find-roots");
 

@@ -36,7 +36,7 @@ public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.filter = r.filter;
+        p.filter = r.getFilter();
 
         logInfo("extendo remove-isolated-atoms");
 

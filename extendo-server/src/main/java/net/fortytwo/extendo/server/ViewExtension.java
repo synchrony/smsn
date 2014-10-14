@@ -40,13 +40,13 @@ public class ViewExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.depth;
-        p.rootId = r.rootId;
-        p.styleName = r.styleName;
-        p.filter = r.filter;
-        p.includeTypes = r.includeTypes;
+        p.depth = r.getDepth();
+        p.rootId = r.getRootId();
+        p.styleName = r.getStyleName();
+        p.filter = r.getFilter();
+        p.includeTypes = r.isIncludeTypes();
 
-        logInfo("extendo view " + r.rootId);
+        logInfo("extendo view " + r.getRootId());
 
         return handleRequestInternal(p);
     }
@@ -70,7 +70,8 @@ public class ViewExtension extends ExtendoExtension {
     }
 
     private class ViewRequest extends RootedViewRequest {
-        public final boolean includeTypes;
+
+        private final boolean includeTypes;
 
         public ViewRequest(final JSONObject json,
                            final Principal user) throws JSONException {
@@ -78,6 +79,10 @@ public class ViewExtension extends ExtendoExtension {
 
             // this argument is optional; do not include types by default
             includeTypes = json.optBoolean(INCLUDE_TYPES, false);
+        }
+
+        public boolean isIncludeTypes() {
+            return includeTypes;
         }
     }
 }

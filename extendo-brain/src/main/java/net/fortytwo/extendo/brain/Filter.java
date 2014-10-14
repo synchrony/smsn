@@ -1,5 +1,8 @@
 package net.fortytwo.extendo.brain;
 
+import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.extendo.Extendo;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */

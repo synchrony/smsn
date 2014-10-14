@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -179,14 +180,10 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                 }
             }
         } catch (Exception e) {
-            logWarning("operation failed with exception: " + e.getMessage());
-            // TODO
-            e.printStackTrace(System.err);
+            logSevere("operation failed with exception", e);
             return ExtensionResponse.error(e);
         } catch (Throwable t) {
-            logWarning("operation failed with throwable: " + t.getMessage());
-            // TODO
-            t.printStackTrace(System.err);
+            logSevere("operation failed with throwable", t);
             return ExtensionResponse.error(t.getMessage());
         }
     }
@@ -265,13 +262,25 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
     }
 
     protected void logInfo(final String message) {
-        LOGGER.info(message);
-        //System.err.println(message);
+        LOGGER.log(Level.INFO, message);
     }
 
     protected void logWarning(final String message) {
-        LOGGER.warning(message);
-        //System.err.println(message);
+        LOGGER.log(Level.WARNING, message);
+    }
+
+    protected void logWarning(final String message,
+                              final Throwable thrown) {
+        LOGGER.log(Level.WARNING, message, thrown);
+    }
+
+    protected void logSevere(final String message) {
+        LOGGER.log(Level.SEVERE, message);
+    }
+
+    protected void logSevere(final String message,
+                              final Throwable thrown) {
+        LOGGER.log(Level.SEVERE, message, thrown);
     }
 
     protected class Params {

@@ -9,8 +9,8 @@ import java.security.Principal;
 * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class BasicViewRequest extends FilteredResultsRequest {
-    public final int depth;
-    public final String styleName;
+    private final int depth;
+    private final String styleName;
 
     public BasicViewRequest(final JSONObject json,
                             final Principal user) throws JSONException {
@@ -18,5 +18,13 @@ public class BasicViewRequest extends FilteredResultsRequest {
 
         depth = this.json.getInt(DEPTH);
         styleName = this.json.getString(STYLE);
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public String getStyleName() {
+        return styleName;
     }
 }

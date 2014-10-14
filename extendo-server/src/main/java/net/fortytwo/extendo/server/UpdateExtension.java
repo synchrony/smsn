@@ -42,13 +42,13 @@ public class UpdateExtension extends ExtendoExtension {
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
-        p.depth = r.depth;
-        p.rootId = r.rootId;
-        p.styleName = r.styleName;
+        p.depth = r.getDepth();
+        p.rootId = r.getRootId();
+        p.styleName = r.getStyleName();
         p.wikiView = r.wikiView;
-        p.filter = r.filter;
+        p.filter = r.getFilter();
 
-        logInfo("extendo update " + r.rootId);
+        logInfo("extendo update " + r.getRootId());
 
         return handleRequestInternal(p);
     }

@@ -10,16 +10,20 @@ import java.security.Principal;
 * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class FilteredResultsRequest extends Request {
-    public final Filter filter;
+    private final Filter filter;
 
     public FilteredResultsRequest(final JSONObject json,
                                   final Principal user) throws JSONException {
         super(json, user);
 
-        filter = getFilter();
+        filter = constructFilter();
     }
 
-    protected Filter getFilter() throws JSONException {
+    public Filter getFilter() {
+        return filter;
+    }
+
+    private Filter constructFilter() throws JSONException {
         JSONObject f = json.getJSONObject(FILTER);
 
         float defaultWeight = (float) f.optDouble(DEFAULT_WEIGHT, -1);
