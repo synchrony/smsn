@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +47,7 @@ public class ViewExtension extends ExtendoExtension {
         p.filter = r.getFilter();
         p.includeTypes = r.isIncludeTypes();
 
-        logInfo("extendo view " + r.getRootId());
+        Extendo.logInfo("extendo view " + r.getRootId());
 
         return handleRequestInternal(p);
     }

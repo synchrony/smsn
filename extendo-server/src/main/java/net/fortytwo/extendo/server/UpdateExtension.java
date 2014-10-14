@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteQueries;
 import org.json.JSONException;
@@ -48,7 +49,7 @@ public class UpdateExtension extends ExtendoExtension {
         p.wikiView = r.wikiView;
         p.filter = r.getFilter();
 
-        logInfo("extendo update " + r.getRootId());
+        Extendo.logInfo("extendo update " + r.getRootId());
 
         return handleRequestInternal(p);
     }

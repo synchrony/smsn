@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brain;
 
+import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
@@ -45,8 +46,8 @@ public class NoteHistory {
 
             String id = visitedAtoms[i % CAPACITY];
 
-            Atom a = graph.getAtom(id);
-            if (null != a && filter.isVisible(a)) {
+            Vertex v = graph.getVertex(id);
+            if (null != v && filter.isVisible(v)) {
                 r.add(id);
             }
         }

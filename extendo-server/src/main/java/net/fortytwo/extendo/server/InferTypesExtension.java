@@ -9,6 +9,7 @@ import com.tinkerpop.rexster.extension.ExtensionNaming;
 import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 
 /**
@@ -23,7 +24,7 @@ public class InferTypesExtension extends ExtendoExtension {
                                            @RexsterContext Graph graph) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
 
-        logInfo("extendo infer-types");
+        Extendo.logInfo("extendo infer-types");
 
         return handleRequestInternal(p);
     }

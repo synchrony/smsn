@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.util.TypedProperties;
 import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
@@ -50,7 +51,7 @@ public class BroadcastRdfExtension extends ExtendoExtension {
 
         p.data = r.dataset;
 
-        logInfo("extendo broadcast-rdf");
+        Extendo.logInfo("extendo broadcast-rdf");
 
         return handleRequestInternal(p);
     }

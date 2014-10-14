@@ -63,7 +63,7 @@ public class ExportExtension extends ExtendoExtension {
         p.file = r.file;
         p.format = r.format;
 
-        logInfo("extendo export " + r.format + " to " + r.file);
+        Extendo.logInfo("extendo export " + r.format + " to " + r.file);
 
         return handleRequestInternal(p);
     }

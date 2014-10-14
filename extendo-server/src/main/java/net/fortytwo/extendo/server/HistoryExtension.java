@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +40,7 @@ public class HistoryExtension extends ExtendoExtension {
 
         p.filter = r.getFilter();
 
-        logInfo("extendo history");
+        Extendo.logInfo("extendo history");
 
         return handleRequestInternal(p);
     }

@@ -85,11 +85,11 @@ public class NoteQueries {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = toNote(root, filter.isVisible(root));
+        Note n = toNote(root, filter.isVisible(root.asVertex()));
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
-                int h = filter.isVisible(target) ? height - 1 : 0;
+                int h = filter.isVisible(target.asVertex()) ? height - 1 : 0;
                 Note cn = viewInternal(target, h, filter, style);
                 n.addChild(cn);
             }
@@ -124,7 +124,7 @@ public class NoteQueries {
                                 final Filter filter,
                                 final AdjacencyStyle style) {
         // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root)) {
+        if (!filter.isVisible(root.asVertex())) {
             return false;
         }
 
@@ -217,7 +217,7 @@ public class NoteQueries {
 
         setProperties(root, rootNote);
 
-        if (0 >= depth || !filter.isVisible(root)) {
+        if (0 >= depth || !filter.isVisible(root.asVertex())) {
             return;
         }
 
@@ -367,7 +367,7 @@ public class NoteQueries {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
                 Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(v)) {
                     Note n = viewInternal(a, depth, filter, style);
                     result.addChild(n);
                 }
@@ -390,7 +390,7 @@ public class NoteQueries {
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
                 Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(v)) {
                     Note n = viewInternal(a, 1, filter, FORWARD_ADJACENCY);
                     result.addChild(n);
                 }
@@ -411,8 +411,8 @@ public class NoteQueries {
             if (null != v.getProperty("value")
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
-                Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(a)) {
+                //Atom a = brain.getBrainGraph().getAtom(v);
+                if (filter.isVisible(v)) {
                     toRemove.add(v);
                 }
             }
@@ -509,7 +509,7 @@ public class NoteQueries {
         Queue<Atom> queue = priorities.getQueue();
         int i = 0;
         for (Atom a : queue) {
-            if (filter.isVisible(a)) {
+            if (filter.isVisible(a.asVertex())) {
                 result.addChild(toNote(a, true));
 
                 if (++i >= maxResults) {
@@ -701,7 +701,7 @@ public class NoteQueries {
                 }
 
                 Atom a = prev.getNotesOf();
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(a.asVertex())) {
                     results.add(a);
                 }
             }

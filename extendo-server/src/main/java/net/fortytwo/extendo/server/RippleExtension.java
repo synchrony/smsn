@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +44,7 @@ public class RippleExtension extends ExtendoExtension {
         p.styleName = r.getStyleName();
         p.filter = r.getFilter();
 
-        logInfo("extendo ripple: \"" + r.getQuery() + "\"");
+        Extendo.logInfo("extendo ripple: \"" + r.getQuery() + "\"");
 
         return handleRequestInternal(p);
     }
