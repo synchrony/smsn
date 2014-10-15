@@ -27,6 +27,10 @@ public class NoteQueries {
      * @param brain the Extend-o-Brain instance to query and update
      */
     public NoteQueries(final ExtendoBrain brain) {
+        if (null == brain) {
+            throw new IllegalArgumentException();
+        }
+
         this.brain = brain;
 
         /*
@@ -62,6 +66,10 @@ public class NoteQueries {
                      final int height,
                      final Filter filter,
                      final AdjacencyStyle style) {
+        if (null == root || height < 0 || null == filter || null == style) {
+            throw new IllegalArgumentException();
+        }
+
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logView(root);
         }
@@ -77,11 +85,11 @@ public class NoteQueries {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = toNote(root, filter.isVisible(root));
+        Note n = toNote(root, filter.isVisible(root.asVertex()));
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
-                int h = filter.isVisible(target) ? height - 1 : 0;
+                int h = filter.isVisible(target.asVertex()) ? height - 1 : 0;
                 Note cn = viewInternal(target, h, filter, style);
                 n.addChild(cn);
             }
@@ -97,6 +105,10 @@ public class NoteQueries {
     public Note view(final List<Atom> atoms,
                      final int height,
                      final Filter filter) {
+        if (null == atoms || height < 1 || null == filter) {
+            throw new IllegalArgumentException();
+        }
+
         Note result = new Note();
         // note: text value of result is not set here
 
@@ -112,7 +124,7 @@ public class NoteQueries {
                                 final Filter filter,
                                 final AdjacencyStyle style) {
         // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root)) {
+        if (!filter.isVisible(root.asVertex())) {
             return false;
         }
 
@@ -124,6 +136,10 @@ public class NoteQueries {
 
     public Note customView(final List<String> atomIds,
                            final Filter filter) {
+        if (null == atomIds || null == filter) {
+            throw new IllegalArgumentException();
+        }
+
         Note n = new Note();
 
         for (String id : atomIds) {
@@ -141,14 +157,14 @@ public class NoteQueries {
     /**
      * Updates the graph.
      *
-     * @param root       the root of the subgraph to be updated
-     * @param rootNote   the root of the note tree
-     * @param depth      the minimum depth to which the graph will be updated.
-     *                   If depth is 0, only the root node will be affected,
-     *                   while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
-     * @param filter     a collection of criteria for atoms and links.
-     *                   Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param style      the adjacency style of the view
+     * @param root     the root of the subgraph to be updated
+     * @param rootNote the root of the note tree
+     * @param depth    the minimum depth to which the graph will be updated.
+     *                 If depth is 0, only the root node will be affected,
+     *                 while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
+     * @param filter   a collection of criteria for atoms and links.
+     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param style    the adjacency style of the view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Atom root,
@@ -156,8 +172,8 @@ public class NoteQueries {
                        final int depth,
                        final Filter filter,
                        final AdjacencyStyle style) throws InvalidUpdateException {
-        if (null == root) {
-            throw new IllegalStateException("null view root");
+        if (null == root || null == rootNote || depth < 0 || null == filter || null == style) {
+            throw new IllegalArgumentException();
         }
 
         if (style != FORWARD_ADJACENCY) {
@@ -193,15 +209,15 @@ public class NoteQueries {
         return sb.toString();
     }*/
 
-    public void updateInternal(final Atom root,
-                               final Note rootNote,
-                               final int depth,
-                               final Filter filter,
-                               final AdjacencyStyle style) throws InvalidUpdateException {
+    private void updateInternal(final Atom root,
+                                final Note rootNote,
+                                final int depth,
+                                final Filter filter,
+                                final AdjacencyStyle style) throws InvalidUpdateException {
 
         setProperties(root, rootNote);
 
-        if (0 >= depth || !filter.isVisible(root)) {
+        if (0 >= depth || !filter.isVisible(root.asVertex())) {
             return;
         }
 
@@ -322,6 +338,9 @@ public class NoteQueries {
                        final int depth,
                        final Filter filter,
                        final AdjacencyStyle style) {
+        if (null == query || depth < 1 || null == filter || null == style) {
+            throw new IllegalArgumentException();
+        }
 
         Note result = new Note();
         result.setValue("full text search results for \"" + query + "\"");
@@ -338,13 +357,17 @@ public class NoteQueries {
     public Note findRoots(final Filter filter,
                           final AdjacencyStyle style,
                           final int depth) {
+        if (null == filter || null == style || depth < 0) {
+            throw new IllegalArgumentException();
+        }
+
         Note result = new Note();
 
         for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
                 Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(v)) {
                     Note n = viewInternal(a, depth, filter, style);
                     result.addChild(n);
                 }
@@ -356,6 +379,10 @@ public class NoteQueries {
     }
 
     public Note findIsolatedAtoms(final Filter filter) {
+        if (null == filter) {
+            throw new IllegalArgumentException();
+        }
+
         Note result = new Note();
 
         for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
@@ -363,7 +390,7 @@ public class NoteQueries {
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
                 Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(v)) {
                     Note n = viewInternal(a, 1, filter, FORWARD_ADJACENCY);
                     result.addChild(n);
                 }
@@ -374,14 +401,18 @@ public class NoteQueries {
     }
 
     public void removeIsolatedAtoms(final Filter filter) {
+        if (null == filter) {
+            throw new IllegalArgumentException();
+        }
+
         List<Vertex> toRemove = new LinkedList<Vertex>();
 
         for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
             if (null != v.getProperty("value")
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
-                Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(a)) {
+                //Atom a = brain.getBrainGraph().getAtom(v);
+                if (filter.isVisible(v)) {
                     toRemove.add(v);
                 }
             }
@@ -410,6 +441,9 @@ public class NoteQueries {
                             final int depth,
                             final Filter filter,
                             final AdjacencyStyle style) throws RippleException {
+        if (null == query || depth < 0 || null == filter || null == style) {
+            throw new IllegalArgumentException();
+        }
 
         Note result = new Note();
         result.setValue("Ripple results for \"" + query + "\"");
@@ -465,6 +499,9 @@ public class NoteQueries {
     public Note priorityView(final Filter filter,
                              final int maxResults,
                              final Priorities priorities) {
+        if (null == filter || maxResults < 1 || null == priorities) {
+            throw new IllegalArgumentException();
+        }
 
         Note result = new Note();
         result.setValue("priority queue with up to " + maxResults + " results");
@@ -472,7 +509,7 @@ public class NoteQueries {
         Queue<Atom> queue = priorities.getQueue();
         int i = 0;
         for (Atom a : queue) {
-            if (filter.isVisible(a)) {
+            if (filter.isVisible(a.asVertex())) {
                 result.addChild(toNote(a, true));
 
                 if (++i >= maxResults) {
@@ -664,7 +701,7 @@ public class NoteQueries {
                 }
 
                 Atom a = prev.getNotesOf();
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(a.asVertex())) {
                     results.add(a);
                 }
             }

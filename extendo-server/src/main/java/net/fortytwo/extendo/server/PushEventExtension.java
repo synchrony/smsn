@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +41,7 @@ public class PushEventExtension extends ExtendoExtension {
 
         p.jsonView = r.jsonView;
 
-        logInfo("extendo push-event");
+        Extendo.logInfo("extendo push-event");
 
         return handleRequestInternal(p);
     }

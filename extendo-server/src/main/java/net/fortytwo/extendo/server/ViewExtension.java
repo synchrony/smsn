@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,13 +41,13 @@ public class ViewExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.depth;
-        p.rootId = r.rootId;
-        p.styleName = r.styleName;
-        p.filter = r.filter;
-        p.includeTypes = r.includeTypes;
+        p.depth = r.getDepth();
+        p.rootId = r.getRootId();
+        p.styleName = r.getStyleName();
+        p.filter = r.getFilter();
+        p.includeTypes = r.isIncludeTypes();
 
-        logInfo("extendo view " + r.rootId);
+        Extendo.logInfo("extendo view " + r.getRootId());
 
         return handleRequestInternal(p);
     }
@@ -70,7 +71,8 @@ public class ViewExtension extends ExtendoExtension {
     }
 
     private class ViewRequest extends RootedViewRequest {
-        public final boolean includeTypes;
+
+        private final boolean includeTypes;
 
         public ViewRequest(final JSONObject json,
                            final Principal user) throws JSONException {
@@ -78,6 +80,10 @@ public class ViewExtension extends ExtendoExtension {
 
             // this argument is optional; do not include types by default
             includeTypes = json.optBoolean(INCLUDE_TYPES, false);
+        }
+
+        public boolean isIncludeTypes() {
+            return includeTypes;
         }
     }
 }

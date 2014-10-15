@@ -1,5 +1,8 @@
 package net.fortytwo.extendo.brain;
 
+import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.extendo.Extendo;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -80,13 +83,22 @@ public class Filter {
         return defaultWeight;
     }
 
-    public boolean isVisible(final Atom atom) {
-        if (null == atom) {
+    public boolean isVisible(final Vertex atomVertex) {
+        if (null == atomVertex) {
             throw new IllegalArgumentException();
         }
 
-        float sharability = atom.getSharability();
-        float weight = atom.getWeight();
+        Float sharability = atomVertex.getProperty(Extendo.SHARABILITY);
+        if (null == sharability) {
+            Extendo.LOGGER.warning("atom " + atomVertex.getId() + " has no @sharability");
+            return false;
+        }
+
+        Float weight = atomVertex.getProperty(Extendo.WEIGHT);
+        if (null == weight) {
+            Extendo.LOGGER.warning("atom " + atomVertex.getId() + " has no @weight");
+            return false;
+        }
 
         // Strictly greater than the minimum, less than or equal to the maximum.
         // Values range from 0 (exclusive) to 1 (inclusive).

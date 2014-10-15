@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.ActivityLog;
 import net.fortytwo.extendo.brain.BrainGraph;
 import org.json.JSONException;
@@ -62,7 +63,7 @@ public class SetPropertiesExtension extends ExtendoExtension {
         p.propertyValue = r.value;
         p.rootId = r.id;
 
-        logInfo("extendo set-properties on " + r.id + ": " + r.name + " <- " + r.value);
+        Extendo.logInfo("extendo set-properties on " + r.id + ": " + r.name + " <- " + r.value);
 
         return handleRequestInternal(p);
     }

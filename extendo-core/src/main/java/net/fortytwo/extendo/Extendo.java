@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -58,7 +59,7 @@ public class Extendo {
     private static final Random RANDOM = new Random();
 
     private static final String CONFIG_PROPERTIES_FILE = "extendo.properties";
-    private static final Logger LOGGER;
+    public static final Logger LOGGER;
 
     private static TypedProperties CONFIGURATION;
 
@@ -151,5 +152,18 @@ public class Extendo {
             }
         }
         return sb.toString();
+    }
+
+    public static void logInfo(final String message) {
+        LOGGER.log(Level.INFO, message);
+    }
+
+    public static void logWarning(final String message) {
+        LOGGER.log(Level.WARNING, message);
+    }
+
+    public static void logSevere(final String message,
+                                 final Throwable thrown) {
+        LOGGER.log(Level.SEVERE, message, thrown);
     }
 }

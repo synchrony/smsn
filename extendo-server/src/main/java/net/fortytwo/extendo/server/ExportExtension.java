@@ -59,11 +59,11 @@ public class ExportExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.filter = r.filter;
+        p.filter = r.getFilter();
         p.file = r.file;
         p.format = r.format;
 
-        logInfo("extendo export " + r.format + " to " + r.file);
+        Extendo.logInfo("extendo export " + r.format + " to " + r.file);
 
         return handleRequestInternal(p);
     }

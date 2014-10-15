@@ -10,7 +10,8 @@ import java.security.Principal;
 * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class BasicSearchRequest extends BasicViewRequest {
-    public String query;
+
+    private String query;
 
     public BasicSearchRequest(JSONObject json, Principal user) throws JSONException {
         super(json, user);
@@ -23,5 +24,9 @@ public class BasicSearchRequest extends BasicViewRequest {
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public String getQuery() {
+        return query;
     }
 }

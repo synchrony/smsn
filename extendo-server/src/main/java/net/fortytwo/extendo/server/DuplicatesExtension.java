@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
@@ -47,9 +48,9 @@ public class DuplicatesExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.filter = r.filter;
+        p.filter = r.getFilter();
 
-        logInfo("extendo duplicates");
+        Extendo.logInfo("extendo duplicates");
 
         return handleRequestInternal(p);
     }
@@ -93,7 +94,7 @@ public class DuplicatesExtension extends ExtendoExtension {
         for (Vertex v : graph.getPropertyGraph().getVertices()) {
             Atom a = graph.getAtom(v);
 
-            if (filter.isVisible(a)) {
+            if (filter.isVisible(v)) {
                 String value = a.getValue();
                 if (null != value && 0 < value.length()) {
                     String hash = md5SumOf(value);
@@ -109,7 +110,7 @@ public class DuplicatesExtension extends ExtendoExtension {
 
                         total++;
                         if (total > MAX_DUPLICATES) {
-                            logInfo("showing only the first " + MAX_DUPLICATES + " duplicates");
+                            Extendo.logInfo("showing only the first " + MAX_DUPLICATES + " duplicates");
                             break;
                         }
                     }

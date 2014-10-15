@@ -6,6 +6,7 @@ import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
@@ -26,6 +27,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -133,7 +135,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                     return ExtensionResponse.error("root of view does not exist: " + rootKey);
                 }
 
-                if (null != p.filter && !p.filter.isVisible(p.root)) {
+                if (null != p.filter && !p.filter.isVisible(p.root.asVertex())) {
                     return ExtensionResponse.error("root of view is not visible: " + rootKey);
                 }
 
@@ -167,26 +169,19 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                 if (doesWrite()) {
                     if (manual) {
                         if (!normal) {
-                            logWarning("rolling back transaction");
+                            Extendo.logWarning("rolling back transaction");
                         }
 
                         ((TransactionalGraph) p.baseGraph).stopTransaction(normal
                                 ? TransactionalGraph.Conclusion.SUCCESS
                                 : TransactionalGraph.Conclusion.FAILURE);
                     } else if (!normal) {
-                        logWarning("failed update of non-transactional graph. Data integrity is not guaranteed");
+                        Extendo.logWarning("failed update of non-transactional graph. Data integrity is not guaranteed");
                     }
                 }
             }
-        } catch (Exception e) {
-            logWarning("operation failed with exception: " + e.getMessage());
-            // TODO
-            e.printStackTrace(System.err);
-            return ExtensionResponse.error(e);
         } catch (Throwable t) {
-            logWarning("operation failed with throwable: " + t.getMessage());
-            // TODO
-            t.printStackTrace(System.err);
+            Extendo.logSevere("request failed", t);
             return ExtensionResponse.error(t.getMessage());
         }
     }
@@ -225,7 +220,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
     }
 
     public static float findMinAuthorizedSharability(final Principal user,
-                                                 final float minSharability) {
+                                                     final float minSharability) {
         // TODO
         float minAuth = (null == user)
                 ? 0.0f
@@ -262,16 +257,6 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                                       final Filter filter) {
         NoteHistory h = getNotesHistory(context);
         return h.getHistory(100, true, graph, filter);
-    }
-
-    protected void logInfo(final String message) {
-        LOGGER.info(message);
-        //System.err.println(message);
-    }
-
-    protected void logWarning(final String message) {
-        LOGGER.warning(message);
-        //System.err.println(message);
     }
 
     protected class Params {

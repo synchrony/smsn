@@ -97,8 +97,12 @@ public class BrainGraph {
         }
     }
 
+    public Vertex getVertex(final String key) {
+        return this.getPropertyGraph().getVertex(key);
+    }
+
     public Atom getAtom(final String key) {
-        Vertex v = this.getPropertyGraph().getVertex(key);
+        Vertex v = getVertex(key);
 
         return null == v ? null : getAtom(v);
     }
@@ -255,7 +259,7 @@ public class BrainGraph {
                     throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
                 }
 
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(v)) {
                     results.add(a);
                 }
             }

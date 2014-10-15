@@ -10,6 +10,7 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.extendo.Extendo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,9 +37,9 @@ public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.filter = r.filter;
+        p.filter = r.getFilter();
 
-        logInfo("extendo remove-isolated-atoms");
+        Extendo.logInfo("extendo remove-isolated-atoms");
 
         return handleRequestInternal(p);
     }
