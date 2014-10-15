@@ -8,7 +8,7 @@
 			"architecture" : "x86"
 		}
 ,
-		"rect" : [ 111.0, 44.0, 1217.0, 1031.0 ],
+		"rect" : [ 608.0, 44.0, 1217.0, 1031.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -28,6 +28,20 @@
 		"digest" : "",
 		"tags" : "",
 		"boxes" : [ 			{
+				"box" : 				{
+					"fontname" : "Arial",
+					"fontsize" : 12.0,
+					"id" : "obj-156",
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 71.75, 418.0, 116.0, 18.0 ],
+					"text" : "/exo/hand/vibro 500"
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
@@ -1863,7 +1877,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 71.75, 436.0, 169.0, 18.0 ],
+					"patching_rect" : [ 71.75, 500.0, 169.0, 18.0 ],
 					"text" : "/exo/hand/audio/tone badargs"
 				}
 
@@ -1877,7 +1891,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 71.75, 418.0, 99.0, 18.0 ],
+					"patching_rect" : [ 71.75, 482.0, 99.0, 18.0 ],
 					"text" : "/exo/hand/bogus"
 				}
 
@@ -2080,7 +2094,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 289.0, 178.0, 357.5, 20.0 ],
-					"text" : "\"OSC message hasError (error type: OSC_OK)\""
+					"text" : "\"no messages dispatched\""
 				}
 
 			}
@@ -2187,7 +2201,7 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 45.75, 500.0, 147.0, 20.0 ],
+					"patching_rect" : [ 45.75, 564.0, 147.0, 20.0 ],
 					"text" : "udpsend 127.0.0.1 42002"
 				}
 
@@ -2201,7 +2215,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "OSCTimeTag" ],
-					"patching_rect" : [ 45.75, 471.0, 113.0, 20.0 ],
+					"patching_rect" : [ 45.75, 535.0, 113.0, 20.0 ],
 					"text" : "OpenSoundControl"
 				}
 
@@ -2859,6 +2873,15 @@
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-155", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-74", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-156", 0 ]
 				}
 
 			}
