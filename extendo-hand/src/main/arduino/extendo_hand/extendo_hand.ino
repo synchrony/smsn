@@ -56,6 +56,7 @@ const char *EXO_HAND_MOTION      = "/exo/hand/motion";
 const char *EXO_HAND_PING        = "/exo/hand/ping";
 const char *EXO_HAND_PING_REPLY  = "/exo/hand/ping/reply";
 const char *EXO_HAND_RGB_SET     = "/exo/hand/rgb/set";
+const char *EXO_HAND_VIBRO       = "/exo/hand/vibro";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +138,15 @@ void setColor(unsigned long color) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void vibrateForDuration(unsigned long ms) {
+    digitalWrite(VIBRO_PIN, HIGH);
+    delay(ms);
+    digitalWrite(VIBRO_PIN, LOW);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 #ifdef GESTURE_MODE
 const double lowerBound = 1.25;
 const double upperBound = 1.75;
@@ -166,6 +176,8 @@ char contextName[32];
 
 void setup()  
 {
+    pinMode(VIBRO_PIN, OUTPUT);
+
     leds.begin();
     setColor(RGB_YELLOW);
     droidspeak.speakPowerUpPhrase();
@@ -224,7 +236,8 @@ void setup()
     
     strcpy(contextName, "default");
     setColor(RGB_BLACK);
-    
+
+    vibrateForDuration(500);    
     osc.sendInfo("Extend-o-Hand is ready");
 }
 
@@ -301,6 +314,20 @@ void handleRGBSetMessage(class OSCMessage &m) {
     }
 }
 
+void handleVibroMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 1)) return;
+
+    int32_t d = m.getInt(0);
+
+    if (d <= 0) {
+        osc.sendError("duration must be a positive number");
+    } else if (d > 60000) {
+        osc.sendError("duration too long");
+    } else {
+        vibrateForDuration((unsigned long) d);
+    }
+}
+
 void handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
         osc.sendOSCBundleError(bundle);
@@ -310,6 +337,7 @@ void handleOSCBundle(class OSCBundle &bundle) {
         //|| bundle.dispatch(EXO_HAND_MORSE, handleMorseMessage)
         || bundle.dispatch(EXO_HAND_PING, handlePingMessage)
         || bundle.dispatch(EXO_HAND_RGB_SET, handleRGBSetMessage)
+        || bundle.dispatch(EXO_HAND_VIBRO, handleVibroMessage)
         )) {
         osc.sendError("no messages dispatched");
     }
