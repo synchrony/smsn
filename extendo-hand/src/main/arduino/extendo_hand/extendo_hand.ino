@@ -31,6 +31,19 @@
 // if defined, output a heartbeat message every so many milliseconds
 //#define HEARTBEAT_MS 1000
 
+
+////////////////////////////////////////////////////////////////////////////////
+
+#define MOTION_X_PIN A0
+#define MOTION_Y_PIN A1
+#define MOTION_Z_PIN A2
+
+#define SPEAKER_PIN  9  // PWM preferred
+#define RGB_LED_PIN  13
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 // OSC addresses
 const char *EXO_HAND             = "/exo/hand";
 const char *EXO_HAND_AUDIO_TONE  = "/exo/hand/audio/tone";
@@ -43,16 +56,6 @@ const char *EXO_HAND_MOTION      = "/exo/hand/motion";
 const char *EXO_HAND_PING        = "/exo/hand/ping";
 const char *EXO_HAND_PING_REPLY  = "/exo/hand/ping/reply";
 const char *EXO_HAND_RGB_SET     = "/exo/hand/rgb/set";
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-#define MOTION_X_PIN A0
-#define MOTION_Y_PIN A1
-#define MOTION_Z_PIN A2
-
-#define SPEAKER_PIN  9  // PWM preferred
-#define RGB_LED_PIN  13
 
 
 ////////////////////////////////////////////////////////////////////////////////
