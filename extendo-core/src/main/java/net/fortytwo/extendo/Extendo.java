@@ -61,6 +61,8 @@ public class Extendo {
     private static final String CONFIG_PROPERTIES_FILE = "extendo.properties";
     public static final Logger LOGGER;
 
+    public static final String UTF8 = "UTF-8";
+
     private static TypedProperties CONFIGURATION;
 
     static {

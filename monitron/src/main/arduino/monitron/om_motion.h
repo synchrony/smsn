@@ -25,14 +25,13 @@ void sampleMotionDetector() {
 
 void reportMotionDetectorResults() {
     beginOSCWrite();
- 
-    Serial.print(OM_SENSOR_SE10_MOTION);
-    Serial.print(" "); 
-    Serial.print(startTime, HEX);
-    Serial.print(" ");
-    Serial.print(endTime, HEX);
-    Serial.print(" 1 ");
-    Serial.println(motionDetected);
+
+    OSCMessage m(EXO_OM_SENSOR_SE10_MOTION);
+    m.add((uint64_t) startTime);
+    m.add((uint64_t) endTime);
+    m.add(1);
+    m.add(motionDetected);
+    osc.sendOSC(m);
         
     endOSCWrite();
 }

@@ -78,7 +78,7 @@ public class NoteWriter {
                            final OutputStream out) {
         PrintStream p;
         try {
-            p = new PrintStream(out, false, "UTF-8");
+            p = new PrintStream(out, false, Extendo.UTF8);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
