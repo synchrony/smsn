@@ -21,7 +21,7 @@ import org.junit.Test;
 public class RDFMappingTest extends TestCase {
     @Test
     public void testAKASyntax() throws Exception {
-        AtomClass t = AKAReference.INSTANCE;
+        AtomClass t = AKAReference.class.newInstance();
 
         /* TODO
         assertTrue(t.getValueRegex().matcher("aka \"Ix\"").matches());
@@ -37,7 +37,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testBibtexReferenceSyntax() throws Exception {
-        AtomClass t = BibtexReference.INSTANCE;
+        AtomClass t = BibtexReference.class.newInstance();
 
         /* TODO
         assertTrue(t.getValueRegex().matcher("bibtex: @article{}").matches());
@@ -51,7 +51,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testDateSyntax() throws Exception {
-        AtomClass t = Date.INSTANCE;
+        AtomClass t = Date.class.newInstance();
 
         /* TODO
         assertTrue(t.getValueRegex().matcher("2013-09-17").matches());
@@ -63,7 +63,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testISBNSyntax() throws Exception {
-        AtomClass t = ISBNReference.INSTANCE;
+        AtomClass t = ISBNReference.class.newInstance();
 
         /* TODO
         // valid ISBN-10
@@ -98,7 +98,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testOpenCollectionSyntax() throws Exception {
-        AtomClass t = GenericCollection.INSTANCE;
+        AtomClass t = GenericCollection.class.newInstance();
 
         /* TODO
         assertTrue(t.getValueRegex().matcher("some things I like about fish").matches());
@@ -109,7 +109,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testPersonSyntax() throws Exception {
-        AtomClass t = Person.INSTANCE;
+        AtomClass t = Person.class.newInstance();
 
         /*
         assertTrue(t.getValueRegex().matcher("Arthur Dent").matches());
@@ -120,7 +120,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testRFIDSyntax() throws Exception {
-        AtomClass t = RFIDReference.INSTANCE;
+        AtomClass t = RFIDReference.class.newInstance();
 
         /*
         assertTrue(t.getValueRegex().matcher("RFID: E200 1021 3707 0148 2440 1C7C").matches());
@@ -131,7 +131,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testTODOSyntax() throws Exception {
-        AtomClass t = TODOTask.INSTANCE;
+        AtomClass t = TODOTask.class.newInstance();
 
         /*
         assertTrue(t.getValueRegex().matcher("TODO: get it done").matches());
@@ -142,7 +142,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testURLSyntax() throws Exception {
-        AtomClass t = URLReference.INSTANCE;
+        AtomClass t = URLReference.class.newInstance();
 
         /*
         assertTrue(t.getValueRegex().matcher("http://example.org/foobar").matches());
@@ -153,7 +153,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testVocabularyTermSyntax() throws Exception {
-        AtomClass t = QuotedValue.INSTANCE;
+        AtomClass t = QuotedValue.class.newInstance();
 
         /*
         assertTrue(t.getValueRegex().matcher("\"antidisestablishmentarianism\"").matches());
@@ -164,7 +164,7 @@ public class RDFMappingTest extends TestCase {
 
     @Test
     public void testWebPageSyntax() throws Exception {
-        AtomClass t = WebPage.INSTANCE;
+        AtomClass t = WebPage.class.newInstance();
 
         /*
         assertTrue(t.getValueRegex().matcher("The Least Known Page on the Web (web page)").matches());

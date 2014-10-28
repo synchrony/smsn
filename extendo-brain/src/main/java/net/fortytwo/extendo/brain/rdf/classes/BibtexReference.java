@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BibtexReference extends SimpleAtomClass {
-    public static final BibtexReference INSTANCE = new BibtexReference();
 
     public BibtexReference() {
         super(

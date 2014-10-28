@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class QuotedValueCollection extends AtomCollection {
-    public static final QuotedValueCollection INSTANCE = new QuotedValueCollection();
 
     public QuotedValueCollection() {
         super(

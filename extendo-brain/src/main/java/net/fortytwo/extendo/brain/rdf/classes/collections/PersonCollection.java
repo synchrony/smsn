@@ -11,12 +11,11 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class PersonCollection extends AtomCollection {
-    public static final PersonCollection INSTANCE = new PersonCollection();
 
     public PersonCollection() {
         super(
                 "person-collection",
-                Pattern.compile("(some .+)" +
+                Pattern.compile("(some people .+)" +
                         "|(.+'s children)" +
                         "|(.+ social network)" +
                         "|(.+ friends)" +

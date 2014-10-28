@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class AKAReference extends SimpleAtomClass {
-    public static final AKAReference INSTANCE = new AKAReference();
 
     public AKAReference() {
         super(

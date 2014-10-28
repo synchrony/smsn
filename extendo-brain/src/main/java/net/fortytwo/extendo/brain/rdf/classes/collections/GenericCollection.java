@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GenericCollection extends AtomCollection {
-    public static final GenericCollection INSTANCE = new GenericCollection();
 
     public GenericCollection() {
         super(

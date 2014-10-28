@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class InterestCollection extends AtomCollection {
-    public static final InterestCollection INSTANCE = new InterestCollection();
 
     public InterestCollection() {
         super(

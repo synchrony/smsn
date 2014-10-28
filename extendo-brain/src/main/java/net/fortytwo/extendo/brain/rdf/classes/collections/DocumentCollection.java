@@ -11,12 +11,11 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class DocumentCollection extends AtomCollection {
-    public static final DocumentCollection INSTANCE = new DocumentCollection();
 
     public DocumentCollection() {
         super(
                 "document-collection",
-                Pattern.compile("some .+"),
+                Pattern.compile("some papers .+"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(null,

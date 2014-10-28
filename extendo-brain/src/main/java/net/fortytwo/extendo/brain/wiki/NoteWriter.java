@@ -67,9 +67,9 @@ public class NoteWriter {
         if (null != n.getMeta()) {
             JSONArray c = new JSONArray();
             json.put(META, c);
-            for (int i = 0; i < n.getMeta().size(); i++) {
-                c.put(i, n.getMeta().get(i));
-                i++;
+            int i = 0;
+            for (String s : n.getMeta()) {
+                c.put(i++, s);
             }
         }
 

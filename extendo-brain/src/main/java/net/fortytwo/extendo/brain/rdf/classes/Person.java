@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Person extends AtomClass {
-    public static final Person INSTANCE = new Person();
 
     public Person() {
         super(

@@ -33,8 +33,13 @@ public class ExtendoBrain {
 
         knowledgeBase = new KnowledgeBase(brainGraph);
 
-        // just for now
-        knowledgeBase.addDefaultTypes();
+        try {
+            knowledgeBase.addDefaultClasses();
+        } catch (InstantiationException e) {
+            throw new ExtendoBrainException(e);
+        } catch (IllegalAccessException e) {
+            throw new ExtendoBrainException(e);
+        }
 
         File logFile;
         try {

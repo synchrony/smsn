@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class LinkedConcept extends AtomClass {
-    public static final LinkedConcept INSTANCE = new LinkedConcept();
 
     public LinkedConcept() {
         super(

@@ -12,16 +12,16 @@ import net.fortytwo.extendo.brain.rdf.classes.Document;
 import net.fortytwo.extendo.brain.rdf.classes.ISBNReference;
 import net.fortytwo.extendo.brain.rdf.classes.LinkedConcept;
 import net.fortytwo.extendo.brain.rdf.classes.Person;
+import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
 import net.fortytwo.extendo.brain.rdf.classes.RFIDReference;
 import net.fortytwo.extendo.brain.rdf.classes.TODOTask;
 import net.fortytwo.extendo.brain.rdf.classes.URLReference;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
-import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
-import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.EventCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.TODOCollection;
@@ -31,7 +31,6 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,16 +59,15 @@ public class KnowledgeBase {
     private static final Logger LOGGER = Extendo.getLogger(KnowledgeBase.class);
 
     private final BrainGraph graph;
-    private final List<AtomClass> classes;
+
+    private final Map<Class<? extends AtomClass>, AtomClass> classes;
 
     private final Map<Atom, List<AtomClassEntry>> atomClassifications;
-    private final Map<Class<? extends AtomClass>, AtomClass> atomClassInstances;
 
     public KnowledgeBase(final BrainGraph graph) {
         this.graph = graph;
-        this.classes = new LinkedList<AtomClass>();
         this.atomClassifications = new HashMap<Atom, List<AtomClassEntry>>();
-        this.atomClassInstances = new HashMap<Class<? extends AtomClass>, AtomClass>();
+        this.classes = new HashMap<Class<? extends AtomClass>, AtomClass>();
     }
 
     // note: graph and vocabulary are not affected by this operation
@@ -81,39 +79,42 @@ public class KnowledgeBase {
         return atomClassifications.get(a);
     }
 
-    public void addDefaultTypes() {
-        classes.addAll(Arrays.asList(
+    public void addDefaultClasses()
+            throws InstantiationException, IllegalAccessException {
+
+        Class[] vocabulary = new Class[]{
                 // basic classes
-                AKAReference.INSTANCE,
-                BibtexReference.INSTANCE,
-                Date.INSTANCE,
-                Document.INSTANCE,
-                ISBNReference.INSTANCE,
-                LinkedConcept.INSTANCE,
-                Person.INSTANCE,
-                RFIDReference.INSTANCE,
-                DatedEvent.INSTANCE,
-                TODOTask.INSTANCE,
-                URLReference.INSTANCE,
-                QuotedValue.INSTANCE,
-                WebPage.INSTANCE,
+                AKAReference.class,
+                BibtexReference.class,
+                Date.class,
+                Document.class,
+                ISBNReference.class,
+                LinkedConcept.class,
+                Person.class,
+                RFIDReference.class,
+                DatedEvent.class,
+                TODOTask.class,
+                URLReference.class,
+                QuotedValue.class,
+                WebPage.class,
                 // context-specific classes
-                DatedEvent.Birthday.INSTANCE,
+                DatedEvent.Birthday.class,
                 // simple collections
-                DocumentCollection.INSTANCE,
-                EventCollection.INSTANCE,
-                GenericCollection.INSTANCE,
-                PersonCollection.INSTANCE,
-                QuotedValueCollection.INSTANCE,
-                TODOCollection.INSTANCE,
+                DocumentCollection.class,
+                EventCollection.class,
+                GenericCollection.class,
+                PersonCollection.class,
+                QuotedValueCollection.class,
+                TODOCollection.class,
                 // context-specific collections
-                InterestCollection.INSTANCE,
-                NoteCollection.INSTANCE
+                InterestCollection.class,
+                NoteCollection.class
                 // some classes still to add:
                 //     Account, ManufacturedPart, Place, SoftwareProject
-        ));
-        for (AtomClass c : classes) {
-            atomClassInstances.put(c.getClass(), c);
+        };
+
+        for (Class<? extends AtomClass> atomClass : vocabulary) {
+            classes.put(atomClass, atomClass.newInstance());
         }
     }
 
@@ -153,7 +154,7 @@ public class KnowledgeBase {
                 // note: if multiple class entries are acceptable, only the first will match, in greedy fashion.
                 // The entries are sorted in descending order such that the highest-scoring is encountered first
                 if (0 == alts.size() || alts.contains(inf.getInferredClass())) {
-                    AtomClass atomClass = atomClassInstances.get(inf.getInferredClass());
+                    AtomClass atomClass = classes.get(inf.getInferredClass());
 
                     evidenceEntries.add(inf);
 
@@ -195,6 +196,8 @@ public class KnowledgeBase {
     }
 
     public void inferClasses(final RDFHandler handler) throws RDFHandlerException {
+        long startTime = System.currentTimeMillis();
+
         RDFBuffer buffer = null == handler ? null : new RDFBuffer(handler);
         ValueFactory vf = new ValueFactoryImpl(); // TODO
         RDFizationContext context = new RDFizationContext(buffer, vf);
@@ -222,7 +225,7 @@ public class KnowledgeBase {
             List<AtomClassEntry> oldEntries = atomClassifications.get(a);
             List<AtomClassEntry> newEntries = new LinkedList<AtomClassEntry>();
 
-            for (AtomClass c : classes) {
+            for (AtomClass c : classes.values()) {
                 /*
                 if (a.asVertex().getId().equals("SBZFumn") && c.name.equals("person") && null != handler) {
                     System.out.println("break point here");
@@ -405,7 +408,9 @@ public class KnowledgeBase {
 
         long typed = atomClassifications.size();
         long total = countAtoms();
-        LOGGER.info("" + typed + " of " + total + " atoms have been typed (" + (total - typed) + " remaining)");
+
+        long endTime = System.currentTimeMillis();
+        LOGGER.info("typed " + typed + " of " + total + " atoms (" + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 
     private long countAtoms() {
@@ -524,7 +529,7 @@ public class KnowledgeBase {
         }
 
         public String getInferredClassName() {
-            return atomClassInstances.get(inferredClass).name;
+            return classes.get(inferredClass).name;
         }
 
         public float getOutScore() {

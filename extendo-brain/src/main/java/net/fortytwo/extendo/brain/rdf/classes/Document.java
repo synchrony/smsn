@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Document extends AtomClass {
-    public static final Document INSTANCE = new Document();
 
     public Document() {
         super(

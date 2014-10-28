@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class DatedEvent extends AtomClass {
-    public static final DatedEvent INSTANCE = new DatedEvent();
 
     public DatedEvent() {
         super(

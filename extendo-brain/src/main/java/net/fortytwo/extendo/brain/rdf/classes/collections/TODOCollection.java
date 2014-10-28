@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TODOCollection extends AtomCollection {
-    public static final TODOCollection INSTANCE = new TODOCollection();
 
     public TODOCollection() {
         super(

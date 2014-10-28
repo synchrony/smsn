@@ -622,7 +622,8 @@ public class NoteQueries {
             if (null != entries && entries.size() > 0) {
                 List<String> meta = new LinkedList<String>();
                 for (KnowledgeBase.AtomClassEntry e : entries) {
-                    String ann = "class " + e.getInferredClassName() + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore();
+                    String ann = String.format("class %s %.2f=%.2f+%.2f",
+                            e.getInferredClassName(), e.getScore(), e.getOutScore(), e.getInScore());
                     meta.add(ann);
                 }
 

@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Date extends SimpleAtomClass {
-    public static final Date INSTANCE = new Date();
 
     public Date() {
         super(

@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TODOTask extends AtomClass {
-    public static final TODOTask INSTANCE = new TODOTask();
 
     public TODOTask() {
         super(

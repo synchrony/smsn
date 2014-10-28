@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class RFIDReference extends SimpleAtomClass {
-    public static final RFIDReference INSTANCE = new RFIDReference();
 
     public RFIDReference() {
         super(

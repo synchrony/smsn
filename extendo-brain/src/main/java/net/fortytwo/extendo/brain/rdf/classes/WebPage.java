@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class WebPage extends AtomClass {
-    public static final WebPage INSTANCE = new WebPage();
 
     public WebPage() {
         super(

@@ -120,6 +120,10 @@
     (let ((x (assoc 'type atom)))
         (if x (cdr x) nil)))
 
+(defun get-meta (atom)
+    (let ((x (assoc 'meta atom)))
+        (if x (cdr x) nil)))
+
 (defun current-root-id ()
     exo-root-id)
 
@@ -170,9 +174,11 @@
         (sharability (get-sharability atom))
         (priority (get-priority atom))
         (alias (get-alias atom))
-        (type (get-type atom)))
+        (meta (get-meta atom)))
+        ;;(type (get-type atom)))
             (message (concat
-                 (if type (concat "type: " type ", "))
+                 ;;(if type (concat "type: " type ", "))
+                 (if meta (concat "[meta], "))
                  "weight: " (number-to-string weight)
                  ", sharability: " (number-to-string sharability)
                  (if priority (concat ", priority: " (number-to-string priority)) "")
@@ -532,10 +538,10 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability bright type)
+(defun find-color (weight sharability bright has-meta)
     (let ((s
         (if (using-inference)
-            (elt (if bright inference-bright-colors inference-base-colors) (if type 0 1))
+            (elt (if bright inference-bright-colors inference-base-colors) (if has-meta 0 1))
             (elt (if bright sharability-bright-colors sharability-base-colors) (- (ceiling (* sharability 4)) 1)))))
         (color-string
             (fade-color (color-part-red s) weight)
@@ -544,9 +550,9 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability underline bold bright type background)
+(defun colorize (text weight sharability underline bold bright has-meta background)
     (let ((color (if full-colors-supported
-            (find-color weight sharability bright type)
+            (find-color weight sharability bright has-meta)
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
         (setq l (list :foreground color :background background))
         (if bold (setq l (cons 'bold l)))
@@ -583,24 +589,28 @@
 		        (target-sharability (get-sharability json))
                 (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
 		        (target-alias (get-alias json))
-		        (target-type (get-type json)))
+		        (target-meta (get-meta json)))
 		            (if target-id (puthash target-id json exo-atoms))
 		            (if (not target-id) (error "missing target id"))
 		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
+		            (setq space "")
+		            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
 		            (let ((line "") (id-infix (create-id-infix target-id)))
 		                (if (not editable)
                             (setq id-infix (propertize id-infix 'invisible t)))
-                        (let ((space ""))
-                            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
-                            (setq line (concat line space)))
+                        (setq line (concat line space))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability nil nil target-alias target-type "white")
+                                (colorize bullet target-weight target-sharability nil nil target-alias target-meta "white")
                                 id-infix
                                 " "
-                                (colorize target-value target-weight target-sharability nil nil target-alias target-type "white")
+                                (colorize target-value target-weight target-sharability nil nil target-alias target-meta "white")
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
+                    (if (using-inference)
+                        ;;(dolist (a target-meta) (insert (concat "@{" a "}\n"))))
+                        ;;(insert (concat "type: " (concat (type-of target-meta)))))
+                        (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n") "white"))))
                     (write-view editable children (+ tree-indent 4))))))
 
 (defun num-or-nil-to-string (n)
