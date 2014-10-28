@@ -19,7 +19,8 @@ public class Note {
     private Float priority;
     private Long created;
     private String alias;
-    private String type;
+    //private String type;
+    private List<String> meta;
 
     public Note() {
         children = new LinkedList<Note>();
@@ -37,7 +38,8 @@ public class Note {
         this.alias = copy.alias;
 
         this.hasChildren = copy.hasChildren;
-        this.type = copy.type;
+        //this.type = copy.type;
+        this.meta = copy.meta;
 
         if (null != copy.children) {
             for (Note c : copy.children) {
@@ -127,12 +129,22 @@ public class Note {
         this.alias = alias;
     }
 
+    /*
     public String getType() {
         return type;
     }
 
     public void setType(final String type) {
         this.type = type;
+    }
+    */
+
+    public List<String> getMeta() {
+        return meta;
+    }
+
+    public void setMeta(List<String> meta) {
+        this.meta = meta;
     }
 
     public List<Note> getChildren() {

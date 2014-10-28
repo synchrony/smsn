@@ -164,6 +164,11 @@ public class Extendo {
         LOGGER.log(Level.WARNING, message);
     }
 
+    public static void logWarning(final String message,
+                                  final Throwable thrown) {
+        LOGGER.log(Level.WARNING, message, thrown);
+    }
+
     public static void logSevere(final String message,
                                  final Throwable thrown) {
         LOGGER.log(Level.SEVERE, message, thrown);

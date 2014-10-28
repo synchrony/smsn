@@ -34,7 +34,9 @@ public class InferTypesExtension extends ExtendoExtension {
         kb.reset();
         long timeBefore = System.currentTimeMillis();
 
-        kb.inferTypes();
+        // TODO: build this two-stage invocation into a method
+        kb.inferClasses(null);
+        kb.inferClasses(null);
 
         long timeAfter = System.currentTimeMillis();
         LOGGER.info("completed type inference in " + (timeAfter - timeBefore) + "ms");

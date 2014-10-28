@@ -4,28 +4,41 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
-import net.fortytwo.extendo.brain.rdf.types.AKA;
-import net.fortytwo.extendo.brain.rdf.types.BibtexReference;
-import net.fortytwo.extendo.brain.rdf.types.Date;
-import net.fortytwo.extendo.brain.rdf.types.Document;
-import net.fortytwo.extendo.brain.rdf.types.ISBN;
-import net.fortytwo.extendo.brain.rdf.types.OpenCollection;
-import net.fortytwo.extendo.brain.rdf.types.Person;
-import net.fortytwo.extendo.brain.rdf.types.RFID;
-import net.fortytwo.extendo.brain.rdf.types.TODO;
-import net.fortytwo.extendo.brain.rdf.types.TimeStampedEvent;
-import net.fortytwo.extendo.brain.rdf.types.URL;
-import net.fortytwo.extendo.brain.rdf.types.VocabularyTerm;
-import net.fortytwo.extendo.brain.rdf.types.WebPage;
+import net.fortytwo.extendo.brain.rdf.classes.AKAReference;
+import net.fortytwo.extendo.brain.rdf.classes.BibtexReference;
+import net.fortytwo.extendo.brain.rdf.classes.Date;
+import net.fortytwo.extendo.brain.rdf.classes.DatedEvent;
+import net.fortytwo.extendo.brain.rdf.classes.Document;
+import net.fortytwo.extendo.brain.rdf.classes.ISBNReference;
+import net.fortytwo.extendo.brain.rdf.classes.LinkedConcept;
+import net.fortytwo.extendo.brain.rdf.classes.Person;
+import net.fortytwo.extendo.brain.rdf.classes.RFIDReference;
+import net.fortytwo.extendo.brain.rdf.classes.TODOTask;
+import net.fortytwo.extendo.brain.rdf.classes.URLReference;
+import net.fortytwo.extendo.brain.rdf.classes.WebPage;
+import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
+import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.EventCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.TODOCollection;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -47,151 +60,350 @@ public class KnowledgeBase {
     private static final Logger LOGGER = Extendo.getLogger(KnowledgeBase.class);
 
     private final BrainGraph graph;
-    private final BottomUpVocabulary vocabulary;
+    private final List<AtomClass> classes;
 
-    // the type of an atom as determined by its properties and the local tree of which it is the root
-    private final Map<Atom, BottomUpType> typeOfAtom;
-    // the type of an atom as determined by local trees in which it is not the root
-    private final Map<Atom, BottomUpType> inferredTypeOfAtom;
-
-    private final Set<BottomUpType> simpleTypes = new HashSet<BottomUpType>();
-
-    private boolean changed;
-
-    public static boolean isCollectionType(final BottomUpType type) {
-        return type instanceof OpenCollection;
-    }
+    private final Map<Atom, List<AtomClassEntry>> atomClassifications;
+    private final Map<Class<? extends AtomClass>, AtomClass> atomClassInstances;
 
     public KnowledgeBase(final BrainGraph graph) {
         this.graph = graph;
-        this.vocabulary = new BottomUpVocabulary();
-        this.typeOfAtom = new HashMap<Atom, BottomUpType>();
-        this.inferredTypeOfAtom = new HashMap<Atom, BottomUpType>();
+        this.classes = new LinkedList<AtomClass>();
+        this.atomClassifications = new HashMap<Atom, List<AtomClassEntry>>();
+        this.atomClassInstances = new HashMap<Class<? extends AtomClass>, AtomClass>();
     }
 
     // note: graph and vocabulary are not affected by this operation
     public void reset() {
-        typeOfAtom.clear();
-        inferredTypeOfAtom.clear();
+        atomClassifications.clear();
     }
 
-    public BottomUpType getTypeOf(final Atom a) {
-        return typeOfAtom.get(a);
-    }
-
-    private void setTypeOf(final Atom a,
-                           final BottomUpType type) {
-        BottomUpType existingType = typeOfAtom.get(a);
-        if (null == existingType) {
-            typeOfAtom.put(a, type);
-            changed = true;
-        } else if (existingType != type) {
-            LOGGER.warning("conflicting types for atom " + a.asVertex().getId() + ": {"
-                    + existingType.getName() + ", " + type.getName() + "}. Only the former will be used.");
-        }
-    }
-
-    public BottomUpType getInferredTypeOf(final Atom a) {
-        return inferredTypeOfAtom.get(a);
-    }
-
-    /**
-     * Provisionally associates an inferred type with an atom.
-     * If, in a subsequent phase, the atom is found to be valid with respect to the type,
-     * it will be mapped to RDF as an instance of that type.
-     */
-    private void setInferredTypeOf(final Atom a,
-                                   final BottomUpType type) {
-        BottomUpType existingType = inferredTypeOfAtom.get(a);
-        if (null == existingType) {
-            inferredTypeOfAtom.put(a, type);
-            changed = true;
-        } else if (existingType != type) {
-            LOGGER.warning("conflicting inferred types for atom " + a.asVertex().getId() + ": {"
-                    + existingType.getName() + ", " + type.getName() + "}. Only the former will be used.");
-        }
-    }
-
-    private long setInferredTypeOfMembers(final Atom container,
-                                          final OpenCollection type) {
-        long count = 0;
-
-        BottomUpType containedType = type.getContainedType();
-        if (null != containedType) {
-
-            // TODO: temporary debugging code; remove
-            //if (container.asVertex().getId().equals("UG&hPK4")) {
-            //    System.out.println("typing members of " + container.asVertex().getId() + " as " + type.getContainedType().getName());
-            //    new Exception().printStackTrace(System.out);
-            //}
-
-            for (Atom child : contentsOfCollection(container)) {
-                BottomUpType t = getTypeOf(child);
-
-                // TODO: temporary debugging code; remove
-                //if (container.asVertex().getId().equals("UG&hPK4")) {
-                //    System.out.println("\t" + t + " " + child.getValue());
-                //}
-
-                // If any child has a type other than the contained data type, the child is ignored.
-                // However, not-yet-typed children are to be coerced if they are valid instances of the type.
-                if (null == t) {
-                    if (simpleConstraintsSatisfied(container, child.getValue(), containedType, false)) {
-
-                        // TODO: temporary debugging code; remove
-                        //if (container.asVertex().getId().equals("UG&hPK4")) {
-                        //    System.out.println("\t\tsetting inferred type of " + child.getValue() + " to " + containedType);
-                        //}
-
-                        setInferredTypeOf(child, containedType);
-                        count++;
-                    }
-                }
-            }
-        }
-
-        return count;
+    public List<AtomClassEntry> getClassInfo(final Atom a) {
+        return atomClassifications.get(a);
     }
 
     public void addDefaultTypes() {
-        BottomUpVocabulary v = vocabulary;
-
-        v.add(AKA.INSTANCE);
-        v.add(BibtexReference.INSTANCE);
-        v.add(Date.INSTANCE);
-        v.add(ISBN.INSTANCE);
-        v.add(RFID.INSTANCE);
-        v.add(TODO.INSTANCE);
-        v.add(URL.INSTANCE);
-        v.add(VocabularyTerm.INSTANCE);
-        v.add(WebPage.INSTANCE);
-
-        // types with the most inclusive regex are last
-        v.add(Document.INSTANCE);
-        v.add(OpenCollection.GENERIC_INSTANCE);
-        v.add(Person.INSTANCE);
-        v.add(TimeStampedEvent.INSTANCE);
-
-        // TODO
-        // * Account
-        // * ManufacturedPart
-        // * Place
-        // * SoftwareProject
-
-        simpleTypes.clear();
-        simpleTypes.addAll(v.getSimpleTypes());
+        classes.addAll(Arrays.asList(
+                // basic classes
+                AKAReference.INSTANCE,
+                BibtexReference.INSTANCE,
+                Date.INSTANCE,
+                Document.INSTANCE,
+                ISBNReference.INSTANCE,
+                LinkedConcept.INSTANCE,
+                Person.INSTANCE,
+                RFIDReference.INSTANCE,
+                DatedEvent.INSTANCE,
+                TODOTask.INSTANCE,
+                URLReference.INSTANCE,
+                QuotedValue.INSTANCE,
+                WebPage.INSTANCE,
+                // context-specific classes
+                DatedEvent.Birthday.INSTANCE,
+                // simple collections
+                DocumentCollection.INSTANCE,
+                EventCollection.INSTANCE,
+                GenericCollection.INSTANCE,
+                PersonCollection.INSTANCE,
+                QuotedValueCollection.INSTANCE,
+                TODOCollection.INSTANCE,
+                // context-specific collections
+                InterestCollection.INSTANCE,
+                NoteCollection.INSTANCE
+                // some classes still to add:
+                //     Account, ManufacturedPart, Place, SoftwareProject
+        ));
+        for (AtomClass c : classes) {
+            atomClassInstances.put(c.getClass(), c);
+        }
     }
 
-    private boolean isSimpleType(final BottomUpType type) {
-        return simpleTypes.contains(type);
+    private void handleAllMembers(final AtomCollectionMemory memory,
+                                  final AtomClass.FieldHandler fieldHandler,
+                                  final RDFizationContext context,
+                                  final Set<String> alreadyHandled) throws RDFHandlerException {
+        // avoid cycles
+        if (alreadyHandled.contains(memory.getAtomId())) {
+            return;
+        }
+        alreadyHandled.add(memory.getAtomId());
+
+        for (Atom a : memory.getMemberAtoms()) {
+            fieldHandler.handle(a, context);
+        }
+
+        for (AtomCollectionMemory m : memory.getMemberCollections()) {
+            handleAllMembers(m, fieldHandler, context, alreadyHandled);
+        }
     }
 
-    public void inferTypes() throws RDFHandlerException {
-        changed = false;
-        matchSimpleTypes();
-        matchCompoundTypes();
+    private boolean match(final Atom first,
+                          final AtomRegex.El el,
+                          final List<AtomClassEntry> evidenceEntries,
+                          final AtomCollectionMemory memory,
+                          final RDFizationContext context) throws RDFHandlerException {
+        Set<Class<? extends AtomClass>> alts = el.getAlternatives();
 
-        long typed = typeOfAtom.size();
+        List<AtomClassEntry> entries = atomClassifications.get(first);
+        if (null == entries) {
+            // (as yet) unclassified atoms are only allowed to be trivial matches;
+            // we don't attempt to rdfize them
+            return 0 == alts.size();
+        } else {
+            for (AtomClassEntry inf : entries) {
+                // note: if multiple class entries are acceptable, only the first will match, in greedy fashion.
+                // The entries are sorted in descending order such that the highest-scoring is encountered first
+                if (0 == alts.size() || alts.contains(inf.getInferredClass())) {
+                    AtomClass atomClass = atomClassInstances.get(inf.getInferredClass());
+
+                    evidenceEntries.add(inf);
+
+                    // generate RDF statements if an RDF handler has been provided
+                    RDFHandler handler = context.getHandler();
+                    if (null != handler) {
+                        AtomClass.FieldHandler fieldHandler = el.getFieldHandler();
+
+                        // fieldHandler is optional
+                        if (null != fieldHandler) {
+                            if (atomClass.isCollectionClass()) {
+                                if (null != inf.memory) {
+                                    handleAllMembers(inf.memory, fieldHandler, context, new HashSet<String>());
+                                }
+                            } else {
+                                fieldHandler.handle(first, context);
+                            }
+                        }
+                    }
+
+                    // if the parent is in the process of being matched as a collection,
+                    // add this member to the collection memory
+                    if (null != memory) {
+                        if (atomClass.isCollectionClass()) {
+                            if (null != inf.memory) {
+                                memory.getMemberCollections().add(inf.memory);
+                            }
+                        } else {
+                            memory.getMemberAtoms().add(first);
+                        }
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    public void inferClasses(final RDFHandler handler) throws RDFHandlerException {
+        RDFBuffer buffer = null == handler ? null : new RDFBuffer(handler);
+        ValueFactory vf = new ValueFactoryImpl(); // TODO
+        RDFizationContext context = new RDFizationContext(buffer, vf);
+
+        Comparator outScoreDescending = Collections.reverseOrder();
+        Comparator totalScoreDescending = new AtomClassificationComparator();
+
+        for (List<AtomClassEntry> l : atomClassifications.values()) {
+            for (AtomClassEntry e : l) {
+                e.inScore = 0;
+            }
+        }
+        List<AtomClassEntry> evidenceEntries = new LinkedList<AtomClassEntry>();
+
+        for (Atom a : graph.getAtoms()) {
+            context.setSubject(a);
+
+            String value = a.getValue();
+            String alias = a.getAlias();
+
+            if (null != buffer) {
+                buffer.clear();
+            }
+
+            List<AtomClassEntry> oldEntries = atomClassifications.get(a);
+            List<AtomClassEntry> newEntries = new LinkedList<AtomClassEntry>();
+
+            for (AtomClass c : classes) {
+                /*
+                if (a.asVertex().getId().equals("SBZFumn") && c.name.equals("person") && null != handler) {
+                    System.out.println("break point here");
+                }//*/
+
+                evidenceEntries.clear();
+
+                AtomCollectionMemory newMemo = c.isCollectionClass()
+                        ? new AtomCollectionMemory((String) a.asVertex().getId())
+                        : null;
+
+                int points = 0;
+
+                if (null != c.valueRegex) {
+                    // one point for value regex
+                    points++;
+                    if (null == value || !c.valueRegex.matcher(value).matches()) {
+                        continue;
+                    }
+                }
+
+                if (null != c.aliasRegex) {
+                    // one point for alias regex
+                    points++;
+                    if (null == alias || !c.aliasRegex.matcher(alias).matches()) {
+                        continue;
+                    }
+                }
+
+                if (null != c.memberRegex) {
+                    AtomList cur = a.getNotes();
+                    Atom first = null;
+                    int eli = 0;
+                    AtomRegex.El el = null;
+                    AtomRegex.Modifier mod = null;
+                    Set<Class<? extends AtomClass>> alts = null;
+                    boolean advanceInput = true;
+                    boolean advanceRegex = true;
+                    boolean matched = false;
+                    boolean fail = false;
+
+                    while (!fail) { // break out on failure or exhaustion of the regex
+                        if (advanceRegex) {
+                            if (matched && null != alts) {
+                                // one point for each wildcard regex element which matches at least one input atom
+                                //     e.g. .? earns one point for "a", "b", "c" or any other atom, none for ""
+                                // three points for each class-specific regex element which matches at least one input atom
+                                //     e.g. A*(B|C)+ earns 3 points for "a" or "aa", 6 points for "aac"
+                                points += alts.size() > 0 ? 3 : 1;
+                            }
+                            matched = false;
+
+                            if (c.memberRegex.getElements().size() > eli) {
+                                el = c.memberRegex.getElements().get(eli++);
+                                mod = el.getModifier();
+                                alts = el.getAlternatives();
+                            } else {
+                                // we need to have exhausted the input
+                                if (null != cur) {
+                                    fail = true;
+                                }
+
+                                break;
+                            }
+
+                            advanceRegex = false;
+                        }
+
+                        if (advanceInput) {
+                            // we have exhausted the input
+                            if (null == cur) {
+                                if (AtomRegex.Modifier.One == mod || AtomRegex.Modifier.OneOrMore == mod) {
+                                    // additional input is required by the regex; fail
+                                    fail = true;
+                                    break;
+                                } else {
+                                    // try to exhaust the regex
+                                    advanceRegex = true;
+                                    continue;
+                                }
+                            }
+                            first = cur.getFirst();
+                            cur = cur.getRest();
+
+                            advanceInput = false;
+                        }
+
+                        switch (mod) {
+                            case ZeroOrOne:
+                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                    advanceRegex = true;
+                                    advanceInput = true;
+                                    matched = true;
+                                } else {
+                                    advanceRegex = true;
+                                }
+                                break;
+                            case ZeroOrMore:
+                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                    advanceInput = true;
+                                    matched = true;
+                                } else {
+                                    advanceRegex = true;
+                                }
+                                break;
+                            case One:
+                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                    advanceRegex = true;
+                                    advanceInput = true;
+                                    matched = true;
+                                } else {
+                                    fail = true;
+                                }
+                                break;
+                            case OneOrMore:
+                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                    mod = AtomRegex.Modifier.ZeroOrMore;
+                                    advanceInput = true;
+                                    matched = true;
+                                } else {
+                                    fail = true;
+                                }
+                                break;
+                        }
+                    }
+
+                    if (fail) {
+                        continue;
+                    }
+                }
+
+                // at this point, we have classified the atom
+
+                // point value is a compromise between a model in which all scores range from 0 to 1,
+                // favoring simple classes, and a model in which scores range from 1 to infinity,
+                // favoring more complex ones.
+                // This gives simple classes priority over simpler atoms (e.g. the ISBN class which simply
+                // matches based on a value regex), which requires more complex classes to be matched by means
+                // of graph structure.
+                int poss = c.getHighestOutScore();
+                float pointValue = (1 + poss) / (2.0f * poss);
+                float outScore = points * pointValue;
+
+                boolean updated = false;
+                if (null != oldEntries) {
+                    for (AtomClassEntry e : oldEntries) {
+                        if (e.getInferredClass() == c.getClass()) {
+                            e.outScore = outScore;
+                            e.memory = newMemo;
+                            newEntries.add(e);
+                            updated = true;
+                            break;
+                        }
+                    }
+                }
+                if (!updated) {
+                    newEntries.add(new AtomClassEntry(c.getClass(), outScore, newMemo));
+                }
+                // augment relevant in-scores of member atoms
+                for (AtomClassEntry e : evidenceEntries) {
+                    e.inScore = outScore + e.getInScore();
+                }
+
+                if (null != buffer) {
+                    c.toRDF(a, context);
+
+                    // flush both the immediate description of the atom, as well as the relationship
+                    // of the atom to its fields to the downstream handler.
+                    buffer.flush();
+                }
+            }
+
+            // replace old classification
+            atomClassifications.remove(a);
+            if (newEntries.size() > 0) {
+                Collections.sort(newEntries, outScoreDescending);
+                atomClassifications.put(a, newEntries);
+            }
+        }
+
+        long typed = atomClassifications.size();
         long total = countAtoms();
         LOGGER.info("" + typed + " of " + total + " atoms have been typed (" + (total - typed) + " remaining)");
     }
@@ -204,368 +416,50 @@ public class KnowledgeBase {
         return count;
     }
 
-    private void matchSimpleTypes() {
-        long total = 0;
-        long mapped = 0;
-
-        for (Atom atom : graph.getAtoms()) {
-            if (null == getTypeOf(atom)) {
-                total++;
-                BottomUpType t = firstMatchingSimpleType(atom);
-
-                if (null == t) {
-                    //System.out.println("" + BrainGraph.getId(a) + "\t" + a.getValue());
-                } else {
-                    // TODO: temporary debugging code; remove
-                    //if (atom.asVertex().getId().equals("KfiWlJj")) {
-                    //    System.out.println("recognized atom " + atom.asVertex().getId() + " as simple type " + t.getName());
-                    //}
-
-                    //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
-                    setTypeOf(atom, t);
-                    mapped++;
-                }
-            }
-        }
-
-        LOGGER.info("" + mapped + " of " + total + " untyped atoms mapped to simple types");
+    // development/convenience method
+    public void viewInferred(final Atom a) {
+        viewInferredInternal(a, 0);
     }
 
-    private void matchCompoundTypes() throws RDFHandlerException {
-        long total;
-        long mapped, inferred, coerced;
-        int pass = 1;
+    public static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
+        private static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
 
-        do {
-            changed = false;
-
-            total = 0;
-            mapped = 0;
-            coerced = 0;
-            inferred = 0;
-
-            for (Atom atom : graph.getAtoms()) {
-                BottomUpType type = getTypeOf(atom);
-                if (null == type || !isSimpleType(type)) {
-                //if (null == getTypeOf(atom)) {
-                    total++;
-
-                    BottomUpType t = firstMatchingCompoundType(atom);
-                    if (null != t) {
-                        // TODO: temporary debugging code; remove
-                        //if (atom.asVertex().getId().equals("KfiWlJj")) {
-                        //    System.out.println("recognized " + atom.getValue() + " as compound type " + t.getName());
-                        //}
-
-                        //System.out.println(t.getClass().getSimpleName() + "\t" + BrainGraph.getId(a) + "\t" + a.getValue());
-                        setTypeOf(atom, t);
-                        mapped++;
-
-                        if (isCollectionType(t)) {
-                            inferred += setInferredTypeOfMembers(atom, (OpenCollection) t);
-                        }
-                    }
-                }
-            }
-
-            LOGGER.info("pass #" + pass + ": " + mapped + " of " + total + " untyped atoms mapped to compound types");
-
-            coerceUntypedAtoms();
-
-            pass++;
-
-            /*
-            // TODO: temporary extra pass
-            for (Atom a : graph.getAtoms()) {
-                BottomUpType t = getTypeOf(a);
-                if (null != t) {
-                    matchCompoundType(a, t, null, false);
-                }
-            }//*/
-        } while (changed);
+        public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
+            // descending order based on total score
+            return ((Float) second.getScore()).compareTo(first.getScore());
+        }
     }
 
-    private long coerceUntypedAtoms() throws RDFHandlerException {
-        long inferred = 0;
-        long coerced = 0;
-
-        for (Atom atom : graph.getAtoms()) {
-
-            // TODO: temporary debugging code; remove
-            //if (atom.asVertex().getId().equals("SBZFumn")) {
-            //    System.out.println("inspecting " + atom.getValue() + " for coercion");
-            //}
-
-            BottomUpType it = getInferredTypeOf(atom);
-            if (null != it) {
-                inferred++;
-                BottomUpType t = getTypeOf(atom);
-                if (null == t) {
-                    // non-strict matching; simple constraints have already been applied once
-                    if (matchCompoundType(atom, it, null, false)) {
-                        // TODO: temporary debugging code; remove
-                        //if (atom.asVertex().getId().equals("KfiWlJj")) {
-                        //    System.out.println("coerced atom " + atom.asVertex().getId() + " to compound type " + it.getName());
-                        //}
-
-                        // from this point on, the inferred type is also the actual type
-                        setTypeOf(atom, it);
-                        coerced++;
-                    }
-                }
-            }
-        }
-
-        LOGGER.info("" + coerced + " of " + inferred + " untyped atoms coerced to their inferred types");
-
-        return coerced;
-    }
-
-    public void generateRDF(final RDFHandler handler,
-                            final ValueFactory vf) throws RDFHandlerException {
-
-        LOGGER.info("generating RDF data from knowledge base");
-        LOGGER.warning("no sharability restrictions have been enforced");
-
-        handler.startRDF();
-
-        MappingContext mc = new MappingContext(this);
-        mc.setHandler(handler);
-        mc.setValueFactory(vf);
-
-        for (Atom a : graph.getAtoms()) {
-            BottomUpType t = getTypeOf(a);
-            if (null != t) {
-                mc.setReference(a);
-                mc.setReferenceUri(vf.createURI(BrainGraph.uriOf(a)));
-                matchCompoundType(a, t, mc, false);
-            }
-        }
-
-        handler.endRDF();
-    }
-
-    // note: we assume for now that there is no overlap among simple types
-    // i.e. that there is no atom which will be matched by more than one simple type
-    private BottomUpType firstMatchingSimpleType(final Atom a) {
-        String value = valueOf(a);
-
-        // TODO: in future, perhaps an optimized matcher (by regex) can be written, so that each type does not need to be tested in series
-        for (BottomUpType t : vocabulary.getSimpleTypes()) {
-            if (simpleConstraintsSatisfied(a, value, t, false)) {
-                return t;
-            }
-        }
-
-        return null;
-    }
-
-    private BottomUpType firstMatchingCompoundType(final Atom a) throws RDFHandlerException {
-        for (BottomUpType t : vocabulary.getCompoundTypes()) {
-            // strict checking is required here; we are identifying instances based on their properties and
-            // children alone, as opposed to their inbound connections
-            if (matchCompoundType(a, t, null, true)) {
-                return t;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param atom   an atom to match against
-     * @param type   a type to match
-     * @param mc     a context for mapping matched fields to RDF.  If null, no mapping is performed
-     * @param strict whether this atom requires strict matching (i.e. can't be accepted as an instance of the type
-     *               unless it contains some uniquely-qualifying fields, in addition to being syntactically valid)
-     * @return whether the type successfully matched
-     */
-    private boolean matchCompoundType(final Atom atom,
-                                      final BottomUpType type,
-                                      final MappingContext mc,
-                                      final boolean strict) throws RDFHandlerException {
-        // TODO: temporary debugging code; remove
-        //if (atom.asVertex().getId().equals("KfiWlJj")) {
-        //    System.out.println("matching compound type " + type.getName() + " for " + atom.getValue());
-        //}
-
-        RDFBuffer buffer = null == mc ? null : new RDFBuffer(mc.getHandler());
-
-        if (!simpleConstraintsSatisfied(atom, atom.getValue(), type, !strict)) {
-            return false;
-        }
-
-        boolean matched = !strict;
-
-        AtomList cur = atom.getNotes();
-        int fieldIndex = 0;
-        Field[] fields = type.getFields();
-        while (cur != null && fieldIndex < fields.length) {
-            Atom fa = cur.getFirst();
-            Field f = fields[fieldIndex];
-            if (matchField(fa, f)) {
-                // if any fields are found which are distinct to the candidate type, it is a match
-                if (fields[fieldIndex].getIsDistinctive()) {
-                    matched = true;
-                }
-
-                if (null != mc) {
-                    mapField(fa, f, mc);
-                }
-
-                cur = cur.getRest();
-            }
-            fieldIndex++;
-        }
-
-        if (matched && null != mc) {
-            type.translateToRDF(atom, mc.getValueFactory(), buffer);
-
-            buffer.flush();
-        }
-
-        return matched;
-    }
-
-    private boolean matchField(final Atom atom,
-                               final Field field) {
-        // TODO: temporary debugging code; remove
-        //if (atom.asVertex().getId().equals("UG&hPK4")) {
-        //    System.out.println("matching field " + field.getValueRegex().pattern() + " against atom " + atom.asVertex().getId());
-        //}
-
-        String value = valueOf(atom);
-
-        // field-specific value regex constraint
-        if (null != field.getValueRegex() && !field.getValueRegex().matcher(value).matches()) {
-            return false;
-        }
-
-        // TODO: temporary debugging code; remove
-        //if (atom.asVertex().getId().equals("UG&hPK4")) {
-        //    System.out.println("a");
-        //}
-
-        // TODO: additional value constraints for fields?
-
-        // type constraint
-        // note: expected type is never null
-        BottomUpType expectedType = field.getDataType();
-        BottomUpType actualType = getTypeOf(atom);
-        if (null == actualType && null != field.getValueRegex()) {
-
-            // TODO: temporary debugging code; remove
-            //if (atom.asVertex().getId().equals("UG&hPK4")) {
-            //    System.out.println("testing " + atom.asVertex().getId());
-            //}
-
-            if (simpleConstraintsSatisfied(atom, value, expectedType, true)) {
-                setInferredTypeOf(atom, expectedType);
-
-                // TODO: temporary debugging code; remove
-                //if (atom.asVertex().getId().equals("UG&hPK4")) {
-                //    System.out.println("\tinferred type as " + expectedType.getName());
-                //}
-
-                return true;
-            } else {
-                return false;
-            }
-        } else if (actualType != expectedType) {
-            return false;
-        }
-
-        // TODO: temporary debugging code; remove
-        //if (atom.asVertex().getId().equals("UG&hPK4")) {
-        //    System.out.println("s");
-        //}
-
-        /*
-        For containers, we do not demand that the children of the
-        container are of the expected type.  Instead, we use the
-        expected type to coerce any still-untyped children when mapping to
-        RDF.
-        Badly-typed children of containers are simply tolerated and ignored.
-        If, on the contrary, a strict type check for children were enforced
-        here, many otherwise recognizable instances of types would be
-        excluded on the basis of a single list item which does not conform.
-        For example, if Confucius is primarily identified by as a person by
-        his long list of quotations, and one of those quotations is not
-        properly enclosed in quotation marks, it shouldn't cause Confucius to
-        disappear entirely from the mapping; only that invalid quote will be
-        missing.
-        */
-        if (isCollectionType(field.getDataType())) {
-            setInferredTypeOfMembers(atom, (OpenCollection) field.getDataType());
-        }
-
-        return true;
-    }
-
-    private void mapField(final Atom a,
-                          final Field field,
-                          final MappingContext mc) throws RDFHandlerException {
-        field.getMapper().mapToRDF(a, mc);
-    }
-
-    private boolean simpleConstraintsSatisfied(final Atom a,
-                                               final String value,
-                                               final BottomUpType t,
-                                               final boolean ignoreRegex) {
-        if (!ignoreRegex) {
-            // value regex constraint
-            if (null != t.getValueRegex() && !t.getValueRegex().matcher(value).matches()) {
-                return false;
-            }
-        }
-
-        // value additional constraints
-        if (!t.additionalConstraintsSatisfied(value)) {
-            return false;
-        }
-
-        // alias constraint
-        if (t.aliasRequired() && null == a.getAlias()) {
-            return false;
-        }
-
-        // children constraint
-        if (t.childrenRequired() && null == a.getNotes()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private String valueOf(final Atom a) {
+    private void viewInferredInternal(final Atom a,
+                                      int indent) {
+        for (int i = 0; i < indent; i++) System.out.print("\t");
         String value = a.getValue();
-        if (null == value) {
-            LOGGER.warning("atom with id '" + BrainGraph.getId(a) + "' has null value");
+        String value50 = null == value
+                ? "[null]"
+                : value.length() > 50
+                ? value.substring(0, 50)
+                : value;
+        System.out.println("* :" + a.asVertex().getId() + ": " + value50);
+        List<AtomClassEntry> entries = atomClassifications.get(a);
+        if (null != entries) {
+            List<AtomClassEntry> helper = new LinkedList<AtomClassEntry>();
+            helper.addAll(entries);
+            Collections.sort(helper, AtomClassificationComparator.INSTANCE);
+            for (AtomClassEntry e : helper) {
+                for (int i = 0; i <= indent; i++) System.out.print("\t");
+                System.out.format("@(%s %.2f=%.2f+%.2f)\n",
+                        e.getInferredClassName(), e.getScore(), e.getOutScore(), e.getInScore());
+            }
         }
-
-        return value;
-    }
-
-    // note: the top-level atom is assumed to be a collection
-    public Collection<Atom> contentsOfCollection(final Atom collection) {
-        Collection<Atom> result = new LinkedList<Atom>();
-        contentsOfCollectionRecursive(collection, result);
-        return result;
-    }
-
-    private void contentsOfCollectionRecursive(final Atom a,
-                                               final Collection<Atom> result) {
-        BottomUpType t = getTypeOf(a);
-        if (null == t || !isCollectionType(t)) {
-            result.add(a);
-        } else {
-            AtomList cur = a.getNotes();
-
-            while (null != cur) {
-                Atom child = cur.getFirst();
-                contentsOfCollectionRecursive(child, result);
-
-                cur = cur.getRest();
+        indent++;
+        if (indent < 2) {
+            AtomList notes = a.getNotes();
+            if (null != notes) {
+                AtomList cur = notes;
+                while (null != cur) {
+                    viewInferredInternal(cur.getFirst(), indent);
+                    cur = cur.getRest();
+                }
             }
         }
     }
@@ -610,6 +504,44 @@ public class KnowledgeBase {
 
         public void clear() {
             buffer.clear();
+        }
+    }
+
+    public class AtomClassEntry implements Comparable<AtomClassEntry> {
+        private final Class<? extends AtomClass> inferredClass;
+        private float outScore;
+        private float inScore;
+        private AtomCollectionMemory memory;
+
+        public AtomClassEntry(Class<? extends AtomClass> inferredClass, float outScore, AtomCollectionMemory memory) {
+            this.inferredClass = inferredClass;
+            this.outScore = outScore;
+            this.memory = memory;
+        }
+
+        public Class<? extends AtomClass> getInferredClass() {
+            return inferredClass;
+        }
+
+        public String getInferredClassName() {
+            return atomClassInstances.get(inferredClass).name;
+        }
+
+        public float getOutScore() {
+            return outScore;
+        }
+
+        // compare based on out-score alone.  Used for the first stage of classification
+        public int compareTo(AtomClassEntry other) {
+            return ((Float) outScore).compareTo(other.outScore);
+        }
+
+        public float getInScore() {
+            return inScore;
+        }
+
+        public float getScore() {
+            return inScore + outScore;
         }
     }
 }

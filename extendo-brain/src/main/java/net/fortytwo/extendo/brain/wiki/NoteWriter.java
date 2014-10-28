@@ -21,7 +21,8 @@ public class NoteWriter {
     public static final String
             CHILDREN = "children",
             HAS_CHILDREN = "hasChildren",
-            ID = "id";
+            ID = "id",
+            META = "meta";
 
     private int valueLengthCutoff = -1;
 
@@ -57,8 +58,19 @@ public class NoteWriter {
             json.put(Extendo.ALIAS, n.getAlias());
         }
 
+        /*
         if (null != n.getType()) {
             json.put(Extendo.TYPE, n.getType());
+        }
+        */
+
+        if (null != n.getMeta()) {
+            JSONArray c = new JSONArray();
+            json.put(META, c);
+            for (int i = 0; i < n.getMeta().size(); i++) {
+                c.put(i, n.getMeta().get(i));
+                i++;
+            }
         }
 
         if (0 < n.getChildren().size()) {
