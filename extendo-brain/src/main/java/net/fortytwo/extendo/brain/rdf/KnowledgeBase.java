@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.brain.rdf;
 
+import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
@@ -28,9 +29,16 @@ import net.fortytwo.extendo.brain.rdf.classes.collections.TODOCollection;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.Rio;
+import org.openrdf.sail.Sail;
+import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.SailException;
+import org.openrdf.sail.memory.MemoryStore;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,7 +64,7 @@ typical steps in the mapping process:
 5) map to RDF
  */
 public class KnowledgeBase {
-    private static final Logger LOGGER = Extendo.getLogger(KnowledgeBase.class);
+    private static final Logger logger = Extendo.getLogger(KnowledgeBase.class);
 
     private final BrainGraph graph;
 
@@ -410,7 +418,7 @@ public class KnowledgeBase {
         long total = countAtoms();
 
         long endTime = System.currentTimeMillis();
-        LOGGER.info("typed " + typed + " of " + total + " atoms (" + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
+        logger.info("typed " + typed + " of " + total + " atoms (" + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 
     private long countAtoms() {
@@ -466,6 +474,86 @@ public class KnowledgeBase {
                     cur = cur.getRest();
                 }
             }
+        }
+    }
+
+    // convenience method
+    public void exportRDF(final OutputStream out) throws SailException, RDFHandlerException {
+        long startTime, endTime;
+        Sail dedupSail = new MemoryStore();
+        dedupSail.initialize();
+        try {
+            SailConnection sc = dedupSail.getConnection();
+            try {
+                sc.begin();
+
+                startTime = System.currentTimeMillis();
+                RDFHandler h0 = new SailAdder(sc);
+                h0.startRDF();
+
+                inferClasses(h0);
+
+                h0.endRDF();
+                endTime = System.currentTimeMillis();
+                logger.info("inferred classes and generated RDF in " + (endTime - startTime) + "ms");
+
+                sc.commit();
+                sc.begin();
+
+                startTime = System.currentTimeMillis();
+                RDFHandler h = Rio.createWriter(RDFFormat.NTRIPLES, out);
+                h.startRDF();
+                CloseableIteration<? extends Statement, SailException>
+                        iter = sc.getStatements(null, null, null, false);
+                try {
+                    while (iter.hasNext()) {
+                        h.handleStatement(iter.next());
+                    }
+                } finally {
+                    iter.close();
+                }
+                h.endRDF();
+                endTime = System.currentTimeMillis();
+                logger.info("wrote triples to disk in " + (endTime - startTime) + "ms");
+            } finally {
+                sc.rollback();
+                sc.close();
+            }
+        } finally {
+            dedupSail.shutDown();
+        }
+    }
+
+    private static class SailAdder implements RDFHandler {
+        private final SailConnection sc;
+
+        private SailAdder(SailConnection sc) {
+            this.sc = sc;
+        }
+
+        @Override
+        public void startRDF() throws RDFHandlerException {
+        }
+
+        @Override
+        public void endRDF() throws RDFHandlerException {
+        }
+
+        @Override
+        public void handleNamespace(String s, String s2) throws RDFHandlerException {
+        }
+
+        @Override
+        public void handleStatement(Statement statement) throws RDFHandlerException {
+            try {
+                sc.addStatement(statement.getSubject(), statement.getPredicate(), statement.getObject(), statement.getContext());
+            } catch (SailException e) {
+                throw new RDFHandlerException(e);
+            }
+        }
+
+        @Override
+        public void handleComment(String s) throws RDFHandlerException {
         }
     }
 

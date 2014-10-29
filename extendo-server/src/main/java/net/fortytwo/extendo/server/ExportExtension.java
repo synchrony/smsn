@@ -22,8 +22,11 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.sail.SailException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +43,7 @@ import java.security.Principal;
 public class ExportExtension extends ExtendoExtension {
 
     private enum Format {
-        Vertices, Edges, GraphML, PageRank
+        Vertices, Edges, GraphML, PageRank, RDF
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
@@ -154,6 +157,19 @@ public class ExportExtension extends ExtendoExtension {
         w.outputGraph(out);
     }
 
+    private void exportRDF(final KnowledgeBase kb,
+                           final OutputStream out) throws IOException {
+        try {
+            kb.exportRDF(out);
+        } catch (SailException e) {
+            throw new IOException(e);
+        } catch (RDFHandlerException e) {
+            throw new IOException(e);
+        }
+        out.flush();
+        out.close();
+    }
+
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
     // Otherwise, R becomes confused and skips rows.
     private String escapeValue(final String value) {
@@ -184,6 +200,9 @@ public class ExportExtension extends ExtendoExtension {
                     break;
                 case PageRank:
                     exportPageRank(p.brain.getBrainGraph(), new PrintStream(out));
+                    break;
+                case RDF:
+                    exportRDF(p.brain.getKnowledgeBase(), out);
                     break;
             }
         } finally {

@@ -25,6 +25,7 @@
 ;; DEPENDENCIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; for JSON-formatted messages to and from Extendo services (see json-read-from-string, json-encode)
+
 (require 'json)
 
 ;; for line number annotations in buffers (see linum-mode)
@@ -47,7 +48,6 @@
 (setq exo-readonly-mode "readonly")
 (setq exo-edit-mode "readwrite")
 (setq exo-search-mode "search")
-
 (setq exo-sharability-viewstyle "sharability")
 (setq exo-inference-viewstyle "inference")
 
@@ -201,7 +201,7 @@
 
 (setq fast-numbers '(
     (?0 0) (?1 1) (?2 2) (?3 3) (?4 4) (?5 5) (?6 6) (?7 7) (?8 8) (?9 9)
-    (?z 0) (?a 1) (?s 2) (?d 3) (?f 4) (?g 5) (?h 6) (?j 7) (?k 8) (?l 9) (?; 10)))
+    (?z 0) (?a 1) (?s 2) (?d 3) (?f 4) (?g 5) (?h 6) (?j 7) (?k 8) (?l 9) (?\; 10)))
 
 (defun number-shorthand-to-number (c)
     (interactive)
@@ -233,7 +233,7 @@
 
 (setq line-addr-keypairs (list
     '(?0 ?0) '(?1 ?1) '(?2 ?2) '(?3 ?3) '(?4 ?4) '(?5 ?5) '(?6 ?6) '(?7 ?7) '(?8 ?8) '(?9 ?9)
-    '(?; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
+    '(?\; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
              '(?u ?1) '(?i ?2) '(?o ?3) '(?p ?4)))
 (setq line-addr-keymap (make-hash-table))
 (dolist (pair line-addr-keypairs)
@@ -399,11 +399,13 @@
     (http-get (request-view-url root depth style mins maxs defaults minw maxw defaultw) (receive-view mode)))
 
 (defun filter-json (mins maxs defaults minw maxw defaultw)
-    (list :minSharability mins :maxSharability maxs :defaultSharability defaults :minWeight minw :maxWeight maxw :defaultWeight defaultw))
+    (list :minSharability mins :maxSharability maxs :defaultSharability defaults
+          :minWeight minw :maxWeight maxw :defaultWeight defaultw))
 
 (defun request-view-url (root depth style mins maxs defaults minw maxw defaultw)
     (concat (base-url) "view?request=" (w3m-url-encode-string (json-encode
-        (list :root root :depth depth :style style :includeTypes (if (using-inference) "true" "false") :filter (filter-json mins maxs defaults minw maxw defaultw))))))
+        (list :root root :depth depth :style style :includeTypes (if (using-inference) "true" "false")
+              :filter (filter-json mins maxs defaults minw maxw defaultw))))))
 
 (defun request-history (mins maxs minw maxw)
     (setq exo-current-line 1)
@@ -769,13 +771,17 @@
     "enter edit (read/write) mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-readonly-mode))
-        (request-view t exo-edit-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view t exo-edit-mode exo-root-id exo-depth exo-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-enter-readonly-view ()
     "enter read-only mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-edit-mode))
-        (request-view t exo-readonly-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view t exo-readonly-mode exo-root-id exo-depth exo-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-events ()
     "retrieve the Extend-o-Brain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
@@ -801,6 +807,13 @@
     (interactive)
     (message (concat "computing and exporting PageRank to " file))
     (do-export "PageRank" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-rdf (file)
+    "export an N-Triples dump of the Extend-o-Brain graph to the file system"
+    (interactive)
+    (message (concat "exporting RDF (N-Triples) to " file))
+    (do-export "RDF" file
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-export-vertices (file)
@@ -895,6 +908,7 @@
     (request-priorities-results
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
+
 (defun exo-push-view ()
     "push an up-to-date view into the Extend-o-Brain graph"
     (interactive)
@@ -914,7 +928,8 @@
                     :style exo-style
                     :view entity
                     :filter (filter-json exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
-            (receive-view exo-edit-mode)))))
+            (receive-view exo-edit-mode))))
+    (sit-for 0 500)(exo-update-view)(sit-for 0 500)(exo-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
 
 (defun exo-ripple-query (query)
     "evaluate Ripple expression QUERY"
@@ -990,7 +1005,9 @@ A value of -1 indicates that values should not be truncated."
     (let ((depth (number-shorthand-to-number expr)))
         (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
             (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
-                (request-view nil exo-mode exo-root-id depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
+                (request-view nil exo-mode exo-root-id depth exo-style
+                    exo-min-sharability exo-max-sharability exo-default-sharability
+                    exo-min-weight exo-max-weight exo-default-weight)))))
 
 (defun exo-toggle-emacspeak ()
     "turn Emacspeak on or off"
@@ -1019,19 +1036,25 @@ a type has been assigned to it by the inference engine."
     "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
     (interactive)
     (if (in-view)
-        (request-view nil exo-mode exo-root-id exo-depth exo-backward-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view nil exo-mode exo-root-id exo-depth exo-backward-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-update-to-forward-view ()
     "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
     (interactive)
     (if (in-view)
-        (request-view nil exo-mode exo-root-id exo-depth exo-forward-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view nil exo-mode exo-root-id exo-depth exo-forward-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-update-view ()
     "refresh the current view from the data store"
     (interactive)
     (if (in-view)
-        (request-view t exo-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view t exo-mode exo-root-id exo-depth exo-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-visit-in-amazon (value-selector)
     "search Amazon.com for the value generated by VALUE-SELECTOR and view the results in a browser"
@@ -1132,6 +1155,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'exo-export-edges "export edges to file: " exo-default-edges-file))
 (global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'exo-export-graphml "export GraphML to file: " exo-default-graphml-file))
 (global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'exo-export-pagerank "export PageRank results to file: " exo-default-pagerank-file))
+(global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export RDF (N-Triples) to file: " exo-default-rdf-file))
 (global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
 (global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
 (global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)
