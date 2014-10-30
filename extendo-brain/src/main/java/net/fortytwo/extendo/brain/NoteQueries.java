@@ -465,7 +465,8 @@ public class NoteQueries {
                     String s = v.stringValue();
 
                     if (s.startsWith(PropertyGraphSail.VERTEX_NS)) {
-                        Vertex vx = graph.getPropertyGraph().getVertex(s.substring(PropertyGraphSail.VERTEX_NS.length()));
+                        Vertex vx = graph.getPropertyGraph().getVertex(
+                            s.substring(PropertyGraphSail.VERTEX_NS.length()));
                         vertices.add(vx);
                     }
                 }

@@ -32,7 +32,8 @@ public class NoteParserTest {
 
     @Test
     public void testExample1() throws Exception {
-        List<Note> notes = parser.fromWikiText(BrainGraph.class.getResourceAsStream("wiki-example-1.txt")).getChildren();
+        List<Note> notes = parser.fromWikiText(
+                BrainGraph.class.getResourceAsStream("wiki-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
         Note indentation = notes.get(1);

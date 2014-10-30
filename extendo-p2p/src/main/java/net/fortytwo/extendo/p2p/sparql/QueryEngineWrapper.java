@@ -73,7 +73,8 @@ public class QueryEngineWrapper {
         c.registerHandler(QueryEngineProxy.TAG_SPARQL_QUERY, new MessageHandler() {
             public void handle(final JSONObject message) {
                 if (Extendo.VERBOSE) {
-                    LOGGER.info("received query message from " + c.getSocket().getRemoteSocketAddress() + ": " + message);
+                    LOGGER.info("received query message from "
+                            + c.getSocket().getRemoteSocketAddress() + ": " + message);
                 }
 
                 try {
@@ -98,7 +99,9 @@ public class QueryEngineWrapper {
     }
 
     private void handleQueryMessage(final Connection c,
-                                    final JSONObject message) throws QueryEngine.InvalidQueryException, IOException, QueryEngine.IncompatibleQueryException {
+                                    final JSONObject message)
+            throws QueryEngine.InvalidQueryException, IOException, QueryEngine.IncompatibleQueryException {
+
         final String queryId;
         String query;
 

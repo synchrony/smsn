@@ -30,7 +30,8 @@ public class RippleExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for performing Ripple queries over Extend-o-Brain graphs")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         BasicSearchRequest r;
         try {

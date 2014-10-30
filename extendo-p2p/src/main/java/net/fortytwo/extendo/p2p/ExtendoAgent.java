@@ -85,7 +85,8 @@ public class ExtendoAgent {
                         facilitatorConnection.start(socket);
                     } else {
                         if (Extendo.VERBOSE) {
-                            LOGGER.info("ignoring broadcast message due to existing connection to " + facilitatorService.address.getHostAddress());
+                            LOGGER.info("ignoring broadcast message due to existing connection to "
+                                    + facilitatorService.address.getHostAddress());
                         }
                     }
                 }

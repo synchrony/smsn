@@ -77,7 +77,8 @@ public class DatedEvent extends AtomClass {
             h.handleStatement(vf.createStatement(interval, RDF.TYPE, Timeline.Interval));
             h.handleStatement(vf.createStatement(interval, Timeline.at, dateValue));
 
-            h.handleStatement(vf.createStatement(context.getSubjectUri(), net.fortytwo.extendo.rdf.vocab.Event.time, interval));
+            h.handleStatement(vf.createStatement(
+                    context.getSubjectUri(), net.fortytwo.extendo.rdf.vocab.Event.time, interval));
         }
     }
 }

@@ -50,7 +50,8 @@ public class ExportExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph to the file system")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         // TODO: any security restrictions here?
 
         Params p = createParams(context, (KeyIndexableGraph) graph);

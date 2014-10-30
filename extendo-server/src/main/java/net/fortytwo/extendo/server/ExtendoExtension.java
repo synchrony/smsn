@@ -46,7 +46,9 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
 
     private static final Map<KeyIndexableGraph, ExtendoBrain> brains = new HashMap<KeyIndexableGraph, ExtendoBrain>();
 
-    public synchronized static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph) throws ExtendoBrain.ExtendoBrainException {
+    public synchronized static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph)
+            throws ExtendoBrain.ExtendoBrainException {
+
         ExtendoBrain b = brains.get(baseGraph);
 
         if (null == b) {
@@ -142,7 +144,9 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                 p.map.put("root", rootKey);
             }
 
-            p.map.put("title", null == p.root || null == p.root.getValue() || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
+            p.map.put("title", null == p.root
+                    || null == p.root.getValue()
+                    || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
 
             if (null != styleName) {
                 p.style = NoteQueries.lookupStyle(styleName);
@@ -176,7 +180,8 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                                 ? TransactionalGraph.Conclusion.SUCCESS
                                 : TransactionalGraph.Conclusion.FAILURE);
                     } else if (!normal) {
-                        Extendo.logWarning("failed update of non-transactional graph. Data integrity is not guaranteed");
+                        Extendo.logWarning(
+                                "failed update of non-transactional graph. Data integrity is not guaranteed");
                     }
                 }
             }

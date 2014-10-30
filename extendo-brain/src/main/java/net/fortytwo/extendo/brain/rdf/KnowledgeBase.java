@@ -278,9 +278,9 @@ public class KnowledgeBase {
                     while (!fail) { // break out on failure or exhaustion of the regex
                         if (advanceRegex) {
                             if (matched && null != alts) {
-                                // one point for each wildcard regex element which matches at least one input atom
+                                // one point for each wildcard regex element which matches at least one input
                                 //     e.g. .? earns one point for "a", "b", "c" or any other atom, none for ""
-                                // three points for each class-specific regex element which matches at least one input atom
+                                // three points for each class-specific regex element which matches at least one input
                                 //     e.g. A*(B|C)+ earns 3 points for "a" or "aa", 6 points for "aac"
                                 points += alts.size() > 0 ? 3 : 1;
                             }
@@ -418,7 +418,8 @@ public class KnowledgeBase {
         long total = countAtoms();
 
         long endTime = System.currentTimeMillis();
-        logger.info("typed " + typed + " of " + total + " atoms (" + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
+        logger.info("typed " + typed + " of " + total + " atoms ("
+                + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 
     private long countAtoms() {
@@ -546,7 +547,11 @@ public class KnowledgeBase {
         @Override
         public void handleStatement(Statement statement) throws RDFHandlerException {
             try {
-                sc.addStatement(statement.getSubject(), statement.getPredicate(), statement.getObject(), statement.getContext());
+                sc.addStatement(
+                        statement.getSubject(),
+                        statement.getPredicate(),
+                        statement.getObject(),
+                        statement.getContext());
             } catch (SailException e) {
                 throw new RDFHandlerException(e);
             }

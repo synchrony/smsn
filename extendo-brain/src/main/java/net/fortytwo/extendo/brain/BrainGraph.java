@@ -56,7 +56,8 @@ public class BrainGraph {
                 Class.forName("org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer");
 
                 LOGGER.info("creating fulltext search index");
-                searchIndex = graph.createIndex("search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+                searchIndex = graph.createIndex(
+                        "search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
             } catch (ClassNotFoundException e) {
                 LOGGER.warning("fulltext search not available");
             }
@@ -70,7 +71,8 @@ public class BrainGraph {
 
     private FramedGraph createFramedGraph(final KeyIndexableGraph baseGraph) {
         // Currently, creating a FramedGraph, rather than via the FramedGraph public constructor,
-        // does *not* add GremlinGroovyAnnotationHandler, which is incompatible with Android (due to missing javax.script)
+        // does *not* add GremlinGroovyAnnotationHandler,
+        // which is incompatible with Android (due to missing javax.script)
         FramedGraphFactory f = new FramedGraphFactory();
         return f.create(baseGraph);
     }

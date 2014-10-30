@@ -12,7 +12,7 @@ public class ISBNReference extends SimpleAtomClass {
     public ISBNReference() {
         super(
                 "isbn",
-                Pattern.compile("ISBN: .+"),
+                Pattern.compile("ISBN(-10|-13)?: .+"),
                 null,
                 null
                 );

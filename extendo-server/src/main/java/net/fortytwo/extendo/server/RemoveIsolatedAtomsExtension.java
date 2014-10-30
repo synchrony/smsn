@@ -23,10 +23,12 @@ import org.json.JSONObject;
 public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for for removing isolated atoms (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for for removing isolated atoms" +
+            " (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
 

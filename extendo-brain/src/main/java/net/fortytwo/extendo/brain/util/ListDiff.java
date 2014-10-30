@@ -86,10 +86,12 @@ public class ListDiff {
         int ecur = 0;
 
         while (lcur < l.size()) {
-            if (0 != cmp.compare(l.get(lcur), a.get(acur))) {         // absent in the subsequence but present in the original
+            if (0 != cmp.compare(l.get(lcur), a.get(acur))) {
+                // absent in the subsequence but present in the original
                 ed.delete(ecur, a.get(acur));
                 acur++;
-            } else if (0 != cmp.compare(l.get(lcur), b.get(bcur))) {  // absent in the subsequence but present in the second sequence
+            } else if (0 != cmp.compare(l.get(lcur), b.get(bcur))) {
+                // absent in the subsequence but present in the second sequence
                 ed.add(ecur, b.get(bcur));
                 bcur++;
                 ecur++;

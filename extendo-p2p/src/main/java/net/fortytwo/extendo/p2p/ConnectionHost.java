@@ -48,7 +48,8 @@ public class ConnectionHost {
                 try {
                     listenForNewConnections();
                 } catch (Throwable e) {
-                    LOGGER.severe("connection listener thread on port " + port + " failed with error: " + e.getMessage());
+                    LOGGER.severe("connection listener thread on port " + port
+                            + " failed with error: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } finally {
                     LOGGER.info("connection listener thread on port " + port + " has stopped");
@@ -78,7 +79,9 @@ public class ConnectionHost {
 
             Connection c = new Connection();
             c.start(socket);
-            LOGGER.info("new pub/sub connection opened to " + socket.getRemoteSocketAddress() + " (" + socket.getInetAddress() + ")");
+            LOGGER.info("new pub/sub connection opened to "
+                    + socket.getRemoteSocketAddress()
+                    + " (" + socket.getInetAddress() + ")");
             for (Notifier notifier : notifiers) {
                 notifier.connectionCreated(c);
             }

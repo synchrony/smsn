@@ -45,7 +45,8 @@ public class InferTypesExtension extends ExtendoExtension {
     }
 
     protected boolean doesRead() {
-        // doesn't read, in that no data is returned by the service; this operation only affects future calls which do read
+        // doesn't read, in that no data is returned by the service;
+        // this operation only affects future calls which do read
         return false;
     }
 

@@ -75,7 +75,9 @@ public class QueryEngineProxy implements QueryEngine {
     }
 
     public Subscription addQuery(final String query,
-                                 final BindingSetHandler handler) throws IncompatibleQueryException, InvalidQueryException, IOException {
+                                 final BindingSetHandler handler)
+            throws IncompatibleQueryException, InvalidQueryException, IOException {
+
         Subscription sub = new SubscriptionImpl();
 
         queriesById.put(sub.getId(), query);

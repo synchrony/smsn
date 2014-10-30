@@ -35,7 +35,8 @@ public class ServiceBroadcastListener {
                 try {
                     listenForFacilitatorBroadcast();
                 } catch (Throwable t) {
-                    LOGGER.severe("listener thread for facilitator broadcast messages failed with error: " + t.getMessage());
+                    LOGGER.severe("listener thread for facilitator broadcast messages failed with error: "
+                            + t.getMessage());
                     t.printStackTrace(System.err);
                 } finally {
                     LOGGER.info("listener thread for facilitator broadcast messages stopped");
@@ -74,7 +75,8 @@ public class ServiceBroadcastListener {
 
                             eventHandler.receivedServiceDescription(dataIn.getAddress(), d);
                         } catch (ServiceDescription.InvalidServiceDescriptionException e) {
-                            LOGGER.warning("invalid service description in datagram from " + dataIn.getAddress().getHostAddress() + ": " + msg);
+                            LOGGER.warning("invalid service description in datagram from "
+                                    + dataIn.getAddress().getHostAddress() + ": " + msg);
                         }
                     }
                 }

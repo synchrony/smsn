@@ -31,7 +31,8 @@ public class PrioritiesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for deriving a prioritized list of items in the knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         PrioritiesRequest r;
         try {

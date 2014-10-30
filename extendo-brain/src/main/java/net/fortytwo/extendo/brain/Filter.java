@@ -28,7 +28,8 @@ public class Filter {
         }
 
         if (maxSharability < minSharability) {
-            throw new IllegalArgumentException("maximum sharability must be greater than or equal to minimum sharability");
+            throw new IllegalArgumentException(
+                    "maximum sharability must be greater than or equal to minimum sharability");
         }
 
         if (defaultSharability <= 0) {

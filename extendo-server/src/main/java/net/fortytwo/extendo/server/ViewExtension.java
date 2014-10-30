@@ -27,10 +27,12 @@ import java.security.Principal;
 public class ViewExtension extends ExtendoExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph in the Extendo Wiki format")
+    @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph" +
+            " in the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
         ViewRequest r;

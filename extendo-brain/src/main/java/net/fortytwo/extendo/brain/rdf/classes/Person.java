@@ -26,7 +26,8 @@ public class Person extends AtomClass {
     public Person() {
         super(
                 "person",
-                // note: currently excludes names which begin with special characters (e.g. Chinese or certain European names)
+                // note: currently excludes names which begin with special characters
+                // (e.g. Chinese or certain European names)
                 Pattern.compile("[A-Z].+"),
                 null,
                 new AtomRegex(Arrays.asList(
