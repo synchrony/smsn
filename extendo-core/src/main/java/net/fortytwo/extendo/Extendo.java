@@ -59,7 +59,7 @@ public class Extendo {
     private static final Random RANDOM = new Random();
 
     private static final String CONFIG_PROPERTIES_FILE = "extendo.properties";
-    public static final Logger LOGGER;
+    public static final Logger logger;
 
     public static final String UTF8 = "UTF-8";
 
@@ -77,7 +77,7 @@ public class Extendo {
                 }
             }
 
-            LOGGER = getLogger(Extendo.class);
+            logger = getLogger(Extendo.class);
 
             CONFIGURATION = new TypedProperties();
 
@@ -86,7 +86,7 @@ public class Extendo {
             // Attempt to load additional properties from a user-provided file in the current directory
             File f = new File(CONFIG_PROPERTIES_FILE);
             if (f.exists()) {
-                LOGGER.info("loading Extendo configuration at " + f.getAbsoluteFile());
+                logger.info("loading Extendo configuration at " + f.getAbsoluteFile());
                 InputStream in = new FileInputStream(f);
                 try {
                     CONFIGURATION.load(in);
@@ -94,7 +94,7 @@ public class Extendo {
                     in.close();
                 }
             } else {
-                LOGGER.info("using default Extendo configuration");
+                logger.info("using default Extendo configuration");
             }
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
@@ -157,20 +157,20 @@ public class Extendo {
     }
 
     public static void logInfo(final String message) {
-        LOGGER.log(Level.INFO, message);
+        logger.log(Level.INFO, message);
     }
 
     public static void logWarning(final String message) {
-        LOGGER.log(Level.WARNING, message);
+        logger.log(Level.WARNING, message);
     }
 
     public static void logWarning(final String message,
                                   final Throwable thrown) {
-        LOGGER.log(Level.WARNING, message, thrown);
+        logger.log(Level.WARNING, message, thrown);
     }
 
     public static void logSevere(final String message,
                                  final Throwable thrown) {
-        LOGGER.log(Level.SEVERE, message, thrown);
+        logger.log(Level.SEVERE, message, thrown);
     }
 }

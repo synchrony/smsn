@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class ExtendoExtension extends AbstractRexsterExtension {
-    protected static final Logger LOGGER = Logger.getLogger(ExtendoExtension.class.getName());
+    protected static final Logger logger = Logger.getLogger(ExtendoExtension.class.getName());
 
     private static final String HISTORY_ATTR = "history";
 

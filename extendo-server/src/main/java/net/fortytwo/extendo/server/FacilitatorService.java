@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FacilitatorService {
-    protected static final Logger LOGGER = Logger.getLogger(FacilitatorService.class.getName());
+    protected static final Logger logger = Logger.getLogger(FacilitatorService.class.getName());
 
     private static FacilitatorService INSTANCE;
 
@@ -136,7 +136,7 @@ public class FacilitatorService {
         }
 
         if (Extendo.VERBOSE) {
-            LOGGER.info("received a dataset with " + count + " statements");
+            logger.info("received a dataset with " + count + " statements");
         }
     }
 
@@ -160,11 +160,11 @@ public class FacilitatorService {
         private long count = 0;
 
         public void startRDF() throws RDFHandlerException {
-            LOGGER.fine("beginning of RDF document");
+            logger.fine("beginning of RDF document");
         }
 
         public void endRDF() throws RDFHandlerException {
-            LOGGER.fine("end of RDF document");
+            logger.fine("end of RDF document");
         }
 
         public void handleNamespace(String s, String s2) throws RDFHandlerException {

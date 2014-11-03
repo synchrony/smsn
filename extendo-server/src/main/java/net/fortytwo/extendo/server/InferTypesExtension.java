@@ -39,7 +39,7 @@ public class InferTypesExtension extends ExtendoExtension {
         kb.inferClasses(null);
 
         long timeAfter = System.currentTimeMillis();
-        LOGGER.info("completed type inference in " + (timeAfter - timeBefore) + "ms");
+        logger.info("completed type inference in " + (timeAfter - timeBefore) + "ms");
 
         return ExtensionResponse.ok(p.map);
     }

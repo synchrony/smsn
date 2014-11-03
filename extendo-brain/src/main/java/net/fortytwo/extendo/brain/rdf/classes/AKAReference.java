@@ -12,7 +12,7 @@ public class AKAReference extends SimpleAtomClass {
     public AKAReference() {
         super(
                 "aka",
-                Pattern.compile("aka \\\"[^\\\"]+\\\"(, \\\"[^\\\"]+\\\")*"),
+                Pattern.compile("(aka|trade name) \\\"[^\\\"]+\\\"(, \\\"[^\\\"]+\\\")*"),
                 null,
                 null
                 );

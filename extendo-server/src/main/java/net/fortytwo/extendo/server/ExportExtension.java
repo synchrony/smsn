@@ -91,7 +91,7 @@ public class ExportExtension extends ExtendoExtension {
 
                 String value = v.getProperty(Extendo.VALUE);
                 if (null == value) {
-                    LOGGER.warning("note has null @value: " + v.getId());
+                    logger.warning("note has null @value: " + v.getId());
                 } else {
                     p.print(escapeValue((String) v.getProperty(Extendo.VALUE)));
                 }

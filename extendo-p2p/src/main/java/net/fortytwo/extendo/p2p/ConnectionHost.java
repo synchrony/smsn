@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ConnectionHost {
-    protected static final Logger LOGGER = Logger.getLogger(ConnectionHost.class.getName());
+    protected static final Logger logger = Logger.getLogger(ConnectionHost.class.getName());
 
     private final Set<Notifier> notifiers;
 
@@ -43,16 +43,16 @@ public class ConnectionHost {
 
         new Thread(new Runnable() {
             public void run() {
-                LOGGER.info("starting connection listener thread on port " + port);
+                logger.info("starting connection listener thread on port " + port);
 
                 try {
                     listenForNewConnections();
                 } catch (Throwable e) {
-                    LOGGER.severe("connection listener thread on port " + port
+                    logger.severe("connection listener thread on port " + port
                             + " failed with error: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } finally {
-                    LOGGER.info("connection listener thread on port " + port + " has stopped");
+                    logger.info("connection listener thread on port " + port + " has stopped");
                 }
             }
         }).start();
@@ -62,7 +62,7 @@ public class ConnectionHost {
         try {
             closeAllConnections();
         } catch (IOException e) {
-            LOGGER.warning("error while closing connection(s): " + e.getMessage());
+            logger.warning("error while closing connection(s): " + e.getMessage());
             e.printStackTrace(System.err);
         }
 
@@ -70,7 +70,7 @@ public class ConnectionHost {
     }
 
     private void listenForNewConnections() throws TypedProperties.PropertyException, IOException {
-        LOGGER.info("listening for new connections on port " + port);
+        logger.info("listening for new connections on port " + port);
         // TODO: recover from network failure (IO errors)
         ServerSocket serverSocket = new ServerSocket(port);
         while (!stopped) {
@@ -79,7 +79,7 @@ public class ConnectionHost {
 
             Connection c = new Connection();
             c.start(socket);
-            LOGGER.info("new pub/sub connection opened to "
+            logger.info("new pub/sub connection opened to "
                     + socket.getRemoteSocketAddress()
                     + " (" + socket.getInetAddress() + ")");
             for (Notifier notifier : notifiers) {

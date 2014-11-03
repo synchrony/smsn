@@ -91,13 +91,13 @@ public class Filter {
 
         Float sharability = atomVertex.getProperty(Extendo.SHARABILITY);
         if (null == sharability) {
-            Extendo.LOGGER.warning("atom " + atomVertex.getId() + " has no @sharability");
+            Extendo.logger.warning("atom " + atomVertex.getId() + " has no @sharability");
             return false;
         }
 
         Float weight = atomVertex.getProperty(Extendo.WEIGHT);
         if (null == weight) {
-            Extendo.LOGGER.warning("atom " + atomVertex.getId() + " has no @weight");
+            Extendo.logger.warning("atom " + atomVertex.getId() + " has no @weight");
             return false;
         }
 
