@@ -11,13 +11,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
-/**
+/*
  * FIXME: this class is nearly identical to RippleProperties, only slightly
  * better.  It may be worthwhile to let Ripple and Extendo inherit a
  * common dependency.
- *
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TypedProperties extends Properties {
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -41,8 +38,6 @@ public class TypedProperties extends Properties {
         return s;
     }
 
-    // String values ///////////////////////////////////////////////////////////
-
     public String getString(final String name) throws PropertyException {
         return getProperty(name, true);
     }
@@ -65,8 +60,6 @@ public class TypedProperties extends Properties {
         }
     }
 
-    // boolean values //////////////////////////////////////////////////////////
-
     public boolean getBoolean(final String name) throws PropertyException {
         String value = getProperty(name, true);
 
@@ -86,8 +79,6 @@ public class TypedProperties extends Properties {
                            final boolean value) {
         setProperty(name, "" + value);
     }
-
-    // double values ///////////////////////////////////////////////////////////
 
     public double getDouble(final String name) throws PropertyException {
         String value = getProperty(name, true);
@@ -120,8 +111,6 @@ public class TypedProperties extends Properties {
         setProperty(name, "" + value);
     }
 
-    // float values ////////////////////////////////////////////////////////////
-
     public float getFloat(final String name) throws PropertyException {
         String value = getProperty(name, true);
 
@@ -151,8 +140,6 @@ public class TypedProperties extends Properties {
     public void setFloat(final String name, final float value) {
         setProperty(name, "" + value);
     }
-
-    // int values //////////////////////////////////////////////////////////////
 
     public int getInt(final String name) throws PropertyException {
         String value = getProperty(name, true);
@@ -184,8 +171,6 @@ public class TypedProperties extends Properties {
         setProperty(name, "" + value);
     }
 
-    // long values /////////////////////////////////////////////////////////////
-
     public long getLong(final String name) throws PropertyException {
         String value = getProperty(name, true);
 
@@ -215,8 +200,6 @@ public class TypedProperties extends Properties {
     public void setLong(final String name, final long value) {
         setProperty(name, "" + value);
     }
-
-    // URI values //////////////////////////////////////////////////////////////
 
     public URI getURI(final String name) throws PropertyException {
         String value = getProperty(name, true);
@@ -252,8 +235,6 @@ public class TypedProperties extends Properties {
         }
     }
 
-    // URL values //////////////////////////////////////////////////////////////
-
     public URL getURL(final String name) throws PropertyException {
         String value = getProperty(name, true);
 
@@ -288,8 +269,6 @@ public class TypedProperties extends Properties {
         }
     }
 
-    // File values ///////////////////////////////////////////////////////////////
-
     public File getFile(final String name) throws PropertyException {
         String value = getProperty(name, true);
 
@@ -311,8 +290,6 @@ public class TypedProperties extends Properties {
             setProperty(name, "" + value.getAbsolutePath());
         }
     }
-
-    // Date values ///////////////////////////////////////////////////////////////
 
     public Date getDate(final String name) throws PropertyException {
         String value = getProperty(name, true);
@@ -348,9 +325,6 @@ public class TypedProperties extends Properties {
         }
     }
 
-    /**
-     * @author Joshua Shinavier (http://fortytwo.net)
-     */
     public static class PropertyException extends Exception {
 
         public PropertyException(final String propertyName) {
@@ -363,9 +337,6 @@ public class TypedProperties extends Properties {
         }
     }
 
-    /**
-     * @author Joshua Shinavier (http://fortytwo.net)
-     */
     public static class InvalidPropertyValueException extends PropertyException {
         public InvalidPropertyValueException(final String propertyName,
                                              final Throwable cause) {
@@ -373,9 +344,6 @@ public class TypedProperties extends Properties {
         }
     }
 
-    /**
-     * @author Joshua Shinavier (http://fortytwo.net)
-     */
     public static class PropertyValueNotFoundException extends PropertyException {
         public PropertyValueNotFoundException(final String propertyName) {
             super(propertyName);

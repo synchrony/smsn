@@ -22,8 +22,11 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.sail.SailException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,14 +43,15 @@ import java.security.Principal;
 public class ExportExtension extends ExtendoExtension {
 
     private enum Format {
-        Vertices, Edges, GraphML, PageRank
+        Vertices, Edges, GraphML, PageRank, RDF
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph to the file system")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         // TODO: any security restrictions here?
 
         Params p = createParams(context, (KeyIndexableGraph) graph);
@@ -87,7 +91,7 @@ public class ExportExtension extends ExtendoExtension {
 
                 String value = v.getProperty(Extendo.VALUE);
                 if (null == value) {
-                    LOGGER.warning("note has null @value: " + v.getId());
+                    logger.warning("note has null @value: " + v.getId());
                 } else {
                     p.print(escapeValue((String) v.getProperty(Extendo.VALUE)));
                 }
@@ -154,6 +158,19 @@ public class ExportExtension extends ExtendoExtension {
         w.outputGraph(out);
     }
 
+    private void exportRDF(final KnowledgeBase kb,
+                           final OutputStream out) throws IOException {
+        try {
+            kb.exportRDF(out);
+        } catch (SailException e) {
+            throw new IOException(e);
+        } catch (RDFHandlerException e) {
+            throw new IOException(e);
+        }
+        out.flush();
+        out.close();
+    }
+
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
     // Otherwise, R becomes confused and skips rows.
     private String escapeValue(final String value) {
@@ -184,6 +201,9 @@ public class ExportExtension extends ExtendoExtension {
                     break;
                 case PageRank:
                     exportPageRank(p.brain.getBrainGraph(), new PrintStream(out));
+                    break;
+                case RDF:
+                    exportRDF(p.brain.getKnowledgeBase(), out);
                     break;
             }
         } finally {

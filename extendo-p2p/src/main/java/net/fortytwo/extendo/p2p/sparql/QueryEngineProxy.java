@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class QueryEngineProxy implements QueryEngine {
-    protected static final Logger LOGGER = Logger.getLogger(QueryEngineProxy.class.getName());
+    protected static final Logger logger = Logger.getLogger(QueryEngineProxy.class.getName());
 
     // tags
     public static final String
@@ -56,7 +56,7 @@ public class QueryEngineProxy implements QueryEngine {
                 try {
                     handleSparqlResultJSON(result);
                 } catch (SimpleJSONRDFFormat.ParseError e) {
-                    LOGGER.warning("invalid SPARQL query result: " + result);
+                    logger.warning("invalid SPARQL query result: " + result);
                     e.printStackTrace(System.err);
                 }
             }
@@ -75,7 +75,9 @@ public class QueryEngineProxy implements QueryEngine {
     }
 
     public Subscription addQuery(final String query,
-                                 final BindingSetHandler handler) throws IncompatibleQueryException, InvalidQueryException, IOException {
+                                 final BindingSetHandler handler)
+            throws IncompatibleQueryException, InvalidQueryException, IOException {
+
         Subscription sub = new SubscriptionImpl();
 
         queriesById.put(sub.getId(), query);

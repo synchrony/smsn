@@ -34,16 +34,19 @@ public class InferTypesExtension extends ExtendoExtension {
         kb.reset();
         long timeBefore = System.currentTimeMillis();
 
-        kb.inferTypes();
+        // TODO: build this two-stage invocation into a method
+        kb.inferClasses(null);
+        kb.inferClasses(null);
 
         long timeAfter = System.currentTimeMillis();
-        LOGGER.info("completed type inference in " + (timeAfter - timeBefore) + "ms");
+        logger.info("completed type inference in " + (timeAfter - timeBefore) + "ms");
 
         return ExtensionResponse.ok(p.map);
     }
 
     protected boolean doesRead() {
-        // doesn't read, in that no data is returned by the service; this operation only affects future calls which do read
+        // doesn't read, in that no data is returned by the service;
+        // this operation only affects future calls which do read
         return false;
     }
 

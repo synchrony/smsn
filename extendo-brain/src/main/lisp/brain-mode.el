@@ -25,6 +25,7 @@
 ;; DEPENDENCIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; for JSON-formatted messages to and from Extendo services (see json-read-from-string, json-encode)
+
 (require 'json)
 
 ;; for line number annotations in buffers (see linum-mode)
@@ -47,7 +48,6 @@
 (setq exo-readonly-mode "readonly")
 (setq exo-edit-mode "readwrite")
 (setq exo-search-mode "search")
-
 (setq exo-sharability-viewstyle "sharability")
 (setq exo-inference-viewstyle "inference")
 
@@ -120,6 +120,10 @@
     (let ((x (assoc 'type atom)))
         (if x (cdr x) nil)))
 
+(defun get-meta (atom)
+    (let ((x (assoc 'meta atom)))
+        (if x (cdr x) nil)))
+
 (defun current-root-id ()
     exo-root-id)
 
@@ -170,9 +174,11 @@
         (sharability (get-sharability atom))
         (priority (get-priority atom))
         (alias (get-alias atom))
-        (type (get-type atom)))
+        (meta (get-meta atom)))
+        ;;(type (get-type atom)))
             (message (concat
-                 (if type (concat "type: " type ", "))
+                 ;;(if type (concat "type: " type ", "))
+                 (if meta (concat "[meta], "))
                  "weight: " (number-to-string weight)
                  ", sharability: " (number-to-string sharability)
                  (if priority (concat ", priority: " (number-to-string priority)) "")
@@ -195,7 +201,7 @@
 
 (setq fast-numbers '(
     (?0 0) (?1 1) (?2 2) (?3 3) (?4 4) (?5 5) (?6 6) (?7 7) (?8 8) (?9 9)
-    (?z 0) (?a 1) (?s 2) (?d 3) (?f 4) (?g 5) (?h 6) (?j 7) (?k 8) (?l 9) (?; 10)))
+    (?z 0) (?a 1) (?s 2) (?d 3) (?f 4) (?g 5) (?h 6) (?j 7) (?k 8) (?l 9) (?\; 10)))
 
 (defun number-shorthand-to-number (c)
     (interactive)
@@ -227,7 +233,7 @@
 
 (setq line-addr-keypairs (list
     '(?0 ?0) '(?1 ?1) '(?2 ?2) '(?3 ?3) '(?4 ?4) '(?5 ?5) '(?6 ?6) '(?7 ?7) '(?8 ?8) '(?9 ?9)
-    '(?; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
+    '(?\; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
              '(?u ?1) '(?i ?2) '(?o ?3) '(?p ?4)))
 (setq line-addr-keymap (make-hash-table))
 (dolist (pair line-addr-keypairs)
@@ -393,11 +399,13 @@
     (http-get (request-view-url root depth style mins maxs defaults minw maxw defaultw) (receive-view mode)))
 
 (defun filter-json (mins maxs defaults minw maxw defaultw)
-    (list :minSharability mins :maxSharability maxs :defaultSharability defaults :minWeight minw :maxWeight maxw :defaultWeight defaultw))
+    (list :minSharability mins :maxSharability maxs :defaultSharability defaults
+          :minWeight minw :maxWeight maxw :defaultWeight defaultw))
 
 (defun request-view-url (root depth style mins maxs defaults minw maxw defaultw)
     (concat (base-url) "view?request=" (w3m-url-encode-string (json-encode
-        (list :root root :depth depth :style style :includeTypes (if (using-inference) "true" "false") :filter (filter-json mins maxs defaults minw maxw defaultw))))))
+        (list :root root :depth depth :style style :includeTypes (if (using-inference) "true" "false")
+              :filter (filter-json mins maxs defaults minw maxw defaultw))))))
 
 (defun request-history (mins maxs minw maxw)
     (setq exo-current-line 1)
@@ -532,10 +540,10 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability bright type)
+(defun find-color (weight sharability bright has-meta)
     (let ((s
         (if (using-inference)
-            (elt (if bright inference-bright-colors inference-base-colors) (if type 0 1))
+            (elt (if bright inference-bright-colors inference-base-colors) (if has-meta 0 1))
             (elt (if bright sharability-bright-colors sharability-base-colors) (- (ceiling (* sharability 4)) 1)))))
         (color-string
             (fade-color (color-part-red s) weight)
@@ -544,9 +552,9 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability underline bold bright type background)
+(defun colorize (text weight sharability underline bold bright has-meta background)
     (let ((color (if full-colors-supported
-            (find-color weight sharability bright type)
+            (find-color weight sharability bright has-meta)
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
         (setq l (list :foreground color :background background))
         (if bold (setq l (cons 'bold l)))
@@ -583,24 +591,28 @@
 		        (target-sharability (get-sharability json))
                 (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
 		        (target-alias (get-alias json))
-		        (target-type (get-type json)))
+		        (target-meta (get-meta json)))
 		            (if target-id (puthash target-id json exo-atoms))
 		            (if (not target-id) (error "missing target id"))
 		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
+		            (setq space "")
+		            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
 		            (let ((line "") (id-infix (create-id-infix target-id)))
 		                (if (not editable)
                             (setq id-infix (propertize id-infix 'invisible t)))
-                        (let ((space ""))
-                            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
-                            (setq line (concat line space)))
+                        (setq line (concat line space))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability nil nil target-alias target-type "white")
+                                (colorize bullet target-weight target-sharability nil nil target-alias target-meta "white")
                                 id-infix
                                 " "
-                                (colorize target-value target-weight target-sharability nil nil target-alias target-type "white")
+                                (colorize target-value target-weight target-sharability nil nil target-alias target-meta "white")
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
+                    (if (using-inference)
+                        ;;(dolist (a target-meta) (insert (concat "@{" a "}\n"))))
+                        ;;(insert (concat "type: " (concat (type-of target-meta)))))
+                        (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n") "white"))))
                     (write-view editable children (+ tree-indent 4))))))
 
 (defun num-or-nil-to-string (n)
@@ -759,13 +771,17 @@
     "enter edit (read/write) mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-readonly-mode))
-        (request-view t exo-edit-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view t exo-edit-mode exo-root-id exo-depth exo-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-enter-readonly-view ()
     "enter read-only mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-edit-mode))
-        (request-view t exo-readonly-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view t exo-readonly-mode exo-root-id exo-depth exo-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-events ()
     "retrieve the Extend-o-Brain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
@@ -791,6 +807,13 @@
     (interactive)
     (message (concat "computing and exporting PageRank to " file))
     (do-export "PageRank" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-rdf (file)
+    "export an N-Triples dump of the Extend-o-Brain graph to the file system"
+    (interactive)
+    (message (concat "exporting RDF (N-Triples) to " file))
+    (do-export "RDF" file
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-export-vertices (file)
@@ -885,6 +908,7 @@
     (request-priorities-results
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
+
 (defun exo-push-view ()
     "push an up-to-date view into the Extend-o-Brain graph"
     (interactive)
@@ -904,7 +928,8 @@
                     :style exo-style
                     :view entity
                     :filter (filter-json exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
-            (receive-view exo-edit-mode)))))
+            (receive-view exo-edit-mode))))
+    (sit-for 0 500)(exo-update-view)(sit-for 0 500)(exo-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
 
 (defun exo-ripple-query (query)
     "evaluate Ripple expression QUERY"
@@ -980,7 +1005,9 @@ A value of -1 indicates that values should not be truncated."
     (let ((depth (number-shorthand-to-number expr)))
         (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
             (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
-                (request-view nil exo-mode exo-root-id depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
+                (request-view nil exo-mode exo-root-id depth exo-style
+                    exo-min-sharability exo-max-sharability exo-default-sharability
+                    exo-min-weight exo-max-weight exo-default-weight)))))
 
 (defun exo-toggle-emacspeak ()
     "turn Emacspeak on or off"
@@ -1009,19 +1036,25 @@ a type has been assigned to it by the inference engine."
     "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
     (interactive)
     (if (in-view)
-        (request-view nil exo-mode exo-root-id exo-depth exo-backward-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view nil exo-mode exo-root-id exo-depth exo-backward-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-update-to-forward-view ()
     "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
     (interactive)
     (if (in-view)
-        (request-view nil exo-mode exo-root-id exo-depth exo-forward-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view nil exo-mode exo-root-id exo-depth exo-forward-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-update-view ()
     "refresh the current view from the data store"
     (interactive)
     (if (in-view)
-        (request-view t exo-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+        (request-view t exo-mode exo-root-id exo-depth exo-style
+            exo-min-sharability exo-max-sharability exo-default-sharability
+            exo-min-weight exo-max-weight exo-default-weight)))
 
 (defun exo-visit-in-amazon (value-selector)
     "search Amazon.com for the value generated by VALUE-SELECTOR and view the results in a browser"
@@ -1122,6 +1155,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'exo-export-edges "export edges to file: " exo-default-edges-file))
 (global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'exo-export-graphml "export GraphML to file: " exo-default-graphml-file))
 (global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'exo-export-pagerank "export PageRank results to file: " exo-default-pagerank-file))
+(global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export RDF (N-Triples) to file: " exo-default-rdf-file))
 (global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
 (global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
 (global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)

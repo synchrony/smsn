@@ -43,7 +43,8 @@ public class ContinuousQueryDemo {
 
             BindingSetHandler bsh = new BindingSetHandler() {
                 public void handle(final BindingSet result) {
-                    StringBuilder sb = new StringBuilder("RESULT (" + f.getName() + ")\t" + System.currentTimeMillis() + "\t");
+                    StringBuilder sb = new StringBuilder("RESULT (" + f.getName() + ")\t"
+                            + System.currentTimeMillis() + "\t");
 
                     boolean first = true;
                     for (String n : result.getBindingNames()) {

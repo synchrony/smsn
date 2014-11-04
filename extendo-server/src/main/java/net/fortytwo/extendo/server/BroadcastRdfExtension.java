@@ -32,15 +32,18 @@ public class BroadcastRdfExtension extends ExtendoExtension {
 
     private final FacilitatorService facilitator;
 
-    public BroadcastRdfExtension() throws IOException, TypedProperties.PropertyException, RippleException, SailException {
+    public BroadcastRdfExtension()
+            throws IOException, TypedProperties.PropertyException, RippleException, SailException {
+
         facilitator =  FacilitatorService.getInstance();
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "a service for broadcasting events modeled in RDF to all peers in the environment")
+    @ExtensionDescriptor(description = "a service for broadcasting events in RDF to all peers in the environment")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         BroadcastRdfRequest r;
         try {

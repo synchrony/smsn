@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Priorities {
-    private static final Logger LOGGER = Extendo.getLogger(Priorities.class);
+    private static final Logger logger = Extendo.getLogger(Priorities.class);
 
     private final PriorityQueue<Atom> queue;
 
@@ -31,7 +31,7 @@ public class Priorities {
 
         new Thread(new Runnable() {
             public void run() {
-                LOGGER.info("generating priority queue");
+                logger.info("generating priority queue");
                 long startTime = System.currentTimeMillis();
 
                 for (Vertex v : graph.getPropertyGraph().getVertices()) {
@@ -42,7 +42,7 @@ public class Priorities {
                 }
 
                 long endTime = System.currentTimeMillis();
-                LOGGER.info("\tfinished generating priority queue in " + (endTime - startTime) + "ms");
+                logger.info("\tfinished generating priority queue in " + (endTime - startTime) + "ms");
             }
         }).start();
     }

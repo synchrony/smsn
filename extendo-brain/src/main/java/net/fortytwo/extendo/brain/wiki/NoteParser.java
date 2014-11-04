@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteParser {
+
     // regex of valid id suffixes
     public static final Pattern ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
 
@@ -34,7 +35,7 @@ public class NoteParser {
     private static final String TAB_REPLACEMENT = "    ";
 
     public Note fromWikiText(final String s) throws IOException, NoteParsingException {
-        InputStream in = new ByteArrayInputStream(s.getBytes());
+        InputStream in = new ByteArrayInputStream(s.getBytes(Extendo.UTF8));
         try {
             return fromWikiText(in);
         } finally {
@@ -48,7 +49,7 @@ public class NoteParser {
         LinkedList<Note> hierarchy = new LinkedList<Note>();
         LinkedList<Integer> indentHierarachy = new LinkedList<Integer>();
 
-        InputStreamReader r = new InputStreamReader(in, "UTF-8");
+        InputStreamReader r = new InputStreamReader(in, Extendo.UTF8);
         BufferedReader br = new BufferedReader(r);
         String line;
         int lineNumber = 0;

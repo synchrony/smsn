@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class QueryEngineWrapper {
-    protected static final Logger LOGGER = Logger.getLogger(QueryEngineWrapper.class.getName());
+    protected static final Logger logger = Logger.getLogger(QueryEngineWrapper.class.getName());
 
     private final QueryEngine queryEngine;
 
@@ -48,11 +48,11 @@ public class QueryEngineWrapper {
                 try {
                     handleDatasetMessage(message);
                 } catch (SimpleJSONRDFFormat.ParseError e) {
-                    LOGGER.warning("invalid dataset message: " + message);
+                    logger.warning("invalid dataset message: " + message);
                     e.printStackTrace(System.err);
                 } catch (IOException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    LOGGER.warning("error raised by query engine: " + e.getMessage());
+                    logger.warning("error raised by query engine: " + e.getMessage());
                     e.printStackTrace(System.err);
                 }
             }
@@ -73,22 +73,23 @@ public class QueryEngineWrapper {
         c.registerHandler(QueryEngineProxy.TAG_SPARQL_QUERY, new MessageHandler() {
             public void handle(final JSONObject message) {
                 if (Extendo.VERBOSE) {
-                    LOGGER.info("received query message from " + c.getSocket().getRemoteSocketAddress() + ": " + message);
+                    logger.info("received query message from "
+                            + c.getSocket().getRemoteSocketAddress() + ": " + message);
                 }
 
                 try {
                     handleQueryMessage(c, message);
                 } catch (QueryEngine.InvalidQueryException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    LOGGER.warning("error raised by query engine: " + e.getMessage());
+                    logger.warning("error raised by query engine: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } catch (IOException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    LOGGER.warning("error raised by query engine: " + e.getMessage());
+                    logger.warning("error raised by query engine: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } catch (QueryEngine.IncompatibleQueryException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    LOGGER.warning("error raised by query engine: " + e.getMessage());
+                    logger.warning("error raised by query engine: " + e.getMessage());
                     e.printStackTrace(System.err);
                 }
             }
@@ -98,7 +99,9 @@ public class QueryEngineWrapper {
     }
 
     private void handleQueryMessage(final Connection c,
-                                    final JSONObject message) throws QueryEngine.InvalidQueryException, IOException, QueryEngine.IncompatibleQueryException {
+                                    final JSONObject message)
+            throws QueryEngine.InvalidQueryException, IOException, QueryEngine.IncompatibleQueryException {
+
         final String queryId;
         String query;
 
@@ -106,13 +109,13 @@ public class QueryEngineWrapper {
             queryId = message.getString(QueryEngineProxy.QUERY_ID);
             query = message.getString(QueryEngineProxy.QUERY);
         } catch (JSONException e) {
-            LOGGER.warning("invalid query message: " + message);
+            logger.warning("invalid query message: " + message);
             e.printStackTrace(System.err);
             return;
         }
 
         if (connectionsByQueryId.keySet().contains(queryId)) {
-            LOGGER.warning("ignoring query with duplicate id '" + queryId + "'");
+            logger.warning("ignoring query with duplicate id '" + queryId + "'");
             return;
         }
 
@@ -125,10 +128,10 @@ public class QueryEngineWrapper {
                     JSONObject bindings = jsonrdfFormat.toJSON(bs);
                     sendQueryResultMessage(c, queryId, bindings);
                 } catch (JSONException e) {
-                    LOGGER.severe("error in creating query result JSON message: " + e.getMessage());
+                    logger.severe("error in creating query result JSON message: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } catch (IOException e) {
-                    LOGGER.warning("failed to send query result due to I/O error: " + e.getMessage());
+                    logger.warning("failed to send query result due to I/O error: " + e.getMessage());
                     e.printStackTrace(System.err);
                 }
             }
@@ -143,7 +146,7 @@ public class QueryEngineWrapper {
         j.put(QueryEngineProxy.BINDINGS, bindings);
 
         if (Extendo.VERBOSE) {
-            LOGGER.info("sending query result message to " + c.getSocket().getRemoteSocketAddress() + ": " + j);
+            logger.info("sending query result message to " + c.getSocket().getRemoteSocketAddress() + ": " + j);
         }
 
         // send SPARQL results immediately or not at all; don't buffer
@@ -152,19 +155,19 @@ public class QueryEngineWrapper {
 
     private void handleDatasetMessage(final JSONObject message) throws SimpleJSONRDFFormat.ParseError, IOException {
         if (Extendo.VERBOSE) {
-            LOGGER.info("received dataset message: " + message);
+            logger.info("received dataset message: " + message);
         }
 
         try {
             JSONArray dataset = message.getJSONArray(QueryEngineProxy.DATASET);
             int length = dataset.length();
             //if (Extendo.VERBOSE) {
-            //    LOGGER.info("found " + length + " statements:");
+            //    logger.info("found " + length + " statements:");
             //}
             for (int i = 0; i < length; i++) {
                 Statement s = jsonrdfFormat.toStatement(dataset.getJSONArray(i));
                 //if (Extendo.VERBOSE) {
-                //    LOGGER.info("\t" + s);
+                //    logger.info("\t" + s);
                 //}
                 queryEngine.addStatement(s);
             }

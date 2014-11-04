@@ -317,7 +317,9 @@ public class BrainModeClient {
         execute(insertFunction, text);
     }
 
-    private void execute(final EmacsFunction f, final String text) throws IOException, InterruptedException, ExecutionException {
+    private void execute(final EmacsFunction f, final String text)
+            throws IOException, InterruptedException, ExecutionException {
+
         Process p = functionExecutor.execute(f, text);
 
         if (null != p && 0 != p.exitValue()) {

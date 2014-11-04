@@ -27,7 +27,8 @@ public class FindRootsExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         BasicViewRequest r;
         try {

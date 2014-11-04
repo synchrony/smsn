@@ -18,7 +18,9 @@ public class BrainModeClientTest extends TestCase {
     private final List<String> results = new ArrayList<String>();
 
     private final BrainModeClient.EmacsFunctionExecutor functionExecutor = new BrainModeClient.EmacsFunctionExecutor() {
-        public Process execute(BrainModeClient.EmacsFunction function, String argument) throws InterruptedException, IOException {
+        public Process execute(BrainModeClient.EmacsFunction function, String argument)
+                throws InterruptedException, IOException {
+
             String expr = function.getRequiresArgument()
                     ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
                     : "(" + function.getName() + ")";
@@ -39,7 +41,8 @@ public class BrainModeClientTest extends TestCase {
                 "(insert \"some inserted text\")",
                 "(next-line)");
 
-        // search for the "sandbox" note and select it from the search results, visit the 11th child of sandbox and add a new note to it
+        // search for the "sandbox" note and select it from the search results,
+        // visit the 11th child of sandbox and add a new note to it
         assertExpected("<C-c>ssandb*\n<down><C-c>t<C-c><C-l>aa\n<C-c>t<C-c><C-v>e* here is a new note\n<C-c>p",
                 "(exo-search \"sandb*\")",
                 "(next-line)",
@@ -67,9 +70,11 @@ public class BrainModeClientTest extends TestCase {
         }
 
         if (results.size() < outputs.length) {
-            assertTrue("insufficient output: expecting " + outputs[results.size()] + " at index " + results.size(), false);
+            assertTrue("insufficient output: expecting " + outputs[results.size()]
+                    + " at index " + results.size(), false);
         } else if (results.size() > outputs.length) {
-            assertTrue("excess output beginning with " + results.get(outputs.length) + " at index " + outputs.length, false);
+            assertTrue("excess output beginning with " + results.get(outputs.length)
+                    + " at index " + outputs.length, false);
         }
     }
 }

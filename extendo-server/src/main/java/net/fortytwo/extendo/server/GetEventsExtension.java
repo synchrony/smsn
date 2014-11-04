@@ -30,7 +30,8 @@ public class GetEventsExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for retrieving the stack of recently pushed events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         GetEventsRequest r;
         try {

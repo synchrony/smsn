@@ -120,6 +120,17 @@
                 </exclusions>
             </dependency>
             <dependency>
+                    <groupId>org.openrdf.sesame</groupId>
+                    <artifactId>sesame-sail-memory</artifactId>
+                    <version>${sesame.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>com.tinkerpop.blueprints</groupId>
                 <artifactId>blueprints-sail-graph</artifactId>
                 <version>${tinkerpop.version}</version>

@@ -28,7 +28,8 @@ public class Filter {
         }
 
         if (maxSharability < minSharability) {
-            throw new IllegalArgumentException("maximum sharability must be greater than or equal to minimum sharability");
+            throw new IllegalArgumentException(
+                    "maximum sharability must be greater than or equal to minimum sharability");
         }
 
         if (defaultSharability <= 0) {
@@ -90,13 +91,13 @@ public class Filter {
 
         Float sharability = atomVertex.getProperty(Extendo.SHARABILITY);
         if (null == sharability) {
-            Extendo.LOGGER.warning("atom " + atomVertex.getId() + " has no @sharability");
+            Extendo.logger.warning("atom " + atomVertex.getId() + " has no @sharability");
             return false;
         }
 
         Float weight = atomVertex.getProperty(Extendo.WEIGHT);
         if (null == weight) {
-            Extendo.LOGGER.warning("atom " + atomVertex.getId() + " has no @weight");
+            Extendo.logger.warning("atom " + atomVertex.getId() + " has no @weight");
             return false;
         }
 

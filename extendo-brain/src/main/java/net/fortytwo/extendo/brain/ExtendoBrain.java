@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendoBrain {
-    private static final Logger LOGGER = Extendo.getLogger(ExtendoBrain.class);
+    private static final Logger logger = Extendo.getLogger(ExtendoBrain.class);
 
     // TODO: make this configurable
     private static final int EVENT_STACK_CAPACITY = 50;
@@ -33,8 +33,13 @@ public class ExtendoBrain {
 
         knowledgeBase = new KnowledgeBase(brainGraph);
 
-        // just for now
-        knowledgeBase.addDefaultTypes();
+        try {
+            knowledgeBase.addDefaultClasses();
+        } catch (InstantiationException e) {
+            throw new ExtendoBrainException(e);
+        } catch (IllegalAccessException e) {
+            throw new ExtendoBrainException(e);
+        }
 
         File logFile;
         try {
@@ -44,10 +49,10 @@ public class ExtendoBrain {
         }
 
         if (null == logFile) {
-            LOGGER.warning("no activity log specified");
+            logger.warning("no activity log specified");
             activityLog = null;
         } else {
-            LOGGER.info("will use activity log at " + logFile.getPath());
+            logger.info("will use activity log at " + logFile.getPath());
             try {
                 activityLog = new ActivityLog(new FileWriter(logFile, true));
             } catch (IOException e) {

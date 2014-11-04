@@ -27,13 +27,14 @@ import java.util.logging.Logger;
 @ExtensionNaming(namespace = "extendo", name = "set")
 //@ExtensionDescriptor(description = "set the properties of an atom")
 public class SetPropertiesExtension extends ExtendoExtension {
-    protected static final Logger LOGGER = Logger.getLogger(SetPropertiesExtension.class.getName());
+    protected static final Logger logger = Logger.getLogger(SetPropertiesExtension.class.getName());
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for setting properties of given atoms")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request", description = "request description (JSON object)") String request) {
+                                           @ExtensionRequestParameter(name = "request",
+                                                   description = "request description (JSON object)") String request) {
         Params p = createParams(context, (KeyIndexableGraph) graph);
         SetPropertiesRequest r;
         try {

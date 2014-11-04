@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainGraph {
-    private static final Logger LOGGER = Extendo.getLogger(BrainGraph.class);
+    private static final Logger logger = Extendo.getLogger(BrainGraph.class);
 
     private final IdGraph<KeyIndexableGraph> graph;
 
@@ -55,22 +55,24 @@ public class BrainGraph {
             try {
                 Class.forName("org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer");
 
-                LOGGER.info("creating fulltext search index");
-                searchIndex = graph.createIndex("search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+                logger.info("creating fulltext search index");
+                searchIndex = graph.createIndex(
+                        "search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
             } catch (ClassNotFoundException e) {
-                LOGGER.warning("fulltext search not available");
+                logger.warning("fulltext search not available");
             }
         }
 
         if (!graph.getIndexedKeys(Vertex.class).contains(Extendo.ALIAS)) {
-            LOGGER.info("creating key index for 'alias' property");
+            logger.info("creating key index for 'alias' property");
             graph.createKeyIndex(Extendo.ALIAS, Vertex.class);
         }
     }
 
     private FramedGraph createFramedGraph(final KeyIndexableGraph baseGraph) {
         // Currently, creating a FramedGraph, rather than via the FramedGraph public constructor,
-        // does *not* add GremlinGroovyAnnotationHandler, which is incompatible with Android (due to missing javax.script)
+        // does *not* add GremlinGroovyAnnotationHandler,
+        // which is incompatible with Android (due to missing javax.script)
         FramedGraphFactory f = new FramedGraphFactory();
         return f.create(baseGraph);
     }

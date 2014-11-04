@@ -3,7 +3,6 @@ package net.fortytwo.extendo.brain;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
-import net.fortytwo.extendo.brain.rdf.BottomUpType;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import net.fortytwo.extendo.brain.util.ListDiff;
 
@@ -466,7 +465,8 @@ public class NoteQueries {
                     String s = v.stringValue();
 
                     if (s.startsWith(PropertyGraphSail.VERTEX_NS)) {
-                        Vertex vx = graph.getPropertyGraph().getVertex(s.substring(PropertyGraphSail.VERTEX_NS.length()));
+                        Vertex vx = graph.getPropertyGraph().getVertex(
+                            s.substring(PropertyGraphSail.VERTEX_NS.length()));
                         vertices.add(vx);
                     }
                 }
@@ -619,9 +619,16 @@ public class NoteQueries {
         }
 
         if (null != brain.getKnowledgeBase()) {
-            BottomUpType type = brain.getKnowledgeBase().getTypeOf(a);
-            if (null != type) {
-                n.setType(type.getName());
+            List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(a);
+            if (null != entries && entries.size() > 0) {
+                List<String> meta = new LinkedList<String>();
+                for (KnowledgeBase.AtomClassEntry e : entries) {
+                    String ann = String.format("class %s %.2f=%.2f+%.2f",
+                            e.getInferredClassName(), e.getScore(), e.getOutScore(), e.getInScore());
+                    meta.add(ann);
+                }
+
+                n.setMeta(meta);
             }
         }
 

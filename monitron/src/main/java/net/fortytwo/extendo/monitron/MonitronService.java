@@ -56,11 +56,14 @@ public class MonitronService {
         dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_7BB206L0_VIBRN),
                 new VibrationLevelSensorListener(c, Universe.MURATA_7BB_20_6L0_1));
         dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_ADJDS311CR999_BLUE),
-                new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.BLUE_LIGHT_LEVEL));
+                new ColorLightLevelSensorListener(
+                        c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.BLUE_LIGHT_LEVEL));
         dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_ADJDS311CR999_GREEN),
-                new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.GREEN_LIGHT_LEVEL));
+                new ColorLightLevelSensorListener(
+                        c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.GREEN_LIGHT_LEVEL));
         dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_ADJDS311CR999_RED),
-                new ColorLightLevelSensorListener(c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.RED_LIGHT_LEVEL));
+                new ColorLightLevelSensorListener(
+                        c, Universe.AVAGO_ADJD_S311_CR999_1, MonitronOntology.RED_LIGHT_LEVEL));
         dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_BMP085_PRESSURE),
                 new BarometerListener(c, Universe.BOSCH_BMP085_1_BAROMETER));
         dispatcher.addListener(new JavaRegexAddressSelector(Universe.OM_SENSOR_BMP085_TEMP),

@@ -55,8 +55,10 @@ public class WebpageVisitedExtension extends AbstractRexsterExtension {
     @ExtensionDescriptor(description = "an extension for logging web page visits")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "url", description = "URL of the visited web page") String url,
-                                           @ExtensionRequestParameter(name = "title", description = "title of the visited web page") String title) {
+                                           @ExtensionRequestParameter(name = "url",
+                                                   description = "URL of the visited web page") String url,
+                                           @ExtensionRequestParameter(name = "title",
+                                                   description = "title of the visited web page") String title) {
         if (!(graph instanceof SailGraph)) {
             return ExtensionResponse.error("specified graph is not an RDF graph");
         }

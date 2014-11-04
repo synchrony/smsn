@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendoAgent {
-    protected static final Logger LOGGER = Logger.getLogger(ExtendoAgent.class.getName());
+    protected static final Logger logger = Logger.getLogger(ExtendoAgent.class.getName());
 
     public static final String
             PROP_BODY = "body",
@@ -37,7 +37,7 @@ public class ExtendoAgent {
 
     public ExtendoAgent(final String agentUri,
                         final boolean listenForServices) {
-        LOGGER.info("creating Extendo agent with URI " + agentUri);
+        logger.info("creating Extendo agent with URI " + agentUri);
 
         this.agentUri = vf.createURI(agentUri);
 
@@ -51,7 +51,7 @@ public class ExtendoAgent {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
                 public void receivedServiceDescription(InetAddress address, ServiceDescription description) {
                     if (Extendo.VERBOSE) {
-                        LOGGER.info("received broadcast message from " + address.getHostAddress()
+                        logger.info("received broadcast message from " + address.getHostAddress()
                                 + ": version=" + description.getVersion()
                                 + ", endpoint=" + description.getEndpoint()
                                 + ", pub/sub port=" + description.getPubsubPort());
@@ -66,10 +66,10 @@ public class ExtendoAgent {
 
                         Socket socket;
                         try {
-                            LOGGER.info("opening socket connection to facilitator");
+                            logger.info("opening socket connection to facilitator");
                             socket = new Socket(address, facilitatorService.description.getPubsubPort());
                         } catch (IOException e) {
-                            LOGGER.severe("failed to open socket connection to facilitator: " + e.getMessage());
+                            logger.severe("failed to open socket connection to facilitator: " + e.getMessage());
                             e.printStackTrace(System.err);
                             return;
                         }
@@ -77,7 +77,7 @@ public class ExtendoAgent {
                         try {
                             queryEngine.notifyConnectionOpen();
                         } catch (IOException e) {
-                            LOGGER.warning("error on query engine notification: " + e.getMessage());
+                            logger.warning("error on query engine notification: " + e.getMessage());
                             e.printStackTrace(System.err);
                             return;
                         }
@@ -85,7 +85,8 @@ public class ExtendoAgent {
                         facilitatorConnection.start(socket);
                     } else {
                         if (Extendo.VERBOSE) {
-                            LOGGER.info("ignoring broadcast message due to existing connection to " + facilitatorService.address.getHostAddress());
+                            logger.info("ignoring broadcast message due to existing connection to "
+                                    + facilitatorService.address.getHostAddress());
                         }
                     }
                 }

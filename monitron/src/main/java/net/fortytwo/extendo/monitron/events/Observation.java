@@ -60,8 +60,10 @@ public abstract class Observation extends MonitronEvent {
         addStatement(dataset, beginning, RDF.TYPE, OWLTime.INSTANT);
         Resource end = valueFactory.createBNode();
         addStatement(dataset, end, RDF.TYPE, OWLTime.INSTANT);
-        addStatement(dataset, beginning, OWLTime.IN_XSD_DATE_TIME, toLiteral(new Date(data.getSampleIntervalBeginning())));
-        addStatement(dataset, end, OWLTime.IN_XSD_DATE_TIME, toLiteral(new Date(data.getSampleIntervalEnd())));
+        addStatement(dataset, beginning, OWLTime.IN_XSD_DATE_TIME,
+                toLiteral(new Date(data.getSampleIntervalBeginning())));
+        addStatement(dataset, end, OWLTime.IN_XSD_DATE_TIME,
+                toLiteral(new Date(data.getSampleIntervalEnd())));
         addStatement(dataset, samplingTime, OWLTime.HAS_BEGINNING, beginning);
         addStatement(dataset, samplingTime, OWLTime.HAS_END, end);
 

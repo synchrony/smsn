@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Connection {
-    protected static final Logger LOGGER = Logger.getLogger(Connection.class.getName());
+    protected static final Logger logger = Logger.getLogger(Connection.class.getName());
 
     private Socket socket;
 
@@ -59,10 +59,10 @@ public class Connection {
             try {
                 sendInternal(bm.tag, bm.body);
             } catch (JSONException e) {
-                LOGGER.warning("error sending buffered message: " + e.getMessage());
+                logger.warning("error sending buffered message: " + e.getMessage());
                 e.printStackTrace(System.err);
             } catch (IOException e) {
-                LOGGER.warning("error sending buffered message: " + e.getMessage());
+                logger.warning("error sending buffered message: " + e.getMessage());
                 e.printStackTrace(System.err);
             }
         }
@@ -72,16 +72,16 @@ public class Connection {
 
         new Thread(new Runnable() {
             public void run() {
-                LOGGER.info("starting message handler thread");
+                logger.info("starting message handler thread");
 
                 try {
                     // TODO: recover from IO errors (e.g. due to temporary network issues)
                     handleIncomingMessages();
                 } catch (Throwable e) {
-                    LOGGER.severe("message handler thread failed with error: " + e.getMessage());
+                    logger.severe("message handler thread failed with error: " + e.getMessage());
                     e.printStackTrace(System.err);
                 } finally {
-                    LOGGER.info("message handler thread stopped");
+                    logger.info("message handler thread stopped");
                 }
 
                 // make this connection inactive
@@ -110,7 +110,7 @@ public class Connection {
     public synchronized void sendNow(final String tag,
                                      final JSONObject body) throws JSONException, IOException {
         if (!isActive()) {
-            LOGGER.fine("can't send; connection is closed");
+            logger.fine("can't send; connection is closed");
             return;
         }
 
@@ -138,7 +138,7 @@ public class Connection {
         String s = message.toString();
 
         if (Extendo.VERBOSE) {
-            LOGGER.info("sending message to " + socket.getRemoteSocketAddress() + ": " + s);
+            logger.info("sending message to " + socket.getRemoteSocketAddress() + ": " + s);
         }
 
         socket.getOutputStream().write(s.getBytes());
@@ -159,19 +159,19 @@ public class Connection {
             String line = br.readLine();
 
             if (null == line) {
-                LOGGER.info("connection to " + socket.getRemoteSocketAddress() + " closed remotely");
+                logger.info("connection to " + socket.getRemoteSocketAddress() + " closed remotely");
                 break;
             }
 
             if (Extendo.VERBOSE) {
-                LOGGER.info("received message from " + socket.getRemoteSocketAddress() + ": " + line);
+                logger.info("received message from " + socket.getRemoteSocketAddress() + ": " + line);
             }
 
             JSONObject message;
             try {
                 message = new JSONObject(line);
             } catch (JSONException e) {
-                LOGGER.warning("could not parse message as JSON: " + e.getMessage());
+                logger.warning("could not parse message as JSON: " + e.getMessage());
                 continue;
             }
 
@@ -179,7 +179,7 @@ public class Connection {
             try {
                 tag = message.getString(ExtendoAgent.PROP_TAG);
             } catch (JSONException e) {
-                LOGGER.warning("missing '" + ExtendoAgent.PROP_TAG + "' in JSON message. Discarding");
+                logger.warning("missing '" + ExtendoAgent.PROP_TAG + "' in JSON message. Discarding");
                 continue;
             }
 
@@ -187,22 +187,22 @@ public class Connection {
             try {
                 body = message.getJSONObject(ExtendoAgent.PROP_BODY);
             } catch (JSONException e) {
-                LOGGER.warning("missing '" + ExtendoAgent.PROP_BODY + "' in JSON message. Discarding");
+                logger.warning("missing '" + ExtendoAgent.PROP_BODY + "' in JSON message. Discarding");
                 continue;
             }
 
             MessageHandler handler = handlers.get(tag);
 
             if (null == handler) {
-                LOGGER.warning("no handler for message with tag '" + tag + "'");
+                logger.warning("no handler for message with tag '" + tag + "'");
             } else {
                 try {
                     handler.handle(body);
                 } catch (MessageHandler.MessageHandlerException e) {
-                    LOGGER.severe("JSON message handler failed with error: " + e.getMessage());
+                    logger.severe("JSON message handler failed with error: " + e.getMessage());
                 } catch (Throwable t) {
                     // don't allow otherwise uncaught handler errors to kill this loop/thread
-                    LOGGER.severe("JSON message handler failed with unexpected error: " + t.getMessage());
+                    logger.severe("JSON message handler failed with unexpected error: " + t.getMessage());
                     t.printStackTrace(System.err);
                 }
             }

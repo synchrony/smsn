@@ -21,7 +21,8 @@ public class NoteWriter {
     public static final String
             CHILDREN = "children",
             HAS_CHILDREN = "hasChildren",
-            ID = "id";
+            ID = "id",
+            META = "meta";
 
     private int valueLengthCutoff = -1;
 
@@ -57,8 +58,19 @@ public class NoteWriter {
             json.put(Extendo.ALIAS, n.getAlias());
         }
 
+        /*
         if (null != n.getType()) {
             json.put(Extendo.TYPE, n.getType());
+        }
+        */
+
+        if (null != n.getMeta()) {
+            JSONArray c = new JSONArray();
+            json.put(META, c);
+            int i = 0;
+            for (String s : n.getMeta()) {
+                c.put(i++, s);
+            }
         }
 
         if (0 < n.getChildren().size()) {
@@ -78,7 +90,7 @@ public class NoteWriter {
                            final OutputStream out) {
         PrintStream p;
         try {
-            p = new PrintStream(out, false, "UTF-8");
+            p = new PrintStream(out, false, Extendo.UTF8);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
