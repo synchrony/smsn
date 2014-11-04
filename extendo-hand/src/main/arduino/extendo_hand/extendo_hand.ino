@@ -9,21 +9,21 @@
 #define KEYBOARD_MODE
 
 // if true, emit raw motion (accelerometer/gyro/magnetometer) data
-#define OUTPUT_SENSOR_DATA    0
+#define OUTPUT_SENSOR_DATA    1
 
 // if true, recognize and emit gestures
-#define OUTPUT_GESTURES       1
+#define OUTPUT_GESTURES       0
 
 // if true, emit info messages with the current sampling rate
 #define OUTPUT_SAMPLING_RATE  0
 
 // if true, listen for incoming OSC messages.  Otherwise, do not wait for input,
 // which permits a higher sampling and output rate
-#define INPUT_ENABLED         1
+#define INPUT_ENABLED         0
 
 // if true, use a minimal comma-separated format for output, rather than OSC
 // best used with OUTPUT_SENSOR_DATA=1, OUTPUT_GESTURES=0, INPUT_ENABLED=0
-#define SIMPLE_OUTPUT         0
+#define SIMPLE_OUTPUT         1
 
 #define THREEAXIS             0
 #define NINEAXIS              1
@@ -180,6 +180,10 @@ void setup()
     setColor(RGB_YELLOW);
     droidspeak.speakPowerUpPhrase();
 
+    osc.beginSerial();
+
+    bundleIn = new OSCBundle();   
+
 #if THREEAXIS
     // TODO: random seed using 9-axis sensor
     randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
@@ -189,17 +193,6 @@ void setup()
     motionSensor.calibrateY(332, 841);
     motionSensor.calibrateZ(175, 700);
 #else
-#if NINEAXIS
-    randomSeed(accel.getAccelerationX() - accel.getAccelerationY() + accel.getAccelerationZ());
-#endif // NINEAXIS
-#endif // THREEAXIS
-
-    osc.beginSerial();
-    setColor(RGB_GREEN);
-    droidspeak.speakSerialOpenPhrase();
-
-    bundleIn = new OSCBundle();   
-
 #if NINEAXIS
     // this sketch, running on Arduino Nano v3, has been found to sample up to 250 Hz
     // when streaming sensor data over serial, and up to 830 Hz when only outputting gestures
@@ -215,6 +208,8 @@ void setup()
     accel.initialize();
     if (!accel.testConnection()) {
         osc.sendError("ADXL345 connection failed");
+    } else {
+        randomSeed(accel.getAccelerationX() - accel.getAccelerationY() + accel.getAccelerationZ());      
     }
 
     gyro.setRate(sampleRate);
@@ -229,7 +224,12 @@ void setup()
         osc.sendError("HMC5883L connection failed");
     }
 #endif // NINEAXIS
+#endif // THREEAXIS
 
+    // delay the serial open phrase until the random number generator has been seeded
+    setColor(RGB_GREEN);
+    droidspeak.speakSerialOpenPhrase();
+    
     state = STATE_ONE;
     
     strcpy(contextName, "default");

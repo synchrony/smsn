@@ -419,7 +419,7 @@ void sendLaserEvent() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-    // OSC serial input
+    // SLIP+OSC serial input
     if (osc.receiveOSCBundle(*bundleIn)) {
         handleOSCBundle(*bundleIn);
         bundleIn->empty();
