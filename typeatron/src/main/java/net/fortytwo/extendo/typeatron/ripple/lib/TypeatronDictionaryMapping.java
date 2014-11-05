@@ -1,8 +1,8 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
+import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.ControlValue;
-import net.fortytwo.extendo.typeatron.ripple.Environment;
 import net.fortytwo.extendo.typeatron.ripple.UserDictionary;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -138,7 +138,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
     private final Map<String, ControlValue> dictionary = new HashMap<String, ControlValue>();
 
-    public TypeatronDictionaryMapping(final Environment environment,
+    public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron,
                                       final UserDictionary userDictionary) throws RippleException {
         // environment-dependent library

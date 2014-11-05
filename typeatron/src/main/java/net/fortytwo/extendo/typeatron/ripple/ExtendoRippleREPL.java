@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.typeatron.ripple;
 
 import com.illposed.osc.OSCMessage;
+import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.ChordedKeyer;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.lib.TypeatronDictionaryMapping;
@@ -23,14 +24,14 @@ public class ExtendoRippleREPL {
     private final ControlValue typeatronDictionary;
     private final TypeatronControl typeatron;
     private final ExtendoAgent agent;
-    private final Environment environment;
+    private final SideEffects environment;
 
     private StringBuilder currentLineOfText;
 
     public ExtendoRippleREPL(final RippleSession session,
                              final TypeatronControl typeatron,
                              final ExtendoAgent agent,
-                             final Environment environment) throws RippleException {
+                             final SideEffects environment) throws RippleException {
         this.session = session;
         this.typeatron = typeatron;
         this.agent = agent;

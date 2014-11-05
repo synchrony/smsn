@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.typeatron.ripple;
 
 import com.illposed.osc.OSCMessage;
+import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.flow.Collector;
 import net.fortytwo.ripple.RippleException;
@@ -31,10 +32,10 @@ public class RippleSession {
     private Collector<RippleList> curCollector;
 
     private final ExtendoAgent agent;
-    private final Environment environment;
+    private final SideEffects environment;
 
     public RippleSession(final ExtendoAgent agent,
-                         final Environment environment) throws RippleException {
+                         final SideEffects environment) throws RippleException {
         this.agent = agent;
         this.environment = environment;
 

@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
-import net.fortytwo.extendo.typeatron.ripple.Environment;
+import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
@@ -17,9 +17,9 @@ public class SpeakMapping extends PrimitiveStackMapping {
 
     private static final Logger logger = Logger.getLogger(SpeakMapping.class.getName());
 
-    private final Environment environment;
+    private final SideEffects environment;
 
-    public SpeakMapping(final Environment context) {
+    public SpeakMapping(final SideEffects context) {
         this.environment = context;
     }
 

@@ -3,11 +3,11 @@ package net.fortytwo.extendo.typeatron;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.brain.BrainModeClient;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
+import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.p2p.osc.OSCDispatcher;
 import net.fortytwo.extendo.p2p.osc.OSCMessageHandler;
 import net.fortytwo.extendo.p2p.osc.SlipOscControl;
 import net.fortytwo.extendo.rdf.Gesture;
-import net.fortytwo.extendo.typeatron.ripple.Environment;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoRippleREPL;
 import net.fortytwo.extendo.typeatron.ripple.RippleSession;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -55,7 +55,7 @@ public class TypeatronControl extends SlipOscControl {
             VIBRATE_MANUAL_MS = 500;
 
     private final ExtendoAgent agent;
-    private final Environment environment;
+    private final SideEffects environment;
 
     private final BrainModeClientWrapper brainModeWrapper;
     private final RippleSession rippleSession;
@@ -66,7 +66,7 @@ public class TypeatronControl extends SlipOscControl {
 
     public TypeatronControl(final OSCDispatcher oscDispatcher,
                             final ExtendoAgent agent,
-                            final Environment environment) throws DeviceInitializationException {
+                            final SideEffects environment) throws DeviceInitializationException {
         super(oscDispatcher);
 
         this.agent = agent;
