@@ -10,18 +10,16 @@ import java.util.regex.Pattern;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class EventCollection extends AtomCollection {
+public class Log extends AtomCollection {
 
-    public EventCollection() {
+    public Log() {
         super(
-                "event-collection",
-                Pattern.compile("some .+"),
+                "log",
+                Pattern.compile("log of .+"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(null,
-                                AtomRegex.Modifier.OneOrMore, DatedEvent.class, EventCollection.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                                AtomRegex.Modifier.OneOrMore, DatedEvent.class, Log.class)
                 )));
     }
 }

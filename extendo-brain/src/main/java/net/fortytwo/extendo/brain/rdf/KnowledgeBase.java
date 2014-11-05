@@ -19,7 +19,7 @@ import net.fortytwo.extendo.brain.rdf.classes.TODOTask;
 import net.fortytwo.extendo.brain.rdf.classes.URLReference;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.EventCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
@@ -109,7 +109,7 @@ public class KnowledgeBase {
                 DatedEvent.Birthday.class,
                 // simple collections
                 DocumentCollection.class,
-                EventCollection.class,
+                Log.class,
                 GenericCollection.class,
                 PersonCollection.class,
                 QuotedValueCollection.class,
