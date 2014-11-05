@@ -46,7 +46,7 @@
 
     <properties>
         <extendo.version>1.1-SNAPSHOT</extendo.version>
-        <httpcomponents.version>4.3.3</httpcomponents.version>
+        <httpcomponents.version>4.3.1</httpcomponents.version>
         <!-- goes with Android 2.2.1 -->
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <javaosc.version>0.3</javaosc.version>
@@ -93,6 +93,18 @@
             </dependency>
             <dependency>
                 <groupId>net.fortytwo.rdfagents</groupId>
+                <artifactId>rdfagents-core</artifactId>
+                <version>${rdfagents.version}</version>
+                <exclusions>
+                    <!-- conflict with SesameStream -->
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>net.fortytwo.rdfagents</groupId>
                 <artifactId>rdfagents-jade</artifactId>
                 <version>${rdfagents.version}</version>
                 <exclusions>
@@ -120,9 +132,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                    <groupId>org.openrdf.sesame</groupId>
-                    <artifactId>sesame-sail-memory</artifactId>
-                    <version>${sesame.version}</version>
+                <groupId>org.openrdf.sesame</groupId>
+                <artifactId>sesame-sail-memory</artifactId>
+                <version>${sesame.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-codec</groupId>
