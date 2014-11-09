@@ -33,6 +33,11 @@
             <groupId>net.fortytwo.rdfagents</groupId>
             <artifactId>rdfagents-jade</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.illposed.osc</groupId>
+            <artifactId>javaosc-core</artifactId>
+            <version>${javaosc.version}</version>
+        </dependency>
         <!-- this is the HTTP client available in Android, so we begin using it here -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

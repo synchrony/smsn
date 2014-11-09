@@ -2,14 +2,13 @@ package net.fortytwo.extendo.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
- * A utility for sending and receiving byte array packets via the Serial Line Internet Protocol (SLIP)
+ * A utility for receiving byte array packets via the Serial Line Internet Protocol (SLIP)
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class SlipStream {
+public class SlipInputStream {
 
     // a somewhat arbitrary UDP-inspired default
     private static final int DEFAULT_BUFFER_LENGTH = 1500;
@@ -20,42 +19,29 @@ public class SlipStream {
             SLIP_ESC_END = 0xdc,
             SLIP_ESC_ESC = 0xdd;
 
+    private final InputStream inputStream;
     private final int bufferLength;
 
-    public SlipStream(final int bufferLength) {
+    public SlipInputStream(final InputStream inputStream,
+                           final int bufferLength) {
+        this.inputStream = inputStream;
         this.bufferLength = bufferLength;
     }
 
-    public SlipStream() {
-        this(DEFAULT_BUFFER_LENGTH);
+    public SlipInputStream(final InputStream inputStream) {
+        this(inputStream, DEFAULT_BUFFER_LENGTH);
     }
 
-    public void send(final OutputStream out,
-                     final byte[] packet) throws IOException {
-        //out.write((byte) SLIP_END);
-        for (byte b : packet) {
-            if ((byte) SLIP_END == b) {
-                out.write((byte) SLIP_ESC);
-                out.write((byte) SLIP_ESC_END);
-            } else if ((byte) SLIP_ESC == b) {
-                out.write((byte) SLIP_ESC);
-                out.write((byte) SLIP_ESC_ESC);
-            }
-        }
-        out.write((byte) SLIP_END);
-    }
-
-    public void receive(final InputStream in,
-                        final PacketHandler handler) throws IOException, PacketHandlerException {
+    public void receive(final PacketHandler handler) throws IOException, PacketHandlerException {
         byte[] buffer = new byte[bufferLength];
         int b;
 
-        while (SLIP_END != (b = in.read())) {
+        while (SLIP_END != (b = inputStream.read())) {
             if (-1 == b) return;
         }
 
         int i = 0;
-        while (-1 != (b = in.read())) {
+        while (-1 != (b = inputStream.read())) {
             if (SLIP_END == b) {
                 // the check for i>0 allows for SLIP variants in which packets both begin and end with END
                 if (i > 0) {
@@ -67,7 +53,7 @@ public class SlipStream {
                 }
                 i = 0;
             } else if (SLIP_ESC == b) {
-                b = in.read();
+                b = inputStream.read();
                 if (-1 == b) break;
 
                 if (SLIP_ESC_END == b) {

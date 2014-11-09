@@ -1,15 +1,25 @@
 package net.fortytwo.extendo.p2p;
 
+import com.illposed.osc.OSCMessage;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineProxy;
 import net.fortytwo.rdfagents.data.DatasetFactory;
+import net.fortytwo.rdfagents.model.Dataset;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.ntriples.NTriplesWriter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -35,9 +45,13 @@ public class ExtendoAgent {
 
     private final Pinger pinger;
 
+    private DatagramSocket oscSocket;
+    private InetAddress oscAddress;
+    private int oscPort;
+
     public ExtendoAgent(final String agentUri,
                         final boolean listenForServices) {
-        logger.info("creating Extendo agent with URI " + agentUri);
+        logger.log(Level.INFO, "creating Extendo agent with URI " + agentUri);
 
         this.agentUri = vf.createURI(agentUri);
 
@@ -51,7 +65,7 @@ public class ExtendoAgent {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
                 public void receivedServiceDescription(InetAddress address, ServiceDescription description) {
                     if (Extendo.VERBOSE) {
-                        logger.info("received broadcast message from " + address.getHostAddress()
+                        logger.log(Level.INFO, "received broadcast message from " + address.getHostAddress()
                                 + ": version=" + description.getVersion()
                                 + ", endpoint=" + description.getEndpoint()
                                 + ", pub/sub port=" + description.getPubsubPort());
@@ -66,26 +80,24 @@ public class ExtendoAgent {
 
                         Socket socket;
                         try {
-                            logger.info("opening socket connection to facilitator");
+                            logger.log(Level.INFO, "opening socket connection to facilitator");
                             socket = new Socket(address, facilitatorService.description.getPubsubPort());
                         } catch (IOException e) {
-                            logger.severe("failed to open socket connection to facilitator: " + e.getMessage());
-                            e.printStackTrace(System.err);
+                            logger.log(Level.INFO, "failed to open socket connection to facilitator", e);
                             return;
                         }
 
                         try {
                             queryEngine.notifyConnectionOpen();
                         } catch (IOException e) {
-                            logger.warning("error on query engine notification: " + e.getMessage());
-                            e.printStackTrace(System.err);
+                            logger.log(Level.WARNING, "error on query engine notification", e);
                             return;
                         }
 
                         facilitatorConnection.start(socket);
                     } else {
                         if (Extendo.VERBOSE) {
-                            logger.info("ignoring broadcast message due to existing connection to "
+                            logger.log(Level.INFO, "ignoring broadcast message due to existing connection to "
                                     + facilitatorService.address.getHostAddress());
                         }
                     }
@@ -122,6 +134,54 @@ public class ExtendoAgent {
     public void stop() {
         if (null != listener) {
             listener.stop();
+        }
+    }
+
+    public void sendOSCMessageToFacilitator(final OSCMessage m) {
+        if (getFacilitatorConnection().isActive()) {
+            try {
+                if (null == oscSocket) {
+                    oscPort = getFacilitatorService().description.getOscPort();
+                    oscAddress = getFacilitatorService().address;
+
+                    oscSocket = new DatagramSocket();
+                }
+
+                byte[] buffer = m.getByteArray();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, oscAddress, oscPort);
+                oscSocket.send(packet);
+
+                logger.log(Level.INFO, "sent OSC datagram to " + oscAddress + ":" + oscPort);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "error in sending OSC datagram to facilitator", e);
+            } catch (Throwable t) {
+                logger.log(Level.SEVERE, "unexpected error in sending OSC datagram to facilitator", t);
+            }
+        }
+    }
+
+    public void sendDataset(final Dataset d,
+                            final boolean relayAsOsc) throws IOException {
+        getQueryEngine().addStatements(d.getStatements());
+
+        if (relayAsOsc) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            // note: direct instantiation of a format-specific writer (as opposed to classloading via Rio)
+            // makes things simpler w.r.t. Proguard's shrinking phase
+            RDFWriter w = new NTriplesWriter(bos);
+            //RDFWriter w = Rio.createWriter(RDFFormat.NTRIPLES, bos);
+            try {
+                w.startRDF();
+                for (Statement s : d.getStatements()) {
+                    w.handleStatement(s);
+                }
+                w.endRDF();
+            } catch (RDFHandlerException e) {
+                throw new IOException(e);
+            }
+            OSCMessage m = new OSCMessage("/exo/fctr/tt/rdf");
+            m.addArgument(new String(bos.toByteArray()));
+            sendOSCMessageToFacilitator(m);
         }
     }
 
