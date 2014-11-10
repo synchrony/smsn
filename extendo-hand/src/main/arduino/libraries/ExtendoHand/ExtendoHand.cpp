@@ -1,6 +1,6 @@
 /*
   ExtendoHand.cpp
-  Created by Joshua Shinavier, 2014
+  Created by Joshua Shinavier, 2012-2014
   Released into the public domain.
 */
 
@@ -315,6 +315,9 @@ void ExtendoHand::getAcceleration(double *x, double *y, double *z) {
         *x = ax / 230.0 - 0.05;
         *y = ay / 230.0;
         *z = az / 230.0;
+        //*x = ax/230.0/16;
+        //*y = ay/230.0/16;
+        //*z = az/230.0/16;
     } else {
         *x = motionSensor.accelX();
         *y = motionSensor.accelY();
