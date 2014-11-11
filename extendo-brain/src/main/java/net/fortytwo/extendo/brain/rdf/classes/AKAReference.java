@@ -12,8 +12,8 @@ public class AKAReference extends SimpleAtomClass {
     public AKAReference() {
         super(
                 "aka",
-                // TODO: the foaf:nick mapping is not quite appropriate to the "trade name" and "formerly" usage
-                Pattern.compile("(aka|trade name|formerly) \\\"[^\\\"]+\\\"(, \\\"[^\\\"]+\\\")*"),
+                // TODO: the foaf:nick mapping is not quite appropriate to the "brand/trade name" and "formerly" usage
+                Pattern.compile("(aka|brand name|trade name|formerly) \\\"[^\\\"]+\\\"(, \\\"[^\\\"]+\\\")*"),
                 null,
                 null
                 );

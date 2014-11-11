@@ -204,13 +204,14 @@ public class ChordedKeyer {
                     String[] a = line.split(",");
                     String chord = a[0];
                     String letter = a[1];
+                    String capital = a[2];
 
                     addChord(Mode.Text, chord, null, null, letter);
                     addChord(Mode.Text, findControlChord(chord), null, Modifier.Control, letter);
                     addChord(Mode.Text, findUppercaseChord(chord), null, null, letter.toUpperCase());
 
-                    if (a.length > 2) {
-                        String punc = a[2].replaceAll("COMMA", ",");
+                    if (a.length > 3) {
+                        String punc = a[3].replaceAll("COMMA", ",");
                         punctuationMap.put(letter, punc);
                         addChord(Mode.Text, findPunctuationChord(chord), null, null, punc);
                     }

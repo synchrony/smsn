@@ -13,11 +13,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteQueries {
+
+    protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());
 
     private final ExtendoBrain brain;
     //private final QueryEngine rippleQueryEngine;
@@ -298,12 +302,15 @@ public class NoteQueries {
         ListDiff.applyDiff(before, after, lcs, noteComparator, ed);
 
         for (Note n : rootNote.getChildren()) {
-            //System.out.println("recursing to note: " + n);
-            //System.out.flush();
             int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : depth - 1;
 
-            // TODO: verify that this can result in multiple log events per call to update()
-            updateInternal(brain.getBrainGraph().getAtom(n.getId()), n, d, filter, style);
+            Atom child = brain.getBrainGraph().getAtom(n.getId());
+            if (null == child) {
+                logger.log(Level.WARNING, "no such atom: " + n.getId());
+            } else {
+                // TODO: verify that this can result in multiple log events per call to update()
+                updateInternal(brain.getBrainGraph().getAtom(n.getId()), n, d, filter, style);
+            }
         }
     }
 
