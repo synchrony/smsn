@@ -75,6 +75,8 @@ boolean lastAdded = false;
 void emitPeak(unsigned long tRef, unsigned long now) {
     OSCMessage m(EXO_HAND_GESTURE);
 
+    m.add(exoHand.getContext());
+    
     m.add("handshake");
     
     // note: recognition is delayed by about one time step from the actual peak,

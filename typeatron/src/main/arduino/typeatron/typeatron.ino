@@ -296,7 +296,12 @@ void handleOSCBundle(class OSCBundle &bundle) {
         || bundle.dispatch(EXO_TT_RGB_SET, handleRGBSetMessage)
         || bundle.dispatch(EXO_TT_VIBRO, handleVibroMessage)
         )) {
-        osc.sendError("no messages dispatched");
+          for (int i = 0; i < bundle.size(); i++) {
+              OSCMessage *m = bundle.getOSCMessage(i);
+              char address[256];
+              m->getAddress(address);
+              osc.sendError("no handler for address %s", address);
+          }
     }
 }
 

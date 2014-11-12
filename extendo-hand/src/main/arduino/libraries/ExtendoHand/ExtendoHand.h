@@ -54,6 +54,8 @@ class ExtendoHand
     void getHeading(double *x, double *y, double *z);
 
     const char* getContext();
+    void setContext(const char *context);
+
     ExtendOSC *getOSC();
 
   private:
@@ -62,6 +64,9 @@ class ExtendoHand
     void handleOSCBundle(class OSCBundle &bundle);
     void sendHeartbeatMessage(unsigned long now);
     void updateSamplingRate();
+
+    // settable identifier which is included with each gestural and sensor output
+    char contextName[32];
 
     ExtendOSC osc;
     OSCBundle *bundleIn;
