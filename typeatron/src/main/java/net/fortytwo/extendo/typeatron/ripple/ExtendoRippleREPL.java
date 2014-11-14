@@ -66,7 +66,7 @@ public class ExtendoRippleREPL {
                 {"se", "http://fortytwo.net/2014/04/twc#SimonEllis"},
                 {"tl", "http://fortytwo.net/2014/04/twc#TimLebo"},
                 {"tz", "http://fortytwo.net/2014/04/twc#TongtaoZhang"},
-                {"tl", "http://fortytwo.net/2014/04/twc#YueLiu"}};
+                {"yl", "http://fortytwo.net/2014/04/twc#YueLiu"}};
         for (String[] pair : shortcuts) {
             userDictionary.put(pair[0], new RDFValue(new URIImpl(pair[1])));
         }
@@ -92,24 +92,27 @@ public class ExtendoRippleREPL {
     public void handle(final String symbol,
                        final ChordedKeyer.Modifier modifier,
                        final ChordedKeyer.Mode mode) throws RippleException {
-
-        logger.log(Level.INFO, "got a symbol: " + symbol + " in mode " + mode + " with modifier " + modifier);
+        //logger.log(Level.INFO, "got a symbol: " + symbol + " in mode " + mode + " with modifier " + modifier);
         if (mode.isTextEntryMode()) {
             if (ChordedKeyer.Modifier.Control == modifier) {
-                logger.log(Level.INFO, "got a control character");
+                //logger.log(Level.INFO, "got a control character");
 
+                // TODO: reserve these character primitives for Ripple mode,
+                // distinguishing it clearly from Emacs mode
                 if (symbol.equals("")) {
                     if (currentLineOfText.length() > 0) {
                         session.push(session.getModelConnection().valueOf(currentLineOfText.toString()));
                         session.push(typeatronDictionary);
                         newLine();
+                    } else {
+                        System.out.println("empty text...");
                     }
-                } else if (symbol.equals("u")) {
+                } else if (symbol.equals("u")) { // "to upper case" character primitive
                     String s = getLastSymbol();
                     if (null != s) {
                         currentLineOfText.append(s.toUpperCase());
                     }
-                } else if (symbol.equals("n")) {
+                } else if (symbol.equals("n")) { // "to number" character primitive
                     String s = getLastSymbol();
                     if (null != s) {
                         char c = s.charAt(0);
@@ -119,7 +122,7 @@ public class ExtendoRippleREPL {
                             currentLineOfText.append((char) (s.charAt(0) - 'a' + '1'));
                         }
                     }
-                } else if (symbol.equals("p")) {
+                } else if (symbol.equals("p")) { // "to punctuation" character primitive
                     String s = getLastSymbol();
                     if (null != s) {
                         String p = typeatron.getKeyer().getPunctuationMap().get(s);
@@ -129,20 +132,22 @@ public class ExtendoRippleREPL {
                     }
                 } else {
                     logger.log(Level.WARNING, "unknown control value: " + symbol);
+                    //currentLineOfText.append("C-" + symbol);
                 }
             } else if (ChordedKeyer.Modifier.None == modifier) {
-                if (symbol.equals("\n")) {
+                if (symbol.equals("\n")) { // handle newline
                     if (currentLineOfText.length() > 0) {
                         session.push(session.getModelConnection().valueOf(currentLineOfText.toString()));
                         newLine();
                     }
-                } else if (symbol.equals("DEL")) {
+                } else if (symbol.equals("DEL")) { // handle delete
                     if (currentLineOfText.length() > 0) {
                         currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
                     }
-                } else if (symbol.equals("ESC")) {
+                } else if (symbol.equals("ESC")) { // handle escape
+                    // TODO: nothing else?
                     newLine();
-                } else {
+                } else { // handle ordinary text
                     currentLineOfText.append(symbol);
                 }
             } else {
@@ -150,6 +155,7 @@ public class ExtendoRippleREPL {
             }
         } else if (ChordedKeyer.Mode.Hardware == mode) {
             // TODO: the above is more or less hardware mode; swap this for Emacs mode
+            logger.warning("currently no support for hardware mode");
         }
 
         if (environment.verbose()) {

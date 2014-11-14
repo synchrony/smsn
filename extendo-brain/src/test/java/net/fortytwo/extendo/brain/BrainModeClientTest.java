@@ -33,7 +33,7 @@ public class BrainModeClientTest extends TestCase {
 
     @Test
     public void testAll() throws Exception {
-        // go up and down, and type some text
+        // go up and down, and type some text (note: the 'e' is not a typo)
         assertExpected("<down><up><C-c><C-v>esome inserted text<down>",
                 "(next-line)",
                 "(previous-line)",

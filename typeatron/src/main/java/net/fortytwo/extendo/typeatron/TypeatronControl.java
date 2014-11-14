@@ -4,9 +4,9 @@ import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.brain.BrainModeClient;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.p2p.SideEffects;
-import net.fortytwo.extendo.p2p.osc.OSCDispatcher;
-import net.fortytwo.extendo.p2p.osc.OSCMessageHandler;
-import net.fortytwo.extendo.p2p.osc.SlipOscControl;
+import net.fortytwo.extendo.p2p.osc.OscControl;
+import net.fortytwo.extendo.p2p.osc.OscMessageHandler;
+import net.fortytwo.extendo.p2p.osc.OscReceiver;
 import net.fortytwo.extendo.rdf.Gesture;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoRippleREPL;
 import net.fortytwo.extendo.typeatron.ripple.RippleSession;
@@ -28,30 +28,29 @@ import java.util.logging.Logger;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class TypeatronControl extends SlipOscControl {
+public class TypeatronControl extends OscControl {
 
     protected static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
 
     // outbound addresses
     private static final String
             EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
-            EXO_TT_MODE = "/exo/tt/mode",
             EXO_TT_MORSE = "/exo/tt/morse",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
-            EXO_TT_VIBR = "/exo/tt/vibr";
+            EXO_TT_VIBRO = "/exo/tt/vibro",
+            EXO_TT_WARNING = "/exo/tt/warning";
 
     // inbound addresses
     private static final String
-            EXO_TT_ERROR = "/exo/tt/error",
-            EXO_TT_INFO = "/exo/tt/info",
+            EXO_TT_ERROR = "/exo/tt/error",  // note: also used as an outbound address
+            EXO_TT_INFO = "/exo/tt/info",  // note: also used as an outbound address
             EXO_TT_KEYS = "/exo/tt/keys",
             EXO_TT_LASER_EVENT = "/exo/tt/laser/event",
             EXO_TT_PHOTO_DATA = "/exo/tt/photo/data",
             EXO_TT_PING_REPLY = "/exo/tt/ping/reply";
 
     public static final int
-            VIBRATE_ALERT_MS = 250,
             VIBRATE_MANUAL_MS = 500;
 
     private final ExtendoAgent agent;
@@ -64,10 +63,10 @@ public class TypeatronControl extends SlipOscControl {
 
     private URI thingPointedTo;
 
-    public TypeatronControl(final OSCDispatcher oscDispatcher,
+    public TypeatronControl(final OscReceiver oscReceiver,
                             final ExtendoAgent agent,
                             final SideEffects environment) throws DeviceInitializationException {
-        super(oscDispatcher);
+        super(oscReceiver);
 
         this.agent = agent;
         this.environment = environment;
@@ -80,38 +79,27 @@ public class TypeatronControl extends SlipOscControl {
         }
 
         try {
-            keyer = new ChordedKeyer(new ChordedKeyer.EventHandler() {
+            ChordedKeyer.EventHandler handler = new ChordedKeyer.EventHandler() {
                 public void handle(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
                     if (null != symbol) {
-                        try {
-                            rippleREPL.handle(symbol, modifier, mode);
-                        } catch (RippleException e) {
-                            logger.log(Level.WARNING, "Ripple error: " + e.getMessage());
-                            e.printStackTrace(System.err);
-                        }
-
-                        String mod = modifySymbol(symbol, modifier);
-                        //toaster.makeText("typed: " + mod);
-                        if (null != brainModeWrapper) {
-                            try {
-                                brainModeWrapper.write(mod);
-                            } catch (IOException e) {
-                                logger.log(Level.WARNING, "I/O error while writing to Brain-mode: " + e.getMessage());
-                                e.printStackTrace(System.err);
-                            }
-                        }
+                        // TODO: currently, we pass the symbol to Ripple and Emacs in parallel
+                        // in future, make this a modal choice
+                        handleSymbolWithRipple(mode, symbol, modifier);
+                        handleSymbolWithEmacs(mode, symbol, modifier);
                     } else {
-                        sendModeInfo(mode);
+                        sendInfoCue();
 
                         logger.log(Level.INFO, "entered mode: " + mode);
                     }
                 }
-            });
+            };
+
+            keyer = new ChordedKeyer(handler);
         } catch (IOException e) {
             throw new DeviceInitializationException(e);
         }
 
-        oscDispatcher.register(EXO_TT_ERROR, new OSCMessageHandler() {
+        oscReceiver.register(EXO_TT_ERROR, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
                 if (1 == args.size()) {
@@ -122,7 +110,7 @@ public class TypeatronControl extends SlipOscControl {
             }
         });
 
-        oscDispatcher.register(EXO_TT_INFO, new OSCMessageHandler() {
+        oscReceiver.register(EXO_TT_INFO, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
                 if (1 == args.size()) {
@@ -133,7 +121,7 @@ public class TypeatronControl extends SlipOscControl {
             }
         });
 
-        oscDispatcher.register(EXO_TT_KEYS, new OSCMessageHandler() {
+        oscReceiver.register(EXO_TT_KEYS, new OscMessageHandler() {
             public void handle(final OSCMessage message) {
                 List<Object> args = message.getArguments();
                 if (1 == args.size()) {
@@ -149,7 +137,7 @@ public class TypeatronControl extends SlipOscControl {
             }
         });
 
-        oscDispatcher.register(EXO_TT_PHOTO_DATA, new OSCMessageHandler() {
+        oscReceiver.register(EXO_TT_PHOTO_DATA, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
                 if (7 != args.size()) {
@@ -185,7 +173,7 @@ public class TypeatronControl extends SlipOscControl {
             }
         });
 
-        oscDispatcher.register(EXO_TT_PING_REPLY, new OSCMessageHandler() {
+        oscReceiver.register(EXO_TT_PING_REPLY, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 // note: argument is ignored for now; in future, it could be used to synchronize clocks
 
@@ -197,7 +185,7 @@ public class TypeatronControl extends SlipOscControl {
             }
         });
 
-        oscDispatcher.register(EXO_TT_LASER_EVENT, new OSCMessageHandler() {
+        oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 // TODO: use the recognition time parameter provided in the message
                 long recognitionTime = System.currentTimeMillis();
@@ -224,8 +212,8 @@ public class TypeatronControl extends SlipOscControl {
         sendPing();
     }
 
-    private String modifySymbol(final String symbol,
-                                final ChordedKeyer.Modifier modifier) {
+    private String symbolForBrainModeClient(final String symbol,
+                                            final ChordedKeyer.Modifier modifier) {
         switch (modifier) {
             case Control:
                 return symbol.length() == 1 ? "<C-" + symbol + ">" : "<" + symbol + ">";
@@ -233,6 +221,29 @@ public class TypeatronControl extends SlipOscControl {
                 return symbol.length() == 1 ? symbol : "<" + symbol + ">";
             default:
                 throw new IllegalStateException();
+        }
+    }
+
+    private void handleSymbolWithRipple(final ChordedKeyer.Mode mode,
+                                        final String symbol,
+                                        final ChordedKeyer.Modifier modifier) {
+        try {
+            rippleREPL.handle(symbol, modifier, mode);
+        } catch (RippleException e) {
+            logger.log(Level.WARNING, "Ripple error", e);
+        }
+    }
+
+    private void handleSymbolWithEmacs(final ChordedKeyer.Mode mode,
+                                       final String symbol,
+                                       final ChordedKeyer.Modifier modifier) {
+        String mapped = symbolForBrainModeClient(symbol, modifier);
+        if (null != brainModeWrapper) {
+            try {
+                brainModeWrapper.write(mapped);
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "I/O error while writing to Brain-mode", e);
+            }
         }
     }
 
@@ -253,23 +264,30 @@ public class TypeatronControl extends SlipOscControl {
                 public void run() {
                     isAlive = true;
 
-                    try {
-                        client.run();
-                    } catch (BrainModeClient.ExecutionException e) {
-                        logger.log(Level.SEVERE,
-                                "Brain-mode client giving up due to execution exception: " + e.getMessage());
-                    } catch (Throwable t) {
-                        logger.log(Level.SEVERE, "Brain-mode client thread died with error: " + t.getMessage());
-                        t.printStackTrace(System.err);
-                    } finally {
-                        isAlive = false;
+                    while (isAlive) {
+                        try {
+                            client.run();
+                            isAlive = false;
+                        } catch (BrainModeClient.ExecutionException e) {
+                            logger.log(Level.WARNING,
+                                    "Brain-mode client error: " + e.getMessage());
+                            sendErrorCue();
+                        } catch(BrainModeClient.UnknownCommandException e) {
+                            logger.log(Level.FINE,
+                                    "unknown command: " + e.getMessage());
+                            sendWarningCue();
+                        } catch (Throwable t) {
+                            isAlive = false;
+                            logger.log(Level.SEVERE, "Brain-mode client thread died with error", t);
+                            t.printStackTrace(System.err);
+                        }
                     }
                 }
             }).start();
         }
 
         public void write(final String symbol) throws IOException {
-            logger.log(Level.INFO, (isAlive ? "" : "NOT ") + "writing '" + symbol + "' to Emacs...");
+            //logger.log(Level.INFO, (isAlive ? "" : "NOT ") + "writing '" + symbol + "' to Emacs...");
             source.write(symbol.getBytes());
         }
     }
@@ -281,13 +299,6 @@ public class TypeatronControl extends SlipOscControl {
         latestPing = System.currentTimeMillis();
         message.addArgument(latestPing);
         send(message);
-    }
-
-    // feedback to the Typeatron whenever mode changes
-    public void sendModeInfo(final ChordedKeyer.Mode mode) {
-        OSCMessage m = new OSCMessage(EXO_TT_MODE);
-        m.addArgument(mode.name());
-        send(m);
     }
 
     public void sendLaserTriggerCommand() {
@@ -337,8 +348,23 @@ public class TypeatronControl extends SlipOscControl {
             throw new IllegalArgumentException("vibration interval too short or too long: " + time);
         }
 
-        OSCMessage m = new OSCMessage(EXO_TT_VIBR);
+        OSCMessage m = new OSCMessage(EXO_TT_VIBRO);
         m.addArgument(time);
+        send(m);
+    }
+
+    public void sendInfoCue() {
+        OSCMessage m = new OSCMessage(EXO_TT_INFO);
+        send(m);
+    }
+
+    public void sendWarningCue() {
+        OSCMessage m = new OSCMessage(EXO_TT_WARNING);
+        send(m);
+    }
+
+    public void sendErrorCue() {
+        OSCMessage m = new OSCMessage(EXO_TT_ERROR);
         send(m);
     }
 }

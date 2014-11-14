@@ -38,28 +38,49 @@ public class ChordedKeyerTest {
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
         reset();
-        pressKeys(3, 2, 4, 4, 3, 2);
+        pressKeys(3, 2, 3, 3, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("E", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
         reset();
-        pressKeys(3, 2, 1, 1, 3, 2);
+        pressKeys(3, 2, 2, 2, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("e", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.Control, lastModifier);
 
         reset();
-        pressKeys(3, 2, 5, 5, 3, 2);
+        pressKeys(3, 2, 2, 2, 3, 3, 3, 2);
+        assertEquals(ChordedKeyer.Mode.Text, lastMode);
+        assertEquals("E", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.Control, lastModifier);
+
+        reset();
+        pressKeys(3, 2, 1, 1, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("=", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
         // make sure the comma has been read correctly from the CSV
         reset();
-        pressKeys(3, 1, 5, 5, 1, 3);
+        pressKeys(3, 1, 2, 2, 1, 3);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals(",", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
+    }
+
+    @Test
+    public void testBrackets() throws Exception {
+        reset();
+        pressKeys(2, 3, 4, 2, 3, 4);
+        assertEquals(ChordedKeyer.Mode.Text, lastMode);
+        assertEquals(">", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
+
+        reset();
+        pressKeys(2, 4, 5, 2, 4, 5);
+        assertEquals(ChordedKeyer.Mode.Text, lastMode);
+        assertEquals("[", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
     }
 

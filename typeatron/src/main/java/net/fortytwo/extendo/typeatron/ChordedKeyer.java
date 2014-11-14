@@ -62,6 +62,7 @@ public class ChordedKeyer {
 
     /**
      * Processes the next input state
+     *
      * @param state the input state, represented by a 4-byte sequence of '0's and '1's
      */
     // TODO: do away with the inefficient format, if it doesn't complicate things in Max/MSP
@@ -105,21 +106,24 @@ public class ChordedKeyer {
 
         if (null != outputSymbol) {
             if (null != cur.symbol && !cur.symbol.equals(outputSymbol)) {
-                throw new IllegalStateException("conflicting symbols for sequence " + sequence);
+                throw new IllegalStateException("conflicting symbols ('"
+                        + cur.symbol + "' vs. '" + outputSymbol + "') for sequence " + sequence);
             }
             cur.symbol = outputSymbol;
         }
 
         if (null != outputMode) {
             if (null != cur.mode && cur.mode != outputMode) {
-                throw new IllegalArgumentException("conflicting output modes for sequence " + sequence);
+                throw new IllegalArgumentException("conflicting output modes ("
+                        + cur.mode + " vs. " + outputMode + ") for sequence " + sequence);
             }
             cur.mode = outputMode;
         }
 
         if (null != outputModifier) {
             if (null != cur.modifier && cur.modifier != outputModifier) {
-                throw new IllegalArgumentException("conflicting output modifiers for sequence " + sequence);
+                throw new IllegalArgumentException("conflicting output modifiers ("
+                        + cur.modifier + " vs. " + outputModifier + ") for sequence " + sequence);
             }
 
             cur.modifier = outputModifier;
@@ -185,10 +189,10 @@ public class ChordedKeyer {
             // control-space codes for the Typeatron dictionary operator
             addChord(m, "11", null, Modifier.Control, "");
 
-            addChord(m, "22", null, null, " ");
-            //addChord("22", null, null, "SPACE", m);
-            addChord(m, "33", null, null, "\n");
-            //addChord("33", null, null, "RET", m);
+            // the "trigger finger" chord has a "do"/"execute" function in various contexts
+            addChord(m, "22", null, null, "\n");
+
+            addChord(m, "33", null, null, " ");
             addChord(m, "44", null, null, "DEL");
             addChord(m, "55", null, null, "ESC");
         }
@@ -200,20 +204,32 @@ public class ChordedKeyer {
             String line;
             while (null != (line = br.readLine())) {
                 line = line.trim();
-                if (line.length() > 0) {
+                if (line.length() > 0 && !line.startsWith("#")) {
                     String[] a = line.split(",");
                     String chord = a[0];
-                    String letter = a[1];
-                    String capital = a[2];
 
+                    String letter = a[1].trim();
                     addChord(Mode.Text, chord, null, null, letter);
-                    addChord(Mode.Text, findControlChord(chord), null, Modifier.Control, letter);
-                    addChord(Mode.Text, findUppercaseChord(chord), null, null, letter.toUpperCase());
+                    if (chord.length() == 2*2) {
+                        addChord(Mode.Text, findControlChord(chord), null, Modifier.Control, letter);
+                    }
 
-                    if (a.length > 3) {
-                        String punc = a[3].replaceAll("COMMA", ",");
-                        punctuationMap.put(letter, punc);
-                        addChord(Mode.Text, findPunctuationChord(chord), null, null, punc);
+                    if (a.length >= 3) {
+                        String capital = a[2].trim();
+                        if (capital.length() > 0) {
+                            addChord(Mode.Text, findShiftChord(chord), null, null, capital);
+                            addChord(Mode.Text, findControlShiftChord(chord), null, Modifier.Control, capital);
+                        }
+                    }
+
+                    if (a.length >= 4) {
+                        // note: we don't bother with control-punctuation chords for now,
+                        // but they are conceivable
+                        String punc = a[3].trim().replaceAll("COMMA", ",");
+                        if (punc.length() > 0 && chord.length() < 3 * 2) {
+                            punctuationMap.put(letter, punc);
+                            addChord(Mode.Text, findPunctuationChord(chord), null, null, punc);
+                        }
                     }
                 }
             }
@@ -243,17 +259,42 @@ public class ChordedKeyer {
     }
 
     private String findControlChord(final String chord) {
-        char key = findUnusedKey(chord, 0);
+        if (4 != chord.length()) {
+            throw new IllegalStateException("can only create control chords for 2-key combos at present");
+        }
+
+        // we add a "flourish" to the second key pressed
+        char key = chord.charAt(1);
+
         return chord.substring(0, 2) + key + key + chord.substring(2);
     }
 
-    private String findUppercaseChord(final String chord) {
-        char key = findUnusedKey(chord, 1);
+    private String findShiftChord(final String chord) {
+        if (4 != chord.length()) {
+            throw new IllegalStateException("can only create shift chords for 2-key combos at present");
+        }
+
+        // we add a "flourish" to the first key pressed
+        char key = chord.charAt(0);
+
         return chord.substring(0, 2) + key + key + chord.substring(2);
+    }
+
+    // note: shift-control chords, with some other meaning, are also possible
+    private String findControlShiftChord(final String chord) {
+        if (4 != chord.length()) {
+            throw new IllegalStateException("can only create control-shift chords for 2-key combos at present");
+        }
+
+        // we add "flourishes" to the second key pressed and the first key released
+        char key1 = chord.charAt(1);
+        char key2 = chord.charAt(0);
+
+        return chord.substring(0, 2) + key1 + key1 + key2 + key2 + chord.substring(2);
     }
 
     private String findPunctuationChord(final String chord) {
-        char key = findUnusedKey(chord, 2);
+        char key = findUnusedKey(chord, 0);
         return chord.substring(0, 2) + key + key + chord.substring(2);
     }
 

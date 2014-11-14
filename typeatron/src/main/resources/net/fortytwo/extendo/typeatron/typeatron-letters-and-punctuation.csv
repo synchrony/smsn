@@ -1,11 +1,12 @@
+# the alphabet, with associated punctuation for 24 of 26 letters
 3232,e,E,=
 2121,t,T,~
 2323,a,A,'
 3131,i,I,:
-4343,o,O,
+4343,o,O
 3434,n,N,#
 2424,s,S,/
-4242,r,R,
+4242,r,R
 3223,l,L,"
 3113,c,C,COMMA
 2332,h,H,^
@@ -14,7 +15,7 @@
 4224,d,D,$
 4114,u,U,_
 4334,p,P,+
-5115,g,G,`
+2552,g,G,`
 5252,w,W,@
 5353,y,Y,&
 3443,b,B,\
@@ -23,4 +24,20 @@
 5335,x,X,!
 5454,j,J,;
 5445,q,Q,?
-4545,z,Z,%
+4554,z,Z,%
+
+# angle brackets modify the 'a'
+234234,>
+235235,<
+
+# curly brackets modify the 'c'
+314134,}
+315135,{
+
+# parentheses modify the 'p'
+432342,)
+435345,(
+
+# square brackets modify the 's'
+243243,]
+245245,[

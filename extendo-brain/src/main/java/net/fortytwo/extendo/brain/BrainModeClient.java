@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A lightweight, Java-based client for Brain-mode, which is in turn the Emacs Lisp client of
+ * the Extend-o-Brain personal knowledge base
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainModeClient {
@@ -49,7 +52,7 @@ public class BrainModeClient {
         }
     };
 
-    public BrainModeClient(InputStream inputstream) {
+    public BrainModeClient(final InputStream inputstream) {
         this.inputstream = inputstream;
 
         textBuffer = new StringBuilder();
@@ -58,8 +61,8 @@ public class BrainModeClient {
         functions = new HashMap<String, EmacsFunction>();
 
         // general Emacs functions
-        functions.put("C-a", new EmacsFunction("move-beginning-of-line", false));
-        functions.put("C-e", new EmacsFunction("move-end-of-line", false));
+        functions.put("C-a", new EmacsFunction("move-beginning-of-line 1", false));
+        functions.put("C-e", new EmacsFunction("move-end-of-line 1", false));
         functions.put("C-g C-g C-g", new EmacsFunction("keyboard-escape-quit", false));
         functions.put("C-k", new EmacsFunction("kill-line", false));
         functions.put("C-x k", new EmacsFunction("kill-buffer", false));
@@ -160,7 +163,7 @@ public class BrainModeClient {
         this.functionExecutor = executor;
     }
 
-    public void run() throws IOException, InterruptedException, ExecutionException {
+    public void run() throws IOException, InterruptedException, ExecutionException, UnknownCommandException {
         // note: this call to reset() makes it unnecessary to reset() before throwing parse errors
         reset();
 
@@ -224,8 +227,11 @@ public class BrainModeClient {
                         lastState = state;
                         state = State.ESCAPE;
                     } else if ('\n' == c) { // newline signals the end of an interactive argument
-                        execute(currentFunction, textBuffer.toString());
-                        reset();
+                        try {
+                            execute(currentFunction, textBuffer.toString());
+                        } finally {
+                            reset();
+                        }
                     } else {
                         textBuffer.append((char) c);
                     }
@@ -258,7 +264,7 @@ public class BrainModeClient {
         }
     }
 
-    private State matchCommand() throws IOException, InterruptedException, ExecutionException {
+    private State matchCommand() throws IOException, InterruptedException, ExecutionException, UnknownCommandException {
         if (textBuffer.length() > 0) {
             String event = textBuffer.toString();
             textBuffer.setLength(0);
@@ -291,15 +297,18 @@ public class BrainModeClient {
 
                         return State.ARGUMENT;
                     } else {
-                        execute(f, null);
-                        reset();
+                        try {
+                            execute(f, null);
+                        } finally {
+                            reset();
+                        }
                         return State.TEXT;
                     }
                 } else if (cmp < 0) {
                     if (cur.startsWith(command)) {
                         return State.COMMAND;
                     } else {
-                        throw new IOException("unknown command: " + command);
+                        throw new UnknownCommandException(command);
                     }
                 } else {
                     shortcutIndex++;
@@ -368,9 +377,23 @@ public class BrainModeClient {
                         String argument) throws InterruptedException, IOException;
     }
 
+    /**
+     * A failure to execute an Emacs command, with reasons ranging in severity from a missing server to
+     * a read-only buffer.
+     */
     public class ExecutionException extends Exception {
         public ExecutionException(final String message) {
             super(message);
+        }
+    }
+
+    /**
+     * A failure due to a missing command.  If not arising from a simple typo, it may have to do with the limited
+     * set of commands supported by the client vis-a-vis the unlimited set of Emacs key bindings.
+     */
+    public class UnknownCommandException extends Exception {
+        public UnknownCommandException(final String command) {
+            super(command);
         }
     }
 }
