@@ -25,10 +25,11 @@
  */
 
 // OSC addresses
+const char *EXO_TT_ERROR         = "/exo/tt/error";
+const char *EXO_TT_INFO         = "/exo/tt/info";
 const char *EXO_TT_KEYS          = "/exo/tt/keys";
 const char *EXO_TT_LASER_EVENT   = "/exo/tt/laser/event";
 const char *EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger";
-const char *EXO_TT_MODE          = "/exo/tt/mode";
 const char *EXO_TT_MORSE         = "/exo/tt/morse";
 const char *EXO_TT_PHOTO_DATA    = "/exo/tt/photo/data";
 const char *EXO_TT_PHOTO_GET     = "/exo/tt/photo/get";
@@ -36,12 +37,20 @@ const char *EXO_TT_PING          = "/exo/tt/ping";
 const char *EXO_TT_PING_REPLY    = "/exo/tt/ping/reply";
 const char *EXO_TT_RGB_SET       = "/exo/tt/rgb/set";
 const char *EXO_TT_VIBRO         = "/exo/tt/vibro";
+const char *EXO_TT_WARNING       = "/exo/tt/warning";
 
 // these are global so that we can read from setup() as well as loop()
 unsigned int keys[5];
 unsigned int keyState;
 unsigned int totalKeysPressed;
 unsigned int lastKeyState = 0;
+
+const unsigned long infoCueHapticDurationMs = 100;
+const unsigned long infoCueVisualDurationMs = 200;
+const unsigned long errorCueHapticDurationMs = 100;
+const unsigned long errorCueVisualDurationMs = 200;
+const unsigned long warningCueHapticDurationMs = 100;
+const unsigned long warningCueVisualDurationMs = 200;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +63,7 @@ ExtendOSC osc("/exo/tt");
 OSCBundle *bundleIn;
 
 void sendError(const char *message) {
+   errorCue();
    osc.sendError(message);
 }
 
@@ -99,21 +109,32 @@ AnalogSampler photoSampler(photoresistorPin);
 
 RGBLED rgbled(redPin, greenPin, bluePin, sendError);
 
-int colorToggle = 0;
+unsigned long ledCueLength = 0;
+unsigned long ledCueSince = 0;
 
-void colorDebug() {
-    if (keyState) {
-        long modeColor = getModeColor();
-        rgbled.replaceColor(modeColor);
-    } else {
-        rgbled.replaceColor(RGB_BLACK);
-    }
+void infoCue() {
+    rgbled.replaceColor(RGB_BLUE);
+    ledCueLength = infoCueVisualDurationMs;
+    ledCueSince = millis();
 }
 
-void rgbForDuration(unsigned long color, unsigned long ms) {
-    rgbled.pushColor(color);
-    delay(ms);
-    rgbled.popColor();
+void warningCue() {
+    rgbled.replaceColor(RGB_YELLOW);
+    ledCueLength = warningCueVisualDurationMs;
+    ledCueSince = millis();
+}
+
+void errorCue() {
+    rgbled.replaceColor(RGB_RED);
+    ledCueLength = errorCueVisualDurationMs;
+    ledCueSince = millis();
+}
+
+void checkLedStatus(unsigned long now) {
+    if (ledCueSince > 0 && now - ledCueSince > ledCueLength) {
+        rgbled.replaceColor(0);
+        ledCueSince = 0;
+    }
 }
 
 
@@ -151,51 +172,16 @@ void vibrateForDuration(unsigned long ms) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const int totalModes = 6;
-
 typedef enum { 
-    Text = 0,
+    Normal = 0,
     LaserTrigger,
-    LaserPointer,
-    Mash
+    LaserPointer
 } Mode;
-
-const char *modeNames[] = {
-    "Text",
-    "LaserTrigger",
-    "LaserPointer",
-    "Mash"
-};
-    
-const unsigned long modeColors[] = {
-    RGB_BLUE,   // Text
-    RGB_BLACK,  // LaserTrigger
-    RGB_RED,    // LaserPointer
-    RGB_WHITE   // Mash
-};
 
 Mode mode;
 
 void setMode(int m) {
     mode = (Mode) m;
-}
-
-unsigned long getModeColor() {
-    return modeColors[mode];      
-}
-
-int modeValueOf(const char *name) {
-    int i;
-    for (i = 0; i < totalModes; i++) {
-        if (!strcmp(name, modeNames[i])) {
-            osc.sendInfo("identified mode as %d", i);
-            return i;
-        }
-    }
-    
-    osc.sendError("no such mode: %s", name);
-    
-    return Text;
 }
 
 
@@ -273,8 +259,6 @@ void setup() {
     osc.beginSerial();
     droidspeak.speakSerialOpenPhrase();
 
-    //setMode(LowercaseText);
-
     bundleIn = new OSCBundle();   
     
     //morse.playMorseString("foo");
@@ -286,41 +270,41 @@ void setup() {
 
 void handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
+        errorCue();
         osc.sendOSCBundleError(bundle);
     } else if (!(0
+        || bundle.dispatch(EXO_TT_ERROR, handleErrorMessage)
+        || bundle.dispatch(EXO_TT_INFO, handleInfoMessage)
         || bundle.dispatch(EXO_TT_LASER_TRIGGER, handleLaserTriggerMessage)
-        || bundle.dispatch(EXO_TT_MODE, handleModeMessage)
         || bundle.dispatch(EXO_TT_MORSE, handleMorseMessage)
         || bundle.dispatch(EXO_TT_PHOTO_GET, handlePhotoGetMessage)
         || bundle.dispatch(EXO_TT_PING, handlePingMessage)
         || bundle.dispatch(EXO_TT_RGB_SET, handleRGBSetMessage)
         || bundle.dispatch(EXO_TT_VIBRO, handleVibroMessage)
+        || bundle.dispatch(EXO_TT_WARNING, handleWarningMessage)
         )) {
           for (int i = 0; i < bundle.size(); i++) {
               OSCMessage *m = bundle.getOSCMessage(i);
               char address[256];
               m->getAddress(address);
+              errorCue();
               osc.sendError("no handler for address %s", address);
           }
     }
 }
 
-void handleLaserTriggerMessage(class OSCMessage &m) {
-    setMode(LaserTrigger); 
+void handleErrorMessage(class OSCMessage &m) {
+    errorCue();
+    vibrateForDuration(errorCueHapticDurationMs);
 }
 
-void handleModeMessage(class OSCMessage &m) {
-    if (!osc.validArgs(m, 1)) return;
+void handleInfoMessage(class OSCMessage &m) {
+    infoCue();
+    vibrateForDuration(infoCueHapticDurationMs);
+}
 
-    if (m.isString(0)) {
-        int length = m.getDataLength(0);
-        char buffer[length+1];
-        m.getString(0, buffer, length+1);
-        
-        setMode(modeValueOf(buffer));
-    } else {
-        osc.sendError("expected string-valued mode name");
-    }
+void handleLaserTriggerMessage(class OSCMessage &m) {
+    setMode(LaserTrigger); 
 }
 
 const int morseBufferLength = 32;
@@ -331,6 +315,7 @@ void handleMorseMessage(class OSCMessage &m) {
 
     int length = m.getDataLength(0);
     if (length >= morseBufferLength) {
+        errorCue();
         osc.sendError("Morse message is too long");
         return;
     } else {
@@ -362,6 +347,7 @@ void handleRGBSetMessage(class OSCMessage &m) {
     int32_t color = m.getInt(0);
 
     if (color < 0 || color > 0xffffff) {
+        errorCue();
         osc.sendError("color out of range: %d", (long) color);
     } else {
         rgbled.replaceColor(color);
@@ -374,13 +360,23 @@ void handleVibroMessage(class OSCMessage &m) {
     int32_t d = m.getInt(0);
 
     if (d <= 0) {
+        errorCue();
         osc.sendError("duration must be a positive number");
     } else if (d > 60000) {
+        errorCue();
         osc.sendError("duration too long");
     } else {
         vibrateForDuration((unsigned long) d);
     }
 }
+
+void handleWarningMessage(class OSCMessage &m) {
+    warningCue();
+    vibrateForDuration(warningCueHapticDurationMs);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 void sendAnalogObservation(class AnalogSampler &s, const char* address) {
     OSCMessage m(address);
@@ -432,11 +428,12 @@ void loop() {
         bundleIn = new OSCBundle();
     }
     
+    unsigned long now = millis();
+    checkLedStatus(now);
+    
     // keying action
     readKeys(); 
     if (keyState != lastKeyState) {
-        colorDebug();
-
         if (LaserTrigger == mode) {
             if (keyState) {
                 laserOn();
@@ -445,7 +442,7 @@ void loop() {
             }
         } else if (LaserPointer == mode) {
             if (!keyState) {
-                setMode(Text);
+                setMode(Normal);
                 laserOff();
             }
         } else {       
@@ -467,10 +464,6 @@ void loop() {
         }
     } 
     lastKeyState = keyState;
-
-    //int l = analogRead(A3);
-    //System.out.print("light level: ");
-    //System.out.println(l);
 }
 
 
