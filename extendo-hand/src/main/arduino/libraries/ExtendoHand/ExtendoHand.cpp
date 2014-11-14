@@ -28,6 +28,7 @@ ExtendoHand::ExtendoHand(): osc(EXO_HAND) {
     lastHeartbeat = 0;
     loopTimeHandler = NULL;
     nineAxis = true;
+    setContext("default");
 }
 
 void ExtendoHand::setLoopTimeHandler(void (*handler)(double)) {
@@ -126,9 +127,6 @@ void ExtendoHand::playTone(unsigned int frequency, unsigned long durationMs) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// settable identifier which is included with each gestural and sensor output
-char contextName[32];
-
 void ExtendoHand::setup() {
     pinMode(VIBRO_PIN, OUTPUT);
 
@@ -175,7 +173,6 @@ void ExtendoHand::setup() {
     setColor(RGB_GREEN);
     droidspeak.speakSerialOpenPhrase();
 
-    strcpy(contextName, "default");
     setColor(RGB_BLACK);
 
     vibrate(500);
@@ -193,6 +190,10 @@ void ExtendoHand::setup() {
 
 const char* ExtendoHand::getContext() {
     return contextName;
+}
+
+void ExtendoHand::setContext(const char *context) {
+    strcpy(contextName, context);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +241,9 @@ void handleAudioToneMessage(class OSCMessage &m) {
 void handleContextSetMessage(class OSCMessage &m) {
     if (!instance->getOSC()->validArgs(m, 1)) return;
 
-    m.getString(0, contextName, m.getDataLength(0) + 1);
+    char buffer[32];
+    m.getString(0, buffer, m.getDataLength(0) + 1);
+    instance->setContext(buffer);
 }
 
 /*
