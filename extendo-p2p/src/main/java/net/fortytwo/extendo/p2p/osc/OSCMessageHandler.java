@@ -5,6 +5,6 @@ import com.illposed.osc.OSCMessage;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public interface OSCMessageHandler {
+public interface OscMessageHandler {
     void handle(OSCMessage message);
 }
