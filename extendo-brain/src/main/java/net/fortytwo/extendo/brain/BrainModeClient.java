@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A lightweight, Java-based client for Brain-mode, which is in turn the Emacs Lisp client of
@@ -16,6 +18,8 @@ import java.util.Map;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BrainModeClient {
+
+    private final Logger logger = Logger.getLogger(BrainModeClient.class.getName());
 
     private final InputStream inputstream;
 
@@ -38,6 +42,8 @@ public class BrainModeClient {
 
     private String executable = "emacsclient";
 
+    private final ResultHandler resultHandler;
+
     private EmacsFunctionExecutor functionExecutor = new EmacsFunctionExecutor() {
         public Process execute(EmacsFunction function, String argument) throws InterruptedException, IOException {
             String expr = function.getRequiresArgument()
@@ -52,8 +58,10 @@ public class BrainModeClient {
         }
     };
 
-    public BrainModeClient(final InputStream inputstream) {
+    public BrainModeClient(final InputStream inputstream,
+                           final ResultHandler resultHandler) {
         this.inputstream = inputstream;
+        this.resultHandler = resultHandler;
 
         textBuffer = new StringBuilder();
         commandBuffer = new StringBuilder();
@@ -65,6 +73,7 @@ public class BrainModeClient {
         functions.put("C-e", new EmacsFunction("move-end-of-line 1", false));
         functions.put("C-g C-g C-g", new EmacsFunction("keyboard-escape-quit", false));
         functions.put("C-k", new EmacsFunction("kill-line", false));
+        //functions.put("C-x C-e", new EmacsFunction("eval-last-sexp", false));
         functions.put("C-x k", new EmacsFunction("kill-buffer", false));
 
         // shortcuts based on Mac command key as "super" key, e.g. using (setq mac-command-modifier 'super)
@@ -76,12 +85,16 @@ public class BrainModeClient {
         functions.put("DEL", new EmacsFunction("delete-backward-char 1", false));
         // TODO: ESC is currently a no-op...
         functions.put("ESC", new EmacsFunction("+40 2", false));
-        //functions.put("RET", ...
-        //functions.put("SPACE", ...
+        /*
         functions.put("up", new EmacsFunction("previous-line", false));
         functions.put("down", new EmacsFunction("next-line", false));
         functions.put("left", new EmacsFunction("backward-char", false));
         functions.put("right", new EmacsFunction("forward-char", false));
+        */
+        functions.put("up", new EmacsFunction("exo-previous-line", false));
+        functions.put("down", new EmacsFunction("exo-next-line", false));
+        functions.put("left", new EmacsFunction("exo-backward-char", false));
+        functions.put("right", new EmacsFunction("exo-forward-char", false));
 
         // Brain-mode specific functions
         functions.put("C-c C-a C-p", new EmacsFunction("exo-insert-attr-priority", true));
@@ -146,6 +159,9 @@ public class BrainModeClient {
         functions.put("C-c t", new EmacsFunction("exo-visit-target", false));
         functions.put("C-c u", new EmacsFunction("exo-update-view", false));
         functions.put("C-c v", new EmacsFunction("exo-events", false));
+
+        // extended Brain-mode mappings, not available as Emacs key mappings
+        functions.put("C-c c", new EmacsFunction("atom-id-at-point", false));
 
         // Emacspeak functions, not available in all environments
         // Note that the actual Emacspeak shortcuts begin with C-e
@@ -235,7 +251,7 @@ public class BrainModeClient {
                         state = State.ESCAPE;
                     } else if ('\n' == c) { // newline signals the end of an interactive argument
                         try {
-                            execute(currentFunction, textBuffer.toString());
+                            execute(currentFunction, textBuffer.toString(), true);
                         } finally {
                             reset();
                         }
@@ -305,7 +321,7 @@ public class BrainModeClient {
                         return State.ARGUMENT;
                     } else {
                         try {
-                            execute(f, null);
+                            execute(f, null, true);
                         } finally {
                             reset();
                         }
@@ -330,19 +346,22 @@ public class BrainModeClient {
     }
 
     private void writeTextBuffer(final String text) throws IOException, InterruptedException, ExecutionException {
-        execute(insertFunction, text);
+        execute(insertFunction, text, false);
     }
 
-    private void execute(final EmacsFunction f, final String text)
+    private void execute(final EmacsFunction f, final String text, final boolean doHandle)
             throws IOException, InterruptedException, ExecutionException {
 
         Process p = functionExecutor.execute(f, text);
+        if (null == p) {
+            return;
+        }
 
-        if (null != p && 0 != p.exitValue()) {
+        if (0 != p.exitValue()) {
             StringBuilder sb = new StringBuilder();
             sb.append("failed to execute emacs function ")
-            .append(f.getName()).append(f.requiresArgument ? " with argument " + text : "")
-            .append(" (exit code = ").append(p.exitValue()).append(").");
+                    .append(f.getName()).append(f.requiresArgument ? " with argument " + text : "")
+                    .append(" (exit code = ").append(p.exitValue()).append(").");
 
             byte[] in = IOUtil.readBytes(p.getInputStream());
             if (in.length > 0) {
@@ -357,6 +376,12 @@ public class BrainModeClient {
             }
 
             throw new ExecutionException(sb.toString());
+        } else if (doHandle) {
+            try {
+                resultHandler.handle(p.getInputStream());
+            } catch (Throwable t) {
+                logger.log(Level.SEVERE, "failed to handle Brain-mode client result", t);
+            }
         }
     }
 
@@ -382,6 +407,10 @@ public class BrainModeClient {
     public interface EmacsFunctionExecutor {
         Process execute(EmacsFunction function,
                         String argument) throws InterruptedException, IOException;
+    }
+
+    public interface ResultHandler {
+        void handle(InputStream result);
     }
 
     /**

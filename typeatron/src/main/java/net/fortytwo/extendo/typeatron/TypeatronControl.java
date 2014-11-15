@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.typeatron;
 
 import com.illposed.osc.OSCMessage;
+import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.brain.BrainModeClient;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.p2p.SideEffects;
@@ -16,6 +17,7 @@ import net.fortytwo.ripple.model.ModelConnection;
 import org.openrdf.model.URI;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Date;
@@ -32,10 +34,14 @@ public class TypeatronControl extends OscControl {
 
     protected static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
 
+    // fully specified, since PATH may or may not include /usr/bin
+    private static final String EMACSCLIENT_BIN = "/usr/bin/emacsclient";
+
     // outbound addresses
     private static final String
             EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
             EXO_TT_MORSE = "/exo/tt/morse",
+            EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
             EXO_TT_VIBRO = "/exo/tt/vibro",
@@ -257,10 +263,33 @@ public class TypeatronControl extends OscControl {
             source = new PipedOutputStream();
 
             PipedInputStream sink = new PipedInputStream(source);
+            BrainModeClient.ResultHandler resultHandler = new BrainModeClient.ResultHandler() {
+                @Override
+                public void handle(InputStream result) {
+                    String s0;
+                    try {
+                        s0 = new String(IOUtil.readBytes(result)).trim();
+                    } catch (IOException e) {
+                        logger.log(Level.SEVERE, "error reading Brain-mode response", e);
+                        sendErrorCue();
+                        return;
+                    }
+                    if (!s0.equals("nil")) {
+                        // TODO: some future return values may need to be properly dequoted
+                        String s1 = s0.substring(1, s0.length() - 2);
+                        try {
+                            rippleSession.push(rippleSession.getModelConnection().valueOf(s1));
+                            sendOkCue();
+                        } catch (RippleException e) {
+                            logger.log(Level.WARNING, "failed to push Brain-mode response", e);
+                            sendWarningCue();
+                        }
+                    }
+                }
+            };
 
-            final BrainModeClient client = new BrainModeClient(sink);
-            // since /usr/bin may not be in PATH
-            client.setExecutable("/usr/bin/emacsclient");
+            final BrainModeClient client = new BrainModeClient(sink, resultHandler);
+            client.setExecutable(EMACSCLIENT_BIN);
 
             new Thread(new Runnable() {
                 public void run() {
@@ -270,18 +299,19 @@ public class TypeatronControl extends OscControl {
                         try {
                             client.run();
                             isAlive = false;
+                            sendWarningCue();
                         } catch (BrainModeClient.ExecutionException e) {
                             logger.log(Level.WARNING,
                                     "Brain-mode client error: " + e.getMessage());
                             sendErrorCue();
-                        } catch(BrainModeClient.UnknownCommandException e) {
+                        } catch (BrainModeClient.UnknownCommandException e) {
                             logger.log(Level.FINE,
                                     "unknown command: " + e.getMessage());
                             sendWarningCue();
                         } catch (Throwable t) {
                             isAlive = false;
                             logger.log(Level.SEVERE, "Brain-mode client thread died with error", t);
-                            t.printStackTrace(System.err);
+                            sendErrorCue();
                         }
                     }
                 }
@@ -352,6 +382,11 @@ public class TypeatronControl extends OscControl {
 
         OSCMessage m = new OSCMessage(EXO_TT_VIBRO);
         m.addArgument(time);
+        send(m);
+    }
+
+    public void sendOkCue() {
+        OSCMessage m = new OSCMessage(EXO_TT_OK);
         send(m);
     }
 

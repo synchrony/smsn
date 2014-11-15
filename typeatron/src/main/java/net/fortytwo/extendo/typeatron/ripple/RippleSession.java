@@ -64,7 +64,10 @@ public class RippleSession {
     }
 
     public void push(final RippleValue... nextValues) throws RippleException {
-        System.out.println("pushing new values: " + nextValues);
+        System.out.println("pushing new values:");
+        for (RippleValue v : nextValues) {
+            System.out.println("\t" + v);
+        }
 
         if (0 == prevCollector.size()) {
             prevCollector.put(SesameList.nilList());

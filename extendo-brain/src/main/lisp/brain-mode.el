@@ -728,7 +728,7 @@
             (concat "weight " (number-to-string v) " is outside of range (0, 1]"))))
 
 
-;; API FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; USER API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun exo-atom-info (selector)
     "display, in the minibuffer, information about an atom produced by SELECTOR"
@@ -761,11 +761,6 @@
     (interactive)
     (request-duplicates
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
-
-(defun exo-emacsclient-eval (function)
-    "evaluate FUNCTION from emacsclient as if a user had typed it into the current buffer"
-    (set-buffer (window-buffer (selected-window)))
-    (funcall function))
 
 (defun exo-enter-edit-view ()
     "enter edit (read/write) mode in the current view"
@@ -1214,19 +1209,38 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c u")           'exo-update-view)
 (global-set-key (kbd "C-c v")           'exo-events)
 
+;; special mappings reserved for use through emacsclient
+;; C-c c  --  atom-id-at-point
+
+
+;; WRAPPER API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun exo-emacsclient-eval (function)
+    "evaluate FUNCTION from emacsclient as if a user had typed it into the current buffer"
+    (set-buffer (window-buffer (selected-window)))
+    (funcall function))
+
+(defun exo-previous-line ()
+    (interactive)
+    (previous-line)
+    (emacspeak-speak-line))
+
+(defun exo-next-line ()
+    (interactive)
+    (next-line)
+    (emacspeak-speak-line))
+
+(defun exo-backward-char ()
+    (interactive)
+    (backward-char)
+    (emacspeak-speak-display-char t)) ;; PREFIX arg disables phonetic pronunciation
+
+(defun exo-forward-char ()
+    (interactive)
+    (forward-char)
+    (emacspeak-speak-display-char t)) ;; PREFIX arg disables phonetic pronunciation
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(setq-default truncate-lines t)
-(if full-colors-supported
-    (let ()
-        (global-hl-line-mode 1)
-        (set-face-background 'hl-line "ivory")))
-;; These may or may not be necessary
-(setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
 
 (provide 'brain-mode)

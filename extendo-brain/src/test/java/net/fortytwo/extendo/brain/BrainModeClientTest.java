@@ -26,7 +26,6 @@ public class BrainModeClientTest extends TestCase {
                     : "(" + function.getName() + ")";
 
             results.add(expr);
-            //System.out.println("output: " + expr);
             return null;
         }
     };
@@ -35,17 +34,17 @@ public class BrainModeClientTest extends TestCase {
     public void testAll() throws Exception {
         // go up and down, and type some text (note: the 'e' is not a typo)
         assertExpected("<down><up><C-c><C-v>esome inserted text<down>",
-                "(next-line)",
-                "(previous-line)",
+                "(exo-next-line)",
+                "(exo-previous-line)",
                 "(exo-enter-edit-view)",
                 "(insert \"some inserted text\")",
-                "(next-line)");
+                "(exo-next-line)");
 
         // search for the "sandbox" note and select it from the search results,
         // visit the 11th child of sandbox and add a new note to it
         assertExpected("<C-c>ssandb*\n<down><C-c>t<C-c><C-l>aa\n<C-c>t<C-c><C-v>e* here is a new note\n<C-c>p",
                 "(exo-search \"sandb*\")",
-                "(next-line)",
+                "(exo-next-line)",
                 "(exo-visit-target)",
                 "(exo-goto-line \"aa\")",
                 "(exo-visit-target)",
@@ -62,7 +61,13 @@ public class BrainModeClientTest extends TestCase {
         results.clear();
 
         InputStream in = new ByteArrayInputStream(input.getBytes());
-        BrainModeClient client = new BrainModeClient(in);
+        BrainModeClient.ResultHandler handler = new BrainModeClient.ResultHandler() {
+            @Override
+            public void handle(InputStream result) {
+                // ignore
+            }
+        };
+        BrainModeClient client = new BrainModeClient(in, handler);
         client.setFunctionExecutor(functionExecutor);
 
         client.run();
