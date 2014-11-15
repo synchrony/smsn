@@ -57,10 +57,14 @@ public class ChordedKeyerTest {
         assertEquals("=", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
-        // make sure the comma has been read correctly from the CSV
-        pressKeys(3, 1, 2, 2, 1, 3);
+        // make sure the comma and quote characters have been read correctly from the CSV
+        pressKeys(3, 2, 1, 1, 2, 3);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals(",", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
+        pressKeys(3, 1, 2, 2, 1, 3);
+        assertEquals(ChordedKeyer.Mode.Text, lastMode);
+        assertEquals("\"", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
     }
 
