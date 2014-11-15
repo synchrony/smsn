@@ -31,6 +31,7 @@ const char *EXO_TT_KEYS          = "/exo/tt/keys";
 const char *EXO_TT_LASER_EVENT   = "/exo/tt/laser/event";
 const char *EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger";
 const char *EXO_TT_MORSE         = "/exo/tt/morse";
+const char *EXO_TT_OK            = "/exo/tt/ok";
 const char *EXO_TT_PHOTO_DATA    = "/exo/tt/photo/data";
 const char *EXO_TT_PHOTO_GET     = "/exo/tt/photo/get";
 const char *EXO_TT_PING          = "/exo/tt/ping";
@@ -49,6 +50,7 @@ const unsigned long infoCueHapticDurationMs = 100;
 const unsigned long infoCueVisualDurationMs = 200;
 const unsigned long errorCueHapticDurationMs = 100;
 const unsigned long errorCueVisualDurationMs = 200;
+const unsigned long okCueVisualDurationMs = 100;
 const unsigned long warningCueHapticDurationMs = 100;
 const unsigned long warningCueVisualDurationMs = 200;
 
@@ -112,6 +114,12 @@ RGBLED rgbled(redPin, greenPin, bluePin, sendError);
 unsigned long ledCueLength = 0;
 unsigned long ledCueSince = 0;
 
+void okCue() {
+    rgbled.replaceColor(RGB_GREEN);
+    ledCueLength = okCueVisualDurationMs;
+    ledCueSince = millis();
+}
+
 void infoCue() {
     rgbled.replaceColor(RGB_BLUE);
     ledCueLength = infoCueVisualDurationMs;
@@ -142,6 +150,8 @@ void checkLedStatus(unsigned long now) {
 
 #include <Droidspeak.h>
 
+// note: tones may not be played (via the Typeatron's transducer) in parallel with the reading of button input,
+// as the vibration causes the push button switches to oscillate when depressed
 Droidspeak droidspeak(transducerPin);
 
 
@@ -221,18 +231,6 @@ Morse morse(transducerPin, morseStopTest, sendError);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// note: tones may not be played (via the Typeatron's transducer) in parallel with the reading of button input,
-// as the vibration causes the push button switches to oscillate when depressed
-void powerUpSequence() {
-    rgbled.replaceColor(RGB_RED);
-    droidspeak.speakPowerUpPhrase();
-    rgbled.replaceColor(RGB_BLUE);
-    digitalWrite(vibrationMotorPin, HIGH);
-    delay(200);
-    digitalWrite(vibrationMotorPin, LOW);
-    rgbled.replaceColor(RGB_GREEN);
-}
-
 void setup() {
     pinMode(keyPin1, INPUT);
     pinMode(keyPin2, INPUT);     
@@ -254,14 +252,16 @@ void setup() {
 
     rgbled.setup();
 
-    powerUpSequence();
-
+    rgbled.replaceColor(RGB_YELLOW);
+    droidspeak.speakPowerUpPhrase();
+    vibrateForDuration(200);
+    rgbled.replaceColor(RGB_GREEN);
+    
     osc.beginSerial();
     droidspeak.speakSerialOpenPhrase();
 
     bundleIn = new OSCBundle();   
     
-    //morse.playMorseString("foo");
     rgbled.replaceColor(RGB_BLACK);
 }
 
@@ -277,6 +277,7 @@ void handleOSCBundle(class OSCBundle &bundle) {
         || bundle.dispatch(EXO_TT_INFO, handleInfoMessage)
         || bundle.dispatch(EXO_TT_LASER_TRIGGER, handleLaserTriggerMessage)
         || bundle.dispatch(EXO_TT_MORSE, handleMorseMessage)
+        || bundle.dispatch(EXO_TT_OK, handleOkMessage)
         || bundle.dispatch(EXO_TT_PHOTO_GET, handlePhotoGetMessage)
         || bundle.dispatch(EXO_TT_PING, handlePingMessage)
         || bundle.dispatch(EXO_TT_RGB_SET, handleRGBSetMessage)
@@ -326,6 +327,10 @@ osc.sendInfo("handle morse here: %s", morseBuffer);
     //char buffer[length+1];
     //m.getString(0, buffer, length+1);
     //morse.playMorseString(buffer);
+}
+
+void handleOkMessage(class OSCMessage &m) {
+    okCue();  
 }
 
 void handlePhotoGetMessage(class OSCMessage &m) {
