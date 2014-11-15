@@ -17,7 +17,7 @@ public class ChordedKeyer {
     private byte[] lastInput;
 
     public enum Mode {
-        Text, Numeric, Hardware, /*Laser,*/ Mash;
+        Text, Arrow, Numeric, Hardware,/*Laser,*/ Mash;
 
         public boolean isTextEntryMode() {
             return this != Hardware && this != Mash;
@@ -148,9 +148,20 @@ public class ChordedKeyer {
         currentMode = Mode.Text;
         currentButtonState = rootStates.get(currentMode);
 
+        // this completely describes Arrow mode
+        addChord(Mode.Text, "1221", Mode.Arrow, null, null);
+        addChord(Mode.Arrow, "22", null, null, "right");
+        addChord(Mode.Arrow, "33", null, null, "left");
+        addChord(Mode.Arrow, "44", null, null, "up");
+        addChord(Mode.Arrow, "55", null, null, "down");
+        addChord(Mode.Arrow, "11", Mode.Text, null, null);
+
+        // TODO: restore these... maybe
+        /*
         addChord(Mode.Text, "1212", null, Modifier.Control, "u"); // uppercase text
         addChord(Mode.Text, "1313", null, Modifier.Control, "p"); // punctuation
         addChord(Mode.Text, "1414", null, Modifier.Control, "n"); // numbers
+        */
 
         // TODO: restore mash mode
         /*

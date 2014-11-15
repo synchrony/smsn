@@ -147,6 +147,13 @@ public class BrainModeClient {
         functions.put("C-c u", new EmacsFunction("exo-update-view", false));
         functions.put("C-c v", new EmacsFunction("exo-events", false));
 
+        // Emacspeak functions, not available in all environments
+        // Note that the actual Emacspeak shortcuts begin with C-e
+        // We prepend C-c to avoid conflict with move-end-of-line
+        functions.put("C-c C-e c", new EmacsFunction("emacspeak-speak-char", false));
+        functions.put("C-c C-e l", new EmacsFunction("emacspeak-speak-line", false));
+        functions.put("C-c C-e w", new EmacsFunction("emacspeak-speak-word", false));
+
         shortcuts = new String[functions.size()];
         int i = 0;
         for (String s : functions.keySet()) {

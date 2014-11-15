@@ -552,11 +552,11 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability underline bold bright has-meta background)
+(defun colorize (text weight sharability underline bold bright has-meta)
     (let ((color (if full-colors-supported
             (find-color weight sharability bright has-meta)
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
-        (setq l (list :foreground color :background background))
+        (setq l (list :foreground color))
         (if bold (setq l (cons 'bold l)))
         (if underline (setq l (cons 'underline l)))
         (propertize text 'face l)))
@@ -603,10 +603,10 @@
                         (setq line (concat line space))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability nil nil target-alias target-meta "white")
+                                (colorize bullet target-weight target-sharability nil nil target-alias target-meta)
                                 id-infix
                                 " "
-                                (colorize target-value target-weight target-sharability nil nil target-alias target-meta "white")
+                                (colorize target-value target-weight target-sharability nil nil target-alias target-meta)
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
                     (if (using-inference)

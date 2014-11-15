@@ -52,6 +52,9 @@ public class BrainModeClientTest extends TestCase {
                 "(exo-enter-edit-view)",
                 "(insert \"* here is a new note\\n\")",
                 "(exo-push-view)");
+
+        assertExpected("<C-c><C-e>l",
+                "(emacspeak-speak-line)");
     }
 
     private void assertExpected(final String input,

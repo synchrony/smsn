@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -31,38 +32,32 @@ public class ChordedKeyerTest {
 
     @Test
     public void testLettersAndPunctuation() throws Exception {
-        reset();
         pressKeys(3, 2, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("e", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
-        reset();
         pressKeys(3, 2, 3, 3, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("E", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
-        reset();
         pressKeys(3, 2, 2, 2, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("e", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.Control, lastModifier);
 
-        reset();
         pressKeys(3, 2, 2, 2, 3, 3, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("E", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.Control, lastModifier);
 
-        reset();
         pressKeys(3, 2, 1, 1, 3, 2);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("=", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
         // make sure the comma has been read correctly from the CSV
-        reset();
         pressKeys(3, 1, 2, 2, 1, 3);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals(",", lastSymbol);
@@ -71,13 +66,11 @@ public class ChordedKeyerTest {
 
     @Test
     public void testBrackets() throws Exception {
-        reset();
         pressKeys(2, 3, 4, 2, 3, 4);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals(">", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
-        reset();
         pressKeys(2, 4, 5, 2, 4, 5);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("[", lastSymbol);
@@ -85,28 +78,45 @@ public class ChordedKeyerTest {
     }
 
     @Test
+    public void testArrows() throws Exception {
+        pressKeys(1, 2, 2, 1);
+        assertEquals(ChordedKeyer.Mode.Arrow, lastMode);
+        assertNull(lastSymbol);
+        pressKeys(2, 2);
+        assertEquals(ChordedKeyer.Mode.Arrow, lastMode);
+        assertEquals("right", lastSymbol);
+        pressKeys(3, 3);
+        assertEquals("left", lastSymbol);
+        pressKeys(4, 4);
+        assertEquals("up", lastSymbol);
+        pressKeys(5, 5);
+        assertEquals("down", lastSymbol);
+        pressKeys(2, 3, 2, 3);
+        assertNull(lastSymbol);
+        pressKeys(1, 1);
+        assertEquals(ChordedKeyer.Mode.Text, lastMode);
+        assertNull(lastSymbol);
+    }
+
+    @Test
     public void testWhitespace() throws Exception {
         // TODO: 1,1 is unmapped
 
-        reset();
         pressKeys(2, 2);
-        assertEquals(ChordedKeyer.Mode.Text, lastMode);
-        assertEquals(" ", lastSymbol);
-        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
-
-        reset();
-        pressKeys(3, 3);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("\n", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
-        reset();
+        pressKeys(3, 3);
+        assertEquals(ChordedKeyer.Mode.Text, lastMode);
+        assertEquals(" ", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
+
         pressKeys(4, 4);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("DEL", lastSymbol);
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
 
-        reset();
         pressKeys(5, 5);
         assertEquals(ChordedKeyer.Mode.Text, lastMode);
         assertEquals("ESC", lastSymbol);
@@ -120,6 +130,8 @@ public class ChordedKeyerTest {
     }
 
     private void pressKeys(final int... keys) {
+        reset();
+
         byte[] inputState = new byte[5];
         for (int i = 0; i < 5; i++) {
             inputState[i] = (byte) (keyState[i] ? '1' : '0');

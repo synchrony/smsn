@@ -86,10 +86,12 @@ public class TypeatronControl extends OscControl {
                         // in future, make this a modal choice
                         handleSymbolWithRipple(mode, symbol, modifier);
                         handleSymbolWithEmacs(mode, symbol, modifier);
-                    } else {
+                    } else if (null != mode) {
                         sendInfoCue();
 
                         logger.log(Level.INFO, "entered mode: " + mode);
+                    } else {
+                        logger.warning("transition without output symbol nor change of mode");
                     }
                 }
             };
