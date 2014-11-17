@@ -16,7 +16,9 @@ import net.fortytwo.extendo.brain.rdf.classes.Person;
 import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
 import net.fortytwo.extendo.brain.rdf.classes.RFIDReference;
 import net.fortytwo.extendo.brain.rdf.classes.TODOTask;
+import net.fortytwo.extendo.brain.rdf.classes.Tool;
 import net.fortytwo.extendo.brain.rdf.classes.URLReference;
+import net.fortytwo.extendo.brain.rdf.classes.Usage;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
@@ -102,7 +104,9 @@ public class KnowledgeBase {
                 RFIDReference.class,
                 DatedEvent.class,
                 TODOTask.class,
+                Tool.class,
                 URLReference.class,
+                Usage.class,
                 QuotedValue.class,
                 WebPage.class,
                 // context-specific classes

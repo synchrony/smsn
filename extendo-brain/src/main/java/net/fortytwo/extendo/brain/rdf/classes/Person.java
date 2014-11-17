@@ -4,14 +4,13 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
-import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
@@ -69,12 +68,7 @@ public class Person extends AtomClass {
         RDFHandler handler = context.getHandler();
 
         URI self = handleTypeAndAlias(a, vf, handler, FOAF.PERSON);
-
-        if (a.getSharability() > 0.5) {
-            handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getValue())));
-        } else {
-            handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
-        }
+        handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getValue())));
 
         return self;
     }
@@ -89,7 +83,7 @@ public class Person extends AtomClass {
             context.getHandler().handleStatement(
                     vf.createStatement(
                             context.getSubjectUri(), FOAF.NICK, vf.createLiteral(
-                            AKAReference.extractAlias(object.getValue()))));
+                                    AKAReference.extractAlias(object.getValue()))));
         }
     }
 
