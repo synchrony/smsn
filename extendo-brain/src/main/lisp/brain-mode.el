@@ -431,12 +431,12 @@
             (list :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
 
-(defun request-search-results (query style mins maxs minw maxw)
+(defun request-query-results (query query-type style mins maxs minw maxw)
     (setq exo-current-line 1)
     (setq exo-future-sharability exo-default-sharability)
     (http-get
         (concat (base-url) "search?request=" (w3m-url-encode-string (json-encode
-            (list :query query :valueCutoff exo-value-truncation-length :depth 1 :style style
+            (list :queryType query-type :query query :valueCutoff exo-value-truncation-length :depth 1 :style style
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
 
@@ -935,12 +935,23 @@
             exo-style
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
 
-(defun exo-search (query)
-    "evaluate full-text search for QUERY, yielding a ranked list of search results in a new buffer"
+(defun exo-fulltext-query (query)
+    "evaluate full-text query for QUERY, yielding a ranked list of query results in a new buffer"
     (interactive)
     (if (> (length query) 0)
-        (request-search-results
+        (request-query-results
             query
+            "FullText"
+            exo-style
+            exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
+
+(defun exo-acronym-query (query)
+    "evaluate acronym (abbreviated fulltext) query for QUERY, yielding a ranked list of query results in a new buffer"
+    (interactive)
+    (if (> (length query) 0)
+        (request-query-results
+            query
+            "Acronym"
             exo-style
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
 
@@ -1196,7 +1207,8 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-v t")       (minibuffer-arg 'exo-set-value-truncation-length "value truncation length: "))
 (global-set-key (kbd "C-c C-w C-d")     (char-arg 'exo-set-default-weight "default weight = ?"))
 (global-set-key (kbd "C-c C-w C-m")     (char-arg 'exo-set-min-weight "minimun weight = ?"))
-(global-set-key (kbd "C-c a")           'exo-visit-url-at-point)
+(global-set-key (kbd "C-c a")           (minibuffer-arg 'exo-acronym-query "acronym search for: "))
+(global-set-key (kbd "C-c b")           'exo-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'exo-duplicates)
 (global-set-key (kbd "C-c f")           'exo-find-roots)
 (global-set-key (kbd "C-c h")           'exo-history)
@@ -1204,7 +1216,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c P")           'exo-priorities)
 (global-set-key (kbd "C-c p")           'exo-push-view)
 (global-set-key (kbd "C-c r")           (minibuffer-arg 'exo-ripple-query "ripple query: "))
-(global-set-key (kbd "C-c s")           (minibuffer-arg 'exo-search "search for: "))
+(global-set-key (kbd "C-c s")           (minibuffer-arg 'exo-fulltext-query "full-text search for: "))
 (global-set-key (kbd "C-c t")           'exo-visit-target)
 (global-set-key (kbd "C-c u")           'exo-update-view)
 (global-set-key (kbd "C-c v")           'exo-events)

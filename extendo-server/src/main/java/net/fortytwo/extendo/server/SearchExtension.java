@@ -43,6 +43,7 @@ public class SearchExtension extends ExtendoExtension {
         }
 
         p.depth = r.getDepth();
+        p.queryType = r.getQueryType();
         p.query = r.getQuery();
         p.styleName = r.getStyleName();
         p.filter = r.getFilter();
@@ -75,7 +76,7 @@ public class SearchExtension extends ExtendoExtension {
     }
 
     protected void addSearchResults(final Params p) throws IOException {
-        Note n = p.queries.search(p.query, p.depth, p.filter, p.style);
+        Note n = p.queries.search(p.queryType, p.query, p.depth, p.filter, p.style);
         addView(n, p);
     }
 

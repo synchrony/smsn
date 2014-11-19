@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.server;
 
+import net.fortytwo.extendo.brain.NoteQueries;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,9 +13,16 @@ import java.security.Principal;
 public class BasicSearchRequest extends BasicViewRequest {
 
     private String query;
+    private final NoteQueries.QueryType queryType;
 
     public BasicSearchRequest(JSONObject json, Principal user) throws JSONException {
         super(json, user);
+
+        queryType = NoteQueries.QueryType.valueOf(this.json.getString(QUERY_TYPE));
+        if (null == queryType) {
+            // TODO: use a more appropriate exception
+            throw new JSONException("no query type specified");
+        }
 
         query = this.json.getString(QUERY);
 
@@ -24,6 +32,10 @@ public class BasicSearchRequest extends BasicViewRequest {
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public NoteQueries.QueryType getQueryType() {
+        return queryType;
     }
 
     public String getQuery() {

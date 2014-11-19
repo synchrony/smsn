@@ -68,7 +68,7 @@ public class BrainGraphTest extends TestCase {
 
         Atom a = bg.createAtom(f, null);
         a.setValue("Arthur Dent");
-        bg.indexForSearch(a, "Arthur Dent");
+        bg.indexForSearch(a, a.getValue());
         //a.setValue("Arthur");
 
         Collection<Atom> result;
@@ -94,5 +94,54 @@ public class BrainGraphTest extends TestCase {
         result = bg.getAtomsByFulltextQuery("\"Arthur Dent\"", f);
         assertEquals(1, result.size());
         assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+    }
+
+    @Test
+    public void testAcronymSearch() throws Exception {
+        Filter f = new Filter();
+
+        Atom a = bg.createAtom(f, null);
+        a.setValue("Arthur\tP.  Dent ");
+        Atom t = bg.createAtom(f, null);
+        t.setValue("Arthur's moth-eaten towel");
+        Atom l = bg.createAtom(f, null);
+        l.setValue("ooooooooo0ooooooooo1ooooooooo2ooooooooo3ooooooooo4ooooooooo5ooooooooo6ooooooooo7" +
+                "ooooooooo8ooooooooo9oooooooooAoooooooooBoooooooooCoooooooooDoooooooooEoooooooooF");
+        bg.indexForSearch(a, a.getValue());
+        bg.indexForSearch(t, t.getValue());
+        bg.indexForSearch(l, l.getValue());
+
+        Collection<Atom> result;
+
+        // oops. This is not a full-text query.
+        result = bg.getAtomsByAcronymQuery("Arthur*", f);
+        assertEquals(0, result.size());
+
+        // l has not been indexed because its value is too long
+        result = bg.getAtomsByAcronymQuery("o", f);
+        assertEquals(0, result.size());
+
+        // exact acronym match
+        // capitalization, punctuation, and idiosyncrasies of white space are ignored
+        result = bg.getAtomsByAcronymQuery("apd", f);
+        assertEquals(1, result.size());
+        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+
+        // hyphens and underscores are treated as white space, while apostrophes and other punctuation are ignored
+        result = bg.getAtomsByAcronymQuery("amet", f);
+        assertEquals(1, result.size());
+        assertEquals(t.asVertex().getId(), result.iterator().next().asVertex().getId());
+
+        // acronym prefix match
+        result = bg.getAtomsByAcronymQuery("ap*", f);
+        assertEquals(1, result.size());
+        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+
+        // acronym search is also case insensitive
+        result = bg.getAtomsByAcronymQuery("AP*", f);
+        assertEquals(1, result.size());
+        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+
+
     }
 }

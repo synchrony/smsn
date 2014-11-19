@@ -22,12 +22,10 @@ import org.json.JSONObject;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -283,6 +281,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public Float propertyValue;
         public NoteQueries queries;
         public String query;
+        public NoteQueries.QueryType queryType;
         public Atom root;
         public String rootId;
         public NoteQueries.AdjacencyStyle style;

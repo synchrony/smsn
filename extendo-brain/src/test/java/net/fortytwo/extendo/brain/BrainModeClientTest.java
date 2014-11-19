@@ -43,7 +43,7 @@ public class BrainModeClientTest extends TestCase {
         // search for the "sandbox" note and select it from the search results,
         // visit the 11th child of sandbox and add a new note to it
         assertExpected("<C-c>ssandb*\n<down><C-c>t<C-c><C-l>aa\n<C-c>t<C-c><C-v>e* here is a new note\n<C-c>p",
-                "(exo-search \"sandb*\")",
+                "(exo-fulltext-query \"sandb*\")",
                 "(exo-next-line)",
                 "(exo-visit-target)",
                 "(exo-goto-line \"aa\")",

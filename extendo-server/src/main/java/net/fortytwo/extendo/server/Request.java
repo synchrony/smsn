@@ -26,6 +26,7 @@ public class Request {
             MIN_WEIGHT = "minWeight",
             NAME = "name",
             QUERY = "query",
+            QUERY_TYPE = "queryType",
             ROOT = "root",
             STYLE = "style",
             VALUE = "value",

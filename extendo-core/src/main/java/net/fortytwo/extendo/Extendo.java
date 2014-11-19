@@ -38,19 +38,21 @@ public class Extendo {
     public static final String
             BRAIN_PORT = "net.fortytwo.extendo.server.brainPort";
 
-    // schema constants
+    // core schema constants
     public static final String
             ALIAS = "alias",
             CREATED = "created",
             FIRST = "first",
-            NOTE = "note",
             NOTES = "notes",
-            PRIORITY = "priority",
             REST = "rest",
             SHARABILITY = "sharability",
-            TYPE = "type",
             VALUE = "value",
             WEIGHT = "weight";
+    // extended schema constants
+    public static final String
+            ACRONYM = "acronym",
+            PRIORITY = "priority",
+            SHORTCUT = "shortcut";
 
     private static final int KEY_DIGITS = 7;
 

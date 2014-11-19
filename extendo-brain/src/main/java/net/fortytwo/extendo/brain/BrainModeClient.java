@@ -146,7 +146,8 @@ public class BrainModeClient {
         functions.put("C-c C-v t", new EmacsFunction("exo-set-value-truncation-length", true));
         functions.put("C-c C-w C-d", new EmacsFunction("exo-set-default-weight", true));
         functions.put("C-c C-w C-m", new EmacsFunction("exo-set-min-weight", true));
-        functions.put("C-c a", new EmacsFunction("exo-visit-url-at-point", false));
+        functions.put("C-c a", new EmacsFunction("exo-acronym-query", true));
+        functions.put("C-c b", new EmacsFunction("exo-visit-url-at-point", false));
         functions.put("C-c d", new EmacsFunction("exo-duplicates", false));
         functions.put("C-c e", new EmacsFunction("exo-export", false));
         functions.put("C-c f", new EmacsFunction("exo-find-roots", false));
@@ -155,7 +156,7 @@ public class BrainModeClient {
         functions.put("C-c P", new EmacsFunction("exo-priorities", false));
         functions.put("C-c p", new EmacsFunction("exo-push-view", false));
         functions.put("C-c r", new EmacsFunction("exo-ripple-query", true));
-        functions.put("C-c s", new EmacsFunction("exo-search", true));
+        functions.put("C-c s", new EmacsFunction("exo-fulltext-query", true));
         functions.put("C-c t", new EmacsFunction("exo-visit-target", false));
         functions.put("C-c u", new EmacsFunction("exo-update-view", false));
         functions.put("C-c v", new EmacsFunction("exo-events", false));

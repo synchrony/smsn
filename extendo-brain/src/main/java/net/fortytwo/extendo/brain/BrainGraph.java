@@ -30,7 +30,10 @@ public class BrainGraph {
 
     private final FramedGraph<KeyIndexableGraph> framedGraph;
 
+    // full-text search
     private Index<Vertex> searchIndex;
+    // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
+    private Index<Vertex> acronymIndex;
 
     private static final String atomNs;
 
@@ -60,6 +63,18 @@ public class BrainGraph {
                         "search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
             } catch (ClassNotFoundException e) {
                 logger.warning("fulltext search not available");
+            }
+        }
+        acronymIndex = graph.getIndex("acronyms", Vertex.class);
+        if (null == acronymIndex) {
+            try {
+                Class.forName("org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer");
+
+                logger.info("creating 'acronym' index");
+                acronymIndex = graph.createIndex(
+                        "acronyms", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+            } catch (ClassNotFoundException e) {
+                logger.warning("acronym search not available");
             }
         }
 
@@ -201,13 +216,37 @@ public class BrainGraph {
     public void indexForSearch(final Atom a,
                                final String value) {
         if (null != searchIndex) {
+            // TODO: remove existing values
             searchIndex.put(Extendo.VALUE, value, a.asVertex());
+        }
+
+        if (null != acronymIndex) {
+            // index only short, name-like values, avoiding free-form text if possible
+            if (value.length() <= 100) {
+                String clean = value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
+                StringBuilder acronym = new StringBuilder();
+                boolean isInside = false;
+                for (byte b : clean.getBytes()) {
+                    // TODO: support international letter characters as such
+                    if (b >= 'a' && b <= 'z') {
+                        if (!isInside) {
+                            acronym.append((char) b);
+                            isInside = true;
+                        }
+                    } else if (' ' == b) {
+                        isInside = false;
+                    }
+                }
+
+                // TODO: remove existing values
+                acronymIndex.put(Extendo.ACRONYM, acronym.toString(), a.asVertex());
+            }
         }
     }
 
     /**
      * @return an Iterable of all atoms in the knowledge base, as opposed to all vertices
-     *         (many of which are list nodes rather than atoms)
+     * (many of which are list nodes rather than atoms)
      */
     public Iterable<Atom> getAtoms() {
         return new Iterable<Atom>() {
@@ -255,6 +294,27 @@ public class BrainGraph {
 
         if (null != searchIndex) {
             for (Vertex v : searchIndex.query(Extendo.VALUE, query)) {
+                Atom a = getAtom(v);
+
+                if (null == a) {
+                    throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
+                }
+
+                if (filter.isVisible(v)) {
+                    results.add(a);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    public List<Atom> getAtomsByAcronymQuery(final String query,
+                                             final Filter filter) {
+        List<Atom> results = new LinkedList<Atom>();
+
+        if (null != acronymIndex) {
+            for (Vertex v : acronymIndex.query(Extendo.ACRONYM, query)) {
                 Atom a = getAtom(v);
 
                 if (null == a) {

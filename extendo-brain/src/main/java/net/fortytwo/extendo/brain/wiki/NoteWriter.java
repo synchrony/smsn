@@ -58,12 +58,6 @@ public class NoteWriter {
             json.put(Extendo.ALIAS, n.getAlias());
         }
 
-        /*
-        if (null != n.getType()) {
-            json.put(Extendo.TYPE, n.getType());
-        }
-        */
-
         if (null != n.getMeta()) {
             JSONArray c = new JSONArray();
             json.put(META, c);

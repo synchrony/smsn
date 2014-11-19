@@ -23,6 +23,10 @@ public class NoteQueries {
 
     protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());
 
+    public enum QueryType {
+        FullText, Acronym
+    }
+
     private final ExtendoBrain brain;
     //private final QueryEngine rippleQueryEngine;
 
@@ -331,16 +335,18 @@ public class NoteQueries {
     }
 
     /**
-     * Performs full text search.
+     * Performs a specified type of search, such as full text or acronym search
      *
-     * @param query  the search query
-     * @param depth  depth of the search results view
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to appear in search results.
-     * @param style  the adjacency style of the view
+     * @param queryType the type of search to perform
+     * @param query     the search query
+     * @param depth     depth of the search results view
+     * @param filter    a collection of criteria for atoms and links.
+     *                  Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */
-    public Note search(final String query,
+    public Note search(final QueryType queryType,
+                       final String query,
                        final int depth,
                        final Filter filter,
                        final AdjacencyStyle style) {
@@ -349,14 +355,27 @@ public class NoteQueries {
         }
 
         Note result = new Note();
-        result.setValue("full text search results for \"" + query + "\"");
 
-        for (Atom a : brain.getBrainGraph().getAtomsByFulltextQuery(query, filter)) {
+        List<Atom> results;
+        switch (queryType) {
+            case FullText:
+                results = brain.getBrainGraph().getAtomsByFulltextQuery(query, filter);
+                break;
+            case Acronym:
+                results = brain.getBrainGraph().getAtomsByAcronymQuery(query, filter);
+                break;
+            default:
+                throw new IllegalStateException("unexpected query type: " + queryType);
+        }
+
+        for (Atom a : results) {
             Note n = viewInternal(a, depth - 1, filter, style);
             result.addChild(n);
         }
 
         Collections.sort(result.getChildren(), new NoteComparator());
+
+        result.setValue(queryType.name() + " results for \"" + query + "\"");
         return result;
     }
 
