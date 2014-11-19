@@ -16,7 +16,7 @@ public class Usage extends SimpleAtomClass {
     public Usage() {
         super(
                 "usage",
-                Pattern.compile(".* usage"),
+                Pattern.compile(".+ usage"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(null,

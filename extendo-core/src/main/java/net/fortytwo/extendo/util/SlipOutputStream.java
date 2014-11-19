@@ -45,4 +45,8 @@ public class SlipOutputStream {
         }
         outputStream.write((byte) SLIP_END);
     }
+
+    public void close() throws IOException {
+        outputStream.close();
+    }
 }

@@ -36,10 +36,25 @@ public abstract class OscControl {
         return receiver;
     }
 
-    public void connect(OscSender sender) {
+    /**
+     * Attaches an OSC sender, also calling the onConnect method which may be used to initialize this control
+     *
+     * @param sender the new OSC sender
+     */
+    public void connect(final OscSender sender) {
         this.sender = sender;
 
         onConnect();
+    }
+
+    /**
+     * Closes and detaches the OSC sender, if one has previously been attached with <code>connect()</code>
+     */
+    public synchronized void disconnect() {
+        if (null != sender) {
+            sender.close();
+            sender = null;
+        }
     }
 
     // override this method

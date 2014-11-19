@@ -51,4 +51,12 @@ public class SlipOscSender implements OscSender {
             }
         }
     }
+
+    public void close() {
+        try {
+            slipStream.close();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "error on closing of SLIP stream", e);
+        }
+    }
 }

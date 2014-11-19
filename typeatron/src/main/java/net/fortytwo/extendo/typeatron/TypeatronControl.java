@@ -193,6 +193,7 @@ public class TypeatronControl extends OscControl {
             }
         });
 
+        // user has "pointed with reference". This event occurs at the moment the laser turns on.
         oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 // TODO: use the recognition time parameter provided in the message

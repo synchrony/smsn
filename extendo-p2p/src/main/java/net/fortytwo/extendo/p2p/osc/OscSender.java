@@ -14,4 +14,6 @@ public interface OscSender {
      * @param bundle a bundle containing one or more OSC messages
      */
     void send(OSCBundle bundle);
+
+    void close();
 }
