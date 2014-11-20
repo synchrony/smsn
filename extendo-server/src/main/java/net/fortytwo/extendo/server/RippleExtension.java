@@ -32,7 +32,7 @@ public class RippleExtension extends ExtendoExtension {
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request",
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         BasicSearchRequest r;
         try {
             r = new BasicSearchRequest(new JSONObject(request), p.user);
@@ -50,7 +50,7 @@ public class RippleExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         addSearchResults(p);
 
         p.map.put("title", p.query);
@@ -65,7 +65,7 @@ public class RippleExtension extends ExtendoExtension {
         return false;
     }
 
-    protected void addSearchResults(final Params p) throws IOException {
+    protected void addSearchResults(final RequestParams p) throws IOException {
         // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
         Note n = new Note();
         //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);

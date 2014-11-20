@@ -14,6 +14,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteQueries;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,10 +35,10 @@ public class UpdateExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "update an Extend-o-Brain graph using the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
 
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         UpdateRequest r;
         try {
             r = new UpdateRequest(new JSONObject(request), p.user);
@@ -55,7 +56,7 @@ public class UpdateExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         Note rootNote;
 
         InputStream in = new ByteArrayInputStream(p.wikiView.getBytes());
@@ -93,7 +94,7 @@ public class UpdateExtension extends ExtendoExtension {
                              final Principal user) throws JSONException {
             super(json, user);
 
-            wikiView = this.json.getString(VIEW);
+            wikiView = this.json.getString(Params.VIEW);
         }
     }
 }

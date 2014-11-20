@@ -9,29 +9,6 @@ import java.security.Principal;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Request {
-    protected static final String
-            DATASET = "dataset",
-            DEFAULT_SHARABILITY = "defaultSharability",
-            DEFAULT_WEIGHT = "defaultWeight",
-            DEPTH = "depth",
-            FILE = "file",
-            FILTER = "filter",
-            FORMAT = "format",
-            ID = "id",
-            INCLUDE_TYPES = "includeTypes",
-            MAX_RESULTS = "maxResults",
-            MAX_SHARABILITY = "maxSharability",
-            MAX_WEIGHT = "maxWeight",
-            MIN_SHARABILITY = "minSharability",
-            MIN_WEIGHT = "minWeight",
-            NAME = "name",
-            QUERY = "query",
-            QUERY_TYPE = "queryType",
-            ROOT = "root",
-            STYLE = "style",
-            VALUE = "value",
-            VALUE_CUTOFF = "valueCutoff",
-            VIEW = "view";
 
     protected final JSONObject json;
     protected final Principal user;

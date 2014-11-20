@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.frames.FramedGraph;
-import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
 import net.fortytwo.extendo.brain.wiki.NoteWriter;
 import org.json.JSONObject;

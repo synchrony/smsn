@@ -41,6 +41,12 @@ public interface Atom extends VertexFrame {
     @Property(Extendo.SHARABILITY)
     void setSharability(Float sharability);
 
+    @Property(Extendo.SHORTCUT)
+    String getShortcut();
+
+    @Property(Extendo.SHORTCUT)
+    void setShortcut(String shortcut);
+
     @Property(Extendo.WEIGHT)
     Float getWeight();
 

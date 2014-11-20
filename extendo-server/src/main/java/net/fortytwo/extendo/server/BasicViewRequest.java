@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.server;
 
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,8 +17,8 @@ public class BasicViewRequest extends FilteredResultsRequest {
                             final Principal user) throws JSONException {
         super(json, user);
 
-        depth = this.json.getInt(DEPTH);
-        styleName = this.json.getString(STYLE);
+        depth = this.json.getInt(Params.DEPTH);
+        styleName = this.json.getString(Params.STYLE);
     }
 
     public int getDepth() {

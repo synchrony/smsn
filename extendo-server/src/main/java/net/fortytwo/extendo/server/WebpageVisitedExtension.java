@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.server;
 
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.sail.SailGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
@@ -19,7 +20,6 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
-import com.tinkerpop.blueprints.impls.sail.SailGraph;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;

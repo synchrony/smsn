@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,9 +30,9 @@ public class HistoryExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         FilteredResultsRequest r;
         try {
             r = new FilteredResultsRequest(new JSONObject(request), p.user);
@@ -46,7 +47,7 @@ public class HistoryExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         List<String> ids = getHistory(p.context, p.brain.getBrainGraph(), p.filter);
 
         addView(p.queries.customView(ids, p.filter), p);

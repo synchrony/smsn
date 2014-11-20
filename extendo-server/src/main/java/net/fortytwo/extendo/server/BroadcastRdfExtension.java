@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.brain.Params;
 import net.fortytwo.extendo.util.TypedProperties;
 import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
@@ -42,9 +43,9 @@ public class BroadcastRdfExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for broadcasting events in RDF to all peers in the environment")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         BroadcastRdfRequest r;
         try {
             r = new BroadcastRdfRequest(new JSONObject(request), p.user);
@@ -59,7 +60,7 @@ public class BroadcastRdfExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         // TODO: take RDF format as an input parameter
         RDFFormat format = RDFFormat.NTRIPLES;
 
@@ -83,7 +84,7 @@ public class BroadcastRdfExtension extends ExtendoExtension {
         public BroadcastRdfRequest(JSONObject json, Principal user) throws JSONException {
             super(json, user);
 
-            dataset = this.json.getString(DATASET);
+            dataset = this.json.getString(Params.DATASET);
         }
     }
 }

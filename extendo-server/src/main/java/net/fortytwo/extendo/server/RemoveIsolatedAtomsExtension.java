@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,10 +28,10 @@ public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
             " (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
 
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
 
         FilteredResultsRequest r;
         try {
@@ -46,7 +47,7 @@ public class RemoveIsolatedAtomsExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         p.queries.removeIsolatedAtoms(p.filter);
 
         return ExtensionResponse.ok(p.map);

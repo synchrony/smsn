@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,9 +33,9 @@ public class SearchExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for performing full text search over an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         SearchRequest r;
         try {
             r = new SearchRequest(new JSONObject(request), p.user);
@@ -54,7 +55,7 @@ public class SearchExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         if (null == p.valueCutoff) {
             p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
         } else {
@@ -75,7 +76,7 @@ public class SearchExtension extends ExtendoExtension {
         return false;
     }
 
-    protected void addSearchResults(final Params p) throws IOException {
+    protected void addSearchResults(final RequestParams p) throws IOException {
         Note n = p.queries.search(p.queryType, p.query, p.depth, p.filter, p.style);
         addView(n, p);
     }
@@ -86,7 +87,7 @@ public class SearchExtension extends ExtendoExtension {
         public SearchRequest(JSONObject json, Principal user) throws JSONException {
             super(json, user);
 
-            valueCutoff = this.json.getInt(VALUE_CUTOFF);
+            valueCutoff = this.json.getInt(Params.VALUE_CUTOFF);
         }
     }
 }

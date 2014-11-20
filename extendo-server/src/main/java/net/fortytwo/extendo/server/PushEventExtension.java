@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,9 +31,9 @@ public class PushEventExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "a service for receiving and internalizing events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         PushEventRequest r;
         try {
             r = new PushEventRequest(new JSONObject(request), p.user);
@@ -47,7 +48,7 @@ public class PushEventExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         Note event = p.parser.fromJSON(p.jsonView);
 
         p.brain.getEventStack().push(event);
@@ -70,7 +71,7 @@ public class PushEventExtension extends ExtendoExtension {
         public PushEventRequest(JSONObject jsonStr, Principal user) throws JSONException {
             super(jsonStr, user);
 
-            jsonView = json.getJSONObject(VIEW);
+            jsonView = json.getJSONObject(Params.VIEW);
         }
     }
 }

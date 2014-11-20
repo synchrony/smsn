@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,10 +32,10 @@ public class ViewExtension extends ExtendoExtension {
             " in the Extendo Wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
 
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         ViewRequest r;
 
         try {
@@ -54,7 +55,7 @@ public class ViewExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
 
         Note n = p.queries.view(p.root, p.depth, p.filter, p.style);
         addView(n, p);
@@ -81,7 +82,7 @@ public class ViewExtension extends ExtendoExtension {
             super(json, user);
 
             // this argument is optional; do not include types by default
-            includeTypes = json.optBoolean(INCLUDE_TYPES, false);
+            includeTypes = json.optBoolean(Params.INCLUDE_TYPES, false);
         }
 
         public boolean isIncludeTypes() {

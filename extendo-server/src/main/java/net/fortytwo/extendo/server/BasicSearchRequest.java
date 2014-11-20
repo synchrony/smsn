@@ -1,6 +1,7 @@
 package net.fortytwo.extendo.server;
 
 import net.fortytwo.extendo.brain.NoteQueries;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,13 +19,13 @@ public class BasicSearchRequest extends BasicViewRequest {
     public BasicSearchRequest(JSONObject json, Principal user) throws JSONException {
         super(json, user);
 
-        queryType = NoteQueries.QueryType.valueOf(this.json.getString(QUERY_TYPE));
+        queryType = NoteQueries.QueryType.valueOf(this.json.getString(Params.QUERY_TYPE));
         if (null == queryType) {
             // TODO: use a more appropriate exception
             throw new JSONException("no query type specified");
         }
 
-        query = this.json.getString(QUERY);
+        query = this.json.getString(Params.QUERY);
 
         try {
             // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)

@@ -59,7 +59,7 @@ public class NoteQueries {
     /**
      * Generates a view of the graph.
      *
-     * @param root   the key of the root atom of the view
+     * @param root   the root atom of the view
      * @param height the height of the view.
      *               A view of height 0 contains only the root,
      *               while a view of height 1 also contains all children of the root,
@@ -571,7 +571,7 @@ public class NoteQueries {
         String alias = note.getAlias();
 
         if (null != alias) {
-            if (alias.equals(Note.CLEAR_ALIAS)) {
+            if (alias.equals(Note.CLEARME_VALUE)) {
                 String prev = target.getAlias();
                 if (null != prev) {
                     target.setAlias(null);
@@ -581,6 +581,24 @@ public class NoteQueries {
                 String prev = target.getAlias();
                 if (null == prev || !prev.equals(alias)) {
                     target.setAlias(alias);
+                    propsSet = true;
+                }
+            }
+        }
+
+        String shortcut = note.getShortcut();
+
+        if (null != shortcut) {
+            if (shortcut.equals(Note.CLEARME_VALUE)) {
+                String prev = target.getShortcut();
+                if (null != prev) {
+                    target.setShortcut(null);
+                    propsSet = true;
+                }
+            } else {
+                String prev = target.getShortcut();
+                if (null == prev || !prev.equals(shortcut)) {
+                    target.setShortcut(shortcut);
                     propsSet = true;
                 }
             }
@@ -637,6 +655,7 @@ public class NoteQueries {
         n.setPriority(a.getPriority());
         n.setCreated(a.getCreated());
         n.setAlias(a.getAlias());
+        n.setShortcut(a.getShortcut());
 
         // The convention for "invisible" notes is to leave the value blank,
         // as well as to avoid displaying any child notes.

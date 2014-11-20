@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,9 +32,9 @@ public class PrioritiesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for deriving a prioritized list of items in the knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         PrioritiesRequest r;
         try {
             r = new PrioritiesRequest(new JSONObject(request), p.user);
@@ -49,7 +50,7 @@ public class PrioritiesExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
 
         Note n = p.queries.priorityView(p.filter, p.maxResults, p.brain.getPriorities());
         addView(n, p);
@@ -71,10 +72,10 @@ public class PrioritiesExtension extends ExtendoExtension {
         public PrioritiesRequest(JSONObject json, Principal user) throws JSONException {
             super(json, user);
 
-            maxResults = this.json.optInt(MAX_RESULTS, DEFAULT_MAX_RESULTS);
+            maxResults = this.json.optInt(Params.MAX_RESULTS, DEFAULT_MAX_RESULTS);
 
             if (maxResults <= 0) {
-                throw new JSONException(MAX_RESULTS + " parameter must be a positive integer");
+                throw new JSONException(Params.MAX_RESULTS + " parameter must be a positive integer");
             }
         }
     }

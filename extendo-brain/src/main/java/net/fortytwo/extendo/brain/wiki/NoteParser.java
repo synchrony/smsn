@@ -27,6 +27,7 @@ public class NoteParser {
             ALIAS_ATTR = "@alias",
             PRIORITY_ATTR = "@priority",
             SHARABILITY_ATTR = "@sharability",
+            SHORTCUT_ATTR = "@shortcut",
             WEIGHT_ATTR = "@weight";
 
     private static final int MAX_BULLET_LENGTH = 1;
@@ -184,7 +185,9 @@ public class NoteParser {
 
             if (0 == value.length()) {
                 if (isAttribute) {
-                    if (!bullet.equals(ALIAS_ATTR)) {
+                    // can "clear" alias or shortcut by writing "@alias" or "@shortcut" and nothing else;
+                    // all other attributes require an argument
+                    if (!(bullet.equals(ALIAS_ATTR) || bullet.equals(SHORTCUT_ATTR))) {
                         throw new NoteParsingException(lineNumber, "empty attribute value");
                     }
                 } else if (null == id) {
@@ -203,8 +206,13 @@ public class NoteParser {
                     if (value.length() > 0) {
                         n.setAlias(value);
                     } else {
-                        n.setAlias(Note.CLEAR_ALIAS);
-                        //throw new NoteParsingException(lineNumber, "missing @alias value");
+                        n.setAlias(Note.CLEARME_VALUE);
+                    }
+                } else if (bullet.equals(SHORTCUT_ATTR)) {
+                    if (value.length() > 0) {
+                        n.setShortcut(value);
+                    } else {
+                        n.setShortcut(Note.CLEARME_VALUE);
                     }
                 } else if (bullet.equals(PRIORITY_ATTR)) {
                     float val;
@@ -264,6 +272,9 @@ public class NoteParser {
         }
         if (j.has(Extendo.ALIAS)) {
             n.setAlias(j.getString(Extendo.ALIAS));
+        }
+        if (j.has(Extendo.SHORTCUT)) {
+            n.setShortcut(j.getString(Extendo.SHORTCUT));
         }
         if (j.has(Extendo.SHARABILITY)) {
             n.setSharability((float) j.getDouble(Extendo.SHARABILITY));

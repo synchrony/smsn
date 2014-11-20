@@ -13,6 +13,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.ActivityLog;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,9 +34,9 @@ public class SetPropertiesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for setting properties of given atoms")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
         SetPropertiesRequest r;
         try {
             r = new SetPropertiesRequest(new JSONObject(request), p.user);
@@ -69,7 +70,7 @@ public class SetPropertiesExtension extends ExtendoExtension {
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         if (p.propertyName.equals("weight")) {
             p.root.setWeight(p.propertyValue);
         } else if (p.propertyName.equals("sharability")) {
@@ -109,9 +110,9 @@ public class SetPropertiesExtension extends ExtendoExtension {
         public SetPropertiesRequest(JSONObject json, Principal user) throws JSONException {
             super(json, user);
 
-            id = this.json.getString(ID);
-            name = this.json.getString(NAME);
-            value = (float) this.json.getDouble(VALUE);
+            id = this.json.getString(Params.ID);
+            name = this.json.getString(Params.NAME);
+            value = (float) this.json.getDouble(Params.VALUE);
         }
     }
 }

@@ -22,6 +22,7 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.Params;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,11 +51,11 @@ public class ExportExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph to the file system")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
         // TODO: any security restrictions here?
 
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
 
         ExportRequest r;
         try {
@@ -177,7 +178,7 @@ public class ExportExtension extends ExtendoExtension {
         return Extendo.unicodeEscape(value);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         Format f = Format.valueOf(p.format);
         if (null == f) {
             return ExtensionResponse.error("no such format: " + p.format);
@@ -230,8 +231,8 @@ public class ExportExtension extends ExtendoExtension {
                              final Principal user) throws JSONException {
             super(json, user);
 
-            format = this.json.getString(FORMAT);
-            file = this.json.getString(FILE);
+            format = this.json.getString(Params.FORMAT);
+            file = this.json.getString(Params.FILE);
         }
     }
 }

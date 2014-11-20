@@ -22,14 +22,14 @@ public class InferTypesExtension extends ExtendoExtension {
     @ExtensionDescriptor(description = "an extension for performing type inference on an Extend-o-Brain knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
-        Params p = createParams(context, (KeyIndexableGraph) graph);
+        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
 
         Extendo.logInfo("extendo infer-types");
 
         return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final Params p) throws Exception {
+    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         KnowledgeBase kb = p.brain.getKnowledgeBase();
         kb.reset();
         long timeBefore = System.currentTimeMillis();

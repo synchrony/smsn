@@ -8,8 +8,8 @@ import java.util.List;
  */
 public class Note {
     // A special value, for incoming notes only,
-    // which causes an atom's alias to be set to null (rather than merely ignored)
-    public static final String CLEAR_ALIAS = "_";
+    // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
+    public static final String CLEARME_VALUE = "_";
 
     private final List<Note> children;
     private boolean hasChildren;
@@ -20,6 +20,7 @@ public class Note {
     private Float priority;
     private Long created;
     private String alias;
+    private String shortcut;
     //private String type;
     private List<String> meta;
 
@@ -130,15 +131,17 @@ public class Note {
         this.alias = alias;
     }
 
-    /*
-    public String getType() {
-        return type;
+    public String getShortcut() {
+        return shortcut;
     }
 
-    public void setType(final String type) {
-        this.type = type;
+    public void setShortcut(final String shortcut) {
+        if (null != shortcut && 0 == shortcut.length()) {
+            throw new IllegalArgumentException("empty shortcut is not valid");
+        }
+
+        this.shortcut = shortcut;
     }
-    */
 
     public List<String> getMeta() {
         return meta;

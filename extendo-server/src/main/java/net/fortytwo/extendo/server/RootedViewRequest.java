@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.server;
 
+import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,7 +17,7 @@ public class RootedViewRequest extends BasicViewRequest {
                              final Principal user) throws JSONException {
         super(json, user);
 
-        rootId = this.json.getString(ROOT);
+        rootId = this.json.getString(Params.ROOT);
     }
 
     public String getRootId() {

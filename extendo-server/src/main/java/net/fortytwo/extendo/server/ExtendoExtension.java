@@ -36,7 +36,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
 
     private static final String HISTORY_ATTR = "history";
 
-    protected abstract ExtensionResponse performTransaction(Params p) throws Exception;
+    protected abstract ExtensionResponse performTransaction(RequestParams p) throws Exception;
 
     protected abstract boolean doesRead();
 
@@ -58,9 +58,9 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         return b;
     }
 
-    protected Params createParams(final RexsterResourceContext context,
+    protected RequestParams createParams(final RexsterResourceContext context,
                                   final KeyIndexableGraph graph) {
-        Params p = new Params();
+        RequestParams p = new RequestParams();
         p.baseGraph = graph;
         p.context = context;
         SecurityContext security = p.context.getSecurityContext();
@@ -74,7 +74,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         return p;
     }
 
-    protected ExtensionResponse handleRequestInternal(final Params p) {
+    protected ExtensionResponse handleRequestInternal(final RequestParams p) {
 
         if (doesWrite() && !canWrite(p.user)) {
             return ExtensionResponse.error("user does not have permission to for write operations");
@@ -210,7 +210,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
     }
 
     protected void addView(final Note n,
-                           final Params p) throws IOException {
+                           final RequestParams p) throws IOException {
         JSONObject json;
 
         try {
@@ -262,7 +262,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         return h.getHistory(100, true, graph, filter);
     }
 
-    protected class Params {
+    protected class RequestParams {
         public KeyIndexableGraph baseGraph;
         public ExtendoBrain brain;
         public RexsterResourceContext context;
