@@ -23,7 +23,7 @@ public class BrainModeClient {
 
     private final InputStream inputstream;
 
-    private enum State {TEXT, EVENT, COMMAND, ARGUMENT, ESCAPE}
+    private enum State {CHAR, ENTITY, COMMAND, ARGUMENT, ESCAPE}
 
     private final Map<String, EmacsFunction> functions;
     // a sorted array of keyboard shortcuts
@@ -177,6 +177,8 @@ public class BrainModeClient {
             shortcuts[i++] = s;
         }
         Arrays.sort(shortcuts);
+
+        reset();
     }
 
     public void setExecutable(final String executable) {
@@ -187,19 +189,21 @@ public class BrainModeClient {
         this.functionExecutor = executor;
     }
 
-    public void run() throws IOException, InterruptedException, ExecutionException, UnknownCommandException {
-        // note: this call to reset() makes it unnecessary to reset() before throwing parse errors
-        reset();
-
+    // note: the client maintains state even between (non-parse) errors,
+    // allowing it to recover as soon as possible from the failed execution of a valid expression.
+    // When a parse error is encountered, the state is reset to CHAR.
+    public void run() throws IOException, InterruptedException, ExecutionException, UnknownCommandException, ParseError {
         int c;
         while (-1 != (c = inputstream.read())) {
+            //System.out.println("read: " + (char) c + " in state " + state);
             switch (state) {
-                case TEXT:
+                case CHAR:
                     if ('<' == c) {
+                        state = State.ENTITY;
                         finishText();
-                        state = State.EVENT;
                     } else if ('>' == c) {
-                        throw new IOException("mismatched '>'");
+                        reset();
+                        throw new ParseError("mismatched '>' in " + state);
                     } else if ('\\' == c) {
                         lastState = state;
                         state = State.ESCAPE;
@@ -211,29 +215,34 @@ public class BrainModeClient {
                         textBuffer.append((char) c);
                     }
                     break;
-                case EVENT:
+                case ENTITY:
                     if ('>' == c) {
                         state = matchCommand();
                     } else if ('\\' == c) {
-                        throw new IOException("escape character '\\' in event <...>");
+                        reset();
+                        throw new ParseError("escape character '\\' in " + state);
                     } else if ('<' == c) {
-                        throw new IOException("mismatched '<'");
+                        reset();
+                        throw new ParseError("mismatched '<' in " + state);
                     } else if ('\n' == c) {
-                        throw new IOException("newline in event <...>");
+                        reset();
+                        throw new ParseError("newline in " + state);
                     } else {
                         textBuffer.append((char) c);
                     }
                     break;
                 case COMMAND:
                     if ('<' == c) {
-                        state = State.EVENT;
+                        state = State.ENTITY;
                     } else if ('>' == c) {
-                        throw new IOException("mismatched '>'");
+                        reset();
+                        throw new ParseError("mismatched '>' in " + state);
                     } else if ('\\' == c) {
                         lastState = state;
                         state = State.ESCAPE;
                     } else if ('\n' == c) {
-                        throw new IOException("no such command: " + commandBuffer.toString());
+                        reset();
+                        throw new ParseError("no such command: " + commandBuffer.toString());
                     } else {
                         textBuffer.append((char) c);
                         state = matchCommand();
@@ -244,9 +253,10 @@ public class BrainModeClient {
                         // simply abandon the command in progress; this is simpler than Emacs behavior,
                         // but allows one to escape from a partially-completed command with C-g C-g C-g, for example
                         reset();
-                        state = State.EVENT;
+                        state = State.ENTITY;
                     } else if ('>' == c) {
-                        throw new IOException("'>' found outside of command");
+                        reset();
+                        throw new ParseError("'>' found outside of command in " + state);
                     } else if ('\\' == c) {
                         lastState = state;
                         state = State.ESCAPE;
@@ -272,7 +282,7 @@ public class BrainModeClient {
         textBuffer.setLength(0);
         commandBuffer.setLength(0);
         shortcutIndex = 0;
-        state = State.TEXT;
+        state = State.CHAR;
 
         // TODO: not necessary; just for looks
         currentFunction = null;
@@ -288,16 +298,16 @@ public class BrainModeClient {
         }
     }
 
-    private State matchCommand() throws IOException, InterruptedException, ExecutionException, UnknownCommandException {
+    private State matchCommand() throws IOException, InterruptedException, ExecutionException, UnknownCommandException, ParseError {
         if (textBuffer.length() > 0) {
-            String event = textBuffer.toString();
+            String entity = textBuffer.toString();
             textBuffer.setLength(0);
 
             if (commandBuffer.length() > 0) {
                 commandBuffer.append(" ");
             }
 
-            commandBuffer.append(event);
+            commandBuffer.append(entity);
 
             String command = commandBuffer.toString();
             //System.err.println("matching command " + command + " from " + shortcuts[shortcutIndex]);
@@ -326,7 +336,7 @@ public class BrainModeClient {
                         } finally {
                             reset();
                         }
-                        return State.TEXT;
+                        return State.CHAR;
                     }
                 } else if (cmp < 0) {
                     if (cur.startsWith(command)) {
@@ -342,7 +352,7 @@ public class BrainModeClient {
                 }
             }
         } else {
-            throw new IOException("empty event: <>");
+            throw new ParseError("empty entity: <>");
         }
     }
 
@@ -412,6 +422,12 @@ public class BrainModeClient {
 
     public interface ResultHandler {
         void handle(InputStream result);
+    }
+
+    public class ParseError extends Exception {
+        public ParseError(final String message) {
+            super(message);
+        }
     }
 
     /**

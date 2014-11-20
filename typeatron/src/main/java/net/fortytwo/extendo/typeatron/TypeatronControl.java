@@ -309,6 +309,10 @@ public class TypeatronControl extends OscControl {
                             logger.log(Level.FINE,
                                     "unknown command: " + e.getMessage());
                             sendWarningCue();
+                        } catch (BrainModeClient.ParseError e) {
+                            // attempt to recover from parse errors
+                            sendErrorCue();
+                            logger.log(Level.SEVERE, "Brain-mode client parse error: ", e.getMessage());
                         } catch (Throwable t) {
                             isAlive = false;
                             logger.log(Level.SEVERE, "Brain-mode client thread died with error", t);
