@@ -24,17 +24,21 @@ public class ExtendoRippleREPL {
     private final TypeatronControl typeatron;
     private final ExtendoAgent agent;
     private final SideEffects environment;
+    private final REPLEventHandler eventHandler;
 
     private StringBuilder currentLineOfText;
 
     public ExtendoRippleREPL(final RippleSession session,
                              final TypeatronControl typeatron,
                              final ExtendoAgent agent,
-                             final SideEffects environment) throws RippleException {
+                             final SideEffects environment,
+                             final REPLEventHandler eventHandler) throws RippleException {
         this.session = session;
         this.typeatron = typeatron;
         this.agent = agent;
         this.environment = environment;
+        this.eventHandler = eventHandler;
+
         UserDictionary userDictionary = new UserDictionary(typeatron);
         typeatronDictionary = new TypeatronDictionaryMapping(
                 environment, typeatron, userDictionary);
@@ -87,20 +91,20 @@ public class ExtendoRippleREPL {
         }
     }
 
-    public boolean handle(final String symbol,
+    public void handle(final String symbol,
                        final ChordedKeyer.Modifier modifier,
                        final ChordedKeyer.Mode mode) throws RippleException {
         //logger.log(Level.INFO, "got a symbol: " + symbol + " in mode " + mode + " with modifier " + modifier);
-        boolean cue = false;
 
         if (ChordedKeyer.Modifier.Control == modifier) {
             //logger.log(Level.INFO, "got a control character");
             if (symbol.equals("")) {
                 if (currentLineOfText.length() > 0) {
+                    eventHandler.beginCommand();
                     session.push(currentLineOfText.toString());
                     session.push(typeatronDictionary);
                     newLine();
-                    cue = true;
+                    eventHandler.finishCommand();
                 } else {
                     logger.warning("empty text...");
                 }
@@ -160,7 +164,10 @@ public class ExtendoRippleREPL {
                 agent.sendOSCMessageToFacilitator(m);
             }
         }
+    }
 
-        return cue;
+    public interface REPLEventHandler {
+        void beginCommand();
+        void finishCommand();
     }
 }

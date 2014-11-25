@@ -44,6 +44,7 @@ public class TypeatronControl extends OscControl {
             EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
+            EXO_TT_READY = "/exo/tt/ready",
             EXO_TT_VIBRO = "/exo/tt/vibro",
             EXO_TT_WARNING = "/exo/tt/warning";
 
@@ -79,7 +80,19 @@ public class TypeatronControl extends OscControl {
 
         try {
             rippleSession = new RippleSession(agent, environment);
-            rippleREPL = new ExtendoRippleREPL(rippleSession, this, agent, environment);
+            
+            ExtendoRippleREPL.REPLEventHandler eventHandler = new ExtendoRippleREPL.REPLEventHandler() {
+                @Override
+                public void beginCommand() {
+                    sendReadyCue();
+                }
+
+                @Override
+                public void finishCommand() {
+                    sendOkCue();
+                }
+            };
+            rippleREPL = new ExtendoRippleREPL(rippleSession, this, agent, environment, eventHandler);
         } catch (RippleException e) {
             throw new DeviceInitializationException(e);
         }
@@ -248,9 +261,7 @@ public class TypeatronControl extends OscControl {
                                         final String symbol,
                                         final ChordedKeyer.Modifier modifier) {
         try {
-            if (rippleREPL.handle(symbol, modifier, mode)) {
-                sendOkCue();
-            }
+            rippleREPL.handle(symbol, modifier, mode);
         } catch (RippleException e) {
             sendErrorCue();
             logger.log(Level.WARNING, "Ripple error", e);
@@ -412,6 +423,11 @@ public class TypeatronControl extends OscControl {
 
     public void sendInfoCue() {
         OSCMessage m = new OSCMessage(EXO_TT_INFO);
+        send(m);
+    }
+
+    public void sendReadyCue() {
+        OSCMessage m = new OSCMessage(EXO_TT_READY);
         send(m);
     }
 
