@@ -12,6 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.ActivityLog;
+import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Params;
 import org.json.JSONException;
@@ -41,21 +42,29 @@ public class SetPropertiesExtension extends ExtendoExtension {
         try {
             r = new SetPropertiesRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
-            return ExtensionResponse.error(e.getMessage());
+            return ExtensionResponse.badRequest(e.getMessage(), null);
         }
 
-        if (r.name.equals("weight")) {
+        if (r.name.equals(Extendo.WEIGHT)) {
+            float f = (Float) r.value;
             // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
-            if (r.value <= 0 || r.value > 1.0) {
-                return ExtensionResponse.error("weight is outside of range (0, 1]: " + r.value);
+            if (f <= 0 || f > 1.0) {
+                return ExtensionResponse.badRequest("weight is outside of range (0, 1]: " + f, null);
             }
-        } else if (r.name.equals("sharability")) {
-            if (r.value <= 0 || r.value > 1.0) {
-                return ExtensionResponse.error("sharability is outside of range (0, 1]: " + r.value);
+        } else if (r.name.equals(Extendo.SHARABILITY)) {
+            float f = (Float) r.value;
+            if (f <= 0 || f > 1.0) {
+                return ExtensionResponse.badRequest("sharability is outside of range (0, 1]: " + f, null);
             }
-        } else if (r.name.equals("priority")) {
-            if (r.value < 0 || r.value > 1.0) {
-                return ExtensionResponse.error("priority is outside of range [0, 1]: " + r.value);
+        } else if (r.name.equals(Extendo.PRIORITY)) {
+            float f = (Float) r.value;
+            if (f < 0 || f > 1.0) {
+                return ExtensionResponse.badRequest("priority is outside of range [0, 1]: " + f, null);
+            }
+        } else if (r.name.equals(Extendo.SHORTCUT)) {
+            String s = (String) r.value;
+            if (s.length() > 50) {
+                return ExtensionResponse.badRequest("shortcut is too long: " + s, null);
             }
         } else {
             return ExtensionResponse.error("unknown property: " + r.name);
@@ -71,13 +80,21 @@ public class SetPropertiesExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        if (p.propertyName.equals("weight")) {
-            p.root.setWeight(p.propertyValue);
-        } else if (p.propertyName.equals("sharability")) {
-            p.root.setSharability(p.propertyValue);
-        } else if (p.propertyName.equals("priority")) {
-            p.root.setPriority(p.propertyValue);
+        if (p.propertyName.equals(Extendo.WEIGHT)) {
+            p.root.setWeight((Float) p.propertyValue);
+        } else if (p.propertyName.equals(Extendo.SHARABILITY)) {
+            p.root.setSharability((Float) p.propertyValue);
+        } else if (p.propertyName.equals(Extendo.PRIORITY)) {
+            p.root.setPriority((Float) p.propertyValue);
             p.brain.getPriorities().updatePriority(p.root);
+        } else if (p.propertyName.equals(Extendo.SHORTCUT)) {
+            // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
+            String shortcut = (String) p.propertyValue;
+            for (Atom a : p.brain.getBrainGraph().getAtomsWithShortcut(shortcut, p.filter)) {
+                a.setShortcut(null);
+            }
+
+            p.root.setShortcut(shortcut);
         } else {
             throw new IllegalStateException();
         }
@@ -105,14 +122,16 @@ public class SetPropertiesExtension extends ExtendoExtension {
     protected class SetPropertiesRequest extends Request {
         public final String id;
         public final String name;
-        public final float value;
+        public final Object value;
 
         public SetPropertiesRequest(JSONObject json, Principal user) throws JSONException {
             super(json, user);
 
             id = this.json.getString(Params.ID);
             name = this.json.getString(Params.NAME);
-            value = (float) this.json.getDouble(Params.VALUE);
+            value = name.equals(Extendo.SHORTCUT)
+                    ? this.json.getString(Params.VALUE)
+                    : (float) this.json.getDouble(Params.VALUE);
         }
     }
 }

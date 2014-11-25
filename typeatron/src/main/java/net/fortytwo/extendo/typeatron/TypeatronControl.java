@@ -88,10 +88,21 @@ public class TypeatronControl extends OscControl {
             ChordedKeyer.EventHandler handler = new ChordedKeyer.EventHandler() {
                 public void handle(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
                     if (null != symbol) {
-                        // TODO: currently, we pass the symbol to Ripple and Emacs in parallel
-                        // in future, make this a modal choice
-                        handleSymbolWithRipple(mode, symbol, modifier);
-                        handleSymbolWithEmacs(mode, symbol, modifier);
+                        switch (mode) {
+                            case Arrows:
+                                // fall through
+                            case TextEdit:
+                                handleSymbolWithEmacs(mode, symbol, modifier);
+                                break;
+                            case CommandLine:
+                                handleSymbolWithRipple(mode, symbol, modifier);
+                                break;
+                            case Mash:
+                                // we shouldn't match any symbols in mash mode
+                                throw new IllegalStateException();
+                            default:
+                                throw new IllegalStateException();
+                        }
                     } else if (null != mode) {
                         sendInfoCue();
 
@@ -166,13 +177,13 @@ public class TypeatronControl extends OscControl {
 
                 ModelConnection mc = rippleSession.getModelConnection();
                 try {
-                    rippleSession.push(mc.valueOf(startTime),
-                            mc.valueOf(endTime),
-                            mc.valueOf(numberOfMeasurements),
-                            mc.valueOf(minValue),
-                            mc.valueOf(maxValue),
-                            mc.valueOf(variance),
-                            mc.valueOf(mean));
+                    rippleSession.push(startTime,
+                            endTime,
+                            numberOfMeasurements,
+                            minValue,
+                            maxValue,
+                            variance,
+                            mean);
                 } catch (RippleException e) {
                     logger.log(Level.SEVERE,
                             "Ripple error while pushing photoresistor observation: " + e.getMessage());
@@ -237,8 +248,11 @@ public class TypeatronControl extends OscControl {
                                         final String symbol,
                                         final ChordedKeyer.Modifier modifier) {
         try {
-            rippleREPL.handle(symbol, modifier, mode);
+            if (rippleREPL.handle(symbol, modifier, mode)) {
+                sendOkCue();
+            }
         } catch (RippleException e) {
+            sendErrorCue();
             logger.log(Level.WARNING, "Ripple error", e);
         }
     }
@@ -251,6 +265,7 @@ public class TypeatronControl extends OscControl {
             try {
                 brainModeWrapper.write(mapped);
             } catch (IOException e) {
+                sendErrorCue();
                 logger.log(Level.WARNING, "I/O error while writing to Brain-mode", e);
             }
         }
@@ -277,9 +292,9 @@ public class TypeatronControl extends OscControl {
                     }
                     if (!s0.equals("nil")) {
                         // TODO: some future return values may need to be properly dequoted
-                        String s1 = s0.substring(1, s0.length() - 2);
+                        String s1 = s0.substring(1, s0.length() - 1);
                         try {
-                            rippleSession.push(rippleSession.getModelConnection().valueOf(s1));
+                            rippleSession.push(s1);
                             sendOkCue();
                         } catch (RippleException e) {
                             logger.log(Level.WARNING, "failed to push Brain-mode response", e);

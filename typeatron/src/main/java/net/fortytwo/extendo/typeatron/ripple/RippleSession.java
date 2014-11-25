@@ -8,7 +8,6 @@ import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.Model;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
-import net.fortytwo.ripple.model.RippleValue;
 import net.fortytwo.ripple.model.impl.sesame.SesameList;
 import net.fortytwo.ripple.model.impl.sesame.SesameModel;
 import net.fortytwo.ripple.query.LazyStackEvaluator;
@@ -63,9 +62,9 @@ public class RippleSession {
         }
     }
 
-    public void push(final RippleValue... nextValues) throws RippleException {
+    public void push(final Object... nextValues) throws RippleException {
         System.out.println("pushing new values:");
-        for (RippleValue v : nextValues) {
+        for (Object v : nextValues) {
             System.out.println("\t" + v);
         }
 
@@ -77,7 +76,7 @@ public class RippleSession {
         System.out.println("\tbefore evaluation:");
         for (RippleList l : prevCollector) {
             RippleList cur = l;
-            for (RippleValue v : nextValues) {
+            for (Object v : nextValues) {
                 //System.out.println("pushing: " + v);
                 cur = cur.push(v);
             }

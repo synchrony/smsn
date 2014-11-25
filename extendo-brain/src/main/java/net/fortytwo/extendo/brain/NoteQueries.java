@@ -24,7 +24,7 @@ public class NoteQueries {
     protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());
 
     public enum QueryType {
-        FullText, Acronym
+        FullText, Acronym, Shortcut
     }
 
     private final ExtendoBrain brain;
@@ -363,6 +363,9 @@ public class NoteQueries {
                 break;
             case Acronym:
                 results = brain.getBrainGraph().getAtomsByAcronymQuery(query, filter);
+                break;
+            case Shortcut:
+                results = brain.getBrainGraph().getAtomsWithShortcut(query, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);

@@ -6,7 +6,6 @@ import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
-import net.fortytwo.ripple.model.RippleValue;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -20,7 +19,7 @@ public class DictionaryPutMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "shortcut-put"
+                ExtendoLibrary.NS_2014_12 + "shortcut-put"
         };
     }
 
@@ -40,9 +39,9 @@ public class DictionaryPutMapping extends PrimitiveStackMapping {
                       final ModelConnection context) throws RippleException {
         String key = context.toString(arg.getFirst());
         RippleList rest = arg.getRest();
-        RippleValue value = rest.getFirst();
+        Object value = rest.getFirst();
 
-        RippleValue newValue = dictionary.put(key, value);
+        Object newValue = dictionary.put(key, value);
 
         solutions.put(rest.getRest().push(newValue));
     }

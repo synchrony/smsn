@@ -1,8 +1,9 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
+import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
-import net.fortytwo.extendo.typeatron.ripple.ControlValue;
+import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.extendo.typeatron.ripple.UserDictionary;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -124,6 +125,7 @@ import net.fortytwo.ripple.libs.system.Script;
 import net.fortytwo.ripple.libs.system.System;
 import net.fortytwo.ripple.libs.system.Time;
 import net.fortytwo.ripple.model.ModelConnection;
+import net.fortytwo.ripple.model.Operator;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.ripple.model.StackMapping;
@@ -136,11 +138,16 @@ import java.util.Map;
  */
 public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
-    private final Map<String, ControlValue> dictionary = new HashMap<String, ControlValue>();
+    private final Map<String, StackMapping> dictionary = new HashMap<String, StackMapping>();
 
     public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron,
                                       final UserDictionary userDictionary) throws RippleException {
+        ExtendoBrainClient exoBrainClient = new ExtendoBrainClient();
+
+        // default filter
+        Filter filter = new Filter();
+
         // environment-dependent library
         add(new SpeakMapping(environment), "s", "speak");
 
@@ -148,11 +155,18 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new LaserPointerMapping(typeatron), "l", "laser");
         add(new GetLightLevelMapping(typeatron), "ll", "light");
         add(new MorseMapping(typeatron), "m", "morse");
-        add(new VibrateMapping(typeatron), "v", "vibrate");
+        add(new VibrateMapping(typeatron), "V", "vibrate");
 
         // Typeatron internals
-        add(new DictionaryPutMapping(userDictionary), "i");
-        add(new DictionaryGetMapping(userDictionary), "o");
+        // TODO: merge these with shortcut get/set and search
+        //add(new DictionaryPutMapping(userDictionary), "i");
+        //add(new DictionaryGetMapping(userDictionary), "o");
+
+        // Extend-o-Brain
+        add(new GetAtomShortcutMapping(exoBrainClient, filter), "h", "shortcut");
+        add(new GetAtomValueMapping(exoBrainClient, filter), "v", "value");
+        add(new SetAtomShortcutMapping(exoBrainClient, filter), "sh", "set-shortcut");
+        add(new ShortcutSearchMapping(exoBrainClient, filter), "o", "shortcut-search");
 
         // TODO: x = experiment / mash mode
         // TODO: y = redo
@@ -298,18 +312,17 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
     private void add(final StackMapping mapping,
                      final String... aliases) {
-        ControlValue v = new ControlValue(mapping);
         for (String name : aliases) {
-            add(name, v);
+            add(name, mapping);
         }
 
         if (mapping instanceof PrimitiveStackMapping) {
-            add(((PrimitiveStackMapping) mapping).getIdentifiers()[0], v);
+            add(((PrimitiveStackMapping) mapping).getIdentifiers()[0], mapping);
         }
     }
 
     private void add(final String alias,
-                     final ControlValue cv) {
+                     final StackMapping cv) {
         if (null != dictionary.get(alias)) {
             throw new IllegalStateException("duplicate control alias '" + alias + "' for mapping " + cv
                     + " (previously used for " + dictionary.get(alias) + ")");
@@ -320,7 +333,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "tt-op"
+                ExtendoLibrary.NS_2014_12 + "tt-op"
         };
     }
 
@@ -339,9 +352,12 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
                       final ModelConnection context) throws RippleException {
         String name = context.toString(arg.getFirst());
 
-        ControlValue v = dictionary.get(name);
+        StackMapping v = dictionary.get(name);
         if (null != v) {
-            solutions.put(arg.getRest().push(v));
+            // TODO: just keep a dictionary of operators, rather than a dictionary of mappings
+            Operator o = new Operator(v);
+
+            solutions.put(arg.getRest().push(o));
         }
     }
 }

@@ -19,7 +19,7 @@ public class VibrateMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "vibrate"
+                ExtendoLibrary.NS_2014_12 + "vibrate"
         };
     }
 

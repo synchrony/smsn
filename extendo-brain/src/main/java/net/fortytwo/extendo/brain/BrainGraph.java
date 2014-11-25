@@ -34,6 +34,9 @@ public class BrainGraph {
     private Index<Vertex> searchIndex;
     // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
     private Index<Vertex> acronymIndex;
+    // reverse index of user-defined shortcuts, e.g. "mf" for "my family"
+    // shortcuts are distinct from acronyms, which are defined automatically for all values below a certain length
+    private Index<Vertex> shortcutIndex;
 
     private static final String atomNs;
 
@@ -78,8 +81,14 @@ public class BrainGraph {
             }
         }
 
+        if (!graph.getIndexedKeys(Vertex.class).contains(Extendo.SHORTCUT)) {
+            logger.info("creating key index for '" + Extendo.SHORTCUT + "' property");
+            graph.createKeyIndex(Extendo.SHORTCUT, Vertex.class);
+        }
+
+        // TODO: alias index is never used
         if (!graph.getIndexedKeys(Vertex.class).contains(Extendo.ALIAS)) {
-            logger.info("creating key index for 'alias' property");
+            logger.info("creating key index for '" + Extendo.ALIAS + "' property");
             graph.createKeyIndex(Extendo.ALIAS, Vertex.class);
         }
     }
@@ -324,6 +333,19 @@ public class BrainGraph {
                 if (filter.isVisible(v)) {
                     results.add(a);
                 }
+            }
+        }
+
+        return results;
+    }
+
+    public List<Atom> getAtomsWithShortcut(final String shortcut,
+                                           final Filter filter) {
+        List<Atom> results = new LinkedList<Atom>();
+
+        for (Vertex v : graph.getVertices(Extendo.SHORTCUT, shortcut)) {
+            if (filter.isVisible(v)) {
+                results.add(getAtom(v));
             }
         }
 

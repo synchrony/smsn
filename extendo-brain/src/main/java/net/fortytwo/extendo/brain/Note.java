@@ -166,11 +166,7 @@ public class Note {
 
     @Override
     public String toString() {
-        String d = getValue();
-        if (null != d && d.length() > 20) {
-            d = d.substring(0, 17) + "...";
-        }
-        return "note(" + d + ")";
+        return "note:" + (null == id ? "null" : id);
     }
 
     public boolean getHasChildren() {

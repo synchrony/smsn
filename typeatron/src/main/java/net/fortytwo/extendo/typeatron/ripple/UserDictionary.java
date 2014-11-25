@@ -1,7 +1,6 @@
 package net.fortytwo.extendo.typeatron.ripple;
 
 import net.fortytwo.extendo.typeatron.TypeatronControl;
-import net.fortytwo.ripple.model.RippleValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,20 +13,20 @@ public class UserDictionary {
 
     private static final Logger logger = Logger.getLogger(UserDictionary.class.getName());
 
-    private Map<String, RippleValue> map = new HashMap<String, RippleValue>();
+    private Map<String, Object> map = new HashMap<String, Object>();
     private final TypeatronControl typeatron;
 
     public UserDictionary(TypeatronControl typeatron) {
         this.typeatron = typeatron;
     }
 
-    public RippleValue get(final String symbol) {
+    public Object get(final String symbol) {
         return map.get(symbol);
     }
 
-    public RippleValue put(final String symbol,
-                           final RippleValue value) {
-        RippleValue existing = map.get(symbol);
+    public Object put(final String symbol,
+                      final Object value) {
+        Object existing = map.get(symbol);
         if (null == existing) {
             map.put(symbol, value);
             return value;

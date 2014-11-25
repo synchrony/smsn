@@ -7,7 +7,6 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -25,7 +24,7 @@ public class SpeakMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "speak"
+                ExtendoLibrary.NS_2014_12 + "speak"
         };
     }
 
@@ -40,7 +39,7 @@ public class SpeakMapping extends PrimitiveStackMapping {
     public void apply(final RippleList arg,
                       final Sink<RippleList> solutions,
                       final ModelConnection context) throws RippleException {
-        logger.log(Level.INFO, "executing the speak mapping");
+        //logger.log(Level.INFO, "executing the speak mapping");
 
         String text = arg.getFirst().toString();
 

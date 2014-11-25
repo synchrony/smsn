@@ -955,6 +955,16 @@
             exo-style
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
 
+(defun exo-shortcut-query (query)
+    "evaluate shortcut query for QUERY, yielding query results (normally zero or one) in a new buffer"
+    (interactive)
+    (if (> (length query) 0)
+        (request-query-results
+            query
+            "Shortcut"
+            exo-style
+            exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight)))
+
 (defun exo-set-default-sharability (expr)
     "set the default @sharability (for atoms created in update operations) to the number represented by EXPR"
     (interactive)
@@ -1213,6 +1223,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c f")           'exo-find-roots)
 (global-set-key (kbd "C-c h")           'exo-history)
 (global-set-key (kbd "C-c i")           'exo-infer-types)
+(global-set-key (kbd "C-c o")           (minibuffer-arg 'exo-shortcut-query "shortcut search for: "))
 (global-set-key (kbd "C-c P")           'exo-priorities)
 (global-set-key (kbd "C-c p")           'exo-push-view)
 (global-set-key (kbd "C-c r")           (minibuffer-arg 'exo-ripple-query "ripple query: "))

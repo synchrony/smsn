@@ -19,7 +19,7 @@ public class GetLightLevelMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "get-light-level"
+                ExtendoLibrary.NS_2014_12 + "get-light-level"
         };
     }
 
@@ -31,7 +31,9 @@ public class GetLightLevelMapping extends PrimitiveStackMapping {
         return "fetches the current light level from the photoresistor";
     }
 
-    public void apply(RippleList arg, Sink<RippleList> solutions, ModelConnection context) throws RippleException {
+    public void apply(RippleList arg,
+                      Sink<RippleList> solutions,
+                      ModelConnection mc) throws RippleException {
         try {
             typeatron.sendPhotoresistorGetCommand();
         } catch (Throwable t) {

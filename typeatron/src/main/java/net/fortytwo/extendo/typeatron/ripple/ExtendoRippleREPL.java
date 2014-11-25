@@ -1,13 +1,12 @@
 package net.fortytwo.extendo.typeatron.ripple;
 
 import com.illposed.osc.OSCMessage;
+import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.ChordedKeyer;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.lib.TypeatronDictionaryMapping;
-import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.RDFValue;
 import org.openrdf.model.impl.URIImpl;
 
 import java.util.logging.Level;
@@ -21,7 +20,7 @@ public class ExtendoRippleREPL {
     protected static final Logger logger = Logger.getLogger(ExtendoRippleREPL.class.getName());
 
     private final RippleSession session;
-    private final ControlValue typeatronDictionary;
+    private final TypeatronDictionaryMapping typeatronDictionary;
     private final TypeatronControl typeatron;
     private final ExtendoAgent agent;
     private final SideEffects environment;
@@ -37,9 +36,8 @@ public class ExtendoRippleREPL {
         this.agent = agent;
         this.environment = environment;
         UserDictionary userDictionary = new UserDictionary(typeatron);
-        typeatronDictionary = new ControlValue(
-                new TypeatronDictionaryMapping(
-                        environment, typeatron, userDictionary));
+        typeatronDictionary = new TypeatronDictionaryMapping(
+                environment, typeatron, userDictionary);
 
         // TODO: temporary, for a demo
         String[][] shortcuts = {
@@ -68,7 +66,7 @@ public class ExtendoRippleREPL {
                 {"tz", "http://fortytwo.net/2014/04/twc#TongtaoZhang"},
                 {"yl", "http://fortytwo.net/2014/04/twc#YueLiu"}};
         for (String[] pair : shortcuts) {
-            userDictionary.put(pair[0], new RDFValue(new URIImpl(pair[1])));
+            userDictionary.put(pair[0], new URIImpl(pair[1]));
         }
 
         newLine();
@@ -89,73 +87,70 @@ public class ExtendoRippleREPL {
         }
     }
 
-    public void handle(final String symbol,
+    public boolean handle(final String symbol,
                        final ChordedKeyer.Modifier modifier,
                        final ChordedKeyer.Mode mode) throws RippleException {
         //logger.log(Level.INFO, "got a symbol: " + symbol + " in mode " + mode + " with modifier " + modifier);
-        if (mode.isTextEntryMode()) {
-            if (ChordedKeyer.Modifier.Control == modifier) {
-                //logger.log(Level.INFO, "got a control character");
+        boolean cue = false;
 
-                // TODO: reserve these character primitives for Ripple mode,
-                // distinguishing it clearly from Emacs mode
-                if (symbol.equals("")) {
-                    if (currentLineOfText.length() > 0) {
-                        session.push(session.getModelConnection().valueOf(currentLineOfText.toString()));
-                        session.push(typeatronDictionary);
-                        newLine();
-                    } else {
-                        System.out.println("empty text...");
-                    }
-                } else if (symbol.equals("u")) { // "to upper case" character primitive
-                    String s = getLastSymbol();
-                    if (null != s) {
-                        currentLineOfText.append(s.toUpperCase());
-                    }
-                } else if (symbol.equals("n")) { // "to number" character primitive
-                    String s = getLastSymbol();
-                    if (null != s) {
-                        char c = s.charAt(0);
-                        if (c == 'o') {
-                            currentLineOfText.append("0");
-                        } else if (c >= 'a' && c <= 'i') {
-                            currentLineOfText.append((char) (s.charAt(0) - 'a' + '1'));
-                        }
-                    }
-                } else if (symbol.equals("p")) { // "to punctuation" character primitive
-                    String s = getLastSymbol();
-                    if (null != s) {
-                        String p = typeatron.getKeyer().getPunctuationMap().get(s);
-                        if (null != p) {
-                            currentLineOfText.append(p);
-                        }
-                    }
-                } else {
-                    logger.log(Level.WARNING, "unknown control value: " + symbol);
-                    //currentLineOfText.append("C-" + symbol);
-                }
-            } else if (ChordedKeyer.Modifier.None == modifier) {
-                if (symbol.equals("\n")) { // handle newline
-                    if (currentLineOfText.length() > 0) {
-                        session.push(session.getModelConnection().valueOf(currentLineOfText.toString()));
-                        newLine();
-                    }
-                } else if (symbol.equals("DEL")) { // handle delete
-                    if (currentLineOfText.length() > 0) {
-                        currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
-                    }
-                } else if (symbol.equals("ESC")) { // handle escape
-                    // TODO: nothing else?
+        if (ChordedKeyer.Modifier.Control == modifier) {
+            //logger.log(Level.INFO, "got a control character");
+            if (symbol.equals("")) {
+                if (currentLineOfText.length() > 0) {
+                    session.push(currentLineOfText.toString());
+                    session.push(typeatronDictionary);
                     newLine();
-                } else { // handle ordinary text
-                    currentLineOfText.append(symbol);
+                    cue = true;
+                } else {
+                    logger.warning("empty text...");
+                }
+            } else if (symbol.equals("u")) { // "to upper case" character primitive
+                String s = getLastSymbol();
+                if (null != s) {
+                    currentLineOfText.append(s.toUpperCase());
+                }
+            } else if (symbol.equals("n")) { // "to number" character primitive
+                String s = getLastSymbol();
+                if (null != s) {
+                    char c = s.charAt(0);
+                    if (c == 'o') {
+                        currentLineOfText.append("0");
+                    } else if (c >= 'a' && c <= 'i') {
+                        currentLineOfText.append((char) (s.charAt(0) - 'a' + '1'));
+                    }
+                }
+            } else if (symbol.equals("p")) { // "to punctuation" character primitive
+                String s = getLastSymbol();
+                if (null != s) {
+                    String p = typeatron.getKeyer().getPunctuationMap().get(s);
+                    if (null != p) {
+                        currentLineOfText.append(p);
+                    }
                 }
             } else {
-                throw new IllegalStateException("unexpected modifier: " + modifier);
+                logger.log(Level.WARNING, "unknown control value: " + symbol);
+                //currentLineOfText.append("C-" + symbol);
             }
-        } else if (ChordedKeyer.Mode.Hardware == mode) {
-            // TODO: the above is more or less hardware mode; swap this for Emacs mode
-            logger.warning("currently no support for hardware mode");
+        } else if (ChordedKeyer.Modifier.None == modifier) {
+            if (symbol.equals("\n")) { // handle newline
+                //System.out.println("got newline");
+                if (currentLineOfText.length() > 0) {
+                    session.push(currentLineOfText.toString());
+                    newLine();
+                }
+            } else if (symbol.equals("DEL")) { // handle delete
+                if (currentLineOfText.length() > 0) {
+                    currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
+                }
+            } else if (symbol.equals("ESC")) { // handle escape
+                // TODO: nothing else?
+                newLine();
+            } else { // handle ordinary text
+                System.out.println("appending: " + symbol);
+                currentLineOfText.append(symbol);
+            }
+        } else {
+            throw new IllegalStateException("unexpected modifier: " + modifier);
         }
 
         if (environment.verbose()) {
@@ -165,5 +160,7 @@ public class ExtendoRippleREPL {
                 agent.sendOSCMessageToFacilitator(m);
             }
         }
+
+        return cue;
     }
 }

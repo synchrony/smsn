@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class MorseMapping extends PrimitiveStackMapping {
 
-    private static final Logger logger = Logger.getLogger(SpeakMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(MorseMapping.class.getName());
 
     private final TypeatronControl typeatron;
 
@@ -25,7 +25,7 @@ public class MorseMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "playMorse"
+                ExtendoLibrary.NS_2014_12 + "play-morse"
         };
     }
 

@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class LaserPointerMapping extends PrimitiveStackMapping {
 
-    private static final Logger logger = Logger.getLogger(SpeakMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(LaserPointerMapping.class.getName());
 
     private final TypeatronControl typeatron;
 
@@ -27,7 +27,7 @@ public class LaserPointerMapping extends PrimitiveStackMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                BrainstemLibrary.NS_2014_04 + "point"
+                ExtendoLibrary.NS_2014_12 + "point"
         };
     }
 
@@ -39,14 +39,14 @@ public class LaserPointerMapping extends PrimitiveStackMapping {
         return "points to or indicates an item";
     }
 
-    public void apply(final RippleList arg,
+    public void apply(final RippleList stack,
                       final Sink<RippleList> solutions,
-                      final ModelConnection context) throws RippleException {
+                      final ModelConnection mc) throws RippleException {
         logger.log(Level.INFO, "executing the laser pointer mapping");
 
-        Value thingPointedTo = arg.getFirst().toRDF(context).sesameValue();
+        Value thingPointedTo = mc.toRDF(stack.getFirst());
 
-        if (thingPointedTo instanceof URI) {
+        if (null != thingPointedTo && thingPointedTo instanceof URI) {
             try {
                 typeatron.pointTo((URI) thingPointedTo);
             } catch (Throwable t) {
@@ -54,7 +54,7 @@ public class LaserPointerMapping extends PrimitiveStackMapping {
             }
 
             // keep the thing pointed to on the stack
-            solutions.put(arg);
+            solutions.put(stack);
         }
     }
 }

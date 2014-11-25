@@ -278,7 +278,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public Integer maxResults;
         public NoteParser parser;
         public String propertyName;
-        public Float propertyValue;
+        public Object propertyValue;
         public NoteQueries queries;
         public String query;
         public NoteQueries.QueryType queryType;
