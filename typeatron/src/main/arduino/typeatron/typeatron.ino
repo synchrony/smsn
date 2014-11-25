@@ -36,6 +36,7 @@ const char *EXO_TT_PHOTO_DATA    = "/exo/tt/photo/data";
 const char *EXO_TT_PHOTO_GET     = "/exo/tt/photo/get";
 const char *EXO_TT_PING          = "/exo/tt/ping";
 const char *EXO_TT_PING_REPLY    = "/exo/tt/ping/reply";
+const char *EXO_TT_READY         = "/exo/tt/ready";
 const char *EXO_TT_RGB_SET       = "/exo/tt/rgb/set";
 const char *EXO_TT_VIBRO         = "/exo/tt/vibro";
 const char *EXO_TT_WARNING       = "/exo/tt/warning";
@@ -51,6 +52,7 @@ const unsigned long infoCueVisualDurationMs = 200;
 const unsigned long errorCueHapticDurationMs = 100;
 const unsigned long errorCueVisualDurationMs = 200;
 const unsigned long okCueVisualDurationMs = 100;
+const unsigned long readyCueVisualDurationMs = 10000;
 const unsigned long warningCueHapticDurationMs = 100;
 const unsigned long warningCueVisualDurationMs = 200;
 
@@ -124,6 +126,12 @@ void infoCue() {
     rgbled.replaceColor(RGB_BLUE);
     ledCueLength = infoCueVisualDurationMs;
     ledCueSince = millis();
+}
+
+void readyCue() {
+    rgbled.replaceColor(RGB_WHITE);
+    ledCueLength = readyCueVisualDurationMs;
+    ledCueSince = millis();      
 }
 
 void warningCue() {
@@ -280,6 +288,7 @@ void handleOSCBundle(class OSCBundle &bundle) {
         || bundle.dispatch(EXO_TT_OK, handleOkMessage)
         || bundle.dispatch(EXO_TT_PHOTO_GET, handlePhotoGetMessage)
         || bundle.dispatch(EXO_TT_PING, handlePingMessage)
+        || bundle.dispatch(EXO_TT_READY, handleReadyMessage)
         || bundle.dispatch(EXO_TT_RGB_SET, handleRGBSetMessage)
         || bundle.dispatch(EXO_TT_VIBRO, handleVibroMessage)
         || bundle.dispatch(EXO_TT_WARNING, handleWarningMessage)
@@ -344,6 +353,10 @@ void handlePhotoGetMessage(class OSCMessage &m) {
 
 void handlePingMessage(class OSCMessage &m) {
     sendPingReply();
+}
+
+void handleReadyMessage(class OSCMessage &m) {
+    readyCue();  
 }
 
 void handleRGBSetMessage(class OSCMessage &m) {
