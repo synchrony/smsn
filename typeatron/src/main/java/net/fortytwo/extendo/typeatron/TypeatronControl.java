@@ -105,10 +105,10 @@ public class TypeatronControl extends OscControl {
                             case Arrows:
                                 // fall through
                             case TextEdit:
-                                handleSymbolWithEmacs(mode, symbol, modifier);
+                                handleSymbolWithEmacs(symbol, modifier);
                                 break;
                             case CommandLine:
-                                handleSymbolWithRipple(mode, symbol, modifier);
+                                handleSymbolWithRipple(symbol, modifier);
                                 break;
                             case Mash:
                                 // we shouldn't match any symbols in mash mode
@@ -257,19 +257,17 @@ public class TypeatronControl extends OscControl {
         }
     }
 
-    private void handleSymbolWithRipple(final ChordedKeyer.Mode mode,
-                                        final String symbol,
+    private void handleSymbolWithRipple(final String symbol,
                                         final ChordedKeyer.Modifier modifier) {
         try {
-            rippleREPL.handle(symbol, modifier, mode);
+            rippleREPL.handle(symbol, modifier);
         } catch (RippleException e) {
             sendErrorCue();
             logger.log(Level.WARNING, "Ripple error", e);
         }
     }
 
-    private void handleSymbolWithEmacs(final ChordedKeyer.Mode mode,
-                                       final String symbol,
+    private void handleSymbolWithEmacs(final String symbol,
                                        final ChordedKeyer.Modifier modifier) {
         String mapped = symbolForBrainModeClient(symbol, modifier);
         if (null != brainModeWrapper) {

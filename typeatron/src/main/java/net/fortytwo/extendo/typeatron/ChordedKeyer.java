@@ -22,6 +22,8 @@ public class ChordedKeyer {
 
     public enum Modifier {Control, None}
 
+    public enum SpecialChar {DEL, ESC, up, down, left, right}
+
     private class StateNode {
         /**
          * A symbol emitted when this state is reached
@@ -160,25 +162,16 @@ public class ChordedKeyer {
         addChord(Mode.CommandLine, "55", Mode.TextEdit, null, null);
 
         addChord(Mode.TextEdit, "1441", Mode.CommandLine, null, null);
-        addChord(Mode.TextEdit, "55", null, null, "ESC");
+        addChord(Mode.TextEdit, "55", null, null, SpecialChar.ESC.name());
         // toggle text entry modes
         addChord(Mode.TextEdit, "11", Mode.CommandLine, null, null);
 
-        // newline, space, delete available in both of the text-entry modes
-        for (Mode m : new Mode[]{Mode.TextEdit, Mode.CommandLine}) {
-            // the "trigger finger" chord has a "do"/"execute" function in various contexts
-            addChord(m, "22", null, null, "\n");
-
-            addChord(m, "33", null, null, " ");
-            addChord(m, "44", null, null, "DEL");
-        }
-
         // this completely describes Arrow mode
         addChord(Mode.TextEdit, "1221", Mode.Arrows, null, null);
-        addChord(Mode.Arrows, "22", null, null, "right");
-        addChord(Mode.Arrows, "33", null, null, "left");
-        addChord(Mode.Arrows, "44", null, null, "up");
-        addChord(Mode.Arrows, "55", null, null, "down");
+        addChord(Mode.Arrows, "22", null, null, SpecialChar.right.name());
+        addChord(Mode.Arrows, "33", null, null, SpecialChar.left.name());
+        addChord(Mode.Arrows, "44", null, null, SpecialChar.up.name());
+        addChord(Mode.Arrows, "55", null, null, SpecialChar.down.name());
         addChord(Mode.Arrows, "11", Mode.TextEdit, null, null);
 
         // TODO: restore these... maybe
@@ -217,10 +210,20 @@ public class ChordedKeyer {
             }
         }
 
+        Mode[] textEntryModes = new Mode[]{Mode.TextEdit, Mode.CommandLine};
+
         // return from mash mode
         addChord(Mode.Mash, "1234554321", Mode.TextEdit, Modifier.None, null);
 
-        Mode[] textEntryModes = new Mode[]{Mode.TextEdit, Mode.CommandLine};
+        // newline, space, delete available in all of the text-entry modes
+        for (Mode m : textEntryModes) {
+            // the "trigger finger" chord has a "do"/"execute" function in various contexts
+            addChord(m, "22", null, null, "\n");
+
+            addChord(m, "33", null, null, " ");
+            addChord(m, "44", null, null, SpecialChar.DEL.name());
+        }
+
         punctuationMap = new HashMap<String, String>();
         InputStream in = TypeatronControl.class.getResourceAsStream("typeatron-letters-and-punctuation.csv");
         try {
@@ -248,11 +251,18 @@ public class ChordedKeyer {
 
                     if (a.length >= 4) {
                         // note: we don't bother with control-punctuation chords for now,
-                        // but they are conceivable
-                        String punc = a[3].trim().replaceAll("COMMA", ",");
+                        // but they are possible
+                        String punc = a[3].trim().replaceAll("comma", ",");
                         if (punc.length() > 0 && chord.length() < 3 * 2) {
                             punctuationMap.put(letter, punc);
                             addChord(textEntryModes, findPunctuationChord(chord), null, null, punc);
+                        }
+                    }
+
+                    if (a.length >= 5) {
+                        String symbol = a[4].trim();
+                        if (symbol.length() > 0) {
+                            addChord(textEntryModes, findExtendedCharacterChord(chord), null, null, symbol);
                         }
                     }
                 }
@@ -263,7 +273,8 @@ public class ChordedKeyer {
     }
 
     private char findUnusedKey(final String chord,
-                               int index) {
+                               final int index) {
+        int ix = index;
         boolean[] used = new boolean[5];
         for (byte b : chord.getBytes()) {
             used[b - 49] = true;
@@ -271,15 +282,15 @@ public class ChordedKeyer {
 
         for (int i = 0; i < 5; i++) {
             if (!used[i]) {
-                if (0 == index) {
+                if (0 == ix) {
                     return (char) (i + 49);
                 } else {
-                    index--;
+                    ix--;
                 }
             }
         }
 
-        throw new IllegalArgumentException("index too high");
+        throw new IllegalArgumentException("index " + index + " too high for chord " + chord);
     }
 
     private String findControlChord(final String chord) {
@@ -319,6 +330,13 @@ public class ChordedKeyer {
 
     private String findPunctuationChord(final String chord) {
         char key = findUnusedKey(chord, 0);
+        // the extra key is pressed and released "in the middle" of the modified chord
+        return chord.substring(0, 2) + key + key + chord.substring(2);
+    }
+
+    private String findExtendedCharacterChord(final String chord) {
+        char key = findUnusedKey(chord, 2);
+        // the extra key is pressed and released "in the middle" of the modified chord
         return chord.substring(0, 2) + key + key + chord.substring(2);
     }
 

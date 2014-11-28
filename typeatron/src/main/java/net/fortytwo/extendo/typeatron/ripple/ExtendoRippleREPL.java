@@ -92,12 +92,11 @@ public class ExtendoRippleREPL {
     }
 
     public void handle(final String symbol,
-                       final ChordedKeyer.Modifier modifier,
-                       final ChordedKeyer.Mode mode) throws RippleException {
-        //logger.log(Level.INFO, "got a symbol: " + symbol + " in mode " + mode + " with modifier " + modifier);
+                       final ChordedKeyer.Modifier modifier) throws RippleException {
+        //logger.log(Level.INFO, "matched symbol " + symbol + " in mode " + mode + " with modifier " + modifier);
 
         if (ChordedKeyer.Modifier.Control == modifier) {
-            //logger.log(Level.INFO, "got a control character");
+            //logger.log(Level.INFO, "matched a control character");
             if (symbol.equals("")) {
                 if (currentLineOfText.length() > 0) {
                     eventHandler.beginCommand();
@@ -137,20 +136,18 @@ public class ExtendoRippleREPL {
             }
         } else if (ChordedKeyer.Modifier.None == modifier) {
             if (symbol.equals("\n")) { // handle newline
-                //System.out.println("got newline");
                 if (currentLineOfText.length() > 0) {
                     session.push(currentLineOfText.toString());
                     newLine();
                 }
-            } else if (symbol.equals("DEL")) { // handle delete
+            } else if (symbol.equals(ChordedKeyer.SpecialChar.DEL.name())) { // handle delete
                 if (currentLineOfText.length() > 0) {
                     currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
                 }
-            } else if (symbol.equals("ESC")) { // handle escape
+            } else if (symbol.equals(ChordedKeyer.SpecialChar.ESC.name())) { // handle escape
                 // TODO: nothing else?
                 newLine();
             } else { // handle ordinary text
-                System.out.println("appending: " + symbol);
                 currentLineOfText.append(symbol);
             }
         } else {

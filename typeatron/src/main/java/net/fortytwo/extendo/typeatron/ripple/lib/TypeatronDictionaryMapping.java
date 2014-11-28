@@ -130,6 +130,7 @@ import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.ripple.model.StackMapping;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -167,6 +168,9 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new GetAtomValueMapping(exoBrainClient, filter), "v", "value");
         add(new SetAtomShortcutMapping(exoBrainClient, filter), "sh", "set-shortcut");
         add(new ShortcutSearchMapping(exoBrainClient, filter), "o", "shortcut-search");
+
+        // Extendo log
+        add(new AppendToLogMapping(filter, new File("typeatron.log")), "a", "append");
 
         // TODO: x = experiment / mash mode
         // TODO: y = redo
