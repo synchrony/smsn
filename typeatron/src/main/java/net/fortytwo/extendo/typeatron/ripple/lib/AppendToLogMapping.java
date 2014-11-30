@@ -1,7 +1,9 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.brain.Filter;
+import net.fortytwo.extendo.util.TypedProperties;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
@@ -12,11 +14,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class AppendToLogMapping extends PrimitiveStackMapping {
+    private static final Logger logger = Logger.getLogger(AppendToLogMapping.class.getName());
 
     // TODO: this filter should be updatable
     private final Filter filter;
@@ -25,9 +29,13 @@ public class AppendToLogMapping extends PrimitiveStackMapping {
 
     private OutputStream keyLog;
 
-    public AppendToLogMapping(Filter filter, File logFile) {
+    public AppendToLogMapping(Filter filter) throws RippleException {
         this.filter = filter;
-        this.logFile = logFile;
+        try {
+            this.logFile = Extendo.getConfiguration().getFile(ExtendoBrain.PROP_BRAINSTREAM, new File("brain-stream.log"));
+        } catch (TypedProperties.PropertyException e) {
+            throw new RippleException(e);
+        }
     }
 
     public String[] getIdentifiers() {
@@ -49,12 +57,17 @@ public class AppendToLogMapping extends PrimitiveStackMapping {
     public void apply(RippleList stack,
                       Sink<RippleList> solutions,
                       ModelConnection mc) throws RippleException {
-        String value = mc.toString(stack.getFirst());
-        stack = stack.getRest();
+        if (null != logFile) {
+            String value = mc.toString(stack.getFirst());
+            stack = stack.getRest();
 
-        append(value);
+            append(value);
 
-        solutions.put(stack);
+            solutions.put(stack);
+        } else {
+            // TODO: send a warning cue to the Typeatron
+            logger.warning("can't append to brain-stream log; none has been configured");
+        }
     }
 
     private void append(final String value) throws RippleException {

@@ -220,10 +220,12 @@ public class TypeatronControl extends OscControl {
         // user has "pointed with reference". This event occurs at the moment the laser turns on.
         oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
             public void handle(OSCMessage message) {
+                System.out.println("got laser event");
                 // TODO: use the recognition time parameter provided in the message
                 long recognitionTime = System.currentTimeMillis();
 
                 handlePointEvent(recognitionTime);
+                logger.info("handled laser pointer event from typeatron");
             }
         });
         // TODO: temporary... assume Emacs is available, even if we can't detect it...
@@ -365,6 +367,7 @@ public class TypeatronControl extends OscControl {
     public void sendLaserTriggerCommand() {
         OSCMessage m = new OSCMessage(EXO_TT_LASER_TRIGGER);
         send(m);
+        System.out.println("sent laser trigger command");
     }
 
     public void sendMorse(final String text) {

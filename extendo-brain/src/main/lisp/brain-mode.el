@@ -791,7 +791,7 @@
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-export-graphml (file)
-    "export a GraphML dump of the Extend-o-Brain graph to the file system"
+    "export a GraphML dump of the knowledge base to the file system"
     (interactive)
     (message (concat "exporting GraphML to " file))
     (do-export "GraphML" file
@@ -805,10 +805,17 @@
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-export-rdf (file)
-    "export an N-Triples dump of the Extend-o-Brain graph to the file system"
+    "export a complete RDF dump of the knowledge base (including personal and private data) to the file system"
     (interactive)
-    (message (concat "exporting RDF (N-Triples) to " file))
+    (message (concat "exporting private RDF dump to " file))
     (do-export "RDF" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-webrdf (file)
+    "export a Web-friendly dump of the public portion of the knowledge base to the file system"
+    (interactive)
+    (message (concat "exporting public Web RDF dump to " file))
+    (do-export "Web" file
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-export-vertices (file)
@@ -819,19 +826,19 @@
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-find-isolated-atoms ()
-    "retrieve a list of isolated atoms (i.e. atoms with neither parents nor children) in the Extend-o-Brain graph"
+    "retrieve a list of isolated atoms (i.e. atoms with neither parents nor children) in the knowledge base"
     (interactive)
         (request-find-isolated-atoms-results
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-remove-isolated-atoms ()
-    "remove all isolated atoms (i.e. atoms with neither parents nor children) from the Extend-o-Brain graph"
+    "remove all isolated atoms (i.e. atoms with neither parents nor children) from the knowledge base"
     (interactive)
         (request-remove-isolated-atoms
             exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-find-roots ()
-    "retrieve a list of roots (i.e. atoms with no parents) in the Extend-o-Brain graph"
+    "retrieve a list of roots (i.e. atoms with no parents) in the knowledge base"
     (interactive)
         (request-find-roots-results
             exo-style
@@ -905,7 +912,7 @@
 
 
 (defun exo-push-view ()
-    "push an up-to-date view into the Extend-o-Brain graph"
+    "push an up-to-date view into the knowledge base"
     (interactive)
     (if (in-edit-view)
     (let (
@@ -1171,8 +1178,9 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'exo-export-edges "export edges to file: " exo-default-edges-file))
 (global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'exo-export-graphml "export GraphML to file: " exo-default-graphml-file))
 (global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'exo-export-pagerank "export PageRank results to file: " exo-default-pagerank-file))
-(global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export RDF (N-Triples) to file: " exo-default-rdf-file))
+(global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export private RDF dump to file: " exo-default-rdf-file))
 (global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
+(global-set-key (kbd "C-c C-e w")       (minibuffer-arg 'exo-export-webrdf "export public Web RDF dump to file: " exo-default-webrdf-file))
 (global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
 (global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)
 (global-set-key (kbd "C-c C-l")         (minibuffer-arg 'exo-goto-line "line: "))
