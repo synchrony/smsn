@@ -17,12 +17,10 @@ public class ExtendoTest {
     public void testConfigurationProperties() throws Exception {
         TypedProperties props = Extendo.getConfiguration();
 
-        assertEquals(new URI("http://extendo.fortytwo.net/"), props.getURI(Extendo.BASE_URI));
         assertNull(props.getString("org.example.someOtherProperty", null));
         
         props.load(ExtendoTest.class.getResourceAsStream("additional.props"));
 
-        assertEquals(new URI("http://example.org/"), props.getURI(Extendo.BASE_URI));
         assertEquals("some other value", props.getString("org.example.someOtherProperty"));
         assertEquals(42, props.getInt("org.example.yetAnotherProperty"));
     }

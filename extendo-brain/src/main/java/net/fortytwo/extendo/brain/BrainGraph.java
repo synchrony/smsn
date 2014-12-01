@@ -34,15 +34,16 @@ public class BrainGraph {
     private Index<Vertex> searchIndex;
     // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
     private Index<Vertex> acronymIndex;
-    // reverse index of user-defined shortcuts, e.g. "mf" for "my family"
-    // shortcuts are distinct from acronyms, which are defined automatically for all values below a certain length
-    private Index<Vertex> shortcutIndex;
 
-    private static final String atomNs;
+    private static final String thingNamespace;
+
+    public static final String PROP_THING_NAMESPACE = "net.fortytwo.extendo.brain.thingNamespace";
+
+    private static final String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
 
     static {
         try {
-            atomNs = Extendo.getConfiguration().getString(Extendo.BASE_URI) + "atom/";
+            thingNamespace = Extendo.getConfiguration().getString(PROP_THING_NAMESPACE, DEFAULT_THING_NAMESPACE);
         } catch (TypedProperties.PropertyException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -81,6 +82,8 @@ public class BrainGraph {
             }
         }
 
+        // reverse index of user-defined shortcuts, e.g. "mf" for "my family"
+        // shortcuts are distinct from acronyms, which are defined automatically for all values below a certain length
         if (!graph.getIndexedKeys(Vertex.class).contains(Extendo.SHORTCUT)) {
             logger.info("creating key index for '" + Extendo.SHORTCUT + "' property");
             graph.createKeyIndex(Extendo.SHORTCUT, Vertex.class);
@@ -114,7 +117,7 @@ public class BrainGraph {
     }
 
     public static String uriForId(final String id) {
-        return atomNs + id;
+        return thingNamespace + id;
     }
 
     public static String uriOf(final Atom a) {
