@@ -130,6 +130,25 @@ public class ChordedKeyerTest {
         assertEquals(ChordedKeyer.Modifier.None, lastModifier);
     }
 
+    @Test
+    public void testControlPunctuation() throws Exception {
+        pressKeys(1, 1);
+
+        pressKeys(3, 2, 3, 2);
+        assertEquals(ChordedKeyer.Mode.CommandLine, lastMode);
+        assertEquals("e", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
+
+        pressKeys(2, 3, 3, 3, 1, 1, 2, 3);
+        assertEquals("'", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.Control, lastModifier);
+
+        // in the Ripple environment, this produces an e-acute character
+        pressKeys(2, 2);
+        assertEquals("\n", lastSymbol);
+        assertEquals(ChordedKeyer.Modifier.None, lastModifier);
+    }
+
     private void reset() {
         lastMode = null;
         lastSymbol = null;

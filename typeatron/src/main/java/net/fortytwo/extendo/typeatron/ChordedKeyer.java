@@ -250,12 +250,14 @@ public class ChordedKeyer {
                     }
 
                     if (a.length >= 4) {
-                        // note: we don't bother with control-punctuation chords for now,
-                        // but they are possible
                         String punc = a[3].trim().replaceAll("comma", ",");
                         if (punc.length() > 0 && chord.length() < 3 * 2) {
                             punctuationMap.put(letter, punc);
                             addChord(textEntryModes, findPunctuationChord(chord), null, null, punc);
+
+                            // note: we don't bother with control-punctuation chords for now,
+                            // but they are possible
+                            addChord(textEntryModes, findControlChord(findPunctuationChord(chord)), null, Modifier.Control, punc);
                         }
                     }
 
@@ -294,8 +296,8 @@ public class ChordedKeyer {
     }
 
     private String findControlChord(final String chord) {
-        if (4 != chord.length()) {
-            throw new IllegalStateException("can only create control chords for 2-key combos at present");
+        if (4 > chord.length()) {
+            throw new IllegalStateException("can't control-modify a chord of length less than 4");
         }
 
         // we add a "flourish" to the second key pressed

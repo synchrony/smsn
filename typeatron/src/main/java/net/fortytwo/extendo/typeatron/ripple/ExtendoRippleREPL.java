@@ -27,6 +27,7 @@ public class ExtendoRippleREPL {
     private final ExtendoAgent agent;
     private final SideEffects environment;
     private final REPLEventHandler eventHandler;
+    private final ExtendedCharacters extendedCharacters = new ExtendedCharacters();
 
     private StringBuilder currentLineOfText;
 
@@ -150,6 +151,17 @@ public class ExtendoRippleREPL {
                         currentLineOfText.append(p);
                     }
                 }
+            } else if (symbol.equals("'")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Acute);
+            } else if (symbol.equals("`")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Grave);
+            } else if (symbol.equals("^")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Circumflex);
+            } else if (symbol.equals("\"")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Dieresis);
+            } else if (symbol.equals("~")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Tilde);
+                // TODO: slash "diacritic"
             } else {
                 logger.log(Level.WARNING, "unknown control value: " + symbol);
                 //currentLineOfText.append("C-" + symbol);
@@ -183,8 +195,27 @@ public class ExtendoRippleREPL {
         }
     }
 
+    private void applyDiacritic(final ExtendedCharacters.Diacritic d) {
+        if (0 == currentLineOfText.length()) {
+            logger.warning("applied diacritic " + d + " to empty string");
+            typeatron.sendWarningCue();
+        } else {
+            char c = currentLineOfText.charAt(currentLineOfText.length() - 1);
+            Character cm = extendedCharacters.modify(d, c);
+            if (null == cm) {
+                logger.warning("diacritic " + d + " cannot modify character '" + c + "'");
+                typeatron.sendWarningCue();
+            } else {
+                currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
+                currentLineOfText.append(cm);
+            }
+        }
+    }
+
     public interface REPLEventHandler {
         void beginCommand();
+
         void finishCommand();
     }
+
 }
