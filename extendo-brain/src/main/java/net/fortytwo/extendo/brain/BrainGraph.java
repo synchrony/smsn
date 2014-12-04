@@ -37,6 +37,9 @@ public class BrainGraph {
 
     private static final String thingNamespace;
 
+    /**
+     * The configurable namespace into which things, i.e. classified atoms, are mapped
+     */
     public static final String PROP_THING_NAMESPACE = "net.fortytwo.extendo.brain.thingNamespace";
 
     private static final String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
@@ -191,32 +194,6 @@ public class BrainGraph {
 
     public void deleteListNode(final AtomList l) {
         graph.removeVertex(l.asVertex());
-    }
-
-    public void deleteListNodesRecursively(final AtomList l) {
-        AtomList cur = l;
-        while (null != cur) {
-            AtomList rest = cur.getRest();
-            graph.removeVertex(cur.asVertex());
-            cur = rest;
-        }
-    }
-
-    public void deleteListNodesAndChildrenRecursively(final AtomList l) {
-        AtomList cur = l;
-        while (null != cur) {
-            AtomList rest = cur.getRest();
-            Atom child = cur.getFirst();
-            graph.removeVertex(cur.asVertex());
-            cur = rest;
-
-            AtomList grandChildren = child.getNotes();
-            if (null != grandChildren) {
-                // delete the list of grandchildren non-recursively
-                deleteListNodesRecursively(grandChildren);
-            }
-            deleteAtom(child);
-        }
     }
 
     public Collection<Atom> getAtomsWithValue(final String value) {

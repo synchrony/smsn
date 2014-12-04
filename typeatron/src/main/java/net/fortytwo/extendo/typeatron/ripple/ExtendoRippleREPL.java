@@ -6,7 +6,9 @@ import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.ChordedKeyer;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.lib.TypeatronDictionaryMapping;
+import net.fortytwo.flow.Collector;
 import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.RippleList;
 import org.openrdf.model.impl.URIImpl;
 
 import java.util.logging.Level;
@@ -105,13 +107,31 @@ public class ExtendoRippleREPL {
                     newLine();
                     eventHandler.finishCommand();
                 } else {
-                    logger.warning("empty text...");
+                    logger.warning("empty command in Ripple REPL");
                 }
+            } else if (symbol.equals("u")) {
+                UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
+                if (!undoRedoStack.canUndo()) {
+                    throw new RippleException("can't undo");
+                } else {
+                    undoRedoStack.undo();
+                    typeatron.sendOkCue();
+                }
+            } else if (symbol.equals("r")) {
+                UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
+                if (!undoRedoStack.canRedo()) {
+                    throw new RippleException("can't undo");
+                } else {
+                    undoRedoStack.redo();
+                    typeatron.sendOkCue();
+                }
+                /*
             } else if (symbol.equals("u")) { // "to upper case" character primitive
                 String s = getLastSymbol();
                 if (null != s) {
                     currentLineOfText.append(s.toUpperCase());
                 }
+                */
             } else if (symbol.equals("n")) { // "to number" character primitive
                 String s = getLastSymbol();
                 if (null != s) {
