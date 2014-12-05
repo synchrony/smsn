@@ -39,6 +39,11 @@ class Morse
     int _morsePin;
     int (*_stopTest)();
     void (*_sendError)(const char*);
+
+    int getOffset(int c);
+
+    static char bits[50];
+    //static int offsets[67];
 };
 
 #endif // Morse_h

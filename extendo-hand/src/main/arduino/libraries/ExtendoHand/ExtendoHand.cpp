@@ -217,7 +217,7 @@ void ExtendoHand::sendHeartbeatMessage(unsigned long now) {
 ////////////////////////////////////////////////////////////////////////////////
 // non-member OSC handler functions
 
-void handleAudioToneMessage(class OSCMessage &m) {
+void handleToneMessage(class OSCMessage &m) {
     if (!osc.validArgs(m, 2)) return;
 
     int32_t frequency = m.getInt(0);
@@ -293,11 +293,11 @@ void ExtendoHand::handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
         osc.sendOSCBundleError(bundle);
     } else if (!(0
-        || bundle.dispatch(EXO_HAND_AUDIO_TONE, handleAudioToneMessage)
         || bundle.dispatch(EXO_HAND_CONTEXT_SET, handleContextSetMessage)
         //|| bundle.dispatch(EXO_HAND_MORSE, handleMorseMessage)
         || bundle.dispatch(EXO_HAND_PING, handlePingMessage)
         || bundle.dispatch(EXO_HAND_RGB_SET, handleRGBSetMessage)
+        || bundle.dispatch(EXO_HAND_TONE, handleToneMessage)
         || bundle.dispatch(EXO_HAND_VIBRO, handleVibroMessage)
         )) {
         osc.sendError("no messages dispatched");

@@ -14,7 +14,6 @@
 
 // OSC addresses
 #define EXO_HAND              "/exo/hand"
-#define EXO_HAND_AUDIO_TONE   "/exo/hand/audio/tone"
 #define EXO_HAND_CONTEXT_SET  "/exo/hand/context/set"
 #define EXO_HAND_GESTURE      "/exo/hand/gesture"
 #define EXO_HAND_HEARTBEAT    "/exo/hand/heartbeat"
@@ -24,6 +23,7 @@
 #define EXO_HAND_PING         "/exo/hand/ping"
 #define EXO_HAND_PING_REPLY   "/exo/hand/ping/reply"
 #define EXO_HAND_RGB_SET      "/exo/hand/rgb/set"
+#define EXO_HAND_TONE         "/exo/hand/tone"
 #define EXO_HAND_VIBRO        "/exo/hand/vibro"
 
 class ExtendoHand

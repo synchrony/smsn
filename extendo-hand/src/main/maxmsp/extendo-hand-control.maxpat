@@ -1878,7 +1878,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 71.75, 500.0, 169.0, 18.0 ],
-					"text" : "/exo/hand/audio/tone badargs"
+					"text" : "/exo/hand/tone badargs"
 				}
 
 			}
@@ -1905,8 +1905,8 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 71.75, 400.0, 169.0, 18.0 ],
-					"text" : "/exo/hand/audio/tone 440 500"
+					"patching_rect" : [ 71.75, 400.0, 137.0, 18.0 ],
+					"text" : "/exo/hand/tone 440 500"
 				}
 
 			}

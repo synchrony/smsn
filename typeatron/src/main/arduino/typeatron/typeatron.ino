@@ -38,6 +38,7 @@ const char *EXO_TT_PING          = "/exo/tt/ping";
 const char *EXO_TT_PING_REPLY    = "/exo/tt/ping/reply";
 const char *EXO_TT_READY         = "/exo/tt/ready";
 const char *EXO_TT_RGB_SET       = "/exo/tt/rgb/set";
+const char *EXO_TT_TONE          = "/exo/tt/tone";
 const char *EXO_TT_VIBRO         = "/exo/tt/vibro";
 const char *EXO_TT_WARNING       = "/exo/tt/warning";
 
@@ -59,21 +60,6 @@ const unsigned long warningCueVisualDurationMs = 200;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <OSCBundle.h>
-#include <ExtendOSC.h>
-
-ExtendOSC osc("/exo/tt");
-
-OSCBundle *bundleIn;
-
-void sendError(const char *message) {
-   errorCue();
-   osc.sendError(message);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 const int keyPin1 = 2;
 const int keyPin2 = 4;
 const int keyPin3 = 7;
@@ -90,21 +76,6 @@ const int greenPin = 10;
 const int bluePin = 11;
 
 const int photoresistorPin = A3;
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-// TODO: tailor the bounce interval to the switch being used.
-// This 2ms value is a conservative estimate based on an average over many kinds of switches.
-// See "A Guide to Debouncing" by Jack G. Ganssle
-unsigned int debounceMicros = 2000;
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-#include <AnalogSampler.h>
-
-AnalogSampler photoSampler(photoresistorPin);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +102,7 @@ void infoCue() {
 void readyCue() {
     rgbled.replaceColor(RGB_WHITE);
     ledCueLength = readyCueVisualDurationMs;
-    ledCueSince = millis();      
+    ledCueSince = millis();
 }
 
 void warningCue() {
@@ -152,6 +123,36 @@ void checkLedStatus(unsigned long now) {
         ledCueSince = 0;
     }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <OSCBundle.h>
+#include <ExtendOSC.h>
+
+ExtendOSC osc("/exo/tt");
+
+OSCBundle *bundleIn;
+
+void sendError(const char *message) {
+   errorCue();
+   osc.sendError(message);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// TODO: tailor the bounce interval to the switch being used.
+// This 2ms value is a conservative estimate based on an average over many kinds of switches.
+// See "A Guide to Debouncing" by Jack G. Ganssle
+unsigned int debounceMicros = 2000;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include <AnalogSampler.h>
+
+AnalogSampler photoSampler(photoresistorPin);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +235,7 @@ int morseStopTest() {
     return totalKeysPressed >= 3;
 }
 
-Morse morse(transducerPin, morseStopTest, sendError);
+Morse *morse;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -268,13 +269,18 @@ void setup() {
     osc.beginSerial();
     droidspeak.speakSerialOpenPhrase();
 
-    bundleIn = new OSCBundle();   
+    bundleIn = new OSCBundle();
+
+    morse = new Morse(transducerPin, morseStopTest, sendError);
     
     rgbled.replaceColor(RGB_BLACK);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
+
+const int morseBufferLength = 32;
+char morseBuffer[morseBufferLength];
 
 void handleOSCBundle(class OSCBundle &bundle) {
     if (bundle.hasError()) {
@@ -290,6 +296,7 @@ void handleOSCBundle(class OSCBundle &bundle) {
         || bundle.dispatch(EXO_TT_PING, handlePingMessage)
         || bundle.dispatch(EXO_TT_READY, handleReadyMessage)
         || bundle.dispatch(EXO_TT_RGB_SET, handleRGBSetMessage)
+        || bundle.dispatch(EXO_TT_TONE, handleToneMessage)
         || bundle.dispatch(EXO_TT_VIBRO, handleVibroMessage)
         || bundle.dispatch(EXO_TT_WARNING, handleWarningMessage)
         )) {
@@ -317,25 +324,17 @@ void handleLaserTriggerMessage(class OSCMessage &m) {
     setMode(LaserTrigger); 
 }
 
-const int morseBufferLength = 32;
-char morseBuffer[morseBufferLength];
-
 void handleMorseMessage(class OSCMessage &m) {
     if (!osc.validArgs(m, 1)) return;
 
     int length = m.getDataLength(0);
     if (length >= morseBufferLength) {
-        errorCue();
         osc.sendError("Morse message is too long");
-        return;
+        errorCue();
     } else {
         m.getString(0, morseBuffer, length+1);
-osc.sendInfo("handle morse here: %s", morseBuffer);
-        //morse.playMorseString((const char*) morseBuffer);  
+        morse->playMorseString((const char*) morseBuffer);
     }
-    //char buffer[length+1];
-    //m.getString(0, buffer, length+1);
-    //morse.playMorseString(buffer);
 }
 
 void handleOkMessage(class OSCMessage &m) {
@@ -369,6 +368,25 @@ void handleRGBSetMessage(class OSCMessage &m) {
         osc.sendError("color out of range: %d", (long) color);
     } else {
         rgbled.replaceColor(color);
+    }
+}
+
+void handleToneMessage(class OSCMessage &m) {
+    if (!osc.validArgs(m, 2)) return;
+
+    int32_t frequency = m.getInt(0);
+    int32_t duration = m.getInt(1);
+
+    if (frequency <= 0 || frequency > 20000) {
+        osc.sendError("frequency out of range: %d", (int) frequency);
+    } else if (duration <= 0) {
+        osc.sendError("duration must be a positive number");
+    } else if (duration > 60000) {
+        osc.sendError("duration too long");
+    } else {
+        tone(transducerPin, (int) frequency);
+        delay((unsigned long) duration);
+        noTone(transducerPin);
     }
 }
 
