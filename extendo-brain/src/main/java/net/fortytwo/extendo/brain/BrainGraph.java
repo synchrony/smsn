@@ -34,15 +34,19 @@ public class BrainGraph {
     private Index<Vertex> searchIndex;
     // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
     private Index<Vertex> acronymIndex;
-    // reverse index of user-defined shortcuts, e.g. "mf" for "my family"
-    // shortcuts are distinct from acronyms, which are defined automatically for all values below a certain length
-    private Index<Vertex> shortcutIndex;
 
-    private static final String atomNs;
+    private static final String thingNamespace;
+
+    /**
+     * The configurable namespace into which things, i.e. classified atoms, are mapped
+     */
+    public static final String PROP_THING_NAMESPACE = "net.fortytwo.extendo.brain.thingNamespace";
+
+    private static final String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
 
     static {
         try {
-            atomNs = Extendo.getConfiguration().getString(Extendo.BASE_URI) + "atom/";
+            thingNamespace = Extendo.getConfiguration().getString(PROP_THING_NAMESPACE, DEFAULT_THING_NAMESPACE);
         } catch (TypedProperties.PropertyException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -81,6 +85,8 @@ public class BrainGraph {
             }
         }
 
+        // reverse index of user-defined shortcuts, e.g. "mf" for "my family"
+        // shortcuts are distinct from acronyms, which are defined automatically for all values below a certain length
         if (!graph.getIndexedKeys(Vertex.class).contains(Extendo.SHORTCUT)) {
             logger.info("creating key index for '" + Extendo.SHORTCUT + "' property");
             graph.createKeyIndex(Extendo.SHORTCUT, Vertex.class);
@@ -113,8 +119,12 @@ public class BrainGraph {
         return (String) a.asVertex().getId();
     }
 
+    public static String uriForId(final String id) {
+        return thingNamespace + id;
+    }
+
     public static String uriOf(final Atom a) {
-        return atomNs + getId(a);
+        return uriForId(getId(a));
     }
 
     private static class ExtendoIdFactory implements IdGraph.IdFactory {
@@ -184,32 +194,6 @@ public class BrainGraph {
 
     public void deleteListNode(final AtomList l) {
         graph.removeVertex(l.asVertex());
-    }
-
-    public void deleteListNodesRecursively(final AtomList l) {
-        AtomList cur = l;
-        while (null != cur) {
-            AtomList rest = cur.getRest();
-            graph.removeVertex(cur.asVertex());
-            cur = rest;
-        }
-    }
-
-    public void deleteListNodesAndChildrenRecursively(final AtomList l) {
-        AtomList cur = l;
-        while (null != cur) {
-            AtomList rest = cur.getRest();
-            Atom child = cur.getFirst();
-            graph.removeVertex(cur.asVertex());
-            cur = rest;
-
-            AtomList grandChildren = child.getNotes();
-            if (null != grandChildren) {
-                // delete the list of grandchildren non-recursively
-                deleteListNodesRecursively(grandChildren);
-            }
-            deleteAtom(child);
-        }
     }
 
     public Collection<Atom> getAtomsWithValue(final String value) {

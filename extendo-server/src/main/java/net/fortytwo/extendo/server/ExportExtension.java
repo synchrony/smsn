@@ -22,10 +22,12 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Params;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.sail.SailException;
 
@@ -44,7 +46,7 @@ import java.security.Principal;
 public class ExportExtension extends ExtendoExtension {
 
     private enum Format {
-        Vertices, Edges, GraphML, PageRank, RDF
+        Vertices, Edges, GraphML, PageRank, RDF, Web
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
@@ -160,9 +162,11 @@ public class ExportExtension extends ExtendoExtension {
     }
 
     private void exportRDF(final KnowledgeBase kb,
+                           final RDFFormat format,
+                           final Filter filter,
                            final OutputStream out) throws IOException {
         try {
-            kb.exportRDF(out);
+            kb.exportRDF(out, format, filter);
         } catch (SailException e) {
             throw new IOException(e);
         } catch (RDFHandlerException e) {
@@ -179,8 +183,8 @@ public class ExportExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        Format f = Format.valueOf(p.format);
-        if (null == f) {
+        Format format = Format.valueOf(p.format);
+        if (null == format) {
             return ExtensionResponse.error("no such format: " + p.format);
         }
 
@@ -188,9 +192,10 @@ public class ExportExtension extends ExtendoExtension {
         //out = new FileOutputStream(new File("/tmp/extendo-edges.txt"));
         //out = new FileOutputStream(new File("/tmp/extendo-pagerank.txt"));
 
+        Filter filter = null;
         OutputStream out = new FileOutputStream(p.file);
         try {
-            switch (f) {
+            switch (format) {
                 case Vertices:
                     exportVertices(p.brain.getBrainGraph(), new PrintStream(out));
                     break;
@@ -203,9 +208,18 @@ public class ExportExtension extends ExtendoExtension {
                 case PageRank:
                     exportPageRank(p.brain.getBrainGraph(), new PrintStream(out));
                     break;
+                case Web:
+                    filter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
+                    // fall through
                 case RDF:
-                    exportRDF(p.brain.getKnowledgeBase(), out);
+                    RDFFormat rdfFormat = RDFFormat.forFileName(p.file);
+                    if (null == rdfFormat) {
+                        throw new IllegalStateException("no RDF format for file name: " + p.file);
+                    }
+                    exportRDF(p.brain.getKnowledgeBase(), rdfFormat, filter, out);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         } finally {
             out.close();

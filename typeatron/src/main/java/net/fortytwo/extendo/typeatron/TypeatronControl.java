@@ -44,6 +44,7 @@ public class TypeatronControl extends OscControl {
             EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
+            EXO_TT_READY = "/exo/tt/ready",
             EXO_TT_VIBRO = "/exo/tt/vibro",
             EXO_TT_WARNING = "/exo/tt/warning";
 
@@ -79,7 +80,19 @@ public class TypeatronControl extends OscControl {
 
         try {
             rippleSession = new RippleSession(agent, environment);
-            rippleREPL = new ExtendoRippleREPL(rippleSession, this, agent, environment);
+            
+            ExtendoRippleREPL.REPLEventHandler eventHandler = new ExtendoRippleREPL.REPLEventHandler() {
+                @Override
+                public void beginCommand() {
+                    sendReadyCue();
+                }
+
+                @Override
+                public void finishCommand() {
+                    sendOkCue();
+                }
+            };
+            rippleREPL = new ExtendoRippleREPL(rippleSession, this, agent, environment, eventHandler);
         } catch (RippleException e) {
             throw new DeviceInitializationException(e);
         }
@@ -92,10 +105,10 @@ public class TypeatronControl extends OscControl {
                             case Arrows:
                                 // fall through
                             case TextEdit:
-                                handleSymbolWithEmacs(mode, symbol, modifier);
+                                handleSymbolWithEmacs(symbol, modifier);
                                 break;
                             case CommandLine:
-                                handleSymbolWithRipple(mode, symbol, modifier);
+                                handleSymbolWithRipple(symbol, modifier);
                                 break;
                             case Mash:
                                 // we shouldn't match any symbols in mash mode
@@ -207,10 +220,12 @@ public class TypeatronControl extends OscControl {
         // user has "pointed with reference". This event occurs at the moment the laser turns on.
         oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
             public void handle(OSCMessage message) {
+                System.out.println("got laser event");
                 // TODO: use the recognition time parameter provided in the message
                 long recognitionTime = System.currentTimeMillis();
 
                 handlePointEvent(recognitionTime);
+                logger.info("handled laser pointer event from typeatron");
             }
         });
         // TODO: temporary... assume Emacs is available, even if we can't detect it...
@@ -244,21 +259,17 @@ public class TypeatronControl extends OscControl {
         }
     }
 
-    private void handleSymbolWithRipple(final ChordedKeyer.Mode mode,
-                                        final String symbol,
+    private void handleSymbolWithRipple(final String symbol,
                                         final ChordedKeyer.Modifier modifier) {
         try {
-            if (rippleREPL.handle(symbol, modifier, mode)) {
-                sendOkCue();
-            }
+            rippleREPL.handle(symbol, modifier);
         } catch (RippleException e) {
             sendErrorCue();
             logger.log(Level.WARNING, "Ripple error", e);
         }
     }
 
-    private void handleSymbolWithEmacs(final ChordedKeyer.Mode mode,
-                                       final String symbol,
+    private void handleSymbolWithEmacs(final String symbol,
                                        final ChordedKeyer.Modifier modifier) {
         String mapped = symbolForBrainModeClient(symbol, modifier);
         if (null != brainModeWrapper) {
@@ -356,6 +367,7 @@ public class TypeatronControl extends OscControl {
     public void sendLaserTriggerCommand() {
         OSCMessage m = new OSCMessage(EXO_TT_LASER_TRIGGER);
         send(m);
+        System.out.println("sent laser trigger command");
     }
 
     public void sendMorse(final String text) {
@@ -412,6 +424,11 @@ public class TypeatronControl extends OscControl {
 
     public void sendInfoCue() {
         OSCMessage m = new OSCMessage(EXO_TT_INFO);
+        send(m);
+    }
+
+    public void sendReadyCue() {
+        OSCMessage m = new OSCMessage(EXO_TT_READY);
         send(m);
     }
 

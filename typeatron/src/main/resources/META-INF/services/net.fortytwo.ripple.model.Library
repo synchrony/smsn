@@ -1,0 +1,14 @@
+# This is a complete list of Ripple libraries defining primitive functions
+# which are to be available to the query environment.
+
+net.fortytwo.ripple.libs.control.ControlLibrary
+net.fortytwo.ripple.libs.data.DataLibrary
+net.fortytwo.ripple.libs.graph.GraphLibrary
+net.fortytwo.ripple.libs.logic.LogicLibrary
+net.fortytwo.ripple.libs.math.MathLibrary
+net.fortytwo.ripple.libs.stack.StackLibrary
+net.fortytwo.ripple.libs.stream.StreamLibrary
+net.fortytwo.ripple.libs.string.StringLibrary
+net.fortytwo.ripple.libs.system.SystemLibrary
+
+net.fortytwo.extendo.typeatron.ripple.lib.ExtendoLibrary

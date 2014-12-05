@@ -53,8 +53,7 @@ public abstract class AtomClass {
 
     protected abstract boolean isCollectionClass();
 
-    public abstract URI toRDF(Atom a,
-                              RDFizationContext context) throws RDFHandlerException;
+    public abstract URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException;
 
     protected URI handleTypeAndAlias(final Atom a,
                                      final ValueFactory vf,

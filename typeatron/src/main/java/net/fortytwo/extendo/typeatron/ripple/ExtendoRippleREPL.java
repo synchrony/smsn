@@ -6,7 +6,9 @@ import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.ChordedKeyer;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.lib.TypeatronDictionaryMapping;
+import net.fortytwo.flow.Collector;
 import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.RippleList;
 import org.openrdf.model.impl.URIImpl;
 
 import java.util.logging.Level;
@@ -24,17 +26,22 @@ public class ExtendoRippleREPL {
     private final TypeatronControl typeatron;
     private final ExtendoAgent agent;
     private final SideEffects environment;
+    private final REPLEventHandler eventHandler;
+    private final ExtendedCharacters extendedCharacters = new ExtendedCharacters();
 
     private StringBuilder currentLineOfText;
 
     public ExtendoRippleREPL(final RippleSession session,
                              final TypeatronControl typeatron,
                              final ExtendoAgent agent,
-                             final SideEffects environment) throws RippleException {
+                             final SideEffects environment,
+                             final REPLEventHandler eventHandler) throws RippleException {
         this.session = session;
         this.typeatron = typeatron;
         this.agent = agent;
         this.environment = environment;
+        this.eventHandler = eventHandler;
+
         UserDictionary userDictionary = new UserDictionary(typeatron);
         typeatronDictionary = new TypeatronDictionaryMapping(
                 environment, typeatron, userDictionary);
@@ -87,28 +94,45 @@ public class ExtendoRippleREPL {
         }
     }
 
-    public boolean handle(final String symbol,
-                       final ChordedKeyer.Modifier modifier,
-                       final ChordedKeyer.Mode mode) throws RippleException {
-        //logger.log(Level.INFO, "got a symbol: " + symbol + " in mode " + mode + " with modifier " + modifier);
-        boolean cue = false;
+    public void handle(final String symbol,
+                       final ChordedKeyer.Modifier modifier) throws RippleException {
+        //logger.log(Level.INFO, "matched symbol " + symbol + " in mode " + mode + " with modifier " + modifier);
 
         if (ChordedKeyer.Modifier.Control == modifier) {
-            //logger.log(Level.INFO, "got a control character");
+            //logger.log(Level.INFO, "matched a control character");
             if (symbol.equals("")) {
                 if (currentLineOfText.length() > 0) {
+                    eventHandler.beginCommand();
                     session.push(currentLineOfText.toString());
                     session.push(typeatronDictionary);
                     newLine();
-                    cue = true;
+                    eventHandler.finishCommand();
                 } else {
-                    logger.warning("empty text...");
+                    logger.warning("empty command in Ripple REPL");
                 }
+            } else if (symbol.equals("u")) {
+                UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
+                if (!undoRedoStack.canUndo()) {
+                    throw new RippleException("can't undo");
+                } else {
+                    undoRedoStack.undo();
+                    typeatron.sendOkCue();
+                }
+            } else if (symbol.equals("r")) {
+                UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
+                if (!undoRedoStack.canRedo()) {
+                    throw new RippleException("can't undo");
+                } else {
+                    undoRedoStack.redo();
+                    typeatron.sendOkCue();
+                }
+                /*
             } else if (symbol.equals("u")) { // "to upper case" character primitive
                 String s = getLastSymbol();
                 if (null != s) {
                     currentLineOfText.append(s.toUpperCase());
                 }
+                */
             } else if (symbol.equals("n")) { // "to number" character primitive
                 String s = getLastSymbol();
                 if (null != s) {
@@ -127,26 +151,35 @@ public class ExtendoRippleREPL {
                         currentLineOfText.append(p);
                     }
                 }
+            } else if (symbol.equals("'")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Acute);
+            } else if (symbol.equals("`")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Grave);
+            } else if (symbol.equals("^")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Circumflex);
+            } else if (symbol.equals("\"")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Dieresis);
+            } else if (symbol.equals("~")) {
+                applyDiacritic(ExtendedCharacters.Diacritic.Tilde);
+                // TODO: slash "diacritic"
             } else {
                 logger.log(Level.WARNING, "unknown control value: " + symbol);
                 //currentLineOfText.append("C-" + symbol);
             }
         } else if (ChordedKeyer.Modifier.None == modifier) {
             if (symbol.equals("\n")) { // handle newline
-                //System.out.println("got newline");
                 if (currentLineOfText.length() > 0) {
                     session.push(currentLineOfText.toString());
                     newLine();
                 }
-            } else if (symbol.equals("DEL")) { // handle delete
+            } else if (symbol.equals(ChordedKeyer.SpecialChar.DEL.name())) { // handle delete
                 if (currentLineOfText.length() > 0) {
                     currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
                 }
-            } else if (symbol.equals("ESC")) { // handle escape
+            } else if (symbol.equals(ChordedKeyer.SpecialChar.ESC.name())) { // handle escape
                 // TODO: nothing else?
                 newLine();
             } else { // handle ordinary text
-                System.out.println("appending: " + symbol);
                 currentLineOfText.append(symbol);
             }
         } else {
@@ -160,7 +193,29 @@ public class ExtendoRippleREPL {
                 agent.sendOSCMessageToFacilitator(m);
             }
         }
-
-        return cue;
     }
+
+    private void applyDiacritic(final ExtendedCharacters.Diacritic d) {
+        if (0 == currentLineOfText.length()) {
+            logger.warning("applied diacritic " + d + " to empty string");
+            typeatron.sendWarningCue();
+        } else {
+            char c = currentLineOfText.charAt(currentLineOfText.length() - 1);
+            Character cm = extendedCharacters.modify(d, c);
+            if (null == cm) {
+                logger.warning("diacritic " + d + " cannot modify character '" + c + "'");
+                typeatron.sendWarningCue();
+            } else {
+                currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
+                currentLineOfText.append(cm);
+            }
+        }
+    }
+
+    public interface REPLEventHandler {
+        void beginCommand();
+
+        void finishCommand();
+    }
+
 }

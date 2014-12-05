@@ -15,6 +15,11 @@ import java.util.logging.Logger;
 public class ExtendoBrain {
     private static final Logger logger = Extendo.getLogger(ExtendoBrain.class);
 
+    /**
+     * A configuration property indicating a log file to which notes may be appended in a stream-of-consciousness style
+     */
+    public static final String PROP_BRAINSTREAM = "net.fortytwo.extendo.brain.brainStream";
+
     // TODO: make this configurable
     private static final int EVENT_STACK_CAPACITY = 50;
 

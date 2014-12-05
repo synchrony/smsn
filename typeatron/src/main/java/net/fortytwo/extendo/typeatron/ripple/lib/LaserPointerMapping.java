@@ -42,9 +42,8 @@ public class LaserPointerMapping extends PrimitiveStackMapping {
     public void apply(final RippleList stack,
                       final Sink<RippleList> solutions,
                       final ModelConnection mc) throws RippleException {
-        logger.log(Level.INFO, "executing the laser pointer mapping");
-
         Value thingPointedTo = mc.toRDF(stack.getFirst());
+        logger.log(Level.INFO, "executing laser pointer mapping with reference to " + thingPointedTo);
 
         if (null != thingPointedTo && thingPointedTo instanceof URI) {
             try {

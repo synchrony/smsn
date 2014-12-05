@@ -5,6 +5,7 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.rdf.classes.AKAReference;
 import net.fortytwo.extendo.brain.rdf.classes.BibtexReference;
 import net.fortytwo.extendo.brain.rdf.classes.Date;
@@ -54,16 +55,6 @@ import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
- */
-/*
-typical steps in the mapping process:
-1) identify simple types
-2) identify compound types
-    "strict" matching is used to find independent instances of types
-    non-strict matching is used for fields of potential independent instances
-3) return to (2) until no more compound types are found
-4) coerce not-yet-typed container members
-5) map to RDF
  */
 public class KnowledgeBase {
     private static final Logger logger = Extendo.getLogger(KnowledgeBase.class);
@@ -133,7 +124,8 @@ public class KnowledgeBase {
     private void handleAllMembers(final AtomCollectionMemory memory,
                                   final AtomClass.FieldHandler fieldHandler,
                                   final RDFizationContext context,
-                                  final Set<String> alreadyHandled) throws RDFHandlerException {
+                                  final Set<String> alreadyHandled,
+                                  final Filter filter) throws RDFHandlerException {
         // avoid cycles
         if (alreadyHandled.contains(memory.getAtomId())) {
             return;
@@ -141,11 +133,13 @@ public class KnowledgeBase {
         alreadyHandled.add(memory.getAtomId());
 
         for (Atom a : memory.getMemberAtoms()) {
-            fieldHandler.handle(a, context);
+            if (null == filter || filter.isVisible(a.asVertex())) {
+                fieldHandler.handle(a, context);
+            }
         }
 
         for (AtomCollectionMemory m : memory.getMemberCollections()) {
-            handleAllMembers(m, fieldHandler, context, alreadyHandled);
+            handleAllMembers(m, fieldHandler, context, alreadyHandled, filter);
         }
     }
 
@@ -153,7 +147,8 @@ public class KnowledgeBase {
                           final AtomRegex.El el,
                           final List<AtomClassEntry> evidenceEntries,
                           final AtomCollectionMemory memory,
-                          final RDFizationContext context) throws RDFHandlerException {
+                          final RDFizationContext context,
+                          final Filter filter) throws RDFHandlerException {
         Set<Class<? extends AtomClass>> alts = el.getAlternatives();
 
         List<AtomClassEntry> entries = atomClassifications.get(first);
@@ -179,9 +174,9 @@ public class KnowledgeBase {
                         if (null != fieldHandler) {
                             if (atomClass.isCollectionClass()) {
                                 if (null != inf.memory) {
-                                    handleAllMembers(inf.memory, fieldHandler, context, new HashSet<String>());
+                                    handleAllMembers(inf.memory, fieldHandler, context, new HashSet<String>(), filter);
                                 }
-                            } else {
+                            } else if (null == filter || filter.isVisible(first.asVertex())) {
                                 fieldHandler.handle(first, context);
                             }
                         }
@@ -207,7 +202,16 @@ public class KnowledgeBase {
         }
     }
 
-    public void inferClasses(final RDFHandler handler) throws RDFHandlerException {
+    /**
+     * Performs Extendo type inference on the knowledge base, generating an RDF representation
+     * @param handler a handler for generated RDF statements
+     * @param filter an optional sharability filter for generated results.
+     *               Type inference is performed on the entire knowledge base without regard to sharability,
+     *               but generated RDF statements are limited to those subjects which are sharable according to
+     *               the filter.
+     * @throws RDFHandlerException
+     */
+    public void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
 
         RDFBuffer buffer = null == handler ? null : new RDFBuffer(handler);
@@ -224,20 +228,20 @@ public class KnowledgeBase {
         }
         List<AtomClassEntry> evidenceEntries = new LinkedList<AtomClassEntry>();
 
-        for (Atom a : graph.getAtoms()) {
-            context.setSubject(a);
+        for (Atom subject : graph.getAtoms()) {
+            context.setSubject(subject);
 
-            String value = a.getValue();
-            String alias = a.getAlias();
+            String value = subject.getValue();
+            String alias = subject.getAlias();
 
             if (null != buffer) {
                 buffer.clear();
             }
 
-            List<AtomClassEntry> oldEntries = atomClassifications.get(a);
+            List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
             List<AtomClassEntry> newEntries = new LinkedList<AtomClassEntry>();
 
-            for (AtomClass c : classes.values()) {
+            for (AtomClass clazz : classes.values()) {
                 /*
                 if (a.asVertex().getId().equals("SBZFumn") && c.name.equals("person") && null != handler) {
                     System.out.println("break point here");
@@ -245,30 +249,30 @@ public class KnowledgeBase {
 
                 evidenceEntries.clear();
 
-                AtomCollectionMemory newMemo = c.isCollectionClass()
-                        ? new AtomCollectionMemory((String) a.asVertex().getId())
+                AtomCollectionMemory newMemo = clazz.isCollectionClass()
+                        ? new AtomCollectionMemory((String) subject.asVertex().getId())
                         : null;
 
                 int points = 0;
 
-                if (null != c.valueRegex) {
+                if (null != clazz.valueRegex) {
                     // one point for value regex
                     points++;
-                    if (null == value || !c.valueRegex.matcher(value).matches()) {
+                    if (null == value || !clazz.valueRegex.matcher(value).matches()) {
                         continue;
                     }
                 }
 
-                if (null != c.aliasRegex) {
+                if (null != clazz.aliasRegex) {
                     // one point for alias regex
                     points++;
-                    if (null == alias || !c.aliasRegex.matcher(alias).matches()) {
+                    if (null == alias || !clazz.aliasRegex.matcher(alias).matches()) {
                         continue;
                     }
                 }
 
-                if (null != c.memberRegex) {
-                    AtomList cur = a.getNotes();
+                if (null != clazz.memberRegex) {
+                    AtomList cur = subject.getNotes();
                     Atom first = null;
                     int eli = 0;
                     AtomRegex.El el = null;
@@ -290,8 +294,8 @@ public class KnowledgeBase {
                             }
                             matched = false;
 
-                            if (c.memberRegex.getElements().size() > eli) {
-                                el = c.memberRegex.getElements().get(eli++);
+                            if (clazz.memberRegex.getElements().size() > eli) {
+                                el = clazz.memberRegex.getElements().get(eli++);
                                 mod = el.getModifier();
                                 alts = el.getAlternatives();
                             } else {
@@ -327,7 +331,7 @@ public class KnowledgeBase {
 
                         switch (mod) {
                             case ZeroOrOne:
-                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
                                     advanceRegex = true;
                                     advanceInput = true;
                                     matched = true;
@@ -336,7 +340,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case ZeroOrMore:
-                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
                                     advanceInput = true;
                                     matched = true;
                                 } else {
@@ -344,7 +348,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case One:
-                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
                                     advanceRegex = true;
                                     advanceInput = true;
                                     matched = true;
@@ -353,7 +357,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case OneOrMore:
-                                if (match(first, el, evidenceEntries, newMemo, context)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
                                     mod = AtomRegex.Modifier.ZeroOrMore;
                                     advanceInput = true;
                                     matched = true;
@@ -377,14 +381,14 @@ public class KnowledgeBase {
                 // This gives simple classes priority over simpler atoms (e.g. the ISBN class which simply
                 // matches based on a value regex), which requires more complex classes to be matched by means
                 // of graph structure.
-                int poss = c.getHighestOutScore();
+                int poss = clazz.getHighestOutScore();
                 float pointValue = (1 + poss) / (2.0f * poss);
                 float outScore = points * pointValue;
 
                 boolean updated = false;
                 if (null != oldEntries) {
                     for (AtomClassEntry e : oldEntries) {
-                        if (e.getInferredClass() == c.getClass()) {
+                        if (e.getInferredClass() == clazz.getClass()) {
                             e.outScore = outScore;
                             e.memory = newMemo;
                             newEntries.add(e);
@@ -394,15 +398,15 @@ public class KnowledgeBase {
                     }
                 }
                 if (!updated) {
-                    newEntries.add(new AtomClassEntry(c.getClass(), outScore, newMemo));
+                    newEntries.add(new AtomClassEntry(clazz.getClass(), outScore, newMemo));
                 }
                 // augment relevant in-scores of member atoms
                 for (AtomClassEntry e : evidenceEntries) {
                     e.inScore = outScore + e.getInScore();
                 }
 
-                if (null != buffer) {
-                    c.toRDF(a, context);
+                if (null != buffer && (null == filter || filter.isVisible(subject.asVertex()))) {
+                    clazz.toRDF(subject, context);
 
                     // flush both the immediate description of the atom, as well as the relationship
                     // of the atom to its fields to the downstream handler.
@@ -411,10 +415,10 @@ public class KnowledgeBase {
             }
 
             // replace old classification
-            atomClassifications.remove(a);
+            atomClassifications.remove(subject);
             if (newEntries.size() > 0) {
                 Collections.sort(newEntries, outScoreDescending);
-                atomClassifications.put(a, newEntries);
+                atomClassifications.put(subject, newEntries);
             }
         }
 
@@ -483,7 +487,10 @@ public class KnowledgeBase {
     }
 
     // convenience method
-    public void exportRDF(final OutputStream out) throws SailException, RDFHandlerException {
+    public void exportRDF(final OutputStream out,
+                          final RDFFormat format,
+                          final Filter filter) throws SailException, RDFHandlerException {
+        logger.info("exporting RDF in format " + format);
         long startTime, endTime;
         Sail dedupSail = new MemoryStore();
         dedupSail.initialize();
@@ -496,7 +503,7 @@ public class KnowledgeBase {
                 RDFHandler h0 = new SailAdder(sc);
                 h0.startRDF();
 
-                inferClasses(h0);
+                inferClasses(h0, filter);
 
                 h0.endRDF();
                 endTime = System.currentTimeMillis();
@@ -506,7 +513,7 @@ public class KnowledgeBase {
                 sc.begin();
 
                 startTime = System.currentTimeMillis();
-                RDFHandler h = Rio.createWriter(RDFFormat.NTRIPLES, out);
+                RDFHandler h = Rio.createWriter(format, out);
                 h.startRDF();
                 CloseableIteration<? extends Statement, SailException>
                         iter = sc.getStatements(null, null, null, false);

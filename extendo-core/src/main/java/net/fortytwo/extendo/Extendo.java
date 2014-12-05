@@ -24,6 +24,7 @@ public class Extendo {
     public static final String
             BASE_URI = "net.fortytwo.extendo.baseURI",
             ACTIVITY_LOG = "net.fortytwo.extendo.activityLog",
+            ATOM_NAMESPACE = "net.fortytwo.extendo.atomNamespace",
             VERSION = "net.fortytwo.extendo.version";
 
     // P2P configuration properties

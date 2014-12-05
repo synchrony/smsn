@@ -145,8 +145,9 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
                                       final UserDictionary userDictionary) throws RippleException {
         ExtendoBrainClient exoBrainClient = new ExtendoBrainClient();
 
-        // default filter
-        Filter filter = new Filter();
+        Filter defaultFilter = new Filter();
+        // brain stream atoms begin with low weight, and with private rather than personal sharability
+        Filter brainstreamFilter = new Filter(0f, 1f, 0.25f, 0f, 1f, 0.25f);
 
         // environment-dependent library
         add(new SpeakMapping(environment), "s", "speak");
@@ -163,10 +164,11 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         //add(new DictionaryGetMapping(userDictionary), "o");
 
         // Extend-o-Brain
-        add(new GetAtomShortcutMapping(exoBrainClient, filter), "h", "shortcut");
-        add(new GetAtomValueMapping(exoBrainClient, filter), "v", "value");
-        add(new SetAtomShortcutMapping(exoBrainClient, filter), "sh", "set-shortcut");
-        add(new ShortcutSearchMapping(exoBrainClient, filter), "o", "shortcut-search");
+        add(new GetAtomShortcutMapping(exoBrainClient, defaultFilter), "h", "shortcut");
+        add(new GetAtomValueMapping(exoBrainClient, defaultFilter), "v", "value");
+        add(new SetAtomShortcutMapping(exoBrainClient, defaultFilter), "sh", "set-shortcut");
+        add(new ShortcutSearchMapping(exoBrainClient, defaultFilter), "o", "shortcut-search");
+        add(new AppendToLogMapping(brainstreamFilter), "a", "append");
 
         // TODO: x = experiment / mash mode
         // TODO: y = redo
