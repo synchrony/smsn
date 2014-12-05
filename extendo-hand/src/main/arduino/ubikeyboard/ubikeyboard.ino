@@ -18,7 +18,7 @@
 #define OUTPUT_SAMPLING_RATE  0
 
 // if true, use a minimal comma-separated format for output, rather than OSC
-// best used with OUTPUT_SENSOR_DATA=1, OUTPUT_GESTURES=0, INPUT_ENABLED=0
+// best used with OUTPUT_SENSOR_DATA=1, OUTPUT_GESTURES=0, enableInput(false)
 #define SIMPLE_OUTPUT         1
 
 #define THREEAXIS             0

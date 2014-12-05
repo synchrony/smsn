@@ -33,8 +33,8 @@ class ExtendoHand
 
     void setLoopTimeHandler(void (*handler)(double));
 
-    // if true (the default), listen for incoming OSC messages
-    // if false, do not wait for input, permitting a higher sampling and output rate
+    // if set to true (the default), listen for incoming OSC messages
+    // if set to false, do not wait for input, permitting a higher sampling and output rate
     void enableInput(boolean b);
 
     // true by default.  Set to false if using the MMA7361 3-axis accelerometer

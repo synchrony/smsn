@@ -29,6 +29,7 @@ ExtendoHand::ExtendoHand(): osc(EXO_HAND) {
     loopTimeHandler = NULL;
     nineAxis = true;
     setContext("default");
+    inputEnabled = true;
 }
 
 void ExtendoHand::setLoopTimeHandler(void (*handler)(double)) {
@@ -160,7 +161,6 @@ void ExtendoHand::setup() {
             osc.sendError("HMC5883L connection failed");
         }
     } else {
-        // TODO: random seed using 9-axis sensor
         randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
 
         // 1.5g constants, sampled 2014-06-21

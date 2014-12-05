@@ -26,7 +26,7 @@
 
 // OSC addresses
 const char *EXO_TT_ERROR         = "/exo/tt/error";
-const char *EXO_TT_INFO         = "/exo/tt/info";
+const char *EXO_TT_INFO          = "/exo/tt/info";
 const char *EXO_TT_KEYS          = "/exo/tt/keys";
 const char *EXO_TT_LASER_EVENT   = "/exo/tt/laser/event";
 const char *EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger";

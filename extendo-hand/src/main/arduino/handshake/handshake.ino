@@ -4,9 +4,6 @@
  * See: https://github.com/joshsh/extendo
  */
 
-// if true, listen for incoming OSC messages.  Otherwise, do not wait for input,
-// which permits a higher sampling and output rate
-#define INPUT_ENABLED         1
 
 #define THREEAXIS             0
 #define NINEAXIS              1
