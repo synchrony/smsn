@@ -218,7 +218,6 @@ void ExtendoHand::sendHeartbeatMessage(unsigned long now) {
 // non-member OSC handler functions
 
 void handleAudioToneMessage(class OSCMessage &m) {
-  /*
     if (!osc.validArgs(m, 2)) return;
 
     int32_t frequency = m.getInt(0);
@@ -235,7 +234,6 @@ void handleAudioToneMessage(class OSCMessage &m) {
         delay((unsigned long) duration);
         noTone(SPEAKER_PIN);
     }
-    */
 }
 
 void handleContextSetMessage(class OSCMessage &m) {
