@@ -48,15 +48,6 @@ unsigned int keyState;
 unsigned int totalKeysPressed;
 unsigned int lastKeyState = 0;
 
-const unsigned long infoCueHapticDurationMs = 100;
-const unsigned long infoCueVisualDurationMs = 200;
-const unsigned long errorCueHapticDurationMs = 100;
-const unsigned long errorCueVisualDurationMs = 200;
-const unsigned long okCueVisualDurationMs = 100;
-const unsigned long readyCueVisualDurationMs = 10000;
-const unsigned long warningCueHapticDurationMs = 100;
-const unsigned long warningCueVisualDurationMs = 200;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -84,42 +75,56 @@ const int photoresistorPin = A3;
 
 RGBLED rgbled(redPin, greenPin, bluePin, sendError);
 
+// TODO: implement virtual function from ExtendoDevice
+void setColor(unsigned long color) {
+    rgbled.replaceColor(color);
+}
+
+const unsigned long infoCueHapticDurationMs = 100;
+const unsigned long infoCueVisualDurationMs = 200;
+const unsigned long errorCueHapticDurationMs = 100;
+const unsigned long errorCueVisualDurationMs = 200;
+const unsigned long okCueVisualDurationMs = 100;
+const unsigned long readyCueVisualDurationMs = 10000;
+const unsigned long warningCueHapticDurationMs = 100;
+const unsigned long warningCueVisualDurationMs = 200;
+
 unsigned long ledCueLength = 0;
 unsigned long ledCueSince = 0;
 
 void okCue() {
-    rgbled.replaceColor(RGB_GREEN);
+    setColor(RGB_GREEN);
     ledCueLength = okCueVisualDurationMs;
     ledCueSince = millis();
 }
 
 void infoCue() {
-    rgbled.replaceColor(RGB_BLUE);
+    setColor(RGB_BLUE);
     ledCueLength = infoCueVisualDurationMs;
     ledCueSince = millis();
 }
 
 void readyCue() {
-    rgbled.replaceColor(RGB_WHITE);
+    setColor(RGB_WHITE);
     ledCueLength = readyCueVisualDurationMs;
     ledCueSince = millis();
 }
 
 void warningCue() {
-    rgbled.replaceColor(RGB_YELLOW);
+    setColor(RGB_YELLOW);
     ledCueLength = warningCueVisualDurationMs;
     ledCueSince = millis();
 }
 
 void errorCue() {
-    rgbled.replaceColor(RGB_RED);
+    setColor(RGB_RED);
     ledCueLength = errorCueVisualDurationMs;
     ledCueSince = millis();
 }
 
 void checkLedStatus(unsigned long now) {
     if (ledCueSince > 0 && now - ledCueSince > ledCueLength) {
-        rgbled.replaceColor(0);
+        setColor(RGB_BLACK);
         ledCueSince = 0;
     }
 }
@@ -261,19 +266,19 @@ void setup() {
 
     rgbled.setup();
 
-    rgbled.replaceColor(RGB_YELLOW);
+    setColor(RGB_YELLOW);
     droidspeak.speakPowerUpPhrase();
     vibrateForDuration(200);
-    rgbled.replaceColor(RGB_GREEN);
+    setColor(RGB_GREEN);
     
     osc.beginSerial();
     droidspeak.speakSerialOpenPhrase();
 
     bundleIn = new OSCBundle();
 
-    morse = new Morse(transducerPin, morseStopTest, sendError);
+    morse = new Morse(transducerPin, morseStopTest);
     
-    rgbled.replaceColor(RGB_BLACK);
+    setColor(RGB_BLACK);
 }
 
 
@@ -367,7 +372,7 @@ void handleRGBSetMessage(class OSCMessage &m) {
         errorCue();
         osc.sendError("color out of range: %d", (long) color);
     } else {
-        rgbled.replaceColor(color);
+        setColor(color);
     }
 }
 

@@ -12,7 +12,7 @@
 class Morse
 {
   public:
-    Morse(int morsePin, int (*stopTest)(), void (*sendError)(const char*));
+    Morse(int morsePin, int (*stopTest)());
 
     void morseOn();
     void morseOff();
@@ -38,7 +38,6 @@ class Morse
   private:
     int _morsePin;
     int (*_stopTest)();
-    void (*_sendError)(const char*);
 
     int getOffset(int c);
 

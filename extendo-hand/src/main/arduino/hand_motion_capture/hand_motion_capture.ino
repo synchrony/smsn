@@ -4,13 +4,13 @@
  * See: https://github.com/joshsh/extendo
  */
 
-
 #define THREEAXIS             0
 #define NINEAXIS              1
 
 #include <ExtendoHand.h>
 
 // ExtendoHand dependencies (they are included in ExtendoHand.cpp, but technically they must be included here)
+#include <ExtendoDevice.h>
 #include <Droidspeak.h>
 #include <ExtendOSC.h>
 #include <Morse.h>
@@ -25,10 +25,8 @@
 #include <ITG3200.h>
 #include <HMC5883L.h>
 
+
 ExtendoHand exoHand;
-
-
-////////////////////////////////////////////////////////////////////////////////
 
 void setup() {
     // output only
@@ -36,9 +34,6 @@ void setup() {
 
     exoHand.setup();
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
     unsigned long now = exoHand.beginLoop();

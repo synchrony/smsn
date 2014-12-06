@@ -19,6 +19,10 @@ ExtendOSC::ExtendOSC(const char *prefix)
     _addressPrefix = prefix;
 }
 
+const char *ExtendOSC::getPrefix() {
+    return _addressPrefix;
+}
+
 void ExtendOSC::beginSerial() {
     // OSCuino: begin SLIPSerial just like Serial
     // set this as high as you can reliably run on your platform

@@ -29,7 +29,6 @@ class RGBLED
     void pushColor(unsigned long color);
     void popColor();
     void replaceColor(unsigned long color);
-    void testColorSequence();
 
   private:
     uint8_t _redPin, _greenPin, _bluePin;

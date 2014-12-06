@@ -17,6 +17,7 @@ class ExtendOSC
     ExtendOSC(const char* prefix);
 
     void beginSerial();
+    const char *getPrefix();
 
     int receiveOSC(class OSCMessage &messageIn);
     int receiveOSCBundle(class OSCBundle &bundleIn);

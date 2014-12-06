@@ -11,19 +11,19 @@
 #include <ExtendoHand.h>
 
 // ExtendoHand dependencies (they are included in ExtendoHand.cpp, but technically they must be included here)
+#include <ExtendoDevice.h>
 #include <Droidspeak.h>
 #include <ExtendOSC.h>
-#include <Morse.h>
+//#include <Morse.h>
 #include <RGBLED.h>
 #include <Adafruit_NeoPixel.h>
-#include <OSCMessage.h>
 #include <OSCBundle.h>
-#include <MMA7361.h>
+//#include <MMA7361.h>
 #include <Wire.h>
 #include <I2Cdev.h>
 #include <ADXL345.h>
-#include <ITG3200.h>
-#include <HMC5883L.h>
+//#include <ITG3200.h>
+//#include <HMC5883L.h>
 
 ExtendoHand exoHand;
 
@@ -70,7 +70,7 @@ unsigned long tLast = 0;
 boolean lastAdded = false;
 
 void emitPeak(unsigned long tRef, unsigned long now) {
-    OSCMessage m(EXO_HAND_GESTURE);
+    OSCMessage m(exoHand.address(OSC_GESTURE));
 
     m.add(exoHand.getContext());
     

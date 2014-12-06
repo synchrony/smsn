@@ -30,9 +30,6 @@ void RGBLED::setup()
     pinMode(_bluePin, OUTPUT);
     
     pushColor(RGB_BLACK);
-    //testSequence();
-    //pushColor(RGB_YELLOW);
-    //delay(3000);
 }
 
 void RGBLED::writeColor()
@@ -71,33 +68,6 @@ void RGBLED::replaceColor(unsigned long color)
 {
     popColor();
     pushColor(color);
-}
-
-void RGBLED::testColorSequence()
-{
-  for (int i=0; i < 10; i++) {
-    replaceColor(RGB_WHITE);
-    delay(50);
-    replaceColor(RGB_BLACK);
-    delay(50);
-  }
-
-  replaceColor(RGB_WHITE);
-  delay(1000);
-  replaceColor(RGB_RED);
-  delay(1000);
-  replaceColor(RGB_YELLOW);
-  delay(1000);
-  replaceColor(RGB_GREEN);
-  delay(1000);
-  replaceColor(RGB_CYAN);
-  delay(1000);
-  replaceColor(RGB_BLUE);
-  delay(1000);
-  replaceColor(RGB_PURPLE);
-  delay(1000);
-  replaceColor(RGB_BLACK);
-  delay(1000);
 }
 
 void RGBLED::checkColor(unsigned long color) {

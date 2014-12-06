@@ -21,11 +21,10 @@ int Morse::offsets[95] = {
     372,376,382,388,394,400};
 */
 
-Morse::Morse(int morsePin, int (*stopTest)(), void (*sendError)(const char*))
+Morse::Morse(int morsePin, int (*stopTest)())
 {
     _morsePin = morsePin;
     _stopTest = stopTest;
-    _sendError = sendError;
 }
 
 void Morse::morseOn() {
