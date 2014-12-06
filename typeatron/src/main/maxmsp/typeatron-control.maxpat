@@ -8,7 +8,7 @@
 			"architecture" : "x86"
 		}
 ,
-		"rect" : [ 92.0, 264.0, 1123.0, 740.0 ],
+		"rect" : [ 724.0, 136.0, 1123.0, 740.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -1068,7 +1068,7 @@
 					"patching_rect" : [ 76.5, 499.0, 275.0, 20.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 79.5, 231.0, 275.0, 20.0 ],
-					"text" : "\"handle morse here: foo\""
+					"text" : "\"/exo/tt is ready\""
 				}
 
 			}
