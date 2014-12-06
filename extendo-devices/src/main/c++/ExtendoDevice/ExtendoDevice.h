@@ -12,7 +12,7 @@
 #include <OSCBundle.h>
 #include <ExtendOSC.h>
 #include <Droidspeak.h>
-#include <Morse.h>
+//#include <Morse.h>   // Morse removed for now due to space constraints w.r.t. Extend-o-Hand on Arduino Nano
 
 const unsigned long infoCueHapticDurationMs = 100;
 const unsigned long infoCueVisualDurationMs = 200;
@@ -44,7 +44,9 @@ class ExtendoDevice
     virtual void setColor(unsigned long color) = 0;
     virtual void vibrate(unsigned long durationMs) = 0;
     virtual void playTone(unsigned int frequency, unsigned long durationMs) = 0;
-    //virtual Morse *getMorse() = 0;
+    void setColorFor(unsigned long color, unsigned long durationMs);
+    //Morse *getMorse();
+    Droidspeak *getDroidspeak();
 
     void errorCue();
     void infoCue();
@@ -60,6 +62,7 @@ class ExtendoDevice
     virtual void setupOther() = 0;
     virtual bool handleOSCBundle(class OSCBundle &bundle) = 0;
     virtual void handleLoopTime() = 0;
+    //virtual Morse *createMorse() = 0;
     virtual Droidspeak *createDroidspeak() = 0;
 
     // settable identifier which is included with each gestural and sensor output
@@ -87,6 +90,7 @@ class ExtendoDevice
     void (*loopTimeHandler)(double);
 
   private:
+    //Morse *morse;
     Droidspeak *droidspeak;
 
     void handleOSCBundleInternal(class OSCBundle &bundle);

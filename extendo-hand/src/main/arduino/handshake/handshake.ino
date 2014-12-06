@@ -10,7 +10,6 @@
 
 #include <ExtendoHand.h>
 
-// ExtendoHand dependencies (they are included in ExtendoHand.cpp, but technically they must be included here)
 #include <ExtendoDevice.h>
 #include <Droidspeak.h>
 #include <ExtendOSC.h>
@@ -135,23 +134,18 @@ void filterForHandshakePeaks(unsigned long t, double s) {
 ////////////////////////////////////////////////////////////////////////////////
 // LED
 
-const unsigned long ledCueLength = 300;
+const unsigned long cueThreshold = 300;
 
-unsigned long ledCueSince = 0;
+unsigned long lastCue = 0;
 int ledCueCount = 0;
 
 void ledCueForHandshake(unsigned long now) {
-    ledCueCount++;
-    exoHand.setColor(ledCueCount > 2 ? RGB_BLUE : ledCueCount > 1 ? RGB_GREEN : RGB_YELLOW);
-    ledCueSince = now;
-}
-
-void checkLedStatus(unsigned long now) {
-    if (ledCueSince > 0 && now - ledCueSince > ledCueLength) {
-        exoHand.setColor(0);
-        ledCueSince = 0;
+    if (now - lastCue > cueThreshold) {
         ledCueCount = 0;
     }
+    ledCueCount++;
+    exoHand.setColorFor(ledCueCount > 2 ? RGB_BLUE : ledCueCount > 1 ? RGB_GREEN : RGB_YELLOW, cueThreshold);
+    lastCue = now;
 }
 
 
@@ -176,8 +170,7 @@ void setup() {
 
 void loop() {
     unsigned long now = exoHand.beginLoop();
-    checkLedStatus(now);
-    
+
     double ax, ay, az, gx, gy, gz, mx, my, mz;
 
     exoHand.getAcceleration(&ax, &ay, &az);

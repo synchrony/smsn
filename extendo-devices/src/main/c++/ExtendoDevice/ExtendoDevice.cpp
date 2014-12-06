@@ -11,7 +11,6 @@
 #define OSC_ERROR        "/error"
 #define OSC_HEARTBEAT    "/heartbeat"
 #define OSC_INFO         "/info"
-#define OSC_MORSE        "/morse"
 #define OSC_OK           "/ok"
 #define OSC_PING         "/ping"
 #define OSC_PING_REPLY   "/ping/reply"
@@ -22,12 +21,16 @@
 #define OSC_WARNING      "/warning"
 
 // allows OSC to dispatch messages to non-member functions which call member functions
-ExtendoDevice *instance;
+ExtendoDevice *thisDevice;
 
 ExtendoDevice::ExtendoDevice(const char *oscPrefix): osc(oscPrefix) {
-    instance = this;
+    thisDevice = this;
     ledCueLength = 0;
     ledCueSince = 0;
+    lastHeartbeat = 0;
+    loopTimeHandler = NULL;
+    setContext("default");
+    inputEnabled = true;
 }
 
 const char* ExtendoDevice::getContext() {
@@ -38,6 +41,16 @@ void ExtendoDevice::setContext(const char *context) {
     strcpy(contextName, context);
 }
 
+/*
+Morse *ExtendoDevice::getMorse() {
+    return morse;
+}
+*/
+
+Droidspeak *ExtendoDevice::getDroidspeak() {
+    return droidspeak;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // setup
@@ -45,10 +58,14 @@ void ExtendoDevice::setContext(const char *context) {
 void ExtendoDevice::setup() {
     setupPins();
 
-    droidspeak = createDroidspeak();
-    droidspeak->speakPowerUpPhrase();
-
     setColor(RGB_YELLOW);
+
+    //morse = createMorse();
+
+    droidspeak = createDroidspeak();
+    if (droidspeak) {
+        droidspeak->speakPowerUpPhrase();
+    }
 
     osc.beginSerial();
 
@@ -58,8 +75,9 @@ void ExtendoDevice::setup() {
 
     // delay the serial open phrase until the random number generator has been seeded
     setColor(RGB_GREEN);
-    droidspeak->speakSerialOpenPhrase();
-
+    if (droidspeak) {
+        droidspeak->speakSerialOpenPhrase();
+    }
     setColor(RGB_BLACK);
 
     vibrate(500);
@@ -128,6 +146,12 @@ unsigned long ExtendoDevice::beginLoop() {
 ////////////////////////////////////////////////////////////////////////////////
 // cues
 
+void ExtendoDevice::setColorFor(unsigned long color, unsigned long durationMs) {
+    setColor(color);
+    ledCueLength = durationMs;
+    ledCueSince = millis();
+}
+
 void ExtendoDevice::checkLedStatus(unsigned long now) {
     if (ledCueSince > 0 && now - ledCueSince > ledCueLength) {
         setColor(RGB_BLACK);
@@ -136,33 +160,23 @@ void ExtendoDevice::checkLedStatus(unsigned long now) {
 }
 
 void ExtendoDevice::errorCue() {
-    setColor(RGB_RED);
-    ledCueLength = errorCueVisualDurationMs;
-    ledCueSince = millis();
+    setColorFor(RGB_RED, errorCueVisualDurationMs);
 }
 
 void ExtendoDevice::infoCue() {
-    setColor(RGB_BLUE);
-    ledCueLength = infoCueVisualDurationMs;
-    ledCueSince = millis();
+    setColorFor(RGB_BLUE, infoCueVisualDurationMs);
 }
 
 void ExtendoDevice::okCue() {
-    setColor(RGB_GREEN);
-    ledCueLength = okCueVisualDurationMs;
-    ledCueSince = millis();
+    setColorFor(RGB_GREEN, okCueVisualDurationMs);
 }
 
 void ExtendoDevice::readyCue() {
-    setColor(RGB_WHITE);
-    ledCueLength = readyCueVisualDurationMs;
-    ledCueSince = millis();
+    setColorFor(RGB_WHITE, readyCueVisualDurationMs);
 }
 
 void ExtendoDevice::warningCue() {
-    setColor(RGB_YELLOW);
-    ledCueLength = warningCueVisualDurationMs;
-    ledCueSince = millis();
+    setColorFor(RGB_YELLOW, warningCueVisualDurationMs);
 }
 
 
@@ -204,95 +218,106 @@ void ExtendoDevice::sendHeartbeatMessage(unsigned long now) {
 // non-member OSC handler functions
 
 void handleContextSetMessage(class OSCMessage &m) {
-    if (!instance->getOSC()->validArgs(m, 1)) return;
+    if (!thisDevice->getOSC()->validArgs(m, 1)) return;
 
     char buffer[32];
     m.getString(0, buffer, m.getDataLength(0) + 1);
-    instance->setContext(buffer);
+    thisDevice->setContext(buffer);
 }
 
 void handleErrorMessage(class OSCMessage &m) {
-    instance->errorCue();
-    instance->vibrate(errorCueHapticDurationMs);
+    thisDevice->errorCue();
+    thisDevice->vibrate(errorCueHapticDurationMs);
 }
 
 void handleInfoMessage(class OSCMessage &m) {
-    instance->infoCue();
-    instance->vibrate(infoCueHapticDurationMs);
+    thisDevice->infoCue();
+    thisDevice->vibrate(infoCueHapticDurationMs);
 }
 
 /*
-void ExtendoDevice::handleMorseMessage(class OSCMessage &m) {
-    if (!osc.validArgs(m, 1)) return;
+const int morseBufferLength = 32;
+char morseBuffer[morseBufferLength];
+
+void handleMorseMessage(class OSCMessage &m) {
+    if (!thisDevice->getOSC()->validArgs(m, 1)) return;
+
+    if (!thisDevice->getMorse()) {
+        thisDevice->getOSC()->sendError("Morse not supported");
+        thisDevice->errorCue();
+    }
 
     int length = m.getDataLength(0);
-    char buffer[length+1];
-    m.getString(0, buffer, length+1);
-
-    morse.playMorseString(buffer);
+    if (length >= morseBufferLength) {
+        thisDevice->getOSC()->sendError("Morse message is too long");
+        thisDevice->errorCue();
+    } else {
+        m.getString(0, morseBuffer, length+1);
+        thisDevice->getMorse()->playMorseString((const char*) morseBuffer);
+    }
 }
 */
 
 void handleOkMessage(class OSCMessage &m) {
-    instance->okCue();
+    thisDevice->okCue();
 }
 
 void handlePingMessage(class OSCMessage &m) {
-    instance->sendPingReply();
+    thisDevice->sendPingReply();
 }
 
 void handleReadyMessage(class OSCMessage &m) {
-    instance->readyCue();
+    thisDevice->readyCue();
 }
 
 void handleRGBSetMessage(class OSCMessage &m) {
-    if (!instance->getOSC()->validArgs(m, 1)) return;
+    if (!thisDevice->getOSC()->validArgs(m, 1)) return;
 
     int32_t color = m.getInt(0);
 
     if (color < 0 || color > 0xffffff) {
-        instance->getOSC()->sendError("color out of range: %d", (long) color);
+        thisDevice->getOSC()->sendError("color out of range: %d", (long) color);
     } else {
-        instance->setColor(color);
+        thisDevice->setColor(color);
     }
 }
 
 void handleToneMessage(class OSCMessage &m) {
-    if (!instance->getOSC()->validArgs(m, 2)) return;
+    if (!thisDevice->getOSC()->validArgs(m, 2)) return;
 
     int32_t frequency = m.getInt(0);
     int32_t duration = m.getInt(1);
 
     if (frequency <= 0 || frequency > 20000) {
-        instance->getOSC()->sendError("frequency out of range: %d", (int) frequency);
+        thisDevice->getOSC()->sendError("frequency out of range: %d", (int) frequency);
     } else if (duration <= 0) {
-        instance->getOSC()->sendError("duration must be a positive number");
+        thisDevice->getOSC()->sendError("duration must be a positive number");
     } else if (duration > 60000) {
-        instance->getOSC()->sendError("duration too long");
+        thisDevice->getOSC()->sendError("duration too long");
     } else {
-        instance->playTone((unsigned int) frequency, (unsigned long) duration);
+        thisDevice->playTone((unsigned int) frequency, (unsigned long) duration);
     }
 }
 
 void handleVibroMessage(class OSCMessage &m) {
-    if (!instance->getOSC()->validArgs(m, 1)) return;
+    if (!thisDevice->getOSC()->validArgs(m, 1)) return;
 
     int32_t d = m.getInt(0);
 
-    instance->vibrate((unsigned long) d);
+    thisDevice->vibrate((unsigned long) d);
 
     if (d <= 0) {
-        instance->getOSC()->sendError("duration must be a positive number");
+        thisDevice->getOSC()->sendError("duration must be a positive number");
     } else if (d > 60000) {
-        instance->getOSC()->sendError("duration too long");
+        thisDevice->getOSC()->sendError("duration too long");
     } else {
-        instance->vibrate((unsigned long) d);
+        thisDevice->vibrate((unsigned long) d);
     }
 }
 
 void handleWarningMessage(class OSCMessage &m) {
-    instance->warningCue();
-    instance->vibrate(warningCueHapticDurationMs);
+    thisDevice->warningCue();
+    thisDevice->vibrate(warningCueHapticDurationMs);
 }
 
 

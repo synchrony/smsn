@@ -32,8 +32,8 @@ class ExtendoHand : public ExtendoDevice
     void getHeading(double *x, double *y, double *z);
 
   protected:
+    //Morse *createMorse();
     Droidspeak *createDroidspeak();
-
     void setupPins();
     void setupOther();
     bool handleOSCBundle(class OSCBundle &bundle);

@@ -21,11 +21,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 ExtendoHand::ExtendoHand(): ExtendoDevice(OSC_EXO_HAND) {
-    lastHeartbeat = 0;
-    loopTimeHandler = NULL;
     nineAxis = true;
-    setContext("default");
-    inputEnabled = true;
 }
 
 void ExtendoHand::useNineAxisSensors(boolean b) {
@@ -63,25 +59,22 @@ ADXL345 accel;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// output signals
 
-Droidspeak *ExtendoHand::createDroidspeak() {
-    return new Droidspeak(SPEAKER_PIN);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-// excluded to save program space
-#ifdef ENABLE_MORSE
-#include <Morse.h>
-
+/*
 int morseStopTest() {
     // no need to abort
     return 0;
 }
 
-Morse morse(SPEAKER_PIN, morseStopTest);
-#endif
+Morse *ExtendoHand::createMorse() {
+    return new Morse(SPEAKER_PIN, morseStopTest);
+}
+*/
+
+Droidspeak *ExtendoHand::createDroidspeak() {
+    return new Droidspeak(SPEAKER_PIN);
+}
 
 #include <Adafruit_NeoPixel.h>
 

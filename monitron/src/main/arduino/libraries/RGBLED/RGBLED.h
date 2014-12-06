@@ -1,5 +1,5 @@
 /*
-  RGBLED.h - tri-color LED control
+  RGBLED.h - simple tri-color LED control
   Created by Joshua Shinavier, 2012-2014
   Released into the public domain.
 */
@@ -23,17 +23,13 @@ const unsigned long
 class RGBLED
 {
   public:
-    RGBLED(uint8_t redPin, uint8_t greenPin, uint8_t bluePin, void (*sendError)(const char*));
+    RGBLED(uint8_t redPin, uint8_t greenPin, uint8_t bluePin);
     void setup();
-    void writeColor();
-    void pushColor(unsigned long color);
-    void popColor();
-    void replaceColor(unsigned long color);
+    // returns true if the operation succeeded, false otherwise (i.e. if the given color is invalid)
+    boolean setColor(unsigned long color);
 
   private:
     uint8_t _redPin, _greenPin, _bluePin;
-    void (*_sendError)(const char*);
-    void checkColor(unsigned long color);
 };
 
 #endif // RGBLED_h
