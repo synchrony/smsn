@@ -37,7 +37,8 @@ class ExtendoHand : public ExtendoDevice
     void setupPins();
     void setupOther();
     bool handleOSCBundle(class OSCBundle &bundle);
-    void handleLoopTime();
+    void onBeginLoop(unsigned long now);
+    void onLoopTimeUpdated(double loopTime);
 
     boolean nineAxis;
 };

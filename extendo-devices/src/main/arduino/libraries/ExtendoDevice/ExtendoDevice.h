@@ -61,7 +61,9 @@ class ExtendoDevice
     virtual void setupPins() = 0;
     virtual void setupOther() = 0;
     virtual bool handleOSCBundle(class OSCBundle &bundle) = 0;
-    virtual void handleLoopTime() = 0;
+    virtual void onBeginLoop(unsigned long now) = 0;
+    virtual void onLoopTimeUpdated(double loopTime) = 0;
+
     //virtual Morse *createMorse() = 0;
     virtual Droidspeak *createDroidspeak() = 0;
 

@@ -46,6 +46,13 @@ const int bluePin = 11;
 
 const int photoresistorPin = A3;
 
+
+// note: only fairly low frequencies of flicker are discernible; the laser has more inertia than an LED
+const unsigned long laserFlickerDurationMs = 525;
+const unsigned long laserFlickerDarkMs = 30;
+const unsigned long laserFlickerLightMs = 45;
+
+
 Typeatron *thisTypeatron;
 
 Typeatron::Typeatron(): ExtendoDevice(OSC_EXO_TT),
@@ -103,7 +110,16 @@ void Typeatron::playTone(unsigned int frequency, unsigned long durationMs) {
     tone(transducerPin, frequency, durationMs);
 }
 
+void Typeatron::resetLaser() {
+    laserModeHigh = false;
+    laserFlickerHigh = true;
+    laserFlickerStart = 0;
+}
+
 void Typeatron::laserOn() {
+    resetLaser();
+    laserModeHigh = true;
+
     digitalWrite(laserPin, HIGH);
 
     // also turn on the on-board LED, as a cue to the developer in USB mode (when the laser is powered off)
@@ -111,10 +127,21 @@ void Typeatron::laserOn() {
 }
 
 void Typeatron::laserOff() {
+    resetLaser();
+
     digitalWrite(laserPin, LOW);
 
     digitalWrite(ledPin, LOW);
 }
+
+void Typeatron::laserFeedback() {
+    if (!laserModeHigh) {
+        return;
+    }
+
+    laserFlickerStart = millis();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // setup
@@ -143,13 +170,43 @@ void Typeatron::setupPins() {
 
 void Typeatron::setupOther() {
     morse = createMorse();
+    resetLaser();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // looping
 
-void Typeatron::handleLoopTime() {
+void Typeatron::onBeginLoop(unsigned long now) {
+    if (!laserModeHigh) {
+        return;
+    }
+
+    if (laserFlickerStart > 0) {
+        unsigned long elapsed = now - laserFlickerStart;
+        if (elapsed >= laserFlickerDurationMs) {
+            laserFlickerStart = 0;
+        } else {
+            unsigned long ms = (elapsed) % (laserFlickerDarkMs + laserFlickerLightMs);
+            bool light = ms > laserFlickerDarkMs;
+            if (light) {
+                if (!laserFlickerHigh) {
+                    digitalWrite(laserPin, HIGH);
+                    digitalWrite(ledPin, HIGH);
+                    laserFlickerHigh = true;
+                }
+            } else {
+                if (laserFlickerHigh) {
+                    digitalWrite(laserPin, LOW);
+                    digitalWrite(ledPin, LOW);
+                    laserFlickerHigh = false;
+                }
+            }
+        }
+    }
+}
+
+void Typeatron::onLoopTimeUpdated(double loopTime) {
     // do nothing
 }
 
@@ -188,6 +245,18 @@ void Typeatron::updateKeys() {
 ////////////////////////////////////////////////////////////////////////////////
 // OSC in
 
+void handleLaserFeedbackMessage(class OSCMessage &m) {
+    thisTypeatron->laserFeedback();
+}
+
+void handleLaserOffMessage(class OSCMessage &m) {
+    thisTypeatron->laserOff();
+}
+
+void handleLaserOnMessage(class OSCMessage &m) {
+    thisTypeatron->laserOn();
+}
+
 void handleLaserTriggerMessage(class OSCMessage &m) {
     thisTypeatron->setMode(LaserTrigger);
 }
@@ -220,6 +289,9 @@ void handlePhotoGetMessage(class OSCMessage &m) {
 
 bool Typeatron::handleOSCBundle(class OSCBundle &bundle) {
     return 0
+        || bundle.dispatch(address(OSC_LASER_FEEDBACK), handleLaserFeedbackMessage)
+        || bundle.dispatch(address(OSC_LASER_OFF), handleLaserOffMessage)
+        || bundle.dispatch(address(OSC_LASER_ON), handleLaserOnMessage)
         || bundle.dispatch(address(OSC_LASER_TRIGGER), handleLaserTriggerMessage)
         || bundle.dispatch(address(OSC_MORSE), handleMorseMessage)
         || bundle.dispatch(address(OSC_PHOTO_GET), handlePhotoGetMessage);

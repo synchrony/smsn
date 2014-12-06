@@ -205,7 +205,11 @@ void ExtendoHand::getHeading(double *x, double *y, double *z) {
     }
 }
 
-void ExtendoHand::handleLoopTime() {
+void ExtendoHand::onBeginLoop(unsigned long now) {
+    // do nothing
+}
+
+void ExtendoHand::onLoopTimeUpdated(double loopTime) {
     if (nineAxis) {
         // the sensor's sampling rate should exceed Extend-o-Hand's loop rate
         uint8_t sampleRate = loopTime <= 0.00125

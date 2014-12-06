@@ -116,6 +116,7 @@ unsigned long ExtendoDevice::beginLoop() {
     unsigned long now = millis();
 
     checkLedStatus(now);
+    onBeginLoop(now);
 
 // TODO: never applies
 #ifdef HEARTBEAT_MS
@@ -129,7 +130,7 @@ unsigned long ExtendoDevice::beginLoop() {
     if (++loopCount >= loopThreshold) {
         loopTime = (now - loopStartTime)/1000.0/loopThreshold;
 
-        handleLoopTime();
+        onLoopTimeUpdated(loopTime);
 
         if (loopTimeHandler) {
             loopTimeHandler(loopTime);
