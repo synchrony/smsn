@@ -91,8 +91,15 @@ void ExtendoHand::vibrate(unsigned long durationMs) {
     digitalWrite(VIBRO_PIN, LOW);
 }
 
+// note: this is a synchronous/blocking tone for now, to match the Typeatron's behavior
 void ExtendoHand::playTone(unsigned int frequency, unsigned long durationMs) {
-    tone(SPEAKER_PIN, frequency, durationMs);
+    if (frequency) {
+        tone(SPEAKER_PIN, frequency);
+        delay(durationMs);
+        noTone(SPEAKER_PIN);
+    } else {
+        delay(durationMs);
+    }
 }
 
 

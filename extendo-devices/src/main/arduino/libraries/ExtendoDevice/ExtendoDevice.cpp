@@ -341,7 +341,17 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
         || bundle.dispatch(address(OSC_VIBRO), handleVibroMessage)
         || bundle.dispatch(address(OSC_WARNING), handleWarningMessage)
         )) {
-        osc.sendError("no messages dispatched");
+        if (!bundle.size()) {
+            osc.sendError("empty OSC bundle");
+        } else {
+            for (int i = 0; i < bundle.size(); i++) {
+                OSCMessage *m = bundle.getOSCMessage(i);
+                char address[256];
+                m->getAddress(address);
+                osc.sendError("no handler at address %s", address);
+            }
+        }
+        errorCue();
     }
 }
 

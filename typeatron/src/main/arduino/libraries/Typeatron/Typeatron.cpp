@@ -106,8 +106,15 @@ void Typeatron::vibrate(unsigned long durationMs) {
     digitalWrite(vibrationMotorPin, LOW);
 }
 
+// note: this is a synchronous/blocking tone, as the transducer interferes with button input, also noted above
 void Typeatron::playTone(unsigned int frequency, unsigned long durationMs) {
-    tone(transducerPin, frequency, durationMs);
+    if (frequency) {
+        tone(transducerPin, frequency);
+        delay(durationMs);
+        noTone(transducerPin);
+    } else {
+        delay(durationMs);
+    }
 }
 
 void Typeatron::resetLaser() {
@@ -122,7 +129,7 @@ void Typeatron::laserOn() {
 
     digitalWrite(laserPin, HIGH);
 
-    // also turn on the on-board LED, as a cue to the developer in USB mode (when the laser is powered off)
+    // also turn on the on-board LED, as a cue to the developer in USB mode (when the laser is disconnected)
     digitalWrite(ledPin, HIGH);
 }
 
