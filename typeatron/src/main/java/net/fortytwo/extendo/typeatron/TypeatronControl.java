@@ -39,7 +39,10 @@ public class TypeatronControl extends OscControl {
 
     // outbound addresses
     private static final String
-            EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
+            EXO_TT_LASER_FEEDBACK = "/exo/tt/laser/feedback",
+            EXO_TT_LASER_OFF = "/exo/tt/laser/off",
+            EXO_TT_LASER_ON = "/exo/tt/laser/on",
+            //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
             EXO_TT_MORSE = "/exo/tt/morse",
             EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
@@ -99,7 +102,8 @@ public class TypeatronControl extends OscControl {
 
         try {
             ChordedKeyer.EventHandler handler = new ChordedKeyer.EventHandler() {
-                public void handle(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
+                @Override
+                public void handleSymbol(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
                     if (null != symbol) {
                         switch (mode) {
                             case Arrows:
@@ -123,6 +127,16 @@ public class TypeatronControl extends OscControl {
                     } else {
                         logger.warning("transition without output symbol nor change of mode");
                     }
+                }
+
+                @Override
+                public void handleLaserOn() {
+                    sendLaserOn();
+                }
+
+                @Override
+                public void handleLaserOff() {
+                    sendLaserOff();
                 }
             };
 
@@ -364,11 +378,27 @@ public class TypeatronControl extends OscControl {
         send(message);
     }
 
+    public void sendLaserFeedback() {
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_FEEDBACK);
+        send(m);
+    }
+
+    public void sendLaserOff() {
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_OFF);
+        send(m);
+    }
+
+    public void sendLaserOn() {
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_ON);
+        send(m);
+    }
+
+    /*
     public void sendLaserTriggerCommand() {
         OSCMessage m = new OSCMessage(EXO_TT_LASER_TRIGGER);
         send(m);
         System.out.println("sent laser trigger command");
-    }
+    }*/
 
     public void sendMorse(final String text) {
         OSCMessage m = new OSCMessage(EXO_TT_MORSE);
@@ -385,7 +415,8 @@ public class TypeatronControl extends OscControl {
         // the next point event from the hardware will reference this thing
         this.thingPointedTo = thingPointedTo;
 
-        sendLaserTriggerCommand();
+        //sendLaserTriggerCommand();
+        keyer.setMode(ChordedKeyer.Mode.Laser);
     }
 
     private void handlePointEvent(final long recognitionTime) {

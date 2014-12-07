@@ -21,11 +21,22 @@ public class ChordedKeyerTest {
     @Before
     public void setUp() throws Exception {
         keyer = new ChordedKeyer(new ChordedKeyer.EventHandler() {
-            public void handle(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
+            @Override
+            public void handleSymbol(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
                 //System.out.println("event:\t" + mode + "\t" + symbol + "\t" + modifier);
                 lastMode = mode;
                 lastSymbol = symbol;
                 lastModifier = modifier;
+            }
+
+            @Override
+            public void handleLaserOn() {
+                // ignored
+            }
+
+            @Override
+            public void handleLaserOff() {
+                // ignored
             }
         });
 

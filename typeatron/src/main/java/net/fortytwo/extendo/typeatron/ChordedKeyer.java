@@ -17,7 +17,7 @@ public class ChordedKeyer {
     private byte[] lastInput;
 
     public enum Mode {
-        TextEdit, CommandLine, Arrows, Mash;
+        TextEdit, CommandLine, Arrows, Laser, Mash
     }
 
     public enum Modifier {Control, None}
@@ -40,6 +40,11 @@ public class ChordedKeyer {
          */
         public Modifier modifier;
 
+        /**
+         * A trigger which is executed when this state is reached
+         */
+        public Trigger trigger;
+
         public StateNode[] nextNodes = new StateNode[5];
     }
 
@@ -56,6 +61,11 @@ public class ChordedKeyer {
     public ChordedKeyer(final EventHandler eventHandler) throws IOException {
         this.eventHandler = eventHandler;
         initializeChords();
+    }
+
+    public void setMode(final Mode mode) {
+        currentButtonState = null;
+        currentMode = mode;
     }
 
     /**
@@ -88,9 +98,10 @@ public class ChordedKeyer {
                           final String sequence,
                           final Mode outputMode,
                           final Modifier outputModifier,
-                          final String outputSymbol) {
+                          final String outputSymbol,
+                          final Trigger trigger) {
         for (Mode m : inputModes) {
-            addChord(m, sequence, outputMode, outputModifier, outputSymbol);
+            addChord(m, sequence, outputMode, outputModifier, outputSymbol, trigger);
         }
     }
 
@@ -98,7 +109,8 @@ public class ChordedKeyer {
                           final String sequence,
                           final Mode outputMode,
                           final Modifier outputModifier,
-                          final String outputSymbol) {
+                          final String outputSymbol,
+                          final Trigger trigger) {
         StateNode cur = rootStates.get(inputMode);
         int l = sequence.length();
         for (int j = 0; j < l; j++) {
@@ -137,6 +149,10 @@ public class ChordedKeyer {
             cur.modifier = outputModifier;
         }
 
+        if (null != trigger) {
+            cur.trigger = trigger;
+        }
+
         if (null != cur.mode && null != cur.symbol) {
             throw new IllegalStateException(
                     "sequence has been assigned both an output symbol and an output mode: " + sequence);
@@ -157,22 +173,22 @@ public class ChordedKeyer {
         currentButtonState = rootStates.get(currentMode);
 
         // control-space codes for the Typeatron dictionary operator
-        addChord(Mode.CommandLine, "11", null, Modifier.Control, "");
+        addChord(Mode.CommandLine, "11", null, Modifier.Control, "", null);
         // toggle text entry modes
-        addChord(Mode.CommandLine, "55", Mode.TextEdit, null, null);
+        addChord(Mode.CommandLine, "55", Mode.TextEdit, null, null, null);
 
-        addChord(Mode.TextEdit, "1441", Mode.CommandLine, null, null);
-        addChord(Mode.TextEdit, "55", null, null, SpecialChar.ESC.name());
+        addChord(Mode.TextEdit, "1441", Mode.CommandLine, null, null, null);
+        addChord(Mode.TextEdit, "55", null, null, SpecialChar.ESC.name(), null);
         // toggle text entry modes
-        addChord(Mode.TextEdit, "11", Mode.CommandLine, null, null);
+        addChord(Mode.TextEdit, "11", Mode.CommandLine, null, null, null);
 
         // this completely describes Arrow mode
-        addChord(Mode.TextEdit, "1221", Mode.Arrows, null, null);
-        addChord(Mode.Arrows, "22", null, null, SpecialChar.right.name());
-        addChord(Mode.Arrows, "33", null, null, SpecialChar.left.name());
-        addChord(Mode.Arrows, "44", null, null, SpecialChar.up.name());
-        addChord(Mode.Arrows, "55", null, null, SpecialChar.down.name());
-        addChord(Mode.Arrows, "11", Mode.TextEdit, null, null);
+        addChord(Mode.TextEdit, "1221", Mode.Arrows, null, null, null);
+        addChord(Mode.Arrows, "22", null, null, SpecialChar.right.name(), null);
+        addChord(Mode.Arrows, "33", null, null, SpecialChar.left.name(), null);
+        addChord(Mode.Arrows, "44", null, null, SpecialChar.up.name(), null);
+        addChord(Mode.Arrows, "55", null, null, SpecialChar.down.name(), null);
+        addChord(Mode.Arrows, "11", Mode.TextEdit, null, null, null);
 
         // TODO: restore these... maybe
         /*
@@ -203,25 +219,42 @@ public class ChordedKeyer {
             addChord(Mode.Laser, "" + i + i, Mode.Text, Modifier.None, null);
         }*/
 
+        Trigger laserOn = new Trigger() {
+            @Override
+            public void execute() {
+                eventHandler.handleLaserOn();
+            }
+        };
+        Trigger laserOff = new Trigger() {
+            @Override
+            public void execute() {
+                eventHandler.handleLaserOff();
+            }
+        };
+        for (int i = 1; i <= 5; i++) {
+            addChord(Mode.Laser, "" + i, null, null, null, laserOn);
+            addChord(Mode.Laser, "" + i + i, Mode.CommandLine, Modifier.None, null, laserOff);
+        }
+
         // return to default mode from anywhere other than mash mode
         for (Mode m : Mode.values()) {
             if (m != Mode.Mash) {
-                addChord(m, "123321", Mode.TextEdit, Modifier.None, null);
+                addChord(m, "123321", Mode.TextEdit, Modifier.None, null, null);
             }
         }
 
         Mode[] textEntryModes = new Mode[]{Mode.TextEdit, Mode.CommandLine};
 
         // return from mash mode
-        addChord(Mode.Mash, "1234554321", Mode.TextEdit, Modifier.None, null);
+        addChord(Mode.Mash, "1234554321", Mode.TextEdit, Modifier.None, null, null);
 
         // newline, space, delete available in all of the text-entry modes
         for (Mode m : textEntryModes) {
             // the "trigger finger" chord has a "do"/"execute" function in various contexts
-            addChord(m, "22", null, null, "\n");
+            addChord(m, "22", null, null, "\n", null);
 
-            addChord(m, "33", null, null, " ");
-            addChord(m, "44", null, null, SpecialChar.DEL.name());
+            addChord(m, "33", null, null, " ", null);
+            addChord(m, "44", null, null, SpecialChar.DEL.name(), null);
         }
 
         punctuationMap = new HashMap<String, String>();
@@ -236,16 +269,16 @@ public class ChordedKeyer {
                     String chord = a[0];
 
                     String letter = a[1].trim();
-                    addChord(textEntryModes, chord, null, null, letter);
+                    addChord(textEntryModes, chord, null, null, letter, null);
                     if (chord.length() == 2*2) {
-                        addChord(textEntryModes, findControlChord(chord), null, Modifier.Control, letter);
+                        addChord(textEntryModes, findControlChord(chord), null, Modifier.Control, letter, null);
                     }
 
                     if (a.length >= 3) {
                         String capital = a[2].trim();
                         if (capital.length() > 0) {
-                            addChord(textEntryModes, findShiftChord(chord), null, null, capital);
-                            addChord(textEntryModes, findControlShiftChord(chord), null, Modifier.Control, capital);
+                            addChord(textEntryModes, findShiftChord(chord), null, null, capital, null);
+                            addChord(textEntryModes, findControlShiftChord(chord), null, Modifier.Control, capital, null);
                         }
                     }
 
@@ -253,18 +286,18 @@ public class ChordedKeyer {
                         String punc = a[3].trim().replaceAll("comma", ",");
                         if (punc.length() > 0 && chord.length() < 3 * 2) {
                             punctuationMap.put(letter, punc);
-                            addChord(textEntryModes, findPunctuationChord(chord), null, null, punc);
+                            addChord(textEntryModes, findPunctuationChord(chord), null, null, punc, null);
 
                             // note: we don't bother with control-punctuation chords for now,
                             // but they are possible
-                            addChord(textEntryModes, findControlChord(findPunctuationChord(chord)), null, Modifier.Control, punc);
+                            addChord(textEntryModes, findControlChord(findPunctuationChord(chord)), null, Modifier.Control, punc, null);
                         }
                     }
 
                     if (a.length >= 5) {
                         String symbol = a[4].trim();
                         if (symbol.length() > 0) {
-                            addChord(textEntryModes, findExtendedCharacterChord(chord), null, null, symbol);
+                            addChord(textEntryModes, findExtendedCharacterChord(chord), null, null, symbol, null);
                         }
                     }
                 }
@@ -346,6 +379,10 @@ public class ChordedKeyer {
     private void buttonEvent(int buttonIndex) {
         if (null != currentButtonState) {
             currentButtonState = currentButtonState.nextNodes[buttonIndex];
+
+            if (null != currentButtonState.trigger) {
+                currentButtonState.trigger.execute();
+            }
         }
     }
 
@@ -360,7 +397,8 @@ public class ChordedKeyer {
 
         buttonEvent(buttonIndex);
 
-        // at present, events are triggered when the last key of a sequence is released
+        // At present, symbols are produced only when the last key of a sequence is released.
+        // However, triggers may be executed on any key press or key release.
         if (0 == totalButtonsCurrentlyPressed) {
             if (null != currentButtonState) {
                 String symbol = currentButtonState.symbol;
@@ -370,14 +408,14 @@ public class ChordedKeyer {
                         modifier = Modifier.None;
                     }
 
-                    eventHandler.handle(currentMode, symbol, modifier);
+                    eventHandler.handleSymbol(currentMode, symbol, modifier);
                 } else {
                     Mode mode = currentButtonState.mode;
                     // this sets the mode for *subsequent* key events
                     if (null != mode) {
                         currentMode = mode;
 
-                        eventHandler.handle(mode, null, currentButtonState.modifier);
+                        eventHandler.handleSymbol(mode, null, currentButtonState.modifier);
                     }
                 }
             }
@@ -390,6 +428,13 @@ public class ChordedKeyer {
      * A handler for each new combination of keyboard mode, output symbol, and symbol modifier
      */
     public interface EventHandler {
-        void handle(Mode mode, String symbol, Modifier modifier);
+        void handleSymbol(Mode mode, String symbol, Modifier modifier);
+
+        void handleLaserOn();
+        void handleLaserOff();
+    }
+
+    public interface Trigger {
+        void execute();
     }
 }
