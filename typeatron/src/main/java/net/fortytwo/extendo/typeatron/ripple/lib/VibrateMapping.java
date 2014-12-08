@@ -33,7 +33,7 @@ public class VibrateMapping extends PrimitiveStackMapping {
 
     public void apply(RippleList arg, Sink<RippleList> solutions, ModelConnection context) throws RippleException {
         try {
-            typeatron.sendVibrateCommand(TypeatronControl.VIBRATE_MANUAL_MS);
+            typeatron.sendVibroMessage(TypeatronControl.VIBRATE_MANUAL_MS);
         } catch (Throwable t) {
             throw new RippleException(t);
         }

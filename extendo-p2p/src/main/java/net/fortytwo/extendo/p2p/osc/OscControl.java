@@ -18,6 +18,9 @@ public abstract class OscControl {
     private final OscReceiver receiver;
     private OscSender sender;
 
+    private long throttlingPeriod;
+    private long timeOfLastPacket;
+
     // TODO: temporary
     protected long timeOfLastEvent;
 
@@ -34,6 +37,10 @@ public abstract class OscControl {
      */
     public OscReceiver getReceiver() {
         return receiver;
+    }
+
+    public void setThrottlingPeriod(final long throttlingPeriod) {
+        this.throttlingPeriod = throttlingPeriod;
     }
 
     /**
@@ -61,13 +68,38 @@ public abstract class OscControl {
     protected void onConnect() {
     }
 
-    public void send(final OSCMessage message) {
+    /**
+     * Passes an OSC message to the attached sender.
+     * Note: this method is synchronized for the sake of senders of uncertain thread safety
+     *
+     * @param message the OSC message to send
+     */
+    public synchronized void send(final OSCMessage message) {
+        // TODO: temporary
+        System.out.println("sending OSC message to " + message.getAddress() + " with " + message.getArguments().size() + " args");
+
         if (null == sender) {
             logger.warning("can't send message with address " + message.getAddress() + "; no sender has been defined");
         } else {
+            throttle();
+
             OSCBundle bundle = new OSCBundle();
             bundle.addPacket(message);
             sender.send(bundle);
+        }
+    }
+
+    private void throttle() {
+        if (throttlingPeriod > 0) {
+            long now = System.currentTimeMillis();
+            if (now - timeOfLastPacket < throttlingPeriod) {
+                try {
+                    Thread.sleep(throttlingPeriod - (now - timeOfLastPacket));
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            timeOfLastPacket = now;
         }
     }
 
@@ -76,5 +108,4 @@ public abstract class OscControl {
             super(cause);
         }
     }
-
 }

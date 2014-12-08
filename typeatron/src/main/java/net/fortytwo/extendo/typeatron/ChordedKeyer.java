@@ -380,7 +380,7 @@ public class ChordedKeyer {
         if (null != currentButtonState) {
             currentButtonState = currentButtonState.nextNodes[buttonIndex];
 
-            if (null != currentButtonState.trigger) {
+            if (null != currentButtonState && null != currentButtonState.trigger) {
                 currentButtonState.trigger.execute();
             }
         }
