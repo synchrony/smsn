@@ -20,6 +20,8 @@
 #define OSC_VIBRO        "/vibro"
 #define OSC_WARNING      "/warning"
 
+const unsigned long connectionRetryIntervalMs = 2000;
+
 // allows OSC to dispatch messages to non-member functions which call member functions
 ExtendoDevice *thisDevice;
 
@@ -116,6 +118,7 @@ unsigned long ExtendoDevice::beginLoop() {
     unsigned long now = millis();
 
     checkLedStatus(now);
+    checkConnection(now);
     onBeginLoop(now);
 
 // TODO: never applies
@@ -267,6 +270,10 @@ void handlePingMessage(class OSCMessage &m) {
     thisDevice->sendPingReply();
 }
 
+void handlePingReplyMessage(class OSCMessage &m) {
+    thisDevice->confirmConnection();
+}
+
 void handleReadyMessage(class OSCMessage &m) {
     thisDevice->readyCue();
 }
@@ -326,6 +333,8 @@ void handleWarningMessage(class OSCMessage &m) {
 
 void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
     if (bundle.hasError()) {
+        errorCue();
+        playTone(400,100);
         osc.sendOSCBundleError(bundle);
     } else if (!(handleOSCBundle(bundle)
         // TODO: copying addresses into buffers on the fly (via address()), one by one, is inefficient
@@ -335,13 +344,57 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
         //|| bundle.dispatch(address(OSC_MORSE), handleMorseMessage)
         || bundle.dispatch(address(OSC_OK), handleOkMessage)
         || bundle.dispatch(address(OSC_PING), handlePingMessage)
+        || bundle.dispatch(address(OSC_PING_REPLY), handlePingReplyMessage)
         || bundle.dispatch(address(OSC_RGB_SET), handleRGBSetMessage)
         || bundle.dispatch(address(OSC_READY), handleReadyMessage)
         || bundle.dispatch(address(OSC_TONE), handleToneMessage)
         || bundle.dispatch(address(OSC_VIBRO), handleVibroMessage)
         || bundle.dispatch(address(OSC_WARNING), handleWarningMessage)
         )) {
-        osc.sendError("no messages dispatched");
+        if (!bundle.size()) {
+            osc.sendError("empty OSC bundle");
+        } else {
+            for (int i = 0; i < bundle.size(); i++) {
+                OSCMessage *m = bundle.getOSCMessage(i);
+                char address[256];
+                m->getAddress(address);
+                osc.sendError("no handler at address %s", address);
+            }
+        }
+        errorCue();
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// connection state
+
+void ExtendoDevice::pingUntilConnected() {
+    connected = false;
+    connecting = true;
+    lastConnectionAttempt = 0;
+}
+
+void ExtendoDevice::confirmConnection() {
+    connected = true;
+}
+
+void ExtendoDevice::checkConnection(unsigned long now) {
+    if (!connecting) {
+        return;
+    }
+
+    if (connected) {
+        connecting = false;
+        okCue();
+        if (droidspeak) {
+            droidspeak->speakOK();
+        }
+    } else if (now - lastConnectionAttempt > connectionRetryIntervalMs) {
+        lastConnectionAttempt = now;
+        warningCue();
+        OSCMessage m(address(OSC_PING));
+        osc.sendOSC(m);
     }
 }
 

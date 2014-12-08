@@ -54,6 +54,10 @@ class ExtendoDevice
     void readyCue();
     void warningCue();
 
+    // ping the host device periodically until a reply is received, then emit an "ok" cue and cease pinging
+    void pingUntilConnected();
+    void confirmConnection();
+
     const char* getContext();
     void setContext(const char *context);
 
@@ -96,6 +100,10 @@ class ExtendoDevice
     Droidspeak *droidspeak;
 
     void handleOSCBundleInternal(class OSCBundle &bundle);
+
+    void checkConnection(unsigned long now);
+    bool connecting, connected;
+    unsigned long lastConnectionAttempt;
 };
 
 #endif // ExtendoDevice_h
