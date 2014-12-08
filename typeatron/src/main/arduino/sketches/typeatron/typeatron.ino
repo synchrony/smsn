@@ -24,6 +24,8 @@ unsigned int debounceMicros = 2000;
 
 void setup() {
     typeatron.setup();
+    
+    typeatron.pingUntilConnected();
 }
 
 unsigned int lastKeyState = 0;
@@ -43,13 +45,11 @@ void flickerTmp() {
 // basic key and laser loop
 void loop() {
     unsigned long now = typeatron.beginLoop();
-//typeatron.setColorFor(RGB_RED, 10000);
 
     typeatron.updateKeys();
     unsigned int keyState = typeatron.getKeyState();
     Mode mode = typeatron.getMode();
     if (keyState != lastKeyState) {
-//flickerTmp();
         if (LaserTrigger == mode) {
             if (keyState) {
                 typeatron.laserOn();

@@ -75,18 +75,15 @@ void Droidspeak::speakRandomSequence()
 
 void Droidspeak::speakOK()
 {
-  /*
-    tone(_speakerPin, 330);
-    delay(100);
-    tone(_speakerPin, 262);
-    delay(300);
-    noTone(_speakerPin);
-    delay(50);
-    */
-    
-    glideLog(50, 196, 784);
-    delay(20);
-    glideLog(300, 1568, 49);
+/*
+    glideLog(105, 220, 313);
+    delay(57);
+    glideLog(132, 466, 313);
+*/
+    glideLog(53, 440, 626);
+    delay(29);
+    glideLog(66, 932, 626);
+
     delay(50);
 }
 
@@ -98,9 +95,6 @@ void Droidspeak::speakPowerUpPhrase()
 
 void Droidspeak::speakSerialOpenPhrase()
 {
-    //delay(100);
-    //speakOK();
-
     speakRandomSequence();
     delay(50);
 }
