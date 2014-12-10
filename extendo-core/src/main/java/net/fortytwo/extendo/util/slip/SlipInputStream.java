@@ -1,4 +1,4 @@
-package net.fortytwo.extendo.util;
+package net.fortytwo.extendo.util.slip;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +43,7 @@ public class SlipInputStream {
         int i = 0;
         while (-1 != (b = inputStream.read())) {
             if (SLIP_END == b) {
-                // the check for i>0 allows for SLIP variants in which packets both begin and end with END
+                // the check for i>0 allows for SLIP variants in which packets both begin and end with SLIP_END
                 if (i > 0) {
                     try {
                         handler.handle(buffer, i);
@@ -52,19 +52,27 @@ public class SlipInputStream {
                     }
                 }
                 i = 0;
-            } else if (SLIP_ESC == b) {
-                b = inputStream.read();
-                if (-1 == b) break;
-
-                if (SLIP_ESC_END == b) {
-                    buffer[i++] = (byte) SLIP_END;
-                } else if (SLIP_ESC_ESC == b) {
-                    buffer[i++] = (byte) SLIP_ESC;
-                } else {
-                    throw new IOException("illegal escape sequence: found byte " + b + " after SLIP_ESC");
-                }
             } else {
-                buffer[i++] = (byte) b;
+                if (bufferLength == i) {
+                    throw new IOException("buffer size of " + bufferLength + " exceeded");
+                }
+
+                if (SLIP_ESC == b) {
+                    b = inputStream.read();
+                    if (-1 == b) {
+                        break;
+                    }
+
+                    if (SLIP_ESC_END == b) {
+                        buffer[i++] = (byte) SLIP_END;
+                    } else if (SLIP_ESC_ESC == b) {
+                        buffer[i++] = (byte) SLIP_ESC;
+                    } else {
+                        throw new IOException("illegal escape sequence: found byte " + b + " after SLIP_ESC");
+                    }
+                } else {
+                    buffer[i++] = (byte) b;
+                }
             }
         }
     }

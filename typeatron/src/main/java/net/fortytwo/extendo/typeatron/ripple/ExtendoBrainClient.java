@@ -315,10 +315,12 @@ public class ExtendoBrainClient {
                         JSONObject json = new JSONObject(
                                 IOUtils.toString(response.getEntity().getContent(), Extendo.UTF8));
                         JSONObject view = json.getJSONObject(Params.VIEW);
-                        JSONArray children = view.getJSONArray(NoteWriter.CHILDREN);
-                        int length = children.length();
-                        for (int i = 0; i < length; i++) {
-                            results.add(noteParser.fromJSON(children.getJSONObject(i)));
+                        JSONArray children = view.optJSONArray(NoteWriter.CHILDREN);
+                        if (null != children) {
+                            int length = children.length();
+                            for (int i = 0; i < length; i++) {
+                                results.add(noteParser.fromJSON(children.getJSONObject(i)));
+                            }
                         }
                     } catch (JSONException e) {
                         throw new IOException(e);

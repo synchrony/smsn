@@ -116,7 +116,7 @@ public class ExtendoRippleREPL {
                     throw new RippleException("can't undo");
                 } else {
                     undoRedoStack.undo();
-                    typeatron.sendOkCue();
+                    typeatron.sendOkMessage();
                 }
             } else if (symbol.equals("r")) {
                 UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
@@ -124,7 +124,7 @@ public class ExtendoRippleREPL {
                     throw new RippleException("can't undo");
                 } else {
                     undoRedoStack.redo();
-                    typeatron.sendOkCue();
+                    typeatron.sendOkMessage();
                 }
                 /*
             } else if (symbol.equals("u")) { // "to upper case" character primitive
@@ -198,13 +198,13 @@ public class ExtendoRippleREPL {
     private void applyDiacritic(final ExtendedCharacters.Diacritic d) {
         if (0 == currentLineOfText.length()) {
             logger.warning("applied diacritic " + d + " to empty string");
-            typeatron.sendWarningCue();
+            typeatron.sendWarningMessage();
         } else {
             char c = currentLineOfText.charAt(currentLineOfText.length() - 1);
             Character cm = extendedCharacters.modify(d, c);
             if (null == cm) {
                 logger.warning("diacritic " + d + " cannot modify character '" + c + "'");
-                typeatron.sendWarningCue();
+                typeatron.sendWarningMessage();
             } else {
                 currentLineOfText.deleteCharAt(currentLineOfText.length() - 1);
                 currentLineOfText.append(cm);

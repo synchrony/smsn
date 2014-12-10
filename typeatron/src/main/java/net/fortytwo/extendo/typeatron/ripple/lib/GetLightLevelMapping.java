@@ -35,7 +35,7 @@ public class GetLightLevelMapping extends PrimitiveStackMapping {
                       Sink<RippleList> solutions,
                       ModelConnection mc) throws RippleException {
         try {
-            typeatron.sendPhotoresistorGetCommand();
+            typeatron.sendPhotoGetMessage();
         } catch (Throwable t) {
             throw new RippleException(t);
         }

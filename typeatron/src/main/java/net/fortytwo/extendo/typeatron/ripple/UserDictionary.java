@@ -35,7 +35,7 @@ public class UserDictionary {
                     + " due to pre-existing value " + existing);
 
             // alert the user to the "exception"
-            typeatron.sendWarningCue();
+            typeatron.sendWarningMessage();
 
             return existing;
         }

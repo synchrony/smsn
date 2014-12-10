@@ -45,7 +45,7 @@ public class MorseMapping extends PrimitiveStackMapping {
         String message = arg.getFirst().toString();
 
         try {
-            typeatron.sendMorse(message);
+            typeatron.sendMorseMessage(message);
         } catch (Throwable t) {
             throw new RippleException(t);
         }

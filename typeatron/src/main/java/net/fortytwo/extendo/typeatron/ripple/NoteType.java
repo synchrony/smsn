@@ -26,6 +26,8 @@ public class NoteType extends SimpleType<Note> {
 
     @Override
     public Value toRDF(Note instance, ModelConnection mc) throws RippleException {
+        // if the note has an alias, use that as its URI.
+        // Otherwise, use the "thing" URI based on its ID
         return null == instance.getAlias()
                 ? null == instance.getId() ? null : new URIImpl(BrainGraph.uriForId(instance.getId()))
                 : new URIImpl(instance.getAlias());

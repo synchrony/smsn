@@ -42,8 +42,8 @@ public class TypeatronControl extends OscControl {
             EXO_TT_LASER_FEEDBACK = "/exo/tt/laser/feedback",
             EXO_TT_LASER_OFF = "/exo/tt/laser/off",
             EXO_TT_LASER_ON = "/exo/tt/laser/on",
-            //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
-            EXO_TT_MORSE = "/exo/tt/morse",
+    //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
+    EXO_TT_MORSE = "/exo/tt/morse",
             EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
@@ -83,16 +83,16 @@ public class TypeatronControl extends OscControl {
 
         try {
             rippleSession = new RippleSession(agent, environment);
-            
+
             ExtendoRippleREPL.REPLEventHandler eventHandler = new ExtendoRippleREPL.REPLEventHandler() {
                 @Override
                 public void beginCommand() {
-                    sendReadyCue();
+                    sendReadyMessage();
                 }
 
                 @Override
                 public void finishCommand() {
-                    sendOkCue();
+                    sendOkMessage();
                 }
             };
             rippleREPL = new ExtendoRippleREPL(rippleSession, this, agent, environment, eventHandler);
@@ -121,7 +121,7 @@ public class TypeatronControl extends OscControl {
                                 throw new IllegalStateException();
                         }
                     } else if (null != mode) {
-                        sendInfoCue();
+                        sendInfoMessage();
 
                         logger.log(Level.INFO, "entered mode: " + mode);
                     } else {
@@ -131,12 +131,12 @@ public class TypeatronControl extends OscControl {
 
                 @Override
                 public void handleLaserOn() {
-                    sendLaserOn();
+                    sendLaserOnMessage();
                 }
 
                 @Override
                 public void handleLaserOff() {
-                    sendLaserOff();
+                    sendLaserOffMessage();
                 }
             };
 
@@ -148,47 +148,59 @@ public class TypeatronControl extends OscControl {
         oscReceiver.register(EXO_TT_ERROR, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
-                if (1 == args.size()) {
-                    logger.log(Level.SEVERE, "error message from Typeatron: " + args.get(0));
-                } else {
-                    logger.log(Level.SEVERE, "wrong number of arguments in Typeatron error message");
+                if (wrongArgs(EXO_TT_ERROR, 1, args.size())) {
+                    return;
                 }
+
+                logger.log(Level.SEVERE, "error message from Typeatron: " + args.get(0));
             }
         });
 
         oscReceiver.register(EXO_TT_INFO, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
-                if (1 == args.size()) {
-                    logger.log(Level.INFO, "info message from Typeatron: " + args.get(0));
-                } else {
-                    logger.log(Level.SEVERE, "wrong number of arguments in Typeatron info message");
+                if (wrongArgs(EXO_TT_INFO, 1, args.size())) {
+                    return;
                 }
+
+                logger.log(Level.INFO, "info message from Typeatron: " + args.get(0));
             }
         });
 
         oscReceiver.register(EXO_TT_KEYS, new OscMessageHandler() {
             public void handle(final OSCMessage message) {
                 List<Object> args = message.getArguments();
-                if (1 == args.size()) {
-                    try {
-                        keyer.nextInputState(((String) args.get(0)).getBytes());
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "failed to relay Typeatron input");
-                        e.printStackTrace(System.err);
-                    }
-                } else {
-                    logger.log(Level.SEVERE, "Typeatron control error (wrong # of args)");
+                if (wrongArgs(EXO_TT_KEYS, 1, args.size())) {
+                    return;
+                }
+
+                try {
+                    keyer.nextInputState(((String) args.get(0)).getBytes());
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "failed to relay Typeatron input", e);
                 }
             }
         });
 
+        /*
+        // user has "pointed with reference". This event occurs at the moment the laser turns on.
+        oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
+            public void handle(OSCMessage message) {
+                System.out.println("got laser event");
+                // TODO: use the recognition time parameter provided in the message
+                long recognitionTime = System.currentTimeMillis();
+
+                handlePointEvent(recognitionTime);
+                logger.info("handled laser pointer event from typeatron");
+            }
+        });
+        */
+
         oscReceiver.register(EXO_TT_PHOTO_DATA, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
-                if (7 != args.size()) {
-                    throw new IllegalStateException("photoresistor observation has unexpected number of arguments ("
-                            + args.size() + "): " + message);
+                if (wrongArgs(EXO_TT_PHOTO_DATA, 7, args.size())) {
+                    return;
                 }
 
                 // workaround for unavailable Xerces dependency:
@@ -219,6 +231,15 @@ public class TypeatronControl extends OscControl {
             }
         });
 
+        oscReceiver.register(EXO_TT_PING, new OscMessageHandler() {
+            public void handle(OSCMessage message) {
+                // note: currently, no argument is provided, or needed;
+                // the ping is used by the Typeatron to notify the user of a connection
+                logger.info("ping received from Typeatron. Replying.");
+                sendPingReplyMessage();
+            }
+        });
+
         oscReceiver.register(EXO_TT_PING_REPLY, new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 // note: argument is ignored for now; in future, it could be used to synchronize clocks
@@ -231,17 +252,6 @@ public class TypeatronControl extends OscControl {
             }
         });
 
-        // user has "pointed with reference". This event occurs at the moment the laser turns on.
-        oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                System.out.println("got laser event");
-                // TODO: use the recognition time parameter provided in the message
-                long recognitionTime = System.currentTimeMillis();
-
-                handlePointEvent(recognitionTime);
-                logger.info("handled laser pointer event from typeatron");
-            }
-        });
         // TODO: temporary... assume Emacs is available, even if we can't detect it...
         boolean forceEmacsAvailable = true;  // emacsAvailable
 
@@ -258,7 +268,7 @@ public class TypeatronControl extends OscControl {
 
     @Override
     protected void onConnect() {
-        sendPing();
+        sendPingMessage();
     }
 
     private String symbolForBrainModeClient(final String symbol,
@@ -278,7 +288,7 @@ public class TypeatronControl extends OscControl {
         try {
             rippleREPL.handle(symbol, modifier);
         } catch (RippleException e) {
-            sendErrorCue();
+            sendErrorMessage();
             logger.log(Level.WARNING, "Ripple error", e);
         }
     }
@@ -290,7 +300,7 @@ public class TypeatronControl extends OscControl {
             try {
                 brainModeWrapper.write(mapped);
             } catch (IOException e) {
-                sendErrorCue();
+                sendErrorMessage();
                 logger.log(Level.WARNING, "I/O error while writing to Brain-mode", e);
             }
         }
@@ -312,7 +322,7 @@ public class TypeatronControl extends OscControl {
                         s0 = new String(IOUtil.readBytes(result)).trim();
                     } catch (IOException e) {
                         logger.log(Level.SEVERE, "error reading Brain-mode response", e);
-                        sendErrorCue();
+                        sendErrorMessage();
                         return;
                     }
                     if (!s0.equals("nil")) {
@@ -320,10 +330,10 @@ public class TypeatronControl extends OscControl {
                         String s1 = s0.substring(1, s0.length() - 1);
                         try {
                             rippleSession.push(s1);
-                            sendOkCue();
+                            sendOkMessage();
                         } catch (RippleException e) {
                             logger.log(Level.WARNING, "failed to push Brain-mode response", e);
-                            sendWarningCue();
+                            sendWarningMessage();
                         }
                     }
                 }
@@ -340,23 +350,23 @@ public class TypeatronControl extends OscControl {
                         try {
                             client.run();
                             isAlive = false;
-                            sendWarningCue();
+                            sendWarningMessage();
                         } catch (BrainModeClient.ExecutionException e) {
                             logger.log(Level.WARNING,
                                     "Brain-mode client error: " + e.getMessage());
-                            sendErrorCue();
+                            sendErrorMessage();
                         } catch (BrainModeClient.UnknownCommandException e) {
                             logger.log(Level.FINE,
                                     "unknown command: " + e.getMessage());
-                            sendWarningCue();
+                            sendWarningMessage();
                         } catch (BrainModeClient.ParseError e) {
                             // attempt to recover from parse errors
-                            sendErrorCue();
+                            sendErrorMessage();
                             logger.log(Level.SEVERE, "Brain-mode client parse error: ", e.getMessage());
                         } catch (Throwable t) {
                             isAlive = false;
                             logger.log(Level.SEVERE, "Brain-mode client thread died with error", t);
-                            sendErrorCue();
+                            sendErrorMessage();
                         }
                     }
                 }
@@ -364,50 +374,96 @@ public class TypeatronControl extends OscControl {
         }
 
         public void write(final String symbol) throws IOException {
-            //logger.log(Level.INFO, (isAlive ? "" : "NOT ") + "writing '" + symbol + "' to Emacs...");
             source.write(symbol.getBytes());
         }
     }
 
     private long latestPing;
 
-    public void sendPing() {
+    public void sendErrorMessage() {
+        OSCMessage m = new OSCMessage(EXO_TT_ERROR);
+        send(m);
+    }
+
+    public void sendInfoMessage() {
+        OSCMessage m = new OSCMessage(EXO_TT_INFO);
+        send(m);
+    }
+
+    public void sendLaserFeedbackMessage() {
+        System.out.println("laser feedback");
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_FEEDBACK);
+        send(m);
+    }
+
+    public void sendLaserOffMessage() {
+        System.out.println("laser off");
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_OFF);
+        send(m);
+    }
+
+    public void sendLaserOnMessage() {
+        System.out.println("laser on");
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_ON);
+        send(m);
+    }
+
+    /*
+    public void sendLaserTriggerMessage() {
+        System.out.println("laser trigger");
+        OSCMessage m = new OSCMessage(EXO_TT_LASER_TRIGGER);
+        send(m);
+    }*/
+
+    public void sendMorseMessage(final String text) {
+        OSCMessage m = new OSCMessage(EXO_TT_MORSE);
+        m.addArgument(text);
+        send(m);
+    }
+
+    public void sendOkMessage() {
+        OSCMessage m = new OSCMessage(EXO_TT_OK);
+        send(m);
+    }
+
+    public void sendPhotoGetMessage() {
+        OSCMessage m = new OSCMessage(EXO_TT_PHOTO_GET);
+        send(m);
+    }
+
+    public void sendPingMessage() {
         OSCMessage message = new OSCMessage(EXO_TT_PING);
         latestPing = System.currentTimeMillis();
         message.addArgument(latestPing);
         send(message);
     }
 
-    public void sendLaserFeedback() {
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_FEEDBACK);
+    public void sendPingReplyMessage() {
+        OSCMessage message = new OSCMessage(EXO_TT_PING_REPLY);
+        // note: currently, no argument is consumed by the Typeatron
+        send(message);
+    }
+
+    public void sendReadyMessage() {
+        OSCMessage m = new OSCMessage(EXO_TT_READY);
         send(m);
     }
 
-    public void sendLaserOff() {
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_OFF);
+    /**
+     * @param time the duration of the signal in milliseconds (valid values range from 1 to 60000)
+     */
+    public void sendVibroMessage(final int time) {
+        if (time < 0 || time > 60000) {
+            throw new IllegalArgumentException("vibration interval too short or too long: " + time);
+        }
+
+        OSCMessage m = new OSCMessage(EXO_TT_VIBRO);
+        m.addArgument(time);
         send(m);
     }
 
-    public void sendLaserOn() {
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_ON);
-        send(m);
-    }
-
-    /*
-    public void sendLaserTriggerCommand() {
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_TRIGGER);
-        send(m);
-        System.out.println("sent laser trigger command");
-    }*/
-
-    public void sendMorse(final String text) {
-        OSCMessage m = new OSCMessage(EXO_TT_MORSE);
-        m.addArgument(text);
-        send(m);
-    }
-
-    public void sendPhotoresistorGetCommand() {
-        OSCMessage m = new OSCMessage(EXO_TT_PHOTO_GET);
+    public void sendWarningMessage() {
+        OSCMessage m = new OSCMessage(EXO_TT_WARNING);
         send(m);
     }
 
@@ -415,7 +471,7 @@ public class TypeatronControl extends OscControl {
         // the next point event from the hardware will reference this thing
         this.thingPointedTo = thingPointedTo;
 
-        //sendLaserTriggerCommand();
+        //sendLaserTriggerMessage();
         keyer.setMode(ChordedKeyer.Mode.Laser);
     }
 
@@ -435,41 +491,15 @@ public class TypeatronControl extends OscControl {
         logger.log(Level.INFO, "pointed to " + thingPointedTo);
     }
 
-    /**
-     * @param time the duration of the signal in milliseconds (valid values range from 1 to 60000)
-     */
-    public void sendVibrateCommand(final int time) {
-        if (time < 0 || time > 60000) {
-            throw new IllegalArgumentException("vibration interval too short or too long: " + time);
+    private boolean wrongArgs(final String address,
+                              final int expected,
+                              final int actual) {
+        if (actual != expected) {
+            logger.log(Level.SEVERE, "received " + actual + " arguments in " + address + " message, "
+                    + "expected " + expected);
+            return true;
+        } else {
+            return false;
         }
-
-        OSCMessage m = new OSCMessage(EXO_TT_VIBRO);
-        m.addArgument(time);
-        send(m);
-    }
-
-    public void sendOkCue() {
-        OSCMessage m = new OSCMessage(EXO_TT_OK);
-        send(m);
-    }
-
-    public void sendInfoCue() {
-        OSCMessage m = new OSCMessage(EXO_TT_INFO);
-        send(m);
-    }
-
-    public void sendReadyCue() {
-        OSCMessage m = new OSCMessage(EXO_TT_READY);
-        send(m);
-    }
-
-    public void sendWarningCue() {
-        OSCMessage m = new OSCMessage(EXO_TT_WARNING);
-        send(m);
-    }
-
-    public void sendErrorCue() {
-        OSCMessage m = new OSCMessage(EXO_TT_ERROR);
-        send(m);
     }
 }
