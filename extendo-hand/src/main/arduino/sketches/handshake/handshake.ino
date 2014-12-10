@@ -11,7 +11,7 @@
 #include <ExtendoHand.h>
 
 #include <ExtendoDevice.h>
-#include <Droidspeak.h>
+//#include <Droidspeak.h>
 #include <ExtendOSC.h>
 //#include <Morse.h>
 #include <RGBLED.h>

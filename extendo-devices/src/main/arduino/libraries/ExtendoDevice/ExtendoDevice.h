@@ -46,7 +46,7 @@ class ExtendoDevice
     virtual void playTone(unsigned int frequency, unsigned long durationMs) = 0;
     void setColorFor(unsigned long color, unsigned long durationMs);
     //Morse *getMorse();
-    Droidspeak *getDroidspeak();
+    //Droidspeak *getDroidspeak();
 
     void errorCue();
     void infoCue();
@@ -69,7 +69,7 @@ class ExtendoDevice
     virtual void onLoopTimeUpdated(double loopTime) = 0;
 
     //virtual Morse *createMorse() = 0;
-    virtual Droidspeak *createDroidspeak() = 0;
+    //virtual Droidspeak *createDroidspeak() = 0;
 
     // settable identifier which is included with each gestural and sensor output
     char contextName[32];
@@ -84,7 +84,7 @@ class ExtendoDevice
 
     ExtendOSC osc;
     OSCBundle *bundleIn;
-    char oscAddressBuffer[64];
+    char oscAddressBuffer[50];
 
     unsigned long lastHeartbeat;
 
@@ -97,7 +97,7 @@ class ExtendoDevice
 
   private:
     //Morse *morse;
-    Droidspeak *droidspeak;
+    //Droidspeak *droidspeak;
 
     void handleOSCBundleInternal(class OSCBundle &bundle);
 

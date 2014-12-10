@@ -49,9 +49,11 @@ Morse *ExtendoDevice::getMorse() {
 }
 */
 
+/*
 Droidspeak *ExtendoDevice::getDroidspeak() {
     return droidspeak;
 }
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,10 +66,12 @@ void ExtendoDevice::setup() {
 
     //morse = createMorse();
 
+/*
     droidspeak = createDroidspeak();
     if (droidspeak) {
         droidspeak->speakPowerUpPhrase();
     }
+*/
 
     osc.beginSerial();
 
@@ -77,9 +81,11 @@ void ExtendoDevice::setup() {
 
     // delay the serial open phrase until the random number generator has been seeded
     setColor(RGB_GREEN);
+    /*
     if (droidspeak) {
         droidspeak->speakSerialOpenPhrase();
     }
+    */
     setColor(RGB_BLACK);
 
     vibrate(500);
@@ -278,6 +284,8 @@ void handleReadyMessage(class OSCMessage &m) {
     thisDevice->readyCue();
 }
 
+// TODO: restore once memory is not so tight on Extend-o-Hand
+#ifdef BOUNTIFUL_RAM
 void handleRGBSetMessage(class OSCMessage &m) {
     if (!thisDevice->getOSC()->validArgs(m, 1)) return;
 
@@ -322,6 +330,7 @@ void handleVibroMessage(class OSCMessage &m) {
         thisDevice->vibrate((unsigned long) d);
     }
 }
+#endif // BOUNTIFUL_RAM
 
 void handleWarningMessage(class OSCMessage &m) {
     thisDevice->warningCue();
@@ -345,10 +354,12 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
         || bundle.dispatch(address(OSC_OK), handleOkMessage)
         || bundle.dispatch(address(OSC_PING), handlePingMessage)
         || bundle.dispatch(address(OSC_PING_REPLY), handlePingReplyMessage)
-        || bundle.dispatch(address(OSC_RGB_SET), handleRGBSetMessage)
         || bundle.dispatch(address(OSC_READY), handleReadyMessage)
+#ifdef BOUNTIFUL_RAM
+        || bundle.dispatch(address(OSC_RGB_SET), handleRGBSetMessage)
         || bundle.dispatch(address(OSC_TONE), handleToneMessage)
         || bundle.dispatch(address(OSC_VIBRO), handleVibroMessage)
+#endif // BOUNTIFUL_RAM
         || bundle.dispatch(address(OSC_WARNING), handleWarningMessage)
         )) {
         if (!bundle.size()) {
@@ -387,9 +398,12 @@ void ExtendoDevice::checkConnection(unsigned long now) {
     if (connected) {
         connecting = false;
         okCue();
+        /*
         if (droidspeak) {
             droidspeak->speakOK();
-        }
+        }*/
+        playTone(1760,100);
+        playTone(880,100);
     } else if (now - lastConnectionAttempt > connectionRetryIntervalMs) {
         lastConnectionAttempt = now;
         warningCue();

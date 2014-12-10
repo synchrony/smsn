@@ -40,6 +40,7 @@ class Typeatron : public ExtendoDevice
     void vibrate(unsigned long durationMs);
     void playTone(unsigned int frequency, unsigned long durationMs);
     Morse *getMorse();
+    Droidspeak *getDroidspeak();
 
     Mode getMode();
     AnalogSampler *getPhotoSampler();
@@ -71,6 +72,7 @@ class Typeatron : public ExtendoDevice
   private:
     AnalogSampler *photoSampler;
     Morse *morse;
+    Droidspeak *droidspeak;
 
     RGBLED rgbled;
 

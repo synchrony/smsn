@@ -72,9 +72,11 @@ Morse *ExtendoHand::createMorse() {
 }
 */
 
+/*
 Droidspeak *ExtendoHand::createDroidspeak() {
     return new Droidspeak(SPEAKER_PIN);
 }
+*/
 
 #include <Adafruit_NeoPixel.h>
 

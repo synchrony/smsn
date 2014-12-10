@@ -33,7 +33,7 @@ class ExtendoHand : public ExtendoDevice
 
   protected:
     //Morse *createMorse();
-    Droidspeak *createDroidspeak();
+    //Droidspeak *createDroidspeak();
     void setupPins();
     void setupOther();
     bool handleOSCBundle(class OSCBundle &bundle);

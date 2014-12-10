@@ -70,6 +70,10 @@ Morse *Typeatron::getMorse() {
     return morse;
 }
 
+Droidspeak *Typeatron::getDroidspeak() {
+    return droidspeak;
+}
+
 AnalogSampler *Typeatron::getPhotoSampler() {
     return photoSampler;
 }
@@ -176,6 +180,11 @@ void Typeatron::setupPins() {
 }
 
 void Typeatron::setupOther() {
+    droidspeak = createDroidspeak();
+    if (droidspeak) {
+        droidspeak->speakPowerUpPhrase();
+    }
+
     morse = createMorse();
     resetLaser();
 }
