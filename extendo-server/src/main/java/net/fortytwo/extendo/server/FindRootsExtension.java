@@ -38,7 +38,7 @@ public class FindRootsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.getDepth();
+        p.height = r.getHeight();
         p.styleName = r.getStyleName();
         p.filter = r.getFilter();
 
@@ -48,7 +48,7 @@ public class FindRootsExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        Note n = p.queries.findRoots(p.filter, p.style, p.depth - 1);
+        Note n = p.queries.findRoots(p.filter, p.style, p.height - 1);
         addView(n, p);
 
         p.map.put("title", "all roots");

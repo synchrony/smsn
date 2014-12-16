@@ -45,7 +45,7 @@ public class UpdateExtension extends ExtendoExtension {
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
-        p.depth = r.getDepth();
+        p.height = r.getHeight();
         p.rootId = r.getRootId();
         p.styleName = r.getStyleName();
         p.wikiView = r.wikiView;
@@ -68,12 +68,12 @@ public class UpdateExtension extends ExtendoExtension {
 
         // Apply the update
         try {
-            p.queries.update(p.root, rootNote, p.depth, p.filter, p.style);
+            p.queries.update(p.root, rootNote, p.height, p.filter, p.style);
         } catch (NoteQueries.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style);
+        Note n = p.queries.view(p.root, p.height, p.filter, p.style);
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);

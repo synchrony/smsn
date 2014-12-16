@@ -10,19 +10,19 @@ import java.security.Principal;
 * @author Joshua Shinavier (http://fortytwo.net)
 */
 public class BasicViewRequest extends FilteredResultsRequest {
-    private final int depth;
+    private final int height;
     private final String styleName;
 
     public BasicViewRequest(final JSONObject json,
                             final Principal user) throws JSONException {
         super(json, user);
 
-        depth = this.json.getInt(Params.DEPTH);
+        height = this.json.getInt(Params.HEIGHT);
         styleName = this.json.getString(Params.STYLE);
     }
 
-    public int getDepth() {
-        return depth;
+    public int getHeight() {
+        return height;
     }
 
     public String getStyleName() {

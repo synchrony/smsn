@@ -40,7 +40,7 @@ public class RippleExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.getDepth();
+        p.height = r.getHeight();
         p.query = r.getQuery();
         p.styleName = r.getStyleName();
         p.filter = r.getFilter();

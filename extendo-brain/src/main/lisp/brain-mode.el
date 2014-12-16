@@ -55,7 +55,7 @@
 (setq exo-backward-style "backward")
 
 ;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
-(setq exo-depth 3)
+(setq exo-height 3)
 (setq exo-root-id nil)
 (setq exo-title nil)
 (setq exo-style exo-forward-style)
@@ -332,7 +332,7 @@
             (let (
                 (root (cdr (assoc 'root json)))
                 (view (cdr (assoc 'view json)))
-                (depth (numeric-value json 'depth nil))
+                (height (numeric-value json 'height nil))
 
                 ;; if the service doesn't specify these values, they will carry over from the previous buffer state
                 (min-sharability (numeric-value json 'minSharability exo-min-sharability))
@@ -346,7 +346,7 @@
                 (title (cdr (assoc 'title json))))
                     (switch-to-buffer (view-name root json))
                     (make-local-variable 'exo-root-id)
-                    (make-local-variable 'exo-depth)
+                    (make-local-variable 'exo-height)
                     (make-local-variable 'exo-style)
                     (make-local-variable 'exo-title)
                     (make-local-variable 'exo-min-sharability)
@@ -360,10 +360,10 @@
                     (make-local-variable 'exo-value-truncation-length)
                     (setq exo-root-id root)
                     (if (equal mode exo-search-mode)
-                        ;; Always leave a search view with depth 1, rather than that of the last view.
+                        ;; Always leave a search view with height 1, rather than that of the last view.
                         ;; The user experience is a little unpredictable otherwise.
-                        (setq exo-depth 1)
-                        (if depth (setq exo-depth depth)))
+                        (setq exo-height 1)
+                        (if height (setq exo-height height)))
                     (setq exo-min-sharability min-sharability)
                     (setq exo-max-sharability max-sharability)
                     (setq exo-default-sharability exo-future-sharability)
@@ -393,18 +393,18 @@
 (defun receive-inference-results (status)
     (acknowledge-http-response status "type inference completed successfully"))
 
-(defun request-view (preserve-line mode root depth style mins maxs defaults minw maxw defaultw)
+(defun request-view (preserve-line mode root height style mins maxs defaults minw maxw defaultw)
     (setq exo-current-line (if preserve-line (line-number-at-pos) 1))
     (setq exo-future-sharability defaults)
-    (http-get (request-view-url root depth style mins maxs defaults minw maxw defaultw) (receive-view mode)))
+    (http-get (request-view-url root height style mins maxs defaults minw maxw defaultw) (receive-view mode)))
 
 (defun filter-json (mins maxs defaults minw maxw defaultw)
     (list :minSharability mins :maxSharability maxs :defaultSharability defaults
           :minWeight minw :maxWeight maxw :defaultWeight defaultw))
 
-(defun request-view-url (root depth style mins maxs defaults minw maxw defaultw)
+(defun request-view-url (root height style mins maxs defaults minw maxw defaultw)
     (concat (base-url) "view?request=" (w3m-url-encode-string (json-encode
-        (list :root root :depth depth :style style :includeTypes (if (using-inference) "true" "false")
+        (list :root root :height height :style style :includeTypes (if (using-inference) "true" "false")
               :filter (filter-json mins maxs defaults minw maxw defaultw))))))
 
 (defun request-history (mins maxs minw maxw)
@@ -415,12 +415,12 @@
             (list :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
 
-(defun request-events (depth)
+(defun request-events (height)
     (setq exo-current-line 1)
     (setq exo-future-sharability exo-default-sharability)
     (http-get
         (concat (base-url) "get-events?request=" (w3m-url-encode-string (json-encode
-            (list :depth depth))))
+            (list :height height))))
         (receive-view exo-search-mode)))
 
 (defun request-duplicates (mins maxs minw maxw)
@@ -436,7 +436,7 @@
     (setq exo-future-sharability exo-default-sharability)
     (http-get
         (concat (base-url) "search?request=" (w3m-url-encode-string (json-encode
-            (list :queryType query-type :query query :valueCutoff exo-value-truncation-length :depth 1 :style style
+            (list :queryType query-type :query query :valueCutoff exo-value-truncation-length :height 1 :style style
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
 
@@ -463,7 +463,7 @@
     (setq exo-future-sharability exo-default-sharability)
     (http-get
         (concat (base-url) "find-roots?request=" (w3m-url-encode-string (json-encode
-            (list :style style :depth 1
+            (list :style style :height 1
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
         (receive-view exo-search-mode)))
 
@@ -484,7 +484,7 @@
     (setq exo-future-sharability exo-default-sharability)
     (http-get
         (concat (base-url) "ripple?request=" (w3m-url-encode-string (json-encode
-            (list :query query :depth 1 :style style
+            (list :query query :height 1 :style style
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
              (receive-view exo-search-mode)))
 
@@ -621,7 +621,7 @@
 (defun view-info ()
     (concat
         "(root: " exo-root-id
-         " :depth " (num-or-nil-to-string exo-depth)
+         " :height " (num-or-nil-to-string exo-height)
          " :style " exo-style
          " :sharability [" (num-or-nil-to-string exo-min-sharability) ", " (num-or-nil-to-string exo-default-sharability) ", " (num-or-nil-to-string exo-max-sharability) "]"
          " :weight [" (num-or-nil-to-string exo-min-weight) ", " (num-or-nil-to-string exo-default-weight) ", " (num-or-nil-to-string exo-max-weight) "]"
@@ -661,7 +661,7 @@
 
 (defun set-min-weight (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t exo-mode exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability s exo-max-weight exo-default-weight)
+        (request-view t exo-mode exo-root-id exo-height exo-style exo-min-sharability exo-max-sharability exo-default-sharability s exo-max-weight exo-default-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -673,7 +673,7 @@
 
 (defun set-min-sharability (s)
     (if (and (in-view) (>= s 0) (<= s 1))
-        (request-view t exo-mode exo-root-id exo-depth exo-style s exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)
+        (request-view t exo-mode exo-root-id exo-height exo-style s exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -682,7 +682,7 @@
     (if (in-view)
         (lexical-let (
                 (mode exo-mode)
-                (url (request-view-url exo-root-id exo-depth exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
+                (url (request-view-url exo-root-id exo-height exo-style exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))
             (setq exo-current-line (line-number-at-pos))
             (setq exo-future-sharability exo-default-sharability)
             (http-get
@@ -766,7 +766,7 @@
     "enter edit (read/write) mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-readonly-mode))
-        (request-view t exo-edit-mode exo-root-id exo-depth exo-style
+        (request-view t exo-edit-mode exo-root-id exo-height exo-style
             exo-min-sharability exo-max-sharability exo-default-sharability
             exo-min-weight exo-max-weight exo-default-weight)))
 
@@ -774,7 +774,7 @@
     "enter read-only mode in the current view"
     (interactive)
     (if (and (in-view) (equal exo-mode exo-edit-mode))
-        (request-view t exo-readonly-mode exo-root-id exo-depth exo-style
+        (request-view t exo-readonly-mode exo-root-id exo-height exo-style
             exo-min-sharability exo-max-sharability exo-default-sharability
             exo-min-weight exo-max-weight exo-default-weight)))
 
@@ -926,7 +926,7 @@
             (list
                 (list "request" (json-encode (list
                     :root exo-root-id
-                    :depth (number-to-string exo-depth)
+                    :height (number-to-string exo-height)
                     :style exo-style
                     :view entity
                     :filter (filter-json exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
@@ -1022,13 +1022,13 @@ A value of -1 indicates that values should not be truncated."
     (let ((n (string-to-number length-str)))
         (setq exo-value-truncation-length n)))
 
-(defun exo-set-view-depth (expr)
-    "set the depth of the current view to the number of levels represented by EXPR"
+(defun exo-set-view-height (expr)
+    "set the height of the current view to the number of levels represented by EXPR"
     (interactive)
-    (let ((depth (number-shorthand-to-number expr)))
-        (if (< depth 1) (error-message (concat "depth of " (number-to-string depth) " is too low (must be >= 1)"))
-            (if (> depth 5) (error-message (concat "depth of " (number-to-string depth) " is too high (must be <= 5)"))
-                (request-view nil exo-mode exo-root-id depth exo-style
+    (let ((height (number-shorthand-to-number expr)))
+        (if (< height 1) (error-message (concat "height of " (number-to-string height) " is too low (must be >= 1)"))
+            (if (> height 5) (error-message (concat "height of " (number-to-string height) " is too high (must be <= 5)"))
+                (request-view nil exo-mode exo-root-id height exo-style
                     exo-min-sharability exo-max-sharability exo-default-sharability
                     exo-min-weight exo-max-weight exo-default-weight)))))
 
@@ -1059,7 +1059,7 @@ a type has been assigned to it by the inference engine."
     "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
     (interactive)
     (if (in-view)
-        (request-view nil exo-mode exo-root-id exo-depth exo-backward-style
+        (request-view nil exo-mode exo-root-id exo-height exo-backward-style
             exo-min-sharability exo-max-sharability exo-default-sharability
             exo-min-weight exo-max-weight exo-default-weight)))
 
@@ -1067,7 +1067,7 @@ a type has been assigned to it by the inference engine."
     "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
     (interactive)
     (if (in-view)
-        (request-view nil exo-mode exo-root-id exo-depth exo-forward-style
+        (request-view nil exo-mode exo-root-id exo-height exo-forward-style
             exo-min-sharability exo-max-sharability exo-default-sharability
             exo-min-weight exo-max-weight exo-default-weight)))
 
@@ -1075,7 +1075,7 @@ a type has been assigned to it by the inference engine."
     "refresh the current view from the data store"
     (interactive)
     (if (in-view)
-        (request-view t exo-mode exo-root-id exo-depth exo-style
+        (request-view t exo-mode exo-root-id exo-height exo-style
             exo-min-sharability exo-max-sharability exo-default-sharability
             exo-min-weight exo-max-weight exo-default-weight)))
 
@@ -1129,7 +1129,7 @@ a type has been assigned to it by the inference engine."
     (interactive)
     (let ((id (atom-id-at-point)))
         (if id
-            (request-view nil (mode-for-visit) id exo-depth exo-style exo-min-sharability exo-max-sharability (future-sharability (current-target-sharability)) exo-min-weight exo-max-weight exo-default-weight)
+            (request-view nil (mode-for-visit) id exo-height exo-style exo-min-sharability exo-max-sharability (future-sharability (current-target-sharability)) exo-min-weight exo-max-weight exo-default-weight)
             (no-target))))
 
 (defun exo-visit-target-alias ()
@@ -1174,13 +1174,13 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-a d")       'exo-insert-current-date)
 (global-set-key (kbd "C-c C-a s")       'exo-insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'exo-insert-current-time)
-(global-set-key (kbd "C-c C-d")         (char-arg 'exo-set-view-depth "depth = ?"))
 (global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'exo-export-edges "export edges to file: " exo-default-edges-file))
 (global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'exo-export-graphml "export GraphML to file: " exo-default-graphml-file))
 (global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'exo-export-pagerank "export PageRank results to file: " exo-default-pagerank-file))
 (global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export private RDF dump to file: " exo-default-rdf-file))
 (global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
 (global-set-key (kbd "C-c C-e w")       (minibuffer-arg 'exo-export-webrdf "export public Web RDF dump to file: " exo-default-webrdf-file))
+(global-set-key (kbd "C-c C-h")         (char-arg 'exo-set-view-height "height = ?"))
 (global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
 (global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)
 (global-set-key (kbd "C-c C-l")         (minibuffer-arg 'exo-goto-line "line: "))

@@ -60,7 +60,7 @@ public class NoteQueries {
      * Generates a view of the graph.
      *
      * @param root   the root atom of the view
-     * @param height the height of the view.
+     * @param height the maximum height of the view.
      *               A view of height 0 contains only the root,
      *               while a view of height 1 also contains all children of the root,
      *               a view of height 2 all grandchildren, etc.
@@ -109,24 +109,6 @@ public class NoteQueries {
         return n;
     }
 
-    public Note view(final List<Atom> atoms,
-                     final int height,
-                     final Filter filter) {
-        if (null == atoms || height < 1 || null == filter) {
-            throw new IllegalArgumentException();
-        }
-
-        Note result = new Note();
-        // note: text value of result is not set here
-
-        for (Atom a : atoms) {
-            Note n = viewInternal(a, height - 1, filter, FORWARD_ADJACENCY);
-            result.addChild(n);
-        }
-
-        return result;
-    }
-
     private boolean hasChildren(final Atom root,
                                 final Filter filter,
                                 final AdjacencyStyle style) {
@@ -166,9 +148,9 @@ public class NoteQueries {
      *
      * @param root     the root of the subgraph to be updated
      * @param rootNote the root of the note tree
-     * @param depth    the minimum depth to which the graph will be updated.
-     *                 If depth is 0, only the root node will be affected,
-     *                 while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
+     * @param height   the maximum height of the tree which will be applied to the graph as an update.
+     *                 If height is 0, only the root node will be affected,
+     *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
      * @param filter   a collection of criteria for atoms and links.
      *                 Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param style    the adjacency style of the view
@@ -176,10 +158,10 @@ public class NoteQueries {
      */
     public void update(final Atom root,
                        final Note rootNote,
-                       final int depth,
+                       final int height,
                        final Filter filter,
                        final AdjacencyStyle style) throws InvalidUpdateException {
-        if (null == root || null == rootNote || depth < 0 || null == filter || null == style) {
+        if (null == root || null == rootNote || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
@@ -187,7 +169,7 @@ public class NoteQueries {
             throw new IllegalStateException("can't update in style " + style);
         }
 
-        updateInternal(root, rootNote, depth, filter, style);
+        updateInternal(root, rootNote, height, filter, style);
     }
 
     private final Comparator<Note> noteComparator = new Comparator<Note>() {
@@ -199,32 +181,15 @@ public class NoteQueries {
         }
     };
 
-    /*
-    private String toString(final List<Note> notes) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (Note n : notes) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(", ");
-            }
-
-            sb.append(n.getValue());
-        }
-
-        return sb.toString();
-    }*/
-
     private void updateInternal(final Atom root,
                                 final Note rootNote,
-                                final int depth,
+                                final int height,
                                 final Filter filter,
                                 final AdjacencyStyle style) throws InvalidUpdateException {
 
         setProperties(root, rootNote);
 
-        if (0 >= depth || !filter.isVisible(root.asVertex())) {
+        if (0 >= height || !filter.isVisible(root.asVertex())) {
             return;
         }
 
@@ -235,16 +200,9 @@ public class NoteQueries {
         List<Note> after = rootNote.getChildren();
         List<Note> lcs = ListDiff.leastCommonSubsequence(before, after, noteComparator);
 
-        //System.out.println("for root " + rootNote.getValue() + ":");
-        //System.out.println("    before: " + showChildren(before));
-        //System.out.println("    after: " + showChildren(after));
-        //System.out.println("    lcs: " + showChildren(lcs));
-
         ListDiff.DiffEditor<Note> ed = new ListDiff.DiffEditor<Note>() {
             public void add(final int position,
                             final Note note) throws InvalidUpdateException {
-                //System.out.println("adding at " + position + ": " + note);
-
                 Atom a = getAtom(note);
                 if (null == a) {
                     a = createAtom(note.getId(), filter);
@@ -278,7 +236,6 @@ public class NoteQueries {
 
             public void delete(final int position,
                                final Note note) {
-                //System.out.println("deleting at " + position + ": " + note);
                 AtomList n = root.getNotes();
 
                 if (0 == position) {
@@ -306,7 +263,7 @@ public class NoteQueries {
         ListDiff.applyDiff(before, after, lcs, noteComparator, ed);
 
         for (Note n : rootNote.getChildren()) {
-            int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : depth - 1;
+            int d = created.contains(n.getId()) ? 1 : added.contains(n.getId()) ? 0 : height - 1;
 
             Atom child = brain.getBrainGraph().getAtom(n.getId());
             if (null == child) {
@@ -339,7 +296,9 @@ public class NoteQueries {
      *
      * @param queryType the type of search to perform
      * @param query     the search query
-     * @param depth     depth of the search results view
+     * @param height     maximum height of the search results view.
+     *                   This must be at least 1, indicating a results node with search results as children.
+     *                   A height of 2 includes the children of the results, as well.
      * @param filter    a collection of criteria for atoms and links.
      *                  Atoms and links which do not meet the criteria are not to appear in search results.
      * @param style     the adjacency style of the view
@@ -347,10 +306,10 @@ public class NoteQueries {
      */
     public Note search(final QueryType queryType,
                        final String query,
-                       final int depth,
+                       final int height,
                        final Filter filter,
                        final AdjacencyStyle style) {
-        if (null == query || depth < 1 || null == filter || null == style) {
+        if (null == query || height < 1 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
@@ -372,7 +331,7 @@ public class NoteQueries {
         }
 
         for (Atom a : results) {
-            Note n = viewInternal(a, depth - 1, filter, style);
+            Note n = viewInternal(a, height - 1, filter, style);
             result.addChild(n);
         }
 
@@ -384,8 +343,8 @@ public class NoteQueries {
 
     public Note findRoots(final Filter filter,
                           final AdjacencyStyle style,
-                          final int depth) {
-        if (null == filter || null == style || depth < 0) {
+                          final int height) {
+        if (null == filter || null == style || height < 0) {
             throw new IllegalArgumentException();
         }
 
@@ -396,7 +355,7 @@ public class NoteQueries {
             if (!inEdges.iterator().hasNext()) {
                 Atom a = brain.getBrainGraph().getAtom(v);
                 if (filter.isVisible(v)) {
-                    Note n = viewInternal(a, depth, filter, style);
+                    Note n = viewInternal(a, height, filter, style);
                     result.addChild(n);
                 }
             }
@@ -456,7 +415,7 @@ public class NoteQueries {
      * Performs a Ripple query.
      *
      * @param query  the Ripple query to execute
-     * @param depth  depth of the search results view
+     * @param height  maximum height of the search results view
      * @param filter a collection of criteria for atoms and links.
      *               Atoms and links which do not meet the criteria are not to appear in search results.
      * @param style  the adjacency style of the view
@@ -466,10 +425,10 @@ public class NoteQueries {
      */
     /*     // TODO: restore Ripple support in such a way as to avoid Android/Dalvik issues
     public Note rippleQuery(final String query,
-                            final int depth,
+                            final int height,
                             final Filter filter,
                             final AdjacencyStyle style) throws RippleException {
-        if (null == query || depth < 0 || null == filter || null == style) {
+        if (null == query || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
@@ -506,7 +465,7 @@ public class NoteQueries {
             Atom a = graph.getAtom(vx);
 
             if (filter.isVisible(a)) {
-                Note n = viewInternal(a, depth - 1, filter, style);
+                Note n = viewInternal(a, height - 1, filter, style);
                 result.addChild(n);
             }
         }

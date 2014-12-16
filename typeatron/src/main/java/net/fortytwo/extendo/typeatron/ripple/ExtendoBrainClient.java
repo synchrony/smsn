@@ -124,7 +124,7 @@ public class ExtendoBrainClient {
         JSONObject requestJson = new JSONObject();
         try {
             requestJson.put(Params.ROOT, root.getId());
-            requestJson.put(Params.DEPTH, height);
+            requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.INCLUDE_TYPES, includeTypes);
             requestJson.put(Params.FILTER, toJson(filter));
@@ -176,26 +176,26 @@ public class ExtendoBrainClient {
      * Updates the graph
      *
      * @param root   the root of the subgraph to be updated
-     * @param depth  the minimum depth to which the graph will be updated.
-     *               If depth is 0, only the root node will be affected,
-     *               while a depth of 1 will affect children (which have a depth of 1 from the root), etc.
+     * @param height   the maximum height of the tree which will be applied to the graph as an update.
+     *                 If height is 0, only the root node will be affected,
+     *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
      * @param filter a collection of criteria for atoms and links.
      *               Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      */
     public Note update(final Note root,
-                       final int depth,
+                       final int height,
                        final Filter filter,
                        final NoteQueries.AdjacencyStyle style) throws ExtendoBrainClientException {
 
-        if (null == root || null == root.getId() || depth < 0 || null == filter || null == style) {
+        if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
             requestJson.put(Params.ROOT, root.getId());
-            requestJson.put(Params.DEPTH, depth);
+            requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VIEW, toJson(root));
             requestJson.put(Params.FILTER, toJson(filter));
@@ -250,7 +250,7 @@ public class ExtendoBrainClient {
             (list
                 (list "request" (json-encode (list
                     :root exo-root-id
-                    :depth (number-to-string exo-depth)
+                    :height (number-to-string exo-height)
                     :style exo-style
                     :view entity
                     :filter (filter-json exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
@@ -309,7 +309,7 @@ public class ExtendoBrainClient {
      *
      * @param queryType the type of search to perform
      * @param query     the search query
-     * @param depth     depth of the search results view
+     * @param height    maximum height of the search results view
      * @param filter    a collection of criteria for atoms and links.
      *                  Atoms and links which do not meet the criteria are not to appear in search results.
      * @param style     the adjacency style of the view
@@ -317,11 +317,11 @@ public class ExtendoBrainClient {
      */
     public List<Note> search(final NoteQueries.QueryType queryType,
                              final String query,
-                             final int depth,
+                             final int height,
                              final Filter filter,
                              final NoteQueries.AdjacencyStyle style) throws ExtendoBrainClientException {
         if (null == queryType || null == query || 0 == query.length()
-                || depth < 0 || null == filter || null == style) {
+                || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
@@ -329,7 +329,7 @@ public class ExtendoBrainClient {
         try {
             requestJson.put(Params.QUERY_TYPE, queryType.name());
             requestJson.put(Params.QUERY, query);
-            requestJson.put(Params.DEPTH, depth);
+            requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.FILTER, toJson(filter));
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VALUE_CUTOFF, DEFAULT_VALUE_CUTOFF);

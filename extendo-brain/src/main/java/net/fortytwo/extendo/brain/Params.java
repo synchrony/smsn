@@ -12,6 +12,7 @@ public interface Params {
             FILE = "file",
             FILTER = "filter",
             FORMAT = "format",
+            HEIGHT = "height",
             ID = "id",
             INCLUDE_TYPES = "includeTypes",
             MAX_RESULTS = "maxResults",

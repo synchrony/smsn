@@ -41,7 +41,7 @@ public class GetEventsExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.depth;
+        p.height = r.height;
 
         Extendo.logInfo("extendo get-events");
 
@@ -67,7 +67,7 @@ public class GetEventsExtension extends ExtendoExtension {
 
         for (Note n : events) {
             Note e = new Note(n);
-            e.truncate(p.depth);
+            e.truncate(p.height);
             view.addChild(e);
         }
 
@@ -86,12 +86,12 @@ public class GetEventsExtension extends ExtendoExtension {
     }
 
     protected class GetEventsRequest extends Request {
-        public final int depth;
+        public final int height;
 
         public GetEventsRequest(JSONObject json, Principal user) throws JSONException {
             super(json, user);
 
-            depth = this.json.getInt(Params.DEPTH);
+            height = this.json.getInt(Params.HEIGHT);
         }
     }
 }

@@ -44,7 +44,7 @@ public class ViewExtension extends ExtendoExtension {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.depth = r.getDepth();
+        p.height = r.getHeight();
         p.rootId = r.getRootId();
         p.styleName = r.getStyleName();
         p.filter = r.getFilter();
@@ -57,7 +57,7 @@ public class ViewExtension extends ExtendoExtension {
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
 
-        Note n = p.queries.view(p.root, p.depth, p.filter, p.style);
+        Note n = p.queries.view(p.root, p.height, p.filter, p.style);
         addView(n, p);
 
         addToHistory(p.rootId, p.context);

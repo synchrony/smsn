@@ -107,16 +107,16 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
             p.parser = new NoteParser();
             p.writer = new NoteWriter();
 
-            if (null != p.depth) {
-                if (p.depth < 1) {
-                    return ExtensionResponse.error("depth must be at least 1");
+            if (null != p.height) {
+                if (p.height < 0) {
+                    return ExtensionResponse.error("height must be at least 0");
                 }
 
-                if (p.depth > 5) {
-                    return ExtensionResponse.error("depth may not be more than 5");
+                if (p.height > 5) {
+                    return ExtensionResponse.error("height may not be more than 5");
                 }
 
-                p.map.put("depth", "" + p.depth);
+                p.map.put("depth", "" + p.height);
             }
 
             if (null != p.filter) {
@@ -267,7 +267,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public ExtendoBrain brain;
         public RexsterResourceContext context;
         public String data;
-        public Integer depth;
+        public Integer height;
         public String file;
         public Filter filter;
         public String format;
@@ -291,5 +291,4 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         public String wikiView;
         public NoteWriter writer;
     }
-
 }
