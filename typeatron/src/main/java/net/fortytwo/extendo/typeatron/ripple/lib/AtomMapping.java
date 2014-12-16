@@ -6,11 +6,9 @@ import net.fortytwo.extendo.brain.NoteQueries;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
-import org.apache.http.HttpException;
-import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -49,12 +47,8 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                     return null;
                 } else if (sync) {
                     try {
-                        n = client.view(n, 1, filter, NoteQueries.FORWARD_ADJACENCY, false);
-                    } catch (JSONException e) {
-                        throw new RippleException(e);
-                    } catch (IOException e) {
-                        throw new RippleException(e);
-                    } catch (HttpException e) {
+                        n = client.view(n, 0, filter, NoteQueries.FORWARD_ADJACENCY, false);
+                    } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
                         throw new RippleException(e);
                     }
                 }
@@ -63,6 +57,37 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
             }
         } else {
             return null;
+        }
+    }
+
+    protected void setProperty(final Note n, final String name, final String value) throws RippleException {
+        try {
+            client.setProperty(n, name, value);
+        } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
+            throw new RippleException(e);
+        }
+    }
+
+    protected Float sharabilityOrWeightFromArgument(final Object arg, final ModelConnection mc)
+            throws RippleException {
+
+        String asString = mc.toString(arg);
+        if (asString.equals("a")) {
+            return 0.25f;
+        } else if (asString.equals("s")) {
+            return 0.5f;
+        } else if (asString.equals("d")) {
+            return 0.75f;
+        } else if (asString.equals("f")) {
+            return 1.0f;
+        } else {
+            Number n = mc.toNumber(arg);
+            Float f = n.floatValue();
+            if (f == 0.25f || f == 0.5f || f == 0.75f || f == 1.0f) {
+                return f;
+            } else {
+                throw new RippleException("illegal sharability or weight value: " + f);
+            }
         }
     }
 }

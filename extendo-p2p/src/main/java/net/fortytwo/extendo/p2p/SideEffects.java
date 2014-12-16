@@ -8,5 +8,4 @@ package net.fortytwo.extendo.p2p;
 public interface SideEffects {
     void speak(String message);
     void setStatus(String message);
-    boolean verbose();
 }

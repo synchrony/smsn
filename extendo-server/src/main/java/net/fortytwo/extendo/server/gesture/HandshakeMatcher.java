@@ -26,10 +26,13 @@ public class HandshakeMatcher {
 
     private final HandshakeHandler handler;
 
+    private final GestureLowPassFilter lowPassFilter;
+
     public HandshakeMatcher(HandshakeHandler handler) {
         this.handler = handler;
         this.handshakesByActor = new HashMap<String, Handshake>();
         this.latestHandshakes = new Stack<Handshake>();
+        lowPassFilter = new GestureLowPassFilter(5000);
     }
 
     public void reset() {
@@ -61,35 +64,38 @@ public class HandshakeMatcher {
 
     public synchronized void receiveEvent(final String actor,
                                           final long timestamp) {
-        //System.out.println("receiveEvent: " + actor + ", " + timestamp);
+        //System.out.println("received handshake by " + actor + " at " + timestamp);
         cleanup(timestamp);
 
-        Handshake shake = handshakesByActor.get(actor);
+        Handshake gesture = handshakesByActor.get(actor);
         boolean isNew = false;
 
-        if (null == shake) {
-            shake = new Handshake();
-            shake.actor = actor;
-            shake.firstPeak = timestamp;
-            handshakesByActor.put(actor, shake);
+        if (null == gesture) {
+            gesture = new Handshake();
+            gesture.actor = actor;
+            gesture.firstPeak = timestamp;
+            handshakesByActor.put(actor, gesture);
             isNew = true;
-        } else if (timestamp < shake.latestPeak) {
+        } else if (timestamp < gesture.latestPeak) {
             throw new IllegalStateException("handshake peaks of actor " + actor + " arrived out of order ("
-                    + timestamp + "<=" + shake.latestPeak + ")");
+                    + timestamp + "<=" + gesture.latestPeak + ")");
         }
 
-        shake.peaks.add(timestamp);
-        shake.latestPeak = timestamp;
+        gesture.peaks.add(timestamp);
+        gesture.latestPeak = timestamp;
 
-        if (!shake.matched) {
+        if (!gesture.matched) {
             for (Handshake h : latestHandshakes) {
-                if (h.matches(shake)) {
-                    handler.handle(shake, h);
+                if (h.matches(gesture)) {
+                    // don't produce the gesture if it is redundant
+                    if (lowPassFilter.doAllow(gesture.actor, h.actor, timestamp)) {
+                        handler.handle(gesture, h, timestamp);
+                    }
 
                     // mark both handshakes as matched and leave them in the stack,
                     // so we don't match them again
                     h.matched = true;
-                    shake.matched = true;
+                    gesture.matched = true;
 
                     break;
                 }
@@ -97,7 +103,7 @@ public class HandshakeMatcher {
         }
 
         if (isNew) {
-            latestHandshakes.add(shake);
+            latestHandshakes.add(gesture);
             if (latestHandshakes.size() > STACK_SIZE_WARN_THRESHOLD) {
                 long now = System.currentTimeMillis();
                 if (now - lastWarning > 10000) {
@@ -114,7 +120,7 @@ public class HandshakeMatcher {
     }
 
     public interface HandshakeHandler {
-        void handle(Handshake left, Handshake right);
+        void handle(Handshake left, Handshake right, long time);
     }
 
     public class Handshake {

@@ -1,7 +1,10 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
+import com.illposed.osc.OSCMessage;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -13,18 +16,21 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GetAtomValueMapping extends AtomMapping {
+public class GiveAtomMapping extends AtomMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomValueMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GiveAtomMapping.class.getName());
+    private final TypeatronControl typeatron;
 
-    public GetAtomValueMapping(final ExtendoBrainClient client,
-                               final Filter filter) {
+    public GiveAtomMapping(final ExtendoBrainClient client,
+                           final Filter filter,
+                           final TypeatronControl typeatron) {
         super(client, filter);
+        this.typeatron = typeatron;
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                ExtendoLibrary.NS_2014_12 + "get-atom-value"
+                ExtendoLibrary.NS_2014_12 + "give-atom"
         };
     }
 
@@ -33,7 +39,7 @@ public class GetAtomValueMapping extends AtomMapping {
     }
 
     public String getComment() {
-        return "gets the @value property of an atom";
+        return "prepares an atom for the 'give' half of a hand-off gesture";
     }
 
     public void apply(RippleList stack,
@@ -41,20 +47,23 @@ public class GetAtomValueMapping extends AtomMapping {
                       final ModelConnection mc) throws RippleException {
 
         Object first = stack.getFirst();
-        stack = stack.getRest();
+        //stack = stack.getRest();
 
         Note n = toNote(first, true);
 
         if (null == n) {
-            logger.warning("can't get @value of non-atom: " + first);
+            logger.warning("can't give non-atom: " + first);
         } else {
             String value = n.getValue();
-            if (null == value) {
-                logger.warning("atom note has no @value: " + n);
-            } else {
-                // put both the @value property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+            if (null != value) {
+                OSCMessage m = new OSCMessage(Extendo.EXO_GESTURE_GIVE);
+                m.addArgument(typeatron.getAgent().getAgentUri().stringValue());
+                m.addArgument(value);
+                typeatron.getAgent().sendOSCMessageToFacilitator(m);
             }
+
+            // keep the stack unchanged
+            solutions.put(stack);
         }
     }
 }

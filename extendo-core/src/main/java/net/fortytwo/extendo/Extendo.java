@@ -29,6 +29,7 @@ public class Extendo {
 
     // P2P configuration properties
     public static final String
+            P2P_AGENT_URI = "net.fortytwo.extendo.p2p.agentUri",
             P2P_BROADCAST_ADDRESS = "net.fortytwo.extendo.p2p.broadcastAddress",
             P2P_BROADCAST_PORT = "net.fortytwo.extendo.p2p.broadcastPort",
             P2P_BROADCAST_INTERVAL = "net.fortytwo.extendo.p2p.broadcastInterval",
@@ -71,6 +72,11 @@ public class Extendo {
     public static final String UTF8 = "UTF-8";
 
     private static TypedProperties configuration;
+
+    // OSC addresses shared between modules
+    // TODO: move to a more appropriate, but still shared location
+    public static final String
+            EXO_GESTURE_GIVE = "/exo/gesture/give";
 
     static {
         try {

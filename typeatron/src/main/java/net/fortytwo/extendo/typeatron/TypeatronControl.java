@@ -37,13 +37,13 @@ public class TypeatronControl extends OscControl {
     // fully specified, since PATH may or may not include /usr/bin
     private static final String EMACSCLIENT_BIN = "/usr/bin/emacsclient";
 
-    // outbound addresses
+    // outbound addresses to Typeatron
     private static final String
             EXO_TT_LASER_FEEDBACK = "/exo/tt/laser/feedback",
             EXO_TT_LASER_OFF = "/exo/tt/laser/off",
             EXO_TT_LASER_ON = "/exo/tt/laser/on",
-    //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
-    EXO_TT_MORSE = "/exo/tt/morse",
+            //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
+            EXO_TT_MORSE = "/exo/tt/morse",
             EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
@@ -51,7 +51,7 @@ public class TypeatronControl extends OscControl {
             EXO_TT_VIBRO = "/exo/tt/vibro",
             EXO_TT_WARNING = "/exo/tt/warning";
 
-    // inbound addresses
+    // inbound addresses from Typeatron
     private static final String
             EXO_TT_ERROR = "/exo/tt/error",  // note: also used as an outbound address
             EXO_TT_INFO = "/exo/tt/info",  // note: also used as an outbound address
@@ -260,6 +260,10 @@ public class TypeatronControl extends OscControl {
         } catch (IOException e) {
             throw new DeviceInitializationException(e);
         }
+    }
+
+    public ExtendoAgent getAgent() {
+        return agent;
     }
 
     public ChordedKeyer getKeyer() {
@@ -482,7 +486,7 @@ public class TypeatronControl extends OscControl {
 
         Dataset d = Gesture.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentUri(), thingPointedTo);
         try {
-            agent.sendDataset(d, environment.verbose());
+            agent.sendDataset(d);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "failed to gestural dataset: " + e.getMessage());
             e.printStackTrace(System.err);

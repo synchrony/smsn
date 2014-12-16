@@ -13,18 +13,18 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GetAtomShortcutMapping extends AtomMapping {
+public class GetAtomCreatedMapping extends AtomMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomShortcutMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetAtomCreatedMapping.class.getName());
 
-    public GetAtomShortcutMapping(final ExtendoBrainClient client,
-                                  final Filter filter) {
+    public GetAtomCreatedMapping(final ExtendoBrainClient client,
+                                 final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                ExtendoLibrary.NS_2014_12 + "get-atom-shortcut"
+                ExtendoLibrary.NS_2014_12 + "get-atom-created"
         };
     }
 
@@ -33,7 +33,7 @@ public class GetAtomShortcutMapping extends AtomMapping {
     }
 
     public String getComment() {
-        return "gets the @shortcut property of an atom";
+        return "gets the @created property of an atom";
     }
 
     public void apply(RippleList stack,
@@ -46,11 +46,11 @@ public class GetAtomShortcutMapping extends AtomMapping {
         Note n = toNote(first, true);
 
         if (null == n) {
-            logger.warning("can't get @shortcut of non-atom: " + first);
+            logger.warning("can't get @created of non-atom: " + first);
         } else {
-            String value = n.getShortcut();
+            Long value = n.getCreated();
             if (null != value) {
-                // put both the @shortcut property and the (synced) atom back on the stack
+                // put both the @created property and the (synced) atom back on the stack
                 solutions.put(stack.push(n).push(value));
             }
         }

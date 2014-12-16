@@ -21,25 +21,79 @@
 #################################################################
 
 
-###  http://fortytwo.net/2013/extendo/gesture#indicatedThing
+###  http://fortytwo.net/2013/extendo/gesture#actor
 
-:indicatedThing rdf:type owl:ObjectProperty ;
+:actor rdf:type owl:ObjectProperty ;
+       
+       rdfs:domain :Activity ;
+       
+       rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#focusOfAttention
+
+:focusOfAttention rdf:type owl:ObjectProperty ;
+                  
+                  rdfs:domain :Attention ;
+                  
+                  rdfs:range owl:Thing .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#giver
+
+:giver rdf:type owl:ObjectProperty ;
+       
+       rdfs:domain :Handoff ;
+       
+       rdfs:subPropertyOf :actor ;
+       
+       rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#recognitionTime
+
+:recognitionTime rdf:type owl:ObjectProperty ;
+                 
+                 rdfs:domain :Activity ;
+                 
+                 rdfs:range <http://www.w3.org/2006/time#Instant> .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#taker
+
+:taker rdf:type owl:ObjectProperty ;
+       
+       rdfs:domain :Handoff ;
+       
+       rdfs:subPropertyOf :actor ;
+       
+       rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#thingGiven
+
+:thingGiven rdf:type owl:ObjectProperty ;
+            
+            rdfs:domain :Handoff ;
+            
+            rdfs:range owl:Thing .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#thingIndicated
+
+:thingIndicated rdf:type owl:ObjectProperty ;
                 
                 rdfs:comment "The object or concept to which the pointing gesture refers" ;
                 
                 rdfs:domain :Point ;
                 
                 rdfs:range owl:Thing .
-
-
-
-###  http://fortytwo.net/2013/extendo/gesture#recognizedAt
-
-:recognizedAt rdf:type owl:ObjectProperty ;
-              
-              rdfs:domain :Gesture ;
-              
-              rdfs:range <http://www.w3.org/2006/time#Instant> .
 
 
 
@@ -52,6 +106,14 @@
 #################################################################
 
 
+###  http://fortytwo.net/2013/extendo/gesture#Activity
+
+:Activity rdf:type owl:Class ;
+          
+          rdfs:subClassOf <http://purl.org/NET/c4dm/event.owl#Event> .
+
+
+
 ###  http://fortytwo.net/2013/extendo/gesture#ArmRaise
 
 :ArmRaise rdf:type owl:Class ;
@@ -59,6 +121,14 @@
           rdfs:subClassOf :Gesture ;
           
           rdfs:comment "An arm raise gesture, as if asking a question" .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#Attention
+
+:Attention rdf:type owl:Class ;
+           
+           rdfs:subClassOf :Activity .
 
 
 
@@ -86,7 +156,7 @@
 
 :Gesture rdf:type owl:Class ;
          
-         rdfs:subClassOf <http://purl.org/NET/c4dm/event.owl#Event> .
+         rdfs:subClassOf :Activity .
 
 
 
@@ -100,13 +170,29 @@
 
 
 
+###  http://fortytwo.net/2013/extendo/gesture#Handoff
+
+:Handoff rdf:type owl:Class ;
+         
+         rdfs:subClassOf :Interaction .
+
+
+
 ###  http://fortytwo.net/2013/extendo/gesture#Handshake
 
 :Handshake rdf:type owl:Class ;
            
-           rdfs:subClassOf :Gesture ;
+           rdfs:subClassOf :Interaction ;
            
            rdfs:comment "A complete handshake ritual, including both participants' gestures" .
+
+
+
+###  http://fortytwo.net/2013/extendo/gesture#Interaction
+
+:Interaction rdf:type owl:Class ;
+             
+             rdfs:subClassOf :Activity .
 
 
 
@@ -126,7 +212,7 @@
       
       rdfs:subClassOf :Gesture ;
       
-      rdfs:comment "A gesture of taking or picking something up" .
+      rdfs:comment "A gesture of taking or receiving something given" .
 
 
 

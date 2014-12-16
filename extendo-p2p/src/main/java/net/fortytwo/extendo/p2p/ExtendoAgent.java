@@ -45,9 +45,13 @@ public class ExtendoAgent {
 
     private final Pinger pinger;
 
-    private DatagramSocket oscSocket;
-    private InetAddress oscAddress;
-    private int oscPort;
+    private DatagramSocket facilitatorOscSocket;
+    private InetAddress facilitatorOscAddress;
+    private int facilitatorOscPort;
+
+    public ExtendoAgent(final boolean listenForServices) {
+        this(Extendo.getConfiguration().getProperty(Extendo.P2P_AGENT_URI), listenForServices);
+    }
 
     public ExtendoAgent(final String agentUri,
                         final boolean listenForServices) {
@@ -65,7 +69,7 @@ public class ExtendoAgent {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
                 public void receivedServiceDescription(InetAddress address, ServiceDescription description) {
                     if (Extendo.VERBOSE) {
-                        logger.log(Level.INFO, "received broadcast message from " + address.getHostAddress()
+                        logger.log(Level.FINE, "received broadcast message from " + address.getHostAddress()
                                 + ": version=" + description.getVersion()
                                 + ", endpoint=" + description.getEndpoint()
                                 + ", pub/sub port=" + description.getPubsubPort());
@@ -97,7 +101,7 @@ public class ExtendoAgent {
                         facilitatorConnection.start(socket);
                     } else {
                         if (Extendo.VERBOSE) {
-                            logger.log(Level.INFO, "ignoring broadcast message due to existing connection to "
+                            logger.log(Level.FINE, "ignoring broadcast message due to existing connection to "
                                     + facilitatorService.address.getHostAddress());
                         }
                     }
@@ -140,18 +144,19 @@ public class ExtendoAgent {
     public void sendOSCMessageToFacilitator(final OSCMessage m) {
         if (getFacilitatorConnection().isActive()) {
             try {
-                if (null == oscSocket) {
-                    oscPort = getFacilitatorService().description.getOscPort();
-                    oscAddress = getFacilitatorService().address;
+                if (null == facilitatorOscSocket) {
+                    facilitatorOscPort = getFacilitatorService().description.getOscPort();
+                    facilitatorOscAddress = getFacilitatorService().address;
 
-                    oscSocket = new DatagramSocket();
+                    facilitatorOscSocket = new DatagramSocket();
                 }
 
                 byte[] buffer = m.getByteArray();
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, oscAddress, oscPort);
-                oscSocket.send(packet);
+                DatagramPacket packet
+                        = new DatagramPacket(buffer, buffer.length, facilitatorOscAddress, facilitatorOscPort);
+                facilitatorOscSocket.send(packet);
 
-                logger.log(Level.INFO, "sent OSC datagram to " + oscAddress + ":" + oscPort);
+                logger.log(Level.INFO, "sent OSC datagram to " + facilitatorOscAddress + ":" + facilitatorOscPort);
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "error in sending OSC datagram to facilitator", e);
             } catch (Throwable t) {
@@ -160,10 +165,10 @@ public class ExtendoAgent {
         }
     }
 
-    public void sendDataset(final Dataset d,
-                            final boolean relayAsOsc) throws IOException {
+    public void sendDataset(final Dataset d) throws IOException {
         getQueryEngine().addStatements(d.getStatements());
 
+        /*
         if (relayAsOsc) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             // note: direct instantiation of a format-specific writer (as opposed to classloading via Rio)
@@ -183,6 +188,7 @@ public class ExtendoAgent {
             m.addArgument(new String(bos.toByteArray()));
             sendOSCMessageToFacilitator(m);
         }
+        */
     }
 
     public class Service {

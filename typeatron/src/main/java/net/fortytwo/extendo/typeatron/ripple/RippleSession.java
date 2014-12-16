@@ -95,14 +95,6 @@ public class RippleSession {
         System.out.println("\tafter evaluation:");
         for (RippleList l : nextCollector) {
             System.out.println("\t\t" + l);
-
-            if (environment.verbose()) {
-                if (agent.getFacilitatorConnection().isActive()) {
-                    OSCMessage m = new OSCMessage("/exo/fctr/tt/stack");
-                    m.addArgument(l.toString());
-                    agent.sendOSCMessageToFacilitator(m);
-                }
-            }
         }
 
         undoRedoStack.done(nextCollector);

@@ -14,8 +14,6 @@ import java.util.logging.Logger;
 */
 public class SpeakMapping extends PrimitiveStackMapping {
 
-    private static final Logger logger = Logger.getLogger(SpeakMapping.class.getName());
-
     private final SideEffects environment;
 
     public SpeakMapping(final SideEffects context) {
@@ -36,12 +34,11 @@ public class SpeakMapping extends PrimitiveStackMapping {
         return "speaks a line of text";
     }
 
-    public void apply(final RippleList arg,
+    public void apply(final RippleList stack,
                       final Sink<RippleList> solutions,
                       final ModelConnection context) throws RippleException {
-        //logger.log(Level.INFO, "executing the speak mapping");
 
-        String text = arg.getFirst().toString();
+        String text = context.toString(stack.getFirst());
 
         try {
             environment.speak(text);
@@ -49,6 +46,6 @@ public class SpeakMapping extends PrimitiveStackMapping {
             throw new RippleException(t);
         }
 
-        solutions.put(arg.getRest());
+        solutions.put(stack);
     }
 }

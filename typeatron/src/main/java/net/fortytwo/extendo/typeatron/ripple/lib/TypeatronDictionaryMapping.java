@@ -143,7 +143,12 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
     public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron,
                                       final UserDictionary userDictionary) throws RippleException {
-        ExtendoBrainClient exoBrainClient = new ExtendoBrainClient();
+        ExtendoBrainClient exoBrainClient = null;
+        try {
+            exoBrainClient = new ExtendoBrainClient();
+        } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
+            throw new RippleException(e);
+        }
 
         Filter defaultFilter = new Filter();
         // brain stream atoms begin with low weight, and with private rather than personal sharability
@@ -164,11 +169,22 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         //add(new DictionaryGetMapping(userDictionary), "o");
 
         // Extend-o-Brain
-        add(new GetAtomShortcutMapping(exoBrainClient, defaultFilter), "h", "shortcut");
-        add(new GetAtomValueMapping(exoBrainClient, defaultFilter), "v", "value");
-        add(new SetAtomShortcutMapping(exoBrainClient, defaultFilter), "sh", "set-shortcut");
+        add(new GetAtomAliasMapping(exoBrainClient, defaultFilter), "@a");
+        add(new GetAtomCreatedMapping(exoBrainClient, defaultFilter), "@c");
+        add(new GetAtomIdMapping(exoBrainClient, defaultFilter), "@i");
+        add(new GetAtomSharabilityMapping(exoBrainClient, defaultFilter), "@y");
+        add(new GetAtomShortcutMapping(exoBrainClient, defaultFilter), "@t");
+        add(new GetAtomValueMapping(exoBrainClient, defaultFilter), "@v", "v");
+        add(new GetAtomWeightMapping(exoBrainClient, defaultFilter), "@w");
+        add(new SetAtomAliasMapping(exoBrainClient, defaultFilter), "a@");
+        add(new SetAtomSharabilityMapping(exoBrainClient, defaultFilter), "y@");
+        add(new SetAtomShortcutMapping(exoBrainClient, defaultFilter), "t@", "sh");  // TODO: mismatch/redundancy
+        add(new SetAtomValueMapping(exoBrainClient, defaultFilter), "v@");
+        add(new SetAtomWeightMapping(exoBrainClient, defaultFilter), "w@");
         add(new ShortcutSearchMapping(exoBrainClient, defaultFilter), "o", "shortcut-search");
         add(new AppendToLogMapping(brainstreamFilter), "a", "append");
+        // TODO: temporary/change
+        add(new GiveAtomMapping(exoBrainClient, defaultFilter, typeatron), "g", "give");
 
         // TODO: x = experiment / mash mode
         // TODO: y = redo

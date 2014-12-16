@@ -8,7 +8,6 @@ import net.fortytwo.extendo.brain.Params;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
 import net.fortytwo.extendo.brain.wiki.NoteWriter;
 import net.fortytwo.extendo.util.TypedProperties;
-import net.fortytwo.ripple.RippleException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpEntity;
@@ -37,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class ExtendoBrainClient {
 
     private final String baseUrl;
 
-    public ExtendoBrainClient() throws RippleException {
+    public ExtendoBrainClient() throws ExtendoBrainClientException {
         TypedProperties config = Extendo.getConfiguration();
         if (null == config) {
             throw new IllegalStateException();
@@ -81,7 +81,7 @@ public class ExtendoBrainClient {
             serverPort = config.getInt(PROP_SERVER_PORT);
             graph = config.getString(PROP_GRAPH);
         } catch (TypedProperties.PropertyException e) {
-            throw new RippleException(e);
+            throw new ExtendoBrainClientException(e);
         }
 
         baseUrl = "/graphs/" + graph + "/extendo/";
@@ -115,18 +115,22 @@ public class ExtendoBrainClient {
                      final int height,
                      final Filter filter,
                      final NoteQueries.AdjacencyStyle style,
-                     final boolean includeTypes) throws JSONException, IOException, HttpException {
+                     final boolean includeTypes) throws ExtendoBrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
-        requestJson.put(Params.ROOT, root.getId());
-        requestJson.put(Params.DEPTH, height);
-        requestJson.put(Params.STYLE, style.getName());
-        requestJson.put(Params.INCLUDE_TYPES, includeTypes);
-        requestJson.put(Params.FILTER, toJson(filter));
+        try {
+            requestJson.put(Params.ROOT, root.getId());
+            requestJson.put(Params.DEPTH, height);
+            requestJson.put(Params.STYLE, style.getName());
+            requestJson.put(Params.INCLUDE_TYPES, includeTypes);
+            requestJson.put(Params.FILTER, toJson(filter));
+        } catch (JSONException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         List<NameValuePair> params = new LinkedList<NameValuePair>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
@@ -157,7 +161,13 @@ public class ExtendoBrainClient {
             }
         };
 
-        get(handler, path);
+        try {
+            get(handler, path);
+        } catch (IOException e) {
+            throw new ExtendoBrainClientException(e);
+        } catch (HttpException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         return results[0];
     }
@@ -176,22 +186,31 @@ public class ExtendoBrainClient {
     public Note update(final Note root,
                        final int depth,
                        final Filter filter,
-                       final NoteQueries.AdjacencyStyle style) throws JSONException, IOException, HttpException {
+                       final NoteQueries.AdjacencyStyle style) throws ExtendoBrainClientException {
 
         if (null == root || null == root.getId() || depth < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
-        requestJson.put(Params.ROOT, root.getId());
-        requestJson.put(Params.DEPTH, depth);
-        requestJson.put(Params.STYLE, style.getName());
-        requestJson.put(Params.VIEW, toJson(root));
-        requestJson.put(Params.FILTER, toJson(filter));
+        try {
+            requestJson.put(Params.ROOT, root.getId());
+            requestJson.put(Params.DEPTH, depth);
+            requestJson.put(Params.STYLE, style.getName());
+            requestJson.put(Params.VIEW, toJson(root));
+            requestJson.put(Params.FILTER, toJson(filter));
+        } catch (JSONException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         List<NameValuePair> params = new LinkedList<NameValuePair>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
-        UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params);
+        UrlEncodedFormEntity ent = null;
+        try {
+            ent = new UrlEncodedFormEntity(params);
+        } catch (UnsupportedEncodingException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         final Note[] results = new Note[1];
 
@@ -216,7 +235,13 @@ public class ExtendoBrainClient {
             }
         };
 
-        post(baseUrl + "update", handler, ent);
+        try {
+            post(baseUrl + "update", handler, ent);
+        } catch (IOException e) {
+            throw new ExtendoBrainClientException(e);
+        } catch (HttpException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         return results[0];
         /*
@@ -237,7 +262,7 @@ public class ExtendoBrainClient {
 
     public void setProperty(final Note root,
                             final String name,
-                            final String value) throws JSONException, IOException, HttpException {
+                            final String value) throws ExtendoBrainClientException {
         // TODO: add ability to clear property values
         if (null == root || null == root.getId()
                 || null == name || 0 == name.length() || null == value || 0 == value.length()) {
@@ -245,9 +270,13 @@ public class ExtendoBrainClient {
         }
 
         JSONObject requestJson = new JSONObject();
-        requestJson.put(Params.ID, root.getId());
-        requestJson.put(Params.NAME, name);
-        requestJson.put(Params.VALUE, value);
+        try {
+            requestJson.put(Params.ID, root.getId());
+            requestJson.put(Params.NAME, name);
+            requestJson.put(Params.VALUE, value);
+        } catch (JSONException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         List<NameValuePair> params = new LinkedList<NameValuePair>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
@@ -266,7 +295,13 @@ public class ExtendoBrainClient {
             }
         };
 
-        get(handler, path);
+        try {
+            get(handler, path);
+        } catch (IOException e) {
+            throw new ExtendoBrainClientException(e);
+        } catch (HttpException e) {
+            throw new ExtendoBrainClientException(e);
+        }
     }
 
     /**
@@ -281,23 +316,26 @@ public class ExtendoBrainClient {
      * @return an ordered list of query results
      */
     public List<Note> search(final NoteQueries.QueryType queryType,
-                       final String query,
-                       final int depth,
-                       final Filter filter,
-                       final NoteQueries.AdjacencyStyle style) throws JSONException, IOException, HttpException {
+                             final String query,
+                             final int depth,
+                             final Filter filter,
+                             final NoteQueries.AdjacencyStyle style) throws ExtendoBrainClientException {
         if (null == queryType || null == query || 0 == query.length()
                 || depth < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
-        requestJson.put(Params.QUERY_TYPE, queryType.name());
-        requestJson.put(Params.QUERY, query);
-        requestJson.put(Params.DEPTH, depth);
-        requestJson.put(Params.FILTER, toJson(filter));
-        requestJson.put(Params.STYLE, style.getName());
-        requestJson.put(Params.VALUE_CUTOFF, DEFAULT_VALUE_CUTOFF);
-
+        try {
+            requestJson.put(Params.QUERY_TYPE, queryType.name());
+            requestJson.put(Params.QUERY, query);
+            requestJson.put(Params.DEPTH, depth);
+            requestJson.put(Params.FILTER, toJson(filter));
+            requestJson.put(Params.STYLE, style.getName());
+            requestJson.put(Params.VALUE_CUTOFF, DEFAULT_VALUE_CUTOFF);
+        } catch (JSONException e) {
+            throw new ExtendoBrainClientException(e);
+        }
         List<NameValuePair> params = new LinkedList<NameValuePair>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
         String paramStr = URLEncodedUtils.format(params, Extendo.UTF8);
@@ -332,7 +370,13 @@ public class ExtendoBrainClient {
             }
         };
 
-        get(handler, path);
+        try {
+            get(handler, path);
+        } catch (IOException e) {
+            throw new ExtendoBrainClientException(e);
+        } catch (HttpException e) {
+            throw new ExtendoBrainClientException(e);
+        }
 
         return results;
     }
@@ -421,5 +465,11 @@ public class ExtendoBrainClient {
 
     private JSONObject toJson(final Note note) throws JSONException {
         return noteWriter.toJSON(note);
+    }
+
+    public class ExtendoBrainClientException extends Exception {
+        public ExtendoBrainClientException(Throwable cause) {
+            super(cause);
+        }
     }
 }

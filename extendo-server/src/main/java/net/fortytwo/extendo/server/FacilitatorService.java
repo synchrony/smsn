@@ -9,6 +9,7 @@ import net.fortytwo.extendo.p2p.PingAnswerer;
 import net.fortytwo.extendo.p2p.ServiceBroadcaster;
 import net.fortytwo.extendo.p2p.ServiceDescription;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineWrapper;
+import net.fortytwo.extendo.server.gesture.GesturalServer;
 import net.fortytwo.extendo.util.TypedProperties;
 import net.fortytwo.flow.NullSink;
 import net.fortytwo.flow.Sink;
@@ -100,6 +101,11 @@ public class FacilitatorService {
         cache.setDataStore(store);
         queryEngine.setLinkedDataCache(cache, sail);
 
+        // gestural event processing via OSC
+        GesturalServer gesturalServer = new GesturalServer(oscPort);
+        gesturalServer.start();
+
+        // SPARQL pub/sub via Extendo P2P
         ConnectionHost ch = new ConnectionHost(pubsubPort);
         ch.addNotifier(wrapper.getNotifier());
         ch.addNotifier(new ConnectionHost.Notifier() {

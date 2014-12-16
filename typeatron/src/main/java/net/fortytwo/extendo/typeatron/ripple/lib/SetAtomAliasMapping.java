@@ -14,29 +14,29 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class SetAtomShortcutMapping extends AtomMapping {
+public class SetAtomAliasMapping extends AtomMapping {
 
-    private static final Logger logger = Logger.getLogger(SetAtomShortcutMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(SetAtomAliasMapping.class.getName());
 
-    public SetAtomShortcutMapping(final ExtendoBrainClient client,
-                                  final Filter filter) {
+    public SetAtomAliasMapping(final ExtendoBrainClient client,
+                               final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                ExtendoLibrary.NS_2014_12 + "set-atom-shortcut"
+                ExtendoLibrary.NS_2014_12 + "set-atom-alias"
         };
     }
 
     public Parameter[] getParameters() {
         return new Parameter[]{
                 new Parameter("atom", "the reference atom", true),
-                new Parameter("shortcut", "the new shortcut", true)};
+                new Parameter("alias", "the new alias", true)};
     }
 
     public String getComment() {
-        return "sets the @shortcut property of an atom";
+        return "sets the @alias property of an atom";
     }
 
     public void apply(RippleList stack,
@@ -51,9 +51,9 @@ public class SetAtomShortcutMapping extends AtomMapping {
         Note n = toNote(no, false);
 
         if (null == n) {
-            logger.warning("can't set @shortcut of non-atom: " + no);
+            logger.warning("can't set @alias of non-atom: " + no);
         } else {
-            setProperty(n, Extendo.SHORTCUT, value);
+            setProperty(n, Extendo.ALIAS, value);
 
             // put the atom back on the stack
             solutions.put(stack.push(n));

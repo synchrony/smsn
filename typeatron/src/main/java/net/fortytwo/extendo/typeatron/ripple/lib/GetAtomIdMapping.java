@@ -13,18 +13,18 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GetAtomShortcutMapping extends AtomMapping {
+public class GetAtomIdMapping extends AtomMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomShortcutMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetAtomIdMapping.class.getName());
 
-    public GetAtomShortcutMapping(final ExtendoBrainClient client,
-                                  final Filter filter) {
+    public GetAtomIdMapping(final ExtendoBrainClient client,
+                            final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                ExtendoLibrary.NS_2014_12 + "get-atom-shortcut"
+                ExtendoLibrary.NS_2014_12 + "get-atom-id"
         };
     }
 
@@ -33,7 +33,7 @@ public class GetAtomShortcutMapping extends AtomMapping {
     }
 
     public String getComment() {
-        return "gets the @shortcut property of an atom";
+        return "gets the unique id of an atom";
     }
 
     public void apply(RippleList stack,
@@ -46,12 +46,12 @@ public class GetAtomShortcutMapping extends AtomMapping {
         Note n = toNote(first, true);
 
         if (null == n) {
-            logger.warning("can't get @shortcut of non-atom: " + first);
+            logger.warning("can't get id of non-atom: " + first);
         } else {
-            String value = n.getShortcut();
-            if (null != value) {
-                // put both the @shortcut property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+            String id = n.getId();
+            if (null != id) {
+                // put both the id and the (synced) atom back on the stack
+                solutions.put(stack.push(n).push(id));
             }
         }
     }

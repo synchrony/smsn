@@ -185,14 +185,6 @@ public class ExtendoRippleREPL {
         } else {
             throw new IllegalStateException("unexpected modifier: " + modifier);
         }
-
-        if (environment.verbose()) {
-            if (agent.getFacilitatorConnection().isActive()) {
-                OSCMessage m = new OSCMessage("/exo/fctr/tt/symbol");
-                m.addArgument(symbol);
-                agent.sendOSCMessageToFacilitator(m);
-            }
-        }
     }
 
     private void applyDiacritic(final ExtendedCharacters.Diacritic d) {
