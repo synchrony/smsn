@@ -3,10 +3,10 @@ package net.fortytwo.extendo.brain.rdf.classes;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
-import net.fortytwo.extendo.rdf.vocab.DCTerms;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
@@ -41,7 +41,7 @@ public class WebPage extends AtomClass {
         // note: assumes that the value ends with "(web page)"
         int i = a.getValue().lastIndexOf("(");
         String d = a.getValue().substring(0, i).trim();
-        handler.handleStatement(vf.createStatement(self, DCTerms.TITLE, vf.createLiteral(d)));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(d)));
 
         return self;
     }

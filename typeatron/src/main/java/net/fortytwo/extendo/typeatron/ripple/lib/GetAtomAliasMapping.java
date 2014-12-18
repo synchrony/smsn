@@ -43,7 +43,7 @@ public class GetAtomAliasMapping extends AtomMapping {
         Object first = stack.getFirst();
         stack = stack.getRest();
 
-        Note n = toNote(first, true);
+        Note n = toNote(first, 0, true);
 
         if (null == n) {
             logger.warning("can't get @alias of non-atom: " + first);

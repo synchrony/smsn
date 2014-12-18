@@ -48,7 +48,7 @@ public class SetAtomWeightMapping extends AtomMapping {
         Object no = stack.getFirst();
         stack = stack.getRest();
 
-        Note n = toNote(no, false);
+        Note n = toNote(no, 0, false);
 
         if (null == n) {
             logger.warning("can't set @weight of non-atom: " + no);

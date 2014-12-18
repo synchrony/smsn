@@ -4,6 +4,8 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 /**
+ * The Extendo gesture/activity ontology as a collection of terms
+ *
  * @author Joshua Shinavier (http://fortytwo.net).
  */
 public interface ExtendoGesture {

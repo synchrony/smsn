@@ -25,6 +25,10 @@ public class NoteParser {
             ID = Pattern.compile("[a-zA-Z0-9-_]+"),
             ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
 
+    public static final String
+            VERBATIM_BLOCK_START = "{{{",
+            VERBATIM_BLOCK_END = "}}}";
+
     private static final String
             ALIAS_ATTR = "@alias",
             PRIORITY_ATTR = "@priority",
@@ -135,13 +139,14 @@ public class NoteParser {
 
             String value = "";
             if (0 < l.length()) {
-                if (!isAttribute && l.contains("{{{")) {
+                // TODO: this only allows a single verbatim block per atom
+                if (!isAttribute && l.contains(VERBATIM_BLOCK_START)) {
                     int start = lineNumber;
                     boolean inside = true;
-                    int index = l.indexOf("{{{") + 3;
+                    int index = l.indexOf(VERBATIM_BLOCK_START) + VERBATIM_BLOCK_START.length();
                     while (true) {
                         // Check for the closing symbol before the opening symbol
-                        int b2 = l.indexOf("}}}", index);
+                        int b2 = l.indexOf(VERBATIM_BLOCK_END, index);
                         if (b2 >= 0) {
                             if (!inside) {
                                 throw new NoteParsingException(start, "unmatched verbatim block terminator" +
@@ -149,18 +154,18 @@ public class NoteParser {
                             }
 
                             inside = false;
-                            index = b2 + 3;
+                            index = b2 + VERBATIM_BLOCK_END.length();
                             continue;
                         }
 
-                        int b1 = l.indexOf("{{{", index);
+                        int b1 = l.indexOf(VERBATIM_BLOCK_START, index);
                         if (b1 >= 0) {
                             if (inside) {
                                 throw new NoteParsingException(start, "nested verbatim blocks (detected on line " +
                                         lineNumber + ") are not allowed");
                             }
                             inside = true;
-                            index = b1 + 3;
+                            index = b1 + VERBATIM_BLOCK_START.length();
                             continue;
                         }
 
@@ -263,6 +268,18 @@ public class NoteParser {
         return root;
     }
 
+    /**
+     * Removes the verbatim block terminators ("{{{" and "}}}") from an atom value string.
+     * This method does not check the value with respect to matching and non-nested terminators;
+     * the value is assumed to be valid.
+     *
+     * @param escaped
+     * @return the unescaped value
+     */
+    public static String unescapeValue(final String escaped) {
+        return escaped.replaceAll(VERBATIM_BLOCK_START, "").replaceAll(VERBATIM_BLOCK_END, "");
+    }
+
     public Note fromJSON(final JSONObject j) throws JSONException {
         Note n = new Note();
 
@@ -306,6 +323,10 @@ public class NoteParser {
     }
 
     public static class NoteParsingException extends Exception {
+        public NoteParsingException(final String message) {
+            super(message);
+        }
+
         public NoteParsingException(final int lineNumber,
                                     final String message) {
             super("line " + lineNumber + ": " + message);

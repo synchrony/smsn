@@ -14,6 +14,7 @@ import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteHistory;
 import net.fortytwo.extendo.brain.NoteQueries;
+import net.fortytwo.extendo.brain.Params;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
 import net.fortytwo.extendo.brain.wiki.NoteWriter;
 import org.json.JSONException;
@@ -116,16 +117,16 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                     return ExtensionResponse.error("height may not be more than 5");
                 }
 
-                p.map.put("depth", "" + p.height);
+                p.map.put(Params.HEIGHT, "" + p.height);
             }
 
             if (null != p.filter) {
-                p.map.put("minSharability", "" + p.filter.getMinSharability());
-                p.map.put("maxSharability", "" + p.filter.getMaxSharability());
-                p.map.put("defaultSharability", "" + p.filter.getDefaultSharability());
-                p.map.put("minWeight", "" + p.filter.getMinWeight());
-                p.map.put("maxWeight", "" + p.filter.getMaxWeight());
-                p.map.put("defaultWeight", "" + p.filter.getDefaultWeight());
+                p.map.put(Params.MIN_SHARABILITY, "" + p.filter.getMinSharability());
+                p.map.put(Params.MAX_SHARABILITY, "" + p.filter.getMaxSharability());
+                p.map.put(Params.DEFAULT_SHARABILITY, "" + p.filter.getDefaultSharability());
+                p.map.put(Params.MIN_WEIGHT, "" + p.filter.getMinWeight());
+                p.map.put(Params.MAX_WEIGHT, "" + p.filter.getMaxWeight());
+                p.map.put(Params.DEFAULT_WEIGHT, "" + p.filter.getDefaultWeight());
             }
 
             if (null != rootKey) {
@@ -139,16 +140,16 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                     return ExtensionResponse.error("root of view is not visible: " + rootKey);
                 }
 
-                p.map.put("root", rootKey);
+                p.map.put(Params.ROOT, rootKey);
             }
 
-            p.map.put("title", null == p.root
+            p.map.put(Params.TITLE, null == p.root
                     || null == p.root.getValue()
                     || 0 == p.root.getValue().length() ? "[no title]" : p.root.getValue());
 
             if (null != styleName) {
                 p.style = NoteQueries.lookupStyle(styleName);
-                p.map.put("style", p.style.getName());
+                p.map.put(Params.STYLE, p.style.getName());
             }
 
             // Force manual transaction mode (provided that the graph is transactional)
@@ -219,7 +220,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
             throw new IOException(e);
         }
 
-        p.map.put("view", toJettison(json));
+        p.map.put(Params.VIEW, toJettison(json));
     }
 
     public static float findMinAuthorizedSharability(final Principal user,

@@ -21,6 +21,7 @@ public class LinkedConcept extends AtomClass {
         super(
                 "linked-concept",
                 null,
+                // TODO: support concepts from datasets other than DBpedia
                 Pattern.compile("http://dbpedia.org/resource/.+"),
                 null
                 );

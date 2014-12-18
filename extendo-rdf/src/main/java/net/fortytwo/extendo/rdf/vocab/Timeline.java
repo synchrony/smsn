@@ -4,9 +4,11 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 /**
+ * The Timeline Ontology as a collection of terms
+ * This class was created on 2013-10-16 from Timeline Ontology version 1.0 published 29th October 2007
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-// this class created on 2013-10-16 from Timeline Ontology version 1.0 published 29th October 2007
 public interface Timeline {
     public static final String NAMESPACE = "http://purl.org/NET/c4dm/timeline.owl#";
 

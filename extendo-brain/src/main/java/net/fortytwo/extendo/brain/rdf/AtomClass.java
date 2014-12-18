@@ -3,6 +3,8 @@ package net.fortytwo.extendo.brain.rdf;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.rdf.classes.AKAReference;
+import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.OWL;
@@ -83,5 +85,31 @@ public abstract class AtomClass {
 
     public interface FieldHandler {
         void handle(Atom object, RDFizationContext context) throws RDFHandlerException;
+    }
+
+    public static class NickHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            ValueFactory vf = context.getValueFactory();
+
+            // TODO: this is an abuse of foaf:nick even when the domain is foaf:Person as it is here...
+            // foaf:nick is supposed to be used for online handles, not aliases in general
+            context.getHandler().handleStatement(
+                    vf.createStatement(
+                            context.getSubjectUri(), FOAF.NICK, vf.createLiteral(
+                                    AKAReference.extractAlias(object.getValue()))));
+        }
+    }
+
+    public static class PageHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            ValueFactory vf = context.getValueFactory();
+            URI objectURI = context.uriOf(object);
+            context.getHandler().handleStatement(vf.createStatement(
+                    // note: use of foaf:page rather than foaf:homepage avoids the assumption that the link is
+                    // always a home page, although this is frequently the case
+                    context.getSubjectUri(), FOAF.PAGE, objectURI));
+        }
     }
 }

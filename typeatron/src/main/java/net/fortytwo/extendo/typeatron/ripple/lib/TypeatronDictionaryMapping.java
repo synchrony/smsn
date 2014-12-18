@@ -143,7 +143,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
     public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron,
                                       final UserDictionary userDictionary) throws RippleException {
-        ExtendoBrainClient exoBrainClient = null;
+        ExtendoBrainClient exoBrainClient;
         try {
             exoBrainClient = new ExtendoBrainClient();
         } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
@@ -170,6 +170,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
         // Extend-o-Brain
         add(new GetAtomAliasMapping(exoBrainClient, defaultFilter), "@a");
+        add(new GetAtomChildrenMapping(exoBrainClient, defaultFilter), "@n");
         add(new GetAtomCreatedMapping(exoBrainClient, defaultFilter), "@c");
         add(new GetAtomIdMapping(exoBrainClient, defaultFilter), "@i");
         add(new GetAtomSharabilityMapping(exoBrainClient, defaultFilter), "@y");
@@ -185,10 +186,6 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new AppendToLogMapping(brainstreamFilter), "a", "append");
         // TODO: temporary/change
         add(new GiveAtomMapping(exoBrainClient, defaultFilter, typeatron), "g", "give");
-
-        // TODO: x = experiment / mash mode
-        // TODO: y = redo
-        // TODO: z = undo
 
         // control library
         add(new Apply(), ".");

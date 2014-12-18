@@ -9,6 +9,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -73,12 +74,19 @@ public class DatedEvent extends AtomClass {
 
             Literal dateValue = vf.createLiteral(dateStr, XMLSchema.DATE);
 
+            h.handleStatement(vf.createStatement(context.getSubjectUri(), DCTERMS.DATE, dateValue));
+
+            /* Alternative, using the Event Ontology (DO NOT DELETE):
+
             Resource interval = vf.createBNode();
             h.handleStatement(vf.createStatement(interval, RDF.TYPE, Timeline.Interval));
             h.handleStatement(vf.createStatement(interval, Timeline.at, dateValue));
 
             h.handleStatement(vf.createStatement(
                     context.getSubjectUri(), net.fortytwo.extendo.rdf.vocab.Event.time, interval));
+            */
+
+            // note: a third possibility is to give Dates individual URIs
         }
     }
 }

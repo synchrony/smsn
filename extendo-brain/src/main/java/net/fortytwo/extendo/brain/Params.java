@@ -8,7 +8,6 @@ public interface Params {
             DATASET = "dataset",
             DEFAULT_SHARABILITY = "defaultSharability",
             DEFAULT_WEIGHT = "defaultWeight",
-            DEPTH = "depth",
             FILE = "file",
             FILTER = "filter",
             FORMAT = "format",
@@ -26,6 +25,7 @@ public interface Params {
             REQUEST = "request",
             ROOT = "root",
             STYLE = "style",
+            TITLE = "title",
             VALUE = "value",
             VALUE_CUTOFF = "valueCutoff",
             VIEW = "view";

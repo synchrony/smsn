@@ -141,6 +141,7 @@ public class BrainModeClient {
         functions.put("C-c C-v e", new EmacsFunction("exo-enter-edit-view", false));
         functions.put("C-c C-v f", new EmacsFunction("exo-update-to-forward-view", false));
         functions.put("C-c C-v i", new EmacsFunction("exo-toggle-inference-viewstyle", false));
+        functions.put("C-c C-v p", new EmacsFunction("exo-toggle-properties-view", false));
         functions.put("C-c C-v r", new EmacsFunction("exo-enter-readonly-view", false));
         functions.put("C-c C-v s", new EmacsFunction("exo-toggle-emacspeak", false));
         functions.put("C-c C-v t", new EmacsFunction("exo-set-value-truncation-length", true));

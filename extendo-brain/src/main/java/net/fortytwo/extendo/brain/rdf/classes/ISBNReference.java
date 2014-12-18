@@ -1,7 +1,6 @@
 package net.fortytwo.extendo.brain.rdf.classes;
 
 import net.fortytwo.extendo.brain.rdf.SimpleAtomClass;
-
 import java.util.regex.Pattern;
 
 /**

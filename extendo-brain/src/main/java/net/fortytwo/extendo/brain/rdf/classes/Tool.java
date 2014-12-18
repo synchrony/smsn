@@ -28,9 +28,9 @@ public class Tool extends AtomClass {
                 Pattern.compile(".{1,50}"),
                 null,
                 new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new NickHandler(),
+                        new AtomRegex.El(new AtomClass.NickHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new HomepageHandler(),
+                        new AtomRegex.El(new PageHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, WebPage.class),
                         new AtomRegex.El(null, // do nothing with usage for now
                                 AtomRegex.Modifier.ZeroOrOne, Usage.class),
@@ -53,29 +53,5 @@ public class Tool extends AtomClass {
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
 
         return self;
-    }
-
-    private static class NickHandler implements FieldHandler {
-        @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            ValueFactory vf = context.getValueFactory();
-
-            // TODO: this is an abuse of foaf:nick even when the domain is foaf:Person as it is here...
-            // foaf:nick is supposed to be used for online handles, not aliases in general
-            context.getHandler().handleStatement(
-                    vf.createStatement(
-                            context.getSubjectUri(), FOAF.NICK, vf.createLiteral(
-                                    AKAReference.extractAlias(object.getValue()))));
-        }
-    }
-
-    private static class HomepageHandler implements FieldHandler {
-        @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
-            context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), FOAF.HOMEPAGE, objectURI));
-        }
     }
 }

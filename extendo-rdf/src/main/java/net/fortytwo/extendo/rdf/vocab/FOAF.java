@@ -4,6 +4,10 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 /**
+ * The FOAF Vocabulary as a collection of terms
+ * Note: this class is used instead of org.openrdf.model.vocabulary.FOAF because the latter covers only
+ * a small subset of the vocabulary.
+ *
  * @author Joshua Shinavier (http://fortytwo.net).
  */
 public interface FOAF {
