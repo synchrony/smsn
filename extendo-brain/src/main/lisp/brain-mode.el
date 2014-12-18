@@ -74,6 +74,7 @@
 (setq exo-current-line 1)
 (setq exo-mode nil)  ;; Note: 'view-mode' is used by Emacs.
 (setq exo-viewstyle exo-sharability-viewstyle)
+(setq exo-view-properties nil)
 (setq exo-value-truncation-length 100)
 
 
@@ -114,6 +115,10 @@
 
 (defun get-alias (atom)
     (let ((x (assoc 'alias atom)))
+        (if x (cdr x) nil)))
+
+(defun get-shortcut (atom)
+    (let ((x (assoc 'shortcut atom)))
         (if x (cdr x) nil)))
 
 (defun get-type (atom)
@@ -564,10 +569,10 @@
 (defun black (text)
     (propertize text 'face (list :foreground "black")))
 
-(defun light-gray (text background)
+(defun light-gray (text)
     (propertize text
 	    'face (if full-colors-supported
-		    (list :foreground "grey80" :background background)
+		    (list :foreground "grey80" :background "white")
 			(list :foreground "black"))))
 
 (defun dark-gray (text background)
@@ -577,7 +582,7 @@
 			(list :foreground "black"))))
 
 (defun create-id-infix (id)
-    (light-gray (concat (propertize (concat " :" id) 'invisible t) ":") "white"))
+    (light-gray (concat (propertize (concat " :" id) 'invisible t) ":")))
 
 (defun write-view (editable children tree-indent)
     (loop for json across children do
@@ -591,6 +596,7 @@
 		        (target-sharability (get-sharability json))
                 (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
 		        (target-alias (get-alias json))
+		        (target-shortcut (get-shortcut json))
 		        (target-meta (get-meta json)))
 		            (if target-id (puthash target-id json exo-atoms))
 		            (if (not target-id) (error "missing target id"))
@@ -610,9 +616,14 @@
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
                     (if (using-inference)
-                        ;;(dolist (a target-meta) (insert (concat "@{" a "}\n"))))
-                        ;;(insert (concat "type: " (concat (type-of target-meta)))))
-                        (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n") "white"))))
+                        (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n")))))
+                    (if exo-view-properties (let ()
+                        (insert (light-gray (concat space "    @sharability " (number-to-string target-sharability) "\n")))
+                        (insert (light-gray (concat space "    @weight      " (number-to-string target-weight) "\n")))
+                        (if target-shortcut
+                            (insert (light-gray (concat space "    @shortcut    " target-shortcut "\n"))))
+                        (if target-alias
+                            (insert (light-gray (concat space "    @alias       " target-alias "\n"))))))
                     (write-view editable children (+ tree-indent 4))))))
 
 (defun num-or-nil-to-string (n)
@@ -1050,6 +1061,13 @@ a type has been assigned to it by the inference engine."
     (exo-update-view)
     (message (concat "switched to " exo-viewstyle " view style")))
 
+(defun exo-toggle-properties-view ()
+    "enable or disable the explicit display of atom properties as extra lines within views"
+    (interactive)
+    (setq exo-view-properties (not exo-view-properties))
+    (exo-update-view)
+    (message (concat (if exo-view-properties "enabled" "disabled") " property view")))
+
 (defun exo-toggle-truncate-lines ()
     "toggle line wrap mode"
     (interactive)
@@ -1220,6 +1238,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-v e")       'exo-enter-edit-view)
 (global-set-key (kbd "C-c C-v f")       'exo-update-to-forward-view)
 (global-set-key (kbd "C-c C-v i")       'exo-toggle-inference-viewstyle)
+(global-set-key (kbd "C-c C-v p")       'exo-toggle-properties-view)
 (global-set-key (kbd "C-c C-v r")       'exo-enter-readonly-view)
 (global-set-key (kbd "C-c C-v s")       'exo-toggle-emacspeak)
 (global-set-key (kbd "C-c C-v t")       (minibuffer-arg 'exo-set-value-truncation-length "value truncation length: "))
