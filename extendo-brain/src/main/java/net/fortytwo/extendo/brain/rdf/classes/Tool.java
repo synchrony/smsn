@@ -4,7 +4,6 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
-import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.OWL;
@@ -16,7 +15,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
- * Something which is used for a purpose, including hardware, software, and services.
+ * Something which is used for a purpose, such as hardware, software, or a service.
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -25,7 +24,7 @@ public class Tool extends AtomClass {
     public Tool() {
         super(
                 "tool",
-                Pattern.compile(".{1,50}"),
+                Pattern.compile("[a-zA-Z0-9].{1,49}"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(new AtomClass.NickHandler(),

@@ -27,14 +27,16 @@ public class NoteParser {
 
     public static final String
             VERBATIM_BLOCK_START = "{{{",
-            VERBATIM_BLOCK_END = "}}}";
+            VERBATIM_BLOCK_END = "}}}",
+            VERBATIM_BLOCK_START_ESC = "\\{\\{\\{",
+            VERBATIM_BLOCK_END_ESC = "\\}\\}\\}";
 
     private static final String
-            ALIAS_ATTR = "@alias",
-            PRIORITY_ATTR = "@priority",
-            SHARABILITY_ATTR = "@sharability",
-            SHORTCUT_ATTR = "@shortcut",
-            WEIGHT_ATTR = "@weight";
+            ALIAS_PROP = "@alias",
+            PRIORITY_PROP = "@priority",
+            SHARABILITY_PROP = "@sharability",
+            SHORTCUT_PROP = "@shortcut",
+            WEIGHT_PROP = "@weight";
 
     private static final int MAX_BULLET_LENGTH = 1;
 
@@ -96,7 +98,7 @@ public class NoteParser {
                 indentHierarachy.removeLast();
             }
 
-            // parse bullet or attribute name
+            // parse bullet or property name
             int j = -1;
             for (int i = 0; i < l.length(); i++) {
                 char c = l.charAt(i);
@@ -109,12 +111,12 @@ public class NoteParser {
                 j = l.length();
             }
 
-            boolean isAttribute;
+            boolean isProperty;
             String bullet = l.substring(0, j);
             if (bullet.startsWith("@") && bullet.length() > 1) {
-                isAttribute = true;
+                isProperty = true;
             } else {
-                isAttribute = false;
+                isProperty = false;
 
                 if (bullet.length() > MAX_BULLET_LENGTH) {
                     throw new NoteParsingException(lineNumber, "bullet is too long: " + bullet);
@@ -129,7 +131,7 @@ public class NoteParser {
 
             // find id, if present
             String id = null;
-            if (!isAttribute) {
+            if (!isProperty) {
                 Matcher m = ID_SUFFIX.matcher(l);
                 if (m.find() && 0 == m.start()) {
                     id = l.substring(1, m.end() - 1);
@@ -140,7 +142,7 @@ public class NoteParser {
             String value = "";
             if (0 < l.length()) {
                 // TODO: this only allows a single verbatim block per atom
-                if (!isAttribute && l.contains(VERBATIM_BLOCK_START)) {
+                if (!isProperty && l.contains(VERBATIM_BLOCK_START)) {
                     int start = lineNumber;
                     boolean inside = true;
                     int index = l.indexOf(VERBATIM_BLOCK_START) + VERBATIM_BLOCK_START.length();
@@ -191,11 +193,12 @@ public class NoteParser {
             value = value.trim();
 
             if (0 == value.length()) {
-                if (isAttribute) {
+                if (isProperty) {
                     // can "clear" alias or shortcut by writing "@alias" or "@shortcut" and nothing else;
-                    // all other attributes require an argument
-                    if (!(bullet.equals(ALIAS_ATTR) || bullet.equals(SHORTCUT_ATTR))) {
-                        throw new NoteParsingException(lineNumber, "empty attribute value");
+                    // all other properties require an argument
+                    if (!(bullet.equals(ALIAS_PROP) || bullet.equals(SHORTCUT_PROP))) {
+                        throw new NoteParsingException(
+                                lineNumber, "empty value for property candidate '" + bullet + "'");
                     }
                 } else if (null == id) {
                     throw new NoteParsingException(lineNumber, "empty value for new note");
@@ -206,22 +209,22 @@ public class NoteParser {
                 }
             }
 
-            if (isAttribute) {
+            if (isProperty) {
                 Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
-                if (bullet.equals(ALIAS_ATTR)) {
+                if (bullet.equals(ALIAS_PROP)) {
                     if (value.length() > 0) {
                         n.setAlias(value);
                     } else {
                         n.setAlias(Note.CLEARME_VALUE);
                     }
-                } else if (bullet.equals(SHORTCUT_ATTR)) {
+                } else if (bullet.equals(SHORTCUT_PROP)) {
                     if (value.length() > 0) {
                         n.setShortcut(value);
                     } else {
                         n.setShortcut(Note.CLEARME_VALUE);
                     }
-                } else if (bullet.equals(PRIORITY_ATTR)) {
+                } else if (bullet.equals(PRIORITY_PROP)) {
                     float val;
                     try {
                         val = Float.valueOf(value);
@@ -229,7 +232,7 @@ public class NoteParser {
                         throw new NoteParsingException(lineNumber, "invalid @priority value: " + value);
                     }
                     n.setPriority(val);
-                } else if (bullet.equals(SHARABILITY_ATTR)) {
+                } else if (bullet.equals(SHARABILITY_PROP)) {
                     float val;
                     try {
                         val = Float.valueOf(value);
@@ -237,7 +240,7 @@ public class NoteParser {
                         throw new NoteParsingException(lineNumber, "invalid @sharability value: " + value);
                     }
                     n.setSharability(val);
-                } else if (bullet.equals(WEIGHT_ATTR)) {
+                } else if (bullet.equals(WEIGHT_PROP)) {
                     float val;
                     try {
                         val = Float.valueOf(value);
@@ -246,7 +249,7 @@ public class NoteParser {
                     }
                     n.setWeight(val);
                 } else {
-                    throw new NoteParsingException(lineNumber, "unknown attribute: " + bullet);
+                    throw new NoteParsingException(lineNumber, "unknown property: " + bullet);
                 }
             } else {
                 Note n = new Note();
@@ -277,7 +280,7 @@ public class NoteParser {
      * @return the unescaped value
      */
     public static String unescapeValue(final String escaped) {
-        return escaped.replaceAll(VERBATIM_BLOCK_START, "").replaceAll(VERBATIM_BLOCK_END, "");
+        return escaped.replaceAll(VERBATIM_BLOCK_START_ESC, "").replaceAll(VERBATIM_BLOCK_END_ESC, "");
     }
 
     public Note fromJSON(final JSONObject j) throws JSONException {

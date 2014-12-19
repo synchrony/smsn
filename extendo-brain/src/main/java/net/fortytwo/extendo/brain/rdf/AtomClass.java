@@ -23,7 +23,6 @@ public abstract class AtomClass {
     protected Pattern valueRegex;
     protected Pattern aliasRegex;
     protected AtomRegex memberRegex;
-    private final int highestOutScore;
 
     public AtomClass(final String name,
                      final Pattern valueRegex,
@@ -33,24 +32,18 @@ public abstract class AtomClass {
         this.valueRegex = valueRegex;
         this.aliasRegex = aliasRegex;
         this.memberRegex = memberRegex;
-
-        int tot = 0;
-        if (null != valueRegex) {
-            tot++;
-        }
-        if (null != aliasRegex) {
-            tot++;
-        }
-        if (null != memberRegex) {
-            for (AtomRegex.El el : memberRegex.getElements()) {
-                tot += el.getAlternatives().size() > 0 ? 3 : 1;
-            }
-        }
-        highestOutScore = tot;
     }
 
-    public int getHighestOutScore() {
-        return highestOutScore;
+    public String getName() {
+        return name;
+    }
+
+    public Pattern getValueRegex() {
+        return valueRegex;
+    }
+
+    public Pattern getAliasRegex() {
+        return aliasRegex;
     }
 
     protected abstract boolean isCollectionClass();

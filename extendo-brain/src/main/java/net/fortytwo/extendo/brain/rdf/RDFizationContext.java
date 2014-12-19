@@ -13,7 +13,7 @@ public class RDFizationContext {
     private final RDFHandler handler;
     private final ValueFactory valueFactory;
 
-    private URI subectUri;
+    private URI subjectUri;
 
     public RDFizationContext(final RDFHandler handler,
                              final ValueFactory valueFactory) {
@@ -22,11 +22,11 @@ public class RDFizationContext {
     }
 
     public void setSubject(Atom subject) {
-        this.subectUri = uriOf(subject);
+        this.subjectUri = uriOf(subject);
     }
 
     public URI getSubjectUri() {
-        return subectUri;
+        return subjectUri;
     }
 
     public ValueFactory getValueFactory() {

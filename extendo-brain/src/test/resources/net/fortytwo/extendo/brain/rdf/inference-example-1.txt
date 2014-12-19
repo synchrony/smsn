@@ -1,0 +1,145 @@
+3
++ :mRwSsu2: Zur Electrodynamik bewegter Körper
+    @sharability 0.75
+    @weight      0.5
+    · :gsaYMBs: www.physik.uni-augsburg.de/annalen/history/einstein-papers/1905_17_891-921.pdf (web page)
+        @sharability 0.75
+        @weight      0.5
+        @alias       http://www.physik.uni-augsburg.de/annalen/history/einstein-papers/1905_17_891-921.pdf
+    · :xKWD1wC: bibtex: {{{
+bibtex reference here
+}}}
+        @sharability 0.75
+        @weight      0.25
+    + :GORFdGO: some concepts from "Zur Electrodynamik bewegter Körper"
+        @sharability 0.75
+        @weight      0.5
+        + :-kKLYO8: principle of relativity
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Principle_of_relativity
+        + :dDn4jt0: speed of light
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Speed_of_light
+        + :x6rw4et: simultaneity
+            @sharability 1
+            @weight      0.75
+            @alias       http://dbpedia.org/resource/Simultaneity
+        · :0MQ4h4a: ...
+            @sharability 0.75
+            @weight      0.5
+
+2
++ :vtdNdMF: some of Einstein's statements about his own thought processes
+    @sharability 0.75
+    @weight      0.5
+    · :T-p_WkO: "I have sensations of a kinesthetic or muscular type."
+        @sharability 0.75
+        @weight      0.5
+    + :Bd338zr: "I very rarely think in words at all. A thought comes, and I may try to express it in words afterwards"
+        @sharability 0.75
+        @weight      0.5
+    · :K3moPdU: "[t]he words of the language, as they are written or spoken, do not seem to play any role in my mechanism of thought. The psychical entities which seem to serve as elements in thought are certain signs and more or less clear images which can be 'voluntarily' reproduced and combined.... The above mentioned elements are, in my case of visual and some of a muscular type.... Conventional words or other signs [presumably mathematical ones] have to be sought for laboriously only in a secondary stage, when the associative play already referred to is sufficiently established and can be reproduced at will"
+        @sharability 0.75
+        @weight      0.5
+
+2
++ :wz60qqd: Einstein's children
+    @sharability 0.75
+    @weight      0.5
+    · :Y3X-skF: Lieserl (Einstein's daughter)
+        @sharability 1
+        @weight      0.5
+    + :6_sSpVa: Hans Albert Einstein
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/Hans_Albert_Einstein
+    + :dleUIwo: Eduard Einstein
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/Eduard_Einstein
+
+3
++ :yOXFhhN: Albert Einstein
+    @sharability 1
+    @weight      1
+    @shortcut    ae
+    @alias       http://dbpedia.org/resource/Albert_Einstein
+    + :Z5UUQn6: some of Albert Einstein's papers
+        @sharability 0.75
+        @weight      0.5
+        + :3MeuFXA: Eine neue Bestimmung der Moleküldimensionen
+            @sharability 0.75
+            @weight      0.5
+        + :mRwSsu2: Zur Electrodynamik bewegter Körper
+            @sharability 0.75
+            @weight      0.5
+        · :MaKtw50: Ist die Trägheit eines Körpers von seinem Energieinhalt abhängig?
+            @sharability 0.75
+            @weight      0.5
+    + :5OfUlUN: some quotes by Albert Einstein
+        @sharability 0.75
+        @weight      0.5
+        + :vtdNdMF: some of Einstein's statements about his own thought processes
+            @sharability 0.75
+            @weight      0.5
+        + :-ngTO_3: "The greatest scientists are artists as well"
+            @sharability 0.75
+            @weight      0.5
+        + :ckisW-T: "The human mind has first to construct forms independently, before we can find them in things."
+            @sharability 0.75
+            @weight      0.5
+        · :q3toWSM: "All great achievements of science must start from intuitive knowledge. I believe in intuition and inspiration.... At times I feel certain I am right while not knowing the reason."
+            @sharability 0.75
+            @weight      0.5
+        · :wP_GFJA: "Imagination is more important than knowledge"
+            @sharability 0.75
+            @weight      0.5
+        · :m_cclOD: "If what is seen and experienced is portrayed in the language of logic, then it is science. If it is communicated through forms whose constructions are not accessible to the conscious mind but are recognized intuitively, then it is art" (Calaprice, 2000, 271)
+            @sharability 0.75
+            @weight      0.5
+        · :pPOz-sc: "At some point in time you should stop reading books and start thinking for yourself." (possibly paraphrased)
+            @sharability 0.75
+            @weight      0.5
+        · :0IbxKLO: "If A is success in life, then A equals x plus y plus z. Work is x; y is play; and z is keeping your mouth shut."
+            @sharability 0.75
+            @weight      0.5
+    + :yWBqSc2: Albert Einstein's family
+        @sharability 0.75
+        @weight      0.5
+        · :mPx8zEW: Hermann Einstein
+            @sharability 1
+            @weight      0.5
+        · :PR8p9B5: Pauline Einstein (née Koch)
+            @sharability 1
+            @weight      0.5
+        · :b6jFIkg: Maria "Maja" Einstein
+            @sharability 1
+            @weight      0.5
+        · :U2RAPqU: Mileva Marić
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Mileva_Mari%C4%87
+        · :Wks2hZM: Elsa Einstein
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Elsa_Einstein
+        + :wz60qqd: Einstein's children
+            @sharability 0.75
+            @weight      0.5
+    · :Mj92Ye0: 14 March 1879 - 18 April 1955
+        @sharability 0.75
+        @weight      0.5
+    + :MZwZ0zD: some of Einstein's views on science and language
+        @sharability 0.75
+        @weight      0.5
+        · :tWHr_wY: a basic kind of language consists of linking basic symbols to sense impressions. A further stage deals with associations between those symbols.  If language is to lead to understanding, there must be rules concerning the relations between the signs on the one hand, and on the other hand, there must be a stable correspondence between signs and impressions.  As children, we learn these rules by intuition, but when we become aware of them, grammar is established.  When language becomes relatively independent of the background of impressions, a greater inner coherence is attained.  Only at this further stage of development, where frequent use is made of abstract concepts, language becomes an instrument of reasoning in the true sense of the word.  At the same time, however, language becomes misleading if the connection with sense impressions is lost.
+            @sharability 0.75
+            @weight      0.5
+        · :S-nFME2: what distinguishes the language of science from ordinary language?  Science strives for precision and clarity of concepts as regards their interrelation and their correspondence to sensory data.  E.g. Euclidean geometry is based on a small set of axioms and is linked to the physical act of measurement.
+            @sharability 0.75
+            @weight      0.5
+        · :fQ0dJDi: science is driven by the goal of understanding, but it does not itself inform the goals of mankind.  Rather, it is a tool which can be used for different ends.  Perfection of means and confusion of goals seem (in Einstein's view) to characterize the modern age.  If even a minority of mankind strives for the safety, the welfare, and the free development of the talent of mankind, they will not be denied the means, and their superiority will be proven in the long run.
+            @sharability 0.75
+            @weight      0.5

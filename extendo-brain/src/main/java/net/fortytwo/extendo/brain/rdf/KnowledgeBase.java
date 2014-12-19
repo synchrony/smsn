@@ -29,6 +29,7 @@ import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.TODOCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.TopicCollection;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -65,10 +66,20 @@ public class KnowledgeBase {
 
     private final Map<Atom, List<AtomClassEntry>> atomClassifications;
 
+    private ValueFactory valueFactory = new ValueFactoryImpl();
+
     public KnowledgeBase(final BrainGraph graph) {
         this.graph = graph;
         this.atomClassifications = new HashMap<Atom, List<AtomClassEntry>>();
         this.classes = new HashMap<Class<? extends AtomClass>, AtomClass>();
+    }
+
+    /**
+     * Overrides the default ValueFactory
+     * @param valueFactory a new ValueFactory to generate RDF statements and basic values
+     */
+    public void setValueFactory(final ValueFactory valueFactory) {
+        this.valueFactory = valueFactory;
     }
 
     // note: graph and vocabulary are not affected by this operation
@@ -111,7 +122,8 @@ public class KnowledgeBase {
                 TODOCollection.class,
                 // context-specific collections
                 InterestCollection.class,
-                NoteCollection.class
+                NoteCollection.class,
+                TopicCollection.class,
                 // some classes still to add:
                 //     Account, ManufacturedPart, Place, SoftwareProject
         };
@@ -143,42 +155,62 @@ public class KnowledgeBase {
         }
     }
 
-    private boolean match(final Atom first,
+    private interface RdfizationCallback {
+        void execute() throws RDFHandlerException;
+    }
+
+    /*
+    Matches the children of an atom against an atom regex element (class or wildcard with quantifier)
+     */
+    private boolean match(final Atom childAtom,
                           final AtomRegex.El el,
                           final List<AtomClassEntry> evidenceEntries,
                           final AtomCollectionMemory memory,
                           final RDFizationContext context,
+                          final Collection<RdfizationCallback> callbacks,
                           final Filter filter) throws RDFHandlerException {
         Set<Class<? extends AtomClass>> alts = el.getAlternatives();
 
-        List<AtomClassEntry> entries = atomClassifications.get(first);
-        if (null == entries) {
-            // (as yet) unclassified atoms are only allowed to be trivial matches;
+        List<AtomClassEntry> entries = atomClassifications.get(childAtom);
+        if (null == entries) { // unclassified
+            // The unclassified atom matches if the element has no alternatives, i.e. accepts everything.
+            // note: (as yet) unclassified atoms are only allowed to be trivial matches;
             // we don't attempt to rdfize them
             return 0 == alts.size();
-        } else {
-            for (AtomClassEntry inf : entries) {
+        } else { // one or more classes
+            for (final AtomClassEntry entry : entries) {
                 // note: if multiple class entries are acceptable, only the first will match, in greedy fashion.
-                // The entries are sorted in descending order such that the highest-scoring is encountered first
-                if (0 == alts.size() || alts.contains(inf.getInferredClass())) {
-                    AtomClass atomClass = classes.get(inf.getInferredClass());
+                // The entries are sorted in descending order such that one with the highest out-score,
+                // or self-classification, is encountered first
+                if (0 == alts.size() || alts.contains(entry.getInferredClass())) {
+                    final AtomClass atomClass = classes.get(entry.getInferredClass());
 
-                    evidenceEntries.add(inf);
+                    // only add evidence for specifically matched classes
+                    if (0 < alts.size()) {
+                        evidenceEntries.add(entry);
+                    }
 
-                    // generate RDF statements if an RDF handler has been provided
-                    RDFHandler handler = context.getHandler();
-                    if (null != handler) {
-                        AtomClass.FieldHandler fieldHandler = el.getFieldHandler();
+                    // add an rdfization callback which will be executed if and only if the current classification is
+                    // chosen for the parent atom.  Delaying execution avoids multiple-typing of atoms,
+                    // or the wasted effort of generating RDF statements which are not allowed in the output.
+                    if (null != callbacks) {
+                        final AtomClass.FieldHandler fieldHandler = el.getFieldHandler();
 
                         // fieldHandler is optional
                         if (null != fieldHandler) {
-                            if (atomClass.isCollectionClass()) {
-                                if (null != inf.memory) {
-                                    handleAllMembers(inf.memory, fieldHandler, context, new HashSet<String>(), filter);
+                            callbacks.add(new RdfizationCallback() {
+                                @Override
+                                public void execute() throws RDFHandlerException {
+                                    if (atomClass.isCollectionClass()) {
+                                        if (null != entry.memory) {
+                                            handleAllMembers(entry.memory, fieldHandler, context,
+                                                    new HashSet<String>(), filter);
+                                        }
+                                    } else if (null == filter || filter.isVisible(childAtom.asVertex())) {
+                                        fieldHandler.handle(childAtom, context);
+                                    }
                                 }
-                            } else if (null == filter || filter.isVisible(first.asVertex())) {
-                                fieldHandler.handle(first, context);
-                            }
+                            });
                         }
                     }
 
@@ -186,11 +218,11 @@ public class KnowledgeBase {
                     // add this member to the collection memory
                     if (null != memory) {
                         if (atomClass.isCollectionClass()) {
-                            if (null != inf.memory) {
-                                memory.getMemberCollections().add(inf.memory);
+                            if (null != entry.memory) {
+                                memory.getMemberCollections().add(entry.memory);
                             }
                         } else {
-                            memory.getMemberAtoms().add(first);
+                            memory.getMemberAtoms().add(childAtom);
                         }
                     }
 
@@ -203,51 +235,43 @@ public class KnowledgeBase {
     }
 
     /**
-     * Performs Extendo type inference on the knowledge base, generating an RDF representation
-     * @param handler a handler for generated RDF statements
+     * Performs Extendo type inference on the knowledge base, optionally generating an RDF representation
+     * @param handler a handler for generated RDF statements (may be null)
      * @param filter an optional sharability filter for generated results.
      *               Type inference is performed on the entire knowledge base without regard to sharability,
      *               but generated RDF statements are limited to those subjects which are sharable according to
      *               the filter.
-     * @throws RDFHandlerException
      */
     public void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
 
-        RDFBuffer buffer = null == handler ? null : new RDFBuffer(handler);
-        ValueFactory vf = new ValueFactoryImpl(); // TODO
-        RDFizationContext context = new RDFizationContext(buffer, vf);
+        RDFizationContext context = new RDFizationContext(handler, valueFactory);
 
+        // class entries are sorted in descending order based on out-score rather than total score so as to avoid
+        // feedback -- see match().  The final score for a class and atom is the sum of out-score and in-score.
         Comparator outScoreDescending = Collections.reverseOrder();
         Comparator totalScoreDescending = new AtomClassificationComparator();
 
-        for (List<AtomClassEntry> l : atomClassifications.values()) {
-            for (AtomClassEntry e : l) {
-                e.inScore = 0;
-            }
-        }
-        List<AtomClassEntry> evidenceEntries = new LinkedList<AtomClassEntry>();
-
+        // classify or re-classify each atom
         for (Atom subject : graph.getAtoms()) {
             context.setSubject(subject);
 
             String value = subject.getValue();
             String alias = subject.getAlias();
 
-            if (null != buffer) {
-                buffer.clear();
-            }
-
             List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
             List<AtomClassEntry> newEntries = new LinkedList<AtomClassEntry>();
 
             for (AtomClass clazz : classes.values()) {
-                /*
-                if (a.asVertex().getId().equals("SBZFumn") && c.name.equals("person") && null != handler) {
+                /* DO NOT REMOVE
+                if (subject.asVertex().getId().equals("yOXFhhN") && clazz.name.equals("person")) {// && null != handler) {
                     System.out.println("break point here");
                 }//*/
 
-                evidenceEntries.clear();
+                List<AtomClassEntry> evidenceEntries = new LinkedList<AtomClassEntry>();
+
+                Collection<RdfizationCallback> callbacks = null == handler
+                        ? null : new LinkedList<RdfizationCallback>();
 
                 AtomCollectionMemory newMemo = clazz.isCollectionClass()
                         ? new AtomCollectionMemory((String) subject.asVertex().getId())
@@ -256,7 +280,7 @@ public class KnowledgeBase {
                 int points = 0;
 
                 if (null != clazz.valueRegex) {
-                    // one point for value regex
+                    // one point for matching value regex
                     points++;
                     if (null == value || !clazz.valueRegex.matcher(value).matches()) {
                         continue;
@@ -264,7 +288,7 @@ public class KnowledgeBase {
                 }
 
                 if (null != clazz.aliasRegex) {
-                    // one point for alias regex
+                    // one point for matching alias regex
                     points++;
                     if (null == alias || !clazz.aliasRegex.matcher(alias).matches()) {
                         continue;
@@ -285,14 +309,15 @@ public class KnowledgeBase {
 
                     while (!fail) { // break out on failure or exhaustion of the regex
                         if (advanceRegex) {
+                            // assign points for each matched regex element, not for each matched input element
                             if (matched && null != alts) {
                                 // one point for each wildcard regex element which matches at least one input
                                 //     e.g. .? earns one point for "a", "b", "c" or any other atom, none for ""
                                 // three points for each class-specific regex element which matches at least one input
                                 //     e.g. A*(B|C)+ earns 3 points for "a" or "aa", 6 points for "aac"
                                 points += alts.size() > 0 ? 3 : 1;
+                                matched = false;
                             }
-                            matched = false;
 
                             if (clazz.memberRegex.getElements().size() > eli) {
                                 el = clazz.memberRegex.getElements().get(eli++);
@@ -311,27 +336,28 @@ public class KnowledgeBase {
                         }
 
                         if (advanceInput) {
-                            // we have exhausted the input
                             if (null == cur) {
+                                // we have exhausted the input
                                 if (AtomRegex.Modifier.One == mod || AtomRegex.Modifier.OneOrMore == mod) {
                                     // additional input is required by the regex; fail
                                     fail = true;
                                     break;
                                 } else {
-                                    // try to exhaust the regex
+                                    // try to exhaust the regex without further input
                                     advanceRegex = true;
+                                    advanceInput = false;
                                     continue;
                                 }
+                            } else {
+                                first = cur.getFirst();
+                                cur = cur.getRest();
+                                advanceInput = false;
                             }
-                            first = cur.getFirst();
-                            cur = cur.getRest();
-
-                            advanceInput = false;
                         }
 
                         switch (mod) {
                             case ZeroOrOne:
-                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
                                     advanceRegex = true;
                                     advanceInput = true;
                                     matched = true;
@@ -340,7 +366,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case ZeroOrMore:
-                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
                                     advanceInput = true;
                                     matched = true;
                                 } else {
@@ -348,7 +374,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case One:
-                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
                                     advanceRegex = true;
                                     advanceInput = true;
                                     matched = true;
@@ -357,7 +383,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case OneOrMore:
-                                if (match(first, el, evidenceEntries, newMemo, context, filter)) {
+                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
                                     mod = AtomRegex.Modifier.ZeroOrMore;
                                     advanceInput = true;
                                     matched = true;
@@ -375,50 +401,73 @@ public class KnowledgeBase {
 
                 // at this point, we have classified the atom
 
-                // point value is a compromise between a model in which all scores range from 0 to 1,
-                // favoring simple classes, and a model in which scores range from 1 to infinity,
-                // favoring more complex ones.
-                // This gives simple classes priority over simpler atoms (e.g. the ISBN class which simply
-                // matches based on a value regex), which requires more complex classes to be matched by means
-                // of graph structure.
-                int poss = clazz.getHighestOutScore();
-                float pointValue = (1 + poss) / (2.0f * poss);
-                float outScore = points * pointValue;
+                // out-score is simply the number of ways in which the regular expressions of the class match the atom
+                int outScore = points;
 
-                boolean updated = false;
+                // update or create the atom's entry for this class.
+                // It is necessary to preserve an existing entry, if any, for the sake of the in-score
+                AtomClassEntry classEntry = null;
                 if (null != oldEntries) {
                     for (AtomClassEntry e : oldEntries) {
                         if (e.getInferredClass() == clazz.getClass()) {
                             e.outScore = outScore;
                             e.memory = newMemo;
-                            newEntries.add(e);
-                            updated = true;
+                            classEntry = e;
                             break;
                         }
                     }
                 }
-                if (!updated) {
-                    newEntries.add(new AtomClassEntry(clazz.getClass(), outScore, newMemo));
+                if (null == classEntry) {
+                    classEntry = new AtomClassEntry(clazz.getClass(), outScore, newMemo);
                 }
+                classEntry.callbacks = callbacks;
+                newEntries.add(classEntry);
+
                 // augment relevant in-scores of member atoms
                 for (AtomClassEntry e : evidenceEntries) {
-                    e.inScore = outScore + e.getInScore();
-                }
-
-                if (null != buffer && (null == filter || filter.isVisible(subject.asVertex()))) {
-                    clazz.toRDF(subject, context);
-
-                    // flush both the immediate description of the atom, as well as the relationship
-                    // of the atom to its fields to the downstream handler.
-                    buffer.flush();
+                    e.futureInScore += outScore;
                 }
             }
 
-            // replace old classification
+            // remove old classification (if any) and replace with the new one (if any)
             atomClassifications.remove(subject);
             if (newEntries.size() > 0) {
                 Collections.sort(newEntries, outScoreDescending);
                 atomClassifications.put(subject, newEntries);
+            }
+
+            // perform rdfization, choosing at most one classification
+            if (null != handler) {
+                if (newEntries.size() > 0) {
+                    List<AtomClassEntry> helper = new LinkedList<AtomClassEntry>();
+                    helper.addAll(newEntries);
+                    Collections.sort(helper, totalScoreDescending);
+                    AtomClassEntry best = helper.get(0);
+                    // a classification which has a score of only one or two is one of a handful of very weakly
+                    // supported inferences including basic regex matches.
+                    // Don't include these in the exported RDF, as they contain many false positives.
+                    if (best.getScore() > 2.0) {
+                        AtomClass clazz = classes.get(best.getInferredClass());
+                        if (subject.asVertex().getId().equals("0MQ4h4a")) {
+                            System.out.println("ELLIPSIS");
+                            System.out.println("\tclazz = " + clazz);
+                        }
+                        clazz.toRDF(subject, context);
+                        for (RdfizationCallback callback : best.callbacks) {
+                            callback.execute();
+                        }
+                    }
+                }
+            }
+        }
+
+        // update all in-scores, globally, and clear future in-scores in preparation for the next iteration
+        for (List<AtomClassEntry> l : atomClassifications.values()) {
+            for (AtomClassEntry e : l) {
+                e.inScore = e.futureInScore;
+                e.futureInScore = 0;
+                // also clear callbacks to free memory
+                e.callbacks = null;
             }
         }
 
@@ -438,7 +487,11 @@ public class KnowledgeBase {
         return count;
     }
 
-    // development/convenience method
+    /**
+     * Prints a representation of the class inference results for a given atom to standard output.
+     * This is a development/convenience method.
+     * @param a the atom to view
+     */
     public void viewInferred(final Atom a) {
         viewInferredInternal(a, 0);
     }
@@ -448,7 +501,7 @@ public class KnowledgeBase {
 
         public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
             // descending order based on total score
-            return ((Float) second.getScore()).compareTo(first.getScore());
+            return ((Integer) second.getScore()).compareTo(first.getScore());
         }
     }
 
@@ -469,8 +522,8 @@ public class KnowledgeBase {
             Collections.sort(helper, AtomClassificationComparator.INSTANCE);
             for (AtomClassEntry e : helper) {
                 for (int i = 0; i <= indent; i++) System.out.print("\t");
-                System.out.format("@(%s %.2f=%.2f+%.2f)\n",
-                        e.getInferredClassName(), e.getScore(), e.getOutScore(), e.getInScore());
+                System.out.println("@(" + e.getInferredClassName()
+                        + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore() + ")");
             }
         }
         indent++;
@@ -486,7 +539,6 @@ public class KnowledgeBase {
         }
     }
 
-    // convenience method
     public void exportRDF(final OutputStream out,
                           final RDFFormat format,
                           final Filter filter) throws SailException, RDFHandlerException {
@@ -573,59 +625,22 @@ public class KnowledgeBase {
         }
     }
 
-    private class RDFBuffer implements RDFHandler {
-        private final RDFHandler wrappedHandler;
-        private final Collection<Statement> buffer = new LinkedList<Statement>();
-
-        private RDFBuffer(final RDFHandler wrappedHandler) {
-            this.wrappedHandler = wrappedHandler;
-        }
-
-        public void startRDF() throws RDFHandlerException {
-            wrappedHandler.startRDF();
-        }
-
-        public void endRDF() throws RDFHandlerException {
-            wrappedHandler.endRDF();
-        }
-
-        public void handleNamespace(String s, String s2) throws RDFHandlerException {
-            wrappedHandler.handleNamespace(s, s2);
-        }
-
-        public void handleStatement(final Statement statement) throws RDFHandlerException {
-            buffer.add(statement);
-        }
-
-        public void handleComment(String s) throws RDFHandlerException {
-            wrappedHandler.handleComment(s);
-        }
-
-        public void flush() throws RDFHandlerException {
-            try {
-                for (Statement s : buffer) {
-                    wrappedHandler.handleStatement(s);
-                }
-            } finally {
-                buffer.clear();
-            }
-        }
-
-        public void clear() {
-            buffer.clear();
-        }
-    }
-
     public class AtomClassEntry implements Comparable<AtomClassEntry> {
         private final Class<? extends AtomClass> inferredClass;
-        private float outScore;
-        private float inScore;
+        private int outScore;
+        private int inScore;
+        private int futureInScore;
         private AtomCollectionMemory memory;
+        private Collection<RdfizationCallback> callbacks;
 
-        public AtomClassEntry(Class<? extends AtomClass> inferredClass, float outScore, AtomCollectionMemory memory) {
+        public AtomClassEntry(Class<? extends AtomClass> inferredClass, int outScore, AtomCollectionMemory memory) {
             this.inferredClass = inferredClass;
             this.outScore = outScore;
             this.memory = memory;
+
+            // note explicitly that in-score and future in-score (the working score) start at 0 for each entry
+            inScore = 0;
+            futureInScore = 0;
         }
 
         public Class<? extends AtomClass> getInferredClass() {
@@ -636,20 +651,20 @@ public class KnowledgeBase {
             return classes.get(inferredClass).name;
         }
 
-        public float getOutScore() {
+        public int getOutScore() {
             return outScore;
         }
 
         // compare based on out-score alone.  Used for the first stage of classification
         public int compareTo(AtomClassEntry other) {
-            return ((Float) outScore).compareTo(other.outScore);
+            return ((Integer) outScore).compareTo(other.outScore);
         }
 
-        public float getInScore() {
+        public int getInScore() {
             return inScore;
         }
 
-        public float getScore() {
+        public int getScore() {
             return inScore + outScore;
         }
     }

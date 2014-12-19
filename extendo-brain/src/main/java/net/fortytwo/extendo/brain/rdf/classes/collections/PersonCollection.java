@@ -16,7 +16,7 @@ public class PersonCollection extends AtomCollection {
         super(
                 "person-collection",
                 Pattern.compile("(some people .+)" +
-                        "|(.+'s children)" +
+                        "|(.+ children)" +
                         "|(.+ social network)" +
                         "|(.+ friends)" +
                         "|(.+ family)" +

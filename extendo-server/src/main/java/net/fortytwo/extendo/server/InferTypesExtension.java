@@ -34,8 +34,7 @@ public class InferTypesExtension extends ExtendoExtension {
         kb.reset();
         long timeBefore = System.currentTimeMillis();
 
-        // TODO: build this two-stage invocation into a method
-        kb.inferClasses(null, null);
+        // note: multiple (typically four) invocations are required before the knowledge base is ready for RDF export
         kb.inferClasses(null, null);
 
         long timeAfter = System.currentTimeMillis();
