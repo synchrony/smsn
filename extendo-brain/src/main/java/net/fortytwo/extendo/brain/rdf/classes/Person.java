@@ -5,7 +5,7 @@ import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
@@ -35,13 +35,13 @@ public class Person extends AtomClass {
                         new AtomRegex.El(new PageHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, WebPage.class),
                         new AtomRegex.El(new MadeHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DocumentCollection.class),
+                                AtomRegex.Modifier.ZeroOrOne, WorksCollection.class),
                         new AtomRegex.El(new QuotationHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, QuotedValueCollection.class),
                         new AtomRegex.El(new InterestHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, InterestCollection.class),
+                                AtomRegex.Modifier.ZeroOrOne, InterestsCollection.class),
                         new AtomRegex.El(new KnowsHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, PersonCollection.class),
+                                AtomRegex.Modifier.ZeroOrMore, SocialNetworkCollection.class),
                         new AtomRegex.El(new BirthdayHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, DatedEvent.Birthday.class),
                         // TODO: when the person passed away
@@ -120,6 +120,33 @@ public class Person extends AtomClass {
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
                             context.getSubjectUri(), FOAF.BIRTHDAY, context.uriOf(object)));
+        }
+    }
+
+    public static class WorksCollection extends DocumentCollection {
+        public WorksCollection() {
+            super();
+            name = "works-collection";
+            valueRegex = Pattern.compile("(some (books|papers|works) by .+)" +
+                    "|(some of .+ (books|papers|works))");
+        }
+    }
+
+    public static class InterestsCollection extends GenericCollection {
+        public InterestsCollection() {
+            super();
+            name = "interests-collection";
+            valueRegex = Pattern.compile("some things .+ like[sd]?");
+        }
+    }
+
+    public static class SocialNetworkCollection extends PersonCollection {
+        public SocialNetworkCollection() {
+            super();
+            name = "social-network-collection";
+            valueRegex = Pattern.compile("(.+ social network)" +
+                    "|(.+ friends)" +
+                    "|(.+ family)");
         }
     }
 }

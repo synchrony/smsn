@@ -635,10 +635,17 @@ public class NoteQueries {
         if (null != brain.getKnowledgeBase()) {
             List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(a);
             if (null != entries && entries.size() > 0) {
+                // sort in descending order by total score, putting the top-ranked class first
+                List<KnowledgeBase.AtomClassEntry> helper = new LinkedList<KnowledgeBase.AtomClassEntry>();
+                helper.addAll(entries);
+                Collections.sort(helper, KnowledgeBase.AtomClassificationComparator.INSTANCE);
+
                 List<String> meta = new LinkedList<String>();
-                for (KnowledgeBase.AtomClassEntry e : entries) {
-                    String ann = String.format("class %s %.2f=%.2f+%.2f",
-                            e.getInferredClassName(), e.getScore(), e.getOutScore(), e.getInScore());
+                for (KnowledgeBase.AtomClassEntry e : helper) {
+                    String ann = "class " + e.getInferredClassName()
+                            + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore();
+                    //String ann = String.format("class %s %.2f=%.2f+%.2f",
+                    //        e.getInferredClassName(), e.getScore(), e.getOutScore(), e.getInScore());
                     meta.add(ann);
                 }
 

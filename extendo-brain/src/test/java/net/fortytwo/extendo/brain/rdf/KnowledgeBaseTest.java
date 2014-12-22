@@ -26,7 +26,9 @@ import net.fortytwo.extendo.brain.rdf.classes.Usage;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
+import net.fortytwo.extendo.rdf.vocab.ExtendoVocab;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.junit.Test;
 import org.openrdf.model.Resource;
@@ -106,6 +108,11 @@ public class KnowledgeBaseTest extends TestCase {
     public void testDocumentCollectionSyntax() throws Exception {
         AtomClass t = DocumentCollection.class.newInstance();
 
+        assertTrue(t.getValueRegex().matcher("some books I have read").matches());
+        assertFalse(t.getValueRegex().matcher("books on tape").matches());
+        assertFalse(t.getValueRegex().matcher("other books").matches());
+
+        t = Person.WorksCollection.class.newInstance();
         assertTrue(t.getValueRegex().matcher("some of Arthur Dent's papers").matches());
         assertFalse(t.getValueRegex().matcher("papers by Arthur Dent").matches());
         assertFalse(t.getValueRegex().matcher("Arthur Dent's publications").matches());
@@ -125,9 +132,15 @@ public class KnowledgeBaseTest extends TestCase {
     public void testGenericCollectionSyntax() throws Exception {
         AtomClass t = GenericCollection.class.newInstance();
 
-        assertTrue(t.getValueRegex().matcher("some things I like about fish").matches());
-        assertFalse(t.getValueRegex().matcher("things I like about fish").matches());
-        assertFalse(t.getValueRegex().matcher("something I like about fish").matches());
+        assertTrue(t.getValueRegex().matcher("some things I think about").matches());
+        assertFalse(t.getValueRegex().matcher("things I think about").matches());
+        assertFalse(t.getValueRegex().matcher("something I think about").matches());
+
+        t = Person.InterestsCollection.class.newInstance();
+
+        assertTrue(t.getValueRegex().matcher("some things I like").matches());
+        assertFalse(t.getValueRegex().matcher("things I like").matches());
+        assertFalse(t.getValueRegex().matcher("something I like").matches());
     }
 
     @Test
@@ -172,6 +185,18 @@ public class KnowledgeBaseTest extends TestCase {
 
         assertTrue(t.getValueRegex().matcher("This is a Concept").matches());
         assertFalse(t.getValueRegex().matcher("...Not a Concept").matches());
+    }
+
+    @Test
+    public void testPersonCollectionSyntax() throws Exception {
+        AtomClass t= PersonCollection.class.newInstance();
+
+        assertTrue(t.getValueRegex().matcher("some people from here and there").matches());
+        assertFalse(t.getValueRegex().matcher("people, places, and things").matches());
+
+        t = Document.AuthorCollection.class.newInstance();
+        assertTrue(t.getValueRegex().matcher("the authors of \"A Very Important Paper\"").matches());
+        assertFalse(t.getValueRegex().matcher("two of the authors").matches());
     }
 
     @Test
@@ -301,6 +326,7 @@ public class KnowledgeBaseTest extends TestCase {
         Atom paperPdf = bg.getAtom("gsaYMBs");
         Atom topics = bg.getAtom("GORFdGO");
         Atom ellipsis = bg.getAtom("0MQ4h4a");
+        Atom quote = bg.getAtom("-ngTO_3");
 
         // The following are nested directly under Einstein's family
         Atom hermann = bg.getAtom("mPx8zEW");
@@ -313,6 +339,9 @@ public class KnowledgeBaseTest extends TestCase {
         Atom lieserl = bg.getAtom("Y3X-skF");
         Atom hansAlbert = bg.getAtom("6_sSpVa");
         Atom eduard = bg.getAtom("dleUIwo");
+
+        Atom googleGlass = bg.getAtom("ufIPR_C");
+        Atom sebastian = bg.getAtom("-L7cCbN");
 
         for (int i = 0; i < 4; i++) {
             System.out.println("#### ITERATION #" + (i + 1) + " ######");
@@ -333,16 +362,18 @@ public class KnowledgeBaseTest extends TestCase {
             kb.viewInferred(bibtex);
             System.out.println("");
             kb.viewInferred(topics);
+            System.out.println("");
+            kb.viewInferred(googleGlass);
         }
 
         assertClassEquals("person", einstein, kb);
-        assertClassEquals("document-collection", einsteinPapers, kb);
+        assertClassEquals("works-collection", einsteinPapers, kb);
         assertClassEquals("document", specialRelPaper, kb);
         assertClassEquals("bibtex-reference", bibtex, kb);
         assertClassEquals("quoted-value-collection", einsteinQuotes, kb);
         assertClassEquals("quoted-value-collection", einsteinQuotes2, kb);
-        assertClassEquals("person-collection", einsteinFamily, kb);
-        assertClassEquals("linked-concept", speedOfLight, kb);
+        assertClassEquals("social-network-collection", einsteinFamily, kb);
+        //assertClassEquals("linked-concept", speedOfLight, kb);
         assertClassEquals("webpage", paperPdf, kb);
 
         kb.exportRDF(new FileOutputStream("/tmp/test.nt"), RDFFormat.NTRIPLES, null);
@@ -374,6 +405,7 @@ public class KnowledgeBaseTest extends TestCase {
             };
 
             for (Resource r : known) {
+                System.out.println("r = " + r);System.out.flush();
                 assertObjects(rc, r, RDF.TYPE, FOAF.PERSON);
             }
 
@@ -395,6 +427,15 @@ public class KnowledgeBaseTest extends TestCase {
             assertObjects(rc, context.uriOf(speedOfLight), RDF.TYPE, OWL.THING);
             assertObjects(rc, context.uriOf(speedOfLight), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Speed_of_light"));
             assertObjects(rc, context.uriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, new LiteralImpl("bibtex reference here"));
+
+            // TODO: support for connection between person and quotation
+            assertObjects(rc, context.uriOf(quote), RDF.TYPE, ExtendoVocab.WORDORPHRASE);
+
+            assertObjects(rc, context.uriOf(googleGlass), RDF.TYPE, OWL.THING);
+            assertObjects(rc, context.uriOf(googleGlass), DCTERMS.CONTRIBUTOR,
+                    context.uriOf(einstein),
+                    context.uriOf(sebastian));
+            // TODO: support for related things
         } finally {
             rc.close();
         }

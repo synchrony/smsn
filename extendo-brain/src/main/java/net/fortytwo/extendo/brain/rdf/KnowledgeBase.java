@@ -24,8 +24,6 @@ import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.InterestCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.TODOCollection;
@@ -55,6 +53,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
+ * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class KnowledgeBase {
@@ -121,9 +121,13 @@ public class KnowledgeBase {
                 QuotedValueCollection.class,
                 TODOCollection.class,
                 // context-specific collections
-                InterestCollection.class,
-                NoteCollection.class,
+                Document.NoteCollection.class,
                 TopicCollection.class,
+                Document.AuthorCollection.class,
+                Person.WorksCollection.class,
+                Person.InterestsCollection.class,
+                Person.SocialNetworkCollection.class,
+                Tool.ContributorCollection.class,
                 // some classes still to add:
                 //     Account, ManufacturedPart, Place, SoftwareProject
         };
@@ -277,23 +281,23 @@ public class KnowledgeBase {
                         ? new AtomCollectionMemory((String) subject.asVertex().getId())
                         : null;
 
-                int points = 0;
 
                 if (null != clazz.valueRegex) {
-                    // one point for matching value regex
-                    points++;
                     if (null == value || !clazz.valueRegex.matcher(value).matches()) {
                         continue;
                     }
                 }
 
                 if (null != clazz.aliasRegex) {
-                    // one point for matching alias regex
-                    points++;
                     if (null == alias || !clazz.aliasRegex.matcher(alias).matches()) {
                         continue;
                     }
                 }
+
+                // out-score is the number of ways in which the member regex of the atom matches
+                // out-score is not affected by the value or alias regex, as these are considered necessary
+                // but not sufficient for classification
+                int outScore = 0;
 
                 if (null != clazz.memberRegex) {
                     AtomList cur = subject.getNotes();
@@ -307,18 +311,18 @@ public class KnowledgeBase {
                     boolean matched = false;
                     boolean fail = false;
 
-                    while (!fail) { // break out on failure or exhaustion of the regex
-                        if (advanceRegex) {
-                            // assign points for each matched regex element, not for each matched input element
-                            if (matched && null != alts) {
-                                // one point for each wildcard regex element which matches at least one input
-                                //     e.g. .? earns one point for "a", "b", "c" or any other atom, none for ""
-                                // three points for each class-specific regex element which matches at least one input
-                                //     e.g. A*(B|C)+ earns 3 points for "a" or "aa", 6 points for "aac"
-                                points += alts.size() > 0 ? 3 : 1;
-                                matched = false;
+                    // break out on failure or exhaustion of the regex
+                    while (!fail) {
+                        // assign one point per matched input element (as opposed to only one per regex element)
+                        if (matched && null != alts) {
+                            // assign a point only if the regex element matches a specific class, not a wildcard
+                            if (alts.size() > 0) {
+                                outScore++;
                             }
+                            matched = false;
+                        }
 
+                        if (advanceRegex) {
                             if (clazz.memberRegex.getElements().size() > eli) {
                                 el = clazz.memberRegex.getElements().get(eli++);
                                 mod = el.getModifier();
@@ -401,9 +405,6 @@ public class KnowledgeBase {
 
                 // at this point, we have classified the atom
 
-                // out-score is simply the number of ways in which the regular expressions of the class match the atom
-                int outScore = points;
-
                 // update or create the atom's entry for this class.
                 // It is necessary to preserve an existing entry, if any, for the sake of the in-score
                 AtomClassEntry classEntry = null;
@@ -425,7 +426,7 @@ public class KnowledgeBase {
 
                 // augment relevant in-scores of member atoms
                 for (AtomClassEntry e : evidenceEntries) {
-                    e.futureInScore += outScore;
+                    e.futureInScore += 1;
                 }
             }
 
@@ -443,15 +444,11 @@ public class KnowledgeBase {
                     helper.addAll(newEntries);
                     Collections.sort(helper, totalScoreDescending);
                     AtomClassEntry best = helper.get(0);
-                    // a classification which has a score of only one or two is one of a handful of very weakly
-                    // supported inferences including basic regex matches.
-                    // Don't include these in the exported RDF, as they contain many false positives.
-                    if (best.getScore() > 2.0) {
+                    // A classification which has a score of zero is a trivial property-based regex match with no
+                    // structural evidence to support it.
+                    // These are not included in the exported RDF, as they include many false positives.
+                    if (best.getScore() > 0) {
                         AtomClass clazz = classes.get(best.getInferredClass());
-                        if (subject.asVertex().getId().equals("0MQ4h4a")) {
-                            System.out.println("ELLIPSIS");
-                            System.out.println("\tclazz = " + clazz);
-                        }
                         clazz.toRDF(subject, context);
                         for (RdfizationCallback callback : best.callbacks) {
                             callback.execute();
@@ -497,11 +494,13 @@ public class KnowledgeBase {
     }
 
     public static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
-        private static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
+        public static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
 
         public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
-            // descending order based on total score
-            return ((Integer) second.getScore()).compareTo(first.getScore());
+            // descending order based on total score.  Resolve a tie by lexicographical order of class names.
+            int cmp = ((Integer) second.getScore()).compareTo(first.getScore());
+            return 0 == cmp
+                    ? first.getInferredClassName().compareTo(second.getInferredClassName()) : cmp;
         }
     }
 

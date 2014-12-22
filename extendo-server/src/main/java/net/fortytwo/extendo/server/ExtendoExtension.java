@@ -51,6 +51,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
         ExtendoBrain b = brains.get(baseGraph);
 
         if (null == b) {
+            logger.info("instantiating Extend-o-Brain with base graph " + baseGraph);
             BrainGraph bg = new BrainGraph(baseGraph);
             b = new ExtendoBrain(bg);
             brains.put(baseGraph, b);

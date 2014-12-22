@@ -15,12 +15,8 @@ public class PersonCollection extends AtomCollection {
     public PersonCollection() {
         super(
                 "person-collection",
-                Pattern.compile("(some people .+)" +
-                        "|(.+ children)" +
-                        "|(.+ social network)" +
-                        "|(.+ friends)" +
-                        "|(.+ family)" +
-                        "|(the authors of .+)"),
+                Pattern.compile("(some (people|individuals) .+)" +
+                        "|(.+ children)"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(null,

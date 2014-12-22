@@ -143,3 +143,33 @@ bibtex reference here
         · :fQ0dJDi: science is driven by the goal of understanding, but it does not itself inform the goals of mankind.  Rather, it is a tool which can be used for different ends.  Perfection of means and confusion of goals seem (in Einstein's view) to characterize the modern age.  If even a minority of mankind strives for the safety, the welfare, and the free development of the talent of mankind, they will not be denied the means, and their superiority will be proven in the long run.
             @sharability 0.75
             @weight      0.5
+
+3
++ :ufIPR_C: Google Glass
+    @sharability 1
+    @weight      0.75
+    @alias       http://dbpedia.org/resource/Google_Glass
+    · :ncpxqEk: Project Glass - Google+ (web page)
+        @sharability 0.75
+        @weight      0.5
+        @alias       https://plus.google.com/+projectglass/posts
+    + :0JmbHl9: some individuals involved in Project Glass
+        + :-L7cCbN: Sebastian Thrun
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Sebastian_Thrun
+        + :yOXFhhN: Albert Einstein
+            @sharability 1
+            @weight      1
+            @shortcut    ae
+            @alias       http://dbpedia.org/resource/Albert_Einstein
+    + :e0Ksupx: some technologies similar to Google Glass
+        @sharability 0.75
+        @weight      0.5
+        + :u2C49PT: EyeTap
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/EyeTap
+        + :n7AMImU: that IBM HUD for which I saw commercials many years ago (and then never saw again)
+            @sharability 0.5
+            @weight      0.5

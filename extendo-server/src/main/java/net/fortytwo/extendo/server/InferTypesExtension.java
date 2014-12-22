@@ -30,8 +30,10 @@ public class InferTypesExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
+        // do *not* reset the knowledge base.  Build upon inference performed in previous iterations
         KnowledgeBase kb = p.brain.getKnowledgeBase();
-        kb.reset();
+        //kb.reset();
+
         long timeBefore = System.currentTimeMillis();
 
         // note: multiple (typically four) invocations are required before the knowledge base is ready for RDF export

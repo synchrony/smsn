@@ -15,8 +15,7 @@ public class DocumentCollection extends AtomCollection {
     public DocumentCollection() {
         super(
                 "document-collection",
-                Pattern.compile("(some (papers|works) by .+)" +
-                        "|(some of .+ (papers|works))"),
+                Pattern.compile("(some (books|papers) .+)"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(null,

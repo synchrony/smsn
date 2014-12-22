@@ -2,6 +2,7 @@ package net.fortytwo.extendo.brain.rdf.classes;
 
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
+import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -10,6 +11,7 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -19,12 +21,18 @@ public class LinkedConcept extends AtomClass {
 
     public LinkedConcept() {
         super(
-                "linked-concept",
+                "any-linked-concept",  // the name beginning with "a" gives this class a lexicographic advantage
                 Pattern.compile("[a-zA-Z0-9].+"),
                 // TODO: support concepts from datasets other than DBpedia
                 Pattern.compile("http://dbpedia.org/resource/.+"),
-                null
-                );
+                new AtomRegex(Arrays.asList(
+                        new AtomRegex.El(new NickHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
+                        new AtomRegex.El(new PageHandler(),
+                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+                        new AtomRegex.El(null,
+                                AtomRegex.Modifier.ZeroOrMore)
+                )));
     }
 
     @Override

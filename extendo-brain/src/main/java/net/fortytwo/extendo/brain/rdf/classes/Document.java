@@ -5,8 +5,8 @@ import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.NoteCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.TopicCollection;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
 import net.fortytwo.extendo.rdf.vocab.Bibo;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
@@ -46,9 +46,9 @@ public class Document extends AtomClass {
                         new AtomRegex.El(new RFIDHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, RFIDReference.class),
                         new AtomRegex.El(new MakerHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, PersonCollection.class),
+                                AtomRegex.Modifier.ZeroOrOne, AuthorCollection.class),
                         new AtomRegex.El(new TopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, GenericCollection.class),
+                                AtomRegex.Modifier.ZeroOrOne, TopicCollection.class),
                         new AtomRegex.El(new NoteHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, NoteCollection.class),
                         new AtomRegex.El(null,
@@ -165,6 +165,22 @@ public class Document extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             // TODO
+        }
+    }
+
+    public static class AuthorCollection extends PersonCollection {
+        public AuthorCollection() {
+            super();
+            name = "author-collection";
+            valueRegex = Pattern.compile("the authors of .+");
+        }
+    }
+
+    public static class NoteCollection extends GenericCollection {
+        public NoteCollection() {
+            super();
+            name = "notes-from";
+            valueRegex = Pattern.compile("some notes from .+");
         }
     }
 }

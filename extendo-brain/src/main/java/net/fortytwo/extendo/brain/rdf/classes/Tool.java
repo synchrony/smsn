@@ -4,8 +4,11 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
+import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
+import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFHandler;
@@ -33,6 +36,8 @@ public class Tool extends AtomClass {
                                 AtomRegex.Modifier.ZeroOrMore, WebPage.class),
                         new AtomRegex.El(null, // do nothing with usage for now
                                 AtomRegex.Modifier.ZeroOrOne, Usage.class),
+                        new AtomRegex.El(new ContributorHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, ContributorCollection.class),
                         new AtomRegex.El(null,
                                 AtomRegex.Modifier.ZeroOrMore)
                 )));
@@ -41,6 +46,17 @@ public class Tool extends AtomClass {
     @Override
     protected boolean isCollectionClass() {
         return false;
+    }
+
+    private static class ContributorHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            ValueFactory vf = context.getValueFactory();
+            URI objectURI = context.uriOf(object);
+            context.getHandler().handleStatement(vf.createStatement(
+                    // note: range of dcterms:contributor is dcterms:Agent, which is fairly broad
+                    context.getSubjectUri(), DCTERMS.CONTRIBUTOR, objectURI));
+        }
     }
 
     @Override
@@ -52,5 +68,13 @@ public class Tool extends AtomClass {
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
 
         return self;
+    }
+
+    public static class ContributorCollection extends PersonCollection {
+        public ContributorCollection() {
+            super();
+            name = "contributor-collection";
+            valueRegex = Pattern.compile("some (people|individuals) (involved in|who (have )?contribute to) .+");
+        }
     }
 }
