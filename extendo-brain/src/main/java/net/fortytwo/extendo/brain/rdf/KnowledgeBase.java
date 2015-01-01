@@ -52,6 +52,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -85,7 +86,7 @@ public class KnowledgeBase {
     }
 
     // note: graph and vocabulary are not affected by this operation
-    public void reset() {
+    public synchronized void reset() {
         atomClassifications.clear();
     }
 
@@ -140,6 +141,45 @@ public class KnowledgeBase {
         for (Class<? extends AtomClass> atomClass : vocabulary) {
             classes.put(atomClass, atomClass.newInstance());
         }
+    }
+
+
+    public void inferAutomatically(final long interval) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 4; i++) {
+                    try {
+                        logger.info("performing warm-up inference step #" + (i+1));
+                        inferClasses(null, null);
+                    } catch (RDFHandlerException e) {
+                        logger.log(Level.WARNING, "could not complete warm-up inference", e);
+                    }
+                }
+
+                long lastUpdate = graph.getLastUpdate();
+
+                while (true) {
+                    try {
+                        Thread.sleep(interval);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+
+                    // only repeat the inference step if there have been updates in the meantime
+                    long u = graph.getLastUpdate();
+                    if (u > lastUpdate) {
+                        try {
+                            logger.info("performing class inference");
+                            inferClasses(null, null);
+                        } catch (RDFHandlerException e) {
+                            logger.log(Level.WARNING, "class inference failed. Will keep trying", e);
+                        }
+                        lastUpdate = u;
+                    }
+                }
+            }
+        }).start();
     }
 
     private void handleAllMembers(final AtomCollectionMemory memory,
@@ -251,7 +291,7 @@ public class KnowledgeBase {
      *               but generated RDF statements are limited to those subjects which are sharable according to
      *               the filter.
      */
-    public void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
+    public synchronized void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
 
         RDFizationContext context = new RDFizationContext(handler, valueFactory);
@@ -477,7 +517,7 @@ public class KnowledgeBase {
         long total = countAtoms();
 
         long endTime = System.currentTimeMillis();
-        logger.info("typed " + typed + " of " + total + " atoms ("
+        logger.info("classified " + typed + " of " + total + " atoms ("
                 + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 

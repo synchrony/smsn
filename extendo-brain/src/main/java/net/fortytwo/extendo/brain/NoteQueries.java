@@ -171,6 +171,8 @@ public class NoteQueries {
         }
 
         updateInternal(root, rootNote, height, filter, style);
+
+        brain.getBrainGraph().updated();
     }
 
     private final Comparator<Note> noteComparator = new Comparator<Note>() {
@@ -425,6 +427,8 @@ public class NoteQueries {
             // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
             brain.getBrainGraph().getPropertyGraph().removeVertex(v);
         }
+
+        brain.getBrainGraph().updated();
     }
 
     /**

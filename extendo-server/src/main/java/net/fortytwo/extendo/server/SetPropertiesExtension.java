@@ -99,6 +99,8 @@ public class SetPropertiesExtension extends ExtendoExtension {
             throw new IllegalStateException();
         }
 
+        p.brain.getBrainGraph().updated();
+
         p.map.put("key", BrainGraph.getId(p.root));
         p.map.put("name", "" + p.propertyName);
         p.map.put("value", "" + p.propertyValue);

@@ -37,6 +37,8 @@ public class BrainGraph {
 
     private static final String thingNamespace;
 
+    private long lastUpdate;
+
     /**
      * The configurable namespace into which things, i.e. classified atoms, are mapped
      */
@@ -97,6 +99,14 @@ public class BrainGraph {
             logger.info("creating key index for '" + Extendo.ALIAS + "' property");
             graph.createKeyIndex(Extendo.ALIAS, Vertex.class);
         }
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void updated() {
+        this.lastUpdate = System.currentTimeMillis();
     }
 
     private FramedGraph createFramedGraph(final KeyIndexableGraph baseGraph) {
