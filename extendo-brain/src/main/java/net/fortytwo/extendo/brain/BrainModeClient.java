@@ -103,7 +103,7 @@ public class BrainModeClient {
         functions.put("C-c C-a d", new EmacsFunction("exo-insert-current-date", false));
         functions.put("C-c C-a s", new EmacsFunction("exo-insert-current-time-with-seconds", false));
         functions.put("C-c C-a t", new EmacsFunction("exo-insert-current-time", false));
-        functions.put("C-c C-h", new EmacsFunction("exo-set-view-height", true));
+        functions.put("C-c C-d", new EmacsFunction("exo-set-view-height", true));
         functions.put("C-c C-i f", new EmacsFunction("exo-find-isolated-atoms", false));
         functions.put("C-c C-i r", new EmacsFunction("exo-remove-isolated-atoms", false));
         functions.put("C-c C-l", new EmacsFunction("exo-goto-line", true));

@@ -7,6 +7,7 @@ import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.rdf.classes.AKAReference;
+import net.fortytwo.extendo.brain.rdf.classes.AbstractEvent;
 import net.fortytwo.extendo.brain.rdf.classes.BibtexReference;
 import net.fortytwo.extendo.brain.rdf.classes.Date;
 import net.fortytwo.extendo.brain.rdf.classes.DatedEvent;
@@ -21,6 +22,7 @@ import net.fortytwo.extendo.brain.rdf.classes.Tool;
 import net.fortytwo.extendo.brain.rdf.classes.URLReference;
 import net.fortytwo.extendo.brain.rdf.classes.Usage;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
+import net.fortytwo.extendo.brain.rdf.classes.collections.AttendedEventsCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
@@ -96,6 +98,7 @@ public class KnowledgeBase {
 
         Class[] vocabulary = new Class[]{
                 // basic classes
+                AbstractEvent.class,
                 AKAReference.class,
                 BibtexReference.class,
                 Date.class,
@@ -121,8 +124,10 @@ public class KnowledgeBase {
                 QuotedValueCollection.class,
                 TODOCollection.class,
                 // context-specific collections
-                Document.NoteCollection.class,
+                AttendedEventsCollection.class,
                 TopicCollection.class,
+                AbstractEvent.InteractorCollection.class,
+                Document.NoteCollection.class,
                 Document.AuthorCollection.class,
                 Person.WorksCollection.class,
                 Person.InterestsCollection.class,

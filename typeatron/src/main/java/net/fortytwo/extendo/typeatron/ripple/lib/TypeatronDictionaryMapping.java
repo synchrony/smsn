@@ -183,7 +183,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new SetAtomValueMapping(exoBrainClient, defaultFilter), "v@");
         add(new SetAtomWeightMapping(exoBrainClient, defaultFilter), "w@");
         add(new ShortcutSearchMapping(exoBrainClient, defaultFilter), "o", "shortcut-search");
-        add(new AppendToLogMapping(brainstreamFilter), "a", "append");
+        add(new AddToStreamMapping(exoBrainClient, brainstreamFilter), "a", "append");
         // TODO: temporary/change
         add(new GiveAtomMapping(exoBrainClient, defaultFilter, typeatron), "g", "give");
 

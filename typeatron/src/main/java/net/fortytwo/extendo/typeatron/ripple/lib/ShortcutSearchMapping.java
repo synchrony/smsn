@@ -8,10 +8,7 @@ import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
-import org.apache.http.HttpException;
-import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -56,7 +53,7 @@ public class ShortcutSearchMapping extends AtomMapping {
 
     private List<Note> shortcutSearch(final String shortcut) throws RippleException {
         try {
-            return client.search(NoteQueries.QueryType.Shortcut, shortcut, 1, filter, NoteQueries.FORWARD_ADJACENCY);
+            return client.search(NoteQueries.QueryType.Shortcut, shortcut, 1, filter, NoteQueries.forwardViewStyle);
         } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
             throw new RippleException(e);
         }

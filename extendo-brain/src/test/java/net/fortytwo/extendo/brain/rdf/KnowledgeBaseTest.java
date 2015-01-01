@@ -305,7 +305,7 @@ public class KnowledgeBaseTest extends TestCase {
                     }
                 }
                 rootNote.setId(rootId);
-                queries.update(root, rootNote, height, filter, NoteQueries.FORWARD_ADJACENCY);
+                queries.update(root, rootNote, height, filter, NoteQueries.forwardViewStyle);
             }
         } finally {
             in.close();

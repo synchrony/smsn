@@ -27,7 +27,7 @@ public interface Atom extends VertexFrame {
     String getValue();
 
     @Property(Extendo.VALUE)
-    void setValue(String description);
+    void setValue(String value);
 
     @Property(Extendo.PRIORITY)
     Float getPriority();

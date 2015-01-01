@@ -28,5 +28,10 @@ public interface Params {
             TITLE = "title",
             VALUE = "value",
             VALUE_CUTOFF = "valueCutoff",
-            VIEW = "view";
+            VIEW = "view",
+            VIEW_FORMAT = "viewFormat";
+
+    public static final String
+            JSON_FORMAT = "json",
+            WIKI_FORMAT = "wiki";
 }

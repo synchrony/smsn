@@ -53,7 +53,7 @@ public class NoteQueriesTest {
     @Test
     public void testEncoding() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
         Atom root = createAtom("11111");
         assertEquals("11111", root.asVertex().getId());
@@ -89,7 +89,7 @@ public class NoteQueriesTest {
     @Test
     public void testUpdateRecursion() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         String s;
 
@@ -185,7 +185,7 @@ public class NoteQueriesTest {
     @Test
     public void testUpdateSharabilityOrWeight() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         String s;
 
@@ -208,7 +208,7 @@ public class NoteQueriesTest {
     @Test
     public void testUpdateAlias() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         String s;
 
@@ -229,7 +229,7 @@ public class NoteQueriesTest {
     @Test
     public void testUpdatePriority() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("priorit");
         String s;
         Atom one;
@@ -255,7 +255,7 @@ public class NoteQueriesTest {
     public void testHideNonSharableItems() throws Exception {
         Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
         Note note = parser.fromWikiText(BrainGraph.class.getResourceAsStream("wiki-example-3.txt"));
         Atom root = createAtom("0000000");
@@ -299,7 +299,7 @@ public class NoteQueriesTest {
     @Test
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.AdjacencyStyle style = NoteQueries.FORWARD_ADJACENCY;
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
         String before = "* :001: one\n" +
                 "* :002: two\n" +
@@ -334,6 +334,45 @@ public class NoteQueriesTest {
         assertEquals("ONE", a1.getValue());
         assertEquals("two", a2.getValue());
         assertEquals("THREE", a3.getValue());
+    }
+
+    @Test
+    public void testAddOnlyUpdate() throws Exception {
+        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        NoteQueries.ViewStyle style = NoteQueries.forwardAddOnlyViewStyle;
+
+        String before = "* :001: one\n" +
+                "* :002: two\n" +
+                "* :003: three";
+        String after = "* :004: four\n" +
+                "* :002: two";
+
+        Note b = parser.fromWikiText(before);
+        Note a = parser.fromWikiText(after);
+
+        Atom root = store.createAtom(filter, "000");
+
+        queries.update(root, b, 2, filter, style);
+
+        Atom a1 = store.getAtom("001");
+        Atom a2 = store.getAtom("002");
+        Atom a3 = store.getAtom("003");
+
+        assertEquals("one", a1.getValue());
+        assertEquals("two", a2.getValue());
+        assertEquals("three", a3.getValue());
+        assertEquals(3, BrainGraph.asList(root.getNotes()).size());
+
+        queries.update(root, a, 2, filter, style);
+
+        Atom a4 = store.getAtom("004");
+
+        assertEquals("four", a4.getValue());
+        List<Atom> children = BrainGraph.asList(root.getNotes());
+        assertEquals(4, children.size());
+        assertEquals("four", children.get(0).getValue());
+        assertEquals("one", children.get(1).getValue());
+        assertEquals("two", children.get(2).getValue());
     }
 
     private void assertNotesEqual(final Atom a,

@@ -114,7 +114,7 @@ public class ExtendoBrainClient {
     public Note view(final Note root,
                      final int height,
                      final Filter filter,
-                     final NoteQueries.AdjacencyStyle style,
+                     final NoteQueries.ViewStyle style,
                      final boolean includeTypes) throws ExtendoBrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
@@ -186,7 +186,7 @@ public class ExtendoBrainClient {
     public Note update(final Note root,
                        final int height,
                        final Filter filter,
-                       final NoteQueries.AdjacencyStyle style) throws ExtendoBrainClientException {
+                       final NoteQueries.ViewStyle style) throws ExtendoBrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -198,6 +198,7 @@ public class ExtendoBrainClient {
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VIEW, toJson(root));
+            requestJson.put(Params.VIEW_FORMAT, Params.JSON_FORMAT);
             requestJson.put(Params.FILTER, toJson(filter));
         } catch (JSONException e) {
             throw new ExtendoBrainClientException(e);
@@ -319,7 +320,7 @@ public class ExtendoBrainClient {
                              final String query,
                              final int height,
                              final Filter filter,
-                             final NoteQueries.AdjacencyStyle style) throws ExtendoBrainClientException {
+                             final NoteQueries.ViewStyle style) throws ExtendoBrainClientException {
         if (null == queryType || null == query || 0 == query.length()
                 || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();

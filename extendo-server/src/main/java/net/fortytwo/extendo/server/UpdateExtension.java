@@ -48,6 +48,7 @@ public class UpdateExtension extends ExtendoExtension {
         p.height = r.getHeight();
         p.rootId = r.getRootId();
         p.styleName = r.getStyleName();
+        p.jsonView = r.jsonView;
         p.wikiView = r.wikiView;
         p.filter = r.getFilter();
 
@@ -59,11 +60,17 @@ public class UpdateExtension extends ExtendoExtension {
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         Note rootNote;
 
-        InputStream in = new ByteArrayInputStream(p.wikiView.getBytes());
-        try {
-            rootNote = p.parser.fromWikiText(in);
-        } finally {
-            in.close();
+        if (null != p.wikiView) {
+            InputStream in = new ByteArrayInputStream(p.wikiView.getBytes());
+            try {
+                rootNote = p.parser.fromWikiText(in);
+            } finally {
+                in.close();
+            }
+        } else if (null != p.jsonView) {
+            rootNote = p.parser.fromJSON(p.jsonView);
+        } else {
+            throw new IllegalStateException();
         }
 
         // Apply the update
@@ -89,12 +96,24 @@ public class UpdateExtension extends ExtendoExtension {
 
     private class UpdateRequest extends RootedViewRequest {
         public final String wikiView;
+        public final JSONObject jsonView;
 
         public UpdateRequest(final JSONObject json,
                              final Principal user) throws JSONException {
             super(json, user);
 
-            wikiView = this.json.getString(Params.VIEW);
+            // default to wiki-formatted updates, but support updates in either the JSON or wiki formats
+            String view = this.json.getString(Params.VIEW);
+            String viewFormat = this.json.optString(Params.VIEW_FORMAT);
+            if (null == viewFormat || 0 == viewFormat.length() || viewFormat.equals(Params.WIKI_FORMAT)) {
+                wikiView = view;
+                jsonView = null;
+            } else if (viewFormat.equals(Params.JSON_FORMAT)) {
+                wikiView = null;
+                jsonView = new JSONObject(view);
+            } else {
+                throw new JSONException("unexpected view format: " + viewFormat);
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package net.fortytwo.extendo.brain.rdf.classes;
 
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
+import net.fortytwo.extendo.brain.rdf.AtomCollection;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
@@ -44,6 +45,8 @@ public class Person extends AtomClass {
                                 AtomRegex.Modifier.ZeroOrMore, SocialNetworkCollection.class),
                         new AtomRegex.El(new BirthdayHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, DatedEvent.Birthday.class),
+                        new AtomRegex.El(new AttendedEventsHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, PersonalEventsCollection.class),
                         // TODO: when the person passed away
                         // TODO: the person's contact information
                         // TODO: things mentioned by the person
@@ -123,6 +126,13 @@ public class Person extends AtomClass {
         }
     }
 
+    public static class AttendedEventsHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            // TODO
+        }
+    }
+
     public static class WorksCollection extends DocumentCollection {
         public WorksCollection() {
             super();
@@ -147,6 +157,20 @@ public class Person extends AtomClass {
             valueRegex = Pattern.compile("(.+ social network)" +
                     "|(.+ friends)" +
                     "|(.+ family)");
+        }
+    }
+
+    public static class PersonalEventsCollection extends AtomCollection {
+
+        public PersonalEventsCollection() {
+            super("personal-events",
+                    Pattern.compile(".+ (logs|events)"),
+                    null,
+                    new AtomRegex(Arrays.asList(
+                            new AtomRegex.El(null,
+                                    AtomRegex.Modifier.ZeroOrMore, GenericCollection.class),
+                            new AtomRegex.El(null,
+                                    AtomRegex.Modifier.ZeroOrMore))));
         }
     }
 }

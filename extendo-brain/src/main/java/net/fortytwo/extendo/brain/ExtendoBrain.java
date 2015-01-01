@@ -16,7 +16,8 @@ public class ExtendoBrain {
     private static final Logger logger = Extendo.getLogger(ExtendoBrain.class);
 
     /**
-     * A configuration property indicating a log file to which notes may be appended in a stream-of-consciousness style
+     * A configuration property indicating a special atom to which notes may be prepended
+     * in a stream-of-consciousness style
      */
     public static final String PROP_BRAINSTREAM = "net.fortytwo.extendo.brain.brainStream";
 

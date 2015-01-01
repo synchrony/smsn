@@ -72,7 +72,7 @@ public class NoteQueries {
     public Note view(final Atom root,
                      final int height,
                      final Filter filter,
-                     final AdjacencyStyle style) {
+                     final ViewStyle style) {
         if (null == root || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
@@ -87,7 +87,7 @@ public class NoteQueries {
     private Note viewInternal(final Atom root,
                               final int height,
                               final Filter filter,
-                              final AdjacencyStyle style) {
+                              final ViewStyle style) {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -111,7 +111,7 @@ public class NoteQueries {
 
     private boolean hasChildren(final Atom root,
                                 final Filter filter,
-                                final AdjacencyStyle style) {
+                                final ViewStyle style) {
         // If the note is invisible, we can't see whether it has children.
         if (!filter.isVisible(root.asVertex())) {
             return false;
@@ -137,7 +137,7 @@ public class NoteQueries {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(viewInternal(a, 0, filter, FORWARD_ADJACENCY));
+            n.addChild(viewInternal(a, 0, filter, forwardViewStyle));
         }
 
         return n;
@@ -160,12 +160,13 @@ public class NoteQueries {
                        final Note rootNote,
                        final int height,
                        final Filter filter,
-                       final AdjacencyStyle style) throws InvalidUpdateException {
+                       final ViewStyle style) throws InvalidUpdateException {
+
         if (null == root || null == rootNote || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
-        if (style != FORWARD_ADJACENCY) {
+        if (!style.addOnUpdate() && !style.deleteOnUpdate()) {
             throw new IllegalStateException("can't update in style " + style);
         }
 
@@ -185,7 +186,7 @@ public class NoteQueries {
                                 final Note rootNote,
                                 final int height,
                                 final Filter filter,
-                                final AdjacencyStyle style) throws InvalidUpdateException {
+                                final ViewStyle style) throws InvalidUpdateException {
 
         setProperties(root, rootNote);
 
@@ -199,6 +200,10 @@ public class NoteQueries {
         ListDiff.DiffEditor<Note> ed = new ListDiff.DiffEditor<Note>() {
             public void add(final int position,
                             final Note note) throws InvalidUpdateException {
+                if (!style.addOnUpdate()) {
+                    return;
+                }
+
                 // retrieve or create an atom for the note
                 Atom a = getAtom(note);
                 if (null == a) {
@@ -234,6 +239,10 @@ public class NoteQueries {
 
             public void delete(final int position,
                                final Note note) {
+                if (!style.deleteOnUpdate()) {
+                    return;
+                }
+
                 AtomList n = root.getNotes();
 
                 // remove the atom's list node
@@ -303,9 +312,9 @@ public class NoteQueries {
      *
      * @param queryType the type of search to perform
      * @param query     the search query
-     * @param height     maximum height of the search results view.
-     *                   This must be at least 1, indicating a results node with search results as children.
-     *                   A height of 2 includes the children of the results, as well.
+     * @param height    maximum height of the search results view.
+     *                  This must be at least 1, indicating a results node with search results as children.
+     *                  A height of 2 includes the children of the results, as well.
      * @param filter    a collection of criteria for atoms and links.
      *                  Atoms and links which do not meet the criteria are not to appear in search results.
      * @param style     the adjacency style of the view
@@ -315,7 +324,7 @@ public class NoteQueries {
                        final String query,
                        final int height,
                        final Filter filter,
-                       final AdjacencyStyle style) {
+                       final ViewStyle style) {
         if (null == query || height < 1 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
@@ -349,7 +358,7 @@ public class NoteQueries {
     }
 
     public Note findRoots(final Filter filter,
-                          final AdjacencyStyle style,
+                          final ViewStyle style,
                           final int height) {
         if (null == filter || null == style || height < 0) {
             throw new IllegalArgumentException();
@@ -385,7 +394,7 @@ public class NoteQueries {
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
                 Atom a = brain.getBrainGraph().getAtom(v);
                 if (filter.isVisible(v)) {
-                    Note n = viewInternal(a, 1, filter, FORWARD_ADJACENCY);
+                    Note n = viewInternal(a, 1, filter, forwardViewStyle);
                     result.addChild(n);
                 }
             }
@@ -674,23 +683,28 @@ public class NoteQueries {
         }
     }
 
-    public interface AdjacencyStyle {
+    public interface ViewStyle {
         String getName();
 
         Iterable<Atom> getLinked(Atom root, Filter filter);
+
+        boolean addOnUpdate();
+
+        boolean deleteOnUpdate();
     }
 
-    public static AdjacencyStyle lookupStyle(final String name) {
-        if (name.equals(FORWARD_ADJACENCY.getName())) {
-            return FORWARD_ADJACENCY;
-        } else if (name.equals(BACKWARD_ADJACENCY.getName())) {
-            return BACKWARD_ADJACENCY;
-        } else {
-            throw new IllegalArgumentException("unknown view style: " + name);
+    public static ViewStyle lookupStyle(final String name) {
+        for (ViewStyle style : viewStyles) {
+            if (name.equals(style.getName())) {
+                return style;
+            }
         }
+
+        throw new IllegalArgumentException("unknown view style: " + name);
     }
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
+    // TODO: see also BrainGraph.toList
     public static Iterable<Atom> toIterable(AtomList l) {
         List<Atom> ll = new LinkedList<Atom>();
         while (null != l) {
@@ -701,22 +715,59 @@ public class NoteQueries {
         return ll;
     }
 
-    public static final AdjacencyStyle FORWARD_ADJACENCY = new AdjacencyStyle() {
+    public static final ViewStyle forwardViewStyle = new ViewStyle() {
+        @Override
         public String getName() {
             return "forward";
         }
 
+        @Override
         public Iterable<Atom> getLinked(final Atom root,
                                         final Filter filter) {
             return toIterable(root.getNotes());
         }
+
+        @Override
+        public boolean addOnUpdate() {
+            return true;
+        }
+
+        @Override
+        public boolean deleteOnUpdate() {
+            return true;
+        }
     };
 
-    public static final AdjacencyStyle BACKWARD_ADJACENCY = new AdjacencyStyle() {
+    public static final ViewStyle forwardAddOnlyViewStyle = new ViewStyle() {
+        @Override
+        public String getName() {
+            return "forward-add-only";
+        }
+
+        @Override
+        public Iterable<Atom> getLinked(final Atom root,
+                                        final Filter filter) {
+            return toIterable(root.getNotes());
+        }
+
+        @Override
+        public boolean addOnUpdate() {
+            return true;
+        }
+
+        @Override
+        public boolean deleteOnUpdate() {
+            return false;
+        }
+    };
+
+    public static final ViewStyle backwardViewStyle = new ViewStyle() {
+        @Override
         public String getName() {
             return "backward";
         }
 
+        @Override
         public Iterable<Atom> getLinked(final Atom root,
                                         final Filter filter) {
             List<Atom> results = new LinkedList<Atom>();
@@ -736,5 +787,17 @@ public class NoteQueries {
 
             return results;
         }
+
+        @Override
+        public boolean addOnUpdate() {
+            return false;
+        }
+
+        @Override
+        public boolean deleteOnUpdate() {
+            return false;
+        }
     };
+
+    private static final ViewStyle[] viewStyles = {forwardViewStyle, forwardAddOnlyViewStyle, backwardViewStyle};
 }

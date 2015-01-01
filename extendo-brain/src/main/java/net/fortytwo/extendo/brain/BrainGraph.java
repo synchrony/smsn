@@ -335,4 +335,13 @@ public class BrainGraph {
 
         return results;
     }
+
+    public static List<Atom> asList(AtomList aList) {
+        List<Atom> list = new LinkedList<Atom>();
+        while (null != aList) {
+            list.add(aList.getFirst());
+            aList = aList.getRest();
+        }
+        return list;
+    }
 }
