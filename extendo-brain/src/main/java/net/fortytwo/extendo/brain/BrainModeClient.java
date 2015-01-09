@@ -145,6 +145,7 @@ public class BrainModeClient {
         functions.put("C-c C-v r", new EmacsFunction("exo-enter-readonly-view", false));
         functions.put("C-c C-v s", new EmacsFunction("exo-toggle-emacspeak", false));
         functions.put("C-c C-v t", new EmacsFunction("exo-set-value-truncation-length", true));
+        functions.put("C-c C-v v", new EmacsFunction("exo-toggle-minimize-verbatim-blocks", false));
         functions.put("C-c C-w C-d", new EmacsFunction("exo-set-default-weight", true));
         functions.put("C-c C-w C-m", new EmacsFunction("exo-set-min-weight", true));
         functions.put("C-c a", new EmacsFunction("exo-acronym-query", true));

@@ -76,6 +76,7 @@
 (setq exo-viewstyle exo-sharability-viewstyle)
 (setq exo-view-properties nil)
 (setq exo-value-truncation-length 100)
+(setq exo-minimize-verbatim-blocks nil)
 
 
 ;; DATA MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -363,6 +364,7 @@
                     (make-local-variable 'exo-current-line)
                     (make-local-variable 'exo-mode)
                     (make-local-variable 'exo-value-truncation-length)
+                    (make-local-variable 'exo-minimize-verbatim-blocks)
                     (setq exo-root-id root)
                     (if (equal mode exo-search-mode)
                         ;; Always leave a search view with height 1, rather than that of the last view.
@@ -584,6 +586,13 @@
 (defun create-id-infix (id)
     (light-gray (concat (propertize (concat " :" id) 'invisible t) ":")))
 
+(defun propertize-value (value)
+    (if exo-minimize-verbatim-blocks (let ((start (string-match "{{{" value)))
+        (if start (let ((end (string-match "}}}" value start)))
+            (concat (substring value 0 (+ start 3))
+                    (propertize (substring value (+ start 3) end) 'invisible t)
+                    (substring value end))) value)) value))
+
 (defun write-view (editable children tree-indent)
     (loop for json across children do
     (let (
@@ -600,7 +609,6 @@
 		        (target-meta (get-meta json)))
 		            (if target-id (puthash target-id json exo-atoms))
 		            (if (not target-id) (error "missing target id"))
-		            ;; black space at the end of the line makes the next line black when you enter a newline and continue typing
 		            (setq space "")
 		            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
 		            (let ((line "") (id-infix (create-id-infix target-id)))
@@ -612,7 +620,8 @@
                                 (colorize bullet target-weight target-sharability nil nil target-alias target-meta)
                                 id-infix
                                 " "
-                                (colorize target-value target-weight target-sharability nil nil target-alias target-meta)
+                                (colorize (propertize-value target-value)
+                                          target-weight target-sharability nil nil target-alias target-meta)
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
                     (if (using-inference)
@@ -1061,6 +1070,13 @@ a type has been assigned to it by the inference engine."
     (exo-update-view)
     (message (concat "switched to " exo-viewstyle " view style")))
 
+(defun exo-toggle-minimize-verbatim-blocks ()
+    "enable or disable the hiding of the contents of {{{verbatim blocks}}}, which may span multiple lines"
+    (interactive)
+    (setq exo-minimize-verbatim-blocks (not exo-minimize-verbatim-blocks))
+    (exo-update-view)
+    (message (concat (if exo-minimize-verbatim-blocks "minimized" "expanded") " verbatim blocks")))
+
 (defun exo-toggle-properties-view ()
     "enable or disable the explicit display of atom properties as extra lines within views"
     (interactive)
@@ -1242,6 +1258,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-v r")       'exo-enter-readonly-view)
 (global-set-key (kbd "C-c C-v s")       'exo-toggle-emacspeak)
 (global-set-key (kbd "C-c C-v t")       (minibuffer-arg 'exo-set-value-truncation-length "value truncation length: "))
+(global-set-key (kbd "C-c C-v v")       'exo-toggle-minimize-verbatim-blocks)
 (global-set-key (kbd "C-c C-w C-d")     (char-arg 'exo-set-default-weight "default weight = ?"))
 (global-set-key (kbd "C-c C-w C-m")     (char-arg 'exo-set-min-weight "minimun weight = ?"))
 (global-set-key (kbd "C-c a")           (minibuffer-arg 'exo-acronym-query "acronym search for: "))
