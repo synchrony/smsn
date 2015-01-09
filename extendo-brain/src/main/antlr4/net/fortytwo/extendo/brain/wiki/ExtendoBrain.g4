@@ -33,7 +33,7 @@ property ::= "@alias" WS TEXT
              | ("@sharability" | "@weight") WS DEGREE
 value    ::= TEXT /* also note:
                      1) line breaks allowed within {{{ }}}
-                     2) [...] is a reserved placeholder */
+                     2) [...] is special at the end of a line */
 EOL      ::= [#xA#xD]     /* line feed or carriage return */
 WS       ::= [#x9#x20]    /* tab or space */
 BULLET   ::= [#x21-x7E#xA1-#xFF] /* visible characters */

@@ -61,6 +61,27 @@ bibtex reference here
         @alias       http://dbpedia.org/resource/Eduard_Einstein
 
 3
++ :uIA1aLv: Einstein's belongings
+    @sharability 0.75
+    @weight      0.5
+    + :TT698yn: The Ultimate Hitchhiker's Guide
+        @sharability 1
+        @weight      0.5
+        · :hvmEFKf: ISBN: 0-157-14925-7
+            @sharability 0.75
+            @weight      0.5
+        · :M8n0Q4Z: RFID: E200 1021 3707 0172 2440 1CDC
+            @sharability 0.5
+            @weight      0.5
+        · :W6b4J9q: Douglas Adams
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Douglas_Adams
+    . :CUJPJV2: this won't be recognized
+            @sharability 0.5
+            @weight      0.5
+
+3
 + :yOXFhhN: Albert Einstein
     @sharability 1
     @weight      1
@@ -126,6 +147,12 @@ bibtex reference here
             @weight      0.5
             @alias       http://dbpedia.org/resource/Elsa_Einstein
         + :wz60qqd: Einstein's children
+            @sharability 0.75
+            @weight      0.5
+    + :56KK1dZ: Einstein's stuff
+        @sharability 0.75
+        @weight      0.5
+        + :uIA1aLv: Einstein's belongings
             @sharability 0.75
             @weight      0.5
     · :Mj92Ye0: 14 March 1879 - 18 April 1955

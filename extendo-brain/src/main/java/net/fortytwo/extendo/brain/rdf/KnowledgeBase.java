@@ -24,8 +24,8 @@ import net.fortytwo.extendo.brain.rdf.classes.Usage;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.AttendedEventsCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.TODOCollection;
@@ -79,6 +79,7 @@ public class KnowledgeBase {
 
     /**
      * Overrides the default ValueFactory
+     *
      * @param valueFactory a new ValueFactory to generate RDF statements and basic values
      */
     public void setValueFactory(final ValueFactory valueFactory) {
@@ -133,6 +134,8 @@ public class KnowledgeBase {
                 Person.WorksCollection.class,
                 Person.InterestsCollection.class,
                 Person.SocialNetworkCollection.class,
+                Person.PersonalStuffCollection.class,
+                Person.BelongingsCollection.class,
                 Tool.ContributorCollection.class,
                 // some classes still to add:
                 //     Account, ManufacturedPart, Place, SoftwareProject
@@ -150,12 +153,13 @@ public class KnowledgeBase {
             public void run() {
                 for (int i = 0; i < 4; i++) {
                     try {
-                        logger.info("performing warm-up inference step #" + (i+1));
+                        logger.info("performing warm-up inference step #" + (i + 1));
                         inferClasses(null, null);
                     } catch (RDFHandlerException e) {
-                        logger.log(Level.WARNING, "could not complete warm-up inference", e);
+                        logger.log(Level.WARNING, "error in warm-up inference", e);
                     }
                 }
+                logger.info("completed warm-up inference");
 
                 long lastUpdate = graph.getLastUpdate();
 
@@ -234,8 +238,9 @@ public class KnowledgeBase {
                 if (0 == alts.size() || alts.contains(entry.getInferredClass())) {
                     final AtomClass atomClass = classes.get(entry.getInferredClass());
 
-                    // only add evidence for specifically matched classes
-                    if (0 < alts.size()) {
+                    // only add evidence for specifically matched classes,
+                    // omitting evidence if the element is scored as a wildcard.
+                    if (el.getWeight() > 0) {
                         evidenceEntries.add(entry);
                     }
 
@@ -285,11 +290,12 @@ public class KnowledgeBase {
 
     /**
      * Performs Extendo type inference on the knowledge base, optionally generating an RDF representation
+     *
      * @param handler a handler for generated RDF statements (may be null)
-     * @param filter an optional sharability filter for generated results.
-     *               Type inference is performed on the entire knowledge base without regard to sharability,
-     *               but generated RDF statements are limited to those subjects which are sharable according to
-     *               the filter.
+     * @param filter  an optional sharability filter for generated results.
+     *                Type inference is performed on the entire knowledge base without regard to sharability,
+     *                but generated RDF statements are limited to those subjects which are sharable according to
+     *                the filter.
      */
     public synchronized void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
@@ -322,7 +328,7 @@ public class KnowledgeBase {
                 Collection<RdfizationCallback> callbacks = null == handler
                         ? null : new LinkedList<RdfizationCallback>();
 
-                AtomCollectionMemory newMemo = clazz.isCollectionClass()
+                AtomCollectionMemory memory = clazz.isCollectionClass()
                         ? new AtomCollectionMemory((String) subject.asVertex().getId())
                         : null;
 
@@ -360,10 +366,14 @@ public class KnowledgeBase {
                     while (!fail) {
                         // assign one point per matched input element (as opposed to only one per regex element)
                         if (matched && null != alts) {
-                            // assign a point only if the regex element matches a specific class, not a wildcard
+                            // assign a point only if the regex element matches a specific class, not a wildcard,
+                            // and the current element has not been marked to score as a wildcard.
+                            // Particularly significant elements may score extra points.
+                            outScore += el.getWeight();
+                            /*
                             if (alts.size() > 0) {
                                 outScore++;
-                            }
+                            }*/
                             matched = false;
                         }
 
@@ -406,7 +416,7 @@ public class KnowledgeBase {
 
                         switch (mod) {
                             case ZeroOrOne:
-                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
+                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
                                     advanceRegex = true;
                                     advanceInput = true;
                                     matched = true;
@@ -415,7 +425,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case ZeroOrMore:
-                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
+                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
                                     advanceInput = true;
                                     matched = true;
                                 } else {
@@ -423,7 +433,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case One:
-                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
+                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
                                     advanceRegex = true;
                                     advanceInput = true;
                                     matched = true;
@@ -432,7 +442,7 @@ public class KnowledgeBase {
                                 }
                                 break;
                             case OneOrMore:
-                                if (match(first, el, evidenceEntries, newMemo, context, callbacks, filter)) {
+                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
                                     mod = AtomRegex.Modifier.ZeroOrMore;
                                     advanceInput = true;
                                     matched = true;
@@ -457,14 +467,14 @@ public class KnowledgeBase {
                     for (AtomClassEntry e : oldEntries) {
                         if (e.getInferredClass() == clazz.getClass()) {
                             e.outScore = outScore;
-                            e.memory = newMemo;
+                            e.memory = memory;
                             classEntry = e;
                             break;
                         }
                     }
                 }
                 if (null == classEntry) {
-                    classEntry = new AtomClassEntry(clazz.getClass(), outScore, newMemo);
+                    classEntry = new AtomClassEntry(clazz.getClass(), outScore, memory);
                 }
                 classEntry.callbacks = callbacks;
                 newEntries.add(classEntry);
@@ -532,6 +542,7 @@ public class KnowledgeBase {
     /**
      * Prints a representation of the class inference results for a given atom to standard output.
      * This is a development/convenience method.
+     *
      * @param a the atom to view
      */
     public void viewInferred(final Atom a) {

@@ -9,6 +9,7 @@ import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.QuotedValueCollection;
+import net.fortytwo.extendo.rdf.vocab.DBpediaOntology;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -47,6 +48,8 @@ public class Person extends AtomClass {
                                 AtomRegex.Modifier.ZeroOrOne, DatedEvent.Birthday.class),
                         new AtomRegex.El(new AttendedEventsHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, PersonalEventsCollection.class),
+                        new AtomRegex.El(null,
+                                AtomRegex.Modifier.ZeroOrOne, PersonalStuffCollection.class),
                         // TODO: when the person passed away
                         // TODO: the person's contact information
                         // TODO: things mentioned by the person
@@ -126,6 +129,16 @@ public class Person extends AtomClass {
         }
     }
 
+    private static class ThingsOwnedHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            System.out.println("###### GOT ONE! " + object.asVertex().getId() + " for " + context.getSubjectUri());
+            context.getHandler().handleStatement(
+                    context.getValueFactory().createStatement(
+                            context.uriOf(object), DBpediaOntology.owner, context.getSubjectUri()));
+        }
+    }
+
     public static class AttendedEventsHandler implements FieldHandler {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
@@ -171,6 +184,28 @@ public class Person extends AtomClass {
                                     AtomRegex.Modifier.ZeroOrMore, GenericCollection.class),
                             new AtomRegex.El(null,
                                     AtomRegex.Modifier.ZeroOrMore))));
+        }
+    }
+
+    public static class PersonalStuffCollection extends AtomCollection {
+
+        public PersonalStuffCollection() {
+            super("personal-stuff",
+                    Pattern.compile("(my|.+'s) stuff"),
+                    null,
+                    new AtomRegex(Arrays.asList(
+                            new AtomRegex.El(new ThingsOwnedHandler(),
+                                    AtomRegex.Modifier.ZeroOrOne, BelongingsCollection.class),
+                            new AtomRegex.El(null,
+                                    AtomRegex.Modifier.ZeroOrMore))));
+        }
+    }
+
+    public static class BelongingsCollection extends GenericCollection {
+        public BelongingsCollection() {
+            super();
+            name = "belongings-collection";
+            valueRegex = Pattern.compile("(my|.+'s) belongings");
         }
     }
 }

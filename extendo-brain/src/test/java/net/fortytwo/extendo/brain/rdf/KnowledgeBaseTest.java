@@ -28,6 +28,7 @@ import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.wiki.NoteParser;
+import net.fortytwo.extendo.rdf.vocab.DBpediaOntology;
 import net.fortytwo.extendo.rdf.vocab.ExtendoVocab;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.junit.Test;
@@ -135,6 +136,17 @@ public class KnowledgeBaseTest extends TestCase {
         assertTrue(t.getValueRegex().matcher("some things I think about").matches());
         assertFalse(t.getValueRegex().matcher("things I think about").matches());
         assertFalse(t.getValueRegex().matcher("something I think about").matches());
+
+        assertTrue(t.getValueRegex().matcher("my new books").matches());
+        assertTrue(t.getValueRegex().matcher("my new book").matches());
+        assertTrue(t.getValueRegex().matcher("our new books").matches());
+        assertTrue(t.getValueRegex().matcher("John's new books").matches());
+        assertFalse(t.getValueRegex().matcher("your new books").matches());
+
+        assertTrue(t.getValueRegex().matcher("the books we bought in Nuuk").matches());
+        assertFalse(t.getValueRegex().matcher("the Inuit we met in Nuuk").matches());
+        assertFalse(t.getValueRegex().matcher("the book we bought in Nuuk").matches());
+        assertFalse(t.getValueRegex().matcher("more books we bought in Nuuk").matches());
 
         t = Person.InterestsCollection.class.newInstance();
 
@@ -327,6 +339,7 @@ public class KnowledgeBaseTest extends TestCase {
         Atom topics = bg.getAtom("GORFdGO");
         Atom ellipsis = bg.getAtom("0MQ4h4a");
         Atom quote = bg.getAtom("-ngTO_3");
+        Atom h2g2 = bg.getAtom("TT698yn");
 
         // The following are nested directly under Einstein's family
         Atom hermann = bg.getAtom("mPx8zEW");
@@ -405,7 +418,7 @@ public class KnowledgeBaseTest extends TestCase {
             };
 
             for (Resource r : known) {
-                System.out.println("r = " + r);System.out.flush();
+                //System.out.println("r = " + r);System.out.flush();
                 assertObjects(rc, r, RDF.TYPE, FOAF.PERSON);
             }
 
@@ -436,6 +449,9 @@ public class KnowledgeBaseTest extends TestCase {
                     context.uriOf(einstein),
                     context.uriOf(sebastian));
             // TODO: support for related things
+
+            assertObjects(rc, context.uriOf(h2g2), RDF.TYPE, FOAF.DOCUMENT);
+            assertObjects(rc, context.uriOf(h2g2), DBpediaOntology.owner, context.uriOf(einstein));
         } finally {
             rc.close();
         }

@@ -28,14 +28,23 @@ public class AtomRegex {
         private final AtomClass.FieldHandler fieldHandler;
         private final Modifier modifier;
         private final Set<Class<? extends AtomClass>> alternatives;
+        private final int weight;
 
-        public El(final AtomClass.FieldHandler fieldHandler,
+        public El(final int weight,
+                  final AtomClass.FieldHandler fieldHandler,
                   final Modifier modifier,
                   final Class<? extends AtomClass>... alternatives) {
+            this.weight = weight;
             this.fieldHandler = fieldHandler;
             this.modifier = modifier;
             this.alternatives = new HashSet<Class<? extends AtomClass>>();
             Collections.addAll(this.alternatives, alternatives);
+        }
+
+        public El(final AtomClass.FieldHandler fieldHandler,
+                  final Modifier modifier,
+                  final Class<? extends AtomClass>... alternatives) {
+            this(0 == alternatives.length ? 0 : 1, fieldHandler, modifier, alternatives);
         }
 
         public AtomClass.FieldHandler getFieldHandler() {
@@ -48,6 +57,10 @@ public class AtomRegex {
 
         public Set<Class<? extends AtomClass>> getAlternatives() {
             return alternatives;
+        }
+
+        public int getWeight() {
+            return weight;
         }
     }
 }

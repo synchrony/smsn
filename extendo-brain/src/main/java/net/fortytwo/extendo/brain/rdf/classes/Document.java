@@ -39,14 +39,21 @@ public class Document extends AtomClass {
                                 AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
                         new AtomRegex.El(new PageHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, WebPage.class),
-                        new AtomRegex.El(new ISBNHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, ISBNReference.class),
-                        new AtomRegex.El(new BibtexHandler(),
+                        new AtomRegex.El(2, new BibtexHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, BibtexReference.class),
-                        new AtomRegex.El(new RFIDHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, RFIDReference.class),
+                        new AtomRegex.El(2, new ISBNHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, ISBNReference.class),
+
+                        // multiple RFID tags on an object are possible, though they may be uncommon
+                        new AtomRegex.El(2, new RFIDHandler(),
+                                AtomRegex.Modifier.ZeroOrMore, RFIDReference.class),
+
+                        // note: without a collection, only the first author is recognized.
+                        // Otherwise, we run the risk of incorrectly classifying publishers (which often
+                        // follow authors) as people.
                         new AtomRegex.El(new MakerHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AuthorCollection.class),
+                                AtomRegex.Modifier.ZeroOrOne, AuthorCollection.class, Person.class),
+
                         new AtomRegex.El(new TopicHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, TopicCollection.class),
                         new AtomRegex.El(new NoteHandler(),
@@ -118,7 +125,7 @@ public class Document extends AtomClass {
             String value = object.getValue();
             // assumes the "bibtex:" prefix
             int i = value.indexOf(':');
-            String bibtex = NoteParser.unescapeValue(value.substring(i+1)).trim();
+            String bibtex = NoteParser.unescapeValue(value.substring(i + 1)).trim();
 
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(
@@ -155,9 +162,9 @@ public class Document extends AtomClass {
             URI objectURI = context.uriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     context.getSubjectUri(), FOAF.TOPIC, objectURI));
-                    // The skos:note on dc:subject reads "This term is intended to be used with non-literal values
-                    // as defined in the DCMI Abstract Model (http://dublincore.org/documents/abstract-model/) [...]"
-                    //context.getSubjectUri(), DCTerms.SUBJECT, objectURI));
+            // The skos:note on dc:subject reads "This term is intended to be used with non-literal values
+            // as defined in the DCMI Abstract Model (http://dublincore.org/documents/abstract-model/) [...]"
+            //context.getSubjectUri(), DCTerms.SUBJECT, objectURI));
         }
     }
 
