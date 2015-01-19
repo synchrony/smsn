@@ -586,12 +586,12 @@
 (defun create-id-infix (id)
     (light-gray (concat (propertize (concat " :" id) 'invisible t) ":")))
 
-(defun propertize-value (value)
-    (if exo-minimize-verbatim-blocks (let ((start (string-match "{{{" value)))
-        (if start (let ((end (string-match "}}}" value start)))
-            (concat (substring value 0 (+ start 3))
-                    (propertize (substring value (+ start 3) end) 'invisible t)
-                    (substring value end))) value)) value))
+(defun delimit-value (value)
+    (let ((s (string-match "\n" value)))
+        (if s (let ((content (concat "\n" value "\n")))
+            (concat "{{{"
+                (if exo-minimize-verbatim-blocks (propertize content 'invisible t) content)
+            "}}}")) value)))
 
 (defun write-view (editable children tree-indent)
     (loop for json across children do
@@ -620,7 +620,7 @@
                                 (colorize bullet target-weight target-sharability nil nil target-alias target-meta)
                                 id-infix
                                 " "
-                                (colorize (propertize-value target-value)
+                                (colorize (delimit-value target-value)
                                           target-weight target-sharability nil nil target-alias target-meta)
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))

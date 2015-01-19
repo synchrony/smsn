@@ -24,6 +24,7 @@ import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Params;
+import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * A service for exporting an Extend-o-Brain graph to the file system
@@ -76,9 +78,10 @@ public class ExportExtension extends ExtendoExtension {
     }
 
     private void exportVertices(final BrainGraph g,
+                                final KnowledgeBase kb,
                                 final PrintStream p) throws IOException {
 
-        p.println("created\tid\tweight\tsharability\tvalue\talias");
+        p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
 
         for (Vertex v : g.getPropertyGraph().getVertices()) {
             Object c = v.getProperty(Extendo.CREATED);
@@ -91,6 +94,19 @@ public class ExportExtension extends ExtendoExtension {
                 p.print('\t');
                 p.print(v.getProperty(Extendo.SHARABILITY));
                 p.print('\t');
+
+                List<KnowledgeBase.AtomClassEntry> entries = kb.getClassInfo(g.getAtom(v));
+                if (null != entries && entries.size() > 0) {
+                    KnowledgeBase.AtomClassEntry e = entries.get(0);
+                    p.print(e.getInferredClassName());
+                    p.print('\t');
+                    p.print(e.getOutScore());
+                    p.print('\t');
+                    p.print(e.getInScore());
+                    p.print('\t');
+                } else {
+                    p.print("\t0\t0\t");
+                }
 
                 String value = v.getProperty(Extendo.VALUE);
                 if (null == value) {
@@ -197,7 +213,7 @@ public class ExportExtension extends ExtendoExtension {
         try {
             switch (format) {
                 case Vertices:
-                    exportVertices(p.brain.getBrainGraph(), new PrintStream(out));
+                    exportVertices(p.brain.getBrainGraph(), p.brain.getKnowledgeBase(), new PrintStream(out));
                     break;
                 case Edges:
                     exportEdges(p.brain.getBrainGraph(), new PrintStream(out));

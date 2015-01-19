@@ -32,4 +32,22 @@ public class ExtendoTest {
         int majorVersion = Integer.valueOf(version.substring(0, i));
         assertTrue(majorVersion >= 1);
     }
+
+    @Test
+    public void testUnicodeEscape() throws Exception {
+        StringBuilder sb;
+
+        sb = new StringBuilder();
+        sb.append((char) 0);
+        assertEquals("\\u0000", Extendo.unicodeEscape(sb.toString()));
+
+        sb = new StringBuilder();
+        sb.append("the number ");
+        sb.append((char) 4);
+        sb.append((char) 2);
+        sb.append("...");
+        sb.append((char) 127);
+        sb.append((char) 1008);
+        assertEquals("the number \\u0004\\u0002...\\u007F\\u03F0", Extendo.unicodeEscape(sb.toString()));
+    }
 }

@@ -179,17 +179,21 @@ public class Extendo {
         return new String(bytes);
     }
 
-    // Note: escapes both high and low (whitespace < 0x20) characters.
+    /**
+     * Unicode-escapes strings for ease of consumption by external tools such as R.
+     * Characters in high (>= 0x7F) and low (< 0x20) ranges are escaped.
+     * Note that these ranges include newline, tab, and delete characters.
+     */
     public static String unicodeEscape(final String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c < 32 || (c >> 7) > 0) {
+            if (c < 32 || c >= 127) {
                 sb.append("\\u");
-                sb.append(HEX_CHARS[(c >> 12) & 0xF]);
-                sb.append(HEX_CHARS[(c >> 8) & 0xF]);
-                sb.append(HEX_CHARS[(c >> 4) & 0xF]);
-                sb.append(HEX_CHARS[c & 0xF]);
+                sb.append((char) HEX_CHARS[(c >> 12) & 0xF]);
+                sb.append((char) HEX_CHARS[(c >> 8) & 0xF]);
+                sb.append((char) HEX_CHARS[(c >> 4) & 0xF]);
+                sb.append((char) HEX_CHARS[c & 0xF]);
             } else {
                 sb.append(c);
             }

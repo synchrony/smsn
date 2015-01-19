@@ -122,14 +122,11 @@ public class Document extends AtomClass {
     private static class BibtexHandler implements FieldHandler {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            String value = object.getValue();
-            // assumes the "bibtex:" prefix
-            int i = value.indexOf(':');
-            String bibtex = NoteParser.unescapeValue(value.substring(i + 1)).trim();
+            String entry = object.getValue().trim();
 
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), DCTERMS.BIBLIOGRAPHIC_CITATION, vf.createLiteral(bibtex)));
+                    context.getSubjectUri(), DCTERMS.BIBLIOGRAPHIC_CITATION, vf.createLiteral(entry)));
         }
     }
 

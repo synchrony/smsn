@@ -92,7 +92,17 @@ public class KnowledgeBase {
     }
 
     public List<AtomClassEntry> getClassInfo(final Atom a) {
-        return atomClassifications.get(a);
+        List<AtomClassEntry> entries = atomClassifications.get(a);
+
+        if (null == entries || 0 == entries.size()) {
+            return entries;
+        } else {
+            // sort in descending order by total score, putting the top-ranked class first
+            List<KnowledgeBase.AtomClassEntry> helper = new LinkedList<KnowledgeBase.AtomClassEntry>();
+            helper.addAll(entries);
+            Collections.sort(helper, KnowledgeBase.AtomClassificationComparator.INSTANCE);
+            return helper;
+        }
     }
 
     public void addDefaultClasses()
@@ -549,7 +559,7 @@ public class KnowledgeBase {
         viewInferredInternal(a, 0);
     }
 
-    public static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
+    private static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
         public static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
 
         public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
@@ -719,6 +729,10 @@ public class KnowledgeBase {
             return inScore;
         }
 
+        /**
+         * Returns the total score of this entry
+         * @return the total score of this entry, which is the sum of its out-score and in-score
+         */
         public int getScore() {
             return inScore + outScore;
         }

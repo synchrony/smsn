@@ -25,7 +25,8 @@
     * white space
         * tab characters are converted to four spaces each: "    "
         * all other whitespace characters count as single spaces: " "
-        * newlines can be preserved with triple braces {{{
+        * newlines can be preserved with triple braces
+            * {{{
 like this.
 Use as many lines of text as you need.
 }}}

@@ -141,50 +141,35 @@ public class NoteParser {
 
             String value = "";
             if (0 < l.length()) {
-                // TODO: this only allows a single verbatim block per atom
-                if (!isProperty && l.contains(VERBATIM_BLOCK_START)) {
-                    int start = lineNumber;
-                    boolean inside = true;
-                    int index = l.indexOf(VERBATIM_BLOCK_START) + VERBATIM_BLOCK_START.length();
+                String lt = l.trim();
+                if (!isProperty && lt.startsWith(VERBATIM_BLOCK_START)) {
+                    if (lt.length() > 3) {
+                        throw new NoteParsingException(lineNumber, "verbatim block must open with a line containing only '{{{'");
+                    }
+
+                    StringBuilder verbatimValue = new StringBuilder();
+                    boolean first = true;
                     while (true) {
-                        // Check for the closing symbol before the opening symbol
-                        int b2 = l.indexOf(VERBATIM_BLOCK_END, index);
-                        if (b2 >= 0) {
-                            if (!inside) {
-                                throw new NoteParsingException(start, "unmatched verbatim block terminator" +
-                                        " (on line " + lineNumber + ")");
+                        String nextLine = br.readLine();
+                        lineNumber++;
+                        if (nextLine.contains(VERBATIM_BLOCK_END)) {
+                            lt = nextLine.trim();
+                            if (lt.length() > 3) {
+                                throw new NoteParsingException(lineNumber, "verbatim block must close with a line containing only '}}}'");
+                            } else {
+                                break;
                             }
-
-                            inside = false;
-                            index = b2 + VERBATIM_BLOCK_END.length();
-                            continue;
-                        }
-
-                        int b1 = l.indexOf(VERBATIM_BLOCK_START, index);
-                        if (b1 >= 0) {
-                            if (inside) {
-                                throw new NoteParsingException(start, "nested verbatim blocks (detected on line " +
-                                        lineNumber + ") are not allowed");
-                            }
-                            inside = true;
-                            index = b1 + VERBATIM_BLOCK_START.length();
-                            continue;
-                        }
-
-                        value += l;
-
-                        if (inside) {
-                            value += "\n";
-                            l = br.readLine();
-                            if (null == l) {
-                                throw new NoteParsingException(start, "non-terminated verbatim block");
-                            }
-                            lineNumber++;
-                            index = 0;
                         } else {
-                            break;
+                            if (first) {
+                                first = false;
+                            } else {
+                                verbatimValue.append('\n');
+                            }
+                            verbatimValue.append(nextLine);
                         }
                     }
+
+                    value = verbatimValue.toString();
                 } else {
                     value = l;
                 }

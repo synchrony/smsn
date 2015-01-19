@@ -2,7 +2,6 @@ package net.fortytwo.extendo.brain.rdf;
 
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import junit.framework.TestCase;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.BrainGraph;
@@ -62,10 +61,15 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class KnowledgeBaseTest extends TestCase {
+public class KnowledgeBaseTest {
     @Test
     public void testAKASyntax() throws Exception {
         AtomClass t = AKAReference.class.newInstance();
@@ -87,12 +91,22 @@ public class KnowledgeBaseTest extends TestCase {
     public void testBibtexReferenceSyntax() throws Exception {
         AtomClass t = BibtexReference.class.newInstance();
 
-        assertTrue(t.getValueRegex().matcher("bibtex: @article{}").matches());
-        assertTrue(t.getValueRegex().matcher("bibtex: {{{@article{}}}}").matches());
-        assertTrue(t.getValueRegex().matcher("bibtex: {{{\n" +
-                "@article{}\n" +
-                "}}}").matches());
-        assertFalse(t.getValueRegex().matcher("bibtex @article{}").matches());
+        assertTrue(t.getValueRegex().matcher("@article{...}").matches());
+        assertTrue(t.getValueRegex().matcher("@article{}").matches());
+        assertTrue(t.getValueRegex().matcher("@inproceedings{...}").matches());
+        // example with multiple lines, line terminators
+        assertTrue(t.getValueRegex().matcher("@article{einstein1905elektrodynamik,\n" +
+                "  title={Zur elektrodynamik bewegter k{\\\"o}rper},\n" +
+                "  author={Einstein, Albert},\n" +
+                "  journal={Annalen der physik},\n" +
+                "  volume={322},\n" +
+                "  number={10},\n" +
+                "  pages={891--921},\n" +
+                "  year={1905},\n" +
+                "  publisher={Wiley Online Library}\n" +
+                "}").matches());
+        assertFalse(t.getValueRegex().matcher("@article{").matches());
+        assertFalse(t.getValueRegex().matcher("@newspaper{...}").matches());
     }
 
     @Test
@@ -439,7 +453,7 @@ public class KnowledgeBaseTest extends TestCase {
                     context.uriOf(relativity));
             assertObjects(rc, context.uriOf(speedOfLight), RDF.TYPE, OWL.THING);
             assertObjects(rc, context.uriOf(speedOfLight), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Speed_of_light"));
-            assertObjects(rc, context.uriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, new LiteralImpl("bibtex reference here"));
+            assertObjects(rc, context.uriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, new LiteralImpl("@article{bibtexEntryHere}"));
 
             // TODO: support for connection between person and quotation
             assertObjects(rc, context.uriOf(quote), RDF.TYPE, ExtendoVocab.WORDORPHRASE);
@@ -457,15 +471,10 @@ public class KnowledgeBaseTest extends TestCase {
         }
     }
 
-    private final Comparator<KnowledgeBase.AtomClassEntry> atomClassComp
-            = new KnowledgeBase.AtomClassificationComparator();
-
     private void assertClassEquals(final String className, final Atom atom, final KnowledgeBase kb) {
-        assertTrue(kb.getClassInfo(atom).size() > 0);
-        List<KnowledgeBase.AtomClassEntry> helper = new LinkedList<KnowledgeBase.AtomClassEntry>();
-        helper.addAll(kb.getClassInfo(atom));
-        Collections.sort(helper, atomClassComp);
-        assertEquals(className, helper.get(0).getInferredClassName());
+        List<KnowledgeBase.AtomClassEntry> entries = kb.getClassInfo(atom);
+        assertTrue(null != entries && entries.size() > 0);
+        assertEquals(className, kb.getClassInfo(atom).get(0).getInferredClassName());
     }
 
     private final Comparator<Value> valueComparator = new ValueComparator();

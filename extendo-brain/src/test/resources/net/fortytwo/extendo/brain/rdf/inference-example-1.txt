@@ -6,9 +6,7 @@
         @sharability 0.75
         @weight      0.5
         @alias       http://www.physik.uni-augsburg.de/annalen/history/einstein-papers/1905_17_891-921.pdf
-    · :xKWD1wC: bibtex: {{{
-bibtex reference here
-}}}
+    · :xKWD1wC: @article{bibtexEntryHere}
         @sharability 0.75
         @weight      0.25
     + :GORFdGO: some concepts from "Zur Electrodynamik bewegter Körper"

@@ -51,10 +51,12 @@ public class NoteParserTest {
 
         Note ws = notes.get(4);
         assertEquals(5, ws.getChildren().size());
-        assertEquals("newlines can be preserved with triple braces {{{\n" +
-                "like this.\n" +
-                "Use as many lines of text as you need.\n" +
-                "}}}", ws.getChildren().get(2).getValue());
+        Note verbatim = ws.getChildren().get(2);
+        assertEquals("newlines can be preserved with triple braces", verbatim.getValue());
+        assertEquals(1, verbatim.getChildren().size());
+        assertEquals("like this.\n" +
+                "Use as many lines of text as you need.", verbatim.getChildren().get(0).getValue());
+
         assertEquals("leading and trailing whitespace are ignored", ws.getChildren().get(3).getValue());
 
         Note ids = notes.get(5);
@@ -125,19 +127,6 @@ public class NoteParserTest {
     }
 
     @Test
-    public void testVerbatimBlocks() throws Exception {
-        List<Note> notes = readNotes("* here is a verbatim block {{{\n" +
-                "which spans two lines}}}");
-
-        notes = readNotes("* here is a verbatim block {{{ all in one line}}} (pointless, but permitted)");
-
-        notes = readNotes("* :0001: here is a verbatim block {{{\n" +
-                "with an id }}}");
-        assertEquals(1, notes.size());
-        assertEquals("0001", notes.get(0).getId());
-    }
-
-    @Test
     public void testLegalIds() throws Exception {
         List<Note> notes = readNotes("+ :LTWrf62: courage\n" +
                 "+ :COAZgCU: justice\n" +
@@ -164,6 +153,54 @@ public class NoteParserTest {
                 "* it does not actually become an ID; just more value text");
         assertEquals(2, notes.size());
         assertNotSame("123@456", notes.get(0).getId());
+    }
+
+    @Test
+    public void testVerbatimBlocks() throws Exception {
+        List<Note> notes = readNotes("* {{{\n" +
+                "here is a verbatim block\n" +
+                "which spans two lines\n" +
+                "}}}");
+        assertEquals(1, notes.size());
+
+        notes = readNotes("* {{{\n" +
+                "here is a verbatim block all in one line (pointless, but permitted)\n" +
+                "}}}");
+        assertEquals(1, notes.size());
+
+        notes = readNotes("* :0001: {{{\n" +
+                "here is a verbatim block\n" +
+                "with an id\n" +
+                "}}}");
+        assertEquals(1, notes.size());
+        assertEquals("0001", notes.get(0).getId());
+    }
+
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testTextAfterVerbatimBlockStartIsInvalid() throws Exception {
+        readNotes("* {{{ this is not OK\n" +
+                "because the value must be on separate lines from the verbatim block delimiters\n" +
+                "}}}");
+    }
+
+    @Test
+    public void testTextBeforeVerbatimBlockStartIsValid() throws Exception {
+        readNotes("* this is OK, because it is not actually a {{{ verbatim block }}}");
+    }
+
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testTextBeforeVerbatimBlockEndIsInvalid() throws Exception {
+        readNotes("* {{{\n" +
+                "this is not OK, because the value must be on separate lines" +
+                "from the verbatim block delimiters}}}");
+    }
+
+    @Test(expected = NoteParser.NoteParsingException.class)
+    public void testTextAfterVerbatimBlockEndIsInvalid() throws Exception {
+        readNotes("* {{{" +
+                "this is not OK, because the value must be completely\n" +
+                "within the verbatim block delimiters,\n" +
+                "}}} with no content outside");
     }
 
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
