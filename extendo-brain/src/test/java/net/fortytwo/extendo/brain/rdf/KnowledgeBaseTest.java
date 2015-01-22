@@ -355,6 +355,8 @@ public class KnowledgeBaseTest {
         Atom quote = bg.getAtom("-ngTO_3");
         Atom h2g2 = bg.getAtom("TT698yn");
 
+        Atom john = bg.getAtom("0rYY9z0");
+
         // The following are nested directly under Einstein's family
         Atom hermann = bg.getAtom("mPx8zEW");
         Atom pauline = bg.getAtom("PR8p9B5");
@@ -374,6 +376,7 @@ public class KnowledgeBaseTest {
             System.out.println("#### ITERATION #" + (i + 1) + " ######");
             kb.inferClasses(null, null);
 
+            /*
             kb.viewInferred(einstein);
             System.out.println("");
             kb.viewInferred(einsteinQuotes);
@@ -391,6 +394,8 @@ public class KnowledgeBaseTest {
             kb.viewInferred(topics);
             System.out.println("");
             kb.viewInferred(googleGlass);
+            */
+            kb.viewInferred(john);
         }
 
         assertClassEquals("person", einstein, kb);
@@ -402,6 +407,8 @@ public class KnowledgeBaseTest {
         assertClassEquals("social-network-collection", einsteinFamily, kb);
         //assertClassEquals("linked-concept", speedOfLight, kb);
         assertClassEquals("webpage", paperPdf, kb);
+
+        assertClassEquals("person", john, kb);
 
         kb.exportRDF(new FileOutputStream("/tmp/test.nt"), RDFFormat.NTRIPLES, null);
 

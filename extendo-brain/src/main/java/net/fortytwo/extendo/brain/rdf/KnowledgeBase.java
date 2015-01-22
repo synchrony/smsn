@@ -144,6 +144,7 @@ public class KnowledgeBase {
                 Person.WorksCollection.class,
                 Person.InterestsCollection.class,
                 Person.SocialNetworkCollection.class,
+                Person.PersonalEventsCollection.class,
                 Person.PersonalStuffCollection.class,
                 Person.BelongingsCollection.class,
                 Tool.ContributorCollection.class,
@@ -222,16 +223,18 @@ public class KnowledgeBase {
         void execute() throws RDFHandlerException;
     }
 
+    private enum MatchResult {Unclassified, Supported, Unsupported, NoMatch}
+
     /*
     Matches the children of an atom against an atom regex element (class or wildcard with quantifier)
      */
-    private boolean match(final Atom childAtom,
-                          final AtomRegex.El el,
-                          final List<AtomClassEntry> evidenceEntries,
-                          final AtomCollectionMemory memory,
-                          final RDFizationContext context,
-                          final Collection<RdfizationCallback> callbacks,
-                          final Filter filter) throws RDFHandlerException {
+    private MatchResult match(final Atom childAtom,
+                              final AtomRegex.El el,
+                              final List<AtomClassEntry> evidenceEntries,
+                              final AtomCollectionMemory memory,
+                              final RDFizationContext context,
+                              final Collection<RdfizationCallback> callbacks,
+                              final Filter filter) throws RDFHandlerException {
         Set<Class<? extends AtomClass>> alts = el.getAlternatives();
 
         List<AtomClassEntry> entries = atomClassifications.get(childAtom);
@@ -239,7 +242,7 @@ public class KnowledgeBase {
             // The unclassified atom matches if the element has no alternatives, i.e. accepts everything.
             // note: (as yet) unclassified atoms are only allowed to be trivial matches;
             // we don't attempt to rdfize them
-            return 0 == alts.size();
+            return 0 == alts.size() ? MatchResult.Unclassified : MatchResult.NoMatch;
         } else { // one or more classes
             for (final AtomClassEntry entry : entries) {
                 // note: if multiple class entries are acceptable, only the first will match, in greedy fashion.
@@ -290,11 +293,11 @@ public class KnowledgeBase {
                         }
                     }
 
-                    return true;
+                    return entry.getOutScore() > 0 ? MatchResult.Supported : MatchResult.Unsupported;
                 }
             }
 
-            return false;
+            return MatchResult.NoMatch;
         }
     }
 
@@ -329,7 +332,7 @@ public class KnowledgeBase {
 
             for (AtomClass clazz : classes.values()) {
                 /* DO NOT REMOVE
-                if (subject.asVertex().getId().equals("yOXFhhN") && clazz.name.equals("person")) {// && null != handler) {
+                if (subject.asVertex().getId().equals("0rYY9z0") && clazz.name.equals("person")) {// && null != handler) {
                     System.out.println("break point here");
                 }//*/
 
@@ -366,32 +369,17 @@ public class KnowledgeBase {
                     int eli = 0;
                     AtomRegex.El el = null;
                     AtomRegex.Modifier mod = null;
-                    Set<Class<? extends AtomClass>> alts = null;
                     boolean advanceInput = true;
                     boolean advanceRegex = true;
-                    boolean matched = false;
+                    boolean matched;
                     boolean fail = false;
 
                     // break out on failure or exhaustion of the regex
                     while (!fail) {
-                        // assign one point per matched input element (as opposed to only one per regex element)
-                        if (matched && null != alts) {
-                            // assign a point only if the regex element matches a specific class, not a wildcard,
-                            // and the current element has not been marked to score as a wildcard.
-                            // Particularly significant elements may score extra points.
-                            outScore += el.getWeight();
-                            /*
-                            if (alts.size() > 0) {
-                                outScore++;
-                            }*/
-                            matched = false;
-                        }
-
                         if (advanceRegex) {
                             if (clazz.memberRegex.getElements().size() > eli) {
                                 el = clazz.memberRegex.getElements().get(eli++);
                                 mod = el.getModifier();
-                                alts = el.getAlternatives();
                             } else {
                                 // we need to have exhausted the input
                                 if (null != cur) {
@@ -424,38 +412,57 @@ public class KnowledgeBase {
                             }
                         }
 
+                        MatchResult matchResult = match(first, el, evidenceEntries, memory, context, callbacks, filter);
+
+                        // assign points per matched input element (rather than only per regex element)
+                        switch (matchResult) {
+                            case Unsupported:
+                                // Assign a point only if the regex element matches a specific class, not a wildcard,
+                                // and the current element has not been marked to score as a wildcard.
+                                // Particularly significant elements may score extra points.
+                                outScore += el.getWeight();
+                                break;
+                            case Supported:
+                                // Members supported by internal evidence (i.e. having non-zero out-scores)
+                                // in turn support the parent more strongly than members which merely satisfy
+                                // the property constraints.
+                                outScore += el.getWeight() * 2;
+                                break;
+                            case Unclassified: // fall through
+                            case NoMatch:
+                                break;
+                        }
+
+                        matched = matchResult != MatchResult.NoMatch;
+
                         switch (mod) {
                             case ZeroOrOne:
-                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
+                                if (matched) {
                                     advanceRegex = true;
                                     advanceInput = true;
-                                    matched = true;
                                 } else {
                                     advanceRegex = true;
                                 }
                                 break;
                             case ZeroOrMore:
-                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
+                                if (matched) {
                                     advanceInput = true;
-                                    matched = true;
                                 } else {
                                     advanceRegex = true;
                                 }
                                 break;
                             case One:
-                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
+                                if (matched) {
                                     advanceRegex = true;
                                     advanceInput = true;
-                                    matched = true;
                                 } else {
                                     fail = true;
                                 }
                                 break;
                             case OneOrMore:
-                                if (match(first, el, evidenceEntries, memory, context, callbacks, filter)) {
+                                if (matched) {
                                     mod = AtomRegex.Modifier.ZeroOrMore;
                                     advanceInput = true;
-                                    matched = true;
                                 } else {
                                     fail = true;
                                 }
@@ -559,17 +566,6 @@ public class KnowledgeBase {
         viewInferredInternal(a, 0);
     }
 
-    private static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
-        public static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
-
-        public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
-            // descending order based on total score.  Resolve a tie by lexicographical order of class names.
-            int cmp = ((Integer) second.getScore()).compareTo(first.getScore());
-            return 0 == cmp
-                    ? first.getInferredClassName().compareTo(second.getInferredClassName()) : cmp;
-        }
-    }
-
     private void viewInferredInternal(final Atom a,
                                       int indent) {
         for (int i = 0; i < indent; i++) System.out.print("\t");
@@ -653,6 +649,17 @@ public class KnowledgeBase {
         }
     }
 
+    private static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
+        public static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
+
+        public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
+            // descending order based on total score.  Resolve a tie by lexicographical order of class names.
+            int cmp = ((Integer) second.getScore()).compareTo(first.getScore());
+            return 0 == cmp
+                    ? first.getInferredClassName().compareTo(second.getInferredClassName()) : cmp;
+        }
+    }
+
     private static class SailAdder implements RDFHandler {
         private final SailConnection sc;
 
@@ -731,6 +738,7 @@ public class KnowledgeBase {
 
         /**
          * Returns the total score of this entry
+         *
          * @return the total score of this entry, which is the sum of its out-score and in-score
          */
         public int getScore() {

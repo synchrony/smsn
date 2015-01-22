@@ -198,3 +198,17 @@
         + :n7AMImU: that IBM HUD for which I saw commercials many years ago (and then never saw again)
             @sharability 0.5
             @weight      0.5
+
+3
++ :0rYY9z0: John Doe
+    @sharability 1
+    @weight      0.5
+    + :g3x2XWI: John was born on 1977-11-24
+        @sharability 0.75
+        @weight      0.5
+        · :DWRemAD: 1977-11-24
+            @sharability 0.75
+            @weight      0.5
+    · :2a5QOde: this person is isolated and must be classified on the basis of having a birthday, which is not one of the first fields in the regex
+        @sharability 0.5
+        @weight      0.5

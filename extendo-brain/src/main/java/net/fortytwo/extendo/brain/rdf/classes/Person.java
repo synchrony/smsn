@@ -29,7 +29,7 @@ public class Person extends AtomClass {
                 "person",
                 // note: value regex currently excludes names which begin with special characters
                 // (e.g. Chinese or certain European names)
-                Pattern.compile("[A-Z].+"),
+                Pattern.compile("[A-Z].{1,49}"),
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(new NickHandler(),
