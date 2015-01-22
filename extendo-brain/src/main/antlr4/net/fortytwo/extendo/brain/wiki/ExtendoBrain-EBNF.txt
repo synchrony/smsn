@@ -1,0 +1,14 @@
+lines     ::= line | lines EOL line
+line      ::= WS? (atom | comment | property)? WS?
+atom      ::= BULLET WS (ID (WS value)? | value)
+comment   ::= "@{" TEXT
+property  ::= "@alias" WS TEXT
+              | ("@sharability" | "@weight") WS DEGREE
+value     ::= multiline | TEXT
+multiline ::= "{{{" WS? EOL (TEXT EOL)*? WS? "}}}" /* nongreedy */
+EOL       ::= [#xA#xD]+     /* line feeds or carriage returns */
+WS        ::= [#x9#x20]+    /* tabs or spaces */
+BULLET    ::= [#x21-x7E#xA1-#xFF] /* visible characters */
+ID        ::= ":" [-_0-9A-Za-z]+ ":"
+TEXT      ::= [^#xA#xD]+
+DEGREE    ::= "1" ("." "0"+)? | "0" ("." [0-9]+)?
