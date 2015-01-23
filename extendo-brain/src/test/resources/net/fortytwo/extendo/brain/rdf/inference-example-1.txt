@@ -57,6 +57,9 @@
         @sharability 1
         @weight      0.5
         @alias       http://dbpedia.org/resource/Eduard_Einstein
+    · :wLjcaYL: not a person, just some text
+        @sharability 0.5
+        @weight      0.5
 
 3
 + :uIA1aLv: Einstein's belongings
@@ -124,6 +127,16 @@
         · :0IbxKLO: "If A is success in life, then A equals x plus y plus z. Work is x; y is play; and z is keeping your mouth shut."
             @sharability 0.75
             @weight      0.5
+    + :TFZ5vJG: some things Einstein likes
+        @sharability 0.75
+        @weight      0.5
+        + :ynyUshJ: physics
+            @sharability 1
+            @weight      0.5
+            @alias       http://dbpedia.org/resource/Physics
+        + :r4zU45R: just some random note
+            @sharability 0.5
+            @weight      0.5
     + :yWBqSc2: Albert Einstein's family
         @sharability 0.75
         @weight      0.5
@@ -146,6 +159,9 @@
             @alias       http://dbpedia.org/resource/Elsa_Einstein
         + :wz60qqd: Einstein's children
             @sharability 0.75
+            @weight      0.5
+        · :ExcPlOw: random notes here
+            @sharability 0.5
             @weight      0.5
     + :56KK1dZ: Einstein's stuff
         @sharability 0.75

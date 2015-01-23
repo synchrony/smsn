@@ -225,7 +225,7 @@ public class ExportExtension extends ExtendoExtension {
                     exportPageRank(p.brain.getBrainGraph(), new PrintStream(out));
                     break;
                 case Web:
-                    filter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
+                    filter = new Filter(0f, 1f, 0.5f, 0.5f, 1f, 0.75f);
                     // fall through
                 case RDF:
                     RDFFormat rdfFormat = RDFFormat.forFileName(p.file);

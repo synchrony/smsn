@@ -20,7 +20,7 @@ public class PersonCollection extends AtomCollection {
                 null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(null,
-                                AtomRegex.Modifier.OneOrMore, Person.class, PersonCollection.class),
+                                AtomRegex.Modifier.OneOrMore, Person.class, PersonCollection.class, Person.SocialNetworkCollection.class),
                         new AtomRegex.El(null,
                                 AtomRegex.Modifier.ZeroOrMore)
                 )));

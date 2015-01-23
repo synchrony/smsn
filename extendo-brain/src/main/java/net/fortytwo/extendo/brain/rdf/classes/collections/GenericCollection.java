@@ -32,10 +32,18 @@ public class GenericCollection extends AtomCollection {
                         // However, the scoring system will penalize such a match unless there is other evidence
                         // that this is a collection (e.g. it is found at the head of other collections).
                         new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore, GenericCollection.class),
-//                        new AtomRegex.El(null,
-//                                AtomRegex.Modifier.ZeroOrMore)
+                                AtomRegex.Modifier.ZeroOrMore,
+                                AttendedEventsCollection.class,
+                                DocumentCollection.class,
+                                GenericCollection.class,
+                                PersonCollection.class,
+                                QuotedValueCollection.class,
+                                TODOCollection.class,
+                                TopicCollection.class),
+                        new AtomRegex.El(0, null,
+                                AtomRegex.Modifier.ZeroOrMore)
 
+                        /*
                         // listing specific classes, rather than allowing all classes,
                         // prevents the collection class from matching structures with simple fields
                         // However, we make the element generic so that a collection does not compete
@@ -50,6 +58,7 @@ public class GenericCollection extends AtomCollection {
                                 QuotedValue.class,
                                 TODOTask.class,
                                 Tool.class)
+                                */
                 )));
     }
 }

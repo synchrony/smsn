@@ -354,6 +354,7 @@ public class KnowledgeBaseTest {
         Atom ellipsis = bg.getAtom("0MQ4h4a");
         Atom quote = bg.getAtom("-ngTO_3");
         Atom h2g2 = bg.getAtom("TT698yn");
+        Atom physics = bg.getAtom("ynyUshJ");
 
         Atom john = bg.getAtom("0rYY9z0");
 
@@ -445,6 +446,7 @@ public class KnowledgeBaseTest {
 
             assertObjects(rc, context.uriOf(einstein), RDF.TYPE, FOAF.PERSON);
             assertObjects(rc, context.uriOf(einstein), FOAF.NAME, new LiteralImpl("Albert Einstein"));
+            //assertObjects(rc, context.uriOf(einstein), FOAF.INTEREST, context.uriOf(physics));
             assertObjects(rc, context.uriOf(einstein), FOAF.KNOWS, known);
 
             assertObjects(rc, context.uriOf(einstein), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Albert_Einstein"));

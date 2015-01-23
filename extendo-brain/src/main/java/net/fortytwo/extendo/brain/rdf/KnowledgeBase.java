@@ -210,7 +210,10 @@ public class KnowledgeBase {
 
         for (Atom a : memory.getMemberAtoms()) {
             if (null == filter || filter.isVisible(a.asVertex())) {
-                fieldHandler.handle(a, context);
+                // only rdfize fields with a known class
+                if (isClassified(a)) {
+                    fieldHandler.handle(a, context);
+                }
             }
         }
 
@@ -225,6 +228,28 @@ public class KnowledgeBase {
 
     private enum MatchResult {Unclassified, Supported, Unsupported, NoMatch}
 
+    private boolean isClassified(final List<AtomClassEntry> entries) {
+        if (null == entries || 0 == entries.size()) {
+            return false;
+        } else {
+            for (AtomClassEntry e : entries) {
+                if (e.getScore() > 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private boolean isClassified(final Atom atom) {
+        /*
+        if (atom.asVertex().getId().equals("ynyUshJ")) {
+            System.out.println("break here");
+        }*/
+        List<AtomClassEntry> entries = atomClassifications.get(atom);
+        return isClassified(entries);
+    }
+
     /*
     Matches the children of an atom against an atom regex element (class or wildcard with quantifier)
      */
@@ -237,7 +262,7 @@ public class KnowledgeBase {
                               final Filter filter) throws RDFHandlerException {
         Set<Class<? extends AtomClass>> alts = el.getAlternatives();
 
-        List<AtomClassEntry> entries = atomClassifications.get(childAtom);
+        final List<AtomClassEntry> entries = atomClassifications.get(childAtom);
         if (null == entries) { // unclassified
             // The unclassified atom matches if the element has no alternatives, i.e. accepts everything.
             // note: (as yet) unclassified atoms are only allowed to be trivial matches;
@@ -274,7 +299,10 @@ public class KnowledgeBase {
                                                     new HashSet<String>(), filter);
                                         }
                                     } else if (null == filter || filter.isVisible(childAtom.asVertex())) {
-                                        fieldHandler.handle(childAtom, context);
+                                        // only rdfize fields with a known class
+                                        if (isClassified(entries)) {
+                                            fieldHandler.handle(childAtom, context);
+                                        }
                                     }
                                 }
                             });
@@ -344,7 +372,6 @@ public class KnowledgeBase {
                 AtomCollectionMemory memory = clazz.isCollectionClass()
                         ? new AtomCollectionMemory((String) subject.asVertex().getId())
                         : null;
-
 
                 if (null != clazz.valueRegex) {
                     if (null == value || !clazz.valueRegex.matcher(value).matches()) {
@@ -510,7 +537,7 @@ public class KnowledgeBase {
             }
 
             // perform rdfization, choosing at most one classification
-            if (null != handler) {
+            if (null != handler && (null == filter || filter.isVisible(subject.asVertex()))) {
                 if (newEntries.size() > 0) {
                     List<AtomClassEntry> helper = new LinkedList<AtomClassEntry>();
                     helper.addAll(newEntries);

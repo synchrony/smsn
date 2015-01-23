@@ -167,9 +167,7 @@ public class Person extends AtomClass {
         public SocialNetworkCollection() {
             super();
             name = "social-network-collection";
-            valueRegex = Pattern.compile("(.+ social network)" +
-                    "|(.+ friends)" +
-                    "|(.+ family)");
+            valueRegex = Pattern.compile(".+ (social network|friends|family)");
         }
     }
 
