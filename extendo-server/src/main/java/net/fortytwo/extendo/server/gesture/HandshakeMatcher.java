@@ -1,5 +1,8 @@
 package net.fortytwo.extendo.server.gesture;
 
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,7 +23,7 @@ public class HandshakeMatcher {
     private static final int STACK_SIZE_WARN_THRESHOLD = 1000;
     private long lastWarning = 0;
 
-    private final Map<String, Handshake> handshakesByActor;
+    private final Map<URI, Handshake> handshakesByActor;
     private final Stack<Handshake> latestHandshakes;
     private Collection<Handshake> cleanupBuffer = new LinkedList<Handshake>();
 
@@ -30,7 +33,7 @@ public class HandshakeMatcher {
 
     public HandshakeMatcher(HandshakeHandler handler) {
         this.handler = handler;
-        this.handshakesByActor = new HashMap<String, Handshake>();
+        this.handshakesByActor = new HashMap<URI, Handshake>();
         this.latestHandshakes = new Stack<Handshake>();
         lowPassFilter = new GestureLowPassFilter(5000);
     }
@@ -62,7 +65,7 @@ public class HandshakeMatcher {
         }
     }
 
-    public synchronized void receiveEvent(final String actor,
+    public synchronized void receiveEvent(final URI actor,
                                           final long timestamp) {
         //System.out.println("received handshake by " + actor + " at " + timestamp);
         cleanup(timestamp);
@@ -74,7 +77,7 @@ public class HandshakeMatcher {
             gesture = new Handshake();
             gesture.actor = actor;
             gesture.firstPeak = timestamp;
-            handshakesByActor.put(actor, gesture);
+            handshakesByActor.put(gesture.actor, gesture);
             isNew = true;
         } else if (timestamp < gesture.latestPeak) {
             throw new IllegalStateException("handshake peaks of actor " + actor + " arrived out of order ("
@@ -124,7 +127,7 @@ public class HandshakeMatcher {
     }
 
     public class Handshake {
-        public String actor;
+        public URI actor;
         public final List<Long> peaks = new LinkedList<Long>();
         public long firstPeak;
         public long latestPeak;

@@ -44,7 +44,7 @@ public class GestureTest {
             //System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
         }
 
-        Dataset ds = Gesture.datasetForGenericBatonGesture(System.currentTimeMillis(), vf.createURI(agentUri));
+        Dataset ds = Gesture.datasetForBatonGesture(System.currentTimeMillis(), vf.createURI(agentUri));
 
         assertEquals(5, ds.getStatements().size());
 
@@ -63,6 +63,7 @@ public class GestureTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             CloseableIteration<? extends BindingSet, QueryEvaluationException> iter
                     = sc.evaluate(q.getTupleExpr(), q.getDataset(), new EmptyBindingSet(), false);
             BindingSet bs = iter.next();

@@ -273,7 +273,7 @@ public class NoteQueries {
 
         List<Note> before = viewInternal(root, 1, filter, style).getChildren();
         List<Note> after = rootNote.getChildren();
-        List<Note> lcs = ListDiff.leastCommonSubsequence(before, after, noteComparator);
+        List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, noteComparator);
         ListDiff.applyDiff(before, after, lcs, noteComparator, ed);
 
         for (Note n : rootNote.getChildren()) {

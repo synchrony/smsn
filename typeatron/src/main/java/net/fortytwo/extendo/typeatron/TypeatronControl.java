@@ -402,14 +402,22 @@ public class TypeatronControl extends OscControl {
 
     public void sendLaserOffMessage() {
         System.out.println("laser off");
+        thingPointedTo = null;
         OSCMessage m = new OSCMessage(EXO_TT_LASER_OFF);
         send(m);
     }
 
     public void sendLaserOnMessage() {
         System.out.println("laser on");
+
+        // note: this moment slightly precedes the time at which the laser becomes visible,
+        // assuming the message is received by the Typeatron
+        long recognitionTime = System.currentTimeMillis();
+
         OSCMessage m = new OSCMessage(EXO_TT_LASER_ON);
         send(m);
+
+        handlePointEvent(recognitionTime);
     }
 
     /*

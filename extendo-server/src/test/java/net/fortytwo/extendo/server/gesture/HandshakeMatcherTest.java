@@ -2,6 +2,8 @@ package net.fortytwo.extendo.server.gesture;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,7 +27,11 @@ public class HandshakeMatcherTest {
     // another typical, but distinct handshake
     private long[] series2 = new long[]{0, 120, 191, 343, 405};
 
-    private String actor1 = "a1", actor2 = "a2";
+    private static final String BASE_URI = "http://example.org/";
+
+    private URI
+            actor1 = new URIImpl(BASE_URI + "a1"),
+            actor2 = new URIImpl(BASE_URI + "a2");
 
     public HandshakeMatcherTest() {
         HandshakeMatcher.HandshakeHandler handler = new HandshakeMatcher.HandshakeHandler() {
@@ -47,10 +53,10 @@ public class HandshakeMatcherTest {
         server.reset();
     }
 
-    private void submitEvents(final String actor1,
+    private void submitEvents(final URI actor1,
                               final long[] series1,
                               final long offset1,
-                              final String actor2,
+                              final URI actor2,
                               final long[] series2,
                               final long offset2) {
         List<Event> events = new LinkedList<Event>();
@@ -86,7 +92,8 @@ public class HandshakeMatcherTest {
         submitEvents(actor1, series1, 0, actor2, series2, 0);
         // the handshakes match just once, even though there are several more events after they first match
         assertEquals(1, totalMatches);
-        assertTrue(matches.contains("a1,a2") || matches.contains("a2,a1"));
+        assertTrue(matches.contains(actor1.stringValue()+ "," + actor2.stringValue())
+                || matches.contains(actor2.stringValue()+ "," + actor1.stringValue()));
     }
 
     @Test
@@ -102,7 +109,7 @@ public class HandshakeMatcherTest {
     }
 
     private class Event implements Comparable<Event> {
-        public String actor;
+        public URI actor;
         public long timestamp;
 
         @Override

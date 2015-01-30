@@ -73,11 +73,6 @@ public class Extendo {
 
     private static TypedProperties configuration;
 
-    // OSC addresses shared between modules
-    // TODO: move to a more appropriate, but still shared location
-    public static final String
-            EXO_GESTURE_GIVE = "/exo/gesture/give";
-
     static {
         try {
             // logging configuration

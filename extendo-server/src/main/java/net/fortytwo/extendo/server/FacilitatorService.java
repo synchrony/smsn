@@ -15,6 +15,7 @@ import net.fortytwo.flow.NullSink;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.flow.rdf.RDFSink;
 import net.fortytwo.linkeddata.LinkedDataCache;
+import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.RippleException;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
@@ -101,8 +102,16 @@ public class FacilitatorService {
         cache.setDataStore(store);
         queryEngine.setLinkedDataCache(cache, sail);
 
+        GesturalServer.DatasetHandler h = new GesturalServer.DatasetHandler() {
+            @Override
+            public void handle(Dataset dataset) {
+                System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
+                queryEngine.addStatements(dataset.getStatements());
+            }
+        };
+
         // gestural event processing via OSC
-        GesturalServer gesturalServer = new GesturalServer(oscPort);
+        GesturalServer gesturalServer = new GesturalServer(oscPort, h);
         gesturalServer.start();
 
         // SPARQL pub/sub via Extendo P2P

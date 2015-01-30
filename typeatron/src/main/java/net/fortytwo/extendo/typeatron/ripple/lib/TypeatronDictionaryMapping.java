@@ -158,7 +158,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new SpeakMapping(environment), "s", "speak");
 
         // Typeatron hardware library
-        add(new LaserPointerMapping(typeatron), "l", "laser");
+        add(new LaserPointerMapping(exoBrainClient, defaultFilter, typeatron), "l", "laser");
         add(new GetLightLevelMapping(typeatron), "ll", "light");
         add(new MorseMapping(typeatron), "m", "morse");
         add(new VibrateMapping(typeatron), "V", "vibrate");

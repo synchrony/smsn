@@ -1,13 +1,14 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
+import net.fortytwo.extendo.brain.Filter;
+import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
+import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
-import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,13 +16,16 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class LaserPointerMapping extends PrimitiveStackMapping {
+public class LaserPointerMapping extends AtomMapping {
 
     private static final Logger logger = Logger.getLogger(LaserPointerMapping.class.getName());
 
     private final TypeatronControl typeatron;
 
-    public LaserPointerMapping(final TypeatronControl typeatron) {
+    public LaserPointerMapping(final ExtendoBrainClient client,
+                               final Filter filter,
+                               final TypeatronControl typeatron) {
+        super(client, filter);
         this.typeatron = typeatron;
     }
 
@@ -32,7 +36,7 @@ public class LaserPointerMapping extends PrimitiveStackMapping {
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("thingPointedTo", "the thing pointed to or referenced", true)};
+        return new Parameter[]{new Parameter("thingIndicated", "the thing pointed to or referenced", true)};
     }
 
     public String getComment() {
@@ -42,17 +46,26 @@ public class LaserPointerMapping extends PrimitiveStackMapping {
     public void apply(final RippleList stack,
                       final Sink<RippleList> solutions,
                       final ModelConnection mc) throws RippleException {
-        Value thingPointedTo = mc.toRDF(stack.getFirst());
-        logger.log(Level.INFO, "executing laser pointer mapping with reference to " + thingPointedTo);
+        Object first = stack.getFirst();
+        Note n = toNote(first, 0, true);
 
-        if (null != thingPointedTo && thingPointedTo instanceof URI) {
+        if (null == n) {
+            logger.warning("can't point to non-atom: " + first);
+        } else {
+            URI uri = uriOf(n);
+
+            // value is informational; it is used only for development/debugging purposes
+            String value = n.getValue();
+
+            logger.log(Level.INFO, "pointing to " + uri + " (" + value + ")");
+
             try {
-                typeatron.pointTo((URI) thingPointedTo);
+                typeatron.pointTo(uri);
             } catch (Throwable t) {
                 throw new RippleException(t);
             }
 
-            // keep the thing pointed to on the stack
+            // keep the stack unchanged
             solutions.put(stack);
         }
     }

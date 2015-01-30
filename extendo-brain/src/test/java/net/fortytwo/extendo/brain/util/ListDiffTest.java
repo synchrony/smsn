@@ -22,7 +22,7 @@ public class ListDiffTest {
         List<String> beforeList = ListDiff.toList(before);
         List<String> afterList = ListDiff.toList(after);
 
-        List<String> lcs = ListDiff.leastCommonSubsequence(beforeList, afterList, cmp);
+        List<String> lcs = ListDiff.longestCommonSubsequence(beforeList, afterList, cmp);
         return ListDiff.toString(lcs);
     }
 

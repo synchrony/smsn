@@ -3,7 +3,9 @@ package net.fortytwo.extendo.server.gesture;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
-import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.rdf.Gesture;
+import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
+import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.StringUtils;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
@@ -28,17 +30,24 @@ public class GesturalServer {
 
     private final int port;
 
-    public GesturalServer() {
-        this(DEFAULT_PORT);
+    private static final boolean doSpeak = false;
+
+    public GesturalServer(final DatasetHandler datasetHandler) {
+        this(DEFAULT_PORT, datasetHandler);
     }
 
-    public GesturalServer(final int port) {
+    public GesturalServer(final int port,
+                          final DatasetHandler datasetHandler) {
         this.port = port;
 
         HandshakeMatcher.HandshakeHandler handshakeHandler = new HandshakeMatcher.HandshakeHandler() {
             @Override
             public void handle(HandshakeMatcher.Handshake left, HandshakeMatcher.Handshake right, long timestamp) {
-                speakWithSystemCall(left.actor + " shook hands with " + right.actor);// + " at " + timestamp);
+                speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
+                // + " at " + timestamp);
+
+                Dataset d = Gesture.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
+                datasetHandler.handle(d);
             }
         };
 
@@ -46,95 +55,132 @@ public class GesturalServer {
 
         HandoffMatcher.HandoffHandler handoffHandler = new HandoffMatcher.HandoffHandler() {
             @Override
-            public void handle(HandoffMatcher.Handoff give, HandoffMatcher.Handoff take, String thingGiven, long timestamp) {
-                speakWithSystemCall(give.actor + " gave \"" + thingGiven + "\" to " + take.actor);// + " at " + timestamp);
+            public void handle(HandoffMatcher.Handoff give,
+                               HandoffMatcher.Handoff take,
+                               URI thingGiven,
+                               long timestamp) {
+                speakWithSystemCall(give.actor.getLocalName() + " gave \"" + thingGiven.getLocalName()
+                        + "\" to " + take.actor.getLocalName());
+                // + " at " + timestamp);
+
+                Dataset d = Gesture.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
+                datasetHandler.handle(d);
             }
         };
 
         handoffMatcher = new HandoffMatcher(handoffHandler);
     }
 
+    private boolean badArgs(final List<Object> args,
+                            final int expected,
+                            final String address) {
+        if (args.size() != expected) {
+            logger.warning("expected " + expected + " arguments to " + address + "; got " + args.size()
+                    + ". Ignoring event.");
+
+            // TODO: temporary.  Beware of an apparent JavaOSC bug when sending certain combinations of arguments.
+            //for (Object arg : args) {
+            //    System.err.println("\targ: " + arg);
+            //}
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private URI getActor(final List<Object> args) {
+        Object arg = args.get(0);
+        if (!(arg instanceof String)) {
+            logger.warning("actor argument must be a String");
+            return null;
+        }
+        try {
+            return new URIImpl((String) arg);
+        } catch (IllegalArgumentException e) {
+            logger.warning("actor not provided as a valid URI: " + arg);
+            return null;
+        }
+    }
+
+    private long getRecognitionTimestamp(final List<Object> args) {
+        // For now, use the current instant as the gestural timestamp,
+        // disregarding all considerations of latency.
+        // We ignore both the estimated moment of occurrence and the moment of recognition provided in the message.
+        // TODO: this ignores the fact that UDP does not guarantee ordered delivery
+        return System.currentTimeMillis();
+    }
+
     public void start() throws SocketException {
-        OSCListener gestureListener = new OSCListener() {
+        OSCListener handshakeListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
                 List<Object> args = oscMessage.getArguments();
-                /* TODO: restore this. These are the proper gestural arguments, but ExoHand on Arduino Nano is
-                   too resource-constrained at the moment to support them
-                if (4 != args.size()) {
-                    logger.warning("gesture event has wrong # of args ("
-                            + args.size() + ", expected 4). Ignoring event.");
-                    return;
-                }
-                if (!(args.get(0) instanceof String)) {
-                    logger.warning("expected first argument in gestural message to be a string-valued actor name." +
-                            " Got: " + args.get(0) + ". Ignoring event.");
-                    return;
-                }
-                if (!(args.get(1) instanceof String)) {
-                    logger.warning("expected second argument in gestural message to be a string-valued gesture name." +
-                            " Got: " + args.get(0) + ". Ignoring event.");
+                if (badArgs(args, 1, ExtendoGesture.EXO_ACTIVITY_HANDSHAKE)) {
                     return;
                 }
 
-                String name = (String) args.get(0);
-                String gesture = (String) args.get(1);
-                */
-
-                if (1 != args.size() || !(args.get(0) instanceof String)) {
-                    logger.warning("gesture event has unexpected argument format..." +
-                            " expecting 'hack' format with only one, string-valued argument (actor:gesturename)");
+                URI actor = getActor(args);
+                if (null == actor) {
                     return;
                 }
 
-                String s = (String) args.get(0);
-                int i = s.indexOf(':');
-                if (i < 0) {
-                    logger.warning("expected (actor:gesturename) format for the 'hack' argument");
-                    return;
-                }
+                long timestamp = getRecognitionTimestamp(args);
 
-                String actorName = s.substring(0, i);
-                String gestureName = s.substring(i + 1);
-
-                System.out.println("received " + gestureName + " gesture from " + actorName);
-
-                // for now, use the current instant as the gestural timestamp,
-                // disregarding all considerations of latency
-                // TODO: this ignores the fact that UDP does not guarantee ordered delivery
-                long timestamp = System.currentTimeMillis();
-
-                if (gestureName.equals("handshake")) {
-                    handshakeMatcher.receiveEvent(actorName, timestamp);
-                } else if (gestureName.equals("handoff")) {
-                    handoffMatcher.receiveEvent(actorName, timestamp);
-                }
+                System.out.println("received half-handshake gesture from " + actor);
+                handshakeMatcher.receiveEvent(actor, timestamp);
             }
         };
+
+        OSCListener handoffListener = new OSCListener() {
+            @Override
+            public void acceptMessage(Date date, OSCMessage oscMessage) {
+                List<Object> args = oscMessage.getArguments();
+                if (badArgs(args, 1, ExtendoGesture.EXO_ACTIVITY_HANDOFF)) {
+                    return;
+                }
+
+                URI actor = getActor(args);
+                if (null == actor) {
+                    return;
+                }
+
+                long timestamp = getRecognitionTimestamp(args);
+
+                System.out.println("received handoff gesture from " + actor);
+                handoffMatcher.receiveEvent(actor, timestamp);
+            }
+        };
+
         OSCListener giveListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
+
+                //byte[] buffer = oscMessage.getByteArray();
+                //System.out.println("received message of length " + buffer.length + ": " + new String(buffer));
+
                 List<Object> args = oscMessage.getArguments();
-                if (2 != args.size()) {
-                    logger.warning("expected two arguments to " + Extendo.EXO_GESTURE_GIVE);
+                if (badArgs(args, 2, ExtendoGesture.EXO_ACTIVITY_GIVE)) {
                     return;
                 }
 
-                String agentUri = (String) args.get(0);
-                // TODO: passing the name instead of the URI is temporary
-                String nameOfThingGiven = (String) args.get(1);
-                System.out.println(agentUri + " gave " + nameOfThingGiven);
+                URI actor = new URIImpl((String) args.get(0));
+                URI thingGiven = new URIImpl((String) args.get(1));
+                //String value = (String) args.get(2);
 
-                URI sesameUri = new URIImpl(agentUri);
-                handoffMatcher.prepareForGive(sesameUri, nameOfThingGiven, System.currentTimeMillis());
+                System.out.println(actor + " gave " + thingGiven);
+                //System.out.println(actor + " gave " + thingGiven + " (" + value + ")");
+
+                handoffMatcher.prepareForGive(actor, thingGiven, System.currentTimeMillis());
             }
         };
+
         OSCListener infoListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
                 logger.info("info message via OSC: " + oscMessage.getArguments().get(0));
             }
         };
+
         OSCListener errorListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
@@ -143,18 +189,24 @@ public class GesturalServer {
         };
 
         OSCPortIn portIn = new OSCPortIn(port);
-        // TODO: these messages should really be directed at /exo/server/gesture
-        portIn.addListener("/exo/hand/gesture", gestureListener);
+        portIn.addListener(ExtendoGesture.EXO_ACTIVITY_GIVE, giveListener);
+        portIn.addListener(ExtendoGesture.EXO_ACTIVITY_HANDOFF, handoffListener);
+        portIn.addListener(ExtendoGesture.EXO_ACTIVITY_HANDSHAKE, handshakeListener);
         portIn.addListener("/exo/hand/info", infoListener);
         portIn.addListener("/exo/hand/error", errorListener);
-        portIn.addListener(Extendo.EXO_GESTURE_GIVE, giveListener);
         logger.info("listening for /exo messages");
         portIn.startListening();
     }
 
     public static void main(final String[] args) throws Exception {
+        DatasetHandler h = new DatasetHandler() {
+            @Override
+            public void handle(Dataset dataset) {
+                // discard dataset
+            }
+        };
 
-        new GesturalServer().start();
+        new GesturalServer(h).start();
         while (true) {
             Thread.sleep(10000);
         }
@@ -162,8 +214,14 @@ public class GesturalServer {
 
     // TODO: temporary for demo
     private final Runtime runtime = Runtime.getRuntime();
+
     private void speakWithSystemCall(final String message) {
         System.out.println("SPEAKING: " + message);
+
+        if (!doSpeak) {
+            return;
+        }
+
         Process p = null;
         try {
             p = runtime.exec("say \"" + StringUtils.escapeString(message) + "\"");
@@ -181,5 +239,9 @@ public class GesturalServer {
                 logger.warning("'say' command failed with code " + exitCode);
             }
         }
+    }
+
+    public interface DatasetHandler {
+        void handle(Dataset dataset);
     }
 }

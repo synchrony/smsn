@@ -1,5 +1,6 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
+import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Note;
 import net.fortytwo.extendo.brain.NoteQueries;
@@ -8,6 +9,8 @@ import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
 import java.util.logging.Logger;
 
@@ -89,5 +92,18 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                 throw new RippleException("illegal sharability or weight value: " + f);
             }
         }
+    }
+
+    protected URI uriOf(final Note n) {
+        String alias = n.getAlias();
+        if (null != alias) {
+            try {
+                return new URIImpl(alias);
+            } catch (IllegalArgumentException e) {
+                logger.warning("alias " + alias + " is not a URI");
+            }
+        }
+
+        return new URIImpl(BrainGraph.uriForId(n.getId()));
     }
 }

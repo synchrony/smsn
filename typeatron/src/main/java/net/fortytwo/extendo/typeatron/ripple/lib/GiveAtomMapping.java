@@ -1,16 +1,18 @@
 package net.fortytwo.extendo.typeatron.ripple.lib;
 
 import com.illposed.osc.OSCMessage;
-import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
+import org.openrdf.model.URI;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,20 +49,23 @@ public class GiveAtomMapping extends AtomMapping {
                       final ModelConnection mc) throws RippleException {
 
         Object first = stack.getFirst();
-        //stack = stack.getRest();
-
         Note n = toNote(first, 0, true);
 
         if (null == n) {
             logger.warning("can't give non-atom: " + first);
         } else {
+            URI uri = uriOf(n);
+
+            // value is informational; it is used only for development/debugging purposes
             String value = n.getValue();
-            if (null != value) {
-                OSCMessage m = new OSCMessage(Extendo.EXO_GESTURE_GIVE);
-                m.addArgument(typeatron.getAgent().getAgentUri().stringValue());
-                m.addArgument(value);
-                typeatron.getAgent().sendOSCMessageToFacilitator(m);
-            }
+
+            logger.log(Level.INFO, "preparing to give " + uri + " (" + value + ")");
+
+            OSCMessage m = new OSCMessage(ExtendoGesture.EXO_ACTIVITY_GIVE);
+            m.addArgument(typeatron.getAgent().getAgentUri().stringValue());
+            m.addArgument(uri.stringValue());
+            //m.addArgument(value);
+            typeatron.getAgent().sendOSCMessageToFacilitator(m);
 
             // keep the stack unchanged
             solutions.put(stack);

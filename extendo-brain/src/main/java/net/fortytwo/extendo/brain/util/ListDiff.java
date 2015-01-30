@@ -35,7 +35,7 @@ public class ListDiff {
         return sb.toString();
     }
 
-    public static <T> List<T> leastCommonSubsequence(List<T> a, List<T> b, Comparator<T> comp) {
+    public static <T> List<T> longestCommonSubsequence(List<T> a, List<T> b, Comparator<T> comp) {
         int[][] lengths = new int[a.size() + 1][b.size() + 1];
 
         // row 0 and column 0 are initialized to 0 already

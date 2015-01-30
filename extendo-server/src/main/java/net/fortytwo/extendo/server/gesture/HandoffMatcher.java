@@ -29,10 +29,10 @@ public class HandoffMatcher {
 
     private final Stack<Handoff> latestHandoffs;
     private Collection<Handoff> cleanupBuffer = new LinkedList<Handoff>();
-    private final Map<String, ThingGiven> thingsGivenByActor;
+    private final Map<URI, ThingGiven> thingsGivenByActor;
 
     // a handoff must occur this many milliseconds after the "give" setup event
-    private long GIVE_EXPIRATION = 20000;
+    private static final long GIVE_EXPIRATION = 20000;
 
     private final HandoffHandler handler;
 
@@ -41,7 +41,7 @@ public class HandoffMatcher {
     public HandoffMatcher(HandoffHandler handler) {
         this.handler = handler;
         this.latestHandoffs = new Stack<Handoff>();
-        thingsGivenByActor = new HashMap<String, ThingGiven>();
+        thingsGivenByActor = new HashMap<URI, ThingGiven>();
         lowPassFilter = new GestureLowPassFilter(5000);
     }
 
@@ -49,11 +49,9 @@ public class HandoffMatcher {
         latestHandoffs.clear();
     }
 
-    public synchronized void prepareForGive(final URI actorUri, final String thing, final long now) {
-        // TODO: using only local name is a hack to deal with memory shortage on Arduino Nano (memory was that tight at demo time)
-        String actor = actorUri.getLocalName();
+    public synchronized void prepareForGive(final URI actor, final URI thingGivenUri, final long now) {
         ThingGiven tg = new ThingGiven();
-        tg.thing = thing;
+        tg.thing = thingGivenUri;
         tg.timestamp = now;
         thingsGivenByActor.put(actor, tg);
     }
@@ -79,7 +77,7 @@ public class HandoffMatcher {
         }
     }
 
-    public synchronized void receiveEvent(final String actor,
+    public synchronized void receiveEvent(final URI actor,
                                           final long timestamp) {
         //System.out.println("received handoff by " + actor + " at " + timestamp);
         cleanup(timestamp);
@@ -146,11 +144,11 @@ public class HandoffMatcher {
     }
 
     public interface HandoffHandler {
-        void handle(Handoff giver, Handoff taker, String thingGiven, long time);
+        void handle(Handoff give, Handoff take, URI thingGiven, long timestamp);
     }
 
     public class Handoff {
-        public String actor;
+        public URI actor;
         public long timeOfSpike;
         public boolean matched;
 
@@ -162,7 +160,7 @@ public class HandoffMatcher {
     }
 
     public class ThingGiven {
-        public String thing;
+        public URI thing;
         public long timestamp;
     }
 }
