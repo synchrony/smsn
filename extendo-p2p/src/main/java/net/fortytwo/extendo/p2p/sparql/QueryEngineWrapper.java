@@ -101,6 +101,10 @@ public class QueryEngineWrapper {
     private void handleQueryMessage(final Connection c,
                                     final JSONObject message)
             throws QueryEngine.InvalidQueryException, IOException, QueryEngine.IncompatibleQueryException {
+        if (!c.isActive()) {
+            logger.severe("can't handle query message; connection is not active");
+            return;
+        }
 
         final String queryId;
         String query;
@@ -141,6 +145,11 @@ public class QueryEngineWrapper {
     private void sendQueryResultMessage(final Connection c,
                                         final String queryId,
                                         final JSONObject bindings) throws JSONException, IOException {
+        if (!c.isActive()) {
+            logger.severe("can't send query result; connection is not active");
+            return;
+        }
+
         JSONObject j = new JSONObject();
         j.put(QueryEngineProxy.QUERY_ID, queryId);
         j.put(QueryEngineProxy.BINDINGS, bindings);

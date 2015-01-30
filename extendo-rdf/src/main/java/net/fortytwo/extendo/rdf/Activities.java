@@ -25,43 +25,43 @@ public class Activities {
     private static final SimpleDateFormat XSD_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static final String QUERY_FOR_ALL_GB_GESTURES =
-            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
+            "PREFIX activity: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
                     "SELECT ?actor ?time WHERE {\n" +
-                    "?gesture a gesture:BatonGesture .\n" +
-                    "?gesture gesture:actor ?actor .\n" +
-                    "?gesture gesture:recognitionTime ?instant .\n" +
+                    "?a a activity:BatonGesture .\n" +
+                    "?a activity:actor ?actor .\n" +
+                    "?a activity:recognitionTime ?instant .\n" +
                     "?instant tl:at ?time .\n" +
                     "}";
+    public static final String QUERY_FOR_ATTENTION =
+            "PREFIX activity: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
+                    "SELECT ?actor ?focus WHERE {\n" +
+                    "?a activity:focusOfAttention ?focus .\n" +
+                    "?a activity:actor ?actor .\n" +
+                    "}";
     public static final String QUERY_FOR_THINGS_POINTED_TO =
-            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
-                    "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
-                    "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
-                    "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
+            "PREFIX activity: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "SELECT ?actor ?indicated WHERE {\n" +
-                    "?gesture gesture:thingIndicated ?indicated .\n" +
-                    "?gesture gesture:actor ?actor .\n" +
+                    "?a activity:thingIndicated ?indicated .\n" +
+                    "?a activity:actor ?actor .\n" +
                     "}";
     public static final String QUERY_FOR_THINGS_POINTED_TO_WITH_COMMON_ORG =
-            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
-                    "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
+            "PREFIX activity: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
                     "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
                     "SELECT ?indicated ?indicatedName ?orgLabel WHERE {\n" +
-                    "?gesture gesture:thingIndicated ?indicated .\n" +
+                    "?a activity:thingIndicated ?indicated .\n" +
                     "?indicated foaf:name ?indicatedName .\n" +
                     "?org rdfs:label ?orgLabel .\n" +
                     "?org foaf:member <http://fortytwo.net/2014/04/twc#JoshuaShinavier> .\n" +  // TODO
                     "?org foaf:member ?indicated .\n" +
                     "}";
     public static final String QUERY_FOR_THINGS_POINTED_TO_WITH_COMMON_INTEREST =
-            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
-                    "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
+            "PREFIX activity: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
-                    "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
                     "SELECT ?indicated ?indicatedName ?interest WHERE {\n" +
                     "?indicated foaf:name ?indicatedName .\n" +
-                    "?gesture gesture:thingIndicated ?indicated .\n" +
+                    "?a activity:thingIndicated ?indicated .\n" +
                     "<http://fortytwo.net/2014/04/twc#JoshuaShinavier> foaf:interest ?interest .\n" +  // TODO
                     "?indicated foaf:interest ?interest .\n" +
                     "}";

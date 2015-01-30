@@ -3,6 +3,7 @@ package net.fortytwo.extendo.p2p.sparql;
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import edu.rpi.twc.sesamestream.Subscription;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.Connection;
 import net.fortytwo.extendo.p2p.MessageHandler;
 import org.json.JSONArray;
@@ -157,14 +158,14 @@ public class QueryEngineProxy implements QueryEngine {
         connection.sendNow(TAG_RDF_DATA, j);
     }
 
-    private static long maxQueryId = 0;
-
     private class SubscriptionImpl implements Subscription {
         private final String queryId;
         private boolean active = true;
 
         public SubscriptionImpl() {
-            queryId = "" + ++maxQueryId;
+            // Co-opt Extendo atom IDs as query IDs; it's just a convenient way of getting a short pseudo-random string
+            // Query IDs are pseudo-random rather than consecutive so as to minimize the chance of collision.
+            queryId = Extendo.createRandomKey();
         }
 
         public String getId() {

@@ -387,6 +387,9 @@
                             <configuration>
                                 <rules>
                                     <DependencyConvergence/>
+                                    <requireJavaVersion>
+                                        <version>[1.6,1.8]</version>
+                                    </requireJavaVersion>
                                 </rules>
                             </configuration>
                         </execution>

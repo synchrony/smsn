@@ -63,6 +63,10 @@ public class ChordedKeyer {
         initializeChords();
     }
 
+    public Mode getMode() {
+        return currentMode;
+    }
+
     public void setMode(final Mode mode) {
         currentButtonState = null;
         currentMode = mode;

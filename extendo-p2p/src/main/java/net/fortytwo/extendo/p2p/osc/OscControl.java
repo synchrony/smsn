@@ -106,5 +106,9 @@ public abstract class OscControl {
         public DeviceInitializationException(final Throwable cause) {
             super(cause);
         }
+
+        public DeviceInitializationException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
     }
 }

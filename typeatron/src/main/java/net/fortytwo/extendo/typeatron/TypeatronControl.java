@@ -1,6 +1,8 @@
 package net.fortytwo.extendo.typeatron;
 
 import com.illposed.osc.OSCMessage;
+import edu.rpi.twc.sesamestream.BindingSetHandler;
+import edu.rpi.twc.sesamestream.QueryEngine;
 import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.brain.BrainModeClient;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
@@ -15,6 +17,8 @@ import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.query.BindingSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,6 +84,41 @@ public class TypeatronControl extends OscControl {
 
         this.agent = agent;
         this.environment = environment;
+
+        try {
+            agent.getQueryEngine().addQuery(Activities.QUERY_FOR_ATTENTION, new BindingSetHandler() {
+                @Override
+                public void handle(BindingSet b) {
+                    Value actor = b.getValue("actor");
+                    Value focus = b.getValue("focus");
+                    logger.info("notified of attention by " + actor + " to " + focus);
+
+                    if (keyer.getMode().equals(ChordedKeyer.Mode.Laser)) {
+                        if (null == thingPointedTo) {
+                            throw new IllegalStateException();
+                        }
+                        
+                        if (thingPointedTo.equals(focus)) {
+                            sendLaserFeedbackMessage();
+                        } else {
+                            // TODO: temporary
+                            logger.warning("got attentional feedback on item not pointed to" +
+                                    " (OK IRL, but not expected in a demo)");
+                        }
+                    } else {
+                        // TODO: temporary
+                        logger.warning("got attentional feedback outside of Laser mode" +
+                                " (OK IRL, but not expected in a demo)");
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
+        } catch (QueryEngine.IncompatibleQueryException e) {
+            throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
+        } catch (QueryEngine.InvalidQueryException e) {
+            throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
+        }
 
         try {
             rippleSession = new RippleSession(agent, environment);
