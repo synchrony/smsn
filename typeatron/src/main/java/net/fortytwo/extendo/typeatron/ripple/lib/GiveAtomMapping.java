@@ -3,7 +3,7 @@ package net.fortytwo.extendo.typeatron.ripple.lib;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Note;
-import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
+import net.fortytwo.extendo.rdf.vocab.ExtendoActivityOntology;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.flow.Sink;
@@ -61,7 +61,7 @@ public class GiveAtomMapping extends AtomMapping {
 
             logger.log(Level.INFO, "preparing to give " + uri + " (" + value + ")");
 
-            OSCMessage m = new OSCMessage(ExtendoGesture.EXO_ACTIVITY_GIVE);
+            OSCMessage m = new OSCMessage(ExtendoActivityOntology.EXO_ACTIVITY_GIVE);
             m.addArgument(typeatron.getAgent().getAgentUri().stringValue());
             m.addArgument(uri.stringValue());
             //m.addArgument(value);

@@ -3,8 +3,8 @@ package net.fortytwo.extendo.server.gesture;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
-import net.fortytwo.extendo.rdf.Gesture;
-import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
+import net.fortytwo.extendo.rdf.Activities;
+import net.fortytwo.extendo.rdf.vocab.ExtendoActivityOntology;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.StringUtils;
 import org.openrdf.model.URI;
@@ -46,7 +46,7 @@ public class GesturalServer {
                 speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
                 // + " at " + timestamp);
 
-                Dataset d = Gesture.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
+                Dataset d = Activities.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
                 datasetHandler.handle(d);
             }
         };
@@ -63,7 +63,7 @@ public class GesturalServer {
                         + "\" to " + take.actor.getLocalName());
                 // + " at " + timestamp);
 
-                Dataset d = Gesture.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
+                Dataset d = Activities.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
                 datasetHandler.handle(d);
             }
         };
@@ -115,7 +115,7 @@ public class GesturalServer {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
                 List<Object> args = oscMessage.getArguments();
-                if (badArgs(args, 1, ExtendoGesture.EXO_ACTIVITY_HANDSHAKE)) {
+                if (badArgs(args, 1, ExtendoActivityOntology.EXO_ACTIVITY_HANDSHAKE)) {
                     return;
                 }
 
@@ -135,7 +135,7 @@ public class GesturalServer {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
                 List<Object> args = oscMessage.getArguments();
-                if (badArgs(args, 1, ExtendoGesture.EXO_ACTIVITY_HANDOFF)) {
+                if (badArgs(args, 1, ExtendoActivityOntology.EXO_ACTIVITY_HANDOFF)) {
                     return;
                 }
 
@@ -159,7 +159,7 @@ public class GesturalServer {
                 //System.out.println("received message of length " + buffer.length + ": " + new String(buffer));
 
                 List<Object> args = oscMessage.getArguments();
-                if (badArgs(args, 2, ExtendoGesture.EXO_ACTIVITY_GIVE)) {
+                if (badArgs(args, 2, ExtendoActivityOntology.EXO_ACTIVITY_GIVE)) {
                     return;
                 }
 
@@ -189,9 +189,9 @@ public class GesturalServer {
         };
 
         OSCPortIn portIn = new OSCPortIn(port);
-        portIn.addListener(ExtendoGesture.EXO_ACTIVITY_GIVE, giveListener);
-        portIn.addListener(ExtendoGesture.EXO_ACTIVITY_HANDOFF, handoffListener);
-        portIn.addListener(ExtendoGesture.EXO_ACTIVITY_HANDSHAKE, handshakeListener);
+        portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_GIVE, giveListener);
+        portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HANDOFF, handoffListener);
+        portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HANDSHAKE, handshakeListener);
         portIn.addListener("/exo/hand/info", infoListener);
         portIn.addListener("/exo/hand/error", errorListener);
         logger.info("listening for /exo messages");

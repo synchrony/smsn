@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GestureTest {
+public class ActivitiesTest {
     @Test
     public void testDatasetForGestureEvent() throws Exception {
         ValueFactory vf = new ValueFactoryImpl();
@@ -44,7 +44,7 @@ public class GestureTest {
             //System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
         }
 
-        Dataset ds = Gesture.datasetForBatonGesture(System.currentTimeMillis(), vf.createURI(agentUri));
+        Dataset ds = Activities.datasetForBatonGesture(System.currentTimeMillis(), vf.createURI(agentUri));
 
         assertEquals(5, ds.getStatements().size());
 
@@ -58,7 +58,7 @@ public class GestureTest {
 
         ParsedQuery q = QueryParserUtil.parseQuery(
                 QueryLanguage.SPARQL,
-                Gesture.QUERY_FOR_ALL_GB_GESTURES,
+                Activities.QUERY_FOR_ALL_GB_GESTURES,
                 "http://example.org/baseURI");
 
         SailConnection sc = sail.getConnection();

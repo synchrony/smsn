@@ -8,7 +8,7 @@ import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.p2p.osc.OscControl;
 import net.fortytwo.extendo.p2p.osc.OscMessageHandler;
 import net.fortytwo.extendo.p2p.osc.OscReceiver;
-import net.fortytwo.extendo.rdf.Gesture;
+import net.fortytwo.extendo.rdf.Activities;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoRippleREPL;
 import net.fortytwo.extendo.typeatron.ripple.RippleSession;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -492,7 +492,7 @@ public class TypeatronControl extends OscControl {
 
         Date recognizedAt = new Date(recognitionTime);
 
-        Dataset d = Gesture.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentUri(), thingPointedTo);
+        Dataset d = Activities.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentUri(), thingPointedTo);
         try {
             agent.sendDataset(d);
         } catch (Exception e) {

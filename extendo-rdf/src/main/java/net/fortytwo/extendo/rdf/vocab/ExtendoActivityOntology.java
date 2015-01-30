@@ -8,8 +8,8 @@ import org.openrdf.model.impl.URIImpl;
  *
  * @author Joshua Shinavier (http://fortytwo.net).
  */
-public interface ExtendoGesture {
-    public static final String NAMESPACE = "http://fortytwo.net/2015/extendo/gesture#";
+public interface ExtendoActivityOntology {
+    public static final String NAMESPACE = "http://fortytwo.net/2015/extendo/activity#";
 
     // OSC addresses shared between modules.  These are the OSC equivalents of the ontology classes.
     public static final String

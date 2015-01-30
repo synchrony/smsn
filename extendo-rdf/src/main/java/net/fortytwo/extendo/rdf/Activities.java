@@ -1,6 +1,6 @@
 package net.fortytwo.extendo.rdf;
 
-import net.fortytwo.extendo.rdf.vocab.ExtendoGesture;
+import net.fortytwo.extendo.rdf.vocab.ExtendoActivityOntology;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import net.fortytwo.extendo.rdf.vocab.Timeline;
 import net.fortytwo.rdfagents.data.DatasetFactory;
@@ -21,49 +21,49 @@ import java.util.LinkedList;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Gesture {
+public class Activities {
     private static final SimpleDateFormat XSD_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static final String QUERY_FOR_ALL_GB_GESTURES =
-            "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
+            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
-                    "SELECT ?person ?time WHERE {\n" +
+                    "SELECT ?actor ?time WHERE {\n" +
                     "?gesture a gesture:BatonGesture .\n" +
-                    "?gesture gesture:actor ?person .\n" +
+                    "?gesture gesture:actor ?actor .\n" +
                     "?gesture gesture:recognitionTime ?instant .\n" +
                     "?instant tl:at ?time .\n" +
                     "}";
-    public static final String QUERY_FOR_THING_POINTED_TO =
-            "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
+    public static final String QUERY_FOR_THINGS_POINTED_TO =
+            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
                     "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
-                    "SELECT ?person ?pointedTo WHERE {\n" +
-                    "?gesture gesture:thingIndicated ?pointedTo .\n" +
-                    "?gesture gesture:actor ?person .\n" +
+                    "SELECT ?actor ?indicated WHERE {\n" +
+                    "?gesture gesture:thingIndicated ?indicated .\n" +
+                    "?gesture gesture:actor ?actor .\n" +
                     "}";
-    public static final String QUERY_FOR_POINT_WITH_COMMON_ORG =
-            "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
+    public static final String QUERY_FOR_THINGS_POINTED_TO_WITH_COMMON_ORG =
+            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
                     "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
-                    "SELECT ?personPointedTo ?personPointedToName ?orgLabel WHERE {\n" +
-                    "?gesture gesture:thingIndicated ?personPointedTo .\n" +
-                    "?personPointedTo foaf:name ?personPointedToName .\n" +
+                    "SELECT ?indicated ?indicatedName ?orgLabel WHERE {\n" +
+                    "?gesture gesture:thingIndicated ?indicated .\n" +
+                    "?indicated foaf:name ?indicatedName .\n" +
                     "?org rdfs:label ?orgLabel .\n" +
-                    "?org foaf:member <http://fortytwo.net/2014/04/twc#JoshuaShinavier> .\n" +
-                    "?org foaf:member ?personPointedTo .\n" +
+                    "?org foaf:member <http://fortytwo.net/2014/04/twc#JoshuaShinavier> .\n" +  // TODO
+                    "?org foaf:member ?indicated .\n" +
                     "}";
-    public static final String QUERY_FOR_POINT_WITH_COMMON_INTEREST =
-            "PREFIX gesture: <" + ExtendoGesture.NAMESPACE + ">\n" +
+    public static final String QUERY_FOR_THINGS_POINTED_TO_WITH_COMMON_INTEREST =
+            "PREFIX gesture: <" + ExtendoActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX tl: <" + Timeline.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
                     "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
-                    "SELECT ?personPointedTo ?personPointedToName ?interest WHERE {\n" +
-                    "?personPointedTo foaf:name ?personPointedToName .\n" +
-                    "?gesture gesture:thingIndicated ?personPointedTo .\n" +
-                    "<http://fortytwo.net/2014/04/twc#JoshuaShinavier> foaf:interest ?interest .\n" +
-                    "?personPointedTo foaf:interest ?interest .\n" +
+                    "SELECT ?indicated ?indicatedName ?interest WHERE {\n" +
+                    "?indicated foaf:name ?indicatedName .\n" +
+                    "?gesture gesture:thingIndicated ?indicated .\n" +
+                    "<http://fortytwo.net/2014/04/twc#JoshuaShinavier> foaf:interest ?interest .\n" +  // TODO
+                    "?indicated foaf:interest ?interest .\n" +
                     "}";
 
     private static final DatasetFactory factory = new DatasetFactory();
@@ -157,9 +157,9 @@ public class Gesture {
         Collection<Statement> c = new LinkedList<Statement>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoGesture.Attention));
-        c.add(vf.createStatement(activity, ExtendoGesture.actor, actor));
-        c.add(vf.createStatement(activity, ExtendoGesture.focusOfAttention, focusOfAttention));
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Attention));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, actor));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.focusOfAttention, focusOfAttention));
 
         return datasetForActivity(timestamp, activity, c);
     }
@@ -171,13 +171,13 @@ public class Gesture {
         URI activity = factory.randomURI();
 
         if (null == thingIndicated) {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoGesture.BatonGesture));
+            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.BatonGesture));
         } else {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoGesture.Point));
-            c.add(vf.createStatement(activity, ExtendoGesture.thingIndicated, thingIndicated));
+            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Point));
+            c.add(vf.createStatement(activity, ExtendoActivityOntology.thingIndicated, thingIndicated));
         }
 
-        c.add(vf.createStatement(activity, ExtendoGesture.actor, agentUri));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, agentUri));
 
         return datasetForActivity(timestamp, activity, c);
     }
@@ -190,14 +190,14 @@ public class Gesture {
         URI activity = factory.randomURI();
 
         if (null != thingGiven) {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoGesture.Handoff));
-            c.add(vf.createStatement(activity, ExtendoGesture.giver, person1));
-            c.add(vf.createStatement(activity, ExtendoGesture.taker, person2));
-            c.add(vf.createStatement(activity, ExtendoGesture.thingGiven, thingGiven));
+            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Handoff));
+            c.add(vf.createStatement(activity, ExtendoActivityOntology.giver, person1));
+            c.add(vf.createStatement(activity, ExtendoActivityOntology.taker, person2));
+            c.add(vf.createStatement(activity, ExtendoActivityOntology.thingGiven, thingGiven));
         } else {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoGesture.Handshake));
-            c.add(vf.createStatement(activity, ExtendoGesture.actor, person1));
-            c.add(vf.createStatement(activity, ExtendoGesture.actor, person2));
+            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Handshake));
+            c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, person1));
+            c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, person2));
         }
 
         return datasetForActivity(timestamp, activity, c);
@@ -210,7 +210,7 @@ public class Gesture {
         c.add(vf.createStatement(instant, RDF.TYPE, Timeline.Instant));
         Literal dateValue = vf.createLiteral(XSD_DATETIME_FORMAT.format(new Date(timestamp)), XMLSchema.DATETIME);
         c.add(vf.createStatement(instant, Timeline.at, dateValue));
-        c.add(vf.createStatement(activity, ExtendoGesture.recognitionTime, instant));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.recognitionTime, instant));
 
         return new Dataset(c);
     }
