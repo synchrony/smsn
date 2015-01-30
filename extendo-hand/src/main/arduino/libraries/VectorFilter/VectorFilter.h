@@ -10,20 +10,19 @@
 #define VectorFilter_h
 
 #include <ScalarFilter.h>
-#include <Vector.h>
+#include <Vector3D.h>
 
 class VectorFilter
 {
   public:
-    VectorFilter(ScalarFilter *xFilter, ScalarFilter *yFilter, ScalarFilter *zFilter);
+    VectorFilter(ScalarFilter &xFilter, ScalarFilter &yFilter, ScalarFilter &zFilter);
 
-    Vector *processNext(unsigned long time, Vector *v);
+    Vector3D processNext(unsigned long time, Vector3D &v);
 
     void updateTimestep(double timestep);
 
   private:
     ScalarFilter *xFilter, *yFilter, *zFilter;
-    Vector current;
 };
 
 #endif // VectorFilter_h

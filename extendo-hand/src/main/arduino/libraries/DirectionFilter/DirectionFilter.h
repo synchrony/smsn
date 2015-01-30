@@ -9,20 +9,20 @@
 #ifndef DirectionFilter_h
 #define DirectionFilter_h
 
-#include <Vector.h>
+#include <Vector3D.h>
 
 class DirectionFilter
 {
   public:
-    DirectionFilter(Vector *center, double radius);
+    DirectionFilter(Vector3D &center, double radius);
 
-    bool process(Vector *v);
+    bool process(Vector3D &v);
 
     // return:
     //   0 -- perfect match; normed vector is exactly the center of the filter
     //   -1 -- fail; normed vector is beyond radius from center
     //   (0, 1] -- normed vector is a corresponding distance from center
-    double processFuzzy(Vector *v);
+    double processFuzzy(Vector3D &v);
 
   private:
       double refx, refy, refz;

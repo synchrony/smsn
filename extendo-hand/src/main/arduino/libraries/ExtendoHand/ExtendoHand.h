@@ -10,6 +10,7 @@
 #define ExtendoHand_h
 
 #include <ExtendoDevice.h>
+#include <Vector3D.h>
 
 #define OSC_EXO_HAND     "/exo/hand"
 #define OSC_GESTURE      "/gesture"
@@ -27,9 +28,9 @@ class ExtendoHand : public ExtendoDevice
     // true by default.  Set to false if using the MMA7361 3-axis accelerometer
     void useNineAxisSensors(boolean b);
 
-    void getAcceleration(double *x, double *y, double *z);
-    void getRotation(double *x, double *y, double *z);
-    void getHeading(double *x, double *y, double *z);
+    void getAcceleration(Vector3D &a);
+    void getRotation(Vector3D &g);
+    void getHeading(Vector3D &m);
 
   protected:
     //Morse *createMorse();

@@ -1,19 +1,19 @@
 /*
-  Vector.h - class of 3D vectors for use with accelerometer data
+  Vector3D.h - class of 3D vectors for use with motion sensor data
   See: http://github.com/joshsh/extendo
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.
 */
 
-#ifndef Vector_h
-#define Vector_h
+#ifndef Vector3D_h
+#define Vector3D_h
 
-class Vector
+class Vector3D
 {
   public:
-    Vector();
-    Vector(double x, double y, double z);
+    Vector3D();
+    Vector3D(double x, double y, double z);
     void set(double x, double y, double z);
 
     double getX();
@@ -26,4 +26,4 @@ class Vector
     double magnitude;
 };
 
-#endif // Vector_h
+#endif // Vector3D_h

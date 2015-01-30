@@ -8,6 +8,7 @@
 #define NINEAXIS              1
 
 #include <ExtendoHand.h>
+#include <Vector3D.h>
 
 // ExtendoHand dependencies (they are included in ExtendoHand.cpp, but technically they must be included here)
 #include <ExtendoDevice.h>
@@ -35,20 +36,20 @@ void setup() {
     exoHand.setup();
 }
 
+Vector3D a, g, m;
+
 void loop() {
     unsigned long now = exoHand.beginLoop();
 
-    double ax, ay, az, gx, gy, gz, mx, my, mz;
+    exoHand.getAcceleration(a);
+    exoHand.getRotation(g);
+    exoHand.getHeading(m);
 
-    exoHand.getAcceleration(&ax, &ay, &az);
-    exoHand.getRotation(&gx, &gy, &gz);
-    exoHand.getHeading(&mx, &my, &mz);
-
-    OSCMessage m("/exo/hand/motion");
-    m.add((uint64_t) now);
+    OSCMessage msg("/exo/hand/motion");
+    msg.add((uint64_t) now);
     //m.add(exoHand.getLoopTime());
-    m.add(ax); m.add(ay); m.add(az);
-    m.add(gx); m.add(gy); m.add(gz);
-    m.add(mx); m.add(my); m.add(mz);
-    exoHand.getOSC()->sendOSC(m);
+    msg.add(a.getX()); msg.add(a.getY()); msg.add(a.getZ());
+    msg.add(g.getX()); msg.add(g.getY()); msg.add(g.getZ());
+    msg.add(m.getX()); msg.add(m.getY()); msg.add(m.getZ());
+    exoHand.getOSC()->sendOSC(msg);
 }

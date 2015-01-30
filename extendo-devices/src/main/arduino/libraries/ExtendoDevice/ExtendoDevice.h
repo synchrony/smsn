@@ -72,7 +72,7 @@ class ExtendoDevice
     //virtual Droidspeak *createDroidspeak() = 0;
 
     // settable identifier which is included with each gestural and sensor output
-    char contextName[32];
+    char contextName[64];
 
     boolean inputEnabled;
     void sendHeartbeatMessage(unsigned long now);

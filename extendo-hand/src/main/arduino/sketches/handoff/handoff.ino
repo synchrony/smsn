@@ -10,7 +10,7 @@
 
 #include <ExtendoHand.h>
 #include <SpikeDetector.h>
-#include <Vector.h>
+#include <Vector3D.h>
 //#include <VectorFilter.h>
 #include <ScalarFilter.h>
 #include <CircularBufferFilter.h>
@@ -62,10 +62,10 @@ CircularBufferFilter smoothingY(smoothingBufferSize, 1);
 CircularBufferFilter smoothingZ(smoothingBufferSize, 1);
 
 // values derived on 2014-12-09 from the 2014-11-25 handoff data using a circular buffer
-Vector giveSpikeDirection(0.686863, -0.6251692, 0.3706516);
-Vector takeSpikeDirection(0.8353023, -0.49748, -0.2340593);
-DirectionFilter giveSpikeFilter(&giveSpikeDirection, 0.3498809 * 1.5);
-DirectionFilter takeSpikeFilter(&takeSpikeDirection, 0.3846736 * 1.5);
+Vector3D giveSpikeDirection(0.686863, -0.6251692, 0.3706516);
+Vector3D takeSpikeDirection(0.8353023, -0.49748, -0.2340593);
+DirectionFilter giveSpikeFilter(giveSpikeDirection, 0.3498809 * 1.5);
+DirectionFilter takeSpikeFilter(takeSpikeDirection, 0.3846736 * 1.5);
 
 //VectorFilter *buildupFilter;
 
@@ -132,9 +132,9 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Vector a;
-Vector lp, hp;
-Vector smooth;
+Vector3D a;
+Vector3D lp, hp;
+Vector3D smooth;
 
 void loop() {
     unsigned long now = exoHand.beginLoop();
@@ -178,24 +178,24 @@ void loop() {
     double hpMag = hp.getMagnitude();
     */
     
-    //Vector *buildup = buildupFilter->processNext(now, &a);
+    //Vector3D *buildup = buildupFilter->processNext(now, &a);
     //double bmag = buildup->getMagnitude();
     
     unsigned long isSpike = spikeDetector->processNext(now, amag);
     if (isSpike > 0) {
         exoHand.warningCue();
-        if (giveSpikeFilter.process(&smooth) || takeSpikeFilter.process(&smooth)) {
+        if (giveSpikeFilter.process(smooth) || takeSpikeFilter.process(smooth)) {
             exoHand.okCue();
             emitGesture("give-take", isSpike, now);  
         }
         /*
-        if (giveSpikeFilter.process(&smooth)) {
+        if (giveSpikeFilter.process(smooth)) {
             exoHand.infoCue();
             emitGesture("give", isSpike, now);
         }
         // A spike can be both a candidate "give" and a candidate "take" if the filter regions overlap.
         // The distinction will be made in the gestural server
-        if (takeSpikeFilter.process(&smooth)) {
+        if (takeSpikeFilter.process(smooth)) {
             exoHand.okCue();  
             emitGesture("take", isSpike, now);
         }
@@ -214,9 +214,9 @@ void loop() {
         */
         
         /*
-        if (giveSpikeFilter.process(&smooth)) {
+        if (giveSpikeFilter.process(smooth)) {
             exoHand.infoCue();
-        } else if (takeSpikeFilter.process(&smooth)) {
+        } else if (takeSpikeFilter.process(smooth)) {
             exoHand.okCue();
         } else {
             exoHand.warningCue();
