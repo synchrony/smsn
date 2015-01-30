@@ -6,18 +6,18 @@
 
 #include "VectorFilter.h"
 
-VectorFilter::VectorFilter(ScalarFilter *_xFilter, ScalarFilter *_yFilter, ScalarFilter *_zFilter) {
-    xFilter = _xFilter;
-    yFilter = _yFilter;
-    zFilter = _zFilter;
+VectorFilter::VectorFilter(ScalarFilter &_xFilter, ScalarFilter &_yFilter, ScalarFilter &_zFilter) {
+    xFilter = &_xFilter;
+    yFilter = &_yFilter;
+    zFilter = &_zFilter;
 }
 
-Vector *VectorFilter::processNext(unsigned long time, Vector *v) {
-    double x = xFilter->processNext(time, v->getX());
-    double y = yFilter->processNext(time, v->getY());
-    double z = zFilter->processNext(time, v->getZ());
-    current.set(x, y, z);
-    return &current;
+Vector3D VectorFilter::processNext(unsigned long time, Vector3D &in) {
+    Vector3D out(
+        xFilter->processNext(time, in.getX()),
+        yFilter->processNext(time, in.getY()),
+        zFilter->processNext(time, in.getZ()));
+    return out;
 }
 
 void VectorFilter::updateTimestep(double timestep) {

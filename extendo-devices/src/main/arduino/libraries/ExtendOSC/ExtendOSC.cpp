@@ -100,14 +100,18 @@ void ExtendOSC::sendError(const char *msg, ...) {
     sendOSC(m);
 }
 
+// TODO: restore error code strings.  Removing them is temporary, for conserving flash memory on Extend-o-Hand + Arduino Nano
+/*
 const char *OSC_OK_msg = "OSC_OK",
     *BUFFER_FULL_msg = "BUFFER_FULL",
     *INVALID_OSC_msg = "INVALID_OSC",
     *ALLOCFAILED_msg = "ALLOCFAILED",
     *INDEX_OUT_OF_BOUNDS_msg = "INDEX_OUT_OF_BOUNDS",
     *unknown_msg = "unknown";
+*/
 
 void ExtendOSC::sendOSCError(OSCErrorCode code) {
+    /*
     const char *name;
 
     switch(code) {
@@ -131,6 +135,8 @@ void ExtendOSC::sendOSCError(OSCErrorCode code) {
     }
 
     sendError("OSC message hasError (error type: %s)", name);
+    */
+    sendError("OSC message hasError %d", code);
 }
 
 void ExtendOSC::sendOSCMessageError(class OSCMessage &message) {

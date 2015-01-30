@@ -153,64 +153,51 @@ void ExtendoHand::setupOther() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ExtendoHand::getAcceleration(double *x, double *y, double *z) {
+void ExtendoHand::getAcceleration(Vector3D &a) {
     if (nineAxis) {
         int16_t ax, ay, az;
         accel.getAcceleration(&ax, &ay, &az);
 
         // approximate g values, per calibration with a specific sensor
-        *x = ax / 230.0 - 0.05;
-        *y = ay / 230.0;
-        *z = az / 230.0;
-        //*x = ax/230.0/16;
-        //*y = ay/230.0/16;
-        //*z = az/230.0/16;
+        a.set(
+            ax / 230.0 - 0.05,
+            ay / 230.0,
+            az / 230.0);
     } else {
 #ifdef THREE_AXIS
-        *x = motionSensor.accelX();
-        *y = motionSensor.accelY();
-        *z = motionSensor.accelZ();
+        a.set(
+            motionSensor.accelX(),
+            motionSensor.accelY(),
+            motionSensor.accelZ());
 #endif // THREE_AXIS
     }
 }
 
-void ExtendoHand::getRotation(double *x, double *y, double *z) {
+void ExtendoHand::getRotation(Vector3D &g) {
     if (nineAxis) {
 #ifdef ENABLE_GYRO
         int16_t gx, gy, gz;
         gyro.getRotation(&gx, &gy, &gz);
-        *x = gx;
-        *y = gy;
-        *z = gz;
+        g.set(gx, gy, gz);
 #else
-        *x = 0;
-        *y = 0;
-        *z = 0;
+        g.set(0, 0, 0);
 #endif // ENABLE_GYRO
     } else {
-        *x = 0;
-        *y = 0;
-        *z = 0;
+        g.set(0, 0, 0);
     }
 }
 
-void ExtendoHand::getHeading(double *x, double *y, double *z) {
+void ExtendoHand::getHeading(Vector3D &m) {
     if (nineAxis) {
 #ifdef ENABLE_MAGNETOMETER
         int16_t mx, my, mz;
         magnet.getHeading(&mx, &my, &mz);
-        *x = mx;
-        *y = my;
-        *z = mz;
+        m.set(mx, my, mz);
 #else
-        *x = 0;
-        *y = 0;
-        *z = 0;
+        m.set(0, 0, 0);
 #endif // ENABLE_MAGNETOMETER
     } else {
-        *x = 0;
-        *y = 0;
-        *z = 0;
+        m.set(0, 0, 0);
     }
 }
 

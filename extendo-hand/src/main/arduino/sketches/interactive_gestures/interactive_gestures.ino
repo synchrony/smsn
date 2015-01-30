@@ -1,5 +1,5 @@
 /*
- * Extend-o-Hand handshake and handoff combination sketch, copyright 2014 by Joshua Shinavier
+ * Extend-o-Hand handshake and handoff combination sketch, copyright 2014-2015 by Joshua Shinavier
  * 
  * See: https://github.com/joshsh/extendo
  */
@@ -9,7 +9,7 @@
 
 #include <ExtendoHand.h>
 #include <SpikeDetector.h>
-#include <Vector.h>
+#include <Vector3D.h>
 #include <ScalarFilter.h>
 #include <CircularBufferFilter.h>
 #include <HighPassFilter.h>
@@ -33,29 +33,25 @@
 //#include <ITG3200.h>
 //#include <HMC5883L.h>
 
-// TODO: hard-coding context in the name of the gesture is a hack to make the most of the memory constraints of the Arduino Nano
-const char *handshake = "xixi:handshake";
-const char *handoff = "xixi:handoff";
+#define HANDOFF   "/exo/activity/handoff"
+#define HANDSHAKE "/exo/activity/handshake"
 
 ExtendoHand exoHand;
 
 unsigned long loopTimeMs;
 
-void emitGesture(const char *name, unsigned long tRef, unsigned long now) {
-//    exoHand.getOSC()->sendInfo(exoHand.getContext());
-    OSCMessage m(exoHand.address(OSC_GESTURE));
-    //m.add(exoHand.getContext());
-    m.add(name);
-/*
+void emitGesture(const char *address, unsigned long tRef, unsigned long now) {
+    OSCMessage m(address);
+    m.add(exoHand.getContext());
+
+    /* TODO: temporarily disabled to save on flash memory
     // note: recognition is delayed by about one time step from the actual crest,
     // so we subtract loopTimeMs
-    //m.add(0);
-    // TODO: restore
-    //m.add((uint64_t) (tRef-loopTimeMs));
+    m.add((uint64_t) (tRef-loopTimeMs));
 
     // also add the time of recognition
-    //m.add((uint64_t) now);
-    */
+    m.add((uint64_t) now);
+    //*/
 
     exoHand.getOSC()->sendOSC(m);
 }
@@ -69,9 +65,9 @@ const double rcLow = 0.03359582;
 const double rcHigh = 0.02259007;
 
 LowPassFilter handshakeXLowPass(rcLow), handshakeYLowPass(rcLow), handshakeZLowPass(rcLow);
-VectorFilter handshakeLowPass(&handshakeXLowPass, &handshakeYLowPass, &handshakeZLowPass);
+VectorFilter handshakeLowPass(handshakeXLowPass, handshakeYLowPass, handshakeZLowPass);
 HighPassFilter handshakeXHighPass(rcHigh), handshakeYHighPass(rcHigh), handshakeZHighPass(rcHigh);
-VectorFilter handshakeHighPass(&handshakeXHighPass, &handshakeYHighPass, &handshakeZHighPass);
+VectorFilter handshakeHighPass(handshakeXHighPass, handshakeYHighPass, handshakeZHighPass);
 
 double minAmp = 0.2;
 
@@ -79,7 +75,7 @@ double minAmp = 0.2;
 const unsigned long crestMaxGap = 353;
 
 CrestDetector handshakeCrests(minAmp, 0);  // TODO: make use of the minPeriod parameter
-//SequenceDetector handshakeSequences(&handshakeCrests, 2, crestMaxGap, 0);
+//SequenceDetector handshakeSequences(handshakeCrests, 2, crestMaxGap, 0);
 
 unsigned long tLast = 0;
 boolean lastAdded = false;
@@ -102,10 +98,10 @@ void processHandshakeCrest(unsigned long tRef, unsigned long now) {
     if (tLast > 0 && tRef - tLast <= crestMaxGap) {
         if (!lastAdded) {
             //exoHand.playTone(1760, 75);
-            emitGesture(handshake, tLast, now);
+            emitGesture(HANDSHAKE, tLast, now);
         }
-        exoHand.playTone(1760, 75);
-        emitGesture(handshake, tRef, now);
+        //exoHand.playTone(1760, 75);
+        emitGesture(HANDSHAKE, tRef, now);
 
         ledCueForHandshake(now);
 
@@ -137,9 +133,9 @@ SpikeDetector spikeDetector(spikeThreshold, interSpikeDelay);
 
 /*
 LowPassFilter handoffXLowPass(handoffRcLow), handoffYLowPass(handoffRcLow), handoffZLowPass(handoffRcLow);
-VectorFilter handoffLowPass(&handoffXLowPass, &handoffYLowPass, &handoffZLowPass);
+VectorFilter handoffLowPass(handoffXLowPass, handoffYLowPass, handoffZLowPass);
 HighPassFilter handoffXHighPass(handoffRcHigh), handoffYHighPass(handoffRcHigh), handoffZHighPass(handoffRcHigh);
-VectorFilter handoffHighPass(&handoffXHighPass, &handoffYHighPass, &handoffZHighPass);
+VectorFilter handoffHighPass(handoffXHighPass, handoffYHighPass, handoffZHighPass);
 */
 
 // note: not using CircularBufferFilter's period and timestep as intended; just creating a simple, small buffer
@@ -147,13 +143,13 @@ const int smoothingBufferSize = 10;
 CircularBufferFilter smoothingX(smoothingBufferSize, 1);
 CircularBufferFilter smoothingY(smoothingBufferSize, 1);
 CircularBufferFilter smoothingZ(smoothingBufferSize, 1);
-VectorFilter smoothing(&smoothingX, &smoothingY, &smoothingZ);
+VectorFilter smoothing(smoothingX, smoothingY, smoothingZ);
 
 // values derived on 2014-12-09 from the 2014-11-25 handoff data using a circular buffer
-Vector giveSpikeDirection(0.686863, -0.6251692, 0.3706516);
-Vector takeSpikeDirection(0.8353023, -0.49748, -0.2340593);
-DirectionFilter giveSpikeFilter(&giveSpikeDirection, 0.3498809 * 2);
-DirectionFilter takeSpikeFilter(&takeSpikeDirection, 0.3846736 * 2);
+Vector3D giveSpikeDirection(0.686863, -0.6251692, 0.3706516);
+Vector3D takeSpikeDirection(0.8353023, -0.49748, -0.2340593);
+DirectionFilter giveSpikeFilter(giveSpikeDirection, 0.3498809 * 2);
+DirectionFilter takeSpikeFilter(takeSpikeDirection, 0.3846736 * 2);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,34 +175,33 @@ void loopTimeUpdated(double loopTime) {
 void setup() {
     exoHand.setLoopTimeHandler(loopTimeUpdated);
     exoHand.setup();
-    exoHand.setContext("josh");
-    
+    exoHand.setContext("http://fortytwo.net/josh/things/SBZFumn");
+//    exoHand.setContext("http://fortytwo.net/josh/things/JdGwZ4n");
+
     exoHand.playTone(440,100);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Vector a;
+Vector3D a; // g, m;
 //Vector gtlp, gthp;
 
 void loop() {
     unsigned long now = exoHand.beginLoop();
 
     // raw motion data
-    double ax, ay, az, gx, gy, gz, mx, my, mz;
-    exoHand.getAcceleration(&ax, &ay, &az);
-    //exoHand.getRotation(&gx, &gy, &gz);
-    //exoHand.getHeading(&mx, &my, &mz);
-    a.set(ax, ay, az);
+    exoHand.getAcceleration(a);
+    //exoHand.getRotation(g);
+    //exoHand.getHeading(m);
 
     // smoothing
-    Vector *smooth = smoothing.processNext(now, &a);
+    Vector3D smooth = smoothing.processNext(now, a);
 
     // handshake recognition
-    Vector *shakeLp = handshakeLowPass.processNext(now, &a);
-    Vector *shakeHp = handshakeHighPass.processNext(now, shakeLp);
-    unsigned long crest = handshakeCrests.processNext(now, shakeHp->getMagnitude());
+    Vector3D shakeLp = handshakeLowPass.processNext(now, a);
+    Vector3D shakeHp = handshakeHighPass.processNext(now, shakeLp);
+    unsigned long crest = handshakeCrests.processNext(now, shakeHp.getMagnitude());
     if (crest) {
         processHandshakeCrest(crest, now);
     }
@@ -214,31 +209,33 @@ void loop() {
     // never mind the band-pass filter for handoff; even a small circular buffer works better
     // for smoothing.  The difference in quality is intuitively and immediately obvious
     /*
-    Vector *gthp = handoffHighPass.processNext(now, &a);
-    Vector *gtlp = handoffLowPass.processNext(now, gthp);
+    Vector3D *gthp = handoffHighPass.processNext(now, &a);
+    Vector3D *gtlp = handoffLowPass.processNext(now, gthp);
     */
 
     // handoff recognition
     unsigned long isSpike = spikeDetector.processNext(now, a.getMagnitude());
     if (isSpike > 0) {
-        exoHand.warningCue();
+        //exoHand.warningCue();
+        exoHand.setColorFor(RGB_WHITE, cueThreshold);
         // "give" and "take" centers are so close that we treat them as one gesture, at least until such time
         // as we take "give" crests (distinct from spikes) into account
         if (giveSpikeFilter.process(smooth) || takeSpikeFilter.process(smooth)) {
 //        if (giveSpikeFilter.process(gtlp) || takeSpikeFilter.process(gtlp)) {
-            exoHand.okCue();
-            exoHand.playTone(880, 75);
-            emitGesture(handoff, isSpike, now);
+            //exoHand.okCue();
+            exoHand.setColorFor(RGB_RED, cueThreshold);
+            //exoHand.playTone(880, 75);
+            emitGesture(HANDOFF, isSpike, now);
         }
     }
 
     /*
     OSCMessage m("/exo/hand/bandpass");
     m.add(exoHand.getLoopTime());
-    //m.add(ax); m.add(ay); m.add(az);
-    m.add(amag);
-    //m.add(gtlp->getMagnitude());
-    m.add(gthp->getMagnitude());
+    //m.add(a.getX()); m.add(a.getY()); m.add(a.getZ());
+    m.add(a.getMagnitude());
+    //m.add(gtlp.getMagnitude());
+    m.add(gthp.getMagnitude());
     m.add(isSpike > 0 ? 1 : 0);
     exoHand.getOSC()->sendOSC(m);
     //*/

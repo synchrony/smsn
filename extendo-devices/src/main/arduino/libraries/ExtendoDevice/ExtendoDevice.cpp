@@ -230,7 +230,7 @@ void ExtendoDevice::sendHeartbeatMessage(unsigned long now) {
 void handleContextSetMessage(class OSCMessage &m) {
     if (!thisDevice->getOSC()->validArgs(m, 1)) return;
 
-    char buffer[32];
+    char buffer[16];
     m.getString(0, buffer, m.getDataLength(0) + 1);
     thisDevice->setContext(buffer);
 }
@@ -367,7 +367,7 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
         } else {
             for (int i = 0; i < bundle.size(); i++) {
                 OSCMessage *m = bundle.getOSCMessage(i);
-                char address[256];
+                char address[128];
                 m->getAddress(address);
                 osc.sendError("no handler at address %s", address);
             }
