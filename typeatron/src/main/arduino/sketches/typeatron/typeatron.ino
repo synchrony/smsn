@@ -1,5 +1,5 @@
 /*
- * Monomanual Typeatron driver sketch, copyright 2014 by Joshua Shinavier
+ * Monomanual Typeatron driver sketch, copyright 2014-2015 by Joshua Shinavier
  *
  * See: https://github.com/joshsh/extendo
  */

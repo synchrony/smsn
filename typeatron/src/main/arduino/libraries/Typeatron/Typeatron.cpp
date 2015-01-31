@@ -48,7 +48,7 @@ const int photoresistorPin = A3;
 
 
 // note: only fairly low frequencies of flicker are discernible; the laser has more inertia than an LED
-const unsigned long laserFlickerDurationMs = 525;
+const unsigned long laserFlickerDurationMs = 1050;
 const unsigned long laserFlickerDarkMs = 30;
 const unsigned long laserFlickerLightMs = 45;
 
