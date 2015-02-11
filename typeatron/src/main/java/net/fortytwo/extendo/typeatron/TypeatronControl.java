@@ -4,6 +4,7 @@ import com.illposed.osc.OSCMessage;
 import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import info.aduna.io.IOUtil;
+import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.BrainModeClient;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.p2p.SideEffects;
@@ -13,6 +14,7 @@ import net.fortytwo.extendo.p2p.osc.OscReceiver;
 import net.fortytwo.extendo.rdf.Activities;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoRippleREPL;
 import net.fortytwo.extendo.typeatron.ripple.RippleSession;
+import net.fortytwo.extendo.typeatron.ripple.lib.music.TypeatronMusicControl;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
@@ -46,8 +48,8 @@ public class TypeatronControl extends OscControl {
             EXO_TT_LASER_FEEDBACK = "/exo/tt/laser/feedback",
             EXO_TT_LASER_OFF = "/exo/tt/laser/off",
             EXO_TT_LASER_ON = "/exo/tt/laser/on",
-            //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
-            EXO_TT_MORSE = "/exo/tt/morse",
+    //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
+    EXO_TT_MORSE = "/exo/tt/morse",
             EXO_TT_OK = "/exo/tt/ok",
             EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
             EXO_TT_PING = "/exo/tt/ping",
@@ -74,6 +76,7 @@ public class TypeatronControl extends OscControl {
     private final RippleSession rippleSession;
     private final ExtendoRippleREPL rippleREPL;
     private final ChordedKeyer keyer;
+    private final TypeatronMusicControl music;
 
     private URI thingPointedTo;
 
@@ -86,18 +89,23 @@ public class TypeatronControl extends OscControl {
         this.environment = environment;
 
         try {
+            this.music = new TypeatronMusicControl();
+        } catch (Exception e) {
+            throw new DeviceInitializationException(e);
+        }
+
+        try {
             agent.getQueryEngine().addQuery(Activities.QUERY_FOR_ATTENTION, new BindingSetHandler() {
                 @Override
                 public void handle(BindingSet b) {
                     Value actor = b.getValue("actor");
                     Value focus = b.getValue("focus");
-                    logger.info("notified of attention by " + actor + " to " + focus);
 
                     if (keyer.getMode().equals(ChordedKeyer.Mode.Laser)) {
                         if (null == thingPointedTo) {
                             throw new IllegalStateException();
                         }
-                        
+
                         if (thingPointedTo.equals(focus)) {
                             sendLaserFeedbackMessage();
                         } else {
@@ -110,6 +118,8 @@ public class TypeatronControl extends OscControl {
                         logger.warning("got attentional feedback outside of Laser mode" +
                                 " (OK IRL, but not expected in a demo)");
                     }
+
+                    logger.info("notified of attention by " + actor + " to " + focus);
                 }
             });
         } catch (IOException e) {
@@ -141,6 +151,16 @@ public class TypeatronControl extends OscControl {
 
         try {
             ChordedKeyer.EventHandler handler = new ChordedKeyer.EventHandler() {
+                @Override
+                public void handleKeyPressed(int key) {
+                    music.handleKeyPressed(key);
+                }
+
+                @Override
+                public void handleKeyReleased(int key) {
+                    music.handleKeyReleased(key);
+                }
+
                 @Override
                 public void handleSymbol(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
                     if (null != symbol) {
@@ -307,6 +327,10 @@ public class TypeatronControl extends OscControl {
 
     public ChordedKeyer getKeyer() {
         return keyer;
+    }
+
+    public TypeatronMusicControl getMusic() {
+        return music;
     }
 
     @Override
@@ -533,7 +557,7 @@ public class TypeatronControl extends OscControl {
 
         Dataset d = Activities.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentUri(), thingPointedTo);
         try {
-            agent.sendDataset(d);
+            agent.sendDataset(d, Extendo.GESTURE_TTL);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "failed to gestural dataset: " + e.getMessage());
             e.printStackTrace(System.err);

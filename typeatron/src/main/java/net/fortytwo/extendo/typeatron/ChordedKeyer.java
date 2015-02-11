@@ -201,7 +201,6 @@ public class ChordedKeyer {
         addChord(Mode.Text, "1414", null, Modifier.Control, "n"); // numbers
         */
 
-        // TODO: restore mash mode
         /*
         // control-ESC codes for dictionary put
         addChord(Mode.Text, "1221", null, Modifier.Control, "ESC");
@@ -213,7 +212,6 @@ public class ChordedKeyer {
         addChord(Mode.Text, "1313", Mode.Numeric, null, null);
         // 1441 unassigned
         addChord(Mode.Text, "1414", Mode.Text, null, null);  // a no-op
-        addChord(Mode.Text, "1551", Mode.Mash, Modifier.None, null);
         // 1515 unassigned
         */
 
@@ -243,23 +241,23 @@ public class ChordedKeyer {
         // return to default mode from anywhere other than mash mode
         for (Mode m : Mode.values()) {
             if (m != Mode.Mash) {
+                // TODO: shorten this to 1221
                 addChord(m, "123321", Mode.TextEdit, Modifier.None, null, null);
             }
         }
 
         Mode[] textEntryModes = new Mode[]{Mode.TextEdit, Mode.CommandLine};
 
-        // return from mash mode
+        // enter and exit mash mode
+        addChord(textEntryModes, "1551", Mode.Mash, Modifier.None, null, null);
+        // TODO: shorten this to 123321
         addChord(Mode.Mash, "1234554321", Mode.TextEdit, Modifier.None, null, null);
 
         // newline, space, delete available in all of the text-entry modes
-        for (Mode m : textEntryModes) {
-            // the "trigger finger" chord has a "do"/"execute" function in various contexts
-            addChord(m, "22", null, null, "\n", null);
-
-            addChord(m, "33", null, null, " ", null);
-            addChord(m, "44", null, null, SpecialChar.DEL.name(), null);
-        }
+        // the "trigger finger" chord has a "do"/"execute" function in various contexts
+        addChord(textEntryModes, "22", null, null, "\n", null);
+        addChord(textEntryModes, "33", null, null, " ", null);
+        addChord(textEntryModes, "44", null, null, SpecialChar.DEL.name(), null);
 
         punctuationMap = new HashMap<String, String>();
         InputStream in = TypeatronControl.class.getResourceAsStream("typeatron-letters-and-punctuation.csv");
@@ -274,7 +272,7 @@ public class ChordedKeyer {
 
                     String letter = a[1].trim();
                     addChord(textEntryModes, chord, null, null, letter, null);
-                    if (chord.length() == 2*2) {
+                    if (chord.length() == 2 * 2) {
                         addChord(textEntryModes, findControlChord(chord), null, Modifier.Control, letter, null);
                     }
 
@@ -393,11 +391,15 @@ public class ChordedKeyer {
     private void buttonPressed(int buttonIndex) {
         totalButtonsCurrentlyPressed++;
 
+        eventHandler.handleKeyPressed(buttonIndex);
+
         buttonEvent(buttonIndex);
     }
 
     private void buttonReleased(int buttonIndex) {
         totalButtonsCurrentlyPressed--;
+
+        eventHandler.handleKeyReleased(buttonIndex);
 
         buttonEvent(buttonIndex);
 
@@ -432,9 +434,14 @@ public class ChordedKeyer {
      * A handler for each new combination of keyboard mode, output symbol, and symbol modifier
      */
     public interface EventHandler {
+        void handleKeyPressed(int key);
+
+        void handleKeyReleased(int key);
+
         void handleSymbol(Mode mode, String symbol, Modifier modifier);
 
         void handleLaserOn();
+
         void handleLaserOff();
     }
 

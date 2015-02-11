@@ -36,7 +36,8 @@ public class QueryEngineProxy implements QueryEngine {
             BINDINGS = "bindings",
             DATASET = "dataset",
             QUERY = "query",
-            QUERY_ID = "id";
+            QUERY_ID = "id",
+            TTL = "ttl";
 
     private final Connection connection;
     private final SimpleJSONRDFFormat jsonrdfFormat;
@@ -92,25 +93,25 @@ public class QueryEngineProxy implements QueryEngine {
         return sub;
     }
 
-    public void addStatement(Statement statement) throws IOException {
-        addStatements(statement);
+    public void addStatement(long ttl, Statement statement) throws IOException {
+        addStatements(ttl, statement);
     }
 
-    public void addStatements(Statement... statements) throws IOException {
+    public void addStatements(long ttl, Statement... statements) throws IOException {
         try {
             JSONArray a = jsonrdfFormat.statementsToJSON(statements);
 
-            sendDatasetMessage(a);
+            sendDatasetMessage(a, ttl);
         } catch (JSONException e) {
             throw new IOException(e);
         }
     }
 
-    public void addStatements(Collection<Statement> statements) throws IOException {
+    public void addStatements(long ttl, Collection<Statement> statements) throws IOException {
         try {
             JSONArray a = jsonrdfFormat.statementsToJSON(statements);
 
-            sendDatasetMessage(a);
+            sendDatasetMessage(a, ttl);
         } catch (JSONException e) {
             throw new IOException(e);
         }
@@ -150,9 +151,10 @@ public class QueryEngineProxy implements QueryEngine {
         }
     }
 
-    private void sendDatasetMessage(final JSONArray statements) throws JSONException, IOException {
+    private void sendDatasetMessage(final JSONArray statements, final long ttl) throws JSONException, IOException {
         JSONObject j = new JSONObject();
         j.put(DATASET, statements);
+        j.put(TTL, ttl);
 
         // send RDF data immediately or not at all; don't buffer
         connection.sendNow(TAG_RDF_DATA, j);

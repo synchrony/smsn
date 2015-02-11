@@ -160,8 +160,14 @@ public class ExtendoAgent {
         }
     }
 
-    public void sendDataset(final Dataset d) throws IOException {
-        getQueryEngine().addStatements(d.getStatements());
+    /**
+     * Sends an RDF Dataset to the continuous query engine
+     * @param d the RDF Dataset to send
+     * @param ttl the time-to-live of the data, in milliseconds. Use ttl=0 for an infinite lifetime
+     * @throws IOException if communication with the query engine fails
+     */
+    public void sendDataset(final Dataset d, final long ttl) throws IOException {
+        getQueryEngine().addStatements(ttl, d.getStatements());
 
         /*
         if (relayAsOsc) {

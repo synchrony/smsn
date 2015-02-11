@@ -169,16 +169,11 @@ public class QueryEngineWrapper {
 
         try {
             JSONArray dataset = message.getJSONArray(QueryEngineProxy.DATASET);
+            long ttl = message.getLong(QueryEngineProxy.TTL);
             int length = dataset.length();
-            //if (Extendo.VERBOSE) {
-            //    logger.info("found " + length + " statements:");
-            //}
             for (int i = 0; i < length; i++) {
                 Statement s = jsonrdfFormat.toStatement(dataset.getJSONArray(i));
-                //if (Extendo.VERBOSE) {
-                //    logger.info("\t" + s);
-                //}
-                queryEngine.addStatement(s);
+                queryEngine.addStatement(ttl, s);
             }
         } catch (JSONException e) {
             throw new SimpleJSONRDFFormat.ParseError(e);

@@ -41,6 +41,9 @@ import java.util.logging.Logger;
 public class FacilitatorService {
     protected static final Logger logger = Logger.getLogger(FacilitatorService.class.getName());
 
+    private static final long LINKED_DATA_TTL = 0;
+    private static final long PUSHED_DATA_TTL = 0;
+
     private static FacilitatorService INSTANCE;
 
     private static final String BASE_URI = "http://example.org/baseURI";
@@ -83,7 +86,7 @@ public class FacilitatorService {
                     public Sink<Statement> statementSink() {
                         return new Sink<Statement>() {
                             public void put(final Statement s) throws RippleException {
-                                queryEngine.addStatement(s);
+                                queryEngine.addStatement(LINKED_DATA_TTL, s);
                             }
                         };
                     }
@@ -106,7 +109,7 @@ public class FacilitatorService {
             @Override
             public void handle(Dataset dataset) {
                 System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
-                queryEngine.addStatements(dataset.getStatements());
+                queryEngine.addStatements(Extendo.GESTURE_TTL, dataset.getStatements());
             }
         };
 
@@ -188,7 +191,7 @@ public class FacilitatorService {
         public void handleStatement(Statement statement) throws RDFHandlerException {
             count++;
 
-            queryEngine.addStatement(statement);
+            queryEngine.addStatement(PUSHED_DATA_TTL, statement);
         }
 
         public void handleComment(String s) throws RDFHandlerException {

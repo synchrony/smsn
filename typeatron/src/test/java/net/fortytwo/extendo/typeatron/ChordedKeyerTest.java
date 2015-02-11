@@ -22,6 +22,16 @@ public class ChordedKeyerTest {
     public void setUp() throws Exception {
         keyer = new ChordedKeyer(new ChordedKeyer.EventHandler() {
             @Override
+            public void handleKeyPressed(int key) {
+                // ignored
+            }
+
+            @Override
+            public void handleKeyReleased(int key) {
+                // ignored
+            }
+
+            @Override
             public void handleSymbol(ChordedKeyer.Mode mode, String symbol, ChordedKeyer.Modifier modifier) {
                 //System.out.println("event:\t" + mode + "\t" + symbol + "\t" + modifier);
                 lastMode = mode;

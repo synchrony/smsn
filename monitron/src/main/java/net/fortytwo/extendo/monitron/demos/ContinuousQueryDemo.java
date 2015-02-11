@@ -30,6 +30,7 @@ import java.io.InputStream;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ContinuousQueryDemo {
+    private static final long DEMO_TTL = 0;
 
     private static void runDemo(final File dir) throws Exception {
         if (null == dir) {
@@ -72,7 +73,7 @@ public class ContinuousQueryDemo {
         }
 
         // First add the static data...
-        RDFHandler a = new QueryEngineAdder(engine);
+        RDFHandler a = new QueryEngineAdder(engine, DEMO_TTL);
         RDFParser p = Rio.createParser(RDFFormat.TURTLE);
         p.setRDFHandler(a);
         p.parse(MonitronOntology.class.getResourceAsStream("universe.ttl"), baseUri);
@@ -83,7 +84,7 @@ public class ContinuousQueryDemo {
             public void handleEvent(MonitronEvent e) throws EventHandlingException {
                 for (Statement st : e.toRDF().getStatements()) {
                     try {
-                        engine.addStatement(st);
+                        engine.addStatement(DEMO_TTL, st);
                     } catch (IOException e1) {
                         throw new EventHandlingException(e1);
                     }

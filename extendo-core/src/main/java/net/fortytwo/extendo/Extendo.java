@@ -71,6 +71,9 @@ public class Extendo {
 
     public static final String UTF8 = "UTF-8";
 
+    // we consider gesture to be useful only for 30s
+    public static final long GESTURE_TTL = 30000;
+
     private static TypedProperties configuration;
 
     static {

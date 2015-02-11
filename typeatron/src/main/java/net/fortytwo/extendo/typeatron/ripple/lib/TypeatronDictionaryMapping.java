@@ -5,6 +5,8 @@ import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.TypeatronControl;
 import net.fortytwo.extendo.typeatron.ripple.ExtendoBrainClient;
 import net.fortytwo.extendo.typeatron.ripple.UserDictionary;
+import net.fortytwo.extendo.typeatron.ripple.lib.music.DisableMusicMapping;
+import net.fortytwo.extendo.typeatron.ripple.lib.music.EnableMusicMapping;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.libs.control.Apply;
@@ -186,6 +188,10 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new AddToStreamMapping(exoBrainClient, brainstreamFilter), "a", "append");
         // TODO: temporary/change
         add(new GiveAtomMapping(exoBrainClient, defaultFilter, typeatron), "g", "give");
+
+        // Typeatron music
+        add(new EnableMusicMapping(typeatron.getMusic()), "me");
+        add(new DisableMusicMapping(typeatron.getMusic()), "md");
 
         // control library
         add(new Apply(), ".");
