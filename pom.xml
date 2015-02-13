@@ -46,18 +46,17 @@
 
     <properties>
         <extendo.version>1.1-SNAPSHOT</extendo.version>
-        <httpcomponents.version>4.3.1</httpcomponents.version>
-        <!-- goes with Android 2.2.1 -->
+        <httpcomponents.version>4.4</httpcomponents.version>
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <javaosc.version>0.3</javaosc.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.12</junit.version>
         <neo4j.version>1.9.6</neo4j.version>
-        <rdfagents.version>1.1</rdfagents.version>
-        <ripple.version>1.2-SNAPSHOT</ripple.version>
-        <sesame.version>2.7.10</sesame.version>
+        <rdfagents.version>1.2</rdfagents.version>
+        <ripple.version>1.2</ripple.version>
+        <sesame.version>2.7.14</sesame.version>
         <sesamestream.version>1.1-SNAPSHOT</sesamestream.version>
-        <sesametools.version>1.8</sesametools.version>
-        <tinkerpop.version>2.5.0</tinkerpop.version>
+        <sesametools.version>1.9</sesametools.version>
+        <tinkerpop.version>2.6.0</tinkerpop.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

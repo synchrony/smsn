@@ -166,7 +166,7 @@ public class ExtendoAgent {
      * @param ttl the time-to-live of the data, in milliseconds. Use ttl=0 for an infinite lifetime
      * @throws IOException if communication with the query engine fails
      */
-    public void sendDataset(final Dataset d, final long ttl) throws IOException {
+    public void sendDataset(final Dataset d, final int ttl) throws IOException {
         getQueryEngine().addStatements(ttl, d.getStatements());
 
         /*

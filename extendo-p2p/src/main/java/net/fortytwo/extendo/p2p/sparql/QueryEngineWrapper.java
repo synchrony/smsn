@@ -108,10 +108,12 @@ public class QueryEngineWrapper {
 
         final String queryId;
         String query;
+        int ttl;
 
         try {
             queryId = message.getString(QueryEngineProxy.QUERY_ID);
             query = message.getString(QueryEngineProxy.QUERY);
+            ttl = message.getInt(QueryEngineProxy.TTL);
         } catch (JSONException e) {
             logger.warning("invalid query message: " + message);
             e.printStackTrace(System.err);
@@ -126,7 +128,7 @@ public class QueryEngineWrapper {
         connectionsByQueryId.put(queryId, c);
 
         // note: subscription is currently discarded; we never cancel query subscriptions
-        Subscription s = queryEngine.addQuery(query, new BindingSetHandler() {
+        Subscription s = queryEngine.addQuery(ttl, query, new BindingSetHandler() {
             public void handle(final BindingSet bs) {
                 try {
                     JSONObject bindings = jsonrdfFormat.toJSON(bs);
@@ -169,7 +171,7 @@ public class QueryEngineWrapper {
 
         try {
             JSONArray dataset = message.getJSONArray(QueryEngineProxy.DATASET);
-            long ttl = message.getLong(QueryEngineProxy.TTL);
+            int ttl = message.getInt(QueryEngineProxy.TTL);
             int length = dataset.length();
             for (int i = 0; i < length; i++) {
                 Statement s = jsonrdfFormat.toStatement(dataset.getJSONArray(i));

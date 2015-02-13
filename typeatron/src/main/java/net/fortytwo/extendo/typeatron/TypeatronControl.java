@@ -37,8 +37,10 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TypeatronControl extends OscControl {
-
     protected static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
+
+    // for now, queries will not expire, and will not need to be renewed
+    private static final int QUERY_TTL = 0;
 
     // fully specified, since PATH may or may not include /usr/bin
     private static final String EMACSCLIENT_BIN = "/usr/bin/emacsclient";
@@ -95,7 +97,7 @@ public class TypeatronControl extends OscControl {
         }
 
         try {
-            agent.getQueryEngine().addQuery(Activities.QUERY_FOR_ATTENTION, new BindingSetHandler() {
+            agent.getQueryEngine().addQuery(QUERY_TTL, Activities.QUERY_FOR_ATTENTION, new BindingSetHandler() {
                 @Override
                 public void handle(BindingSet b) {
                     Value actor = b.getValue("actor");

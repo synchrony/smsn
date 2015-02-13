@@ -41,8 +41,9 @@ import java.util.logging.Logger;
 public class FacilitatorService {
     protected static final Logger logger = Logger.getLogger(FacilitatorService.class.getName());
 
-    private static final long LINKED_DATA_TTL = 0;
-    private static final long PUSHED_DATA_TTL = 0;
+    private static final int
+            LINKED_DATA_TTL = 0,
+            PUSHED_DATA_TTL = 0;
 
     private static FacilitatorService INSTANCE;
 

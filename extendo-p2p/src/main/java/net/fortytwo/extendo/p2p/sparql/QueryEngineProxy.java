@@ -42,7 +42,7 @@ public class QueryEngineProxy implements QueryEngine {
     private final Connection connection;
     private final SimpleJSONRDFFormat jsonrdfFormat;
 
-    private final Map<String, String> queriesById;
+    private final Map<String, Query> queriesById;
     private final Map<String, BindingSetHandler> handlers;
 
     public QueryEngineProxy(final Connection connection) {
@@ -50,7 +50,7 @@ public class QueryEngineProxy implements QueryEngine {
 
         jsonrdfFormat = new SimpleJSONRDFFormat(new ValueFactoryImpl());
 
-        queriesById = new HashMap<String, String>();
+        queriesById = new HashMap<String, Query>();
         handlers = new HashMap<String, BindingSetHandler>();
 
         connection.registerHandler(TAG_SPARQL_RESULT, new MessageHandler() {
@@ -71,21 +71,25 @@ public class QueryEngineProxy implements QueryEngine {
 
     public void notifyConnectionOpen() throws IOException {
         // send all subscriptions, again if necessary
-        for (Map.Entry<String, String> e : queriesById.entrySet()) {
-            sendSubscriptionMessage(e.getValue(), e.getKey());
+        for (Map.Entry<String, Query> e : queriesById.entrySet()) {
+            sendSubscriptionMessage(e.getValue().queryStr, e.getKey(), e.getValue().ttl);
         }
     }
 
-    public Subscription addQuery(final String query,
+    public Subscription addQuery(final int ttl,
+                                 final String queryStr,
                                  final BindingSetHandler handler)
             throws IncompatibleQueryException, InvalidQueryException, IOException {
 
         Subscription sub = new SubscriptionImpl();
 
-        queriesById.put(sub.getId(), query);
+        Query q = new Query();
+        q.queryStr = queryStr;
+        q.ttl = ttl;
+        queriesById.put(sub.getId(), q);
 
         if (connection.isActive()) {
-            sendSubscriptionMessage(query, sub.getId());
+            sendSubscriptionMessage(queryStr, sub.getId(), ttl);
         }
 
         handlers.put(sub.getId(), handler);
@@ -93,11 +97,11 @@ public class QueryEngineProxy implements QueryEngine {
         return sub;
     }
 
-    public void addStatement(long ttl, Statement statement) throws IOException {
+    public void addStatement(int ttl, Statement statement) throws IOException {
         addStatements(ttl, statement);
     }
 
-    public void addStatements(long ttl, Statement... statements) throws IOException {
+    public void addStatements(int ttl, Statement... statements) throws IOException {
         try {
             JSONArray a = jsonrdfFormat.statementsToJSON(statements);
 
@@ -107,7 +111,7 @@ public class QueryEngineProxy implements QueryEngine {
         }
     }
 
-    public void addStatements(long ttl, Collection<Statement> statements) throws IOException {
+    public void addStatements(int ttl, Collection<Statement> statements) throws IOException {
         try {
             JSONArray a = jsonrdfFormat.statementsToJSON(statements);
 
@@ -137,11 +141,13 @@ public class QueryEngineProxy implements QueryEngine {
     }
 
     private void sendSubscriptionMessage(final String query,
-                                         final String queryId) throws IOException {
+                                         final String queryId,
+                                         final long ttl) throws IOException {
         try {
             JSONObject j = new JSONObject();
             j.put(QUERY_ID, queryId);
             j.put(QUERY, query);
+            j.put(TTL, ttl);
 
             // TODO: confirmation of subscription receipt, retry in case of failure
             // queries are of central importance and should be buffered to ensure that they are received
@@ -170,18 +176,31 @@ public class QueryEngineProxy implements QueryEngine {
             queryId = Extendo.createRandomKey();
         }
 
+        @Override
         public String getId() {
             return queryId;
         }
 
+        @Override
         public boolean isActive() {
             return active;
         }
 
+        @Override
         public void cancel() {
             // TODO
             throw new UnsupportedOperationException("not yet possible to cancel subscriptions through the proxy");
         }
+
+        @Override
+        public boolean renew(int ttl) {
+            // TODO
+            throw new UnsupportedOperationException("not yet possible to renew subscriptions through the proxy");
+        }
     }
 
+    private static class Query {
+        public String queryStr;
+        public long ttl;
+    }
 }
