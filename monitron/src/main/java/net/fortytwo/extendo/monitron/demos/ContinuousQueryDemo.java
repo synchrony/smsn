@@ -1,8 +1,6 @@
 package net.fortytwo.extendo.monitron.demos;
 
 import edu.rpi.twc.sesamestream.BindingSetHandler;
-import edu.rpi.twc.sesamestream.QueryEngine;
-import edu.rpi.twc.sesamestream.etc.QueryEngineAdder;
 import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.monitron.EventHandler;
@@ -23,7 +21,6 @@ import org.openrdf.rio.Rio;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -37,7 +34,7 @@ public class ContinuousQueryDemo {
             throw new IllegalArgumentException();
         }
 
-        final QueryEngine engine = new QueryEngineImpl();
+        final QueryEngineImpl engine = new QueryEngineImpl();
         String baseUri = "http://example.org/base-uri/";
 
         for (final File f : dir.listFiles()) {
@@ -73,7 +70,7 @@ public class ContinuousQueryDemo {
         }
 
         // First add the static data...
-        RDFHandler a = new QueryEngineAdder(engine, TUPLE_TTL);
+        RDFHandler a = engine.createRDFHandler(TUPLE_TTL);
         RDFParser p = Rio.createParser(RDFFormat.TURTLE);
         p.setRDFHandler(a);
         p.parse(MonitronOntology.class.getResourceAsStream("universe.ttl"), baseUri);
@@ -84,9 +81,9 @@ public class ContinuousQueryDemo {
             public void handleEvent(MonitronEvent e) throws EventHandlingException {
                 for (Statement st : e.toRDF().getStatements()) {
                     try {
-                        engine.addStatement(TUPLE_TTL, st);
-                    } catch (IOException e1) {
-                        throw new EventHandlingException(e1);
+                        engine.addStatements(TUPLE_TTL, st);
+                    } catch (Throwable t) {
+                        throw new EventHandlingException(t);
                     }
                 }
             }

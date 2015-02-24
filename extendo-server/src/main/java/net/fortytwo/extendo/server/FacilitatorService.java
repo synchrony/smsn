@@ -33,6 +33,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
@@ -87,7 +88,7 @@ public class FacilitatorService {
                     public Sink<Statement> statementSink() {
                         return new Sink<Statement>() {
                             public void put(final Statement s) throws RippleException {
-                                queryEngine.addStatement(LINKED_DATA_TTL, s);
+                                queryEngine.addStatements(LINKED_DATA_TTL, s);
                             }
                         };
                     }
@@ -110,7 +111,7 @@ public class FacilitatorService {
             @Override
             public void handle(Dataset dataset) {
                 System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
-                queryEngine.addStatements(Extendo.GESTURE_TTL, dataset.getStatements());
+                queryEngine.addStatements(Extendo.GESTURE_TTL, toArray(dataset));
             }
         };
 
@@ -175,6 +176,12 @@ public class FacilitatorService {
         return parsedRDFHandler.getCount();
     }
 
+    private Statement[] toArray(Dataset d) {
+        Collection<Statement> c = d.getStatements();
+        Statement[] a = new Statement[c.size()];
+        return c.toArray(a);
+    }
+
     private class ParsedRDFHandler implements RDFHandler {
         private long count = 0;
 
@@ -192,7 +199,7 @@ public class FacilitatorService {
         public void handleStatement(Statement statement) throws RDFHandlerException {
             count++;
 
-            queryEngine.addStatement(PUSHED_DATA_TTL, statement);
+            queryEngine.addStatements(PUSHED_DATA_TTL, statement);
         }
 
         public void handleComment(String s) throws RDFHandlerException {

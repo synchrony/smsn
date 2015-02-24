@@ -17,6 +17,7 @@ import org.openrdf.query.BindingSet;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -48,12 +49,10 @@ public class QueryEngineWrapper {
                 try {
                     handleDatasetMessage(message);
                 } catch (SimpleJSONRDFFormat.ParseError e) {
-                    logger.warning("invalid dataset message: " + message);
-                    e.printStackTrace(System.err);
+                    logger.log(Level.WARNING, "invalid dataset message: " + message, e);
                 } catch (IOException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    logger.warning("error raised by query engine: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    logger.log(Level.WARNING, "error raised by query engine", e);
                 }
             }
         };
@@ -81,16 +80,13 @@ public class QueryEngineWrapper {
                     handleQueryMessage(c, message);
                 } catch (QueryEngine.InvalidQueryException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    logger.warning("error raised by query engine: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    logger.log(Level.WARNING, "error raised by query engine", e);
                 } catch (IOException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    logger.warning("error raised by query engine: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    logger.log(Level.WARNING, "error raised by query engine", e);
                 } catch (QueryEngine.IncompatibleQueryException e) {
                     // TODO: propagate the QueryEngine's exception back to the proxy
-                    logger.warning("error raised by query engine: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    logger.log(Level.WARNING, "error raised by query engine", e);
                 }
             }
         });
@@ -115,8 +111,7 @@ public class QueryEngineWrapper {
             query = message.getString(QueryEngineProxy.QUERY);
             ttl = message.getInt(QueryEngineProxy.TTL);
         } catch (JSONException e) {
-            logger.warning("invalid query message: " + message);
-            e.printStackTrace(System.err);
+            logger.log(Level.WARNING, "invalid query message: " + message, e);
             return;
         }
 
@@ -134,11 +129,9 @@ public class QueryEngineWrapper {
                     JSONObject bindings = jsonrdfFormat.toJSON(bs);
                     sendQueryResultMessage(c, queryId, bindings);
                 } catch (JSONException e) {
-                    logger.severe("error in creating query result JSON message: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    logger.log(Level.SEVERE, "error in creating query result JSON message", e);
                 } catch (IOException e) {
-                    logger.warning("failed to send query result due to I/O error: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    logger.log(Level.WARNING, "failed to send query result due to I/O error",  e);
                 }
             }
         });
@@ -173,10 +166,12 @@ public class QueryEngineWrapper {
             JSONArray dataset = message.getJSONArray(QueryEngineProxy.DATASET);
             int ttl = message.getInt(QueryEngineProxy.TTL);
             int length = dataset.length();
+            Statement[] a = new Statement[length];
             for (int i = 0; i < length; i++) {
-                Statement s = jsonrdfFormat.toStatement(dataset.getJSONArray(i));
-                queryEngine.addStatement(ttl, s);
+                a[i] = jsonrdfFormat.toStatement(dataset.getJSONArray(i));;
             }
+            // add statements as an array, which can be slightly more efficient than adding them individually
+            queryEngine.addStatements(ttl, a);
         } catch (JSONException e) {
             throw new SimpleJSONRDFFormat.ParseError(e);
         }

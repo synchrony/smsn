@@ -6,14 +6,19 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineProxy;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.Rio;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -167,7 +172,20 @@ public class ExtendoAgent {
      * @throws IOException if communication with the query engine fails
      */
     public void sendDataset(final Dataset d, final int ttl) throws IOException {
-        getQueryEngine().addStatements(ttl, d.getStatements());
+        getQueryEngine().addStatements(ttl, toArray(d));
+
+
+        try {
+            RDFFormat format = RDFFormat.NTRIPLES;
+            RDFWriter writer = Rio.createWriter(format, System.out);
+            writer.startRDF();
+            for (Statement s : d.getStatements()) {
+                writer.handleStatement(s);
+            }
+            writer.endRDF();
+        } catch (Throwable t) {
+            throw new IOException("failed to output triples");
+        }
 
         /*
         if (relayAsOsc) {
@@ -190,6 +208,12 @@ public class ExtendoAgent {
             sendOSCMessageToFacilitator(m);
         }
         */
+    }
+
+    private Statement[] toArray(Dataset d) {
+        Collection<Statement> c = d.getStatements();
+        Statement[] a = new Statement[c.size()];
+        return c.toArray(a);
     }
 
     public class Service {

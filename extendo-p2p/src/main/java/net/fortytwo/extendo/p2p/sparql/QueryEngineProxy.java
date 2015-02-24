@@ -14,7 +14,6 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BindingSet;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -97,10 +96,6 @@ public class QueryEngineProxy implements QueryEngine {
         return sub;
     }
 
-    public void addStatement(int ttl, Statement statement) throws IOException {
-        addStatements(ttl, statement);
-    }
-
     public void addStatements(int ttl, Statement... statements) throws IOException {
         try {
             JSONArray a = jsonrdfFormat.statementsToJSON(statements);
@@ -111,14 +106,14 @@ public class QueryEngineProxy implements QueryEngine {
         }
     }
 
-    public void addStatements(int ttl, Collection<Statement> statements) throws IOException {
-        try {
-            JSONArray a = jsonrdfFormat.statementsToJSON(statements);
+    @Override
+    public void setClock(QueryEngine.Clock clock) {
+        throw new UnsupportedOperationException("sorry, clock cannot be set by proxy");
+    }
 
-            sendDatasetMessage(a, ttl);
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
+    @Override
+    public void setCleanupPolicy(QueryEngine.CleanupPolicy cleanupPolicy) {
+        throw new UnsupportedOperationException("sorry, cleanup policy cannot be set by proxy");
     }
 
     private void handleSparqlResultJSON(final JSONObject result) throws SimpleJSONRDFFormat.ParseError {
