@@ -84,7 +84,13 @@ public class Activities {
             throw new IllegalArgumentException();
         }
 
-        return datasetForGesture(timestamp, actor, thingIndicated);
+        Collection<Statement> c = new LinkedList<Statement>();
+        URI activity = factory.randomURI();
+
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Point));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.thingIndicated, thingIndicated));
+
+        return datasetForGesture(timestamp, activity, c, actor);
     }
 
     /**
@@ -100,14 +106,41 @@ public class Activities {
             throw new IllegalArgumentException();
         }
 
-        return datasetForGesture(timestamp, actor, null);
+        Collection<Statement> c = new LinkedList<Statement>();
+        URI activity = factory.randomURI();
+
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.BatonGesture));
+
+        return datasetForGesture(timestamp, activity, c, actor);
+    }
+
+    /**
+     * Creates an RDF dataset for any of the basic up-and-down motions of a handshake
+     *
+     * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
+     * @param actor     the person performing the gesture
+     * @return an RDF dataset describing the activity
+     */
+    public static Dataset datasetForHandshakePulse(final long timestamp,
+                                                   final URI actor) {
+        if (null == actor) {
+            throw new IllegalArgumentException();
+        }
+
+        Collection<Statement> c = new LinkedList<Statement>();
+        URI activity = factory.randomURI();
+
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.HandshakePulse));
+
+        return datasetForGesture(timestamp, activity, c, actor);
     }
 
     /**
      * Creates an RDF dataset for a handshake interaction
+     *
      * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
-     * @param actor1 one of the two people shaking hands
-     * @param actor2 one of the two people shaking hands
+     * @param actor1    one of the two people shaking hands
+     * @param actor2    one of the two people shaking hands
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandshakeInteraction(final long timestamp,
@@ -117,15 +150,23 @@ public class Activities {
             throw new IllegalArgumentException();
         }
 
-        return datasetForInteraction(timestamp, actor1, actor2, null);
+        Collection<Statement> c = new LinkedList<Statement>();
+        URI activity = factory.randomURI();
+
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Handshake));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, actor1));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, actor2));
+
+        return datasetForActivity(timestamp, activity, c);
     }
 
     /**
      * Creates an RDF dataset for a hand-off interaction, during which one person physically or virtually
      * gives an item to the other
-     * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
-     * @param giver the person giving the item
-     * @param taker the person receiving the item
+     *
+     * @param timestamp  the moment at which the activity was recognized, in milliseconds since the Unix epoch
+     * @param giver      the person giving the item
+     * @param taker      the person receiving the item
      * @param thingGiven the item given
      * @return an RDF dataset describing the activity
      */
@@ -137,13 +178,22 @@ public class Activities {
             throw new IllegalArgumentException();
         }
 
-        return datasetForInteraction(timestamp, giver, taker, thingGiven);
+        Collection<Statement> c = new LinkedList<Statement>();
+        URI activity = factory.randomURI();
+
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Handoff));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.giver, giver));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.taker, taker));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.thingGiven, thingGiven));
+
+        return datasetForActivity(timestamp, activity, c);
     }
 
     /**
      * Creates an RDF dataset for the activity of attention to an item of interest
-     * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
-     * @param actor the person attending to the item
+     *
+     * @param timestamp        the moment at which the activity was recognized, in milliseconds since the Unix epoch
+     * @param actor            the person attending to the item
      * @param focusOfAttention the object of attention
      * @return an RDF dataset describing the activity
      */
@@ -165,40 +215,10 @@ public class Activities {
     }
 
     private static Dataset datasetForGesture(final long timestamp,
-                                             final URI agentUri,
-                                             final URI thingIndicated) {
-        Collection<Statement> c = new LinkedList<Statement>();
-        URI activity = factory.randomURI();
-
-        if (null == thingIndicated) {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.BatonGesture));
-        } else {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Point));
-            c.add(vf.createStatement(activity, ExtendoActivityOntology.thingIndicated, thingIndicated));
-        }
-
+                                             final URI activity,
+                                             final Collection<Statement> c,
+                                             final URI agentUri) {
         c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, agentUri));
-
-        return datasetForActivity(timestamp, activity, c);
-    }
-
-    private static Dataset datasetForInteraction(final long timestamp,
-                                                 final URI person1,
-                                                 final URI person2,
-                                                 final URI thingGiven) {
-        Collection<Statement> c = new LinkedList<Statement>();
-        URI activity = factory.randomURI();
-
-        if (null != thingGiven) {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Handoff));
-            c.add(vf.createStatement(activity, ExtendoActivityOntology.giver, person1));
-            c.add(vf.createStatement(activity, ExtendoActivityOntology.taker, person2));
-            c.add(vf.createStatement(activity, ExtendoActivityOntology.thingGiven, thingGiven));
-        } else {
-            c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.Handshake));
-            c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, person1));
-            c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, person2));
-        }
 
         return datasetForActivity(timestamp, activity, c);
     }

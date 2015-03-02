@@ -190,6 +190,16 @@
 
 
 
+###  http://fortytwo.net/2015/extendo/activity#HandshakePulse
+
+<http://fortytwo.net/2015/extendo/activity#HandshakePulse> rdf:type owl:Class ;
+                                                           
+                                                           rdfs:subClassOf <http://fortytwo.net/2015/extendo/activity#Motion> ;
+                                                           
+                                                           rdfs:comment "Any of the basic up-and-down motions which characterize a handshake" .
+
+
+
 ###  http://fortytwo.net/2015/extendo/activity#HighFive
 
 <http://fortytwo.net/2015/extendo/activity#HighFive> rdf:type owl:Class ;
@@ -204,7 +214,19 @@
 
 <http://fortytwo.net/2015/extendo/activity#Interaction> rdf:type owl:Class ;
                                                         
-                                                        rdfs:subClassOf <http://fortytwo.net/2015/extendo/activity#Activity> .
+                                                        rdfs:subClassOf <http://fortytwo.net/2015/extendo/activity#Activity> ;
+                                                        
+                                                        rdfs:comment "An activity involving more than one individual" .
+
+
+
+###  http://fortytwo.net/2015/extendo/activity#Motion
+
+<http://fortytwo.net/2015/extendo/activity#Motion> rdf:type owl:Class ;
+                                                   
+                                                   rdfs:subClassOf <http://fortytwo.net/2015/extendo/activity#Activity> ;
+                                                   
+                                                   rdfs:comment "A movement which may be part of a gesture or interaction" .
 
 
 

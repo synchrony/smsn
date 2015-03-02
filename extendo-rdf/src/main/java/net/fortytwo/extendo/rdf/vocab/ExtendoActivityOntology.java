@@ -26,8 +26,10 @@ public interface ExtendoActivityOntology {
             BatonGesture = new URIImpl(NAMESPACE + "BatonGesture"),
             Handoff = new URIImpl(NAMESPACE + "Handoff"),
             Handshake = new URIImpl(NAMESPACE + "Handshake"),
+            HandshakePulse = new URIImpl(NAMESPACE + "HandshakePulse"),
             Interaction = new URIImpl(NAMESPACE + "Interaction"),
             Gesture = new URIImpl(NAMESPACE + "Gesture"),
+            Motion = new URIImpl(NAMESPACE + "Motion"),
             Point = new URIImpl(NAMESPACE + "Point");
 
     // properties
