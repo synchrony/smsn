@@ -18,12 +18,14 @@ import net.fortytwo.extendo.brain.rdf.classes.Person;
 import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
 import net.fortytwo.extendo.brain.rdf.classes.RFIDReference;
 import net.fortytwo.extendo.brain.rdf.classes.TODOTask;
+import net.fortytwo.extendo.brain.rdf.classes.Topic;
 import net.fortytwo.extendo.brain.rdf.classes.Tool;
 import net.fortytwo.extendo.brain.rdf.classes.URLReference;
 import net.fortytwo.extendo.brain.rdf.classes.Usage;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.AttendedEventsCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
@@ -126,6 +128,7 @@ public class KnowledgeBase {
                 Usage.class,
                 QuotedValue.class,
                 WebPage.class,
+                Topic.class,
                 // context-specific classes
                 DatedEvent.Birthday.class,
                 // simple collections
@@ -138,6 +141,7 @@ public class KnowledgeBase {
                 // context-specific collections
                 AttendedEventsCollection.class,
                 TopicCollection.class,
+                DocumentAboutTopicCollection.class,
                 AbstractEvent.InteractorCollection.class,
                 Document.NoteCollection.class,
                 Document.AuthorCollection.class,
@@ -159,12 +163,13 @@ public class KnowledgeBase {
 
 
     public void inferAutomatically(final long interval) {
+        final int totalSteps = 4;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < totalSteps; i++) {
                     try {
-                        logger.info("performing warm-up inference step #" + (i + 1));
+                        logger.info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
                         inferClasses(null, null);
                     } catch (RDFHandlerException e) {
                         logger.log(Level.WARNING, "error in warm-up inference", e);

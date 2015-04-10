@@ -4,6 +4,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
+import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.TopicCollection;
@@ -39,14 +40,18 @@ public class Document extends AtomClass {
                                 AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
                         new AtomRegex.El(new PageHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, WebPage.class),
-                        new AtomRegex.El(2, new BibtexHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, BibtexReference.class),
-                        new AtomRegex.El(2, new ISBNHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, ISBNReference.class),
+
+                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
 
                         // multiple RFID tags on an object are possible, though they may be uncommon
                         new AtomRegex.El(2, new RFIDHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, RFIDReference.class),
+
+                        new AtomRegex.El(2, new BibtexHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, BibtexReference.class),
+                        new AtomRegex.El(2, new ISBNHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, ISBNReference.class),
 
                         // note: without a collection, only the first author is recognized.
                         // Otherwise, we run the risk of incorrectly classifying publishers (which often
@@ -127,17 +132,6 @@ public class Document extends AtomClass {
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(
                     context.getSubjectUri(), DCTERMS.BIBLIOGRAPHIC_CITATION, vf.createLiteral(entry)));
-        }
-    }
-
-    private static class RFIDHandler implements FieldHandler {
-        @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            // TODO
-
-            // note: there are no relevant properties in the BTC 2014 matching "rfid":
-            // grep -i rfid btc-predicates-frequency.tsv
-            // 1       http://dbpedia-live.openlinksw.com/property/perfid
         }
     }
 

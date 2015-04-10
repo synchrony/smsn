@@ -4,6 +4,7 @@ import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.AtomRegex;
 import net.fortytwo.extendo.brain.rdf.RDFizationContext;
+import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.extendo.rdf.vocab.FOAF;
 import org.openrdf.model.URI;
@@ -34,6 +35,10 @@ public class Tool extends AtomClass {
                                 AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
                         new AtomRegex.El(new PageHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+
+                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+
                         new AtomRegex.El(null, // do nothing with usage for now
                                 AtomRegex.Modifier.ZeroOrOne, Usage.class),
                         new AtomRegex.El(new ContributorHandler(),

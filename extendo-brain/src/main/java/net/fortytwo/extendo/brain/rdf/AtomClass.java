@@ -105,4 +105,28 @@ public abstract class AtomClass {
                     context.getSubjectUri(), FOAF.PAGE, objectURI));
         }
     }
+
+    public static class RFIDHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            // TODO
+
+            // note: there are no relevant properties in the BTC 2014 matching "rfid":
+            // grep -i rfid btc-predicates-frequency.tsv
+            // 1       http://dbpedia-live.openlinksw.com/property/perfid
+        }
+    }
+
+    public static class DocumentsAboutTopicHandler implements FieldHandler {
+        @Override
+        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+            ValueFactory vf = context.getValueFactory();
+            URI objectURI = context.uriOf(object);
+            context.getHandler().handleStatement(vf.createStatement(
+                    objectURI, FOAF.TOPIC, context.getSubjectUri()));
+            // The skos:note on dc:subject reads "This term is intended to be used with non-literal values
+            // as defined in the DCMI Abstract Model (http://dublincore.org/documents/abstract-model/) [...]"
+            //objectURI, DCTerms.SUBJECT, context.getSubjectUri()));
+        }
+    }
 }

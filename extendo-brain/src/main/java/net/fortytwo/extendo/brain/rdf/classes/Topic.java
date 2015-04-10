@@ -7,25 +7,26 @@ import net.fortytwo.extendo.brain.rdf.RDFizationContext;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class LinkedConcept extends AtomClass {
+public class Topic extends AtomClass {
+    private static final Logger logger = Logger.getLogger(Topic.class.getName());
 
-    public LinkedConcept() {
+    public Topic() {
         super(
-                "any-linked-concept",  // the name beginning with "a" gives this class a lexicographic advantage
-                Pattern.compile("[a-zA-Z0-9].+"),
-                // TODO: support concepts from datasets other than DBpedia
-                Pattern.compile("http://dbpedia.org/resource/.+"),
+                "topic",
+                Pattern.compile("[A-Z].+"),
+                null,
                 new AtomRegex(Arrays.asList(
                         new AtomRegex.El(new NickHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
@@ -34,6 +35,10 @@ public class LinkedConcept extends AtomClass {
 
                         new AtomRegex.El(new DocumentsAboutTopicHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+
+                        // multiple RFID tags on an object are possible, though they may be uncommon
+                        new AtomRegex.El(2, new RFIDHandler(),
+                                AtomRegex.Modifier.ZeroOrMore, RFIDReference.class),
 
                         new AtomRegex.El(null,
                                 AtomRegex.Modifier.ZeroOrMore)
@@ -52,8 +57,7 @@ public class LinkedConcept extends AtomClass {
 
         URI self = handleTypeAndAlias(a, vf, handler, OWL.THING);
 
-        // note: we assume short, name-like values for linked atoms
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
 
         return self;
     }
