@@ -17,6 +17,7 @@ public interface ExtendoActivityOntology {
             EXO_ACTIVITY_GIVE = "/exo/activity/give",
             EXO_ACTIVITY_HANDOFF = "/exo/activity/handoff",
             EXO_ACTIVITY_HANDSHAKE = "/exo/activity/handshake",
+            EXO_ACTIVITY_HIGHFIVE = "/exo/activity/highfive",
             EXO_ACTIVITY_POINT = "/exo/activity/point";
 
     // classes
@@ -27,6 +28,7 @@ public interface ExtendoActivityOntology {
             Handoff = new URIImpl(NAMESPACE + "Handoff"),
             Handshake = new URIImpl(NAMESPACE + "Handshake"),
             HandshakePulse = new URIImpl(NAMESPACE + "HandshakePulse"),
+            HighFive = new URIImpl(NAMESPACE + "HighFive"),
             Interaction = new URIImpl(NAMESPACE + "Interaction"),
             Gesture = new URIImpl(NAMESPACE + "Gesture"),
             Motion = new URIImpl(NAMESPACE + "Motion"),
