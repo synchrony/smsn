@@ -1,8 +1,11 @@
 package net.fortytwo.extendo.server.gesture;
 
+import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
+import net.fortytwo.extendo.p2p.osc.OscSender;
+import net.fortytwo.extendo.p2p.osc.UdpOscSender;
 import net.fortytwo.extendo.rdf.Activities;
 import net.fortytwo.extendo.rdf.vocab.ExtendoActivityOntology;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -12,6 +15,7 @@ import org.openrdf.model.impl.URIImpl;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,10 +31,13 @@ public class GesturalServer {
 
     private final HandshakeMatcher handshakeMatcher;
     private final HandoffMatcher handoffMatcher;
+    private final HighFiveMatcher highFiveMatcher;
 
     private final int port;
 
     private static final boolean doSpeak = false;
+
+    private final OscSender oscSender;
 
     public GesturalServer(final DatasetHandler datasetHandler) {
         this(DEFAULT_PORT, datasetHandler);
@@ -40,9 +47,18 @@ public class GesturalServer {
                           final DatasetHandler datasetHandler) {
         this.port = port;
 
+        // TODO: host and port are temporary; they should be configurable
+        try {
+            oscSender = new UdpOscSender("localhost", 42003);
+        } catch (UnknownHostException e) {
+            throw new IllegalStateException();
+        } catch (SocketException e) {
+            throw new IllegalStateException();
+        }
+
         HandshakeMatcher.HandshakeHandler handshakeHandler = new HandshakeMatcher.HandshakeHandler() {
             @Override
-            public void handle(HandshakeMatcher.Handshake left, HandshakeMatcher.Handshake right, long timestamp) {
+            public void handle(HandshakeMatcher.HandshakeSequence left, HandshakeMatcher.HandshakeSequence right, long timestamp) {
                 speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
                 // + " at " + timestamp);
 
@@ -69,6 +85,20 @@ public class GesturalServer {
         };
 
         handoffMatcher = new HandoffMatcher(handoffHandler);
+
+        HighFiveMatcher.HighFiveHandler highFiveHandler = new HighFiveMatcher.HighFiveHandler() {
+            @Override
+            public void handle(HighFiveMatcher.Clap left, HighFiveMatcher.Clap right, long time) {
+                speakWithSystemCall(left.actor.getLocalName() + " high-fived " + right.actor.getLocalName());
+
+                OSCMessage m = new OSCMessage(ExtendoActivityOntology.EXO_ACTIVITY_HIGHFIVE);
+                OSCBundle bundle = new OSCBundle();
+                bundle.addPacket(m);
+                oscSender.send(bundle);
+            }
+        };
+
+        highFiveMatcher = new HighFiveMatcher(highFiveHandler);
     }
 
     private boolean badArgs(final List<Object> args,
@@ -131,6 +161,7 @@ public class GesturalServer {
             }
         };
 
+        // this serves as both the "give" and "take" half of the hand-off interaction
         OSCListener handoffListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
@@ -151,6 +182,7 @@ public class GesturalServer {
             }
         };
 
+        // this is where the "giver" in a handoff interaction provides the item to give
         OSCListener giveListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
@@ -174,6 +206,26 @@ public class GesturalServer {
             }
         };
 
+        OSCListener highFiveListener = new OSCListener() {
+            @Override
+            public void acceptMessage(Date date, OSCMessage oscMessage) {
+                List<Object> args = oscMessage.getArguments();
+                if (badArgs(args, 1, ExtendoActivityOntology.EXO_ACTIVITY_HIGHFIVE)) {
+                    return;
+                }
+
+                URI actor = getActor(args);
+                if (null == actor) {
+                    return;
+                }
+
+                long timestamp = getRecognitionTimestamp(args);
+
+                System.out.println("received high-five clap from " + actor);
+                highFiveMatcher.receiveEvent(actor, timestamp);
+            }
+        };
+
         OSCListener infoListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
@@ -192,6 +244,7 @@ public class GesturalServer {
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_GIVE, giveListener);
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HANDOFF, handoffListener);
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HANDSHAKE, handshakeListener);
+        portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HIGHFIVE, highFiveListener);
         portIn.addListener("/exo/hand/info", infoListener);
         portIn.addListener("/exo/hand/error", errorListener);
         logger.info("listening for /exo messages");

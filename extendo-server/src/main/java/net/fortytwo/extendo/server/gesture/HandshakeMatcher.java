@@ -1,7 +1,6 @@
 package net.fortytwo.extendo.server.gesture;
 
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,9 +22,9 @@ public class HandshakeMatcher {
     private static final int STACK_SIZE_WARN_THRESHOLD = 1000;
     private long lastWarning = 0;
 
-    private final Map<URI, Handshake> handshakesByActor;
-    private final Stack<Handshake> latestHandshakes;
-    private Collection<Handshake> cleanupBuffer = new LinkedList<Handshake>();
+    private final Map<URI, HandshakeSequence> handshakesByActor;
+    private final Stack<HandshakeSequence> latestHandshakeSequences;
+    private Collection<HandshakeSequence> cleanupBuffer = new LinkedList<HandshakeSequence>();
 
     private final HandshakeHandler handler;
 
@@ -33,31 +32,31 @@ public class HandshakeMatcher {
 
     public HandshakeMatcher(HandshakeHandler handler) {
         this.handler = handler;
-        this.handshakesByActor = new HashMap<URI, Handshake>();
-        this.latestHandshakes = new Stack<Handshake>();
+        this.handshakesByActor = new HashMap<URI, HandshakeSequence>();
+        this.latestHandshakeSequences = new Stack<HandshakeSequence>();
         lowPassFilter = new GestureLowPassFilter(5000);
     }
 
     public void reset() {
         handshakesByActor.clear();
-        latestHandshakes.clear();
+        latestHandshakeSequences.clear();
     }
 
-    private boolean isOld(final Handshake h,
+    private boolean isOld(final HandshakeSequence h,
                           final long now) {
         return now - h.latestPeak > PEAK_MAX_GAP;
     }
 
     private void cleanup(final long timestamp) {
-        for (Handshake h : latestHandshakes) {
+        for (HandshakeSequence h : latestHandshakeSequences) {
             if (isOld(h, timestamp)) {
                 cleanupBuffer.add(h);
             }
         }
 
         if (cleanupBuffer.size() > 0) {
-            for (Handshake h : cleanupBuffer) {
-                latestHandshakes.remove(h);
+            for (HandshakeSequence h : cleanupBuffer) {
+                latestHandshakeSequences.remove(h);
                 handshakesByActor.remove(h.actor);
             }
 
@@ -70,11 +69,11 @@ public class HandshakeMatcher {
         //System.out.println("received handshake by " + actor + " at " + timestamp);
         cleanup(timestamp);
 
-        Handshake gesture = handshakesByActor.get(actor);
+        HandshakeSequence gesture = handshakesByActor.get(actor);
         boolean isNew = false;
 
         if (null == gesture) {
-            gesture = new Handshake();
+            gesture = new HandshakeSequence();
             gesture.actor = actor;
             gesture.firstPeak = timestamp;
             handshakesByActor.put(gesture.actor, gesture);
@@ -88,7 +87,7 @@ public class HandshakeMatcher {
         gesture.latestPeak = timestamp;
 
         if (!gesture.matched) {
-            for (Handshake h : latestHandshakes) {
+            for (HandshakeSequence h : latestHandshakeSequences) {
                 if (h.matches(gesture)) {
                     // don't produce the gesture if it is redundant
                     if (lowPassFilter.doAllow(gesture.actor, h.actor, timestamp)) {
@@ -106,8 +105,8 @@ public class HandshakeMatcher {
         }
 
         if (isNew) {
-            latestHandshakes.add(gesture);
-            if (latestHandshakes.size() > STACK_SIZE_WARN_THRESHOLD) {
+            latestHandshakeSequences.add(gesture);
+            if (latestHandshakeSequences.size() > STACK_SIZE_WARN_THRESHOLD) {
                 long now = System.currentTimeMillis();
                 if (now - lastWarning > 10000) {
                     logger.warning("gestural stack is suspiciously large");
@@ -123,17 +122,17 @@ public class HandshakeMatcher {
     }
 
     public interface HandshakeHandler {
-        void handle(Handshake left, Handshake right, long time);
+        void handle(HandshakeSequence left, HandshakeSequence right, long time);
     }
 
-    public class Handshake {
+    public class HandshakeSequence {
         public URI actor;
         public final List<Long> peaks = new LinkedList<Long>();
         public long firstPeak;
         public long latestPeak;
         private boolean matched = false;
 
-        public boolean matches(Handshake other) {
+        public boolean matches(HandshakeSequence other) {
             return !other.actor.equals(actor)
                     && !matched && !other.matched
                     && ((other.firstPeak >= firstPeak && other.firstPeak <= latestPeak

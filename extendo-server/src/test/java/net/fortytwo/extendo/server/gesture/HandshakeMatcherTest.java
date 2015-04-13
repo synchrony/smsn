@@ -36,7 +36,7 @@ public class HandshakeMatcherTest {
     public HandshakeMatcherTest() {
         HandshakeMatcher.HandshakeHandler handler = new HandshakeMatcher.HandshakeHandler() {
             @Override
-            public void handle(HandshakeMatcher.Handshake left, HandshakeMatcher.Handshake right, long timestamp) {
+            public void handle(HandshakeMatcher.HandshakeSequence left, HandshakeMatcher.HandshakeSequence right, long timestamp) {
                 totalMatches++;
                 matches.add("" + left.actor + "," + right.actor);
                 //System.out.println("handshake: " + left.actor + " and " + right.actor + " at " + timestamp);

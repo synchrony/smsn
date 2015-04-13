@@ -190,6 +190,31 @@ public class Activities {
     }
 
     /**
+     * Creates an RDF dataset for a high-five interaction
+     *
+     * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
+     * @param actor1    one of the two people clapping hands
+     * @param actor2    one of the two people clapping hands
+     * @return an RDF dataset describing the activity
+     */
+    public static Dataset datasetForHighFiveInteraction(final long timestamp,
+                                                        final URI actor1,
+                                                        final URI actor2) {
+        if (null == actor1 || null == actor2) {
+            throw new IllegalArgumentException();
+        }
+
+        Collection<Statement> c = new LinkedList<Statement>();
+        URI activity = factory.randomURI();
+
+        c.add(vf.createStatement(activity, RDF.TYPE, ExtendoActivityOntology.HighFive));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, actor1));
+        c.add(vf.createStatement(activity, ExtendoActivityOntology.actor, actor2));
+
+        return datasetForActivity(timestamp, activity, c);
+    }
+
+    /**
      * Creates an RDF dataset for the activity of attention to an item of interest
      *
      * @param timestamp        the moment at which the activity was recognized, in milliseconds since the Unix epoch
