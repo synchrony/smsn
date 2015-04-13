@@ -1,6 +1,6 @@
 /*
   ExtendoHand.cpp
-  Created by Joshua Shinavier, 2012-2014
+  Created by Joshua Shinavier, 2012-2015
   Released into the public domain.
 */
 
@@ -17,10 +17,22 @@
 #define RGB_LED_PIN  13
 #define VIBRO_PIN    2
 
+// These should be identical to the constants defined for the Typeatron;
+// they match the slow flicker of the Typeatron's laser after a feedback event.
+const unsigned long alertFlickerDurationMs = 1050;
+const unsigned long alertFlickerDarkMs = 30;
+const unsigned long alertFlickerLightMs = 45;
+
+const unsigned long alertVibroDuration = 500;
+
+ExtendoHand *thisDevice;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
 ExtendoHand::ExtendoHand(): ExtendoDevice(OSC_EXO_HAND) {
+    thisDevice = this;
+
     nineAxis = true;
 }
 
@@ -93,6 +105,13 @@ void ExtendoHand::vibrate(unsigned long durationMs) {
     digitalWrite(VIBRO_PIN, LOW);
 }
 
+void ExtendoHand::vibrateNonBlocking(unsigned long durationMs) {
+    vibrateLength = durationMs;
+    vibrateStart = millis();
+
+    digitalWrite(VIBRO_PIN, HIGH);
+}
+
 // note: this is a synchronous/blocking tone for now, to match the Typeatron's behavior
 void ExtendoHand::playTone(unsigned int frequency, unsigned long durationMs) {
     if (frequency) {
@@ -102,6 +121,20 @@ void ExtendoHand::playTone(unsigned int frequency, unsigned long durationMs) {
     } else {
         delay(durationMs);
     }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ExtendoHand::alert() {
+    alertFlickerHigh = true;
+    alertStart = millis();
+
+    // note: we use a haptic cue rather than an auditory one for practical reasons:
+    //       activating the vibration motor is computationally cheap, whereas playing
+    //       a tone is a blocking operation, complicated and expensive as a non-blocking one.
+    //       Arguably, the haptic cue is also less disruptive.
+    vibrateNonBlocking(alertVibroDuration);
 }
 
 
@@ -149,6 +182,9 @@ void ExtendoHand::setupOther() {
         motionSensor.calibrateZ(175, 700);
 #endif // THREE_AXIS
     }
+
+    vibrateStart = 0;
+    alertStart = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +238,38 @@ void ExtendoHand::getHeading(Vector3D &m) {
 }
 
 void ExtendoHand::onBeginLoop(unsigned long now) {
-    // do nothing
+    if (vibrateStart > 0) {
+        unsigned long elapsed = now - vibrateStart;
+        if (elapsed >= vibrateLength) {
+            digitalWrite(VIBRO_PIN, LOW);
+            vibrateStart = 0;
+        }
+    }
+
+    if (alertStart > 0) {
+        unsigned long elapsed = now - alertStart;
+        if (elapsed >= alertFlickerDurationMs) {
+            alertStart = 0;
+            setColor(RGB_BLACK);
+            digitalWrite(ledPin, LOW);
+        } else {
+            unsigned long ms = (elapsed) % (alertFlickerDarkMs + alertFlickerLightMs);
+            bool light = ms > alertFlickerDarkMs;
+            if (light) {
+                if (!alertFlickerHigh) {
+                    setColor(RGB_RED);
+                    digitalWrite(ledPin, HIGH);
+                    alertFlickerHigh = true;
+                }
+            } else {
+                if (alertFlickerHigh) {
+                    setColor(RGB_BLACK);
+                    digitalWrite(ledPin, LOW);
+                    alertFlickerHigh = false;
+                }
+            }
+        }
+    }
 }
 
 void ExtendoHand::onLoopTimeUpdated(double loopTime) {
@@ -232,8 +299,13 @@ void ExtendoHand::onLoopTimeUpdated(double loopTime) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// OSC in
+
+void handleAlertMessage(class OSCMessage &m) {
+    thisDevice->alert();
+}
 
 bool ExtendoHand::handleOSCBundle(class OSCBundle &bundle) {
-    // no Extend-o-Hand -specific handlers
-    return 0;
+    return 0
+        || bundle.dispatch(address(OSC_ALERT), handleAlertMessage);
 }

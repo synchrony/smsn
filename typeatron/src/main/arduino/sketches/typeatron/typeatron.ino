@@ -30,18 +30,6 @@ void setup() {
 
 unsigned int lastKeyState = 0;
 
-unsigned long flickerDurationMs = 300;
-void flickerTmp() {
-   unsigned long start = millis(), now;
-   do {
-       typeatron.setColor(RGB_RED);
-       delay(30);
-       typeatron.setColor(RGB_BLACK);
-       delay(10);
-       now = millis();
-   } while (now - start < flickerDurationMs); 
-}
-
 // basic key and laser loop
 void loop() {
     unsigned long now = typeatron.beginLoop();

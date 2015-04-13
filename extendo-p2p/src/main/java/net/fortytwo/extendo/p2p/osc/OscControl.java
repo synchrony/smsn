@@ -14,8 +14,8 @@ public abstract class OscControl {
 
     protected static final Logger logger = Logger.getLogger(SlipOscSender.class.getName());
 
-    private final OscReceiver receiver;
-    private OscSender sender;
+    protected final OscReceiver receiver;
+    protected OscSender sender;
 
     private long throttlingPeriod;
     private long timeOfLastPacket;

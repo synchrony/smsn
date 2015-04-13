@@ -5,10 +5,10 @@ import edu.rpi.twc.sesamestream.BindingSetHandler;
 import edu.rpi.twc.sesamestream.QueryEngine;
 import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.Extendo;
+import net.fortytwo.extendo.ExtendoDeviceControl;
 import net.fortytwo.extendo.brain.BrainModeClient;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.p2p.SideEffects;
-import net.fortytwo.extendo.p2p.osc.OscControl;
 import net.fortytwo.extendo.p2p.osc.OscMessageHandler;
 import net.fortytwo.extendo.p2p.osc.OscReceiver;
 import net.fortytwo.extendo.rdf.Activities;
@@ -36,42 +36,28 @@ import java.util.logging.Logger;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class TypeatronControl extends OscControl {
+public class TypeatronControl extends ExtendoDeviceControl {
     protected static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
-
-    // for now, queries will not expire, and will not need to be renewed
-    private static final int QUERY_TTL = 0;
-
+    
     // fully specified, since PATH may or may not include /usr/bin
     private static final String EMACSCLIENT_BIN = "/usr/bin/emacsclient";
 
-    // outbound addresses to Typeatron
+    // outbound paths: for messages to the device
     private static final String
-            EXO_TT_LASER_FEEDBACK = "/exo/tt/laser/feedback",
-            EXO_TT_LASER_OFF = "/exo/tt/laser/off",
-            EXO_TT_LASER_ON = "/exo/tt/laser/on",
-    //EXO_TT_LASER_TRIGGER = "/exo/tt/laser/trigger",
-    EXO_TT_MORSE = "/exo/tt/morse",
-            EXO_TT_OK = "/exo/tt/ok",
-            EXO_TT_PHOTO_GET = "/exo/tt/photo/get",
-            EXO_TT_PING = "/exo/tt/ping",
-            EXO_TT_READY = "/exo/tt/ready",
-            EXO_TT_VIBRO = "/exo/tt/vibro",
-            EXO_TT_WARNING = "/exo/tt/warning";
+            OSC_LASER_FEEDBACK = "/laser/feedback",
+            OSC_LASER_OFF = "/laser/off",
+            OSC_LASER_ON = "/laser/on",
+            OSC_PHOTO_GET = "/photo/get";
 
-    // inbound addresses from Typeatron
+    // inbound paths: for messages from the device
     private static final String
-            EXO_TT_ERROR = "/exo/tt/error",  // note: also used as an outbound address
-            EXO_TT_INFO = "/exo/tt/info",  // note: also used as an outbound address
-            EXO_TT_KEYS = "/exo/tt/keys",
-            EXO_TT_LASER_EVENT = "/exo/tt/laser/event",
-            EXO_TT_PHOTO_DATA = "/exo/tt/photo/data",
-            EXO_TT_PING_REPLY = "/exo/tt/ping/reply";
+            OSC_KEYS = "/keys",
+            OSC_LASER_EVENT = "/laser/event",
+            OSC_PHOTO_DATA = "/photo/data";
 
     public static final int
             VIBRATE_MANUAL_MS = 500;
 
-    private final ExtendoAgent agent;
     private final SideEffects environment;
 
     private final BrainModeClientWrapper brainModeWrapper;
@@ -85,9 +71,8 @@ public class TypeatronControl extends OscControl {
     public TypeatronControl(final OscReceiver oscReceiver,
                             final ExtendoAgent agent,
                             final SideEffects environment) throws DeviceInitializationException {
-        super(oscReceiver);
+        super("/exo/tt", oscReceiver, agent);
 
-        this.agent = agent;
         this.environment = environment;
 
         try {
@@ -205,33 +190,11 @@ public class TypeatronControl extends OscControl {
         } catch (IOException e) {
             throw new DeviceInitializationException(e);
         }
-
-        oscReceiver.register(EXO_TT_ERROR, new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                List<Object> args = message.getArguments();
-                if (wrongArgs(EXO_TT_ERROR, 1, args.size())) {
-                    return;
-                }
-
-                logger.log(Level.SEVERE, "error message from Typeatron: " + args.get(0));
-            }
-        });
-
-        oscReceiver.register(EXO_TT_INFO, new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                List<Object> args = message.getArguments();
-                if (wrongArgs(EXO_TT_INFO, 1, args.size())) {
-                    return;
-                }
-
-                logger.log(Level.INFO, "info message from Typeatron: " + args.get(0));
-            }
-        });
-
-        oscReceiver.register(EXO_TT_KEYS, new OscMessageHandler() {
+        
+        oscReceiver.register(absoluteAddress(OSC_KEYS), new OscMessageHandler() {
             public void handle(final OSCMessage message) {
                 List<Object> args = message.getArguments();
-                if (wrongArgs(EXO_TT_KEYS, 1, args.size())) {
+                if (wrongArgs(OSC_KEYS, 1, args.size())) {
                     return;
                 }
 
@@ -245,7 +208,7 @@ public class TypeatronControl extends OscControl {
 
         /*
         // user has "pointed with reference". This event occurs at the moment the laser turns on.
-        oscReceiver.register(EXO_TT_LASER_EVENT, new OscMessageHandler() {
+        oscReceiver.register(absoluteAddress(OSC_LASER_EVENT), new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 System.out.println("got laser event");
                 // TODO: use the recognition time parameter provided in the message
@@ -257,10 +220,10 @@ public class TypeatronControl extends OscControl {
         });
         */
 
-        oscReceiver.register(EXO_TT_PHOTO_DATA, new OscMessageHandler() {
+        oscReceiver.register(absoluteAddress(OSC_PHOTO_DATA), new OscMessageHandler() {
             public void handle(OSCMessage message) {
                 List<Object> args = message.getArguments();
-                if (wrongArgs(EXO_TT_PHOTO_DATA, 7, args.size())) {
+                if (wrongArgs(OSC_PHOTO_DATA, 7, args.size())) {
                     return;
                 }
 
@@ -292,27 +255,6 @@ public class TypeatronControl extends OscControl {
             }
         });
 
-        oscReceiver.register(EXO_TT_PING, new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                // note: currently, no argument is provided, or needed;
-                // the ping is used by the Typeatron to notify the user of a connection
-                logger.info("ping received from Typeatron. Replying.");
-                sendPingReplyMessage();
-            }
-        });
-
-        oscReceiver.register(EXO_TT_PING_REPLY, new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                // note: argument is ignored for now; in future, it could be used to synchronize clocks
-
-                // we assume this reply is a response to the latest ping
-                // TODO: we don't have to... why not send and receive latestPing in the message
-                long delay = System.currentTimeMillis() - latestPing;
-
-                logger.log(Level.INFO, "ping reply received from Typeatron in " + delay + "ms");
-            }
-        });
-
         // TODO: temporary... assume Emacs is available, even if we can't detect it...
         boolean forceEmacsAvailable = true;  // emacsAvailable
 
@@ -323,21 +265,12 @@ public class TypeatronControl extends OscControl {
         }
     }
 
-    public ExtendoAgent getAgent() {
-        return agent;
-    }
-
     public ChordedKeyer getKeyer() {
         return keyer;
     }
 
     public TypeatronMusicControl getMusic() {
         return music;
-    }
-
-    @Override
-    protected void onConnect() {
-        sendPingMessage();
     }
 
     private String symbolForBrainModeClient(final String symbol,
@@ -447,28 +380,16 @@ public class TypeatronControl extends OscControl {
         }
     }
 
-    private long latestPing;
-
-    public void sendErrorMessage() {
-        OSCMessage m = new OSCMessage(EXO_TT_ERROR);
-        send(m);
-    }
-
-    public void sendInfoMessage() {
-        OSCMessage m = new OSCMessage(EXO_TT_INFO);
-        send(m);
-    }
-
     public void sendLaserFeedbackMessage() {
         System.out.println("laser feedback");
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_FEEDBACK);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_LASER_FEEDBACK));
         send(m);
     }
 
     public void sendLaserOffMessage() {
         System.out.println("laser off");
         thingPointedTo = null;
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_OFF);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_LASER_OFF));
         send(m);
     }
 
@@ -479,7 +400,7 @@ public class TypeatronControl extends OscControl {
         // assuming the message is received by the Typeatron
         long recognitionTime = System.currentTimeMillis();
 
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_ON);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_LASER_ON));
         send(m);
 
         handlePointEvent(recognitionTime);
@@ -488,59 +409,12 @@ public class TypeatronControl extends OscControl {
     /*
     public void sendLaserTriggerMessage() {
         System.out.println("laser trigger");
-        OSCMessage m = new OSCMessage(EXO_TT_LASER_TRIGGER);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_LASER_TRIGGER));
         send(m);
     }*/
 
-    public void sendMorseMessage(final String text) {
-        OSCMessage m = new OSCMessage(EXO_TT_MORSE);
-        m.addArgument(text);
-        send(m);
-    }
-
-    public void sendOkMessage() {
-        OSCMessage m = new OSCMessage(EXO_TT_OK);
-        send(m);
-    }
-
     public void sendPhotoGetMessage() {
-        OSCMessage m = new OSCMessage(EXO_TT_PHOTO_GET);
-        send(m);
-    }
-
-    public void sendPingMessage() {
-        OSCMessage message = new OSCMessage(EXO_TT_PING);
-        latestPing = System.currentTimeMillis();
-        message.addArgument(latestPing);
-        send(message);
-    }
-
-    public void sendPingReplyMessage() {
-        OSCMessage message = new OSCMessage(EXO_TT_PING_REPLY);
-        // note: currently, no argument is consumed by the Typeatron
-        send(message);
-    }
-
-    public void sendReadyMessage() {
-        OSCMessage m = new OSCMessage(EXO_TT_READY);
-        send(m);
-    }
-
-    /**
-     * @param time the duration of the signal in milliseconds (valid values range from 1 to 60000)
-     */
-    public void sendVibroMessage(final int time) {
-        if (time < 0 || time > 60000) {
-            throw new IllegalArgumentException("vibration interval too short or too long: " + time);
-        }
-
-        OSCMessage m = new OSCMessage(EXO_TT_VIBRO);
-        m.addArgument(time);
-        send(m);
-    }
-
-    public void sendWarningMessage() {
-        OSCMessage m = new OSCMessage(EXO_TT_WARNING);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_PHOTO_GET));
         send(m);
     }
 
@@ -566,17 +440,5 @@ public class TypeatronControl extends OscControl {
         }
 
         logger.log(Level.INFO, "pointed to " + thingPointedTo);
-    }
-
-    private boolean wrongArgs(final String address,
-                              final int expected,
-                              final int actual) {
-        if (actual != expected) {
-            logger.log(Level.SEVERE, "received " + actual + " arguments in " + address + " message, "
-                    + "expected " + expected);
-            return true;
-        } else {
-            return false;
-        }
     }
 }

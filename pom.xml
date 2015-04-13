@@ -65,6 +65,8 @@
     <modules>
         <module>extendo-core</module>
         <module>extendo-brain</module>
+        <module>extendo-devices</module>
+        <module>extendo-hand</module>
         <module>extendo-p2p</module>
         <module>extendo-rdf</module>
         <module>monitron</module>

@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>typeatron</artifactId>
-    <name>Monomanual Typeatron</name>
+    <artifactId>extendo-hand</artifactId>
+    <name>Extend-o-Hand</name>
 
     <parent>
         <groupId>net.fortytwo.extendo</groupId>
@@ -19,6 +19,7 @@
             <artifactId>extendo-devices</artifactId>
             <version>${extendo.version}</version>
         </dependency>
+        <!-- TODO: remove the extendo-brain dependency if possible -->
         <dependency>
             <groupId>net.fortytwo.extendo</groupId>
             <artifactId>extendo-brain</artifactId>
@@ -31,11 +32,6 @@
                     <artifactId>gremlin-groovy</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo.ripple</groupId>
-            <artifactId>ripple-core</artifactId>
-            <version>${ripple.version}</version>
         </dependency>
 
         <dependency>
