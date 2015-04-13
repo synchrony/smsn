@@ -53,12 +53,12 @@ const unsigned long laserFlickerDarkMs = 30;
 const unsigned long laserFlickerLightMs = 45;
 
 
-Typeatron *thisDevice;
+Typeatron *thisTypeatron;
 
 Typeatron::Typeatron(): ExtendoDevice(OSC_EXO_TT),
   rgbled(redPin, greenPin, bluePin) {
 
-    thisDevice = this;
+    thisTypeatron = this;
     photoSampler = new AnalogSampler(photoresistorPin);
 }
 
@@ -87,7 +87,7 @@ Mode Typeatron::getMode() {
 
 int morseStopTest() {
     // abort the playing of a Morse code sequence by pressing 3 or more keys at the same time
-    return thisDevice->getTotalKeysPressed() >= 3;
+    return thisTypeatron->getTotalKeysPressed() >= 3;
 }
 
 Morse *Typeatron::createMorse() {
@@ -262,45 +262,45 @@ void Typeatron::updateKeys() {
 // OSC in
 
 void handleLaserFeedbackMessage(class OSCMessage &m) {
-    thisDevice->laserFeedback();
+    thisTypeatron->laserFeedback();
 }
 
 void handleLaserOffMessage(class OSCMessage &m) {
-    thisDevice->laserOff();
+    thisTypeatron->laserOff();
 }
 
 void handleLaserOnMessage(class OSCMessage &m) {
-    thisDevice->laserOn();
+    thisTypeatron->laserOn();
 }
 
 void handleLaserTriggerMessage(class OSCMessage &m) {
-    thisDevice->setMode(LaserTrigger);
+    thisTypeatron->setMode(LaserTrigger);
 }
 
 const int morseBufferLength = 32;
 char morseBuffer[morseBufferLength];
 
 void handleMorseMessage(class OSCMessage &m) {
-    if (!thisDevice->getOSC()->validArgs(m, 1)) return;
+    if (!thisTypeatron->getOSC()->validArgs(m, 1)) return;
 
     int length = m.getDataLength(0);
     if (length >= morseBufferLength) {
-        thisDevice->getOSC()->sendError("Morse message is too long");
-        thisDevice->errorCue();
+        thisTypeatron->getOSC()->sendError("Morse message is too long");
+        thisTypeatron->errorCue();
     } else {
         m.getString(0, morseBuffer, length+1);
-        thisDevice->getMorse()->playMorseString((const char*) morseBuffer);
+        thisTypeatron->getMorse()->playMorseString((const char*) morseBuffer);
     }
 }
 
 void handlePhotoGetMessage(class OSCMessage &m) {
-    AnalogSampler *sampler = thisDevice->getPhotoSampler();
+    AnalogSampler *sampler = thisTypeatron->getPhotoSampler();
     sampler->reset();
     sampler->beginSample();
     sampler->measure();
     sampler->endSample();
 
-    thisDevice->sendLightLevel();
+    thisTypeatron->sendLightLevel();
 }
 
 bool Typeatron::handleOSCBundle(class OSCBundle &bundle) {

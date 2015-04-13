@@ -5,6 +5,7 @@
 */
 
 #include "ExtendoHand.h"
+#include "RGBLED.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -25,13 +26,13 @@ const unsigned long alertFlickerLightMs = 45;
 
 const unsigned long alertVibroDuration = 500;
 
-ExtendoHand *thisDevice;
+ExtendoHand *thisHand;
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
 ExtendoHand::ExtendoHand(): ExtendoDevice(OSC_EXO_HAND) {
-    thisDevice = this;
+    thisHand = this;
 
     nineAxis = true;
 }
@@ -251,20 +252,20 @@ void ExtendoHand::onBeginLoop(unsigned long now) {
         if (elapsed >= alertFlickerDurationMs) {
             alertStart = 0;
             setColor(RGB_BLACK);
-            digitalWrite(ledPin, LOW);
+            //digitalWrite(ledPin, LOW);
         } else {
             unsigned long ms = (elapsed) % (alertFlickerDarkMs + alertFlickerLightMs);
             bool light = ms > alertFlickerDarkMs;
             if (light) {
                 if (!alertFlickerHigh) {
                     setColor(RGB_RED);
-                    digitalWrite(ledPin, HIGH);
+                    //digitalWrite(ledPin, HIGH);
                     alertFlickerHigh = true;
                 }
             } else {
                 if (alertFlickerHigh) {
                     setColor(RGB_BLACK);
-                    digitalWrite(ledPin, LOW);
+                    //digitalWrite(ledPin, LOW);
                     alertFlickerHigh = false;
                 }
             }
@@ -302,7 +303,7 @@ void ExtendoHand::onLoopTimeUpdated(double loopTime) {
 // OSC in
 
 void handleAlertMessage(class OSCMessage &m) {
-    thisDevice->alert();
+    thisHand->alert();
 }
 
 bool ExtendoHand::handleOSCBundle(class OSCBundle &bundle) {
