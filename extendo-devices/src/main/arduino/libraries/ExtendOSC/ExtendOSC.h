@@ -11,6 +11,9 @@
 #include <OSCBundle.h>
 #include "Arduino.h"
 
+//#define BAUD_RATE 9600
+#define BAUD_RATE 115200
+
 class ExtendOSC
 {
   public:

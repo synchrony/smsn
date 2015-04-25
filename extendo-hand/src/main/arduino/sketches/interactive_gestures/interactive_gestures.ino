@@ -33,6 +33,10 @@
 //#include <ITG3200.h>
 //#include <HMC5883L.h>
 
+#define AGENT_URI "http://fortytwo.net/josh/things/SBZFumn" // JS
+//#define AGENT_URI "http://fortytwo.net/josh/things/JdGwZ4n" // XL
+//#define AGENT_URI "http://fortytwo.net/josh/things/D4bbQSr" // OH
+
 #define HANDOFF   "/exo/activity/handoff"
 #define HANDSHAKE "/exo/activity/handshake"
 
@@ -175,9 +179,7 @@ void loopTimeUpdated(double loopTime) {
 void setup() {
     exoHand.setLoopTimeHandler(loopTimeUpdated);
     exoHand.setup();
-    exoHand.setContext("http://fortytwo.net/josh/things/SBZFumn");
-//    exoHand.setContext("http://fortytwo.net/josh/things/JdGwZ4n");
-
+    exoHand.setContext(AGENT_URI);
     exoHand.playTone(440,100);
 }
 

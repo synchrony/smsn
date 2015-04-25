@@ -9,6 +9,9 @@
 #ifndef ExtendoDevice_h
 #define ExtendoDevice_h
 
+// don't use the space-saving tricks intended for Extend-o-Hand
+#define BOUNTIFUL_RAM
+
 #include <OSCBundle.h>
 #include <ExtendOSC.h>
 #include <Droidspeak.h>
@@ -55,8 +58,10 @@ class ExtendoDevice
     void warningCue();
 
     // ping the host device periodically until a reply is received, then emit an "ok" cue and cease pinging
+#ifdef BOUNTIFUL_RAM
     void pingUntilConnected();
     void confirmConnection();
+#endif
 
     const char* getContext();
     void setContext(const char *context);
@@ -101,9 +106,11 @@ class ExtendoDevice
 
     void handleOSCBundleInternal(class OSCBundle &bundle);
 
+#ifdef BOUNTIFUL_RAM
     void checkConnection(unsigned long now);
     bool connecting, connected;
     unsigned long lastConnectionAttempt;
+#endif
 };
 
 #endif // ExtendoDevice_h

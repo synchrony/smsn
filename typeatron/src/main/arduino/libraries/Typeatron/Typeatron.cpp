@@ -28,7 +28,6 @@
 #include "Typeatron.h"
 #include "Arduino.h"
 
-
 const int keyPin1 = 2;
 const int keyPin2 = 4;
 const int keyPin3 = 7;
@@ -185,6 +184,22 @@ void Typeatron::setupOther() {
         droidspeak->speakPowerUpPhrase();
     }
 
+    // note: this operation is performed below SLIP
+    // note: match BAUD_RATE in ExtendOSC.h
+    Serial.print("$");  // Print three times individually
+    Serial.print("$");
+    Serial.print("$");  // Enter command mode
+    delay(100);  // Short delay, wait for the modem to send back CMD
+
+    // temporarily change the baud rate, no parity
+    //Serial.println("U,9600,N");
+    Serial.println("U,115200,N");
+    delay(100);
+
+    Serial.println("SM,6"); // pair mode (purportedly)
+    //Serial.println("F,1"); // fast data mode
+    delay(100);
+
     morse = createMorse();
     resetLaser();
 }
@@ -280,6 +295,7 @@ void handleLaserTriggerMessage(class OSCMessage &m) {
 const int morseBufferLength = 32;
 char morseBuffer[morseBufferLength];
 
+/* TODO: restore; these are commented out so as to save some space
 void handleMorseMessage(class OSCMessage &m) {
     if (!thisTypeatron->getOSC()->validArgs(m, 1)) return;
 
@@ -302,15 +318,16 @@ void handlePhotoGetMessage(class OSCMessage &m) {
 
     thisTypeatron->sendLightLevel();
 }
+*/
 
 bool Typeatron::handleOSCBundle(class OSCBundle &bundle) {
     return 0
         || bundle.dispatch(address(OSC_LASER_FEEDBACK), handleLaserFeedbackMessage)
         || bundle.dispatch(address(OSC_LASER_OFF), handleLaserOffMessage)
         || bundle.dispatch(address(OSC_LASER_ON), handleLaserOnMessage)
-        || bundle.dispatch(address(OSC_LASER_TRIGGER), handleLaserTriggerMessage)
-        || bundle.dispatch(address(OSC_MORSE), handleMorseMessage)
-        || bundle.dispatch(address(OSC_PHOTO_GET), handlePhotoGetMessage);
+        || bundle.dispatch(address(OSC_LASER_TRIGGER), handleLaserTriggerMessage);
+        //|| bundle.dispatch(address(OSC_MORSE), handleMorseMessage)
+        //|| bundle.dispatch(address(OSC_PHOTO_GET), handlePhotoGetMessage);
 }
 
 

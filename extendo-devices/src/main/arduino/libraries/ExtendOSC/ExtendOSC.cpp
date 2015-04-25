@@ -26,7 +26,7 @@ const char *ExtendOSC::getPrefix() {
 void ExtendOSC::beginSerial() {
     // OSCuino: begin SLIPSerial just like Serial
     // set this as high as you can reliably run on your platform
-    SLIPSerial.begin(115200);
+    SLIPSerial.begin(BAUD_RATE);
 /*
 #if ARDUINO >= 100
     while(!Serial); // for Arduino Leonardo

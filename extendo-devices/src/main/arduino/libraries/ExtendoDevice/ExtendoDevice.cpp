@@ -1,6 +1,6 @@
 /*
   ExtendoDevice.cpp
-  Created by Joshua Shinavier, 2014
+  Created by Joshua Shinavier, 2014-2015
   Released into the public domain.
 */
 
@@ -124,7 +124,9 @@ unsigned long ExtendoDevice::beginLoop() {
     unsigned long now = millis();
 
     checkLedStatus(now);
+#ifdef BOUNTIFUL_RAM
     checkConnection(now);
+#endif
     onBeginLoop(now);
 
 // TODO: never applies
@@ -227,6 +229,7 @@ void ExtendoDevice::sendHeartbeatMessage(unsigned long now) {
 ////////////////////////////////////////////////////////////////////////////////
 // non-member OSC handler functions
 
+#ifdef BOUNTIFUL_RAM
 void handleContextSetMessage(class OSCMessage &m) {
     if (!thisDevice->getOSC()->validArgs(m, 1)) return;
 
@@ -234,6 +237,7 @@ void handleContextSetMessage(class OSCMessage &m) {
     m.getString(0, buffer, m.getDataLength(0) + 1);
     thisDevice->setContext(buffer);
 }
+#endif
 
 void handleErrorMessage(class OSCMessage &m) {
     thisDevice->errorCue();
@@ -276,9 +280,11 @@ void handlePingMessage(class OSCMessage &m) {
     thisDevice->sendPingReply();
 }
 
+#ifdef BOUNTIFUL_RAM
 void handlePingReplyMessage(class OSCMessage &m) {
     thisDevice->confirmConnection();
 }
+#endif
 
 void handleReadyMessage(class OSCMessage &m) {
     thisDevice->readyCue();
@@ -347,15 +353,15 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
         osc.sendOSCBundleError(bundle);
     } else if (!(handleOSCBundle(bundle)
         // TODO: copying addresses into buffers on the fly (via address()), one by one, is inefficient
-        || bundle.dispatch(address(OSC_CONTEXT_SET), handleContextSetMessage)
         || bundle.dispatch(address(OSC_ERROR), handleErrorMessage)
         || bundle.dispatch(address(OSC_INFO), handleInfoMessage)
         //|| bundle.dispatch(address(OSC_MORSE), handleMorseMessage)
         || bundle.dispatch(address(OSC_OK), handleOkMessage)
         || bundle.dispatch(address(OSC_PING), handlePingMessage)
-        || bundle.dispatch(address(OSC_PING_REPLY), handlePingReplyMessage)
         || bundle.dispatch(address(OSC_READY), handleReadyMessage)
 #ifdef BOUNTIFUL_RAM
+        || bundle.dispatch(address(OSC_CONTEXT_SET), handleContextSetMessage)
+        || bundle.dispatch(address(OSC_PING_REPLY), handlePingReplyMessage)
         || bundle.dispatch(address(OSC_RGB_SET), handleRGBSetMessage)
         || bundle.dispatch(address(OSC_TONE), handleToneMessage)
         || bundle.dispatch(address(OSC_VIBRO), handleVibroMessage)
@@ -380,6 +386,7 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
 ////////////////////////////////////////////////////////////////////////////////
 // connection state
 
+#ifdef BOUNTIFUL_RAM
 void ExtendoDevice::pingUntilConnected() {
     connected = false;
     connecting = true;
@@ -411,5 +418,6 @@ void ExtendoDevice::checkConnection(unsigned long now) {
         osc.sendOSC(m);
     }
 }
+#endif
 
 

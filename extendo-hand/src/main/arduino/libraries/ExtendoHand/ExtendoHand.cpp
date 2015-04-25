@@ -107,6 +107,10 @@ void ExtendoHand::vibrate(unsigned long durationMs) {
 }
 
 void ExtendoHand::vibrateNonBlocking(unsigned long durationMs) {
+    if (0 == durationMs) {
+        return;
+    }
+
     vibrateLength = durationMs;
     vibrateStart = millis();
 
@@ -122,6 +126,17 @@ void ExtendoHand::playTone(unsigned int frequency, unsigned long durationMs) {
     } else {
         delay(durationMs);
     }
+}
+
+void ExtendoHand::multiCue(
+    unsigned int toneFrequency, unsigned long toneDurationMs,
+    unsigned long color,
+    unsigned long vibrateDurationMs) {
+
+    setColor(color);
+    vibrateNonBlocking(vibrateDurationMs);
+    playTone(toneFrequency, toneDurationMs);
+    setColor(RGB_BLACK);
 }
 
 
@@ -306,7 +321,17 @@ void handleAlertMessage(class OSCMessage &m) {
     thisHand->alert();
 }
 
+void handleMulticueMessage(class OSCMessage &m) {
+    unsigned int toneFrequency = (unsigned int) m.getInt(0);
+    unsigned long toneDurationMs = (unsigned long) m.getInt(0);
+    unsigned long color = (unsigned long) m.getInt(0);
+    unsigned long vibrateDurationMs = (unsigned long) m.getInt(0);
+
+    thisHand->multiCue(toneFrequency, toneDurationMs, color, vibrateDurationMs);
+}
+
 bool ExtendoHand::handleOSCBundle(class OSCBundle &bundle) {
     return 0
-        || bundle.dispatch(address(OSC_ALERT), handleAlertMessage);
+        || bundle.dispatch(address(OSC_ALERT), handleAlertMessage)
+        || bundle.dispatch(address(OSC_MULTI), handleMulticueMessage);
 }
