@@ -1,6 +1,5 @@
 package net.fortytwo.extendo.typeatron.ripple;
 
-import com.illposed.osc.OSCMessage;
 import net.fortytwo.extendo.p2p.ExtendoAgent;
 import net.fortytwo.extendo.p2p.SideEffects;
 import net.fortytwo.extendo.typeatron.ChordedKeyer;
@@ -42,39 +41,8 @@ public class ExtendoRippleREPL {
         this.environment = environment;
         this.eventHandler = eventHandler;
 
-        UserDictionary userDictionary = new UserDictionary(typeatron);
         typeatronDictionary = new TypeatronDictionaryMapping(
-                environment, typeatron, userDictionary);
-
-        // TODO: temporary, for a demo
-        String[][] shortcuts = {
-                {"an", "http://fortytwo.net/2014/04/twc#AliNendick"},
-                {"av", "http://fortytwo.net/2014/04/twc#AmarViswanathan"},
-                {"bm", "http://fortytwo.net/2014/04/twc#BassemMakni"},
-                {"bz", "http://fortytwo.net/2014/04/twc#BoliangZhang"},
-                {"dy", "http://fortytwo.net/2014/04/twc#DianYu"},
-                {"ea", "http://fortytwo.net/2014/04/twc#EricAmeres"},
-                {"ep", "http://fortytwo.net/2014/04/twc#EvanPatton"},
-                {"hw", "http://fortytwo.net/2014/04/twc#HanWang"},
-                {"hl", "http://fortytwo.net/2014/04/twc#HaoLi"},
-                {"hh", "http://fortytwo.net/2014/04/twc#HongzhaoHuang"},
-                {"jm", "http://fortytwo.net/2014/04/twc#JamesMichaelis"},
-                {"jc", "http://fortytwo.net/2014/04/twc#JimMcCusker"},
-                {"jz", "http://fortytwo.net/2014/04/twc#JinGuangZheng"},
-                {"je", "http://fortytwo.net/2014/04/twc#JohnErickson"},
-                {"js", "http://fortytwo.net/2014/04/twc#JoshuaShinavier"},
-                {"kc", "http://fortytwo.net/2014/04/twc#KatieChastain"},
-                {"kg", "http://fortytwo.net/2014/04/twc#KristineGloria"},
-                {"mf", "http://fortytwo.net/2014/04/twc#MattFerrito"},
-                {"nr", "http://fortytwo.net/2014/04/twc#NidhiRastogi"},
-                {"ql", "http://fortytwo.net/2014/04/twc#QiLi"},
-                {"se", "http://fortytwo.net/2014/04/twc#SimonEllis"},
-                {"tl", "http://fortytwo.net/2014/04/twc#TimLebo"},
-                {"tz", "http://fortytwo.net/2014/04/twc#TongtaoZhang"},
-                {"yl", "http://fortytwo.net/2014/04/twc#YueLiu"}};
-        for (String[] pair : shortcuts) {
-            userDictionary.put(pair[0], new URIImpl(pair[1]));
-        }
+                environment, typeatron);
 
         newLine();
     }

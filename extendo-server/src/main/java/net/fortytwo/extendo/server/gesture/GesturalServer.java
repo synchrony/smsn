@@ -37,7 +37,7 @@ public class GesturalServer {
 
     private static final boolean doSpeak = false;
 
-    private final OscSender oscSender;
+    private final OscSender notificationSender;
 
     public GesturalServer(final DatasetHandler datasetHandler) {
         this(DEFAULT_PORT, datasetHandler);
@@ -49,7 +49,7 @@ public class GesturalServer {
 
         // TODO: host and port are temporary; they should be configurable
         try {
-            oscSender = new UdpOscSender("localhost", 42003);
+            notificationSender = new UdpOscSender("localhost", 42003);
         } catch (UnknownHostException e) {
             throw new IllegalStateException();
         } catch (SocketException e) {
@@ -58,12 +58,15 @@ public class GesturalServer {
 
         HandshakeMatcher.HandshakeHandler handshakeHandler = new HandshakeMatcher.HandshakeHandler() {
             @Override
-            public void handle(HandshakeMatcher.HandshakeSequence left, HandshakeMatcher.HandshakeSequence right, long timestamp) {
-                speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
-                // + " at " + timestamp);
+            public void handle(HandshakeMatcher.HandshakeSequence left,
+                               HandshakeMatcher.HandshakeSequence right, long timestamp) {
+                notifyOfInteraction(ExtendoActivityOntology.EXO_ACTIVITY_HANDSHAKE);
 
                 Dataset d = Activities.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
                 datasetHandler.handle(d);
+
+                speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
+                // + " at " + timestamp);
             }
         };
 
@@ -75,12 +78,14 @@ public class GesturalServer {
                                HandoffMatcher.Handoff take,
                                URI thingGiven,
                                long timestamp) {
-                speakWithSystemCall(give.actor.getLocalName() + " gave \"" + thingGiven.getLocalName()
-                        + "\" to " + take.actor.getLocalName());
-                // + " at " + timestamp);
+                notifyOfInteraction(ExtendoActivityOntology.EXO_ACTIVITY_HANDOFF);
 
                 Dataset d = Activities.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
                 datasetHandler.handle(d);
+
+                speakWithSystemCall(give.actor.getLocalName() + " gave \"" + thingGiven.getLocalName()
+                        + "\" to " + take.actor.getLocalName());
+                // + " at " + timestamp);
             }
         };
 
@@ -89,16 +94,20 @@ public class GesturalServer {
         HighFiveMatcher.HighFiveHandler highFiveHandler = new HighFiveMatcher.HighFiveHandler() {
             @Override
             public void handle(HighFiveMatcher.Clap left, HighFiveMatcher.Clap right, long time) {
-                speakWithSystemCall(left.actor.getLocalName() + " high-fived " + right.actor.getLocalName());
+                notifyOfInteraction(ExtendoActivityOntology.EXO_ACTIVITY_HIGHFIVE);
 
-                OSCMessage m = new OSCMessage(ExtendoActivityOntology.EXO_ACTIVITY_HIGHFIVE);
-                OSCBundle bundle = new OSCBundle();
-                bundle.addPacket(m);
-                oscSender.send(bundle);
+                speakWithSystemCall(left.actor.getLocalName() + " high-fived " + right.actor.getLocalName());
             }
         };
 
         highFiveMatcher = new HighFiveMatcher(highFiveHandler);
+    }
+
+    private void notifyOfInteraction(final String activityAddress) {
+        OSCMessage m = new OSCMessage(activityAddress);
+        OSCBundle bundle = new OSCBundle();
+        bundle.addPacket(m);
+        notificationSender.send(bundle);
     }
 
     private boolean badArgs(final List<Object> args,
@@ -156,7 +165,7 @@ public class GesturalServer {
 
                 long timestamp = getRecognitionTimestamp(args);
 
-                System.out.println("received half-handshake gesture from " + actor);
+                System.out.println("" + System.currentTimeMillis() + ": received half-handshake from " + actor);
                 handshakeMatcher.receiveEvent(actor, timestamp);
             }
         };
@@ -177,7 +186,7 @@ public class GesturalServer {
 
                 long timestamp = getRecognitionTimestamp(args);
 
-                System.out.println("received handoff gesture from " + actor);
+                System.out.println("" + System.currentTimeMillis() + ": received handoff gesture from " + actor);
                 handoffMatcher.receiveEvent(actor, timestamp);
             }
         };
@@ -221,7 +230,7 @@ public class GesturalServer {
 
                 long timestamp = getRecognitionTimestamp(args);
 
-                System.out.println("received high-five clap from " + actor);
+                System.out.println("" + System.currentTimeMillis() + ": received high-five clap from " + actor);
                 highFiveMatcher.receiveEvent(actor, timestamp);
             }
         };

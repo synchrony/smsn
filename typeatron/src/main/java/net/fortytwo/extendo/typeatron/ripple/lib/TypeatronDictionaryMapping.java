@@ -143,8 +143,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
     private final Map<String, StackMapping> dictionary = new HashMap<String, StackMapping>();
 
     public TypeatronDictionaryMapping(final SideEffects environment,
-                                      final TypeatronControl typeatron,
-                                      final UserDictionary userDictionary) throws RippleException {
+                                      final TypeatronControl typeatron) throws RippleException {
         ExtendoBrainClient exoBrainClient;
         try {
             exoBrainClient = new ExtendoBrainClient();
