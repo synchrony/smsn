@@ -56,7 +56,8 @@ public class FacilitatorService {
     private final QueryEngineImpl queryEngine;
 
     public static FacilitatorService getInstance()
-            throws IOException, TypedProperties.PropertyException, RippleException, SailException {
+            throws IOException, TypedProperties.PropertyException,
+            RippleException, SailException, InterruptedException {
 
         if (null == INSTANCE) {
             INSTANCE = new FacilitatorService();
@@ -66,7 +67,7 @@ public class FacilitatorService {
     }
 
     private FacilitatorService()
-            throws IOException, TypedProperties.PropertyException, RippleException, SailException {
+            throws IOException, TypedProperties.PropertyException, RippleException, SailException, InterruptedException {
 
         int oscPort = Extendo.getConfiguration().getInt(Extendo.P2P_OSC_PORT);
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);

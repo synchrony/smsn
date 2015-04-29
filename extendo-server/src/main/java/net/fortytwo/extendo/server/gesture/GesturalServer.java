@@ -149,7 +149,7 @@ public class GesturalServer {
         return System.currentTimeMillis();
     }
 
-    public void start() throws SocketException {
+    public void start() throws SocketException, InterruptedException {
         OSCListener handshakeListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
@@ -256,8 +256,17 @@ public class GesturalServer {
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HIGHFIVE, highFiveListener);
         portIn.addListener("/exo/hand/info", infoListener);
         portIn.addListener("/exo/hand/error", errorListener);
-        logger.info("listening for /exo messages");
-        portIn.startListening();
+
+        // Loop indefinitely, first starting the OSC listener, then restarting it if it fails for any reason
+        // This happens when it receives a badly-formatted message.
+        while (true) {
+            if (!portIn.isListening()) {
+                logger.info("listening for /exo messages");
+                portIn.startListening();
+            }
+
+            Thread.sleep(10000);
+        }
     }
 
     public static void main(final String[] args) throws Exception {
@@ -269,9 +278,6 @@ public class GesturalServer {
         };
 
         new GesturalServer(h).start();
-        while (true) {
-            Thread.sleep(10000);
-        }
     }
 
     // TODO: temporary for demo

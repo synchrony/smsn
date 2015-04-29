@@ -34,7 +34,8 @@ public class BroadcastRdfExtension extends ExtendoExtension {
     private final FacilitatorService facilitator;
 
     public BroadcastRdfExtension()
-            throws IOException, TypedProperties.PropertyException, RippleException, SailException {
+            throws IOException, TypedProperties.PropertyException, RippleException,
+            SailException, InterruptedException {
 
         facilitator =  FacilitatorService.getInstance();
     }
