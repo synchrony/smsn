@@ -26,9 +26,9 @@
             <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc.sesamestream</groupId>
-            <artifactId>sesamestream-impl</artifactId>
-            <version>${sesamestream.version}</version>
+            <groupId>edu.rpi.twc.rdfstream4j</groupId>
+            <artifactId>rdfstream4j-impl</artifactId>
+            <version>${rdfstream4j.version}</version>
         </dependency>
         <dependency>
             <groupId>com.illposed.osc</groupId>

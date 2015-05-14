@@ -149,7 +149,7 @@ public class GesturalServer {
         return System.currentTimeMillis();
     }
 
-    public void start() throws SocketException, InterruptedException {
+    public void start() throws SocketException {
         OSCListener handshakeListener = new OSCListener() {
             @Override
             public void acceptMessage(Date date, OSCMessage oscMessage) {
@@ -249,7 +249,7 @@ public class GesturalServer {
             }
         };
 
-        OSCPortIn portIn = new OSCPortIn(port);
+        final OSCPortIn portIn = new OSCPortIn(port);
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_GIVE, giveListener);
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HANDOFF, handoffListener);
         portIn.addListener(ExtendoActivityOntology.EXO_ACTIVITY_HANDSHAKE, handshakeListener);
@@ -257,16 +257,26 @@ public class GesturalServer {
         portIn.addListener("/exo/hand/info", infoListener);
         portIn.addListener("/exo/hand/error", errorListener);
 
-        // Loop indefinitely, first starting the OSC listener, then restarting it if it fails for any reason
-        // This happens when it receives a badly-formatted message.
-        while (true) {
-            if (!portIn.isListening()) {
-                logger.info("listening for /exo messages");
-                portIn.startListening();
-            }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Loop indefinitely, first starting the OSC listener, then restarting it if it fails for any reason
+                    // This happens when it receives a badly-formatted message.
+                    while (true) {
+                        if (!portIn.isListening()) {
+                            logger.info("listening for /exo messages");
+                            System.out.println("\tnot listening");
+                            portIn.startListening();
+                        }
 
-            Thread.sleep(10000);
-        }
+                        Thread.sleep(500);
+                    }
+                } catch (Throwable t) {
+                    logger.log(Level.SEVERE, "gestural server listener died with error", t);
+                }
+            }
+        }).start();
     }
 
     public static void main(final String[] args) throws Exception {
@@ -278,6 +288,10 @@ public class GesturalServer {
         };
 
         new GesturalServer(h).start();
+
+        while (true) {
+            Thread.sleep(10000);
+        }
     }
 
     // TODO: temporary for demo

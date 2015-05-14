@@ -1,8 +1,8 @@
 package net.fortytwo.extendo.p2p.sparql;
 
-import edu.rpi.twc.sesamestream.BindingSetHandler;
-import edu.rpi.twc.sesamestream.QueryEngine;
-import edu.rpi.twc.sesamestream.Subscription;
+import edu.rpi.twc.rdfstream4j.BindingSetHandler;
+import edu.rpi.twc.rdfstream4j.QueryEngine;
+import edu.rpi.twc.rdfstream4j.Subscription;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.Connection;
 import net.fortytwo.extendo.p2p.ConnectionHost;

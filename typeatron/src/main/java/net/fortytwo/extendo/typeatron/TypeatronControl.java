@@ -1,8 +1,8 @@
 package net.fortytwo.extendo.typeatron;
 
 import com.illposed.osc.OSCMessage;
-import edu.rpi.twc.sesamestream.BindingSetHandler;
-import edu.rpi.twc.sesamestream.QueryEngine;
+import edu.rpi.twc.rdfstream4j.BindingSetHandler;
+import edu.rpi.twc.rdfstream4j.QueryEngine;
 import info.aduna.io.IOUtil;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.ExtendoDeviceControl;

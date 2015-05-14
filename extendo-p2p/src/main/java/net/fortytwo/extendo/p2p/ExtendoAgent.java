@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.p2p;
 
 import com.illposed.osc.OSCMessage;
-import edu.rpi.twc.sesamestream.QueryEngine;
+import edu.rpi.twc.rdfstream4j.QueryEngine;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.sparql.QueryEngineProxy;
 import net.fortytwo.rdfagents.data.DatasetFactory;

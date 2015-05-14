@@ -40,8 +40,8 @@
             <artifactId>blueprints-sail-graph</artifactId>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc.sesamestream</groupId>
-            <artifactId>sesamestream-impl</artifactId>
+            <groupId>edu.rpi.twc.rdfstream4j</groupId>
+            <artifactId>rdfstream4j-impl</artifactId>
         </dependency>
 
         <!-- temporary, because of the self-conflict within Rexster -->

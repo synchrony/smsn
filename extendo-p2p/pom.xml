@@ -25,9 +25,9 @@
             <version>${sesame.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc.sesamestream</groupId>
-            <artifactId>sesamestream-api</artifactId>
-            <version>${sesamestream.version}</version>
+            <groupId>edu.rpi.twc.rdfstream4j</groupId>
+            <artifactId>rdfstream4j-api</artifactId>
+            <version>${rdfstream4j.version}</version>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>

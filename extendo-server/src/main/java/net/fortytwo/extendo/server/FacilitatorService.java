@@ -1,7 +1,7 @@
 package net.fortytwo.extendo.server;
 
-import edu.rpi.twc.sesamestream.SesameStream;
-import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
+import edu.rpi.twc.rdfstream4j.RDFStream4j;
+import edu.rpi.twc.rdfstream4j.impl.QueryEngineImpl;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.p2p.Connection;
 import net.fortytwo.extendo.p2p.ConnectionHost;
@@ -73,8 +73,8 @@ public class FacilitatorService {
         int pubsubPort = Extendo.getConfiguration().getInt(Extendo.P2P_PUBSUB_PORT);
 
         if (Extendo.VERBOSE) {
-            SesameStream.setDoPerformanceMetrics(true);
-            SesameStream.setDoUseCompactLogFormat(false);
+            RDFStream4j.setDoPerformanceMetrics(true);
+            RDFStream4j.setDoUseCompactLogFormat(false);
         }
 
         queryEngine = new QueryEngineImpl();
