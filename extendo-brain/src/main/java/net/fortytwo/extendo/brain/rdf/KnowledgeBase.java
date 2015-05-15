@@ -14,6 +14,7 @@ import net.fortytwo.extendo.brain.rdf.classes.DatedEvent;
 import net.fortytwo.extendo.brain.rdf.classes.Document;
 import net.fortytwo.extendo.brain.rdf.classes.ISBNReference;
 import net.fortytwo.extendo.brain.rdf.classes.LinkedConcept;
+import net.fortytwo.extendo.brain.rdf.classes.Organization;
 import net.fortytwo.extendo.brain.rdf.classes.Person;
 import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
 import net.fortytwo.extendo.brain.rdf.classes.RFIDReference;
@@ -119,6 +120,7 @@ public class KnowledgeBase {
                 Document.class,
                 ISBNReference.class,
                 LinkedConcept.class,
+                Organization.class,
                 Person.class,
                 RFIDReference.class,
                 DatedEvent.class,
