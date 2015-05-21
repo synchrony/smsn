@@ -97,6 +97,8 @@ public class BrainModeClient {
         functions.put("right", new EmacsFunction("exo-forward-char", false));
 
         // Brain-mode specific functions
+        functions.put("C-c C-I f", new EmacsFunction("exo-find-isolated-atoms", false));
+        functions.put("C-c C-I r", new EmacsFunction("exo-remove-isolated-atoms", false));
         functions.put("C-c C-a C-p", new EmacsFunction("exo-insert-attr-priority", true));
         functions.put("C-c C-a C-s", new EmacsFunction("exo-insert-attr-sharability", true));
         functions.put("C-c C-a C-w", new EmacsFunction("exo-insert-attr-weight", true));
@@ -104,8 +106,7 @@ public class BrainModeClient {
         functions.put("C-c C-a s", new EmacsFunction("exo-insert-current-time-with-seconds", false));
         functions.put("C-c C-a t", new EmacsFunction("exo-insert-current-time", false));
         functions.put("C-c C-d", new EmacsFunction("exo-set-view-height", true));
-        functions.put("C-c C-i f", new EmacsFunction("exo-find-isolated-atoms", false));
-        functions.put("C-c C-i r", new EmacsFunction("exo-remove-isolated-atoms", false));
+        // TODO: export and import functions
         functions.put("C-c C-l", new EmacsFunction("exo-goto-line", true));
         functions.put("C-c C-r C-b a", new EmacsFunction("exo-visit-in-amazon 'current-root-value", false));
         functions.put("C-c C-r C-b e", new EmacsFunction("exo-visit-in-ebay 'current-root-value", false));

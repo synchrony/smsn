@@ -51,6 +51,8 @@ public class LaserPointerMapping extends AtomMapping {
 
         if (null == n) {
             logger.warning("can't point to non-atom: " + first);
+
+            // soft fail; propagate the stack even if we couldn't point
         } else {
             URI uri = uriOf(n);
 
@@ -64,9 +66,9 @@ public class LaserPointerMapping extends AtomMapping {
             } catch (Throwable t) {
                 throw new RippleException(t);
             }
-
-            // keep the stack unchanged
-            solutions.put(stack);
         }
+
+        // keep the stack unchanged
+        solutions.put(stack);
     }
 }

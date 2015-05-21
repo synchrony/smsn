@@ -24,7 +24,6 @@ import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.Filter;
 import net.fortytwo.extendo.brain.Params;
-import net.fortytwo.extendo.brain.rdf.AtomClass;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,10 +45,6 @@ import java.util.List;
  */
 @ExtensionNaming(namespace = "extendo", name = "export")
 public class ExportExtension extends ExtendoExtension {
-
-    private enum Format {
-        Vertices, Edges, GraphML, PageRank, RDF, Web
-    }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph to the file system")
@@ -199,7 +194,7 @@ public class ExportExtension extends ExtendoExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        Format format = Format.valueOf(p.format);
+        Params.Format format = Params.Format.valueOf(p.format);
         if (null == format) {
             return ExtensionResponse.error("no such format: " + p.format);
         }

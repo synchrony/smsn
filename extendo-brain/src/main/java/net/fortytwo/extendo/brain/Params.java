@@ -34,4 +34,8 @@ public interface Params {
     public static final String
             JSON_FORMAT = "json",
             WIKI_FORMAT = "wiki";
+
+    public enum Format {
+        Vertices, Edges, GraphML, PageRank, RDF, Web
+    }
 }

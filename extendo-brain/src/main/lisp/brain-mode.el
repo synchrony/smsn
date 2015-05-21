@@ -397,6 +397,9 @@
 (defun receive-export-results (status)
     (acknowledge-http-response status "exported successfully"))
 
+(defun receive-import-results (status)
+    (acknowledge-http-response status "imported successfully"))
+
 (defun receive-inference-results (status)
     (acknowledge-http-response status "type inference completed successfully"))
 
@@ -502,6 +505,12 @@
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
          'receive-export-results))
 
+(defun do-import (format file)
+    (http-get
+        (concat (base-url) "import?request=" (w3m-url-encode-string (json-encode
+            (list :format format :file file))))
+         'receive-import-results))
+
 (defun do-infer-types ()
     (http-get
         (concat (base-url) "infer-types") 'receive-inference-results))
@@ -559,13 +568,17 @@
 
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
-(defun colorize (text weight sharability underline bold bright has-meta)
+(defun colorize (text weight sharability priority-bg priority-fg bright has-meta)
     (let ((color (if full-colors-supported
             (find-color weight sharability bright has-meta)
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
-        (setq l (list :foreground color))
-        (if bold (setq l (cons 'bold l)))
-        (if underline (setq l (cons 'underline l)))
+        (setq l (list
+            :foreground color
+            :weight 'bold
+            :underline (if (and priority-fg (> priority-fg 0))
+                (list :color (find-color priority-fg sharability bright has-meta)) nil)
+            :box (if priority-bg (list
+                :color (find-color priority-bg sharability bright has-meta)) nil)))
         (propertize text 'face l)))
 
 (defun black (text)
@@ -584,7 +597,7 @@
 			(list :foreground "black"))))
 
 (defun create-id-infix (id)
-    (light-gray (concat (propertize (concat " :" id) 'invisible t) ":")))
+    (propertize (concat " :" id ":") 'invisible t))
 
 (defun delimit-value (value)
     (let ((s (string-match "\n" value)))
@@ -603,6 +616,7 @@
                 (target-value (let ((v (get-value json))) (if v v "")))
 		        (target-weight (get-weight json))
 		        (target-sharability (get-sharability json))
+		        (target-priority (get-priority json))
                 (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
 		        (target-alias (get-alias json))
 		        (target-shortcut (get-shortcut json))
@@ -617,11 +631,11 @@
                         (setq line (concat line space))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability nil nil target-alias target-meta)
+                                (colorize bullet target-weight target-sharability target-priority nil target-alias target-meta)
                                 id-infix
                                 " "
                                 (colorize (delimit-value target-value)
-                                          target-weight target-sharability nil nil target-alias target-meta)
+                                          target-weight target-sharability nil target-priority target-alias target-meta)
                                  "\n")))
                         (insert (propertize line 'target-id target-id)))
                     (if (using-inference)
@@ -844,6 +858,12 @@
     (message (concat "exporting vertices to " file))
     (do-export "Vertices" file
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-import-graphml (file)
+    "import a GraphML dump from the file system into the knowledge base"
+    (interactive)
+    (message (concat "importing GraphML from " file))
+    (do-import "GraphML" file))
 
 (defun exo-find-isolated-atoms ()
     "retrieve a list of isolated atoms (i.e. atoms with neither parents nor children) in the knowledge base"
@@ -1202,6 +1222,8 @@ a type has been assigned to it by the inference engine."
                 (if c (funcall f c))))))
 
 ;; Note: when updating this list of mappings, also update the PKB
+(global-set-key (kbd "C-c C-I f")       'exo-find-isolated-atoms)
+(global-set-key (kbd "C-c C-I r")       'exo-remove-isolated-atoms)
 (global-set-key (kbd "C-c C-a C-p")     (char-arg 'exo-insert-attr-priority "priority = ?"))
 (global-set-key (kbd "C-c C-a C-s")     (char-arg 'exo-insert-attr-sharability "sharability = ?"))
 (global-set-key (kbd "C-c C-a C-w")     (char-arg 'exo-insert-attr-weight "weight = ?"))
@@ -1215,8 +1237,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export private RDF dump to file: " exo-default-rdf-file))
 (global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
 (global-set-key (kbd "C-c C-e w")       (minibuffer-arg 'exo-export-webrdf "export public Web RDF dump to file: " exo-default-webrdf-file))
-(global-set-key (kbd "C-c C-i f")       'exo-find-isolated-atoms)
-(global-set-key (kbd "C-c C-i r")       'exo-remove-isolated-atoms)
+(global-set-key (kbd "C-c C-i g")       (minibuffer-arg 'exo-import-graphml "import GraphML from file: " exo-default-graphml-file))
 (global-set-key (kbd "C-c C-l")         (minibuffer-arg 'exo-goto-line "line: "))
 (global-set-key (kbd "C-c C-r C-b a")   (exo-visit-in-amazon 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b e")   (exo-visit-in-ebay 'current-root-value))
