@@ -40,7 +40,7 @@
             <graph-enabled>true</graph-enabled>
             <graph-name>joshkb</graph-name>
             <graph-type>neo4jgraph</graph-type>
-            <graph-location>/Volumes/encrypted/joshkb/joshkb-neo4j</graph-location>
+            <graph-location>/Volumes/encrypted/personal-data/joshkb-neo4j</graph-location>
             <extensions>
                 <allows>
                     <allow>extendo:*</allow>
