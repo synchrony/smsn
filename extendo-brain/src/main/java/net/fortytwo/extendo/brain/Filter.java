@@ -106,4 +106,27 @@ public class Filter {
         return sharability > minSharability && sharability <= maxSharability
                 && weight > minWeight && weight <= maxWeight;
     }
+
+    public boolean isVisible(final Note note) {
+        if (null == note) {
+            throw new IllegalArgumentException();
+        }
+
+        Float sharability = note.getSharability();
+        if (null == sharability) {
+            Extendo.logger.warning("note " + note.getId() + " has no @sharability");
+            return false;
+        }
+
+        Float weight = note.getWeight();
+        if (null == weight) {
+            Extendo.logger.warning("note " + note.getId() + " has no @weight");
+            return false;
+        }
+
+        // Strictly greater than the minimum, less than or equal to the maximum.
+        // Values range from 0 (exclusive) to 1 (inclusive).
+        return sharability > minSharability && sharability <= maxSharability
+                && weight > minWeight && weight <= maxWeight;
+    }
 }

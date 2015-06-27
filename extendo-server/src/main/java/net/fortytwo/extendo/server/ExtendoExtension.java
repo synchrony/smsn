@@ -8,7 +8,6 @@ import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
-import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
 import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.brain.Filter;
@@ -23,17 +22,11 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.SecurityContext;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

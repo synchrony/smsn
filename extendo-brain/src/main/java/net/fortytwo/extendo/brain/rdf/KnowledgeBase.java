@@ -19,14 +19,14 @@ import net.fortytwo.extendo.brain.rdf.classes.Person;
 import net.fortytwo.extendo.brain.rdf.classes.QuotedValue;
 import net.fortytwo.extendo.brain.rdf.classes.RFIDReference;
 import net.fortytwo.extendo.brain.rdf.classes.TODOTask;
-import net.fortytwo.extendo.brain.rdf.classes.Topic;
 import net.fortytwo.extendo.brain.rdf.classes.Tool;
+import net.fortytwo.extendo.brain.rdf.classes.Topic;
 import net.fortytwo.extendo.brain.rdf.classes.URLReference;
 import net.fortytwo.extendo.brain.rdf.classes.Usage;
 import net.fortytwo.extendo.brain.rdf.classes.WebPage;
 import net.fortytwo.extendo.brain.rdf.classes.collections.AttendedEventsCollection;
-import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentAboutTopicCollection;
+import net.fortytwo.extendo.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.extendo.brain.rdf.classes.collections.Log;
 import net.fortytwo.extendo.brain.rdf.classes.collections.PersonCollection;
@@ -94,6 +94,13 @@ public class KnowledgeBase {
         atomClassifications.clear();
     }
 
+    /**
+     * Gets a list of classifications of the given atom, sorted in descending order by score.
+     * If the atom has not been classified, a null is returned.
+     * @param a the classified atom
+     * @return either null (if the atom has not been classified)
+     * or a list of classifications of the given atom, sorted in descending order by score
+     */
     public List<AtomClassEntry> getClassInfo(final Atom a) {
         List<AtomClassEntry> entries = atomClassifications.get(a);
 
@@ -550,10 +557,7 @@ public class KnowledgeBase {
                     helper.addAll(newEntries);
                     Collections.sort(helper, totalScoreDescending);
                     AtomClassEntry best = helper.get(0);
-                    // A classification which has a score of zero is a trivial property-based regex match with no
-                    // structural evidence to support it.
-                    // These are not included in the exported RDF, as they include many false positives.
-                    if (best.getScore() > 0) {
+                    if (best.isNonTrivial()) {
                         AtomClass clazz = classes.get(best.getInferredClass());
                         clazz.toRDF(subject, context);
                         for (RdfizationCallback callback : best.callbacks) {
@@ -777,6 +781,15 @@ public class KnowledgeBase {
          */
         public int getScore() {
             return inScore + outScore;
+        }
+
+        /**
+         * A classification which has a score of zero is a trivial property-based regex match with no
+         * structural evidence to support it.
+         * These are not included in the exported RDF, as they include many false positives.
+         */
+        public boolean isNonTrivial() {
+            return getScore() > 0;
         }
     }
 }

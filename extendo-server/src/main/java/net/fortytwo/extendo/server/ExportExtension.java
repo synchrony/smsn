@@ -22,9 +22,13 @@ import net.fortytwo.extendo.Extendo;
 import net.fortytwo.extendo.brain.Atom;
 import net.fortytwo.extendo.brain.AtomList;
 import net.fortytwo.extendo.brain.BrainGraph;
+import net.fortytwo.extendo.brain.ExtendoBrain;
 import net.fortytwo.extendo.brain.Filter;
+import net.fortytwo.extendo.brain.Note;
+import net.fortytwo.extendo.brain.NoteQueries;
 import net.fortytwo.extendo.brain.Params;
 import net.fortytwo.extendo.brain.rdf.KnowledgeBase;
+import net.fortytwo.extendo.brain.rdf.classes.Document;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
@@ -66,6 +70,9 @@ public class ExportExtension extends ExtendoExtension {
         p.filter = r.getFilter();
         p.file = r.file;
         p.format = r.format;
+
+        p.rootId = r.rootId;
+        p.height = r.height;
 
         Extendo.logInfo("extendo export " + r.format + " to " + r.file);
 
@@ -187,6 +194,68 @@ public class ExportExtension extends ExtendoExtension {
         out.close();
     }
 
+    private boolean isLatexExcludedAtom(final Atom atom,
+                                        final KnowledgeBase kb) {
+        List<KnowledgeBase.AtomClassEntry> classes = kb.getClassInfo(atom);
+        if (null != classes && classes.size() > 0) {
+            KnowledgeBase.AtomClassEntry ace = classes.get(0);
+            return ace.isNonTrivial() && ace.getInferredClassName().equals(Document.DOCUMENT);
+        } else {
+            return false;
+        }
+    }
+
+    private void writeLatex(final Note note,
+                            final BrainGraph bg,
+                            final KnowledgeBase kb,
+                            final Filter filter,
+                            final OutputStream out) throws IOException {
+        for (Note child : note.getChildren()) {
+            Atom a = bg.getAtom(child.getId());
+            if (null == a) {
+                throw new IllegalStateException();
+            }
+            if (!filter.isVisible(a.asVertex()) || isLatexExcludedAtom(a, kb)) {
+                continue;
+            }
+
+            String value = a.getValue();
+            if (value.startsWith("\"")) {
+                value = value.substring(1, value.endsWith("\"") ? value.length() - 1 : value.length());
+            } else {
+                String t = value.trim();
+                if (!((t.startsWith("%") || t.startsWith("\\") || value.contains("\\n")))) {
+                    value = null;
+                }
+            }
+
+            if (null != value) {
+                out.write(value.getBytes());
+                out.write('\n');
+            }
+
+            writeLatex(child, bg, kb, filter, out);
+        }
+    }
+
+    private void exportLatexTree(final ExtendoBrain brain,
+                                 final NoteQueries queries,
+                                 final String root,
+                                 final int height,
+                                 final Filter filter,
+                                 final OutputStream out) throws IOException {
+
+        Atom rootAtom = brain.getBrainGraph().getAtom(root);
+        if (null == rootAtom) {
+            throw new IllegalStateException("no such atom: " + root);
+        }
+
+        Note view = queries.view(rootAtom, height, filter, NoteQueries.forwardViewStyle);
+        writeLatex(view, brain.getBrainGraph(), brain.getKnowledgeBase(), filter, out);
+
+        out.close();
+    }
+
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
     // Otherwise, R becomes confused and skips rows.
     private String escapeValue(final String value) {
@@ -215,6 +284,9 @@ public class ExportExtension extends ExtendoExtension {
                     break;
                 case GraphML:
                     exportGraphML(p.brain.getBrainGraph(), out);
+                    break;
+                case LaTeX:
+                    exportLatexTree(p.brain, p.queries, p.rootId, p.height, p.filter, out);
                     break;
                 case PageRank:
                     exportPageRank(p.brain.getBrainGraph(), new PrintStream(out));
@@ -252,12 +324,18 @@ public class ExportExtension extends ExtendoExtension {
         private final String format;
         private final String file;
 
+        private final String rootId;
+        private final int height;
+
         public ExportRequest(final JSONObject json,
                              final Principal user) throws JSONException {
             super(json, user);
 
             format = this.json.getString(Params.FORMAT);
             file = this.json.getString(Params.FILE);
+
+            rootId = this.json.optString(Params.ROOT);
+            height = this.json.optInt(Params.HEIGHT, 0);
         }
     }
 }

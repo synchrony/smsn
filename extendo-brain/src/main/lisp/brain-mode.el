@@ -133,13 +133,13 @@
 (defun current-root-id ()
     exo-root-id)
 
-(defun current-root-value ()
-    exo-title)
-
 (defun current-root ()
     (get-atom (current-root-id)))
 
-(defun current-target-value ()
+;;(defun current-root-value ()
+;;    exo-title)
+
+(defun current-root-value ()
     (let ((g (current-root)))
         (if g (get-value g))))
 
@@ -501,7 +501,7 @@
 (defun do-export (format file mins maxs minw maxw)
     (http-get
         (concat (base-url) "export?request=" (w3m-url-encode-string (json-encode
-            (list :format format :file file
+            (list :root exo-root-id :height exo-height :format format :file file
                 :filter (filter-json mins maxs exo-default-sharability minw maxw exo-default-weight)))))
          'receive-export-results))
 
@@ -574,7 +574,7 @@
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
         (setq l (list
             :foreground color
-            :weight 'bold
+            ;;:weight 'bold
             :underline (if (and priority-fg (> priority-fg 0))
                 (list :color (find-color priority-fg sharability bright has-meta)) nil)
             :box (if priority-bg (list
@@ -829,6 +829,13 @@
     (interactive)
     (message (concat "exporting GraphML to " file))
     (do-export "GraphML" file
+        exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
+
+(defun exo-export-latex (file)
+    "export a LaTeX-formatted view of a subtree of the knowledge base to the file system"
+    (interactive)
+    (message (concat "exporting LaTeX to " file))
+    (do-export "LaTeX" file
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
 (defun exo-export-pagerank (file)
@@ -1233,6 +1240,7 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-d")         (char-arg 'exo-set-view-height "height = ?"))
 (global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'exo-export-edges "export edges to file: " exo-default-edges-file))
 (global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'exo-export-graphml "export GraphML to file: " exo-default-graphml-file))
+(global-set-key (kbd "C-c C-e l")       (minibuffer-arg 'exo-export-latex "export LaTeX to file: " exo-default-latex-file))
 (global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'exo-export-pagerank "export PageRank results to file: " exo-default-pagerank-file))
 (global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'exo-export-rdf "export private RDF dump to file: " exo-default-rdf-file))
 (global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'exo-export-vertices "export vertices to file: " exo-default-vertices-file))
