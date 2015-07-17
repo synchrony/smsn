@@ -7,6 +7,9 @@
 #include "ExtendoHand.h"
 #include "RGBLED.h"
 
+// currently hard-coded
+#define NINE_AXIS
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,12 +36,6 @@ ExtendoHand *thisHand;
 
 ExtendoHand::ExtendoHand(): ExtendoDevice(OSC_EXO_HAND) {
     thisHand = this;
-
-    nineAxis = true;
-}
-
-void ExtendoHand::useNineAxisSensors(boolean b) {
-    nineAxis = b;
 }
 
 
@@ -51,7 +48,8 @@ void ExtendoHand::useNineAxisSensors(boolean b) {
 MMA7361 motionSensor(MOTION_X_PIN, MOTION_Y_PIN, MOTION_Z_PIN);
 #endif // THREE_AXIS
 
-// nine-axis
+
+#ifdef NINE_AXIS
 
 #include <Wire.h>
 #include <I2Cdev.h>
@@ -69,6 +67,7 @@ HMC5883L magnet;
 #endif // ENABLE_MAGNETOMETER
 
 ADXL345 accel;
+#endif // NINE_AXIS
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,14 +162,15 @@ void ExtendoHand::setupPins() {
 }
 
 void ExtendoHand::setupOther() {
-    if (nineAxis) {
+#ifdef NINE_AXIS
         // adjust the power settings after you call this method if you want the accelerometer
         // to enter standby mode, or another less demanding mode of operation
         accel.setRange(1); // 4g
         accel.setFullResolution(1); // maintain 4mg/LSB scale factor (irrespective of range)
         accel.initialize();
         if (!accel.testConnection()) {
-            osc.sendError("ADXL345 connection failed");
+            //osc.sendError("ADXL345 connection failed");
+            osc.sendError("fail");
         } else {
             randomSeed(accel.getAccelerationX() - accel.getAccelerationY() + accel.getAccelerationZ());
         }
@@ -188,7 +188,7 @@ void ExtendoHand::setupOther() {
             osc.sendError("HMC5883L connection failed");
         }
 #endif // ENABLE_MAGNETOMETER
-    } else {
+#endif // NINE_AXIS
 #ifdef THREE_AXIS
         randomSeed(motionSensor.rawX() + motionSensor.rawY() + motionSensor.rawZ());
 
@@ -197,7 +197,6 @@ void ExtendoHand::setupOther() {
         motionSensor.calibrateY(332, 841);
         motionSensor.calibrateZ(175, 700);
 #endif // THREE_AXIS
-    }
 
     vibrateStart = 0;
     alertStart = 0;
@@ -206,7 +205,7 @@ void ExtendoHand::setupOther() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ExtendoHand::getAcceleration(Vector3D &a) {
-    if (nineAxis) {
+#ifdef NINE_AXIS
         int16_t ax, ay, az;
         accel.getAcceleration(&ax, &ay, &az);
 
@@ -215,43 +214,30 @@ void ExtendoHand::getAcceleration(Vector3D &a) {
             ax / 230.0 - 0.05,
             ay / 230.0,
             az / 230.0);
-    } else {
+#endif // NINE_AXIS
 #ifdef THREE_AXIS
         a.set(
             motionSensor.accelX(),
             motionSensor.accelY(),
             motionSensor.accelZ());
 #endif // THREE_AXIS
-    }
 }
 
-void ExtendoHand::getRotation(Vector3D &g) {
-    if (nineAxis) {
 #ifdef ENABLE_GYRO
+void ExtendoHand::getRotation(Vector3D &g) {
         int16_t gx, gy, gz;
         gyro.getRotation(&gx, &gy, &gz);
         g.set(gx, gy, gz);
-#else
-        g.set(0, 0, 0);
-#endif // ENABLE_GYRO
-    } else {
-        g.set(0, 0, 0);
-    }
 }
+#endif // ENABLE_GYRO
 
-void ExtendoHand::getHeading(Vector3D &m) {
-    if (nineAxis) {
 #ifdef ENABLE_MAGNETOMETER
+void ExtendoHand::getHeading(Vector3D &m) {
         int16_t mx, my, mz;
         magnet.getHeading(&mx, &my, &mz);
         m.set(mx, my, mz);
-#else
-        m.set(0, 0, 0);
-#endif // ENABLE_MAGNETOMETER
-    } else {
-        m.set(0, 0, 0);
-    }
 }
+#endif // ENABLE_MAGNETOMETER
 
 void ExtendoHand::onBeginLoop(unsigned long now) {
     if (vibrateStart > 0) {
@@ -289,7 +275,7 @@ void ExtendoHand::onBeginLoop(unsigned long now) {
 }
 
 void ExtendoHand::onLoopTimeUpdated(double loopTime) {
-    if (nineAxis) {
+#ifdef NINE_AXIS
         // the sensor's sampling rate should exceed Extend-o-Hand's loop rate
         uint8_t sampleRate = loopTime <= 0.00125
             ? 0xe  // 1600 Hz
@@ -310,7 +296,7 @@ void ExtendoHand::onLoopTimeUpdated(double loopTime) {
 #ifdef ENABLE_MAGNETOMETER
         magnet.setDataRate(sampleRate);
 #endif // ENABLE_MAGNETOMETER
-    }
+#endif // NINE_AXIS
 }
 
 

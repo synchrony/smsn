@@ -9,12 +9,10 @@
 #ifndef ExtendoDevice_h
 #define ExtendoDevice_h
 
-// don't use the space-saving tricks intended for Extend-o-Hand
-#define BOUNTIFUL_RAM
-
+#include "Extendo.h"
 #include <OSCBundle.h>
 #include <ExtendOSC.h>
-#include <Droidspeak.h>
+//#include <Droidspeak.h>
 //#include <Morse.h>   // Morse removed for now due to space constraints w.r.t. Extend-o-Hand on Arduino Nano
 
 const unsigned long infoCueHapticDurationMs = 100;

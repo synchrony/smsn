@@ -6,6 +6,7 @@
 
 #include <Typeatron.h>
 
+#include <Extendo.h>
 #include <ExtendoDevice.h>
 #include <AnalogSampler.h>
 #include <Droidspeak.h>
@@ -21,46 +22,53 @@ Typeatron typeatron;
 // See "A Guide to Debouncing" by Jack G. Ganssle
 unsigned int debounceMicros = 2000;
 
+unsigned int lastKeyState = 0;
+unsigned int lastUpdate = 0;
+
 void setup() {
   typeatron.setup();
 
   typeatron.pingUntilConnected();
 }
 
-unsigned int lastKeyState = 0;
-
 // basic key and laser loop
 void loop() {
-  unsigned long now = typeatron.beginLoop();
-
-  typeatron.updateKeys();
-  unsigned int keyState = typeatron.getKeyState();
-  Mode mode = typeatron.getMode();
-  if (keyState != lastKeyState) {
-    if (LaserTrigger == mode) {
-      if (keyState) {
-        typeatron.laserOn();
-        typeatron.sendLaserEvent();
-        typeatron.setMode(LaserPointer);
-      }
-    } 
-    else if (LaserPointer == mode) {
-      if (!keyState) {
-        typeatron.setMode(Normal);
-        typeatron.laserOff();
-      }
-    } 
-    else {       
-      unsigned int before = micros();
-      typeatron.sendKeyState();
-      unsigned int after = micros();
-
-      if (after - before < debounceMicros) {
-        delayMicroseconds(debounceMicros - (after - before));
-      }
-    }
-  } 
-
-  lastKeyState = keyState;
+    // execute the I/O portion of the loop as quickly as possible
+    unsigned long ms = typeatron.beginLoop();
+    
+    // throttle sampling of keys appropriately
+    unsigned int us = micros();
+    if (us - lastUpdate >= debounceMicros) {
+        typeatron.updateKeys();
+        unsigned int keyState = typeatron.getKeyState();
+        if (keyState != lastKeyState) {
+            Mode mode = typeatron.getMode();
+            if (LaserTrigger == mode) {
+                if (keyState) {
+                    typeatron.laserOn();
+                    typeatron.sendLaserEvent();
+                    typeatron.setMode(LaserPointer);
+                } else {
+                    typeatron.setMode(Normal);
+                    typeatron.laserOff(); 
+                }
+            } else if (LaserPointer == mode) {
+                typeatron.laserOff();
+                if (!keyState) {
+                    typeatron.setMode(Normal);
+                }
+            } else {      
+                // TODO: temporary; shouldn't be necessary 
+                typeatron.laserOff();
+                
+                typeatron.sendKeyState();
+            }
+                        
+            lastUpdate = us;
+            lastKeyState = keyState;
+        }        
+    }    
 }
+
+
 

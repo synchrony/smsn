@@ -9,6 +9,7 @@
 #define THREEAXIS             0
 #define NINEAXIS              1
 
+#include <Extendo.h>
 #include <ExtendoHand.h>
 #include <SpikeDetector.h>
 #include <Vector3D.h>

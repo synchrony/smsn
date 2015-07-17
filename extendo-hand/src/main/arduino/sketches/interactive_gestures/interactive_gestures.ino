@@ -4,9 +4,10 @@
  * See: https://github.com/joshsh/extendo
  */
 
-#define THREEAXIS             0
-#define NINEAXIS              1
+//#define THREE_AXIS
+#define NINE_AXIS
 
+#include <Extendo.h>
 #include <ExtendoHand.h>
 #include <SpikeDetector.h>
 #include <Vector3D.h>
@@ -33,8 +34,8 @@
 //#include <ITG3200.h>
 //#include <HMC5883L.h>
 
-#define AGENT_URI "http://fortytwo.net/josh/things/SBZFumn" // JS
-//#define AGENT_URI "http://fortytwo.net/josh/things/JdGwZ4n" // XL
+//#define AGENT_URI "http://fortytwo.net/josh/things/SBZFumn" // JS
+#define AGENT_URI "http://fortytwo.net/josh/things/JdGwZ4n" // XL
 //#define AGENT_URI "http://fortytwo.net/josh/things/D4bbQSr" // OH
 
 #define HANDOFF   "/exo/activity/handoff"
@@ -89,25 +90,30 @@ const unsigned long cueThreshold = 300;
 unsigned long lastCue = 0;
 int ledCueCount = 0;
 
-void ledCueForHandshake(unsigned long now) {
+int pulseCount(unsigned long now) {
     if (now - lastCue > cueThreshold) {
         ledCueCount = 0;
     }
     ledCueCount++;
-    exoHand.setColorFor(ledCueCount > 2 ? RGB_BLUE : ledCueCount > 1 ? RGB_GREEN : RGB_YELLOW, cueThreshold);
+    //exoHand.setColorFor(ledCueCount > 2 ? RGB_BLUE : ledCueCount > 1 ? RGB_GREEN : RGB_YELLOW, cueThreshold);
     lastCue = now;
+    return ledCueCount;
 }
 
 void processHandshakeCrest(unsigned long tRef, unsigned long now) {
     if (tLast > 0 && tRef - tLast <= crestMaxGap) {
+        /* note: previous crests are currently not reported
         if (!lastAdded) {
             //exoHand.playTone(1760, 75);
             emitGesture(HANDSHAKE, tLast, now);
         }
         //exoHand.playTone(1760, 75);
         emitGesture(HANDSHAKE, tRef, now);
+        */
 
-        ledCueForHandshake(now);
+        if (pulseCount(now) > 2) {
+            emitGesture(HANDSHAKE, tRef, now);
+        }
 
         lastAdded = true;
     } else {
@@ -218,15 +224,13 @@ void loop() {
     // handoff recognition
     unsigned long isSpike = spikeDetector.processNext(now, a.getMagnitude());
     if (isSpike > 0) {
-        //exoHand.warningCue();
-        exoHand.setColorFor(RGB_WHITE, cueThreshold);
+        //exoHand.setColorFor(RGB_WHITE, cueThreshold);
+
         // "give" and "take" centers are so close that we treat them as one gesture, at least until such time
         // as we take "give" crests (distinct from spikes) into account
         if (giveSpikeFilter.process(smooth) || takeSpikeFilter.process(smooth)) {
 //        if (giveSpikeFilter.process(gtlp) || takeSpikeFilter.process(gtlp)) {
-            //exoHand.okCue();
-            exoHand.setColorFor(RGB_RED, cueThreshold);
-            //exoHand.playTone(880, 75);
+            //exoHand.setColorFor(RGB_RED, cueThreshold);
             emitGesture(HANDOFF, isSpike, now);
         }
     }

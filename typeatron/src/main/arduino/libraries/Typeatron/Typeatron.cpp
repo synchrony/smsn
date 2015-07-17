@@ -17,12 +17,14 @@
   D11: RGB LED blue
   D12: push button 5
   D13: LED
-  A0:  piezo motion sensor
+  A0:  (unused)
   A1:  (unused)
-  A2:  (unused)
+  A2:  piezo motion sensor
   A3:  photoresistor
   A4:  I2C SDA for MPU-6050
   A5:  I2C SCL for MPU-6050
+  A6:  Bluetooth RTS
+  A7:  Bluetooth CTS
 */
 
 #include "Typeatron.h"
@@ -163,17 +165,17 @@ void Typeatron::setupPins() {
     pinMode(keyPin4, INPUT);
     pinMode(keyPin5, INPUT);
 
-    pinMode(vibrationMotorPin, OUTPUT);
-    pinMode(transducerPin, OUTPUT);
-    pinMode(laserPin, OUTPUT);
-    pinMode(ledPin, OUTPUT);
-
     // take advantage of the Arduino's internal pullup resistors
     digitalWrite(keyPin1, HIGH);
     digitalWrite(keyPin2, HIGH);
     digitalWrite(keyPin3, HIGH);
     digitalWrite(keyPin4, HIGH);
     digitalWrite(keyPin5, HIGH);
+
+    pinMode(vibrationMotorPin, OUTPUT);
+    pinMode(transducerPin, OUTPUT);
+    pinMode(laserPin, OUTPUT);
+    pinMode(ledPin, OUTPUT);
 
     rgbled.setup();
 }
@@ -184,6 +186,8 @@ void Typeatron::setupOther() {
         droidspeak->speakPowerUpPhrase();
     }
 
+/*
+    // TODO: it is not safe to assume Serial
     // note: this operation is performed below SLIP
     // note: match BAUD_RATE in ExtendOSC.h
     Serial.print("$");  // Print three times individually
@@ -191,14 +195,10 @@ void Typeatron::setupOther() {
     Serial.print("$");  // Enter command mode
     delay(100);  // Short delay, wait for the modem to send back CMD
 
-    // temporarily change the baud rate, no parity
-    //Serial.println("U,9600,N");
-    Serial.println("U,115200,N");
+    //Serial.println("SM,6"); // pair mode (purportedly)
+    Serial.println("f,1"); // fast data mode
     delay(100);
-
-    Serial.println("SM,6"); // pair mode (purportedly)
-    //Serial.println("F,1"); // fast data mode
-    delay(100);
+*/
 
     morse = createMorse();
     resetLaser();

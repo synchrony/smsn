@@ -4,6 +4,7 @@
   Released into the public domain.
 */
 
+#include "Extendo.h"
 #include "ExtendoDevice.h"
 #include <RGBLED.h>
 
@@ -19,6 +20,24 @@
 #define OSC_TONE         "/tone"
 #define OSC_VIBRO        "/vibro"
 #define OSC_WARNING      "/warning"
+
+#ifdef BOUNTIFUL_RAM
+#define ERR_COLOR_OUT_OF_RANGE "color out of range: %d"
+#define ERR_FREQ_OUT_OF_RANGE "frequency out of range: %d"
+#define ERR_DURATION_NONPOS "duration must be a positive number"
+#define ERR_DURATION_TOO_LONG "duration too long"
+#define ERR_EMPTY_OSC_BUNDLE "empty OSC bundle"
+#define ERR_NO_HANDLER "no handler at address %s"
+#else
+const char *error_msg = "error";
+#define ERR_COLOR_OUT_OF_RANGE error_msg
+#define ERR_FREQ_OUT_OF_RANGE error_msg
+#define ERR_DURATION_NONPOS error_msg
+#define ERR_DURATION_TOO_LONG error_msg
+#define ERR_EMPTY_OSC_BUNDLE error_msg
+#define ERR_NO_HANDLER error_msg
+#endif // BOUNTIFUL_RAM
+
 
 const unsigned long connectionRetryIntervalMs = 2000;
 
@@ -298,7 +317,7 @@ void handleRGBSetMessage(class OSCMessage &m) {
     int32_t color = m.getInt(0);
 
     if (color < 0 || color > 0xffffff) {
-        thisDevice->getOSC()->sendError("color out of range: %d", (long) color);
+        thisDevice->getOSC()->sendError(ERR_COLOR_OUT_OF_RANGE, (long) color);
     } else {
         thisDevice->setColor(color);
     }
@@ -311,11 +330,11 @@ void handleToneMessage(class OSCMessage &m) {
     int32_t duration = m.getInt(1);
 
     if (frequency <= 0 || frequency > 20000) {
-        thisDevice->getOSC()->sendError("frequency out of range: %d", (int) frequency);
+        thisDevice->getOSC()->sendError(ERR_FREQ_OUT_OF_RANGE, (int) frequency);
     } else if (duration <= 0) {
-        thisDevice->getOSC()->sendError("duration must be a positive number");
+        thisDevice->getOSC()->sendError(ERR_DURATION_NONPOS);
     } else if (duration > 60000) {
-        thisDevice->getOSC()->sendError("duration too long");
+        thisDevice->getOSC()->sendError(ERR_DURATION_TOO_LONG);
     } else {
         thisDevice->playTone((unsigned int) frequency, (unsigned long) duration);
     }
@@ -329,9 +348,9 @@ void handleVibroMessage(class OSCMessage &m) {
     thisDevice->vibrate((unsigned long) d);
 
     if (d <= 0) {
-        thisDevice->getOSC()->sendError("duration must be a positive number");
+        thisDevice->getOSC()->sendError(ERR_DURATION_NONPOS);
     } else if (d > 60000) {
-        thisDevice->getOSC()->sendError("duration too long");
+        thisDevice->getOSC()->sendError(ERR_DURATION_TOO_LONG);
     } else {
         thisDevice->vibrate((unsigned long) d);
     }
@@ -369,13 +388,13 @@ void ExtendoDevice::handleOSCBundleInternal(class OSCBundle &bundle) {
         || bundle.dispatch(address(OSC_WARNING), handleWarningMessage)
         )) {
         if (!bundle.size()) {
-            osc.sendError("empty OSC bundle");
+            osc.sendError(ERR_EMPTY_OSC_BUNDLE);
         } else {
             for (int i = 0; i < bundle.size(); i++) {
                 OSCMessage *m = bundle.getOSCMessage(i);
-                char address[128];
+                char address[64];
                 m->getAddress(address);
-                osc.sendError("no handler at address %s", address);
+                osc.sendError(ERR_NO_HANDLER, address);
             }
         }
         errorCue();
@@ -418,6 +437,6 @@ void ExtendoDevice::checkConnection(unsigned long now) {
         osc.sendOSC(m);
     }
 }
-#endif
+#endif // BOUNTIFUL_RAM
 
 

@@ -4,15 +4,23 @@
   Released into the public domain.
 */
 
+#include "Extendo.h"
 #include "ExtendOSC.h"
 
+
+#ifdef USE_SERIAL1
+#include <SLIPEncodedSerial.h>
+SLIPEncodedSerial SLIPSerial(Serial1);
+#else
 #ifdef BOARD_HAS_USB_SERIAL
 #include <SLIPEncodedUSBSerial.h>
 SLIPEncodedUSBSerial SLIPSerial(thisBoardsSerialUSB);
 #else
 #include <SLIPEncodedSerial.h>
 SLIPEncodedSerial SLIPSerial(Serial);
-#endif
+#endif // BOARD_HAS_USB_SERIAL
+#endif // USE_SERIAL1
+
 
 ExtendOSC::ExtendOSC(const char *prefix)
 {
@@ -33,10 +41,14 @@ void ExtendOSC::beginSerial() {
 #endif
 */
 #if ARDUINO >= 100
+#ifdef USE_SERIAL1
+    while(!Serial1);
+#else
 #ifdef BOARD_HAS_USB_SERIAL
     while(!thisBoardsSerialUSB);
 #else
     while(!Serial);
+#endif
 #endif
 #endif
 }
@@ -72,6 +84,7 @@ void ExtendOSC::sendOSC(class OSCMessage &messageOut) {
     messageOut.send(SLIPSerial); // send the bytes to the SLIP stream
     SLIPSerial.endPacket(); // mark the end of the OSC Packet
     messageOut.empty(); // free the space occupied by the message
+    SLIPSerial.flush(); // insofar as it is possible, don't proceed until we have completely sent the message
 }
 
 void ExtendOSC::sendInfo(const char *msg, ...) {

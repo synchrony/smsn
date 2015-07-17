@@ -13,6 +13,7 @@
 #include <AnalogSampler.h>
 #include <RGBLED.h>
 #include <Morse.h>
+#include <Droidspeak.h>
 
 #define OSC_EXO_TT         "/exo/tt"
 #define OSC_KEYS           "/keys"
