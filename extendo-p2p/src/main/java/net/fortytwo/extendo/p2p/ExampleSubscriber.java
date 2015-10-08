@@ -38,7 +38,7 @@ public class ExampleSubscriber {
 
             String line;
             while (null != (line = br.readLine())) {
-                System.out.println("notification from facilitator: " + line);
+                System.out.println("notification from coordinator: " + line);
             }
         }
     }

@@ -31,13 +31,13 @@ import java.security.Principal;
 @ExtensionNaming(namespace = "extendo", name = "broadcast-rdf")
 public class BroadcastRdfExtension extends ExtendoExtension {
 
-    private final FacilitatorService facilitator;
+    private final CoordinatorService coordinator;
 
     public BroadcastRdfExtension()
             throws IOException, TypedProperties.PropertyException, RippleException,
             SailException, InterruptedException {
 
-        facilitator =  FacilitatorService.getInstance();
+        coordinator =  CoordinatorService.getInstance();
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
@@ -65,7 +65,7 @@ public class BroadcastRdfExtension extends ExtendoExtension {
         // TODO: take RDF format as an input parameter
         RDFFormat format = RDFFormat.NTRIPLES;
 
-        facilitator.pushUpdate(p.data, format);
+        coordinator.pushUpdate(p.data, format);
 
         return ExtensionResponse.ok(p.map);
     }

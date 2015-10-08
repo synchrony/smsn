@@ -44,14 +44,14 @@ public class ExtendoAgent {
 
     private QueryEngineProxy queryEngine;
 
-    private Service facilitatorService;
-    private final Connection facilitatorConnection;
+    private Service coordinatorService;
+    private final Connection coordinatorConnection;
 
     private final Pinger pinger;
 
-    private DatagramSocket facilitatorOscSocket;
-    private InetAddress facilitatorOscAddress;
-    private int facilitatorOscPort;
+    private DatagramSocket coordinatorOscSocket;
+    private InetAddress coordinatorOscAddress;
+    private int coordinatorOscPort;
 
     public ExtendoAgent(final boolean listenForServices) {
         this(Extendo.getConfiguration().getProperty(Extendo.P2P_AGENT_URI), listenForServices);
@@ -63,11 +63,11 @@ public class ExtendoAgent {
 
         this.agentUri = vf.createURI(agentUri);
 
-        facilitatorConnection = new Connection();
+        coordinatorConnection = new Connection();
 
-        pinger = new Pinger(facilitatorConnection);
+        pinger = new Pinger(coordinatorConnection);
 
-        queryEngine = new QueryEngineProxy(facilitatorConnection);
+        queryEngine = new QueryEngineProxy(coordinatorConnection);
 
         if (listenForServices) {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
@@ -81,17 +81,17 @@ public class ExtendoAgent {
 
                     // The first broadcast message is used to discover the service and create a connection.
                     // Subsequent messages are used only if the connection is lost.
-                    if (!facilitatorConnection.isActive()) {
-                        facilitatorService = new Service();
-                        facilitatorService.address = address;
-                        facilitatorService.description = description;
+                    if (!coordinatorConnection.isActive()) {
+                        coordinatorService = new Service();
+                        coordinatorService.address = address;
+                        coordinatorService.description = description;
 
                         Socket socket;
                         try {
-                            logger.log(Level.INFO, "opening socket connection to facilitator");
-                            socket = new Socket(address, facilitatorService.description.getPubsubPort());
+                            logger.log(Level.INFO, "opening socket connection to coordinator");
+                            socket = new Socket(address, coordinatorService.description.getPubsubPort());
                         } catch (IOException e) {
-                            logger.log(Level.INFO, "failed to open socket connection to facilitator", e);
+                            logger.log(Level.INFO, "failed to open socket connection to coordinator", e);
                             return;
                         }
 
@@ -102,11 +102,11 @@ public class ExtendoAgent {
                             return;
                         }
 
-                        facilitatorConnection.start(socket);
+                        coordinatorConnection.start(socket);
                     } else {
                         if (Extendo.VERBOSE) {
                             logger.log(Level.FINE, "ignoring broadcast message due to existing connection to "
-                                    + facilitatorService.address.getHostAddress());
+                                    + coordinatorService.address.getHostAddress());
                         }
                     }
                 }
@@ -131,12 +131,12 @@ public class ExtendoAgent {
         return factory;
     }
 
-    public Service getFacilitatorService() {
-        return facilitatorService;
+    public Service getCoordinatorService() {
+        return coordinatorService;
     }
 
-    public Connection getFacilitatorConnection() {
-        return facilitatorConnection;
+    public Connection getCoordinatorConnection() {
+        return coordinatorConnection;
     }
 
     public void stop() {
@@ -145,26 +145,26 @@ public class ExtendoAgent {
         }
     }
 
-    public void sendOSCMessageToFacilitator(final OSCMessage m) {
-        if (getFacilitatorConnection().isActive()) {
+    public void sendOSCMessageToCoordinator(final OSCMessage m) {
+        if (getCoordinatorConnection().isActive()) {
             try {
-                if (null == facilitatorOscSocket) {
-                    facilitatorOscPort = getFacilitatorService().description.getOscPort();
-                    facilitatorOscAddress = getFacilitatorService().address;
+                if (null == coordinatorOscSocket) {
+                    coordinatorOscPort = getCoordinatorService().description.getOscPort();
+                    coordinatorOscAddress = getCoordinatorService().address;
 
-                    facilitatorOscSocket = new DatagramSocket();
+                    coordinatorOscSocket = new DatagramSocket();
                 }
 
                 byte[] buffer = m.getByteArray();
                 DatagramPacket packet
-                        = new DatagramPacket(buffer, buffer.length, facilitatorOscAddress, facilitatorOscPort);
-                facilitatorOscSocket.send(packet);
+                        = new DatagramPacket(buffer, buffer.length, coordinatorOscAddress, coordinatorOscPort);
+                coordinatorOscSocket.send(packet);
 
-                logger.log(Level.INFO, "sent OSC datagram to " + facilitatorOscAddress + ":" + facilitatorOscPort);
+                logger.log(Level.INFO, "sent OSC datagram to " + coordinatorOscAddress + ":" + coordinatorOscPort);
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "error in sending OSC datagram to facilitator", e);
+                logger.log(Level.SEVERE, "error in sending OSC datagram to coordinator", e);
             } catch (Throwable t) {
-                logger.log(Level.SEVERE, "unexpected error in sending OSC datagram to facilitator", t);
+                logger.log(Level.SEVERE, "unexpected error in sending OSC datagram to coordinator", t);
             }
         }
     }
@@ -213,7 +213,7 @@ public class ExtendoAgent {
             }
             OSCMessage m = new OSCMessage("/exo/fctr/tt/rdf");
             m.addArgument(new String(bos.toByteArray()));
-            sendOSCMessageToFacilitator(m);
+            sendOSCMessageToCoordinator(m);
         }
         */
     }

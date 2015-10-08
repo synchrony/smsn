@@ -30,16 +30,16 @@ public class ServiceBroadcastListener {
 
         new Thread(new Runnable() {
             public void run() {
-                logger.info("starting listener thread for facilitator broadcast messages");
+                logger.info("starting listener thread for coordinator broadcast messages");
 
                 try {
-                    listenForFacilitatorBroadcast();
+                    listenForCoordinatorBroadcast();
                 } catch (Throwable t) {
-                    logger.severe("listener thread for facilitator broadcast messages failed with error: "
+                    logger.severe("listener thread for coordinator broadcast messages failed with error: "
                             + t.getMessage());
                     t.printStackTrace(System.err);
                 } finally {
-                    logger.info("listener thread for facilitator broadcast messages stopped");
+                    logger.info("listener thread for coordinator broadcast messages stopped");
                 }
             }
         }).start();
@@ -49,7 +49,7 @@ public class ServiceBroadcastListener {
         stopped = true;
     }
 
-    private void listenForFacilitatorBroadcast() throws TypedProperties.PropertyException {
+    private void listenForCoordinatorBroadcast() throws TypedProperties.PropertyException {
         int port = Extendo.getConfiguration().getInt(Extendo.P2P_BROADCAST_PORT);
 
         byte[] buffer = new byte[BROADCAST_MAX_LENGTH];
@@ -57,7 +57,7 @@ public class ServiceBroadcastListener {
             DatagramPacket dataIn = new DatagramPacket(buffer, buffer.length);
             DatagramSocket socket = new DatagramSocket(port);
             try {
-                // never time out; wait as long as it takes for a facilitator to become available
+                // never time out; wait as long as it takes for a coordinator to become available
                 socket.setSoTimeout(0);
 
                 while (!stopped) {
@@ -84,7 +84,7 @@ public class ServiceBroadcastListener {
                 socket.close();
             }
         } catch (IOException e) {
-            logger.severe("IOException while waiting for broadcast datagram from facilitator: " + e.getMessage());
+            logger.severe("IOException while waiting for broadcast datagram from coordinator: " + e.getMessage());
         }
     }
 

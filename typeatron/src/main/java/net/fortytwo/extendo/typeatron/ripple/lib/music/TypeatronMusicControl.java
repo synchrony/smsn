@@ -79,9 +79,9 @@ public class TypeatronMusicControl {
             // TODO: temporary
             logger.log(Level.INFO, "sent music control OSC datagram to " + musicControlAddress + ":" + musicControlPort);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "error in sending OSC datagram to facilitator", e);
+            logger.log(Level.SEVERE, "error in sending OSC datagram to coordinator", e);
         } catch (Throwable t) {
-            logger.log(Level.SEVERE, "unexpected error in sending OSC datagram to facilitator", t);
+            logger.log(Level.SEVERE, "unexpected error in sending OSC datagram to coordinator", t);
         }
     }
 }

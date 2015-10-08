@@ -65,7 +65,7 @@ public class GiveAtomMapping extends AtomMapping {
             m.addArgument(typeatron.getAgent().getAgentUri().stringValue());
             m.addArgument(uri.stringValue());
             //m.addArgument(value);
-            typeatron.getAgent().sendOSCMessageToFacilitator(m);
+            typeatron.getAgent().sendOSCMessageToCoordinator(m);
 
             // keep the stack unchanged
             solutions.put(stack);
