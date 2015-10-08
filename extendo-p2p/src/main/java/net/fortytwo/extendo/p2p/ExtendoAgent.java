@@ -10,10 +10,14 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.ntriples.NTriplesWriter;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -167,25 +171,29 @@ public class ExtendoAgent {
 
     /**
      * Sends an RDF Dataset to the continuous query engine
-     * @param d the RDF Dataset to send
+     *
+     * @param d   the RDF Dataset to send
      * @param ttl the time-to-live of the data, in milliseconds. Use ttl=0 for an infinite lifetime
      * @throws IOException if communication with the query engine fails
      */
     public void sendDataset(final Dataset d, final int ttl) throws IOException {
         getQueryEngine().addStatements(ttl, toArray(d));
 
-
+        /*
+        // TODO: temporary
+        OutputStream os = new FileOutputStream("/tmp/extendo.nt");
+        RDFWriter w = new NTriplesWriter(os);
         try {
-            RDFFormat format = RDFFormat.NTRIPLES;
-            RDFWriter writer = Rio.createWriter(format, System.out);
-            writer.startRDF();
+            w.startRDF();
             for (Statement s : d.getStatements()) {
-                writer.handleStatement(s);
+                w.handleStatement(s);
             }
-            writer.endRDF();
-        } catch (Throwable t) {
-            throw new IOException("failed to output triples");
+            w.endRDF();
+        } catch (RDFHandlerException e) {
+            throw new IOException(e);
         }
+        os.close();
+        */
 
         /*
         if (relayAsOsc) {

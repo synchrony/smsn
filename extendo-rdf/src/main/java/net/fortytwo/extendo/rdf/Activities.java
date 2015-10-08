@@ -9,10 +9,17 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.ntriples.NTriplesWriter;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -258,5 +265,22 @@ public class Activities {
         c.add(vf.createStatement(activity, ExtendoActivityOntology.recognitionTime, instant));
 
         return new Dataset(c);
+    }
+
+    public static void main(final String[] args) throws Exception {
+        Dataset d = Activities.datasetForAttentionActivity(
+                new Date().getTime(), new URIImpl("http://example.org/ArthurDent"), new URIImpl("http://example.org/sofa42"));
+
+        OutputStream os = System.out;
+        RDFWriter w = new NTriplesWriter(os);
+        try {
+            w.startRDF();
+            for (Statement s : d.getStatements()) {
+                w.handleStatement(s);
+            }
+            w.endRDF();
+        } catch (RDFHandlerException e) {
+            throw new IOException(e);
+        }
     }
 }

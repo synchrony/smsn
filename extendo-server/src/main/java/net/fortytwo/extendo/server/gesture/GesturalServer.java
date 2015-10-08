@@ -165,8 +165,9 @@ public class GesturalServer {
 
                 long timestamp = getRecognitionTimestamp(args);
 
-                System.out.println("" + System.currentTimeMillis() + ": received half-handshake from " + actor);
-                handshakeMatcher.receiveEvent(actor, timestamp);
+                long now = System.currentTimeMillis();
+                System.out.println("" + now + ": received half-handshake from " + actor);
+                handshakeMatcher.receiveEvent(actor, timestamp, now);
             }
         };
 

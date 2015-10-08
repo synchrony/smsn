@@ -83,7 +83,8 @@ public class HandshakeMatcherTest {
         }*/
 
         for (Event e : events) {
-            server.receiveEvent(e.actor, e.timestamp);
+            long now = System.currentTimeMillis();
+            server.receiveEvent(e.actor, e.timestamp, now);
         }
     }
 
@@ -106,6 +107,43 @@ public class HandshakeMatcherTest {
     public void testPartialOverlap() throws Exception {
         submitEvents(actor1, series1, 0, actor2, series2, 300);
         assertEquals(1, totalMatches);
+    }
+
+    private int handshakeCount;
+
+    @Test
+    public void testPerformance() throws Exception {
+        int nShakes = 10000;
+        int nPeaks = 5;
+        long interShakeGap = 1000l;
+        long interPeakGap = 160l;
+        long offset = 10l;
+
+        handshakeCount = 0;
+        server.setHandler(new HandshakeMatcher.HandshakeHandler() {
+            @Override
+            public void handle(HandshakeMatcher.HandshakeSequence left, HandshakeMatcher.HandshakeSequence right, long time) {
+                handshakeCount++;
+            }
+        });
+
+        long before = System.currentTimeMillis();
+        long now = 0;
+        for (int i = 0; i < nShakes; i++) {
+            for (int j = 0; j < nPeaks; j++) {
+                long actor1Peak = now;
+                long actor2Peak = now + offset;
+                server.receiveEvent(actor1, actor1Peak, actor1Peak);
+                server.receiveEvent(actor2, actor2Peak, actor2Peak);
+                now += interPeakGap;
+            }
+            now += interShakeGap;
+        }
+        long after = System.currentTimeMillis();
+        System.out.println("matched " + handshakeCount + " handshakes in " + (after - before) + "ms");
+
+        // TODO
+        //assertEquals(nShakes, handshakeCount);
     }
 
     private class Event implements Comparable<Event> {

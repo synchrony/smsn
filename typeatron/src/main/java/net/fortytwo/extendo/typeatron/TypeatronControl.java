@@ -435,7 +435,7 @@ public class TypeatronControl extends ExtendoDeviceControl {
         try {
             agent.sendDataset(d, Extendo.GESTURE_TTL);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "failed to gestural dataset: " + e.getMessage());
+            logger.log(Level.SEVERE, "failed to send gestural dataset: " + e.getMessage());
             e.printStackTrace(System.err);
         }
 

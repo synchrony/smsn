@@ -67,7 +67,7 @@ public class ActivitiesTest {
             CloseableIteration<? extends BindingSet, QueryEvaluationException> iter
                     = sc.evaluate(q.getTupleExpr(), q.getDataset(), new EmptyBindingSet(), false);
             BindingSet bs = iter.next();
-            assertEquals(agentUri, bs.getValue("person").stringValue());
+            assertEquals(agentUri, bs.getValue("actor").stringValue());
             assertTrue(bs.getValue("time") instanceof Literal);
             assertFalse(iter.hasNext());
             iter.close();

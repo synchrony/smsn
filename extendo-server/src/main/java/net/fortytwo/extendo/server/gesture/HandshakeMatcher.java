@@ -26,7 +26,7 @@ public class HandshakeMatcher {
     private final Stack<HandshakeSequence> latestHandshakeSequences;
     private Collection<HandshakeSequence> cleanupBuffer = new LinkedList<HandshakeSequence>();
 
-    private final HandshakeHandler handler;
+    private HandshakeHandler handler;
 
     private final GestureLowPassFilter lowPassFilter;
 
@@ -35,6 +35,10 @@ public class HandshakeMatcher {
         this.handshakesByActor = new HashMap<URI, HandshakeSequence>();
         this.latestHandshakeSequences = new Stack<HandshakeSequence>();
         lowPassFilter = new GestureLowPassFilter(5000);
+    }
+
+    public void setHandler(final HandshakeHandler handler) {
+        this.handler = handler;
     }
 
     public void reset() {
@@ -65,7 +69,8 @@ public class HandshakeMatcher {
     }
 
     public synchronized void receiveEvent(final URI actor,
-                                          final long timestamp) {
+                                          final long timestamp,
+                                          final long now) {
         //System.out.println("received handshake by " + actor + " at " + timestamp);
         cleanup(timestamp);
 
@@ -107,7 +112,6 @@ public class HandshakeMatcher {
         if (isNew) {
             latestHandshakeSequences.add(gesture);
             if (latestHandshakeSequences.size() > STACK_SIZE_WARN_THRESHOLD) {
-                long now = System.currentTimeMillis();
                 if (now - lastWarning > 10000) {
                     logger.warning("gestural stack is suspiciously large");
                     lastWarning = now;

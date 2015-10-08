@@ -49,14 +49,12 @@ void emitGesture(const char *address, unsigned long tRef, unsigned long now) {
     OSCMessage m(address);
     m.add(exoHand.getContext());
 
-    /* TODO: temporarily disabled to save on flash memory
     // note: recognition is delayed by about one time step from the actual crest,
     // so we subtract loopTimeMs
     m.add((uint64_t) (tRef-loopTimeMs));
 
     // also add the time of recognition
     m.add((uint64_t) now);
-    //*/
 
     exoHand.getOSC()->sendOSC(m);
 }
