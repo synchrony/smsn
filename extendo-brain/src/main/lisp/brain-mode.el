@@ -43,6 +43,11 @@
 ;;(eval-when-compile (require 'cl))
 
 
+;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq exo-max-height 7)
+
+
 ;; VARIABLES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq exo-readonly-mode "readonly")
@@ -957,7 +962,6 @@
     (request-priorities-results
         exo-min-sharability exo-max-sharability exo-min-weight exo-max-weight))
 
-
 (defun exo-push-view ()
     "push an up-to-date view into the knowledge base"
     (interactive)
@@ -1074,7 +1078,9 @@ A value of -1 indicates that values should not be truncated."
     (interactive)
     (let ((height (number-shorthand-to-number expr)))
         (if (< height 1) (error-message (concat "height of " (number-to-string height) " is too low (must be >= 1)"))
-            (if (> height 5) (error-message (concat "height of " (number-to-string height) " is too high (must be <= 5)"))
+            (if (> height exo-max-height)
+                (error-message (concat "height of " (number-to-string height) " is too high (must be <= "
+                    (number-to-string exo-max-height) ")"))
                 (request-view nil exo-mode exo-root-id height exo-style
                     exo-min-sharability exo-max-sharability exo-default-sharability
                     exo-min-weight exo-max-weight exo-default-weight)))))

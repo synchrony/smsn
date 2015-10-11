@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 public abstract class ExtendoExtension extends AbstractRexsterExtension {
     protected static final Logger logger = Logger.getLogger(ExtendoExtension.class.getName());
 
+    public static final int MAX_VIEW_HEIGHT = 7;
+
     private static final String HISTORY_ATTR = "history";
 
     protected abstract ExtensionResponse performTransaction(RequestParams p) throws Exception;
@@ -114,7 +116,7 @@ public abstract class ExtendoExtension extends AbstractRexsterExtension {
                     return ExtensionResponse.error("height must be at least 0");
                 }
 
-                if (p.height > 5) {
+                if (p.height > MAX_VIEW_HEIGHT) {
                     return ExtensionResponse.error("height may not be more than 5");
                 }
 

@@ -219,18 +219,27 @@ public class ExportExtension extends ExtendoExtension {
                 continue;
             }
 
-            String value = a.getValue();
+            // trim immediately; don't try to preserve indentation or trailing whitespace
+            String value = a.getValue().trim();
+            String textOut;
+
             if (value.startsWith("\"")) {
-                value = value.substring(1, value.endsWith("\"") ? value.length() - 1 : value.length());
+                textOut = value.substring(1, value.endsWith("\"") ? value.length() - 1 : value.length());
+            } else if (value.contains("\\n")) {
+                // write verbatim blocks out verbatim
+                textOut = value;
+            } else if (value.startsWith("%") || value.startsWith("\\")) {
+                // Add an extra newline before demarcated paragraphs and Exobrain items which are
+                // specifically LaTeX, e.g. chapters, sections, subsections, begin blocks.
+                // This saves on explicit line breaks in the source notes.
+                textOut = "\n" + value;
             } else {
-                String t = value.trim();
-                if (!((t.startsWith("%") || t.startsWith("\\") || value.contains("\\n")))) {
-                    value = null;
-                }
+                // anything else is ignored
+                textOut = null;
             }
 
-            if (null != value) {
-                out.write(value.getBytes());
+            if (null != textOut) {
+                out.write(textOut.getBytes());
                 out.write('\n');
             }
 
