@@ -8,24 +8,24 @@
     <name>Monomanual Typeatron</name>
 
     <parent>
-        <groupId>net.fortytwo.extendo</groupId>
-        <artifactId>extendo-all</artifactId>
+        <groupId>net.fortytwo.smsn</groupId>
+        <artifactId>smsn-all</artifactId>
         <version>1.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>net.fortytwo.extendo</groupId>
-            <artifactId>extendo-devices</artifactId>
-            <version>${extendo.version}</version>
+            <groupId>net.fortytwo.smsn</groupId>
+            <artifactId>smsn-devices</artifactId>
+            <version>${smsn.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.fortytwo.extendo</groupId>
-            <artifactId>extendo-brain</artifactId>
-            <version>${extendo.version}</version>
+            <groupId>net.fortytwo.smsn</groupId>
+            <artifactId>brain</artifactId>
+            <version>${smsn.version}</version>
             <exclusions>
                 <!-- via Frames. Gremlin and its dependencies are full of dangling class references which make things
-                     interesting for ProGuard in extendo-android.  Exclude it until needed -->
+                     interesting for ProGuard in smsn-android.  Exclude it until needed -->
                 <exclusion>
                     <groupId>com.tinkerpop.gremlin</groupId>
                     <artifactId>gremlin-groovy</artifactId>

@@ -1,6 +1,6 @@
 /*
   Typeatron.h - Arduino library for the Monomanual Typeatron chorded keyer
-  See: http://github.com/joshsh/extendo and the Typeatron Mark 1 EAGLE schematic
+  See: http://github.com/joshsh/smsn and the Typeatron Mark 1 EAGLE schematic
   
   Created by Joshua Shinavier, 2013-2014
   Released into the public domain.
@@ -9,7 +9,7 @@
 #ifndef Typeatron_h
 #define Typeatron_h
 
-#include <ExtendoDevice.h>
+#include <SmSnDevice.h>
 #include <AnalogSampler.h>
 #include <RGBLED.h>
 #include <Morse.h>
@@ -32,7 +32,7 @@ typedef enum {
     LaserPointer
 } Mode;
 
-class Typeatron : public ExtendoDevice
+class Typeatron : public SmSnDevice
 {
   public:
     Typeatron();

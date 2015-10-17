@@ -56,7 +56,7 @@ const unsigned long laserFlickerLightMs = 45;
 
 Typeatron *thisTypeatron;
 
-Typeatron::Typeatron(): ExtendoDevice(OSC_EXO_TT),
+Typeatron::Typeatron(): SmSnDevice(OSC_EXO_TT),
   rgbled(redPin, greenPin, bluePin) {
 
     thisTypeatron = this;
@@ -189,7 +189,7 @@ void Typeatron::setupOther() {
 /*
     // TODO: it is not safe to assume Serial
     // note: this operation is performed below SLIP
-    // note: match BAUD_RATE in ExtendOSC.h
+    // note: match BAUD_RATE in SmSnOsc.h
     Serial.print("$");  // Print three times individually
     Serial.print("$");
     Serial.print("$");  // Enter command mode
@@ -334,7 +334,7 @@ bool Typeatron::handleOSCBundle(class OSCBundle &bundle) {
 ////////////////////////////////////////////////////////////////////////////////
 // OSC out
 
-void sendAnalogObservation(class ExtendOSC &osc, class AnalogSampler &s, const char* address) {
+void sendAnalogObservation(class SmSnOsc &osc, class AnalogSampler &s, const char* address) {
     OSCMessage m(address);
     m.add((uint64_t) s.getStartTime());
     m.add((uint64_t) s.getEndTime());

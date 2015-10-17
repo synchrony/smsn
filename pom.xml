@@ -9,16 +9,16 @@
         <version>7</version>
     </parent>
 
-    <groupId>net.fortytwo.extendo</groupId>
-    <artifactId>extendo-all</artifactId>
+    <groupId>net.fortytwo.smsn</groupId>
+    <artifactId>smsn-all</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Extendo</name>
-    <description>Extendo Project</description>
-    <url>https://github.com/joshsh/extendo</url>
+    <name>Semantic Synchrony</name>
+    <description>An exercise in augmented perception</description>
+    <url>https://github.com/joshsh/smsn</url>
 
     <issueManagement>
-        <url>https://github.com/joshsh/extendo/issues</url>
+        <url>https://github.com/joshsh/smsn/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -31,9 +31,9 @@
     </licenses>
 
     <scm>
-        <url>git@github.com:joshsh/extendo.git</url>
-        <connection>scm:git:git@github.com:joshsh/extendo.git</connection>
-        <developerConnection>scm:git:git@github.com:joshsh/extendo.git</developerConnection>
+        <url>git@github.com:joshsh/smsn.git</url>
+        <connection>scm:git:git@github.com:joshsh/smsn.git</connection>
+        <developerConnection>scm:git:git@github.com:joshsh/smsn.git</developerConnection>
     </scm>
 
     <developers>
@@ -45,7 +45,7 @@
     </developers>
 
     <properties>
-        <extendo.version>1.1-SNAPSHOT</extendo.version>
+        <smsn.version>1.1-SNAPSHOT</smsn.version>
         <httpcomponents.version>4.4</httpcomponents.version>
         <jackrabbit.version>2.7.0</jackrabbit.version>
         <javaosc.version>0.3</javaosc.version>
@@ -63,14 +63,14 @@
     </properties>
 
     <modules>
-        <module>extendo-core</module>
-        <module>extendo-brain</module>
-        <module>extendo-devices</module>
-        <module>extendo-hand</module>
-        <module>extendo-p2p</module>
-        <module>extendo-rdf</module>
+        <module>smsn-core</module>
+        <module>brain</module>
+        <module>smsn-devices</module>
+        <module>hand</module>
+        <module>smsn-p2p</module>
+        <module>smsn-rdf</module>
         <module>monitron</module>
-        <module>extendo-server</module>
+        <module>smsn-server</module>
         <module>typeatron</module>
     </modules>
 
@@ -158,7 +158,7 @@
                         <groupId>net.fortytwo.sesametools</groupId>
                         <artifactId>common</artifactId>
                     </exclusion>
-                    <!-- conflicts with extendo-p2p -->
+                    <!-- conflicts with smsn-p2p -->
                     <exclusion>
                         <groupId>commons-codec</groupId>
                         <artifactId>commons-codec</artifactId>
@@ -243,7 +243,7 @@
                 <artifactId>frames</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- conflicts with extendo-brain -->
+                    <!-- conflicts with extend-o-brain -->
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
@@ -314,7 +314,7 @@
                         <groupId>org.javassist</groupId>
                         <artifactId>javassist</artifactId>
                     </exclusion>
-                    <!-- conflict with extendo-brain -->
+                    <!-- conflict with extend-o-brain -->
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>

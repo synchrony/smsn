@@ -1,7 +1,7 @@
 /*
  * Omnisensory Monitron firmware, copyright 2012-2014 by Joshua Shinavier
  *
- * See: https://github.com/joshsh/extendo
+ * See: https://github.com/joshsh/smsn
  */
 
 
@@ -117,9 +117,9 @@ Droidspeak droidspeak(SPEAKER_PIN);
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <OSCBundle.h>
-#include <ExtendOSC.h>
+#include <SmSnOsc.h>
 
-ExtendOSC osc(EXO_OM);
+SmSnOsc osc(EXO_OM);
 
 OSCBundle *bundleIn;
 

@@ -11,4 +11,4 @@ net.fortytwo.ripple.libs.stream.StreamLibrary
 net.fortytwo.ripple.libs.string.StringLibrary
 net.fortytwo.ripple.libs.system.SystemLibrary
 
-net.fortytwo.extendo.typeatron.ripple.lib.ExtendoLibrary
+net.fortytwo.smsn.typeatron.ripple.lib.SmSnLibrary

@@ -1,0 +1,313 @@
+@prefix : <http://fortytwo.net/2013/smsn/gesture#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://fortytwo.net/2015/smsn/activity#> .
+
+<http://fortytwo.net/2015/smsn/activity#> rdf:type owl:Ontology ;
+                                             
+                                             rdfs:comment "An ontology of gesture and interaction for the Semantic Synchrony framework" ;
+                                             
+                                             owl:imports <http://purl.org/NET/c4dm/event.owl> ,
+                                                         <http://xmlns.com/foaf/0.1/> .
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://fortytwo.net/2015/smsn/activity#actor
+
+<http://fortytwo.net/2015/smsn/activity#actor> rdf:type owl:ObjectProperty ;
+                                                  
+                                                  rdfs:domain <http://fortytwo.net/2015/smsn/activity#Activity> ;
+                                                  
+                                                  rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#focusOfAttention
+
+<http://fortytwo.net/2015/smsn/activity#focusOfAttention> rdf:type owl:ObjectProperty ;
+                                                             
+                                                             rdfs:domain <http://fortytwo.net/2015/smsn/activity#Attention> ;
+                                                             
+                                                             rdfs:range owl:Thing .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#giver
+
+<http://fortytwo.net/2015/smsn/activity#giver> rdf:type owl:ObjectProperty ;
+                                                  
+                                                  rdfs:domain <http://fortytwo.net/2015/smsn/activity#Handoff> ;
+                                                  
+                                                  rdfs:subPropertyOf <http://fortytwo.net/2015/smsn/activity#actor> ;
+                                                  
+                                                  rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#recognitionTime
+
+<http://fortytwo.net/2015/smsn/activity#recognitionTime> rdf:type owl:ObjectProperty ;
+                                                            
+                                                            rdfs:domain <http://fortytwo.net/2015/smsn/activity#Activity> ;
+                                                            
+                                                            rdfs:range <http://www.w3.org/2006/time#Instant> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#taker
+
+<http://fortytwo.net/2015/smsn/activity#taker> rdf:type owl:ObjectProperty ;
+                                                  
+                                                  rdfs:domain <http://fortytwo.net/2015/smsn/activity#Handoff> ;
+                                                  
+                                                  rdfs:subPropertyOf <http://fortytwo.net/2015/smsn/activity#actor> ;
+                                                  
+                                                  rdfs:range <http://xmlns.com/foaf/0.1/Person> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#thingGiven
+
+<http://fortytwo.net/2015/smsn/activity#thingGiven> rdf:type owl:ObjectProperty ;
+                                                       
+                                                       rdfs:domain <http://fortytwo.net/2015/smsn/activity#Handoff> ;
+                                                       
+                                                       rdfs:range owl:Thing .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#thingIndicated
+
+<http://fortytwo.net/2015/smsn/activity#thingIndicated> rdf:type owl:ObjectProperty ;
+                                                           
+                                                           rdfs:comment "The object or concept to which the pointing gesture refers" ;
+                                                           
+                                                           rdfs:domain <http://fortytwo.net/2015/smsn/activity#Point> ;
+                                                           
+                                                           rdfs:range owl:Thing .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://fortytwo.net/2015/smsn/activity#Activity
+
+<http://fortytwo.net/2015/smsn/activity#Activity> rdf:type owl:Class ;
+                                                     
+                                                     rdfs:subClassOf <http://purl.org/NET/c4dm/event.owl#Event> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#ArmRaise
+
+<http://fortytwo.net/2015/smsn/activity#ArmRaise> rdf:type owl:Class ;
+                                                     
+                                                     rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                     
+                                                     rdfs:comment "An arm raise gesture, as if asking a question" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Attention
+
+<http://fortytwo.net/2015/smsn/activity#Attention> rdf:type owl:Class ;
+                                                      
+                                                      rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Activity> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#BatonGesture
+
+<http://fortytwo.net/2015/smsn/activity#BatonGesture> rdf:type owl:Class ;
+                                                         
+                                                         rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                         
+                                                         rdfs:comment "A simple gesture which can be used for testing purposes.  It carries little meaning other than emphasis or activity." .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Clap
+
+<http://fortytwo.net/2015/smsn/activity#Clap> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                 
+                                                 rdfs:comment "A clapping gesture" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Gesture
+
+<http://fortytwo.net/2015/smsn/activity#Gesture> rdf:type owl:Class ;
+                                                    
+                                                    rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Activity> .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Give
+
+<http://fortytwo.net/2015/smsn/activity#Give> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                 
+                                                 rdfs:comment "A gesture of giving or handing something over" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Handoff
+
+<http://fortytwo.net/2015/smsn/activity#Handoff> rdf:type owl:Class ;
+                                                    
+                                                    rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Interaction> ;
+                                                    
+                                                    rdfs:comment "An interaction in which one individual physically or virtually hands an item to another individual" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Handshake
+
+<http://fortytwo.net/2015/smsn/activity#Handshake> rdf:type owl:Class ;
+                                                      
+                                                      rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Interaction> ;
+                                                      
+                                                      rdfs:comment "A complete handshake ritual, including both participants' gestures" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#HandshakePulse
+
+<http://fortytwo.net/2015/smsn/activity#HandshakePulse> rdf:type owl:Class ;
+                                                           
+                                                           rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Motion> ;
+                                                           
+                                                           rdfs:comment "Any of the basic up-and-down motions which characterize a handshake" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#HighFive
+
+<http://fortytwo.net/2015/smsn/activity#HighFive> rdf:type owl:Class ;
+                                                     
+                                                     rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Interaction> ;
+                                                     
+                                                     rdfs:comment "A single high-five interaction, including both participants' gestures" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Interaction
+
+<http://fortytwo.net/2015/smsn/activity#Interaction> rdf:type owl:Class ;
+                                                        
+                                                        rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Activity> ;
+                                                        
+                                                        rdfs:comment "An activity involving more than one individual" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Motion
+
+<http://fortytwo.net/2015/smsn/activity#Motion> rdf:type owl:Class ;
+                                                   
+                                                   rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Activity> ;
+                                                   
+                                                   rdfs:comment "A movement which may be part of a gesture or interaction" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Point
+
+<http://fortytwo.net/2015/smsn/activity#Point> rdf:type owl:Class ;
+                                                  
+                                                  rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                  
+                                                  rdfs:comment "A pointing gesture" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Take
+
+<http://fortytwo.net/2015/smsn/activity#Take> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                 
+                                                 rdfs:comment "A gesture of taking or receiving something given" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Tap
+
+<http://fortytwo.net/2015/smsn/activity#Tap> rdf:type owl:Class ;
+                                                
+                                                rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                
+                                                rdfs:comment "A tap gesture" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Throw
+
+<http://fortytwo.net/2015/smsn/activity#Throw> rdf:type owl:Class ;
+                                                  
+                                                  rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                  
+                                                  rdfs:comment "A throwing gesture" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Twist
+
+<http://fortytwo.net/2015/smsn/activity#Twist> rdf:type owl:Class ;
+                                                  
+                                                  rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                  
+                                                  rdfs:comment "A twisting gesture, as if grasping a doorknob" .
+
+
+
+###  http://fortytwo.net/2015/smsn/activity#Wave
+
+<http://fortytwo.net/2015/smsn/activity#Wave> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:subClassOf <http://fortytwo.net/2015/smsn/activity#Gesture> ;
+                                                 
+                                                 rdfs:comment "A waving gesture" .
+
+
+
+###  http://purl.org/NET/c4dm/event.owl#Event
+
+<http://purl.org/NET/c4dm/event.owl#Event> rdf:type owl:Class .
+
+
+
+###  http://www.w3.org/2006/time#Instant
+
+<http://www.w3.org/2006/time#Instant> rdf:type owl:Class .
+
+
+
+###  http://xmlns.com/foaf/0.1/Person
+
+<http://xmlns.com/foaf/0.1/Person> rdf:type owl:Class .
+
+
+
+
+###  Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net
+

@@ -1,16 +1,16 @@
 /*
  * Monomanual Typeatron driver sketch, copyright 2014-2015 by Joshua Shinavier
  *
- * See: https://github.com/joshsh/extendo
+ * See: https://github.com/joshsh/smsn
  */
 
 #include <Typeatron.h>
 
-#include <Extendo.h>
-#include <ExtendoDevice.h>
+#include <SmSn.h>
+#include <SmSnDevice.h>
 #include <AnalogSampler.h>
 #include <Droidspeak.h>
-#include <ExtendOSC.h>
+#include <SmSnOsc.h>
 #include <Morse.h>
 #include <RGBLED.h>
 #include <OSCBundle.h>
