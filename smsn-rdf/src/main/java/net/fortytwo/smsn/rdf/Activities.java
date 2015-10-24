@@ -6,6 +6,7 @@ import net.fortytwo.smsn.rdf.vocab.Timeline;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -84,8 +85,8 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForPointingGesture(final long timestamp,
-                                                    final URI actor,
-                                                    final URI thingIndicated) {
+                                                    final Resource actor,
+                                                    final Resource thingIndicated) {
         if (null == actor || null == thingIndicated) {
             throw new IllegalArgumentException();
         }
@@ -107,7 +108,7 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForBatonGesture(final long timestamp,
-                                                 final URI actor) {
+                                                 final Resource actor) {
         if (null == actor) {
             throw new IllegalArgumentException();
         }
@@ -128,7 +129,7 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandshakePulse(final long timestamp,
-                                                   final URI actor) {
+                                                   final Resource actor) {
         if (null == actor) {
             throw new IllegalArgumentException();
         }
@@ -150,8 +151,8 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandshakeInteraction(final long timestamp,
-                                                         final URI actor1,
-                                                         final URI actor2) {
+                                                         final Resource actor1,
+                                                         final Resource actor2) {
         if (null == actor1 || null == actor2) {
             throw new IllegalArgumentException();
         }
@@ -177,9 +178,9 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandoffInteraction(final long timestamp,
-                                                       final URI giver,
-                                                       final URI taker,
-                                                       final URI thingGiven) {
+                                                       final Resource giver,
+                                                       final Resource taker,
+                                                       final Resource thingGiven) {
         if (null == giver || null == taker || null == thingGiven) {
             throw new IllegalArgumentException();
         }
@@ -204,8 +205,8 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHighFiveInteraction(final long timestamp,
-                                                        final URI actor1,
-                                                        final URI actor2) {
+                                                        final Resource actor1,
+                                                        final Resource actor2) {
         if (null == actor1 || null == actor2) {
             throw new IllegalArgumentException();
         }
@@ -229,8 +230,8 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForAttentionActivity(final long timestamp,
-                                                      final URI actor,
-                                                      final URI focusOfAttention) {
+                                                      final Resource actor,
+                                                      final Resource focusOfAttention) {
         if (null == actor || null == focusOfAttention) {
             throw new IllegalArgumentException();
         }
@@ -246,16 +247,16 @@ public class Activities {
     }
 
     private static Dataset datasetForGesture(final long timestamp,
-                                             final URI activity,
+                                             final Resource activity,
                                              final Collection<Statement> c,
-                                             final URI agentUri) {
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, agentUri));
+                                             final Resource agent) {
+        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, agent));
 
         return datasetForActivity(timestamp, activity, c);
     }
 
     private static Dataset datasetForActivity(final long timestamp,
-                                              final URI activity,
+                                              final Resource activity,
                                               final Collection<Statement> c) {
         URI instant = factory.randomURI();
         c.add(vf.createStatement(instant, RDF.TYPE, Timeline.Instant));
