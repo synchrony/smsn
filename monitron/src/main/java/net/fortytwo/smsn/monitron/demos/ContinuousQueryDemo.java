@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.monitron.demos;
 
-import edu.rpi.twc.rdfstream4j.BindingSetHandler;
-import edu.rpi.twc.rdfstream4j.impl.QueryEngineImpl;
+import edu.rpi.twc.sesamestream.BindingSetHandler;
+import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import info.aduna.io.IOUtil;
 import net.fortytwo.smsn.monitron.EventHandler;
 import net.fortytwo.smsn.monitron.MonitronService;

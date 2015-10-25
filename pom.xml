@@ -54,7 +54,7 @@
         <rdfagents.version>1.2</rdfagents.version>
         <ripple.version>1.3-SNAPSHOT</ripple.version>
         <sesame.version>2.7.14</sesame.version>
-        <rdfstream4j.version>1.1-SNAPSHOT</rdfstream4j.version>
+        <sesamestream.version>1.1-SNAPSHOT</sesamestream.version>
         <sesametools.version>1.9</sesametools.version>
         <tinkerpop.version>2.6.0</tinkerpop.version>
 
@@ -77,9 +77,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>edu.rpi.twc.rdfstream4j</groupId>
-                <artifactId>rdfstream4j-impl</artifactId>
-                <version>${rdfstream4j.version}</version>
+                <groupId>edu.rpi.twc.sesamestream</groupId>
+                <artifactId>sesamestream-impl</artifactId>
+                <version>${sesamestream.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-codec</groupId>
@@ -98,7 +98,7 @@
                 <artifactId>rdfagents-core</artifactId>
                 <version>${rdfagents.version}</version>
                 <exclusions>
-                    <!-- conflict with RDFStream4j -->
+                    <!-- conflict with SesameStream -->
                     <exclusion>
                         <groupId>com.fasterxml.jackson.core</groupId>
                         <artifactId>jackson-core</artifactId>
@@ -126,7 +126,7 @@
                         <groupId>commons-codec</groupId>
                         <artifactId>commons-codec</artifactId>
                     </exclusion>
-                    <!-- conflict with RDFStream4j -->
+                    <!-- conflict with SesameStream -->
                     <exclusion>
                         <groupId>com.fasterxml.jackson.core</groupId>
                         <artifactId>jackson-core</artifactId>
@@ -149,7 +149,7 @@
                 <artifactId>blueprints-sail-graph</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- conflicts with RDFStream4j -->
+                    <!-- conflicts with SesameStream -->
                     <exclusion>
                         <groupId>net.fortytwo</groupId>
                         <artifactId>linked-data-sail</artifactId>
@@ -319,7 +319,7 @@
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
                     </exclusion>
-                    <!-- conflict with RDFStream4j -->
+                    <!-- conflict with SesameStream -->
                     <exclusion>
                         <groupId>com.fasterxml.jackson.core</groupId>
                         <artifactId>jackson-core</artifactId>
@@ -456,7 +456,7 @@
     </build>
 
     <repositories>
-        <!-- temporary, for RDFStream4j snapshots -->
+        <!-- temporary, for SesameStream snapshots -->
         <repository>
             <id>fortytwo</id>
             <name>fortytwo.net Maven repository</name>

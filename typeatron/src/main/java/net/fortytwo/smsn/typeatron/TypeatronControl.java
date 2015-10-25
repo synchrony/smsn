@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.typeatron;
 
 import com.illposed.osc.OSCMessage;
-import edu.rpi.twc.rdfstream4j.BindingSetHandler;
-import edu.rpi.twc.rdfstream4j.QueryEngine;
+import edu.rpi.twc.sesamestream.BindingSetHandler;
+import edu.rpi.twc.sesamestream.QueryEngine;
 import info.aduna.io.IOUtil;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.SmSnDeviceControl;

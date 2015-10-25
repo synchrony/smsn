@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server;
 
-import edu.rpi.twc.rdfstream4j.RDFStream4j;
-import edu.rpi.twc.rdfstream4j.impl.QueryEngineImpl;
+import edu.rpi.twc.sesamestream.SesameStream;
+import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.ConnectionHost;
@@ -73,8 +73,8 @@ public class CoordinatorService {
         int pubsubPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_PUBSUB_PORT);
 
         if (SemanticSynchrony.VERBOSE) {
-            RDFStream4j.setDoPerformanceMetrics(true);
-            RDFStream4j.setDoUseCompactLogFormat(false);
+            SesameStream.setDoPerformanceMetrics(true);
+            SesameStream.setDoUseCompactLogFormat(false);
         }
 
         queryEngine = new QueryEngineImpl();

@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.p2p.sparql;
 
-import edu.rpi.twc.rdfstream4j.BindingSetHandler;
-import edu.rpi.twc.rdfstream4j.QueryEngine;
-import edu.rpi.twc.rdfstream4j.Subscription;
+import edu.rpi.twc.sesamestream.BindingSetHandler;
+import edu.rpi.twc.sesamestream.QueryEngine;
+import edu.rpi.twc.sesamestream.Subscription;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.MessageHandler;
