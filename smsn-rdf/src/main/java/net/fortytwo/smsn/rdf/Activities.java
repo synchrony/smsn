@@ -29,7 +29,10 @@ import java.util.LinkedList;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Activities {
-    private static final SimpleDateFormat XSD_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    /**
+     * A XML Schema dateTime formatter for millisecond-precision timestamps
+     */
+    public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public static final String QUERY_FOR_ALL_GB_GESTURES =
             "PREFIX activity: <" + SmSnActivityOntology.NAMESPACE + ">\n" +
@@ -260,7 +263,7 @@ public class Activities {
                                               final Collection<Statement> c) {
         URI instant = factory.randomURI();
         c.add(vf.createStatement(instant, RDF.TYPE, Timeline.Instant));
-        Literal dateValue = vf.createLiteral(XSD_DATETIME_FORMAT.format(new Date(timestamp)), XMLSchema.DATETIME);
+        Literal dateValue = vf.createLiteral(TIMESTAMP_FORMAT.format(timestamp), XMLSchema.DATETIME);
         c.add(vf.createStatement(instant, Timeline.at, dateValue));
         c.add(vf.createStatement(activity, SmSnActivityOntology.recognitionTime, instant));
 

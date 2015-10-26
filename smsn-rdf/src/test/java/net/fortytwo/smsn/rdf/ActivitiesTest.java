@@ -4,8 +4,11 @@ import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.rdfagents.model.RDFContentLanguage;
+import net.fortytwo.smsn.rdf.vocab.Timeline;
 import org.junit.Test;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BindingSet;
@@ -22,19 +25,18 @@ import org.openrdf.sail.memory.MemoryStore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ActivitiesTest {
+    private         ValueFactory valueFactory = new ValueFactoryImpl();
+    private String agentUri = "http://example.org/ns#bob";
+    private DatasetFactory f = new DatasetFactory();
+
     @Test
     public void testDatasetForGestureEvent() throws Exception {
-        ValueFactory vf = new ValueFactoryImpl();
-
-        String agentUri = "http://example.org/ns#bob";
-
-        DatasetFactory f = new DatasetFactory();
-
         //System.out.println("available RDF content languages:");
         RDFContentLanguage format = null;
         for (RDFContentLanguage l : f.getSupportedLanguages()) {
@@ -44,7 +46,7 @@ public class ActivitiesTest {
             //System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
         }
 
-        Dataset ds = Activities.datasetForBatonGesture(System.currentTimeMillis(), vf.createURI(agentUri));
+        Dataset ds = Activities.datasetForBatonGesture(System.currentTimeMillis(), valueFactory.createURI(agentUri));
 
         assertEquals(5, ds.getStatements().size());
 
@@ -74,5 +76,25 @@ public class ActivitiesTest {
         } finally {
             sc.close();
         }
+    }
+
+    @Test
+    public void testDateTimeFormat() throws Exception {
+
+        URI actor = valueFactory.createURI(agentUri);
+
+        long timestamp = 42L;
+
+        Dataset ds = Activities.datasetForHandshakePulse(timestamp, actor);
+        for (Statement s : ds.getStatements()) {
+            if (s.getPredicate().equals(Timeline.at)) {
+                String dateValue = s.getObject().stringValue();
+                // we need this millisecond precision in timestamps
+                assertTrue(dateValue.contains(":00:00.042"));
+                return;
+            }
+        }
+
+        fail("no " + Timeline.at + " statement in dataset");
     }
 }
