@@ -40,7 +40,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A service for exporting an Extend-o-Brain graph to the file system
@@ -48,7 +50,25 @@ import java.util.List;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "export")
+
 public class ExportExtension extends SmSnExtension {
+    private static final Set<String>
+            sectionKeywords,
+            nonbreakingKeywords;
+
+    static {
+        sectionKeywords = keywords("section", "subsection", "subsubsection");
+        nonbreakingKeywords = keywords("caption", "end", "item", "label");
+    }
+
+    private static Set<String> keywords(final String... labels) {
+        Set<String> set = new HashSet<String>();
+        for (String l : labels) {
+            set.add("\\" + l);
+        }
+
+        return set;
+    }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph to the file system")
@@ -209,41 +229,71 @@ public class ExportExtension extends SmSnExtension {
                             final BrainGraph bg,
                             final KnowledgeBase kb,
                             final Filter filter,
+                            final int sectionLevel,
                             final OutputStream out) throws IOException {
+        boolean isSec = false;
+
+        Atom a = bg.getAtom(note.getId());
+        if (null == a) {
+            throw new IllegalStateException();
+        }
+        if (!filter.isVisible(a.asVertex()) || isLatexExcludedAtom(a, kb)) {
+            return;
+        }
+
+        // trim immediately; don't try to preserve indentation or trailing whitespace
+        String value = a.getValue().trim();
+        String textOut;
+
+        if (value.startsWith("\"")) {
+            textOut = value.substring(1, value.endsWith("\"") ? value.length() - 1 : value.length());
+        } else if (value.contains("\\n")) {
+            // write verbatim blocks out verbatim
+            textOut = value;
+        } else if (value.startsWith("%")) {
+            // Add an extra newline before demarcated paragraphs.
+            // This saves on explicit line breaks in the source notes.
+            textOut = "\n" + value;
+        } else if (value.startsWith("\\")) {
+            // Automatically correct section/subsection/subsubsection keywords according to the hierarchy;
+            // this allows more flexibility w.r.t. including content trees in multiple documents.
+            for (String keyword : sectionKeywords) {
+                if (value.startsWith(keyword)) {
+                    String replacement = sectionLevel > 1
+                            ? "\\subsubsection" : sectionLevel > 0
+                            ? "\\subsection" : "\\section";
+                    value = replacement + value.substring(keyword.length());
+                    isSec = true;
+                    break;
+                }
+            }
+
+            // for a few keywords, like /item, we don't need the extra space
+            boolean doBreak = true;
+            if (!isSec) {
+                for (String keyword : nonbreakingKeywords) {
+                    if (value.startsWith(keyword)) {
+                        doBreak = false;
+                        break;
+                    }
+                }
+            }
+
+            // also add an extra newline before Exobrain items which are
+            // specifically LaTeX, e.g. chapters, sections, subsections, begin blocks.
+            textOut = doBreak ? "\n" + value : value;
+        } else {
+            // anything else is ignored
+            textOut = null;
+        }
+
+        if (null != textOut) {
+            out.write(textOut.getBytes());
+            out.write('\n');
+        }
+
         for (Note child : note.getChildren()) {
-            Atom a = bg.getAtom(child.getId());
-            if (null == a) {
-                throw new IllegalStateException();
-            }
-            if (!filter.isVisible(a.asVertex()) || isLatexExcludedAtom(a, kb)) {
-                continue;
-            }
-
-            // trim immediately; don't try to preserve indentation or trailing whitespace
-            String value = a.getValue().trim();
-            String textOut;
-
-            if (value.startsWith("\"")) {
-                textOut = value.substring(1, value.endsWith("\"") ? value.length() - 1 : value.length());
-            } else if (value.contains("\\n")) {
-                // write verbatim blocks out verbatim
-                textOut = value;
-            } else if (value.startsWith("%") || value.startsWith("\\")) {
-                // Add an extra newline before demarcated paragraphs and Exobrain items which are
-                // specifically LaTeX, e.g. chapters, sections, subsections, begin blocks.
-                // This saves on explicit line breaks in the source notes.
-                textOut = "\n" + value;
-            } else {
-                // anything else is ignored
-                textOut = null;
-            }
-
-            if (null != textOut) {
-                out.write(textOut.getBytes());
-                out.write('\n');
-            }
-
-            writeLatex(child, bg, kb, filter, out);
+            writeLatex(child, bg, kb, filter, isSec ? sectionLevel + 1 : sectionLevel, out);
         }
     }
 
@@ -260,7 +310,7 @@ public class ExportExtension extends SmSnExtension {
         }
 
         Note view = queries.view(rootAtom, height, filter, NoteQueries.forwardViewStyle);
-        writeLatex(view, brain.getBrainGraph(), brain.getKnowledgeBase(), filter, out);
+        writeLatex(view, brain.getBrainGraph(), brain.getKnowledgeBase(), filter, 0, out);
 
         out.close();
     }

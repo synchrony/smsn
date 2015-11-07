@@ -250,13 +250,13 @@ public class ExtendoBrainClient {
             (concat (base-url) "update")
             (list
                 (list "request" (json-encode (list
-                    :root exo-root-id
-                    :height (number-to-string exo-height)
-                    :style exo-style
+                    :root smsn-root-id
+                    :height (number-to-string smsn-height)
+                    :style smsn-style
                     :view entity
-                    :filter (filter-json exo-min-sharability exo-max-sharability exo-default-sharability exo-min-weight exo-max-weight exo-default-weight)))))
-            (receive-view exo-edit-mode))))
-    (sit-for 0 500)(exo-update-view)(sit-for 0 500)(exo-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
+                    :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)))))
+            (receive-view smsn-edit-mode))))
+    (sit-for 0 500)(smsn-update-view)(sit-for 0 500)(smsn-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
 
          */
     }

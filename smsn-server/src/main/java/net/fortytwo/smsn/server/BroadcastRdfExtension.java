@@ -11,10 +11,10 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.ripple.RippleException;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.util.TypedProperties;
-import net.fortytwo.ripple.RippleException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
@@ -37,7 +37,7 @@ public class BroadcastRdfExtension extends SmSnExtension {
             throws IOException, TypedProperties.PropertyException, RippleException,
             SailException, InterruptedException {
 
-        coordinator =  CoordinatorService.getInstance();
+        coordinator = CoordinatorService.getInstance();
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)

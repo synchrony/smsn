@@ -12,31 +12,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rexster URL and Extend-o-Brain graph (essential)
 
-(defvar exo-rexster-url "http://localhost:8182")
-(defvar exo-rexster-graph "joshkb")
+(defvar smsn-rexster-url "http://localhost:8182")
+(defvar smsn-rexster-graph "joshkb")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data importing and exporting
 
 ;; export the graph to here, or populate an empty graph from here
-(defvar exo-default-graphml-file "/Volumes/encrypted/personal-git-repo/joshkb.xml")
+(defvar smsn-default-graphml-file "/Volumes/encrypted/personal-git-repo/joshkb.xml")
 
 ;; RDF inference over entire graph is written here
-(defvar exo-default-rdf-file "/tmp/joshkb.nt")
+(defvar smsn-default-rdf-file "/tmp/joshkb.nt")
 
 ;; RDF inference over the public portion of the graph is written here
 ;; using Dropbox and Apache+.htaccess allows it to be automatically published as Linked Data
-(defvar exo-default-webrdf-file "/Users/josh/Dropbox/shared/domains/www.fortytwo.net/people/josh/extend-o-brain.rdf")
+(defvar smsn-default-webrdf-file "/Users/josh/Dropbox/shared/domains/www.fortytwo.net/people/josh/extend-o-brain.rdf")
 
 ;; default location for dumps of tab-separated vertex and edge files
 ;; vertex files contain the properties of each atom
 ;; edge files are parent/child adjacency lists
-(defvar exo-default-vertices-file "/tmp/joshkb-vertices.tsv")
-(defvar exo-default-edges-file "/tmp/joshkb-edges.tsv")
+(defvar smsn-default-vertices-file "/tmp/joshkb-vertices.tsv")
+(defvar smsn-default-edges-file "/tmp/joshkb-edges.tsv")
 
 ;; default location for PageRank results
-(defvar exo-default-pagerank-file "/tmp/joshkb-pagerank.tsv")
+(defvar smsn-default-pagerank-file "/tmp/joshkb-pagerank.tsv")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -34,23 +34,23 @@ public class BrainModeClientTest extends TestCase {
     public void testAll() throws Exception {
         // go up and down, and type some text (note: the 'e' is not a typo)
         assertExpected("<down><up><C-c><C-v>esome inserted text<down>",
-                "(exo-next-line)",
-                "(exo-previous-line)",
-                "(exo-enter-edit-view)",
+                "(smsn-next-line)",
+                "(smsn-previous-line)",
+                "(smsn-enter-edit-view)",
                 "(insert \"some inserted text\")",
-                "(exo-next-line)");
+                "(smsn-next-line)");
 
         // search for the "sandbox" note and select it from the search results,
         // visit the 11th child of sandbox and add a new note to it
         assertExpected("<C-c>ssandb*\n<down><C-c>t<C-c><C-l>aa\n<C-c>t<C-c><C-v>e* here is a new note\n<C-c>p",
-                "(exo-fulltext-query \"sandb*\")",
-                "(exo-next-line)",
-                "(exo-visit-target)",
-                "(exo-goto-line \"aa\")",
-                "(exo-visit-target)",
-                "(exo-enter-edit-view)",
+                "(smsn-fulltext-query \"sandb*\")",
+                "(smsn-next-line)",
+                "(smsn-visit-target)",
+                "(smsn-goto-line \"aa\")",
+                "(smsn-visit-target)",
+                "(smsn-enter-edit-view)",
                 "(insert \"* here is a new note\\n\")",
-                "(exo-push-view)");
+                "(smsn-push-view)");
 
         assertExpected("<C-c><C-e>l",
                 "(emacspeak-speak-line)");
