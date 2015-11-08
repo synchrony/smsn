@@ -24,11 +24,9 @@ import net.fortytwo.smsn.brain.AtomList;
 import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.ExtendoBrain;
 import net.fortytwo.smsn.brain.Filter;
-import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import net.fortytwo.smsn.brain.rdf.classes.Document;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
@@ -50,15 +48,17 @@ import java.util.Set;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "export")
-
 public class ExportExtension extends SmSnExtension {
+
+    private static final int MAX_LATEX_RECURSE_LEVELS = 16;
+
     private static final Set<String>
             sectionKeywords,
             nonbreakingKeywords;
 
     static {
         sectionKeywords = keywords("section", "subsection", "subsubsection");
-        nonbreakingKeywords = keywords("caption", "end", "item", "label");
+        nonbreakingKeywords = keywords("begin", "caption", "end", "item", "label");
     }
 
     private static Set<String> keywords(final String... labels) {
@@ -214,46 +214,39 @@ public class ExportExtension extends SmSnExtension {
         out.close();
     }
 
-    private boolean isLatexExcludedAtom(final Atom atom,
-                                        final KnowledgeBase kb) {
-        List<KnowledgeBase.AtomClassEntry> classes = kb.getClassInfo(atom);
-        if (null != classes && classes.size() > 0) {
-            KnowledgeBase.AtomClassEntry ace = classes.get(0);
-            return ace.isNonTrivial() && ace.getInferredClassName().equals(Document.DOCUMENT);
-        } else {
-            return false;
-        }
-    }
-
-    private void writeLatex(final Note note,
-                            final BrainGraph bg,
-                            final KnowledgeBase kb,
+    private void writeLatex(final Atom root,
                             final Filter filter,
+                            final int level,
                             final int sectionLevel,
                             final OutputStream out) throws IOException {
-        boolean isSec = false;
 
-        Atom a = bg.getAtom(note.getId());
-        if (null == a) {
-            throw new IllegalStateException();
-        }
-        if (!filter.isVisible(a.asVertex()) || isLatexExcludedAtom(a, kb)) {
+        if (!filter.isVisible(root.asVertex())) {
             return;
         }
 
+        if (level >= MAX_LATEX_RECURSE_LEVELS) {
+            logger.warning("LaTeX tree exceeds maximum depth of " + MAX_LATEX_RECURSE_LEVELS);
+            return;
+        }
+
+        boolean isSec = false;
+        boolean doRecurse = false;
+
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = a.getValue().trim();
+        String value = root.getValue().trim();
         String textOut;
 
         if (value.startsWith("\"")) {
             textOut = value.substring(1, value.endsWith("\"") ? value.length() - 1 : value.length());
         } else if (value.contains("\\n")) {
             // write verbatim blocks out verbatim
+            // note: we don't expect any children of verbatim blocks
             textOut = value;
         } else if (value.startsWith("%")) {
             // Add an extra newline before demarcated paragraphs.
             // This saves on explicit line breaks in the source notes.
             textOut = "\n" + value;
+            doRecurse = true;
         } else if (value.startsWith("\\")) {
             // Automatically correct section/subsection/subsubsection keywords according to the hierarchy;
             // this allows more flexibility w.r.t. including content trees in multiple documents.
@@ -282,8 +275,9 @@ public class ExportExtension extends SmSnExtension {
             // also add an extra newline before Exobrain items which are
             // specifically LaTeX, e.g. chapters, sections, subsections, begin blocks.
             textOut = doBreak ? "\n" + value : value;
+            doRecurse = true;
         } else {
-            // anything else is ignored
+            // anything else is ignored along with any children
             textOut = null;
         }
 
@@ -292,15 +286,15 @@ public class ExportExtension extends SmSnExtension {
             out.write('\n');
         }
 
-        for (Note child : note.getChildren()) {
-            writeLatex(child, bg, kb, filter, isSec ? sectionLevel + 1 : sectionLevel, out);
+        if (doRecurse) {
+            for (Atom child : NoteQueries.forwardViewStyle.getLinked(root, filter)) {
+                writeLatex(child, filter, level + 1, isSec ? sectionLevel + 1 : sectionLevel, out);
+            }
         }
     }
 
     private void exportLatexTree(final ExtendoBrain brain,
-                                 final NoteQueries queries,
                                  final String root,
-                                 final int height,
                                  final Filter filter,
                                  final OutputStream out) throws IOException {
 
@@ -309,8 +303,7 @@ public class ExportExtension extends SmSnExtension {
             throw new IllegalStateException("no such atom: " + root);
         }
 
-        Note view = queries.view(rootAtom, height, filter, NoteQueries.forwardViewStyle);
-        writeLatex(view, brain.getBrainGraph(), brain.getKnowledgeBase(), filter, 0, out);
+        writeLatex(rootAtom, filter, 0, 0, out);
 
         out.close();
     }
@@ -345,7 +338,7 @@ public class ExportExtension extends SmSnExtension {
                     exportGraphML(p.brain.getBrainGraph(), out);
                     break;
                 case LaTeX:
-                    exportLatexTree(p.brain, p.queries, p.rootId, p.height, p.filter, out);
+                    exportLatexTree(p.brain, p.rootId, p.filter, out);
                     break;
                 case PageRank:
                     exportPageRank(p.brain.getBrainGraph(), new PrintStream(out));
