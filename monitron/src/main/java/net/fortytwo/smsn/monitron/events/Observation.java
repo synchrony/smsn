@@ -44,18 +44,20 @@ public abstract class Observation extends MonitronEvent {
     public Dataset toRDF() {
         Dataset dataset = super.toRDF();
 
-        // add event type and observed property in subclasses
+        // TODO: use appropriate class for result type in Observation subclasses
+        // (om:SimpleMeasure is only for xsd:double values)
+        addStatement(dataset, result, RDF.TYPE, OMOntology.SIMPLE_MEASURE);
+        addStatement(dataset, event, OMOntology.RESULT, result);
+        // add details of result in subclasses
 
         // TODO: don't hard-code location
-        addStatement(dataset, event, OMOntology.OBSERVATION_LOCATION, Universe.ROOM_1);
-        //addStatement(dataset, event, EventOntology.PLACE, Universe.ROOM_1);
         addStatement(dataset, event, OMOntology.FEATURE_OF_INTEREST, Universe.ROOM_1);
 
         addStatement(dataset, event, OMOntology.PROCEDURE, sensor);
 
         Resource samplingTime = valueFactory.createBNode();
         addStatement(dataset, samplingTime, RDF.TYPE, OWLTime.INTERVAL);
-        addStatement(dataset, event, OMOntology.SAMPLING_TIME, samplingTime);
+        addStatement(dataset, event, OMOntology.PHENOMENON_TIME, samplingTime);
         Resource beginning = valueFactory.createBNode();
         addStatement(dataset, beginning, RDF.TYPE, OWLTime.INSTANT);
         Resource end = valueFactory.createBNode();
@@ -66,10 +68,6 @@ public abstract class Observation extends MonitronEvent {
                 toLiteral(new Date(data.getSampleIntervalEnd())));
         addStatement(dataset, samplingTime, OWLTime.HAS_BEGINNING, beginning);
         addStatement(dataset, samplingTime, OWLTime.HAS_END, end);
-
-        addStatement(dataset, result, RDF.TYPE, OMOntology.RESULT_DATA);
-        addStatement(dataset, event, OMOntology.RESULT, result);
-        // add details of result in subclasses
 
         return dataset;
     }

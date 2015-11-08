@@ -28,7 +28,7 @@ public class AirTemperatureObservation extends Observation {
         addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.AIR_TEMPERATURE);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
-        addStatement(dataset, result, OMOntology.VALUE, value);
+        addStatement(dataset, result, OMOntology.AMOUNT, value);
         addStatement(dataset, result, OMOntology.UOM, MonitronOntology.DEGREES_CELSIUS);
 
         return dataset;

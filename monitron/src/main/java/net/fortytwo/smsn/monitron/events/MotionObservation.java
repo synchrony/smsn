@@ -2,7 +2,6 @@ package net.fortytwo.smsn.monitron.events;
 
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.BooleanData;
-import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
 import net.fortytwo.smsn.monitron.ontologies.OMOntology;
 import net.fortytwo.rdfagents.model.Dataset;
@@ -29,7 +28,7 @@ public class MotionObservation extends Observation {
         addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.IS_MOTION);
 
         Literal value = valueFactory.createLiteral(((BooleanData) data).getResult());
-        addStatement(dataset, result, OMOntology.VALUE, value);
+        addStatement(dataset, result, OMOntology.AMOUNT, value);
         // no units; the result is a true/false value
 
         return dataset;

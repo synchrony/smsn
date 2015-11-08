@@ -28,7 +28,7 @@ public class AtmosphericPressureObservation extends Observation {
         addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.ATMOSPHERIC_PRESSURE);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
-        addStatement(dataset, result, OMOntology.VALUE, value);
+        addStatement(dataset, result, OMOntology.AMOUNT, value);
         addStatement(dataset, result, OMOntology.UOM, MonitronOntology.PASCALS);
 
         return dataset;

@@ -30,7 +30,7 @@ public class RelativeHumidityObservation extends Observation {
         addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.RELATIVE_HUMIDITY);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
-        addStatement(dataset, result, OMOntology.VALUE, value);
+        addStatement(dataset, result, OMOntology.AMOUNT, value);
         // no units (relative humidity is dimensionless)
 
         return dataset;

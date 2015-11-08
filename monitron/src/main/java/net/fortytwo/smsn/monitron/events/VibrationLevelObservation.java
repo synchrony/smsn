@@ -28,7 +28,7 @@ public class VibrationLevelObservation extends Observation {
         addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.VIBRATION_LEVEL);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMaxValue());
-        addStatement(dataset, result, OMOntology.VALUE, value);
+        addStatement(dataset, result, OMOntology.AMOUNT, value);
         // TODO: add units
 
         return dataset;

@@ -1,32 +1,14 @@
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix : <http://fortytwo.net/2012/08/monitron##> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @base <http://fortytwo.net/2012/08/monitron#> .
 
 <http://fortytwo.net/2012/08/monitron#> rdf:type owl:Ontology ;
                                         
-                                        owl:imports <http://purl.org/NET/c4dm/event.owl> .
-
-
-#################################################################
-#
-#    Annotation properties
-#
-#################################################################
-
-
-
-
-#################################################################
-#
-#    Datatypes
-#
-#################################################################
-
-
+                                        owl:imports <http://def.seegrid.csiro.au/ontology/om/om-lite> .
 
 
 #################################################################
@@ -41,9 +23,9 @@
 <http://fortytwo.net/2012/08/monitron#containedIn> rdf:type owl:FunctionalProperty ,
                                                             owl:ObjectProperty ;
                                                    
-                                                   rdfs:domain <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
+                                                   rdfs:range <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
                                                    
-                                                   rdfs:range <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> .
+                                                   rdfs:domain <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> .
 
 
 
@@ -62,7 +44,7 @@
                                                                  
                                                                  rdfs:label "air temperature observation" ;
                                                                  
-                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                                 rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -90,7 +72,7 @@
                                                                       
                                                                       rdfs:label "atmospheric pressure observation" ;
                                                                       
-                                                                      rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                                      rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -128,7 +110,7 @@
                                                                   
                                                                   rdfs:label "color light level observation" ;
                                                                   
-                                                                  rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                                  rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -148,7 +130,7 @@
                                                             
                                                             rdfs:label "dust level observation" ;
                                                             
-                                                            rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                            rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -192,7 +174,7 @@
                                                              
                                                              rdfs:label "light level observation" ;
                                                              
-                                                             rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                             rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -212,7 +194,7 @@
                                                          
                                                          rdfs:label "motion observation" ;
                                                          
-                                                         rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                         rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#TruthObservation> .
 
 
 
@@ -221,14 +203,6 @@
 <http://fortytwo.net/2012/08/monitron#NaturalGasDetector> rdf:type owl:Class ;
                                                           
                                                           rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#GasDetector> .
-
-
-
-###  http://fortytwo.net/2012/08/monitron#Observation
-
-<http://fortytwo.net/2012/08/monitron#Observation> rdf:type owl:Class ;
-                                                   
-                                                   rdfs:subClassOf <http://purl.org/NET/c4dm/event.owl#Event> .
 
 
 
@@ -272,7 +246,7 @@
                                                                    
                                                                    rdfs:label "relative humidity observation" ;
                                                                    
-                                                                   rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                                   rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -288,7 +262,9 @@
 
 ###  http://fortytwo.net/2012/08/monitron#Sensor
 
-<http://fortytwo.net/2012/08/monitron#Sensor> rdf:type owl:Class .
+<http://fortytwo.net/2012/08/monitron#Sensor> rdf:type owl:Class ;
+                                              
+                                              rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Process> .
 
 
 
@@ -298,7 +274,7 @@
                                                              
                                                              rdfs:label "sound level observation" ;
                                                              
-                                                             rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                             rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -334,7 +310,7 @@
                                                                  
                                                                  rdfs:label "vibration level observation" ;
                                                                  
-                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Observation> .
+                                                                 rdfs:subClassOf <http://def.seegrid.csiro.au/ontology/om/om-lite#Measurement> .
 
 
 
@@ -353,6 +329,12 @@
 <http://fortytwo.net/2012/08/monitron#XBandDopplerMotionSensor> rdf:type owl:Class ;
                                                                 
                                                                 rdfs:subClassOf <http://fortytwo.net/2012/08/monitron#Sensor> .
+
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
+
+<http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> rdf:type owl:Class .
 
 
 
@@ -483,5 +465,5 @@
 
 
 
-###  Generated by the OWL API (version 3.2.3.22702) http://owlapi.sourceforge.net
+###  Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net
 
