@@ -42,5 +42,5 @@ public interface SmSnActivityOntology {
             recognitionTime = new URIImpl(NAMESPACE + "recognitionTime"),
             taker = new URIImpl(NAMESPACE + "taker"),
             thingGiven = new URIImpl(NAMESPACE + "thingGiven"),
-            thingIndicated = new URIImpl(NAMESPACE + "thingIndicated");
+            referent = new URIImpl(NAMESPACE + "referent");
 }

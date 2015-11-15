@@ -36,7 +36,7 @@ public class LaserPointerMapping extends AtomMapping {
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("thingIndicated", "the thing pointed to or referenced", true)};
+        return new Parameter[]{new Parameter("referent", "the thing pointed to or referenced", true)};
     }
 
     public String getComment() {

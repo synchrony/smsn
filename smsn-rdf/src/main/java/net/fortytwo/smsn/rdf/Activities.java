@@ -49,31 +49,31 @@ public class Activities {
                     "?a activity:focusOfAttention ?focus .\n" +
                     "?a activity:actor ?actor .\n" +
                     "}";
-    public static final String QUERY_FOR_THINGS_POINTED_TO =
+    public static final String QUERY_FOR_REFERENTS =
             "PREFIX activity: <" + SmSnActivityOntology.NAMESPACE + ">\n" +
-                    "SELECT ?actor ?indicated WHERE {\n" +
-                    "?a activity:thingIndicated ?indicated .\n" +
+                    "SELECT ?actor ?referent WHERE {\n" +
+                    "?a activity:referent ?referent .\n" +
                     "?a activity:actor ?actor .\n" +
                     "}";
-    public static final String QUERY_FOR_THINGS_POINTED_TO_WITH_COMMON_ORG =
+    public static final String QUERY_FOR_REFERENTS_WITH_COMMON_ORG =
             "PREFIX activity: <" + SmSnActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
                     "PREFIX rdfs: <" + RDFS.NAMESPACE + ">\n" +
-                    "SELECT ?indicated ?indicatedName ?orgLabel WHERE {\n" +
-                    "?a activity:thingIndicated ?indicated .\n" +
-                    "?indicated foaf:name ?indicatedName .\n" +
+                    "SELECT ?referent ?referentName ?orgLabel WHERE {\n" +
+                    "?a activity:referent ?referent .\n" +
+                    "?referent foaf:name ?referentName .\n" +
                     "?org rdfs:label ?orgLabel .\n" +
                     "?org foaf:member <http://fortytwo.net/2014/04/twc#JoshuaShinavier> .\n" +  // TODO
-                    "?org foaf:member ?indicated .\n" +
+                    "?org foaf:member ?referent .\n" +
                     "}";
-    public static final String QUERY_FOR_THINGS_POINTED_TO_WITH_COMMON_INTEREST =
+    public static final String QUERY_FOR_REFERENTS_WITH_COMMON_INTEREST =
             "PREFIX activity: <" + SmSnActivityOntology.NAMESPACE + ">\n" +
                     "PREFIX foaf: <" + FOAF.NAMESPACE + ">\n" +
-                    "SELECT ?indicated ?indicatedName ?interest WHERE {\n" +
-                    "?indicated foaf:name ?indicatedName .\n" +
-                    "?a activity:thingIndicated ?indicated .\n" +
+                    "SELECT ?referent ?referentName ?interest WHERE {\n" +
+                    "?referent foaf:name ?referentName .\n" +
+                    "?a activity:referent ?referent .\n" +
                     "<http://fortytwo.net/2014/04/twc#JoshuaShinavier> foaf:interest ?interest .\n" +  // TODO
-                    "?indicated foaf:interest ?interest .\n" +
+                    "?referent foaf:interest ?interest .\n" +
                     "}";
 
     private static final DatasetFactory factory = new DatasetFactory();
@@ -84,13 +84,13 @@ public class Activities {
      *
      * @param timestamp      the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor          the person performing the action of pointing
-     * @param thingIndicated the thing referenced or physically pointed to
+     * @param referent the thing referenced or physically pointed to
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForPointingGesture(final long timestamp,
                                                     final Resource actor,
-                                                    final Resource thingIndicated) {
-        if (null == actor || null == thingIndicated) {
+                                                    final Resource referent) {
+        if (null == actor || null == referent) {
             throw new IllegalArgumentException();
         }
 
@@ -98,7 +98,7 @@ public class Activities {
         URI activity = factory.randomURI();
 
         c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.Point));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.thingIndicated, thingIndicated));
+        c.add(vf.createStatement(activity, SmSnActivityOntology.referent, referent));
 
         return datasetForGesture(timestamp, activity, c, actor);
     }

@@ -58,7 +58,7 @@ public class ExportExtension extends SmSnExtension {
 
     static {
         sectionKeywords = keywords("section", "subsection", "subsubsection");
-        nonbreakingKeywords = keywords("begin", "caption", "end", "item", "label");
+        nonbreakingKeywords = keywords("begin", "caption", "end", "item", "label", "textbf");
     }
 
     private static Set<String> keywords(final String... labels) {
@@ -319,10 +319,6 @@ public class ExportExtension extends SmSnExtension {
         if (null == format) {
             return ExtensionResponse.error("no such format: " + p.format);
         }
-
-        //OutputStream out = new FileOutputStream(new File("/tmp/exobrain-vertices.txt"));
-        //out = new FileOutputStream(new File("/tmp/exobrain-edges.txt"));
-        //out = new FileOutputStream(new File("/tmp/exobrain-pagerank.txt"));
 
         Filter filter = null;
         OutputStream out = new FileOutputStream(p.file);
