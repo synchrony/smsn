@@ -128,13 +128,15 @@ void ExtendoHand::playTone(unsigned int frequency, unsigned long durationMs) {
 }
 
 void ExtendoHand::multiCue(
-    unsigned int toneFrequency, unsigned long toneDurationMs,
+    unsigned int toneFrequency,
+    unsigned long toneDurationMs,
     unsigned long color,
     unsigned long vibrateDurationMs) {
 
     setColor(color);
     vibrateNonBlocking(vibrateDurationMs);
     playTone(toneFrequency, toneDurationMs);
+    // the visual cue also lasts for toneDurationMs
     setColor(RGB_BLACK);
 }
 

@@ -271,8 +271,17 @@ public class Activities {
     }
 
     public static void main(final String[] args) throws Exception {
+        /*
         Dataset d = Activities.datasetForAttentionActivity(
                 new Date().getTime(), new URIImpl("http://example.org/ArthurDent"), new URIImpl("http://example.org/sofa42"));
+        *//*
+        Dataset d = Activities.datasetForHandoffInteraction(new Date().getTime(),
+                new URIImpl("http://fortytwo.net/josh/things/wRYn7qX"),
+                new URIImpl("http://fortytwo.net/josh/things/E2jV2SK"),
+                new URIImpl("http://fortytwo.net/josh/things/7N_7fqX"));
+        */
+        Dataset d = Activities.datasetForHandshakePulse(new Date().getTime(),
+                new URIImpl("http://fortytwo.net/josh/things/CybU2QN"));
 
         OutputStream os = System.out;
         RDFWriter w = new NTriplesWriter(os);

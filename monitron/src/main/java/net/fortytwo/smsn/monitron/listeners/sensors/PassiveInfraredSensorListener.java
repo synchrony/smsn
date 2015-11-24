@@ -13,7 +13,7 @@ import org.openrdf.model.URI;
 public class PassiveInfraredSensorListener extends SensorListener {
 
     public PassiveInfraredSensorListener(final Context context,
-                                            final URI sensor) {
+                                         final URI sensor) {
         super(context, sensor);
     }
 

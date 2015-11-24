@@ -71,8 +71,9 @@ public class SemanticSynchrony {
 
     public static final String UTF8 = "UTF-8";
 
-    // we consider gesture to be useful only for 30s
-    public static final int GESTURE_TTL = 30;
+    public static final int
+            GESTURE_TTL = 1, // we consider gestural events to be valid only for 1 second (the minimum TTL)
+            ATTENTION_TTL = 5; // we consider attention to be valid for several seconds
 
     private static TypedProperties configuration;
 

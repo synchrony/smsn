@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class HandoffMatcher {
     private static final Logger logger = Logger.getLogger(HandoffMatcher.class.getName());
 
-    // This shoudl be an overestimate.  give/take spikes are assumed logically to occur at the same moment, but
+    // This should be an overestimate.  give/take spikes are assumed logically to occur at the same moment, but
     // take 30-40ms from trough to trough.  They can be recognized at any time during the first 15-20ms, which
     // contributes 20ms of potential offset.
     // Serial and network latency are assumed to be around the same for both devices, but we allow another 40ms
