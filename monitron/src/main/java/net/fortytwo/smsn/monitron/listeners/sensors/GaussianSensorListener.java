@@ -28,9 +28,9 @@ public abstract class GaussianSensorListener extends SensorListener {
         s.setSampleIntervalEnd(timeArg(m, i++));
         s.setTotalMeasurements(longArg(m, i++));
         s.setMinValue(doubleArg(m, i++));
-        s.setMaxValue(doubleArg(m, i++));
         s.setMean(doubleArg(m, i++));
-        s.setVariance(doubleArg(m, i));
+        s.setMaxValue(doubleArg(m, i++));
+        s.setStandardDeviation(doubleArg(m, i));
 
         return handleSample(s);
     }

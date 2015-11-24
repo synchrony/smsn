@@ -9,7 +9,7 @@ public class GaussianData extends Data {
     private double maxValue;
 
     private double mean;
-    private double variance;
+    private double standardDeviation;
 
     public double getMinValue() {
         return minValue;
@@ -35,11 +35,11 @@ public class GaussianData extends Data {
         this.mean = mean;
     }
 
-    public double getVariance() {
-        return variance;
+    public double getStandardDeviation() {
+        return standardDeviation;
     }
 
-    public void setVariance(double variance) {
-        this.variance = variance;
+    public void setStandardDeviation(double standardDeviation) {
+        this.standardDeviation = standardDeviation;
     }
 }
