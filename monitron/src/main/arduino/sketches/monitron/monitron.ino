@@ -286,9 +286,9 @@ void finishAnalogObservation(AnalogSampler &s, char* address)
     m.add((uint64_t) s.getEndTime());
     m.add(s.getNumberOfMeasurements());
     m.add(s.getMinValue());
-    m.add(s.getMaxValue());
     m.add(s.getMean());
-    m.add(s.getVariance());
+    m.add(s.getMaxValue());
+    m.add(s.getStandardDeviation());
     osc.sendOSC(m);
     
     s.reset();

@@ -35,10 +35,15 @@ void AnalogSampler::addMeasurement(double v)
 {
     _n++;
 
+    // See Knuth TAOCP vol 2, 3rd edition, page 232
+    // See also http://www.johndcook.com/blog/standard_deviation
     if (1 == _n)
     {
         _minValue = v;
         _maxValue = v;
+
+        _oldM = _newM = v;
+        _oldS = 0.0;
     }
     else
     {
@@ -51,17 +56,17 @@ void AnalogSampler::addMeasurement(double v)
         {
             _maxValue = v;
         }
+
+        _newM = _oldM + (v - _oldM)/_n;
+        _newS = _oldS + (v - _oldM)*(v - _newM);
+        _oldM = _newM;
+        _oldS = _newS;
     }
-    
-    _sumOfValues += v;
-    _sumOfSquares += (v * v);	
 }
 
 void AnalogSampler::reset()
 {
     _n = 0;
-    _sumOfValues = 0;
-    _sumOfSquares = 0;
 
     _minValue = 0.0;
     _maxValue = 0.0;
@@ -96,16 +101,15 @@ double AnalogSampler::getMaxValue()
 
 double AnalogSampler::getMean()
 {
-    return (_n > 0) ? _sumOfValues / _n : 0;
+    return (_n > 0) ? _newM : 0.0;
 }
 
 double AnalogSampler::getVariance()
 {
-    if (_n < 2) {
-        return 0;
-    } else {
-	    double m = getMean();
-	    return (_sumOfSquares - (_n * m * m)) / (_n - 1);
-    }	    
+    return ((_n > 1) ? _newS/(_n - 1) : 0.0);
 }
 
+double AnalogSampler::getStandardDeviation()
+{
+    return sqrt(getVariance());
+}
