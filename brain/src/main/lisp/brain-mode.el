@@ -337,7 +337,7 @@
 
 (defun receive-view-internal (status mode)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
-          (editable (equal mode smsn-edit-mode)))
+          (editable (is-update-mode mode)))
         (if status
             (show-http-response-status status json)
             (let (
@@ -671,54 +671,63 @@
         smsn-mode
         smsn-readonly-mode))
 
-(defun current-view-mode-is-atom-view ()
-    (or
-        (equal smsn-mode smsn-readonly-mode)
-        (equal smsn-mode smsn-edit-mode)))
-
-(defun in-view ()
+(defun in-view-mode ()
     (if (or
-;;            (equal smsn-mode smsn-search-mode)
             (equal smsn-mode smsn-readonly-mode)
             (equal smsn-mode smsn-edit-mode))
         t
-	    (and (error-message "this command can only be executed from within an atom view") nil)))
+	    (and (error-message "cannot create tree view in current mode") nil)))
 
-(defun in-edit-view ()
-    (if (equal smsn-mode smsn-edit-mode)
+(defun in-setproperties-mode ()
+    (if (or
+            (equal smsn-mode smsn-search-mode)
+            (equal smsn-mode smsn-readonly-mode)
+            (equal smsn-mode smsn-edit-mode))
         t
-	    (and (error-message "this command can only be executed from within an edit view") nil)))
+	    (and (error-message "cannot set properties in current mode") nil)))
+
+(defun in-update-mode ()
+    (if (or
+            (equal smsn-mode smsn-edit-mode)
+            (equal smsn-mode smsn-search-mode))
+        t
+        (and (error-message "cannot update view in current mode") nil)))
+
+(defun is-update-mode (mode)
+    (or
+        (equal mode smsn-edit-mode)
+        (equal mode smsn-search-mode)))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun set-default-weight (s)
-    (if (and (in-view) (> s 0) (<= s 1))
+    (if (and (in-setproperties-mode) (> s 0) (<= s 1))
         (setq smsn-default-weight s)
         (error-message
             (concat "weight " (number-to-string s) " is outside of range (0, 1]"))))
 
 (defun set-min-weight (s)
-    (if (and (in-view) (>= s 0) (<= s 1))
+    (if (and (in-setproperties-mode) (>= s 0) (<= s 1))
         (request-view t smsn-mode smsn-root-id smsn-height smsn-style smsn-min-sharability smsn-max-sharability smsn-default-sharability s smsn-max-weight smsn-default-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun set-default-sharability (s)
-    (if (and (in-view) (> s 0) (<= s 1))
+    (if (and (in-setproperties-mode) (> s 0) (<= s 1))
         (setq smsn-default-sharability s)
         (error-message
             (concat "sharability " (number-to-string s) " is outside of range (0, 1]"))))
 
 (defun set-min-sharability (s)
-    (if (and (in-view) (>= s 0) (<= s 1))
+    (if (and (in-setproperties-mode) (>= s 0) (<= s 1))
         (request-view t smsn-mode smsn-root-id smsn-height smsn-style s smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun set-property (id name value)
     (interactive)
-    (if (in-view)
+    (if (in-setproperties-mode)
         (lexical-let (
                 (mode smsn-mode)
                 (url (request-view-url smsn-root-id smsn-height smsn-style smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)))
@@ -804,7 +813,7 @@
 (defun smsn-enter-edit-view ()
     "enter edit (read/write) mode in the current view"
     (interactive)
-    (if (and (in-view) (equal smsn-mode smsn-readonly-mode))
+    (if (and (in-view-mode) (equal smsn-mode smsn-readonly-mode))
         (request-view t smsn-edit-mode smsn-root-id smsn-height smsn-style
             smsn-min-sharability smsn-max-sharability smsn-default-sharability
             smsn-min-weight smsn-max-weight smsn-default-weight)))
@@ -812,7 +821,7 @@
 (defun smsn-enter-readonly-view ()
     "enter read-only mode in the current view"
     (interactive)
-    (if (and (in-view) (equal smsn-mode smsn-edit-mode))
+    (if (and (in-view-mode) (equal smsn-mode smsn-edit-mode))
         (request-view t smsn-readonly-mode smsn-root-id smsn-height smsn-style
             smsn-min-sharability smsn-max-sharability smsn-default-sharability
             smsn-min-weight smsn-max-weight smsn-default-weight)))
@@ -962,10 +971,13 @@
     (request-priorities-results
         smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
 
+(defun current-root-id ()
+    (if (in-view-mode) smsn-root-id nil))
+
 (defun smsn-push-view ()
     "push an up-to-date view into the knowledge base"
     (interactive)
-    (if (in-edit-view)
+    (if (in-update-mode)
     (let (
         (entity (buffer-string)))
         ;; The received view may very well differ from the pushed view in terms of line numbering,
@@ -975,12 +987,13 @@
         (http-post
             (concat (base-url) "update")
             (list
-                (list "request" (json-encode (list
-                    :root smsn-root-id
-                    :height (number-to-string smsn-height)
-                    :style smsn-style
-                    :view entity
-                    :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)))))
+                (list "request" (json-encode (append
+                    (if (in-view-mode) (list :root (current-root-id)) nil)
+                    (list
+                        :height (number-to-string smsn-height)
+                        :style smsn-style
+                        :view entity
+                        :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight))))))
             (receive-view smsn-edit-mode))))
     (sit-for 0 500)(smsn-update-view)(sit-for 0 500)(smsn-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
 
@@ -1125,7 +1138,7 @@ a type has been assigned to it by the inference engine."
 (defun smsn-update-to-backward-view ()
     "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
     (interactive)
-    (if (in-view)
+    (if (in-view-mode)
         (request-view nil smsn-mode smsn-root-id smsn-height smsn-backward-style
             smsn-min-sharability smsn-max-sharability smsn-default-sharability
             smsn-min-weight smsn-max-weight smsn-default-weight)))
@@ -1133,7 +1146,7 @@ a type has been assigned to it by the inference engine."
 (defun smsn-update-to-forward-view ()
     "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
     (interactive)
-    (if (in-view)
+    (if (in-view-mode)
         (request-view nil smsn-mode smsn-root-id smsn-height smsn-forward-style
             smsn-min-sharability smsn-max-sharability smsn-default-sharability
             smsn-min-weight smsn-max-weight smsn-default-weight)))
@@ -1141,7 +1154,7 @@ a type has been assigned to it by the inference engine."
 (defun smsn-update-view ()
     "refresh the current view from the data store"
     (interactive)
-    (if (in-view)
+    (if (in-view-mode)
         (request-view t smsn-mode smsn-root-id smsn-height smsn-style
             smsn-min-sharability smsn-max-sharability smsn-default-sharability
             smsn-min-weight smsn-max-weight smsn-default-weight)))

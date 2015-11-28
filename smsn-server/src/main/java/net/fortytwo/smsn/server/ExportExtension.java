@@ -41,6 +41,7 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * A service for exporting an Extend-o-Brain graph to the file system
@@ -75,28 +76,34 @@ public class ExportExtension extends SmSnExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
-                                                   description = "request description (JSON object)") String request) {
+                                                   description = "request description (JSON object)") String request)
+            throws Exception {
+
         // TODO: any security restrictions here?
-
-        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-
-        ExportRequest r;
         try {
-            r = new ExportRequest(new JSONObject(request), p.user);
-        } catch (JSONException e) {
-            return ExtensionResponse.error(e.getMessage());
+            RequestParams p = createParams(context, (KeyIndexableGraph) graph);
+
+            ExportRequest r;
+            try {
+                r = new ExportRequest(new JSONObject(request), p.user);
+            } catch (JSONException e) {
+                return ExtensionResponse.error(e.getMessage());
+            }
+
+            p.filter = r.getFilter();
+            p.file = r.file;
+            p.format = r.format;
+
+            p.rootId = r.rootId;
+            p.height = r.height;
+
+            SemanticSynchrony.logInfo("SmSn export " + r.format + " to " + r.file);
+
+            return handleRequestInternal(p);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "export failed", e);
+            throw e;
         }
-
-        p.filter = r.getFilter();
-        p.file = r.file;
-        p.format = r.format;
-
-        p.rootId = r.rootId;
-        p.height = r.height;
-
-        SemanticSynchrony.logInfo("SmSn export " + r.format + " to " + r.file);
-
-        return handleRequestInternal(p);
     }
 
     private void exportVertices(final BrainGraph g,

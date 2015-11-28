@@ -27,6 +27,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -81,21 +82,21 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
     protected ExtensionResponse handleRequestInternal(final RequestParams p) {
 
         if (doesWrite() && !canWrite(p.user)) {
-            return ExtensionResponse.error("user does not have permission to for write operations");
+            return error("user does not have permission to for write operations");
         }
 
         if (doesRead() && null == p.filter) {
-            return ExtensionResponse.error("service reads from graph, but weight and sharability filter is not set");
+            return error("service reads from graph, but weight and sharability filter is not set");
         }
 
-        String rootKey = p.rootId;
+        String rootId = p.rootId;
         String styleName = p.styleName;
 
         try {
             p.map = new HashMap<String, Object>();
 
             if (!(p.baseGraph instanceof KeyIndexableGraph)) {
-                return ExtensionResponse.error("graph must be an instance of IndexableGraph");
+                return error("graph must be an instance of IndexableGraph");
             }
 
             if (null != p.wikiView) {
@@ -113,11 +114,11 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
             if (null != p.height) {
                 if (p.height < 0) {
-                    return ExtensionResponse.error("height must be at least 0");
+                    return error("height must be at least 0");
                 }
 
                 if (p.height > MAX_VIEW_HEIGHT) {
-                    return ExtensionResponse.error("height may not be more than 5");
+                    return error("height may not be more than 5");
                 }
 
                 p.map.put(Params.HEIGHT, "" + p.height);
@@ -132,18 +133,18 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
                 p.map.put(Params.DEFAULT_WEIGHT, "" + p.filter.getDefaultWeight());
             }
 
-            if (null != rootKey) {
-                p.root = p.brain.getBrainGraph().getAtom(rootKey);
+            if (null != rootId) {
+                p.root = p.brain.getBrainGraph().getAtom(rootId);
 
                 if (null == p.root) {
-                    return ExtensionResponse.error("root of view does not exist: " + rootKey);
+                    return error("root of view does not exist: " + rootId);
                 }
 
                 if (null != p.filter && !p.filter.isVisible(p.root.asVertex())) {
-                    return ExtensionResponse.error("root of view is not visible: " + rootKey);
+                    return error("root of view is not visible: " + rootId);
                 }
 
-                p.map.put(Params.ROOT, rootKey);
+                p.map.put(Params.ROOT, rootId);
             }
 
             p.map.put(Params.TITLE, null == p.root
@@ -187,9 +188,9 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
                     }
                 }
             }
-        } catch (Throwable t) {
-            SemanticSynchrony.logSevere("request failed", t);
-            return ExtensionResponse.error(t.getMessage());
+        } catch (Exception e) {
+            SemanticSynchrony.logSevere("request failed", e);
+            return error(e.getMessage());
         }
     }
 
@@ -240,6 +241,11 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
     protected boolean canWrite(final Principal user) {
         // TODO
         return null == user || user.getName().equals("josh");
+    }
+
+    private ExtensionResponse error(final String message) {
+        logger.log(Level.WARNING, "SmSn extension error: " + message);
+        return ExtensionResponse.error(message);
     }
 
     private NoteHistory getNotesHistory(final RexsterResourceContext context) {

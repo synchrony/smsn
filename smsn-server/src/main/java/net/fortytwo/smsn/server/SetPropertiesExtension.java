@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 @ExtensionNaming(namespace = "smsn", name = "set")
 //@ExtensionDescriptor(description = "set the properties of an atom")
 public class SetPropertiesExtension extends SmSnExtension {
-    protected static final Logger logger = Logger.getLogger(SetPropertiesExtension.class.getName());
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for setting properties of given atoms")

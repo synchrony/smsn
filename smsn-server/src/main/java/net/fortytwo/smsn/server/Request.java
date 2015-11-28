@@ -18,4 +18,8 @@ public class Request {
         this.json = json;
         this.user = user;
     }
+
+    protected String optString(final String key) throws JSONException {
+        return json.has(key) ? json.getString(key) : null;
+    }
 }

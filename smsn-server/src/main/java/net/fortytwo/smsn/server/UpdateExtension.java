@@ -46,6 +46,7 @@ public class UpdateExtension extends SmSnExtension {
             return ExtensionResponse.error(e.getMessage());
         }
         p.height = r.getHeight();
+        // note: may be null
         p.rootId = r.getRootId();
         p.styleName = r.getStyleName();
         p.jsonView = r.jsonView;
@@ -75,12 +76,15 @@ public class UpdateExtension extends SmSnExtension {
 
         // Apply the update
         try {
-            p.queries.update(p.root, rootNote, p.height, p.filter, p.style);
+            p.queries.update(rootNote, p.height, p.filter, p.style);
         } catch (NoteQueries.InvalidUpdateException e) {
             return ExtensionResponse.error("invalid update: " + e.getMessage());
         }
 
-        Note n = p.queries.view(p.root, p.height, p.filter, p.style);
+        // TODO: produce an appropriate view (e.g. a search) if the root is null
+        Note n = null == p.root
+                ? new Note()
+                : p.queries.view(p.root, p.height, p.filter, p.style);
         addView(n, p);
 
         return ExtensionResponse.ok(p.map);

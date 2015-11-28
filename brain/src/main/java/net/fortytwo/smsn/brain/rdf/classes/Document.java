@@ -8,7 +8,6 @@ import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollect
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.TopicCollection;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.rdf.vocab.Bibo;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import org.apache.commons.validator.routines.ISBNValidator;
@@ -50,8 +49,10 @@ public class Document extends AtomClass {
                         new AtomRegex.El(2, new RFIDHandler(),
                                 AtomRegex.Modifier.ZeroOrMore, RFIDReference.class),
 
-                        new AtomRegex.El(2, new BibtexHandler(),
+                        new AtomRegex.El(2, null, // TODO: do something with BibTeX references
                                 AtomRegex.Modifier.ZeroOrOne, BibtexReference.class),
+                        new AtomRegex.El(2, new BibtexEntryHandler(),
+                                AtomRegex.Modifier.ZeroOrOne, BibtexEntry.class),
                         new AtomRegex.El(2, new ISBNHandler(),
                                 AtomRegex.Modifier.ZeroOrOne, ISBNReference.class),
 
@@ -126,7 +127,8 @@ public class Document extends AtomClass {
         }
     }
 
-    private static class BibtexHandler implements FieldHandler {
+    private static class BibtexEntryHandler implements FieldHandler {
+        // TODO: we no longer use this inline format
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             String entry = object.getValue().trim();

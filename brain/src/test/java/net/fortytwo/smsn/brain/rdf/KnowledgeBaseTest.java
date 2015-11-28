@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
+import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexReference;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
 import net.fortytwo.smsn.brain.rdf.classes.Document;
@@ -89,6 +90,28 @@ public class KnowledgeBaseTest {
     @Test
     public void testBibtexReferenceSyntax() throws Exception {
         AtomClass t = BibtexReference.class.newInstance();
+
+        assertTrue(t.getValueRegex().matcher("\\cite{schmoe2015nonsense}").matches());
+        assertTrue(t.getValueRegex().matcher("\\cite{moronconf2015:nonsense}").matches());
+        assertTrue(t.getValueRegex().matcher("\\cite{2015moronconf:nonsense}").matches());
+
+        assertFalse(t.getValueRegex().matcher("schmoe2015nonsense").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe2015nonsense").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{ schmoe2015nonsense}").matches());
+
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe2015(nonsense)}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe2015 nonsense}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe2015\\nonsense}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe\n2015\nnonsense}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe\t2015nonsense}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{#schmoe2015nonsense}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe2015\"nonsense\"}").matches());
+        assertFalse(t.getValueRegex().matcher("\\cite{schmoe2015%nonsense}").matches());
+    }
+
+    @Test
+    public void testBibtexEntrySyntax() throws Exception {
+        AtomClass t = BibtexEntry.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("@article{...}").matches());
         assertTrue(t.getValueRegex().matcher("@article{}").matches());
@@ -330,7 +353,7 @@ public class KnowledgeBaseTest {
                     }
                 }
                 rootNote.setId(rootId);
-                queries.update(root, rootNote, height, filter, NoteQueries.forwardViewStyle);
+                queries.update(rootNote, height, filter, NoteQueries.forwardViewStyle);
             }
         } finally {
             in.close();
@@ -401,7 +424,7 @@ public class KnowledgeBaseTest {
         assertClassEquals("person", einstein, kb);
         assertClassEquals("works-collection", einsteinPapers, kb);
         assertClassEquals("document", specialRelPaper, kb);
-        assertClassEquals("bibtex-reference", bibtex, kb);
+        assertClassEquals("bibtex-entry", bibtex, kb);
         assertClassEquals("quoted-value-collection", einsteinQuotes, kb);
         assertClassEquals("quoted-value-collection", einsteinQuotes2, kb);
         assertClassEquals("social-network-collection", einsteinFamily, kb);

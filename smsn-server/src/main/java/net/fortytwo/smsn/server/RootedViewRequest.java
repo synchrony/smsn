@@ -17,7 +17,8 @@ public class RootedViewRequest extends BasicViewRequest {
                              final Principal user) throws JSONException {
         super(json, user);
 
-        rootId = this.json.getString(Params.ROOT);
+        // note: root may be null
+        rootId = optString(Params.ROOT);
     }
 
     public String getRootId() {

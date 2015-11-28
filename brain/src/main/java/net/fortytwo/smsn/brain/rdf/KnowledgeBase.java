@@ -8,6 +8,7 @@ import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
+import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexReference;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
 import net.fortytwo.smsn.brain.rdf.classes.DatedEvent;
@@ -122,6 +123,7 @@ public class KnowledgeBase {
                 // basic classes
                 AbstractEvent.class,
                 AKAReference.class,
+                BibtexEntry.class,
                 BibtexReference.class,
                 Date.class,
                 Document.class,

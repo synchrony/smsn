@@ -12,12 +12,7 @@ public class BibtexReference extends SimpleAtomClass {
     public BibtexReference() {
         super(
                 "bibtex-reference",
-                // note: currently case-sensitive
-                // note: . "may or may not match line terminators", hence the (.|[\n\r])
-                Pattern.compile("[ \\t]*@" +
-                        "(article|book|booklet|conference|inbook|incollection|inproceedings|manual|mastersthesis" +
-                        "|misc|phdthesis|proceedings|techreport|unpublished)" +
-                        "[ \\t]*\\{(.|[\n\r])*\\}[ \\t]*"),
+                Pattern.compile("\\\\cite\\{[^\\n\\r\\t \\\"#%'(){}\\\\]+\\}"),
                 null,
                 null
         );
