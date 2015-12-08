@@ -74,6 +74,8 @@ public class UpdateExtension extends SmSnExtension {
             throw new IllegalStateException();
         }
 
+        rootNote.setId(p.rootId);
+
         // Apply the update
         try {
             p.queries.update(rootNote, p.height, p.filter, p.style);

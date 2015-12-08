@@ -108,20 +108,6 @@ public class NoteQueries {
         return n;
     }
 
-    private boolean hasChildren(final Atom root,
-                                final Filter filter,
-                                final ViewStyle style) {
-        // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root.asVertex())) {
-            return false;
-        }
-
-        // If the note is visible, we can see its children (although we will not be able to read the values of any
-        // children which are themselves invisible).
-        Iterable<Atom> children = style.getLinked(root, filter);
-        return children.iterator().hasNext();
-    }
-
     public Note customView(final List<String> atomIds,
                            final Filter filter) {
         if (null == atomIds || null == filter) {
@@ -181,6 +167,20 @@ public class NoteQueries {
         }
     };
 
+    private boolean hasChildren(final Atom root,
+                                final Filter filter,
+                                final ViewStyle style) {
+        // If the note is invisible, we can't see whether it has children.
+        if (!filter.isVisible(root.asVertex())) {
+            return false;
+        }
+
+        // If the note is visible, we can see its children (although we will not be able to read the values of any
+        // children which are themselves invisible).
+        Iterable<Atom> children = style.getLinked(root, filter);
+        return children.iterator().hasNext();
+    }
+
     private void updateInternal(final Note rootNote,
                                 final int height,
                                 final Filter filter,
@@ -197,7 +197,7 @@ public class NoteQueries {
                 return;
             }
 
-            ListDiff.DiffEditor<Note> ed = new ListDiff.DiffEditor<Note>() {
+            ListDiff.DiffEditor<Note> editor = new ListDiff.DiffEditor<Note>() {
                 public void add(final int position,
                                 final Note note) throws InvalidUpdateException {
                     if (!style.addOnUpdate()) {
@@ -205,6 +205,7 @@ public class NoteQueries {
                     }
 
                     // retrieve or create an atom for the note
+                    // atoms are only created if they appear under a parent which is also an atom
                     Atom a = getAtom(note);
                     if (null == a) {
                         a = createAtom(note.getId(), filter);
@@ -272,7 +273,7 @@ public class NoteQueries {
             List<Note> before = viewInternal(root, 1, filter, style).getChildren();
             List<Note> after = rootNote.getChildren();
             List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, noteComparator);
-            ListDiff.applyDiff(before, after, lcs, noteComparator, ed);
+            ListDiff.applyDiff(before, after, lcs, noteComparator, editor);
         }
 
         for (Note n : rootNote.getChildren()) {

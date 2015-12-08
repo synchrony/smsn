@@ -994,8 +994,7 @@
                         :style smsn-style
                         :view entity
                         :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight))))))
-            (receive-view smsn-edit-mode))))
-    (sit-for 0 500)(smsn-update-view)(sit-for 0 500)(smsn-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
+            (receive-view smsn-edit-mode)))))
 
 (defun smsn-ripple-query (query)
     "evaluate Ripple expression QUERY"

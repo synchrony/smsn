@@ -118,7 +118,7 @@ public class KnowledgeBaseTest {
         assertTrue(t.getValueRegex().matcher("@inproceedings{...}").matches());
         // example with multiple lines, line terminators
         assertTrue(t.getValueRegex().matcher("@article{einstein1905elektrodynamik,\n" +
-                "  title={Zur elektrodynamik bewegter k{\\\"o}rper},\n" +
+                "  title={Zur elektrodynamik bewegter K{\\\"o}rper},\n" +
                 "  author={Einstein, Albert},\n" +
                 "  journal={Annalen der physik},\n" +
                 "  volume={322},\n" +
