@@ -56,7 +56,7 @@ public class BrainGraph {
 
     public BrainGraph(final KeyIndexableGraph baseGraph) {
         IdGraph.IdFactory f = new ExtendoIdFactory();
-        graph = new IdGraph<KeyIndexableGraph>(baseGraph);
+        graph = new IdGraph<>(baseGraph);
         graph.setVertexIdFactory(f);
         graph.setEdgeIdFactory(f);
 
@@ -207,7 +207,7 @@ public class BrainGraph {
     }
 
     public Collection<Atom> getAtomsWithValue(final String value) {
-        Collection<Atom> results = new LinkedList<Atom>();
+        Collection<Atom> results = new LinkedList<>();
 
         for (Vertex v : graph.getVertices(SemanticSynchrony.VALUE, value)) {
             results.add(getAtom(v));
@@ -293,7 +293,7 @@ public class BrainGraph {
 
     public List<Atom> getAtomsByFulltextQuery(final String query,
                                               final Filter filter) {
-        List<Atom> results = new LinkedList<Atom>();
+        List<Atom> results = new LinkedList<>();
 
         if (null != searchIndex) {
             for (Vertex v : searchIndex.query(SemanticSynchrony.VALUE, query)) {
@@ -314,7 +314,7 @@ public class BrainGraph {
 
     public List<Atom> getAtomsByAcronymQuery(final String query,
                                              final Filter filter) {
-        List<Atom> results = new LinkedList<Atom>();
+        List<Atom> results = new LinkedList<>();
 
         if (null != acronymIndex) {
             for (Vertex v : acronymIndex.query(SemanticSynchrony.ACRONYM, query)) {
@@ -335,7 +335,7 @@ public class BrainGraph {
 
     public List<Atom> getAtomsWithShortcut(final String shortcut,
                                            final Filter filter) {
-        List<Atom> results = new LinkedList<Atom>();
+        List<Atom> results = new LinkedList<>();
 
         for (Vertex v : graph.getVertices(SemanticSynchrony.SHORTCUT, shortcut)) {
             if (filter.isVisible(v)) {
@@ -347,7 +347,7 @@ public class BrainGraph {
     }
 
     public static List<Atom> asList(AtomList aList) {
-        List<Atom> list = new LinkedList<Atom>();
+        List<Atom> list = new LinkedList<>();
         while (null != aList) {
             list.add(aList.getFirst());
             aList = aList.getRest();

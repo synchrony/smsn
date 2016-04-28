@@ -23,7 +23,7 @@ public class ExtendedCharacters {
     private final Map<Diacritic, Map<Character, Character>> diacriticMaps;
 
     ExtendedCharacters() {
-        diacriticMaps = new HashMap<Diacritic, Map<Character, Character>>();
+        diacriticMaps = new HashMap<>();
         for (Diacritic d : Diacritic.values()) {
             diacriticMaps.put(d, new HashMap<Character, Character>());
         }

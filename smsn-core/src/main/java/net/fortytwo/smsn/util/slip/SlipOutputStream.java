@@ -79,7 +79,7 @@ public class SlipOutputStream {
     /**
      * Constructs a new non-threaded SlipOutputStream
      *
-     * @param outputStream
+     * @param outputStream the base output stream
      */
     public SlipOutputStream(final OutputStream outputStream) {
         this(outputStream, false);

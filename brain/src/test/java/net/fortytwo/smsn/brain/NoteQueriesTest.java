@@ -439,7 +439,7 @@ public class NoteQueriesTest {
     }
 
     private List<Atom> getNotes(Atom a) {
-        List<Atom> l = new LinkedList<Atom>();
+        List<Atom> l = new LinkedList<>();
         AtomList cur = a.getNotes();
         while (null != cur) {
             l.add(cur.getFirst());

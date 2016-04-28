@@ -28,7 +28,7 @@ public class HandoffMatcher {
     private long lastWarning = 0;
 
     private final Stack<Handoff> latestHandoffs;
-    private Collection<Handoff> cleanupBuffer = new LinkedList<Handoff>();
+    private Collection<Handoff> cleanupBuffer = new LinkedList<>();
     private final Map<URI, ThingGiven> thingsGivenByActor;
 
     // a handoff must occur this many milliseconds after the "give" setup event
@@ -40,8 +40,8 @@ public class HandoffMatcher {
 
     public HandoffMatcher(HandoffHandler handler) {
         this.handler = handler;
-        this.latestHandoffs = new Stack<Handoff>();
-        thingsGivenByActor = new HashMap<URI, ThingGiven>();
+        this.latestHandoffs = new Stack<>();
+        thingsGivenByActor = new HashMap<>();
         lowPassFilter = new GestureLowPassFilter(5000);
     }
 

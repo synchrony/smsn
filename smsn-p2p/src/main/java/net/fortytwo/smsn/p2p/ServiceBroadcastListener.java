@@ -55,8 +55,7 @@ public class ServiceBroadcastListener {
         byte[] buffer = new byte[BROADCAST_MAX_LENGTH];
         try {
             DatagramPacket dataIn = new DatagramPacket(buffer, buffer.length);
-            DatagramSocket socket = new DatagramSocket(port);
-            try {
+            try (DatagramSocket socket = new DatagramSocket(port)) {
                 // never time out; wait as long as it takes for a coordinator to become available
                 socket.setSoTimeout(0);
 
@@ -80,8 +79,6 @@ public class ServiceBroadcastListener {
                         }
                     }
                 }
-            } finally {
-                socket.close();
             }
         } catch (IOException e) {
             logger.severe("IOException while waiting for broadcast datagram from coordinator: " + e.getMessage());

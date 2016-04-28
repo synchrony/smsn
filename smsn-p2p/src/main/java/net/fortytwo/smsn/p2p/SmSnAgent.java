@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.p2p;
 
 import com.illposed.osc.OSCMessage;
-import edu.rpi.twc.sesamestream.QueryEngine;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.p2p.sparql.QueryEngineProxy;
+import net.fortytwo.smsn.p2p.sparql.ProxySparqlStreamProcessor;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.stream.sparql.RDFStreamProcessor;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -35,7 +35,7 @@ public class SmSnAgent {
 
     private ServiceBroadcastListener listener;
 
-    private QueryEngineProxy queryEngine;
+    private ProxySparqlStreamProcessor streamProcessor;
 
     private Service coordinatorService;
     private final Connection coordinatorConnection;
@@ -60,7 +60,7 @@ public class SmSnAgent {
 
         pinger = new Pinger(coordinatorConnection);
 
-        queryEngine = new QueryEngineProxy(coordinatorConnection);
+        streamProcessor = new ProxySparqlStreamProcessor(coordinatorConnection);
 
         if (listenForServices) {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
@@ -89,7 +89,7 @@ public class SmSnAgent {
                         }
 
                         try {
-                            queryEngine.notifyConnectionOpen();
+                            streamProcessor.notifyConnectionOpen();
                         } catch (IOException e) {
                             logger.log(Level.WARNING, "error on query engine notification", e);
                             return;
@@ -116,8 +116,8 @@ public class SmSnAgent {
         return pinger;
     }
 
-    public QueryEngine getQueryEngine() {
-        return queryEngine;
+    public RDFStreamProcessor getStreamProcessor() {
+        return streamProcessor;
     }
 
     public DatasetFactory getDatasetFactory() {
@@ -170,7 +170,7 @@ public class SmSnAgent {
      * @throws IOException if communication with the query engine fails
      */
     public void sendDataset(final Dataset d, final int ttl) throws IOException {
-        getQueryEngine().addStatements(ttl, toArray(d));
+        getStreamProcessor().addInputs(ttl, toArray(d));
 
         /*
         // TODO: temporary

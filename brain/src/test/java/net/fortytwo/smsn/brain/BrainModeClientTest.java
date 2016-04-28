@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class BrainModeClientTest extends TestCase {
 
-    private final List<String> results = new ArrayList<String>();
+    private final List<String> results = new ArrayList<>();
 
     private final BrainModeClient.EmacsFunctionExecutor functionExecutor = new BrainModeClient.EmacsFunctionExecutor() {
         public Process execute(BrainModeClient.EmacsFunction function, String argument)

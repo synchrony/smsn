@@ -75,22 +75,23 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
             throws RippleException {
 
         String asString = mc.toString(arg);
-        if (asString.equals("a")) {
-            return 0.25f;
-        } else if (asString.equals("s")) {
-            return 0.5f;
-        } else if (asString.equals("d")) {
-            return 0.75f;
-        } else if (asString.equals("f")) {
-            return 1.0f;
-        } else {
-            Number n = mc.toNumber(arg);
-            Float f = n.floatValue();
-            if (f == 0.25f || f == 0.5f || f == 0.75f || f == 1.0f) {
-                return f;
-            } else {
-                throw new RippleException("illegal sharability or weight value: " + f);
-            }
+        switch (asString) {
+            case "a":
+                return 0.25f;
+            case "s":
+                return 0.5f;
+            case "d":
+                return 0.75f;
+            case "f":
+                return 1.0f;
+            default:
+                Number n = mc.toNumber(arg);
+                Float f = n.floatValue();
+                if (f == 0.25f || f == 0.5f || f == 0.75f || f == 1.0f) {
+                    return f;
+                } else {
+                    throw new RippleException("illegal sharability or weight value: " + f);
+                }
         }
     }
 

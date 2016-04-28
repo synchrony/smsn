@@ -29,8 +29,8 @@ public class Connection {
     private boolean stopped = false;
 
     public Connection() {
-        handlers = new HashMap<String, MessageHandler>();
-        buffer = new LinkedList<BufferedMessage>();
+        handlers = new HashMap<>();
+        buffer = new LinkedList<>();
     }
 
     /**

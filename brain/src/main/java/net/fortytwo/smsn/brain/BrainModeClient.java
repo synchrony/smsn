@@ -66,7 +66,7 @@ public class BrainModeClient {
         textBuffer = new StringBuilder();
         commandBuffer = new StringBuilder();
 
-        functions = new HashMap<String, EmacsFunction>();
+        functions = new HashMap<>();
 
         // general Emacs functions
         functions.put("C-a", new EmacsFunction("move-beginning-of-line 1", false));

@@ -19,7 +19,7 @@ public class Priorities {
     private final PriorityQueue<Atom> queue;
 
     public Priorities() {
-        queue = new PriorityQueue<Atom>(1, new AtomPriorityComparator());
+        queue = new PriorityQueue<>(1, new AtomPriorityComparator());
     }
 
     public Queue<Atom> getQueue() {

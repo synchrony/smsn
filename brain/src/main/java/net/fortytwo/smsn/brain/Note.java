@@ -25,7 +25,7 @@ public class Note {
     private List<String> meta;
 
     public Note() {
-        children = new LinkedList<Note>();
+        children = new LinkedList<>();
     }
 
     public Note(final Note copy) {

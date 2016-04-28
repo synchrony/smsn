@@ -24,7 +24,7 @@ public class HandshakeMatcher {
 
     private final Map<URI, HandshakeSequence> handshakesByActor;
     private final Stack<HandshakeSequence> latestHandshakeSequences;
-    private Collection<HandshakeSequence> cleanupBuffer = new LinkedList<HandshakeSequence>();
+    private Collection<HandshakeSequence> cleanupBuffer = new LinkedList<>();
 
     private HandshakeHandler handler;
 
@@ -32,8 +32,8 @@ public class HandshakeMatcher {
 
     public HandshakeMatcher(HandshakeHandler handler) {
         this.handler = handler;
-        this.handshakesByActor = new HashMap<URI, HandshakeSequence>();
-        this.latestHandshakeSequences = new Stack<HandshakeSequence>();
+        this.handshakesByActor = new HashMap<>();
+        this.latestHandshakeSequences = new Stack<>();
         lowPassFilter = new GestureLowPassFilter(5000);
     }
 
@@ -131,7 +131,7 @@ public class HandshakeMatcher {
 
     public class HandshakeSequence {
         public URI actor;
-        public final List<Long> peaks = new LinkedList<Long>();
+        public final List<Long> peaks = new LinkedList<>();
         public long firstPeak;
         public long latestPeak;
         private boolean matched = false;

@@ -17,7 +17,7 @@ import java.util.List;
 public class ListDiff {
 
     public static List<String> toList(final String s) {
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
 
         for (byte b : s.getBytes()) {
             result.add("" + (char) b);
@@ -49,7 +49,7 @@ public class ListDiff {
                             Math.max(lengths[i + 1][j], lengths[i][j + 1]);
 
         // read the substring out from the matrix
-        List<T> result = new LinkedList<T>();
+        List<T> result = new LinkedList<>();
         for (int x = a.size(), y = b.size();
              x != 0 && y != 0; ) {
             if (lengths[x][y] == lengths[x - 1][y])

@@ -89,8 +89,8 @@ public class DuplicatesExtension extends SmSnExtension {
 
     private List<String> getDuplicates(final BrainGraph graph,
                                        final Filter filter) throws Exception {
-        Map<String, List<String>> m = new HashMap<String, List<String>>();
-        List<List<String>> dups = new LinkedList<List<String>>();
+        Map<String, List<String>> m = new HashMap<>();
+        List<List<String>> dups = new LinkedList<>();
         int total = 0;
 
         for (Vertex v : graph.getPropertyGraph().getVertices()) {
@@ -102,7 +102,7 @@ public class DuplicatesExtension extends SmSnExtension {
                     String hash = md5SumOf(value);
                     List<String> ids = m.get(hash);
                     if (null == ids) {
-                        ids = new LinkedList<String>();
+                        ids = new LinkedList<>();
                         m.put(hash, ids);
                     } else {
                         if (1 == ids.size()) {
@@ -122,7 +122,7 @@ public class DuplicatesExtension extends SmSnExtension {
             }
         }
 
-        List<String> allDups = new LinkedList<String>();
+        List<String> allDups = new LinkedList<>();
         for (List<String> l : dups) {
             allDups.addAll(l);
         }

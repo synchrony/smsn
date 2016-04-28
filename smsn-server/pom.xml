@@ -40,8 +40,8 @@
             <artifactId>blueprints-sail-graph</artifactId>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc.sesamestream</groupId>
-            <artifactId>sesamestream-impl</artifactId>
+            <groupId>net.fortytwo.stream</groupId>
+            <artifactId>stream42-sparql</artifactId>
         </dependency>
 
         <!-- temporary, because of the self-conflict within Rexster -->

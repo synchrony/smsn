@@ -168,7 +168,7 @@ public class ChordedKeyer {
         totalButtonsCurrentlyPressed = 0;
         lastInput = "00000".getBytes();
 
-        rootStates = new HashMap<Mode, StateNode>();
+        rootStates = new HashMap<>();
         for (Mode m : Mode.values()) {
             rootStates.put(m, new StateNode());
         }
@@ -259,9 +259,8 @@ public class ChordedKeyer {
         addChord(textEntryModes, "33", null, null, " ", null);
         addChord(textEntryModes, "44", null, null, SpecialChar.DEL.name(), null);
 
-        punctuationMap = new HashMap<String, String>();
-        InputStream in = TypeatronControl.class.getResourceAsStream("typeatron-letters-and-punctuation.csv");
-        try {
+        punctuationMap = new HashMap<>();
+        try (InputStream in = TypeatronControl.class.getResourceAsStream("typeatron-letters-and-punctuation.csv")) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
             while (null != (line = br.readLine())) {
@@ -304,8 +303,6 @@ public class ChordedKeyer {
                     }
                 }
             }
-        } finally {
-            in.close();
         }
     }
 

@@ -18,6 +18,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,12 +40,12 @@ public class GesturalServer {
 
     private final OscSender notificationSender;
 
-    public GesturalServer(final DatasetHandler datasetHandler) {
+    public GesturalServer(final Consumer<Dataset> datasetHandler) {
         this(DEFAULT_PORT, datasetHandler);
     }
 
     public GesturalServer(final int port,
-                          final DatasetHandler datasetHandler) {
+                          final Consumer<Dataset> datasetHandler) {
         this.port = port;
 
         // TODO: host and port are temporary; they should be configurable
@@ -63,7 +64,7 @@ public class GesturalServer {
                 notifyOfInteraction(SmSnActivityOntology.EXO_ACTIVITY_HANDSHAKE);
 
                 Dataset d = Activities.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
-                datasetHandler.handle(d);
+                datasetHandler.accept(d);
 
                 speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
                 // + " at " + timestamp);
@@ -81,7 +82,7 @@ public class GesturalServer {
                 notifyOfInteraction(SmSnActivityOntology.EXO_ACTIVITY_HANDOFF);
 
                 Dataset d = Activities.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
-                datasetHandler.handle(d);
+                datasetHandler.accept(d);
 
                 speakWithSystemCall(give.actor.getLocalName() + " gave \"" + thingGiven.getLocalName()
                         + "\" to " + take.actor.getLocalName());
@@ -281,9 +282,9 @@ public class GesturalServer {
     }
 
     public static void main(final String[] args) throws Exception {
-        DatasetHandler h = new DatasetHandler() {
+        Consumer<Dataset> h = new Consumer<Dataset>() {
             @Override
-            public void handle(Dataset dataset) {
+            public void accept(Dataset dataset) {
                 // discard dataset
             }
         };

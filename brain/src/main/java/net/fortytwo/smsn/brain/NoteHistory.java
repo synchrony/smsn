@@ -53,7 +53,7 @@ public class NoteHistory {
         }
 
         if (dedup) {
-            List<String> s = new LinkedList<String>();
+            List<String> s = new LinkedList<>();
             s.addAll(r);
             return s;
         } else {

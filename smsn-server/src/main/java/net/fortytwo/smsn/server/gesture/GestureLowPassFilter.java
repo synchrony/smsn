@@ -15,7 +15,7 @@ public class GestureLowPassFilter {
 
     public GestureLowPassFilter(final long minPeriod) {
         this.minPeriod = minPeriod;
-        this.lastGestures = new HashMap<String, Long>();
+        this.lastGestures = new HashMap<>();
     }
 
     public boolean doAllow(URI actor1, URI actor2, final long timestamp) {

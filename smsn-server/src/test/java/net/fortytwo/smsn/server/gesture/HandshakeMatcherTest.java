@@ -18,7 +18,7 @@ public class HandshakeMatcherTest {
 
     private final HandshakeMatcher server;
 
-    private final Set<String> matches = new HashSet<String>();
+    private final Set<String> matches = new HashSet<>();
     private int totalMatches;
 
     // a typical handshake
@@ -59,7 +59,7 @@ public class HandshakeMatcherTest {
                               final URI actor2,
                               final long[] series2,
                               final long offset2) {
-        List<Event> events = new LinkedList<Event>();
+        List<Event> events = new LinkedList<>();
 
         for (long l : series1) {
             Event e = new Event();

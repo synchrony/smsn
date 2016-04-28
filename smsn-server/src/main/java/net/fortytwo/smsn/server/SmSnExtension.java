@@ -46,7 +46,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
     protected abstract boolean doesWrite();
 
-    private static final Map<KeyIndexableGraph, ExtendoBrain> brains = new HashMap<KeyIndexableGraph, ExtendoBrain>();
+    private static final Map<KeyIndexableGraph, ExtendoBrain> brains = new HashMap<>();
 
     public synchronized static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph)
             throws ExtendoBrain.ExtendoBrainException {
@@ -93,7 +93,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
         String styleName = p.styleName;
 
         try {
-            p.map = new HashMap<String, Object>();
+            p.map = new HashMap<>();
 
             if (!(p.baseGraph instanceof KeyIndexableGraph)) {
                 return error("graph must be an instance of IndexableGraph");
@@ -106,7 +106,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
                 p.wikiView = new String(p.wikiView.getBytes("UTF-8"));
             }
 
-            p.manager = new FramedGraph<KeyIndexableGraph>(p.baseGraph);
+            p.manager = new FramedGraph<>(p.baseGraph);
             p.brain = getBrain(p.baseGraph);
             p.queries = new NoteQueries(p.brain);
             p.parser = new NoteParser();

@@ -77,8 +77,8 @@ public class KnowledgeBase {
 
     public KnowledgeBase(final BrainGraph graph) {
         this.graph = graph;
-        this.atomClassifications = new HashMap<Atom, List<AtomClassEntry>>();
-        this.classes = new HashMap<Class<? extends AtomClass>, AtomClass>();
+        this.atomClassifications = new HashMap<>();
+        this.classes = new HashMap<>();
     }
 
     /**
@@ -98,6 +98,7 @@ public class KnowledgeBase {
     /**
      * Gets a list of classifications of the given atom, sorted in descending order by score.
      * If the atom has not been classified, a null is returned.
+     *
      * @param a the classified atom
      * @return either null (if the atom has not been classified)
      * or a list of classifications of the given atom, sorted in descending order by score
@@ -109,7 +110,7 @@ public class KnowledgeBase {
             return entries;
         } else {
             // sort in descending order by total score, putting the top-ranked class first
-            List<KnowledgeBase.AtomClassEntry> helper = new LinkedList<KnowledgeBase.AtomClassEntry>();
+            List<KnowledgeBase.AtomClassEntry> helper = new LinkedList<>();
             helper.addAll(entries);
             Collections.sort(helper, KnowledgeBase.AtomClassificationComparator.INSTANCE);
             return helper;
@@ -353,6 +354,7 @@ public class KnowledgeBase {
      *                Type inference is performed on the entire knowledge base without regard to sharability,
      *                but generated RDF statements are limited to those subjects which are sharable according to
      *                the filter.
+     * @throws org.openrdf.rio.RDFHandlerException if a downstream error occurs
      */
     public synchronized void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
@@ -372,7 +374,7 @@ public class KnowledgeBase {
             String alias = subject.getAlias();
 
             List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
-            List<AtomClassEntry> newEntries = new LinkedList<AtomClassEntry>();
+            List<AtomClassEntry> newEntries = new LinkedList<>();
 
             for (AtomClass clazz : classes.values()) {
                 /* DO NOT REMOVE
@@ -380,7 +382,7 @@ public class KnowledgeBase {
                     System.out.println("break point here");
                 }//*/
 
-                List<AtomClassEntry> evidenceEntries = new LinkedList<AtomClassEntry>();
+                List<AtomClassEntry> evidenceEntries = new LinkedList<>();
 
                 Collection<RdfizationCallback> callbacks = null == handler
                         ? null : new LinkedList<RdfizationCallback>();
@@ -555,7 +557,7 @@ public class KnowledgeBase {
             // perform rdfization, choosing at most one classification
             if (null != handler && (null == filter || filter.isVisible(subject.asVertex()))) {
                 if (newEntries.size() > 0) {
-                    List<AtomClassEntry> helper = new LinkedList<AtomClassEntry>();
+                    List<AtomClassEntry> helper = new LinkedList<>();
                     helper.addAll(newEntries);
                     Collections.sort(helper, totalScoreDescending);
                     AtomClassEntry best = helper.get(0);
@@ -618,7 +620,7 @@ public class KnowledgeBase {
         System.out.println("* :" + a.asVertex().getId() + ": " + value50);
         List<AtomClassEntry> entries = atomClassifications.get(a);
         if (null != entries) {
-            List<AtomClassEntry> helper = new LinkedList<AtomClassEntry>();
+            List<AtomClassEntry> helper = new LinkedList<>();
             helper.addAll(entries);
             Collections.sort(helper, AtomClassificationComparator.INSTANCE);
             for (AtomClassEntry e : helper) {
@@ -789,6 +791,7 @@ public class KnowledgeBase {
          * A classification which has a score of zero is a trivial property-based regex match with no
          * structural evidence to support it.
          * These are not included in the exported RDF, as they include many false positives.
+         * @return whether this classification has a nonzero confidence score
          */
         public boolean isNonTrivial() {
             return getScore() > 0;

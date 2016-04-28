@@ -81,12 +81,9 @@ public class SemanticSynchrony {
         try {
             // logging configuration
             {
-                InputStream in = SemanticSynchrony.class.getResourceAsStream("logging.properties");
-                try {
+                try (InputStream in = SemanticSynchrony.class.getResourceAsStream("logging.properties")) {
                     LogManager.getLogManager().reset();
                     LogManager.getLogManager().readConfiguration(in);
-                } finally {
-                    in.close();
                 }
                 logger = getLogger(SemanticSynchrony.class);
             }
@@ -120,16 +117,14 @@ public class SemanticSynchrony {
      * in the current directory.
      *
      * @param file the file path to the configuration properties to add
+     * @throws java.io.IOException if the file does not exist or can't be loaded
      */
     public static void addConfiguration(final File file) throws IOException {
         if (file.exists()) {
             logger.info("loading Semantic Synchrony configuration at " + file.getAbsoluteFile());
             Properties p = new Properties();
-            InputStream in = new FileInputStream(file);
-            try {
+            try (InputStream in = new FileInputStream(file)) {
                 p.load(in);
-            } finally {
-                in.close();
             }
 
             addConfiguration(p);
@@ -180,13 +175,16 @@ public class SemanticSynchrony {
 
     /**
      * Unicode-escapes strings for ease of consumption by external tools such as R.
-     * Characters in high (>= 0x7F) and low (< 0x20) ranges are escaped.
+     * Characters in high (0x7F or higher) and low (lower than 0x20) ranges are escaped.
      * Note that these ranges include newline, tab, and delete characters.
+     *
+     * @param plain the string to escape
+     * @return the escaped string
      */
-    public static String unicodeEscape(final String s) {
+    public static String unicodeEscape(final String plain) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
+        for (int i = 0; i < plain.length(); i++) {
+            char c = plain.charAt(i);
             if (c < 32 || c >= 127) {
                 sb.append("\\u");
                 sb.append((char) HEX_CHARS[(c >> 12) & 0xF]);

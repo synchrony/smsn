@@ -1,14 +1,15 @@
 package net.fortytwo.smsn.rdf;
 
-import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
-import net.fortytwo.smsn.rdf.vocab.FOAF;
-import net.fortytwo.smsn.rdf.vocab.Timeline;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.smsn.rdf.vocab.FOAF;
+import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
+import net.fortytwo.smsn.rdf.vocab.Timeline;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.vocabulary.RDF;
@@ -79,28 +80,33 @@ public class Activities {
     private static final DatasetFactory factory = new DatasetFactory();
     private static final ValueFactory vf = factory.getValueFactory();
 
+    private static final Resource[] defaultGraphArray = {null};
+
     /**
      * Creates an RDF dataset for a pointing event
      *
-     * @param timestamp      the moment at which the activity was recognized, in milliseconds since the Unix epoch
-     * @param actor          the person performing the action of pointing
-     * @param referent the thing referenced or physically pointed to
+     * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
+     * @param actor     the person performing the action of pointing
+     * @param referent  the thing referenced or physically pointed to
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForPointingGesture(final long timestamp,
                                                     final Resource actor,
-                                                    final Resource referent) {
+                                                    final Resource referent,
+                                                    Resource... graphs) {
         if (null == actor || null == referent) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.Point));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.referent, referent));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Point, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.referent, referent, graph));
+        }
 
-        return datasetForGesture(timestamp, activity, c, actor);
+        return datasetForGesture(timestamp, activity, c, actor, graphs);
     }
 
     /**
@@ -111,17 +117,20 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForBatonGesture(final long timestamp,
-                                                 final Resource actor) {
+                                                 final Resource actor,
+                                                 Resource... graphs) {
         if (null == actor) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.BatonGesture));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.BatonGesture, graph));
+        }
 
-        return datasetForGesture(timestamp, activity, c, actor);
+        return datasetForGesture(timestamp, activity, c, actor, graphs);
     }
 
     /**
@@ -132,17 +141,20 @@ public class Activities {
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandshakePulse(final long timestamp,
-                                                   final Resource actor) {
+                                                   final Resource actor,
+                                                   Resource... graphs) {
         if (null == actor) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.HandshakePulse));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.HandshakePulse, graph));
+        }
 
-        return datasetForGesture(timestamp, activity, c, actor);
+        return datasetForGesture(timestamp, activity, c, actor, graphs);
     }
 
     /**
@@ -155,19 +167,22 @@ public class Activities {
      */
     public static Dataset datasetForHandshakeInteraction(final long timestamp,
                                                          final Resource actor1,
-                                                         final Resource actor2) {
+                                                         final Resource actor2,
+                                                         Resource... graphs) {
         if (null == actor1 || null == actor2) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handshake));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, actor1));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, actor2));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handshake, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.actor, actor1, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.actor, actor2, graph));
+        }
 
-        return datasetForActivity(timestamp, activity, c);
+        return datasetForActivity(timestamp, activity, c, graphs);
     }
 
     /**
@@ -183,20 +198,23 @@ public class Activities {
     public static Dataset datasetForHandoffInteraction(final long timestamp,
                                                        final Resource giver,
                                                        final Resource taker,
-                                                       final Resource thingGiven) {
+                                                       final Resource thingGiven,
+                                                       Resource... graphs) {
         if (null == giver || null == taker || null == thingGiven) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handoff));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.giver, giver));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.taker, taker));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.thingGiven, thingGiven));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handoff, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.giver, giver, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.taker, taker, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.thingGiven, thingGiven, graph));
+        }
 
-        return datasetForActivity(timestamp, activity, c);
+        return datasetForActivity(timestamp, activity, c, graphs);
     }
 
     /**
@@ -209,19 +227,22 @@ public class Activities {
      */
     public static Dataset datasetForHighFiveInteraction(final long timestamp,
                                                         final Resource actor1,
-                                                        final Resource actor2) {
+                                                        final Resource actor2,
+                                                        Resource... graphs) {
         if (null == actor1 || null == actor2) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.HighFive));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, actor1));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, actor2));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.HighFive, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.actor, actor1, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.actor, actor2, graph));
+        }
 
-        return datasetForActivity(timestamp, activity, c);
+        return datasetForActivity(timestamp, activity, c, graphs);
     }
 
     /**
@@ -234,40 +255,57 @@ public class Activities {
      */
     public static Dataset datasetForAttentionActivity(final long timestamp,
                                                       final Resource actor,
-                                                      final Resource focusOfAttention) {
+                                                      final Resource focusOfAttention,
+                                                      Resource... graphs) {
         if (null == actor || null == focusOfAttention) {
             throw new IllegalArgumentException();
         }
 
-        Collection<Statement> c = new LinkedList<Statement>();
+        Collection<Statement> c = new LinkedList<>();
         URI activity = factory.randomURI();
 
-        c.add(vf.createStatement(activity, RDF.TYPE, SmSnActivityOntology.Attention));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, actor));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.focusOfAttention, focusOfAttention));
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Attention, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.actor, actor, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.focusOfAttention, focusOfAttention, graph));
+        }
 
-        return datasetForActivity(timestamp, activity, c);
+        return datasetForActivity(timestamp, activity, c, graphs);
     }
 
     private static Dataset datasetForGesture(final long timestamp,
                                              final Resource activity,
                                              final Collection<Statement> c,
-                                             final Resource agent) {
-        c.add(vf.createStatement(activity, SmSnActivityOntology.actor, agent));
+                                             final Resource agent,
+                                             Resource... graphs) {
+        for (Resource graph : fixGraphs(graphs)) {
+            c.add(createStatement(activity, SmSnActivityOntology.actor, agent, graph));
+        }
 
-        return datasetForActivity(timestamp, activity, c);
+        return datasetForActivity(timestamp, activity, c, graphs);
     }
 
     private static Dataset datasetForActivity(final long timestamp,
                                               final Resource activity,
-                                              final Collection<Statement> c) {
-        URI instant = factory.randomURI();
-        c.add(vf.createStatement(instant, RDF.TYPE, Timeline.Instant));
-        Literal dateValue = vf.createLiteral(TIMESTAMP_FORMAT.format(timestamp), XMLSchema.DATETIME);
-        c.add(vf.createStatement(instant, Timeline.at, dateValue));
-        c.add(vf.createStatement(activity, SmSnActivityOntology.recognitionTime, instant));
+                                              final Collection<Statement> c,
+                                              Resource... graphs) {
+        for (Resource graph : fixGraphs(graphs)) {
+            URI instant = factory.randomURI();
+            c.add(createStatement(instant, RDF.TYPE, Timeline.Instant, graph));
+            Literal dateValue = vf.createLiteral(TIMESTAMP_FORMAT.format(timestamp), XMLSchema.DATETIME);
+            c.add(createStatement(instant, Timeline.at, dateValue, graph));
+            c.add(createStatement(activity, SmSnActivityOntology.recognitionTime, instant, graph));
+        }
 
         return new Dataset(c);
+    }
+
+    private static Resource[] fixGraphs(Resource... graphs) {
+        return (0 == graphs.length) ? defaultGraphArray : graphs;
+    }
+
+    private static Statement createStatement(Resource subject, URI predicate, Value object, Resource graph) {
+        return vf.createStatement(subject, predicate, object, graph);
     }
 
     public static void main(final String[] args) throws Exception {

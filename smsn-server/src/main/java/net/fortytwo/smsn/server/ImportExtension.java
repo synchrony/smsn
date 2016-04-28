@@ -39,8 +39,8 @@ public class ImportExtension extends SmSnExtension {
     private final Map<Graph, Set<String>> importsSucceeded;
 
     public ImportExtension() {
-        importsInProgress = new HashMap<Graph, Set<String>>();
-        importsSucceeded = new HashMap<Graph, Set<String>>();
+        importsInProgress = new HashMap<>();
+        importsSucceeded = new HashMap<>();
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
@@ -80,7 +80,7 @@ public class ImportExtension extends SmSnExtension {
                 return ExtensionResponse.error("graph at " + file + " is currently being imported");
             }
         } else {
-            files = new HashSet<String>();
+            files = new HashSet<>();
         }
         files.add(file);
 
@@ -96,7 +96,7 @@ public class ImportExtension extends SmSnExtension {
         if (success) {
             files = importsSucceeded.get(g);
             if (null == files) {
-                files = new HashSet<String>();
+                files = new HashSet<>();
                 importsSucceeded.put(g, files);
             }
             files.add(file);
@@ -138,8 +138,7 @@ public class ImportExtension extends SmSnExtension {
         }
 
         boolean success = false;
-        InputStream in = new FileInputStream(p.file);
-        try {
+        try (InputStream in = new FileInputStream(p.file)) {
             switch (format) {
                 case GraphML:
                     importGraphML(p.brain.getBrainGraph(), in);
@@ -150,7 +149,7 @@ public class ImportExtension extends SmSnExtension {
             success = true;
         } finally {
             finishImport(p.baseGraph, p.file, success);
-            in.close();
+
         }
 
         return ExtensionResponse.ok(p.map);

@@ -63,7 +63,7 @@ public class ExportExtension extends SmSnExtension {
     }
 
     private static Set<String> keywords(final String... labels) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (String l : labels) {
             set.add("\\" + l);
         }
@@ -187,7 +187,7 @@ public class ExportExtension extends SmSnExtension {
                     "link");
         }
 
-        PageRank<Vertex, Edge> pr = new PageRank<Vertex, Edge>(new GraphJung(g2), 0.15d);
+        PageRank<Vertex, Edge> pr = new PageRank<>(new GraphJung(g2), 0.15d);
         pr.evaluate();
 
         p.println("id\tscore");
@@ -328,8 +328,7 @@ public class ExportExtension extends SmSnExtension {
         }
 
         Filter filter = null;
-        OutputStream out = new FileOutputStream(p.file);
-        try {
+        try (OutputStream out = new FileOutputStream(p.file)) {
             switch (format) {
                 case Vertices:
                     exportVertices(p.brain.getBrainGraph(), p.brain.getKnowledgeBase(), new PrintStream(out));
@@ -359,8 +358,6 @@ public class ExportExtension extends SmSnExtension {
                 default:
                     throw new IllegalStateException();
             }
-        } finally {
-            out.close();
         }
 
         return ExtensionResponse.ok(p.map);
