@@ -1,9 +1,9 @@
-;; Brain-mode: the Extend-o-Brain Emacs library
+;; Brain-mode: the MyOtherBrain Emacs library
 ;;
 ;; Required global variables:
 ;;
 ;;     smsn-rexster-url: IP, port, and local path to the rexster server
-;;     smsn-rexster-graph: name of Extend-o-Brain graph served by Rexster
+;;     smsn-rexster-graph: name of MyOtherBrain graph served by Rexster
 ;;
 ;; Optional global variables:
 ;;
@@ -53,8 +53,9 @@
 (setq smsn-readonly-mode "readonly")
 (setq smsn-edit-mode "readwrite")
 (setq smsn-search-mode "search")
-(setq smsn-sharability-viewstyle "sharability")
-(setq smsn-inference-viewstyle "inference")
+
+(setq smsn-color-by-sharability "sharability")
+(setq smsn-color-by-class-inference "inference")
 
 (setq smsn-forward-style "forward")
 (setq smsn-backward-style "backward")
@@ -78,7 +79,7 @@
 (setq smsn-atoms nil)
 (setq smsn-current-line 1)
 (setq smsn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
-(setq smsn-viewstyle smsn-sharability-viewstyle)
+(setq smsn-viewstyle smsn-color-by-sharability)
 (setq smsn-view-properties nil)
 (setq smsn-value-truncation-length 100)
 (setq smsn-minimize-verbatim-blocks nil)
@@ -534,7 +535,7 @@
             title)))
 
 (defun using-inference ()
-    (equal smsn-viewstyle smsn-inference-viewstyle))
+    (equal smsn-viewstyle smsn-color-by-class-inference))
 
 ;; unused colors: black/gray, orange
 (setq sharability-base-colors  '("#660000" "#604000" "#005000" "#000066"))
@@ -561,7 +562,7 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability bright has-meta)
+(defun atom-color (weight sharability bright has-meta)
     (let ((s
         (if (using-inference)
             (elt (if bright inference-bright-colors inference-base-colors) (if has-meta 0 1))
@@ -571,19 +572,22 @@
             (fade-color (color-part-green s) weight)
             (fade-color (color-part-blue s) weight))))
 
+(defun atom-color-at-visibility-threshold ()
+    (atom-color 0.75 (+ 0.25 smsn-min-sharability) nil nil))
+
 (setq full-colors-supported (> (length (defined-colors)) 8))
 
 (defun colorize (text weight sharability priority-bg priority-fg bright has-meta)
     (let ((color (if full-colors-supported
-            (find-color weight sharability bright has-meta)
+            (atom-color weight sharability bright has-meta)
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
         (setq l (list
             :foreground color
             ;;:weight 'bold
             :underline (if (and priority-fg (> priority-fg 0))
-                (list :color (find-color priority-fg sharability bright has-meta)) nil)
+                (list :color (atom-color priority-fg sharability bright has-meta)) nil)
             :box (if priority-bg (list
-                :color (find-color priority-bg sharability bright has-meta)) nil)))
+                :color (atom-color priority-bg sharability bright has-meta)) nil)))
         (propertize text 'face l)))
 
 (defun black (text)
@@ -636,7 +640,8 @@
                         (setq line (concat line space))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability target-priority nil target-alias target-meta)
+                                (colorize bullet
+                                    target-weight target-sharability target-priority nil target-alias target-meta)
                                 id-infix
                                 " "
                                 (colorize (delimit-value target-value)
@@ -646,8 +651,10 @@
                     (if (using-inference)
                         (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n")))))
                     (if smsn-view-properties (let ()
-                        (insert (light-gray (concat space "    @sharability " (number-to-string target-sharability) "\n")))
-                        (insert (light-gray (concat space "    @weight      " (number-to-string target-weight) "\n")))
+                        (insert (light-gray
+                            (concat space "    @sharability " (number-to-string target-sharability) "\n")))
+                        (insert (light-gray
+                            (concat space "    @weight      " (number-to-string target-weight) "\n")))
                         (if target-shortcut
                             (insert (light-gray (concat space "    @shortcut    " target-shortcut "\n"))))
                         (if target-alias
@@ -662,8 +669,14 @@
         "(root: " smsn-root-id
          " :height " (num-or-nil-to-string smsn-height)
          " :style " smsn-style
-         " :sharability [" (num-or-nil-to-string smsn-min-sharability) ", " (num-or-nil-to-string smsn-default-sharability) ", " (num-or-nil-to-string smsn-max-sharability) "]"
-         " :weight [" (num-or-nil-to-string smsn-min-weight) ", " (num-or-nil-to-string smsn-default-weight) ", " (num-or-nil-to-string smsn-max-weight) "]"
+         " :sharability
+             [" (num-or-nil-to-string smsn-min-sharability)
+             ", " (num-or-nil-to-string smsn-default-sharability)
+             ", " (num-or-nil-to-string smsn-max-sharability) "]"
+         " :weight
+             [" (num-or-nil-to-string smsn-min-weight)
+             ", " (num-or-nil-to-string smsn-default-weight)
+             ", " (num-or-nil-to-string smsn-max-weight) "]"
          " :value \"" smsn-title "\")"))  ;; TODO: actually escape the title string
 
 (defun mode-for-visit ()
@@ -709,7 +722,9 @@
 
 (defun set-min-weight (s)
     (if (and (in-setproperties-mode) (>= s 0) (<= s 1))
-        (request-view t smsn-mode smsn-root-id smsn-height smsn-style smsn-min-sharability smsn-max-sharability smsn-default-sharability s smsn-max-weight smsn-default-weight)
+        (request-view t smsn-mode smsn-root-id smsn-height smsn-style
+            smsn-min-sharability smsn-max-sharability smsn-default-sharability
+            s smsn-max-weight smsn-default-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -721,7 +736,9 @@
 
 (defun set-min-sharability (s)
     (if (and (in-setproperties-mode) (>= s 0) (<= s 1))
-        (request-view t smsn-mode smsn-root-id smsn-height smsn-style s smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)
+        (request-view t smsn-mode smsn-root-id smsn-height smsn-style
+            s smsn-max-sharability smsn-default-sharability
+            smsn-min-weight smsn-max-weight smsn-default-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -730,7 +747,9 @@
     (if (in-setproperties-mode)
         (lexical-let (
                 (mode smsn-mode)
-                (url (request-view-url smsn-root-id smsn-height smsn-style smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)))
+                (url (request-view-url smsn-root-id smsn-height smsn-style
+                    smsn-min-sharability smsn-max-sharability smsn-default-sharability
+                    smsn-min-weight smsn-max-weight smsn-default-weight)))
             (setq smsn-current-line (line-number-at-pos))
             (setq smsn-future-sharability smsn-default-sharability)
             (http-get
@@ -827,12 +846,12 @@
             smsn-min-weight smsn-max-weight smsn-default-weight)))
 
 (defun smsn-events ()
-    "retrieve the Extend-o-Brain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
+    "retrieve the MyOtherBrain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
     (interactive)
     (request-events 2))
 
 (defun smsn-export-edges (file)
-    "export tab-separated dump of Extend-o-Brain parent-child edges to the file system"
+    "export tab-separated dump of MyOtherBrain parent-child edges to the file system"
     (interactive)
     (message (concat "exporting edges to " file))
     (do-export "Edges" file
@@ -853,7 +872,7 @@
         smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
 
 (defun smsn-export-pagerank (file)
-    "export a tab-separated PageRank ranking of Extend-o-Brain atoms to the file system"
+    "export a tab-separated PageRank ranking of MyOtherBrain atoms to the file system"
     (interactive)
     (message (concat "computing and exporting PageRank to " file))
     (do-export "PageRank" file
@@ -874,7 +893,7 @@
         smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
 
 (defun smsn-export-vertices (file)
-    "export tab-separated dump of Extend-o-Brain vertices (atoms) to the file system"
+    "export tab-separated dump of MyOtherBrain vertices (atoms) to the file system"
     (interactive)
     (message (concat "exporting vertices to " file))
     (do-export "Vertices" file
@@ -920,7 +939,7 @@
         smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
 
 (defun smsn-infer-types ()
-    "perform type inference on the Extend-o-Brain knowledge base, adding type annotations"
+    "perform type inference on the MyOtherBrain knowledge base, adding type annotations"
     (interactive)
     (message "performing type inference")
     (do-infer-types))
@@ -993,7 +1012,9 @@
                         :height (number-to-string smsn-height)
                         :style smsn-style
                         :view entity
-                        :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight))))))
+                        :filter (filter-json
+                            smsn-min-sharability smsn-max-sharability smsn-default-sharability
+                            smsn-min-weight smsn-max-weight smsn-default-weight))))))
             (receive-view smsn-edit-mode)))))
 
 (defun smsn-ripple-query (query)
@@ -1109,9 +1130,9 @@ In the sharability view style, colors are assigned to atoms based on the sharabi
 However, in the type inference view style, an atom is either cyan or magenta depending on whether
 a type has been assigned to it by the inference engine."
     (interactive)
-    (setq smsn-viewstyle (if (equal smsn-viewstyle smsn-sharability-viewstyle)
-        smsn-inference-viewstyle
-        smsn-sharability-viewstyle))
+    (setq smsn-viewstyle (if (equal smsn-viewstyle smsn-color-by-sharability)
+        smsn-color-by-class-inference
+        smsn-color-by-sharability))
     (smsn-update-view)
     (message (concat "switched to " smsn-viewstyle " view style")))
 
@@ -1161,7 +1182,9 @@ a type has been assigned to it by the inference engine."
 (defun smsn-visit-in-amazon (value-selector)
     "search Amazon.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
-        (concat "http://www.amazon.com/s?ie=UTF8&index=blended&link_code=qs&field-keywords=" (w3m-url-encode-string value)))))
+        (concat
+            "http://www.amazon.com/s?ie=UTF8&index=blended&link_code=qs&field-keywords="
+            (w3m-url-encode-string value)))))
 
 (defun smsn-visit-in-delicious (value-selector)
     "search delicious.com for the value generated by VALUE-SELECTOR and view the results in a browser"
@@ -1208,7 +1231,9 @@ a type has been assigned to it by the inference engine."
     (interactive)
     (let ((id (atom-id-at-point)))
         (if id
-            (request-view nil (mode-for-visit) id smsn-height smsn-style smsn-min-sharability smsn-max-sharability (future-sharability (current-target-sharability)) smsn-min-weight smsn-max-weight smsn-default-weight)
+            (request-view nil (mode-for-visit) id smsn-height smsn-style
+                smsn-min-sharability smsn-max-sharability (future-sharability (current-target-sharability))
+                smsn-min-weight smsn-max-weight smsn-default-weight)
             (no-target))))
 
 (defun smsn-visit-target-alias ()
@@ -1230,41 +1255,140 @@ a type has been assigned to it by the inference engine."
 
 
 ;; KEYBOARD MAPPINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun minibuffer-arg (function prompt &optional initial)
-    (lexical-let ((f function) (p prompt) (i initial))
-        (lambda ()
-            (interactive)
-            ;; note: use of the INITIAL argument is discouraged, but here it makes sense
-            (let ((arg (read-from-minibuffer p i)))
-                (if arg (funcall f arg))))))
-
-(defun char-arg (function prompt)
-    (lexical-let ((f function) (p prompt))
-        (lambda ()
-            (interactive)
-            (let ((c (read-char p)))
-                (if c (funcall f c))))))
-
 ;; Note: when updating this list of mappings, also update the PKB
+
+(defun prompt-for-string (function prompt &optional initial)
+    ;; note: use of the INITIAL argument is discouraged, but here it makes sense
+    (let ((arg (read-from-minibuffer prompt initial)))
+        (if arg (funcall function arg))))
+
+(defun prompt-for-char (function prompt)
+    (let ((c (read-char prompt)))
+        (if c (funcall function c))))
+
+(defun smsn-insert-attr-priority-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-insert-attr-priority "priority = ?"))
+
+(defun smsn-insert-attr-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-insert-attr-sharability "sharability = ?"))
+
+(defun smsn-insert-attr-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-insert-attr-weight "weight = ?"))
+
+(defun smsn-set-view-height-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-view-height "height = ?"))
+
+(defun smsn-export-edges-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-edges "export edges to file: " smsn-default-edges-file))
+
+(defun smsn-export-graphml-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-graphml "export GraphML to file: " smsn-default-graphml-file))
+
+(defun smsn-export-latex-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-latex "export LaTeX to file: " smsn-default-latex-file))
+
+(defun smsn-export-pagerank-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-pagerank "export PageRank results to file: " smsn-default-pagerank-file))
+
+(defun smsn-export-rdf-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-rdf "export private RDF dump to file: " smsn-default-rdf-file))
+
+(defun smsn-export-vertices-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-vertices "export vertices to file: " smsn-default-vertices-file))
+
+(defun smsn-export-webrdf-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-export-webrdf "export public Web RDF dump to file: " smsn-default-webrdf-file))
+
+(defun smsn-import-graphml-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-import-graphml "import GraphML from file: " smsn-default-graphml-file))
+
+(defun smsn-goto-line-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-goto-line "line: "))
+
+(defun smsn-set-default-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-default-sharability "default sharability = ?"))
+
+(defun smsn-set-min-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-min-sharability "minimum sharability = ?"))
+
+(defun smsn-set-target-priority-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-target-priority "new priority = ?"))
+
+(defun smsn-set-target-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-target-sharability "new sharability = ?"))
+
+(defun smsn-set-target-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-target-weight "new weight = ?"))
+
+(defun smsn-set-value-truncation-length-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-set-value-truncation-length "value truncation length: "))
+
+(defun smsn-set-default-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-default-weight "default weight = ?"))
+
+(defun smsn-set-min-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'smsn-set-min-weight "minimun weight = ?"))
+
+(defun smsn-acronym-query-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-acronym-query "acronym search for: "))
+
+(defun smsn-shortcut-query-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-shortcut-query "shortcut search for: "))
+
+(defun smsn-ripple-query-prompt ()
+    (interactive)
+    (prompt-for-string 'smsn-ripple-query "ripple query: "))
+
+(defun smsn-fulltext-query-prompt ()
+    (interactive)
+    (let (
+      (newcol (atom-color-at-visibility-threshold))
+      (oldcol (face-foreground 'minibuffer-prompt)))
+        (set-face-foreground 'minibuffer-prompt newcol)
+        (prompt-for-string 'smsn-fulltext-query "full-text search for: ")
+        (set-face-foreground 'minibuffer-prompt oldcol)))
+
 (global-set-key (kbd "C-c C-I f")       'smsn-find-isolated-atoms)
 (global-set-key (kbd "C-c C-I r")       'smsn-remove-isolated-atoms)
-(global-set-key (kbd "C-c C-a C-p")     (char-arg 'smsn-insert-attr-priority "priority = ?"))
-(global-set-key (kbd "C-c C-a C-s")     (char-arg 'smsn-insert-attr-sharability "sharability = ?"))
-(global-set-key (kbd "C-c C-a C-w")     (char-arg 'smsn-insert-attr-weight "weight = ?"))
+(global-set-key (kbd "C-c C-a C-p")     'smsn-insert-attr-priority-prompt)
+(global-set-key (kbd "C-c C-a C-s")     'smsn-insert-attr-sharability-prompt)
+(global-set-key (kbd "C-c C-a C-w")     'smsn-insert-attr-weight-prompt)
 (global-set-key (kbd "C-c C-a d")       'smsn-insert-current-date)
 (global-set-key (kbd "C-c C-a s")       'smsn-insert-current-time-with-seconds)
 (global-set-key (kbd "C-c C-a t")       'smsn-insert-current-time)
-(global-set-key (kbd "C-c C-d")         (char-arg 'smsn-set-view-height "height = ?"))
-(global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'smsn-export-edges "export edges to file: " smsn-default-edges-file))
-(global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'smsn-export-graphml "export GraphML to file: " smsn-default-graphml-file))
-(global-set-key (kbd "C-c C-e l")       (minibuffer-arg 'smsn-export-latex "export LaTeX to file: " smsn-default-latex-file))
-(global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'smsn-export-pagerank "export PageRank results to file: " smsn-default-pagerank-file))
-(global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'smsn-export-rdf "export private RDF dump to file: " smsn-default-rdf-file))
-(global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'smsn-export-vertices "export vertices to file: " smsn-default-vertices-file))
-(global-set-key (kbd "C-c C-e w")       (minibuffer-arg 'smsn-export-webrdf "export public Web RDF dump to file: " smsn-default-webrdf-file))
-(global-set-key (kbd "C-c C-i g")       (minibuffer-arg 'smsn-import-graphml "import GraphML from file: " smsn-default-graphml-file))
-(global-set-key (kbd "C-c C-l")         (minibuffer-arg 'smsn-goto-line "line: "))
+(global-set-key (kbd "C-c C-d")         'smsn-set-view-height-prompt)
+(global-set-key (kbd "C-c C-e e")       'smsn-export-edges-prompt)
+(global-set-key (kbd "C-c C-e g")       'smsn-export-graphml-prompt)
+(global-set-key (kbd "C-c C-e l")       'smsn-export-latex-prompt)
+(global-set-key (kbd "C-c C-e p")       'smsn-export-pagerank-prompt)
+(global-set-key (kbd "C-c C-e r")       'smsn-export-rdf-prompt)
+(global-set-key (kbd "C-c C-e v")       'smsn-export-vertices-prompt)
+(global-set-key (kbd "C-c C-e w")       'smsn-export-webrdf-prompt)
+(global-set-key (kbd "C-c C-i g")       'smsn-import-graphml-prompt)
+(global-set-key (kbd "C-c C-l")         'smsn-goto-line-prompt)
 (global-set-key (kbd "C-c C-r C-b a")   (smsn-visit-in-amazon 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b e")   (smsn-visit-in-ebay 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b d")   (smsn-visit-in-delicious 'current-root-value))
@@ -1274,8 +1398,8 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-r C-b t")   (smsn-visit-in-twitter 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b w")   (smsn-visit-in-wikipedia 'current-root-value))
 (global-set-key (kbd "C-c C-r C-b y")   (smsn-visit-in-youtube 'current-root-value))
-(global-set-key (kbd "C-c C-s C-d")     (char-arg 'smsn-set-default-sharability "default sharability = ?"))
-(global-set-key (kbd "C-c C-s C-m")     (char-arg 'smsn-set-min-sharability "minimum sharability = ?"))
+(global-set-key (kbd "C-c C-s C-d")     'smsn-set-default-sharability-prompt)
+(global-set-key (kbd "C-c C-s C-m")     'smsn-set-min-sharability-prompt)
 (global-set-key (kbd "C-c C-t C-a b")   'smsn-visit-target-alias)
 (global-set-key (kbd "C-c C-t C-b a")   (smsn-visit-in-amazon 'current-target-value))
 (global-set-key (kbd "C-c C-t C-b e")   (smsn-visit-in-ebay 'current-target-value))
@@ -1286,9 +1410,9 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-t C-b t")   (smsn-visit-in-twitter 'current-target-value))
 (global-set-key (kbd "C-c C-t C-b w")   (smsn-visit-in-wikipedia 'current-target-value))
 (global-set-key (kbd "C-c C-t C-b y")   (smsn-visit-in-youtube 'current-target-value))
-(global-set-key (kbd "C-c C-t C-p")     (char-arg 'smsn-set-target-priority "new priority = ?"))
-(global-set-key (kbd "C-c C-t C-s")     (char-arg 'smsn-set-target-sharability "new sharability = ?"))
-(global-set-key (kbd "C-c C-t C-w")     (char-arg 'smsn-set-target-weight "new weight = ?"))
+(global-set-key (kbd "C-c C-t C-p")     'smsn-set-target-priority-prompt)
+(global-set-key (kbd "C-c C-t C-s")     'smsn-set-target-sharability-prompt)
+(global-set-key (kbd "C-c C-t C-w")     'smsn-set-target-weight-prompt)
 ;; TODO: finish generalizing these "C-c C-t x" functions to root vs. target
 (global-set-key (kbd "C-c C-t a")       (smsn-visit-as-url 'current-target-value))
 (global-set-key (kbd "C-c C-t c")       'smsn-copy-target-value-to-clipboard)
@@ -1304,21 +1428,21 @@ a type has been assigned to it by the inference engine."
 (global-set-key (kbd "C-c C-v p")       'smsn-toggle-properties-view)
 (global-set-key (kbd "C-c C-v r")       'smsn-enter-readonly-view)
 (global-set-key (kbd "C-c C-v s")       'smsn-toggle-emacspeak)
-(global-set-key (kbd "C-c C-v t")       (minibuffer-arg 'smsn-set-value-truncation-length "value truncation length: "))
+(global-set-key (kbd "C-c C-v t")       'smsn-set-value-truncation-length-prompt)
 (global-set-key (kbd "C-c C-v v")       'smsn-toggle-minimize-verbatim-blocks)
-(global-set-key (kbd "C-c C-w C-d")     (char-arg 'smsn-set-default-weight "default weight = ?"))
-(global-set-key (kbd "C-c C-w C-m")     (char-arg 'smsn-set-min-weight "minimun weight = ?"))
-(global-set-key (kbd "C-c a")           (minibuffer-arg 'smsn-acronym-query "acronym search for: "))
+(global-set-key (kbd "C-c C-w C-d")     'smsn-set-default-weight-prompt)
+(global-set-key (kbd "C-c C-w C-m")     'smsn-set-min-weight-prompt)
+(global-set-key (kbd "C-c a")           'smsn-acronym-query-prompt)
 (global-set-key (kbd "C-c b")           'smsn-visit-url-at-point)
 (global-set-key (kbd "C-c d")           'smsn-duplicates)
 (global-set-key (kbd "C-c f")           'smsn-find-roots)
 (global-set-key (kbd "C-c h")           'smsn-history)
 (global-set-key (kbd "C-c i")           'smsn-infer-types)
-(global-set-key (kbd "C-c o")           (minibuffer-arg 'smsn-shortcut-query "shortcut search for: "))
+(global-set-key (kbd "C-c o")           'smsn-shortcut-query-prompt)
 (global-set-key (kbd "C-c P")           'smsn-priorities)
 (global-set-key (kbd "C-c p")           'smsn-push-view)
-(global-set-key (kbd "C-c r")           (minibuffer-arg 'smsn-ripple-query "ripple query: "))
-(global-set-key (kbd "C-c s")           (minibuffer-arg 'smsn-fulltext-query "full-text search for: "))
+(global-set-key (kbd "C-c r")           'smsn-ripple-query-prompt)
+(global-set-key (kbd "C-c s")           'smsn-fulltext-query-prompt)
 (global-set-key (kbd "C-c t")           'smsn-visit-target)
 (global-set-key (kbd "C-c u")           'smsn-update-view)
 (global-set-key (kbd "C-c v")           'smsn-events)
