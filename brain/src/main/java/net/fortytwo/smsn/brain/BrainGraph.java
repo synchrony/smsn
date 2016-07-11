@@ -129,12 +129,12 @@ public class BrainGraph {
         return (String) a.asVertex().getId();
     }
 
-    public static String uriForId(final String id) {
+    public static String iriForId(final String id) {
         return thingNamespace + id;
     }
 
-    public static String uriOf(final Atom a) {
-        return uriForId(getId(a));
+    public static String iriOf(final Atom a) {
+        return iriForId(getId(a));
     }
 
     private static class ExtendoIdFactory implements IdGraph.IdFactory {

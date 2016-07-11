@@ -445,17 +445,17 @@ public class KnowledgeBaseTest {
             rc.commit();
 
             // ellipsis has no class, as the value "..." is matched by no regex
-            assertObjects(rc, context.uriOf(ellipsis), RDF.TYPE);
+            assertObjects(rc, context.iriOf(ellipsis), RDF.TYPE);
 
             Resource[] known = new Resource[]{
-                    context.uriOf(hermann),
-                    context.uriOf(pauline),
-                    context.uriOf(maria),
-                    context.uriOf(mileva),
-                    context.uriOf(elsa),
-                    context.uriOf(lieserl),
-                    context.uriOf(hansAlbert),
-                    context.uriOf(eduard)
+                    context.iriOf(hermann),
+                    context.iriOf(pauline),
+                    context.iriOf(maria),
+                    context.iriOf(mileva),
+                    context.iriOf(elsa),
+                    context.iriOf(lieserl),
+                    context.iriOf(hansAlbert),
+                    context.iriOf(eduard)
             };
 
             for (Resource r : known) {
@@ -463,38 +463,38 @@ public class KnowledgeBaseTest {
                 assertObjects(rc, r, RDF.TYPE, FOAF.PERSON);
             }
 
-            assertObjects(rc, context.uriOf(einstein), RDF.TYPE, FOAF.PERSON);
-            assertObjects(rc, context.uriOf(einstein), FOAF.NAME, new LiteralImpl("Albert Einstein"));
+            assertObjects(rc, context.iriOf(einstein), RDF.TYPE, FOAF.PERSON);
+            assertObjects(rc, context.iriOf(einstein), FOAF.NAME, new LiteralImpl("Albert Einstein"));
             //assertObjects(rc, context.uriOf(einstein), FOAF.INTEREST, context.uriOf(physics));
-            assertObjects(rc, context.uriOf(einstein), FOAF.KNOWS, known);
+            assertObjects(rc, context.iriOf(einstein), FOAF.KNOWS, known);
 
-            assertObjects(rc, context.uriOf(einstein), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Albert_Einstein"));
-            assertObjects(rc, context.uriOf(elsa), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Elsa_Einstein"));
-            assertObjects(rc, context.uriOf(eduard), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Eduard_Einstein"));
+            assertObjects(rc, context.iriOf(einstein), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Albert_Einstein"));
+            assertObjects(rc, context.iriOf(elsa), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Elsa_Einstein"));
+            assertObjects(rc, context.iriOf(eduard), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Eduard_Einstein"));
 
-            assertObjects(rc, context.uriOf(specialRelPaper), RDF.TYPE, FOAF.DOCUMENT);
-            assertObjects(rc, context.uriOf(specialRelPaper), FOAF.MAKER, context.uriOf(einstein));
-            assertObjects(rc, context.uriOf(specialRelPaper), FOAF.PAGE, context.uriOf(paperPdf));
-            assertObjects(rc, context.uriOf(specialRelPaper), FOAF.TOPIC,
-                    context.uriOf(speedOfLight),
-                    context.uriOf(simultaneity),
-                    context.uriOf(relativity));
-            assertObjects(rc, context.uriOf(speedOfLight), RDF.TYPE, OWL.THING);
-            assertObjects(rc, context.uriOf(speedOfLight), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Speed_of_light"));
-            assertObjects(rc, context.uriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, new LiteralImpl("@article{bibtexEntryHere}"));
+            assertObjects(rc, context.iriOf(specialRelPaper), RDF.TYPE, FOAF.DOCUMENT);
+            assertObjects(rc, context.iriOf(specialRelPaper), FOAF.MAKER, context.iriOf(einstein));
+            assertObjects(rc, context.iriOf(specialRelPaper), FOAF.PAGE, context.iriOf(paperPdf));
+            assertObjects(rc, context.iriOf(specialRelPaper), FOAF.TOPIC,
+                    context.iriOf(speedOfLight),
+                    context.iriOf(simultaneity),
+                    context.iriOf(relativity));
+            assertObjects(rc, context.iriOf(speedOfLight), RDF.TYPE, OWL.THING);
+            assertObjects(rc, context.iriOf(speedOfLight), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Speed_of_light"));
+            assertObjects(rc, context.iriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, new LiteralImpl("@article{bibtexEntryHere}"));
 
             // TODO: support for connection between person and quotation
-            assertObjects(rc, context.uriOf(quote), RDF.TYPE, SmSnVocabulary.WORDORPHRASE);
+            assertObjects(rc, context.iriOf(quote), RDF.TYPE, SmSnVocabulary.WORDORPHRASE);
 
             // note: in the future, this should be a project/tool rather than an organization
-            assertObjects(rc, context.uriOf(googleGlass), RDF.TYPE, FOAF.ORGANIZATION);
+            assertObjects(rc, context.iriOf(googleGlass), RDF.TYPE, FOAF.ORGANIZATION);
             // TODO
             //assertObjects(rc, context.uriOf(googleGlass), DCTERMS.CONTRIBUTOR,
             //        context.uriOf(einstein),
             //        context.uriOf(sebastian));
             // TODO: support for related things
 
-            assertObjects(rc, context.uriOf(h2g2), RDF.TYPE, FOAF.DOCUMENT);
+            assertObjects(rc, context.iriOf(h2g2), RDF.TYPE, FOAF.DOCUMENT);
             // TODO
             //assertObjects(rc, context.uriOf(h2g2), DBpediaOntology.owner, context.uriOf(einstein));
         } finally {

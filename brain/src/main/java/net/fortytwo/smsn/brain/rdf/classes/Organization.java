@@ -66,7 +66,7 @@ public class Organization extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     context.getSubjectUri(), FOAF.MEMBER, objectURI));
         }

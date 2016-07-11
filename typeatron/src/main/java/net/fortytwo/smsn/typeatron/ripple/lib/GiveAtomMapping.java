@@ -1,16 +1,16 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import com.illposed.osc.OSCMessage;
+import net.fortytwo.flow.Sink;
+import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.ModelConnection;
+import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
-import net.fortytwo.flow.Sink;
-import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.ModelConnection;
-import net.fortytwo.ripple.model.RippleList;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,21 +54,21 @@ public class GiveAtomMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't give non-atom: " + first);
         } else {
-            URI uri = uriOf(n);
+            IRI iri = iriOf(n);
 
             // value is informational; it is used only for development/debugging purposes
             String value = n.getValue();
 
-            logger.log(Level.INFO, "preparing to give " + uri + " (" + value + ")");
+            logger.log(Level.INFO, "preparing to give " + iri + " (" + value + ")");
 
             OSCMessage m = new OSCMessage(SmSnActivityOntology.EXO_ACTIVITY_GIVE);
-            m.addArgument(typeatron.getAgent().getAgentUri().stringValue());
-            m.addArgument(uri.stringValue());
+            m.addArgument(typeatron.getAgent().getAgentIri().stringValue());
+            m.addArgument(iri.stringValue());
             //m.addArgument(value);
             typeatron.getAgent().sendOSCMessageToCoordinator(m);
 
             // keep the stack unchanged
-            solutions.put(stack);
+            solutions.accept(stack);
         }
     }
 }

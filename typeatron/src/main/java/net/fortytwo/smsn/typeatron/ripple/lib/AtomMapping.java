@@ -1,16 +1,17 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
+import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.ModelConnection;
+import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
-import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.ModelConnection;
-import net.fortytwo.ripple.model.PrimitiveStackMapping;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.IRI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 import java.util.logging.Logger;
 
@@ -19,6 +20,8 @@ import java.util.logging.Logger;
  */
 public abstract class AtomMapping extends PrimitiveStackMapping {
     private static final Logger logger = Logger.getLogger(GetAtomValueMapping.class.getName());
+
+    private static final ValueFactory valueFactory = new ValueFactoryImpl();
 
     protected final ExtendoBrainClient client;
     protected final Filter filter;
@@ -95,16 +98,16 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
         }
     }
 
-    protected URI uriOf(final Note n) {
+    protected IRI iriOf(final Note n) {
         String alias = n.getAlias();
         if (null != alias) {
             try {
-                return new URIImpl(alias);
+                return valueFactory.createIRI(alias);
             } catch (IllegalArgumentException e) {
-                logger.warning("alias " + alias + " is not a URI");
+                logger.warning("alias " + alias + " is not an IRI");
             }
         }
 
-        return new URIImpl(BrainGraph.uriForId(n.getId()));
+        return valueFactory.createIRI(BrainGraph.iriForId(n.getId()));
     }
 }

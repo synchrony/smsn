@@ -37,13 +37,11 @@ public class ActivitiesTest {
 
     @Test
     public void testDatasetForGestureEvent() throws Exception {
-        //System.out.println("available RDF content languages:");
         RDFContentLanguage format = null;
         for (RDFContentLanguage l : f.getSupportedLanguages()) {
             if (RDFFormat.NTRIPLES.equals(l.getFormat())) {
                 format = l;
             }
-            //System.out.println("\t" + l.getFipaName() + ": " + l.getFormat().getName());
         }
 
         Dataset ds = Activities.datasetForBatonGesture(System.currentTimeMillis(), valueFactory.createURI(agentUri));

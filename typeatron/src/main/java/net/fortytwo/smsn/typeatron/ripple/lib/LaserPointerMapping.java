@@ -8,7 +8,7 @@ import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,21 +54,21 @@ public class LaserPointerMapping extends AtomMapping {
 
             // soft fail; propagate the stack even if we couldn't point
         } else {
-            URI uri = uriOf(n);
+            IRI iri = iriOf(n);
 
             // value is informational; it is used only for development/debugging purposes
             String value = n.getValue();
 
-            logger.log(Level.INFO, "pointing to " + uri + " (" + value + ")");
+            logger.log(Level.INFO, "pointing to " + iri + " (" + value + ")");
 
             try {
-                typeatron.pointTo(uri);
+                typeatron.pointTo(iri);
             } catch (Throwable t) {
                 throw new RippleException(t);
             }
         }
 
         // keep the stack unchanged
-        solutions.put(stack);
+        solutions.accept(stack);
     }
 }

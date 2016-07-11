@@ -9,9 +9,10 @@ import net.fortytwo.smsn.p2p.osc.UdpOscSender;
 import net.fortytwo.smsn.rdf.Activities;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.rdfagents.model.Dataset;
-import net.fortytwo.ripple.StringUtils;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.IRI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -27,6 +28,8 @@ import java.util.logging.Logger;
  */
 public class GesturalServer {
     private static final Logger logger = Logger.getLogger(GesturalServer.class.getName());
+
+    private static final ValueFactory valueFactory = new ValueFactoryImpl();
 
     private static final int DEFAULT_PORT = 42003;
 
@@ -77,7 +80,7 @@ public class GesturalServer {
             @Override
             public void handle(HandoffMatcher.Handoff give,
                                HandoffMatcher.Handoff take,
-                               URI thingGiven,
+                               IRI thingGiven,
                                long timestamp) {
                 notifyOfInteraction(SmSnActivityOntology.EXO_ACTIVITY_HANDOFF);
 
@@ -128,16 +131,16 @@ public class GesturalServer {
         }
     }
 
-    private URI getActor(final List<Object> args) {
+    private IRI getActor(final List<Object> args) {
         Object arg = args.get(0);
         if (!(arg instanceof String)) {
             logger.warning("actor argument must be a String");
             return null;
         }
         try {
-            return new URIImpl((String) arg);
+            return valueFactory.createIRI((String) arg);
         } catch (IllegalArgumentException e) {
-            logger.warning("actor not provided as a valid URI: " + arg);
+            logger.warning("actor not provided as a valid IRI: " + arg);
             return null;
         }
     }
@@ -159,7 +162,7 @@ public class GesturalServer {
                     return;
                 }
 
-                URI actor = getActor(args);
+                IRI actor = getActor(args);
                 if (null == actor) {
                     return;
                 }
@@ -181,7 +184,7 @@ public class GesturalServer {
                     return;
                 }
 
-                URI actor = getActor(args);
+                IRI actor = getActor(args);
                 if (null == actor) {
                     return;
                 }
@@ -206,8 +209,8 @@ public class GesturalServer {
                     return;
                 }
 
-                URI actor = new URIImpl((String) args.get(0));
-                URI thingGiven = new URIImpl((String) args.get(1));
+                IRI actor = valueFactory.createIRI((String) args.get(0));
+                IRI thingGiven = valueFactory.createIRI((String) args.get(1));
                 //String value = (String) args.get(2);
 
                 System.out.println(actor + " gave " + thingGiven);
@@ -225,7 +228,7 @@ public class GesturalServer {
                     return;
                 }
 
-                URI actor = getActor(args);
+                IRI actor = getActor(args);
                 if (null == actor) {
                     return;
                 }
@@ -296,9 +299,6 @@ public class GesturalServer {
         }
     }
 
-    // TODO: temporary for demo
-    private final Runtime runtime = Runtime.getRuntime();
-
     private void speakWithSystemCall(final String message) {
         System.out.println("SPEAKING: " + message);
 
@@ -308,7 +308,8 @@ public class GesturalServer {
 
         Process p = null;
         try {
-            p = runtime.exec("say \"" + StringUtils.escapeString(message) + "\"");
+            Runtime runtime = Runtime.getRuntime();
+            p = runtime.exec("say \"" + StringUtils.escape(message) + "\"");
         } catch (IOException e) {
             logger.log(Level.WARNING, "'say' command failed", e);
         }
@@ -323,9 +324,5 @@ public class GesturalServer {
                 logger.warning("'say' command failed with code " + exitCode);
             }
         }
-    }
-
-    public interface DatasetHandler {
-        void handle(Dataset dataset);
     }
 }

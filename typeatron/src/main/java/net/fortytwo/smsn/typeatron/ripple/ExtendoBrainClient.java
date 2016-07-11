@@ -71,12 +71,10 @@ public class ExtendoBrainClient {
         }
 
         // note: constructor will fail if any of these properties are not defined
-        String agentName = null;
-        String serverName = null;
-        int serverPort = 0;
-        String graph = null;
+        String serverName;
+        int serverPort;
+        String graph;
         try {
-            agentName = "ExtendoClient/" + config.getString(SemanticSynchrony.VERSION);
             serverName = config.getString(PROP_SERVER_NAME);
             serverPort = config.getInt(PROP_SERVER_PORT);
             graph = config.getString(PROP_GRAPH);
@@ -84,14 +82,14 @@ public class ExtendoBrainClient {
             throw new ExtendoBrainClientException(e);
         }
 
-        baseUrl = "/graphs/" + graph + "/extendo/";
+        baseUrl = "/graphs/" + graph + "/smsn/";
 
         httpProcessor = HttpProcessorBuilder.create()
                 .add(new RequestContent())
                 .add(new RequestTargetHost())
                 .add(new RequestConnControl())
-                .add(new RequestUserAgent(agentName))
-                .add(new RequestExpectContinue(true)).build();
+                .add(new RequestUserAgent())
+                .add(new RequestExpectContinue()).build();
         httpExecutor = new HttpRequestExecutor();
         httpContext = HttpCoreContext.create();
         httpHost = new HttpHost(serverName, serverPort);
@@ -385,7 +383,7 @@ public class ExtendoBrainClient {
     private void get(final HttpResponseHandler responseHandler,
                      final String... paths) throws IOException, HttpException {
 
-        ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
+        ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
         try (DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024)) {
             for (String path : paths) {
@@ -394,7 +392,7 @@ public class ExtendoBrainClient {
                     conn.bind(socket);
                 }
                 BasicHttpRequest request = new BasicHttpRequest("GET", path);
-                System.out.println(">> Request URI: " + request.getRequestLine().getUri());
+                System.out.println(">> Request IRI: " + request.getRequestLine().getUri());
 
                 httpExecutor.preProcess(request, httpProcessor, httpContext);
                 HttpResponse response = httpExecutor.execute(request, conn, httpContext);
@@ -415,7 +413,7 @@ public class ExtendoBrainClient {
                       final HttpResponseHandler responseHandler,
                       final HttpEntity... requests) throws IOException, HttpException {
 
-        ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
+        ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
         try (DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024)) {
             for (HttpEntity requestBody : requests) {
@@ -426,7 +424,7 @@ public class ExtendoBrainClient {
                 BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest("POST",
                         path);
                 request.setEntity(requestBody);
-                System.out.println(">> Request URI: " + request.getRequestLine().getUri());
+                System.out.println(">> Request IRI: " + request.getRequestLine().getUri());
 
                 httpExecutor.preProcess(request, httpProcessor, httpContext);
                 HttpResponse response = httpExecutor.execute(request, conn, httpContext);

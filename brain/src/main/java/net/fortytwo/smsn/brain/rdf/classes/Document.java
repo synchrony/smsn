@@ -143,7 +143,7 @@ public class Document extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: dc:creator is recommended only for simple textual names, hence foaf:maker
                     context.getSubjectUri(), FOAF.MAKER, objectURI));
@@ -154,7 +154,7 @@ public class Document extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     context.getSubjectUri(), FOAF.TOPIC, objectURI));
             // The skos:note on dc:subject reads "This term is intended to be used with non-literal values

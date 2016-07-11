@@ -8,12 +8,15 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.StackMapping;
 import net.fortytwo.ripple.model.types.SimpleType;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteType extends SimpleType<Note> {
+
+    private static final ValueFactory valueFactory = new ValueFactoryImpl();
 
     public NoteType() {
         super(Note.class);
@@ -26,15 +29,15 @@ public class NoteType extends SimpleType<Note> {
 
     @Override
     public Value toRDF(Note instance, ModelConnection mc) throws RippleException {
-        // if the note has an alias, use that as its URI.
-        // Otherwise, use the "thing" URI based on its ID
+        // if the note has an alias, use that as its IRI.
+        // Otherwise, use the "thing" IRI based on its ID
         // This has the effect of mapping to an externally-defined resource if the given atom has an alias,
         // otherwise mapping to a reference to a thing described in the personal knowledge base.
         // In the latter case, the resource will only be accessible in an interactive setting if the thing is a public,
         // classified atom and the knowledge base has been appropriately published as Linked Data.
         return null == instance.getAlias()
-                ? null == instance.getId() ? null : new URIImpl(BrainGraph.uriForId(instance.getId()))
-                : new URIImpl(instance.getAlias());
+                ? null == instance.getId() ? null : valueFactory.createIRI(BrainGraph.iriForId(instance.getId()))
+                : valueFactory.createIRI(instance.getAlias());
     }
 
     @Override

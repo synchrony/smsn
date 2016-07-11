@@ -6,8 +6,8 @@ import net.fortytwo.smsn.p2p.sparql.ProxySparqlStreamProcessor;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.stream.sparql.RDFStreamProcessor;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class SmSnAgent {
             PROP_BODY = "body",
             PROP_TAG = "tag";
 
-    protected final URI agentUri;
+    protected final IRI agentIri;
     protected final DatasetFactory factory = new DatasetFactory();
     protected final ValueFactory vf = factory.getValueFactory();
 
@@ -47,14 +47,14 @@ public class SmSnAgent {
     private int coordinatorOscPort;
 
     public SmSnAgent(final boolean listenForServices) {
-        this(SemanticSynchrony.getConfiguration().getProperty(SemanticSynchrony.P2P_AGENT_URI), listenForServices);
+        this(SemanticSynchrony.getConfiguration().getProperty(SemanticSynchrony.P2P_AGENT_IRI), listenForServices);
     }
 
-    public SmSnAgent(final String agentUri,
+    public SmSnAgent(final String agentIri,
                      final boolean listenForServices) {
-        logger.log(Level.INFO, "creating SmSn agent with URI " + agentUri);
+        logger.log(Level.INFO, "creating SmSn agent with IRI " + agentIri);
 
-        this.agentUri = vf.createURI(agentUri);
+        this.agentIri = vf.createIRI(agentIri);
 
         coordinatorConnection = new Connection();
 
@@ -108,8 +108,8 @@ public class SmSnAgent {
         }
     }
 
-    public URI getAgentUri() {
-        return agentUri;
+    public IRI getAgentIri() {
+        return agentIri;
     }
 
     public Pinger getPinger() {

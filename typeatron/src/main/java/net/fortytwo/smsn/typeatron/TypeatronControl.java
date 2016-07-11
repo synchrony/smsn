@@ -16,7 +16,7 @@ import net.fortytwo.smsn.typeatron.ripple.RippleSession;
 import net.fortytwo.smsn.typeatron.ripple.SmSnRippleRepl;
 import net.fortytwo.smsn.typeatron.ripple.lib.music.TypeatronMusicControl;
 import net.fortytwo.stream.StreamProcessor;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
@@ -63,7 +63,7 @@ public class TypeatronControl extends SmSnDeviceControl {
     private final ChordedKeyer keyer;
     private final TypeatronMusicControl music;
 
-    private URI thingPointedTo;
+    private IRI thingPointedTo;
 
     public TypeatronControl(final OscReceiver oscReceiver,
                             final SmSnAgent agent,
@@ -409,7 +409,7 @@ public class TypeatronControl extends SmSnDeviceControl {
         send(m);
     }
 
-    public void pointTo(final URI thingPointedTo) {
+    public void pointTo(final IRI thingPointedTo) {
         // the next point event from the hardware will reference this thing
         this.thingPointedTo = thingPointedTo;
 
@@ -422,7 +422,7 @@ public class TypeatronControl extends SmSnDeviceControl {
 
         Date recognizedAt = new Date(recognitionTime);
 
-        Dataset d = Activities.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentUri(), thingPointedTo);
+        Dataset d = Activities.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentIri(), thingPointedTo);
         try {
             agent.sendDataset(d, SemanticSynchrony.GESTURE_TTL);
         } catch (Exception e) {

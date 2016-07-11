@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.gesture;
 
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class HandoffMatcher {
 
     private final Stack<Handoff> latestHandoffs;
     private Collection<Handoff> cleanupBuffer = new LinkedList<>();
-    private final Map<URI, ThingGiven> thingsGivenByActor;
+    private final Map<IRI, ThingGiven> thingsGivenByActor;
 
     // a handoff must occur this many milliseconds after the "give" setup event
     private static final long GIVE_EXPIRATION = 20000;
@@ -49,9 +49,9 @@ public class HandoffMatcher {
         latestHandoffs.clear();
     }
 
-    public synchronized void prepareForGive(final URI actor, final URI thingGivenUri, final long now) {
+    public synchronized void prepareForGive(final IRI actor, final IRI thingGivenIri, final long now) {
         ThingGiven tg = new ThingGiven();
-        tg.thing = thingGivenUri;
+        tg.thing = thingGivenIri;
         tg.timestamp = now;
         thingsGivenByActor.put(actor, tg);
     }
@@ -77,7 +77,7 @@ public class HandoffMatcher {
         }
     }
 
-    public synchronized void receiveEvent(final URI actor,
+    public synchronized void receiveEvent(final IRI actor,
                                           final long timestamp) {
         //System.out.println("received handoff by " + actor + " at " + timestamp);
         cleanup(timestamp);
@@ -144,11 +144,11 @@ public class HandoffMatcher {
     }
 
     public interface HandoffHandler {
-        void handle(Handoff give, Handoff take, URI thingGiven, long timestamp);
+        void handle(Handoff give, Handoff take, IRI thingGiven, long timestamp);
     }
 
     public class Handoff {
-        public URI actor;
+        public IRI actor;
         public long timeOfSpike;
         public boolean matched;
 
@@ -160,7 +160,7 @@ public class HandoffMatcher {
     }
 
     public class ThingGiven {
-        public URI thing;
+        public IRI thing;
         public long timestamp;
     }
 }

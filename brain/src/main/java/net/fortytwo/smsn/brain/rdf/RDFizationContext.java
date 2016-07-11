@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.BrainGraph;
+import org.openrdf.model.IRI;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
@@ -13,7 +14,7 @@ public class RDFizationContext {
     private final RDFHandler handler;
     private final ValueFactory valueFactory;
 
-    private URI subjectUri;
+    private IRI subjectUri;
 
     public RDFizationContext(final RDFHandler handler,
                              final ValueFactory valueFactory) {
@@ -22,7 +23,7 @@ public class RDFizationContext {
     }
 
     public void setSubject(Atom subject) {
-        this.subjectUri = uriOf(subject);
+        this.subjectUri = iriOf(subject);
     }
 
     public URI getSubjectUri() {
@@ -37,7 +38,7 @@ public class RDFizationContext {
         return handler;
     }
 
-    public URI uriOf(final Atom a) {
-        return valueFactory.createURI(BrainGraph.uriOf(a));
+    public IRI iriOf(final Atom a) {
+        return valueFactory.createIRI(BrainGraph.iriOf(a));
     }
 }

@@ -54,7 +54,7 @@ public abstract class AtomClass {
                                      final ValueFactory vf,
                                      final RDFHandler handler,
                                      final URI type) throws RDFHandlerException {
-        URI self = vf.createURI(BrainGraph.uriOf(a));
+        URI self = vf.createURI(BrainGraph.iriOf(a));
 
         handler.handleStatement(vf.createStatement(self, RDF.TYPE, type));
 
@@ -98,7 +98,7 @@ public abstract class AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: use of foaf:page rather than foaf:homepage avoids the assumption that the link is
                     // always a home page, although this is frequently the case
@@ -121,7 +121,7 @@ public abstract class AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     objectURI, FOAF.TOPIC, context.getSubjectUri()));
             // The skos:note on dc:subject reads "This term is intended to be used with non-literal values

@@ -2,8 +2,9 @@ package net.fortytwo.smsn.server.gesture;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.IRI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,6 +17,8 @@ import static org.junit.Assert.assertTrue;
 
 public class HandshakeMatcherTest {
 
+    private static final ValueFactory valueFactory = new ValueFactoryImpl();
+
     private final HandshakeMatcher server;
 
     private final Set<String> matches = new HashSet<>();
@@ -27,11 +30,11 @@ public class HandshakeMatcherTest {
     // another typical, but distinct handshake
     private long[] series2 = new long[]{0, 120, 191, 343, 405};
 
-    private static final String BASE_URI = "http://example.org/";
+    private static final String BASE_IRI = "http://example.org/";
 
-    private URI
-            actor1 = new URIImpl(BASE_URI + "a1"),
-            actor2 = new URIImpl(BASE_URI + "a2");
+    private IRI
+            actor1 = valueFactory.createIRI(BASE_IRI + "a1"),
+            actor2 = valueFactory.createIRI(BASE_IRI + "a2");
 
     public HandshakeMatcherTest() {
         HandshakeMatcher.HandshakeHandler handler = new HandshakeMatcher.HandshakeHandler() {
@@ -53,10 +56,10 @@ public class HandshakeMatcherTest {
         server.reset();
     }
 
-    private void submitEvents(final URI actor1,
+    private void submitEvents(final IRI actor1,
                               final long[] series1,
                               final long offset1,
-                              final URI actor2,
+                              final IRI actor2,
                               final long[] series2,
                               final long offset2) {
         List<Event> events = new LinkedList<>();
@@ -147,7 +150,7 @@ public class HandshakeMatcherTest {
     }
 
     private class Event implements Comparable<Event> {
-        public URI actor;
+        public IRI actor;
         public long timestamp;
 
         @Override

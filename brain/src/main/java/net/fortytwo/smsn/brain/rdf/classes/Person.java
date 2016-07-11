@@ -83,7 +83,7 @@ public class Person extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: dc:creator is recommended only for simple textual names
                     objectURI, FOAF.MAKER, context.getSubjectUri()));
@@ -101,7 +101,7 @@ public class Person extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     context.getSubjectUri(), FOAF.INTEREST, objectURI));
         }
@@ -111,7 +111,7 @@ public class Person extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.uriOf(object);
+            URI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     context.getSubjectUri(), FOAF.KNOWS, objectURI));
         }
@@ -130,7 +130,7 @@ public class Person extends AtomClass {
 
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
-                            context.getSubjectUri(), FOAF.BIRTHDAY, context.uriOf(object)));
+                            context.getSubjectUri(), FOAF.BIRTHDAY, context.iriOf(object)));
         }
     }
 
@@ -140,7 +140,7 @@ public class Person extends AtomClass {
             System.out.println("###### GOT ONE! " + object.asVertex().getId() + " for " + context.getSubjectUri());
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
-                            context.uriOf(object), DBpediaOntology.owner, context.getSubjectUri()));
+                            context.iriOf(object), DBpediaOntology.owner, context.getSubjectUri()));
         }
     }
 

@@ -29,7 +29,7 @@ public class SemanticSynchrony {
 
     // P2P configuration properties
     public static final String
-            P2P_AGENT_URI = "net.fortytwo.smsn.p2p.agentUri",
+            P2P_AGENT_IRI = "net.fortytwo.smsn.p2p.agentIri",
             P2P_BROADCAST_ADDRESS = "net.fortytwo.smsn.p2p.broadcastAddress",
             P2P_BROADCAST_PORT = "net.fortytwo.smsn.p2p.broadcastPort",
             P2P_BROADCAST_INTERVAL = "net.fortytwo.smsn.p2p.broadcastInterval",
