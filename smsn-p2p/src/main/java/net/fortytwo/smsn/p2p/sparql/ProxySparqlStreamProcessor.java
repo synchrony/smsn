@@ -1,28 +1,29 @@
 package net.fortytwo.smsn.p2p.sparql;
 
-import edu.rpi.twc.sesamestream.BindingSetHandler;
-import edu.rpi.twc.sesamestream.QueryEngine;
-import edu.rpi.twc.sesamestream.Subscription;
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.MessageHandler;
+import net.fortytwo.stream.BasicSubscription;
+import net.fortytwo.stream.sparql.RDFStreamProcessor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Statement;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BindingSet;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class QueryEngineProxy implements QueryEngine {
-    protected static final Logger logger = Logger.getLogger(QueryEngineProxy.class.getName());
+public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, ProxySparqlStreamProcessor.Query> {
+    protected static final Logger logger = Logger.getLogger(ProxySparqlStreamProcessor.class.getName());
 
     // tags
     public static final String
@@ -32,25 +33,27 @@ public class QueryEngineProxy implements QueryEngine {
 
     // fields
     public static final String
-            BINDINGS = "bindings",
+            MAPPING = "mapping",
             DATASET = "dataset",
+            EXPIRATION_TIME = "expirationTime",
             QUERY = "query",
             QUERY_ID = "id",
+            SOLUTION = "solution",
             TTL = "ttl";
 
     private final Connection connection;
     private final SimpleJSONRDFFormat jsonrdfFormat;
 
     private final Map<String, Query> queriesById;
-    private final Map<String, BindingSetHandler> handlers;
+    private final Map<String, BiConsumer<BindingSet, Long>> handlers;
 
-    public QueryEngineProxy(final Connection connection) {
+    public ProxySparqlStreamProcessor(final Connection connection) {
         this.connection = connection;
 
         jsonrdfFormat = new SimpleJSONRDFFormat(new ValueFactoryImpl());
 
-        queriesById = new HashMap<String, Query>();
-        handlers = new HashMap<String, BindingSetHandler>();
+        queriesById = new HashMap<>();
+        handlers = new HashMap<>();
 
         connection.registerHandler(TAG_SPARQL_RESULT, new MessageHandler() {
             public void handle(final JSONObject result) {
@@ -75,25 +78,49 @@ public class QueryEngineProxy implements QueryEngine {
         }
     }
 
-    public Subscription addQuery(final int ttl,
-                                 final String queryStr,
-                                 final BindingSetHandler handler)
-            throws IncompatibleQueryException, InvalidQueryException, IOException {
+    @Override
+    protected BasicSubscription<String, Query, BindingSet> createSubscription(final int ttl,
+            final String sparqlQuery, BiConsumer<BindingSet, Long> consumer)
+            throws IOException {
 
-        Subscription sub = new SubscriptionImpl();
 
-        Query q = new Query();
-        q.queryStr = queryStr;
-        q.ttl = ttl;
-        queriesById.put(sub.getId(), q);
+        Query query = new Query();
+        query.queryStr = sparqlQuery;
+        query.ttl = ttl;
+
+        BasicSubscription<String, Query, BindingSet> sub
+                = new BasicSubscription<>(sparqlQuery, query, consumer, this);
+        queriesById.put(sub.getId(), query);
 
         if (connection.isActive()) {
-            sendSubscriptionMessage(queryStr, sub.getId(), ttl);
+            sendSubscriptionMessage(sparqlQuery, sub.getId(), ttl);
         }
 
-        handlers.put(sub.getId(), handler);
+        handlers.put(sub.getId(), consumer);
 
         return sub;
+    }
+
+    @Override
+    protected boolean addTuple(Value[] tuple, int ttl, long now) {
+        return false;
+    }
+
+    @Override
+    public void unregister(BasicSubscription<String, Query, BindingSet> subscription) throws IOException {
+        // TODO
+        throw new UnsupportedOperationException("not yet possible to cancel subscriptions through the proxy");
+    }
+
+    @Override
+    protected String parseQuery(String queryStr) throws InvalidQueryException, IncompatibleQueryException {
+        return queryStr;
+    }
+
+    @Override
+    public boolean renew(BasicSubscription<String, Query, BindingSet> subscription, int i) throws IOException {
+        // TODO
+        throw new UnsupportedOperationException("not yet possible to renew subscriptions through the proxy");
     }
 
     public void addStatements(int ttl, Statement... statements) throws IOException {
@@ -107,28 +134,24 @@ public class QueryEngineProxy implements QueryEngine {
     }
 
     @Override
-    public void setClock(QueryEngine.Clock clock) {
-        throw new UnsupportedOperationException("sorry, clock cannot be set by proxy");
-    }
-
-    @Override
-    public void setCleanupPolicy(QueryEngine.CleanupPolicy cleanupPolicy) {
-        throw new UnsupportedOperationException("sorry, cleanup policy cannot be set by proxy");
+    public void setClock(Supplier<Long> clock) {
+        throw new UnsupportedOperationException("sorry, the clock cannot be set by proxy");
     }
 
     private void handleSparqlResultJSON(final JSONObject result) throws SimpleJSONRDFFormat.ParseError {
         try {
             String queryId = result.getString(QUERY_ID);
 
-            BindingSetHandler handler = handlers.get(queryId);
+            BiConsumer<BindingSet, Long> handler = handlers.get(queryId);
 
             if (null != handler) {
-                JSONObject bindings = result.getJSONObject(BINDINGS);
+                JSONObject mapping = result.getJSONObject(MAPPING);
+                Long expirationTime = result.getLong(EXPIRATION_TIME);
 
-                BindingSet bs = jsonrdfFormat.toBindingSet(bindings);
+                BindingSet bindingSet = jsonrdfFormat.toBindingSet(mapping);
 
                 // note: no need to catch runtime exceptions here; the connection will survive them
-                handler.handle(bs);
+                handler.accept(bindingSet, expirationTime);
             }
         } catch (JSONException e) {
             throw new SimpleJSONRDFFormat.ParseError(e);
@@ -161,40 +184,7 @@ public class QueryEngineProxy implements QueryEngine {
         connection.sendNow(TAG_RDF_DATA, j);
     }
 
-    private class SubscriptionImpl implements Subscription {
-        private final String queryId;
-        private boolean active = true;
-
-        public SubscriptionImpl() {
-            // Co-opt SmSn atom IDs as query IDs; it's just a convenient way of getting a short pseudo-random string
-            // Query IDs are pseudo-random rather than consecutive so as to minimize the chance of collision.
-            queryId = SemanticSynchrony.createRandomKey();
-        }
-
-        @Override
-        public String getId() {
-            return queryId;
-        }
-
-        @Override
-        public boolean isActive() {
-            return active;
-        }
-
-        @Override
-        public void cancel() {
-            // TODO
-            throw new UnsupportedOperationException("not yet possible to cancel subscriptions through the proxy");
-        }
-
-        @Override
-        public boolean renew(int ttl) {
-            // TODO
-            throw new UnsupportedOperationException("not yet possible to renew subscriptions through the proxy");
-        }
-    }
-
-    private static class Query {
+    public static class Query {
         public String queryStr;
         public long ttl;
     }

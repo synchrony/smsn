@@ -156,12 +156,16 @@ public class SimpleJSONRDFFormat {
         }
     }
 
-    public JSONObject toJSON(final BindingSet bs) throws JSONException {
+    public JSONObject toJSON(final BindingSet solution, final Long expirationTime) throws JSONException {
         JSONObject j = new JSONObject();
 
-        for (Binding b : bs) {
-            j.put(b.getName(), toJSON(b.getValue()));
+        JSONObject solutionObj = new JSONObject();
+        for (Binding b : solution) {
+            solutionObj.put(b.getName(), toJSON(b.getValue()));
         }
+
+        j.put("solution", solutionObj);
+        j.put("expirationTime", expirationTime);
 
         return j;
     }

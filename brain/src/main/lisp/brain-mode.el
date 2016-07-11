@@ -1,31 +1,36 @@
-;; Brain-mode: the Extend-o-Brain Emacs library
+;; Brain-mode: the MyOtherBrain Emacs library
+;;
+;; This major mode allows you to view, edit, search, and process a MyOtherBrain personal knowledge base.
+;;
+;; Dependencies:
+;;
+;;     json, linum, goto-addr, aes, and latex-math-preview
 ;;
 ;; Required global variables:
 ;;
-;;     smsn-rexster-url: IP, port, and local path to the rexster server
-;;     smsn-rexster-graph: name of Extend-o-Brain graph served by Rexster
+;;     brain-rexster-url: IP, port, and local path to the rexster server
+;;     brain-rexster-graph: name of MyOtherBrain graph served by Rexster
 ;;
 ;; Optional global variables:
 ;;
-;;     smsn-default-graphml-file: file to which GraphML dumps will be exported by default
-;;     smsn-default-vertices-file: file to which tab-separated vertex dumps will be exported by default
-;;     smsn-default-edge-file: file to which tab-separated edge dumps will be exported by default
-;;     smsn-default-pagerank-file: file to which PageRank results will be exported by default
+;;     brain-default-graphml-file: file to which GraphML dumps will be exported by default
+;;     brain-default-vertices-file: file to which tab-separated vertex dumps will be exported by default
+;;     brain-default-edge-file: file to which tab-separated edge dumps will be exported by default
+;;     brain-default-pagerank-file: file to which PageRank results will be exported by default
 ;;
 ;; For example:
 ;;
-;;     (defvar smsn-rexster-url "http://localhost:8182")
-;;     (defvar smsn-rexster-graph "joshkb")
-;;     (defvar smsn-default-graphml-file "/tmp/joshkb-graphml.xml")
-;;     (defvar smsn-default-vertices-file "/tmp/joshkb-vertices.tsv")
-;;     (defvar smsn-default-edges-file "/tmp/joshkb-edges.tsv")
-;;     (defvar smsn-default-pagerank-file "/tmp/joshkb-pagerank.tsv")
+;;     (defvar brain-rexster-url "http://localhost:8182")
+;;     (defvar brain-rexster-graph "joshkb")
+;;     (defvar brain-default-graphml-file "/tmp/joshkb-graphml.xml")
+;;     (defvar brain-default-vertices-file "/tmp/joshkb-vertices.tsv")
+;;     (defvar brain-default-edges-file "/tmp/joshkb-edges.tsv")
+;;     (defvar brain-default-pagerank-file "/tmp/joshkb-pagerank.tsv")
 
 
 ;; DEPENDENCIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; for JSON-formatted messages to and from Semantic Synchrony services (see json-read-from-string, json-encode)
-
 (require 'json)
 
 ;; for line number annotations in buffers (see linum-mode)
@@ -43,52 +48,53 @@
 ;;(eval-when-compile (require 'cl))
 
 
-;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CONSTANTS AND BUFFER-LOCAL VARIABLES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq smsn-max-height 7)
+(defconst brain-const-max-height 7)
 
+(defconst brain-const-readonly-mode "readonly")
+(defconst brain-const-edit-mode "readwrite")
+(defconst brain-const-search-mode "search")
 
-;; VARIABLES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defconst brain-const-color-by-sharability "sharability")
+(defconst brain-const-color-by-class-inference "inference")
 
-(setq smsn-readonly-mode "readonly")
-(setq smsn-edit-mode "readwrite")
-(setq smsn-search-mode "search")
-(setq smsn-sharability-viewstyle "sharability")
-(setq smsn-inference-viewstyle "inference")
+(defconst brain-const-forward-style "forward")
+(defconst brain-const-backward-style "backward")
 
-(setq smsn-forward-style "forward")
-(setq smsn-backward-style "backward")
+(defconst brain-const-sharability-private 0.25)
+(defconst brain-const-sharability-personal 0.5)
+(defconst brain-const-sharability-universal 1.0)
+(defconst brain-const-weight-none 0.0)
+(defconst brain-const-weight-default 0.5)
+(defconst brain-const-weight-all 1.0)
 
-;; Buffer-local variables. Given them initial, global bindings so they're defined before there are actual view buffers.
-(setq smsn-height 3)
-(setq smsn-root-id nil)
-(setq smsn-title nil)
-(setq smsn-style smsn-forward-style)
-;; "private" atoms are hidden to begin with
-(setq smsn-min-sharability 0.25)
-(setq smsn-max-sharability 1)
-;; default to "average" sharability to begin with
-(setq smsn-default-sharability 0.5)
-(setq smsn-future-sharability smsn-default-sharability)
-;; atoms of all weights are visible to begin with
-(setq smsn-min-weight 0.0)
-(setq smsn-max-weight 1.0)
-;; default to "average" weight to begin with
-(setq smsn-default-weight 0.5)
-(setq smsn-atoms nil)
-(setq smsn-current-line 1)
-(setq smsn-mode nil)  ;; Note: 'view-mode' is used by Emacs.
-(setq smsn-viewstyle smsn-sharability-viewstyle)
-(setq smsn-view-properties nil)
-(setq smsn-value-truncation-length 100)
-(setq smsn-minimize-verbatim-blocks nil)
+(defconst brain-const-date-format "%Y-%m-%d")
+(defconst brain-const-time-format "%H:%M")
+(defconst brain-const-time-with-seconds-format "%H:%M:%S")
+
+(defun brain-define-buffer-local-variables ()
+  (defvar brain-current-height 3)
+  (defvar brain-current-root-id nil)
+  (defvar brain-current-title nil)
+  (defvar brain-current-style brain-const-forward-style)
+  (defvar brain-current-min-sharability brain-const-sharability-private)
+  (defvar brain-current-max-sharability brain-const-sharability-universal)
+  (defvar brain-current-default-sharability brain-const-sharability-personal)
+  (defvar brain-current-future-sharability brain-current-default-sharability)
+  (defvar brain-current-min-weight brain-const-weight-none)
+  (defvar brain-current-max-weight brain-const-weight-all)
+  (defvar brain-current-default-weight brain-const-weight-default)
+  (defvar brain-current-atoms-by-id nil)
+  (defvar brain-current-line 1)
+  (defvar brain-current-mode nil)  ;; Note: 'view-mode' is used by Emacs.
+  (defvar brain-current-view-style brain-const-color-by-sharability)
+  (defvar brain-current-view-properties nil)
+  (defvar brain-current-value-length-cutoff 100)
+  (defvar brain-current-minimize-verbatim-blocks nil))
 
 
 ;; DATA MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defvar smsn-date-format "%Y-%m-%d")
-(defvar smsn-time-format "%H:%M")
-(defvar smsn-time-with-seconds-format "%H:%M:%S")
 
 (defun atom-id-at-point ()
     (let ((line (current-line)))
@@ -113,11 +119,11 @@
 
 (defun get-sharability (atom)
     (let ((v (assoc 'sharability atom)))
-        (if v (cdr v) smsn-default-sharability)))
+        (if v (cdr v) brain-current-default-sharability)))
 
 (defun get-weight (atom)
     (let ((v (assoc 'weight atom)))
-        (if v (cdr v) smsn-default-weight)))
+        (if v (cdr v) brain-current-default-weight)))
 
 (defun get-alias (atom)
     (let ((x (assoc 'alias atom)))
@@ -136,13 +142,13 @@
         (if x (cdr x) nil)))
 
 (defun current-root-id ()
-    smsn-root-id)
+    brain-current-root-id)
 
 (defun current-root ()
     (get-atom (current-root-id)))
 
 ;;(defun current-root-value ()
-;;    smsn-title)
+;;    brain-current-title)
 
 (defun current-root-value ()
     (let ((g (current-root)))
@@ -172,8 +178,8 @@
 
 (defun get-atom (id)
     (if id
-        (if smsn-atoms
-            (gethash id smsn-atoms)
+        (if brain-current-atoms-by-id
+            (gethash id brain-current-atoms-by-id)
             nil)
         nil))
 
@@ -210,7 +216,7 @@
 (defun error-message (msg)
     (message (concat "Error: " msg)))
 
-(setq fast-numbers '(
+(defconst fast-numbers '(
     (?0 0) (?1 1) (?2 2) (?3 3) (?4 4) (?5 5) (?6 6) (?7 7) (?8 8) (?9 9)
     (?z 0) (?a 1) (?s 2) (?d 3) (?f 4) (?g 5) (?h 6) (?j 7) (?k 8) (?l 9) (?\; 10)))
 
@@ -232,6 +238,13 @@
 
 ;; NAVIGATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defconst line-addr-keypairs (list
+    '(?0 ?0) '(?1 ?1) '(?2 ?2) '(?3 ?3) '(?4 ?4) '(?5 ?5) '(?6 ?6) '(?7 ?7) '(?8 ?8) '(?9 ?9)
+    '(?\; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
+             '(?u ?1) '(?i ?2) '(?o ?3) '(?p ?4)))
+
+(defvar line-addr-keymap (make-hash-table))
+
 (defun current-line ()
     (interactive)
     (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
@@ -242,11 +255,6 @@
 (defun no-target ()
     (error-message "there is no target associated with this line"))
 
-(setq line-addr-keypairs (list
-    '(?0 ?0) '(?1 ?1) '(?2 ?2) '(?3 ?3) '(?4 ?4) '(?5 ?5) '(?6 ?6) '(?7 ?7) '(?8 ?8) '(?9 ?9)
-    '(?\; ?0) '(?a ?1) '(?s ?2) '(?d ?3) '(?f ?4) '(?g ?5) '(?h ?6) '(?j ?7) '(?k ?8) '(?l ?9)
-             '(?u ?1) '(?i ?2) '(?o ?3) '(?p ?4)))
-(setq line-addr-keymap (make-hash-table))
 (dolist (pair line-addr-keypairs)
     (puthash (car pair) (car (cdr pair)) line-addr-keymap))
 
@@ -259,12 +267,12 @@
         nil))
 
 (defun handle-changewindow (address)
-    (setq c (car (coerce address 'list)))
-    (if (string-match "[uiop]" (string c))
-       (let ((n (string-to-number (string (gethash c line-addr-keymap)))))
+    (let ((c (car (coerce address 'list))))
+      (if (string-match "[uiop]" (string c))
+         (let ((n (string-to-number (string (gethash c line-addr-keymap)))))
            (other-window n)
            (coerce (cdr (coerce address 'list)) 'string))
-       address))
+         address)))
 
 (defun visit-target-value (value-selector value-to-url)
     (lexical-let ((vs value-selector) (vu value-to-url))
@@ -316,7 +324,7 @@
             (decode-coding-string (substring entity (+ i 2)) 'utf-8)))
 
 (defun base-url ()
-    (concat smsn-rexster-url "/graphs/" smsn-rexster-graph "/smsn/"))
+    (concat brain-rexster-url "/graphs/" brain-rexster-graph "/smsn/"))
 
 (defun receive-view (mode)
     (lexical-let ((m mode))
@@ -335,6 +343,11 @@
             (show-http-response-status status json)
             (info-message success-message))))
 
+(defun brain-switch-to-buffer (name)
+    "activate Brain-mode in all new view buffers created by Brain-mode"
+    (switch-to-buffer name)
+    (brain-mode))
+
 (defun receive-view-internal (status mode)
     (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
           (editable (is-update-mode mode)))
@@ -346,46 +359,46 @@
                 (height (numeric-value json 'height nil))
 
                 ;; if the service doesn't specify these values, they will carry over from the previous buffer state
-                (min-sharability (numeric-value json 'minSharability smsn-min-sharability))
-                (max-sharability (numeric-value json 'maxSharability smsn-max-sharability))
-                (default-sharability (numeric-value json 'defaultSharability smsn-default-sharability))
-                (min-weight (numeric-value json 'minWeight smsn-min-weight))
-                (max-weight (numeric-value json 'maxWeight smsn-max-weight))
-                (default-weight (numeric-value json 'defaultWeight smsn-default-weight))
+                (min-sharability (numeric-value json 'minSharability brain-current-min-sharability))
+                (max-sharability (numeric-value json 'maxSharability brain-current-max-sharability))
+                (default-sharability (numeric-value json 'defaultSharability brain-current-default-sharability))
+                (min-weight (numeric-value json 'minWeight brain-current-min-weight))
+                (max-weight (numeric-value json 'maxWeight brain-current-max-weight))
+                (default-weight (numeric-value json 'defaultWeight brain-current-default-weight))
 
                 (style (cdr (assoc 'style json)))
                 (title (cdr (assoc 'title json))))
-                    (switch-to-buffer (view-name root json))
-                    (make-local-variable 'smsn-root-id)
-                    (make-local-variable 'smsn-height)
-                    (make-local-variable 'smsn-style)
-                    (make-local-variable 'smsn-title)
-                    (make-local-variable 'smsn-min-sharability)
-                    (make-local-variable 'smsn-max-sharability)
-                    (make-local-variable 'smsn-default-sharability)
-                    (make-local-variable 'smsn-min-weight)
-                    (make-local-variable 'smsn-max-weight)
-                    (make-local-variable 'smsn-atoms)
-                    (make-local-variable 'smsn-current-line)
-                    (make-local-variable 'smsn-mode)
-                    (make-local-variable 'smsn-value-truncation-length)
-                    (make-local-variable 'smsn-minimize-verbatim-blocks)
-                    (setq smsn-root-id root)
-                    (if (equal mode smsn-search-mode)
+                    (brain-switch-to-buffer (view-name root json))
+                    (make-local-variable 'brain-current-root-id)
+                    (make-local-variable 'brain-current-height)
+                    (make-local-variable 'brain-current-style)
+                    (make-local-variable 'brain-current-title)
+                    (make-local-variable 'brain-current-min-sharability)
+                    (make-local-variable 'brain-current-max-sharability)
+                    (make-local-variable 'brain-current-default-sharability)
+                    (make-local-variable 'brain-current-min-weight)
+                    (make-local-variable 'brain-current-max-weight)
+                    (make-local-variable 'brain-current-atoms-by-id)
+                    (make-local-variable 'brain-current-line)
+                    (make-local-variable 'brain-current-mode)
+                    (make-local-variable 'brain-current-value-length-cutoff)
+                    (make-local-variable 'brain-current-minimize-verbatim-blocks)
+                    (setq brain-current-root-id root)
+                    (if (equal mode brain-const-search-mode)
                         ;; Always leave a search view with height 1, rather than that of the last view.
                         ;; The user experience is a little unpredictable otherwise.
-                        (setq smsn-height 1)
-                        (if height (setq smsn-height height)))
-                    (setq smsn-min-sharability min-sharability)
-                    (setq smsn-max-sharability max-sharability)
-                    (setq smsn-default-sharability smsn-future-sharability)
-                    (setq smsn-min-weight min-weight)
-                    (setq smsn-max-weight max-weight)
-                    (setq smsn-default-weight default-weight)
-                    (setq smsn-style (if style style smsn-style))
-                    (setq smsn-title title)
-                    (setq smsn-atoms (make-hash-table :test 'equal))
-                    (setq smsn-mode mode)
+                        (setq brain-current-height 1)
+                        (if height (setq brain-current-height height)))
+                    (setq brain-current-min-sharability min-sharability)
+                    (setq brain-current-max-sharability max-sharability)
+                    (setq brain-current-default-sharability brain-current-future-sharability)
+                    (setq brain-current-min-weight min-weight)
+                    (setq brain-current-max-weight max-weight)
+                    (setq brain-current-default-weight default-weight)
+                    (setq brain-current-style (if style style brain-current-style))
+                    (setq brain-current-title title)
+                    (setq brain-current-atoms-by-id (make-hash-table :test 'equal))
+                    (setq brain-current-mode mode)
                     (setq buffer-read-only nil)
                     (erase-buffer)
                     (write-view editable (cdr (assoc 'children view)) 0)
@@ -393,7 +406,7 @@
                     (setq visible-cursor t)
                     ;; Try to move to the corresponding line in the previous view.
                     ;; This is not always possible and not always helpful, but it is often both.
-                    (beginning-of-line smsn-current-line)
+                    (beginning-of-line brain-current-line)
                     (setq buffer-read-only (not editable))
                     ;; always include line numbers in views
                     (linum-mode t)
@@ -409,8 +422,8 @@
     (acknowledge-http-response status "type inference completed successfully"))
 
 (defun request-view (preserve-line mode root height style mins maxs defaults minw maxw defaultw)
-    (setq smsn-current-line (if preserve-line (line-number-at-pos) 1))
-    (setq smsn-future-sharability defaults)
+    (setq brain-current-line (if preserve-line (line-number-at-pos) 1))
+    (setq brain-current-future-sharability defaults)
     (http-get (request-view-url root height style mins maxs defaults minw maxw defaultw) (receive-view mode)))
 
 (defun filter-json (mins maxs defaults minw maxw defaultw)
@@ -423,91 +436,91 @@
               :filter (filter-json mins maxs defaults minw maxw defaultw))))))
 
 (defun request-history (mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "history?request=" (w3m-url-encode-string (json-encode
-            (list :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-        (receive-view smsn-search-mode)))
+            (list :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+        (receive-view brain-const-search-mode)))
 
 (defun request-events (height)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "get-events?request=" (w3m-url-encode-string (json-encode
             (list :height height))))
-        (receive-view smsn-search-mode)))
+        (receive-view brain-const-search-mode)))
 
 (defun request-duplicates (mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "duplicates?request=" (w3m-url-encode-string (json-encode
-            (list :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-        (receive-view smsn-search-mode)))
+            (list :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+        (receive-view brain-const-search-mode)))
 
 (defun request-query-results (query query-type style mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "search?request=" (w3m-url-encode-string (json-encode
-            (list :queryType query-type :query query :valueCutoff smsn-value-truncation-length :height 1 :style style
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-        (receive-view smsn-search-mode)))
+            (list :queryType query-type :query query :valueCutoff brain-current-value-length-cutoff :height 1 :style style
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+        (receive-view brain-const-search-mode)))
 
 (defun request-priorities-results (mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "priorities?request=" (w3m-url-encode-string (json-encode
             (list :maxResults 100
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-        (receive-view smsn-search-mode)))
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+        (receive-view brain-const-search-mode)))
 
 (defun request-find-isolated-atoms-results (mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "find-isolated-atoms?request=" (w3m-url-encode-string (json-encode
             (list
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-        (receive-view smsn-search-mode)))
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+        (receive-view brain-const-search-mode)))
 
 (defun request-find-roots-results (style mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "find-roots?request=" (w3m-url-encode-string (json-encode
             (list :style style :height 1
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-        (receive-view smsn-search-mode)))
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+        (receive-view brain-const-search-mode)))
 
 (defun request-remove-isolated-atoms (mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "remove-isolated-atoms?request=" (w3m-url-encode-string (json-encode
             (list
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
         (lambda (status)
             (interactive)
             (if status
                 (acknowledge-http-response status "removed isolated atoms")))))
 
 (defun request-ripple-results (query style mins maxs minw maxw)
-    (setq smsn-current-line 1)
-    (setq smsn-future-sharability smsn-default-sharability)
+    (setq brain-current-line 1)
+    (setq brain-current-future-sharability brain-current-default-sharability)
     (http-get
         (concat (base-url) "ripple?request=" (w3m-url-encode-string (json-encode
             (list :query query :height 1 :style style
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
-             (receive-view smsn-search-mode)))
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
+             (receive-view brain-const-search-mode)))
 
 (defun do-export (format file mins maxs minw maxw)
     (http-get
         (concat (base-url) "export?request=" (w3m-url-encode-string (json-encode
-            (list :root smsn-root-id :height smsn-height :format format :file file
-                :filter (filter-json mins maxs smsn-default-sharability minw maxw smsn-default-weight)))))
+            (list :root brain-current-root-id :height brain-current-height :format format :file file
+                :filter (filter-json mins maxs brain-current-default-sharability minw maxw brain-current-default-weight)))))
          'receive-export-results))
 
 (defun do-import (format file)
@@ -523,6 +536,15 @@
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; unused colors: black/gray, orange
+(defconst sharability-base-colors  '("#660000" "#604000" "#005000" "#000066"))
+(defconst sharability-bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
+(defconst sharability-reduced-colors '("red" "red" "blue" "blue"))
+(defconst inference-base-colors '("#660066" "#006666"))
+(defconst inference-bright-colors '("#FF00FF" "#00FFFF"))
+
+(defvar full-colors-supported (> (length (defined-colors)) 8))
+
 (defun view-name (root-id json)
     (let ((title (cdr (assoc 'title json))))
         (if root-id
@@ -534,14 +556,7 @@
             title)))
 
 (defun using-inference ()
-    (equal smsn-viewstyle smsn-inference-viewstyle))
-
-;; unused colors: black/gray, orange
-(setq sharability-base-colors  '("#660000" "#604000" "#005000" "#000066"))
-(setq sharability-bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
-(setq sharability-reduced-colors '("red" "red" "blue" "blue"))
-(setq inference-base-colors '("#660066" "#006666"))
-(setq inference-bright-colors '("#FF00FF" "#00FFFF"))
+    (equal brain-current-view-style brain-const-color-by-class-inference))
 
 (defun color-part-red (color)
     (string-to-number (substring color 1 3) 16))
@@ -561,7 +576,7 @@
           (high color))
         (weighted-average low high weight)))
 
-(defun find-color (weight sharability bright has-meta)
+(defun atom-color (weight sharability bright has-meta)
     (let ((s
         (if (using-inference)
             (elt (if bright inference-bright-colors inference-base-colors) (if has-meta 0 1))
@@ -571,19 +586,20 @@
             (fade-color (color-part-green s) weight)
             (fade-color (color-part-blue s) weight))))
 
-(setq full-colors-supported (> (length (defined-colors)) 8))
+(defun atom-color-at-visibility-threshold ()
+    (atom-color 0.75 (+ 0.25 brain-current-min-sharability) nil nil))
 
 (defun colorize (text weight sharability priority-bg priority-fg bright has-meta)
     (let ((color (if full-colors-supported
-            (find-color weight sharability bright has-meta)
+            (atom-color weight sharability bright has-meta)
             (elt sharability-reduced-colors (- (ceiling (* sharability 4)) 1)))))
         (setq l (list
             :foreground color
             ;;:weight 'bold
             :underline (if (and priority-fg (> priority-fg 0))
-                (list :color (find-color priority-fg sharability bright has-meta)) nil)
+                (list :color (atom-color priority-fg sharability bright has-meta)) nil)
             :box (if priority-bg (list
-                :color (find-color priority-bg sharability bright has-meta)) nil)))
+                :color (atom-color priority-bg sharability bright has-meta)) nil)))
         (propertize text 'face l)))
 
 (defun black (text)
@@ -608,7 +624,7 @@
     (let ((s (string-match "\n" value)))
         (if s (let ((content (concat "\n" value "\n")))
             (concat "{{{"
-                (if smsn-minimize-verbatim-blocks (propertize content 'invisible t) content)
+                (if brain-current-minimize-verbatim-blocks (propertize content 'invisible t) content)
             "}}}")) value)))
 
 (defun write-view (editable children tree-indent)
@@ -626,7 +642,7 @@
 		        (target-alias (get-alias json))
 		        (target-shortcut (get-shortcut json))
 		        (target-meta (get-meta json)))
-		            (if target-id (puthash target-id json smsn-atoms))
+		            (if target-id (puthash target-id json brain-current-atoms-by-id))
 		            (if (not target-id) (error "missing target id"))
 		            (setq space "")
 		            (loop for i from 1 to tree-indent do (setq space (concat space " ")))
@@ -636,7 +652,8 @@
                         (setq line (concat line space))
                         (let ((bullet (if target-has-children "+" "\u00b7")))   ;; previously: "-" or "\u25ba"
                             (setq line (concat line
-                                (colorize bullet target-weight target-sharability target-priority nil target-alias target-meta)
+                                (colorize bullet
+                                    target-weight target-sharability target-priority nil target-alias target-meta)
                                 id-infix
                                 " "
                                 (colorize (delimit-value target-value)
@@ -645,9 +662,11 @@
                         (insert (propertize line 'target-id target-id)))
                     (if (using-inference)
                         (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n")))))
-                    (if smsn-view-properties (let ()
-                        (insert (light-gray (concat space "    @sharability " (number-to-string target-sharability) "\n")))
-                        (insert (light-gray (concat space "    @weight      " (number-to-string target-weight) "\n")))
+                    (if brain-current-view-properties (let ()
+                        (insert (light-gray
+                            (concat space "    @sharability " (number-to-string target-sharability) "\n")))
+                        (insert (light-gray
+                            (concat space "    @weight      " (number-to-string target-weight) "\n")))
                         (if target-shortcut
                             (insert (light-gray (concat space "    @shortcut    " target-shortcut "\n"))))
                         (if target-alias
@@ -659,69 +678,79 @@
 
 (defun view-info ()
     (concat
-        "(root: " smsn-root-id
-         " :height " (num-or-nil-to-string smsn-height)
-         " :style " smsn-style
-         " :sharability [" (num-or-nil-to-string smsn-min-sharability) ", " (num-or-nil-to-string smsn-default-sharability) ", " (num-or-nil-to-string smsn-max-sharability) "]"
-         " :weight [" (num-or-nil-to-string smsn-min-weight) ", " (num-or-nil-to-string smsn-default-weight) ", " (num-or-nil-to-string smsn-max-weight) "]"
-         " :value \"" smsn-title "\")"))  ;; TODO: actually escape the title string
+        "(root: " brain-current-root-id
+         " :height " (num-or-nil-to-string brain-current-height)
+         " :style " brain-current-style
+         " :sharability
+             [" (num-or-nil-to-string brain-current-min-sharability)
+             ", " (num-or-nil-to-string brain-current-default-sharability)
+             ", " (num-or-nil-to-string brain-current-max-sharability) "]"
+         " :weight
+             [" (num-or-nil-to-string brain-current-min-weight)
+             ", " (num-or-nil-to-string brain-current-default-weight)
+             ", " (num-or-nil-to-string brain-current-max-weight) "]"
+         " :value \"" brain-current-title "\")"))  ;; TODO: actually escape the title string
 
 (defun mode-for-visit ()
-    (if (or (equal smsn-mode smsn-edit-mode) (equal smsn-mode smsn-readonly-mode))
-        smsn-mode
-        smsn-readonly-mode))
+    (if (or (equal brain-current-mode brain-const-edit-mode) (equal brain-current-mode brain-const-readonly-mode))
+        brain-current-mode
+        brain-const-readonly-mode))
 
 (defun in-view-mode ()
     (if (or
-            (equal smsn-mode smsn-readonly-mode)
-            (equal smsn-mode smsn-edit-mode))
+            (equal brain-current-mode brain-const-readonly-mode)
+            (equal brain-current-mode brain-const-edit-mode))
         t
 	    (and (error-message "cannot create tree view in current mode") nil)))
 
 (defun in-setproperties-mode ()
     (if (or
-            (equal smsn-mode smsn-search-mode)
-            (equal smsn-mode smsn-readonly-mode)
-            (equal smsn-mode smsn-edit-mode))
+            (equal brain-current-mode brain-const-search-mode)
+            (equal brain-current-mode brain-const-readonly-mode)
+            (equal brain-current-mode brain-const-edit-mode))
         t
 	    (and (error-message "cannot set properties in current mode") nil)))
 
 (defun in-update-mode ()
     (if (or
-            (equal smsn-mode smsn-edit-mode)
-            (equal smsn-mode smsn-search-mode))
+            (equal brain-current-mode brain-const-edit-mode)
+            (equal brain-current-mode brain-const-search-mode))
         t
         (and (error-message "cannot update view in current mode") nil)))
 
 (defun is-update-mode (mode)
     (or
-        (equal mode smsn-edit-mode)
-        (equal mode smsn-search-mode)))
+        (equal mode brain-const-edit-mode)
+        (equal mode brain-const-search-mode)))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun set-default-weight (s)
     (if (and (in-setproperties-mode) (> s 0) (<= s 1))
-        (setq smsn-default-weight s)
+        (setq brain-current-default-weight s)
         (error-message
             (concat "weight " (number-to-string s) " is outside of range (0, 1]"))))
 
 (defun set-min-weight (s)
     (if (and (in-setproperties-mode) (>= s 0) (<= s 1))
-        (request-view t smsn-mode smsn-root-id smsn-height smsn-style smsn-min-sharability smsn-max-sharability smsn-default-sharability s smsn-max-weight smsn-default-weight)
+        (request-view t brain-current-mode brain-current-root-id brain-current-height brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+            s brain-current-max-weight brain-current-default-weight)
         (error-message
             (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
 
 (defun set-default-sharability (s)
     (if (and (in-setproperties-mode) (> s 0) (<= s 1))
-        (setq smsn-default-sharability s)
+        (setq brain-current-default-sharability s)
         (error-message
             (concat "sharability " (number-to-string s) " is outside of range (0, 1]"))))
 
 (defun set-min-sharability (s)
     (if (and (in-setproperties-mode) (>= s 0) (<= s 1))
-        (request-view t smsn-mode smsn-root-id smsn-height smsn-style s smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)
+        (request-view t brain-current-mode brain-current-root-id brain-current-height brain-current-style
+            s brain-current-max-sharability brain-current-default-sharability
+            brain-current-min-weight brain-current-max-weight brain-current-default-weight)
         (error-message
             (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
 
@@ -729,10 +758,12 @@
     (interactive)
     (if (in-setproperties-mode)
         (lexical-let (
-                (mode smsn-mode)
-                (url (request-view-url smsn-root-id smsn-height smsn-style smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)))
-            (setq smsn-current-line (line-number-at-pos))
-            (setq smsn-future-sharability smsn-default-sharability)
+                (mode brain-current-mode)
+                (url (request-view-url brain-current-root-id brain-current-height brain-current-style
+                    brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+                    brain-current-min-weight brain-current-max-weight brain-current-default-weight)))
+            (setq brain-current-line (line-number-at-pos))
+            (setq brain-current-future-sharability brain-current-default-sharability)
             (http-get
                 (concat (base-url) "set?request=" (w3m-url-encode-string (json-encode
                     (list :id id :name name :value value))))
@@ -778,7 +809,7 @@
 
 ;; USER API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun smsn-atom-info (selector)
+(defun brain-atom-info (selector)
     "display, in the minibuffer, information about an atom produced by SELECTOR"
     (lexical-let ((as selector))
         (lambda () (interactive)
@@ -788,7 +819,7 @@
                     (no-target))))))
 
 ;; note: for some reason, the id doesn't stay invisible when you paste it, although it stays light gray
-(defun smsn-copy-target-reference-to-clipboard ()
+(defun brain-copy-target-reference-to-clipboard ()
     "copy a reference to the atom at point to the system clipboard"
     (interactive)
     (let ((id (atom-id-at-point)))
@@ -796,7 +827,7 @@
             (copy-to-clipboard (concat "*" (create-id-infix id)))
             (no-target))))
 
-(defun smsn-copy-target-value-to-clipboard ()
+(defun brain-copy-target-value-to-clipboard ()
     "copy the value of the atom at point to the system clipboard"
     (interactive)
     (let ((value (current-target-value)))
@@ -804,108 +835,108 @@
             (copy-to-clipboard value)
             (no-target))))
 
-(defun smsn-duplicates ()
+(defun brain-duplicates ()
     "retrieve a list of atoms with duplicate values"
     (interactive)
     (request-duplicates
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-enter-edit-view ()
+(defun brain-enter-edit-view ()
     "enter edit (read/write) mode in the current view"
     (interactive)
-    (if (and (in-view-mode) (equal smsn-mode smsn-readonly-mode))
-        (request-view t smsn-edit-mode smsn-root-id smsn-height smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-default-sharability
-            smsn-min-weight smsn-max-weight smsn-default-weight)))
+    (if (and (in-view-mode) (equal brain-current-mode brain-const-readonly-mode))
+        (request-view t brain-const-edit-mode brain-current-root-id brain-current-height brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+            brain-current-min-weight brain-current-max-weight brain-current-default-weight)))
 
-(defun smsn-enter-readonly-view ()
+(defun brain-enter-readonly-view ()
     "enter read-only mode in the current view"
     (interactive)
-    (if (and (in-view-mode) (equal smsn-mode smsn-edit-mode))
-        (request-view t smsn-readonly-mode smsn-root-id smsn-height smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-default-sharability
-            smsn-min-weight smsn-max-weight smsn-default-weight)))
+    (if (and (in-view-mode) (equal brain-current-mode brain-const-edit-mode))
+        (request-view t brain-const-readonly-mode brain-current-root-id brain-current-height brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+            brain-current-min-weight brain-current-max-weight brain-current-default-weight)))
 
-(defun smsn-events ()
-    "retrieve the Extend-o-Brain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
+(defun brain-events ()
+    "retrieve the MyOtherBrain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
     (interactive)
     (request-events 2))
 
-(defun smsn-export-edges (file)
-    "export tab-separated dump of Extend-o-Brain parent-child edges to the file system"
+(defun brain-export-edges (file)
+    "export tab-separated dump of MyOtherBrain parent-child edges to the file system"
     (interactive)
     (message (concat "exporting edges to " file))
     (do-export "Edges" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-export-graphml (file)
+(defun brain-export-graphml (file)
     "export a GraphML dump of the knowledge base to the file system"
     (interactive)
     (message (concat "exporting GraphML to " file))
     (do-export "GraphML" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-export-latex (file)
+(defun brain-export-latex (file)
     "export a LaTeX-formatted view of a subtree of the knowledge base to the file system"
     (interactive)
     (message (concat "exporting LaTeX to " file))
     (do-export "LaTeX" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-export-pagerank (file)
-    "export a tab-separated PageRank ranking of Extend-o-Brain atoms to the file system"
+(defun brain-export-pagerank (file)
+    "export a tab-separated PageRank ranking of MyOtherBrain atoms to the file system"
     (interactive)
     (message (concat "computing and exporting PageRank to " file))
     (do-export "PageRank" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-export-rdf (file)
+(defun brain-export-rdf (file)
     "export a complete RDF dump of the knowledge base (including personal and private data) to the file system"
     (interactive)
     (message (concat "exporting private RDF dump to " file))
     (do-export "RDF" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-export-webrdf (file)
+(defun brain-export-webrdf (file)
     "export a Web-friendly dump of the public portion of the knowledge base to the file system"
     (interactive)
     (message (concat "exporting public Web RDF dump to " file))
     (do-export "Web" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-export-vertices (file)
-    "export tab-separated dump of Extend-o-Brain vertices (atoms) to the file system"
+(defun brain-export-vertices (file)
+    "export tab-separated dump of MyOtherBrain vertices (atoms) to the file system"
     (interactive)
     (message (concat "exporting vertices to " file))
     (do-export "Vertices" file
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-import-graphml (file)
+(defun brain-import-graphml (file)
     "import a GraphML dump from the file system into the knowledge base"
     (interactive)
     (message (concat "importing GraphML from " file))
     (do-import "GraphML" file))
 
-(defun smsn-find-isolated-atoms ()
+(defun brain-find-isolated-atoms ()
     "retrieve a list of isolated atoms (i.e. atoms with neither parents nor children) in the knowledge base"
     (interactive)
         (request-find-isolated-atoms-results
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-remove-isolated-atoms ()
+(defun brain-remove-isolated-atoms ()
     "remove all isolated atoms (i.e. atoms with neither parents nor children) from the knowledge base"
     (interactive)
         (request-remove-isolated-atoms
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-find-roots ()
+(defun brain-find-roots ()
     "retrieve a list of roots (i.e. atoms with no parents) in the knowledge base"
     (interactive)
         (request-find-roots-results
-            smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+            brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-goto-line (address)
+(defun brain-goto-line (address)
     "move point to the line represented by ADDRESS"
     (interactive)
     (let ((line (address-to-lineno (handle-changewindow address))))
@@ -913,68 +944,68 @@
             (goto-line line)
             (error-message "invalid line address"))))
 
-(defun smsn-history ()
+(defun brain-history ()
     "retrieve a list of the most recently viewed or updated atoms, in decreasing order of recency"
     (interactive)
     (request-history
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
-(defun smsn-infer-types ()
-    "perform type inference on the Extend-o-Brain knowledge base, adding type annotations"
+(defun brain-infer-types ()
+    "perform type inference on the MyOtherBrain knowledge base, adding type annotations"
     (interactive)
     (message "performing type inference")
     (do-infer-types))
 
-(defun smsn-insert-attr-priority (expr)
+(defun brain-insert-attr-priority (expr)
     "insert a line to set the priority of an atom to the value given by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (insert (concat "\n                @priority " (number-to-string (/ n 4.0)) "\n")))))
 
-(defun smsn-insert-attr-sharability (expr)
+(defun brain-insert-attr-sharability (expr)
     "insert a line to set the sharability of an atom to the value given by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (insert (concat "\n                @sharability " (number-to-string (/ n 4.0)) "\n")))))
 
-(defun smsn-insert-attr-weight (expr)
+(defun brain-insert-attr-weight (expr)
     "insert a line to set the weight of an atom to the value given by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (insert (concat "\n                @weight " (number-to-string (/ n 4.0)) "\n")))))
 
-(defun smsn-insert-current-date ()
+(defun brain-insert-current-date ()
     "insert the current date, in the format yyyy-mm-dd, into the current buffer"
     (interactive)
-    (insert (format-time-string smsn-date-format (current-time))))
+    (insert (format-time-string brain-const-date-format (current-time))))
 
-(defun smsn-insert-current-time ()
+(defun brain-insert-current-time ()
     "insert the current time, in the format hh:mm, into the current buffer"
     (interactive)
-    (insert (format-time-string smsn-time-format (current-time))))
+    (insert (format-time-string brain-const-time-format (current-time))))
 
-(defun smsn-insert-current-time-with-seconds ()
+(defun brain-insert-current-time-with-seconds ()
     "insert the current time with seconds, in the format hh:mm:ss, into the current buffer"
     (interactive)
-    (insert (format-time-string smsn-time-with-seconds-format (current-time))))
+    (insert (format-time-string brain-const-time-with-seconds-format (current-time))))
 
-(defun smsn-preview-target-latex-math ()
+(defun brain-preview-target-latex-math ()
     "create a graphical preview of the value of the atom at point, which must be a LaTeX mathematical expression"
     (interactive)
     (end-of-line)
     (backward-word)
     (latex-math-preview-expression))
 
-(defun smsn-priorities ()
+(defun brain-priorities ()
     "retrieve a list of atoms with nonzero priority values, ordered by decreasing priority"
     (interactive)
     (request-priorities-results
-        smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight))
+        brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight))
 
 (defun current-root-id ()
-    (if (in-view-mode) smsn-root-id nil))
+    (if (in-view-mode) brain-current-root-id nil))
 
-(defun smsn-push-view ()
+(defun brain-push-view ()
     "push an up-to-date view into the knowledge base"
     (interactive)
     (if (in-update-mode)
@@ -982,236 +1013,242 @@
         (entity (buffer-string)))
         ;; The received view may very well differ from the pushed view in terms of line numbering,
         ;; but we'll try to stay on the same line anyway.
-        (setq smsn-current-line (line-number-at-pos))
-        (setq smsn-future-sharability smsn-default-sharability)
+        (setq brain-current-line (line-number-at-pos))
+        (setq brain-current-future-sharability brain-current-default-sharability)
         (http-post
             (concat (base-url) "update")
             (list
                 (list "request" (json-encode (append
                     (if (in-view-mode) (list :root (current-root-id)) nil)
                     (list
-                        :height (number-to-string smsn-height)
-                        :style smsn-style
+                        :height (number-to-string brain-current-height)
+                        :style brain-current-style
                         :view entity
-                        :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight))))))
-            (receive-view smsn-edit-mode)))))
+                        :filter (filter-json
+                            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+                            brain-current-min-weight brain-current-max-weight brain-current-default-weight))))))
+            (receive-view brain-const-edit-mode)))))
 
-(defun smsn-ripple-query (query)
+(defun brain-ripple-query (query)
     "evaluate Ripple expression QUERY"
     (interactive)
     (if (> (length query) 0)
         (request-ripple-results
             query
-            smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight)))
+            brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight)))
 
-(defun smsn-fulltext-query (query)
+(defun brain-fulltext-query (query)
     "evaluate full-text query for QUERY, yielding a ranked list of query results in a new buffer"
     (interactive)
     (if (> (length query) 0)
         (request-query-results
             query
             "FullText"
-            smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight)))
+            brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight)))
 
-(defun smsn-acronym-query (query)
+(defun brain-acronym-query (query)
     "evaluate acronym (abbreviated fulltext) query for QUERY, yielding a ranked list of query results in a new buffer"
     (interactive)
     (if (> (length query) 0)
         (request-query-results
             query
             "Acronym"
-            smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight)))
+            brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight)))
 
-(defun smsn-shortcut-query (query)
+(defun brain-shortcut-query (query)
     "evaluate shortcut query for QUERY, yielding query results (normally zero or one) in a new buffer"
     (interactive)
     (if (> (length query) 0)
         (request-query-results
             query
             "Shortcut"
-            smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-min-weight smsn-max-weight)))
+            brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-min-weight brain-current-max-weight)))
 
-(defun smsn-set-default-sharability (expr)
+(defun brain-set-default-sharability (expr)
     "set the default @sharability (for atoms created in update operations) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-default-sharability (/ n 4.0)))))
 
-(defun smsn-set-default-weight (expr)
+(defun brain-set-default-weight (expr)
     "set the default @weight (for atoms created in update operations) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-default-weight (/ n 4.0)))))
 
-(defun smsn-set-min-sharability (expr)
+(defun brain-set-min-sharability (expr)
     "set the minimum @sharability (for atoms visible in the current view) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-min-sharability (/ n 4.0)))))
 
-(defun smsn-set-min-weight (expr)
+(defun brain-set-min-weight (expr)
     "set the minimum @weight (for atoms visible in the current view) to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-min-weight (/ n 4.0)))))
 
-(defun smsn-set-target-priority (expr)
+(defun brain-set-target-priority (expr)
     "set the @priority of the atom at point to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-target-priority (/ n 4.0)))))
 
-(defun smsn-set-target-sharability (expr)
+(defun brain-set-target-sharability (expr)
     "set the @sharability of the atom at point to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-target-sharability (/ n 4.0)))))
 
-(defun smsn-set-target-weight (expr)
+(defun brain-set-target-weight (expr)
     "set the @weight of the atom at point to the number represented by EXPR"
     (interactive)
     (let ((n (number-shorthand-to-number expr)))
         (if n (set-target-weight (/ n 4.0)))))
 
-(defun smsn-set-value-truncation-length (length-str)
+(defun brain-set-value-truncation-length (length-str)
     "set the value truncation length to the number represented by LENGTH-STR.
 Longer values are truncated, for efficiency and readability, when they appear in views.
 A value of -1 indicates that values should not be truncated."
     (interactive)
     (let ((n (string-to-number length-str)))
-        (setq smsn-value-truncation-length n)))
+        (setq brain-current-value-length-cutoff n)))
 
-(defun smsn-set-view-height (expr)
+(defun brain-set-view-height (expr)
     "set the height of the current view to the number of levels represented by EXPR"
     (interactive)
     (let ((height (number-shorthand-to-number expr)))
         (if (< height 1) (error-message (concat "height of " (number-to-string height) " is too low (must be >= 1)"))
-            (if (> height smsn-max-height)
+            (if (> height brain-const-max-height)
                 (error-message (concat "height of " (number-to-string height) " is too high (must be <= "
-                    (number-to-string smsn-max-height) ")"))
-                (request-view nil smsn-mode smsn-root-id height smsn-style
-                    smsn-min-sharability smsn-max-sharability smsn-default-sharability
-                    smsn-min-weight smsn-max-weight smsn-default-weight)))))
+                    (number-to-string brain-const-max-height) ")"))
+                (request-view nil brain-current-mode brain-current-root-id height brain-current-style
+                    brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+                    brain-current-min-weight brain-current-max-weight brain-current-default-weight)))))
 
-(defun smsn-toggle-emacspeak ()
+(defun brain-toggle-emacspeak ()
     "turn Emacspeak on or off"
     (interactive)
     (dtk-toggle-quiet))
 
-(defun smsn-toggle-inference-viewstyle ()
+(defun brain-toggle-inference-viewstyle ()
     "toggle between the sharability view style and the type inference view style.
 In the sharability view style, colors are assigned to atoms based on the sharability of each atom
 (for example, private atoms are red, while public atoms are green).
 However, in the type inference view style, an atom is either cyan or magenta depending on whether
 a type has been assigned to it by the inference engine."
     (interactive)
-    (setq smsn-viewstyle (if (equal smsn-viewstyle smsn-sharability-viewstyle)
-        smsn-inference-viewstyle
-        smsn-sharability-viewstyle))
-    (smsn-update-view)
-    (message (concat "switched to " smsn-viewstyle " view style")))
+    (setq brain-current-view-style (if (equal brain-current-view-style brain-const-color-by-sharability)
+        brain-const-color-by-class-inference
+        brain-const-color-by-sharability))
+    (brain-update-view)
+    (message (concat "switched to " brain-current-view-style " view style")))
 
-(defun smsn-toggle-minimize-verbatim-blocks ()
+(defun brain-toggle-minimize-verbatim-blocks ()
     "enable or disable the hiding of the contents of {{{verbatim blocks}}}, which may span multiple lines"
     (interactive)
-    (setq smsn-minimize-verbatim-blocks (not smsn-minimize-verbatim-blocks))
-    (smsn-update-view)
-    (message (concat (if smsn-minimize-verbatim-blocks "minimized" "expanded") " verbatim blocks")))
+    (setq brain-current-minimize-verbatim-blocks (not brain-current-minimize-verbatim-blocks))
+    (brain-update-view)
+    (message (concat (if brain-current-minimize-verbatim-blocks "minimized" "expanded") " verbatim blocks")))
 
-(defun smsn-toggle-properties-view ()
+(defun brain-toggle-properties-view ()
     "enable or disable the explicit display of atom properties as extra lines within views"
     (interactive)
-    (setq smsn-view-properties (not smsn-view-properties))
-    (smsn-update-view)
-    (message (concat (if smsn-view-properties "enabled" "disabled") " property view")))
+    (setq brain-current-view-properties (not brain-current-view-properties))
+    (brain-update-view)
+    (message (concat (if brain-current-view-properties "enabled" "disabled") " property view")))
 
-(defun smsn-toggle-truncate-lines ()
+(defun brain-toggle-truncate-lines ()
     "toggle line wrap mode"
     (interactive)
     (toggle-truncate-lines))
 
-(defun smsn-update-to-backward-view ()
+(defun brain-update-to-backward-view ()
     "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
     (interactive)
     (if (in-view-mode)
-        (request-view nil smsn-mode smsn-root-id smsn-height smsn-backward-style
-            smsn-min-sharability smsn-max-sharability smsn-default-sharability
-            smsn-min-weight smsn-max-weight smsn-default-weight)))
+        (request-view nil brain-current-mode brain-current-root-id brain-current-height brain-const-backward-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+            brain-current-min-weight brain-current-max-weight brain-current-default-weight)))
 
-(defun smsn-update-to-forward-view ()
+(defun brain-update-to-forward-view ()
     "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
     (interactive)
     (if (in-view-mode)
-        (request-view nil smsn-mode smsn-root-id smsn-height smsn-forward-style
-            smsn-min-sharability smsn-max-sharability smsn-default-sharability
-            smsn-min-weight smsn-max-weight smsn-default-weight)))
+        (request-view nil brain-current-mode brain-current-root-id brain-current-height brain-const-forward-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+            brain-current-min-weight brain-current-max-weight brain-current-default-weight)))
 
-(defun smsn-update-view ()
+(defun brain-update-view ()
     "refresh the current view from the data store"
     (interactive)
     (if (in-view-mode)
-        (request-view t smsn-mode smsn-root-id smsn-height smsn-style
-            smsn-min-sharability smsn-max-sharability smsn-default-sharability
-            smsn-min-weight smsn-max-weight smsn-default-weight)))
+        (request-view t brain-current-mode brain-current-root-id brain-current-height brain-current-style
+            brain-current-min-sharability brain-current-max-sharability brain-current-default-sharability
+            brain-current-min-weight brain-current-max-weight brain-current-default-weight)))
 
-(defun smsn-visit-in-amazon (value-selector)
+(defun brain-visit-in-amazon (value-selector)
     "search Amazon.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
-        (concat "http://www.amazon.com/s?ie=UTF8&index=blended&link_code=qs&field-keywords=" (w3m-url-encode-string value)))))
+        (concat
+            "http://www.amazon.com/s?ie=UTF8&index=blended&link_code=qs&field-keywords="
+            (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-delicious (value-selector)
+(defun brain-visit-in-delicious (value-selector)
     "search delicious.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.delicious.com/search?p=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-ebay (value-selector)
+(defun brain-visit-in-ebay (value-selector)
     "search ebay.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.ebay.com/sch/i.html?_nkw=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-google (value-selector)
+(defun brain-visit-in-google (value-selector)
     "search google.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.google.com/search?ie=UTF-8&q=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-google-maps (value-selector)
+(defun brain-visit-in-google-maps (value-selector)
     "search Google Maps for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://maps.google.com/maps?q=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-google-scholar (value-selector)
+(defun brain-visit-in-google-scholar (value-selector)
     "search Google Scholar for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://scholar.google.com/scholar?q=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-twitter (value-selector)
+(defun brain-visit-in-twitter (value-selector)
     "search twitter.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://twitter.com/#!/search/" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-wikipedia (value-selector)
+(defun brain-visit-in-wikipedia (value-selector)
     "search en.wikipedia.org for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-in-youtube (value-selector)
+(defun brain-visit-in-youtube (value-selector)
     "search youtube.com for the value generated by VALUE-SELECTOR and view the results in a browser"
     (visit-target-value value-selector (lambda (value)
         (concat "http://www.youtube.com/results?search_query=" (w3m-url-encode-string value)))))
 
-(defun smsn-visit-target ()
+(defun brain-visit-target ()
     "navigate to the atom at point, opening a new view with that atom as root"
     (interactive)
     (let ((id (atom-id-at-point)))
         (if id
-            (request-view nil (mode-for-visit) id smsn-height smsn-style smsn-min-sharability smsn-max-sharability (future-sharability (current-target-sharability)) smsn-min-weight smsn-max-weight smsn-default-weight)
+            (request-view nil (mode-for-visit) id brain-current-height brain-current-style
+                brain-current-min-sharability brain-current-max-sharability (future-sharability (current-target-sharability))
+                brain-current-min-weight brain-current-max-weight brain-current-default-weight)
             (no-target))))
 
-(defun smsn-visit-target-alias ()
+(defun brain-visit-target-alias ()
     "visit the @alias of the atom at point (normally a URL) in a browser"
     (interactive)
     (let ((alias (current-target-alias)))
@@ -1219,109 +1256,209 @@ a type has been assigned to it by the inference engine."
             (browse-url alias)
             (no-target))))
 
-(defun smsn-visit-as-url (value-selector)
+(defun brain-visit-as-url (value-selector)
     "visit the URL generated by VALUE-SELECTOR in a browser"
     (visit-target-value value-selector (lambda (value) value)))
 
-(defun smsn-visit-url-at-point ()
+(defun brain-visit-url-at-point ()
     "visit the URL at point in a browser"
     (interactive)
     (goto-address-at-point))
 
 
 ;; KEYBOARD MAPPINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun minibuffer-arg (function prompt &optional initial)
-    (lexical-let ((f function) (p prompt) (i initial))
-        (lambda ()
-            (interactive)
-            ;; note: use of the INITIAL argument is discouraged, but here it makes sense
-            (let ((arg (read-from-minibuffer p i)))
-                (if arg (funcall f arg))))))
-
-(defun char-arg (function prompt)
-    (lexical-let ((f function) (p prompt))
-        (lambda ()
-            (interactive)
-            (let ((c (read-char p)))
-                (if c (funcall f c))))))
-
 ;; Note: when updating this list of mappings, also update the PKB
-(global-set-key (kbd "C-c C-I f")       'smsn-find-isolated-atoms)
-(global-set-key (kbd "C-c C-I r")       'smsn-remove-isolated-atoms)
-(global-set-key (kbd "C-c C-a C-p")     (char-arg 'smsn-insert-attr-priority "priority = ?"))
-(global-set-key (kbd "C-c C-a C-s")     (char-arg 'smsn-insert-attr-sharability "sharability = ?"))
-(global-set-key (kbd "C-c C-a C-w")     (char-arg 'smsn-insert-attr-weight "weight = ?"))
-(global-set-key (kbd "C-c C-a d")       'smsn-insert-current-date)
-(global-set-key (kbd "C-c C-a s")       'smsn-insert-current-time-with-seconds)
-(global-set-key (kbd "C-c C-a t")       'smsn-insert-current-time)
-(global-set-key (kbd "C-c C-d")         (char-arg 'smsn-set-view-height "height = ?"))
-(global-set-key (kbd "C-c C-e e")       (minibuffer-arg 'smsn-export-edges "export edges to file: " smsn-default-edges-file))
-(global-set-key (kbd "C-c C-e g")       (minibuffer-arg 'smsn-export-graphml "export GraphML to file: " smsn-default-graphml-file))
-(global-set-key (kbd "C-c C-e l")       (minibuffer-arg 'smsn-export-latex "export LaTeX to file: " smsn-default-latex-file))
-(global-set-key (kbd "C-c C-e p")       (minibuffer-arg 'smsn-export-pagerank "export PageRank results to file: " smsn-default-pagerank-file))
-(global-set-key (kbd "C-c C-e r")       (minibuffer-arg 'smsn-export-rdf "export private RDF dump to file: " smsn-default-rdf-file))
-(global-set-key (kbd "C-c C-e v")       (minibuffer-arg 'smsn-export-vertices "export vertices to file: " smsn-default-vertices-file))
-(global-set-key (kbd "C-c C-e w")       (minibuffer-arg 'smsn-export-webrdf "export public Web RDF dump to file: " smsn-default-webrdf-file))
-(global-set-key (kbd "C-c C-i g")       (minibuffer-arg 'smsn-import-graphml "import GraphML from file: " smsn-default-graphml-file))
-(global-set-key (kbd "C-c C-l")         (minibuffer-arg 'smsn-goto-line "line: "))
-(global-set-key (kbd "C-c C-r C-b a")   (smsn-visit-in-amazon 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b e")   (smsn-visit-in-ebay 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b d")   (smsn-visit-in-delicious 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b g")   (smsn-visit-in-google 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b m")   (smsn-visit-in-google-maps 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b s")   (smsn-visit-in-google-scholar 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b t")   (smsn-visit-in-twitter 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b w")   (smsn-visit-in-wikipedia 'current-root-value))
-(global-set-key (kbd "C-c C-r C-b y")   (smsn-visit-in-youtube 'current-root-value))
-(global-set-key (kbd "C-c C-s C-d")     (char-arg 'smsn-set-default-sharability "default sharability = ?"))
-(global-set-key (kbd "C-c C-s C-m")     (char-arg 'smsn-set-min-sharability "minimum sharability = ?"))
-(global-set-key (kbd "C-c C-t C-a b")   'smsn-visit-target-alias)
-(global-set-key (kbd "C-c C-t C-b a")   (smsn-visit-in-amazon 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b e")   (smsn-visit-in-ebay 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b d")   (smsn-visit-in-delicious 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b g")   (smsn-visit-in-google 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b m")   (smsn-visit-in-google-maps 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b s")   (smsn-visit-in-google-scholar 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b t")   (smsn-visit-in-twitter 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b w")   (smsn-visit-in-wikipedia 'current-target-value))
-(global-set-key (kbd "C-c C-t C-b y")   (smsn-visit-in-youtube 'current-target-value))
-(global-set-key (kbd "C-c C-t C-p")     (char-arg 'smsn-set-target-priority "new priority = ?"))
-(global-set-key (kbd "C-c C-t C-s")     (char-arg 'smsn-set-target-sharability "new sharability = ?"))
-(global-set-key (kbd "C-c C-t C-w")     (char-arg 'smsn-set-target-weight "new weight = ?"))
-;; TODO: finish generalizing these "C-c C-t x" functions to root vs. target
-(global-set-key (kbd "C-c C-t a")       (smsn-visit-as-url 'current-target-value))
-(global-set-key (kbd "C-c C-t c")       'smsn-copy-target-value-to-clipboard)
-(global-set-key (kbd "C-c C-t i")       (smsn-atom-info 'current-target))
-(global-set-key (kbd "C-c C-t l")       'smsn-preview-target-latex-math)
-(global-set-key (kbd "C-c C-t r")       'smsn-copy-target-reference-to-clipboard)
-;; Note: this should perhaps be a local setting
-(global-set-key (kbd "C-c C-v ;")       'smsn-toggle-truncate-lines)
-(global-set-key (kbd "C-c C-v b")       'smsn-update-to-backward-view)
-(global-set-key (kbd "C-c C-v e")       'smsn-enter-edit-view)
-(global-set-key (kbd "C-c C-v f")       'smsn-update-to-forward-view)
-(global-set-key (kbd "C-c C-v i")       'smsn-toggle-inference-viewstyle)
-(global-set-key (kbd "C-c C-v p")       'smsn-toggle-properties-view)
-(global-set-key (kbd "C-c C-v r")       'smsn-enter-readonly-view)
-(global-set-key (kbd "C-c C-v s")       'smsn-toggle-emacspeak)
-(global-set-key (kbd "C-c C-v t")       (minibuffer-arg 'smsn-set-value-truncation-length "value truncation length: "))
-(global-set-key (kbd "C-c C-v v")       'smsn-toggle-minimize-verbatim-blocks)
-(global-set-key (kbd "C-c C-w C-d")     (char-arg 'smsn-set-default-weight "default weight = ?"))
-(global-set-key (kbd "C-c C-w C-m")     (char-arg 'smsn-set-min-weight "minimun weight = ?"))
-(global-set-key (kbd "C-c a")           (minibuffer-arg 'smsn-acronym-query "acronym search for: "))
-(global-set-key (kbd "C-c b")           'smsn-visit-url-at-point)
-(global-set-key (kbd "C-c d")           'smsn-duplicates)
-(global-set-key (kbd "C-c f")           'smsn-find-roots)
-(global-set-key (kbd "C-c h")           'smsn-history)
-(global-set-key (kbd "C-c i")           'smsn-infer-types)
-(global-set-key (kbd "C-c o")           (minibuffer-arg 'smsn-shortcut-query "shortcut search for: "))
-(global-set-key (kbd "C-c P")           'smsn-priorities)
-(global-set-key (kbd "C-c p")           'smsn-push-view)
-(global-set-key (kbd "C-c r")           (minibuffer-arg 'smsn-ripple-query "ripple query: "))
-(global-set-key (kbd "C-c s")           (minibuffer-arg 'smsn-fulltext-query "full-text search for: "))
-(global-set-key (kbd "C-c t")           'smsn-visit-target)
-(global-set-key (kbd "C-c u")           'smsn-update-view)
-(global-set-key (kbd "C-c v")           'smsn-events)
+
+(defun prompt-for-string (function prompt &optional initial)
+    ;; note: use of the INITIAL argument is discouraged, but here it makes sense
+    (let ((arg (read-from-minibuffer prompt initial)))
+        (if arg (funcall function arg))))
+
+(defun prompt-for-char (function prompt)
+    (let ((c (read-char prompt)))
+        (if c (funcall function c))))
+
+(defun brain-insert-attr-priority-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-insert-attr-priority "priority = ?"))
+
+(defun brain-insert-attr-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-insert-attr-sharability "sharability = ?"))
+
+(defun brain-insert-attr-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-insert-attr-weight "weight = ?"))
+
+(defun brain-set-view-height-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-view-height "height = ?"))
+
+(defun brain-export-edges-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-edges "export edges to file: " brain-default-edges-file))
+
+(defun brain-export-graphml-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-graphml "export GraphML to file: " brain-default-graphml-file))
+
+(defun brain-export-latex-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-latex "export LaTeX to file: " brain-default-latex-file))
+
+(defun brain-export-pagerank-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-pagerank "export PageRank results to file: " brain-default-pagerank-file))
+
+(defun brain-export-rdf-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-rdf "export private RDF dump to file: " brain-default-rdf-file))
+
+(defun brain-export-vertices-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-vertices "export vertices to file: " brain-default-vertices-file))
+
+(defun brain-export-webrdf-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-export-webrdf "export public Web RDF dump to file: " brain-default-webrdf-file))
+
+(defun brain-import-graphml-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-import-graphml "import GraphML from file: " brain-default-graphml-file))
+
+(defun brain-goto-line-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-goto-line "line: "))
+
+(defun brain-set-default-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-default-sharability "default sharability = ?"))
+
+(defun brain-set-min-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-min-sharability "minimum sharability = ?"))
+
+(defun brain-set-target-priority-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-target-priority "new priority = ?"))
+
+(defun brain-set-target-sharability-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-target-sharability "new sharability = ?"))
+
+(defun brain-set-target-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-target-weight "new weight = ?"))
+
+(defun brain-set-value-truncation-length-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-set-value-truncation-length "value truncation length: "))
+
+(defun brain-set-default-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-default-weight "default weight = ?"))
+
+(defun brain-set-min-weight-prompt ()
+    (interactive)
+    (prompt-for-char 'brain-set-min-weight "minimun weight = ?"))
+
+(defun brain-acronym-query-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-acronym-query "acronym search for: "))
+
+(defun brain-shortcut-query-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-shortcut-query "shortcut search for: "))
+
+(defun brain-ripple-query-prompt ()
+    (interactive)
+    (prompt-for-string 'brain-ripple-query "ripple query: "))
+
+(defun brain-fulltext-query-prompt ()
+    (interactive)
+    (let (
+      (newcol (atom-color-at-visibility-threshold))
+      (oldcol (face-foreground 'minibuffer-prompt)))
+        (set-face-foreground 'minibuffer-prompt newcol)
+        (prompt-for-string 'brain-fulltext-query "full-text search for: ")
+        (set-face-foreground 'minibuffer-prompt oldcol)))
+
+(defvar brain-mode-map nil)
+(if brain-mode-map () (progn
+    (setq brain-mode-map (make-sparse-keymap))
+    (define-key brain-mode-map (kbd "C-c C-I f")       'brain-find-isolated-atoms)
+    (define-key brain-mode-map (kbd "C-c C-I r")       'brain-remove-isolated-atoms)
+    (define-key brain-mode-map (kbd "C-c C-a C-p")     'brain-insert-attr-priority-prompt)
+    (define-key brain-mode-map (kbd "C-c C-a C-s")     'brain-insert-attr-sharability-prompt)
+    (define-key brain-mode-map (kbd "C-c C-a C-w")     'brain-insert-attr-weight-prompt)
+    (define-key brain-mode-map (kbd "C-c C-a d")       'brain-insert-current-date)
+    (define-key brain-mode-map (kbd "C-c C-a s")       'brain-insert-current-time-with-seconds)
+    (define-key brain-mode-map (kbd "C-c C-a t")       'brain-insert-current-time)
+    (define-key brain-mode-map (kbd "C-c C-d")         'brain-set-view-height-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e e")       'brain-export-edges-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e g")       'brain-export-graphml-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e l")       'brain-export-latex-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e p")       'brain-export-pagerank-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e r")       'brain-export-rdf-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e v")       'brain-export-vertices-prompt)
+    (define-key brain-mode-map (kbd "C-c C-e w")       'brain-export-webrdf-prompt)
+    (define-key brain-mode-map (kbd "C-c C-i g")       'brain-import-graphml-prompt)
+    (define-key brain-mode-map (kbd "C-c C-l")         'brain-goto-line-prompt)
+    (define-key brain-mode-map (kbd "C-c C-r C-b a")   (brain-visit-in-amazon 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b e")   (brain-visit-in-ebay 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b d")   (brain-visit-in-delicious 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b g")   (brain-visit-in-google 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b m")   (brain-visit-in-google-maps 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b s")   (brain-visit-in-google-scholar 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b t")   (brain-visit-in-twitter 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b w")   (brain-visit-in-wikipedia 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-r C-b y")   (brain-visit-in-youtube 'current-root-value))
+    (define-key brain-mode-map (kbd "C-c C-s C-d")     'brain-set-default-sharability-prompt)
+    (define-key brain-mode-map (kbd "C-c C-s C-m")     'brain-set-min-sharability-prompt)
+    (define-key brain-mode-map (kbd "C-c C-t C-a b")   'brain-visit-target-alias)
+    (define-key brain-mode-map (kbd "C-c C-t C-b a")   (brain-visit-in-amazon 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b e")   (brain-visit-in-ebay 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b d")   (brain-visit-in-delicious 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b g")   (brain-visit-in-google 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b m")   (brain-visit-in-google-maps 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b s")   (brain-visit-in-google-scholar 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b t")   (brain-visit-in-twitter 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b w")   (brain-visit-in-wikipedia 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-b y")   (brain-visit-in-youtube 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t C-p")     'brain-set-target-priority-prompt)
+    (define-key brain-mode-map (kbd "C-c C-t C-s")     'brain-set-target-sharability-prompt)
+    (define-key brain-mode-map (kbd "C-c C-t C-w")     'brain-set-target-weight-prompt)
+    (define-key brain-mode-map (kbd "C-c C-t a")       (brain-visit-as-url 'current-target-value))
+    (define-key brain-mode-map (kbd "C-c C-t c")       'brain-copy-target-value-to-clipboard)
+    (define-key brain-mode-map (kbd "C-c C-t i")       (brain-atom-info 'current-target))
+    (define-key brain-mode-map (kbd "C-c C-t l")       'brain-preview-target-latex-math)
+    (define-key brain-mode-map (kbd "C-c C-t r")       'brain-copy-target-reference-to-clipboard)
+    (define-key brain-mode-map (kbd "C-c C-v ;")       'brain-toggle-truncate-lines)
+    (define-key brain-mode-map (kbd "C-c C-v b")       'brain-update-to-backward-view)
+    (define-key brain-mode-map (kbd "C-c C-v e")       'brain-enter-edit-view)
+    (define-key brain-mode-map (kbd "C-c C-v f")       'brain-update-to-forward-view)
+    (define-key brain-mode-map (kbd "C-c C-v i")       'brain-toggle-inference-viewstyle)
+    (define-key brain-mode-map (kbd "C-c C-v p")       'brain-toggle-properties-view)
+    (define-key brain-mode-map (kbd "C-c C-v r")       'brain-enter-readonly-view)
+    (define-key brain-mode-map (kbd "C-c C-v s")       'brain-toggle-emacspeak)
+    (define-key brain-mode-map (kbd "C-c C-v t")       'brain-set-value-truncation-length-prompt)
+    (define-key brain-mode-map (kbd "C-c C-v v")       'brain-toggle-minimize-verbatim-blocks)
+    (define-key brain-mode-map (kbd "C-c C-w C-d")     'brain-set-default-weight-prompt)
+    (define-key brain-mode-map (kbd "C-c C-w C-m")     'brain-set-min-weight-prompt)
+    (define-key brain-mode-map (kbd "C-c a")           'brain-acronym-query-prompt)
+    (define-key brain-mode-map (kbd "C-c b")           'brain-visit-url-at-point)
+    (define-key brain-mode-map (kbd "C-c d")           'brain-duplicates)
+    (define-key brain-mode-map (kbd "C-c f")           'brain-find-roots)
+    (define-key brain-mode-map (kbd "C-c h")           'brain-history)
+    (define-key brain-mode-map (kbd "C-c i")           'brain-infer-types)
+    (define-key brain-mode-map (kbd "C-c o")           'brain-shortcut-query-prompt)
+    (define-key brain-mode-map (kbd "C-c P")           'brain-priorities)
+    (define-key brain-mode-map (kbd "C-c p")           'brain-push-view)
+    (define-key brain-mode-map (kbd "C-c r")           'brain-ripple-query-prompt)
+    (define-key brain-mode-map (kbd "C-c s")           'brain-fulltext-query-prompt)
+    (define-key brain-mode-map (kbd "C-c t")           'brain-visit-target)
+    (define-key brain-mode-map (kbd "C-c u")           'brain-update-view)
+    (define-key brain-mode-map (kbd "C-c v")           'brain-events)))
 
 ;; special mappings reserved for use through emacsclient
 ;; C-c c  --  atom-id-at-point
@@ -1329,32 +1466,54 @@ a type has been assigned to it by the inference engine."
 
 ;; WRAPPER API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun smsn-emacsclient-eval (function)
+(defun brain-emacsclient-eval (function)
     "evaluate FUNCTION from emacsclient as if a user had typed it into the current buffer"
     (set-buffer (window-buffer (selected-window)))
     (funcall function))
 
-(defun smsn-previous-line ()
+(defun brain-previous-line ()
     (interactive)
     (previous-line)
     (emacspeak-speak-line))
 
-(defun smsn-next-line ()
+(defun brain-next-line ()
     (interactive)
     (next-line)
     (emacspeak-speak-line))
 
-(defun smsn-backward-char ()
+(defun brain-backward-char ()
     (interactive)
     (backward-char)
     (emacspeak-speak-display-char t)) ;; PREFIX arg disables phonetic pronunciation
 
-(defun smsn-forward-char ()
+(defun brain-forward-char ()
     (interactive)
     (forward-char)
     (emacspeak-speak-display-char t)) ;; PREFIX arg disables phonetic pronunciation
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAJOR MODE DEFINITION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar brain-mode-syntax-table nil
+  "Syntax table used while in Brain-mode.")
+(if brain-mode-syntax-table ()
+  (setq brain-mode-syntax-table (make-syntax-table)))
+
+(defvar brain-mode-abbrev-table nil
+  "Abbrev table used while in Brain-mode.")
+(define-abbrev-table 'brain-mode-abbrev-table ())
+
+(defun brain-mode ()
+    "Major mode for interacting with a MyOtherBrain personal knowledge base"
+    (interactive)
+    (kill-all-local-variables)
+    (use-local-map brain-mode-map)
+    (brain-define-buffer-local-variables)
+    (setq local-abbrev-table brain-mode-abbrev-table)
+    (set-syntax-table brain-mode-syntax-table)
+    ;; note: not customizing indent style with indent-line-function
+    (setq mode-name "Brain-mode")
+    (setq major-mode 'brain-mode)
+    (run-hooks 'brain-hook))
 
 (provide 'brain-mode)

@@ -120,7 +120,7 @@ public class MonitronService {
 
         String address = parts[0];
         if (parts.length > 1) {
-            Collection<Object> args = new ArrayList<Object>();
+            Collection<Object> args = new ArrayList<>();
             args.addAll(Arrays.asList(parts).subList(1, parts.length));
             return new OSCMessage(address, args);
         } else {

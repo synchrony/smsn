@@ -132,7 +132,7 @@ public class ExtendoBrainClient {
             throw new ExtendoBrainClientException(e);
         }
 
-        List<NameValuePair> params = new LinkedList<NameValuePair>();
+        List<NameValuePair> params = new LinkedList<>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         System.out.println("parameter string: " + paramStr);
@@ -204,7 +204,7 @@ public class ExtendoBrainClient {
             throw new ExtendoBrainClientException(e);
         }
 
-        List<NameValuePair> params = new LinkedList<NameValuePair>();
+        List<NameValuePair> params = new LinkedList<>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
         UrlEncodedFormEntity ent = null;
         try {
@@ -279,7 +279,7 @@ public class ExtendoBrainClient {
             throw new ExtendoBrainClientException(e);
         }
 
-        List<NameValuePair> params = new LinkedList<NameValuePair>();
+        List<NameValuePair> params = new LinkedList<>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "set?" + paramStr;
@@ -337,12 +337,12 @@ public class ExtendoBrainClient {
         } catch (JSONException e) {
             throw new ExtendoBrainClientException(e);
         }
-        List<NameValuePair> params = new LinkedList<NameValuePair>();
+        List<NameValuePair> params = new LinkedList<>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "search?" + paramStr;
 
-        final List<Note> results = new LinkedList<Note>();
+        final List<Note> results = new LinkedList<>();
 
         HttpResponseHandler handler = new HttpResponseHandler() {
             @Override
@@ -385,10 +385,9 @@ public class ExtendoBrainClient {
     private void get(final HttpResponseHandler responseHandler,
                      final String... paths) throws IOException, HttpException {
 
-        DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024);
         ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
 
-        try {
+        try (DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024)) {
             for (String path : paths) {
                 if (!conn.isOpen()) {
                     Socket socket = new Socket(httpHost.getHostName(), httpHost.getPort());
@@ -409,8 +408,6 @@ public class ExtendoBrainClient {
                     System.out.println("Connection kept alive...");
                 }
             }
-        } finally {
-            conn.close();
         }
     }
 
@@ -418,10 +415,9 @@ public class ExtendoBrainClient {
                       final HttpResponseHandler responseHandler,
                       final HttpEntity... requests) throws IOException, HttpException {
 
-        DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024);
         ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
 
-        try {
+        try (DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024)) {
             for (HttpEntity requestBody : requests) {
                 if (!conn.isOpen()) {
                     Socket socket = new Socket(httpHost.getHostName(), httpHost.getPort());
@@ -444,8 +440,6 @@ public class ExtendoBrainClient {
                     System.out.println("Connection kept alive...");
                 }
             }
-        } finally {
-            conn.close();
         }
     }
 

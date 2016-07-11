@@ -67,32 +67,36 @@ public class SmSnRippleRepl {
 
         if (ChordedKeyer.Modifier.Control == modifier) {
             //logger.log(Level.INFO, "matched a control character");
-            if (symbol.equals("")) {
-                if (currentLineOfText.length() > 0) {
-                    eventHandler.beginCommand();
-                    session.push(currentLineOfText.toString());
-                    session.push(typeatronDictionary);
-                    newLine();
-                    eventHandler.finishCommand();
-                } else {
-                    logger.warning("empty command in Ripple REPL");
+            switch (symbol) {
+                case "":
+                    if (currentLineOfText.length() > 0) {
+                        eventHandler.beginCommand();
+                        session.push(currentLineOfText.toString());
+                        session.push(typeatronDictionary);
+                        newLine();
+                        eventHandler.finishCommand();
+                    } else {
+                        logger.warning("empty command in Ripple REPL");
+                    }
+                    break;
+                case "u": {
+                    UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
+                    if (!undoRedoStack.canUndo()) {
+                        throw new RippleException("can't undo");
+                    } else {
+                        undoRedoStack.undo();
+                        typeatron.sendOkMessage();
+                    }
+                    break;
                 }
-            } else if (symbol.equals("u")) {
-                UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
-                if (!undoRedoStack.canUndo()) {
-                    throw new RippleException("can't undo");
-                } else {
-                    undoRedoStack.undo();
-                    typeatron.sendOkMessage();
-                }
-            } else if (symbol.equals("r")) {
-                UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
-                if (!undoRedoStack.canRedo()) {
-                    throw new RippleException("can't undo");
-                } else {
-                    undoRedoStack.redo();
-                    typeatron.sendOkMessage();
-                }
+                case "r": {
+                    UndoRedoStack<Collector<RippleList>> undoRedoStack = session.getUndoRedoStack();
+                    if (!undoRedoStack.canRedo()) {
+                        throw new RippleException("can't undo");
+                    } else {
+                        undoRedoStack.redo();
+                        typeatron.sendOkMessage();
+                    }
                 /*
             } else if (symbol.equals("u")) { // "to upper case" character primitive
                 String s = getLastSymbol();
@@ -100,38 +104,50 @@ public class SmSnRippleRepl {
                     currentLineOfText.append(s.toUpperCase());
                 }
                 */
-            } else if (symbol.equals("n")) { // "to number" character primitive
-                String s = getLastSymbol();
-                if (null != s) {
-                    char c = s.charAt(0);
-                    if (c == 'o') {
-                        currentLineOfText.append("0");
-                    } else if (c >= 'a' && c <= 'i') {
-                        currentLineOfText.append((char) (s.charAt(0) - 'a' + '1'));
-                    }
+                    break;
                 }
-            } else if (symbol.equals("p")) { // "to punctuation" character primitive
-                String s = getLastSymbol();
-                if (null != s) {
-                    String p = typeatron.getKeyer().getPunctuationMap().get(s);
-                    if (null != p) {
-                        currentLineOfText.append(p);
+                case "n": { // "to number" character primitive
+                    String s = getLastSymbol();
+                    if (null != s) {
+                        char c = s.charAt(0);
+                        if (c == 'o') {
+                            currentLineOfText.append("0");
+                        } else if (c >= 'a' && c <= 'i') {
+                            currentLineOfText.append((char) (s.charAt(0) - 'a' + '1'));
+                        }
                     }
+                    break;
                 }
-            } else if (symbol.equals("'")) {
-                applyDiacritic(ExtendedCharacters.Diacritic.Acute);
-            } else if (symbol.equals("`")) {
-                applyDiacritic(ExtendedCharacters.Diacritic.Grave);
-            } else if (symbol.equals("^")) {
-                applyDiacritic(ExtendedCharacters.Diacritic.Circumflex);
-            } else if (symbol.equals("\"")) {
-                applyDiacritic(ExtendedCharacters.Diacritic.Dieresis);
-            } else if (symbol.equals("~")) {
-                applyDiacritic(ExtendedCharacters.Diacritic.Tilde);
-                // TODO: slash "diacritic"
-            } else {
-                logger.log(Level.WARNING, "unknown control value: " + symbol);
-                //currentLineOfText.append("C-" + symbol);
+                case "p": { // "to punctuation" character primitive
+                    String s = getLastSymbol();
+                    if (null != s) {
+                        String p = typeatron.getKeyer().getPunctuationMap().get(s);
+                        if (null != p) {
+                            currentLineOfText.append(p);
+                        }
+                    }
+                    break;
+                }
+                case "'":
+                    applyDiacritic(ExtendedCharacters.Diacritic.Acute);
+                    break;
+                case "`":
+                    applyDiacritic(ExtendedCharacters.Diacritic.Grave);
+                    break;
+                case "^":
+                    applyDiacritic(ExtendedCharacters.Diacritic.Circumflex);
+                    break;
+                case "\"":
+                    applyDiacritic(ExtendedCharacters.Diacritic.Dieresis);
+                    break;
+                case "~":
+                    applyDiacritic(ExtendedCharacters.Diacritic.Tilde);
+                    // TODO: slash "diacritic"
+                    break;
+                default:
+                    logger.log(Level.WARNING, "unknown control value: " + symbol);
+                    //currentLineOfText.append("C-" + symbol);
+                    break;
             }
         } else if (ChordedKeyer.Modifier.None == modifier) {
             if (symbol.equals("\n")) { // handle newline

@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.server;
 
-import edu.rpi.twc.sesamestream.SesameStream;
-import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.ConnectionHost;
@@ -17,6 +15,9 @@ import net.fortytwo.flow.rdf.RDFSink;
 import net.fortytwo.linkeddata.LinkedDataCache;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.RippleException;
+import net.fortytwo.stream.StreamProcessor;
+import net.fortytwo.stream.sparql.SparqlStreamProcessor;
+import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.ParserConfig;
@@ -34,6 +35,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -43,8 +46,8 @@ public class CoordinatorService {
     protected static final Logger logger = Logger.getLogger(CoordinatorService.class.getName());
 
     private static final int
-            LINKED_DATA_TTL = 0,
-            PUSHED_DATA_TTL = 0;
+            LINKED_DATA_TTL = StreamProcessor.INFINITE_TTL,
+            PUSHED_DATA_TTL = StreamProcessor.INFINITE_TTL;
 
     private static CoordinatorService INSTANCE;
 
@@ -53,7 +56,7 @@ public class CoordinatorService {
     // TODO
     private final String broadcastEndpoint = "/graphs/joshkb/smsn/";
 
-    private final QueryEngineImpl queryEngine;
+    private final SparqlStreamProcessor streamProcessor;
 
     public static CoordinatorService getInstance()
             throws IOException, TypedProperties.PropertyException,
@@ -72,13 +75,13 @@ public class CoordinatorService {
         int oscPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_OSC_PORT);
         int pubsubPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_PUBSUB_PORT);
 
-        if (SemanticSynchrony.VERBOSE) {
-            SesameStream.setDoPerformanceMetrics(true);
-            SesameStream.setDoUseCompactLogFormat(false);
-        }
+        streamProcessor = new SHJSparqlStreamProcessor();
+        QueryEngineWrapper wrapper = new QueryEngineWrapper(streamProcessor);
 
-        queryEngine = new QueryEngineImpl();
-        QueryEngineWrapper wrapper = new QueryEngineWrapper(queryEngine);
+        if (SemanticSynchrony.VERBOSE) {
+            streamProcessor.setDoPerformanceMetrics(true);
+            streamProcessor.setDoUseCompactLogFormat(false);
+        }
 
         // TODO: make the base Sail configurable (e.g. disable it, or make it a persistent NativeStore)
         MemoryStore sail = new MemoryStore();
@@ -89,30 +92,38 @@ public class CoordinatorService {
                     public Sink<Statement> statementSink() {
                         return new Sink<Statement>() {
                             public void put(final Statement s) throws RippleException {
-                                queryEngine.addStatements(LINKED_DATA_TTL, s);
+                                try {
+                                    streamProcessor.addInputs(LINKED_DATA_TTL, s);
+                                } catch (IOException e) {
+                                    throw new RippleException(e);
+                                }
                             }
                         };
                     }
 
                     public Sink<Namespace> namespaceSink() {
-                        return new NullSink<Namespace>();
+                        return new NullSink<>();
                     }
 
                     public Sink<String> commentSink() {
-                        return new NullSink<String>();
+                        return new NullSink<>();
                     }
                 };
             }
         };
         LinkedDataCache cache = LinkedDataCache.createDefault(sail);
         cache.setDataStore(store);
-        queryEngine.setLinkedDataCache(cache, sail);
+        streamProcessor.setLinkedDataCache(cache);
 
-        GesturalServer.DatasetHandler h = new GesturalServer.DatasetHandler() {
+        Consumer<Dataset> h = new Consumer<Dataset>() {
             @Override
-            public void handle(Dataset dataset) {
+            public void accept(Dataset dataset) {
                 System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
-                queryEngine.addStatements(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
+                try {
+                    streamProcessor.addInputs(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "failed to add query input(s)", e);
+                }
             }
         };
 
@@ -144,16 +155,13 @@ public class CoordinatorService {
                            final RDFFormat format) throws IOException {
         long count;
 
-        InputStream in = new ByteArrayInputStream(rdfData.getBytes());
-        try {
+        try (InputStream in = new ByteArrayInputStream(rdfData.getBytes())) {
             count = parseRdfContent(in, format);
             //ds = dsFactory.parse(in, lang);
         } catch (RDFHandlerException e) {
             throw new IOException(e);
         } catch (RDFParseException e) {
             throw new IOException(e);
-        } finally {
-            in.close();
         }
 
         if (SemanticSynchrony.VERBOSE) {
@@ -200,7 +208,11 @@ public class CoordinatorService {
         public void handleStatement(Statement statement) throws RDFHandlerException {
             count++;
 
-            queryEngine.addStatements(PUSHED_DATA_TTL, statement);
+            try {
+                streamProcessor.addInputs(PUSHED_DATA_TTL, statement);
+            } catch (IOException e) {
+                throw new RDFHandlerException(e);
+            }
         }
 
         public void handleComment(String s) throws RDFHandlerException {

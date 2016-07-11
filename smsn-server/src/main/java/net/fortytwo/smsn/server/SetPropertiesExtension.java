@@ -44,29 +44,37 @@ public class SetPropertiesExtension extends SmSnExtension {
             return ExtensionResponse.badRequest(e.getMessage(), null);
         }
 
-        if (r.name.equals(SemanticSynchrony.WEIGHT)) {
-            float f = (Float) r.value;
-            // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
-            if (f <= 0 || f > 1.0) {
-                return ExtensionResponse.badRequest("weight is outside of range (0, 1]: " + f, null);
+        switch (r.name) {
+            case SemanticSynchrony.WEIGHT: {
+                float f = (Float) r.value;
+                // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
+                if (f <= 0 || f > 1.0) {
+                    return ExtensionResponse.badRequest("weight is outside of range (0, 1]: " + f, null);
+                }
+                break;
             }
-        } else if (r.name.equals(SemanticSynchrony.SHARABILITY)) {
-            float f = (Float) r.value;
-            if (f <= 0 || f > 1.0) {
-                return ExtensionResponse.badRequest("sharability is outside of range (0, 1]: " + f, null);
+            case SemanticSynchrony.SHARABILITY: {
+                float f = (Float) r.value;
+                if (f <= 0 || f > 1.0) {
+                    return ExtensionResponse.badRequest("sharability is outside of range (0, 1]: " + f, null);
+                }
+                break;
             }
-        } else if (r.name.equals(SemanticSynchrony.PRIORITY)) {
-            float f = (Float) r.value;
-            if (f < 0 || f > 1.0) {
-                return ExtensionResponse.badRequest("priority is outside of range [0, 1]: " + f, null);
+            case SemanticSynchrony.PRIORITY: {
+                float f = (Float) r.value;
+                if (f < 0 || f > 1.0) {
+                    return ExtensionResponse.badRequest("priority is outside of range [0, 1]: " + f, null);
+                }
+                break;
             }
-        } else if (r.name.equals(SemanticSynchrony.SHORTCUT)) {
-            String s = (String) r.value;
-            if (s.length() > 50) {
-                return ExtensionResponse.badRequest("shortcut is too long: " + s, null);
-            }
-        } else {
-            return ExtensionResponse.error("unknown property: " + r.name);
+            case SemanticSynchrony.SHORTCUT:
+                String s = (String) r.value;
+                if (s.length() > 50) {
+                    return ExtensionResponse.badRequest("shortcut is too long: " + s, null);
+                }
+                break;
+            default:
+                return ExtensionResponse.error("unknown property: " + r.name);
         }
 
         p.propertyName = r.name;
@@ -79,23 +87,28 @@ public class SetPropertiesExtension extends SmSnExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        if (p.propertyName.equals(SemanticSynchrony.WEIGHT)) {
-            p.root.setWeight((Float) p.propertyValue);
-        } else if (p.propertyName.equals(SemanticSynchrony.SHARABILITY)) {
-            p.root.setSharability((Float) p.propertyValue);
-        } else if (p.propertyName.equals(SemanticSynchrony.PRIORITY)) {
-            p.root.setPriority((Float) p.propertyValue);
-            p.brain.getPriorities().updatePriority(p.root);
-        } else if (p.propertyName.equals(SemanticSynchrony.SHORTCUT)) {
-            // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
-            String shortcut = (String) p.propertyValue;
-            for (Atom a : p.brain.getBrainGraph().getAtomsWithShortcut(shortcut, p.filter)) {
-                a.setShortcut(null);
-            }
+        switch (p.propertyName) {
+            case SemanticSynchrony.WEIGHT:
+                p.root.setWeight((Float) p.propertyValue);
+                break;
+            case SemanticSynchrony.SHARABILITY:
+                p.root.setSharability((Float) p.propertyValue);
+                break;
+            case SemanticSynchrony.PRIORITY:
+                p.root.setPriority((Float) p.propertyValue);
+                p.brain.getPriorities().updatePriority(p.root);
+                break;
+            case SemanticSynchrony.SHORTCUT:
+                // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
+                String shortcut = (String) p.propertyValue;
+                for (Atom a : p.brain.getBrainGraph().getAtomsWithShortcut(shortcut, p.filter)) {
+                    a.setShortcut(null);
+                }
 
-            p.root.setShortcut(shortcut);
-        } else {
-            throw new IllegalStateException();
+                p.root.setShortcut(shortcut);
+                break;
+            default:
+                throw new IllegalStateException();
         }
 
         p.brain.getBrainGraph().updated();

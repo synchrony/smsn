@@ -62,11 +62,8 @@ public class UpdateExtension extends SmSnExtension {
         Note rootNote;
 
         if (null != p.wikiView) {
-            InputStream in = new ByteArrayInputStream(p.wikiView.getBytes());
-            try {
+            try (InputStream in = new ByteArrayInputStream(p.wikiView.getBytes())) {
                 rootNote = p.parser.fromWikiText(in);
-            } finally {
-                in.close();
             }
         } else if (null != p.jsonView) {
             rootNote = p.parser.fromJSON(p.jsonView);

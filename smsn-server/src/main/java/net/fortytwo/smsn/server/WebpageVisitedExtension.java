@@ -71,7 +71,7 @@ public class WebpageVisitedExtension extends AbstractRexsterExtension {
         DatasetFactory f = new DatasetFactory(sail.getValueFactory());
         ValueFactory vf = sail.getValueFactory();
 
-        Collection<Statement> s = new LinkedList<Statement>();
+        Collection<Statement> s = new LinkedList<>();
         URI event = f.randomURI();
         URI page;
         try {

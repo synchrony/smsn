@@ -24,10 +24,11 @@
             <artifactId>sesame-rio-api</artifactId>
             <version>${sesame.version}</version>
         </dependency>
+        <!-- note: SPARQL implementations themselves are not needed -->
         <dependency>
-            <groupId>edu.rpi.twc.sesamestream</groupId>
-            <artifactId>sesamestream-api</artifactId>
-            <version>${sesamestream.version}</version>
+            <groupId>net.fortytwo.stream</groupId>
+            <artifactId>stream42-sparql</artifactId>
+            <version>${stream42.version}</version>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>

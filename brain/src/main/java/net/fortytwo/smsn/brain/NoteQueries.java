@@ -186,8 +186,8 @@ public class NoteQueries {
                                 final Filter filter,
                                 final ViewStyle style) throws InvalidUpdateException {
 
-        final Set<String> added = new HashSet<String>();
-        final Set<String> created = new HashSet<String>();
+        final Set<String> added = new HashSet<>();
+        final Set<String> created = new HashSet<>();
 
         final Atom root = null == rootNote.getId() ? null : brain.getBrainGraph().getAtom(rootNote.getId());
         if (null != root) {
@@ -411,7 +411,7 @@ public class NoteQueries {
             throw new IllegalArgumentException();
         }
 
-        List<Vertex> toRemove = new LinkedList<Vertex>();
+        List<Vertex> toRemove = new LinkedList<>();
 
         for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
             if (null != v.getProperty("value")
@@ -649,7 +649,7 @@ public class NoteQueries {
         if (null != brain.getKnowledgeBase()) {
             List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(a);
             if (null != entries && entries.size() > 0) {
-                List<String> meta = new LinkedList<String>();
+                List<String> meta = new LinkedList<>();
                 for (KnowledgeBase.AtomClassEntry e : entries) {
                     String ann = "class " + e.getInferredClassName()
                             + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore();
@@ -704,7 +704,7 @@ public class NoteQueries {
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
     // TODO: see also BrainGraph.toList
     public static Iterable<Atom> toIterable(AtomList l) {
-        List<Atom> ll = new LinkedList<Atom>();
+        List<Atom> ll = new LinkedList<>();
         while (null != l) {
             ll.add(l.getFirst());
             l = l.getRest();
@@ -768,7 +768,7 @@ public class NoteQueries {
         @Override
         public Iterable<Atom> getLinked(final Atom root,
                                         final Filter filter) {
-            List<Atom> results = new LinkedList<Atom>();
+            List<Atom> results = new LinkedList<>();
             for (AtomList l : root.getFirstOf()) {
                 AtomList cur = l;
                 AtomList prev = null;

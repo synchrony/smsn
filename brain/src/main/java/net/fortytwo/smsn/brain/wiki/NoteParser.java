@@ -44,19 +44,16 @@ public class NoteParser {
     private static final String TAB_REPLACEMENT = "    ";
 
     public Note fromWikiText(final String s) throws IOException, NoteParsingException {
-        InputStream in = new ByteArrayInputStream(s.getBytes(SemanticSynchrony.UTF8));
-        try {
+        try (InputStream in = new ByteArrayInputStream(s.getBytes(SemanticSynchrony.UTF8))) {
             return fromWikiText(in);
-        } finally {
-            in.close();
         }
     }
 
     public Note fromWikiText(final InputStream in) throws IOException, NoteParsingException {
         Note root = new Note();
 
-        LinkedList<Note> hierarchy = new LinkedList<Note>();
-        LinkedList<Integer> indentHierarachy = new LinkedList<Integer>();
+        LinkedList<Note> hierarchy = new LinkedList<>();
+        LinkedList<Integer> indentHierarachy = new LinkedList<>();
 
         InputStreamReader r = new InputStreamReader(in, SemanticSynchrony.UTF8);
         BufferedReader br = new BufferedReader(r);
@@ -197,44 +194,53 @@ public class NoteParser {
             if (isProperty) {
                 Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
-                if (bullet.equals(ALIAS_PROP)) {
-                    if (value.length() > 0) {
-                        n.setAlias(value);
-                    } else {
-                        n.setAlias(Note.CLEARME_VALUE);
+                switch (bullet) {
+                    case ALIAS_PROP:
+                        if (value.length() > 0) {
+                            n.setAlias(value);
+                        } else {
+                            n.setAlias(Note.CLEARME_VALUE);
+                        }
+                        break;
+                    case SHORTCUT_PROP:
+                        if (value.length() > 0) {
+                            n.setShortcut(value);
+                        } else {
+                            n.setShortcut(Note.CLEARME_VALUE);
+                        }
+                        break;
+                    case PRIORITY_PROP: {
+                        float val;
+                        try {
+                            val = Float.valueOf(value);
+                        } catch (NumberFormatException e) {
+                            throw new NoteParsingException(lineNumber, "invalid @priority value: " + value);
+                        }
+                        n.setPriority(val);
+                        break;
                     }
-                } else if (bullet.equals(SHORTCUT_PROP)) {
-                    if (value.length() > 0) {
-                        n.setShortcut(value);
-                    } else {
-                        n.setShortcut(Note.CLEARME_VALUE);
+                    case SHARABILITY_PROP: {
+                        float val;
+                        try {
+                            val = Float.valueOf(value);
+                        } catch (NumberFormatException e) {
+                            throw new NoteParsingException(lineNumber, "invalid @sharability value: " + value);
+                        }
+                        n.setSharability(val);
+                        break;
                     }
-                } else if (bullet.equals(PRIORITY_PROP)) {
-                    float val;
-                    try {
-                        val = Float.valueOf(value);
-                    } catch (NumberFormatException e) {
-                        throw new NoteParsingException(lineNumber, "invalid @priority value: " + value);
+                    case WEIGHT_PROP: {
+                        float val;
+                        try {
+                            val = Float.valueOf(value);
+                        } catch (NumberFormatException e) {
+                            throw new NoteParsingException(lineNumber, "invalid @weight value: " + value);
+                        }
+                        n.setWeight(val);
+                        break;
                     }
-                    n.setPriority(val);
-                } else if (bullet.equals(SHARABILITY_PROP)) {
-                    float val;
-                    try {
-                        val = Float.valueOf(value);
-                    } catch (NumberFormatException e) {
-                        throw new NoteParsingException(lineNumber, "invalid @sharability value: " + value);
-                    }
-                    n.setSharability(val);
-                } else if (bullet.equals(WEIGHT_PROP)) {
-                    float val;
-                    try {
-                        val = Float.valueOf(value);
-                    } catch (NumberFormatException e) {
-                        throw new NoteParsingException(lineNumber, "invalid @weight value: " + value);
-                    }
-                    n.setWeight(val);
-                } else {
-                    throw new NoteParsingException(lineNumber, "unknown property: " + bullet);
+                    default:
+                        throw new NoteParsingException(lineNumber, "unknown property: " + bullet);
                 }
             } else {
                 Note n = new Note();

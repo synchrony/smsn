@@ -26,9 +26,9 @@
             <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.rpi.twc.sesamestream</groupId>
-            <artifactId>sesamestream-impl</artifactId>
-            <version>${sesamestream.version}</version>
+            <groupId>net.fortytwo.stream</groupId>
+            <artifactId>stream42-sparql</artifactId>
+            <version>${stream42.version}</version>
         </dependency>
         <dependency>
             <groupId>com.illposed.osc</groupId>

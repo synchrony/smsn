@@ -37,7 +37,7 @@ public class ListGraphMigrator {
         for (Vertex vs : source.getVertices()) {
             Vertex vt = target.getVertex(vs.getId());
 
-            List<Vertex> list = new LinkedList<Vertex>();
+            List<Vertex> list = new LinkedList<>();
             for (Edge e : vs.getEdges(Direction.OUT)) {
                 list.add(e.getVertex(Direction.IN));
             }
@@ -91,11 +91,8 @@ public class ListGraphMigrator {
         String fileIn = "/tmp/brain.xml";
         System.out.println("reading graph from " + fileIn);
         GraphMLReader r = new GraphMLReader(source.getPropertyGraph());
-        InputStream in = new FileInputStream(fileIn);
-        try {
+        try (InputStream in = new FileInputStream(fileIn)) {
             r.inputGraph(in);
-        } finally {
-            in.close();
         }
 
         //String dirOut = dirt.getAbsolutePath();
@@ -111,11 +108,8 @@ public class ListGraphMigrator {
         System.out.println("writing graph to " + fileOut);
         GraphMLWriter w = new GraphMLWriter(target.getPropertyGraph());
         w.setNormalize(true);
-        OutputStream out = new FileOutputStream(fileOut);
-        try {
+        try (OutputStream out = new FileOutputStream(fileOut)) {
             w.outputGraph(out);
-        } finally {
-            out.close();
         }
 
         target.getPropertyGraph().shutdown();

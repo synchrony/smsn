@@ -23,8 +23,8 @@ public class OscReceiver {
     private final Set<OSCMessageListener> listeners;
 
     public OscReceiver() {
-        handlers = new HashMap<String, OscMessageHandler>();
-        listeners = new HashSet<OSCMessageListener>();
+        handlers = new HashMap<>();
+        listeners = new HashSet<>();
     }
 
     public void register(final String oscAddress,

@@ -37,7 +37,7 @@ public class AtomRegex {
             this.weight = weight;
             this.fieldHandler = fieldHandler;
             this.modifier = modifier;
-            this.alternatives = new HashSet<Class<? extends AtomClass>>();
+            this.alternatives = new HashSet<>();
             Collections.addAll(this.alternatives, alternatives);
         }
 

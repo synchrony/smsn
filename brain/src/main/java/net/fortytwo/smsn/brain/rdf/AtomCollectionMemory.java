@@ -11,8 +11,8 @@ import java.util.LinkedList;
 public class AtomCollectionMemory {
 
     private final String atomId;
-    private final Collection<AtomCollectionMemory> collections = new LinkedList<AtomCollectionMemory>();
-    private final Collection<Atom> atoms = new LinkedList<Atom>();
+    private final Collection<AtomCollectionMemory> collections = new LinkedList<>();
+    private final Collection<Atom> atoms = new LinkedList<>();
 
     public AtomCollectionMemory(final String atomId) {
         this.atomId = atomId;

@@ -332,8 +332,7 @@ public class KnowledgeBaseTest {
         Atom root = bg.createAtom(filter, SemanticSynchrony.createRandomKey());
         String rootId = (String) root.asVertex().getId();
 
-        InputStream in = KnowledgeBase.class.getResourceAsStream("inference-example-1.txt");
-        try {
+        try (InputStream in = KnowledgeBase.class.getResourceAsStream("inference-example-1.txt")) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
             while (null != (line = br.readLine())) {
@@ -355,8 +354,6 @@ public class KnowledgeBaseTest {
                 rootNote.setId(rootId);
                 queries.update(rootNote, height, filter, NoteQueries.forwardViewStyle);
             }
-        } finally {
-            in.close();
         }
 
         kb.addDefaultClasses();
@@ -526,12 +523,12 @@ public class KnowledgeBaseTest {
                                          final Value... expected) throws RepositoryException {
         //actual.enableDuplicateFilter();
 
-        List<Value> actualList = new LinkedList<Value>();
+        List<Value> actualList = new LinkedList<>();
         while (actual.hasNext()) {
             actualList.add(selectObjects ? actual.next().getObject() : actual.next().getSubject());
         }
         actual.close();
-        List<Value> expectedList = new LinkedList<Value>();
+        List<Value> expectedList = new LinkedList<>();
         Collections.addAll(expectedList, expected);
 
         Collections.sort(expectedList, valueComparator);

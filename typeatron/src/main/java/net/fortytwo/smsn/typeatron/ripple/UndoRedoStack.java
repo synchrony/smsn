@@ -13,8 +13,8 @@ public class UndoRedoStack<T> {
 
     public UndoRedoStack(final int capacity) {
         this.capacity = capacity;
-        undoStack = new Stack<T>();
-        redoStack = new Stack<T>();
+        undoStack = new Stack<>();
+        redoStack = new Stack<>();
     }
 
     public void done(T t) {

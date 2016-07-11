@@ -139,7 +139,7 @@ import java.util.Map;
  */
 public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
-    private final Map<String, StackMapping> dictionary = new HashMap<String, StackMapping>();
+    private final Map<String, StackMapping> dictionary = new HashMap<>();
 
     public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron) throws RippleException {

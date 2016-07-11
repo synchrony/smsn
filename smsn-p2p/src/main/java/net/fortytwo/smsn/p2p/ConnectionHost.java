@@ -18,7 +18,7 @@ public class ConnectionHost {
     private final Set<Notifier> notifiers;
 
     // TODO: manage this set of connections, periodically checking which have been closed and removing them
-    private final Set<Connection> connections = new HashSet<Connection>();
+    private final Set<Connection> connections = new HashSet<>();
 
     private boolean stopped = true;
 
@@ -27,7 +27,7 @@ public class ConnectionHost {
     public ConnectionHost(final int port) {
         this.port = port;
 
-        notifiers = new HashSet<Notifier>();
+        notifiers = new HashSet<>();
     }
 
     public void addNotifier(final Notifier notifier) {

@@ -1,12 +1,12 @@
 package net.fortytwo.smsn.monitron.demos;
 
-import edu.rpi.twc.sesamestream.BindingSetHandler;
-import edu.rpi.twc.sesamestream.impl.QueryEngineImpl;
 import info.aduna.io.IOUtil;
 import net.fortytwo.smsn.monitron.EventHandler;
 import net.fortytwo.smsn.monitron.MonitronService;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
+import net.fortytwo.stream.sparql.SparqlStreamProcessor;
+import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -22,6 +22,7 @@ import org.openrdf.rio.Rio;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.function.BiConsumer;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -34,15 +35,16 @@ public class ContinuousQueryDemo {
             throw new IllegalArgumentException();
         }
 
-        final QueryEngineImpl engine = new QueryEngineImpl();
+        final SparqlStreamProcessor streamProcessor = new SHJSparqlStreamProcessor();
         String baseUri = "http://example.org/base-uri/";
 
         for (final File f : dir.listFiles()) {
 
-            BindingSetHandler bsh = new BindingSetHandler() {
-                public void handle(final BindingSet result) {
+            BiConsumer<BindingSet, Long> bsh = new BiConsumer<BindingSet, Long>() {
+                @Override
+                public void accept(final BindingSet result, Long expirationTime) {
                     StringBuilder sb = new StringBuilder("RESULT (" + f.getName() + ")\t"
-                            + System.currentTimeMillis() + "\t");
+                            + System.currentTimeMillis() + "\t" + "\t" + expirationTime);
 
                     boolean first = true;
                     for (String n : result.getBindingNames()) {
@@ -59,18 +61,15 @@ public class ContinuousQueryDemo {
             };
 
             System.out.println("RUN\t" + System.currentTimeMillis() + "\tadding query file " + f);
-            InputStream in = new FileInputStream(f);
-            try {
+            try (InputStream in = new FileInputStream(f)) {
                 String query = IOUtil.readString(in);
 
-                engine.addQuery(QUERY_TTL, query, bsh);
-            } finally {
-                in.close();
+                streamProcessor.addQuery(QUERY_TTL, query, bsh);
             }
         }
 
         // First add the static data...
-        RDFHandler a = engine.createRDFHandler(TUPLE_TTL);
+        RDFHandler a = streamProcessor.createRDFHandler(TUPLE_TTL);
         RDFParser p = Rio.createParser(RDFFormat.TURTLE);
         p.setRDFHandler(a);
         p.parse(MonitronOntology.class.getResourceAsStream("universe.ttl"), baseUri);
@@ -81,7 +80,7 @@ public class ContinuousQueryDemo {
             public void handleEvent(MonitronEvent e) throws EventHandlingException {
                 for (Statement st : e.toRDF().getStatements()) {
                     try {
-                        engine.addStatements(TUPLE_TTL, st);
+                        streamProcessor.addInputs(TUPLE_TTL, st);
                     } catch (Throwable t) {
                         throw new EventHandlingException(t);
                     }

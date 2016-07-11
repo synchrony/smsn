@@ -1,23 +1,21 @@
 package net.fortytwo.smsn.typeatron;
 
 import com.illposed.osc.OSCMessage;
-import edu.rpi.twc.sesamestream.BindingSetHandler;
-import edu.rpi.twc.sesamestream.QueryEngine;
 import info.aduna.io.IOUtil;
+import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.ripple.RippleException;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.SmSnDeviceControl;
 import net.fortytwo.smsn.brain.BrainModeClient;
-import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.smsn.p2p.SideEffects;
+import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.smsn.p2p.osc.OscMessageHandler;
 import net.fortytwo.smsn.p2p.osc.OscReceiver;
 import net.fortytwo.smsn.rdf.Activities;
-import net.fortytwo.smsn.typeatron.ripple.SmSnRippleRepl;
 import net.fortytwo.smsn.typeatron.ripple.RippleSession;
+import net.fortytwo.smsn.typeatron.ripple.SmSnRippleRepl;
 import net.fortytwo.smsn.typeatron.ripple.lib.music.TypeatronMusicControl;
-import net.fortytwo.rdfagents.model.Dataset;
-import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.ModelConnection;
+import net.fortytwo.stream.StreamProcessor;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
@@ -28,6 +26,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,8 +57,6 @@ public class TypeatronControl extends SmSnDeviceControl {
     public static final int
             VIBRATE_MANUAL_MS = 500;
 
-    private final SideEffects environment;
-
     private final BrainModeClientWrapper brainModeWrapper;
     private final RippleSession rippleSession;
     private final SmSnRippleRepl rippleREPL;
@@ -73,8 +70,6 @@ public class TypeatronControl extends SmSnDeviceControl {
                             final SideEffects environment) throws DeviceInitializationException {
         super("/exo/tt", oscReceiver, agent);
 
-        this.environment = environment;
-
         try {
             this.music = new TypeatronMusicControl();
         } catch (Exception e) {
@@ -82,9 +77,10 @@ public class TypeatronControl extends SmSnDeviceControl {
         }
 
         try {
-            agent.getQueryEngine().addQuery(QUERY_TTL, Activities.QUERY_FOR_ATTENTION, new BindingSetHandler() {
+            agent.getStreamProcessor().addQuery(QUERY_TTL, Activities.QUERY_FOR_ATTENTION,
+                    new BiConsumer<BindingSet, Long>() {
                 @Override
-                public void handle(BindingSet b) {
+                public void accept(BindingSet b, Long expirationTime) {
                     Value actor = b.getValue("actor");
                     Value focus = b.getValue("focus");
 
@@ -109,11 +105,7 @@ public class TypeatronControl extends SmSnDeviceControl {
                     logger.info("notified of attention by " + actor + " to " + focus);
                 }
             });
-        } catch (IOException e) {
-            throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
-        } catch (QueryEngine.IncompatibleQueryException e) {
-            throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
-        } catch (QueryEngine.InvalidQueryException e) {
+        } catch (IOException | StreamProcessor.IncompatibleQueryException | StreamProcessor.InvalidQueryException e) {
             throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
         }
 
@@ -238,7 +230,6 @@ public class TypeatronControl extends SmSnDeviceControl {
                 Float mean = (Float) args.get(5);
                 Float variance = (Float) args.get(6);
 
-                ModelConnection mc = rippleSession.getModelConnection();
                 try {
                     rippleSession.push(startTime,
                             endTime,

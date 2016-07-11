@@ -39,7 +39,7 @@ public class ListDiffTest {
         List<String> afterList = ListDiff.toList(after);
         List<String> diffList = ListDiff.toList(diff);
 
-        final List<String> work = new LinkedList<String>();
+        final List<String> work = new LinkedList<>();
         work.addAll(beforeList);
 
         ListDiff.DiffEditor<String> ed = new ListDiff.DiffEditor<String>() {

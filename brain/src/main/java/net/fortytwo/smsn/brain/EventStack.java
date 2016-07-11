@@ -18,7 +18,7 @@ public class EventStack {
 
     private final int capacity;
 
-    private final LinkedList<Note> stack = new LinkedList<Note>();
+    private final LinkedList<Note> stack = new LinkedList<>();
 
     private final RoutineNamer personNames = new RoutineNamer("person");
 
@@ -92,7 +92,7 @@ public class EventStack {
 
         public RoutineNamer(final String type) {
             this.type = type;
-            numberByName = new HashMap<String, Long>();
+            numberByName = new HashMap<>();
         }
 
         public String getRoutineName(final String longName) {

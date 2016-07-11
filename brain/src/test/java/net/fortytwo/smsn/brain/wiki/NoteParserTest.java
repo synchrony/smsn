@@ -204,11 +204,8 @@ public class NoteParserTest {
     }
 
     private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
-        InputStream in = new ByteArrayInputStream(s.getBytes());
-        try {
+        try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
             return parser.fromWikiText(in).getChildren();
-        } finally {
-            in.close();
         }
     }
 }

@@ -36,7 +36,7 @@ public class RippleSession {
                          final SideEffects environment) throws RippleException {
         this.agent = agent;
         this.environment = environment;
-        this.undoRedoStack = new UndoRedoStack<Collector<RippleList>>(UNDO_REDO_DEPTH);
+        this.undoRedoStack = new UndoRedoStack<>(UNDO_REDO_DEPTH);
         undoRedoStack.done(new Collector<RippleList>());
 
         sail = new MemoryStore();
@@ -76,7 +76,7 @@ public class RippleSession {
             // note: this modifies evaluation history, harmlessly
             prevCollector.put(SesameList.nilList());
         }
-        Collector<RippleList> nextCollector = new Collector<RippleList>();
+        Collector<RippleList> nextCollector = new Collector<>();
 
         System.out.println("\tbefore evaluation:");
         for (RippleList l : prevCollector) {

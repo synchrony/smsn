@@ -75,7 +75,7 @@ public abstract class OscControl {
         }
 
         final OscControl self = this;
-        messages = new LinkedBlockingQueue<OSCMessage>(bufferCapacity);
+        messages = new LinkedBlockingQueue<>(bufferCapacity);
 
         new Thread(new Runnable() {
             @Override
