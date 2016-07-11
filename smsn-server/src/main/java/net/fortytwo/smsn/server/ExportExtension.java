@@ -119,9 +119,9 @@ public class ExportExtension extends SmSnExtension {
                 p.print('\t');
                 p.print(v.getId());
                 p.print('\t');
-                p.print(v.getProperty(SemanticSynchrony.WEIGHT));
+                p.print((double) v.getProperty(SemanticSynchrony.WEIGHT));
                 p.print('\t');
-                p.print(v.getProperty(SemanticSynchrony.SHARABILITY));
+                p.print((double) v.getProperty(SemanticSynchrony.SHARABILITY));
                 p.print('\t');
 
                 List<KnowledgeBase.AtomClassEntry> entries = kb.getClassInfo(g.getAtom(v));
@@ -212,9 +212,7 @@ public class ExportExtension extends SmSnExtension {
                            final OutputStream out) throws IOException {
         try {
             kb.exportRDF(out, format, filter);
-        } catch (SailException e) {
-            throw new IOException(e);
-        } catch (RDFHandlerException e) {
+        } catch (SailException | RDFHandlerException e) {
             throw new IOException(e);
         }
         out.flush();

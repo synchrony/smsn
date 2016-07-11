@@ -40,13 +40,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendoBrainClient {
-    private static final Logger logger = Logger.getLogger(ExtendoBrainClient.class.getName());
 
     public static final String PROP_SERVER_NAME = "net.fortytwo.smsn.brain.client.serverName",
             PROP_SERVER_PORT = "net.fortytwo.smsn.brain.client.serverPort",
@@ -71,12 +69,12 @@ public class ExtendoBrainClient {
         }
 
         // note: constructor will fail if any of these properties are not defined
-        String agentName = null;
-        String serverName = null;
-        int serverPort = 0;
-        String graph = null;
+        String agentName;
+        String serverName;
+        int serverPort;
+        String graph;
         try {
-            agentName = "ExtendoClient/" + config.getString(SemanticSynchrony.VERSION);
+            //agentName = "ExtendoClient/" + config.getString(SemanticSynchrony.VERSION);
             serverName = config.getString(PROP_SERVER_NAME);
             serverPort = config.getInt(PROP_SERVER_PORT);
             graph = config.getString(PROP_GRAPH);
@@ -90,8 +88,10 @@ public class ExtendoBrainClient {
                 .add(new RequestContent())
                 .add(new RequestTargetHost())
                 .add(new RequestConnControl())
-                .add(new RequestUserAgent(agentName))
-                .add(new RequestExpectContinue(true)).build();
+                // TODO
+                //.add(new RequestUserAgent(agentName))
+                .add(new RequestUserAgent())
+                .add(new RequestExpectContinue()).build();
         httpExecutor = new HttpRequestExecutor();
         httpContext = HttpCoreContext.create();
         httpHost = new HttpHost(serverName, serverPort);
@@ -140,32 +140,27 @@ public class ExtendoBrainClient {
 
         final Note[] results = new Note[1];
 
-        HttpResponseHandler handler = new HttpResponseHandler() {
-            @Override
-            public void handle(HttpResponse response) throws IOException {
-                int code = response.getStatusLine().getStatusCode();
+        HttpResponseHandler handler = response -> {
+            int code = response.getStatusLine().getStatusCode();
 
-                if (200 == code) {
-                    try {
-                        JSONObject json = new JSONObject(
-                                IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
-                        JSONObject view = json.getJSONObject(Params.VIEW);
-                        results[0] = noteParser.fromJSON(view);
-                    } catch (JSONException e) {
-                        throw new IOException(e);
-                    }
-                } else {
-                    throw new IOException("HTTP response of " + code + " for view request: "
-                            + response.getStatusLine().getReasonPhrase());
+            if (200 == code) {
+                try {
+                    JSONObject json = new JSONObject(
+                            IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
+                    JSONObject view = json.getJSONObject(Params.VIEW);
+                    results[0] = noteParser.fromJSON(view);
+                } catch (JSONException e) {
+                    throw new IOException(e);
                 }
+            } else {
+                throw new IOException("HTTP response of " + code + " for view request: "
+                        + response.getStatusLine().getReasonPhrase());
             }
         };
 
         try {
             get(handler, path);
-        } catch (IOException e) {
-            throw new ExtendoBrainClientException(e);
-        } catch (HttpException e) {
+        } catch (IOException | HttpException e) {
             throw new ExtendoBrainClientException(e);
         }
 
@@ -206,7 +201,7 @@ public class ExtendoBrainClient {
 
         List<NameValuePair> params = new LinkedList<>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
-        UrlEncodedFormEntity ent = null;
+        UrlEncodedFormEntity ent;
         try {
             ent = new UrlEncodedFormEntity(params);
         } catch (UnsupportedEncodingException e) {
@@ -215,50 +210,31 @@ public class ExtendoBrainClient {
 
         final Note[] results = new Note[1];
 
-        HttpResponseHandler handler = new HttpResponseHandler() {
-            @Override
-            public void handle(HttpResponse response) throws IOException {
-                int code = response.getStatusLine().getStatusCode();
+        HttpResponseHandler handler = response -> {
+            int code = response.getStatusLine().getStatusCode();
 
-                if (200 == code) {
-                    try {
-                        JSONObject json = new JSONObject(
-                                IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
-                        JSONObject view = json.getJSONObject(Params.VIEW);
-                        results[0] = noteParser.fromJSON(view);
-                    } catch (JSONException e) {
-                        throw new IOException(e);
-                    }
-                } else {
-                    throw new IOException("HTTP response of " + code + " for view request: "
-                            + response.getStatusLine().getReasonPhrase());
+            if (200 == code) {
+                try {
+                    JSONObject json = new JSONObject(
+                            IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
+                    JSONObject view = json.getJSONObject(Params.VIEW);
+                    results[0] = noteParser.fromJSON(view);
+                } catch (JSONException e) {
+                    throw new IOException(e);
                 }
+            } else {
+                throw new IOException("HTTP response of " + code + " for view request: "
+                        + response.getStatusLine().getReasonPhrase());
             }
         };
 
         try {
             post(baseUrl + "update", handler, ent);
-        } catch (IOException e) {
-            throw new ExtendoBrainClientException(e);
-        } catch (HttpException e) {
+        } catch (IOException | HttpException e) {
             throw new ExtendoBrainClientException(e);
         }
 
         return results[0];
-        /*
-                (http-post
-            (concat (base-url) "update")
-            (list
-                (list "request" (json-encode (list
-                    :root smsn-root-id
-                    :height (number-to-string smsn-height)
-                    :style smsn-style
-                    :view entity
-                    :filter (filter-json smsn-min-sharability smsn-max-sharability smsn-default-sharability smsn-min-weight smsn-max-weight smsn-default-weight)))))
-            (receive-view smsn-edit-mode))))
-    (sit-for 0 500)(smsn-update-view)(sit-for 0 500)(smsn-update-view)) ;; TODO: this is a hack to get around the 405 issue on the server
-
-         */
     }
 
     public void setProperty(final Note root,
@@ -284,23 +260,18 @@ public class ExtendoBrainClient {
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "set?" + paramStr;
 
-        HttpResponseHandler handler = new HttpResponseHandler() {
-            @Override
-            public void handle(HttpResponse response) throws IOException {
-                int code = response.getStatusLine().getStatusCode();
+        HttpResponseHandler handler = response -> {
+            int code = response.getStatusLine().getStatusCode();
 
-                if (200 != code) {
-                    throw new IOException("HTTP response of " + code + " for set property request: "
-                            + response.getStatusLine().getReasonPhrase());
-                }
+            if (200 != code) {
+                throw new IOException("HTTP response of " + code + " for set property request: "
+                        + response.getStatusLine().getReasonPhrase());
             }
         };
 
         try {
             get(handler, path);
-        } catch (IOException e) {
-            throw new ExtendoBrainClientException(e);
-        } catch (HttpException e) {
+        } catch (IOException | HttpException e) {
             throw new ExtendoBrainClientException(e);
         }
     }
@@ -344,38 +315,33 @@ public class ExtendoBrainClient {
 
         final List<Note> results = new LinkedList<>();
 
-        HttpResponseHandler handler = new HttpResponseHandler() {
-            @Override
-            public void handle(HttpResponse response) throws IOException {
-                int code = response.getStatusLine().getStatusCode();
+        HttpResponseHandler handler = response -> {
+            int code = response.getStatusLine().getStatusCode();
 
-                if (200 == code) {
-                    try {
-                        JSONObject json = new JSONObject(
-                                IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
-                        JSONObject view = json.getJSONObject(Params.VIEW);
-                        JSONArray children = view.optJSONArray(NoteWriter.CHILDREN);
-                        if (null != children) {
-                            int length = children.length();
-                            for (int i = 0; i < length; i++) {
-                                results.add(noteParser.fromJSON(children.getJSONObject(i)));
-                            }
+            if (200 == code) {
+                try {
+                    JSONObject json = new JSONObject(
+                            IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
+                    JSONObject view = json.getJSONObject(Params.VIEW);
+                    JSONArray children = view.optJSONArray(NoteWriter.CHILDREN);
+                    if (null != children) {
+                        int length = children.length();
+                        for (int i = 0; i < length; i++) {
+                            results.add(noteParser.fromJSON(children.getJSONObject(i)));
                         }
-                    } catch (JSONException e) {
-                        throw new IOException(e);
                     }
-                } else {
-                    throw new IOException("HTTP response of " + code + " for search request: "
-                            + response.getStatusLine().getReasonPhrase());
+                } catch (JSONException e) {
+                    throw new IOException(e);
                 }
+            } else {
+                throw new IOException("HTTP response of " + code + " for search request: "
+                        + response.getStatusLine().getReasonPhrase());
             }
         };
 
         try {
             get(handler, path);
-        } catch (IOException e) {
-            throw new ExtendoBrainClientException(e);
-        } catch (HttpException e) {
+        } catch (IOException | HttpException e) {
             throw new ExtendoBrainClientException(e);
         }
 
@@ -385,7 +351,7 @@ public class ExtendoBrainClient {
     private void get(final HttpResponseHandler responseHandler,
                      final String... paths) throws IOException, HttpException {
 
-        ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
+        ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
         try (DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024)) {
             for (String path : paths) {
@@ -415,7 +381,7 @@ public class ExtendoBrainClient {
                       final HttpResponseHandler responseHandler,
                       final HttpEntity... requests) throws IOException, HttpException {
 
-        ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
+        ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
         try (DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024)) {
             for (HttpEntity requestBody : requests) {
