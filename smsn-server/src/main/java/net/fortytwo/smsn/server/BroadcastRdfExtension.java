@@ -11,7 +11,6 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.ripple.RippleException;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.util.TypedProperties;
@@ -34,7 +33,7 @@ public class BroadcastRdfExtension extends SmSnExtension {
     private final CoordinatorService coordinator;
 
     public BroadcastRdfExtension()
-            throws IOException, TypedProperties.PropertyException, RippleException,
+            throws IOException, TypedProperties.PropertyException,
             SailException, InterruptedException {
 
         coordinator = CoordinatorService.getInstance();

@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.server;
 
+import net.fortytwo.linkeddata.LinkedDataCache;
+import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.ConnectionHost;
@@ -9,16 +11,9 @@ import net.fortytwo.smsn.p2p.ServiceDescription;
 import net.fortytwo.smsn.p2p.sparql.QueryEngineWrapper;
 import net.fortytwo.smsn.server.gesture.GesturalServer;
 import net.fortytwo.smsn.util.TypedProperties;
-import net.fortytwo.flow.NullSink;
-import net.fortytwo.flow.Sink;
-import net.fortytwo.flow.rdf.RDFSink;
-import net.fortytwo.linkeddata.LinkedDataCache;
-import net.fortytwo.rdfagents.model.Dataset;
-import net.fortytwo.ripple.RippleException;
 import net.fortytwo.stream.StreamProcessor;
 import net.fortytwo.stream.sparql.SparqlStreamProcessor;
 import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;
-import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.ParserConfig;
 import org.openrdf.rio.RDFFormat;
@@ -36,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -54,13 +48,12 @@ public class CoordinatorService {
     private static final String BASE_URI = "http://example.org/baseURI";
 
     // TODO
-    private final String broadcastEndpoint = "/graphs/joshkb/smsn/";
+    private static final String BROADCAST_ENDPOINT = "/graphs/joshkb/smsn/";
 
     private final SparqlStreamProcessor streamProcessor;
 
     public static CoordinatorService getInstance()
-            throws IOException, TypedProperties.PropertyException,
-            RippleException, SailException, InterruptedException {
+            throws IOException, TypedProperties.PropertyException, SailException, InterruptedException {
 
         if (null == INSTANCE) {
             INSTANCE = new CoordinatorService();
@@ -70,7 +63,7 @@ public class CoordinatorService {
     }
 
     private CoordinatorService()
-            throws IOException, TypedProperties.PropertyException, RippleException, SailException, InterruptedException {
+            throws IOException, TypedProperties.PropertyException, SailException, InterruptedException {
 
         int oscPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_OSC_PORT);
         int pubsubPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_PUBSUB_PORT);
@@ -87,26 +80,12 @@ public class CoordinatorService {
         MemoryStore sail = new MemoryStore();
         sail.initialize();
         LinkedDataCache.DataStore store = new LinkedDataCache.DataStore() {
-            public RDFSink createInputSink(final SailConnection sc) {
-                return new RDFSink() {
-                    public Sink<Statement> statementSink() {
-                        return new Sink<Statement>() {
-                            public void put(final Statement s) throws RippleException {
-                                try {
-                                    streamProcessor.addInputs(LINKED_DATA_TTL, s);
-                                } catch (IOException e) {
-                                    throw new RippleException(e);
-                                }
-                            }
-                        };
-                    }
-
-                    public Sink<Namespace> namespaceSink() {
-                        return new NullSink<>();
-                    }
-
-                    public Sink<String> commentSink() {
-                        return new NullSink<>();
+            @Override
+            public Consumer<Statement> createConsumer(SailConnection sc) {
+                return new Consumer<Statement>() {
+                    @Override
+                    public void accept(Statement statement) {
+                        streamProcessor.addInputs(LINKED_DATA_TTL, statement);
                     }
                 };
             }
@@ -119,11 +98,7 @@ public class CoordinatorService {
             @Override
             public void accept(Dataset dataset) {
                 System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
-                try {
-                    streamProcessor.addInputs(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "failed to add query input(s)", e);
-                }
+                streamProcessor.addInputs(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
             }
         };
 
@@ -144,7 +119,7 @@ public class CoordinatorService {
 
         // begin advertising the service now that the query engine is available
         ServiceDescription d = new ServiceDescription(SemanticSynchrony.getConfiguration().getProperty(SemanticSynchrony.VERSION),
-                broadcastEndpoint,
+                BROADCAST_ENDPOINT,
                 oscPort,
                 pubsubPort);
         // TODO: stop the broadcaster when this object is destroyed
@@ -157,10 +132,7 @@ public class CoordinatorService {
 
         try (InputStream in = new ByteArrayInputStream(rdfData.getBytes())) {
             count = parseRdfContent(in, format);
-            //ds = dsFactory.parse(in, lang);
-        } catch (RDFHandlerException e) {
-            throw new IOException(e);
-        } catch (RDFParseException e) {
+        } catch (RDFHandlerException | RDFParseException e) {
             throw new IOException(e);
         }
 
@@ -208,11 +180,7 @@ public class CoordinatorService {
         public void handleStatement(Statement statement) throws RDFHandlerException {
             count++;
 
-            try {
-                streamProcessor.addInputs(PUSHED_DATA_TTL, statement);
-            } catch (IOException e) {
-                throw new RDFHandlerException(e);
-            }
+            streamProcessor.addInputs(PUSHED_DATA_TTL, statement);
         }
 
         public void handleComment(String s) throws RDFHandlerException {

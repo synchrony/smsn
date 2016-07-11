@@ -65,12 +65,12 @@
     <modules>
         <module>smsn-core</module>
         <module>brain</module>
-        <module>smsn-devices</module>
-        <module>hand</module>
         <module>smsn-p2p</module>
         <module>smsn-rdf</module>
-        <module>monitron</module>
         <module>smsn-server</module>
+        <module>smsn-devices</module>
+        <module>monitron</module>
+        <module>hand</module>
         <module>typeatron</module>
     </modules>
 
@@ -372,8 +372,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.5.1</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                     </configuration>
                 </plugin>
                 <!-- TODO: restore me

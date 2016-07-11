@@ -137,7 +137,6 @@ public class Person extends AtomClass {
     private static class ThingsOwnedHandler implements FieldHandler {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            System.out.println("###### GOT ONE! " + object.asVertex().getId() + " for " + context.getSubjectUri());
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
                             context.iriOf(object), DBpediaOntology.owner, context.getSubjectUri()));
