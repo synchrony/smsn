@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -48,28 +48,28 @@ public abstract class AtomClass {
 
     protected abstract boolean isCollectionClass();
 
-    public abstract URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException;
+    public abstract IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException;
 
-    protected URI handleTypeAndAlias(final Atom a,
+    protected IRI handleTypeAndAlias(final Atom a,
                                      final ValueFactory vf,
                                      final RDFHandler handler,
-                                     final URI type) throws RDFHandlerException {
-        URI self = vf.createURI(BrainGraph.iriOf(a));
+                                     final IRI type) throws RDFHandlerException {
+        IRI self = vf.createIRI(BrainGraph.iriOf(a));
 
         handler.handleStatement(vf.createStatement(self, RDF.TYPE, type));
 
         if (null != a.getAlias()) {
-            URI aliasURI;
+            IRI aliasIRI;
 
             try {
-                aliasURI = vf.createURI(a.getAlias());
+                aliasIRI = vf.createIRI(a.getAlias());
             } catch (Exception e) {
-                SemanticSynchrony.logWarning("alias is not a valid URI: " + a.getAlias(), e);
-                aliasURI = null;
+                SemanticSynchrony.logWarning("alias is not a valid IRI: " + a.getAlias(), e);
+                aliasIRI = null;
             }
 
-            if (null != aliasURI) {
-                handler.handleStatement(vf.createStatement(self, OWL.SAMEAS, vf.createURI(a.getAlias())));
+            if (null != aliasIRI) {
+                handler.handleStatement(vf.createStatement(self, OWL.SAMEAS, vf.createIRI(a.getAlias())));
             }
         }
 
@@ -89,7 +89,7 @@ public abstract class AtomClass {
             // foaf:nick is supposed to be used for online handles, not aliases in general
             context.getHandler().handleStatement(
                     vf.createStatement(
-                            context.getSubjectUri(), FOAF.NICK, vf.createLiteral(
+                            context.getSubjectIri(), FOAF.NICK, vf.createLiteral(
                                     AKAReference.extractAlias(object.getValue()))));
         }
     }
@@ -98,11 +98,11 @@ public abstract class AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: use of foaf:page rather than foaf:homepage avoids the assumption that the link is
                     // always a home page, although this is frequently the case
-                    context.getSubjectUri(), FOAF.PAGE, objectURI));
+                    context.getSubjectIri(), FOAF.PAGE, objectIRI));
         }
     }
 
@@ -121,12 +121,12 @@ public abstract class AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
-                    objectURI, FOAF.TOPIC, context.getSubjectUri()));
+                    objectIRI, FOAF.TOPIC, context.getSubjectIri()));
             // The skos:note on dc:subject reads "This term is intended to be used with non-literal values
             // as defined in the DCMI Abstract Model (http://dublincore.org/documents/abstract-model/) [...]"
-            //objectURI, DCTerms.SUBJECT, context.getSubjectUri()));
+            //objectIRI, DCTerms.SUBJECT, context.getSubjectIri()));
         }
     }
 }

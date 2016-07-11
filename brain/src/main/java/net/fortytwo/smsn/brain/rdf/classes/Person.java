@@ -12,7 +12,7 @@ import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.QuotedValueCollection;
 import net.fortytwo.smsn.rdf.vocab.DBpediaOntology;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -69,11 +69,11 @@ public class Person extends AtomClass {
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, FOAF.PERSON);
+        IRI self = handleTypeAndAlias(a, vf, handler, FOAF.PERSON);
         handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getValue())));
 
         return self;
@@ -83,10 +83,10 @@ public class Person extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: dc:creator is recommended only for simple textual names
-                    objectURI, FOAF.MAKER, context.getSubjectUri()));
+                    objectIRI, FOAF.MAKER, context.getSubjectIri()));
         }
     }
 
@@ -101,9 +101,9 @@ public class Person extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), FOAF.INTEREST, objectURI));
+                    context.getSubjectIri(), FOAF.INTEREST, objectIRI));
         }
     }
 
@@ -111,9 +111,9 @@ public class Person extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), FOAF.KNOWS, objectURI));
+                    context.getSubjectIri(), FOAF.KNOWS, objectIRI));
         }
     }
 
@@ -130,7 +130,7 @@ public class Person extends AtomClass {
 
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
-                            context.getSubjectUri(), FOAF.BIRTHDAY, context.iriOf(object)));
+                            context.getSubjectIri(), FOAF.BIRTHDAY, context.iriOf(object)));
         }
     }
 
@@ -139,7 +139,7 @@ public class Person extends AtomClass {
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
-                            context.iriOf(object), DBpediaOntology.owner, context.getSubjectUri()));
+                            context.iriOf(object), DBpediaOntology.owner, context.getSubjectIri()));
         }
     }
 

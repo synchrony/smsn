@@ -56,7 +56,7 @@ public class SetAtomAliasMapping extends AtomMapping {
             setProperty(n, SemanticSynchrony.ALIAS, value);
 
             // put the atom back on the stack
-            solutions.put(stack.push(n));
+            solutions.accept(stack.push(n));
         }
     }
 }

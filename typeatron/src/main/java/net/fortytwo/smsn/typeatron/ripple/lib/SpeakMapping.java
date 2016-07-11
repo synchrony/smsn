@@ -44,6 +44,6 @@ public class SpeakMapping extends PrimitiveStackMapping {
             throw new RippleException(t);
         }
 
-        solutions.put(stack);
+        solutions.accept(stack);
     }
 }

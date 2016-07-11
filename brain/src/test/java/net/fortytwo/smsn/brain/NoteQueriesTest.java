@@ -31,7 +31,6 @@ public class NoteQueriesTest {
     private NoteParser parser;
     private NoteWriter writer = new NoteWriter();
     private NoteQueries queries;
-    private Priorities priorities;
 
     @Before
     public void setUp() throws Exception {
@@ -41,7 +40,6 @@ public class NoteQueriesTest {
         graph = store.getPropertyGraph();
         manager = store.getFramedGraph();
         ExtendoBrain brain = new ExtendoBrain(store);
-        priorities = brain.getPriorities();
         queries = new NoteQueries(brain);
     }
 

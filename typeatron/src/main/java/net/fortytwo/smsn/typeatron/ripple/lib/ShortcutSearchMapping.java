@@ -47,7 +47,7 @@ public class ShortcutSearchMapping extends AtomMapping {
 
         List<Note> results = shortcutSearch(shortcut);
         for (Note n : results) {
-            solutions.put(stack.push(n));
+            solutions.accept(stack.push(n));
         }
     }
 

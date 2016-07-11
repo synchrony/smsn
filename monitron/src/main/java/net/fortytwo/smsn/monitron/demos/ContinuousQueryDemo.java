@@ -40,24 +40,21 @@ public class ContinuousQueryDemo {
 
         for (final File f : dir.listFiles()) {
 
-            BiConsumer<BindingSet, Long> bsh = new BiConsumer<BindingSet, Long>() {
-                @Override
-                public void accept(final BindingSet result, Long expirationTime) {
-                    StringBuilder sb = new StringBuilder("RESULT (" + f.getName() + ")\t"
-                            + System.currentTimeMillis() + "\t" + "\t" + expirationTime);
+            BiConsumer<BindingSet, Long> bsh = (result, expirationTime) -> {
+                StringBuilder sb = new StringBuilder("RESULT (" + f.getName() + ")\t"
+                        + System.currentTimeMillis() + "\t" + "\t" + expirationTime);
 
-                    boolean first = true;
-                    for (String n : result.getBindingNames()) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            sb.append(", ");
-                        }
-                        sb.append(n).append(":").append(result.getValue(n));
+                boolean first = true;
+                for (String n : result.getBindingNames()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(", ");
                     }
-
-                    System.out.println(sb);
+                    sb.append(n).append(":").append(result.getValue(n));
                 }
+
+                System.out.println(sb);
             };
 
             System.out.println("RUN\t" + System.currentTimeMillis() + "\tadding query file " + f);
@@ -76,14 +73,12 @@ public class ContinuousQueryDemo {
         p.parse(MonitronOntology.class.getResourceAsStream("monitron.ttl"), baseUri);
 
         // ...then start the stream
-        EventHandler handler = new EventHandler() {
-            public void handleEvent(MonitronEvent e) throws EventHandlingException {
-                for (Statement st : e.toRDF().getStatements()) {
-                    try {
-                        streamProcessor.addInputs(TUPLE_TTL, st);
-                    } catch (Throwable t) {
-                        throw new EventHandlingException(t);
-                    }
+        EventHandler handler = e -> {
+            for (Statement st : e.toRDF().getStatements()) {
+                try {
+                    streamProcessor.addInputs(TUPLE_TTL, st);
+                } catch (Throwable t) {
+                    throw new EventHandler.EventHandlingException(t);
                 }
             }
         };

@@ -19,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.Principal;
-import java.util.logging.Logger;
 
 /**
  * A service for setting the properties of an atom

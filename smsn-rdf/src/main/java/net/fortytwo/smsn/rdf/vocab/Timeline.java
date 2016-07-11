@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * The Timeline Ontology as a collection of terms
@@ -13,74 +13,74 @@ public interface Timeline {
     public static final String NAMESPACE = "http://purl.org/NET/c4dm/timeline.owl#";
 
     // classes
-    public static final URI
-            AbstractInstant = new URIImpl(NAMESPACE + "AbstractInstant"),
-            AbstractInterval = new URIImpl(NAMESPACE + "AbstractInterval"),
-            AbstractTimeLine = new URIImpl(NAMESPACE + "AbstractTimeLine"),
-            ContinuousTimeLine = new URIImpl(NAMESPACE + "ContinuousTimeLine"),
-            DiscreteInstant = new URIImpl(NAMESPACE + "DiscreteInstant"),
-            DiscreteInterval = new URIImpl(NAMESPACE + "DiscreteInterval"),
-            DiscreteTimeLine = new URIImpl(NAMESPACE + "DiscreteTimeLine"),
-            Instant = new URIImpl(NAMESPACE + "Instant"),
-            Interval = new URIImpl(NAMESPACE + "Interval"),
-            OriginMap = new URIImpl(NAMESPACE + "OriginMap"),
-            PhysicalTimeLine = new URIImpl(NAMESPACE + "PhysicalTimeLine"),
-            RelativeInstant = new URIImpl(NAMESPACE + "RelativeInstant"),
-            RelativeInterval = new URIImpl(NAMESPACE + "RelativeInterval"),
-            RelativeTimeLine = new URIImpl(NAMESPACE + "RelativeTimeLine"),
-            ShiftMap = new URIImpl(NAMESPACE + "ShiftMap"),
-            TimeLine = new URIImpl(NAMESPACE + "TimeLine"),
-            TimeLineMap = new URIImpl(NAMESPACE + "TimeLineMap"),
-            UTInstant = new URIImpl(NAMESPACE + "UTInstant"),
-            UTInterval = new URIImpl(NAMESPACE + "UTInterval"),
-            UniformSamplingMap = new URIImpl(NAMESPACE + "UniformSamplingMap"),
-            UniformSamplingWindowingMap = new URIImpl(NAMESPACE + "UniformSamplingWindowingMap"),
-            UniformWindowingMap = new URIImpl(NAMESPACE + "UniformWindowingMap");
+    public static final IRI
+            AbstractInstant = RDFAgents.createIRI(NAMESPACE + "AbstractInstant"),
+            AbstractInterval = RDFAgents.createIRI(NAMESPACE + "AbstractInterval"),
+            AbstractTimeLine = RDFAgents.createIRI(NAMESPACE + "AbstractTimeLine"),
+            ContinuousTimeLine = RDFAgents.createIRI(NAMESPACE + "ContinuousTimeLine"),
+            DiscreteInstant = RDFAgents.createIRI(NAMESPACE + "DiscreteInstant"),
+            DiscreteInterval = RDFAgents.createIRI(NAMESPACE + "DiscreteInterval"),
+            DiscreteTimeLine = RDFAgents.createIRI(NAMESPACE + "DiscreteTimeLine"),
+            Instant = RDFAgents.createIRI(NAMESPACE + "Instant"),
+            Interval = RDFAgents.createIRI(NAMESPACE + "Interval"),
+            OriginMap = RDFAgents.createIRI(NAMESPACE + "OriginMap"),
+            PhysicalTimeLine = RDFAgents.createIRI(NAMESPACE + "PhysicalTimeLine"),
+            RelativeInstant = RDFAgents.createIRI(NAMESPACE + "RelativeInstant"),
+            RelativeInterval = RDFAgents.createIRI(NAMESPACE + "RelativeInterval"),
+            RelativeTimeLine = RDFAgents.createIRI(NAMESPACE + "RelativeTimeLine"),
+            ShiftMap = RDFAgents.createIRI(NAMESPACE + "ShiftMap"),
+            TimeLine = RDFAgents.createIRI(NAMESPACE + "TimeLine"),
+            TimeLineMap = RDFAgents.createIRI(NAMESPACE + "TimeLineMap"),
+            UTInstant = RDFAgents.createIRI(NAMESPACE + "UTInstant"),
+            UTInterval = RDFAgents.createIRI(NAMESPACE + "UTInterval"),
+            UniformSamplingMap = RDFAgents.createIRI(NAMESPACE + "UniformSamplingMap"),
+            UniformSamplingWindowingMap = RDFAgents.createIRI(NAMESPACE + "UniformSamplingWindowingMap"),
+            UniformWindowingMap = RDFAgents.createIRI(NAMESPACE + "UniformWindowingMap");
 
     // properties
-    public static final URI
-            after = new URIImpl(NAMESPACE + "after"),
-            at = new URIImpl(NAMESPACE + "at"),
-            atDate = new URIImpl(NAMESPACE + "atDate"),
-            atDateTime = new URIImpl(NAMESPACE + "atDateTime"),
-            atDuration = new URIImpl(NAMESPACE + "atDuration"),
-            atInt = new URIImpl(NAMESPACE + "atInt"),
-            atReal = new URIImpl(NAMESPACE + "atReal"),
-            atYear = new URIImpl(NAMESPACE + "atYear"),
-            atYearMonth = new URIImpl(NAMESPACE + "atYearMonth"),
-            before = new URIImpl(NAMESPACE + "before"),
-            beginsAtDateTime = new URIImpl(NAMESPACE + "beginsAtDateTime"),
-            beginsAtDuration = new URIImpl(NAMESPACE + "beginsAtDuration"),
-            beginsAtInt = new URIImpl(NAMESPACE + "beginsAtInt"),
-            contains = new URIImpl(NAMESPACE + "contains"),
-            delay = new URIImpl(NAMESPACE + "delay"),
-            domainTimeLine = new URIImpl(NAMESPACE + "domainTimeLine"),
-            duration = new URIImpl(NAMESPACE + "duration"),
-            durationInt = new URIImpl(NAMESPACE + "durationInt"),
-            durationXSD = new URIImpl(NAMESPACE + "durationXSD"),
-            during = new URIImpl(NAMESPACE + "during"),
-            end = new URIImpl(NAMESPACE + "end"),
-            endsAtDateTime = new URIImpl(NAMESPACE + "endsAtDateTime"),
-            endsAtDuration = new URIImpl(NAMESPACE + "endsAtDuration"),
-            endsAtInt = new URIImpl(NAMESPACE + "endsAtInt"),
-            equals = new URIImpl(NAMESPACE + "equals"),
-            finishedBy = new URIImpl(NAMESPACE + "finishedBy"),
-            finishes = new URIImpl(NAMESPACE + "finishes"),
-            hopSize = new URIImpl(NAMESPACE + "hopSize"),
-            meets = new URIImpl(NAMESPACE + "meets"),
-            metBy = new URIImpl(NAMESPACE + "metBy"),
-            origin = new URIImpl(NAMESPACE + "origin"),
-            overlappedBy = new URIImpl(NAMESPACE + "overlappedBy"),
-            overlaps = new URIImpl(NAMESPACE + "overlaps"),
-            rangeTimeLine = new URIImpl(NAMESPACE + "rangeTimeLine"),
-            sampleRate = new URIImpl(NAMESPACE + "sampleRate"),
-            start = new URIImpl(NAMESPACE + "start"),
-            startedBy = new URIImpl(NAMESPACE + "startedBy"),
-            starts = new URIImpl(NAMESPACE + "starts"),
-            timeline = new URIImpl(NAMESPACE + "timeline"),
-            windowLength = new URIImpl(NAMESPACE + "windowLength");
+    public static final IRI
+            after = RDFAgents.createIRI(NAMESPACE + "after"),
+            at = RDFAgents.createIRI(NAMESPACE + "at"),
+            atDate = RDFAgents.createIRI(NAMESPACE + "atDate"),
+            atDateTime = RDFAgents.createIRI(NAMESPACE + "atDateTime"),
+            atDuration = RDFAgents.createIRI(NAMESPACE + "atDuration"),
+            atInt = RDFAgents.createIRI(NAMESPACE + "atInt"),
+            atReal = RDFAgents.createIRI(NAMESPACE + "atReal"),
+            atYear = RDFAgents.createIRI(NAMESPACE + "atYear"),
+            atYearMonth = RDFAgents.createIRI(NAMESPACE + "atYearMonth"),
+            before = RDFAgents.createIRI(NAMESPACE + "before"),
+            beginsAtDateTime = RDFAgents.createIRI(NAMESPACE + "beginsAtDateTime"),
+            beginsAtDuration = RDFAgents.createIRI(NAMESPACE + "beginsAtDuration"),
+            beginsAtInt = RDFAgents.createIRI(NAMESPACE + "beginsAtInt"),
+            contains = RDFAgents.createIRI(NAMESPACE + "contains"),
+            delay = RDFAgents.createIRI(NAMESPACE + "delay"),
+            domainTimeLine = RDFAgents.createIRI(NAMESPACE + "domainTimeLine"),
+            duration = RDFAgents.createIRI(NAMESPACE + "duration"),
+            durationInt = RDFAgents.createIRI(NAMESPACE + "durationInt"),
+            durationXSD = RDFAgents.createIRI(NAMESPACE + "durationXSD"),
+            during = RDFAgents.createIRI(NAMESPACE + "during"),
+            end = RDFAgents.createIRI(NAMESPACE + "end"),
+            endsAtDateTime = RDFAgents.createIRI(NAMESPACE + "endsAtDateTime"),
+            endsAtDuration = RDFAgents.createIRI(NAMESPACE + "endsAtDuration"),
+            endsAtInt = RDFAgents.createIRI(NAMESPACE + "endsAtInt"),
+            equals = RDFAgents.createIRI(NAMESPACE + "equals"),
+            finishedBy = RDFAgents.createIRI(NAMESPACE + "finishedBy"),
+            finishes = RDFAgents.createIRI(NAMESPACE + "finishes"),
+            hopSize = RDFAgents.createIRI(NAMESPACE + "hopSize"),
+            meets = RDFAgents.createIRI(NAMESPACE + "meets"),
+            metBy = RDFAgents.createIRI(NAMESPACE + "metBy"),
+            origin = RDFAgents.createIRI(NAMESPACE + "origin"),
+            overlappedBy = RDFAgents.createIRI(NAMESPACE + "overlappedBy"),
+            overlaps = RDFAgents.createIRI(NAMESPACE + "overlaps"),
+            rangeTimeLine = RDFAgents.createIRI(NAMESPACE + "rangeTimeLine"),
+            sampleRate = RDFAgents.createIRI(NAMESPACE + "sampleRate"),
+            start = RDFAgents.createIRI(NAMESPACE + "start"),
+            startedBy = RDFAgents.createIRI(NAMESPACE + "startedBy"),
+            starts = RDFAgents.createIRI(NAMESPACE + "starts"),
+            timeline = RDFAgents.createIRI(NAMESPACE + "timeline"),
+            windowLength = RDFAgents.createIRI(NAMESPACE + "windowLength");
 
     // individuals
-    public static final URI
-            universaltimeline = new URIImpl(NAMESPACE + "universaltimeline");
+    public static final IRI
+            universaltimeline = RDFAgents.createIRI(NAMESPACE + "universaltimeline");
 }

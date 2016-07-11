@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.rio.RDFHandlerException;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class AbstractEvent extends AtomClass {
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         // TODO
         return null;
     }

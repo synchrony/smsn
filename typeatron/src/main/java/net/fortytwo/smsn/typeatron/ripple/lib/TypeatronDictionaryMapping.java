@@ -374,9 +374,9 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         StackMapping v = dictionary.get(name);
         if (null != v) {
             // TODO: just keep a dictionary of operators, rather than a dictionary of mappings
-            Operator o = new Operator(v);
+            Operator op = new Operator(v);
 
-            solutions.put(arg.getRest().push(o));
+            solutions.accept(arg.getRest().push(op));
         }
     }
 }

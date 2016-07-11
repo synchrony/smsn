@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -44,9 +45,7 @@ public class Note {
         this.meta = copy.meta;
 
         if (null != copy.children) {
-            for (Note c : copy.children) {
-                children.add(new Note(c));
-            }
+            children.addAll(copy.children.stream().map(Note::new).collect(Collectors.toList()));
         }
     }
 

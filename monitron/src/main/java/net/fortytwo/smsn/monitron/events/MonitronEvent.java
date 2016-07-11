@@ -1,13 +1,12 @@
 package net.fortytwo.smsn.monitron.events;
 
+import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.ontologies.Universe;
-import net.fortytwo.rdfagents.model.Dataset;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 
@@ -40,11 +39,11 @@ public abstract class MonitronEvent {
     }
 
     public Dataset toRDF() {
-        return new Dataset(new LinkedList<Statement>());
+        return new Dataset(new LinkedList<>());
     }
 
-    protected URI coinEventURI() {
-        return valueFactory.createURI(Universe.NAMESPACE + "event-" + SemanticSynchrony.createRandomKey());
+    protected IRI coinEventIRI() {
+        return valueFactory.createIRI(Universe.NAMESPACE + "event-" + SemanticSynchrony.createRandomKey());
     }
 
     protected Literal toLiteral(final Date d) {
@@ -55,7 +54,7 @@ public abstract class MonitronEvent {
 
     protected void addStatement(final Dataset d,
                                 final Resource subject,
-                                final URI predicate,
+                                final IRI predicate,
                                 final Value object) {
         d.getStatements().add(valueFactory.createStatement(subject, predicate, object));
     }

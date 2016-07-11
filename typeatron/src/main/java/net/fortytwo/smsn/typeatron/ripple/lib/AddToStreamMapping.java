@@ -57,7 +57,7 @@ public class AddToStreamMapping extends AtomMapping {
 
             prepend(value);
 
-            solutions.put(stack);
+            solutions.accept(stack);
         } else {
             // TODO: send a warning cue to the Typeatron
             logger.warning("can't append to brain-stream; none has been configured");

@@ -33,7 +33,6 @@ import java.util.Map;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "duplicates")
-//@ExtensionDescriptor(description = "identify atoms with duplicate values")
 public class DuplicatesExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
@@ -123,9 +122,7 @@ public class DuplicatesExtension extends SmSnExtension {
         }
 
         List<String> allDups = new LinkedList<>();
-        for (List<String> l : dups) {
-            allDups.addAll(l);
-        }
+        dups.forEach(allDups::addAll);
 
         return allDups;
     }

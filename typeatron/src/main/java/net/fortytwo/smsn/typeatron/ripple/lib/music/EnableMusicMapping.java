@@ -38,6 +38,6 @@ public class EnableMusicMapping extends PrimitiveStackMapping {
 
         music.enable();
 
-        solutions.put(stack);
+        solutions.accept(stack);
     }
 }

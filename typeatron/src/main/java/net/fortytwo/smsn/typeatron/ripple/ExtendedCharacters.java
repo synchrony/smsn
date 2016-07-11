@@ -25,7 +25,7 @@ public class ExtendedCharacters {
     ExtendedCharacters() {
         diacriticMaps = new HashMap<>();
         for (Diacritic d : Diacritic.values()) {
-            diacriticMaps.put(d, new HashMap<Character, Character>());
+            diacriticMaps.put(d, new HashMap<>());
         }
 
         add(Diacritic.Grave, 'A', '\u00c0');

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.monitron.ontologies;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -9,13 +9,13 @@ import org.openrdf.model.impl.URIImpl;
 public interface OWLTime {
     public static final String NAMESPACE = "http://www.w3.org/2006/time#";
 
-    public static final URI
-            AFTER = new URIImpl(NAMESPACE + "after"),
-            BEFORE = new URIImpl(NAMESPACE + "before"),
-            HAS_BEGINNING = new URIImpl(NAMESPACE + "hasBeginning"),
-            HAS_END = new URIImpl(NAMESPACE + "hasEnd"),
-            INSIDE = new URIImpl(NAMESPACE + "inside"),
-            INSTANT = new URIImpl(NAMESPACE + "Instant"),
-            INTERVAL = new URIImpl(NAMESPACE + "Interval"),
-            IN_XSD_DATE_TIME = new URIImpl(NAMESPACE + "inXSDDateTime");
+    public static final IRI
+            AFTER = RDFAgents.createIRI(NAMESPACE + "after"),
+            BEFORE = RDFAgents.createIRI(NAMESPACE + "before"),
+            HAS_BEGINNING = RDFAgents.createIRI(NAMESPACE + "hasBeginning"),
+            HAS_END = RDFAgents.createIRI(NAMESPACE + "hasEnd"),
+            INSIDE = RDFAgents.createIRI(NAMESPACE + "inside"),
+            INSTANT = RDFAgents.createIRI(NAMESPACE + "Instant"),
+            INTERVAL = RDFAgents.createIRI(NAMESPACE + "Interval"),
+            IN_XSD_DATE_TIME = RDFAgents.createIRI(NAMESPACE + "inXSDDateTime");
 }

@@ -22,6 +22,7 @@
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
             <artifactId>rdfagents-core</artifactId>
+            <version>${rdfagents.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>

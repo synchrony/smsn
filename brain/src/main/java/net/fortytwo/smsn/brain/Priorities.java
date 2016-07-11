@@ -29,21 +29,19 @@ public class Priorities {
     public void refreshQueue(final BrainGraph graph) {
         queue.clear();
 
-        new Thread(new Runnable() {
-            public void run() {
-                logger.info("generating priority queue");
-                long startTime = System.currentTimeMillis();
+        new Thread(() -> {
+            logger.info("generating priority queue");
+            long startTime = System.currentTimeMillis();
 
-                for (Vertex v : graph.getPropertyGraph().getVertices()) {
-                    if (null != v.getProperty(SemanticSynchrony.PRIORITY)) {
-                        Atom a = graph.getAtom(v);
-                        updatePriority(a);
-                    }
+            for (Vertex v : graph.getPropertyGraph().getVertices()) {
+                if (null != v.getProperty(SemanticSynchrony.PRIORITY)) {
+                    Atom a = graph.getAtom(v);
+                    updatePriority(a);
                 }
-
-                long endTime = System.currentTimeMillis();
-                logger.info("\tfinished generating priority queue in " + (endTime - startTime) + "ms");
             }
+
+            long endTime = System.currentTimeMillis();
+            logger.info("\tfinished generating priority queue in " + (endTime - startTime) + "ms");
         }).start();
     }
 

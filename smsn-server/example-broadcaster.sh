@@ -15,7 +15,7 @@ fi
 DIR=`dirname $0`
 
 # Launch the application
-$JAVA $JAVA_OPTIONS -cp $DIR/target/smsn-server-*-standalone.jar net.fortytwo.smsn.p2p.ExampleBroadcaster $*
+${JAVA} ${JAVA_OPTIONS} -cp ${DIR}/target/smsn-server-*-standalone.jar net.fortytwo.smsn.p2p.ExampleBroadcaster $*
 
 # Return the program's exit code
 exit $?

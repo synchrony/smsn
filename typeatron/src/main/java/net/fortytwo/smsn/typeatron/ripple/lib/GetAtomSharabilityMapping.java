@@ -51,7 +51,7 @@ public class GetAtomSharabilityMapping extends AtomMapping {
             Float value = n.getSharability();
             if (null != value) {
                 // put both the @sharability property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+                solutions.accept(stack.push(n).push(value));
             }
         }
     }

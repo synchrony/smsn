@@ -5,8 +5,8 @@ import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
 import net.fortytwo.smsn.monitron.ontologies.OMOntology;
 import net.fortytwo.rdfagents.model.Dataset;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
-import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
 
 /**
@@ -16,7 +16,7 @@ public class RelativeHumidityObservation extends Observation {
 
     public RelativeHumidityObservation(
             final Context context,
-            final URI sensor,
+            final IRI sensor,
             final GaussianData data) {
 
         super(context, sensor, data);

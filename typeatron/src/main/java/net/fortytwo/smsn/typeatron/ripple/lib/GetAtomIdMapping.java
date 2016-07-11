@@ -51,7 +51,7 @@ public class GetAtomIdMapping extends AtomMapping {
             String id = n.getId();
             if (null != id) {
                 // put both the id and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(id));
+                solutions.accept(stack.push(n).push(id));
             }
         }
     }

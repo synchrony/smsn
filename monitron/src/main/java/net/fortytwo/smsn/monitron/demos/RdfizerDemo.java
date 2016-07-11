@@ -32,19 +32,17 @@ public class RdfizerDemo {
         CommandLine cmd = new PosixParser().parse(options, args);
         String fileName = cmd.getOptionValue("file");
 
-        EventHandler handler = new EventHandler() {
-            public void handleEvent(MonitronEvent e) throws EventHandlingException {
-                System.out.println("\nreceived dataset:\t\n");
-                RDFWriter w = Rio.createWriter(RDFFormat.NQUADS, System.out);
-                try {
-                    w.startRDF();
-                    for (Statement s : e.toRDF().getStatements()) {
-                        w.handleStatement(s);
-                    }
-                    w.endRDF();
-                } catch (RDFHandlerException e1) {
-                    throw new EventHandler.EventHandlingException(e1);
+        EventHandler handler = e -> {
+            System.out.println("\nreceived dataset:\t\n");
+            RDFWriter w = Rio.createWriter(RDFFormat.NQUADS, System.out);
+            try {
+                w.startRDF();
+                for (Statement s : e.toRDF().getStatements()) {
+                    w.handleStatement(s);
                 }
+                w.endRDF();
+            } catch (RDFHandlerException e1) {
+                throw new EventHandler.EventHandlingException(e1);
             }
         };
 

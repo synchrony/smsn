@@ -15,13 +15,13 @@ import net.fortytwo.stream.StreamProcessor;
 import net.fortytwo.stream.sparql.SparqlStreamProcessor;
 import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;
 import org.openrdf.model.Statement;
-import org.openrdf.rio.ParserConfig;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.BasicParserSettings;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.memory.MemoryStore;
@@ -45,7 +45,7 @@ public class CoordinatorService {
 
     private static CoordinatorService INSTANCE;
 
-    private static final String BASE_URI = "http://example.org/baseURI";
+    private static final String BASE_IRI = "http://example.org/baseIRI";
 
     // TODO
     private static final String BROADCAST_ENDPOINT = "/graphs/joshkb/smsn/";
@@ -82,24 +82,16 @@ public class CoordinatorService {
         LinkedDataCache.DataStore store = new LinkedDataCache.DataStore() {
             @Override
             public Consumer<Statement> createConsumer(SailConnection sc) {
-                return new Consumer<Statement>() {
-                    @Override
-                    public void accept(Statement statement) {
-                        streamProcessor.addInputs(LINKED_DATA_TTL, statement);
-                    }
-                };
+                return statement -> streamProcessor.addInputs(LINKED_DATA_TTL, statement);
             }
         };
         LinkedDataCache cache = LinkedDataCache.createDefault(sail);
         cache.setDataStore(store);
         streamProcessor.setLinkedDataCache(cache);
 
-        Consumer<Dataset> h = new Consumer<Dataset>() {
-            @Override
-            public void accept(Dataset dataset) {
-                System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
-                streamProcessor.addInputs(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
-            }
+        Consumer<Dataset> h = dataset -> {
+            System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
+            streamProcessor.addInputs(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
         };
 
         // gestural event processing via OSC
@@ -109,12 +101,7 @@ public class CoordinatorService {
         // SPARQL pub/sub via SmSn P2P
         ConnectionHost ch = new ConnectionHost(pubsubPort);
         ch.addNotifier(wrapper.getNotifier());
-        ch.addNotifier(new ConnectionHost.Notifier() {
-            public void connectionCreated(final Connection c) {
-                // add a ping answerer to each new connection
-                new PingAnswerer(c);
-            }
-        });
+        ch.addNotifier(PingAnswerer::new);
         ch.start();
 
         // begin advertising the service now that the query engine is available
@@ -146,14 +133,13 @@ public class CoordinatorService {
                                  final RDFFormat format) throws RDFParseException, IOException, RDFHandlerException {
 
         RDFParser parser = Rio.createParser(format);
-        ParserConfig config = new ParserConfig(false, false, false, RDFParser.DatatypeHandling.IGNORE);
-        parser.setParserConfig(config);
+        parser.getParserConfig().set(BasicParserSettings.VERIFY_DATATYPE_VALUES, false);
 
         ParsedRDFHandler parsedRDFHandler = new ParsedRDFHandler();
 
         parsedRDFHandler.clear();
         parser.setRDFHandler(parsedRDFHandler);
-        parser.parse(content, BASE_URI);
+        parser.parse(content, BASE_IRI);
         return parsedRDFHandler.getCount();
     }
 

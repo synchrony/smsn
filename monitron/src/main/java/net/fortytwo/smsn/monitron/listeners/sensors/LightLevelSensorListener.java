@@ -2,9 +2,9 @@ package net.fortytwo.smsn.monitron.listeners.sensors;
 
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.GaussianData;
-import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.events.LightLevelObservation;
-import org.openrdf.model.URI;
+import net.fortytwo.smsn.monitron.events.MonitronEvent;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -12,7 +12,7 @@ import org.openrdf.model.URI;
 public class LightLevelSensorListener extends GaussianSensorListener {
 
     public LightLevelSensorListener(final Context context,
-                                       final URI sensor) {
+                                       final IRI sensor) {
         super(context, sensor);
     }
 

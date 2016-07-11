@@ -221,18 +221,8 @@ public class ChordedKeyer {
             addChord(Mode.Laser, "" + i + i, Mode.Text, Modifier.None, null);
         }*/
 
-        Trigger laserOn = new Trigger() {
-            @Override
-            public void execute() {
-                eventHandler.handleLaserOn();
-            }
-        };
-        Trigger laserOff = new Trigger() {
-            @Override
-            public void execute() {
-                eventHandler.handleLaserOff();
-            }
-        };
+        Trigger laserOn = eventHandler::handleLaserOn;
+        Trigger laserOff = eventHandler::handleLaserOff;
         for (int i = 1; i <= 5; i++) {
             addChord(Mode.Laser, "" + i, null, null, null, laserOn);
             addChord(Mode.Laser, "" + i + i, Mode.CommandLine, Modifier.None, null, laserOff);

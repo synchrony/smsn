@@ -41,19 +41,17 @@ public class ConnectionHost {
 
         stopped = false;
 
-        new Thread(new Runnable() {
-            public void run() {
-                logger.info("starting connection listener thread on port " + port);
+        new Thread(() -> {
+            logger.info("starting connection listener thread on port " + port);
 
-                try {
-                    listenForNewConnections();
-                } catch (Throwable e) {
-                    logger.severe("connection listener thread on port " + port
-                            + " failed with error: " + e.getMessage());
-                    e.printStackTrace(System.err);
-                } finally {
-                    logger.info("connection listener thread on port " + port + " has stopped");
-                }
+            try {
+                listenForNewConnections();
+            } catch (Throwable e) {
+                logger.severe("connection listener thread on port " + port
+                        + " failed with error: " + e.getMessage());
+                e.printStackTrace(System.err);
+            } finally {
+                logger.info("connection listener thread on port " + port + " has stopped");
             }
         }).start();
     }

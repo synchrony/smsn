@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
-import net.fortytwo.smsn.p2p.SideEffects;
-import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.flow.Collector;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.Model;
@@ -22,22 +20,14 @@ import org.openrdf.sail.memory.MemoryStore;
 public class RippleSession {
     private static final int UNDO_REDO_DEPTH = 20;
     private final Sail sail;
-    private final Model model;
     private final StackEvaluator evaluator;
-    private final QueryEngine queryEngine;
     private final ModelConnection connection;
 
     private final UndoRedoStack<Collector<RippleList>> undoRedoStack;
 
-    private final SmSnAgent agent;
-    private final SideEffects environment;
-
-    public RippleSession(final SmSnAgent agent,
-                         final SideEffects environment) throws RippleException {
-        this.agent = agent;
-        this.environment = environment;
+    public RippleSession() throws RippleException {
         this.undoRedoStack = new UndoRedoStack<>(UNDO_REDO_DEPTH);
-        undoRedoStack.done(new Collector<RippleList>());
+        undoRedoStack.done(new Collector<>());
 
         sail = new MemoryStore();
         try {
@@ -45,9 +35,9 @@ public class RippleSession {
         } catch (SailException e) {
             throw new RippleException(e);
         }
-        model = new SesameModel(sail);
+        Model model = new SesameModel(sail);
         evaluator = new LazyStackEvaluator();
-        queryEngine = new QueryEngine(model, evaluator, System.out, System.err);
+        QueryEngine queryEngine = new QueryEngine(model, evaluator, System.out, System.err);
         connection = queryEngine.getConnection();
     }
 
@@ -74,7 +64,7 @@ public class RippleSession {
         Collector<RippleList> prevCollector = undoRedoStack.currentState();
         if (0 == prevCollector.size()) {
             // note: this modifies evaluation history, harmlessly
-            prevCollector.put(SesameList.nilList());
+            prevCollector.accept(SesameList.nilList());
         }
         Collector<RippleList> nextCollector = new Collector<>();
 
@@ -82,7 +72,6 @@ public class RippleSession {
         for (RippleList l : prevCollector) {
             RippleList cur = l;
             for (Object v : nextValues) {
-                //System.out.println("pushing: " + v);
                 cur = cur.push(v);
             }
 

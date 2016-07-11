@@ -77,20 +77,17 @@ public abstract class OscControl {
         final OscControl self = this;
         messages = new LinkedBlockingQueue<>(bufferCapacity);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (self.throttlingPeriod > 0) {
-                        OSCMessage message = messages.take();
+        new Thread(() -> {
+            try {
+                while (self.throttlingPeriod > 0) {
+                    OSCMessage message = messages.take();
 
-                        throttle();
+                    throttle();
 
-                        sendInternal(message);
-                    }
-                } catch (Throwable t) {
-                    logger.log(Level.SEVERE, "message throttling thread died with error", t);
+                    sendInternal(message);
                 }
+            } catch (Throwable t) {
+                logger.log(Level.SEVERE, "message throttling thread died with error", t);
             }
         }).start();
     }

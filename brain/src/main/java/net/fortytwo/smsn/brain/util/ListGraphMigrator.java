@@ -68,7 +68,7 @@ public class ListGraphMigrator {
     private class VertexTimestampComparator implements Comparator<Vertex> {
         public int compare(final Vertex v1,
                            final Vertex v2) {
-            return ((Long) v1.getProperty(SemanticSynchrony.CREATED)).compareTo((Long) v2.getProperty(SemanticSynchrony.CREATED));
+            return ((Long) v1.getProperty(SemanticSynchrony.CREATED)).compareTo(v2.getProperty(SemanticSynchrony.CREATED));
         }
     }
 

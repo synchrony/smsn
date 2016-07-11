@@ -1,13 +1,12 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
-import net.fortytwo.smsn.p2p.SmSnAgent;
+import net.fortytwo.flow.Collector;
+import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.p2p.SideEffects;
 import net.fortytwo.smsn.typeatron.ChordedKeyer;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.lib.TypeatronDictionaryMapping;
-import net.fortytwo.flow.Collector;
-import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,8 +21,6 @@ public class SmSnRippleRepl {
     private final RippleSession session;
     private final TypeatronDictionaryMapping typeatronDictionary;
     private final TypeatronControl typeatron;
-    private final SmSnAgent agent;
-    private final SideEffects environment;
     private final REPLEventHandler eventHandler;
     private final ExtendedCharacters extendedCharacters = new ExtendedCharacters();
 
@@ -31,13 +28,10 @@ public class SmSnRippleRepl {
 
     public SmSnRippleRepl(final RippleSession session,
                           final TypeatronControl typeatron,
-                          final SmSnAgent agent,
                           final SideEffects environment,
                           final REPLEventHandler eventHandler) throws RippleException {
         this.session = session;
         this.typeatron = typeatron;
-        this.agent = agent;
-        this.environment = environment;
         this.eventHandler = eventHandler;
 
         typeatronDictionary = new TypeatronDictionaryMapping(

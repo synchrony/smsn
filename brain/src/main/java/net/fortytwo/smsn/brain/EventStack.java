@@ -79,9 +79,7 @@ public class EventStack {
             n.setId(SemanticSynchrony.createRandomKey());
         }
 
-        for (Note c : n.getChildren()) {
-            setIds(c);
-        }
+        n.getChildren().forEach(this::setIds);
     }
 
     // note: instances of this class currently grow without bound

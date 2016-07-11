@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.monitron.ontologies;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -11,34 +11,34 @@ public interface MonitronOntology {
     public static final String NAMESPACE = "http://fortytwo.net/2012/08/monitron#";
 
     // classes
-    public static final URI
-            AIR_TEMPERATURE_OBSERVATION = new URIImpl(NAMESPACE + "AirTemperatureObservation"),
-            ATMOSPHERIC_PRESSURE_OBSERVATION = new URIImpl(NAMESPACE + "AtmosphericPressureObservation"),
-            COLOR = new URIImpl(NAMESPACE + "Color"),
-            COLOR_LIGHT_LEVEL_OBSERVATION = new URIImpl(NAMESPACE + "ColorLightLevelObservation"),
-            DUST_LEVEL_OBSERVATION = new URIImpl(NAMESPACE + "DustLevelObservation"),
-            LIGHT_LEVEL_OBSERVATION = new URIImpl(NAMESPACE + "LightLevelObservation"),
-            MOTION_OBSERVATION = new URIImpl(NAMESPACE + "MotionObservation"),
-            RELATIVE_HUMIDITY_OBSERVATION = new URIImpl(NAMESPACE + "RelativeHumidityObservation"),
-            SOUND_LEVEL_OBSERVATION = new URIImpl(NAMESPACE + "SoundLevelObservation"),
-            VIBRATION_LEVEL_OBSERVATION = new URIImpl(NAMESPACE + "VibrationLevelObservation");
+    public static final IRI
+            AIR_TEMPERATURE_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "AirTemperatureObservation"),
+            ATMOSPHERIC_PRESSURE_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "AtmosphericPressureObservation"),
+            COLOR = RDFAgents.createIRI(NAMESPACE + "Color"),
+            COLOR_LIGHT_LEVEL_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "ColorLightLevelObservation"),
+            DUST_LEVEL_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "DustLevelObservation"),
+            LIGHT_LEVEL_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "LightLevelObservation"),
+            MOTION_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "MotionObservation"),
+            RELATIVE_HUMIDITY_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "RelativeHumidityObservation"),
+            SOUND_LEVEL_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "SoundLevelObservation"),
+            VIBRATION_LEVEL_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "VibrationLevelObservation");
 
     // UnitOfMeasurement individuals
-    public static final URI
-            DEGREES_CELSIUS = new URIImpl(NAMESPACE + "degreesCelsius"),
-            PASCALS = new URIImpl(NAMESPACE + "pascals");
+    public static final IRI
+            DEGREES_CELSIUS = RDFAgents.createIRI(NAMESPACE + "degreesCelsius"),
+            PASCALS = RDFAgents.createIRI(NAMESPACE + "pascals");
 
     // Property individuals
-    public static final URI
-            AIR_TEMPERATURE = new URIImpl(NAMESPACE + "airTemperature"),
-            ATMOSPHERIC_PRESSURE = new URIImpl(NAMESPACE + "atmosphericPressure"),
-            BLUE_LIGHT_LEVEL = new URIImpl(NAMESPACE + "blueLightLevel"),
-            GREEN_LIGHT_LEVEL = new URIImpl(NAMESPACE + "greenLightLevel"),
-            RED_LIGHT_LEVEL = new URIImpl(NAMESPACE + "redLightLevel"),
-            IS_MOTION = new URIImpl(NAMESPACE + "isMotion"),
-            LIGHT_LEVEL = new URIImpl(NAMESPACE + "lightLevel"),
-            OPTICAL_DUST_LEVEL = new URIImpl(NAMESPACE + "opticalDustLevel"),
-            RELATIVE_HUMIDITY = new URIImpl(NAMESPACE + "relativeHumidity"),
-            SOUND_LEVEL = new URIImpl(NAMESPACE + "soundLevel"),
-            VIBRATION_LEVEL = new URIImpl(NAMESPACE + "vibrationLevel");
+    public static final IRI
+            AIR_TEMPERATURE = RDFAgents.createIRI(NAMESPACE + "airTemperature"),
+            ATMOSPHERIC_PRESSURE = RDFAgents.createIRI(NAMESPACE + "atmosphericPressure"),
+            BLUE_LIGHT_LEVEL = RDFAgents.createIRI(NAMESPACE + "blueLightLevel"),
+            GREEN_LIGHT_LEVEL = RDFAgents.createIRI(NAMESPACE + "greenLightLevel"),
+            RED_LIGHT_LEVEL = RDFAgents.createIRI(NAMESPACE + "redLightLevel"),
+            IS_MOTION = RDFAgents.createIRI(NAMESPACE + "isMotion"),
+            LIGHT_LEVEL = RDFAgents.createIRI(NAMESPACE + "lightLevel"),
+            OPTICAL_DUST_LEVEL = RDFAgents.createIRI(NAMESPACE + "opticalDustLevel"),
+            RELATIVE_HUMIDITY = RDFAgents.createIRI(NAMESPACE + "relativeHumidity"),
+            SOUND_LEVEL = RDFAgents.createIRI(NAMESPACE + "soundLevel"),
+            VIBRATION_LEVEL = RDFAgents.createIRI(NAMESPACE + "vibrationLevel");
 }

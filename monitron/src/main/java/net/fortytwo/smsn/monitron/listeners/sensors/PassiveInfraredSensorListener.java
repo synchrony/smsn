@@ -5,7 +5,7 @@ import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.BooleanData;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.events.MotionObservation;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -13,7 +13,7 @@ import org.openrdf.model.URI;
 public class PassiveInfraredSensorListener extends SensorListener {
 
     public PassiveInfraredSensorListener(final Context context,
-                                         final URI sensor) {
+                                         final IRI sensor) {
         super(context, sensor);
     }
 

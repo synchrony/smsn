@@ -31,18 +31,16 @@ public class ServiceBroadcaster {
     public void start() {
         stopped = false;
 
-        new Thread(new Runnable() {
-            public void run() {
-                logger.info("starting service broadcaster thread");
+        new Thread(() -> {
+            logger.info("starting service broadcaster thread");
 
-                try {
-                    sendBroadcastMessages();
-                } catch (Throwable t) {
-                    logger.severe("service broadcaster thread failed with error: " + t.getMessage());
-                    t.printStackTrace(System.err);
-                } finally {
-                    logger.info("service broadcaster thread stopped");
-                }
+            try {
+                sendBroadcastMessages();
+            } catch (Throwable t) {
+                logger.severe("service broadcaster thread failed with error: " + t.getMessage());
+                t.printStackTrace(System.err);
+            } finally {
+                logger.info("service broadcaster thread stopped");
             }
         }).start();
     }

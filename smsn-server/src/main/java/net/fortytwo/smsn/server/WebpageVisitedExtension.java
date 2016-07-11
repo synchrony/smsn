@@ -11,12 +11,12 @@ import com.tinkerpop.rexster.extension.ExtensionPoint;
 import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
+import net.fortytwo.rdfagents.RDFAgents;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
@@ -42,14 +42,14 @@ public class WebpageVisitedExtension extends AbstractRexsterExtension {
             EVENTS_NS = "http://fortytwo.net/2012/06/myotherbrain-events#", // temporary namespace
             RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
-    private static final URI
-            FOAF_DOCUMENT = new URIImpl(FOAF_NS + "Document"),
-            IDENTIFIER = new URIImpl(DC_NS + "identifier"),
-            RDF_TYPE = new URIImpl(RDF_NS + "type"),
-            WEBPAGE_VISIT = new URIImpl(EVENTS_NS + "WebpageVisit"),
-            PAGE = new URIImpl(EVENTS_NS + "page"),
-            TIME = new URIImpl(EVENTS_NS + "time"),
-            TITLE = new URIImpl(DC_NS + "title");
+    private static final IRI
+            FOAF_DOCUMENT = RDFAgents.createIRI(FOAF_NS + "Document"),
+            IDENTIFIER = RDFAgents.createIRI(DC_NS + "identifier"),
+            RDF_TYPE = RDFAgents.createIRI(RDF_NS + "type"),
+            WEBPAGE_VISIT = RDFAgents.createIRI(EVENTS_NS + "WebpageVisit"),
+            PAGE = RDFAgents.createIRI(EVENTS_NS + "page"),
+            TIME = RDFAgents.createIRI(EVENTS_NS + "time"),
+            TITLE = RDFAgents.createIRI(DC_NS + "title");
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for logging web page visits")
@@ -72,12 +72,12 @@ public class WebpageVisitedExtension extends AbstractRexsterExtension {
         ValueFactory vf = sail.getValueFactory();
 
         Collection<Statement> s = new LinkedList<>();
-        URI event = f.randomURI();
-        URI page;
+        IRI event = f.randomIRI();
+        IRI page;
         try {
-            page = vf.createURI(url);
+            page = vf.createIRI(url);
         } catch (Exception e) {
-            return ExtensionResponse.error("'url' parameter is not a valid URI: " + url);
+            return ExtensionResponse.error("'url' parameter is not a valid IRI: " + url);
         }
         s.add(vf.createStatement(event, RDF_TYPE, WEBPAGE_VISIT));
         s.add(vf.createStatement(event, PAGE, page));

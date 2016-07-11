@@ -2,14 +2,14 @@ package net.fortytwo.smsn.monitron;
 
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Context {
 
-    private final ValueFactory valueFactory = new ValueFactoryImpl();
+    private final ValueFactory valueFactory = SimpleValueFactory.getInstance();
     private final EventHandler eventHandler;
 
     private long timerStart;

@@ -267,7 +267,6 @@ public class NoteParser {
      * This method does not check the value with respect to matching and non-nested terminators;
      * the value is assumed to be valid.
      *
-     * @param escaped
      * @return the unescaped value
      */
     public static String unescapeValue(final String escaped) {

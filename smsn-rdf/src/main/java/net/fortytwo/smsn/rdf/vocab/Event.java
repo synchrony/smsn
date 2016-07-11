@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * The Event Ontology as a collection of terms
@@ -13,29 +13,29 @@ public interface Event {
     public static final String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";
 
     // classes
-    public static final URI
-            Event = new URIImpl(NAMESPACE + "Event"),
-            Factor = new URIImpl(NAMESPACE + "Factor"),
-            Product = new URIImpl(NAMESPACE + "Product");
+    public static final IRI
+            Event = RDFAgents.createIRI(NAMESPACE + "Event"),
+            Factor = RDFAgents.createIRI(NAMESPACE + "Factor"),
+            Product = RDFAgents.createIRI(NAMESPACE + "Product");
 
     // properties
-    public static final URI
-            agent = new URIImpl(NAMESPACE + "agent"),
-            agent_in = new URIImpl(NAMESPACE + "agent_in"),
-            factor = new URIImpl(NAMESPACE + "factor"),
-            factor_of = new URIImpl(NAMESPACE + "factor_of"),
-            hasAgent = new URIImpl(NAMESPACE + "hasAgent"),
-            hasFactor = new URIImpl(NAMESPACE + "hasFactor"),
-            hasLiteralFactor = new URIImpl(NAMESPACE + "hasLiteralFactor"),
-            hasProduct = new URIImpl(NAMESPACE + "hasProduct"),
-            hasSubEvent = new URIImpl(NAMESPACE + "hasSubEvent"),
-            isAgentIn = new URIImpl(NAMESPACE + "isAgentIn"),
-            isFactorOf = new URIImpl(NAMESPACE + "isFactorOf"),
-            literal_factor = new URIImpl(NAMESPACE + "literal_factor"),
-            place = new URIImpl(NAMESPACE + "place"),
-            producedIn = new URIImpl(NAMESPACE + "producedIn"),
-            produced_in = new URIImpl(NAMESPACE + "produced_in"),
-            product = new URIImpl(NAMESPACE + "product"),
-            sub_event = new URIImpl(NAMESPACE + "sub_event"),
-            time = new URIImpl(NAMESPACE + "time");
+    public static final IRI
+            agent = RDFAgents.createIRI(NAMESPACE + "agent"),
+            agent_in = RDFAgents.createIRI(NAMESPACE + "agent_in"),
+            factor = RDFAgents.createIRI(NAMESPACE + "factor"),
+            factor_of = RDFAgents.createIRI(NAMESPACE + "factor_of"),
+            hasAgent = RDFAgents.createIRI(NAMESPACE + "hasAgent"),
+            hasFactor = RDFAgents.createIRI(NAMESPACE + "hasFactor"),
+            hasLiteralFactor = RDFAgents.createIRI(NAMESPACE + "hasLiteralFactor"),
+            hasProduct = RDFAgents.createIRI(NAMESPACE + "hasProduct"),
+            hasSubEvent = RDFAgents.createIRI(NAMESPACE + "hasSubEvent"),
+            isAgentIn = RDFAgents.createIRI(NAMESPACE + "isAgentIn"),
+            isFactorOf = RDFAgents.createIRI(NAMESPACE + "isFactorOf"),
+            literal_factor = RDFAgents.createIRI(NAMESPACE + "literal_factor"),
+            place = RDFAgents.createIRI(NAMESPACE + "place"),
+            producedIn = RDFAgents.createIRI(NAMESPACE + "producedIn"),
+            produced_in = RDFAgents.createIRI(NAMESPACE + "produced_in"),
+            product = RDFAgents.createIRI(NAMESPACE + "product"),
+            sub_event = RDFAgents.createIRI(NAMESPACE + "sub_event"),
+            time = RDFAgents.createIRI(NAMESPACE + "time");
 }

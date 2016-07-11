@@ -12,7 +12,7 @@ import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 public class GesturalServer {
     private static final Logger logger = Logger.getLogger(GesturalServer.class.getName());
 
-    private static final ValueFactory valueFactory = new ValueFactoryImpl();
+    private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     private static final int DEFAULT_PORT = 42003;
 

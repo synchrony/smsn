@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -62,16 +63,10 @@ public class HandoffMatcher {
     }
 
     private void cleanup(final long timestamp) {
-        for (Handoff h : latestHandoffs) {
-            if (isOld(h, timestamp)) {
-                cleanupBuffer.add(h);
-            }
-        }
+        cleanupBuffer.addAll(latestHandoffs.stream().filter(h -> isOld(h, timestamp)).collect(Collectors.toList()));
 
         if (cleanupBuffer.size() > 0) {
-            for (Handoff h : cleanupBuffer) {
-                latestHandoffs.remove(h);
-            }
+            cleanupBuffer.forEach(latestHandoffs::remove);
 
             cleanupBuffer.clear();
         }

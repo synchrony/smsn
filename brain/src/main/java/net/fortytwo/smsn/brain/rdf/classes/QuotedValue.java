@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFHandler;
@@ -32,12 +32,12 @@ public class QuotedValue extends AtomClass {
     }
 
     @Override
-    public URI toRDF(final Atom a,
+    public IRI toRDF(final Atom a,
                      final RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, SmSnVocabulary.WORDORPHRASE);
+        IRI self = handleTypeAndAlias(a, vf, handler, SmSnVocabulary.WORDORPHRASE);
 
         // note: a few atoms currently break this pattern, e.g. an atom with the value: "one", "two"
         String d = a.getValue().substring(1, a.getValue().length() - 1).trim();

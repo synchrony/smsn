@@ -15,7 +15,7 @@ fi
 DIR=`dirname $0`
 
 # Launch the application
-$JAVA $JAVA_OPTIONS -cp $DIR/target/classes:$DIR/"target/dependency/*" net.fortytwo.smsn.monitron.demos.ContinuousQueryDemo $*
+${JAVA} ${JAVA_OPTIONS} -cp ${DIR}/target/classes:${DIR}/"target/dependency/*" net.fortytwo.smsn.monitron.demos.ContinuousQueryDemo $*
 
 # Return the program's exit code
 exit $?

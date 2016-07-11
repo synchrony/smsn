@@ -1,17 +1,17 @@
 package net.fortytwo.smsn.rdf;
 
+import net.fortytwo.rdfagents.RDFAgents;
 import net.fortytwo.rdfagents.data.DatasetFactory;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.rdf.vocab.Timeline;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -99,7 +99,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Point, graph));
@@ -124,7 +124,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.BatonGesture, graph));
@@ -148,7 +148,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.HandshakePulse, graph));
@@ -174,7 +174,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handshake, graph));
@@ -205,7 +205,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handoff, graph));
@@ -234,7 +234,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.HighFive, graph));
@@ -262,7 +262,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        URI activity = factory.randomURI();
+        IRI activity = factory.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Attention, graph));
@@ -290,7 +290,7 @@ public class Activities {
                                               final Collection<Statement> c,
                                               Resource... graphs) {
         for (Resource graph : fixGraphs(graphs)) {
-            URI instant = factory.randomURI();
+            IRI instant = factory.randomIRI();
             c.add(createStatement(instant, RDF.TYPE, Timeline.Instant, graph));
             Literal dateValue = vf.createLiteral(TIMESTAMP_FORMAT.format(timestamp), XMLSchema.DATETIME);
             c.add(createStatement(instant, Timeline.at, dateValue, graph));
@@ -304,30 +304,19 @@ public class Activities {
         return (0 == graphs.length) ? defaultGraphArray : graphs;
     }
 
-    private static Statement createStatement(Resource subject, URI predicate, Value object, Resource graph) {
+    private static Statement createStatement(Resource subject, IRI predicate, Value object, Resource graph) {
         return vf.createStatement(subject, predicate, object, graph);
     }
 
     public static void main(final String[] args) throws Exception {
-        /*
-        Dataset d = Activities.datasetForAttentionActivity(
-                new Date().getTime(), new URIImpl("http://example.org/ArthurDent"), new URIImpl("http://example.org/sofa42"));
-        *//*
-        Dataset d = Activities.datasetForHandoffInteraction(new Date().getTime(),
-                new URIImpl("http://fortytwo.net/josh/things/wRYn7qX"),
-                new URIImpl("http://fortytwo.net/josh/things/E2jV2SK"),
-                new URIImpl("http://fortytwo.net/josh/things/7N_7fqX"));
-        */
         Dataset d = Activities.datasetForHandshakePulse(new Date().getTime(),
-                new URIImpl("http://fortytwo.net/josh/things/CybU2QN"));
+                RDFAgents.createIRI("http://fortytwo.net/josh/things/CybU2QN"));
 
         OutputStream os = System.out;
         RDFWriter w = new NTriplesWriter(os);
         try {
             w.startRDF();
-            for (Statement s : d.getStatements()) {
-                w.handleStatement(s);
-            }
+            d.getStatements().forEach(w::handleStatement);
             w.endRDF();
         } catch (RDFHandlerException e) {
             throw new IOException(e);

@@ -11,7 +11,7 @@ import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 import java.util.logging.Logger;
 
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public abstract class AtomMapping extends PrimitiveStackMapping {
     private static final Logger logger = Logger.getLogger(GetAtomValueMapping.class.getName());
 
-    private static final ValueFactory valueFactory = new ValueFactoryImpl();
+    private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     protected final ExtendoBrainClient client;
     protected final Filter filter;

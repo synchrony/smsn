@@ -56,7 +56,7 @@ public class SetAtomValueMapping extends AtomMapping {
             setProperty(n, SemanticSynchrony.VALUE, value);
 
             // put the atom back on the stack
-            solutions.put(stack.push(n));
+            solutions.accept(stack.push(n));
         }
     }
 }

@@ -53,7 +53,7 @@ public class GetAtomValueMapping extends AtomMapping {
                 logger.warning("atom note has no @value: " + n);
             } else {
                 // put both the @value property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+                solutions.accept(stack.push(n).push(value));
             }
         }
     }

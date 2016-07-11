@@ -38,9 +38,7 @@ public class ServiceDescription {
             version = j.getString(PROP_VERSION);
             oscPort = j.getInt(PROP_OSC_PORT);
             pubsubPort = j.getInt(PROP_PUBSUB_PORT);
-        } catch (JSONException e) {
-            throw new InvalidServiceDescriptionException(e.getMessage());
-        } catch (NumberFormatException e) {
+        } catch (JSONException | NumberFormatException e) {
             throw new InvalidServiceDescriptionException(e.getMessage());
         }
     }

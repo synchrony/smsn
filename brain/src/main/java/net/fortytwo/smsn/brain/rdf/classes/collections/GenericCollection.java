@@ -2,14 +2,6 @@ package net.fortytwo.smsn.brain.rdf.classes.collections;
 
 import net.fortytwo.smsn.brain.rdf.AtomCollection;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
-import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
-import net.fortytwo.smsn.brain.rdf.classes.DatedEvent;
-import net.fortytwo.smsn.brain.rdf.classes.Document;
-import net.fortytwo.smsn.brain.rdf.classes.LinkedConcept;
-import net.fortytwo.smsn.brain.rdf.classes.Person;
-import net.fortytwo.smsn.brain.rdf.classes.QuotedValue;
-import net.fortytwo.smsn.brain.rdf.classes.TODOTask;
-import net.fortytwo.smsn.brain.rdf.classes.Tool;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;

@@ -43,6 +43,6 @@ public class GetLightLevelMapping extends PrimitiveStackMapping {
         // For now, we decouple the response from the request, pushing the light level onto all stacks in the session.
         // Eventually, it would be best to push the light level only onto *this* stack (arg).
 
-        solutions.put(arg);
+        solutions.accept(arg);
     }
 }

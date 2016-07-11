@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.monitron;
 
-import com.illposed.osc.AddressSelector;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.utility.JavaRegexAddressSelector;
@@ -26,8 +25,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 
 /*
 sudo cu -l /dev/cu.usbserial-A600HFHJ -s 9600 | tee /tmp/arduino.out

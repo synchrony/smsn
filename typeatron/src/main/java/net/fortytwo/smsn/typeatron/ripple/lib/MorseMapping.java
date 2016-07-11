@@ -50,6 +50,6 @@ public class MorseMapping extends PrimitiveStackMapping {
             throw new RippleException(t);
         }
 
-        solutions.put(arg.getRest());
+        solutions.accept(arg.getRest());
     }
 }

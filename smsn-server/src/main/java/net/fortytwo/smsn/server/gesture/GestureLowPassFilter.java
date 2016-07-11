@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.gesture;
 
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class GestureLowPassFilter {
         this.lastGestures = new HashMap<>();
     }
 
-    public boolean doAllow(URI actor1, URI actor2, final long timestamp) {
+    public boolean doAllow(IRI actor1, IRI actor2, final long timestamp) {
         String a1 = actor1.stringValue();
         String a2 = actor2.stringValue();
 

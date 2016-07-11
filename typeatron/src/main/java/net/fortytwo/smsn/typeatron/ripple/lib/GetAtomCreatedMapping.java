@@ -51,7 +51,7 @@ public class GetAtomCreatedMapping extends AtomMapping {
             Long value = n.getCreated();
             if (null != value) {
                 // put both the @created property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+                solutions.accept(stack.push(n).push(value));
             }
         }
     }

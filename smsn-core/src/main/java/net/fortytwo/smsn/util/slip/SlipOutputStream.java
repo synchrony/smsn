@@ -37,7 +37,7 @@ public class SlipOutputStream {
      */
     public SlipOutputStream(final OutputStream outputStream, final boolean threaded) {
         this.outputStream = outputStream;
-        queue = threaded ? new LinkedBlockingQueue<byte[]>() : null;
+        queue = threaded ? new LinkedBlockingQueue<>() : null;
 
         if (threaded) {
             thread = new Thread(new Runnable() {

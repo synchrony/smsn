@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.brain.Atom;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
@@ -23,7 +23,7 @@ public abstract class SimpleAtomClass extends AtomClass {
         return false;
     }
 
-    public URI toRDF(final Atom a,
+    public IRI toRDF(final Atom a,
                      final RDFizationContext context) throws RDFHandlerException {
         // Some classes are meaningful only as fields of other classes.
         // They are not identified by URIs, and they are not the subjects of RDF statements.

@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.gesture;
 
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -22,7 +23,7 @@ public class HandshakeMatcher {
     private static final int STACK_SIZE_WARN_THRESHOLD = 1000;
     private long lastWarning = 0;
 
-    private final Map<URI, HandshakeSequence> handshakesByActor;
+    private final Map<IRI, HandshakeSequence> handshakesByActor;
     private final Stack<HandshakeSequence> latestHandshakeSequences;
     private Collection<HandshakeSequence> cleanupBuffer = new LinkedList<>();
 
@@ -52,11 +53,7 @@ public class HandshakeMatcher {
     }
 
     private void cleanup(final long timestamp) {
-        for (HandshakeSequence h : latestHandshakeSequences) {
-            if (isOld(h, timestamp)) {
-                cleanupBuffer.add(h);
-            }
-        }
+        cleanupBuffer.addAll(latestHandshakeSequences.stream().filter(h -> isOld(h, timestamp)).collect(Collectors.toList()));
 
         if (cleanupBuffer.size() > 0) {
             for (HandshakeSequence h : cleanupBuffer) {
@@ -68,7 +65,7 @@ public class HandshakeMatcher {
         }
     }
 
-    public synchronized void receiveEvent(final URI actor,
+    public synchronized void receiveEvent(final IRI actor,
                                           final long timestamp,
                                           final long now) {
         //System.out.println("received handshake by " + actor + " at " + timestamp);
@@ -130,7 +127,7 @@ public class HandshakeMatcher {
     }
 
     public class HandshakeSequence {
-        public URI actor;
+        public IRI actor;
         public final List<Long> peaks = new LinkedList<>();
         public long firstPeak;
         public long latestPeak;

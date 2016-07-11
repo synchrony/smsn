@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.monitron.ontologies;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -9,9 +9,9 @@ import org.openrdf.model.impl.URIImpl;
 public interface EventOntology {
     public static final String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";
 
-    public static final URI
-            EVENT = new URIImpl(NAMESPACE + "Event"),
-            PLACE = new URIImpl(NAMESPACE + "place"),
-            SUB_EVENT = new URIImpl(NAMESPACE + "sub_event"),
-            TIME = new URIImpl(NAMESPACE + "time");
+    public static final IRI
+            EVENT = RDFAgents.createIRI(NAMESPACE + "Event"),
+            PLACE = RDFAgents.createIRI(NAMESPACE + "place"),
+            SUB_EVENT = RDFAgents.createIRI(NAMESPACE + "sub_event"),
+            TIME = RDFAgents.createIRI(NAMESPACE + "time");
 }

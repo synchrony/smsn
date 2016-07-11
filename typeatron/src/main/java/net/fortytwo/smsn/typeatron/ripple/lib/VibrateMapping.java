@@ -38,6 +38,6 @@ public class VibrateMapping extends PrimitiveStackMapping {
             throw new RippleException(t);
         }
 
-        solutions.put(arg);
+        solutions.accept(arg);
     }
 }

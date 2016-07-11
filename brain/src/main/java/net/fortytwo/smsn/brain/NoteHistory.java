@@ -1,9 +1,6 @@
 package net.fortytwo.smsn.brain;
 
 import com.tinkerpop.blueprints.Vertex;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.Filter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -34,8 +31,8 @@ public class NoteHistory {
                                    final BrainGraph graph,
                                    final Filter filter) {
         Collection<String> r = dedup
-                ? new LinkedHashSet<String>()
-                : new LinkedList<String>();
+                ? new LinkedHashSet<>()
+                : new LinkedList<>();
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 

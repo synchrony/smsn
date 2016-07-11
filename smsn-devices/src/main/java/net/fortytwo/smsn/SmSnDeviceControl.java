@@ -58,47 +58,39 @@ public abstract class SmSnDeviceControl extends OscControl {
     }
 
     protected void registerCommonHandlers() {
-        receiver.register(absoluteAddress(OSC_ERROR), new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                List<Object> args = message.getArguments();
-                if (wrongArgs(OSC_ERROR, 1, args.size())) {
-                    return;
-                }
-
-                logger.log(Level.SEVERE, "error message from Extend-o-Hand: " + args.get(0));
+        receiver.register(absoluteAddress(OSC_ERROR), message -> {
+            List<Object> args = message.getArguments();
+            if (wrongArgs(OSC_ERROR, 1, args.size())) {
+                return;
             }
+
+            logger.log(Level.SEVERE, "error message from Extend-o-Hand: " + args.get(0));
         });
 
-        receiver.register(absoluteAddress(OSC_INFO), new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                List<Object> args = message.getArguments();
-                if (wrongArgs(OSC_INFO, 1, args.size())) {
-                    return;
-                }
-
-                logger.log(Level.INFO, "info message from Extend-o-Hand: " + args.get(0));
+        receiver.register(absoluteAddress(OSC_INFO), message -> {
+            List<Object> args = message.getArguments();
+            if (wrongArgs(OSC_INFO, 1, args.size())) {
+                return;
             }
+
+            logger.log(Level.INFO, "info message from Extend-o-Hand: " + args.get(0));
         });
 
-        receiver.register(absoluteAddress(OSC_PING), new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                // note: currently, no argument is provided, or needed;
-                // the ping is used by the Extend-o-Hand to notify the user of a connection
-                logger.info("ping received from Extend-o-Hand. Replying.");
-                sendPingReplyMessage();
-            }
+        receiver.register(absoluteAddress(OSC_PING), message -> {
+            // note: currently, no argument is provided, or needed;
+            // the ping is used by the Extend-o-Hand to notify the user of a connection
+            logger.info("ping received from Extend-o-Hand. Replying.");
+            sendPingReplyMessage();
         });
 
-        receiver.register(absoluteAddress(OSC_PING_REPLY), new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                // note: argument is ignored for now; in future, it could be used to synchronize clocks
+        receiver.register(absoluteAddress(OSC_PING_REPLY), message -> {
+            // note: argument is ignored for now; in future, it could be used to synchronize clocks
 
-                // we assume this reply is a response to the latest ping
-                // TODO: we don't have to... why not send and receive latestPing in the message
-                long delay = System.currentTimeMillis() - latestPing;
+            // we assume this reply is a response to the latest ping
+            // TODO: we don't have to... why not send and receive latestPing in the message
+            long delay = System.currentTimeMillis() - latestPing;
 
-                logger.log(Level.INFO, "ping reply received from Extend-o-Hand in " + delay + "ms");
-            }
+            logger.log(Level.INFO, "ping reply received from Extend-o-Hand in " + delay + "ms");
         });
     }
 

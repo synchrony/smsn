@@ -1,33 +1,31 @@
 package net.fortytwo.smsn.brain;
 
 import groovy.json.StringEscapeUtils;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class BrainModeClientTest extends TestCase {
+public class BrainModeClientTest {
 
     private final List<String> results = new ArrayList<>();
 
-    private final BrainModeClient.EmacsFunctionExecutor functionExecutor = new BrainModeClient.EmacsFunctionExecutor() {
-        public Process execute(BrainModeClient.EmacsFunction function, String argument)
-                throws InterruptedException, IOException {
+    private final BrainModeClient.EmacsFunctionExecutor functionExecutor = (function, argument) -> {
 
-            String expr = function.getRequiresArgument()
-                    ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
-                    : "(" + function.getName() + ")";
+        String expr = function.getRequiresArgument()
+                ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
+                : "(" + function.getName() + ")";
 
-            results.add(expr);
-            return null;
-        }
+        results.add(expr);
+        return null;
     };
 
     @Test
@@ -61,11 +59,8 @@ public class BrainModeClientTest extends TestCase {
         results.clear();
 
         InputStream in = new ByteArrayInputStream(input.getBytes());
-        BrainModeClient.ResultHandler handler = new BrainModeClient.ResultHandler() {
-            @Override
-            public void handle(InputStream result) {
-                // ignore
-            }
+        BrainModeClient.ResultHandler handler = result -> {
+            // ignore
         };
         BrainModeClient client = new BrainModeClient(in, handler);
         client.setFunctionExecutor(functionExecutor);

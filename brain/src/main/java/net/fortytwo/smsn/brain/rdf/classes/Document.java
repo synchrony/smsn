@@ -11,7 +11,7 @@ import net.fortytwo.smsn.brain.rdf.classes.collections.TopicCollection;
 import net.fortytwo.smsn.rdf.vocab.Bibo;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import org.apache.commons.validator.routines.ISBNValidator;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.rio.RDFHandler;
@@ -77,12 +77,12 @@ public class Document extends AtomClass {
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
         // TODO: a more specific type than foaf:Document may be appropriate (WebPage also uses foaf:Document)
-        URI self = handleTypeAndAlias(a, vf, handler, FOAF.DOCUMENT);
+        IRI self = handleTypeAndAlias(a, vf, handler, FOAF.DOCUMENT);
 
         handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
 
@@ -93,7 +93,7 @@ public class Document extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             String value = object.getValue();
-            URI predicate;
+            IRI predicate;
 
             int i = value.indexOf(':');
             String isbn = value.substring(i + 1).trim();
@@ -123,7 +123,7 @@ public class Document extends AtomClass {
 
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), predicate, vf.createLiteral(isbn)));
+                    context.getSubjectIri(), predicate, vf.createLiteral(isbn)));
         }
     }
 
@@ -135,7 +135,7 @@ public class Document extends AtomClass {
 
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), DCTERMS.BIBLIOGRAPHIC_CITATION, vf.createLiteral(entry)));
+                    context.getSubjectIri(), DCTERMS.BIBLIOGRAPHIC_CITATION, vf.createLiteral(entry)));
         }
     }
 
@@ -143,10 +143,10 @@ public class Document extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: dc:creator is recommended only for simple textual names, hence foaf:maker
-                    context.getSubjectUri(), FOAF.MAKER, objectURI));
+                    context.getSubjectIri(), FOAF.MAKER, objectIRI));
         }
     }
 
@@ -154,12 +154,12 @@ public class Document extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), FOAF.TOPIC, objectURI));
+                    context.getSubjectIri(), FOAF.TOPIC, objectIRI));
             // The skos:note on dc:subject reads "This term is intended to be used with non-literal values
             // as defined in the DCMI Abstract Model (http://dublincore.org/documents/abstract-model/) [...]"
-            //context.getSubjectUri(), DCTerms.SUBJECT, objectURI));
+            //context.getSubjectIri(), DCTerms.SUBJECT, objectIRI));
         }
     }
 

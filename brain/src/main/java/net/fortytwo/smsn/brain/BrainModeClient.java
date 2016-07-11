@@ -44,18 +44,16 @@ public class BrainModeClient {
 
     private final ResultHandler resultHandler;
 
-    private EmacsFunctionExecutor functionExecutor = new EmacsFunctionExecutor() {
-        public Process execute(EmacsFunction function, String argument) throws InterruptedException, IOException {
-            String expr = function.getRequiresArgument()
-                    ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
-                    : "(" + function.getName() + ")";
-            expr = "(smsn-emacsclient-eval (lambda () " + expr + "))";
+    private EmacsFunctionExecutor functionExecutor = (function, argument) -> {
+        String expr = function.getRequiresArgument()
+                ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
+                : "(" + function.getName() + ")";
+        expr = "(smsn-emacsclient-eval (lambda () " + expr + "))";
 
-            Process p = Runtime.getRuntime().exec(new String[]{executable, "-e", expr});
-            p.waitFor();
+        Process p = Runtime.getRuntime().exec(new String[]{executable, "-e", expr});
+        p.waitFor();
 
-            return p;
-        }
+        return p;
     };
 
     public BrainModeClient(final InputStream inputstream,

@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
@@ -46,11 +46,11 @@ public class LinkedConcept extends AtomClass {
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, OWL.THING);
+        IRI self = handleTypeAndAlias(a, vf, handler, OWL.THING);
 
         // note: we assume short, name-like values for linked atoms
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));

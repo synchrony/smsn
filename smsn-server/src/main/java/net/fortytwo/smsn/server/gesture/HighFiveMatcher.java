@@ -1,14 +1,11 @@
 package net.fortytwo.smsn.server.gesture;
 
-import org.openrdf.model.URI;
-
-import java.util.logging.Logger;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class HighFiveMatcher {
-    private static final Logger logger = Logger.getLogger(HighFiveMatcher.class.getName());
 
     // the maximum interval allowed between matching claps of a high-five
     // TODO: this figure has been chosen arbitrarily, and is not yet based on an analysis of sample data
@@ -35,7 +32,7 @@ public class HighFiveMatcher {
         }
     }
 
-    public synchronized void receiveEvent(final URI actor,
+    public synchronized void receiveEvent(final IRI actor,
                                           final long timestamp) {
         //System.out.println("received clap by " + actor + " at " + timestamp);
         cleanup(timestamp);
@@ -59,7 +56,7 @@ public class HighFiveMatcher {
     }
 
     public class Clap {
-        public URI actor;
+        public IRI actor;
         public long timeOfPeak;
 
         public boolean matches(final Clap other) {

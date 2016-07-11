@@ -36,7 +36,7 @@ import net.fortytwo.smsn.brain.rdf.classes.collections.TODOCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.TopicCollection;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -73,7 +73,7 @@ public class KnowledgeBase {
 
     private final Map<Atom, List<AtomClassEntry>> atomClassifications;
 
-    private ValueFactory valueFactory = new ValueFactoryImpl();
+    private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     public KnowledgeBase(final BrainGraph graph) {
         this.graph = graph;
@@ -176,39 +176,36 @@ public class KnowledgeBase {
 
     public void inferAutomatically(final long interval) {
         final int totalSteps = 4;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < totalSteps; i++) {
+        new Thread(() -> {
+            for (int i = 0; i < totalSteps; i++) {
+                try {
+                    logger.info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
+                    inferClasses(null, null);
+                } catch (RDFHandlerException e) {
+                    logger.log(Level.WARNING, "error in warm-up inference", e);
+                }
+            }
+            logger.info("completed warm-up inference");
+
+            long lastUpdate = graph.getLastUpdate();
+
+            while (true) {
+                try {
+                    Thread.sleep(interval);
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                // only repeat the inference step if there have been updates in the meantime
+                long u = graph.getLastUpdate();
+                if (u > lastUpdate) {
                     try {
-                        logger.info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
+                        logger.info("performing class inference");
                         inferClasses(null, null);
                     } catch (RDFHandlerException e) {
-                        logger.log(Level.WARNING, "error in warm-up inference", e);
+                        logger.log(Level.WARNING, "class inference failed. Will keep trying", e);
                     }
-                }
-                logger.info("completed warm-up inference");
-
-                long lastUpdate = graph.getLastUpdate();
-
-                while (true) {
-                    try {
-                        Thread.sleep(interval);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-
-                    // only repeat the inference step if there have been updates in the meantime
-                    long u = graph.getLastUpdate();
-                    if (u > lastUpdate) {
-                        try {
-                            logger.info("performing class inference");
-                            inferClasses(null, null);
-                        } catch (RDFHandlerException e) {
-                            logger.log(Level.WARNING, "class inference failed. Will keep trying", e);
-                        }
-                        lastUpdate = u;
-                    }
+                    lastUpdate = u;
                 }
             }
         }).start();
@@ -225,14 +222,13 @@ public class KnowledgeBase {
         }
         alreadyHandled.add(memory.getAtomId());
 
-        for (Atom a : memory.getMemberAtoms()) {
-            if (null == filter || filter.isVisible(a.asVertex())) {
-                // only rdfize fields with a known class
-                if (isClassified(a)) {
-                    fieldHandler.handle(a, context);
-                }
+        // only rdfize fields with a known class
+        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.isVisible(a.asVertex())).forEach(a -> {
+            // only rdfize fields with a known class
+            if (isClassified(a)) {
+                fieldHandler.handle(a, context);
             }
-        }
+        });
 
         for (AtomCollectionMemory m : memory.getMemberCollections()) {
             handleAllMembers(m, fieldHandler, context, alreadyHandled, filter);
@@ -307,19 +303,16 @@ public class KnowledgeBase {
 
                         // fieldHandler is optional
                         if (null != fieldHandler) {
-                            callbacks.add(new RdfizationCallback() {
-                                @Override
-                                public void execute() throws RDFHandlerException {
-                                    if (atomClass.isCollectionClass()) {
-                                        if (null != entry.memory) {
-                                            handleAllMembers(entry.memory, fieldHandler, context,
-                                                    new HashSet<String>(), filter);
-                                        }
-                                    } else if (null == filter || filter.isVisible(childAtom.asVertex())) {
-                                        // only rdfize fields with a known class
-                                        if (isClassified(entries)) {
-                                            fieldHandler.handle(childAtom, context);
-                                        }
+                            callbacks.add(() -> {
+                                if (atomClass.isCollectionClass()) {
+                                    if (null != entry.memory) {
+                                        handleAllMembers(entry.memory, fieldHandler, context,
+                                                new HashSet<>(), filter);
+                                    }
+                                } else if (null == filter || filter.isVisible(childAtom.asVertex())) {
+                                    // only rdfize fields with a known class
+                                    if (isClassified(entries)) {
+                                        fieldHandler.handle(childAtom, context);
                                     }
                                 }
                             });
@@ -385,7 +378,7 @@ public class KnowledgeBase {
                 List<AtomClassEntry> evidenceEntries = new LinkedList<>();
 
                 Collection<RdfizationCallback> callbacks = null == handler
-                        ? null : new LinkedList<RdfizationCallback>();
+                        ? null : new LinkedList<>();
 
                 AtomCollectionMemory memory = clazz.isCollectionClass()
                         ? new AtomCollectionMemory((String) subject.asVertex().getId())
@@ -670,14 +663,11 @@ public class KnowledgeBase {
                 startTime = System.currentTimeMillis();
                 RDFHandler h = Rio.createWriter(format, out);
                 h.startRDF();
-                CloseableIteration<? extends Statement, SailException>
-                        iter = sc.getStatements(null, null, null, false);
-                try {
+                try (CloseableIteration<? extends Statement, SailException> iter
+                             = sc.getStatements(null, null, null, false)) {
                     while (iter.hasNext()) {
                         h.handleStatement(iter.next());
                     }
-                } finally {
-                    iter.close();
                 }
                 h.endRDF();
                 endTime = System.currentTimeMillis();

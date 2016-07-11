@@ -6,11 +6,11 @@ import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.rdfagents.model.RDFContentLanguage;
 import net.fortytwo.smsn.rdf.vocab.Timeline;
 import org.junit.Test;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -31,8 +31,8 @@ import static org.junit.Assert.fail;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ActivitiesTest {
-    private         ValueFactory valueFactory = new ValueFactoryImpl();
-    private String agentUri = "http://example.org/ns#bob";
+    private ValueFactory valueFactory = SimpleValueFactory.getInstance();
+    private String agentIri = "http://example.org/ns#bob";
     private DatasetFactory f = new DatasetFactory();
 
     @Test
@@ -44,7 +44,7 @@ public class ActivitiesTest {
             }
         }
 
-        Dataset ds = Activities.datasetForBatonGesture(System.currentTimeMillis(), valueFactory.createURI(agentUri));
+        Dataset ds = Activities.datasetForBatonGesture(System.currentTimeMillis(), valueFactory.createIRI(agentIri));
 
         assertEquals(5, ds.getStatements().size());
 
@@ -59,7 +59,7 @@ public class ActivitiesTest {
         ParsedQuery q = QueryParserUtil.parseQuery(
                 QueryLanguage.SPARQL,
                 Activities.QUERY_FOR_ALL_GB_GESTURES,
-                "http://example.org/baseURI");
+                "http://example.org/baseIRI");
 
         SailConnection sc = sail.getConnection();
         try {
@@ -67,7 +67,7 @@ public class ActivitiesTest {
             CloseableIteration<? extends BindingSet, QueryEvaluationException> iter
                     = sc.evaluate(q.getTupleExpr(), q.getDataset(), new EmptyBindingSet(), false);
             BindingSet bs = iter.next();
-            assertEquals(agentUri, bs.getValue("actor").stringValue());
+            assertEquals(agentIri, bs.getValue("actor").stringValue());
             assertTrue(bs.getValue("time") instanceof Literal);
             assertFalse(iter.hasNext());
             iter.close();
@@ -79,7 +79,7 @@ public class ActivitiesTest {
     @Test
     public void testDateTimeFormat() throws Exception {
 
-        URI actor = valueFactory.createURI(agentUri);
+        IRI actor = valueFactory.createIRI(agentIri);
 
         long timestamp = 42L;
 

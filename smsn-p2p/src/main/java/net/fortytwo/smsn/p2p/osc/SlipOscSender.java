@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.p2p.osc;
 
 import com.illposed.osc.OSCBundle;
-import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.util.slip.SlipOutputStream;
 
 import java.io.IOException;

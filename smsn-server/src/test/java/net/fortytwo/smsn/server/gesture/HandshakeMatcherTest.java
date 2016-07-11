@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class HandshakeMatcherTest {
 
-    private static final ValueFactory valueFactory = new ValueFactoryImpl();
+    private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     private final HandshakeMatcher server;
 
@@ -123,12 +123,7 @@ public class HandshakeMatcherTest {
         long offset = 10l;
 
         handshakeCount = 0;
-        server.setHandler(new HandshakeMatcher.HandshakeHandler() {
-            @Override
-            public void handle(HandshakeMatcher.HandshakeSequence left, HandshakeMatcher.HandshakeSequence right, long time) {
-                handshakeCount++;
-            }
-        });
+        server.setHandler((left, right, time) -> handshakeCount++);
 
         long before = System.currentTimeMillis();
         long now = 0;

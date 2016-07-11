@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.monitron.ontologies;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -9,15 +9,15 @@ import org.openrdf.model.impl.URIImpl;
 public interface OMOntology {
     public static final String NAMESPACE = "http://def.seegrid.csiro.au/ontology/om/om-lite#";
 
-    public static final URI
-            FEATURE_OF_INTEREST = new URIImpl(NAMESPACE + "featureOfInterest"),
-            MEASUREMENT = new URIImpl(NAMESPACE + "Measurement"),
-            OBSERVATION = new URIImpl(NAMESPACE + "Observation"),
-            OBSERVED_PROPERTY = new URIImpl(NAMESPACE + "observedProperty"),
-            PROCEDURE = new URIImpl(NAMESPACE + "procedure"),
-            RESULT = new URIImpl(NAMESPACE + "result"),
-            SIMPLE_MEASURE = new URIImpl(NAMESPACE + "SimpleMeasure"),
-            PHENOMENON_TIME = new URIImpl(NAMESPACE + "phenomenonTime"),
-            UOM = new URIImpl(NAMESPACE + "uom"),
-            AMOUNT = new URIImpl(NAMESPACE + "amount");
+    public static final IRI
+            FEATURE_OF_INTEREST = RDFAgents.createIRI(NAMESPACE + "featureOfInterest"),
+            MEASUREMENT = RDFAgents.createIRI(NAMESPACE + "Measurement"),
+            OBSERVATION = RDFAgents.createIRI(NAMESPACE + "Observation"),
+            OBSERVED_PROPERTY = RDFAgents.createIRI(NAMESPACE + "observedProperty"),
+            PROCEDURE = RDFAgents.createIRI(NAMESPACE + "procedure"),
+            RESULT = RDFAgents.createIRI(NAMESPACE + "result"),
+            SIMPLE_MEASURE = RDFAgents.createIRI(NAMESPACE + "SimpleMeasure"),
+            PHENOMENON_TIME = RDFAgents.createIRI(NAMESPACE + "phenomenonTime"),
+            UOM = RDFAgents.createIRI(NAMESPACE + "uom"),
+            AMOUNT = RDFAgents.createIRI(NAMESPACE + "amount");
 }

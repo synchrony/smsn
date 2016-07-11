@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,35 +59,29 @@ public class Connection {
         for (BufferedMessage bm : buffer) {
             try {
                 sendInternal(bm.tag, bm.body);
-            } catch (JSONException e) {
-                logger.warning("error sending buffered message: " + e.getMessage());
-                e.printStackTrace(System.err);
-            } catch (IOException e) {
-                logger.warning("error sending buffered message: " + e.getMessage());
-                e.printStackTrace(System.err);
+            } catch (JSONException | IOException e) {
+                logger.log(Level.WARNING, "error sending buffered message", e);
             }
         }
         buffer.clear();
 
         stopped = false;
 
-        new Thread(new Runnable() {
-            public void run() {
-                logger.info("starting message handler thread");
+        new Thread(() -> {
+            logger.info("starting message handler thread");
 
-                try {
-                    // TODO: recover from IO errors (e.g. due to temporary network issues)
-                    handleIncomingMessages();
-                } catch (Throwable e) {
-                    logger.severe("message handler thread failed with error: " + e.getMessage());
-                    e.printStackTrace(System.err);
-                } finally {
-                    logger.info("message handler thread stopped");
-                }
-
-                // make this connection inactive
-                setSocket(null);
+            try {
+                // TODO: recover from IO errors (e.g. due to temporary network issues)
+                handleIncomingMessages();
+            } catch (Throwable e) {
+                logger.severe("message handler thread failed with error: " + e.getMessage());
+                e.printStackTrace(System.err);
+            } finally {
+                logger.info("message handler thread stopped");
             }
+
+            // make this connection inactive
+            setSocket(null);
         }).start();
     }
 

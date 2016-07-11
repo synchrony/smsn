@@ -56,7 +56,7 @@ public class GetAtomChildrenMapping extends AtomMapping {
                     cur = cur.push(children.get(i));
                 }
                 // put both the children and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(cur));
+                solutions.accept(stack.push(n).push(cur));
             }
         }
     }

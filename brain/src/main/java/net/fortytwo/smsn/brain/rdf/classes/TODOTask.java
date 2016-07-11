@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFHandler;
@@ -32,11 +32,11 @@ public class TODOTask extends AtomClass {
     }
 
     @Override
-    public URI toRDF(final Atom a,RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(final Atom a,RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, SmSnVocabulary.TODO);
+        IRI self = handleTypeAndAlias(a, vf, handler, SmSnVocabulary.TODO);
 
         // assumes the prefix "TODO:"
         String d = a.getValue().substring(5).trim();

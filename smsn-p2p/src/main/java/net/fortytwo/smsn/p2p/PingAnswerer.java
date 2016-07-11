@@ -24,9 +24,7 @@ public class PingAnswerer {
 
             try {
                 connection.sendNow(Pinger.PING_REPLY, body);
-            } catch (JSONException e) {
-                throw new MessageHandlerException(e);
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 throw new MessageHandlerException(e);
             }
         }

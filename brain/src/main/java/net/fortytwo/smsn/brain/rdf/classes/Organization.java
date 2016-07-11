@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.rio.RDFHandler;
@@ -51,11 +51,11 @@ public class Organization extends AtomClass {
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, FOAF.ORGANIZATION);
+        IRI self = handleTypeAndAlias(a, vf, handler, FOAF.ORGANIZATION);
 
         handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
 
@@ -66,9 +66,9 @@ public class Organization extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
-                    context.getSubjectUri(), FOAF.MEMBER, objectURI));
+                    context.getSubjectIri(), FOAF.MEMBER, objectIRI));
         }
     }
 }

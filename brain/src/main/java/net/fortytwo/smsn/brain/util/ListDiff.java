@@ -28,9 +28,7 @@ public class ListDiff {
 
     public static String toString(List<String> l) {
         StringBuilder sb = new StringBuilder();
-        for (String s : l) {
-            sb.append(s);
-        }
+        l.forEach(sb::append);
 
         return sb.toString();
     }
@@ -39,7 +37,6 @@ public class ListDiff {
         int[][] lengths = new int[a.size() + 1][b.size() + 1];
 
         // row 0 and column 0 are initialized to 0 already
-
         for (int i = 0; i < a.size(); i++)
             for (int j = 0; j < b.size(); j++)
                 if (0 == comp.compare(a.get(i), b.get(j)))

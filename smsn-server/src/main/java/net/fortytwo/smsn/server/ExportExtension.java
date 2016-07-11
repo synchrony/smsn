@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFWriterRegistry;
 import org.openrdf.sail.SailException;
 
 import java.io.FileOutputStream;
@@ -40,6 +41,7 @@ import java.io.PrintStream;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -141,7 +143,7 @@ public class ExportExtension extends SmSnExtension {
                 if (null == value) {
                     logger.warning("note has null @value: " + v.getId());
                 } else {
-                    p.print(escapeValue((String) v.getProperty(SemanticSynchrony.VALUE)));
+                    p.print(escapeValue(v.getProperty(SemanticSynchrony.VALUE)));
                 }
                 p.print('\t');
 
@@ -347,11 +349,11 @@ public class ExportExtension extends SmSnExtension {
                     filter = new Filter(0f, 1f, 0.5f, 0.5f, 1f, 0.75f);
                     // fall through
                 case RDF:
-                    RDFFormat rdfFormat = RDFFormat.forFileName(p.file);
-                    if (null == rdfFormat) {
+                    Optional<RDFFormat> rdfFormat = RDFWriterRegistry.getInstance().getFileFormatForFileName(p.file);
+                    if (!rdfFormat.isPresent()) {
                         throw new IllegalStateException("no RDF format for file name: " + p.file);
                     }
-                    exportRDF(p.brain.getKnowledgeBase(), rdfFormat, filter, out);
+                    exportRDF(p.brain.getKnowledgeBase(), rdfFormat.get(), filter, out);
                     break;
                 default:
                     throw new IllegalStateException();

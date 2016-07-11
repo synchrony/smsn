@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain.rdf;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.BrainGraph;
 import org.openrdf.model.IRI;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
 
@@ -26,7 +25,7 @@ public class RDFizationContext {
         this.subjectUri = iriOf(subject);
     }
 
-    public URI getSubjectUri() {
+    public IRI getSubjectIri() {
         return subjectUri;
     }
 

@@ -28,15 +28,15 @@ import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
-import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
+import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.junit.Test;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.LiteralImpl;
-import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -61,15 +61,17 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class KnowledgeBaseTest {
+    private static final ValueFactory vf = SimpleValueFactory.getInstance();
+    
     @Test
     public void testAKASyntax() throws Exception {
         AtomClass t = AKAReference.class.newInstance();
@@ -435,10 +437,9 @@ public class KnowledgeBaseTest {
         Sail inferred = new MemoryStore();
         Repository repo = new SailRepository(inferred);
         repo.initialize();
-        RepositoryConnection rc = repo.getConnection();
         RDFHandler handler;
         RDFizationContext context;
-        try {
+        try (RepositoryConnection rc = repo.getConnection()) {
             handler = new RDFInserter(rc);
             context = new RDFizationContext(handler, inferred.getValueFactory());
             kb.inferClasses(handler, null);
@@ -464,13 +465,13 @@ public class KnowledgeBaseTest {
             }
 
             assertObjects(rc, context.iriOf(einstein), RDF.TYPE, FOAF.PERSON);
-            assertObjects(rc, context.iriOf(einstein), FOAF.NAME, new LiteralImpl("Albert Einstein"));
-            //assertObjects(rc, context.uriOf(einstein), FOAF.INTEREST, context.uriOf(physics));
+            assertObjects(rc, context.iriOf(einstein), FOAF.NAME, vf.createLiteral("Albert Einstein"));
+            //assertObjects(rc, context.iriOf(einstein), FOAF.INTEREST, context.iriOf(physics));
             assertObjects(rc, context.iriOf(einstein), FOAF.KNOWS, known);
 
-            assertObjects(rc, context.iriOf(einstein), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Albert_Einstein"));
-            assertObjects(rc, context.iriOf(elsa), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Elsa_Einstein"));
-            assertObjects(rc, context.iriOf(eduard), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Eduard_Einstein"));
+            assertObjects(rc, context.iriOf(einstein), OWL.SAMEAS, vf.createIRI("http://dbpedia.org/resource/Albert_Einstein"));
+            assertObjects(rc, context.iriOf(elsa), OWL.SAMEAS, vf.createIRI("http://dbpedia.org/resource/Elsa_Einstein"));
+            assertObjects(rc, context.iriOf(eduard), OWL.SAMEAS, vf.createIRI("http://dbpedia.org/resource/Eduard_Einstein"));
 
             assertObjects(rc, context.iriOf(specialRelPaper), RDF.TYPE, FOAF.DOCUMENT);
             assertObjects(rc, context.iriOf(specialRelPaper), FOAF.MAKER, context.iriOf(einstein));
@@ -480,8 +481,8 @@ public class KnowledgeBaseTest {
                     context.iriOf(simultaneity),
                     context.iriOf(relativity));
             assertObjects(rc, context.iriOf(speedOfLight), RDF.TYPE, OWL.THING);
-            assertObjects(rc, context.iriOf(speedOfLight), OWL.SAMEAS, new URIImpl("http://dbpedia.org/resource/Speed_of_light"));
-            assertObjects(rc, context.iriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, new LiteralImpl("@article{bibtexEntryHere}"));
+            assertObjects(rc, context.iriOf(speedOfLight), OWL.SAMEAS, vf.createIRI("http://dbpedia.org/resource/Speed_of_light"));
+            assertObjects(rc, context.iriOf(specialRelPaper), DCTERMS.BIBLIOGRAPHIC_CITATION, vf.createLiteral("@article{bibtexEntryHere}"));
 
             // TODO: support for connection between person and quotation
             assertObjects(rc, context.iriOf(quote), RDF.TYPE, SmSnVocabulary.WORDORPHRASE);
@@ -489,16 +490,14 @@ public class KnowledgeBaseTest {
             // note: in the future, this should be a project/tool rather than an organization
             assertObjects(rc, context.iriOf(googleGlass), RDF.TYPE, FOAF.ORGANIZATION);
             // TODO
-            //assertObjects(rc, context.uriOf(googleGlass), DCTERMS.CONTRIBUTOR,
-            //        context.uriOf(einstein),
-            //        context.uriOf(sebastian));
+            //assertObjects(rc, context.iriOf(googleGlass), DCTERMS.CONTRIBUTOR,
+            //        context.iriOf(einstein),
+            //        context.iriOf(sebastian));
             // TODO: support for related things
 
             assertObjects(rc, context.iriOf(h2g2), RDF.TYPE, FOAF.DOCUMENT);
             // TODO
-            //assertObjects(rc, context.uriOf(h2g2), DBpediaOntology.owner, context.uriOf(einstein));
-        } finally {
-            rc.close();
+            //assertObjects(rc, context.iriOf(h2g2), DBpediaOntology.owner, context.iriOf(einstein));
         }
     }
 
@@ -512,7 +511,7 @@ public class KnowledgeBaseTest {
 
     private void assertObjects(final RepositoryConnection rc,
                                final Resource subject,
-                               final URI predicate,
+                               final IRI predicate,
                                final Value... objects) throws RepositoryException {
         RepositoryResult<Statement> rr = rc.getStatements(subject, predicate, null, false);
         assertSubjectsOrObjects(rr, true, objects);

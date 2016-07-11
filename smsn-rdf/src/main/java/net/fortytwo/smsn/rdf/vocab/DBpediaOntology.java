@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * A selection of terms from the DBpedia Ontology
@@ -12,6 +12,6 @@ public class DBpediaOntology {
     public static final String NAMESPACE = "http://dbpedia.org/ontology/";
 
     // properties
-    public static final URI
-            owner = new URIImpl(NAMESPACE + "owner");
+    public static final IRI
+            owner = RDFAgents.createIRI(NAMESPACE + "owner");
 }

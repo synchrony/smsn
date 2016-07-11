@@ -51,7 +51,7 @@ public class GetAtomShortcutMapping extends AtomMapping {
             String value = n.getShortcut();
             if (null != value) {
                 // put both the @shortcut property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+                solutions.accept(stack.push(n).push(value));
             }
         }
     }

@@ -11,13 +11,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Statement;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.query.BindingSet;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +40,7 @@ public class QueryEngineWrapper {
     public QueryEngineWrapper(final SparqlStreamProcessor processor) {
         this.processor = processor;
 
-        jsonrdfFormat = new SimpleJSONRDFFormat(new ValueFactoryImpl());
+        jsonrdfFormat = new SimpleJSONRDFFormat(SimpleValueFactory.getInstance());
 
         connectionsByQueryId = new HashMap<>();
 
@@ -58,11 +57,7 @@ public class QueryEngineWrapper {
             }
         };
 
-        notifier = new ConnectionHost.Notifier() {
-            public void connectionCreated(final Connection c) {
-                QueryEngineWrapper.this.newConnection(c);
-            }
-        };
+        notifier = QueryEngineWrapper.this::newConnection;
     }
 
     public ConnectionHost.Notifier getNotifier() {
@@ -70,20 +65,18 @@ public class QueryEngineWrapper {
     }
 
     private void newConnection(final Connection c) {
-        c.registerHandler(ProxySparqlStreamProcessor.TAG_SPARQL_QUERY, new MessageHandler() {
-            public void handle(final JSONObject message) {
-                if (SemanticSynchrony.VERBOSE) {
-                    logger.info("received query message from "
-                            + c.getSocket().getRemoteSocketAddress() + ": " + message);
-                }
+        c.registerHandler(ProxySparqlStreamProcessor.TAG_SPARQL_QUERY, message -> {
+            if (SemanticSynchrony.VERBOSE) {
+                logger.info("received query message from "
+                        + c.getSocket().getRemoteSocketAddress() + ": " + message);
+            }
 
-                try {
-                    handleQueryMessage(c, message);
-                } catch (StreamProcessor.InvalidQueryException
-                        | IOException | StreamProcessor.IncompatibleQueryException e) {
-                    // TODO: propagate the StreamProcessor's exception back to the proxy
-                    logger.log(Level.WARNING, "error raised by query engine", e);
-                }
+            try {
+                handleQueryMessage(c, message);
+            } catch (StreamProcessor.InvalidQueryException
+                    | IOException | StreamProcessor.IncompatibleQueryException e) {
+                // TODO: propagate the StreamProcessor's exception back to the proxy
+                logger.log(Level.WARNING, "error raised by query engine", e);
             }
         });
 
@@ -119,17 +112,14 @@ public class QueryEngineWrapper {
         connectionsByQueryId.put(queryId, c);
 
         // note: subscription is currently discarded; we never cancel query subscriptions
-        Subscription s = processor.addQuery(ttl, query, new BiConsumer<BindingSet, Long>() {
-            @Override
-            public void accept(final BindingSet solution, Long expirationTime) {
-                try {
-                    JSONObject bindings = jsonrdfFormat.toJSON(solution, expirationTime);
-                    sendQueryResultMessage(c, queryId, bindings, expirationTime);
-                } catch (JSONException e) {
-                    logger.log(Level.SEVERE, "error in creating query result JSON message", e);
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "failed to send query result due to I/O error",  e);
-                }
+        processor.addQuery(ttl, query, (solution, expirationTime) -> {
+            try {
+                JSONObject bindings = jsonrdfFormat.toJSON((BindingSet) solution, (Long) expirationTime);
+                sendQueryResultMessage(c, queryId, bindings, (Long) expirationTime);
+            } catch (JSONException e) {
+                logger.log(Level.SEVERE, "error in creating query result JSON message", e);
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "failed to send query result due to I/O error",  e);
             }
         });
     }

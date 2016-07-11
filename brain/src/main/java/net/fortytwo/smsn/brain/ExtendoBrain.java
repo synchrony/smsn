@@ -44,9 +44,7 @@ public class ExtendoBrain {
 
         try {
             knowledgeBase.addDefaultClasses();
-        } catch (InstantiationException e) {
-            throw new ExtendoBrainException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new ExtendoBrainException(e);
         }
 

@@ -1,22 +1,22 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.io.RipplePrintStream;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.StackMapping;
 import net.fortytwo.ripple.model.types.SimpleType;
+import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.Note;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteType extends SimpleType<Note> {
 
-    private static final ValueFactory valueFactory = new ValueFactoryImpl();
+    private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     public NoteType() {
         super(Note.class);

@@ -4,14 +4,14 @@ import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.events.AirTemperatureObservation;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ThermometerListener extends GaussianSensorListener {
     public ThermometerListener(final Context context,
-                               final URI sensor) {
+                               final IRI sensor) {
         super(context, sensor);
     }
 

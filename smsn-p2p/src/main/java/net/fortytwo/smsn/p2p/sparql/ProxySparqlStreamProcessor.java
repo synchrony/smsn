@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.query.BindingSet;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, Proxy
     public ProxySparqlStreamProcessor(final Connection connection) {
         this.connection = connection;
 
-        jsonrdfFormat = new SimpleJSONRDFFormat(new ValueFactoryImpl());
+        jsonrdfFormat = new SimpleJSONRDFFormat(SimpleValueFactory.getInstance());
 
         queriesById = new HashMap<>();
         handlers = new HashMap<>();
@@ -80,9 +80,7 @@ public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, Proxy
 
     @Override
     protected BasicSubscription<String, Query, BindingSet> createSubscription(final int ttl,
-            final String sparqlQuery, BiConsumer<BindingSet, Long> consumer)
-            throws IOException {
-
+            final String sparqlQuery, BiConsumer<BindingSet, Long> consumer) {
 
         Query query = new Query();
         query.queryStr = sparqlQuery;
@@ -93,7 +91,11 @@ public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, Proxy
         queriesById.put(sub.getId(), query);
 
         if (connection.isActive()) {
-            sendSubscriptionMessage(sparqlQuery, sub.getId(), ttl);
+            try {
+                sendSubscriptionMessage(sparqlQuery, sub.getId(), ttl);
+            } catch (IOException e) {
+                throw new IllegalStateException("failed to create subscription", e);
+            }
         }
 
         handlers.put(sub.getId(), consumer);
@@ -107,7 +109,7 @@ public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, Proxy
     }
 
     @Override
-    public void unregister(BasicSubscription<String, Query, BindingSet> subscription) throws IOException {
+    public void unregister(BasicSubscription<String, Query, BindingSet> subscription) {
         // TODO
         throw new UnsupportedOperationException("not yet possible to cancel subscriptions through the proxy");
     }
@@ -118,7 +120,7 @@ public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, Proxy
     }
 
     @Override
-    public boolean renew(BasicSubscription<String, Query, BindingSet> subscription, int i) throws IOException {
+    public boolean renew(BasicSubscription<String, Query, BindingSet> subscription, int i) {
         // TODO
         throw new UnsupportedOperationException("not yet possible to renew subscriptions through the proxy");
     }

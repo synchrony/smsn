@@ -110,7 +110,7 @@ public class TypeatronControl extends SmSnDeviceControl {
         }
 
         try {
-            rippleSession = new RippleSession(agent, environment);
+            rippleSession = new RippleSession();
 
             SmSnRippleRepl.REPLEventHandler eventHandler = new SmSnRippleRepl.REPLEventHandler() {
                 @Override
@@ -123,7 +123,7 @@ public class TypeatronControl extends SmSnDeviceControl {
                     sendOkMessage();
                 }
             };
-            rippleREPL = new SmSnRippleRepl(rippleSession, this, agent, environment, eventHandler);
+            rippleREPL = new SmSnRippleRepl(rippleSession, this, environment, eventHandler);
         } catch (RippleException e) {
             throw new DeviceInitializationException(e);
         }
@@ -307,27 +307,24 @@ public class TypeatronControl extends SmSnDeviceControl {
             source = new PipedOutputStream();
 
             PipedInputStream sink = new PipedInputStream(source);
-            BrainModeClient.ResultHandler resultHandler = new BrainModeClient.ResultHandler() {
-                @Override
-                public void handle(InputStream result) {
-                    String s0;
+            BrainModeClient.ResultHandler resultHandler = result -> {
+                String s0;
+                try {
+                    s0 = new String(IOUtil.readBytes(result)).trim();
+                } catch (IOException e) {
+                    logger.log(Level.SEVERE, "error reading Brain-mode response", e);
+                    sendErrorMessage();
+                    return;
+                }
+                if (!s0.equals("nil")) {
+                    // TODO: some future return values may need to be properly dequoted
+                    String s1 = s0.substring(1, s0.length() - 1);
                     try {
-                        s0 = new String(IOUtil.readBytes(result)).trim();
-                    } catch (IOException e) {
-                        logger.log(Level.SEVERE, "error reading Brain-mode response", e);
-                        sendErrorMessage();
-                        return;
-                    }
-                    if (!s0.equals("nil")) {
-                        // TODO: some future return values may need to be properly dequoted
-                        String s1 = s0.substring(1, s0.length() - 1);
-                        try {
-                            rippleSession.push(s1);
-                            sendOkMessage();
-                        } catch (RippleException e) {
-                            logger.log(Level.WARNING, "failed to push Brain-mode response", e);
-                            sendWarningMessage();
-                        }
+                        rippleSession.push(s1);
+                        sendOkMessage();
+                    } catch (RippleException e) {
+                        logger.log(Level.WARNING, "failed to push Brain-mode response", e);
+                        sendWarningMessage();
                     }
                 }
             };
@@ -335,32 +332,30 @@ public class TypeatronControl extends SmSnDeviceControl {
             final BrainModeClient client = new BrainModeClient(sink, resultHandler);
             client.setExecutable(EMACSCLIENT_BIN);
 
-            new Thread(new Runnable() {
-                public void run() {
-                    isAlive = true;
+            new Thread(() -> {
+                isAlive = true;
 
-                    while (isAlive) {
-                        try {
-                            client.run();
-                            isAlive = false;
-                            sendWarningMessage();
-                        } catch (BrainModeClient.ExecutionException e) {
-                            logger.log(Level.WARNING,
-                                    "Brain-mode client error: " + e.getMessage());
-                            sendErrorMessage();
-                        } catch (BrainModeClient.UnknownCommandException e) {
-                            logger.log(Level.FINE,
-                                    "unknown command: " + e.getMessage());
-                            sendWarningMessage();
-                        } catch (BrainModeClient.ParseError e) {
-                            // attempt to recover from parse errors
-                            sendErrorMessage();
-                            logger.log(Level.SEVERE, "Brain-mode client parse error: ", e.getMessage());
-                        } catch (Throwable t) {
-                            isAlive = false;
-                            logger.log(Level.SEVERE, "Brain-mode client thread died with error", t);
-                            sendErrorMessage();
-                        }
+                while (isAlive) {
+                    try {
+                        client.run();
+                        isAlive = false;
+                        sendWarningMessage();
+                    } catch (BrainModeClient.ExecutionException e) {
+                        logger.log(Level.WARNING,
+                                "Brain-mode client error: " + e.getMessage());
+                        sendErrorMessage();
+                    } catch (BrainModeClient.UnknownCommandException e) {
+                        logger.log(Level.FINE,
+                                "unknown command: " + e.getMessage());
+                        sendWarningMessage();
+                    } catch (BrainModeClient.ParseError e) {
+                        // attempt to recover from parse errors
+                        sendErrorMessage();
+                        logger.log(Level.SEVERE, "Brain-mode client parse error: ", e.getMessage());
+                    } catch (Throwable t) {
+                        isAlive = false;
+                        logger.log(Level.SEVERE, "Brain-mode client thread died with error", t);
+                        sendErrorMessage();
                     }
                 }
             }).start();

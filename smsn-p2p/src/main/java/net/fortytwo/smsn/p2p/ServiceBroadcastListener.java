@@ -28,19 +28,17 @@ public class ServiceBroadcastListener {
     public void start() {
         stopped = false;
 
-        new Thread(new Runnable() {
-            public void run() {
-                logger.info("starting listener thread for coordinator broadcast messages");
+        new Thread(() -> {
+            logger.info("starting listener thread for coordinator broadcast messages");
 
-                try {
-                    listenForCoordinatorBroadcast();
-                } catch (Throwable t) {
-                    logger.severe("listener thread for coordinator broadcast messages failed with error: "
-                            + t.getMessage());
-                    t.printStackTrace(System.err);
-                } finally {
-                    logger.info("listener thread for coordinator broadcast messages stopped");
-                }
+            try {
+                listenForCoordinatorBroadcast();
+            } catch (Throwable t) {
+                logger.severe("listener thread for coordinator broadcast messages failed with error: "
+                        + t.getMessage());
+                t.printStackTrace(System.err);
+            } finally {
+                logger.info("listener thread for coordinator broadcast messages stopped");
             }
         }).start();
     }

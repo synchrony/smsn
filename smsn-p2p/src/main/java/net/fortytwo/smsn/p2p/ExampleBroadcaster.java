@@ -1,11 +1,14 @@
 package net.fortytwo.smsn.p2p;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
@@ -27,7 +30,7 @@ public class ExampleBroadcaster {
         String content;
 
         if (false) {
-            ValueFactory vf = new ValueFactoryImpl();
+            ValueFactory vf = SimpleValueFactory.getInstance();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             RDFWriter w = Rio.createWriter(RDFFormat.NTRIPLES, bos);
             w.startRDF();
@@ -43,18 +46,16 @@ public class ExampleBroadcaster {
                     "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://fortytwo.net/2013/smsn/gesture#recognizedAt> <urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> .\n";
         }
 
-        HttpClient client = new HttpClient();
+        HttpClient client = new DefaultHttpClient();
 
-        PostMethod method = new PostMethod(endpoint);
-
-        //method.addRequestHeader("Content-Type", "application/json");
+        HttpPost method = new HttpPost(endpoint);
 
         JSONObject r = new JSONObject();
         r.put("dataset", content);
 
-        method.addParameter("request", r.toString());
-        client.executeMethod(method);
-        String responseBody = method.getResponseBodyAsString();
+        method.getParams().setParameter("request", r.toString());
+        HttpResponse response = client.execute(method);
+        String responseBody = IOUtils.toString(response.getEntity().getContent());
         System.out.println("response body: " + responseBody);
         method.releaseConnection();
     }

@@ -4,13 +4,10 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
-import net.fortytwo.smsn.rdf.vocab.Timeline;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFHandler;
@@ -44,11 +41,11 @@ public class DatedEvent extends AtomClass {
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, net.fortytwo.smsn.rdf.vocab.Event.Event);
+        IRI self = handleTypeAndAlias(a, vf, handler, net.fortytwo.smsn.rdf.vocab.Event.Event);
 
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
 
@@ -74,7 +71,7 @@ public class DatedEvent extends AtomClass {
 
             Literal dateValue = vf.createLiteral(dateStr, XMLSchema.DATE);
 
-            h.handleStatement(vf.createStatement(context.getSubjectUri(), DCTERMS.DATE, dateValue));
+            h.handleStatement(vf.createStatement(context.getSubjectIri(), DCTERMS.DATE, dateValue));
 
             /* Alternative, using the Event Ontology (DO NOT DELETE):
 
@@ -83,10 +80,10 @@ public class DatedEvent extends AtomClass {
             h.handleStatement(vf.createStatement(interval, Timeline.at, dateValue));
 
             h.handleStatement(vf.createStatement(
-                    context.getSubjectUri(), net.fortytwo.smsn.rdf.vocab.Event.time, interval));
+                    context.getSubjectIri(), net.fortytwo.smsn.rdf.vocab.Event.time, interval));
             */
 
-            // note: a third possibility is to give Dates individual URIs
+            // note: a third possibility is to give Dates individual IRI
         }
     }
 }

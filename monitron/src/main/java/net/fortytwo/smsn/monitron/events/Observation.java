@@ -1,13 +1,13 @@
 package net.fortytwo.smsn.monitron.events;
 
+import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.Data;
 import net.fortytwo.smsn.monitron.ontologies.OMOntology;
 import net.fortytwo.smsn.monitron.ontologies.OWLTime;
 import net.fortytwo.smsn.monitron.ontologies.Universe;
-import net.fortytwo.rdfagents.model.Dataset;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
 
 import java.util.Date;
@@ -18,21 +18,21 @@ import java.util.Date;
 public abstract class Observation extends MonitronEvent {
 
     protected final Data data;
-    protected final URI sensor;
-    protected final URI event;
+    protected final IRI sensor;
+    protected final IRI event;
     protected final Resource result;
 
     public Observation(final Context context,
-                       final URI sensor,
+                       final IRI sensor,
                        final Data data) {
         super(context);
         this.sensor = sensor;
-        event = coinEventURI();
+        event = coinEventIRI();
         this.data = data;
         result = valueFactory.createBNode();
     }
 
-    public URI getSensor() {
+    public IRI getSensor() {
         return sensor;
     }
 

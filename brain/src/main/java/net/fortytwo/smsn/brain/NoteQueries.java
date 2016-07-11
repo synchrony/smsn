@@ -158,14 +158,9 @@ public class NoteQueries {
         brain.getBrainGraph().updated();
     }
 
-    private final Comparator<Note> noteComparator = new Comparator<Note>() {
-        public int compare(final Note a,
-                           final Note b) {
-            return null == a.getId()
-                    ? (null == b.getId() ? 0 : -1)
-                    : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
-        }
-    };
+    private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
+            ? (null == b.getId() ? 0 : -1)
+            : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
 
     private boolean hasChildren(final Atom root,
                                 final Filter filter,

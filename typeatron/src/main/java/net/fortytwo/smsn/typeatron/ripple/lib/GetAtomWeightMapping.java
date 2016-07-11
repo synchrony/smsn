@@ -51,7 +51,7 @@ public class GetAtomWeightMapping extends AtomMapping {
             Float value = n.getWeight();
             if (null != value) {
                 // put both the @weight property and the (synced) atom back on the stack
-                solutions.put(stack.push(n).push(value));
+                solutions.accept(stack.push(n).push(value));
             }
         }
     }

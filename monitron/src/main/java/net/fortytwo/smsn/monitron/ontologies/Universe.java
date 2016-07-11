@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.monitron.ontologies;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import net.fortytwo.rdfagents.RDFAgents;
+import org.openrdf.model.IRI;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -11,28 +11,28 @@ public interface Universe {
     public static final String NAMESPACE = "http://fortytwo.net/2012/08/universe#";
 
     // environment
-    public static final URI
-            BUILDING_1 = new URIImpl(NAMESPACE + "winslowBuilding"),
-            APARTMENT_1 = new URIImpl(NAMESPACE + "apartment_1"),
-            ROOM_1 = new URIImpl(NAMESPACE + "room_1");
+    public static final IRI
+            BUILDING_1 = RDFAgents.createIRI(NAMESPACE + "winslowBuilding"),
+            APARTMENT_1 = RDFAgents.createIRI(NAMESPACE + "apartment_1"),
+            ROOM_1 = RDFAgents.createIRI(NAMESPACE + "room_1");
 
     // agents
-    public static final URI
-            MONITRON_1 = new URIImpl(NAMESPACE + "monitron_1"),
-            EDDIE_4 = new URIImpl(NAMESPACE + "eddie_4");
+    public static final IRI
+            MONITRON_1 = RDFAgents.createIRI(NAMESPACE + "monitron_1"),
+            EDDIE_4 = RDFAgents.createIRI(NAMESPACE + "eddie_4");
 
     // sensors
-    public static final URI
-            BOSCH_BMP085_1_BAROMETER = new URIImpl(NAMESPACE + "bosch-bmp085_1_barometer"),
-            AVAGO_ADJD_S311_CR999_1 = new URIImpl(NAMESPACE + "avago-adjd-s311-cr999_1"),
-            MAXDETECT_RHT03_1_HYGROMETER = new URIImpl(NAMESPACE + "maxdetect-rht03_1_hygrometer"),
-            GENERIC_PHOTORESISTOR_1 = new URIImpl(NAMESPACE + "generic-photoresistor_1"),
-            SHARP_GP2Y101AU0F_1 = new URIImpl(NAMESPACE + "sharp-gp2y1010au0f_1"),
-            HANSE_SE10_1 = new URIImpl(NAMESPACE + "hanse-se10_1"),
-            KNOWLES_MD9745APZ_F_1 = new URIImpl(NAMESPACE + "knowles-md9745apz-f_1"),
-            BOSCH_BMP085_1_THERMOMETER = new URIImpl(NAMESPACE + "bosch-bmp085_1_thermometer"),
-            MAXDETECT_RHT03_1_THERMOMETER = new URIImpl(NAMESPACE + "maxdetect-rht03_1_thermometer"),
-            MURATA_7BB_20_6L0_1 = new URIImpl(NAMESPACE + "murata-7bb-20-6l0_1");
+    public static final IRI
+            BOSCH_BMP085_1_BAROMETER = RDFAgents.createIRI(NAMESPACE + "bosch-bmp085_1_barometer"),
+            AVAGO_ADJD_S311_CR999_1 = RDFAgents.createIRI(NAMESPACE + "avago-adjd-s311-cr999_1"),
+            MAXDETECT_RHT03_1_HYGROMETER = RDFAgents.createIRI(NAMESPACE + "maxdetect-rht03_1_hygrometer"),
+            GENERIC_PHOTORESISTOR_1 = RDFAgents.createIRI(NAMESPACE + "generic-photoresistor_1"),
+            SHARP_GP2Y101AU0F_1 = RDFAgents.createIRI(NAMESPACE + "sharp-gp2y1010au0f_1"),
+            HANSE_SE10_1 = RDFAgents.createIRI(NAMESPACE + "hanse-se10_1"),
+            KNOWLES_MD9745APZ_F_1 = RDFAgents.createIRI(NAMESPACE + "knowles-md9745apz-f_1"),
+            BOSCH_BMP085_1_THERMOMETER = RDFAgents.createIRI(NAMESPACE + "bosch-bmp085_1_thermometer"),
+            MAXDETECT_RHT03_1_THERMOMETER = RDFAgents.createIRI(NAMESPACE + "maxdetect-rht03_1_thermometer"),
+            MURATA_7BB_20_6L0_1 = RDFAgents.createIRI(NAMESPACE + "murata-7bb-20-6l0_1");
 
     public static final String
             OM_SENSOR_7BB206L0_VIBRN = "/om/sensor/7bb206l0/vibr",

@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.OWL;
@@ -56,19 +56,19 @@ public class Tool extends AtomClass {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
-            URI objectURI = context.iriOf(object);
+            IRI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
                     // note: range of dcterms:contributor is dcterms:Agent, which is fairly broad
-                    context.getSubjectUri(), DCTERMS.CONTRIBUTOR, objectURI));
+                    context.getSubjectIri(), DCTERMS.CONTRIBUTOR, objectURI));
         }
     }
 
     @Override
-    public URI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        URI self = handleTypeAndAlias(a, vf, handler, OWL.THING);
+        IRI self = handleTypeAndAlias(a, vf, handler, OWL.THING);
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
 
         return self;

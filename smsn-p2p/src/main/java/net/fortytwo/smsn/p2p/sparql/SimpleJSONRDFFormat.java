@@ -4,10 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.BNode;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.Binding;
@@ -30,7 +30,7 @@ public class SimpleJSONRDFFormat {
             FIELD_LANG = "lang",
             FIELD_LITERAL = "literal",
             FIELD_TYPE = "type",
-            FIELD_URI = "uri",
+            FIELD_IRI = "iri",
             FIELD_VALUE = "value";
 
     private final ValueFactory valueFactory;
@@ -92,10 +92,10 @@ public class SimpleJSONRDFFormat {
             j.put(FIELD_VALUE, "_:" + ((BNode) v).getID());
 
             j.put(FIELD_TYPE, FIELD_BNODE);
-        } else if (v instanceof org.openrdf.model.URI) {
+        } else if (v instanceof IRI) {
             j.put(FIELD_VALUE, v.stringValue());
 
-            j.put(FIELD_TYPE, FIELD_URI);
+            j.put(FIELD_TYPE, FIELD_IRI);
         } else {
             throw new IllegalStateException("value is of unexpected type: " + v);
         }
@@ -117,14 +117,14 @@ public class SimpleJSONRDFFormat {
                 if (lang != null) {
                     object = valueFactory.createLiteral(value, lang);
                 } else if (datatype != null) {
-                    object = valueFactory.createLiteral(value, valueFactory.createURI(datatype));
+                    object = valueFactory.createLiteral(value, valueFactory.createIRI(datatype));
                 } else {
                     object = valueFactory.createLiteral(value);
                 }
             } else if (FIELD_BNODE.equals(type)) {
                 object = valueFactory.createBNode(value.substring(2));
-            } else if (FIELD_URI.equals(type)) {
-                object = valueFactory.createURI(value);
+            } else if (FIELD_IRI.equals(type)) {
+                object = valueFactory.createIRI(value);
             } else {
                 throw new ParseError("unexpected type: " + type);
             }
@@ -186,15 +186,15 @@ public class SimpleJSONRDFFormat {
                 throw new ParseError("subject of statement must be an RDF resource");
             }
 
-            if (!(predicate instanceof URI)) {
-                throw new ParseError("predicate of statement must be a URI");
+            if (!(predicate instanceof IRI)) {
+                throw new ParseError("predicate of statement must be a IRI");
             }
 
             if (null != context && !(context instanceof Resource)) {
                 throw new ParseError("graph context of statement must be an RDF resource");
             }
 
-            return valueFactory.createStatement((Resource) subject, (URI) predicate, object, (Resource) context);
+            return valueFactory.createStatement((Resource) subject, (IRI) predicate, object, (Resource) context);
         } catch (JSONException e) {
             throw new ParseError(e);
         }
