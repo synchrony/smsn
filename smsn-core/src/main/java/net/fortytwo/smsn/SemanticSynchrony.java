@@ -180,8 +180,11 @@ public class SemanticSynchrony {
 
     /**
      * Unicode-escapes strings for ease of consumption by external tools such as R.
-     * Characters in high (>= 0x7F) and low (< 0x20) ranges are escaped.
+     * Characters in high (greater than 0x7F) and low (less than 0x20) ranges are escaped.
      * Note that these ranges include newline, tab, and delete characters.
+     *
+     * @param s the string to escape
+     * @return the escaped string
      */
     public static String unicodeEscape(final String s) {
         StringBuilder sb = new StringBuilder();

@@ -65,12 +65,12 @@
     <modules>
         <module>smsn-core</module>
         <module>brain</module>
-        <module>smsn-devices</module>
-        <module>hand</module>
         <module>smsn-p2p</module>
         <module>smsn-rdf</module>
-        <module>monitron</module>
         <module>smsn-server</module>
+        <module>smsn-devices</module>
+        <module>monitron</module>
+        <module>hand</module>
         <module>typeatron</module>
     </modules>
 
@@ -389,7 +389,7 @@
                                 <rules>
                                     <DependencyConvergence/>
                                     <requireJavaVersion>
-                                        <version>[1.6,1.8]</version>
+                                        <version>[1.6,)</version>
                                     </requireJavaVersion>
                                 </rules>
                             </configuration>

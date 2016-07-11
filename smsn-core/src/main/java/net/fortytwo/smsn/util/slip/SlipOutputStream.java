@@ -79,7 +79,7 @@ public class SlipOutputStream {
     /**
      * Constructs a new non-threaded SlipOutputStream
      *
-     * @param outputStream
+     * @param outputStream the wrapped, transport-level stream
      */
     public SlipOutputStream(final OutputStream outputStream) {
         this(outputStream, false);
