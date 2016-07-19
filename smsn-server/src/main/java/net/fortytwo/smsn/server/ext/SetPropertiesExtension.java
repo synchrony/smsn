@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -15,6 +15,8 @@ import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.Request;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 

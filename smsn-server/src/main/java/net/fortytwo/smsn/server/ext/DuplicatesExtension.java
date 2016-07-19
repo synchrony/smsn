@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
@@ -15,6 +15,8 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Graph;

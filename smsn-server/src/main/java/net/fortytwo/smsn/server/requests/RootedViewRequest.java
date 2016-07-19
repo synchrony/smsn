@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.requests;
 
 import net.fortytwo.smsn.brain.Params;
 import org.json.JSONException;

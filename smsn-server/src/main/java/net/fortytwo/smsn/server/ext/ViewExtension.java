@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -12,48 +12,58 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.requests.RootedViewRequest;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.security.Principal;
 
 /**
- * A service for executing Ripple queries over Extend-o-Brain graphs
+ * A service for retrieving hierarchical views of Extend-o-Brain graphs
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "ripple")
-//@ExtensionDescriptor(description = "execute a Ripple query over an Extend-o-Brain graph")
-public class RippleExtension extends SmSnExtension {
+@ExtensionNaming(namespace = "smsn", name = "view")
+//@ExtensionDescriptor(description = "retrieve a hierarchical view of an Extend-o-Brain graph")
+public class ViewExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing Ripple queries over Extend-o-Brain graphs")
+    @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph" +
+            " in the wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = "request",
+                                           @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
+
         RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-        BasicSearchRequest r;
+        ViewRequest r;
+
         try {
-            r = new BasicSearchRequest(new JSONObject(request), p.user);
+            r = new ViewRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
         p.height = r.getHeight();
-        p.query = r.getQuery();
+        p.rootId = r.getRootId();
         p.styleName = r.getStyleName();
         p.filter = r.getFilter();
+        p.includeTypes = r.isIncludeTypes();
 
-        SemanticSynchrony.logInfo("SmSn Ripple: \"" + r.getQuery() + "\"");
+        SemanticSynchrony.logInfo("SmSn view " + r.getRootId());
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        addSearchResults(p);
 
-        p.map.put("title", p.query);
+        Note n = p.queries.view(p.root, p.height, p.filter, p.style);
+        addView(n, p);
+
+        addToHistory(p.rootId, p.context);
+
         return ExtensionResponse.ok(p.map);
     }
 
@@ -65,17 +75,20 @@ public class RippleExtension extends SmSnExtension {
         return false;
     }
 
-    protected void addSearchResults(final RequestParams p) throws IOException {
-        // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
-        Note n = new Note();
-        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
-        JSONObject json;
+    private class ViewRequest extends RootedViewRequest {
 
-        try {
-            json = p.writer.toJSON(n);
-        } catch (JSONException e) {
-            throw new IOException(e);
+        private final boolean includeTypes;
+
+        public ViewRequest(final JSONObject json,
+                           final Principal user) throws JSONException {
+            super(json, user);
+
+            // this argument is optional; do not include types by default
+            includeTypes = json.optBoolean(Params.INCLUDE_TYPES, false);
         }
-        p.map.put("view", json.toString());
+
+        public boolean isIncludeTypes() {
+            return includeTypes;
+        }
     }
 }

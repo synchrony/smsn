@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -13,45 +13,48 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A service for finding root nodes of an Extend-o-Brain graph
+ * A service for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "find-roots")
-//@ExtensionDescriptor(description = "find root nodes of an Extend-o-Brain graph")
-public class FindRootsExtension extends SmSnExtension {
+@ExtensionNaming(namespace = "smsn", name = "find-isolated-atoms")
+public class FindIsolatedAtomsExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for for finding isolated atoms" +
+            " (i.e. atoms with no parents or children) in an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
         RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-        BasicViewRequest r;
+
+        FilteredResultsRequest r;
         try {
-            r = new BasicViewRequest(new JSONObject(request), p.user);
+            r = new FilteredResultsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.height = r.getHeight();
-        p.styleName = r.getStyleName();
         p.filter = r.getFilter();
 
-        SemanticSynchrony.logInfo("SmSn find-roots");
+        SemanticSynchrony.logInfo("SmSn find-isolated-atoms");
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        Note n = p.queries.findRoots(p.filter, p.style, p.height - 1);
+        Note n = p.queries.findIsolatedAtoms(p.filter);
         addView(n, p);
 
-        p.map.put("title", "all roots");
+        p.map.put("title", "isolated atoms");
+
         return ExtensionResponse.ok(p.map);
     }
 

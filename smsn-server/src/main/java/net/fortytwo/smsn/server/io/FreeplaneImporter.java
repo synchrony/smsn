@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,10 +44,17 @@ public class FreeplaneImporter extends Importer {
             ATTR_LOCALIZED_STYLE_REF = "LOCALIZED_STYLE_REF",
             ATTR_TEXT = "TEXT";
 
+    public static final String FORMAT = "Freeplane";
+
+    @Override
+    public List<String> getFormats() {
+        return Arrays.asList(FORMAT);
+    }
+
     private Map<BrainGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
 
     @Override
-    protected void importInternal(BrainGraph destGraph, InputStream sourceStream) throws IOException {
+    protected void importInternal(ExtendoBrain destBrain, InputStream sourceStream) throws IOException {
         Document doc;
         try {
             doc = parseStreamToDocument(sourceStream);
@@ -54,7 +62,7 @@ public class FreeplaneImporter extends Importer {
             throw new IOException(e);
         }
 
-        getParserInstanceFor(destGraph).parseDOMToGraph(doc);
+        getParserInstanceFor(destBrain.getBrainGraph()).parseDOMToGraph(doc);
     }
 
     private ParserInstance getParserInstanceFor(final BrainGraph destGraph) {

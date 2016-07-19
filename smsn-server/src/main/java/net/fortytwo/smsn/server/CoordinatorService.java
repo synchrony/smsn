@@ -3,7 +3,6 @@ package net.fortytwo.smsn.server;
 import net.fortytwo.linkeddata.LinkedDataCache;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.ConnectionHost;
 import net.fortytwo.smsn.p2p.PingAnswerer;
 import net.fortytwo.smsn.p2p.ServiceBroadcaster;

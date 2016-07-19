@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -12,8 +12,9 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.server.io.FreeplaneImporter;
-import net.fortytwo.smsn.server.io.GraphMLImporter;
+import net.fortytwo.smsn.server.ImporterLoader;
+import net.fortytwo.smsn.server.Request;
+import net.fortytwo.smsn.server.SmSnExtension;
 import net.fortytwo.smsn.server.io.Importer;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,8 +103,13 @@ public class ImportExtension extends SmSnExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        Params.Format format = Params.Format.valueOf(p.format);
-        if (null == format) {
+        if (null == p.format) {
+            return ExtensionResponse.error("format is required");
+        }
+
+        Importer importer = getImporter(p.format);
+
+        if (null == importer) {
             return ExtensionResponse.error("no such format: " + p.format);
         }
 
@@ -113,27 +119,28 @@ public class ImportExtension extends SmSnExtension {
         }
 
         boolean success = false;
-        try (InputStream in = new FileInputStream(p.file)) {
-            Importer importer;
 
-            switch (format) {
-                case GraphML:
-                    importer = new GraphMLImporter();
-                    break;
-                case Freeplane:
-                    importer = new FreeplaneImporter();
-                    break;
-                default:
-                    throw new IllegalStateException("no importer for format " + format);
-            }
-
-            importer.doImport(p.brain.getBrainGraph(), in);
+        try (InputStream sourceStream = new FileInputStream(p.file)) {
+            importer.setDefaultNodeName(p.file);
+            importer.doImport(p.brain, sourceStream);
             success = true;
         } finally {
             finishImport(p.baseGraph, p.file, success);
         }
 
         return ExtensionResponse.ok(p.map);
+    }
+
+    private Importer getImporter(final String format) {
+        // get a fresh (w.r.t. state) importer
+        Map<String, Importer> importersByFormat = new ImporterLoader().loadAll();
+
+        Importer importer = importersByFormat.get(format);
+        if (null == importer) {
+            throw new IllegalArgumentException("no importer for format " + format);
+        }
+
+        return importer;
     }
 
     protected boolean doesRead() {

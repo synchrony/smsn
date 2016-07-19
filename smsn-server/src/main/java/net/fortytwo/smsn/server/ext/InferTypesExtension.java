@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -11,6 +11,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
+import net.fortytwo.smsn.server.SmSnExtension;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -12,59 +12,48 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.server.Request;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.SailException;
 
-import java.io.IOException;
 import java.security.Principal;
 
 /**
- * A service for broadcasting events modeled in RDF to all peers in the environment
+ * A service for receiving and internalizing events
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "broadcast-rdf")
-public class BroadcastRdfExtension extends SmSnExtension {
-
-    private final CoordinatorService coordinator;
-
-    public BroadcastRdfExtension()
-            throws IOException, TypedProperties.PropertyException,
-            SailException, InterruptedException {
-
-        coordinator = CoordinatorService.getInstance();
-    }
+@ExtensionNaming(namespace = "smsn", name = "push-event")
+public class PushEventExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "a service for broadcasting events in RDF to all peers in the environment")
+    @ExtensionDescriptor(description = "a service for receiving and internalizing events")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
         RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-        BroadcastRdfRequest r;
+        PushEventRequest r;
         try {
-            r = new BroadcastRdfRequest(new JSONObject(request), p.user);
+            r = new PushEventRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.data = r.dataset;
+        p.jsonView = r.jsonView;
 
-        SemanticSynchrony.logInfo("smsn broadcast-rdf");
+        SemanticSynchrony.logInfo("SmSn push-event");
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        // TODO: take RDF format as an input parameter
-        RDFFormat format = RDFFormat.NTRIPLES;
+        Note event = p.parser.fromJSON(p.jsonView);
 
-        coordinator.pushUpdate(p.data, format);
+        p.brain.getEventStack().push(event);
 
         return ExtensionResponse.ok(p.map);
     }
@@ -78,13 +67,13 @@ public class BroadcastRdfExtension extends SmSnExtension {
         return false;
     }
 
-    protected class BroadcastRdfRequest extends Request {
-        public final String dataset;
+    protected class PushEventRequest extends Request {
+        public final JSONObject jsonView;
 
-        public BroadcastRdfRequest(JSONObject json, Principal user) throws JSONException {
-            super(json, user);
+        public PushEventRequest(JSONObject jsonStr, Principal user) throws JSONException {
+            super(jsonStr, user);
 
-            dataset = this.json.getString(Params.DATASET);
+            jsonView = json.getJSONObject(Params.VIEW);
         }
     }
 }

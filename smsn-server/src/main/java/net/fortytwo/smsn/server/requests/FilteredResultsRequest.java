@@ -1,7 +1,9 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.requests;
 
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.Request;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 

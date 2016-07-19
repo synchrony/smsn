@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -11,56 +11,48 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Principal;
+import java.util.List;
 
 /**
- * A service for retrieving hierarchical views of Extend-o-Brain graphs
+ * A service for finding recently visited atoms
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "view")
-//@ExtensionDescriptor(description = "retrieve a hierarchical view of an Extend-o-Brain graph")
-public class ViewExtension extends SmSnExtension {
+@ExtensionNaming(namespace = "smsn", name = "history")
+//@ExtensionDescriptor(description = "find recently visited atoms")
+public class HistoryExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph" +
-            " in the wiki format")
+    @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-
         RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-        ViewRequest r;
-
+        FilteredResultsRequest r;
         try {
-            r = new ViewRequest(new JSONObject(request), p.user);
+            r = new FilteredResultsRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
-        p.height = r.getHeight();
-        p.rootId = r.getRootId();
-        p.styleName = r.getStyleName();
         p.filter = r.getFilter();
-        p.includeTypes = r.isIncludeTypes();
 
-        SemanticSynchrony.logInfo("SmSn view " + r.getRootId());
+        SemanticSynchrony.logInfo("SmSn history");
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
+        List<String> ids = getHistory(p.context, p.brain.getBrainGraph(), p.filter);
 
-        Note n = p.queries.view(p.root, p.height, p.filter, p.style);
-        addView(n, p);
-
-        addToHistory(p.rootId, p.context);
+        addView(p.queries.customView(ids, p.filter), p);
 
         return ExtensionResponse.ok(p.map);
     }
@@ -71,22 +63,5 @@ public class ViewExtension extends SmSnExtension {
 
     protected boolean doesWrite() {
         return false;
-    }
-
-    private class ViewRequest extends RootedViewRequest {
-
-        private final boolean includeTypes;
-
-        public ViewRequest(final JSONObject json,
-                           final Principal user) throws JSONException {
-            super(json, user);
-
-            // this argument is optional; do not include types by default
-            includeTypes = json.optBoolean(Params.INCLUDE_TYPES, false);
-        }
-
-        public boolean isIncludeTypes() {
-            return includeTypes;
-        }
     }
 }

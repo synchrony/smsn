@@ -5,25 +5,31 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.ExtendoBrain;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class Importer {
-    protected static final Logger logger = Logger.getLogger(GraphMLImporter.class.getName());
+    protected static final Logger logger = Logger.getLogger(Importer.class.getName());
 
-    protected abstract void importInternal(BrainGraph destGraph, final InputStream sourceStream) throws IOException;
+    protected abstract void importInternal(ExtendoBrain destBrain, final InputStream sourceStream) throws IOException;
 
     private String defaultNodeName;
 
-    public void doImport(final BrainGraph destGraph, final InputStream sourceStream) throws IOException {
+    public abstract List<String> getFormats();
+
+    public void doImport(final ExtendoBrain destBrain, final InputStream sourceStream) throws IOException {
         long before = System.currentTimeMillis();
 
-        importInternal(destGraph, sourceStream);
+        importInternal(destBrain, sourceStream);
+
+        BrainGraph destGraph = destBrain.getBrainGraph();
 
         // note: we assume the graph is small
         commit(destGraph);

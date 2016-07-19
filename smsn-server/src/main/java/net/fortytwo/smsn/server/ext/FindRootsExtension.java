@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.ext;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -11,45 +11,49 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.requests.BasicViewRequest;
+import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A service for removing isolated atoms (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph
- *
+ * A service for finding root nodes of an Extend-o-Brain graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "remove-isolated-atoms")
-public class RemoveIsolatedAtomsExtension extends SmSnExtension {
+@ExtensionNaming(namespace = "smsn", name = "find-roots")
+//@ExtensionDescriptor(description = "find root nodes of an Extend-o-Brain graph")
+public class FindRootsExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for for removing isolated atoms" +
-            " (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
-
         RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-
-        FilteredResultsRequest r;
+        BasicViewRequest r;
         try {
-            r = new FilteredResultsRequest(new JSONObject(request), p.user);
+            r = new BasicViewRequest(new JSONObject(request), p.user);
         } catch (JSONException e) {
             return ExtensionResponse.error(e.getMessage());
         }
 
+        p.height = r.getHeight();
+        p.styleName = r.getStyleName();
         p.filter = r.getFilter();
 
-        SemanticSynchrony.logInfo("SmSn remove-isolated-atoms");
+        SemanticSynchrony.logInfo("SmSn find-roots");
 
         return handleRequestInternal(p);
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        p.queries.removeIsolatedAtoms(p.filter);
+        Note n = p.queries.findRoots(p.filter, p.style, p.height - 1);
+        addView(n, p);
 
+        p.map.put("title", "all roots");
         return ExtensionResponse.ok(p.map);
     }
 
@@ -58,6 +62,6 @@ public class RemoveIsolatedAtomsExtension extends SmSnExtension {
     }
 
     protected boolean doesWrite() {
-        return true;
+        return false;
     }
 }
