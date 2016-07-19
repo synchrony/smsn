@@ -24,8 +24,10 @@ public class ExtendoBrain {
     // TODO: make this configurable
     private static final int EVENT_STACK_CAPACITY = 50;
 
-    // TODO: make this configurable
-    private static final long INFERENCE_INTERVAL = 1000L * 60;
+    // TODO: make these configurable
+    private static final long
+            INFERENCE_PERIOD = 1000L * 60,
+            INFERENCE_INITIAL_WAIT = 1000L * 30;
 
     private final BrainGraph brainGraph;
 
@@ -68,11 +70,14 @@ public class ExtendoBrain {
         }
 
         priorities = new Priorities();
-        priorities.refreshQueue(brainGraph);
 
         eventStack = new EventStack(EVENT_STACK_CAPACITY);
+    }
 
-        knowledgeBase.inferAutomatically(INFERENCE_INTERVAL);
+    public void startBackgroundTasks() {
+        priorities.refreshQueue(brainGraph);
+
+        knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);
     }
 
     public BrainGraph getBrainGraph() {

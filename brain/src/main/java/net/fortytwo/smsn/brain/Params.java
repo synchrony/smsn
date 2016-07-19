@@ -36,6 +36,6 @@ public interface Params {
             WIKI_FORMAT = "wiki";
 
     public enum Format {
-        Vertices, Edges, GraphML, LaTeX, PageRank, RDF, Web
+        Vertices, Edges, GraphML, Freeplane, LaTeX, PageRank, RDF, Web
     }
 }

@@ -184,88 +184,52 @@ public class NoteQueries {
         final Set<String> added = new HashSet<>();
         final Set<String> created = new HashSet<>();
 
-        final Atom root = null == rootNote.getId() ? null : brain.getBrainGraph().getAtom(rootNote.getId());
-        if (null != root) {
-            setProperties(root, rootNote);
+        final Atom rootAtom = null == rootNote.getId() ? null : brain.getBrainGraph().getAtom(rootNote.getId());
+        if (null != rootAtom) {
+            setProperties(rootAtom, rootNote);
 
-            if (0 >= height || !filter.isVisible(root.asVertex())) {
+            if (0 >= height || !filter.isVisible(rootAtom.asVertex())) {
                 return;
             }
 
             ListDiff.DiffEditor<Note> editor = new ListDiff.DiffEditor<Note>() {
+                @Override
                 public void add(final int position,
                                 final Note note) throws InvalidUpdateException {
                     if (!style.addOnUpdate()) {
                         return;
                     }
 
-                    // retrieve or create an atom for the note
-                    // atoms are only created if they appear under a parent which is also an atom
-                    Atom a = getAtom(note);
-                    if (null == a) {
-                        a = createAtom(note.getId(), filter);
-                        created.add((String) a.asVertex().getId());
-                    }
-                    added.add((String) a.asVertex().getId());
-                    if (null == note.getId()) {
-                        note.setId((String) a.asVertex().getId());
-                    }
+                    Atom atom = getAtom(note, filter, created);
 
-                    // create a list node for the atom and insert it
-                    AtomList l = brain.getBrainGraph().createAtomList();
-                    l.setFirst(a);
-                    if (0 == position) {
-                        l.setRest(root.getNotes());
-                        root.setNotes(l);
-                    } else {
-                        AtomList prev = root.getNotes();
-                        for (int i = 1; i < position; i++) {
-                            prev = prev.getRest();
-                        }
+                    brain.getBrainGraph().addChildAt(rootAtom, atom, position);
 
-                        l.setRest(prev.getRest());
-                        prev.setRest(l);
-                    }
+                    added.add((String) atom.asVertex().getId());
 
                     // log this activity
                     if (null != brain.getActivityLog()) {
-                        brain.getActivityLog().logLink(root, a);
+                        brain.getActivityLog().logLink(rootAtom, atom);
                     }
                 }
 
+                @Override
                 public void delete(final int position,
                                    final Note note) {
                     if (!style.deleteOnUpdate()) {
                         return;
                     }
 
-                    AtomList n = root.getNotes();
-
-                    // remove the atom's list node
-                    if (0 == position) {
-                        root.setNotes(n.getRest());
-
-                        brain.getBrainGraph().deleteListNode(n);
-                    } else {
-                        AtomList prev = n;
-                        for (int i = 1; i < position; i++) {
-                            prev = prev.getRest();
-                        }
-
-                        AtomList l = prev.getRest();
-                        prev.setRest(l.getRest());
-                        brain.getBrainGraph().deleteListNode(l);
-                    }
+                    brain.getBrainGraph().deleteChildAt(rootAtom, position);
 
                     // log this activity
                     if (null != brain.getActivityLog()) {
                         Atom a = brain.getBrainGraph().getAtom(note.getId());
-                        brain.getActivityLog().logUnlink(root, a);
+                        brain.getActivityLog().logUnlink(rootAtom, a);
                     }
                 }
             };
 
-            List<Note> before = viewInternal(root, 1, filter, style).getChildren();
+            List<Note> before = viewInternal(rootAtom, 1, filter, style).getChildren();
             List<Note> after = rootNote.getChildren();
             List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, noteComparator);
             ListDiff.applyDiff(before, after, lcs, noteComparator, editor);
@@ -289,9 +253,21 @@ public class NoteQueries {
         }
     }
 
-    private Atom getAtom(final Note n) {
-        String id = n.getId();
-        return null == id ? null : brain.getBrainGraph().getAtom(id);
+    private Atom getAtom(final Note note, final Filter filter, final Set<String> created) {
+        // retrieve or create an atom for the note
+        // atoms are only created if they appear under a parent which is also an atom
+        String id = note.getId();
+        Atom atom = null == id ? null : brain.getBrainGraph().getAtom(id);
+
+        if (null == atom) {
+            atom = createAtom(note.getId(), filter);
+            created.add((String) atom.asVertex().getId());
+        }
+        if (null == note.getId()) {
+            note.setId((String) atom.asVertex().getId());
+        }
+
+        return atom;
     }
 
     private Atom createAtom(final String id,

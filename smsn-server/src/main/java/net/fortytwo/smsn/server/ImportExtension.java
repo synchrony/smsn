@@ -2,9 +2,6 @@ package net.fortytwo.smsn.server;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.ExtensionDefinition;
 import com.tinkerpop.rexster.extension.ExtensionDescriptor;
@@ -14,13 +11,14 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.BrainGraph;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.server.io.FreeplaneImporter;
+import net.fortytwo.smsn.server.io.GraphMLImporter;
+import net.fortytwo.smsn.server.io.Importer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.HashMap;
@@ -103,29 +101,6 @@ public class ImportExtension extends SmSnExtension {
         }
     }
 
-    private void importGraphML(final BrainGraph bg,
-                               final InputStream in) throws IOException {
-        long before = System.currentTimeMillis();
-
-        TransactionalGraph g = (TransactionalGraph) bg.getPropertyGraph();
-        GraphMLReader r = new GraphMLReader(g);
-        r.inputGraph(in);
-
-        // note: we assume the graph is small
-        g.commit();
-
-        for (Vertex v : bg.getPropertyGraph().getVertices()) {
-            String value = v.getProperty(SemanticSynchrony.VALUE);
-            if (null != value) bg.indexForSearch(bg.getAtom(v), value);
-        }
-
-        // again, we assume the graph is small
-        g.commit();
-
-        long after = System.currentTimeMillis();
-        logger.info("imported subgraph in " + (after - before) + "ms");
-    }
-
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         Params.Format format = Params.Format.valueOf(p.format);
         if (null == format) {
@@ -139,17 +114,23 @@ public class ImportExtension extends SmSnExtension {
 
         boolean success = false;
         try (InputStream in = new FileInputStream(p.file)) {
+            Importer importer;
+
             switch (format) {
                 case GraphML:
-                    importGraphML(p.brain.getBrainGraph(), in);
+                    importer = new GraphMLImporter();
+                    break;
+                case Freeplane:
+                    importer = new FreeplaneImporter();
                     break;
                 default:
-                    throw new IllegalStateException();
+                    throw new IllegalStateException("no importer for format " + format);
             }
+
+            importer.doImport(p.brain.getBrainGraph(), in);
             success = true;
         } finally {
             finishImport(p.baseGraph, p.file, success);
-
         }
 
         return ExtensionResponse.ok(p.map);

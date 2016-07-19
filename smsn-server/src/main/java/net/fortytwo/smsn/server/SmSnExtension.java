@@ -57,6 +57,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
             logger.info("instantiating Extend-o-Brain with base graph " + baseGraph);
             BrainGraph bg = new BrainGraph(baseGraph);
             b = new ExtendoBrain(bg);
+            b.startBackgroundTasks();
             brains.put(baseGraph, b);
         }
 

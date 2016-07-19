@@ -27,6 +27,7 @@ import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
+import net.fortytwo.smsn.server.io.GraphMLExporter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
@@ -203,9 +204,7 @@ public class ExportExtension extends SmSnExtension {
     private void exportGraphML(final BrainGraph g,
                                final OutputStream out) throws IOException {
         ((TransactionalGraph) g.getPropertyGraph()).commit();
-        GraphMLWriter w = new GraphMLWriter(g.getPropertyGraph());
-        w.setNormalize(true);
-        w.outputGraph(out);
+        new GraphMLExporter().doExport(g, out);
     }
 
     private void exportRDF(final KnowledgeBase kb,

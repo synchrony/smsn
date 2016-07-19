@@ -174,9 +174,15 @@ public class KnowledgeBase {
     }
 
 
-    public void inferAutomatically(final long interval) {
+    public void inferAutomatically(final long initialWait, final long interval) {
         final int totalSteps = 4;
         new Thread(() -> {
+            try {
+                Thread.sleep(initialWait);
+            } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "interrupted", e);
+            }
+
             for (int i = 0; i < totalSteps; i++) {
                 try {
                     logger.info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);

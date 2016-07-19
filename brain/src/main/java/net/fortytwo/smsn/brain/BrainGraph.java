@@ -206,6 +206,44 @@ public class BrainGraph {
         graph.removeVertex(l.asVertex());
     }
 
+    public void addChildAt(final Atom parent, final Atom child, int position) {
+        // create a list node for the atom and insert it
+        AtomList list = createAtomList();
+        list.setFirst(child);
+        if (0 == position) {
+            list.setRest(parent.getNotes());
+            parent.setNotes(list);
+        } else {
+            AtomList prev = parent.getNotes();
+            for (int i = 1; i < position; i++) {
+                prev = prev.getRest();
+            }
+
+            list.setRest(prev.getRest());
+            prev.setRest(list);
+        }
+    }
+
+    public void deleteChildAt(Atom parent, int position) {
+        AtomList list = parent.getNotes();
+
+        // remove the atom's list node
+        if (0 == position) {
+            parent.setNotes(list.getRest());
+
+            deleteListNode(list);
+        } else {
+            AtomList prev = list;
+            for (int i = 1; i < position; i++) {
+                prev = prev.getRest();
+            }
+
+            AtomList l = prev.getRest();
+            prev.setRest(l.getRest());
+            deleteListNode(l);
+        }
+    }
+
     public Collection<Atom> getAtomsWithValue(final String value) {
         Collection<Atom> results = new LinkedList<>();
 
