@@ -92,8 +92,12 @@
     (set-future-sharability context)
     context))
 
+(defun get-value (key json)
+  (cdr (assoc key json)))
+
 (defun get-bufferlocal (context key)
-  (cdr (assoc key (get-context context))))
+  (let ((value (get-value key (get-context context))))
+    (if (equal NIL value) nil value)))
 
 (defun set-bufferlocal (context key value)
   (setcdr (assoc key (get-context context)) value))
@@ -156,7 +160,7 @@
   (cons 'default-weight brain-const-weight-default)
   (cons 'file NIL)
   (cons 'format NIL)
-  (cons 'height 3)
+  (cons 'height 2)
   (cons 'line 1)
   (cons 'max-sharability brain-const-sharability-universal)
   (cons 'max-weight brain-const-weight-all)
@@ -188,13 +192,13 @@
       (get-text-property (line-beginning-position) 'target-id))))
 
 (defun get-atom-id (atom)
-  (cdr (assoc 'id atom)))
+  (get-value 'id atom))
 
 (defun get-atom-created (atom)
-  (cdr (assoc 'created atom)))
+  (get-value 'created atom))
 
 (defun get-atom-value (atom)
-  (cdr (assoc 'value atom)))
+  (get-value 'value atom))
 
 (defun get-atom-priority (atom)
   (let ((v (assoc 'priority atom)))
@@ -254,15 +258,13 @@
 ;; The default will never be greater than 0.75 unless explicitly set by the user.
 (defun adjust-default-sharability (sharability)
   (if sharability
-      (if (<= s 0.75) sharability 0.75)
+      (if (<= sharability 0.75) sharability 0.75)
     0.5))
 
 (defun get-atom (id)
   (if id
       (let ((atoms (get-atoms-by-id)))
-        (if atoms
-          (gethash id (get-atoms-by-id))
-          nil))
+        (if atoms (gethash id atoms) nil))
     nil))
 
 (defun show-info (atom)
@@ -412,8 +414,8 @@
   (concat brain-rexster-url "/graphs/" brain-rexster-graph "/smsn/"))
 
 (defun show-http-response-status (status json)
-  (let ((msg (cdr (assoc 'message json)))
-        (error (cdr (assoc 'error json))))
+  (let ((msg (get-value 'message json))
+        (error (get-value 'error json)))
     (if error
         (error-message error)
       (error-message msg))))
@@ -440,20 +442,30 @@
         (editable (is-update-mode (get-mode context))))
     (if status
       (show-http-response-status status json)
-      (let ((view (cdr (assoc 'view json))))
-        (setq buffer-read-only nil)
-        (erase-buffer)
-        (receive-context json context)
-        (write-view editable (cdr (assoc 'children view)) 0)
-        (beginning-of-buffer)
-        (setq visible-cursor t)
-        ;; Try to move to the corresponding line in the previous view.
-        ;; This is not always possible and not always helpful, but it is often both.
-        (beginning-of-line (get-line))
-        (setq buffer-read-only (not editable))
-        ;; always include line numbers in views
-        (linum-mode t)
-        (info-message (concat "updated to view " (view-info)))))))
+      (let (
+        (view (get-value 'view json))
+        (root (get-value 'root json))
+        (height (numeric-value json 'height nil)))
+          (brain-switch-to-buffer (view-name root json))
+          (receive-context json context)
+          (set-root-id root)
+          (if (equal (get-mode) brain-const-search-mode)
+              ;; Always leave a search view with height 1, rather than that of the last view.
+              ;; The user experience is a little unpredictable otherwise.
+              (setq brain-current-height 1)
+              (if height (setq brain-current-height height)))
+          (erase-buffer)
+  ;;(error "got the view...")
+          (write-view editable (get-value 'children view) 0)
+          (beginning-of-buffer)
+          (setq visible-cursor t)
+          ;; Try to move to the corresponding line in the previous view.
+          ;; This is not always possible and not always helpful, but it is often both.
+          (beginning-of-line (get-line))
+          (setq buffer-read-only (not editable))
+          ;; always include line numbers in views
+          (linum-mode t)
+          (info-message (concat "updated to view " (view-info)))))))
 
 (defun receive-context (json context)
   (set-min-sharability (numeric-value json 'minSharability (get-min-sharability context)))
@@ -462,16 +474,16 @@
   (set-min-weight (numeric-value json 'minWeight (get-min-weight context)))
   (set-max-weight (numeric-value json 'maxWeight (get-max-weight)))
   (set-default-weight (numeric-value json 'defaultWeight (get-default-weight)))
-  (set-root-id (cdr (assoc 'root json)))
+  (set-root-id (get-value 'root json))
   (set-height
     ;; Always leave a search view with height 1, rather than that of the last view.
     ;; The user experience is a little unpredictable otherwise.
     (if (equal (get-mode) brain-const-search-mode)
       1
       (numeric-value json 'height (get-height context))))
-  (let ((style (cdr (assoc 'style json))))
+  (let ((style (get-value 'style json)))
     (if style (set-style style)))
-  (set-title (cdr (assoc 'title json)))
+  (set-title (get-value 'title json))
   (set-atoms-by-id (make-hash-table :test 'equal)))
 
 (defun receive-export-results (status)
@@ -493,7 +505,6 @@
     :format (get-format context)
     :query (get-query context)
     :queryType (get-query-type context)
-    :style (get-style)
     :valueCutoff (get-value-length-cutoff)
     ;;:maxResults 100
     :view (get-view)
@@ -509,9 +520,13 @@
   (concat
     (base-url)
     path
-    (w3m-url-encode-string
-      (json-encode params))))
-      
+    (if params
+      (entity-for-request params)
+      nil)))
+
+(defun entity-for-request (params)
+  (w3m-url-encode-string (json-encode params)))
+
 (defun url-for-view-request (&optional context)
   (url-for-request "view?request=" (to-query-list context)))
 
@@ -525,16 +540,17 @@
 
 (defun to-params (context params)
   (if params params
-    (to-query-lost (if context context (get-context)))))
+    (to-query-list (if context context (get-context)))))
     
 (defun fetch-path (path context params &optional handler)
   (http-get-and-receive (url-for-request path (to-params context params)) handler context))
 
-(defun fetch-path (path context params &optional handler)
-  (http-get-and-receive (url-for-request path (to-params context params)) handler context))
+(defun fetch-path-post (path context params &optional handler)
+  (http-post-and-receive (url-for-request path)
+    (entity-for-request (to-params context params)) handler context))
 
 (defun fetch-view (&optional context)
-  (http-get-and-receive (url-for-view-request context) context))
+  (http-get-and-receive (url-for-view-request context) nil context))
 
 (defun fetch-history ()
   (let ((context (clone-context)))
@@ -606,28 +622,17 @@
        (fetch-path "set?request=" context params))))
 
 (defun push-view ()
-  (let ((params (list
-    :height (number-to-string (get-height))
-    :style (get-style)
-    :view entity
-    :filter (filter-json
-    (get-min-sharability) (get-max-sharability) (get-sharability)
-    (get-min-weight) (get-max-weight) (get-default-weight)))))
-
-
   (let ((context (clone-context)) (entity (buffer-string)))
     (set-view entity context)
     (set-mode brain-const-edit-mode context)
-    
-        (setq brain-current-future-sharability (get-sharability))
-        (fetch-
-        (http-post
-         (concat (base-url) "update")
-         (list
-          (list "request" (json-encode (append
-                                        (if (in-view-mode) (list :root (get-root-id)) nil)
-                                        ))))
-         (receive-view brain-const-edit-mode)))))
+    (let ((params (list
+      :height (number-to-string (get-height))
+      :style (get-style)
+      :view entity
+      :filter (filter-json
+      (get-min-sharability) (get-max-sharability) (get-default-sharability)
+      (get-min-weight) (get-max-weight) (get-default-weight)))))
+        (fetch-path-post "update" context params))))
          
 (defun do-infer-types ()
   (http-get
@@ -646,7 +651,7 @@
 (defvar full-colors-supported (> (length (defined-colors)) 8))
 
 (defun view-name (root-id json)
-  (let ((title (cdr (assoc 'title json))))
+  (let ((title (get-value 'title json)))
     (if root-id
         (let ((name
                (if (> (length title) 20)
@@ -732,20 +737,20 @@
 (defun write-view (editable children tree-indent)
   (loop for json across children do
         (let (
-              (link (cdr (assoc 'link json)))
-              (children (cdr (assoc 'children json))))
-          (let (
-                (target-id (get-atom-id json))
+              (link (get-value 'link json))
+              (children (get-value 'children json)))
+          (let ((target-id (get-atom-id json))
                 (target-value (let ((v (get-atom-value json))) (if v v "")))
 		        (target-weight (get-atom-weight json))
 		        (target-sharability (get-atom-sharability json))
 		        (target-priority (get-atom-priority json))
-                (target-has-children (not (equal json-false (cdr (assoc 'hasChildren json)))))
+                (target-has-children (not (equal json-false (get-value 'hasChildren json))))
 		        (target-alias (get-atom-alias json))
 		        (target-shortcut (get-atom-shortcut json))
 		        (target-meta (get-atom-meta json)))
-            (if target-id (puthash target-id json (get-atoms-by-id)))
-            (if (not target-id) (error "missing target id"))
+            (if target-id
+              (puthash target-id json (get-atoms-by-id))
+              (error "missing target id"))
             (setq space "")
             (loop for i from 1 to tree-indent do (setq space (concat space " ")))
             (let ((line "") (id-infix (create-id-infix target-id)))
@@ -785,7 +790,7 @@
    " :style " (get-style)
    " :sharability
              [" (num-or-nil-to-string (get-min-sharability))
-   ", " (num-or-nil-to-string (get-sharability))
+   ", " (num-or-nil-to-string (get-default-sharability))
    ", " (num-or-nil-to-string (get-max-sharability)) "]"
    " :weight
              [" (num-or-nil-to-string (get-min-weight))
@@ -799,11 +804,12 @@
     brain-const-readonly-mode))
 
 (defun in-view-mode ()
-  (if (or
-       (equal (get-mode) brain-const-readonly-mode)
-       (equal (get-mode) brain-const-edit-mode))
+  (let ((mode (get-mode)))
+    (if (or
+        (equal mode brain-const-readonly-mode)
+        (equal mode brain-const-edit-mode))
       t
-    (and (error-message "cannot create tree view in current mode") nil)))
+    (and (error-message (concat "cannot create tree view in mode '" mode "'")) nil))))
 
 (defun in-setproperties-mode ()
   "determines whether atom properties can be set in the current buffer"
@@ -834,7 +840,7 @@
     (progn
       (set-min-weight s)
       (fetch-view t (get-mode) (get-root-id) (get-height) (get-style)
-                    (get-min-sharability) (get-max-sharability) (get-sharability)
+                    (get-min-sharability) (get-max-sharability) (get-default-sharability)
                     s (get-max-weight) (get-default-weight)))
     (error-message
      (concat "min weight " (number-to-string s) " is outside of range [0, 1]"))))
@@ -844,7 +850,7 @@
     (progn
       (set-min-sharability s)
       (fetch-view t (get-mode) (get-root-id) (get-height) (get-style)
-                    s (get-max-sharability) (get-sharability)
+                    s (get-max-sharability) (get-default-sharability)
                     (get-min-weight) (get-max-weight) (get-default-weight)))
     (error-message
      (concat "min sharability " (number-to-string s) " is outside of range [0, 1]"))))
@@ -918,18 +924,18 @@
 (defun brain-enter-edit-view ()
   "enter edit (read/write) mode in the current view"
   (interactive)
-  (if (and (in-view-mode) (equal (get-mode) brain-const-readonly-mode))
-      (fetch-view t brain-const-edit-mode (get-root-id) (get-height) (get-style)
-                    (get-min-sharability) (get-max-sharability) (get-sharability)
-                    (get-min-weight) (get-max-weight) (get-default-weight))))
+  (if (equal (get-mode) brain-const-readonly-mode)
+    (let ((context (clone-context)))
+      (set-mode brain-const-edit-mode context)
+      (fetch-view context))))
 
 (defun brain-enter-readonly-view ()
   "enter read-only mode in the current view"
   (interactive)
-  (if (and (in-view-mode) (equal (get-mode) brain-const-edit-mode))
-      (fetch-view t brain-const-readonly-mode (get-root-id) (get-height) (get-style)
-                    (get-min-sharability) (get-max-sharability) (get-sharability)
-                    (get-min-weight) (get-max-weight) (get-default-weight))))
+  (if (equal (get-mode) brain-const-edit-mode)
+    (let ((context (clone-context)))
+      (set-mode brain-const-readonly-mode context)
+      (fetch-view context))))
 
 (defun brain-events ()
   "retrieve the MyOtherBrain event stack (e.g. notifications of gestural events), ordered by decreasing time stamp"
@@ -1139,9 +1145,9 @@ A value of -1 indicates that values should not be truncated."
       (if (> height brain-const-max-height)
           (error-message (concat "height of " (number-to-string height) " is too high (must be <= "
                                  (number-to-string brain-const-max-height) ")"))
-        (fetch-view nil (get-mode) (get-root-id) height (get-style)
-                      (get-min-sharability) (get-max-sharability) (get-sharability)
-                      (get-min-weight) (get-max-weight) (get-default-weight))))))
+          (let ((context (clone-context)))
+            (set-height height context)
+            (fetch-view context))))))
 
 (defun brain-toggle-emacspeak ()
   "turn Emacspeak on or off"
@@ -1184,25 +1190,22 @@ a type has been assigned to it by the inference engine."
   "switch to a 'backward' view, i.e. a view in which an atom's parents appear as list items beneath it"
   (interactive)
   (if (in-view-mode)
-      (fetch-view nil (get-mode) (get-root-id) (get-height) brain-const-backward-style
-                    (get-min-sharability) (get-max-sharability) (get-sharability)
-                    (get-min-weight) (get-max-weight) (get-default-weight))))
+    (let ((context (clone-context)))
+      (set-style brain-const-backward-style)
+      (fetch-view context))))
 
 (defun brain-update-to-forward-view ()
   "switch to a 'forward' view (the default), i.e. a view in which an atom's children appear as list items beneath it"
   (interactive)
   (if (in-view-mode)
-      (fetch-view nil (get-mode) (get-root-id) (get-height) brain-const-forward-style
-                    (get-min-sharability) (get-max-sharability) (get-sharability)
-                    (get-min-weight) (get-max-weight) (get-default-weight))))
+    (let ((context (clone-context)))
+      (set-style brain-const-forward-style)
+      (fetch-view context))))
 
 (defun brain-update-view ()
   "refresh the current view from the data store"
   (interactive)
-  (if (in-view-mode)
-      (fetch-view t (get-mode) (get-root-id) (get-height) (get-style)
-                    (get-min-sharability) (get-max-sharability) (get-sharability)
-                    (get-min-weight) (get-max-weight) (get-default-weight))))
+  (if (in-view-mode) (fetch-view)))
 
 (defun brain-visit-in-amazon (value-selector)
   "search Amazon.com for the value generated by VALUE-SELECTOR and view the results in a browser"
@@ -1256,10 +1259,9 @@ a type has been assigned to it by the inference engine."
   (interactive)
   (let ((id (atom-id-at-point)))
     (if id
-        (fetch-view nil (mode-for-visit) id (get-height) (get-style)
-                      (get-min-sharability) (get-max-sharability)
-                        (future-sharability (current-target-sharability))
-                      (get-min-weight) (get-max-weight) (get-default-weight))
+        (let ((context (clone-context)))
+          (set-root-id id context)
+          (fetch-view context))
       (no-target))))
 
 (defun brain-visit-target-alias ()
