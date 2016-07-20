@@ -64,7 +64,7 @@ public class SemanticSynchrony {
     private static final Random random = new Random();
 
     private static final String
-            DEFAULT_PROPERTIES = "smsn.properties",
+            DEFAULT_PROPERTIES = "smsn-default.properties",
             WORKING_DIR_PROPERTIES = "smsn.properties";
 
     public static final Logger logger;
@@ -113,7 +113,7 @@ public class SemanticSynchrony {
 
     /**
      * Adds the properties found at a given file path to the SmSn configuration.
-     * These add to or replace SmSn's default properties and any properties found in an smsn.properties file
+     * These add to or replace SmSn's default properties and any properties found in a smsn.properties file
      * in the current directory.
      *
      * @param file the file path to the configuration properties to add
@@ -135,7 +135,7 @@ public class SemanticSynchrony {
 
     /**
      * Adds the given properties to the SmSn configuration.
-     * These add to or replace SmSn's default properties and any properties found in an smsn.properties file
+     * These add to or replace SmSn's default properties and any properties found in a smsn.properties file
      * in the current directory.
      *
      * @param properties the new key/value pairs to add.

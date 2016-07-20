@@ -34,14 +34,14 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/smsn.properties</include>
+                    <include>**/smsn-default.properties</include>
                 </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>**/smsn.properties</exclude>
+                    <exclude>**/smsn-default.properties</exclude>
                 </excludes>
             </resource>
         </resources>
