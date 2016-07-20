@@ -1388,6 +1388,7 @@ a type has been assigned to it by the inference engine."
     (set-face-foreground 'minibuffer-prompt newcol)
     (prompt-for-string 'brain-fulltext-query "full-text search for: ")
     (set-face-foreground 'minibuffer-prompt oldcol)))
+
 (defvar brain-mode-map nil)
 (if brain-mode-map ()
   (progn
