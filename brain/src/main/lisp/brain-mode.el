@@ -1451,20 +1451,20 @@ a type has been assigned to it by the inference engine."
     (define-key brain-mode-map (kbd "C-c C-v v")       'brain-toggle-minimize-verbatim-blocks)
     (define-key brain-mode-map (kbd "C-c C-w C-m")     'brain-set-min-weight-prompt)
     (define-key brain-mode-map (kbd "C-c a")           'brain-acronym-query-prompt)
-    (define-key brain-mode-map (kbd "C-c C-b")           'brain-visit-url-at-point)
+    (define-key brain-mode-map (kbd "C-c C-b")         'brain-visit-url-at-point)
     (define-key brain-mode-map (kbd "C-c d")           'brain-duplicates)
-    (define-key brain-mode-map (kbd "C-c C-f")           'brain-find-roots)
+    (define-key brain-mode-map (kbd "C-c C-f")         'brain-find-roots)
     (define-key brain-mode-map (kbd "C-c h")           'brain-history)
     (define-key brain-mode-map (kbd "C-c i")           'brain-infer-types)
     (define-key brain-mode-map (kbd "C-c o")           'brain-shortcut-query-prompt)
     (define-key brain-mode-map (kbd "C-c P")           'brain-priorities)
     (define-key brain-mode-map (kbd "C-c p")           'brain-push-view)
-    (define-key brain-mode-map (kbd "C-c C-w r")           'brain-ripple-query-prompt)
+    (define-key brain-mode-map (kbd "C-c C-w r")       'brain-ripple-query-prompt)
       ;; likely not the greatest shortcut -- w just stands for weird
     (define-key brain-mode-map (kbd "C-c s")           'brain-fulltext-query-prompt)
     (define-key brain-mode-map (kbd "C-c t")           'brain-visit-target)
     (define-key brain-mode-map (kbd "C-c u")           'brain-update-view)
-    (define-key brain-mode-map (kbd "C-c C-w v")           'brain-events)))
+    (define-key brain-mode-map (kbd "C-c C-w v")       'brain-events)))
       ;; likely not the greatest shortcut -- w just stands for weird
 
 ;; special mappings reserved for use through emacsclient
