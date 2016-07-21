@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class ExtendoBrain {
-    private static final Logger logger = SemanticSynchrony.getLogger(ExtendoBrain.class);
+public class MyOtherBrain {
+    private static final Logger logger = SemanticSynchrony.getLogger(MyOtherBrain.class);
 
     /**
      * A configuration property indicating a special atom to which notes may be prepended
@@ -29,7 +29,7 @@ public class ExtendoBrain {
             INFERENCE_PERIOD = 1000L * 60,
             INFERENCE_INITIAL_WAIT = 1000L * 30;
 
-    private final BrainGraph brainGraph;
+    private final AtomGraph atomGraph;
 
     private final KnowledgeBase knowledgeBase;
 
@@ -39,22 +39,22 @@ public class ExtendoBrain {
 
     private final EventStack eventStack;
 
-    public ExtendoBrain(final BrainGraph brainGraph) throws ExtendoBrainException {
-        this.brainGraph = brainGraph;
+    public MyOtherBrain(final AtomGraph atomGraph) throws BrainException {
+        this.atomGraph = atomGraph;
 
-        knowledgeBase = new KnowledgeBase(brainGraph);
+        knowledgeBase = new KnowledgeBase(atomGraph);
 
         try {
             knowledgeBase.addDefaultClasses();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new ExtendoBrainException(e);
+            throw new BrainException(e);
         }
 
         File logFile;
         try {
             logFile = SemanticSynchrony.getConfiguration().getFile(SemanticSynchrony.ACTIVITY_LOG, null);
         } catch (TypedProperties.PropertyException e) {
-            throw new ExtendoBrainException(e);
+            throw new BrainException(e);
         }
 
         if (null == logFile) {
@@ -65,7 +65,7 @@ public class ExtendoBrain {
             try {
                 activityLog = new ActivityLog(new FileWriter(logFile, true));
             } catch (IOException e) {
-                throw new ExtendoBrainException(e);
+                throw new BrainException(e);
             }
         }
 
@@ -75,13 +75,13 @@ public class ExtendoBrain {
     }
 
     public void startBackgroundTasks() {
-        priorities.refreshQueue(brainGraph);
+        priorities.refreshQueue(atomGraph);
 
         knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);
     }
 
-    public BrainGraph getBrainGraph() {
-        return brainGraph;
+    public AtomGraph getAtomGraph() {
+        return atomGraph;
     }
 
     public KnowledgeBase getKnowledgeBase() {
@@ -100,8 +100,8 @@ public class ExtendoBrain {
         return eventStack;
     }
 
-    public class ExtendoBrainException extends Exception {
-        public ExtendoBrainException(final Throwable cause) {
+    public class BrainException extends Exception {
+        public BrainException(final Throwable cause) {
             super(cause);
         }
     }

@@ -3,7 +3,7 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
@@ -18,7 +18,7 @@ public class SetAtomShortcutMapping extends AtomMapping {
 
     private static final Logger logger = Logger.getLogger(SetAtomShortcutMapping.class.getName());
 
-    public SetAtomShortcutMapping(final ExtendoBrainClient client,
+    public SetAtomShortcutMapping(final BrainClient client,
                                   final Filter filter) {
         super(client, filter);
     }

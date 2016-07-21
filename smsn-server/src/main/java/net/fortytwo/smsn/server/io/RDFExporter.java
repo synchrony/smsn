@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.server.io;
 
-import net.fortytwo.smsn.brain.ExtendoBrain;
-import net.fortytwo.smsn.brain.Filter;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.server.RDFFormatLoader;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -33,7 +32,7 @@ public class RDFExporter extends Exporter {
     }
 
     @Override
-    protected void exportInternal(ExtendoBrain sourceBrain, OutputStream destStream) throws IOException {
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
         try {
             sourceBrain.getKnowledgeBase().exportRDF(destStream, format, requireFilter());
         } catch (SailException | RDFHandlerException e) {

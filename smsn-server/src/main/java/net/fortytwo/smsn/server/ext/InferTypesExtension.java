@@ -20,7 +20,7 @@ import net.fortytwo.smsn.server.SmSnExtension;
 public class InferTypesExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing type inference on an Extend-o-Brain knowledge base")
+    @ExtensionDescriptor(description = "an extension for performing type inference on a MyOtherBrain knowledge base")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph) {
         RequestParams p = createParams(context, (KeyIndexableGraph) graph);

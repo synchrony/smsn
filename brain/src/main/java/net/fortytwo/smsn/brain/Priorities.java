@@ -26,7 +26,7 @@ public class Priorities {
         return queue;
     }
 
-    public void refreshQueue(final BrainGraph graph) {
+    public void refreshQueue(final AtomGraph graph) {
         queue.clear();
 
         new Thread(() -> {

@@ -2,8 +2,8 @@ package net.fortytwo.smsn.server.io;
 
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
@@ -27,8 +27,8 @@ public class VertexExporter extends Exporter {
     }
 
     @Override
-    protected void exportInternal(ExtendoBrain sourceBrain, OutputStream destStream) throws IOException {
-        BrainGraph sourceGraph = sourceBrain.getBrainGraph();
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
+        AtomGraph sourceGraph = sourceBrain.getAtomGraph();
         KnowledgeBase sourceKb = sourceBrain.getKnowledgeBase();
         PrintStream p = new PrintStream(destStream);
 

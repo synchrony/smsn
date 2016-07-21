@@ -26,13 +26,13 @@ public class NoteQueries {
         FullText, Acronym, Shortcut
     }
 
-    private final ExtendoBrain brain;
+    private final MyOtherBrain brain;
     //private final QueryEngine rippleQueryEngine;
 
     /**
-     * @param brain the Extend-o-Brain instance to query and update
+     * @param brain the MyOtherBrain instance to query and update
      */
-    public NoteQueries(final ExtendoBrain brain) {
+    public NoteQueries(final MyOtherBrain brain) {
         if (null == brain) {
             throw new IllegalArgumentException();
         }
@@ -117,7 +117,7 @@ public class NoteQueries {
         Note n = new Note();
 
         for (String id : atomIds) {
-            Atom a = brain.getBrainGraph().getAtom(id);
+            Atom a = brain.getAtomGraph().getAtom(id);
             if (null == a) {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
@@ -155,7 +155,7 @@ public class NoteQueries {
 
         updateInternal(rootNote, height, filter, style);
 
-        brain.getBrainGraph().updated();
+        brain.getAtomGraph().updated();
     }
 
     private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
@@ -184,7 +184,7 @@ public class NoteQueries {
         final Set<String> added = new HashSet<>();
         final Set<String> created = new HashSet<>();
 
-        final Atom rootAtom = null == rootNote.getId() ? null : brain.getBrainGraph().getAtom(rootNote.getId());
+        final Atom rootAtom = null == rootNote.getId() ? null : brain.getAtomGraph().getAtom(rootNote.getId());
         if (null != rootAtom) {
             setProperties(rootAtom, rootNote);
 
@@ -202,7 +202,7 @@ public class NoteQueries {
 
                     Atom atom = getAtom(note, filter, created);
 
-                    brain.getBrainGraph().addChildAt(rootAtom, atom, position);
+                    brain.getAtomGraph().addChildAt(rootAtom, atom, position);
 
                     added.add((String) atom.asVertex().getId());
 
@@ -219,11 +219,11 @@ public class NoteQueries {
                         return;
                     }
 
-                    brain.getBrainGraph().deleteChildAt(rootAtom, position);
+                    brain.getAtomGraph().deleteChildAt(rootAtom, position);
 
                     // log this activity
                     if (null != brain.getActivityLog()) {
-                        Atom a = brain.getBrainGraph().getAtom(note.getId());
+                        Atom a = brain.getAtomGraph().getAtom(note.getId());
                         brain.getActivityLog().logUnlink(rootAtom, a);
                     }
                 }
@@ -257,7 +257,7 @@ public class NoteQueries {
         // retrieve or create an atom for the note
         // atoms are only created if they appear under a parent which is also an atom
         String id = note.getId();
-        Atom atom = null == id ? null : brain.getBrainGraph().getAtom(id);
+        Atom atom = null == id ? null : brain.getAtomGraph().getAtom(id);
 
         if (null == atom) {
             atom = createAtom(note.getId(), filter);
@@ -272,7 +272,7 @@ public class NoteQueries {
 
     private Atom createAtom(final String id,
                             final Filter filter) {
-        Atom a = brain.getBrainGraph().createAtom(filter, id);
+        Atom a = brain.getAtomGraph().createAtom(filter, id);
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logCreate(a);
@@ -308,13 +308,13 @@ public class NoteQueries {
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getBrainGraph().getAtomsByFulltextQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByFulltextQuery(query, filter);
                 break;
             case Acronym:
-                results = brain.getBrainGraph().getAtomsByAcronymQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByAcronymQuery(query, filter);
                 break;
             case Shortcut:
-                results = brain.getBrainGraph().getAtomsWithShortcut(query, filter);
+                results = brain.getAtomGraph().getAtomsWithShortcut(query, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);
@@ -340,10 +340,10 @@ public class NoteQueries {
 
         Note result = new Note();
 
-        for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
+        for (Vertex v : brain.getAtomGraph().getPropertyGraph().getVertices()) {
             Iterable<Edge> inEdges = v.getEdges(Direction.IN);
             if (!inEdges.iterator().hasNext()) {
-                Atom a = brain.getBrainGraph().getAtom(v);
+                Atom a = brain.getAtomGraph().getAtom(v);
                 if (filter.isVisible(v)) {
                     Note n = viewInternal(a, height, filter, style);
                     result.addChild(n);
@@ -362,11 +362,11 @@ public class NoteQueries {
 
         Note result = new Note();
 
-        for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
+        for (Vertex v : brain.getAtomGraph().getPropertyGraph().getVertices()) {
             if (null != v.getProperty("value")
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
-                Atom a = brain.getBrainGraph().getAtom(v);
+                Atom a = brain.getAtomGraph().getAtom(v);
                 if (filter.isVisible(v)) {
                     Note n = viewInternal(a, 1, filter, forwardViewStyle);
                     result.addChild(n);
@@ -384,7 +384,7 @@ public class NoteQueries {
 
         List<Vertex> toRemove = new LinkedList<>();
 
-        for (Vertex v : brain.getBrainGraph().getPropertyGraph().getVertices()) {
+        for (Vertex v : brain.getAtomGraph().getPropertyGraph().getVertices()) {
             if (null != v.getProperty("value")
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
@@ -397,10 +397,10 @@ public class NoteQueries {
 
         for (Vertex v : toRemove) {
             // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
-            brain.getBrainGraph().getPropertyGraph().removeVertex(v);
+            brain.getAtomGraph().getPropertyGraph().removeVertex(v);
         }
 
-        brain.getBrainGraph().updated();
+        brain.getAtomGraph().updated();
     }
 
     /**
@@ -517,7 +517,7 @@ public class NoteQueries {
             }
 
             target.setValue(value);
-            brain.getBrainGraph().indexForSearch(target, value);
+            brain.getAtomGraph().indexForSearch(target, value);
         }
 
         boolean propsSet = false;

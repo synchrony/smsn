@@ -12,7 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
@@ -38,7 +38,7 @@ import java.util.Map;
 public class DuplicatesExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
+    @ExtensionDescriptor(description = "an extension for viewing MyOtherBrain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
@@ -59,7 +59,7 @@ public class DuplicatesExtension extends SmSnExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        List<String> ids = getDuplicates(p.brain.getBrainGraph(), p.filter);
+        List<String> ids = getDuplicates(p.brain.getAtomGraph(), p.filter);
 
         addView(p.queries.customView(ids, p.filter), p);
 
@@ -88,7 +88,7 @@ public class DuplicatesExtension extends SmSnExtension {
         }
     }
 
-    private List<String> getDuplicates(final BrainGraph graph,
+    private List<String> getDuplicates(final AtomGraph graph,
                                        final Filter filter) throws Exception {
         Map<String, List<String>> m = new HashMap<>();
         List<List<String>> dups = new LinkedList<>();

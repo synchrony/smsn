@@ -1,6 +1,6 @@
 /*
   ExtendoHand.h - Arduino library for the Extend-o-Hand gestural glove
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
   
   Created by Joshua Shinavier, 2012-2015
   Released into the public domain.

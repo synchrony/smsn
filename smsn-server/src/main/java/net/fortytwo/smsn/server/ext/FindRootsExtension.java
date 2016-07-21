@@ -19,15 +19,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A service for finding root nodes of an Extend-o-Brain graph
+ * A service for finding root nodes of a MyOtherBrain graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "find-roots")
-//@ExtensionDescriptor(description = "find root nodes of an Extend-o-Brain graph")
+//@ExtensionDescriptor(description = "find root nodes of a MyOtherBrain graph")
 public class FindRootsExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for finding root nodes of an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for finding root nodes of a MyOtherBrain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

@@ -1,6 +1,6 @@
 /*
   HighPassFilter.h - a high-pass filter implementation
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.

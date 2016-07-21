@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.smsn.util.TypedProperties;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -22,11 +22,11 @@ public class AddToStreamMapping extends AtomMapping {
 
     private final String brainStream;
 
-    public AddToStreamMapping(final ExtendoBrainClient client,
+    public AddToStreamMapping(final BrainClient client,
                               final Filter filter) throws RippleException {
         super(client, filter);
         try {
-            brainStream = SemanticSynchrony.getConfiguration().getString(ExtendoBrain.PROP_BRAINSTREAM, null);
+            brainStream = SemanticSynchrony.getConfiguration().getString(MyOtherBrain.PROP_BRAINSTREAM, null);
         } catch (TypedProperties.PropertyException e) {
             throw new RippleException(e);
         }
@@ -78,7 +78,7 @@ public class AddToStreamMapping extends AtomMapping {
 
         try {
             client.update(streamNote, 1, filter, NoteQueries.forwardAddOnlyViewStyle);
-        } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
+        } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }
     }

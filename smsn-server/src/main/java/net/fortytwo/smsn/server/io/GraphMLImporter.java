@@ -1,8 +1,7 @@
 package net.fortytwo.smsn.server.io;
 
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +20,8 @@ public class GraphMLImporter extends Importer {
     }
 
     @Override
-    protected void importInternal(ExtendoBrain destBrain, final InputStream sourceStream) throws IOException {
-        GraphMLReader r = new GraphMLReader(destBrain.getBrainGraph().getPropertyGraph());
+    protected void importInternal(MyOtherBrain destBrain, final InputStream sourceStream) throws IOException {
+        GraphMLReader r = new GraphMLReader(destBrain.getAtomGraph().getPropertyGraph());
         r.inputGraph(sourceStream);
     }
 }

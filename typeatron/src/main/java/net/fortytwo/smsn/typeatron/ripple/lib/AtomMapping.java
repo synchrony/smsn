@@ -3,12 +3,12 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
-import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
@@ -23,10 +23,10 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
 
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-    protected final ExtendoBrainClient client;
+    protected final BrainClient client;
     protected final Filter filter;
 
-    protected AtomMapping(final ExtendoBrainClient client,
+    protected AtomMapping(final BrainClient client,
                           final Filter filter) {
         this.client = client;
         this.filter = filter;
@@ -54,7 +54,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                 } else if (sync) {
                     try {
                         n = client.view(n, height, filter, NoteQueries.forwardViewStyle, false);
-                    } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
+                    } catch (BrainClient.BrainClientException e) {
                         throw new RippleException(e);
                     }
                 }
@@ -69,7 +69,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
     protected void setProperty(final Note n, final String name, final String value) throws RippleException {
         try {
             client.setProperty(n, name, value);
-        } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
+        } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }
     }
@@ -108,6 +108,6 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
             }
         }
 
-        return valueFactory.createIRI(BrainGraph.iriForId(n.getId()));
+        return valueFactory.createIRI(AtomGraph.iriForId(n.getId()));
     }
 }

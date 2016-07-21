@@ -1,7 +1,7 @@
 /*
  * Extend-o-Hand calibration and sampling, copyright 2013-2014 by Joshua Shinavier
  * 
- * See: https://github.com/joshsh/extendo
+ * See: https://github.com/joshsh/smsn
  */
 
 #include <MMA7361.h>

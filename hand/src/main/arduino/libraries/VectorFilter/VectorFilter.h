@@ -1,6 +1,6 @@
 /*
   VectorFilter.h - a three-dimensional filter
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.

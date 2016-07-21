@@ -1,11 +1,9 @@
 package net.fortytwo.smsn.server.io;
 
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Filter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,9 +19,9 @@ public abstract class Exporter {
 
     public abstract List<String> getFormats();
 
-    protected abstract void exportInternal(ExtendoBrain sourceBrain, OutputStream destStream) throws IOException;
+    protected abstract void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException;
 
-    public void doExport(ExtendoBrain sourceBrain, OutputStream destStream) throws IOException {
+    public void doExport(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
         exportInternal(sourceBrain, destStream);
     }
 

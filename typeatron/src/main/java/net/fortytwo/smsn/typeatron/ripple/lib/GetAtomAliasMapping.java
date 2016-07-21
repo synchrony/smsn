@@ -2,7 +2,7 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
@@ -17,7 +17,7 @@ public class GetAtomAliasMapping extends AtomMapping {
 
     private static final Logger logger = Logger.getLogger(GetAtomAliasMapping.class.getName());
 
-    public GetAtomAliasMapping(final ExtendoBrainClient client,
+    public GetAtomAliasMapping(final BrainClient client,
                                final Filter filter) {
         super(client, filter);
     }

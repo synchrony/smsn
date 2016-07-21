@@ -4,8 +4,8 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
@@ -291,10 +291,10 @@ public class KnowledgeBaseTest {
     public void testToolSyntax() throws Exception {
         AtomClass t = Tool.class.newInstance();
 
-        assertTrue(t.getValueRegex().matcher("Extend-o-Brain").matches());
+        assertTrue(t.getValueRegex().matcher("MyOtherBrain").matches());
         assertFalse(t.getValueRegex().matcher("...not a tool").matches());
         assertFalse(t.getValueRegex().matcher("This is the Really Long Name of a Really Important Tool" +
-                " Which Unfortunately Will Not Be Recognized As Such By Extend-o-Brain").matches());
+                " Which Unfortunately Will Not Be Recognized As Such By MyOtherBrain").matches());
     }
 
     @Test
@@ -303,15 +303,15 @@ public class KnowledgeBaseTest {
 
         assertTrue(t.getValueRegex().matcher("http://example.org/foobar").matches());
         assertTrue(t.getValueRegex().matcher("https://example.org/foobar").matches());
-        assertFalse(t.getValueRegex().matcher("git://github.com/joshsh/extendo.git").matches());
+        assertFalse(t.getValueRegex().matcher("git://github.com/joshsh/smsn.git").matches());
     }
 
     @Test
     public void testUsageSyntax() throws Exception {
         AtomClass t = Usage.class.newInstance();
 
-        assertTrue(t.getValueRegex().matcher("Extend-o-Brain usage").matches());
-        assertFalse(t.getValueRegex().matcher("how to use Extend-o-Brain").matches());
+        assertTrue(t.getValueRegex().matcher("MyOtherBrain usage").matches());
+        assertFalse(t.getValueRegex().matcher("how to use MyOtherBrain").matches());
     }
 
     @Test
@@ -325,8 +325,8 @@ public class KnowledgeBaseTest {
     @Test
     public void testInference() throws Exception {
         KeyIndexableGraph g = new TinkerGraph();
-        BrainGraph bg = new BrainGraph(g);
-        ExtendoBrain brain = new ExtendoBrain(bg);
+        AtomGraph bg = new AtomGraph(g);
+        MyOtherBrain brain = new MyOtherBrain(bg);
         KnowledgeBase kb = new KnowledgeBase(bg);
         NoteParser parser = new NoteParser();
         NoteQueries queries = new NoteQueries(brain);

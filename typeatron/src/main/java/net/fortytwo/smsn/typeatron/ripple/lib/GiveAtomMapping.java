@@ -9,7 +9,7 @@ import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 
 import java.util.logging.Level;
@@ -23,7 +23,7 @@ public class GiveAtomMapping extends AtomMapping {
     private static final Logger logger = Logger.getLogger(GiveAtomMapping.class.getName());
     private final TypeatronControl typeatron;
 
-    public GiveAtomMapping(final ExtendoBrainClient client,
+    public GiveAtomMapping(final BrainClient client,
                            final Filter filter,
                            final TypeatronControl typeatron) {
         super(client, filter);

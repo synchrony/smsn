@@ -1,7 +1,7 @@
 /*
  * Extend-o-Hand UbiKeyboard sketch, copyright 2014 by Joshua Shinavier
  * 
- * See: https://github.com/joshsh/extendo
+ * See: https://github.com/joshsh/smsn
  */
 
 

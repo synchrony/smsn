@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNull;
  */
 public class NoteQueriesTest {
     private KeyIndexableGraph graph;
-    private BrainGraph store;
+    private AtomGraph store;
     private FramedGraph<KeyIndexableGraph> manager;
     private NoteParser parser;
     private NoteWriter writer = new NoteWriter();
@@ -36,10 +36,10 @@ public class NoteQueriesTest {
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
         parser = new NoteParser();
-        store = new BrainGraph(g);
+        store = new AtomGraph(g);
         graph = store.getPropertyGraph();
         manager = store.getFramedGraph();
-        ExtendoBrain brain = new ExtendoBrain(store);
+        MyOtherBrain brain = new MyOtherBrain(store);
         queries = new NoteQueries(brain);
     }
 
@@ -288,7 +288,7 @@ public class NoteQueriesTest {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = parser.fromWikiText(BrainGraph.class.getResourceAsStream("wiki-example-3.txt"));
+        Note rootNote = parser.fromWikiText(AtomGraph.class.getResourceAsStream("wiki-example-3.txt"));
         Atom root = createAtom("0000000");
         root.setSharability(1.0f);
         rootNote.setId((String) root.asVertex().getId());
@@ -396,7 +396,7 @@ public class NoteQueriesTest {
         assertEquals("one", a1.getValue());
         assertEquals("two", a2.getValue());
         assertEquals("three", a3.getValue());
-        assertEquals(3, BrainGraph.asList(root.getNotes()).size());
+        assertEquals(3, AtomGraph.asList(root.getNotes()).size());
 
         a.setId((String) root.asVertex().getId());
         queries.update(a, 2, filter, style);
@@ -404,7 +404,7 @@ public class NoteQueriesTest {
         Atom a4 = store.getAtom("004");
 
         assertEquals("four", a4.getValue());
-        List<Atom> children = BrainGraph.asList(root.getNotes());
+        List<Atom> children = AtomGraph.asList(root.getNotes());
         assertEquals(4, children.size());
         assertEquals("four", children.get(0).getValue());
         assertEquals("one", children.get(1).getValue());

@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A service for importing an Extend-o-Brain subgraph
+ * A service for importing a MyOtherBrain subgraph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -43,7 +43,7 @@ public class ImportExtension extends SmSnExtension {
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain subgraph")
+    @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain subgraph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

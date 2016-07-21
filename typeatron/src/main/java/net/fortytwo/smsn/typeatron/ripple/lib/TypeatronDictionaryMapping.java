@@ -3,7 +3,7 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.p2p.SideEffects;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.smsn.typeatron.ripple.lib.music.DisableMusicMapping;
 import net.fortytwo.smsn.typeatron.ripple.lib.music.EnableMusicMapping;
 import net.fortytwo.flow.Sink;
@@ -143,10 +143,10 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
     public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron) throws RippleException {
-        ExtendoBrainClient exoBrainClient;
+        BrainClient exoBrainClient;
         try {
-            exoBrainClient = new ExtendoBrainClient();
-        } catch (ExtendoBrainClient.ExtendoBrainClientException e) {
+            exoBrainClient = new BrainClient();
+        } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }
 
@@ -168,7 +168,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         //add(new DictionaryPutMapping(userDictionary), "i");
         //add(new DictionaryGetMapping(userDictionary), "o");
 
-        // Extend-o-Brain
+        // MyOtherBrain
         add(new GetAtomAliasMapping(exoBrainClient, defaultFilter), "@a");
         add(new GetAtomChildrenMapping(exoBrainClient, defaultFilter), "@n");
         add(new GetAtomCreatedMapping(exoBrainClient, defaultFilter), "@c");

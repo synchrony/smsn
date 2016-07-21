@@ -4,8 +4,8 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,18 +18,18 @@ import java.util.logging.Logger;
 public abstract class Importer {
     protected static final Logger logger = Logger.getLogger(Importer.class.getName());
 
-    protected abstract void importInternal(ExtendoBrain destBrain, final InputStream sourceStream) throws IOException;
+    protected abstract void importInternal(MyOtherBrain destBrain, final InputStream sourceStream) throws IOException;
 
     private String defaultNodeName;
 
     public abstract List<String> getFormats();
 
-    public void doImport(final ExtendoBrain destBrain, final InputStream sourceStream) throws IOException {
+    public void doImport(final MyOtherBrain destBrain, final InputStream sourceStream) throws IOException {
         long before = System.currentTimeMillis();
 
         importInternal(destBrain, sourceStream);
 
-        BrainGraph destGraph = destBrain.getBrainGraph();
+        AtomGraph destGraph = destBrain.getAtomGraph();
 
         // note: we assume the graph is small
         commit(destGraph);
@@ -51,7 +51,7 @@ public abstract class Importer {
         this.defaultNodeName = defaultNodeName;
     }
 
-    private void reindexVertices(BrainGraph destGraph) {
+    private void reindexVertices(AtomGraph destGraph) {
         TransactionalGraph propertyGraph = (TransactionalGraph) destGraph.getPropertyGraph();
         for (Vertex v : propertyGraph.getVertices()) {
             String value = v.getProperty(SemanticSynchrony.VALUE);
@@ -59,8 +59,8 @@ public abstract class Importer {
         }
     }
 
-    private void commit(final BrainGraph brainGraph) {
-        Graph propertyGraph = brainGraph.getPropertyGraph();
+    private void commit(final AtomGraph atomGraph) {
+        Graph propertyGraph = atomGraph.getPropertyGraph();
         if (propertyGraph instanceof TransactionalGraph) {
             ((TransactionalGraph) propertyGraph).commit();
         }

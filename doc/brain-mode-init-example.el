@@ -10,7 +10,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Rexster URL and Extend-o-Brain graph (essential)
+;; Rexster URL and MyOtherBrain graph (essential)
 
 (defvar smsn-rexster-url "http://localhost:8182")
 (defvar smsn-rexster-graph "joshkb")
@@ -27,7 +27,7 @@
 
 ;; RDF inference over the public portion of the graph is written here
 ;; using Dropbox and Apache+.htaccess allows it to be automatically published as Linked Data
-(defvar smsn-default-webrdf-file "/Users/josh/Dropbox/shared/domains/www.fortytwo.net/people/josh/extend-o-brain.rdf")
+(defvar smsn-default-webrdf-file "/Users/josh/Dropbox/shared/domains/www.fortytwo.net/people/josh/myotherbrain.rdf")
 
 ;; default location for dumps of tab-separated vertex and edge files
 ;; vertex files contain the properties of each atom

@@ -6,22 +6,22 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
-    <!ENTITY extendobrain "http://fortytwo.net/2009/05/extendobrain#" >
+    <!ENTITY brain "http://fortytwo.net/2014/12/smsn#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
 ]>
 
 
-<rdf:RDF xmlns="http://fortytwo.net/2009/05/extendobrain#"
-     xml:base="http://fortytwo.net/2009/05/extendobrain"
+<rdf:RDF xmlns="http://fortytwo.net/2014/12/smsn#"
+     xml:base="http://fortytwo.net/2014/12/smsn"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:extendobrain="http://fortytwo.net/2009/05/extendobrain#">
+     xmlns:brain="http://fortytwo.net/2014/12/smsn#">
     <owl:Ontology rdf:about="">
         <rdfs:comment
-            >Ontology for Extend-o-Brain knowledge bases.
+            >Ontology for MyOtherBrain knowledge bases.
 
 Note: it has been a design decision not to re-use elements from other, previously existing ontologies, even where these might seem appropriate.  For instance, this ontology introduces its own title (&quot;name&quot;) and description properties rather than re-using existing Dublin Core properties.  This allows more precise modeling of the domain (for instance, this ontology requires that names and descriptions are string-valued), which is expedient for application development.  However, this does not preclude mapping to and from widely-used community ontologies when integrating data with other sources.</rdfs:comment>
     </owl:Ontology>
@@ -39,7 +39,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#alias -->
+    <!-- http://fortytwo.net/2014/12/smsn#alias -->
 
     <owl:ObjectProperty rdf:about="#alias">
         <rdfs:comment
@@ -50,7 +50,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#creationPlaceStamp -->
+    <!-- http://fortytwo.net/2014/12/smsn#creationPlaceStamp -->
 
     <owl:ObjectProperty rdf:about="#creationPlaceStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -62,7 +62,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#icon -->
+    <!-- http://fortytwo.net/2014/12/smsn#icon -->
 
     <owl:ObjectProperty rdf:about="#icon">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -74,7 +74,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#markerTag -->
+    <!-- http://fortytwo.net/2014/12/smsn#markerTag -->
 
     <owl:ObjectProperty rdf:about="#markerTag">
         <rdfs:comment
@@ -85,7 +85,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#object -->
+    <!-- http://fortytwo.net/2014/12/smsn#object -->
 
     <owl:ObjectProperty rdf:about="#object">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -97,7 +97,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#personalGraph -->
+    <!-- http://fortytwo.net/2014/12/smsn#personalGraph -->
 
     <owl:ObjectProperty rdf:about="#personalGraph">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -110,7 +110,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#sensitivity -->
+    <!-- http://fortytwo.net/2014/12/smsn#sensitivity -->
 
     <owl:ObjectProperty rdf:about="#sensitivity">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -122,7 +122,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#subject -->
+    <!-- http://fortytwo.net/2014/12/smsn#subject -->
 
     <owl:ObjectProperty rdf:about="#subject">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -145,7 +145,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#contactEmailAddress -->
+    <!-- http://fortytwo.net/2014/12/smsn#contactEmailAddress -->
 
     <owl:DatatypeProperty rdf:about="#contactEmailAddress">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -157,7 +157,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#creationTimeStamp -->
+    <!-- http://fortytwo.net/2014/12/smsn#creationTimeStamp -->
 
     <owl:DatatypeProperty rdf:about="#creationTimeStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -169,7 +169,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#datatypeURI -->
+    <!-- http://fortytwo.net/2014/12/smsn#datatypeURI -->
 
     <owl:DatatypeProperty rdf:about="#datatypeURI">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -181,7 +181,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#description -->
+    <!-- http://fortytwo.net/2014/12/smsn#description -->
 
     <owl:DatatypeProperty rdf:about="#description">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -193,7 +193,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#emphasis -->
+    <!-- http://fortytwo.net/2014/12/smsn#emphasis -->
 
     <owl:DatatypeProperty rdf:about="#emphasis">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -205,7 +205,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#languageTag -->
+    <!-- http://fortytwo.net/2014/12/smsn#languageTag -->
 
     <owl:DatatypeProperty rdf:about="#languageTag">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -217,7 +217,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#latitude -->
+    <!-- http://fortytwo.net/2014/12/smsn#latitude -->
 
     <owl:DatatypeProperty rdf:about="#latitude">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -229,7 +229,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#lexicalForm -->
+    <!-- http://fortytwo.net/2014/12/smsn#lexicalForm -->
 
     <owl:DatatypeProperty rdf:about="#lexicalForm">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -241,7 +241,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#longitude -->
+    <!-- http://fortytwo.net/2014/12/smsn#longitude -->
 
     <owl:DatatypeProperty rdf:about="#longitude">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -253,7 +253,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#name -->
+    <!-- http://fortytwo.net/2014/12/smsn#name -->
 
     <owl:DatatypeProperty rdf:about="#name">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -265,7 +265,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#passwordSha1Sum -->
+    <!-- http://fortytwo.net/2014/12/smsn#passwordSha1Sum -->
 
     <owl:DatatypeProperty rdf:about="#passwordSha1Sum">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -277,7 +277,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#representationMediaType -->
+    <!-- http://fortytwo.net/2014/12/smsn#representationMediaType -->
 
     <owl:DatatypeProperty rdf:about="#representationMediaType">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -289,7 +289,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#representationSha1Sum -->
+    <!-- http://fortytwo.net/2014/12/smsn#representationSha1Sum -->
 
     <owl:DatatypeProperty rdf:about="#representationSha1Sum">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -301,7 +301,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#richTextDescription -->
+    <!-- http://fortytwo.net/2014/12/smsn#richTextDescription -->
 
     <owl:DatatypeProperty rdf:about="#richTextDescription">
         <rdfs:comment
@@ -311,7 +311,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#score -->
+    <!-- http://fortytwo.net/2014/12/smsn#score -->
 
     <owl:DatatypeProperty rdf:about="#score">
         <rdfs:comment
@@ -322,7 +322,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#userName -->
+    <!-- http://fortytwo.net/2014/12/smsn#userName -->
 
     <owl:DatatypeProperty rdf:about="#userName">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -345,7 +345,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Account -->
+    <!-- http://fortytwo.net/2014/12/smsn#Account -->
 
     <owl:Class rdf:about="#Account">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -355,7 +355,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Association -->
+    <!-- http://fortytwo.net/2014/12/smsn#Association -->
 
     <owl:Class rdf:about="#Association">
         <rdfs:subClassOf rdf:resource="#Atom"/>
@@ -365,7 +365,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Atom -->
+    <!-- http://fortytwo.net/2014/12/smsn#Atom -->
 
     <owl:Class rdf:about="#Atom">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -375,7 +375,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#GeoPoint -->
+    <!-- http://fortytwo.net/2014/12/smsn#GeoPoint -->
 
     <owl:Class rdf:about="#GeoPoint">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -385,7 +385,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Graph -->
+    <!-- http://fortytwo.net/2014/12/smsn#Graph -->
 
     <owl:Class rdf:about="#Graph">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -395,7 +395,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Literal -->
+    <!-- http://fortytwo.net/2014/12/smsn#Literal -->
 
     <owl:Class rdf:about="#Literal">
         <rdfs:subClassOf rdf:resource="#Atom"/>
@@ -405,7 +405,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Marker -->
+    <!-- http://fortytwo.net/2014/12/smsn#Marker -->
 
     <owl:Class rdf:about="#Marker">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -415,7 +415,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#SensitivityLevel -->
+    <!-- http://fortytwo.net/2014/12/smsn#SensitivityLevel -->
 
     <owl:Class rdf:about="#SensitivityLevel">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -425,7 +425,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#WebResource -->
+    <!-- http://fortytwo.net/2014/12/smsn#WebResource -->
 
     <owl:Class rdf:about="#WebResource">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
@@ -452,7 +452,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Broken -->
+    <!-- http://fortytwo.net/2014/12/smsn#Broken -->
 
     <Marker rdf:about="#Broken">
         <rdfs:comment
@@ -461,7 +461,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#MOBAdminGraph -->
+    <!-- http://fortytwo.net/2014/12/smsn#MOBAdminGraph -->
 
     <Graph rdf:about="#MOBAdminGraph">
         <rdfs:comment
@@ -470,7 +470,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#MOBOntologyGraph -->
+    <!-- http://fortytwo.net/2014/12/smsn#MOBOntologyGraph -->
 
     <Graph rdf:about="#MOBOntologyGraph">
         <rdfs:comment
@@ -479,7 +479,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Personal -->
+    <!-- http://fortytwo.net/2014/12/smsn#Personal -->
 
     <SensitivityLevel rdf:about="#Personal">
         <rdfs:comment
@@ -488,7 +488,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Private -->
+    <!-- http://fortytwo.net/2014/12/smsn#Private -->
 
     <SensitivityLevel rdf:about="#Private">
         <rdfs:comment
@@ -497,7 +497,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Public -->
+    <!-- http://fortytwo.net/2014/12/smsn#Public -->
 
     <SensitivityLevel rdf:about="#Public">
         <rdfs:comment
@@ -506,7 +506,7 @@ Note: it has been a design decision not to re-use elements from other, previousl
     
 
 
-    <!-- http://fortytwo.net/2009/05/extendobrain#Starred -->
+    <!-- http://fortytwo.net/2014/12/smsn#Starred -->
 
     <Marker rdf:about="#Starred">
         <rdfs:comment

@@ -3,7 +3,7 @@
  * Note: this is a "weak" high-five recognizer for a fun demo;
  * in its current form, it is not precise enough to be combined with other gestures.
  * 
- * See: https://github.com/joshsh/extendo
+ * See: https://github.com/joshsh/smsn
  */
 
 #define THREEAXIS             0

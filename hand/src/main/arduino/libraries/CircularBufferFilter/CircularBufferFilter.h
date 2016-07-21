@@ -4,7 +4,7 @@
   Note: while this filter produces a cleaner signal than BandPassFilter for certain Extend-o-Hand data,
   it also consumes too much RAM to be used on the Arduino.
 
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.

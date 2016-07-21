@@ -1,6 +1,6 @@
 /*
   Vector3D.h - class of 3D vectors for use with motion sensor data
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.

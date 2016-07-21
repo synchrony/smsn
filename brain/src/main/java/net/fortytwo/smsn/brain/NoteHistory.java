@@ -28,7 +28,7 @@ public class NoteHistory {
 
     public List<String> getHistory(final int maxlen,
                                    final boolean dedup,
-                                   final BrainGraph graph,
+                                   final AtomGraph graph,
                                    final Filter filter) {
         Collection<String> r = dedup
                 ? new LinkedHashSet<>()

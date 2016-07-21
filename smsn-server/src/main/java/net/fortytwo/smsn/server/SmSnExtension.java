@@ -8,8 +8,8 @@ import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteHistory;
@@ -46,17 +46,17 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
     protected abstract boolean doesWrite();
 
-    private static final Map<KeyIndexableGraph, ExtendoBrain> brains = new HashMap<>();
+    private static final Map<KeyIndexableGraph, MyOtherBrain> brains = new HashMap<>();
 
-    public synchronized static ExtendoBrain getBrain(final KeyIndexableGraph baseGraph)
-            throws ExtendoBrain.ExtendoBrainException {
+    public synchronized static MyOtherBrain getBrain(final KeyIndexableGraph baseGraph)
+            throws MyOtherBrain.BrainException {
 
-        ExtendoBrain b = brains.get(baseGraph);
+        MyOtherBrain b = brains.get(baseGraph);
 
         if (null == b) {
-            logger.info("instantiating Extend-o-Brain with base graph " + baseGraph);
-            BrainGraph bg = new BrainGraph(baseGraph);
-            b = new ExtendoBrain(bg);
+            logger.info("instantiating MyOtherBrain with base graph " + baseGraph);
+            AtomGraph bg = new AtomGraph(baseGraph);
+            b = new MyOtherBrain(bg);
             b.startBackgroundTasks();
             brains.put(baseGraph, b);
         }
@@ -135,7 +135,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
             }
 
             if (null != rootId) {
-                p.root = p.brain.getBrainGraph().getAtom(rootId);
+                p.root = p.brain.getAtomGraph().getAtom(rootId);
 
                 if (null == p.root) {
                     return error("root of view does not exist: " + rootId);
@@ -267,7 +267,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
     }
 
     protected List<String> getHistory(final RexsterResourceContext context,
-                                      final BrainGraph graph,
+                                      final AtomGraph graph,
                                       final Filter filter) {
         NoteHistory h = getNotesHistory(context);
         return h.getHistory(100, true, graph, filter);
@@ -275,7 +275,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
     protected class RequestParams {
         public KeyIndexableGraph baseGraph;
-        public ExtendoBrain brain;
+        public MyOtherBrain brain;
         public RexsterResourceContext context;
         public String data;
         public Integer height;

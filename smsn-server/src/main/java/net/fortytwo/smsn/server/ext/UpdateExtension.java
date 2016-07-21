@@ -25,16 +25,16 @@ import java.io.InputStream;
 import java.security.Principal;
 
 /**
- * A service for updating an Extend-o-Brain graph
+ * A service for updating a MyOtherBrain graph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "update")
-//@ExtensionDescriptor(description = "update an Extend-o-Brain graph")
+//@ExtensionDescriptor(description = "update a MyOtherBrain graph")
 public class UpdateExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "update an Extend-o-Brain graph using the wiki format")
+    @ExtensionDescriptor(description = "update a MyOtherBrain graph using the wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

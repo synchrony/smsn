@@ -1,6 +1,6 @@
 /*
   BooleanFilter.h - abstract base class of filters for time-series data which produce boolean values
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.

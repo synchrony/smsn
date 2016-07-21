@@ -4,7 +4,7 @@ import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomList;
-import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
@@ -60,14 +60,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
+ * An inference layer for a MyOtherBrain graph, supporting automatic classification of atoms and exporting to RDF
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class KnowledgeBase {
     private static final Logger logger = SemanticSynchrony.getLogger(KnowledgeBase.class);
 
-    private final BrainGraph graph;
+    private final AtomGraph graph;
 
     private final Map<Class<? extends AtomClass>, AtomClass> classes;
 
@@ -75,7 +75,7 @@ public class KnowledgeBase {
 
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-    public KnowledgeBase(final BrainGraph graph) {
+    public KnowledgeBase(final AtomGraph graph) {
         this.graph = graph;
         this.atomClassifications = new HashMap<>();
         this.classes = new HashMap<>();
@@ -346,7 +346,7 @@ public class KnowledgeBase {
     }
 
     /**
-     * Performs Extendo type inference on the knowledge base, optionally generating an RDF representation
+     * Performs SmSn type inference on the knowledge base, optionally generating an RDF representation
      *
      * @param handler a handler for generated RDF statements (may be null)
      * @param filter  an optional sharability filter for generated results.

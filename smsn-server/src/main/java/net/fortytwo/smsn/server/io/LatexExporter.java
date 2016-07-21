@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.io;
 
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteQueries;
 
@@ -36,12 +36,12 @@ public class LatexExporter extends Exporter {
     }
 
     @Override
-    protected void exportInternal(ExtendoBrain sourceBrain, OutputStream destStream)
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream)
             throws IOException {
         String rootId = requireRootId();
         Filter filter = requireFilter();
 
-        Atom rootAtom = sourceBrain.getBrainGraph().getAtom(rootId);
+        Atom rootAtom = sourceBrain.getAtomGraph().getAtom(rootId);
         if (null == rootAtom) {
             throw new IllegalStateException("no such atom: " + rootId);
         }

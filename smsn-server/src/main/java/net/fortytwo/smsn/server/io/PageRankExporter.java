@@ -6,8 +6,8 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.oupls.jung.GraphJung;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,8 +28,8 @@ public class PageRankExporter extends Exporter {
     }
 
     @Override
-    protected void exportInternal(ExtendoBrain sourceBrain, OutputStream destStream) throws IOException {
-        BrainGraph sourceGraph = sourceBrain.getBrainGraph();
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
+        AtomGraph sourceGraph = sourceBrain.getAtomGraph();
 
         TinkerGraph tmpGraph = new TinkerGraph();
         for (Vertex v : sourceGraph.getPropertyGraph().getVertices()) {

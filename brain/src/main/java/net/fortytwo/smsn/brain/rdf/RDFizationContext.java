@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.AtomGraph;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
@@ -38,6 +38,6 @@ public class RDFizationContext {
     }
 
     public IRI iriOf(final Atom a) {
-        return valueFactory.createIRI(BrainGraph.iriOf(a));
+        return valueFactory.createIRI(AtomGraph.iriOf(a));
     }
 }

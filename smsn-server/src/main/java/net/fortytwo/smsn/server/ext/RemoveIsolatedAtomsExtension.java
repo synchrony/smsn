@@ -18,7 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A service for removing isolated atoms (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph
+ * A service for removing isolated atoms (i.e. atoms with neither parents nor children) from a MyOtherBrain graph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -27,7 +27,7 @@ public class RemoveIsolatedAtomsExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for for removing isolated atoms" +
-            " (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph")
+            " (i.e. atoms with neither parents nor children) from a MyOtherBrain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

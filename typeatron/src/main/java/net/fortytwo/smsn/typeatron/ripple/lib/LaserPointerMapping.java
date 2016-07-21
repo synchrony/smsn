@@ -3,7 +3,7 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
-import net.fortytwo.smsn.typeatron.ripple.ExtendoBrainClient;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
@@ -22,7 +22,7 @@ public class LaserPointerMapping extends AtomMapping {
 
     private final TypeatronControl typeatron;
 
-    public LaserPointerMapping(final ExtendoBrainClient client,
+    public LaserPointerMapping(final BrainClient client,
                                final Filter filter,
                                final TypeatronControl typeatron) {
         super(client, filter);

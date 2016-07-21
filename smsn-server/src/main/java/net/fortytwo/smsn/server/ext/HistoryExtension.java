@@ -29,7 +29,7 @@ import java.util.List;
 public class HistoryExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
+    @ExtensionDescriptor(description = "an extension for viewing MyOtherBrain browsing history")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
@@ -50,7 +50,7 @@ public class HistoryExtension extends SmSnExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        List<String> ids = getHistory(p.context, p.brain.getBrainGraph(), p.filter);
+        List<String> ids = getHistory(p.context, p.brain.getAtomGraph(), p.filter);
 
         addView(p.queries.customView(ids, p.filter), p);
 

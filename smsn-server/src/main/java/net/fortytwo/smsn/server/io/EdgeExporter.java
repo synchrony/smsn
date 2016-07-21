@@ -3,14 +3,13 @@ package net.fortytwo.smsn.server.io;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomList;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,8 +24,8 @@ public class EdgeExporter extends Exporter {
     }
 
     @Override
-    protected void exportInternal(ExtendoBrain sourceBrain, OutputStream destStream) throws IOException {
-        BrainGraph sourceGraph = sourceBrain.getBrainGraph();
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
+        AtomGraph sourceGraph = sourceBrain.getAtomGraph();
         PrintStream p = new PrintStream(destStream);
 
         p.println("from\tto");

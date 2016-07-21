@@ -13,7 +13,7 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
+import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.SmSnExtension;
@@ -102,7 +102,7 @@ public class SetPropertiesExtension extends SmSnExtension {
             case SemanticSynchrony.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) p.propertyValue;
-                for (Atom a : p.brain.getBrainGraph().getAtomsWithShortcut(shortcut, p.filter)) {
+                for (Atom a : p.brain.getAtomGraph().getAtomsWithShortcut(shortcut, p.filter)) {
                     a.setShortcut(null);
                 }
 
@@ -112,9 +112,9 @@ public class SetPropertiesExtension extends SmSnExtension {
                 throw new IllegalStateException();
         }
 
-        p.brain.getBrainGraph().updated();
+        p.brain.getAtomGraph().updated();
 
-        p.map.put("key", BrainGraph.getId(p.root));
+        p.map.put("key", AtomGraph.getId(p.root));
         p.map.put("name", "" + p.propertyName);
         p.map.put("value", "" + p.propertyValue);
 

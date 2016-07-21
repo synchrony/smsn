@@ -22,17 +22,17 @@ import java.io.IOException;
 import java.security.Principal;
 
 /**
- * A service for executing keyword search over an Extend-o-Brain graph
+ * A service for executing keyword search over a MyOtherBrain graph
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "search")
-//@ExtensionDescriptor(description = "execute keyword search over an Extend-o-Brain graph")
+//@ExtensionDescriptor(description = "execute keyword search over a MyOtherBrain graph")
 public class SearchExtension extends SmSnExtension {
 
     private static final int DEFAULT_VALUE_LENGTH_CUTOFF = 100;
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing full text search over an Extend-o-Brain graph")
+    @ExtensionDescriptor(description = "an extension for performing full text search over a MyOtherBrain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

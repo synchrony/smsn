@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * A graph of atoms and lists conforming to the Extend-o-Brain data model
+ * A graph of atoms and lists conforming to the MyOtherBrain data model
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class BrainGraph {
-    private static final Logger logger = SemanticSynchrony.getLogger(BrainGraph.class);
+public class AtomGraph {
+    private static final Logger logger = SemanticSynchrony.getLogger(AtomGraph.class);
 
     private final IdGraph<KeyIndexableGraph> graph;
 
@@ -32,7 +32,7 @@ public class BrainGraph {
 
     // full-text search
     private Index<Vertex> searchIndex;
-    // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
+    // search on first letters, e.g. "ny" finds "New York", "eob" finds "MyOtherBrain"
     private Index<Vertex> acronymIndex;
 
     private static final String thingNamespace;
@@ -54,8 +54,8 @@ public class BrainGraph {
         }
     }
 
-    public BrainGraph(final KeyIndexableGraph baseGraph) {
-        IdGraph.IdFactory f = new ExtendoIdFactory();
+    public AtomGraph(final KeyIndexableGraph baseGraph) {
+        IdGraph.IdFactory f = new AtomIdFactory();
         graph = new IdGraph<>(baseGraph);
         graph.setVertexIdFactory(f);
         graph.setEdgeIdFactory(f);
@@ -137,7 +137,7 @@ public class BrainGraph {
         return iriForId(getId(a));
     }
 
-    private static class ExtendoIdFactory implements IdGraph.IdFactory {
+    private static class AtomIdFactory implements IdGraph.IdFactory {
         public String createId() {
             return SemanticSynchrony.createRandomKey();
         }

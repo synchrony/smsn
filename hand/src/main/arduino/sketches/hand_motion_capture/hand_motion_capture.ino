@@ -1,7 +1,7 @@
 /*
  * Extend-o-Hand simple motion capture sketch, copyright 2014 by Joshua Shinavier
  * 
- * See: https://github.com/joshsh/extendo
+ * See: https://github.com/joshsh/smsn
  */
 
 #define THREEAXIS             0

@@ -2,7 +2,7 @@
   CrestDetector.h - utility for identifying successive crests in a signal
   The signal need not be sinusoidal, but it should oscillate between extremes with a characteristic amplitude
 
-  See: http://github.com/joshsh/extendo
+  See: http://github.com/joshsh/smsn
 
   Created by Joshua Shinavier, 2014
   Released into the public domain.

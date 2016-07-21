@@ -123,7 +123,7 @@ public class EventStackTest {
         w.toWikiText(eventStack.getEvents(), System.out);
     }
 
-    private long countAtoms(final BrainGraph bg) {
+    private long countAtoms(final AtomGraph bg) {
         long count = 0;
         for (Atom a : bg.getAtoms()) {
             count++;
