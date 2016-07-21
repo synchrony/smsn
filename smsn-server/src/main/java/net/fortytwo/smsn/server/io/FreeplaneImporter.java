@@ -2,9 +2,9 @@ package net.fortytwo.smsn.server.io;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.BrainGraph;
-import net.fortytwo.smsn.brain.ExtendoBrain;
+import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import org.w3c.dom.Document;
@@ -13,9 +13,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -29,6 +33,8 @@ import java.util.stream.Collectors;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FreeplaneImporter extends Importer {
+    public static final String FORMAT = "Freeplane";
+
     private static final String
             ELEMENTNAME_ARROWLINK = "arrowlink",
             ELEMENTNAME_BODY = "body",
@@ -44,17 +50,20 @@ public class FreeplaneImporter extends Importer {
             ATTR_LOCALIZED_STYLE_REF = "LOCALIZED_STYLE_REF",
             ATTR_TEXT = "TEXT";
 
-    public static final String FORMAT = "Freeplane";
+    private static final String SCHEMA_PATH = "freemind.xsd";
+
+
+    private static final boolean USE_VALIDATION = false;
 
     @Override
     public List<String> getFormats() {
         return Arrays.asList(FORMAT);
     }
 
-    private Map<BrainGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
+    private Map<AtomGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
 
     @Override
-    protected void importInternal(ExtendoBrain destBrain, InputStream sourceStream) throws IOException {
+    protected void importInternal(MyOtherBrain destBrain, InputStream sourceStream) throws IOException {
         Document doc;
         try {
             doc = parseStreamToDocument(sourceStream);
@@ -62,10 +71,10 @@ public class FreeplaneImporter extends Importer {
             throw new IOException(e);
         }
 
-        getParserInstanceFor(destBrain.getBrainGraph()).parseDOMToGraph(doc);
+        getParserInstanceFor(destBrain.getAtomGraph()).parseDOMToGraph(doc);
     }
 
-    private ParserInstance getParserInstanceFor(final BrainGraph destGraph) {
+    private ParserInstance getParserInstanceFor(final AtomGraph destGraph) {
         ParserInstance instance = parserInstancesByGraph.get(destGraph);
         if (null == instance) {
             instance = new ParserInstance(destGraph);
@@ -79,19 +88,30 @@ public class FreeplaneImporter extends Importer {
             throws ParserConfigurationException, IOException, org.xml.sax.SAXException {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(true);
+
+        if (USE_VALIDATION) configureValidation(factory);
+
         factory.setIgnoringElementContentWhitespace(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(sourceStream);
     }
 
+    private void configureValidation(DocumentBuilderFactory docFactory) throws SAXException {
+        docFactory.setNamespaceAware(true);
+        SchemaFactory schemaFactory =
+                SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        docFactory.setValidating(true);
+        Schema schema = schemaFactory.newSchema(new StreamSource(
+                getClass().getResourceAsStream(SCHEMA_PATH)));
+        docFactory.setSchema(schema);
+    }
 
-    private void persistNote(final BrainGraph destGraph, final Note rootNote)
-            throws ExtendoBrain.ExtendoBrainException, NoteQueries.InvalidUpdateException {
+    private void persistNote(final AtomGraph destGraph, final Note rootNote)
+            throws MyOtherBrain.BrainException, NoteQueries.InvalidUpdateException {
 
         int maxHeight = 1000;
 
-        ExtendoBrain brain = new ExtendoBrain(destGraph);
+        MyOtherBrain brain = new MyOtherBrain(destGraph);
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
 
@@ -168,12 +188,12 @@ public class FreeplaneImporter extends Importer {
     }
 
     private class ParserInstance {
-        private final BrainGraph destGraph;
+        private final AtomGraph destGraph;
         private Map<String, List<String>> arrowLinks = new HashMap<>();
         private Map<String, Note> notesByFreeplaneId = new HashMap<>();
         private Map<String, Note> styleNotes = new HashMap<>();
 
-        public ParserInstance(BrainGraph destGraph) {
+        public ParserInstance(AtomGraph destGraph) {
             this.destGraph = destGraph;
         }
 
@@ -187,7 +207,7 @@ public class FreeplaneImporter extends Importer {
             Note mindMapAsNote = parseTree(root);
             try {
                 persistNote(destGraph, mindMapAsNote);
-            } catch (ExtendoBrain.ExtendoBrainException | NoteQueries.InvalidUpdateException e) {
+            } catch (MyOtherBrain.BrainException | NoteQueries.InvalidUpdateException e) {
                 throw new IOException(e);
             }
 
