@@ -45,8 +45,6 @@
 ;; for LaTeX views (nice-to-have, but not essential)
 (require 'latex-math-preview)
 
-;;(eval-when-compile (require 'cl))
-
 
 ;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -83,11 +81,11 @@
   (setq brain-bufferlocal-context context)
   (make-local-variable 'brain-bufferlocal-context))
 
-(defun update-context (&optional context)
+(defun refresh-context (&optional context)
   (set-line (line-number-at-pos) context))
 
 (defun clone-context (&optional context)
-  (update-context context)
+  (refresh-context context)
   (let ((context (copy-alist (get-context context))))
     (set-future-sharability context)
     context))
@@ -144,7 +142,7 @@
 (defun set-style (style &optional context) (set-bufferlocal context 'style style))
 (defun set-title (title &optional context) (set-bufferlocal context 'title title))
 (defun set-value-length-cutoff (cutoff &optional context) (set-bufferlocal context 'value-length-cutoff cutoff))
-(defun set-view (view &optionai context) (set-bufferlocal context 'view view))
+(defun set-view (view &optional context) (set-bufferlocal context 'view view))
 (defun set-view-properties (view-properties &optional context) (set-bufferlocal context 'view-properties view-properties))
 (defun set-view-style (view-style &optional context) (set-bufferlocal context 'view-style view-style))
 
@@ -167,20 +165,33 @@
   (cons 'min-sharability brain-const-sharability-private)
   (cons 'min-weight brain-const-weight-none)
   (cons 'minimize-verbatim-blocks NIL)
-  (cons 'mode NIL) ;; Note: 'view-mode' is used by Emacs.
+  (cons 'mode brain-const-readonly-mode)
   (cons 'query NIL)
   (cons 'query-type NIL)
   (cons 'root-id NIL)
   (cons 'style brain-const-forward-style)
   (cons 'title NIL)
   (cons 'value-length-cutoff 100)
+  (cons 'view NIL)
   (cons 'view-properties NIL)
   (cons 'view-style brain-const-color-by-sharability)))
 
 (defun brain-define-buffer-local-variables ()
   (defvar brain-bufferlocal-context (default-context)))
 
-    
+
+;; MISC. HELPERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun debug-message (msg)
+  (message "%s" (concat "Debug: " msg)))
+
+(defun info-message (msg)
+  (message "%s" (concat "Info: " msg)))
+
+(defun error-message (msg)
+  (message "%s" (concat "Error: " msg)))
+
+
 ;; DATA MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun atom-id-at-point ()
@@ -277,7 +288,7 @@
         (alias (get-atom-alias atom))
         (meta (get-atom-meta atom)))
     ;;(type (get-atom-type atom)))
-    (message (concat
+    (info-message (concat
               ;;(if type (concat "type: " type ", "))
               (if meta (concat "[meta], "))
               "weight: " (number-to-string weight)
@@ -293,12 +304,6 @@
 
 
 ;; INTERFACE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun info-message (msg)
-  (message (concat "Info: " msg)))
-
-(defun error-message (msg)
-  (message (concat "Error: " msg)))
 
 (defconst fast-numbers
   '(
@@ -385,22 +390,24 @@
                  (append (encode-coding-string str (or coding 'utf-8))
                          nil))))
 
-(defun http-post (url args callback)
-  "Send ARGS to URL as a POST request."
+(defun format-request-data (params)
+  (debug-message (concat "request to encode: " (json-encode params)))
+  (mapconcat
+    (lambda (arg)
+      (concat
+        (w3m-url-encode-string (car arg))
+        "="
+        (w3m-url-encode-string (car (last arg)))))
+    params
+    "&"))
+
+(defun http-post (url params callback)
+  "Send PARAMS to URL as a POST request."
   (let ((url-request-method "POST")
         (url-request-extra-headers
          '(("Content-Type" . "application/x-www-form-urlencoded;charset=UTF-8")))
         (url-request-data
-         (mapconcat (lambda (arg)
-                      (concat
-                       (w3m-url-encode-string (car arg))
-                       "="
-                       (w3m-url-encode-string (car (last arg)))))
-                    ;;                      (concat (url-hexify-string (car arg))
-                    ;;                              "="
-                    ;;                              (url-hexify-string (cdr arg))))
-                    args
-                    "&")))
+          (format-request-data params)))
     (url-retrieve url callback)))
 
 (defun http-get (url callback)
@@ -426,12 +433,11 @@
         (show-http-response-status status json)
       (info-message success-message))))
 
-(defun brain-switch-to-buffer (name)
+(defun brain-switch-to-buffer (name context)
   "activate Brain-mode in all new view buffers created by Brain-mode"
-  (let ((context (get-context)))
-    (switch-to-buffer name)
-    (brain-mode)
-    (set-context context)))
+  (switch-to-buffer name)
+  (brain-mode)
+  (set-context context))
 
 (defun receive-view (&optional context)
   (lexical-let ((context (get-context context)))
@@ -439,24 +445,33 @@
 
 (defun receive-view-internal (status context)
   (let ((json (json-read-from-string (strip-http-headers (buffer-string))))
-        (editable (is-update-mode (get-mode context))))
+      (editable (is-readwrite-context context)))
+  (debug-message (concat "mode provided: " (get-mode context)))
+  (debug-message (concat "editable: " (if editable "T" "F")))
+  (debug-message (concat "context before: " (json-encode context)))
+  (debug-message (concat "global context before: " (json-encode brain-bufferlocal-context)))
     (if status
       (show-http-response-status status json)
+  (debug-message (concat "mode before: " (get-mode)))
       (let (
         (view (get-value 'view json))
-        (root (get-value 'root json))
+        (root-id (get-value 'root json))
         (height (numeric-value json 'height nil)))
-          (brain-switch-to-buffer (view-name root json))
+          (brain-switch-to-buffer (name-for-view-buffer root-id json) context)
           (receive-context json context)
-          (set-root-id root)
+  (debug-message (concat "context after: " (json-encode context)))
+  (debug-message (concat "global context after: " (json-encode brain-bufferlocal-context)))
+  (debug-message (concat "root: " root-id))
+  (debug-message (concat "json: " (json-encode json)))
           (if (equal (get-mode) brain-const-search-mode)
               ;; Always leave a search view with height 1, rather than that of the last view.
               ;; The user experience is a little unpredictable otherwise.
               (setq brain-current-height 1)
               (if height (setq brain-current-height height)))
           (erase-buffer)
-  ;;(error "got the view...")
-          (write-view editable (get-value 'children view) 0)
+  (debug-message "got the view...")
+   (debug-message (concat "mode after: " (get-mode)))
+         (write-view editable (get-value 'children view) 0)
           (beginning-of-buffer)
           (setq visible-cursor t)
           ;; Try to move to the corresponding line in the previous view.
@@ -516,16 +531,16 @@
       :maxWeight (get-max-weight context)
       :defaultWeight (get-default-weight context))))
 
-(defun url-for-request (path params)
+(defun entity-for-request (params)
+  (w3m-url-encode-string (json-encode params)))
+
+(defun url-for-request (path &optional params)
   (concat
     (base-url)
     path
     (if params
       (entity-for-request params)
       nil)))
-
-(defun entity-for-request (params)
-  (w3m-url-encode-string (json-encode params)))
 
 (defun url-for-view-request (&optional context)
   (url-for-request "view?request=" (to-query-list context)))
@@ -534,8 +549,8 @@
   (http-get url
     (if handler handler (receive-view context))))
 
-(defun http-post-and-receive (url entity &optional handler context)
-  (http-get url
+(defun http-post-and-receive (url params &optional handler context)
+  (http-post url params
     (if handler handler (receive-view context))))
 
 (defun to-params (context params)
@@ -547,7 +562,8 @@
 
 (defun fetch-path-post (path context params &optional handler)
   (http-post-and-receive (url-for-request path)
-    (entity-for-request (to-params context params)) handler context))
+    (to-params context params) handler context))
+    ;;(entity-for-request (to-params context params)) handler context))
 
 (defun fetch-view (&optional context)
   (http-get-and-receive (url-for-view-request context) nil context))
@@ -625,14 +641,7 @@
   (let ((context (clone-context)) (entity (buffer-string)))
     (set-view entity context)
     (set-mode brain-const-edit-mode context)
-    (let ((params (list
-      :height (number-to-string (get-height))
-      :style (get-style)
-      :view entity
-      :filter (filter-json
-      (get-min-sharability) (get-max-sharability) (get-default-sharability)
-      (get-min-weight) (get-max-weight) (get-default-weight)))))
-        (fetch-path-post "update" context params))))
+    (fetch-path-post "update" context nil)))
          
 (defun do-infer-types ()
   (http-get
@@ -650,14 +659,15 @@
 
 (defvar full-colors-supported (> (length (defined-colors)) 8))
 
-(defun view-name (root-id json)
+(defun shorten-title (str maxlen)
+  (if (> (length str) maxlen)
+    (concat (substring str 0 maxlen) "...")
+    str))
+
+(defun name-for-view-buffer (root-id json)
   (let ((title (get-value 'title json)))
     (if root-id
-        (let ((name
-               (if (> (length title) 20)
-                   (concat (substring title 0 20) "...")
-                 title)))
-          (concat name " [" root-id "]"))
+      (concat (shorten-title title 20) " [" root-id "]")
       title)))
 
 (defun using-inference ()
@@ -820,17 +830,15 @@
       t
     (and (error-message "cannot set properties in current mode") nil)))
 
-(defun in-update-mode ()
-  (if (or
-       (equal (get-mode) brain-const-edit-mode)
-       (equal (get-mode) brain-const-search-mode))
-      t
-    (and (error-message "cannot update view in current mode") nil)))
+(defun is-readwrite-context (&optional context)
+  (let ((mode (get-mode context)))
+    (and mode
+      (equal mode brain-const-edit-mode))))
 
-(defun is-update-mode (mode)
-  (or
-   (equal mode brain-const-edit-mode)
-   (equal mode brain-const-search-mode)))
+(defun assert-readwrite-context ()
+  (if (is-readwrite-context)
+    t
+    (and (error-message (concat "cannot update view in current mode: " (get-mode))) nil)))
 
 
 ;; UPDATES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -924,6 +932,7 @@
 (defun brain-enter-edit-view ()
   "enter edit (read/write) mode in the current view"
   (interactive)
+(debug-message (concat "current mode: " (get-mode)))
   (if (equal (get-mode) brain-const-readonly-mode)
     (let ((context (clone-context)))
       (set-mode brain-const-edit-mode context)
@@ -945,49 +954,49 @@
 (defun brain-export-edges (file)
   "export tab-separated dump of MyOtherBrain parent-child edges to the file system"
   (interactive)
-  (message (concat "exporting edges to " file))
+  (info-message (concat "exporting edges to " file))
   (do-export "Edges" file))
 
 (defun brain-export-graphml (file)
   "export a GraphML dump of the knowledge base to the file system"
   (interactive)
-  (message (concat "exporting GraphML to " file))
+  (info-message (concat "exporting GraphML to " file))
   (do-export "GraphML" file))
 
 (defun brain-export-latex (file)
   "export a LaTeX-formatted view of a subtree of the knowledge base to the file system"
   (interactive)
-  (message (concat "exporting LaTeX to " file))
+  (info-message (concat "exporting LaTeX to " file))
   (do-export "LaTeX" file))
 
 (defun brain-export-pagerank (file)
   "export a tab-separated PageRank ranking of MyOtherBrain atoms to the file system"
   (interactive)
-  (message (concat "computing and exporting PageRank to " file))
+  (info-message (concat "computing and exporting PageRank to " file))
   (do-export "PageRank" file))
 
 (defun brain-export-rdf (file)
   "export a complete RDF dump of the knowledge base (including personal and private data) to the file system"
   (interactive)
-  (message (concat "exporting private RDF dump to " file))
+  (info-message (concat "exporting private RDF dump to " file))
   (do-export "RDF" file))
 
 (defun brain-export-webrdf (file)
   "export a Web-friendly dump of the public portion of the knowledge base to the file system"
   (interactive)
-  (message (concat "exporting public Web RDF dump to " file))
+  (info-message (concat "exporting public Web RDF dump to " file))
   (do-export "Web" file))
 
 (defun brain-export-vertices (file)
   "export tab-separated dump of MyOtherBrain vertices (atoms) to the file system"
   (interactive)
-  (message (concat "exporting vertices to " file))
+  (info-message (concat "exporting vertices to " file))
   (do-export "Vertices" file))
 
 (defun brain-import-graphml (file)
   "import a GraphML dump from the file system into the knowledge base"
   (interactive)
-  (message (concat "importing GraphML from " file))
+  (info-message (concat "importing GraphML from " file))
   (do-import "GraphML" file))
 
 (defun brain-find-isolated-atoms ()
@@ -1021,7 +1030,7 @@
 (defun brain-infer-types ()
   "perform type inference on the MyOtherBrain knowledge base, adding type annotations"
   (interactive)
-  (message "performing type inference")
+  (info-message "performing type inference")
   (do-infer-types))
 
 (defun brain-insert-attr-priority (expr)
@@ -1072,7 +1081,7 @@
 (defun brain-push-view ()
   "push an up-to-date view into the knowledge base"
   (interactive)
-  (if (in-update-mode)
+  (if (assert-readwrite-context)
     (push-view)))
 
 (defun brain-ripple-query (query)
@@ -1165,21 +1174,21 @@ a type has been assigned to it by the inference engine."
                                      brain-const-color-by-class-inference
                                    brain-const-color-by-sharability))
   (brain-update-view)
-  (message (concat "switched to " (get-view-style) " view style")))
+  (info-message (concat "switched to " (get-view-style) " view style")))
 
 (defun brain-toggle-minimize-verbatim-blocks ()
   "enable or disable the hiding of the contents of {{{verbatim blocks}}}, which may span multiple lines"
   (interactive)
   (set-minimize-verbatim-blocks (not (get-minimize-verbatim-blocks)))
   (brain-update-view)
-  (message (concat (if (get-minimize-verbatim-blocks) "minimized" "expanded") " verbatim blocks")))
+  (info-message (concat (if (get-minimize-verbatim-blocks) "minimized" "expanded") " verbatim blocks")))
 
 (defun brain-toggle-properties-view ()
   "enable or disable the explicit display of atom properties as extra lines within views"
   (interactive)
   (set-view-properties (not (get-view-properties)))
   (brain-update-view)
-  (message (concat (if (get-view-properties) "enabled" "disabled") " property view")))
+  (info-message (concat (if (get-view-properties) "enabled" "disabled") " property view")))
 
 (defun brain-toggle-truncate-lines ()
   "toggle line wrap mode"
@@ -1254,17 +1263,18 @@ a type has been assigned to it by the inference engine."
   (visit-target-value value-selector (lambda (value)
                                        (concat "http://www.youtube.com/results?search_query=" (w3m-url-encode-string value)))))
 
-(defun brain-visit-target ()
+(defun brain-navigate-to-target-atom ()
   "navigate to the atom at point, opening a new view with that atom as root"
   (interactive)
   (let ((id (atom-id-at-point)))
     (if id
         (let ((context (clone-context)))
           (set-root-id id context)
+          (set-mode brain-const-readonly-mode context)
           (fetch-view context))
       (no-target))))
 
-(defun brain-visit-target-alias ()
+(defun brain-navigate-to-target-atom-alias ()
   "visit the @alias of the atom at point (normally a URL) in a browser"
   (interactive)
   (let ((alias (current-target-alias)))
@@ -1423,7 +1433,7 @@ a type has been assigned to it by the inference engine."
     (define-key brain-mode-map (kbd "C-c C-r C-b w")   (brain-visit-in-wikipedia 'current-root-value))
     (define-key brain-mode-map (kbd "C-c C-r C-b y")   (brain-visit-in-youtube 'current-root-value))
     (define-key brain-mode-map (kbd "C-c C-s C-m")     'brain-set-min-sharability-prompt)
-    (define-key brain-mode-map (kbd "C-c C-t C-a b")   'brain-visit-target-alias)
+    (define-key brain-mode-map (kbd "C-c C-t C-a b")   'brain-navigate-to-target-atom-alias)
     (define-key brain-mode-map (kbd "C-c C-t C-b a")   (brain-visit-in-amazon 'current-target-value))
     (define-key brain-mode-map (kbd "C-c C-t C-b e")   (brain-visit-in-ebay 'current-target-value))
     (define-key brain-mode-map (kbd "C-c C-t C-b d")   (brain-visit-in-delicious 'current-target-value))
@@ -1464,7 +1474,7 @@ a type has been assigned to it by the inference engine."
     (define-key brain-mode-map (kbd "C-c C-w r")       'brain-ripple-query-prompt)
       ;; likely not the greatest shortcut -- w just stands for weird
     (define-key brain-mode-map (kbd "C-c s")           'brain-fulltext-query-prompt)
-    (define-key brain-mode-map (kbd "C-c t")           'brain-visit-target)
+    (define-key brain-mode-map (kbd "C-c t")           'brain-navigate-to-target-atom)
     (define-key brain-mode-map (kbd "C-c u")           'brain-update-view)
     (define-key brain-mode-map (kbd "C-c C-w v")       'brain-events)))
       ;; likely not the greatest shortcut -- w just stands for weird

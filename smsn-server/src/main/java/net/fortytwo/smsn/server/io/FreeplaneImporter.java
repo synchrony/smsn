@@ -50,10 +50,9 @@ public class FreeplaneImporter extends Importer {
             ATTR_LOCALIZED_STYLE_REF = "LOCALIZED_STYLE_REF",
             ATTR_TEXT = "TEXT";
 
-    private static final String SCHEMA_PATH = "freemind.xsd";
+    private static final String SCHEMA_PATH = "freeplane.xsd";
 
-
-    private static final boolean USE_VALIDATION = false;
+    private static final boolean USE_VALIDATION = true;
 
     @Override
     public List<String> getFormats() {
@@ -96,6 +95,7 @@ public class FreeplaneImporter extends Importer {
         return builder.parse(sourceStream);
     }
 
+    // as of July 2016: http://www.freeplane.org/wiki/index.php/Current_Freeplane_File_Format
     private void configureValidation(DocumentBuilderFactory docFactory) throws SAXException {
         docFactory.setNamespaceAware(true);
         SchemaFactory schemaFactory =
