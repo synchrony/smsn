@@ -9,10 +9,8 @@ import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.server.io.BrainReader;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
-import net.fortytwo.smsn.server.io.freeplane.FreeplaneFormat;
-import net.fortytwo.smsn.server.io.freeplane.FreeplaneReader;
-import net.fortytwo.smsn.server.io.graphml.GraphMLWriter;
 import net.fortytwo.smsn.server.io.graphml.GraphMLFormat;
+import net.fortytwo.smsn.server.io.graphml.GraphMLWriter;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,9 +32,9 @@ public class FreeplaneReaderIT {
         MyOtherBrain brain = new MyOtherBrain(atomGraph);
 
         Format format = Format.getFormat("freeplane");
-        Assert.assertNotNull(format);
+        assertNotNull(format);
         BrainReader reader = Format.getReader(format);
-        Assert.assertNotNull(reader);
+        assertNotNull(reader);
 
         reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain, true);
 
