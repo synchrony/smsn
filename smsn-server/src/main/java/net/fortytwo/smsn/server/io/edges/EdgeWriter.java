@@ -1,10 +1,12 @@
-package net.fortytwo.smsn.server.io;
+package net.fortytwo.smsn.server.io.edges;
 
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomList;
 import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.server.io.BrainWriter;
+import net.fortytwo.smsn.server.io.Format;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,16 +17,15 @@ import java.util.List;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class EdgeExporter extends Exporter {
-    public static final String FORMAT = "Edges";
+public class EdgeWriter extends BrainWriter {
 
     @Override
-    public List<String> getFormats() {
-        return Arrays.asList(FORMAT);
+    public List<Format> getFormats() {
+        return Arrays.asList(EdgeTSVFormat.getInstance());
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format) throws IOException {
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();
         PrintStream p = new PrintStream(destStream);
 

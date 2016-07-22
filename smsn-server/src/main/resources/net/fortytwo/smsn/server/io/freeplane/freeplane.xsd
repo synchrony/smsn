@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <xs:element name='Parameters'>
+        <xs:complexType>
+            <!--Is the time management plugin.-->
+            <xs:attribute name='REMINDUSERAT' type='xs:integer' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <!--Used for node notes.-->
+    <xs:element name='text'>
+        <xs:complexType/>
+    </xs:element>
+
+    <!-- BEGIN ATTRIBUTES -->
+
+    <xs:element name='attribute_value'>
+        <xs:complexType>
+            <xs:attribute name='VALUE' type='xs:string' use='required'/>
+            <xs:attribute name='TYPE' type='xs:string' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='attribute_name'>
+        <xs:complexType>
+            <xs:choice minOccurs='0' maxOccurs='unbounded'>
+                <xs:element ref='attribute_value'/>
+            </xs:choice>
+            <xs:attribute name='NAME' type='xs:string' use='required'/>
+            <xs:attribute name='MANUAL' type='xs:boolean' use='optional' />
+            <xs:attribute name='RESTRICTED' type='xs:boolean' use='optional' />
+            <xs:attribute name='VISIBLE' type='xs:boolean' use='optional' />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='attribute_registry'>
+        <xs:complexType>
+            <xs:choice minOccurs='0' maxOccurs='unbounded'>
+                <xs:element ref='attribute_name'/>
+            </xs:choice>
+            <xs:attribute name='RESTRICTED' type='xs:boolean' use='optional' />
+            <xs:attribute name='SHOW_ATTRIBUTES' use='optional'>
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value='selected'/>
+                        <xs:enumeration value='hide'/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='attribute_layout'>
+        <xs:complexType>
+            <xs:attribute name='NAME_WIDTH'  type='xs:integer' use='optional'/>
+            <xs:attribute name='VALUE_WIDTH' type='xs:integer' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='attribute'>
+        <xs:complexType>
+            <xs:attribute name='NAME'  type='xs:string' use='required'/>
+            <xs:attribute name='VALUE' type='xs:string' use='required'/>
+            <xs:attribute name='TYPE' type='xs:string' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- END ATTRIBUTES -->
+
+    <xs:element name='arrowlink'>
+        <xs:complexType>
+            <xs:attribute name='COLOR' type='xs:string' use='optional'/>
+            <xs:attribute name='DESTINATION' type='xs:string' use='required'/>
+            <xs:attribute name='ENDARROW' type='xs:string' use='optional'/>
+            <xs:attribute name='ENDINCLINATION' type='xs:string' use='optional'/>
+            <xs:attribute name='ID' type='xs:string' use='optional'/>
+            <xs:attribute name='STARTARROW' type='xs:string' use='optional'/>
+            <xs:attribute name='STARTINCLINATION' type='xs:string' use='optional'/>
+            <xs:attribute name='SOURCE_LABEL' type='xs:string' use='optional'/>
+            <xs:attribute name='MIDDLE_LABEL' type='xs:string' use='optional'/>
+            <xs:attribute name='TARGET_LABEL' type='xs:string' use='optional'/>
+            <xs:attribute name='EDGE_LIKE' type='xs:boolean' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='cloud'>
+        <xs:complexType>
+            <xs:attribute name='COLOR' type='xs:string' use='optional'/>
+            <xs:attribute name='WIDTH' type='xs:integer' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='edge'>
+        <xs:complexType>
+            <xs:attribute name='COLOR' type='xs:string' use='optional'/>
+            <xs:attribute name='STYLE' type='xs:string' use='optional'/>
+            <xs:attribute name='WIDTH' type='xs:string' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='font'>
+        <xs:complexType>
+            <xs:attribute name='BOLD' use='optional'>
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value='true'/>
+                        <xs:enumeration value='false'/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name='ITALIC' use='optional'>
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value='true'/>
+                        <xs:enumeration value='false'/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name='NAME' type='xs:string' use='optional'/>
+            <xs:attribute name='SIZE' type='xs:integer' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='hook'>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref='Parameters' minOccurs='0' maxOccurs='1'/>
+                <xs:element ref='text' minOccurs='0' maxOccurs='1'/>
+            </xs:sequence>
+            <xs:attribute name='NAME' type='xs:string' use='required'/>
+            <!-- for embedded images NAME="ExternalObject" -->
+            <xs:attribute name='URI'  type='xs:anyURI' use='optional'/>
+            <xs:attribute name='SIZE' type='xs:decimal' use='optional'/>
+            <!-- for map config info NAME="MapStyle" -->
+            <xs:attribute name='max_node_width'  type='xs:integer' use='optional'/>
+            <xs:attribute name='zoom' type='xs:decimal' use='optional'/>
+            <!-- for equations NAME="plugins/latex/LatexNodeHook.properties" -->
+            <xs:attribute name='EQUATION' type='xs:string' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='icon'>
+        <xs:complexType>
+            <xs:attribute name='BUILTIN' type='xs:string' use='required'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='html'>
+        <xs:complexType>
+            <xs:sequence>
+                <!--Anything that is valid XML, but should be http://www.w3.org/1999/xhtml -->
+                <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='richcontent'>
+        <xs:complexType>
+            <!-- And contains XHTML as unique child:-->
+            <xs:sequence>
+                <xs:element ref='html' minOccurs='1' maxOccurs='1'/>
+            </xs:sequence>
+            <!--Currently, only NODE or NOTE is allowed.-->
+            <xs:attribute name='TYPE' use='required'>
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value='NODE'/>
+                        <xs:enumeration value='NOTE'/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='map'>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref='attribute_registry' minOccurs='0' maxOccurs='1'/>
+                <xs:element ref='node' minOccurs='1' maxOccurs='1' />
+            </xs:sequence>
+            <xs:attribute name='version' type='xs:string' use='required'/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='node'>
+        <xs:complexType>
+            <xs:choice minOccurs='0' maxOccurs='unbounded'>
+                <xs:element ref='arrowlink'/>
+                <xs:element ref='cloud'/>
+                <xs:element ref='edge'/>
+                <xs:element ref='font'/>
+                <xs:element ref='hook'/>
+                <xs:element ref='icon'/>
+                <xs:element ref='node'/>
+                <!-- For nodes with extended formatting content or for notes to nodes. -->
+                <xs:element ref='richcontent'/>
+                <xs:element ref='attribute_layout'/>
+                <xs:element ref='attribute'/>
+            </xs:choice>
+            <xs:attribute name='BACKGROUND_COLOR' type='xs:string' use='optional'/>
+            <xs:attribute name='COLOR' type='xs:string' use='optional'/>
+            <xs:attribute name='FOLDED' use='optional'>
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value='true'/>
+                        <xs:enumeration value='false'/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name='ID' type='xs:ID' use='optional'/>
+            <xs:attribute name='LINK' type='xs:string' use='optional'/>
+            <xs:attribute name='POSITION' use='optional'>
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value='left'/>
+                        <xs:enumeration value='right'/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name='STYLE' type='xs:string' use='optional'/>
+            <xs:attribute name='TEXT' type='xs:string' use='optional'/>
+            <xs:attribute name='LOCALIZED_TEXT' type='xs:string' use='optional'/>
+            <xs:attribute name='TYPE' type='xs:string' use='optional'/>
+            <xs:attribute name='CREATED' type='xs:integer' use='optional'/>
+            <xs:attribute name='MODIFIED' type='xs:integer' use='optional'/>
+            <xs:attribute name='HGAP' type='xs:integer' use='optional'/>
+            <xs:attribute name='VGAP' type='xs:integer' use='optional'/>
+            <xs:attribute name='VSHIFT' type='xs:integer' use='optional'/>
+            <xs:attribute name='ENCRYPTED_CONTENT' type='xs:string' use='optional'/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,9 +1,11 @@
-package net.fortytwo.smsn.server.io;
+package net.fortytwo.smsn.server.io.latex;
 
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.server.io.BrainWriter;
+import net.fortytwo.smsn.server.io.Format;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +17,7 @@ import java.util.Set;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class LatexExporter extends Exporter {
+public class LatexWriter extends BrainWriter {
 
     private static final int MAX_LATEX_RECURSE_LEVELS = 16;
 
@@ -28,15 +30,13 @@ public class LatexExporter extends Exporter {
         nonbreakingKeywords = keywords("begin", "caption", "end", "item", "label", "textbf");
     }
 
-    public static final String FORMAT = "LaTeX";
-
     @Override
-    public List<String> getFormats() {
-        return Arrays.asList(FORMAT);
+    public List<Format> getFormats() {
+        return Arrays.asList(LatexFormat.getInstance());
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream)
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
         String rootId = requireRootId();
         Filter filter = requireFilter();

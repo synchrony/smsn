@@ -993,6 +993,12 @@
   (info-message (concat "exporting vertices to " file))
   (do-export "Vertices" file))
 
+(defun brain-import-freeplane (file)
+  "import one or more Freeplane files into the knowledge base"
+  (interactive)
+  (info-message (concat "importing Freeplane nodes from " file))
+  (do-import "Freeplane" file))
+
 (defun brain-import-graphml (file)
   "import a GraphML dump from the file system into the knowledge base"
   (interactive)
@@ -1348,6 +1354,10 @@ a type has been assigned to it by the inference engine."
   (interactive)
   (prompt-for-string 'brain-export-webrdf "export public Web RDF dump to file: " brain-default-webrdf-file))
 
+(defun brain-import-freeplane-prompt ()
+  (interactive)
+  (prompt-for-string 'brain-import-freeplane "import Freeplane data from file/directory: " brain-default-freeplane-file))
+
 (defun brain-import-graphml-prompt ()
   (interactive)
   (prompt-for-string 'brain-import-graphml "import GraphML from file: " brain-default-graphml-file))
@@ -1405,8 +1415,8 @@ a type has been assigned to it by the inference engine."
 (if brain-mode-map ()
   (progn
     (setq brain-mode-map (make-sparse-keymap))
-    (define-key brain-mode-map (kbd "C-c C-i f")       'brain-find-isolated-atoms)
-    (define-key brain-mode-map (kbd "C-c C-i r")       'brain-remove-isolated-atoms)
+    (define-key brain-mode-map (kbd "C-c C-I f")       'brain-find-isolated-atoms)
+    (define-key brain-mode-map (kbd "C-c C-I r")       'brain-remove-isolated-atoms)
     (define-key brain-mode-map (kbd "C-c C-a C-p")     'brain-insert-attr-priority-prompt)
     (define-key brain-mode-map (kbd "C-c C-a C-s")     'brain-insert-attr-sharability-prompt)
     (define-key brain-mode-map (kbd "C-c C-a C-w")     'brain-insert-attr-weight-prompt)
@@ -1421,6 +1431,7 @@ a type has been assigned to it by the inference engine."
     (define-key brain-mode-map (kbd "C-c C-e r")       'brain-export-rdf-prompt)
     (define-key brain-mode-map (kbd "C-c C-e v")       'brain-export-vertices-prompt)
     (define-key brain-mode-map (kbd "C-c C-e w")       'brain-export-webrdf-prompt)
+    (define-key brain-mode-map (kbd "C-c C-i f")       'brain-import-graphml-prompt)
     (define-key brain-mode-map (kbd "C-c C-i g")       'brain-import-graphml-prompt)
     (define-key brain-mode-map (kbd "C-c l")           'brain-goto-line-prompt)
     (define-key brain-mode-map (kbd "C-c C-r C-b a")   (brain-visit-in-amazon 'current-root-value))

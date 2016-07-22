@@ -11,18 +11,19 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public abstract class Exporter {
-    protected static final Logger logger = Logger.getLogger(Exporter.class.getName());
+public abstract class BrainWriter {
+    protected static final Logger logger = Logger.getLogger(BrainWriter.class.getName());
 
     private Filter filter;
     private String rootId;
 
-    public abstract List<String> getFormats();
+    public abstract List<Format> getFormats();
 
-    protected abstract void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException;
+    protected abstract void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+            throws IOException;
 
-    public void doExport(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
-        exportInternal(sourceBrain, destStream);
+    public void doExport(MyOtherBrain sourceBrain, OutputStream destStream, Format format) throws IOException {
+        exportInternal(sourceBrain, destStream, format);
     }
 
     protected String requireRootId() {

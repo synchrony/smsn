@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server;
+package net.fortytwo.smsn.server.io.rdf;
 
 import org.openrdf.rio.RDFFormat;
 

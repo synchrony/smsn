@@ -1,10 +1,12 @@
-package net.fortytwo.smsn.server.io;
+package net.fortytwo.smsn.server.io.vertices;
 
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
+import net.fortytwo.smsn.server.io.BrainWriter;
+import net.fortytwo.smsn.server.io.Format;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,18 +18,18 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class VertexExporter extends Exporter {
-    protected static final Logger logger = Logger.getLogger(VertexExporter.class.getName());
-
-    public static final String FORMAT = "Vertices";
+public class VertexWriter extends BrainWriter {
+    protected static final Logger logger = Logger.getLogger(VertexWriter.class.getName());
 
     @Override
-    public List<String> getFormats() {
-        return Arrays.asList(FORMAT);
+    public List<Format> getFormats() {
+        return Arrays.asList(VertexTSVFormat.getInstance());
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+            throws IOException {
+
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();
         KnowledgeBase sourceKb = sourceBrain.getKnowledgeBase();
         PrintStream p = new PrintStream(destStream);

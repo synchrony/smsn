@@ -11,17 +11,22 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.server.ImporterLoader;
+import net.fortytwo.smsn.server.io.Format;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.SmSnExtension;
-import net.fortytwo.smsn.server.io.Importer;
+import net.fortytwo.smsn.server.io.BrainReader;
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -107,11 +112,8 @@ public class ImportExtension extends SmSnExtension {
             return ExtensionResponse.error("format is required");
         }
 
-        Importer importer = getImporter(p.format);
-
-        if (null == importer) {
-            return ExtensionResponse.error("no such format: " + p.format);
-        }
+        Format format = Format.getFormat(p.format);
+        BrainReader reader = Format.getReader(format);
 
         ExtensionResponse r = beginImport(p.baseGraph, p.file);
         if (null != r) {
@@ -119,28 +121,13 @@ public class ImportExtension extends SmSnExtension {
         }
 
         boolean success = false;
-
-        try (InputStream sourceStream = new FileInputStream(p.file)) {
-            importer.setDefaultNodeName(p.file);
-            importer.doImport(p.brain, sourceStream);
-            success = true;
+        try {
+            reader.doImport(new File(p.file), format, p.brain, true);
         } finally {
             finishImport(p.baseGraph, p.file, success);
         }
 
         return ExtensionResponse.ok(p.map);
-    }
-
-    private Importer getImporter(final String format) {
-        // get a fresh (w.r.t. state) importer
-        Map<String, Importer> importersByFormat = new ImporterLoader().loadAll();
-
-        Importer importer = importersByFormat.get(format);
-        if (null == importer) {
-            throw new IllegalArgumentException("no importer for format " + format);
-        }
-
-        return importer;
     }
 
     protected boolean doesRead() {

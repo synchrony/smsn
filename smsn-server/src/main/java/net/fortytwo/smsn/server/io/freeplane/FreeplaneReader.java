@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server.io;
+package net.fortytwo.smsn.server.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
@@ -7,6 +7,8 @@ import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.server.io.Format;
+import net.fortytwo.smsn.server.io.BrainReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,8 +34,7 @@ import java.util.stream.Collectors;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class FreeplaneImporter extends Importer {
-    public static final String FORMAT = "Freeplane";
+public class FreeplaneReader extends BrainReader {
 
     private static final String
             ELEMENTNAME_ARROWLINK = "arrowlink",
@@ -55,14 +56,14 @@ public class FreeplaneImporter extends Importer {
     private static final boolean USE_VALIDATION = true;
 
     @Override
-    public List<String> getFormats() {
-        return Arrays.asList(FORMAT);
+    public List<Format> getFormats() {
+        return Arrays.asList(FreeplaneFormat.getInstance());
     }
 
     private Map<AtomGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
 
     @Override
-    protected void importInternal(MyOtherBrain destBrain, InputStream sourceStream) throws IOException {
+    protected void importInternal(MyOtherBrain destBrain, InputStream sourceStream, Format format) throws IOException {
         Document doc;
         try {
             doc = parseStreamToDocument(sourceStream);

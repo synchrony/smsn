@@ -12,9 +12,9 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.server.ExporterLoader;
 import net.fortytwo.smsn.server.SmSnExtension;
-import net.fortytwo.smsn.server.io.Exporter;
+import net.fortytwo.smsn.server.io.BrainWriter;
+import net.fortytwo.smsn.server.io.Format;
 import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +22,6 @@ import org.json.JSONObject;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.Principal;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -73,28 +72,17 @@ public class ExportExtension extends SmSnExtension {
             return ExtensionResponse.error("format is required");
         }
 
-        Exporter exporter = getExporter(p.format);
+        Format format = Format.getFormat(p.format);
+        BrainWriter writer = Format.getWriter(format);
 
-        exporter.setFilter(p.filter);
-        exporter.setRootId(p.rootId);
+        writer.setFilter(p.filter);
+        writer.setRootId(p.rootId);
 
         try (OutputStream destStream = new FileOutputStream(p.file)) {
-            exporter.doExport(p.brain, destStream);
+            writer.doExport(p.brain, destStream, format);
         }
 
         return ExtensionResponse.ok(p.map);
-    }
-
-    private Exporter getExporter(final String format) {
-        // get a fresh (w.r.t. state) exporter
-        Map<String, Exporter> exportersByFormat = new ExporterLoader().loadAll();
-
-        Exporter exporter = exportersByFormat.get(format);
-        if (null == exporter) {
-            throw new IllegalArgumentException("no exporter for format " + format);
-        }
-
-        return exporter;
     }
 
     protected boolean doesRead() {

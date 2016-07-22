@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server.io;
+package net.fortytwo.smsn.server.io.pagerank;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -8,6 +8,8 @@ import com.tinkerpop.blueprints.oupls.jung.GraphJung;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
 import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.server.io.BrainWriter;
+import net.fortytwo.smsn.server.io.Format;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,17 +20,16 @@ import java.util.List;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class PageRankExporter extends Exporter {
-
-    public static final String FORMAT = "PageRank";
+public class PageRankWriter extends BrainWriter {
 
     @Override
-    public List<String> getFormats() {
-        return Arrays.asList(FORMAT);
+    public List<Format> getFormats() {
+        return Arrays.asList(PageRankTSVFormat.getInstance());
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream) throws IOException {
+    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+            throws IOException {
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();
 
         TinkerGraph tmpGraph = new TinkerGraph();
