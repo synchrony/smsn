@@ -434,7 +434,7 @@
         (show-http-response-status status json)
       (info-message success-message))))
 
-(defun switch-to-buffer (name context)
+(defun switch-to-buffer-context (name context)
   "activate Brain-mode in all new view buffers created by Brain-mode"
   (switch-to-buffer name)
   (setq buffer-read-only nil)
@@ -454,7 +454,7 @@
         (view (get-value 'view json))
         (root-id (get-value 'root json))
         (height (numeric-value json 'height nil)))
-          (switch-to-buffer (name-for-view-buffer root-id json) context)
+          (switch-to-buffer-context (name-for-view-buffer root-id json) context)
           (receive-context json context)
           (if (equal (get-mode) brain-const-search-mode)
               ;; Always leave a search view with height 1, rather than that of the last view.
@@ -504,6 +504,11 @@
 (defun receive-remove-isolated-atoms-response (status)
   (acknowledge-http-response status "removed isolated atoms"))
 
+(defun receive-set-properties-response (status)
+  (if status
+    (show-http-response-status status json)
+    (fetch-view)))
+
 (defun to-query-list (&optional context)
   (list
     :root (get-root-id context)
@@ -538,7 +543,7 @@
 (defun url-for-view-request (&optional context)
   (url-for-request "view?request=" (to-query-list context)))
 
-(defun http-get-and-receive (url &optional handler context)
+(defun http-get-and-receive (url &optional context handler)
   (http-get url
     (if handler handler (receive-view context))))
 
@@ -551,14 +556,14 @@
     (to-query-list (if context context (get-context)))))
     
 (defun fetch-path (path context params &optional handler)
-  (http-get-and-receive (url-for-request path (to-params context params)) handler context))
+  (http-get-and-receive (url-for-request path (to-params context params)) context handler))
 
 (defun fetch-path-post (path context params &optional handler)
   (http-post-and-receive (url-for-request path)
     (to-params context params) handler context))
 
-(defun fetch-view (&optional context)
-  (http-get-and-receive (url-for-view-request context) nil context))
+(defun fetch-view (&optional context handler)
+  (http-get-and-receive (url-for-view-request context) context handler))
 
 (defun fetch-history ()
   (let ((context (create-search-context)))
@@ -614,8 +619,7 @@
 (defun set-property (id name value)
   (if (in-setproperties-mode)
     (let ((params (list :id id :name name :value value)))
-       (fetch-path "set?request=" nil params)))
-  (fetch-view))
+       (fetch-path "set?request=" nil params 'receive-set-properties-response))))
 
 (defun push-view ()
   (let ((context (clone-context)) (entity (buffer-string)))
@@ -1151,9 +1155,10 @@ In the sharability view style, colors are assigned to atoms based on the sharabi
 However, in the type inference view style, an atom is either cyan or magenta depending on whether
 a type has been assigned to it by the inference engine."
   (interactive)
-  (setq (get-view-style) (if (equal (get-view-style) brain-const-color-by-sharability)
-                                     brain-const-color-by-class-inference
-                                   brain-const-color-by-sharability))
+  (set-view-style
+    (if (equal (get-view-style) brain-const-color-by-sharability)
+      brain-const-color-by-class-inference
+      brain-const-color-by-sharability))
   (brain-update-view)
   (info-message (concat "switched to " (get-view-style) " view style")))
 
@@ -1432,9 +1437,8 @@ a type has been assigned to it by the inference engine."
     (define-key brain-mode-map (kbd "C-c C-v t")       'brain-set-value-truncation-length-prompt)
     (define-key brain-mode-map (kbd "C-c C-v v")       'brain-toggle-minimize-verbatim-blocks)
     (define-key brain-mode-map (kbd "C-c C-w C-m")     'brain-set-min-weight-prompt)
+     ;; likely not the greatest shortcut -- w just stands for weird
     (define-key brain-mode-map (kbd "C-c C-w r")       'brain-ripple-query-prompt)
-      ;; likely not the greatest shortcut -- w just stands for weird
-
     (define-key brain-mode-map (kbd "C-c C-w e")       'brain-export-edges-prompt)
     (define-key brain-mode-map (kbd "C-c C-w g")       'brain-export-graphml-prompt)
     (define-key brain-mode-map (kbd "C-c C-w l")       'brain-export-latex-prompt)
@@ -1442,7 +1446,6 @@ a type has been assigned to it by the inference engine."
     (define-key brain-mode-map (kbd "C-c C-w r")       'brain-export-rdf-prompt)
     (define-key brain-mode-map (kbd "C-c C-w v")       'brain-export-vertices-prompt)
     (define-key brain-mode-map (kbd "C-c C-w w")       'brain-export-webrdf-prompt)
-
     (define-key brain-mode-map (kbd "C-c a")           'brain-acronym-query-prompt)
     (define-key brain-mode-map (kbd "C-c C-b")         'brain-visit-url-at-point)
     (define-key brain-mode-map (kbd "C-c d")           'brain-duplicates)
