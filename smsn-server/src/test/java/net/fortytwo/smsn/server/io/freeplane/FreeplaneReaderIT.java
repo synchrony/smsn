@@ -31,7 +31,7 @@ public class FreeplaneReaderIT {
         AtomGraph atomGraph = new AtomGraph(propertyGraph);
         MyOtherBrain brain = new MyOtherBrain(atomGraph);
 
-        Format format = Format.getFormat("freeplane");
+        Format format = Format.getFormat("fReePLAne");
         assertNotNull(format);
         BrainReader reader = Format.getReader(format);
         assertNotNull(reader);

@@ -13,7 +13,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -51,6 +54,9 @@ public class FreeplaneReader extends BrainReader {
             ATTR_LOCALIZED_STYLE_REF = "LOCALIZED_STYLE_REF",
             ATTR_TEXT = "TEXT";
 
+    //private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    //private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+
     private static final String SCHEMA_PATH = "freeplane.xsd";
 
     private static final boolean USE_VALIDATION = true;
@@ -62,11 +68,17 @@ public class FreeplaneReader extends BrainReader {
 
     private Map<AtomGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
 
+    private final FreeplaneXMLParser xmlParser;
+
+    public FreeplaneReader() throws ParserConfigurationException, SAXException {
+        xmlParser = new FreeplaneXMLParser();
+    }
+
     @Override
     protected void importInternal(MyOtherBrain destBrain, InputStream sourceStream, Format format) throws IOException {
         Document doc;
         try {
-            doc = parseStreamToDocument(sourceStream);
+            doc = xmlParser.parseStreamToDocument(sourceStream);
         } catch (ParserConfigurationException | SAXException e) {
             throw new IOException(e);
         }
@@ -84,29 +96,6 @@ public class FreeplaneReader extends BrainReader {
         return instance;
     }
 
-    private Document parseStreamToDocument(final InputStream sourceStream)
-            throws ParserConfigurationException, IOException, org.xml.sax.SAXException {
-
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-        if (USE_VALIDATION) configureValidation(factory);
-
-        factory.setIgnoringElementContentWhitespace(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(sourceStream);
-    }
-
-    // as of July 2016: http://www.freeplane.org/wiki/index.php/Current_Freeplane_File_Format
-    private void configureValidation(DocumentBuilderFactory docFactory) throws SAXException {
-        docFactory.setNamespaceAware(true);
-        SchemaFactory schemaFactory =
-                SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        docFactory.setValidating(true);
-        Schema schema = schemaFactory.newSchema(new StreamSource(
-                getClass().getResourceAsStream(SCHEMA_PATH)));
-        docFactory.setSchema(schema);
-    }
-
     private void persistNote(final AtomGraph destGraph, final Note rootNote)
             throws MyOtherBrain.BrainException, NoteQueries.InvalidUpdateException {
 
@@ -122,7 +111,6 @@ public class FreeplaneReader extends BrainReader {
     }
 
     private void setText(Note note, String text) {
-        System.out.println("text: " + text);
         note.setValue(text);
     }
 
@@ -205,6 +193,8 @@ public class FreeplaneReader extends BrainReader {
                 throw new IllegalArgumentException("root of mind map XML must be called 'map'");
             }
 
+            resetArrowLinks();
+
             Note mindMapAsNote = parseTree(root);
             try {
                 persistNote(destGraph, mindMapAsNote);
@@ -228,6 +218,10 @@ public class FreeplaneReader extends BrainReader {
                     destGraph.addChildAt(tailAtom, headAtom, 0);
                 }
             }
+        }
+
+        private void resetArrowLinks() {
+            arrowLinks.clear();
         }
 
         private Note parseTree(Element nodeElement) {
@@ -302,6 +296,44 @@ public class FreeplaneReader extends BrainReader {
                 styleNotes.put(style, note);
             }
             return note;
+        }
+    }
+
+    private static class FreeplaneXMLParser extends DefaultHandler {
+        private final DocumentBuilder builder;
+
+        public FreeplaneXMLParser() throws SAXException, ParserConfigurationException {
+            DocumentBuilderFactory factory = createDocumentBuilderFactory();
+            builder = factory.newDocumentBuilder();
+
+            // note: this suppresses error messages relating to the not-quite-accurate Freeplane schema
+            builder.setErrorHandler(new DefaultHandler());
+        }
+
+        private Document parseStreamToDocument(final InputStream sourceStream)
+                throws ParserConfigurationException, IOException, org.xml.sax.SAXException {
+            return builder.parse(sourceStream);
+        }
+
+        private DocumentBuilderFactory createDocumentBuilderFactory() throws SAXException {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setIgnoringElementContentWhitespace(true);
+
+            if (USE_VALIDATION) configureValidation(factory);
+
+            return factory;
+        }
+
+        // as of July 2016: http://www.freeplane.org/wiki/index.php/Current_Freeplane_File_Format
+        private void configureValidation(DocumentBuilderFactory docFactory) throws SAXException {
+            docFactory.setNamespaceAware(false);
+            //docFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+            SchemaFactory schemaFactory =
+                    SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = schemaFactory.newSchema(new StreamSource(
+                    getClass().getResourceAsStream(SCHEMA_PATH)));
+            docFactory.setSchema(schema);
+            docFactory.setValidating(true);
         }
     }
 }
