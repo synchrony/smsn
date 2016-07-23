@@ -96,10 +96,6 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
         try {
             p.map = new HashMap<>();
 
-            if (!(p.baseGraph instanceof KeyIndexableGraph)) {
-                return error("graph must be an instance of IndexableGraph");
-            }
-
             if (null != p.wikiView) {
                 // Force the use of the UTF-8 charset, which is apparently not chosen by Jersey
                 // even when it is specified by the client in the Content-Type header, e.g.
