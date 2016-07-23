@@ -14,3 +14,5 @@ See also:
 * [SmSn Android](http://github.com/joshsh/extendo-android): contains the **Brainstem**, which controls and receives data from the Bluetooth devices, and a port of much of the Semantic Synchrony stack to Android/Dalvik
 * [SmSn demos](https://github.com/joshsh/laboratory/tree/master/net/fortytwo/smsn/smsn-demos) a collection of demos, utilities, and scripts for analysis
 * [SmSn "extras"](https://github.com/joshsh/extendo-extras), which contain lightweight support for RFID tracking and speech recognition, among other things
+
+**Credits**: Semantic Synchrony is written and maintained by [Joshua Shinavier](https://github.com/joshsh), with contributions from [Jeffrey Brown](https://github.com/JeffreyBenjaminBrown).
