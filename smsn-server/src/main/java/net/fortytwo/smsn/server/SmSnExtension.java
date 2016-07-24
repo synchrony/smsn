@@ -9,7 +9,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteHistory;
@@ -46,17 +46,17 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
     protected abstract boolean doesWrite();
 
-    private static final Map<KeyIndexableGraph, MyOtherBrain> brains = new HashMap<>();
+    private static final Map<KeyIndexableGraph, Brain> brains = new HashMap<>();
 
-    public synchronized static MyOtherBrain getBrain(final KeyIndexableGraph baseGraph)
-            throws MyOtherBrain.BrainException {
+    public synchronized static Brain getBrain(final KeyIndexableGraph baseGraph)
+            throws Brain.BrainException {
 
-        MyOtherBrain b = brains.get(baseGraph);
+        Brain b = brains.get(baseGraph);
 
         if (null == b) {
-            logger.info("instantiating MyOtherBrain with base graph " + baseGraph);
+            logger.info("instantiating Extend-o-Brain with base graph " + baseGraph);
             AtomGraph bg = new AtomGraph(baseGraph);
-            b = new MyOtherBrain(bg);
+            b = new Brain(bg);
             b.startBackgroundTasks();
             brains.put(baseGraph, b);
         }
@@ -271,7 +271,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
     protected class RequestParams {
         public KeyIndexableGraph baseGraph;
-        public MyOtherBrain brain;
+        public Brain brain;
         public RexsterResourceContext context;
         public String data;
         public Integer height;

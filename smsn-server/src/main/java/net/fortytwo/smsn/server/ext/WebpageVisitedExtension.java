@@ -39,7 +39,7 @@ public class WebpageVisitedExtension extends AbstractRexsterExtension {
             AAIR_NS = "http://xmlns.notu.be/aair#",
             DC_NS = "http://purl.org/dc/terms/",
             FOAF_NS = "http://xmlns.com/foaf/0.1/",
-            EVENTS_NS = "http://fortytwo.net/2012/06/myotherbrain-events#", // temporary namespace
+            EVENTS_NS = "http://fortytwo.net/2012/06/smsn-events#", // temporary namespace
             RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
     private static final IRI

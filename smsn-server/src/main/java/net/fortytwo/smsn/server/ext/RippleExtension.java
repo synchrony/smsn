@@ -20,16 +20,16 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
- * A service for executing Ripple queries over MyOtherBrain graphs
+ * A service for executing Ripple queries over Extend-o-Brain graphs
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "ripple")
-//@ExtensionDescriptor(description = "execute a Ripple query over a MyOtherBrain graph")
+//@ExtensionDescriptor(description = "execute a Ripple query over an Extend-o-Brain graph")
 public class RippleExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for performing Ripple queries over MyOtherBrain graphs")
+    @ExtensionDescriptor(description = "an extension for performing Ripple queries over Extend-o-Brain graphs")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "request",

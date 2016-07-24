@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.io.latex;
 
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.server.io.BrainWriter;
@@ -36,7 +36,7 @@ public class LatexWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
         String rootId = requireRootId();
         Filter filter = requireFilter();

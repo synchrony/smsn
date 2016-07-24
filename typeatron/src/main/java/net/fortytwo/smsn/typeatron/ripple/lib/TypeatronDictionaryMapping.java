@@ -168,7 +168,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         //add(new DictionaryPutMapping(userDictionary), "i");
         //add(new DictionaryGetMapping(userDictionary), "o");
 
-        // MyOtherBrain
+        // Extend-o-Brain
         add(new GetAtomAliasMapping(exoBrainClient, defaultFilter), "@a");
         add(new GetAtomChildrenMapping(exoBrainClient, defaultFilter), "@n");
         add(new GetAtomCreatedMapping(exoBrainClient, defaultFilter), "@c");

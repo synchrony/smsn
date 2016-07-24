@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
@@ -291,10 +291,10 @@ public class KnowledgeBaseTest {
     public void testToolSyntax() throws Exception {
         AtomClass t = Tool.class.newInstance();
 
-        assertTrue(t.getValueRegex().matcher("MyOtherBrain").matches());
+        assertTrue(t.getValueRegex().matcher("Extend-o-Brain").matches());
         assertFalse(t.getValueRegex().matcher("...not a tool").matches());
         assertFalse(t.getValueRegex().matcher("This is the Really Long Name of a Really Important Tool" +
-                " Which Unfortunately Will Not Be Recognized As Such By MyOtherBrain").matches());
+                " Which Unfortunately Will Not Be Recognized As Such By Extend-o-Brain").matches());
     }
 
     @Test
@@ -310,8 +310,8 @@ public class KnowledgeBaseTest {
     public void testUsageSyntax() throws Exception {
         AtomClass t = Usage.class.newInstance();
 
-        assertTrue(t.getValueRegex().matcher("MyOtherBrain usage").matches());
-        assertFalse(t.getValueRegex().matcher("how to use MyOtherBrain").matches());
+        assertTrue(t.getValueRegex().matcher("Extend-o-Brain usage").matches());
+        assertFalse(t.getValueRegex().matcher("how to use Extend-o-Brain").matches());
     }
 
     @Test
@@ -326,7 +326,7 @@ public class KnowledgeBaseTest {
     public void testInference() throws Exception {
         KeyIndexableGraph g = new TinkerGraph();
         AtomGraph bg = new AtomGraph(g);
-        MyOtherBrain brain = new MyOtherBrain(bg);
+        Brain brain = new Brain(bg);
         KnowledgeBase kb = new KnowledgeBase(bg);
         NoteParser parser = new NoteParser();
         NoteQueries queries = new NoteQueries(brain);

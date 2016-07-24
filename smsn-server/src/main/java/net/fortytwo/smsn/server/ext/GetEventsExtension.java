@@ -53,17 +53,6 @@ public class GetEventsExtension extends SmSnExtension {
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
         List<Note> events = p.brain.getEventStack().getEvents();
 
-        /*
-        // temporary, for debugging
-        if (0 == events.size()) {
-            Note debugNote = new Note();
-            debugNote.setValue("test event");
-            debugNote.setWeight(0.5f);
-            debugNote.setSharability(0.5f);
-            p.brain.getEventStack().push(debugNote);
-        }
-        */
-
         Note view = new Note();
         view.setValue("event stack");
 

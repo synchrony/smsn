@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.io.rdf;
 
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
 import org.openrdf.rio.RDFFormat;
@@ -41,7 +41,7 @@ public class RDFWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
         RDFFormat rdfFormat = toRDFFormat(format);
 

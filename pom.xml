@@ -243,7 +243,7 @@
                 <artifactId>frames</artifactId>
                 <version>${tinkerpop.version}</version>
                 <exclusions>
-                    <!-- conflicts with MyOtherBrain -->
+                    <!-- conflicts with Extend-o-Brain -->
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
@@ -314,7 +314,7 @@
                         <groupId>org.javassist</groupId>
                         <artifactId>javassist</artifactId>
                     </exclusion>
-                    <!-- conflict with MyOtherBrain -->
+                    <!-- conflict with Extend-o-Brain -->
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>

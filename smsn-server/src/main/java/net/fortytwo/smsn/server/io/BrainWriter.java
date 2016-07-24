@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.io;
 
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
 
 import java.io.IOException;
@@ -19,10 +19,10 @@ public abstract class BrainWriter {
 
     public abstract List<Format> getFormats();
 
-    protected abstract void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+    protected abstract void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException;
 
-    public void doExport(MyOtherBrain sourceBrain, OutputStream destStream, Format format) throws IOException {
+    public void doExport(Brain sourceBrain, OutputStream destStream, Format format) throws IOException {
         exportInternal(sourceBrain, destStream, format);
     }
 

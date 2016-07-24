@@ -60,7 +60,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An inference layer for a MyOtherBrain graph, supporting automatic classification of atoms and exporting to RDF
+ * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */

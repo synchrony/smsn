@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomList;
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
 
@@ -25,7 +25,7 @@ public class EdgeWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format) throws IOException {
+    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format) throws IOException {
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();
         PrintStream p = new PrintStream(destStream);
 

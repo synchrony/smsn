@@ -19,7 +19,7 @@
             <artifactId>smsn-devices</artifactId>
             <version>${smsn.version}</version>
         </dependency>
-        <!-- TODO: remove the MyOtherBrain dependency if possible -->
+        <!-- TODO: remove the Extend-o-Brain dependency if possible -->
         <dependency>
             <groupId>net.fortytwo.smsn</groupId>
             <artifactId>brain</artifactId>

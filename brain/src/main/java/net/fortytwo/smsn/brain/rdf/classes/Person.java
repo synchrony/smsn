@@ -122,7 +122,7 @@ public class Person extends AtomClass {
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
             // technically, this is a misuse of foaf:birthday, which expects
             // string values of the form mm-dd, eg. '12-31', as opposed to
-            // MyOtherBrain's structured date values, which are represented
+            // Extend-o-Brain's structured date values, which are represented
             // using the Event Ontology.
             // Nevertheless, foaf:birthday is used here because of its
             // appropriateness for the "birthday" meaning and its association with

@@ -39,7 +39,7 @@ public class NoteQueriesTest {
         store = new AtomGraph(g);
         graph = store.getPropertyGraph();
         manager = store.getFramedGraph();
-        MyOtherBrain brain = new MyOtherBrain(store);
+        Brain brain = new Brain(store);
         queries = new NoteQueries(brain);
     }
 

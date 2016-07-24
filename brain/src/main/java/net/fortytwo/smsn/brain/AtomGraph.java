@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * A graph of atoms and lists conforming to the MyOtherBrain data model
+ * A graph of atoms and lists conforming to the Extend-o-Brain data model
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -32,7 +32,7 @@ public class AtomGraph {
 
     // full-text search
     private Index<Vertex> searchIndex;
-    // search on first letters, e.g. "ny" finds "New York", "eob" finds "MyOtherBrain"
+    // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
     private Index<Vertex> acronymIndex;
 
     private static final String thingNamespace;

@@ -3,7 +3,7 @@ package net.fortytwo.smsn.server.io.vertices;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
@@ -27,7 +27,7 @@ public class VertexWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
 
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();

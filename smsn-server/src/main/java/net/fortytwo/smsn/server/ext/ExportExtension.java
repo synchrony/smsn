@@ -25,7 +25,7 @@ import java.security.Principal;
 import java.util.logging.Level;
 
 /**
- * A service for exporting a MyOtherBrain graph to the file system
+ * A service for exporting an Extend-o-Brain graph to the file system
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -33,7 +33,7 @@ import java.util.logging.Level;
 public class ExportExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain graph to the file system")
+    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain graph to the file system")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
@@ -26,7 +26,7 @@ public class AddToStreamMapping extends AtomMapping {
                               final Filter filter) throws RippleException {
         super(client, filter);
         try {
-            brainStream = SemanticSynchrony.getConfiguration().getString(MyOtherBrain.PROP_BRAINSTREAM, null);
+            brainStream = SemanticSynchrony.getConfiguration().getString(Brain.PROP_BRAINSTREAM, null);
         } catch (TypedProperties.PropertyException e) {
             throw new RippleException(e);
         }

@@ -21,7 +21,7 @@
      xmlns:brain="http://fortytwo.net/2014/12/smsn#">
     <owl:Ontology rdf:about="">
         <rdfs:comment
-            >Ontology for MyOtherBrain knowledge bases.
+            >Ontology for Extend-o-Brain knowledge bases.
 
 Note: it has been a design decision not to re-use elements from other, previously existing ontologies, even where these might seem appropriate.  For instance, this ontology introduces its own title (&quot;name&quot;) and description properties rather than re-using existing Dublin Core properties.  This allows more precise modeling of the domain (for instance, this ontology requires that names and descriptions are string-valued), which is expedient for application development.  However, this does not preclude mapping to and from widely-used community ontologies when integrating data with other sources.</rdfs:comment>
     </owl:Ontology>

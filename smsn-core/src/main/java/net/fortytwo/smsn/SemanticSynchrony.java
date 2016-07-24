@@ -151,7 +151,7 @@ public class SemanticSynchrony {
 
     /**
      * Creates a pseudo-random Base64 SmSn key.
-     * These keys are typically used as ids of atoms and list elements in MyOtherBrain.
+     * These keys are typically used as ids of atoms and list elements in Extend-o-Brain.
      *
      * @return a new pseudo-random key
      */

@@ -26,13 +26,13 @@ public class NoteQueries {
         FullText, Acronym, Shortcut
     }
 
-    private final MyOtherBrain brain;
+    private final Brain brain;
     //private final QueryEngine rippleQueryEngine;
 
     /**
-     * @param brain the MyOtherBrain instance to query and update
+     * @param brain the Extend-o-Brain instance to query and update
      */
-    public NoteQueries(final MyOtherBrain brain) {
+    public NoteQueries(final Brain brain) {
         if (null == brain) {
             throw new IllegalArgumentException();
         }

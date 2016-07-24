@@ -19,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A service for finding isolated atoms (i.e. atoms with no parents or children) in a MyOtherBrain graph
+ * A service for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -28,7 +28,7 @@ public class FindIsolatedAtomsExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for for finding isolated atoms" +
-            " (i.e. atoms with no parents or children) in a MyOtherBrain graph")
+            " (i.e. atoms with no parents or children) in an Extend-o-Brain graph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.io.graphml;
 
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.Format;
 import net.fortytwo.smsn.server.io.BrainReader;
 
@@ -20,7 +20,7 @@ public class GraphMLReader extends BrainReader {
     }
 
     @Override
-    protected void importInternal(MyOtherBrain destBrain, final InputStream sourceStream, final Format format)
+    protected void importInternal(Brain destBrain, final InputStream sourceStream, final Format format)
             throws IOException {
         com.tinkerpop.blueprints.util.io.graphml.GraphMLReader r = new com.tinkerpop.blueprints.util.io.graphml.GraphMLReader(destBrain.getAtomGraph().getPropertyGraph());
         r.inputGraph(sourceStream);

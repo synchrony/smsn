@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class MyOtherBrain {
-    private static final Logger logger = SemanticSynchrony.getLogger(MyOtherBrain.class);
+public class Brain {
+    private static final Logger logger = SemanticSynchrony.getLogger(Brain.class);
 
     /**
      * A configuration property indicating a special atom to which notes may be prepended
@@ -39,7 +39,7 @@ public class MyOtherBrain {
 
     private final EventStack eventStack;
 
-    public MyOtherBrain(final AtomGraph atomGraph) throws BrainException {
+    public Brain(final AtomGraph atomGraph) throws BrainException {
         this.atomGraph = atomGraph;
 
         knowledgeBase = new KnowledgeBase(atomGraph);

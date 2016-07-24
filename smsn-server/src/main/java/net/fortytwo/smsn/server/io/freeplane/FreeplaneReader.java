@@ -4,7 +4,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.server.io.Format;
@@ -13,9 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
@@ -75,7 +73,7 @@ public class FreeplaneReader extends BrainReader {
     }
 
     @Override
-    protected void importInternal(MyOtherBrain destBrain, InputStream sourceStream, Format format) throws IOException {
+    protected void importInternal(Brain destBrain, InputStream sourceStream, Format format) throws IOException {
         Document doc;
         try {
             doc = xmlParser.parseStreamToDocument(sourceStream);
@@ -97,11 +95,11 @@ public class FreeplaneReader extends BrainReader {
     }
 
     private void persistNote(final AtomGraph destGraph, final Note rootNote)
-            throws MyOtherBrain.BrainException, NoteQueries.InvalidUpdateException {
+            throws Brain.BrainException, NoteQueries.InvalidUpdateException {
 
         int maxHeight = 1000;
 
-        MyOtherBrain brain = new MyOtherBrain(destGraph);
+        Brain brain = new Brain(destGraph);
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
 
@@ -198,7 +196,7 @@ public class FreeplaneReader extends BrainReader {
             Note mindMapAsNote = parseTree(root);
             try {
                 persistNote(destGraph, mindMapAsNote);
-            } catch (MyOtherBrain.BrainException | NoteQueries.InvalidUpdateException e) {
+            } catch (Brain.BrainException | NoteQueries.InvalidUpdateException e) {
                 throw new IOException(e);
             }
 

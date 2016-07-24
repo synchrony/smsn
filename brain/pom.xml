@@ -5,8 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>brain</artifactId>
-    <packaging>jar</packaging>
-    <name>MyOtherBrain</name>
+    <name>Extend-o-Brain</name>
 
     <parent>
         <groupId>net.fortytwo.smsn</groupId>

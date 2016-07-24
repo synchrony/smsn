@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.oupls.jung.GraphJung;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
 
@@ -28,7 +28,7 @@ public class PageRankWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();
 

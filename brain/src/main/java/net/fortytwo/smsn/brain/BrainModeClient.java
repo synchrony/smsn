@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  * A lightweight, Java-based client for Brain-mode, which is in turn the Emacs Lisp client of
- * the MyOtherBrain personal knowledge base
+ * the Extend-o-Brain personal knowledge base
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.io.graphml;
 
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
 
@@ -21,7 +21,7 @@ public class GraphMLWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(MyOtherBrain sourceBrain, OutputStream destStream, Format format)
+    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
 
         AtomGraph sourceGraph = sourceBrain.getAtomGraph();

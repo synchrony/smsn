@@ -1,8 +1,8 @@
 /*
-See also MyOtherBrain-EBNF.txt
+See also ExtendoBrain-EBNF.txt
 */
 
-grammar MyOtherBrain;
+grammar ExtendoBrain;
 
 options
 {

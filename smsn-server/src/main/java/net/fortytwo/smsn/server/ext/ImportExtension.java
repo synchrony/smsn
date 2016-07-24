@@ -11,29 +11,23 @@ import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.MyOtherBrain;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.io.Format;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.SmSnExtension;
 import net.fortytwo.smsn.server.io.BrainReader;
-import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * A service for importing a MyOtherBrain subgraph
+ * A service for importing an Extend-o-Brain subgraph
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -48,7 +42,7 @@ public class ImportExtension extends SmSnExtension {
     }
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for exporting a MyOtherBrain subgraph")
+    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain subgraph")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,

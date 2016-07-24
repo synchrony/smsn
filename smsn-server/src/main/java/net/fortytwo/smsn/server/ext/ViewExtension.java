@@ -21,16 +21,16 @@ import org.json.JSONObject;
 import java.security.Principal;
 
 /**
- * A service for retrieving hierarchical views of MyOtherBrain graphs
+ * A service for retrieving hierarchical views of Extend-o-Brain graphs
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 @ExtensionNaming(namespace = "smsn", name = "view")
-//@ExtensionDescriptor(description = "retrieve a hierarchical view of a MyOtherBrain graph")
+//@ExtensionDescriptor(description = "retrieve a hierarchical view of an Extend-o-Brain graph")
 public class ViewExtension extends SmSnExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing a portion of a MyOtherBrain graph" +
+    @ExtensionDescriptor(description = "an extension for viewing a portion of an Extend-o-Brain graph" +
             " in the wiki format")
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,

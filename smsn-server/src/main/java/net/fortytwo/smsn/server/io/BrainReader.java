@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.MyOtherBrain;
+import net.fortytwo.smsn.brain.Brain;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public abstract class BrainReader {
     protected static final Logger logger = Logger.getLogger(BrainReader.class.getName());
 
-    protected abstract void importInternal(MyOtherBrain destBrain, InputStream sourceStream, Format format)
+    protected abstract void importInternal(Brain destBrain, InputStream sourceStream, Format format)
             throws IOException;
 
     private String defaultNodeName;
@@ -32,7 +32,7 @@ public abstract class BrainReader {
     public abstract List<Format> getFormats();
 
     public void doImport(
-            File fileOrDir, Format format, MyOtherBrain brain, boolean recursive)
+            File fileOrDir, Format format, Brain brain, boolean recursive)
             throws IOException {
 
         if (!fileOrDir.exists()) {
@@ -48,7 +48,7 @@ public abstract class BrainReader {
         }
     }
 
-    public void doImport(final MyOtherBrain destBrain, final InputStream sourceStream, final Format format)
+    public void doImport(final Brain destBrain, final InputStream sourceStream, final Format format)
             throws IOException {
 
         long before = System.currentTimeMillis();
@@ -77,7 +77,7 @@ public abstract class BrainReader {
         this.defaultNodeName = defaultNodeName;
     }
 
-    private void importDirectoryRecursive(File dir, Format format, MyOtherBrain brain) throws IOException {
+    private void importDirectoryRecursive(File dir, Format format, Brain brain) throws IOException {
         Set<String> extensions = new HashSet<>();
         Collections.addAll(extensions, format.getFileExtensions());
         for (File file : dir.listFiles()) {
@@ -95,7 +95,7 @@ public abstract class BrainReader {
         }
     }
 
-    private void importSingleFile(File file, Format format, MyOtherBrain brain) throws IOException {
+    private void importSingleFile(File file, Format format, Brain brain) throws IOException {
         logger.info("importing file " + file);
         try (InputStream sourceStream = new FileInputStream(file)) {
             setDefaultNodeName(file.getName());
