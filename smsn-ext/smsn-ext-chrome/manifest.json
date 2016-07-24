@@ -1,8 +1,8 @@
 {
-  "name": "MyOtherBrain extension",
+  "name": "Extend-o-Brain extension",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "An extension for importing bookmarks into MyOtherBrain",
+  "description": "An extension for importing bookmarks into Extend-o-Brain",
   "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html"
