@@ -2,6 +2,9 @@ package net.fortytwo.smsn.brain;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.junit.After;
 import org.junit.Before;
@@ -125,7 +128,7 @@ public class EventStackTest {
 
     private long countAtoms(final AtomGraph bg) {
         long count = 0;
-        for (Atom a : bg.getAtoms()) {
+        for (Atom a : bg.getAllAtoms()) {
             count++;
         }
 

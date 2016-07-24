@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import org.apache.commons.io.FilenameUtils;
 
@@ -104,10 +104,10 @@ public abstract class BrainReader {
     }
 
     private void reindexVertices(AtomGraph destGraph) {
-        TransactionalGraph propertyGraph = (TransactionalGraph) destGraph.getPropertyGraph();
+        TransactionalGraph propertyGraph = destGraph.getPropertyGraph();
         for (Vertex v : propertyGraph.getVertices()) {
             String value = v.getProperty(SemanticSynchrony.VALUE);
-            if (null != value) destGraph.indexForSearch(destGraph.getAtom(v), value);
+            if (null != value) destGraph.addAtomToIndices(destGraph.getAtom(v));
         }
     }
 

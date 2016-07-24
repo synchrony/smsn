@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain.util;
 
-import net.fortytwo.smsn.brain.NoteQueries;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +30,7 @@ public class ListDiffTest {
 
     private String applyDiff(final String before,
                              final String after,
-                             final String diff) throws NoteQueries.InvalidUpdateException {
+                             final String diff) {
         additions = 0;
         removals = 0;
 

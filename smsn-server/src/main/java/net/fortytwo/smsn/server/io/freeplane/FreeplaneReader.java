@@ -1,11 +1,12 @@
 package net.fortytwo.smsn.server.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.server.io.Format;
 import net.fortytwo.smsn.server.io.BrainReader;
@@ -73,7 +74,9 @@ public class FreeplaneReader extends BrainReader {
     }
 
     @Override
-    protected void importInternal(Brain destBrain, InputStream sourceStream, Format format) throws IOException {
+    protected void importInternal(Brain destBrain, InputStream sourceStream, Format format)
+            throws IOException {
+
         Document doc;
         try {
             doc = xmlParser.parseStreamToDocument(sourceStream);
@@ -95,7 +98,7 @@ public class FreeplaneReader extends BrainReader {
     }
 
     private void persistNote(final AtomGraph destGraph, final Note rootNote)
-            throws Brain.BrainException, NoteQueries.InvalidUpdateException {
+            throws Brain.BrainException {
 
         int maxHeight = 1000;
 
@@ -184,7 +187,7 @@ public class FreeplaneReader extends BrainReader {
             this.destGraph = destGraph;
         }
 
-        private void parseDOMToGraph(Document document) throws IOException {
+        private void parseDOMToGraph(Document document) throws IOException, InvalidGraphException {
             Element root = document.getDocumentElement();
 
             if (!root.getTagName().equals(ELEMENTNAME_MAP)) {
@@ -196,7 +199,7 @@ public class FreeplaneReader extends BrainReader {
             Note mindMapAsNote = parseTree(root);
             try {
                 persistNote(destGraph, mindMapAsNote);
-            } catch (Brain.BrainException | NoteQueries.InvalidUpdateException e) {
+            } catch (Brain.BrainException e) {
                 throw new IOException(e);
             }
 
@@ -207,13 +210,13 @@ public class FreeplaneReader extends BrainReader {
             return destGraph.getAtom(notesByFreeplaneId.get(id).getId());
         }
 
-        private void persistArrowLinks() {
+        private void persistArrowLinks() throws InvalidGraphException {
             for (Map.Entry<String, List<String>> link : arrowLinks.entrySet()) {
                 Atom tailAtom = getAtom(link.getKey());
                 List<String> heads = link.getValue();
                 for (String head : heads) {
                     Atom headAtom = getAtom(head);
-                    destGraph.addChildAt(tailAtom, headAtom, 0);
+                    tailAtom.addChildAt(headAtom, 0);
                 }
             }
         }

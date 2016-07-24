@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
@@ -82,7 +82,7 @@ public class Document extends AtomClass {
         RDFHandler handler = context.getHandler();
 
         // TODO: a more specific type than foaf:Document may be appropriate (WebPage also uses foaf:Document)
-        IRI self = handleTypeAndAlias(a, vf, handler, FOAF.DOCUMENT);
+        IRI self = handleTypeAndAlias(a, context, FOAF.DOCUMENT);
 
         handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
 

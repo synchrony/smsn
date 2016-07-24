@@ -4,7 +4,11 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import com.tinkerpop.frames.FramedGraph;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
@@ -25,27 +29,27 @@ import static org.junit.Assert.assertNull;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class NoteQueriesTest {
-    private KeyIndexableGraph graph;
-    private AtomGraph store;
-    private FramedGraph<KeyIndexableGraph> manager;
+    private KeyIndexableGraph propertyGraph;
+    private AtomGraph atomGraph;
     private NoteParser parser;
     private NoteWriter writer = new NoteWriter();
     private NoteQueries queries;
+    private Filter filter;
 
     @Before
     public void setUp() throws Exception {
         TinkerGraph g = new TinkerGraph();
         parser = new NoteParser();
-        store = new AtomGraph(g);
-        graph = store.getPropertyGraph();
-        manager = store.getFramedGraph();
-        Brain brain = new Brain(store);
+        atomGraph = new PGAtomGraph(g);
+        propertyGraph = atomGraph.getPropertyGraph();
+        Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
+        filter = new Filter();
     }
 
     @After
     public void tearDown() throws Exception {
-        graph.shutdown();
+        propertyGraph.shutdown();
     }
 
     @Test
@@ -90,6 +94,7 @@ public class NoteQueriesTest {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
+        root.setValue("root");
         Note rootNote;
         String s;
 
@@ -102,8 +107,8 @@ public class NoteQueriesTest {
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "one", "two", "three");
 
-        Atom one = store.getAtom("N5KBOAq");
-        Atom two = store.getAtom("v8EuMtl");
+        Atom one = atomGraph.getAtom("N5KBOAq");
+        Atom two = atomGraph.getAtom("v8EuMtl");
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -117,7 +122,7 @@ public class NoteQueriesTest {
         assertNotesEqual(root, "one", "three");
         // grandchildren have been added
         assertNotesEqual(one, "ten", "yellow");
-        Atom ten = store.getAtom("r4zU45R");
+        Atom ten = atomGraph.getAtom("r4zU45R");
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -166,7 +171,7 @@ public class NoteQueriesTest {
         queries.update(rootNote, 2, filter, style);
                 // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
-        Atom three = store.getAtom("tOpwKho");
+        Atom three = atomGraph.getAtom("tOpwKho");
         // ...therefore, the children of "three" can't be modified in this update operation
         // (so "red" has been ignored)
         assertNotesEqual(three);
@@ -203,6 +208,7 @@ public class NoteQueriesTest {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
+        root.setValue("root");
         Note rootNote;
         String s;
 
@@ -211,7 +217,7 @@ public class NoteQueriesTest {
         rootNote = parser.fromWikiText(s);
         rootNote.setId((String) root.asVertex().getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = store.getAtom("N5KBOAq");
+        Atom one = atomGraph.getAtom("N5KBOAq");
         assertEquals(0.5f, one.getWeight());
         assertEquals(0.5f, one.getSharability());
 
@@ -231,6 +237,7 @@ public class NoteQueriesTest {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
+        root.setValue("root");
         Note rootNote;
         String s;
 
@@ -240,7 +247,7 @@ public class NoteQueriesTest {
         rootNote = parser.fromWikiText(s);
         rootNote.setId((String) root.asVertex().getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = store.getAtom("N5KBOAq");
+        Atom one = atomGraph.getAtom("N5KBOAq");
         assertEquals("http://example.org/ns/one", one.getAlias());
 
         s = "" +
@@ -256,7 +263,8 @@ public class NoteQueriesTest {
     public void testUpdatePriority() throws Exception {
         Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
-        Atom root = createAtom("priorit");
+        Atom root = createAtom("0000000");
+        root.setValue("root");
         Note rootNote;
         String s;
         Atom one;
@@ -267,7 +275,7 @@ public class NoteQueriesTest {
         rootNote = parser.fromWikiText(s);
         rootNote.setId((String) root.asVertex().getId());
         queries.update(rootNote, 2, filter, style);
-        one = store.getAtom("0000001");
+        one = atomGraph.getAtom("0000001");
         assertEquals(0.5f, one.getPriority());
 
         // setting priority to 0 has the effect of removing the priority property from the note
@@ -277,7 +285,7 @@ public class NoteQueriesTest {
         rootNote = parser.fromWikiText(s);
         rootNote.setId((String) root.asVertex().getId());
         queries.update(rootNote, 2, filter, style);
-        one = store.getAtom("0000001");
+        one = atomGraph.getAtom("0000001");
         assertNull(one.getPriority());
     }
 
@@ -288,15 +296,16 @@ public class NoteQueriesTest {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = parser.fromWikiText(AtomGraph.class.getResourceAsStream("wiki-example-3.txt"));
+        Note rootNote = parser.fromWikiText(NoteParser.class.getResourceAsStream("wiki-example-3.txt"));
         Atom root = createAtom("0000000");
+        root.setValue("root");
         root.setSharability(1.0f);
         rootNote.setId((String) root.asVertex().getId());
         queries.update(rootNote, 2, writeFilter, style);
 
-        Atom a1 = store.getAtom("0000001");
+        Atom a1 = atomGraph.getAtom("0000001");
         assertEquals(1f, a1.getSharability());
-        Atom a2 = store.getAtom("0000002");
+        Atom a2 = atomGraph.getAtom("0000002");
         assertEquals(0.5f, a2.getSharability());
 
         Note after = queries.view(root, 2, readFilter, style);
@@ -348,14 +357,15 @@ public class NoteQueriesTest {
         assertEquals("002", a.getChildren().get(1).getId());
         assertNull(a.getChildren().get(1).getValue());
 
-        Atom root = store.createAtom(filter, "000");
+        Atom root = atomGraph.createAtom(filter, "000");
+        root.setValue("root");
 
         b.setId((String) root.asVertex().getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = store.getAtom("001");
-        Atom a2 = store.getAtom("002");
-        Atom a3 = store.getAtom("003");
+        Atom a1 = atomGraph.getAtom("001");
+        Atom a2 = atomGraph.getAtom("002");
+        Atom a3 = atomGraph.getAtom("003");
 
         assertEquals("one", a1.getValue());
         assertEquals("two", a2.getValue());
@@ -384,27 +394,28 @@ public class NoteQueriesTest {
         Note b = parser.fromWikiText(before);
         Note a = parser.fromWikiText(after);
 
-        Atom root = store.createAtom(filter, "000");
+        Atom root = atomGraph.createAtom(filter, "000");
+        root.setValue("root");
 
         b.setId((String) root.asVertex().getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = store.getAtom("001");
-        Atom a2 = store.getAtom("002");
-        Atom a3 = store.getAtom("003");
+        Atom a1 = atomGraph.getAtom("001");
+        Atom a2 = atomGraph.getAtom("002");
+        Atom a3 = atomGraph.getAtom("003");
 
         assertEquals("one", a1.getValue());
         assertEquals("two", a2.getValue());
         assertEquals("three", a3.getValue());
-        assertEquals(3, AtomGraph.asList(root.getNotes()).size());
+        assertEquals(3, root.getNotes().toJavaList().size());
 
         a.setId((String) root.asVertex().getId());
         queries.update(a, 2, filter, style);
 
-        Atom a4 = store.getAtom("004");
+        Atom a4 = atomGraph.getAtom("004");
 
         assertEquals("four", a4.getValue());
-        List<Atom> children = AtomGraph.asList(root.getNotes());
+        List<Atom> children = root.getNotes().toJavaList();
         assertEquals(4, children.size());
         assertEquals("four", children.get(0).getValue());
         assertEquals("one", children.get(1).getValue());
@@ -449,7 +460,7 @@ public class NoteQueriesTest {
 
     private int countVertices() {
         int count = 0;
-        for (Vertex v : graph.getVertices()) {
+        for (Vertex v : propertyGraph.getVertices()) {
             count++;
         }
         return count;
@@ -457,16 +468,13 @@ public class NoteQueriesTest {
 
     private int countEdges() {
         int count = 0;
-        for (Edge v : graph.getEdges()) {
+        for (Edge v : propertyGraph.getEdges()) {
             count++;
         }
         return count;
     }
 
-    private Atom createAtom(final String id) {
-        Atom a = manager.frame(graph.addVertex(id), Atom.class);
-        a.setWeight(0.5f);
-        a.setSharability(0.5f);
-        return a;
+    private Atom createAtom(String id) {
+        return atomGraph.createAtom(filter, id);
     }
 }

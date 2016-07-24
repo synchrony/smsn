@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain;
 
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Note;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

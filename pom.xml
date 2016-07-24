@@ -239,22 +239,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.tinkerpop</groupId>
-                <artifactId>frames</artifactId>
-                <version>${tinkerpop.version}</version>
-                <exclusions>
-                    <!-- conflicts with Extend-o-Brain -->
-                    <exclusion>
-                        <groupId>commons-lang</groupId>
-                        <artifactId>commons-lang</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>com.tinkerpop.blueprints</groupId>
                 <artifactId>blueprints-neo4j-graph</artifactId>
                 <version>${tinkerpop.version}</version>

@@ -1,6 +1,10 @@
 package net.fortytwo.smsn.brain;
 
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +30,7 @@ public class AtomGraphTest {
 
         graph = new Neo4jGraph(dir.getPath());
 
-        atomGraph = new AtomGraph(graph);
+        atomGraph = new PGAtomGraph(graph);
     }
 
     @After
@@ -55,7 +59,7 @@ public class AtomGraphTest {
 
         // getAtoms returns a list of only atom vertices, excluding list vertices
         int count = 0;
-        Iterable<Atom> atoms = atomGraph.getAtoms();
+        Iterable<Atom> atoms = atomGraph.getAllAtoms();
         for (Atom a : atoms) {
             count++;
             System.out.println(a.getValue());
@@ -69,7 +73,7 @@ public class AtomGraphTest {
 
         Atom a = atomGraph.createAtom(f, null);
         a.setValue("Arthur Dent");
-        atomGraph.indexForSearch(a, a.getValue());
+        atomGraph.addAtomToIndices(a);
         //a.setValue("Arthur");
 
         Collection<Atom> result;
@@ -108,9 +112,9 @@ public class AtomGraphTest {
         Atom l = atomGraph.createAtom(f, null);
         l.setValue("ooooooooo0ooooooooo1ooooooooo2ooooooooo3ooooooooo4ooooooooo5ooooooooo6ooooooooo7" +
                 "ooooooooo8ooooooooo9oooooooooAoooooooooBoooooooooCoooooooooDoooooooooEoooooooooF");
-        atomGraph.indexForSearch(a, a.getValue());
-        atomGraph.indexForSearch(t, t.getValue());
-        atomGraph.indexForSearch(l, l.getValue());
+        atomGraph.addAtomToIndices(a);
+        atomGraph.addAtomToIndices(t);
+        atomGraph.addAtomToIndices(l);
 
         Collection<Atom> result;
 

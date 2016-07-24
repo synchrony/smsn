@@ -1,9 +1,9 @@
 package net.fortytwo.smsn.server.io.edges;
 
 import com.tinkerpop.blueprints.Vertex;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.AtomList;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;

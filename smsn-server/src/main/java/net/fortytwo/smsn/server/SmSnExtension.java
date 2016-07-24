@@ -2,19 +2,19 @@ package net.fortytwo.smsn.server;
 
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.rexster.RexsterResourceContext;
 import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
 import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
-import net.fortytwo.smsn.brain.Note;
 import net.fortytwo.smsn.brain.NoteHistory;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONException;
@@ -55,7 +55,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
         if (null == b) {
             logger.info("instantiating Extend-o-Brain with base graph " + baseGraph);
-            AtomGraph bg = new AtomGraph(baseGraph);
+            AtomGraph bg = new PGAtomGraph(baseGraph);
             b = new Brain(bg);
             b.startBackgroundTasks();
             brains.put(baseGraph, b);
@@ -103,7 +103,6 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
                 p.wikiView = new String(p.wikiView.getBytes("UTF-8"));
             }
 
-            p.manager = new FramedGraph<>(p.baseGraph);
             p.brain = getBrain(p.baseGraph);
             p.queries = new NoteQueries(p.brain);
             p.parser = new NoteParser();
@@ -280,7 +279,6 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
         public String format;
         public boolean includeTypes;
         public JSONObject jsonView;
-        public FramedGraph<KeyIndexableGraph> manager;
         public Map<String, Object> map;
         public Integer maxResults;
         public NoteParser parser;

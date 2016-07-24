@@ -2,9 +2,9 @@ package net.fortytwo.smsn.brain.rdf;
 
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.AtomList;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
@@ -67,7 +67,7 @@ import java.util.logging.Logger;
 public class KnowledgeBase {
     private static final Logger logger = SemanticSynchrony.getLogger(KnowledgeBase.class);
 
-    private final AtomGraph graph;
+    private final AtomGraph atomGraph;
 
     private final Map<Class<? extends AtomClass>, AtomClass> classes;
 
@@ -75,8 +75,8 @@ public class KnowledgeBase {
 
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-    public KnowledgeBase(final AtomGraph graph) {
-        this.graph = graph;
+    public KnowledgeBase(final AtomGraph atomGraph) {
+        this.atomGraph = atomGraph;
         this.atomClassifications = new HashMap<>();
         this.classes = new HashMap<>();
     }
@@ -193,7 +193,7 @@ public class KnowledgeBase {
             }
             logger.info("completed warm-up inference");
 
-            long lastUpdate = graph.getLastUpdate();
+            long lastUpdate = atomGraph.getLastUpdate();
 
             while (true) {
                 try {
@@ -203,7 +203,7 @@ public class KnowledgeBase {
                 }
 
                 // only repeat the inference step if there have been updates in the meantime
-                long u = graph.getLastUpdate();
+                long u = atomGraph.getLastUpdate();
                 if (u > lastUpdate) {
                     try {
                         logger.info("performing class inference");
@@ -358,7 +358,7 @@ public class KnowledgeBase {
     public synchronized void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
 
-        RDFizationContext context = new RDFizationContext(handler, valueFactory);
+        RDFizationContext context = new RDFizationContext(atomGraph, handler, valueFactory);
 
         // class entries are sorted in descending order based on out-score rather than total score so as to avoid
         // feedback -- see match().  The final score for a class and atom is the sum of out-score and in-score.
@@ -366,7 +366,7 @@ public class KnowledgeBase {
         Comparator totalScoreDescending = new AtomClassificationComparator();
 
         // classify or re-classify each atom
-        for (Atom subject : graph.getAtoms()) {
+        for (Atom subject : atomGraph.getAllAtoms()) {
             context.setSubject(subject);
 
             String value = subject.getValue();
@@ -591,7 +591,7 @@ public class KnowledgeBase {
 
     private long countAtoms() {
         long count = 0;
-        for (Atom a : graph.getAtoms()) {
+        for (Atom a : atomGraph.getAllAtoms()) {
             count++;
         }
         return count;

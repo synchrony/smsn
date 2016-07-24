@@ -4,8 +4,9 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.server.io.BrainReader;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
@@ -28,7 +29,7 @@ public class FreeplaneReaderIT {
     @Test
     public void testTmp() throws Exception {
         KeyIndexableGraph propertyGraph = new TinkerGraph();
-        AtomGraph atomGraph = new AtomGraph(propertyGraph);
+        AtomGraph atomGraph = new PGAtomGraph(propertyGraph);
         Brain brain = new Brain(atomGraph);
 
         Format format = Format.getFormat("fReePLAne");

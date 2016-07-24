@@ -3,6 +3,11 @@ package net.fortytwo.smsn.brain;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
+import net.fortytwo.smsn.brain.error.InvalidUpdateException;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
 
@@ -143,7 +148,7 @@ public class NoteQueries {
     public void update(final Note rootNote,
                        final int height,
                        final Filter filter,
-                       final ViewStyle style) throws InvalidUpdateException {
+                       final ViewStyle style) {
 
         if (null == rootNote || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -155,7 +160,7 @@ public class NoteQueries {
 
         updateInternal(rootNote, height, filter, style);
 
-        brain.getAtomGraph().updated();
+        brain.getAtomGraph().notifyOfUpdate();
     }
 
     private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
@@ -179,10 +184,10 @@ public class NoteQueries {
     private void updateInternal(final Note rootNote,
                                 final int height,
                                 final Filter filter,
-                                final ViewStyle style) throws InvalidUpdateException {
+                                final ViewStyle style) {
 
-        final Set<String> added = new HashSet<>();
-        final Set<String> created = new HashSet<>();
+        final Set<String> childrenAdded = new HashSet<>();
+        final Set<String> childrenCreated = new HashSet<>();
 
         final Atom rootAtom = null == rootNote.getId() ? null : brain.getAtomGraph().getAtom(rootNote.getId());
         if (null != rootAtom) {
@@ -195,16 +200,16 @@ public class NoteQueries {
             ListDiff.DiffEditor<Note> editor = new ListDiff.DiffEditor<Note>() {
                 @Override
                 public void add(final int position,
-                                final Note note) throws InvalidUpdateException {
+                                final Note note) {
                     if (!style.addOnUpdate()) {
                         return;
                     }
 
-                    Atom atom = getAtom(note, filter, created);
+                    Atom atom = getAtom(note, filter, childrenCreated);
 
-                    brain.getAtomGraph().addChildAt(rootAtom, atom, position);
+                    rootAtom.addChildAt(atom, position);
 
-                    added.add((String) atom.asVertex().getId());
+                    childrenAdded.add((String) atom.asVertex().getId());
 
                     // log this activity
                     if (null != brain.getActivityLog()) {
@@ -214,12 +219,12 @@ public class NoteQueries {
 
                 @Override
                 public void delete(final int position,
-                                   final Note note) {
+                                   final Note note) throws InvalidGraphException {
                     if (!style.deleteOnUpdate()) {
                         return;
                     }
 
-                    brain.getAtomGraph().deleteChildAt(rootAtom, position);
+                    rootAtom.deleteChildAt(position);
 
                     // log this activity
                     if (null != brain.getActivityLog()) {
@@ -242,9 +247,9 @@ public class NoteQueries {
             // if a child is not new, update both the child and the grandchildren with decreasing height
             int h = null == rootNote.getId()
                     ? height - 1
-                    : created.contains(n.getId())
+                    : childrenCreated.contains(n.getId())
                     ? 1
-                    : added.contains(n.getId())
+                    : childrenAdded.contains(n.getId())
                     ? 0
                     : height - 1;
 
@@ -377,32 +382,6 @@ public class NoteQueries {
         return result;
     }
 
-    public void removeIsolatedAtoms(final Filter filter) {
-        if (null == filter) {
-            throw new IllegalArgumentException();
-        }
-
-        List<Vertex> toRemove = new LinkedList<>();
-
-        for (Vertex v : brain.getAtomGraph().getPropertyGraph().getVertices()) {
-            if (null != v.getProperty("value")
-                    && !v.getEdges(Direction.IN).iterator().hasNext()
-                    && !v.getEdges(Direction.OUT).iterator().hasNext()) {
-                //Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(v)) {
-                    toRemove.add(v);
-                }
-            }
-        }
-
-        for (Vertex v : toRemove) {
-            // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
-            brain.getAtomGraph().getPropertyGraph().removeVertex(v);
-        }
-
-        brain.getAtomGraph().updated();
-    }
-
     /**
      * Performs a Ripple query.
      *
@@ -478,7 +457,7 @@ public class NoteQueries {
      */
     public Note priorityView(final Filter filter,
                              final int maxResults,
-                             final Priorities priorities) {
+                             final Priorities priorities) throws InvalidGraphException {
         if (null == filter || maxResults < 1 || null == priorities) {
             throw new IllegalArgumentException();
         }
@@ -501,124 +480,100 @@ public class NoteQueries {
         return result;
     }
 
-    private void setProperties(final Atom target,
-                               final Note note) {
-        String value = note.getValue();
-
+    private boolean setValue(final Atom target,
+                             final String value) {
         // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null values.
-        // TODO: is this the best way to handle values of "fake" root nodes?
-        if (null != value) {
-            if (null != brain.getActivityLog()) {
-                String prev = target.getValue();
-                // Note: assumes value is not null
-                if (null == prev || (!prev.equals(value))) {
-                    brain.getActivityLog().logUpdate(target);
-                }
-            }
+        return null != value && target.setValue(value);
+    }
 
-            target.setValue(value);
-            brain.getAtomGraph().indexForSearch(target, value);
-        }
-
-        boolean propsSet = false;
-
-        String alias = note.getAlias();
-
+    private boolean setAlias(final Atom target,
+                             final String alias) {
         if (null != alias) {
             if (alias.equals(Note.CLEARME_VALUE)) {
-                String prev = target.getAlias();
-                if (null != prev) {
-                    target.setAlias(null);
-                    propsSet = true;
-                }
+                return target.setAlias(null);
             } else {
-                String prev = target.getAlias();
-                if (null == prev || !prev.equals(alias)) {
-                    target.setAlias(alias);
-                    propsSet = true;
-                }
+                return target.setAlias(alias);
             }
-        }
-
-        String shortcut = note.getShortcut();
-
-        if (null != shortcut) {
-            if (shortcut.equals(Note.CLEARME_VALUE)) {
-                String prev = target.getShortcut();
-                if (null != prev) {
-                    target.setShortcut(null);
-                    propsSet = true;
-                }
-            } else {
-                String prev = target.getShortcut();
-                if (null == prev || !prev.equals(shortcut)) {
-                    target.setShortcut(shortcut);
-                    propsSet = true;
-                }
-            }
-        }
-
-        Float priority = note.getPriority();
-        if (null != priority) {
-            Float p = target.getPriority();
-            if (0 == priority) {
-                if (null != p) {
-                    target.setPriority(null);
-                    brain.getPriorities().updatePriority(target);
-                    propsSet = true;
-                }
-            } else {
-                if (null == p || (!p.equals(priority))) {
-                    target.setPriority(priority);
-                    brain.getPriorities().updatePriority(target);
-                    propsSet = true;
-                }
-            }
-        }
-
-        Float sharability = note.getSharability();
-        if (null != sharability) {
-            Float p = target.getSharability();
-            if (null == p || (!p.equals(sharability))) {
-                target.setSharability(sharability);
-                propsSet = true;
-            }
-        }
-
-        Float weight = note.getWeight();
-        if (null != weight) {
-            Float p = target.getWeight();
-            if (null == p || (!p.equals(weight))) {
-                target.setWeight(weight);
-                propsSet = true;
-            }
-        }
-
-        if (propsSet && null != brain.getActivityLog()) {
-            brain.getActivityLog().logSetProperties(target);
+        } else {
+            return false;
         }
     }
 
-    private Note toNote(final Atom a,
-                        final boolean isVisible) {
-        Note n = new Note();
+    private boolean setShortcut(final Atom target,
+                                final String shortcut) {
+        if (null != shortcut) {
+            if (shortcut.equals(Note.CLEARME_VALUE)) {
+                return target.setShortcut(null);
+            } else {
+                return target.setShortcut(shortcut);
+            }
+        } else {
+            return false;
+        }
+    }
 
-        n.setId((String) a.asVertex().getId());
-        n.setWeight(a.getWeight());
-        n.setSharability(a.getSharability());
-        n.setPriority(a.getPriority());
-        n.setCreated(a.getCreated());
-        n.setAlias(a.getAlias());
-        n.setShortcut(a.getShortcut());
+    private boolean setPriority(final Atom target,
+                                 Float priority) {
+        if (null != priority) {
+            if (0 == priority) priority = null;
+
+            if (target.setPriority(priority)) {
+                brain.getPriorities().updatePriority(target);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean setSharability(final Atom target,
+                                final Float sharability) {
+        return null != sharability && target.setSharability(sharability);
+    }
+
+    private boolean setWeight(final Atom target,
+                                   final Float weight) {
+        return null != weight && target.setWeight(weight);
+    }
+
+    private void setProperties(final Atom target,
+                               final Note note) throws InvalidGraphException, InvalidUpdateException {
+        boolean changed = setValue(target, note.getValue())
+                | setAlias(target, note.getAlias())
+                | setShortcut(target, note.getShortcut())
+                | setPriority(target, note.getPriority())
+                | setWeight(target, note.getWeight())
+                | setSharability(target, note.getSharability());
+
+        if (changed) {
+            brain.getAtomGraph().addAtomToIndices(target);
+
+            if (null != brain.getActivityLog()) {
+                brain.getActivityLog().logSetProperties(target);
+            }
+        }
+    }
+
+    private Note toNote(final Atom atom,
+                        final boolean isVisible) throws InvalidGraphException {
+        Note note = new Note();
+
+        note.setId((String) atom.asVertex().getId());
+        note.setWeight(atom.getWeight());
+        note.setSharability(atom.getSharability());
+        note.setPriority(atom.getPriority());
+        note.setCreated(atom.getCreated());
+        note.setAlias(atom.getAlias());
+        note.setShortcut(atom.getShortcut());
 
         // The convention for "invisible" notes is to leave the value blank,
         // as well as to avoid displaying any child notes.
         if (isVisible) {
-            n.setValue(a.getValue());
+            note.setValue(atom.getValue());
         }
 
         if (null != brain.getKnowledgeBase()) {
-            List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(a);
+            List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(atom);
             if (null != entries && entries.size() > 0) {
                 List<String> meta = new LinkedList<>();
                 for (KnowledgeBase.AtomClassEntry e : entries) {
@@ -627,11 +582,11 @@ public class NoteQueries {
                     meta.add(ann);
                 }
 
-                n.setMeta(meta);
+                note.setMeta(meta);
             }
         }
 
-        return n;
+        return note;
     }
 
     private class NoteComparator implements Comparator<Note> {
@@ -643,12 +598,6 @@ public class NoteQueries {
             }
 
             return cmp;
-        }
-    }
-
-    public static class InvalidUpdateException extends Exception {
-        public InvalidUpdateException(final String message) {
-            super(message);
         }
     }
 
@@ -740,8 +689,8 @@ public class NoteQueries {
         public Iterable<Atom> getLinked(final Atom root,
                                         final Filter filter) {
             List<Atom> results = new LinkedList<>();
-            for (AtomList l : root.getFirstOf()) {
-                AtomList cur = l;
+            root.forFirstOf(list -> {
+                AtomList cur = list;
                 AtomList prev = null;
                 while (null != cur) {
                     prev = cur;
@@ -752,7 +701,7 @@ public class NoteQueries {
                 if (filter.isVisible(a.asVertex())) {
                     results.add(a);
                 }
-            }
+            });
 
             return results;
         }

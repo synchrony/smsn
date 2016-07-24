@@ -50,7 +50,7 @@ public class RemoveIsolatedAtomsExtension extends SmSnExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        p.queries.removeIsolatedAtoms(p.filter);
+        p.brain.getAtomGraph().removeIsolatedAtoms(p.filter);
 
         return ExtensionResponse.ok(p.map);
     }

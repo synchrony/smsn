@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;

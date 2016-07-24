@@ -1,15 +1,13 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
@@ -51,25 +49,25 @@ public abstract class AtomClass {
     public abstract IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException;
 
     protected IRI handleTypeAndAlias(final Atom a,
-                                     final ValueFactory vf,
-                                     final RDFHandler handler,
+                                     final RDFizationContext context,
                                      final IRI type) throws RDFHandlerException {
-        IRI self = vf.createIRI(AtomGraph.iriOf(a));
+        IRI self = context.getValueFactory().createIRI(context.getAtomGraph().iriOfAtom(a));
 
-        handler.handleStatement(vf.createStatement(self, RDF.TYPE, type));
+        context.getHandler().handleStatement(context.getValueFactory().createStatement(self, RDF.TYPE, type));
 
         if (null != a.getAlias()) {
             IRI aliasIRI;
 
             try {
-                aliasIRI = vf.createIRI(a.getAlias());
+                aliasIRI = context.getValueFactory().createIRI(a.getAlias());
             } catch (Exception e) {
                 SemanticSynchrony.logWarning("alias is not a valid IRI: " + a.getAlias(), e);
                 aliasIRI = null;
             }
 
             if (null != aliasIRI) {
-                handler.handleStatement(vf.createStatement(self, OWL.SAMEAS, vf.createIRI(a.getAlias())));
+                context.getHandler().handleStatement(
+                        context.getValueFactory().createStatement(self, OWL.SAMEAS, context.getValueFactory().createIRI(a.getAlias())));
             }
         }
 

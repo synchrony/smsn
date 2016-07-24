@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Note;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

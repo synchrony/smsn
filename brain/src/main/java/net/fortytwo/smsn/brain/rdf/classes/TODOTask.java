@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
@@ -36,7 +36,7 @@ public class TODOTask extends AtomClass {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        IRI self = handleTypeAndAlias(a, vf, handler, SmSnVocabulary.TODO);
+        IRI self = handleTypeAndAlias(a, context, SmSnVocabulary.TODO);
 
         // assumes the prefix "TODO:"
         String d = a.getValue().substring(5).trim();

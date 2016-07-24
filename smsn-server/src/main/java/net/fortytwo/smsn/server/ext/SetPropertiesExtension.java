@@ -12,8 +12,8 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.SmSnExtension;
@@ -112,9 +112,9 @@ public class SetPropertiesExtension extends SmSnExtension {
                 throw new IllegalStateException();
         }
 
-        p.brain.getAtomGraph().updated();
+        p.brain.getAtomGraph().notifyOfUpdate();
 
-        p.map.put("key", AtomGraph.getId(p.root));
+        p.map.put("key", p.brain.getAtomGraph().idOfAtom(p.root));
         p.map.put("name", "" + p.propertyName);
         p.map.put("value", "" + p.propertyValue);
 

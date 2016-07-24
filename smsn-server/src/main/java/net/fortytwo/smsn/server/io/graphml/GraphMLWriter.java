@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.io.graphml;
 
-import net.fortytwo.smsn.brain.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;

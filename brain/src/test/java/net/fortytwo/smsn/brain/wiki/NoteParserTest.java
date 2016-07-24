@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.brain.wiki;
 
-import net.fortytwo.smsn.brain.AtomGraph;
-import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.model.Note;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class NoteParserTest {
     @Test
     public void testExample1() throws Exception {
         List<Note> notes = parser.fromWikiText(
-                AtomGraph.class.getResourceAsStream("wiki-example-1.txt")).getChildren();
+                getClass().getResourceAsStream("wiki-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
         Note indentation = notes.get(1);
@@ -67,7 +66,7 @@ public class NoteParserTest {
 
     @Test
     public void testExample2() throws Exception {
-        Note root = parser.fromWikiText(AtomGraph.class.getResourceAsStream("wiki-example-2.txt"));
+        Note root = parser.fromWikiText(getClass().getResourceAsStream("wiki-example-2.txt"));
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());

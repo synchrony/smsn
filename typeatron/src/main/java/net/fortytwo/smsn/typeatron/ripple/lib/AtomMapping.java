@@ -3,10 +3,10 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
-import net.fortytwo.smsn.brain.AtomGraph;
 import net.fortytwo.smsn.brain.Filter;
-import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
@@ -108,6 +108,6 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
             }
         }
 
-        return valueFactory.createIRI(AtomGraph.iriForId(n.getId()));
+        return valueFactory.createIRI(PGAtomGraph.iriForId(n.getId()));
     }
 }

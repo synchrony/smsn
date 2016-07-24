@@ -6,7 +6,7 @@ import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.brain.Filter;
-import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;

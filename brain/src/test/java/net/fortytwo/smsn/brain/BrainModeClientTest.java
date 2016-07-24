@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain;
 
-import groovy.json.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -19,9 +19,8 @@ public class BrainModeClientTest {
     private final List<String> results = new ArrayList<>();
 
     private final BrainModeClient.EmacsFunctionExecutor functionExecutor = (function, argument) -> {
-
         String expr = function.getRequiresArgument()
-                ? "(" + function.getName() + " \"" + StringEscapeUtils.escapeJava(argument) + "\")"
+                ? "(" + function.getName() + " \"" + StringUtils.escape(argument) + "\")"
                 : "(" + function.getName() + ")";
 
         results.add(expr);

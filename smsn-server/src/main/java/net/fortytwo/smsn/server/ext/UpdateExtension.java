@@ -12,11 +12,10 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.server.requests.RootedViewRequest;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.SmSnExtension;
+import net.fortytwo.smsn.server.requests.RootedViewRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -76,11 +75,7 @@ public class UpdateExtension extends SmSnExtension {
         rootNote.setId(p.rootId);
 
         // Apply the update
-        try {
-            p.queries.update(rootNote, p.height, p.filter, p.style);
-        } catch (NoteQueries.InvalidUpdateException e) {
-            return ExtensionResponse.error("invalid update: " + e.getMessage());
-        }
+        p.queries.update(rootNote, p.height, p.filter, p.style);
 
         // TODO: produce an appropriate view (e.g. a search) if the root is null
         Note n = null == p.root

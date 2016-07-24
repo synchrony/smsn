@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.model.Note;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

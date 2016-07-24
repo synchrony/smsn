@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.util;
 
 import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,7 +77,7 @@ public class ListDiff {
                                      final List<T> b,
                                      final List<T> l,
                                      final Comparator<T> cmp,
-                                     final DiffEditor<T> ed) throws NoteQueries.InvalidUpdateException {
+                                     final DiffEditor<T> ed) {
         int acur = 0;
         int bcur = 0;
         int lcur = 0;
@@ -115,7 +116,7 @@ public class ListDiff {
     }
 
     public static interface DiffEditor<T> {
-        void add(int position, T letter) throws NoteQueries.InvalidUpdateException;
+        void add(int position, T letter);
 
         void delete(int position, T letter);
     }

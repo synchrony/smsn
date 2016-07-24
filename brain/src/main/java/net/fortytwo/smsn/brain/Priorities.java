@@ -2,6 +2,8 @@ package net.fortytwo.smsn.brain;
 
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;

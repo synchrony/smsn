@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.brain;
+package net.fortytwo.smsn.brain.model;
 
 import java.util.LinkedList;
 import java.util.List;

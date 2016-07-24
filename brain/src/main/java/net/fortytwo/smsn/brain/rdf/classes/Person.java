@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomCollection;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
@@ -73,7 +73,7 @@ public class Person extends AtomClass {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        IRI self = handleTypeAndAlias(a, vf, handler, FOAF.PERSON);
+        IRI self = handleTypeAndAlias(a, context, FOAF.PERSON);
         handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getValue())));
 
         return self;

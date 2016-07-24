@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.model.Atom;
 
 import java.io.FileWriter;
 import java.io.IOException;

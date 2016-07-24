@@ -12,7 +12,7 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Note;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.SmSnExtension;

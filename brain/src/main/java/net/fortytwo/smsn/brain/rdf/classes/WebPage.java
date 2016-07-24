@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
@@ -36,7 +36,7 @@ public class WebPage extends AtomClass {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
-        IRI self = handleTypeAndAlias(a, vf, handler, FOAF.DOCUMENT);
+        IRI self = handleTypeAndAlias(a, context, FOAF.DOCUMENT);
 
         // note: assumes that the value ends with "(web page)"
         int i = a.getValue().lastIndexOf("(");

@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.io.latex;
 
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteQueries;
