@@ -1,10 +1,12 @@
 ;; Brain-mode: the MyOtherBrain Emacs library
 ;;
+;; Copyright (C) 2011-2016 Joshua Shinavier
+;;
 ;; This major mode allows you to view, edit, search, and process a MyOtherBrain personal knowledge base.
 ;;
 ;; Dependencies:
 ;;
-;;     json, linum, goto-addr, aes, and latex-math-preview
+;;     aes, indent-guide, goto-addr, json, latex-math-preview, and linum
 ;;
 ;; Required global variables:
 ;;
@@ -44,6 +46,9 @@
 
 ;; for LaTeX views (nice-to-have, but not essential)
 (require 'latex-math-preview)
+
+;; TODO: experimental
+(require 'indent-guide)
 
 
 ;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -634,7 +639,7 @@
 
 ;; VIEWS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; unused colors: black/gray, orange
+;; unused colors: make-black/gray, orange
 (defconst sharability-base-colors  '("#660000" "#604000" "#005000" "#000066"))
 (defconst sharability-bright-colors  '("#D00000" "#D0B000" "#00B000" "#0000D0"))
 (defconst sharability-reduced-colors '("red" "red" "blue" "blue"))
@@ -703,20 +708,26 @@
                                    :color (atom-color priority-bg sharability bright has-meta)) nil)))
     (propertize text 'face l)))
 
-(defun black (text)
-  (propertize text 'face (list :foreground "black")))
+(defun light-gray ()
+  (if full-colors-supported
+    (list :foreground "grey80" :background "white")
+    (list :foreground "make-black")))
 
-(defun light-gray (text)
-  (propertize text
-              'face (if full-colors-supported
-                        (list :foreground "grey80" :background "white")
-                      (list :foreground "black"))))
+(defun dark-gray ()
+  (if full-colors-supported
+    (list :foreground "grey50" :background background)
+    (list :foreground "make-black")))
 
-(defun dark-gray (text background)
+(defun make-black (text)
+  (propertize text 'face (list :foreground "make-black")))
+
+(defun make-light-gray (text)
   (propertize text
-              'face (if full-colors-supported
-                        (list :foreground "grey50" :background background)
-                      (list :foreground "black"))))
+              'face (light-gray)))
+
+(defun make-dark-gray (text background)
+  (propertize text
+              'face (dark-gray)))
 
 (defun create-id-infix (id)
   (propertize (concat " :" id ":") 'invisible t))
@@ -762,16 +773,16 @@
                                    "\n")))
               (insert (propertize line 'target-id target-id)))
             (if (using-inference)
-                (loop for a across target-meta do (insert (light-gray (concat space "    @{" a "}\n")))))
+                (loop for a across target-meta do (insert (make-light-gray (concat space "    @{" a "}\n")))))
             (if (get-view-properties) (let ()
-                                                (insert (light-gray
+                                                (insert (make-light-gray
                                                          (concat space "    @sharability " (number-to-string target-sharability) "\n")))
-                                                (insert (light-gray
+                                                (insert (make-light-gray
                                                          (concat space "    @weight      " (number-to-string target-weight) "\n")))
                                                 (if target-shortcut
-                                                    (insert (light-gray (concat space "    @shortcut    " target-shortcut "\n"))))
+                                                    (insert (make-light-gray (concat space "    @shortcut    " target-shortcut "\n"))))
                                                 (if target-alias
-                                                    (insert (light-gray (concat space "    @alias       " target-alias "\n"))))))
+                                                    (insert (make-light-gray (concat space "    @alias       " target-alias "\n"))))))
             (write-view editable children (+ tree-indent 4))))))
 
 (defun num-or-nil-to-string (n)
@@ -1504,6 +1515,11 @@ a type has been assigned to it by the inference engine."
   "Abbrev table used while in Brain-mode.")
 (define-abbrev-table 'brain-mode-abbrev-table ())
 
+(defun set-indent-guide-mode ()
+  (indent-guide-mode)
+  (setq indent-guide-recursive t)
+  (set-face-foreground 'indent-guide-face "gray"))
+
 (defun brain-mode ()
   "Major mode for interacting with a MyOtherBrain personal knowledge base"
   (interactive)
@@ -1515,6 +1531,7 @@ a type has been assigned to it by the inference engine."
   ;; note: not customizing indent style with indent-line-function
   (setq mode-name "Brain-mode")
   (setq major-mode 'brain-mode)
+  (set-indent-guide-mode)
   (run-hooks 'brain-hook))
 
 (provide 'brain-mode)
