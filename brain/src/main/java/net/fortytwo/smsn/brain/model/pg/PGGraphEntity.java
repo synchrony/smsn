@@ -78,7 +78,7 @@ abstract class PGGraphEntity {
     protected Object getRequiredProperty(String name) {
         Object value = getOptionalProperty(name);
         if (null == value) {
-            throw new InvalidGraphException("missing property '" + name + "' for entity " + getId());
+            throw new InvalidGraphException("missing property '" + name + "' for atom vertex " + getId());
         }
         return value;
     }
@@ -109,30 +109,37 @@ abstract class PGGraphEntity {
 
     protected boolean setRequiredProperty(String name, Object value) {
         if (null == value) {
-            throw new InvalidUpdateException("can't clear required property '" + name + "' on entity " + getId());
+            throw new InvalidUpdateException("can't clear required property '" + name
+                    + "' on atom vertex " + getId());
         }
 
         return setProperty(name, value);
     }
 
-    protected Vertex getAtMostOneVertex(final String label, Direction direction) {
+    protected void forAllVertices(final String label, final Direction direction, final Consumer<AtomList> consumer) {
+        vertex.getVertices(direction, label).forEach(vertex -> consumer.accept(vertexAsAtomList(vertex)));
+    }
+
+    protected Vertex getAtMostOneVertex(final String label, final Direction direction) {
         Iterator<Vertex> vertexIter = vertex.getVertices(direction, label).iterator();
         if (!vertexIter.hasNext()) {
             return null;
         }
         Vertex result = vertexIter.next();
         if (vertexIter.hasNext()) {
-            throw new InvalidGraphException("vertex has more than one '" + label + "' out-edge");
+            throw new InvalidGraphException("atom vertex " + getId()
+                    + " has more than one '" + label + "' " + direction + " edge");
         }
         return result;
     }
 
-    protected Vertex getExactlyOneVertex(final String label, Direction direction) {
-        Vertex vertex = getAtMostOneVertex(label, direction);
-        if (null == vertex) {
-            throw new InvalidGraphException("missing '" + label + "' " + direction + " edge");
+    protected Vertex getExactlyOneVertex(final String label, final Direction direction) {
+        Vertex other = getAtMostOneVertex(label, direction);
+        if (null == other) {
+            throw new InvalidGraphException("atom vertex " + getId()
+                    + "is missing '" + label + "' " + direction + " edge");
         }
-        return vertex;
+        return other;
     }
 
     protected void forEachAdjacentVertex(final String label, Direction direction, Consumer<Vertex> consumer) {

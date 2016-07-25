@@ -5,6 +5,7 @@ package net.fortytwo.smsn.brain;
  */
 public interface Params {
     public static final String
+            ACTION = "action",
             DATASET = "dataset",
             DEFAULT_SHARABILITY = "defaultSharability",
             DEFAULT_WEIGHT = "defaultWeight",

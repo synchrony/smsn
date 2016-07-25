@@ -3,7 +3,7 @@ package net.fortytwo.smsn.server.requests;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.Request;
-import net.fortytwo.smsn.server.SmSnExtension;
+import net.fortytwo.smsn.server.Action;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +35,7 @@ public class FilteredResultsRequest extends Request {
         float maxWeight = (float) f.optDouble(Params.MAX_WEIGHT, 1.0);
 
         float ms = (float) f.getDouble(Params.MIN_SHARABILITY);
-        float minSharability = SmSnExtension.findMinAuthorizedSharability(user, ms);
+        float minSharability = Action.findMinAuthorizedSharability(user, ms);
 
         float maxSharability = (float) f.optDouble(Params.MAX_SHARABILITY, 1.0);
 

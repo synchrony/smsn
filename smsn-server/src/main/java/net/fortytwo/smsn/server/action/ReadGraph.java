@@ -1,25 +1,18 @@
-package net.fortytwo.smsn.server.ext;
+package net.fortytwo.smsn.server.action;
 
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.extension.ExtensionDefinition;
-import com.tinkerpop.rexster.extension.ExtensionDescriptor;
-import com.tinkerpop.rexster.extension.ExtensionNaming;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.server.io.Format;
+import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.Request;
-import net.fortytwo.smsn.server.SmSnExtension;
+import net.fortytwo.smsn.server.error.BadRequestException;
+import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.io.BrainReader;
+import net.fortytwo.smsn.server.io.Format;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,58 +24,43 @@ import java.util.Set;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "import")
-public class ImportExtension extends SmSnExtension {
+public class ReadGraph extends Action {
     private final Map<Graph, Set<String>> importsInProgress;
     private final Map<Graph, Set<String>> importsSucceeded;
 
-    public ImportExtension() {
+    public ReadGraph() {
         importsInProgress = new HashMap<>();
         importsSucceeded = new HashMap<>();
     }
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for exporting an Extend-o-Brain subgraph")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
-                                           @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = Params.REQUEST,
-                                                   description = "request description (JSON object)") String request) {
-        // TODO: any security restrictions here?  See also the export extension.
+    @Override
+    public String getName() {
+        return "import";
+    }
 
-        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-
-        ImportRequest r;
-        try {
-            r = new ImportRequest(new JSONObject(request), p.user);
-        } catch (JSONException e) {
-            return ExtensionResponse.error(e.getMessage());
-        }
+    @Override
+    public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
+        ImportRequest r = new ImportRequest(request, p.user);
 
         p.file = r.file;
         p.format = r.format;
-
-        SemanticSynchrony.logInfo("SmSn import " + r.format + " from " + r.file);
-
-        return handleRequestInternal(p);
     }
 
-    private synchronized ExtensionResponse beginImport(final Graph g, final String file) {
+    private synchronized void beginImport(final Graph g, final String file) throws BadRequestException {
         Set<String> files = importsSucceeded.get(g);
         if (null != files && files.contains(file)) {
-            return ExtensionResponse.error("graph at " + file + " has already been imported successfully");
+            throw new BadRequestException("graph at " + file + " has already been imported successfully");
         }
 
         files = importsInProgress.get(g);
         if (null != files) {
             if (files.contains(file)) {
-                return ExtensionResponse.error("graph at " + file + " is currently being imported");
+                throw new BadRequestException("graph at " + file + " is currently being imported");
             }
         } else {
             files = new HashSet<>();
         }
         files.add(file);
-
-        return null;
     }
 
     private synchronized void finishImport(final Graph g, final String file, final boolean success) {
@@ -101,27 +79,25 @@ public class ImportExtension extends SmSnExtension {
         }
     }
 
-    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
+    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         if (null == p.format) {
-            return ExtensionResponse.error("format is required");
+            throw new BadRequestException("format is required");
         }
 
         Format format = Format.getFormat(p.format);
         BrainReader reader = Format.getReader(format);
 
-        ExtensionResponse r = beginImport(p.baseGraph, p.file);
-        if (null != r) {
-            return r;
-        }
+        beginImport(p.baseGraph, p.file);
 
         boolean success = false;
         try {
             reader.doImport(new File(p.file), format, p.brain, true);
+            success = true;
+        } catch (IOException e) {
+            throw new RequestProcessingException(e);
         } finally {
             finishImport(p.baseGraph, p.file, success);
         }
-
-        return ExtensionResponse.ok(p.map);
     }
 
     protected boolean doesRead() {

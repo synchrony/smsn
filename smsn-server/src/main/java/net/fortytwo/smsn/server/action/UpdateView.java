@@ -1,25 +1,17 @@
-package net.fortytwo.smsn.server.ext;
+package net.fortytwo.smsn.server.action;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.extension.ExtensionDefinition;
-import com.tinkerpop.rexster.extension.ExtensionDescriptor;
-import com.tinkerpop.rexster.extension.ExtensionNaming;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.HttpMethod;
-import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.SmSnExtension;
+import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.error.BadRequestException;
+import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.RootedViewRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 
@@ -28,24 +20,12 @@ import java.security.Principal;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "update")
-//@ExtensionDescriptor(description = "update an Extend-o-Brain graph")
-public class UpdateExtension extends SmSnExtension {
+public class UpdateView extends Action {
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
-    @ExtensionDescriptor(description = "update an Extend-o-Brain graph using the wiki format")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
-                                           @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = Params.REQUEST,
-                                                   description = "request description (JSON object)") String request) {
-
-        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
+    public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
         UpdateRequest r;
-        try {
-            r = new UpdateRequest(new JSONObject(request), p.user);
-        } catch (JSONException e) {
-            return ExtensionResponse.error(e.getMessage());
-        }
+        r = new UpdateRequest(request, p.user);
+
         p.height = r.getHeight();
         // note: may be null
         p.rootId = r.getRootId();
@@ -53,21 +33,30 @@ public class UpdateExtension extends SmSnExtension {
         p.jsonView = r.jsonView;
         p.wikiView = r.wikiView;
         p.filter = r.getFilter();
-
-        SemanticSynchrony.logInfo("SmSn update " + r.getRootId());
-
-        return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
+    @Override
+    public String getName() {
+        return "update";
+    }
+
+    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         Note rootNote;
 
         if (null != p.wikiView) {
-            try (InputStream in = new ByteArrayInputStream(p.wikiView.getBytes())) {
-                rootNote = p.parser.fromWikiText(in);
+            try {
+                try (InputStream in = new ByteArrayInputStream(p.wikiView.getBytes())) {
+                    rootNote = p.parser.fromWikiText(in);
+                }
+            } catch (IOException | NoteParser.NoteParsingException e) {
+                throw new RequestProcessingException(e);
             }
         } else if (null != p.jsonView) {
-            rootNote = p.parser.fromJSON(p.jsonView);
+            try {
+                rootNote = p.parser.fromJSON(p.jsonView);
+            } catch (JSONException e) {
+                throw new RequestProcessingException(e);
+            }
         } else {
             throw new IllegalStateException();
         }
@@ -81,9 +70,11 @@ public class UpdateExtension extends SmSnExtension {
         Note n = null == p.root
                 ? new Note()
                 : p.queries.view(p.root, p.height, p.filter, p.style);
-        addView(n, p);
-
-        return ExtensionResponse.ok(p.map);
+        try {
+            addView(n, p);
+        } catch (IOException e) {
+            throw new RequestProcessingException(e);
+        }
     }
 
     protected boolean doesRead() {

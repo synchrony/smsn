@@ -1,21 +1,13 @@
-package net.fortytwo.smsn.server.ext;
+package net.fortytwo.smsn.server.action;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.extension.ExtensionDefinition;
-import com.tinkerpop.rexster.extension.ExtensionDescriptor;
-import com.tinkerpop.rexster.extension.ExtensionNaming;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.server.Request;
-import net.fortytwo.smsn.server.SmSnExtension;
+import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.error.BadRequestException;
+import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,55 +18,48 @@ import java.security.Principal;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "set")
-//@ExtensionDescriptor(description = "set the properties of an atom")
-public class SetPropertiesExtension extends SmSnExtension {
+public class SetProperties extends Action {
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for setting properties of given atoms")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
-                                           @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = Params.REQUEST,
-                                                   description = "request description (JSON object)") String request) {
-        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-        SetPropertiesRequest r;
-        try {
-            r = new SetPropertiesRequest(new JSONObject(request), p.user);
-        } catch (JSONException e) {
-            return ExtensionResponse.badRequest(e.getMessage(), null);
-        }
+    @Override
+    public String getName() {
+        return "set";
+    }
+
+    @Override
+    public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException, BadRequestException {
+        SetPropertiesRequest r = new SetPropertiesRequest(request, p.user);
 
         switch (r.name) {
             case SemanticSynchrony.WEIGHT: {
                 float f = (Float) r.value;
                 // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
                 if (f <= 0 || f > 1.0) {
-                    return ExtensionResponse.badRequest("weight is outside of range (0, 1]: " + f, null);
+                    throw new BadRequestException("weight is outside of range (0, 1]: " + f);
                 }
                 break;
             }
             case SemanticSynchrony.SHARABILITY: {
                 float f = (Float) r.value;
                 if (f <= 0 || f > 1.0) {
-                    return ExtensionResponse.badRequest("sharability is outside of range (0, 1]: " + f, null);
+                    throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
                 }
                 break;
             }
             case SemanticSynchrony.PRIORITY: {
                 float f = (Float) r.value;
                 if (f < 0 || f > 1.0) {
-                    return ExtensionResponse.badRequest("priority is outside of range [0, 1]: " + f, null);
+                    throw new BadRequestException("priority is outside of range [0, 1]: " + f);
                 }
                 break;
             }
             case SemanticSynchrony.SHORTCUT:
                 String s = (String) r.value;
                 if (s.length() > 50) {
-                    return ExtensionResponse.badRequest("shortcut is too long: " + s, null);
+                    throw new BadRequestException("shortcut is too long: " + s);
                 }
                 break;
             default:
-                return ExtensionResponse.error("unknown property: " + r.name);
+                throw new BadRequestException("unknown property: " + r.name);
         }
 
         p.propertyName = r.name;
@@ -82,11 +67,9 @@ public class SetPropertiesExtension extends SmSnExtension {
         p.rootId = r.id;
 
         SemanticSynchrony.logInfo("SmSn set-properties on " + r.id + ": " + r.name + " <- " + r.value);
-
-        return handleRequestInternal(p);
     }
 
-    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
+    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         switch (p.propertyName) {
             case SemanticSynchrony.WEIGHT:
                 p.root.setWeight((Float) p.propertyValue);
@@ -121,8 +104,6 @@ public class SetPropertiesExtension extends SmSnExtension {
         if (null != log) {
             log.logSetProperties(p.root);
         }
-
-        return ExtensionResponse.ok(p.map);
     }
 
     protected boolean doesRead() {
@@ -148,4 +129,5 @@ public class SetPropertiesExtension extends SmSnExtension {
                     : (float) this.json.getDouble(Params.VALUE);
         }
     }
+
 }

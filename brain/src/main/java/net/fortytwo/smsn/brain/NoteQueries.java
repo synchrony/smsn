@@ -336,7 +336,7 @@ public class NoteQueries {
 
     private boolean isAdjacent(final Atom a, final boolean includeChildren, final boolean includeParents) {
         return (includeChildren && null != a.getNotes())
-                || (includeParents && null != a.getFirstOf());
+                || (includeParents && a.getFirstOf().size() > 0);
     }
 
     private Note findAtoms(final Filter filter,

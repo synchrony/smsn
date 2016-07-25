@@ -1,26 +1,16 @@
-package net.fortytwo.smsn.server.ext;
+package net.fortytwo.smsn.server.action;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.rexster.RexsterResourceContext;
-import com.tinkerpop.rexster.extension.ExtensionDefinition;
-import com.tinkerpop.rexster.extension.ExtensionDescriptor;
-import com.tinkerpop.rexster.extension.ExtensionNaming;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
-import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openrdf.model.Graph;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,36 +24,29 @@ import java.util.Map;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-@ExtensionNaming(namespace = "smsn", name = "duplicates")
-public class DuplicatesExtension extends SmSnExtension {
+public class FindDuplicates extends Action {
 
-    @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
-    @ExtensionDescriptor(description = "an extension for viewing Extend-o-Brain browsing history")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
-                                           @RexsterContext Graph graph,
-                                           @ExtensionRequestParameter(name = Params.REQUEST,
-                                                   description = "request description (JSON object)") String request) {
-        RequestParams p = createParams(context, (KeyIndexableGraph) graph);
-        FilteredResultsRequest r;
-        try {
-            r = new FilteredResultsRequest(new JSONObject(request), p.user);
-        } catch (JSONException e) {
-            return ExtensionResponse.error(e.getMessage());
-        }
-
-        p.filter = r.getFilter();
-
-        SemanticSynchrony.logInfo("SmSn duplicates");
-
-        return handleRequestInternal(p);
+    @Override
+    public String getName() {
+        return "duplicates";
     }
 
-    protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
+    @Override
+    public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
+        FilteredResultsRequest r;
+        r = new FilteredResultsRequest(request, p.user);
+
+        p.filter = r.getFilter();
+    }
+
+    protected void performTransaction(final RequestParams p) throws RequestProcessingException {
         List<String> ids = getDuplicates(p.brain.getAtomGraph(), p.filter);
 
-        addView(p.queries.customView(ids, p.filter), p);
-
-        return ExtensionResponse.ok(p.map);
+        try {
+            addView(p.queries.customView(ids, p.filter), p);
+        } catch (IOException e) {
+            throw new RequestProcessingException(e);
+        }
     }
 
     protected boolean doesRead() {
@@ -89,7 +72,7 @@ public class DuplicatesExtension extends SmSnExtension {
     }
 
     private List<String> getDuplicates(final AtomGraph graph,
-                                       final Filter filter) throws Exception {
+                                       final Filter filter) throws RequestProcessingException {
         Map<String, List<String>> m = new HashMap<>();
         List<List<String>> dups = new LinkedList<>();
         int total = 0;
@@ -98,7 +81,12 @@ public class DuplicatesExtension extends SmSnExtension {
             if (filter.isVisible(a)) {
                 String value = a.getValue();
                 if (null != value && 0 < value.length()) {
-                    String hash = md5SumOf(value);
+                    String hash = null;
+                    try {
+                        hash = md5SumOf(value);
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RequestProcessingException(e);
+                    }
                     List<String> ids = m.get(hash);
                     if (null == ids) {
                         ids = new LinkedList<>();

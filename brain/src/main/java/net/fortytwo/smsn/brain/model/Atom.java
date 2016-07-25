@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
@@ -47,5 +48,5 @@ public interface Atom {
 
     void deleteChildAt(int position);
 
-    AtomList getFirstOf();
+    Collection<AtomList> getFirstOf();
 }

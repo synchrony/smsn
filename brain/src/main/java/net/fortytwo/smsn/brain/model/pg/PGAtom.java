@@ -6,6 +6,9 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -157,8 +160,11 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
     }
 
     @Override
-    public AtomList getFirstOf() {
-        return asAtomList(getAtMostOneVertex(SemanticSynchrony.FIRST, Direction.IN));
+    public Collection<AtomList> getFirstOf() {
+        List<AtomList> result = new LinkedList<>();
+        forAllVertices(SemanticSynchrony.FIRST, Direction.IN, result::add);
+
+        return result;
     }
 
     private void deleteListNode(final AtomList l) {
