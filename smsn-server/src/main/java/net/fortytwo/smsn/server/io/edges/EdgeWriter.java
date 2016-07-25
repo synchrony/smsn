@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.server.io.edges;
 
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.AtomGraph;
@@ -31,14 +30,13 @@ public class EdgeWriter extends BrainWriter {
 
         p.println("from\tto");
 
-        for (Vertex v : sourceGraph.getPropertyGraph().getVertices()) {
-            Atom a = sourceGraph.getAtom(v);
+        for (Atom a : sourceGraph.getAllAtoms()) {
             if (null != a) {
                 AtomList l = a.getNotes();
                 while (null != l) {
-                    p.print(v.getId());
+                    p.print(a.getId());
                     p.print('\t');
-                    p.print(l.getFirst().asVertex().getId());
+                    p.print(l.getFirst().getId());
                     p.print('\n');
                     l = l.getRest();
                 }

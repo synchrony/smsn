@@ -19,13 +19,13 @@ public abstract class AtomClass {
 
     protected String name;
     protected Pattern valueRegex;
-    protected Pattern aliasRegex;
-    protected AtomRegex memberRegex;
+    protected final Pattern aliasRegex;
+    protected final AtomRegex memberRegex;
 
-    public AtomClass(final String name,
-                     final Pattern valueRegex,
-                     final Pattern aliasRegex,
-                     final AtomRegex memberRegex) {
+    protected AtomClass(final String name,
+                        final Pattern valueRegex,
+                        final Pattern aliasRegex,
+                        final AtomRegex memberRegex) {
         this.name = name;
         this.valueRegex = valueRegex;
         this.aliasRegex = aliasRegex;

@@ -23,19 +23,19 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SmSnAgent {
-    protected static final Logger logger = Logger.getLogger(SmSnAgent.class.getName());
+    private static final Logger logger = Logger.getLogger(SmSnAgent.class.getName());
 
     public static final String
             PROP_BODY = "body",
             PROP_TAG = "tag";
 
-    protected final IRI agentIri;
-    protected final DatasetFactory factory = new DatasetFactory();
-    protected final ValueFactory vf = factory.getValueFactory();
+    private final IRI agentIri;
+    private final DatasetFactory factory = new DatasetFactory();
+    private final ValueFactory vf = factory.getValueFactory();
 
     private ServiceBroadcastListener listener;
 
-    private ProxySparqlStreamProcessor streamProcessor;
+    private final ProxySparqlStreamProcessor streamProcessor;
 
     private Service coordinatorService;
     private final Connection coordinatorConnection;
@@ -167,9 +167,8 @@ public class SmSnAgent {
      *
      * @param d   the RDF Dataset to send
      * @param ttl the time-to-live of the data, in milliseconds. Use ttl=0 for an infinite lifetime
-     * @throws IOException if communication with the query engine fails
      */
-    public void sendDataset(final Dataset d, final int ttl) throws IOException {
+    public void sendDataset(final Dataset d, final int ttl) {
         getStreamProcessor().addInputs(ttl, toArray(d));
 
         /*

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.io;
 
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.Filter;
+import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
 import java.io.OutputStream;

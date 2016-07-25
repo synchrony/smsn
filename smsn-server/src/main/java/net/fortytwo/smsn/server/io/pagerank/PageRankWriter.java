@@ -1,13 +1,13 @@
 package net.fortytwo.smsn.server.io.pagerank;
 
-import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.oupls.jung.GraphJung;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
-import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
 
@@ -30,17 +30,24 @@ public class PageRankWriter extends BrainWriter {
     @Override
     protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
             throws IOException {
-        AtomGraph sourceGraph = sourceBrain.getAtomGraph();
 
         TinkerGraph tmpGraph = new TinkerGraph();
-        for (Vertex v : sourceGraph.getPropertyGraph().getVertices()) {
-            tmpGraph.addVertex(v.getId());
+
+        for (Atom a : sourceBrain.getAtomGraph().getAllAtoms()) {
+            tmpGraph.addVertex(a.getId());
         }
-        for (Edge e : sourceGraph.getPropertyGraph().getEdges()) {
-            tmpGraph.addEdge(null,
-                    tmpGraph.getVertex(e.getVertex(Direction.OUT).getId()),
-                    tmpGraph.getVertex(e.getVertex(Direction.IN).getId()),
-                    "link");
+
+        for (Atom a : sourceBrain.getAtomGraph().getAllAtoms()) {
+            AtomList children = a.getNotes();
+            Vertex outVertex = tmpGraph.getVertex(a.getId());
+            while (null != children) {
+                Vertex inVertex = tmpGraph.getVertex(children.getFirst().getId());
+                tmpGraph.addEdge(null,
+                        outVertex,
+                        inVertex,
+                        "link");
+                children = children.getRest();
+            }
         }
 
         PageRank<Vertex, Edge> pr = new PageRank<>(new GraphJung(tmpGraph), 0.15d);

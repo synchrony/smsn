@@ -5,7 +5,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Filter;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
@@ -229,7 +229,7 @@ public class KnowledgeBase {
         alreadyHandled.add(memory.getAtomId());
 
         // only rdfize fields with a known class
-        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.isVisible(a.asVertex())).forEach(a -> {
+        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.isVisible(a)).forEach(a -> {
             // only rdfize fields with a known class
             if (isClassified(a)) {
                 fieldHandler.handle(a, context);
@@ -315,7 +315,7 @@ public class KnowledgeBase {
                                         handleAllMembers(entry.memory, fieldHandler, context,
                                                 new HashSet<>(), filter);
                                     }
-                                } else if (null == filter || filter.isVisible(childAtom.asVertex())) {
+                                } else if (null == filter || filter.isVisible(childAtom)) {
                                     // only rdfize fields with a known class
                                     if (isClassified(entries)) {
                                         fieldHandler.handle(childAtom, context);
@@ -387,7 +387,7 @@ public class KnowledgeBase {
                         ? null : new LinkedList<>();
 
                 AtomCollectionMemory memory = clazz.isCollectionClass()
-                        ? new AtomCollectionMemory((String) subject.asVertex().getId())
+                        ? new AtomCollectionMemory(subject.getId())
                         : null;
 
                 if (null != clazz.valueRegex) {
@@ -554,7 +554,7 @@ public class KnowledgeBase {
             }
 
             // perform rdfization, choosing at most one classification
-            if (null != handler && (null == filter || filter.isVisible(subject.asVertex()))) {
+            if (null != handler && (null == filter || filter.isVisible(subject))) {
                 if (newEntries.size() > 0) {
                     List<AtomClassEntry> helper = new LinkedList<>();
                     helper.addAll(newEntries);
@@ -616,7 +616,7 @@ public class KnowledgeBase {
                 : value.length() > 50
                 ? value.substring(0, 50)
                 : value;
-        System.out.println("* :" + a.asVertex().getId() + ": " + value50);
+        System.out.println("* :" + a.getId() + ": " + value50);
         List<AtomClassEntry> entries = atomClassifications.get(a);
         if (null != entries) {
             List<AtomClassEntry> helper = new LinkedList<>();

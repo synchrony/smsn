@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public interface AtomList extends GraphEntity {
+public interface AtomList {
 
     Atom getFirst();
 

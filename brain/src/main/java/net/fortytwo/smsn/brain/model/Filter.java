@@ -1,7 +1,7 @@
-package net.fortytwo.smsn.brain;
+package net.fortytwo.smsn.brain.model;
 
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.Note;
 
 /**
@@ -85,22 +85,13 @@ public class Filter {
         return defaultWeight;
     }
 
-    public boolean isVisible(final Vertex atomVertex) {
-        if (null == atomVertex) {
+    public boolean isVisible(final Atom atom) {
+        if (null == atom) {
             throw new IllegalArgumentException();
         }
 
-        Float sharability = atomVertex.getProperty(SemanticSynchrony.SHARABILITY);
-        if (null == sharability) {
-            SemanticSynchrony.logger.warning("atom " + atomVertex.getId() + " has no @sharability");
-            return false;
-        }
-
-        Float weight = atomVertex.getProperty(SemanticSynchrony.WEIGHT);
-        if (null == weight) {
-            SemanticSynchrony.logger.warning("atom " + atomVertex.getId() + " has no @weight");
-            return false;
-        }
+        Float sharability = atom.getSharability();
+        Float weight = atom.getWeight();
 
         // Strictly greater than the minimum, less than or equal to the maximum.
         // Values range from 0 (exclusive) to 1 (inclusive).

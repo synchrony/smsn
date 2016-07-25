@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ServiceBroadcastListener {
-    protected static final Logger logger = Logger.getLogger(ServiceBroadcastListener.class.getName());
+    private static final Logger logger = Logger.getLogger(ServiceBroadcastListener.class.getName());
 
     private static final int BROADCAST_MAX_LENGTH = 1000;
 

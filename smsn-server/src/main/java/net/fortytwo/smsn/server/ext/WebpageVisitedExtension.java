@@ -53,8 +53,7 @@ public class WebpageVisitedExtension extends AbstractRexsterExtension {
 
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH)
     @ExtensionDescriptor(description = "an extension for logging web page visits")
-    public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
-                                           @RexsterContext Graph graph,
+    public ExtensionResponse handleRequest(@RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = "url",
                                                    description = "URL of the visited web page") String url,
                                            @ExtensionRequestParameter(name = "title",

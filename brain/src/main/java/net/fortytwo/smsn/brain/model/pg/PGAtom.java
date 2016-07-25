@@ -18,6 +18,11 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
     }
 
     @Override
+    public String getId() {
+        return (String) asVertex().getId();
+    }
+
+    @Override
     public String getAlias() {
         return (String) getOptionalProperty(SemanticSynchrony.ALIAS);
     }
@@ -96,7 +101,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
     public boolean setNotes(AtomList notes) {
         boolean changed = removeNotes();
         if (null != notes) {
-            addOutEdge(notes.asVertex(), SemanticSynchrony.NOTES);
+            addOutEdge(((PGGraphEntity) notes).asVertex(), SemanticSynchrony.NOTES);
         }
         return changed;
     }
@@ -151,8 +156,13 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
         }
     }
 
-    public void deleteListNode(final AtomList l) {
-        getPropertyGraph().removeVertex(l.asVertex());
+    @Override
+    public AtomList getFirstOf() {
+        return asAtomList(getAtMostOneVertex(SemanticSynchrony.FIRST, Direction.IN));
+    }
+
+    private void deleteListNode(final AtomList l) {
+        getPropertyGraph().removeVertex(((PGGraphEntity) l).asVertex());
     }
 
     private boolean removeNotes() {

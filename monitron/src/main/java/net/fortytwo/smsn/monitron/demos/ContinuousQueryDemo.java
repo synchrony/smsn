@@ -3,7 +3,6 @@ package net.fortytwo.smsn.monitron.demos;
 import info.aduna.io.IOUtil;
 import net.fortytwo.smsn.monitron.EventHandler;
 import net.fortytwo.smsn.monitron.MonitronService;
-import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
 import net.fortytwo.stream.sparql.SparqlStreamProcessor;
 import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;

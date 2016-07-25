@@ -27,7 +27,7 @@ abstract class PGAtomList extends PGGraphEntity implements AtomList {
     public boolean setFirst(Atom first) {
         boolean changed = removeFirst();
         if (null != first) {
-            addOutEdge(first.asVertex(), SemanticSynchrony.FIRST);
+            addOutEdge(((PGGraphEntity) first).asVertex(), SemanticSynchrony.FIRST);
         }
         return changed;
     }
@@ -41,7 +41,7 @@ abstract class PGAtomList extends PGGraphEntity implements AtomList {
     public boolean setRest(AtomList rest) {
         boolean changed = removeRest();
         if (null != rest) {
-            addOutEdge(rest.asVertex(), SemanticSynchrony.REST);
+            addOutEdge(((PGGraphEntity) rest).asVertex(), SemanticSynchrony.REST);
         }
         return changed;
     }

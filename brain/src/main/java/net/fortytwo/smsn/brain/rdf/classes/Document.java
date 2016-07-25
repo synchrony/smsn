@@ -29,7 +29,7 @@ public class Document extends AtomClass {
     private static final Logger logger = Logger.getLogger(Document.class.getName());
     private static final ISBNValidator isbnValidator = new ISBNValidator();
 
-    public static final String DOCUMENT = "document";
+    private static final String DOCUMENT = "document";
 
     public Document() {
         super(

@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import org.apache.commons.io.FilenameUtils;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class BrainReader {
-    protected static final Logger logger = Logger.getLogger(BrainReader.class.getName());
+    private static final Logger logger = Logger.getLogger(BrainReader.class.getName());
 
     protected abstract void importInternal(Brain destBrain, InputStream sourceStream, Format format)
             throws IOException;
@@ -58,12 +59,12 @@ public abstract class BrainReader {
         AtomGraph destGraph = destBrain.getAtomGraph();
 
         // note: we assume the graph is small
-        commit(destGraph);
+        destGraph.commit();
 
         reindexVertices(destGraph);
 
         // again, we assume the graph is small
-        commit(destGraph);
+        destGraph.commit();
 
         long after = System.currentTimeMillis();
         logger.info("imported " + format + " data in " + (after - before) + "ms");
@@ -104,17 +105,9 @@ public abstract class BrainReader {
     }
 
     private void reindexVertices(AtomGraph destGraph) {
-        TransactionalGraph propertyGraph = destGraph.getPropertyGraph();
-        for (Vertex v : propertyGraph.getVertices()) {
-            String value = v.getProperty(SemanticSynchrony.VALUE);
-            if (null != value) destGraph.addAtomToIndices(destGraph.getAtom(v));
-        }
-    }
-
-    private void commit(final AtomGraph atomGraph) {
-        Graph propertyGraph = atomGraph.getPropertyGraph();
-        if (propertyGraph instanceof TransactionalGraph) {
-            ((TransactionalGraph) propertyGraph).commit();
+        for (Atom a : destGraph.getAllAtoms()) {
+            String value = a.getValue();
+            if (null != value) destGraph.addAtomToIndices(a);
         }
     }
 }

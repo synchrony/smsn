@@ -418,7 +418,7 @@ public class BrainModeClient {
 
     public interface EmacsFunctionExecutor {
         Process execute(EmacsFunction function,
-                        String argument) throws InterruptedException, IOException;
+                        String argument) throws IOException, InterruptedException;
     }
 
     public interface ResultHandler {

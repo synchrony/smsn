@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, ProxySparqlStreamProcessor.Query> {
-    protected static final Logger logger = Logger.getLogger(ProxySparqlStreamProcessor.class.getName());
+    private static final Logger logger = Logger.getLogger(ProxySparqlStreamProcessor.class.getName());
 
     // tags
     public static final String

@@ -14,7 +14,7 @@ public class Request {
     protected final Principal user;
 
     public Request(final JSONObject json,
-                   final Principal user) throws JSONException {
+                   final Principal user) {
         this.json = json;
         this.user = user;
     }

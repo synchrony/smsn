@@ -30,7 +30,7 @@ public abstract class MonitronEvent {
         }
     }
 
-    protected final Context context;
+    private final Context context;
     protected final ValueFactory valueFactory;
 
     public MonitronEvent(final Context context) {

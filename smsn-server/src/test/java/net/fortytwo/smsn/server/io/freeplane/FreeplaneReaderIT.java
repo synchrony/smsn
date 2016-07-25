@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
@@ -24,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FreeplaneReaderIT {
-    private File mindMapDirectory = new File("/Users/josh/projects/notmine/mindmaps");
+    private final File mindMapDirectory = new File("/Users/josh/projects/notmine/mindmaps");
 
     @Test
     public void testTmp() throws Exception {
@@ -39,7 +40,7 @@ public class FreeplaneReaderIT {
 
         reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain, true);
 
-        System.out.println("# vertices: " + countVertices(atomGraph));
+        System.out.println("# atoms: " + countAtoms(atomGraph));
 
         BrainWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(new File("/tmp/mindMap.xml"))) {
@@ -47,10 +48,9 @@ public class FreeplaneReaderIT {
         }
     }
 
-    private int countVertices(final AtomGraph atomGraph) {
-        Graph graph = atomGraph.getPropertyGraph();
+    private int countAtoms(final AtomGraph atomGraph) {
         int count = 0;
-        for (Vertex ignored : graph.getVertices()) {
+        for (Atom ignored : atomGraph.getAllAtoms()) {
             count++;
         }
         return count;

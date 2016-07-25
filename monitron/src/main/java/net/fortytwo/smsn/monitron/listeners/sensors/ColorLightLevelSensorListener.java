@@ -11,7 +11,7 @@ import org.openrdf.model.IRI;
  */
 public class ColorLightLevelSensorListener extends GaussianSensorListener {
 
-    protected final IRI colorProperty;
+    private final IRI colorProperty;
 
     public ColorLightLevelSensorListener(final Context context,
                                          final IRI sensor,

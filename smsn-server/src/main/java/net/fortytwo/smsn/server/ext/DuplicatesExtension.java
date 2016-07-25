@@ -13,8 +13,8 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
 import net.fortytwo.smsn.server.SmSnExtension;
 import org.json.JSONException;
@@ -74,7 +74,7 @@ public class DuplicatesExtension extends SmSnExtension {
         return false;
     }
 
-    protected static final int MAX_DUPLICATES = 1000;
+    private static final int MAX_DUPLICATES = 1000;
 
     private static final String UTF_8 = "UTF-8";
 
@@ -94,10 +94,8 @@ public class DuplicatesExtension extends SmSnExtension {
         List<List<String>> dups = new LinkedList<>();
         int total = 0;
 
-        for (Vertex v : graph.getPropertyGraph().getVertices()) {
-            Atom a = graph.getAtom(v);
-
-            if (filter.isVisible(v)) {
+        for (Atom a : graph.getAllAtoms()) {
+            if (filter.isVisible(a)) {
                 String value = a.getValue();
                 if (null != value && 0 < value.length()) {
                     String hash = md5SumOf(value);
@@ -118,7 +116,7 @@ public class DuplicatesExtension extends SmSnExtension {
                         }
                     }
 
-                    ids.add((String) v.getId());
+                    ids.add(a.getId());
                 }
             }
         }

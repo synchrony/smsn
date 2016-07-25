@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.p2p;
 
-import net.fortytwo.smsn.util.TypedProperties;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -67,7 +65,7 @@ public class ConnectionHost {
         stopped = true;
     }
 
-    private void listenForNewConnections() throws TypedProperties.PropertyException, IOException {
+    private void listenForNewConnections() throws IOException {
         logger.info("listening for new connections on port " + port);
         // TODO: recover from network failure (IO errors)
         ServerSocket serverSocket = new ServerSocket(port);

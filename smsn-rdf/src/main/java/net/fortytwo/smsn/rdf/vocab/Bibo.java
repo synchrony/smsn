@@ -9,7 +9,7 @@ import org.openrdf.model.IRI;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Bibo {
-    public static final String NAMESPACE = "http://purl.org/ontology/bibo/";
+    private static final String NAMESPACE = "http://purl.org/ontology/bibo/";
 
     public static final IRI
             ACADEMIC_ARTICLE = RDFAgents.createIRI(NAMESPACE + "AcademicArticle"),

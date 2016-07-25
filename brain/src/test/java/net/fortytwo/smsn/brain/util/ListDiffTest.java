@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ListDiffTest {
-    private Comparator<String> cmp = new ListDiff.StringComparator();
+    private final Comparator<String> cmp = new ListDiff.StringComparator();
 
     private String findDiff(final String before,
                             final String after) {
@@ -59,16 +59,6 @@ public class ListDiffTest {
         ListDiff.applyDiff(beforeList, afterList, diffList, cmp, ed);
 
         return ListDiff.toString(work);
-    }
-
-    @Before
-    public void setUp() {
-
-    }
-
-    @After
-    public void tearDown() {
-
     }
 
     @Test

@@ -3,7 +3,6 @@ package net.fortytwo.smsn;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.smsn.p2p.osc.OscControl;
-import net.fortytwo.smsn.p2p.osc.OscMessageHandler;
 import net.fortytwo.smsn.p2p.osc.OscReceiver;
 
 import java.util.List;
@@ -94,12 +93,12 @@ public abstract class SmSnDeviceControl extends OscControl {
         });
     }
 
-    public void sendErrorMessage() {
+    protected void sendErrorMessage() {
         OSCMessage m = new OSCMessage(absoluteAddress(OSC_ERROR));
         send(m);
     }
 
-    public void sendInfoMessage() {
+    protected void sendInfoMessage() {
         OSCMessage m = new OSCMessage(absoluteAddress(OSC_INFO));
         send(m);
     }
@@ -128,7 +127,7 @@ public abstract class SmSnDeviceControl extends OscControl {
         send(message);
     }
 
-    public void sendReadyMessage() {
+    protected void sendReadyMessage() {
         OSCMessage m = new OSCMessage(absoluteAddress(OSC_READY));
         send(m);
     }

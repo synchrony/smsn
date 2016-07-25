@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class EventStack {
-    public static final SimpleDateFormat EVENT_TIME_FORMAT
+    private static final SimpleDateFormat EVENT_TIME_FORMAT
             = new SimpleDateFormat("HH:mm:ss' on 'yyyy-MM-dd' 'Z");
 
     private final int capacity;

@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
@@ -35,9 +34,8 @@ public class Priorities {
             logger.info("generating priority queue");
             long startTime = System.currentTimeMillis();
 
-            for (Vertex v : graph.getPropertyGraph().getVertices()) {
-                if (null != v.getProperty(SemanticSynchrony.PRIORITY)) {
-                    Atom a = graph.getAtom(v);
+            for (Atom a : graph.getAllAtoms()) {
+                if (null != a.getPriority()) {
                     updatePriority(a);
                 }
             }

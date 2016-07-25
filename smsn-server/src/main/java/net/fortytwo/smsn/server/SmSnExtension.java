@@ -8,11 +8,11 @@ import com.tinkerpop.rexster.extension.ExtensionResponse;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteHistory;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 public abstract class SmSnExtension extends AbstractRexsterExtension {
     protected static final Logger logger = Logger.getLogger(SmSnExtension.class.getName());
 
-    public static final int MAX_VIEW_HEIGHT = 7;
+    private static final int MAX_VIEW_HEIGHT = 7;
 
     private static final String HISTORY_ATTR = "history";
 
@@ -48,7 +48,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
 
     private static final Map<KeyIndexableGraph, Brain> brains = new HashMap<>();
 
-    public synchronized static Brain getBrain(final KeyIndexableGraph baseGraph)
+    private synchronized static Brain getBrain(final KeyIndexableGraph baseGraph)
             throws Brain.BrainException {
 
         Brain b = brains.get(baseGraph);
@@ -71,11 +71,6 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
         p.context = context;
         SecurityContext security = p.context.getSecurityContext();
         p.user = null == security ? null : security.getUserPrincipal();
-
-        // TODO: reconsider security
-        if (null == p.user) {
-            //    logWarning("no security");
-        }
 
         return p;
     }
@@ -136,7 +131,7 @@ public abstract class SmSnExtension extends AbstractRexsterExtension {
                     return error("root of view does not exist: " + rootId);
                 }
 
-                if (null != p.filter && !p.filter.isVisible(p.root.asVertex())) {
+                if (null != p.filter && !p.filter.isVisible(p.root)) {
                     return error("root of view is not visible: " + rootId);
                 }
 

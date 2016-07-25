@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Format {
-    protected static final Logger logger = Logger.getLogger(Format.class.getName());
+    private static final Logger logger = Logger.getLogger(Format.class.getName());
 
     private static final Map<String, Format> formatsByNameLowercase;
     private static final Map<Format, BrainReader> readersByFormat;

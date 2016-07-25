@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import org.junit.After;
 import org.junit.Before;
@@ -89,7 +90,7 @@ public class AtomGraphTest {
         // Wildcards are supported
         result = atomGraph.getAtomsByFulltextQuery("Arthur*", f);
         assertEquals(1, result.size());
-        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+        assertEquals(a.getId(), result.iterator().next().getId());
 
         // Search is case-insensitive
         result = atomGraph.getAtomsByFulltextQuery("arthur*", f);
@@ -98,7 +99,7 @@ public class AtomGraphTest {
         // Exact matches in quotes
         result = atomGraph.getAtomsByFulltextQuery("\"Arthur Dent\"", f);
         assertEquals(1, result.size());
-        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+        assertEquals(a.getId(), result.iterator().next().getId());
     }
 
     @Test
@@ -130,21 +131,21 @@ public class AtomGraphTest {
         // capitalization, punctuation, and idiosyncrasies of white space are ignored
         result = atomGraph.getAtomsByAcronymQuery("apd", f);
         assertEquals(1, result.size());
-        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+        assertEquals(a.getId(), result.iterator().next().getId());
 
         // hyphens and underscores are treated as white space, while apostrophes and other punctuation are ignored
         result = atomGraph.getAtomsByAcronymQuery("amet", f);
         assertEquals(1, result.size());
-        assertEquals(t.asVertex().getId(), result.iterator().next().asVertex().getId());
+        assertEquals(t.getId(), result.iterator().next().getId());
 
         // acronym prefix match
         result = atomGraph.getAtomsByAcronymQuery("ap*", f);
         assertEquals(1, result.size());
-        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+        assertEquals(a.getId(), result.iterator().next().getId());
 
         // acronym search is also case insensitive
         result = atomGraph.getAtomsByAcronymQuery("AP*", f);
         assertEquals(1, result.size());
-        assertEquals(a.asVertex().getId(), result.iterator().next().asVertex().getId());
+        assertEquals(a.getId(), result.iterator().next().getId());
     }
 }

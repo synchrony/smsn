@@ -7,10 +7,10 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
@@ -99,13 +99,12 @@ public class PGAtomGraph implements AtomGraph {
         }
     }
 
-    @Override
     public IdGraph<KeyIndexableGraph> getPropertyGraph() {
         return propertyGraph;
     }
 
-    public  String idOfAtom(final Atom a) {
-        return (String) a.asVertex().getId();
+    public String idOfAtom(final Atom a) {
+        return a.getId();
     }
 
     // TODO: move me
@@ -113,13 +112,18 @@ public class PGAtomGraph implements AtomGraph {
         return thingNamespace + id;
     }
 
-    public  String iriOfAtom(final Atom a) {
+    public String iriOfAtom(final Atom a) {
         return iriForId(idOfAtom(a));
     }
 
     @Override
     public long getLastUpdate() {
         return lastUpdate;
+    }
+
+    @Override
+    public void commit() {
+        propertyGraph.commit();
     }
 
     @Override
@@ -133,7 +137,6 @@ public class PGAtomGraph implements AtomGraph {
         }
     }
 
-    @Override
     public Vertex getVertex(final String key) {
         return this.getPropertyGraph().getVertex(key);
     }
@@ -145,7 +148,6 @@ public class PGAtomGraph implements AtomGraph {
         return null == v ? null : getAtom(v);
     }
 
-    @Override
     public Atom getAtom(final Vertex v) {
         if (null == v) {
             throw new IllegalArgumentException("null vertex");
@@ -208,8 +210,8 @@ public class PGAtomGraph implements AtomGraph {
             if (null != v.getProperty("value")
                     && !v.getEdges(Direction.IN).iterator().hasNext()
                     && !v.getEdges(Direction.OUT).iterator().hasNext()) {
-                //Atom a = brain.getBrainGraph().getAtom(v);
-                if (filter.isVisible(v)) {
+                Atom a = getAtom(v);
+                if (filter.isVisible(a)) {
                     toRemove.add(v);
                 }
             }
@@ -229,7 +231,7 @@ public class PGAtomGraph implements AtomGraph {
 
         if (null != searchIndex) {
             // TODO: remove existing values
-            searchIndex.put(SemanticSynchrony.VALUE, value, atom.asVertex());
+            searchIndex.put(SemanticSynchrony.VALUE, value, ((PGGraphEntity) atom).asVertex());
         }
 
         if (null != acronymIndex) {
@@ -251,7 +253,7 @@ public class PGAtomGraph implements AtomGraph {
                 }
 
                 // TODO: remove existing values
-                acronymIndex.put(SemanticSynchrony.ACRONYM, acronym.toString(), atom.asVertex());
+                acronymIndex.put(SemanticSynchrony.ACRONYM, acronym.toString(), ((PGGraphEntity) atom).asVertex());
             }
         }
     }
@@ -265,7 +267,7 @@ public class PGAtomGraph implements AtomGraph {
         return new Iterable<Atom>() {
             public Iterator<Atom> iterator() {
                 return new Iterator<Atom>() {
-                    private Iterator<Vertex> iter = getPropertyGraph().getVertices().iterator();
+                    private final Iterator<Vertex> iter = getPropertyGraph().getVertices().iterator();
                     private Atom next = null;
 
                     public boolean hasNext() {
@@ -313,7 +315,7 @@ public class PGAtomGraph implements AtomGraph {
                     throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
                 }
 
-                if (filter.isVisible(v)) {
+                if (filter.isVisible(a)) {
                     results.add(a);
                 }
             }
@@ -334,7 +336,7 @@ public class PGAtomGraph implements AtomGraph {
                     throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
                 }
 
-                if (filter.isVisible(v)) {
+                if (filter.isVisible(a)) {
                     results.add(a);
                 }
             }
@@ -348,7 +350,8 @@ public class PGAtomGraph implements AtomGraph {
         List<Atom> results = new LinkedList<>();
 
         for (Vertex v : getPropertyGraph().getVertices(SemanticSynchrony.SHORTCUT, shortcut)) {
-            if (filter.isVisible(v)) {
+            Atom a = getAtom(v);
+            if (filter.isVisible(a)) {
                 results.add(getAtom(v));
             }
         }

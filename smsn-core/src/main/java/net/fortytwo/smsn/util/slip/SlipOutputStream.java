@@ -43,8 +43,6 @@ public class SlipOutputStream {
             thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    long lastPacketSent = 0l;
-
                     try {
                         while (!Thread.currentThread().isInterrupted()) {
                             // blocks until a packet is available

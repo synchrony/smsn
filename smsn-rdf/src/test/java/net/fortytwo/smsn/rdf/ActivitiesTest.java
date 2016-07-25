@@ -31,9 +31,9 @@ import static org.junit.Assert.fail;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ActivitiesTest {
-    private ValueFactory valueFactory = SimpleValueFactory.getInstance();
-    private String agentIri = "http://example.org/ns#bob";
-    private DatasetFactory f = new DatasetFactory();
+    private final ValueFactory valueFactory = SimpleValueFactory.getInstance();
+    private final String agentIri = "http://example.org/ns#bob";
+    private final DatasetFactory f = new DatasetFactory();
 
     @Test
     public void testDatasetForGestureEvent() throws Exception {

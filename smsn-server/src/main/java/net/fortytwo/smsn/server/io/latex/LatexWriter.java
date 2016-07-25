@@ -2,8 +2,8 @@ package net.fortytwo.smsn.server.io.latex;
 
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
 
@@ -64,7 +64,7 @@ public class LatexWriter extends BrainWriter {
                             final int sectionLevel,
                             final OutputStream out) throws IOException {
 
-        if (!filter.isVisible(root.asVertex())) {
+        if (!filter.isVisible(root)) {
             return;
         }
 

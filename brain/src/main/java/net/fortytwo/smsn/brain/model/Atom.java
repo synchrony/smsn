@@ -5,7 +5,9 @@ import java.util.function.Consumer;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public interface Atom extends GraphEntity {
+public interface Atom {
+
+    String getId();
 
     String getAlias();
 
@@ -44,4 +46,6 @@ public interface Atom extends GraphEntity {
     void addChildAt(final Atom child, int position);
 
     void deleteChildAt(int position);
+
+    AtomList getFirstOf();
 }

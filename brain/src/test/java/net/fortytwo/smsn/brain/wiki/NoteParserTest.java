@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.brain.wiki;
 
 import net.fortytwo.smsn.brain.model.Note;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,10 +22,6 @@ public class NoteParserTest {
     @Before
     public void setUp() throws Exception {
         parser = new NoteParser();
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test

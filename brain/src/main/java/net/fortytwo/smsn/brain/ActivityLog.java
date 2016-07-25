@@ -57,11 +57,11 @@ public class ActivityLog {
     private void log(final String action, final Atom... a) {
         try {
             out.append("")
-                    .append("" + System.currentTimeMillis())
+                    .append("").append(String.valueOf(System.currentTimeMillis()))
                     .append("\t").append(action);
 
             for (Atom atom : a) {
-                out.append("\t").append(atom.asVertex().getId().toString());
+                out.append("\t").append(atom.getId());
             }
 
             out.append("\n");

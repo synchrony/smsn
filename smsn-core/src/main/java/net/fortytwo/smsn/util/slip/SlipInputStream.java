@@ -78,7 +78,7 @@ public class SlipInputStream {
     }
 
     public interface PacketHandler {
-        void handle(byte[] buffer, int length) throws Exception;
+        void handle(byte[] buffer, int length);
     }
 
     public static class PacketHandlerException extends Exception {

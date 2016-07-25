@@ -45,7 +45,7 @@ public class ChordedKeyer {
          */
         public Trigger trigger;
 
-        public StateNode[] nextNodes = new StateNode[5];
+        public final StateNode[] nextNodes = new StateNode[5];
     }
 
     private Map<Mode, StateNode> rootStates;

@@ -25,7 +25,7 @@ public class ExtendoHandControl extends SmSnDeviceControl {
             OSC_MULTI = "/multi";
 
     public ExtendoHandControl(final OscReceiver oscReceiver,
-                              final SmSnAgent agent) throws DeviceInitializationException {
+                              final SmSnAgent agent) {
         super("/exo/hand", oscReceiver, agent);
     }
 

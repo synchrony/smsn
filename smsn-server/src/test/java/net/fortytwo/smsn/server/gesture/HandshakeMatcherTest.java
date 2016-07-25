@@ -25,16 +25,16 @@ public class HandshakeMatcherTest {
     private int totalMatches;
 
     // a typical handshake
-    private long[] series1 = new long[]{0, 226, 417, 526, 612, 709};
+    private final long[] series1 = new long[]{0, 226, 417, 526, 612, 709};
 
     // another typical, but distinct handshake
-    private long[] series2 = new long[]{0, 120, 191, 343, 405};
+    private final long[] series2 = new long[]{0, 120, 191, 343, 405};
 
     private static final String BASE_IRI = "http://example.org/";
 
-    private IRI
-            actor1 = valueFactory.createIRI(BASE_IRI + "a1"),
-            actor2 = valueFactory.createIRI(BASE_IRI + "a2");
+    private final IRI
+            actor1 = valueFactory.createIRI(BASE_IRI + "a1");
+    private final IRI actor2 = valueFactory.createIRI(BASE_IRI + "a2");
 
     public HandshakeMatcherTest() {
         HandshakeMatcher.HandshakeHandler handler = new HandshakeMatcher.HandshakeHandler() {

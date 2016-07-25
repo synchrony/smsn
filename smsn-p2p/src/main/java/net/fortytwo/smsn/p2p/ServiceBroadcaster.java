@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ServiceBroadcaster {
-    protected static final Logger logger = Logger.getLogger(ServiceBroadcaster.class.getName());
+    private static final Logger logger = Logger.getLogger(ServiceBroadcaster.class.getName());
 
     // TODO: make this configurable
     private static final long MAX_BACKOFF = 60000;

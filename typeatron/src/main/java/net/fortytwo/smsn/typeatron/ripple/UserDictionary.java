@@ -13,10 +13,10 @@ public class UserDictionary {
 
     private static final Logger logger = Logger.getLogger(UserDictionary.class.getName());
 
-    private Map<String, Object> map = new HashMap<>();
+    private final Map<String, Object> map = new HashMap<>();
     private final TypeatronControl typeatron;
 
-    public UserDictionary(TypeatronControl typeatron) {
+    private UserDictionary(TypeatronControl typeatron) {
         this.typeatron = typeatron;
     }
 

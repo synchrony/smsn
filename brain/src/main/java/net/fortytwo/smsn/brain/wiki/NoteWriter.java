@@ -18,11 +18,10 @@ public class NoteWriter {
 
     public static final String VALUE_TRUNCATOR = " [...]";
 
-    public static final String
-            CHILDREN = "children",
-            HAS_CHILDREN = "hasChildren",
-            ID = "id",
-            META = "meta";
+    public static final String CHILDREN = "children";
+    public static final String HAS_CHILDREN = "hasChildren";
+    public static final String ID = "id";
+    public static final String META = "meta";
 
     private int valueLengthCutoff = -1;
 

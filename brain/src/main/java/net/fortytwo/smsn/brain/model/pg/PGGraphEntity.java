@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
-import net.fortytwo.smsn.brain.model.GraphEntity;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -15,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-abstract class PGGraphEntity implements GraphEntity {
+abstract class PGGraphEntity {
     protected abstract PGAtomGraph getAtomGraph();
 
     private final Vertex vertex;

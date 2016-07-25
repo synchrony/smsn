@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class SmSnRippleRepl {
 
-    protected static final Logger logger = Logger.getLogger(SmSnRippleRepl.class.getName());
+    private static final Logger logger = Logger.getLogger(SmSnRippleRepl.class.getName());
 
     private final RippleSession session;
     private final TypeatronDictionaryMapping typeatronDictionary;

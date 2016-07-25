@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class OscReceiver {
 
-    protected static final Logger logger = Logger.getLogger(OscReceiver.class.getName());
+    private static final Logger logger = Logger.getLogger(OscReceiver.class.getName());
 
     private final Map<String, OscMessageHandler> handlers;
 

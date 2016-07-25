@@ -50,7 +50,7 @@ public class FindRootsExtension extends SmSnExtension {
     }
 
     protected ExtensionResponse performTransaction(final RequestParams p) throws Exception {
-        Note n = p.queries.findRoots(p.filter, p.style, p.height - 1);
+        Note n = p.queries.findRootAtoms(p.filter, p.style, p.height - 1);
         addView(n, p);
 
         p.map.put("title", "all roots");

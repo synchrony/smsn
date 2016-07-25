@@ -23,8 +23,8 @@ public class EventStackTest {
 
     private final int testCapacity = 50;
 
-    private String agent1 = "http://example.org/people/arthurDent";
-    private String agent2 = "http://example.org/people/triciaMcMillan";
+    private final String agent1 = "http://example.org/people/arthurDent";
+    private final String agent2 = "http://example.org/people/triciaMcMillan";
 
     @Before
     public void setUp() throws Exception {

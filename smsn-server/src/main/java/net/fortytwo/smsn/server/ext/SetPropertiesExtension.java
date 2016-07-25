@@ -13,7 +13,6 @@ import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.SmSnExtension;

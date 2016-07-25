@@ -21,15 +21,13 @@ import java.util.regex.Pattern;
 public class NoteParser {
 
     // regex of valid id suffixes
-    public static final Pattern
-            ID = Pattern.compile("[a-zA-Z0-9-_]+"),
-            ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
+    public static final Pattern ID = Pattern.compile("[a-zA-Z0-9-_]+");
+    private static final Pattern ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
 
-    public static final String
-            VERBATIM_BLOCK_START = "{{{",
-            VERBATIM_BLOCK_END = "}}}",
-            VERBATIM_BLOCK_START_ESC = "\\{\\{\\{",
-            VERBATIM_BLOCK_END_ESC = "\\}\\}\\}";
+    private static final String VERBATIM_BLOCK_START = "{{{";
+    private static final String VERBATIM_BLOCK_END = "}}}";
+    private static final String VERBATIM_BLOCK_START_ESC = "\\{\\{\\{";
+    private static final String VERBATIM_BLOCK_END_ESC = "\\}\\}\\}";
 
     private static final String
             ALIAS_PROP = "@alias",

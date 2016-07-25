@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class CoordinatorService {
-    protected static final Logger logger = Logger.getLogger(CoordinatorService.class.getName());
+    private static final Logger logger = Logger.getLogger(CoordinatorService.class.getName());
 
     private static final int
             LINKED_DATA_TTL = StreamProcessor.INFINITE_TTL,
@@ -62,7 +62,7 @@ public class CoordinatorService {
     }
 
     private CoordinatorService()
-            throws IOException, TypedProperties.PropertyException, SailException, InterruptedException {
+            throws IOException, TypedProperties.PropertyException, SailException {
 
         int oscPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_OSC_PORT);
         int pubsubPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_PUBSUB_PORT);

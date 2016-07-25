@@ -4,8 +4,8 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Filter;
 import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.server.io.Format;
@@ -65,7 +65,7 @@ public class FreeplaneReader extends BrainReader {
         return Arrays.asList(FreeplaneFormat.getInstance());
     }
 
-    private Map<AtomGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
+    private final Map<AtomGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
 
     private final FreeplaneXMLParser xmlParser;
 
@@ -80,7 +80,7 @@ public class FreeplaneReader extends BrainReader {
         Document doc;
         try {
             doc = xmlParser.parseStreamToDocument(sourceStream);
-        } catch (ParserConfigurationException | SAXException e) {
+        } catch (SAXException e) {
             throw new IOException(e);
         }
 
@@ -107,7 +107,7 @@ public class FreeplaneReader extends BrainReader {
         Filter filter = new Filter();
 
         Atom atom = destGraph.createAtom(filter, SemanticSynchrony.createRandomKey());
-        rootNote.setId((String) atom.asVertex().getId());
+        rootNote.setId(atom.getId());
         queries.update(rootNote, maxHeight, filter, NoteQueries.forwardViewStyle);
     }
 
@@ -179,9 +179,9 @@ public class FreeplaneReader extends BrainReader {
 
     private class ParserInstance {
         private final AtomGraph destGraph;
-        private Map<String, List<String>> arrowLinks = new HashMap<>();
-        private Map<String, Note> notesByFreeplaneId = new HashMap<>();
-        private Map<String, Note> styleNotes = new HashMap<>();
+        private final Map<String, List<String>> arrowLinks = new HashMap<>();
+        private final Map<String, Note> notesByFreeplaneId = new HashMap<>();
+        private final Map<String, Note> styleNotes = new HashMap<>();
 
         public ParserInstance(AtomGraph destGraph) {
             this.destGraph = destGraph;
@@ -312,7 +312,7 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private Document parseStreamToDocument(final InputStream sourceStream)
-                throws ParserConfigurationException, IOException, org.xml.sax.SAXException {
+                throws IOException, org.xml.sax.SAXException {
             return builder.parse(sourceStream);
         }
 

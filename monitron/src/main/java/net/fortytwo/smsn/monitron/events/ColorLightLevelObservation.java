@@ -14,7 +14,7 @@ import org.openrdf.model.vocabulary.RDF;
  */
 public class ColorLightLevelObservation extends Observation {
 
-    protected final IRI colorProperty;
+    private final IRI colorProperty;
 
     public ColorLightLevelObservation(final Context context,
                                       final IRI sensor,

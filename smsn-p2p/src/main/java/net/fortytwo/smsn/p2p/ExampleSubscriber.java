@@ -10,19 +10,15 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExampleSubscriber {
-    protected static final Logger logger = Logger.getLogger(ExampleSubscriber.class.getName());
+    private static final Logger logger = Logger.getLogger(ExampleSubscriber.class.getName());
 
-    public ExampleSubscriber() {
-        //new Thread(new Runnable() {
-        //    public void run() {
-                try {
-                    listenForNotifications();
-                } catch (Throwable e) {
-                    logger.severe("SPARQL notification listener stream closed with error: " + e.getMessage());
-                    e.printStackTrace(System.err);
-                }
-        //    }
-        //}).start();
+    private ExampleSubscriber() {
+        try {
+            listenForNotifications();
+        } catch (Throwable e) {
+            logger.severe("SPARQL notification listener stream closed with error: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 
     private void listenForNotifications() throws IOException {

@@ -33,7 +33,7 @@ public class Activities {
     /**
      * A XML Schema dateTime formatter for millisecond-precision timestamps
      */
-    public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public static final String QUERY_FOR_ALL_GB_GESTURES =
             "PREFIX activity: <" + SmSnActivityOntology.NAMESPACE + ">\n" +

@@ -1,12 +1,10 @@
 package net.fortytwo.smsn.brain;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
@@ -96,11 +94,11 @@ public class NoteQueries {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = toNote(root, filter.isVisible(root.asVertex()));
+        Note n = toNote(root, filter.isVisible(root));
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
-                int h = filter.isVisible(target.asVertex()) ? height - 1 : 0;
+                int h = filter.isVisible(target) ? height - 1 : 0;
                 Note cn = viewInternal(target, h, filter, style);
                 n.addChild(cn);
             }
@@ -171,7 +169,7 @@ public class NoteQueries {
                                 final Filter filter,
                                 final ViewStyle style) {
         // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root.asVertex())) {
+        if (!filter.isVisible(root)) {
             return false;
         }
 
@@ -193,7 +191,7 @@ public class NoteQueries {
         if (null != rootAtom) {
             setProperties(rootAtom, rootNote);
 
-            if (0 >= height || !filter.isVisible(rootAtom.asVertex())) {
+            if (0 >= height || !filter.isVisible(rootAtom)) {
                 return;
             }
 
@@ -209,7 +207,7 @@ public class NoteQueries {
 
                     rootAtom.addChildAt(atom, position);
 
-                    childrenAdded.add((String) atom.asVertex().getId());
+                    childrenAdded.add(atom.getId());
 
                     // log this activity
                     if (null != brain.getActivityLog()) {
@@ -266,10 +264,10 @@ public class NoteQueries {
 
         if (null == atom) {
             atom = createAtom(note.getId(), filter);
-            created.add((String) atom.asVertex().getId());
+            created.add(atom.getId());
         }
         if (null == note.getId()) {
-            note.setId((String) atom.asVertex().getId());
+            note.setId(atom.getId());
         }
 
         return atom;
@@ -336,107 +334,25 @@ public class NoteQueries {
         return result;
     }
 
-    public Note findRoots(final Filter filter,
-                          final ViewStyle style,
-                          final int height) {
-        if (null == filter || null == style || height < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        Note result = new Note();
-
-        for (Vertex v : brain.getAtomGraph().getPropertyGraph().getVertices()) {
-            Iterable<Edge> inEdges = v.getEdges(Direction.IN);
-            if (!inEdges.iterator().hasNext()) {
-                Atom a = brain.getAtomGraph().getAtom(v);
-                if (filter.isVisible(v)) {
-                    Note n = viewInternal(a, height, filter, style);
-                    result.addChild(n);
-                }
-            }
-        }
-
-        Collections.sort(result.getChildren(), new NoteComparator());
-        return result;
+    private boolean isAdjacent(final Atom a, final boolean includeChildren, final boolean includeParents) {
+        return (includeChildren && null != a.getNotes())
+                || (includeParents && null != a.getFirstOf());
     }
 
-    public Note findIsolatedAtoms(final Filter filter) {
-        if (null == filter) {
+    private Note findAtoms(final Filter filter,
+                           final boolean includeChildren,
+                           final boolean includeParents,
+                           int height,
+                           ViewStyle style) {
+        if (null == filter || height < 0) {
             throw new IllegalArgumentException();
         }
 
         Note result = new Note();
 
-        for (Vertex v : brain.getAtomGraph().getPropertyGraph().getVertices()) {
-            if (null != v.getProperty("value")
-                    && !v.getEdges(Direction.IN).iterator().hasNext()
-                    && !v.getEdges(Direction.OUT).iterator().hasNext()) {
-                Atom a = brain.getAtomGraph().getAtom(v);
-                if (filter.isVisible(v)) {
-                    Note n = viewInternal(a, 1, filter, forwardViewStyle);
-                    result.addChild(n);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Performs a Ripple query.
-     *
-     * @param query  the Ripple query to execute
-     * @param height  maximum height of the search results view
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to appear in search results.
-     * @param style  the adjacency style of the view
-     * @return an ordered list of query results
-     * @throws net.fortytwo.ripple.RippleException
-     *          if the query fails in Ripple
-     */
-    /*     // TODO: restore Ripple support in such a way as to avoid Android/Dalvik issues
-    public Note rippleQuery(final String query,
-                            final int height,
-                            final Filter filter,
-                            final AdjacencyStyle style) throws RippleException {
-        if (null == query || height < 0 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
-
-        Note result = new Note();
-        result.setValue("Ripple results for \"" + query + "\"");
-
-        Collector<RippleList> results = new Collector<RippleList>();
-        QueryPipe qp = new QueryPipe(rippleQueryEngine, results);
-        try {
-            qp.put(query);
-        } finally {
-            qp.close();
-        }
-
-        Set<Vertex> vertices = new HashSet<Vertex>();
-
-        for (RippleList l : results) {
-            //System.out.println("result list: " + l);
-            if (1 == l.length()) {
-                Value v = l.getFirst().toRDF(qp.getConnection()).sesameValue();
-                if (v instanceof URI && v.stringValue().startsWith(PropertyGraphSail.VERTEX_NS)) {
-                    String s = v.stringValue();
-
-                    if (s.startsWith(PropertyGraphSail.VERTEX_NS)) {
-                        Vertex vx = graph.getPropertyGraph().getVertex(
-                            s.substring(PropertyGraphSail.VERTEX_NS.length()));
-                        vertices.add(vx);
-                    }
-                }
-            }
-        }
-
-        for (Vertex vx : vertices) {
-            Atom a = graph.getAtom(vx);
-
-            if (filter.isVisible(a)) {
-                Note n = viewInternal(a, height - 1, filter, style);
+        for (Atom a : brain.getAtomGraph().getAllAtoms()) {
+            if (filter.isVisible(a) && !isAdjacent(a, includeChildren, includeParents)) {
+                Note n = viewInternal(a, height, filter, style);
                 result.addChild(n);
             }
         }
@@ -444,7 +360,20 @@ public class NoteQueries {
         Collections.sort(result.getChildren(), new NoteComparator());
         return result;
     }
-    */
+
+    public Note findRootAtoms(final Filter filter,
+                              final ViewStyle style,
+                              final int height) {
+
+        boolean includeChildren = style.getDirection().equals(ViewStyle.Direction.Backward);
+        boolean includeParents = style.getDirection().equals(ViewStyle.Direction.Forward);
+
+        return findAtoms(filter, includeChildren, includeParents, height, style);
+    }
+
+    public Note findIsolatedAtoms(final Filter filter) {
+        return findAtoms(filter, true, true, 1, forwardViewStyle);
+    }
 
     /**
      * Generates a prioritized list of notes
@@ -468,7 +397,7 @@ public class NoteQueries {
         Queue<Atom> queue = priorities.getQueue();
         int i = 0;
         for (Atom a : queue) {
-            if (filter.isVisible(a.asVertex())) {
+            if (filter.isVisible(a)) {
                 result.addChild(toNote(a, true));
 
                 if (++i >= maxResults) {
@@ -513,7 +442,7 @@ public class NoteQueries {
     }
 
     private boolean setPriority(final Atom target,
-                                 Float priority) {
+                                Float priority) {
         if (null != priority) {
             if (0 == priority) priority = null;
 
@@ -527,12 +456,12 @@ public class NoteQueries {
     }
 
     private boolean setSharability(final Atom target,
-                                final Float sharability) {
+                                   final Float sharability) {
         return null != sharability && target.setSharability(sharability);
     }
 
     private boolean setWeight(final Atom target,
-                                   final Float weight) {
+                              final Float weight) {
         return null != weight && target.setWeight(weight);
     }
 
@@ -558,7 +487,7 @@ public class NoteQueries {
                         final boolean isVisible) throws InvalidGraphException {
         Note note = new Note();
 
-        note.setId((String) atom.asVertex().getId());
+        note.setId(atom.getId());
         note.setWeight(atom.getWeight());
         note.setSharability(atom.getSharability());
         note.setPriority(atom.getPriority());
@@ -602,6 +531,8 @@ public class NoteQueries {
     }
 
     public interface ViewStyle {
+        public enum Direction {Forward, Backward}
+
         String getName();
 
         Iterable<Atom> getLinked(Atom root, Filter filter);
@@ -609,6 +540,8 @@ public class NoteQueries {
         boolean addOnUpdate();
 
         boolean deleteOnUpdate();
+
+        Direction getDirection();
     }
 
     public static ViewStyle lookupStyle(final String name) {
@@ -654,6 +587,11 @@ public class NoteQueries {
         public boolean deleteOnUpdate() {
             return true;
         }
+
+        @Override
+        public Direction getDirection() {
+            return Direction.Forward;
+        }
     };
 
     public static final ViewStyle forwardAddOnlyViewStyle = new ViewStyle() {
@@ -677,6 +615,11 @@ public class NoteQueries {
         public boolean deleteOnUpdate() {
             return false;
         }
+
+        @Override
+        public Direction getDirection() {
+            return Direction.Forward;
+        }
     };
 
     public static final ViewStyle backwardViewStyle = new ViewStyle() {
@@ -698,7 +641,7 @@ public class NoteQueries {
                 }
 
                 Atom a = prev.getNotesOf();
-                if (filter.isVisible(a.asVertex())) {
+                if (filter.isVisible(a)) {
                     results.add(a);
                 }
             });
@@ -714,6 +657,11 @@ public class NoteQueries {
         @Override
         public boolean deleteOnUpdate() {
             return false;
+        }
+
+        @Override
+        public Direction getDirection() {
+            return Direction.Backward;
         }
     };
 

@@ -5,7 +5,6 @@ import net.fortytwo.smsn.p2p.Connection;
 import net.fortytwo.smsn.p2p.ConnectionHost;
 import net.fortytwo.smsn.p2p.MessageHandler;
 import net.fortytwo.stream.StreamProcessor;
-import net.fortytwo.stream.Subscription;
 import net.fortytwo.stream.sparql.SparqlStreamProcessor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,7 +23,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class QueryEngineWrapper {
-    protected static final Logger logger = Logger.getLogger(QueryEngineWrapper.class.getName());
+    private static final Logger logger = Logger.getLogger(QueryEngineWrapper.class.getName());
 
     private final SparqlStreamProcessor processor;
 
@@ -50,9 +49,6 @@ public class QueryEngineWrapper {
                     handleDatasetMessage(message);
                 } catch (SimpleJSONRDFFormat.ParseError e) {
                     logger.log(Level.WARNING, "invalid dataset message: " + message, e);
-                } catch (IOException e) {
-                    // TODO: propagate the QueryEngine's exception back to the proxy
-                    logger.log(Level.WARNING, "error raised by query engine", e);
                 }
             }
         };
@@ -146,7 +142,7 @@ public class QueryEngineWrapper {
         c.sendNow(ProxySparqlStreamProcessor.TAG_SPARQL_RESULT, j);
     }
 
-    private void handleDatasetMessage(final JSONObject message) throws SimpleJSONRDFFormat.ParseError, IOException {
+    private void handleDatasetMessage(final JSONObject message) throws SimpleJSONRDFFormat.ParseError {
         if (SemanticSynchrony.VERBOSE) {
             logger.info("received dataset message: " + message);
         }

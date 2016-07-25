@@ -37,8 +37,7 @@ public class ExportExtension extends SmSnExtension {
     public ExtensionResponse handleRequest(@RexsterContext RexsterResourceContext context,
                                            @RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
-                                                   description = "request description (JSON object)") String request)
-            throws Exception {
+                                                   description = "request description (JSON object)") String request) {
 
         // TODO: any security restrictions here?
         try {

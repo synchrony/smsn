@@ -1,9 +1,9 @@
 package net.fortytwo.smsn.server.io.vertices;
 
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.server.io.BrainWriter;
 import net.fortytwo.smsn.server.io.Format;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class VertexWriter extends BrainWriter {
-    protected static final Logger logger = Logger.getLogger(VertexWriter.class.getName());
+    private static final Logger logger = Logger.getLogger(VertexWriter.class.getName());
 
     @Override
     public List<Format> getFormats() {
@@ -36,19 +36,19 @@ public class VertexWriter extends BrainWriter {
 
         p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
 
-        for (Vertex v : sourceGraph.getPropertyGraph().getVertices()) {
-            Object c = v.getProperty(SemanticSynchrony.CREATED);
+        for (Atom a : sourceGraph.getAllAtoms()) {
+            Long c = a.getCreated();
             if (null != c) {
                 p.print(c);
                 p.print('\t');
-                p.print(v.getId());
+                p.print(a.getId());
                 p.print('\t');
-                p.print((double) v.getProperty(SemanticSynchrony.WEIGHT));
+                p.print(a.getWeight());
                 p.print('\t');
-                p.print((double) v.getProperty(SemanticSynchrony.SHARABILITY));
+                p.print(a.getSharability());
                 p.print('\t');
 
-                List<KnowledgeBase.AtomClassEntry> entries = sourceKb.getClassInfo(sourceGraph.getAtom(v));
+                List<KnowledgeBase.AtomClassEntry> entries = sourceKb.getClassInfo(a);
                 if (null != entries && entries.size() > 0) {
                     KnowledgeBase.AtomClassEntry e = entries.get(0);
                     p.print(e.getInferredClassName());
@@ -61,15 +61,15 @@ public class VertexWriter extends BrainWriter {
                     p.print("\t0\t0\t");
                 }
 
-                String value = v.getProperty(SemanticSynchrony.VALUE);
+                String value = a.getValue();
                 if (null == value) {
-                    logger.warning("note has null @value: " + v.getId());
+                    logger.warning("note has null @value: " + a.getId());
                 } else {
-                    p.print(escapeValue(v.getProperty(SemanticSynchrony.VALUE)));
+                    p.print(escapeValue(a.getValue()));
                 }
                 p.print('\t');
 
-                String alias = v.getProperty(SemanticSynchrony.ALIAS);
+                String alias = a.getAlias();
                 if (null != alias) {
                     p.print(escapeValue(alias));
                 }

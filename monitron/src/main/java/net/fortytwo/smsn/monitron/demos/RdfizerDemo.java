@@ -2,7 +2,6 @@ package net.fortytwo.smsn.monitron.demos;
 
 import net.fortytwo.smsn.monitron.EventHandler;
 import net.fortytwo.smsn.monitron.MonitronService;
-import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;

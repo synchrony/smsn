@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Filter;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
@@ -46,9 +46,9 @@ import java.util.List;
  */
 public class BrainClient {
 
-    public static final String PROP_SERVER_NAME = "net.fortytwo.smsn.brain.client.serverName",
-            PROP_SERVER_PORT = "net.fortytwo.smsn.brain.client.serverPort",
-            PROP_GRAPH = "net.fortytwo.smsn.brain.client.graph";
+    private static final String PROP_SERVER_NAME = "net.fortytwo.smsn.brain.client.serverName";
+    private static final String PROP_SERVER_PORT = "net.fortytwo.smsn.brain.client.serverPort";
+    private static final String PROP_GRAPH = "net.fortytwo.smsn.brain.client.graph";
 
     private static final int DEFAULT_VALUE_CUTOFF = 100;
 
@@ -69,7 +69,6 @@ public class BrainClient {
         }
 
         // note: constructor will fail if any of these properties are not defined
-        String agentName;
         String serverName;
         int serverPort;
         String graph;
@@ -168,16 +167,15 @@ public class BrainClient {
 
     /**
      * Updates the graph
-     *
-     * @param root   the root of the subgraph to be updated
+     *  @param root   the root of the subgraph to be updated
      * @param height   the maximum height of the tree which will be applied to the graph as an update.
      *                 If height is 0, only the root node will be affected,
      *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
      * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to be affected by the update.
+ *               Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      */
-    public Note update(final Note root,
+    public void update(final Note root,
                        final int height,
                        final Filter filter,
                        final NoteQueries.ViewStyle style) throws BrainClientException {
@@ -207,8 +205,6 @@ public class BrainClient {
             throw new BrainClientException(e);
         }
 
-        final Note[] results = new Note[1];
-
         HttpResponseHandler handler = response -> {
             int code = response.getStatusLine().getStatusCode();
 
@@ -217,7 +213,6 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    results[0] = noteParser.fromJSON(view);
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
@@ -232,8 +227,6 @@ public class BrainClient {
         } catch (IOException | HttpException e) {
             throw new BrainClientException(e);
         }
-
-        return results[0];
     }
 
     public void setProperty(final Note root,

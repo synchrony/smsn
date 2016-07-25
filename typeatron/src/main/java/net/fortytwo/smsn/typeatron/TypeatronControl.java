@@ -21,7 +21,6 @@ import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Date;
@@ -36,7 +35,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TypeatronControl extends SmSnDeviceControl {
-    protected static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
+    private static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
     
     // fully specified, since PATH may or may not include /usr/bin
     private static final String EMACSCLIENT_BIN = "/usr/bin/emacsclient";

@@ -9,7 +9,7 @@ import org.openrdf.model.IRI;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class DBpediaOntology {
-    public static final String NAMESPACE = "http://dbpedia.org/ontology/";
+    private static final String NAMESPACE = "http://dbpedia.org/ontology/";
 
     // properties
     public static final IRI

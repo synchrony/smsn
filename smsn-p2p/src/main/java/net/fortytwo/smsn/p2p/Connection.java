@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Connection {
-    protected static final Logger logger = Logger.getLogger(Connection.class.getName());
+    private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
     private Socket socket;
 
@@ -85,7 +85,7 @@ public class Connection {
         }).start();
     }
 
-    public synchronized void stop() throws IOException {
+    public synchronized void stop() {
         if (!isActive()) {
             throw new IllegalStateException("connection is not active");
         }

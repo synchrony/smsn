@@ -75,7 +75,7 @@ public class SemanticSynchrony {
             GESTURE_TTL = 1, // we consider gestural events to be valid only for 1 second (the minimum TTL)
             ATTENTION_TTL = 5; // we consider attention to be valid for several seconds
 
-    private static TypedProperties configuration;
+    private static final TypedProperties configuration;
 
     static {
         try {
@@ -141,7 +141,7 @@ public class SemanticSynchrony {
      * @param properties the new key/value pairs to add.
      *                   Note that a new value for a key already present in configuration will replace the old value
      */
-    public static void addConfiguration(final Properties properties) {
+    private static void addConfiguration(final Properties properties) {
         configuration.putAll(properties);
     }
 

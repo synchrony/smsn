@@ -6,7 +6,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.Filter;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
@@ -336,7 +336,7 @@ public class KnowledgeBaseTest {
         Filter filter = new Filter();
         Atom root = atomGraph.createAtom(filter, SemanticSynchrony.createRandomKey());
         root.setValue("root");
-        String rootId = (String) root.asVertex().getId();
+        String rootId = root.getId();
 
         try (InputStream in = getClass().getResourceAsStream("inference-example-1.txt")) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));

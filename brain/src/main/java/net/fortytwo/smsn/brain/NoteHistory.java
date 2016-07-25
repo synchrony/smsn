@@ -1,7 +1,8 @@
 package net.fortytwo.smsn.brain;
 
-import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.Filter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -44,7 +45,7 @@ public class NoteHistory {
 
             String id = visitedAtoms[i % CAPACITY];
 
-            Vertex v = graph.getVertex(id);
+            Atom v = graph.getAtom(id);
             if (null != v && filter.isVisible(v)) {
                 r.add(id);
             }

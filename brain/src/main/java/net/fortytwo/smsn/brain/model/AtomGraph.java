@@ -1,10 +1,5 @@
 package net.fortytwo.smsn.brain.model;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
-import net.fortytwo.smsn.brain.Filter;
-
 import java.util.List;
 
 /**
@@ -21,17 +16,11 @@ public interface AtomGraph {
 
     static final String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
 
-    IdGraph<KeyIndexableGraph> getPropertyGraph();
-
     Iterable<Atom> getAllAtoms();
 
     String idOfAtom(Atom a);
 
     String iriOfAtom(Atom a);
-
-    Vertex getVertex(String id);
-
-    Atom getAtom(Vertex v);
 
     Atom getAtom(String id);
 
@@ -52,4 +41,6 @@ public interface AtomGraph {
     void addAtomToIndices(Atom a);
 
     long getLastUpdate();
+
+    void commit();
 }

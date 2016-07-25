@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  */
 public class SlipOscSender implements OscSender {
 
-    protected static final Logger logger = Logger.getLogger(SlipOscSender.class.getName());
+    private static final Logger logger = Logger.getLogger(SlipOscSender.class.getName());
 
     private static final int SPP_PAYLOAD_CAPACITY = 128;
 
