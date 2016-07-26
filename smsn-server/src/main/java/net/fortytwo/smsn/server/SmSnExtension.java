@@ -12,6 +12,8 @@ import com.tinkerpop.rexster.extension.HttpMethod;
 import com.tinkerpop.rexster.extension.RexsterContext;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
+import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.server.error.AuthorizationException;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.action.BroadcastRDF;
@@ -120,6 +122,11 @@ public class SmSnExtension extends AbstractRexsterExtension {
             return ExtensionResponse.error(e.getMessage());
         } catch (RequestProcessingException e) {
             logger.log(Level.WARNING, "internal error", e);
+            return ExtensionResponse.error(e);
+        } catch (InvalidUpdateException e) {
+            return ExtensionResponse.error(e.getMessage());
+        } catch (InvalidGraphException e) {
+            logger.log(Level.WARNING, "invalid graph", e);
             return ExtensionResponse.error(e);
         }
 

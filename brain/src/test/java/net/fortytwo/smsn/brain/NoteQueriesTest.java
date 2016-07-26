@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -39,11 +41,12 @@ public class NoteQueriesTest {
         Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
         filter = new Filter();
+
+
     }
 
     @Test
     public void testEncoding() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
         Atom root = createAtom("11111");
@@ -80,7 +83,6 @@ public class NoteQueriesTest {
 
     @Test
     public void testUpdateRecursion() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setValue("root");
@@ -158,7 +160,7 @@ public class NoteQueriesTest {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-                // we swapped the order of "two" and "three"...
+        // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
         Atom three = atomGraph.getAtom("tOpwKho");
         // ...therefore, the children of "three" can't be modified in this update operation
@@ -173,7 +175,7 @@ public class NoteQueriesTest {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-                // duplicates are possible...
+        // duplicates are possible...
         assertNotesEqual(root, "two", "two", "three");
         // ...but when a duplicate is added, children of any matching duplicate will be ignored
         assertNotesEqual(two);
@@ -193,8 +195,159 @@ public class NoteQueriesTest {
     }
 
     @Test
+    public void testPathologicalUpdateWithCycles() throws Exception {
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        Atom root = createAtom("0000000");
+        root.setValue("root");
+        Note rootNote, child, grandChild;
+        String s;
+
+        // OK to create an atom which is its own parent
+        s = "" +
+                "* :001: one\n" +
+                "    * :001: one\n";
+        rootNote = parser.fromWikiText(s);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 2, filter, style);
+        Atom one = atomGraph.getAtom("001");
+        assertNotNull(one);
+        Assert.assertEquals(1, one.getNotes().toJavaList().size());
+        for (int i = 0; i < 2; i++) {
+            assertEquals(1, rootNote.getChildren().size());
+            child = rootNote.getChildren().get(0);
+            Assert.assertEquals("001", child.getId());
+            assertEquals(1, child.getChildren().size());
+            grandChild = child.getChildren().get(0);
+            assertEquals("001", grandChild.getId());
+
+            rootNote = queries.view(root, 2, filter, style);
+        }
+
+        // setting properties at the higher level has no effect, as we are pre-ordered w.r.t. updating of properties
+        s = "" +
+                "* :001: one - updated\n" +
+                "    * :001: one\n";
+        rootNote = parser.fromWikiText(s);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 2, filter, style);
+        one = atomGraph.getAtom("001");
+        assertNotNull(one);
+        Assert.assertEquals(1, one.getNotes().toJavaList().size());
+        rootNote = queries.view(root, 2, filter, style);
+        assertEquals(1, rootNote.getChildren().size());
+        child = rootNote.getChildren().get(0);
+        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("one", child.getValue());
+        assertEquals(1, child.getChildren().size());
+        grandChild = child.getChildren().get(0);
+        assertEquals("001", grandChild.getId());
+
+        // setting properties at the lower level (the last visited) does have an effect
+        s = "" +
+                "* :001: one\n" +
+                "    * :001: one - updated\n";
+        rootNote = parser.fromWikiText(s);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 2, filter, style);
+        one = atomGraph.getAtom("001");
+        assertNotNull(one);
+        Assert.assertEquals(1, one.getNotes().toJavaList().size());
+        rootNote = queries.view(root, 2, filter, style);
+        assertEquals(1, rootNote.getChildren().size());
+        child = rootNote.getChildren().get(0);
+        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("one - updated", child.getValue());
+        assertEquals(1, child.getChildren().size());
+        grandChild = child.getChildren().get(0);
+        assertEquals("001", grandChild.getId());
+
+        // the preorder rule does not apply when the link from parent to child is not repeated in the view;
+        // the children of an atom are updated only once
+        s = "" +
+                "* :001: one\n" +
+                "    * :001: one\n" +
+                "    * :002: two\n";
+        rootNote = parser.fromWikiText(s);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 2, filter, style);
+        one = atomGraph.getAtom("001");
+        assertNotNull(one);
+        Assert.assertEquals(2, one.getNotes().toJavaList().size());
+        for (int i = 0; i < 2; i++) {
+            assertEquals(1, rootNote.getChildren().size());
+            child = rootNote.getChildren().get(0);
+            Assert.assertEquals("001", child.getId());
+            assertEquals(2, child.getChildren().size());
+            grandChild = child.getChildren().get(0);
+            assertEquals("001", grandChild.getId());
+            grandChild = child.getChildren().get(1);
+            assertEquals("002", grandChild.getId());
+
+            rootNote = queries.view(root, 2, filter, style);
+        }
+
+        // get the height-3 view
+        rootNote = queries.view(root, 3, filter, style);
+        assertEquals(1, rootNote.getChildren().size());
+        child = rootNote.getChildren().get(0);
+        Assert.assertEquals("001", child.getId());
+        assertEquals(2, child.getChildren().size());
+        grandChild = child.getChildren().get(0);
+        assertEquals("001", grandChild.getId());
+        Assert.assertEquals(2, grandChild.getChildren().size());
+        grandChild = child.getChildren().get(1);
+        assertEquals("002", grandChild.getId());
+        Assert.assertEquals(0, grandChild.getChildren().size());
+
+        // adding or removing at the higher level has no effect, as we are pre-ordered w.r.t. updating of children
+        s = "" +
+                "* :001: one\n" +
+                "    * :001: one\n" +
+                "        * :001: one\n" +
+                "        * :002: two\n" +
+                "    * :002: two\n" +
+                "    * :003: three\n";
+        rootNote = parser.fromWikiText(s);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 3, filter, style);
+        rootNote = queries.view(root, 3, filter, style);
+        assertEquals(1, rootNote.getChildren().size());
+        child = rootNote.getChildren().get(0);
+        Assert.assertEquals("001", child.getId());
+        assertEquals(2, child.getChildren().size());
+        grandChild = child.getChildren().get(0);
+        assertEquals("001", grandChild.getId());
+        Assert.assertEquals(2, grandChild.getChildren().size());
+        grandChild = child.getChildren().get(1);
+        assertEquals("002", grandChild.getId());
+        Assert.assertEquals(0, grandChild.getChildren().size());
+
+        // adding or removing children at the lower level (the last visited) does have an effect
+        s = "" +
+                "* :001: one\n" +
+                "    * :001: one\n" +
+                "        * :001: one\n" +
+                "        * :002: two\n" +
+                "        * :003: three\n" +
+                "    * :002: two\n";
+        rootNote = parser.fromWikiText(s);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 3, filter, style);
+        rootNote = queries.view(root, 3, filter, style);
+        assertEquals(1, rootNote.getChildren().size());
+        child = rootNote.getChildren().get(0);
+        Assert.assertEquals("001", child.getId());
+        assertEquals(3, child.getChildren().size());
+        grandChild = child.getChildren().get(0);
+        assertEquals("001", grandChild.getId());
+        Assert.assertEquals(3, grandChild.getChildren().size());
+        grandChild = child.getChildren().get(1);
+        assertEquals("002", grandChild.getId());
+        Assert.assertEquals(0, grandChild.getChildren().size());
+    }
+
+    @Test
     public void testUpdateSharabilityOrWeight() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setValue("root");
@@ -223,7 +376,6 @@ public class NoteQueriesTest {
 
     @Test
     public void testUpdateAlias() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setValue("root");
@@ -250,7 +402,6 @@ public class NoteQueriesTest {
 
     @Test
     public void testUpdatePriority() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
         Atom root = createAtom("0000000");
         root.setValue("root");
@@ -328,7 +479,6 @@ public class NoteQueriesTest {
 
     @Test
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
         String before = "* :001: one\n" +
@@ -371,7 +521,6 @@ public class NoteQueriesTest {
 
     @Test
     public void testAddOnlyUpdate() throws Exception {
-        Filter filter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardAddOnlyViewStyle;
 
         String before = "* :001: one\n" +
@@ -413,8 +562,6 @@ public class NoteQueriesTest {
 
     @Test
     public void testFindRootsAndIsolatedAtoms() throws Exception {
-        Filter filter = new Filter();
-
         assertEquals(0, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
