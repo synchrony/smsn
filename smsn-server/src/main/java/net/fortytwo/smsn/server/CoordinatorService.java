@@ -8,7 +8,7 @@ import net.fortytwo.smsn.p2p.PingAnswerer;
 import net.fortytwo.smsn.p2p.ServiceBroadcaster;
 import net.fortytwo.smsn.p2p.ServiceDescription;
 import net.fortytwo.smsn.p2p.sparql.QueryEngineWrapper;
-import net.fortytwo.smsn.server.gesture.GesturalServer;
+import net.fortytwo.smsn.gesture.GesturalServer;
 import net.fortytwo.smsn.util.TypedProperties;
 import net.fortytwo.stream.StreamProcessor;
 import net.fortytwo.stream.sparql.SparqlStreamProcessor;

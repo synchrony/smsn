@@ -1,6 +1,0 @@
-net.fortytwo.smsn.server.io.edges.EdgeWriter
-net.fortytwo.smsn.server.io.graphml.GraphMLWriter
-net.fortytwo.smsn.server.io.latex.LatexWriter
-net.fortytwo.smsn.server.io.pagerank.PageRankWriter
-net.fortytwo.smsn.server.io.rdf.RDFWriter
-net.fortytwo.smsn.server.io.vertices.VertexWriter

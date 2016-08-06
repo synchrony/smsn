@@ -6,8 +6,8 @@ import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.io.BrainReader;
-import net.fortytwo.smsn.server.io.Format;
+import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.Format;
 import org.json.JSONException;
 import org.json.JSONObject;
 

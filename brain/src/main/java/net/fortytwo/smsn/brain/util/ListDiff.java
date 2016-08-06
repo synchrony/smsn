@@ -1,8 +1,5 @@
 package net.fortytwo.smsn.brain.util;
 
-import net.fortytwo.smsn.brain.NoteQueries;
-import net.fortytwo.smsn.brain.error.InvalidGraphException;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;

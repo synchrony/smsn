@@ -54,11 +54,9 @@ public class PGAtomGraph implements AtomGraph {
 
     private long lastUpdate;
 
-
     public PGAtomGraph(final KeyIndexableGraph baseGraph) {
         this.propertyGraph = createIdGraph(baseGraph);
         thisGraph = this;
-
 
         searchIndex = getPropertyGraph().getIndex("search", Vertex.class);
         if (null == searchIndex) {
