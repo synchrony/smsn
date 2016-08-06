@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain.io.rdf;
 
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import org.openrdf.rio.RDFFormat;
@@ -8,7 +7,6 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.sail.SailException;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,17 +39,15 @@ public class RDFWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
-            throws IOException {
-        RDFFormat rdfFormat = toRDFFormat(format);
+    public void doExport(Context context) throws IOException {
+
+        RDFFormat rdfFormat = toRDFFormat(context.getFormat());
 
         try {
-            sourceBrain.getKnowledgeBase().exportRDF(destStream, rdfFormat, requireFilter());
+            context.getKnowledgeBase().exportRDF(context.getDestStream(), rdfFormat, context.getFilter());
         } catch (SailException | RDFHandlerException e) {
             throw new IOException(e);
         }
-        destStream.flush();
-        destStream.close();
     }
 
     private RDFFormat toRDFFormat(Format format) {

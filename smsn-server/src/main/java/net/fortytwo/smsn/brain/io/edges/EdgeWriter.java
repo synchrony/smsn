@@ -1,14 +1,12 @@
 package net.fortytwo.smsn.brain.io.edges;
 
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomList;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.AtomList;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +22,9 @@ public class EdgeWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format) throws IOException {
-        AtomGraph sourceGraph = sourceBrain.getAtomGraph();
-        PrintStream p = new PrintStream(destStream);
+    public void doExport(Context context) throws IOException {
+        AtomGraph sourceGraph = context.getAtomGraph();
+        PrintStream p = new PrintStream(context.getDestStream());
 
         p.println("from\tto");
 

@@ -45,15 +45,18 @@ public class WriteGraph extends Action {
             throw new BadRequestException("format is required");
         }
 
-        Format format = Format.getFormat(p.format);
-        BrainWriter writer = Format.getWriter(format);
-
-        writer.setFilter(p.filter);
-        writer.setRootId(p.rootId);
+        BrainWriter.Context context = new BrainWriter.Context();
+        context.setAtomGraph(p.brain.getAtomGraph());
+        context.setKnowledgeBase(p.brain.getKnowledgeBase());
+        context.setRootId(p.rootId);
+        context.setFilter(p.filter);
+        BrainWriter writer = Format.getWriter(context.getFormat());
+        context.setFormat(Format.getFormat(p.format));
 
         try {
             try (OutputStream destStream = new FileOutputStream(p.file)) {
-                writer.doExport(p.brain, destStream, format);
+                context.setDestStream(destStream);
+                writer.doExport(context);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);

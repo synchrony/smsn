@@ -1,11 +1,10 @@
 package net.fortytwo.smsn.brain.io.latex;
 
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteQueries;
-import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,17 +35,16 @@ public class LatexWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
-            throws IOException {
-        String rootId = requireRootId();
-        Filter filter = requireFilter();
+    public void doExport(Context context) throws IOException {
+        String rootId = context.getRootId();
+        Filter filter = context.getFilter();
 
-        Atom rootAtom = sourceBrain.getAtomGraph().getAtom(rootId);
+        Atom rootAtom = context.getAtomGraph().getAtom(rootId);
         if (null == rootAtom) {
             throw new IllegalStateException("no such atom: " + rootId);
         }
 
-        writeLatex(rootAtom, filter, 0, 0, destStream);
+        writeLatex(rootAtom, filter, 0, 0, context.getDestStream());
     }
 
     private static Set<String> keywords(final String... labels) {

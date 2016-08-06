@@ -21,13 +21,13 @@ public class GraphMLReader extends BrainReader {
     }
 
     @Override
-    protected void importInternal(Brain destBrain, final InputStream sourceStream, final Format format)
+    protected void importInternal(Context context)
             throws IOException {
-        if (destBrain.getAtomGraph() instanceof PGAtomGraph) {
+        if (context.getAtomGraph() instanceof PGAtomGraph) {
             com.tinkerpop.blueprints.util.io.graphml.GraphMLReader r
                     = new com.tinkerpop.blueprints.util.io.graphml.GraphMLReader(
-                    ((PGAtomGraph) destBrain.getAtomGraph()).getPropertyGraph());
-            r.inputGraph(sourceStream);
+                    ((PGAtomGraph) context.getAtomGraph()).getPropertyGraph());
+            r.inputGraph(context.getSourceStream());
         } else {
             throw new UnsupportedOperationException("GraphML I/O is not supported for this graph");
         }

@@ -21,8 +21,7 @@ import java.util.logging.Logger;
 public abstract class BrainReader {
     private static final Logger logger = Logger.getLogger(BrainReader.class.getName());
 
-    protected abstract void importInternal(Brain destBrain, InputStream sourceStream, Format format)
-            throws IOException;
+    protected abstract void importInternal(Context context) throws IOException;
 
     private String defaultNodeName;
 
@@ -45,14 +44,14 @@ public abstract class BrainReader {
         }
     }
 
-    public void doImport(final Brain destBrain, final InputStream sourceStream, final Format format)
+    public void doImport(Context context)
             throws IOException {
 
         long before = System.currentTimeMillis();
 
-        importInternal(destBrain, sourceStream, format);
+        importInternal(context);
 
-        AtomGraph destGraph = destBrain.getAtomGraph();
+        AtomGraph destGraph = context.getAtomGraph();
 
         // note: we assume the graph is small
         destGraph.commit();
@@ -63,7 +62,7 @@ public abstract class BrainReader {
         destGraph.commit();
 
         long after = System.currentTimeMillis();
-        logger.info("imported " + format + " data in " + (after - before) + "ms");
+        logger.info("imported " + context.getFormat() + " data in " + (after - before) + "ms");
     }
 
     protected String getDefaultNodeName() {
@@ -96,7 +95,13 @@ public abstract class BrainReader {
         logger.info("importing file " + file);
         try (InputStream sourceStream = new FileInputStream(file)) {
             setDefaultNodeName(file.getName());
-            doImport(brain, sourceStream, format);
+
+            Context context = new Context();
+            context.setAtomGraph(brain.getAtomGraph());
+            context.setSourceStream(sourceStream);
+            context.setFormat(format);
+
+            doImport(context);
         }
     }
 
@@ -104,6 +109,36 @@ public abstract class BrainReader {
         for (Atom a : destGraph.getAllAtoms()) {
             String value = a.getValue();
             if (null != value) destGraph.addAtomToIndices(a);
+        }
+    }
+
+    public static class Context {
+        private AtomGraph atomGraph;
+        private InputStream sourceStream;
+        private Format format;
+
+        public AtomGraph getAtomGraph() {
+            return atomGraph;
+        }
+
+        public void setAtomGraph(AtomGraph atomGraph) {
+            this.atomGraph = atomGraph;
+        }
+
+        public InputStream getSourceStream() {
+            return sourceStream;
+        }
+
+        public void setSourceStream(InputStream sourceStream) {
+            this.sourceStream = sourceStream;
+        }
+
+        public Format getFormat() {
+            return format;
+        }
+
+        public void setFormat(Format format) {
+            this.format = format;
         }
     }
 }

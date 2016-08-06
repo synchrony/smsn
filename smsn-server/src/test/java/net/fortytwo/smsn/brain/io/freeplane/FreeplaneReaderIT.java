@@ -42,7 +42,12 @@ public class FreeplaneReaderIT {
 
         BrainWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(new File("/tmp/mindMap.xml"))) {
-            exporter.doExport(brain, out, GraphMLFormat.getInstance());
+            BrainWriter.Context context = new BrainWriter.Context();
+            context.setAtomGraph(brain.getAtomGraph());
+            context.setKnowledgeBase(brain.getKnowledgeBase());
+            context.setDestStream(out);
+            context.setFormat(GraphMLFormat.getInstance());
+            exporter.doExport(context);
         }
     }
 

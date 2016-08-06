@@ -1,15 +1,13 @@
 package net.fortytwo.smsn.brain.io.vertices;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import net.fortytwo.smsn.brain.io.BrainWriter;
-import net.fortytwo.smsn.brain.io.Format;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
@@ -27,12 +25,11 @@ public class VertexWriter extends BrainWriter {
     }
 
     @Override
-    protected void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
-            throws IOException {
+    public void doExport(Context context) throws IOException {
 
-        AtomGraph sourceGraph = sourceBrain.getAtomGraph();
-        KnowledgeBase sourceKb = sourceBrain.getKnowledgeBase();
-        PrintStream p = new PrintStream(destStream);
+        AtomGraph sourceGraph = context.getAtomGraph();
+        KnowledgeBase sourceKb = context.getKnowledgeBase();
+        PrintStream p = new PrintStream(context.getDestStream());
 
         p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
 

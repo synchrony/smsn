@@ -1,7 +1,8 @@
 package net.fortytwo.smsn.brain.io;
 
-import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,33 +15,64 @@ import java.util.logging.Logger;
 public abstract class BrainWriter {
     protected static final Logger logger = Logger.getLogger(BrainWriter.class.getName());
 
-    private Filter filter;
-    private String rootId;
-
     public abstract List<Format> getFormats();
 
-    protected abstract void exportInternal(Brain sourceBrain, OutputStream destStream, Format format)
-            throws IOException;
+    public abstract void doExport(Context context) throws IOException;
 
-    public void doExport(Brain sourceBrain, OutputStream destStream, Format format) throws IOException {
-        exportInternal(sourceBrain, destStream, format);
-    }
+    public static class Context {
+        private AtomGraph atomGraph;
+        private KnowledgeBase knowledgeBase;
+        private String rootId;
+        private Filter filter;
+        private OutputStream destStream;
+        private Format format;
 
-    protected String requireRootId() {
-        if (null == rootId) throw new IllegalStateException("no root id");
-        return rootId;
-    }
+        public KnowledgeBase getKnowledgeBase() {
+            return knowledgeBase;
+        }
 
-    public void setRootId(String rootId) {
-        this.rootId = rootId;
-    }
+        public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
+            this.knowledgeBase = knowledgeBase;
+        }
 
-    protected Filter requireFilter() {
-        if (null == filter) throw new IllegalArgumentException("no filter");
-        return filter;
-    }
+        public AtomGraph getAtomGraph() {
+            return atomGraph;
+        }
 
-    public void setFilter(Filter filter) {
-        this.filter = filter;
+        public void setAtomGraph(AtomGraph atomGraph) {
+            this.atomGraph = atomGraph;
+        }
+
+        public String getRootId() {
+            return rootId;
+        }
+
+        public void setRootId(String rootId) {
+            this.rootId = rootId;
+        }
+
+        public Filter getFilter() {
+            return filter;
+        }
+
+        public void setFilter(Filter filter) {
+            this.filter = filter;
+        }
+
+        public OutputStream getDestStream() {
+            return destStream;
+        }
+
+        public void setDestStream(OutputStream destStream) {
+            this.destStream = destStream;
+        }
+
+        public Format getFormat() {
+            return format;
+        }
+
+        public void setFormat(Format format) {
+            this.format = format;
+        }
     }
 }

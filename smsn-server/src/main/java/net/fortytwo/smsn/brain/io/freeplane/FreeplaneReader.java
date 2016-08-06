@@ -74,17 +74,17 @@ public class FreeplaneReader extends BrainReader {
     }
 
     @Override
-    protected void importInternal(Brain destBrain, InputStream sourceStream, Format format)
+    protected void importInternal(Context context)
             throws IOException {
 
         Document doc;
         try {
-            doc = xmlParser.parseStreamToDocument(sourceStream);
+            doc = xmlParser.parseStreamToDocument(context.getSourceStream());
         } catch (SAXException e) {
             throw new IOException(e);
         }
 
-        getParserInstanceFor(destBrain.getAtomGraph()).parseDOMToGraph(doc);
+        getParserInstanceFor(context.getAtomGraph()).parseDOMToGraph(doc);
     }
 
     private ParserInstance getParserInstanceFor(final AtomGraph destGraph) {
