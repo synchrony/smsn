@@ -102,9 +102,13 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public boolean setNotes(AtomList notes) {
+        return setNotes(notes, null);
+    }
+
+    public boolean setNotes(AtomList notes, final String edgeId) {
         boolean changed = removeNotes();
         if (null != notes) {
-            addOutEdge(((PGGraphEntity) notes).asVertex(), SemanticSynchrony.NOTES);
+            addOutEdge(edgeId, ((PGGraphEntity) notes).asVertex(), SemanticSynchrony.NOTES);
         }
         return changed;
     }

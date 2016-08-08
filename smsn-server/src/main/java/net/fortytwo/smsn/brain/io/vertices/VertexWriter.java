@@ -27,7 +27,7 @@ public class VertexWriter extends BrainWriter {
     @Override
     public void doExport(Context context) throws IOException {
 
-        AtomGraph sourceGraph = context.getAtomGraph();
+        AtomGraph sourceGraph = context.getFilteredGraph();
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 

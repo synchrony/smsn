@@ -23,7 +23,7 @@ public class EdgeWriter extends BrainWriter {
 
     @Override
     public void doExport(Context context) throws IOException {
-        AtomGraph sourceGraph = context.getAtomGraph();
+        AtomGraph sourceGraph = context.getFilteredGraph();
         PrintStream p = new PrintStream(context.getDestStream());
 
         p.println("from\tto");

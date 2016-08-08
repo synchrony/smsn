@@ -30,11 +30,11 @@ public class PageRankWriter extends BrainWriter {
 
         TinkerGraph tmpGraph = new TinkerGraph();
 
-        for (Atom a : context.getAtomGraph().getAllAtoms()) {
+        for (Atom a : context.getFilteredGraph().getAllAtoms()) {
             tmpGraph.addVertex(a.getId());
         }
 
-        for (Atom a : context.getAtomGraph().getAllAtoms()) {
+        for (Atom a : context.getFilteredGraph().getAllAtoms()) {
             AtomList children = a.getNotes();
             Vertex outVertex = tmpGraph.getVertex(a.getId());
             while (null != children) {

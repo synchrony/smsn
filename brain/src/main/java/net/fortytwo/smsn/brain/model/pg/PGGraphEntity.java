@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
@@ -39,8 +40,8 @@ abstract class PGGraphEntity {
         return vertex;
     }
 
-    protected void addOutEdge(final Vertex inVertex, final String label) {
-        getPropertyGraph().addEdge(null, asVertex(), inVertex, label);
+    protected void addOutEdge(final String id, final Vertex inVertex, final String label) {
+        getPropertyGraph().addEdge(id, asVertex(), inVertex, label);
     }
 
     protected Atom asAtom(Vertex vertex) {
@@ -121,20 +122,29 @@ abstract class PGGraphEntity {
     }
 
     protected Vertex getAtMostOneVertex(final String label, final Direction direction) {
-        Iterator<Vertex> vertexIter = vertex.getVertices(direction, label).iterator();
-        if (!vertexIter.hasNext()) {
+        Edge edge = getAtMostOneEdge(label, direction);
+        return null == edge ? null : edge.getVertex(direction.opposite());
+    }
+
+    protected Vertex getExactlyOneVertex(final String label, final Direction direction) {
+        return getExactlyOneEdge(label, direction).getVertex(direction.opposite());
+    }
+
+    protected Edge getAtMostOneEdge(final String label, final Direction direction) {
+        Iterator<Edge> iter = vertex.getEdges(direction, label).iterator();
+        if (!iter.hasNext()) {
             return null;
         }
-        Vertex result = vertexIter.next();
-        if (vertexIter.hasNext()) {
+        Edge result = iter.next();
+        if (iter.hasNext()) {
             throw new InvalidGraphException("atom vertex " + getId()
                     + " has more than one '" + label + "' " + direction + " edge");
         }
         return result;
     }
 
-    protected Vertex getExactlyOneVertex(final String label, final Direction direction) {
-        Vertex other = getAtMostOneVertex(label, direction);
+    protected Edge getExactlyOneEdge(final String label, final Direction direction) {
+        Edge other = getAtMostOneEdge(label, direction);
         if (null == other) {
             throw new InvalidGraphException("atom vertex " + getId()
                     + "is missing '" + label + "' " + direction + " edge");

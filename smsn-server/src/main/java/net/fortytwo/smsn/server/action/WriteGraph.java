@@ -50,8 +50,8 @@ public class WriteGraph extends Action {
         context.setKnowledgeBase(p.brain.getKnowledgeBase());
         context.setRootId(p.rootId);
         context.setFilter(p.filter);
-        BrainWriter writer = Format.getWriter(context.getFormat());
         context.setFormat(Format.getFormat(p.format));
+        BrainWriter writer = Format.getWriter(context.getFormat());
 
         try {
             try (OutputStream destStream = new FileOutputStream(p.file)) {

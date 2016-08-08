@@ -85,6 +85,10 @@ public class Filter {
         return defaultWeight;
     }
 
+    public boolean isTrivial() {
+        return minSharability == 0 && minWeight == 0;
+    }
+
     public boolean isVisible(final Atom atom) {
         if (null == atom) {
             throw new IllegalArgumentException();

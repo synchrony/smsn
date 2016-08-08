@@ -27,6 +27,8 @@ public abstract class BrainWriter {
         private OutputStream destStream;
         private Format format;
 
+        private AtomGraph filteredGraph;
+
         public KnowledgeBase getKnowledgeBase() {
             return knowledgeBase;
         }
@@ -73,6 +75,18 @@ public abstract class BrainWriter {
 
         public void setFormat(Format format) {
             this.format = format;
+        }
+
+        public AtomGraph getFilteredGraph() {
+            if (null == filter) {
+                return atomGraph;
+            } else {
+                if (null == filteredGraph) {
+                    filteredGraph = atomGraph.createFilteredGraph(filter);
+                }
+
+                return filteredGraph;
+            }
         }
     }
 }

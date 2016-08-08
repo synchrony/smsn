@@ -72,12 +72,14 @@ public class Format {
     }
 
     public static BrainWriter getWriter(final Format format) {
+        if (null == format) throw new IllegalArgumentException();
+
         checkInitialized();
 
         BrainWriter writer = writersByFormat.get(format);
 
         if (null == writer) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("no writer for format " + format);
         }
 
         return writer;
@@ -94,6 +96,7 @@ public class Format {
 
     private static void initializeReaders() {
         ServiceLoader<BrainReader> loader = ServiceLoader.load(BrainReader.class);
+        int count = 0;
         for (BrainReader reader : loader) {
             if (0 == reader.getFormats().size()) {
                 logger.warning("reader has no formats: " + reader);
@@ -102,11 +105,15 @@ public class Format {
                 addFormat(format, reader);
                 readersByFormat.put(format, reader);
             }
+            count++;
         }
+
+        logger.info("loaded " + count + " readers");
     }
 
     private static void initializeWriters() {
         ServiceLoader<BrainWriter> loader = ServiceLoader.load(BrainWriter.class);
+        int count = 0;
         for (BrainWriter writer : loader) {
             if (0 == writer.getFormats().size()) {
                 logger.warning("writer has no formats: " + writer);
@@ -115,7 +122,9 @@ public class Format {
                 addFormat(format, writer);
                 writersByFormat.put(format, writer);
             }
+            count++;
         }
+        logger.info("loaded " + count + " writers");
     }
 
     private static void addFormat(final Format format, final Object owner) {

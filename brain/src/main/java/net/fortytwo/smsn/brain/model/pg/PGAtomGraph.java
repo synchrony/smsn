@@ -5,12 +5,14 @@ import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.filtered.FilteredAtomGraph;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
@@ -125,6 +127,11 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
+    public AtomGraph createFilteredGraph(Filter filter) {
+        return new FilteredAtomGraph(this, filter);
+    }
+
+    @Override
     public void notifyOfUpdate() {
         this.lastUpdate = System.currentTimeMillis();
     }
@@ -152,6 +159,12 @@ public class PGAtomGraph implements AtomGraph {
         }
 
         return new PGAtomImpl(v);
+    }
+
+    @Override
+    public AtomList createAtomList(String id) {
+        Vertex vertex = createVertex(id);
+        return new PGAtomListImpl(vertex);
     }
 
     @Override
@@ -192,8 +205,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     public AtomList createAtomList() {
-        Vertex vertex = createVertex(null);
-        return new PGAtomListImpl(vertex);
+        return createAtomList((String) null);
     }
 
     @Override
@@ -355,6 +367,76 @@ public class PGAtomGraph implements AtomGraph {
         }
 
         return results;
+    }
+
+    public PGAtomGraph copyGraph(final Filter filter) {
+        String edgeId;
+        PGAtomGraph newGraph = new PGAtomGraph(new TinkerGraph());
+
+        for (Atom originalAtom : getAllAtoms()) {
+            if (filter.isVisible(originalAtom)) {
+                PGAtom newAtom = findOrCopyAtom(originalAtom, filter, newGraph);
+                PGAtomList notes = (PGAtomList) originalAtom.getNotes();
+                if (null != notes) {
+                    edgeId = getOutEdgeId((PGAtom) originalAtom, SemanticSynchrony.NOTES);
+                    newAtom.setNotes(copyAtomList(notes, filter, newGraph), edgeId);
+                }
+            }
+        }
+
+        return newGraph;
+    }
+
+    private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final AtomGraph newGraph) {
+        PGAtom newAtom = (PGAtom) newGraph.getAtom(original.getId());
+        if (null != newAtom) return newAtom;
+
+        newAtom = (PGAtom) newGraph.createAtom(filter, original.getId());
+
+        if (filter.isVisible(original)) {
+            newAtom.setValue(original.getValue());
+            newAtom.setWeight(original.getWeight());
+            newAtom.setShortcut(original.getShortcut());
+            newAtom.setSharability(original.getSharability());
+            newAtom.setPriority(original.getPriority());
+            newAtom.setAlias(original.getAlias());
+            newAtom.setCreated(original.getCreated());
+        }
+
+        return newAtom;
+    }
+
+    private AtomList copyAtomList(final PGAtomList original, final Filter filter, final PGAtomGraph newGraph) {
+        String edgeId;
+        PGAtomList originalCur = original, originalPrev = null;
+        PGAtomList newHead = null, newCur, newPrev = null;
+        while (null != originalCur) {
+            newCur = (PGAtomList) newGraph.createAtomList(originalCur.getId());
+            edgeId = getOutEdgeId(originalCur, SemanticSynchrony.FIRST);
+            Atom originalFirst = original.getFirst();
+            PGAtom newAtom = (PGAtom) newGraph.getAtom(originalFirst.getId());
+            if (null == newAtom) {
+                newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
+            }
+            newCur.setFirst(newAtom, edgeId);
+
+            if (null == newPrev) {
+                newHead = newCur;
+            } else {
+                edgeId = getOutEdgeId(originalPrev, SemanticSynchrony.REST);
+                newPrev.setRest(newCur, edgeId);
+            }
+
+            newPrev = newCur;
+            originalPrev = originalCur;
+            originalCur = (PGAtomList) originalCur.getRest();
+        }
+
+        return newHead;
+    }
+
+    private String getOutEdgeId(final PGGraphEntity entity, final String label) {
+        return (String) entity.getExactlyOneEdge(label, Direction.OUT).getId();
     }
 
     private Vertex createVertex(final String id) {

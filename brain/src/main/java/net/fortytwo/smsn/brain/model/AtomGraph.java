@@ -26,6 +26,8 @@ public interface AtomGraph {
 
     Atom createAtom(Filter filter, String id);
 
+    AtomList createAtomList(String id);
+
     AtomList createAtomList(Atom... elements);
 
     void removeIsolatedAtoms(Filter filter);
@@ -43,4 +45,6 @@ public interface AtomGraph {
     long getLastUpdate();
 
     void commit();
+
+    AtomGraph createFilteredGraph(Filter filter);
 }
