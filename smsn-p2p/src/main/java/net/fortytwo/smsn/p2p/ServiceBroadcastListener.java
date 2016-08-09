@@ -9,9 +9,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ServiceBroadcastListener {
     private static final Logger logger = Logger.getLogger(ServiceBroadcastListener.class.getName());
 

@@ -4,9 +4,6 @@ import net.fortytwo.smsn.brain.rdf.SimpleAtomClass;
 
 import java.util.regex.Pattern;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RFIDReference extends SimpleAtomClass {
 
     public RFIDReference() {

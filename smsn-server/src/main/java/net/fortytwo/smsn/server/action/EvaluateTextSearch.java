@@ -14,8 +14,6 @@ import java.security.Principal;
 
 /**
  * A service for executing keyword search over an Extend-o-Brain graph
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class EvaluateTextSearch extends Action {
 

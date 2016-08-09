@@ -10,9 +10,6 @@ import java.util.Stack;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class HandoffMatcher {
     private static final Logger logger = Logger.getLogger(HandoffMatcher.class.getName());
 

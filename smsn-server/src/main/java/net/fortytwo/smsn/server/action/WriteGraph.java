@@ -17,8 +17,6 @@ import java.security.Principal;
 
 /**
  * A service for exporting an Extend-o-Brain graph to the file system
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class WriteGraph extends Action {
 

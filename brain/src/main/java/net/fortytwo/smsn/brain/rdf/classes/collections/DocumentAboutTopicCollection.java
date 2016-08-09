@@ -7,9 +7,6 @@ import net.fortytwo.smsn.brain.rdf.classes.Document;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class DocumentAboutTopicCollection extends AtomCollection {
 
     // TODO: unit tests for documents about plain and sub-typed topics

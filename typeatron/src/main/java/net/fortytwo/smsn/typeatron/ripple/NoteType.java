@@ -11,9 +11,6 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class NoteType extends SimpleType<Note> {
 
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();

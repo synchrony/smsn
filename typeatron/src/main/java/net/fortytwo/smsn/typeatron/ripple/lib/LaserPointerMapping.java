@@ -13,9 +13,6 @@ import org.openrdf.model.IRI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class LaserPointerMapping extends AtomMapping {
 
     private static final Logger logger = Logger.getLogger(LaserPointerMapping.class.getName());

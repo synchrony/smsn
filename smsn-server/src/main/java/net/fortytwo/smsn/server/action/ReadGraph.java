@@ -21,8 +21,6 @@ import java.util.Set;
 
 /**
  * A service for importing an Extend-o-Brain subgraph
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ReadGraph extends Action {
     private final Map<Graph, Set<String>> importsInProgress;

@@ -12,9 +12,6 @@ import net.fortytwo.smsn.brain.model.AtomList;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 abstract class PGGraphEntity {
     protected abstract PGAtomGraph getAtomGraph();
 

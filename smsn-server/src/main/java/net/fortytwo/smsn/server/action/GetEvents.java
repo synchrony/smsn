@@ -15,8 +15,6 @@ import java.util.List;
 
 /**
  * A service for retrieving the stack of recently pushed events
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GetEvents extends Action {
 

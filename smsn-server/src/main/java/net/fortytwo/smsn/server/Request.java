@@ -5,9 +5,6 @@ import org.json.JSONObject;
 
 import java.security.Principal;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Request {
 
     protected final JSONObject json;

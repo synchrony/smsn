@@ -12,8 +12,6 @@ import java.io.IOException;
 
 /**
  * A service for executing Ripple queries over Extend-o-Brain graphs
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class EvaluateRippleQuery extends Action {
 

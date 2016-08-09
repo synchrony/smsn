@@ -13,9 +13,6 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class TypeatronMusicControl {
     private final Logger logger = SemanticSynchrony.getLogger(TypeatronMusicControl.class);
 

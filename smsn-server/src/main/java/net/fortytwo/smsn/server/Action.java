@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class Action {
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
 

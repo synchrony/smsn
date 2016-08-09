@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class UserDictionary {
 
     private static final Logger logger = Logger.getLogger(UserDictionary.class.getName());

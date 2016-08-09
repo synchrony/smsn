@@ -27,9 +27,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ActivitiesTest {
     private final ValueFactory valueFactory = SimpleValueFactory.getInstance();
     private final String agentIri = "http://example.org/ns#bob";

@@ -6,9 +6,6 @@ import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class AtomCollection extends AtomClass {
 
     public AtomCollection(final String name,

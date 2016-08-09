@@ -15,8 +15,6 @@ import java.security.Principal;
 
 /**
  * A service for setting the properties of an atom
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SetProperties extends Action {
 

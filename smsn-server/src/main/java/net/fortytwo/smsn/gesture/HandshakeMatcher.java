@@ -11,9 +11,6 @@ import java.util.Stack;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class HandshakeMatcher {
     private static final Logger logger = Logger.getLogger(HandshakeMatcher.class.getName());
 

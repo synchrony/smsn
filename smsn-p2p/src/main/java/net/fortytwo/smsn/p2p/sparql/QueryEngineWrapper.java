@@ -19,9 +19,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class QueryEngineWrapper {
     private static final Logger logger = Logger.getLogger(QueryEngineWrapper.class.getName());
 

@@ -8,9 +8,6 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class SlipOscSender implements OscSender {
 
     private static final Logger logger = Logger.getLogger(SlipOscSender.class.getName());

@@ -6,9 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ActivityLog {
     private final OutputStreamWriter out;
 

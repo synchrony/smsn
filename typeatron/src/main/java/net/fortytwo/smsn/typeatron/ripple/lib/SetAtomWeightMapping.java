@@ -11,9 +11,6 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class SetAtomWeightMapping extends AtomMapping {
 
     private static final Logger logger = Logger.getLogger(SetAtomWeightMapping.class.getName());

@@ -22,9 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class PGAtomGraph implements AtomGraph {
     private static final Logger logger = SemanticSynchrony.getLogger(PGAtomGraph.class);
 

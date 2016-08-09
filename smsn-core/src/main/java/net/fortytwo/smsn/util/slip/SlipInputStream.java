@@ -5,8 +5,6 @@ import java.io.InputStream;
 
 /**
  * A utility for receiving byte array packets via the Serial Line Internet Protocol (SLIP)
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SlipInputStream {
 

@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 
 /**
  * A controller for a remote device or component, which communicates with it via Open Sound Control (OSC) messages
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class OscControl {
 

@@ -11,9 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Brain {
     private static final Logger logger = SemanticSynchrony.getLogger(Brain.class);
 

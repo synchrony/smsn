@@ -5,9 +5,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class PingAnswerer {
     private final Connection connection;
 

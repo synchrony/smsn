@@ -2,9 +2,6 @@ package net.fortytwo.smsn.gesture;
 
 import org.openrdf.model.IRI;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class HighFiveMatcher {
 
     // the maximum interval allowed between matching claps of a high-five

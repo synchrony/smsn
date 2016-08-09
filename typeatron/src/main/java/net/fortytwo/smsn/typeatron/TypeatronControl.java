@@ -31,8 +31,6 @@ import java.util.logging.Logger;
 
 /**
  * A controller for the Typeatron chorded keyer
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TypeatronControl extends SmSnDeviceControl {
     private static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());

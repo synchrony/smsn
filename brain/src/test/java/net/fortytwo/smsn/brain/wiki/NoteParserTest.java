@@ -13,9 +13,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class NoteParserTest {
     private NoteParser parser;
 

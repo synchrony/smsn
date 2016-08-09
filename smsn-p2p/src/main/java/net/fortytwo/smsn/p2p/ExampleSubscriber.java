@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ExampleSubscriber {
     private static final Logger logger = Logger.getLogger(ExampleSubscriber.class.getName());
 

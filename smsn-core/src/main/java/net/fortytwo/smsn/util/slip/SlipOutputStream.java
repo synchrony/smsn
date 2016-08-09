@@ -8,8 +8,6 @@ import java.util.logging.Logger;
 
 /**
  * A utility for sending byte array packets via the Serial Line Internet Protocol (SLIP)
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SlipOutputStream {
     private static final Logger logger = Logger.getLogger(SlipOutputStream.class.getName());

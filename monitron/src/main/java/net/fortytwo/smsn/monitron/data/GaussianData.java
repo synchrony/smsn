@@ -1,8 +1,5 @@
 package net.fortytwo.smsn.monitron.data;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class GaussianData extends Data {
 
     private double minValue;

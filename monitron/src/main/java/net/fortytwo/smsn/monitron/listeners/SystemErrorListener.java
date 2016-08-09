@@ -4,9 +4,6 @@ import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class SystemErrorListener extends MonitronListener {
 
     public SystemErrorListener(final Context context) {

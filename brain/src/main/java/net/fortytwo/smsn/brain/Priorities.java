@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 
 /**
  * A dynamically updated list of atoms ordered by their priority value
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Priorities {
     private static final Logger logger = SemanticSynchrony.getLogger(Priorities.class);

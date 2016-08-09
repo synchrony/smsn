@@ -5,8 +5,6 @@ import org.openrdf.model.IRI;
 
 /**
  * The Bibliographic Ontology as a collection of terms
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Bibo {
     private static final String NAMESPACE = "http://purl.org/ontology/bibo/";

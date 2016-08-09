@@ -16,9 +16,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class MonitronEvent {
     private static final DatatypeFactory DATATYPE_FACTORY;
 

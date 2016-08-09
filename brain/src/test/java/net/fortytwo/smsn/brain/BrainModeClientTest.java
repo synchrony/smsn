@@ -11,9 +11,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class BrainModeClientTest {
 
     private final List<String> results = new ArrayList<>();

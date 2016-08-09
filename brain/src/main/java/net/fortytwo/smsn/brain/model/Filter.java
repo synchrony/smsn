@@ -4,9 +4,6 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.Note;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Filter {
 
     private final Float minSharability, maxSharability;

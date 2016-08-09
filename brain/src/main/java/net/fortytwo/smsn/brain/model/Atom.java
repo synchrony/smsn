@@ -3,9 +3,6 @@ package net.fortytwo.smsn.brain.model;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public interface Atom {
 
     String getId();

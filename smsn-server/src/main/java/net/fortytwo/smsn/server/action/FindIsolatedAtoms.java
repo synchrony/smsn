@@ -12,8 +12,6 @@ import java.io.IOException;
 
 /**
  * A service for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FindIsolatedAtoms extends Action {
 

@@ -9,8 +9,6 @@ import java.util.List;
  * Note: the LCS algorithm is probably not optimal in the sense of minimizing vertex and edge churn
  * e.g. ab to ba destroys one vertex and one edge, and creates one vertex and one edge.
  * A better algorithm would use a swap operation, merely deleting one edge and creating one edge.
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ListDiff {
 

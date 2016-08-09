@@ -41,9 +41,6 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class BrainClient {
 
     private static final String PROP_SERVER_NAME = "net.fortytwo.smsn.brain.client.serverName";

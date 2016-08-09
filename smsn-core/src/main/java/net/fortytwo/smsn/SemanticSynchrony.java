@@ -12,9 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class SemanticSynchrony {
     public static final boolean
             SAFE = true,

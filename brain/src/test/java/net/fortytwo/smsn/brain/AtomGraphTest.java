@@ -15,9 +15,6 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class AtomGraphTest {
     private Neo4jGraph graph;
     private AtomGraph atomGraph;

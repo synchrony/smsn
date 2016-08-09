@@ -19,9 +19,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, ProxySparqlStreamProcessor.Query> {
     private static final Logger logger = Logger.getLogger(ProxySparqlStreamProcessor.class.getName());
 

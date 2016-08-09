@@ -19,8 +19,6 @@ import java.util.Iterator;
 
 /**
  * A simple RDF format used for embedding RDF data in JSON-based messages
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SimpleJSONRDFFormat {
 

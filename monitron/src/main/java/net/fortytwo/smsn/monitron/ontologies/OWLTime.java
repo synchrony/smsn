@@ -3,9 +3,6 @@ package net.fortytwo.smsn.monitron.ontologies;
 import net.fortytwo.rdfagents.RDFAgents;
 import org.openrdf.model.IRI;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public interface OWLTime {
     public static final String NAMESPACE = "http://www.w3.org/2006/time#";
 

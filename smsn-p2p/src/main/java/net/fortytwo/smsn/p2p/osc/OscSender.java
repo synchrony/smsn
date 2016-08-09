@@ -4,8 +4,6 @@ import com.illposed.osc.OSCBundle;
 
 /**
  * An abstraction for sending bundles of OSC messages to remote components
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface OscSender {
     /**

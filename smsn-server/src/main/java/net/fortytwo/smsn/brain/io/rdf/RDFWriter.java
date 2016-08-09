@@ -12,9 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RDFWriter extends BrainWriter {
 
     private static final List<Format> formats;

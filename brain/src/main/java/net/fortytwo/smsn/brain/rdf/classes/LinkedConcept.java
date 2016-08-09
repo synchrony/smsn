@@ -15,9 +15,6 @@ import org.openrdf.rio.RDFHandlerException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class LinkedConcept extends AtomClass {
 
     public LinkedConcept() {

@@ -44,9 +44,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 @ExtensionNaming(namespace = "smsn", name = "brain")
 public class SmSnExtension extends AbstractRexsterExtension {
     protected static final Logger logger = Logger.getLogger(SmSnExtension.class.getName());
@@ -84,6 +81,15 @@ public class SmSnExtension extends AbstractRexsterExtension {
     public ExtensionResponse handleRequest(@RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
                                                    description = "request description (JSON object)") String request) {
+        try {
+            return handleRequestInternal(graph, request);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "unclassified exception", e);
+            return ExtensionResponse.error(e);
+        }
+    }
+
+    private ExtensionResponse handleRequestInternal(Graph graph, String request) {
         JSONObject json;
         String action;
         try {

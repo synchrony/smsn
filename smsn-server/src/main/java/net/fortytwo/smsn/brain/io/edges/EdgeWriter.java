@@ -11,9 +11,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class EdgeWriter extends BrainWriter {
 
     @Override

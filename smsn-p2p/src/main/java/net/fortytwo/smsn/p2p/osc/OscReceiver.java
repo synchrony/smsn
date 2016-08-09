@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class OscReceiver {
 
     private static final Logger logger = Logger.getLogger(OscReceiver.class.getName());

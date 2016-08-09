@@ -17,8 +17,6 @@ import java.security.Principal;
 
 /**
  * A service for broadcasting events modeled in RDF to all peers in the environment
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class BroadcastRDF extends Action {
 

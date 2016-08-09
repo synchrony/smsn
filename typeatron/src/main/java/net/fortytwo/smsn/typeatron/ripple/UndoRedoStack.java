@@ -2,9 +2,6 @@ package net.fortytwo.smsn.typeatron.ripple;
 
 import java.util.Stack;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class UndoRedoStack<T> {
     private final Stack<T> undoStack;
     private final Stack<T> redoStack;

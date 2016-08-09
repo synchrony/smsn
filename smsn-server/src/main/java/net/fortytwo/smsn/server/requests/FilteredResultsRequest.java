@@ -9,9 +9,6 @@ import org.json.JSONObject;
 
 import java.security.Principal;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class FilteredResultsRequest extends Request {
     private final Filter filter;
 

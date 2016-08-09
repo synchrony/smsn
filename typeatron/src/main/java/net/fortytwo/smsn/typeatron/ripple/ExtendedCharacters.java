@@ -11,8 +11,6 @@ import java.util.Map;
  * value and ease of chording with the Typeatron.
  * For example, the enye symbol in "sen~or" is obviously an n modified by a tilde,
  * but what is the modifier in c-cedilla?  Here, it is considered to be an acute.
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendedCharacters {
 

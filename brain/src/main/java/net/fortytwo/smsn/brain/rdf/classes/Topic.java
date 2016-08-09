@@ -16,9 +16,6 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Topic extends AtomClass {
     private static final Logger logger = Logger.getLogger(Topic.class.getName());
 

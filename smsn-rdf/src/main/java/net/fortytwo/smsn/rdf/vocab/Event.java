@@ -6,8 +6,6 @@ import org.openrdf.model.IRI;
 /**
  * The Event Ontology as a collection of terms
  * This class was created on 2013-09-19 from Event Ontology version published 25th October 2007
- *
- * @author Joshua Shinavier (http://fortytwo.net).
  */
 public interface Event {
     public static final String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";

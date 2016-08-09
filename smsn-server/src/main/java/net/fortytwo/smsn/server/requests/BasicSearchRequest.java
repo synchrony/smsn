@@ -8,9 +8,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class BasicSearchRequest extends BasicViewRequest {
 
     private String query;

@@ -32,9 +32,6 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class CoordinatorService {
     private static final Logger logger = Logger.getLogger(CoordinatorService.class.getName());
 

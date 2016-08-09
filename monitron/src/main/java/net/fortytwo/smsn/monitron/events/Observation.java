@@ -12,9 +12,6 @@ import org.openrdf.model.vocabulary.RDF;
 
 import java.util.Date;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class Observation extends MonitronEvent {
 
     protected final Data data;

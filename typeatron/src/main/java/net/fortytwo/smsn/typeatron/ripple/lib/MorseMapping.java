@@ -10,9 +10,6 @@ import net.fortytwo.ripple.model.RippleList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class MorseMapping extends PrimitiveStackMapping {
 
     private static final Logger logger = Logger.getLogger(MorseMapping.class.getName());

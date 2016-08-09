@@ -13,8 +13,6 @@ import java.security.Principal;
 
 /**
  * A service for receiving and internalizing events
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class PushEvent extends Action {
 

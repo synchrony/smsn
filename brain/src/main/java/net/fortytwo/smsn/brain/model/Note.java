@@ -4,9 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Note {
     // A special value, for incoming notes only,
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)

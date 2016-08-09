@@ -68,9 +68,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class KnowledgeBaseTest {
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
     

@@ -7,9 +7,6 @@ import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class InferTypes extends Action {
 
     @Override

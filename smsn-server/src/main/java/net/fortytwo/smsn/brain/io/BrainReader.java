@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class BrainReader {
     private static final Logger logger = Logger.getLogger(BrainReader.class.getName());
 

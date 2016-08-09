@@ -7,9 +7,6 @@ import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.events.MotionObservation;
 import org.openrdf.model.IRI;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class PassiveInfraredSensorListener extends SensorListener {
 
     public PassiveInfraredSensorListener(final Context context,

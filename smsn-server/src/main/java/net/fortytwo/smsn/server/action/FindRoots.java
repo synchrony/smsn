@@ -12,8 +12,6 @@ import java.io.IOException;
 
 /**
  * A service for finding root nodes of an Extend-o-Brain graph
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FindRoots extends Action {
 

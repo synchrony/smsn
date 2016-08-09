@@ -5,9 +5,6 @@ import net.fortytwo.smsn.brain.model.Atom;
 import java.util.Collection;
 import java.util.LinkedList;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class AtomCollectionMemory {
 
     private final String atomId;

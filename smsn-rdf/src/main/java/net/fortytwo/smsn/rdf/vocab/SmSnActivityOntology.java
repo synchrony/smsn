@@ -5,8 +5,6 @@ import org.openrdf.model.IRI;
 
 /**
  * The Semantic Synchrony gesture/activity ontology as a collection of terms
- *
- * @author Joshua Shinavier (http://fortytwo.net).
  */
 public interface SmSnActivityOntology {
     public static final String NAMESPACE = "http://fortytwo.net/2015/smsn/activity#";

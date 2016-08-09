@@ -30,9 +30,6 @@ import java.util.Collection;
 sudo cu -l /dev/cu.usbserial-A600HFHJ -s 9600 | tee /tmp/arduino.out
  */
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class MonitronService {
 
     private final InputStream input;

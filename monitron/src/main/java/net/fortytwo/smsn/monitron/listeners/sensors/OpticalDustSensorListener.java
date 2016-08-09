@@ -6,9 +6,6 @@ import net.fortytwo.smsn.monitron.events.DustLevelObservation;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import org.openrdf.model.IRI;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class OpticalDustSensorListener extends GaussianSensorListener {
 
     public OpticalDustSensorListener(final Context context,

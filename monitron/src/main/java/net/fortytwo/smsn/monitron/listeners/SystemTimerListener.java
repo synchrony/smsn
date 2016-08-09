@@ -7,8 +7,6 @@ import net.fortytwo.smsn.monitron.events.MonitronEvent;
 /**
  * A listener for timer messages which are sent out by the Monitron before each set of observations,
  * allowing the observation timestamps to be synchronized with the system clock
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SystemTimerListener extends MonitronListener {
 

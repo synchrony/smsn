@@ -2,9 +2,6 @@ package net.fortytwo.smsn.brain.model;
 
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public interface AtomList {
 
     String getId();

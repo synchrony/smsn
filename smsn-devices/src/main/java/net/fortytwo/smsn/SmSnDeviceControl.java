@@ -93,12 +93,12 @@ public abstract class SmSnDeviceControl extends OscControl {
         });
     }
 
-    protected void sendErrorMessage() {
+    public void sendErrorMessage() {
         OSCMessage m = new OSCMessage(absoluteAddress(OSC_ERROR));
         send(m);
     }
 
-    protected void sendInfoMessage() {
+    public void sendInfoMessage() {
         OSCMessage m = new OSCMessage(absoluteAddress(OSC_INFO));
         send(m);
     }
@@ -127,7 +127,7 @@ public abstract class SmSnDeviceControl extends OscControl {
         send(message);
     }
 
-    protected void sendReadyMessage() {
+    public void sendReadyMessage() {
         OSCMessage m = new OSCMessage(absoluteAddress(OSC_READY));
         send(m);
     }

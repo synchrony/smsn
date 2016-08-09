@@ -11,9 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 abstract class PGAtom extends PGGraphEntity implements Atom {
 
     protected PGAtom(final Vertex vertex) {

@@ -10,9 +10,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ListDiffTest {
     private final Comparator<String> cmp = new ListDiff.StringComparator();
 

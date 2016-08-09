@@ -6,9 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RDFFormatLoader extends ClassLoader {
     public RDFFormatLoader() {
         super(RDFFormatLoader.class.getClassLoader());

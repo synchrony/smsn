@@ -11,9 +11,6 @@ import net.fortytwo.smsn.typeatron.ripple.lib.TypeatronDictionaryMapping;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class SmSnRippleRepl {
 
     private static final Logger logger = Logger.getLogger(SmSnRippleRepl.class.getName());

@@ -6,9 +6,6 @@ import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.RDFHandler;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RDFizationContext {
     private final AtomGraph atomGraph;
     private final RDFHandler handler;

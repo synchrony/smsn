@@ -6,9 +6,6 @@ import net.fortytwo.ripple.model.Library;
 import net.fortytwo.ripple.model.LibraryLoader;
 import net.fortytwo.ripple.model.Model;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class SmSnLibrary extends Library {
     public static final String
             // was: http://fortytwo.net/2009/05/extendobrain#

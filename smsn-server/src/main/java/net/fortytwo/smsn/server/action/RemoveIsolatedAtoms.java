@@ -9,8 +9,6 @@ import org.json.JSONObject;
 
 /**
  * A service for removing isolated atoms (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class RemoveIsolatedAtoms extends Action {
 

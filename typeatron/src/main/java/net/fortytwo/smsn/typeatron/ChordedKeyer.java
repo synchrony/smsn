@@ -9,8 +9,6 @@ import java.util.Map;
 
 /**
  * A recognizer of the Typeatron's five-key chording scheme
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ChordedKeyer {
 

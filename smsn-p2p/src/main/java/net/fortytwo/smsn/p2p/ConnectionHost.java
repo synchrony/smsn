@@ -7,9 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ConnectionHost {
     protected static final Logger logger = Logger.getLogger(ConnectionHost.class.getName());
 

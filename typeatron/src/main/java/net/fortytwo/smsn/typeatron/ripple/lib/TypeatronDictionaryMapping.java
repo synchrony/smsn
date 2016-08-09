@@ -134,9 +134,6 @@ import net.fortytwo.ripple.model.StackMapping;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
     private final Map<String, StackMapping> dictionary = new HashMap<>();

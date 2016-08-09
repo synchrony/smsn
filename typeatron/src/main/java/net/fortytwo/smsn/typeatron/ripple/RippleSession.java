@@ -14,9 +14,6 @@ import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.memory.MemoryStore;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RippleSession {
     private static final int UNDO_REDO_DEPTH = 20;
     private final Sail sail;

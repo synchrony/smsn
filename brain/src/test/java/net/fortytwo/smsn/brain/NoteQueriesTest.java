@@ -23,9 +23,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class NoteQueriesTest {
     private AtomGraph atomGraph;
     private NoteParser parser;

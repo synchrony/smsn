@@ -10,9 +10,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class GraphMLReader extends BrainReader {
 
     @Override

@@ -9,9 +9,6 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class BrainWriter {
     protected static final Logger logger = Logger.getLogger(BrainWriter.class.getName());
 

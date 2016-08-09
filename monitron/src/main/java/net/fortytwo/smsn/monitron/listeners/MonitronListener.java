@@ -9,9 +9,6 @@ import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class MonitronListener implements OSCListener {
     protected final Context context;
 

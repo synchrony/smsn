@@ -33,9 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class FreeplaneReader extends BrainReader {
 
     private static final String

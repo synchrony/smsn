@@ -11,9 +11,6 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class NoteWriter {
 
     public static final String VALUE_TRUNCATOR = " [...]";

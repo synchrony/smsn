@@ -1,8 +1,5 @@
 package net.fortytwo.smsn.monitron.data;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Data {
     private long sampleIntervalBeginning;
     private long sampleIntervalEnd;

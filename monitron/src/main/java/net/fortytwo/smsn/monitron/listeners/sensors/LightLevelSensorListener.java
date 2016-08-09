@@ -6,9 +6,6 @@ import net.fortytwo.smsn.monitron.events.LightLevelObservation;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import org.openrdf.model.IRI;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class LightLevelSensorListener extends GaussianSensorListener {
 
     public LightLevelSensorListener(final Context context,

@@ -61,8 +61,6 @@ import java.util.logging.Logger;
 
 /**
  * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class KnowledgeBase {
     private static final Logger logger = SemanticSynchrony.getLogger(KnowledgeBase.class);

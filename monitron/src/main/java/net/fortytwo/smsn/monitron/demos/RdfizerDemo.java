@@ -17,9 +17,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RdfizerDemo {
     public static void main(final String[] args) throws ParseException {
         Options options = new Options();

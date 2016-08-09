@@ -3,9 +3,6 @@ package net.fortytwo.smsn.p2p;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ServiceDescription {
 
     // see also corresponding SmSn configuration properties

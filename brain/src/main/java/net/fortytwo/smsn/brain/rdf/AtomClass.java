@@ -12,9 +12,6 @@ import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class AtomClass {
 
     protected String name;

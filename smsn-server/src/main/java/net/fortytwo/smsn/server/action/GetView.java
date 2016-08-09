@@ -14,8 +14,6 @@ import java.security.Principal;
 
 /**
  * A service for retrieving hierarchical views of Extend-o-Brain graphs
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GetView extends Action {
 

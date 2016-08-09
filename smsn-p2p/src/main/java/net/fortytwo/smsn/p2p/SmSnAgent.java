@@ -19,9 +19,6 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class SmSnAgent {
     private static final Logger logger = Logger.getLogger(SmSnAgent.class.getName());
 

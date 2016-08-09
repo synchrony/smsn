@@ -1,8 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public interface Params {
     public static final String
             ACTION = "action",

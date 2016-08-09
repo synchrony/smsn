@@ -13,9 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class LatexWriter extends BrainWriter {
 
     private static final int MAX_LATEX_RECURSE_LEVELS = 16;

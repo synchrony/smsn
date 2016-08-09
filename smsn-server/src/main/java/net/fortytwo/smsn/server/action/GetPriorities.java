@@ -14,8 +14,6 @@ import java.security.Principal;
 
 /**
  * A service for deriving a prioritized list of items in the knowledge base
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GetPriorities extends Action {
 

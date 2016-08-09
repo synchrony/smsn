@@ -6,9 +6,6 @@ import org.json.JSONObject;
 
 import java.security.Principal;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class BasicViewRequest extends FilteredResultsRequest {
     private final int height;
     private final String styleName;

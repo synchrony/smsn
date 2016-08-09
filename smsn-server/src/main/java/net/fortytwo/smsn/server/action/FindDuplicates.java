@@ -21,8 +21,6 @@ import java.util.Map;
 
 /**
  * A service for identifying atoms with duplicate values.
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class FindDuplicates extends Action {
 

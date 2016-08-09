@@ -5,9 +5,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Format {
     private static final Logger logger = Logger.getLogger(Format.class.getName());
 

@@ -22,9 +22,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class GesturalServer {
     private static final Logger logger = Logger.getLogger(GesturalServer.class.getName());
 

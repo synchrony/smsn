@@ -7,8 +7,6 @@ import org.openrdf.model.IRI;
  * The FOAF Vocabulary as a collection of terms
  * Note: this class is used instead of org.openrdf.model.vocabulary.FOAF because the latter covers only
  * a small subset of the vocabulary.
- *
- * @author Joshua Shinavier (http://fortytwo.net).
  */
 public interface FOAF {
     public static final String NAMESPACE = "http://xmlns.com/foaf/0.1/";

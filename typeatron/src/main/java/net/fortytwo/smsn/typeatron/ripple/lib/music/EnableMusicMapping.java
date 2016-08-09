@@ -7,9 +7,6 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class EnableMusicMapping extends PrimitiveStackMapping {
 
     private final TypeatronMusicControl music;

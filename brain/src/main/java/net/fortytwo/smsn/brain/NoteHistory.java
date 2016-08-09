@@ -9,9 +9,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class NoteHistory {
     private static final int CAPACITY = 1000;
 

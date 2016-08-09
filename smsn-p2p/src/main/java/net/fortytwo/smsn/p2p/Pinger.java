@@ -5,9 +5,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class Pinger {
     public static final String
             PING = "ping",

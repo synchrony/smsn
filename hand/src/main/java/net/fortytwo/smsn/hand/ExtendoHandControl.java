@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 
 /**
  * A controller for the Extend-o-Hand gestural glove
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class ExtendoHandControl extends SmSnDeviceControl {
     protected static final Logger logger = Logger.getLogger(ExtendoHandControl.class.getName());

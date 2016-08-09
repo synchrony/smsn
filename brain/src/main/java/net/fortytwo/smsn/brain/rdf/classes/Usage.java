@@ -8,8 +8,6 @@ import java.util.regex.Pattern;
 
 /**
  * A collection of how-to notes relating to a tool
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Usage extends SimpleAtomClass {
 

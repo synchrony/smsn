@@ -19,8 +19,6 @@ import java.util.regex.Pattern;
 
 /**
  * Something which is used for a purpose, such as hardware, software, or a service.
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Tool extends AtomClass {
 

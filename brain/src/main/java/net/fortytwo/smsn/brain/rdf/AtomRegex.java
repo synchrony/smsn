@@ -5,9 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class AtomRegex {
 
     public enum Modifier {

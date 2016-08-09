@@ -10,9 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class FilteredAtomGraph implements AtomGraph {
     private final AtomGraph baseGraph;
     private final Filter filter;

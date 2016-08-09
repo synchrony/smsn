@@ -9,9 +9,6 @@ import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
 import org.openrdf.model.vocabulary.RDF;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class RelativeHumidityObservation extends Observation {
 
     public RelativeHumidityObservation(

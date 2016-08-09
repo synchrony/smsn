@@ -23,9 +23,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.function.BiConsumer;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ContinuousQueryDemo {
     private static final int TUPLE_TTL = 0, QUERY_TTL = 0;
 

@@ -15,9 +15,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class EventStackTest {
     private EventStack eventStack;
 

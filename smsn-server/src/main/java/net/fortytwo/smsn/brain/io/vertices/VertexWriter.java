@@ -13,9 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class VertexWriter extends BrainWriter {
     private static final Logger logger = Logger.getLogger(VertexWriter.class.getName());
 

@@ -6,9 +6,6 @@ import org.json.JSONObject;
 
 import java.security.Principal;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 public class RootedViewRequest extends BasicViewRequest {
 
     private final String rootId;

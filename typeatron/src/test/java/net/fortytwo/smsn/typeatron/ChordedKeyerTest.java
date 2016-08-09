@@ -6,9 +6,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ChordedKeyerTest {
 
     private ChordedKeyer keyer;

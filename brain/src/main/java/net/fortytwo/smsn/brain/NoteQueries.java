@@ -18,9 +18,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class NoteQueries {
 
     protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());

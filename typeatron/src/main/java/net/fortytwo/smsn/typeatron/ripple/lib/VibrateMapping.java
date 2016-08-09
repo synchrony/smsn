@@ -7,9 +7,6 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.ripple.model.RippleList;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class VibrateMapping extends PrimitiveStackMapping {
     private final TypeatronControl typeatron;
 

@@ -19,9 +19,6 @@ import java.io.OutputStream;
 
 import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class FreeplaneReaderIT {
     private final File mindMapDirectory = new File("/Users/josh/projects/notmine/mindmaps");
 

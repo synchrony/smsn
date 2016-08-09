@@ -19,9 +19,6 @@ import org.openrdf.rio.Rio;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class ExampleBroadcaster {
 
     private void sendExampleDataset() throws RDFHandlerException, IOException, JSONException {

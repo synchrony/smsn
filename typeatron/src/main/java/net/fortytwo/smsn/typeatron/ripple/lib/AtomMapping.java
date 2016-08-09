@@ -15,9 +15,6 @@ import org.openrdf.model.impl.SimpleValueFactory;
 
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public abstract class AtomMapping extends PrimitiveStackMapping {
     private static final Logger logger = Logger.getLogger(GetAtomValueMapping.class.getName());
 

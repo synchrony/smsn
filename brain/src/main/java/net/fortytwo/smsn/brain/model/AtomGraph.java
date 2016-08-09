@@ -4,8 +4,6 @@ import java.util.List;
 
 /**
  * A graph of atoms and lists conforming to the Extend-o-Brain data model
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public interface AtomGraph {
 

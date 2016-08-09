@@ -9,9 +9,6 @@ import net.fortytwo.smsn.brain.model.AtomList;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
-* @author Joshua Shinavier (http://fortytwo.net)
-*/
 abstract class PGAtomList extends PGGraphEntity implements AtomList {
 
     public PGAtomList(final Vertex vertex) {

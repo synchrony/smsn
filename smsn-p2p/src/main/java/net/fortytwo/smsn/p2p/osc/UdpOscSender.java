@@ -10,9 +10,6 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Joshua Shinavier (http://fortytwo.net)
- */
 public class UdpOscSender implements OscSender {
     private static final Logger logger = Logger.getLogger(UdpOscSender.class.getName());
 

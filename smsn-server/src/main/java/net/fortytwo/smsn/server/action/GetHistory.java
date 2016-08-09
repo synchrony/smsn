@@ -12,8 +12,6 @@ import java.util.List;
 
 /**
  * A service for finding recently visited atoms
- *
- * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GetHistory extends Action {
 
