@@ -1,5 +1,5 @@
 /*
- * Omnisensory Monitron firmware, copyright 2012-2014 by Joshua Shinavier
+ * Omnisensory Monitron firmware, copyright 2012-2016 by Joshua Shinavier
  *
  * See: https://github.com/joshsh/smsn
  */

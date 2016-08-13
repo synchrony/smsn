@@ -2,7 +2,7 @@
   Typeatron.h - Arduino library for the Monomanual Typeatron chorded keyer
   See: http://github.com/joshsh/smsn and the Typeatron Mark 1 EAGLE schematic
   
-  Created by Joshua Shinavier, 2013-2014
+  Created by Joshua Shinavier, 2013-2016
   Released into the public domain.
 */
 

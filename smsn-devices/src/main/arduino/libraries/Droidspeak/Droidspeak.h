@@ -1,6 +1,6 @@
 /*
   Droidspeak.h - a simple vocabulary of beeps and whistles for symbolic auditory feedback without speech
-  Created by Joshua Shinavier, 2012-2014
+  Created by Joshua Shinavier, 2012-2016
   Released into the public domain.
 */
 

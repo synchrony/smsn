@@ -1,5 +1,5 @@
 /*
- * Extend-o-Hand calibration and sampling, copyright 2013-2014 by Joshua Shinavier
+ * Extend-o-Hand calibration and sampling, copyright 2013-2016 by Joshua Shinavier
  * 
  * See: https://github.com/joshsh/smsn
  */

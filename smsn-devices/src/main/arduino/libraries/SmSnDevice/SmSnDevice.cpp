@@ -1,6 +1,6 @@
 /*
   SmSnDevice.cpp
-  Created by Joshua Shinavier, 2014-2015
+  Created by Joshua Shinavier, 2014-2016
   Released into the public domain.
 */
 

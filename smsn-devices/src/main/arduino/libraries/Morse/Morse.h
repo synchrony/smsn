@@ -1,6 +1,6 @@
 /*
   Morse.h - utility to play Morse code sequences via Arduino outputs
-  Created by Joshua Shinavier, 2013-2014
+  Created by Joshua Shinavier, 2013-2016
   Released into the public domain.
 */
 

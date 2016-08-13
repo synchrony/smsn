@@ -38,8 +38,6 @@ public class NoteQueriesTest {
         Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
         filter = new Filter();
-
-
     }
 
     @Test

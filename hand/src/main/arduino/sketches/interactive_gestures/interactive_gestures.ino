@@ -1,5 +1,5 @@
 /*
- * Extend-o-Hand handshake and handoff combination sketch, copyright 2014-2015 by Joshua Shinavier
+ * Extend-o-Hand handshake and handoff combination sketch, copyright 2014-2016 by Joshua Shinavier
  * 
  * See: https://github.com/joshsh/smsn
  */

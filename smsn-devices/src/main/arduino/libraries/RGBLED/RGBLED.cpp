@@ -1,6 +1,6 @@
 /*
   RGBLED.cpp
-  Created by Joshua Shinavier, 2012-2014
+  Created by Joshua Shinavier, 2012-2016
   Released into the public domain.
 */
 

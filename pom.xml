@@ -47,7 +47,6 @@
     <properties>
         <smsn.version>1.1-SNAPSHOT</smsn.version>
         <httpcomponents.version>4.4</httpcomponents.version>
-        <jackrabbit.version>2.7.0</jackrabbit.version>
         <javaosc.version>0.3</javaosc.version>
         <junit.version>4.12</junit.version>
         <neo4j.version>1.9.6</neo4j.version>

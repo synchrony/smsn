@@ -1,6 +1,6 @@
 /*
   MMA7361.h - calibration and sampling with the Freescale Semiconductor MMA7361 3-axis accelerometer
-  Created by Joshua Shinavier, 2013-2014
+  Created by Joshua Shinavier, 2013-2016
   Released into the public domain.
 */
 
