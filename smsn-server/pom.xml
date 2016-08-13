@@ -30,11 +30,6 @@
             <artifactId>rexster-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-graph-jung</artifactId>
-            <version>${tinkerpop.version}</version>
-        </dependency>
-        <dependency>
             <groupId>net.fortytwo.stream</groupId>
             <artifactId>stream42-sparql</artifactId>
         </dependency>
