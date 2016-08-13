@@ -3,7 +3,7 @@ Semantic Synchrony CHANGELOG
 
 SmSn 1.1 (More Brains)
 ------------------------------------
-SmSn 1.1.0 (NOT YET RELEASED)
+SmSn 1.1.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Created a unified BrainReader/BrainWriter framework for graph I/O
 * Minimized TinkerPop2 dependencies
