@@ -23,14 +23,6 @@
             <groupId>net.fortytwo.smsn</groupId>
             <artifactId>brain</artifactId>
             <version>${smsn.version}</version>
-            <exclusions>
-                <!-- via Frames. Gremlin and its dependencies are full of dangling class references which make things
-                     interesting for ProGuard in smsn-android.  Exclude it until needed -->
-                <exclusion>
-                    <groupId>com.tinkerpop.gremlin</groupId>
-                    <artifactId>gremlin-groovy</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.ripple</groupId>

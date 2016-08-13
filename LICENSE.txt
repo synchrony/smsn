@@ -1,5 +1,5 @@
-Semantic Synchrony project copyright (C) 2009-2016 Joshua Shinavier
-and the Tetherless World Constellation, Rensselaer Polytechnic Institute
+Semantic Synchrony project
+Copyright (C) 2009-2016 Joshua Shinavier and collaborators
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
