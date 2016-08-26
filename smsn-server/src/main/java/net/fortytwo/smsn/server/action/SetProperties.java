@@ -82,7 +82,7 @@ public class SetProperties extends Action {
             case SemanticSynchrony.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) p.propertyValue;
-                for (Atom a : p.brain.getAtomGraph().getAtomsWithShortcut(shortcut, p.filter)) {
+                for (Atom a : p.brain.getAtomGraph().getAtomsByShortcut(shortcut, p.filter)) {
                     a.setShortcut(null);
                 }
 

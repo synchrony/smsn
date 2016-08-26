@@ -317,13 +317,13 @@ public class NoteQueries {
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getAtomGraph().getAtomsByFulltextQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByValue(query, filter);
                 break;
             case Acronym:
-                results = brain.getAtomGraph().getAtomsByAcronymQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
                 break;
             case Shortcut:
-                results = brain.getAtomGraph().getAtomsWithShortcut(query, filter);
+                results = brain.getAtomGraph().getAtomsByShortcut(query, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);
@@ -481,7 +481,7 @@ public class NoteQueries {
                 | setSharability(target, note.getSharability());
 
         if (changed) {
-            brain.getAtomGraph().addAtomToIndices(target);
+            brain.getAtomGraph().reindexAtom(target);
 
             if (null != brain.getActivityLog()) {
                 brain.getActivityLog().logSetProperties(target);

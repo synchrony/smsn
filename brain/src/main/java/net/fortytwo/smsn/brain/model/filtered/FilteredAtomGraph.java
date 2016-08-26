@@ -97,23 +97,23 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public List<Atom> getAtomsWithShortcut(String shortcut, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsWithShortcut(shortcut, filter));
+    public List<Atom> getAtomsByShortcut(String shortcut, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByShortcut(shortcut, filter));
     }
 
     @Override
-    public List<Atom> getAtomsByFulltextQuery(String query, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsByFulltextQuery(query, filter));
+    public List<Atom> getAtomsByValue(String value, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByValue(value, filter));
     }
 
     @Override
-    public List<Atom> getAtomsByAcronymQuery(String query, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsByAcronymQuery(query, filter));
+    public List<Atom> getAtomsByAcronym(String acronym, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByAcronym(acronym, filter));
     }
 
     @Override
-    public void addAtomToIndices(Atom a) {
-        baseGraph.addAtomToIndices(((FilteredAtom) a).baseAtom);
+    public void reindexAtom(Atom a) {
+        baseGraph.reindexAtom(((FilteredAtom) a).baseAtom);
     }
 
     @Override

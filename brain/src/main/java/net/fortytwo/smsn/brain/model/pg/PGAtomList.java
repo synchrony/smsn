@@ -1,15 +1,15 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.LinkedList;
 import java.util.List;
 
-abstract class PGAtomList extends PGGraphEntity implements AtomList {
+public abstract class PGAtomList extends PGGraphEntity implements AtomList {
 
     public PGAtomList(final Vertex vertex) {
         super(vertex);

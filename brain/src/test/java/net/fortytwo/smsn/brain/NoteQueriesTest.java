@@ -1,12 +1,10 @@
 package net.fortytwo.smsn.brain;
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
@@ -23,7 +21,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class NoteQueriesTest {
+public class NoteQueriesTest extends BrainTestBase {
     private AtomGraph atomGraph;
     private NoteParser parser;
     private final NoteWriter writer = new NoteWriter();
@@ -32,9 +30,8 @@ public class NoteQueriesTest {
 
     @Before
     public void setUp() throws Exception {
-        TinkerGraph g = new TinkerGraph();
+        atomGraph = createTinkerAtomGraph();
         parser = new NoteParser();
-        atomGraph = new PGAtomGraph(g);
         Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
         filter = new Filter();

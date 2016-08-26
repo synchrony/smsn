@@ -105,7 +105,7 @@ public abstract class BrainReader {
     private void reindexVertices(AtomGraph destGraph) {
         for (Atom a : destGraph.getAllAtoms()) {
             String value = a.getValue();
-            if (null != value) destGraph.addAtomToIndices(a);
+            if (null != value) destGraph.reindexAtom(a);
         }
     }
 

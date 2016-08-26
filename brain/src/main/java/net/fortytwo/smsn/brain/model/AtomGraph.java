@@ -16,11 +16,17 @@ public interface AtomGraph {
 
     Iterable<Atom> getAllAtoms();
 
+    Atom getAtom(String id);
+
+    List<Atom> getAtomsByShortcut(String shortcut, Filter filter);
+
+    List<Atom> getAtomsByValue(String value, Filter filter);
+
+    List<Atom> getAtomsByAcronym(String acronym, Filter filter);
+
     String idOfAtom(Atom a);
 
     String iriOfAtom(Atom a);
-
-    Atom getAtom(String id);
 
     Atom createAtom(Filter filter, String id);
 
@@ -32,13 +38,7 @@ public interface AtomGraph {
 
     void notifyOfUpdate();
 
-    List<Atom> getAtomsWithShortcut(String shortcut, Filter filter);
-
-    List<Atom> getAtomsByFulltextQuery(String query, Filter filter);
-
-    List<Atom> getAtomsByAcronymQuery(String query, Filter filter);
-
-    void addAtomToIndices(Atom a);
+    void reindexAtom(Atom a);
 
     long getLastUpdate();
 

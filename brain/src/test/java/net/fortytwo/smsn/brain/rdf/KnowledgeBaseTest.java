@@ -1,15 +1,13 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.BrainTestBase;
+import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexReference;
@@ -68,7 +66,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class KnowledgeBaseTest {
+public class KnowledgeBaseTest extends BrainTestBase {
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
     
     @Test
@@ -324,8 +322,7 @@ public class KnowledgeBaseTest {
     @Ignore  // TODO: restore me
     @Test
     public void testInference() throws Exception {
-        KeyIndexableGraph g = new TinkerGraph();
-        AtomGraph atomGraph = new PGAtomGraph(g);
+        AtomGraph atomGraph = createTinkerAtomGraph();
         Brain brain = new Brain(atomGraph);
         KnowledgeBase kb = new KnowledgeBase(atomGraph);
         NoteParser parser = new NoteParser();

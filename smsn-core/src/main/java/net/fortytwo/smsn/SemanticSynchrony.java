@@ -37,6 +37,14 @@ public class SemanticSynchrony {
     public static final String
             BRAIN_PORT = "net.fortytwo.smsn.server.brainPort";
 
+    // the id property also used by ElementIdStrategy
+    public static final String
+            ID = "__id";
+
+    public static final String
+            ATOM = "atom",
+            ATOM_LIST = "list";
+
     // core schema constants
     public static final String
             ALIAS = "alias",

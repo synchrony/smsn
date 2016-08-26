@@ -1,12 +1,5 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
@@ -14,16 +7,19 @@ import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.filtered.FilteredAtomGraph;
 import net.fortytwo.smsn.util.TypedProperties;
-import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.T;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class PGAtomGraph implements AtomGraph {
-    private static final Logger logger = SemanticSynchrony.getLogger(PGAtomGraph.class);
 
     private static final String thingNamespace;
 
@@ -35,68 +31,19 @@ public class PGAtomGraph implements AtomGraph {
         }
     }
 
-    private static IdGraph<KeyIndexableGraph> createIdGraph(final KeyIndexableGraph baseGraph) {
-        IdGraph.IdFactory f = new AtomIdFactory();
-        IdGraph<KeyIndexableGraph> idGraph = new IdGraph<>(baseGraph);
-        idGraph.setVertexIdFactory(f);
-        idGraph.setEdgeIdFactory(f);
-        return idGraph;
-    }
-
-    private final IdGraph<KeyIndexableGraph> propertyGraph;
+    private final GraphWrapper wrapper;
+    private final Graph propertyGraph;
     private final PGAtomGraph thisGraph;
-
-    // full-text search
-    private Index<Vertex> searchIndex;
-    // search on first letters, e.g. "ny" finds "New York", "eob" finds "Extend-o-Brain"
-    private Index<Vertex> acronymIndex;
 
     private long lastUpdate;
 
-    public PGAtomGraph(final KeyIndexableGraph baseGraph) {
-        this.propertyGraph = createIdGraph(baseGraph);
+    public PGAtomGraph(final GraphWrapper wrapper) {
+        this.wrapper = wrapper;
+        this.propertyGraph = wrapper.getGraph();
         thisGraph = this;
-
-        searchIndex = getPropertyGraph().getIndex("search", Vertex.class);
-        if (null == searchIndex) {
-            try {
-                Class.forName("org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer");
-
-                logger.info("creating fulltext search index");
-                searchIndex = getPropertyGraph().createIndex(
-                        "search", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
-            } catch (ClassNotFoundException e) {
-                logger.warning("fulltext search not available");
-            }
-        }
-        acronymIndex = getPropertyGraph().getIndex("acronyms", Vertex.class);
-        if (null == acronymIndex) {
-            try {
-                Class.forName("org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer");
-
-                logger.info("creating 'acronym' index");
-                acronymIndex = getPropertyGraph().createIndex(
-                        "acronyms", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
-            } catch (ClassNotFoundException e) {
-                logger.warning("acronym search not available");
-            }
-        }
-
-        // reverse index of user-defined shortcuts, e.g. "mf" for "my family"
-        // shortcuts are distinct from acronyms, which are defined automatically for all values below a certain length
-        if (!getPropertyGraph().getIndexedKeys(Vertex.class).contains(SemanticSynchrony.SHORTCUT)) {
-            logger.info("creating key index for '" + SemanticSynchrony.SHORTCUT + "' property");
-            getPropertyGraph().createKeyIndex(SemanticSynchrony.SHORTCUT, Vertex.class);
-        }
-
-        // TODO: alias index is never used
-        if (!getPropertyGraph().getIndexedKeys(Vertex.class).contains(SemanticSynchrony.ALIAS)) {
-            logger.info("creating key index for '" + SemanticSynchrony.ALIAS + "' property");
-            getPropertyGraph().createKeyIndex(SemanticSynchrony.ALIAS, Vertex.class);
-        }
     }
 
-    public IdGraph<KeyIndexableGraph> getPropertyGraph() {
+    public Graph getPropertyGraph() {
         return propertyGraph;
     }
 
@@ -120,7 +67,7 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public void commit() {
-        propertyGraph.commit();
+        propertyGraph.tx().commit();
     }
 
     @Override
@@ -133,19 +80,9 @@ public class PGAtomGraph implements AtomGraph {
         this.lastUpdate = System.currentTimeMillis();
     }
 
-    private static class AtomIdFactory implements IdGraph.IdFactory {
-        public String createId() {
-            return SemanticSynchrony.createRandomKey();
-        }
-    }
-
-    public Vertex getVertex(final String key) {
-        return this.getPropertyGraph().getVertex(key);
-    }
-
     @Override
     public Atom getAtom(final String key) {
-        Vertex v = getVertex(key);
+        Vertex v = getVertex(propertyGraph, key);
 
         return null == v ? null : getAtom(v);
     }
@@ -160,7 +97,7 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public AtomList createAtomList(String id) {
-        Vertex vertex = createVertex(id);
+        Vertex vertex = createVertex(id, SemanticSynchrony.ATOM_LIST);
         return new PGAtomListImpl(vertex);
     }
 
@@ -191,7 +128,7 @@ public class PGAtomGraph implements AtomGraph {
     public Atom createAtom(final Filter filter,
                            final String id) {
 
-        Vertex vertex = createVertex(id);
+        Vertex vertex = createVertex(id, SemanticSynchrony.ATOM);
         Atom atom = new PGAtomImpl(vertex);
         atom.setCreated(new Date().getTime());
 
@@ -213,56 +150,32 @@ public class PGAtomGraph implements AtomGraph {
 
         List<Vertex> toRemove = new LinkedList<>();
 
-        for (Vertex v : propertyGraph.getVertices()) {
-            if (null != v.getProperty("value")
-                    && !v.getEdges(Direction.IN).iterator().hasNext()
-                    && !v.getEdges(Direction.OUT).iterator().hasNext()) {
+        propertyGraph.vertices().forEachRemaining(v -> {
+            if (null != v.property("value")
+                    && !v.edges(Direction.IN).hasNext()
+                    && !v.edges(Direction.OUT).hasNext()) {
                 Atom a = getAtom(v);
                 if (filter.isVisible(a)) {
                     toRemove.add(v);
                 }
             }
-        }
+        });
 
         for (Vertex v : toRemove) {
             // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
-            propertyGraph.removeVertex(v);
+            v.remove();
         }
 
         notifyOfUpdate();
     }
 
     @Override
-    public void addAtomToIndices(final Atom atom) {
-        String value = atom.getValue();
+    public void reindexAtom(final Atom atom) {
+        Vertex vertex = ((PGAtom) atom).asVertex();
 
-        if (null != searchIndex) {
-            // TODO: remove existing values
-            searchIndex.put(SemanticSynchrony.VALUE, value, ((PGGraphEntity) atom).asVertex());
-        }
+        updateAcronym((PGAtom) atom, vertex);
 
-        if (null != acronymIndex) {
-            // index only short, name-like values, avoiding free-form text if possible
-            if (value.length() <= 100) {
-                String clean = value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
-                StringBuilder acronym = new StringBuilder();
-                boolean isInside = false;
-                for (byte b : clean.getBytes()) {
-                    // TODO: support international letter characters as such
-                    if (b >= 'a' && b <= 'z') {
-                        if (!isInside) {
-                            acronym.append((char) b);
-                            isInside = true;
-                        }
-                    } else if (' ' == b) {
-                        isInside = false;
-                    }
-                }
-
-                // TODO: remove existing values
-                acronymIndex.put(SemanticSynchrony.ACRONYM, acronym.toString(), ((PGGraphEntity) atom).asVertex());
-            }
-        }
+        wrapper.reindex(vertex);
     }
 
     /**
@@ -271,104 +184,98 @@ public class PGAtomGraph implements AtomGraph {
      */
     @Override
     public Iterable<Atom> getAllAtoms() {
-        return new Iterable<Atom>() {
-            public Iterator<Atom> iterator() {
-                return new Iterator<Atom>() {
-                    private final Iterator<Vertex> iter = getPropertyGraph().getVertices().iterator();
-                    private Atom next = null;
+        return () -> new Iterator<Atom>() {
+            private final Iterator<Vertex> iter = getPropertyGraph().vertices();
+            private Atom next = null;
 
-                    public boolean hasNext() {
-                        if (null == next) {
-                            while (iter.hasNext()) {
-                                Vertex v = iter.next();
+            public boolean hasNext() {
+                if (null == next) {
+                    while (iter.hasNext()) {
+                        Vertex v = iter.next();
 
-                                // Here, a vertex is considered an atom if it has a creation timestamp
-                                if (null != v.getProperty(SemanticSynchrony.CREATED)) {
-                                    next = getAtom(v);
-                                    break;
-                                }
-                            }
-
-                            return null != next;
-                        } else {
-                            return true;
+                        // Here, a vertex is considered an atom if it has a creation timestamp
+                        if (v.property(SemanticSynchrony.CREATED).isPresent()) {
+                            next = getAtom(v);
+                            break;
                         }
                     }
 
-                    public Atom next() {
-                        hasNext();
-                        Atom tmp = next;
-                        next = null;
-                        return tmp;
-                    }
+                    return null != next;
+                } else {
+                    return true;
+                }
+            }
 
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+            public Atom next() {
+                hasNext();
+                Atom tmp = next;
+                next = null;
+                return tmp;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
             }
         };
     }
 
     @Override
-    public List<Atom> getAtomsByFulltextQuery(final String query, final Filter filter) {
-        List<Atom> results = new LinkedList<>();
-
-        if (null != searchIndex) {
-            for (Vertex v : searchIndex.query(SemanticSynchrony.VALUE, query)) {
-                Atom a = getAtom(v);
-
-                if (null == a) {
-                    throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
-                }
-
-                if (filter.isVisible(a)) {
-                    results.add(a);
-                }
-            }
-        }
-
-        return results;
+    public List<Atom> getAtomsByValue(final String value, final Filter filter) {
+        return filterVerticesToAtoms(wrapper.queryByValue(value), filter);
     }
 
     @Override
-    public List<Atom> getAtomsByAcronymQuery(final String query, final Filter filter) {
-        List<Atom> results = new LinkedList<>();
-
-        if (null != acronymIndex) {
-            for (Vertex v : acronymIndex.query(SemanticSynchrony.ACRONYM, query)) {
-                Atom a = getAtom(v);
-
-                if (null == a) {
-                    throw new IllegalStateException("vertex with id " + v.getId() + " is not an atom");
-                }
-
-                if (filter.isVisible(a)) {
-                    results.add(a);
-                }
-            }
-        }
-
-        return results;
+    public List<Atom> getAtomsByAcronym(final String acronym, final Filter filter) {
+        return filterVerticesToAtoms(wrapper.queryByAcronym(acronym), filter);
     }
 
     @Override
-    public List<Atom> getAtomsWithShortcut(final String shortcut, final Filter filter) {
-        List<Atom> results = new LinkedList<>();
+    public List<Atom> getAtomsByShortcut(final String shortcut, final Filter filter) {
+        return filterVerticesToAtoms(wrapper.queryByShortcut(shortcut), filter);
+    }
 
-        for (Vertex v : getPropertyGraph().getVertices(SemanticSynchrony.SHORTCUT, shortcut)) {
-            Atom a = getAtom(v);
-            if (filter.isVisible(a)) {
-                results.add(getAtom(v));
-            }
+    private void updateAcronym(final PGAtom atom, final Vertex asVertex) {
+        String value = atom.getValue();
+        String acronym = valueToAcronym(value);
+
+        VertexProperty<String> previousProperty = asVertex.property(SemanticSynchrony.ACRONYM);
+        if (null != previousProperty) {
+            previousProperty.remove();
         }
 
-        return results;
+        if (null != acronym) {
+            asVertex.property(SemanticSynchrony.ACRONYM, acronym);
+        }
+    }
+
+    private String valueToAcronym(final String value) {
+        // index only short, name-like values, avoiding free-form text if possible
+        if (value.length() <= 100) {
+            String clean = value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
+            StringBuilder acronym = new StringBuilder();
+            boolean isInside = false;
+            for (byte b : clean.getBytes()) {
+                // TODO: support international letter characters as such
+                if (b >= 'a' && b <= 'z') {
+                    if (!isInside) {
+                        acronym.append((char) b);
+                        isInside = true;
+                    }
+                } else if (' ' == b) {
+                    isInside = false;
+                }
+            }
+
+            return acronym.toString();
+        } else {
+            return null;
+        }
     }
 
     public PGAtomGraph copyGraph(final Filter filter) {
         String edgeId;
-        PGAtomGraph newGraph = new PGAtomGraph(new TinkerGraph());
+        GraphWrapper newWrapper = new TinkerGraphWrapper(TinkerGraph.open());
+        PGAtomGraph newGraph = new PGAtomGraph(newWrapper);
 
         for (Atom originalAtom : getAllAtoms()) {
             if (filter.isVisible(originalAtom)) {
@@ -382,6 +289,20 @@ public class PGAtomGraph implements AtomGraph {
         }
 
         return newGraph;
+    }
+
+    private List<Atom> filterVerticesToAtoms(final Iterator<Vertex> vertices, final Filter filter) {
+        List<Atom> results = new LinkedList<>();
+
+        vertices.forEachRemaining(v -> {
+            Atom a = getAtom(v);
+
+            if (filter.isVisible(a)) {
+                results.add(a);
+            }
+        });
+
+        return results;
     }
 
     private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final AtomGraph newGraph) {
@@ -433,11 +354,25 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     private String getOutEdgeId(final PGGraphEntity entity, final String label) {
-        return (String) entity.getExactlyOneEdge(label, Direction.OUT).getId();
+        return (String) entity.getExactlyOneEdge(label, Direction.OUT).id();
     }
 
-    private Vertex createVertex(final String id) {
-        return propertyGraph.addVertex(id);
+    private Vertex getVertex(Graph graph, String id) {
+        // note: requires a key index for efficiency
+        Iterator<Vertex> vertices = graph.traversal().V().has(SemanticSynchrony.ID, id);
+        return vertices.hasNext() ? vertices.next() : null;
+    }
+
+    private Vertex createVertex(final String id, final String label) {
+        Vertex vertex = propertyGraph.addVertex(T.label, label);
+        // TODO: use id strategy
+        vertex.property(SemanticSynchrony.ID, getNonNullId(id));
+
+        return vertex;
+    }
+
+    private String getNonNullId(final String id) {
+        return null == id ? SemanticSynchrony.createRandomKey() : id;
     }
 
     private class PGAtomImpl extends PGAtom {

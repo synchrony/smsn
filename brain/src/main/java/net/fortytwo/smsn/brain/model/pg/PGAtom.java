@@ -1,17 +1,17 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-abstract class PGAtom extends PGGraphEntity implements Atom {
+public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     protected PGAtom(final Vertex vertex) {
         super(vertex);
@@ -19,12 +19,12 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public String getId() {
-        return (String) asVertex().getId();
+        return super.getId();
     }
 
     @Override
     public String getAlias() {
-        return (String) getOptionalProperty(SemanticSynchrony.ALIAS);
+        return getOptionalProperty(SemanticSynchrony.ALIAS);
     }
 
     @Override
@@ -34,7 +34,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Long getCreated() {
-        return (Long) getRequiredProperty(SemanticSynchrony.CREATED);
+        return getRequiredProperty(SemanticSynchrony.CREATED);
     }
 
     @Override
@@ -44,7 +44,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public String getValue() {
-        return (String) getRequiredProperty(SemanticSynchrony.VALUE);
+        return getRequiredProperty(SemanticSynchrony.VALUE);
     }
 
     @Override
@@ -54,7 +54,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Float getPriority() {
-        return (Float) getOptionalProperty(SemanticSynchrony.PRIORITY);
+        return getOptionalProperty(SemanticSynchrony.PRIORITY);
     }
 
     @Override
@@ -64,7 +64,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Float getSharability() {
-        return (Float) getRequiredProperty(SemanticSynchrony.SHARABILITY);
+        return getRequiredProperty(SemanticSynchrony.SHARABILITY);
     }
 
     @Override
@@ -74,7 +74,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public String getShortcut() {
-        return (String) getOptionalProperty(SemanticSynchrony.SHORTCUT);
+        return getOptionalProperty(SemanticSynchrony.SHORTCUT);
     }
 
     @Override
@@ -84,7 +84,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Float getWeight() {
-        return (Float) getRequiredProperty(SemanticSynchrony.WEIGHT);
+        return getRequiredProperty(SemanticSynchrony.WEIGHT);
     }
 
     @Override
@@ -169,7 +169,7 @@ abstract class PGAtom extends PGGraphEntity implements Atom {
     }
 
     private void deleteListNode(final AtomList l) {
-        getPropertyGraph().removeVertex(((PGGraphEntity) l).asVertex());
+        ((PGGraphEntity) l).asVertex().remove();
     }
 
     private boolean removeNotes() {

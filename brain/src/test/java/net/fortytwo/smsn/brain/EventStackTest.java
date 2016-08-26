@@ -1,9 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.junit.After;
@@ -121,23 +117,5 @@ public class EventStackTest {
 
         NoteWriter w = new NoteWriter();
         w.toWikiText(eventStack.getEvents(), System.out);
-    }
-
-    private long countAtoms(final AtomGraph bg) {
-        long count = 0;
-        for (Atom a : bg.getAllAtoms()) {
-            count++;
-        }
-
-        return count;
-    }
-
-    private long countVertices(final Graph g) {
-        long count = 0;
-        for (Vertex v : g.getVertices()) {
-            count++;
-        }
-
-        return count;
     }
 }
