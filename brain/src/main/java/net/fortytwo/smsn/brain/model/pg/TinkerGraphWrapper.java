@@ -33,6 +33,21 @@ public class TinkerGraphWrapper extends GraphWrapper {
     }
 
     @Override
+    public boolean isTransactional() {
+        return false;
+    }
+
+    @Override
+    public void commit() {
+        // do nothing
+    }
+
+    @Override
+    public void rollback() {
+        // do nothing
+    }
+
+    @Override
     public void shutdown() {
         // do nothing
     }

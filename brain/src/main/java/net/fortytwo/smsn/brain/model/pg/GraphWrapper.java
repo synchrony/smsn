@@ -30,6 +30,12 @@ public abstract class GraphWrapper {
 
     protected abstract void updateIndex(Vertex updatedVertex, String key, Object value);
 
+    public abstract boolean isTransactional();
+
+    public abstract void commit();
+
+    public abstract void rollback();
+
     public abstract void shutdown();
 
     public void reindex(final Vertex vertex) {

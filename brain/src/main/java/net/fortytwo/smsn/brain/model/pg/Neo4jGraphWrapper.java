@@ -49,6 +49,21 @@ public class Neo4jGraphWrapper extends GraphWrapper {
     }
 
     @Override
+    public boolean isTransactional() {
+        return true;
+    }
+
+    @Override
+    public void commit() {
+        getNeo4jGraph().getBaseGraph().tx().success();
+    }
+
+    @Override
+    public void rollback() {
+        getNeo4jGraph().getBaseGraph().tx().failure();
+    }
+
+    @Override
     protected void createFullTextIndex(final String key) {
         createIndex(key, IndexManager.PROVIDER, "lucene", "type", "fulltext");
     }
@@ -92,8 +107,6 @@ public class Neo4jGraphWrapper extends GraphWrapper {
 
     @Override
     protected Iterator<Vertex> queryByKeyValue(String key, String value) {
-        System.out.println("query (" + key + "," + value + ")");
-
         Index<Node> index = getIndex(key);
         IndexHits<Node> hits = index.query(key, value);
 
@@ -139,7 +152,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
 
     private static Graph createGraph(final File dataDir) {
         if (!dataDir.exists()) {
-            createGraphDatabaseService(dataDir);
+            createAndShutdownGraphDatabaseService(dataDir);
         }
 
         return Neo4jGraph.open(dataDir.getAbsolutePath());
@@ -150,7 +163,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         return getGraphDatabaseService().index().forNodes(indexName);
     }
 
-    private static void createGraphDatabaseService(File dataDir) {
+    private static void createAndShutdownGraphDatabaseService(File dataDir) {
         GraphDatabaseService graphDb = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(dataDir)
                 .setConfig(GraphDatabaseSettings.node_keys_indexable,

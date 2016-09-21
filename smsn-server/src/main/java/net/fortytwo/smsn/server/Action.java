@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.server;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteHistory;
@@ -11,12 +9,14 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import net.fortytwo.smsn.server.error.AuthorizationException;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,21 +41,21 @@ public abstract class Action {
 
     protected abstract boolean doesWrite();
 
-    private static final Map<KeyIndexableGraph, Brain> brains = new HashMap<>();
+    private static final Map<Graph, Brain> brains = new HashMap<>();
 
     private static final NoteHistory noteHistory = new NoteHistory();
 
-    private synchronized static Brain getBrain(final KeyIndexableGraph baseGraph)
+    private synchronized static Brain getBrain(final GraphWrapper wrapper)
             throws Brain.BrainException {
 
-        Brain b = brains.get(baseGraph);
+        Brain b = brains.get(wrapper.getGraph());
 
         if (null == b) {
-            logger.info("instantiating Extend-o-Brain with base graph " + baseGraph);
-            AtomGraph bg = new PGAtomGraph(baseGraph);
+            logger.info("instantiating Extend-o-Brain with base graph " + wrapper.getGraph());
+            AtomGraph bg = new PGAtomGraph(wrapper);
             b = new Brain(bg);
             b.startBackgroundTasks();
-            brains.put(baseGraph, b);
+            brains.put(wrapper.getGraph(), b);
         }
 
         return b;
@@ -65,14 +65,6 @@ public abstract class Action {
 
     public void parseRequest(final String request, final RequestParams p) throws JSONException, BadRequestException {
         parseRequest(new JSONObject(request), p);
-    }
-
-    public static RequestParams createParams(final KeyIndexableGraph graph) {
-        RequestParams p = new RequestParams();
-        p.baseGraph = graph;
-        p.user = () -> "none";
-
-        return p;
     }
 
     private void checkAuthorized(final RequestParams p) throws AuthorizationException {
@@ -107,7 +99,7 @@ public abstract class Action {
         }
 
         try {
-            p.brain = getBrain(p.baseGraph);
+            p.brain = getBrain(p.graphWrapper);
         } catch (Brain.BrainException e) {
             throw new RequestProcessingException(e);
         }
@@ -160,7 +152,7 @@ public abstract class Action {
         }
 
         // Force manual transaction mode (provided that the graph is transactional)
-        boolean manual = doesWrite() && p.baseGraph instanceof TransactionalGraph;
+        boolean manual = doesWrite() && p.graphWrapper.isTransactional();
 
         boolean normal = false;
 
@@ -177,13 +169,12 @@ public abstract class Action {
         } finally {
             if (doesWrite()) {
                 if (manual) {
-                    if (!normal) {
+                    if (normal) {
+                        p.graphWrapper.commit();
+                    } else {
                         SemanticSynchrony.logWarning("rolling back transaction");
+                        p.graphWrapper.rollback();
                     }
-
-                    ((TransactionalGraph) p.baseGraph).stopTransaction(normal
-                            ? TransactionalGraph.Conclusion.SUCCESS
-                            : TransactionalGraph.Conclusion.FAILURE);
                 } else if (!normal) {
                     SemanticSynchrony.logWarning(
                             "failed update of non-transactional graph. Inconsistent data is possible.");
@@ -234,7 +225,7 @@ public abstract class Action {
     }
 
     public static class RequestParams {
-        public KeyIndexableGraph baseGraph;
+        public GraphWrapper graphWrapper;
         public Brain brain;
         public String data;
         public Integer height;

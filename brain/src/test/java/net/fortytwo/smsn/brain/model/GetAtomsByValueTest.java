@@ -31,6 +31,18 @@ public class GetAtomsByValueTest extends AtomGraphTest {
     }
 
     @Test
+    public void subsetOfWordsMatchingSucceeds() throws Exception {
+        result = atomGraph.getAtomsByValue("Arthur Beeblebrox", filter);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void outOfOrderWordsSucceeds() throws Exception {
+        result = atomGraph.getAtomsByValue("Dent Arthur", filter);
+        assertEquals(1, result.size());
+    }
+
+    @Test
     public void partialValueSucceeds() throws Exception {
         result = atomGraph.getAtomsByValue("Arthur", filter);
         assertEquals(1, result.size());

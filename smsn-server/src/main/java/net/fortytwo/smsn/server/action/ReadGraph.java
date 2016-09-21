@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.server.action;
 
-import com.tinkerpop.blueprints.Graph;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.Request;
@@ -8,6 +7,7 @@ import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,7 +85,7 @@ public class ReadGraph extends Action {
         Format format = Format.getFormat(p.format);
         BrainReader reader = Format.getReader(format);
 
-        beginImport(p.baseGraph, p.file);
+        beginImport(p.graphWrapper.getGraph(), p.file);
 
         boolean success = false;
         try {
@@ -94,7 +94,7 @@ public class ReadGraph extends Action {
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         } finally {
-            finishImport(p.baseGraph, p.file, success);
+            finishImport(p.graphWrapper.getGraph(), p.file, success);
         }
     }
 

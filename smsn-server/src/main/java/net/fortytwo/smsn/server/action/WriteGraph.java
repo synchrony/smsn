@@ -28,7 +28,7 @@ public class WriteGraph extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        ExportRequest r = new ExportRequest(request, p.user);
+        WriteGraphRequest r = new WriteGraphRequest(request, p.user);
 
         p.filter = r.getFilter();
         p.file = r.file;
@@ -70,15 +70,15 @@ public class WriteGraph extends Action {
         return false;
     }
 
-    private class ExportRequest extends FilteredResultsRequest {
+    private class WriteGraphRequest extends FilteredResultsRequest {
         private final String format;
         private final String file;
 
         private final String rootId;
         private final int height;
 
-        public ExportRequest(final JSONObject json,
-                             final Principal user) throws JSONException {
+        public WriteGraphRequest(final JSONObject json,
+                                 final Principal user) throws JSONException {
             super(json, user);
 
             format = this.json.getString(Params.FORMAT);

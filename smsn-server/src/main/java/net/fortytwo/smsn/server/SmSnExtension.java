@@ -1,51 +1,34 @@
 package net.fortytwo.smsn.server;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.rexster.extension.AbstractRexsterExtension;
-import com.tinkerpop.rexster.extension.ExtensionDefinition;
-import com.tinkerpop.rexster.extension.ExtensionNaming;
-import com.tinkerpop.rexster.extension.ExtensionPoint;
-import com.tinkerpop.rexster.extension.ExtensionRequestParameter;
-import com.tinkerpop.rexster.extension.ExtensionResponse;
-import com.tinkerpop.rexster.extension.HttpMethod;
-import com.tinkerpop.rexster.extension.RexsterContext;
-import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.error.InvalidGraphException;
-import net.fortytwo.smsn.brain.error.InvalidUpdateException;
-import net.fortytwo.smsn.server.error.AuthorizationException;
-import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.action.BroadcastRDF;
+import net.fortytwo.smsn.server.action.EvaluateRippleQuery;
+import net.fortytwo.smsn.server.action.EvaluateTextSearch;
 import net.fortytwo.smsn.server.action.FindDuplicates;
-import net.fortytwo.smsn.server.action.WriteGraph;
 import net.fortytwo.smsn.server.action.FindIsolatedAtoms;
 import net.fortytwo.smsn.server.action.FindRoots;
 import net.fortytwo.smsn.server.action.GetEvents;
 import net.fortytwo.smsn.server.action.GetHistory;
-import net.fortytwo.smsn.server.action.ReadGraph;
-import net.fortytwo.smsn.server.action.InferTypes;
 import net.fortytwo.smsn.server.action.GetPriorities;
+import net.fortytwo.smsn.server.action.GetView;
+import net.fortytwo.smsn.server.action.InferTypes;
 import net.fortytwo.smsn.server.action.PushEvent;
+import net.fortytwo.smsn.server.action.ReadGraph;
 import net.fortytwo.smsn.server.action.RemoveIsolatedAtoms;
-import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.action.EvaluateRippleQuery;
-import net.fortytwo.smsn.server.action.EvaluateTextSearch;
 import net.fortytwo.smsn.server.action.SetProperties;
 import net.fortytwo.smsn.server.action.UpdateView;
-import net.fortytwo.smsn.server.action.GetView;
+import net.fortytwo.smsn.server.action.WriteGraph;
 import net.fortytwo.smsn.util.TypedProperties;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.tinkerpop.gremlin.groovy.plugin.AbstractGremlinPlugin;
+import org.apache.tinkerpop.gremlin.groovy.plugin.IllegalEnvironmentException;
+import org.apache.tinkerpop.gremlin.groovy.plugin.PluginAcceptor;
+import org.apache.tinkerpop.gremlin.groovy.plugin.PluginInitializationException;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@ExtensionNaming(namespace = "smsn", name = "brain")
-public class SmSnExtension extends AbstractRexsterExtension {
+public class SmSnExtension extends AbstractGremlinPlugin {
     protected static final Logger logger = Logger.getLogger(SmSnExtension.class.getName());
 
     private final Map<String, Action> extensionsByName;
@@ -73,10 +56,16 @@ public class SmSnExtension extends AbstractRexsterExtension {
         add(new GetView());
     }
 
+    @Override
+    public void afterPluginTo(PluginAcceptor pluginAcceptor) throws IllegalEnvironmentException, PluginInitializationException {
+        // nothing to do?
+    }
+
     private void add(Action extension) {
         extensionsByName.put(extension.getName(), extension);
     }
 
+    /*
     @ExtensionDefinition(extensionPoint = ExtensionPoint.GRAPH, method = HttpMethod.POST)
     public ExtensionResponse handleRequest(@RexsterContext Graph graph,
                                            @ExtensionRequestParameter(name = Params.REQUEST,
@@ -137,5 +126,11 @@ public class SmSnExtension extends AbstractRexsterExtension {
         }
 
         return ExtensionResponse.ok(p.map);
+    }
+    */
+
+    @Override
+    public String getName() {
+        return "smsn";
     }
 }
