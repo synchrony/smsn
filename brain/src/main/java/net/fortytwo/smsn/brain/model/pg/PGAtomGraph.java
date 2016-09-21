@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 public class PGAtomGraph implements AtomGraph {
     private static final Logger logger = SemanticSynchrony.getLogger(PGAtomGraph.class);
 
+    private static final String REDACTED_VALUE = "";
+
     private static final String thingNamespace;
 
     static {
@@ -398,6 +400,8 @@ public class PGAtomGraph implements AtomGraph {
             newAtom.setPriority(original.getPriority());
             newAtom.setAlias(original.getAlias());
             newAtom.setCreated(original.getCreated());
+        } else {
+            newAtom.setValue(REDACTED_VALUE);
         }
 
         return newAtom;
