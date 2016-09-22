@@ -127,7 +127,8 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public AtomGraph createFilteredGraph(Filter filter) {
-        return new FilteredAtomGraph(this, filter);
+        //return new FilteredAtomGraph(this, filter);
+        return copyGraph(filter);
     }
 
     @Override
@@ -391,12 +392,12 @@ public class PGAtomGraph implements AtomGraph {
         if (null != newAtom) return newAtom;
 
         newAtom = (PGAtom) newGraph.createAtom(filter, original.getId());
+        newAtom.setSharability(original.getSharability());
 
         if (filter.isVisible(original)) {
             newAtom.setValue(original.getValue());
             newAtom.setWeight(original.getWeight());
             newAtom.setShortcut(original.getShortcut());
-            newAtom.setSharability(original.getSharability());
             newAtom.setPriority(original.getPriority());
             newAtom.setAlias(original.getAlias());
             newAtom.setCreated(original.getCreated());
@@ -414,11 +415,8 @@ public class PGAtomGraph implements AtomGraph {
         while (null != originalCur) {
             newCur = (PGAtomList) newGraph.createAtomList(originalCur.getId());
             edgeId = getOutEdgeId(originalCur, SemanticSynchrony.FIRST);
-            Atom originalFirst = original.getFirst();
-            PGAtom newAtom = (PGAtom) newGraph.getAtom(originalFirst.getId());
-            if (null == newAtom) {
-                newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
-            }
+            Atom originalFirst = originalCur.getFirst();
+            PGAtom newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
             newCur.setFirst(newAtom, edgeId);
 
             if (null == newPrev) {

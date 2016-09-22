@@ -8,10 +8,8 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteParser;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -23,21 +21,12 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class NoteQueriesTest {
-    private AtomGraph atomGraph;
-    private NoteParser parser;
-    private final NoteWriter writer = new NoteWriter();
-    private NoteQueries queries;
-    private Filter filter;
+public class NoteQueriesTest extends BrainTestBase {
 
-    @Before
-    public void setUp() throws Exception {
+    @Override
+    protected AtomGraph createAtomGraph() {
         TinkerGraph g = new TinkerGraph();
-        parser = new NoteParser();
-        atomGraph = new PGAtomGraph(g);
-        Brain brain = new Brain(atomGraph);
-        queries = new NoteQueries(brain);
-        filter = new Filter();
+        return new PGAtomGraph(g);
     }
 
     @Test

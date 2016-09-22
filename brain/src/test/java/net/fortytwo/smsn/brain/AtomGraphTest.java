@@ -5,22 +5,27 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.wiki.NoteParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class AtomGraphTest {
+public class AtomGraphTest extends BrainTestBase {
     private Neo4jGraph graph;
-    private AtomGraph atomGraph;
 
-    @Before
-    public void setUp() throws Exception {
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
         File dir = File.createTempFile("smsn", "test");
         dir.delete();
         dir.mkdir();
@@ -28,7 +33,7 @@ public class AtomGraphTest {
 
         graph = new Neo4jGraph(dir.getPath());
 
-        atomGraph = new PGAtomGraph(graph);
+        return new PGAtomGraph(graph);
     }
 
     @After
@@ -144,5 +149,49 @@ public class AtomGraphTest {
         result = atomGraph.getAtomsByAcronymQuery("AP*", f);
         assertEquals(1, result.size());
         assertEquals(a.getId(), result.iterator().next().getId());
+    }
+
+    @Test
+    public void testFilteredCopy() throws Exception {
+        assertEquals(0, countAtoms(atomGraph));
+
+        // unfiltered
+        Atom root = importExample("wiki-example-4.txt");
+        root.setValue("William James");
+        assertEquals(0.5, root.getSharability(), 0);
+        assertEquals(23, countAtoms(atomGraph));
+        assertEquals(7, root.getNotes().toJavaList().size());
+        assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getValue());
+        assertEquals("William James's depression", root.getNotes().toJavaList().get(3).getValue());
+        assertEquals(0.75, root.getNotes().toJavaList().get(0).getSharability(), 0);
+        assertEquals(0.25, root.getNotes().toJavaList().get(3).getSharability(), 0);
+        assertEquals(3, root.getNotes().toJavaList().get(0).getNotes().toJavaList().size());
+        assertEquals(2, root.getNotes().toJavaList().get(3).getNotes().toJavaList().size());
+
+        // filtered
+        Filter publicFilter = new Filter(0f, 1f, 0.5f, 0.25f, 1f, 0.5f);
+        assertTrue(publicFilter.isVisible(root));
+        AtomGraph filteredGraph = atomGraph.createFilteredGraph(publicFilter);
+        assertEquals(22, countAtoms(filteredGraph));
+        root = filteredGraph.getAtom(root.getId());
+        assertNotNull(root);
+        assertEquals(0.5, root.getSharability(), 0);
+        assertEquals("William James", root.getValue());
+
+        assertEquals(7, root.getNotes().toJavaList().size());
+        assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getValue());
+        assertEquals("", root.getNotes().toJavaList().get(3).getValue());
+        assertEquals(0.75, root.getNotes().toJavaList().get(0).getSharability(), 0);
+        assertEquals(0.25, root.getNotes().toJavaList().get(3).getSharability(), 0);
+        assertEquals(3, root.getNotes().toJavaList().get(0).getNotes().toJavaList().size());
+        assertNull(root.getNotes().toJavaList().get(3).getNotes());
+    }
+
+    private int countAtoms(final AtomGraph atomGraph) {
+        int count = 0;
+        for (Atom a : atomGraph.getAllAtoms()) {
+            count++;
+        }
+        return count;
     }
 }
