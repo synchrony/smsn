@@ -5,14 +5,14 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.junit.Before;
 
 import java.io.IOException;
 
 public abstract class BrainTestBase {
-    protected final NoteParser parser = new NoteParser();
+    protected final NoteReader parser = new NoteReader();
     protected final NoteWriter writer = new NoteWriter();
 
     protected NoteQueries queries;
@@ -29,11 +29,11 @@ public abstract class BrainTestBase {
         filter = new Filter();
     }
 
-    protected Atom importExample(final String exampleFile) throws IOException, NoteParser.NoteParsingException {
+    protected Atom importExample(final String exampleFile) throws IOException, NoteReader.NoteParsingException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = parser.fromWikiText(NoteParser.class.getResourceAsStream(exampleFile));
+        Note rootNote = parser.fromWikiText(NoteReader.class.getResourceAsStream(exampleFile));
         rootNote.setId(SemanticSynchrony.createRandomKey());
         Atom root = atomGraph.createAtom(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);

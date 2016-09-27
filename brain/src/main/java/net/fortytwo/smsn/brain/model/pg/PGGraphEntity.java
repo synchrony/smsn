@@ -144,7 +144,7 @@ abstract class PGGraphEntity {
         Edge other = getAtMostOneEdge(label, direction);
         if (null == other) {
             throw new InvalidGraphException("atom vertex " + getId()
-                    + "is missing '" + label + "' " + direction + " edge");
+                    + " is missing '" + label + "' " + direction + " edge");
         }
         return other;
     }

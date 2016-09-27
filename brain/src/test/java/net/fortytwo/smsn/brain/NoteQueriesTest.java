@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -420,7 +420,7 @@ public class NoteQueriesTest extends BrainTestBase {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = parser.fromWikiText(NoteParser.class.getResourceAsStream("wiki-example-3.txt"));
+        Note rootNote = parser.fromWikiText(NoteReader.class.getResourceAsStream("wiki-example-3.txt"));
         Atom root = createAtom("0000000");
         root.setValue("root");
         root.setSharability(1.0f);

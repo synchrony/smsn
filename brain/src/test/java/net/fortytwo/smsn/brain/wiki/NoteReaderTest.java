@@ -13,12 +13,12 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 
-public class NoteParserTest {
-    private NoteParser parser;
+public class NoteReaderTest {
+    private NoteReader parser;
 
     @Before
     public void setUp() throws Exception {
-        parser = new NoteParser();
+        parser = new NoteReader();
     }
 
     @Test
@@ -80,7 +80,7 @@ public class NoteParserTest {
         assertEquals(3, notes.size());
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testEmptyValuesNotAllowedForNewNotes() throws Exception {
         readNotes("* ");
     }
@@ -95,22 +95,22 @@ public class NoteParserTest {
         readNotes("@alias ");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testEmptyPriorityAttributeNotAllowed() throws Exception {
         readNotes("@priority ");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testEmptySharabilityAttributeNotAllowed() throws Exception {
         readNotes("@sharability ");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testEmptyWeightAttributeNotAllowed() throws Exception {
         readNotes("@weight ");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testLineTruncationSequenceNotAllowed() throws Exception {
         readNotes("" +
                 "* this is a note whose value was truncated for readability [...]\n" +
@@ -167,7 +167,7 @@ public class NoteParserTest {
         assertEquals("0001", notes.get(0).getId());
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testTextAfterVerbatimBlockStartIsInvalid() throws Exception {
         readNotes("* {{{ this is not OK\n" +
                 "because the value must be on separate lines from the verbatim block delimiters\n" +
@@ -179,14 +179,14 @@ public class NoteParserTest {
         readNotes("* this is OK, because it is not actually a {{{ verbatim block }}}");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testTextBeforeVerbatimBlockEndIsInvalid() throws Exception {
         readNotes("* {{{\n" +
                 "this is not OK, because the value must be on separate lines" +
                 "from the verbatim block delimiters}}}");
     }
 
-    @Test(expected = NoteParser.NoteParsingException.class)
+    @Test(expected = NoteReader.NoteParsingException.class)
     public void testTextAfterVerbatimBlockEndIsInvalid() throws Exception {
         readNotes("* {{{" +
                 "this is not OK, because the value must be completely\n" +
@@ -194,7 +194,7 @@ public class NoteParserTest {
                 "}}} with no content outside");
     }
 
-    private List<Note> readNotes(final String s) throws IOException, NoteParser.NoteParsingException {
+    private List<Note> readNotes(final String s) throws IOException, NoteReader.NoteParsingException {
         try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
             return parser.fromWikiText(in).getChildren();
         }

@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
@@ -46,7 +46,7 @@ public class UpdateView extends Action {
                 try (InputStream in = new ByteArrayInputStream(p.wikiView.getBytes())) {
                     rootNote = p.parser.fromWikiText(in);
                 }
-            } catch (IOException | NoteParser.NoteParsingException e) {
+            } catch (IOException | NoteReader.NoteParsingException e) {
                 throw new RequestProcessingException(e);
             }
         } else if (null != p.jsonView) {

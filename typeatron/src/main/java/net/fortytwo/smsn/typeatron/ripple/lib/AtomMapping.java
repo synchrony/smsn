@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
@@ -31,7 +31,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
 
     protected Note toNote(Object o, int height, boolean sync) throws RippleException {
         if (o instanceof String) {
-            if (NoteParser.ID.matcher((String) o).matches()) {
+            if (NoteReader.ID.matcher((String) o).matches()) {
                 Note n = new Note();
                 n.setId((String) o);
                 o = n;

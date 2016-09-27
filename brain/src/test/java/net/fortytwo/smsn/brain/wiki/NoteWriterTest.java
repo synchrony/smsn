@@ -13,12 +13,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class NoteWriterTest {
-    private NoteParser parser;
+    private NoteReader parser;
     private NoteWriter writer;
 
     @Before
     public void setUp() {
-        parser = new NoteParser();
+        parser = new NoteReader();
         writer = new NoteWriter();
     }
 

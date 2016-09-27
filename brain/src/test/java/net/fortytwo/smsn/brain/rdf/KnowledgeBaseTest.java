@@ -28,7 +28,7 @@ import net.fortytwo.smsn.brain.rdf.classes.WebPage;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.junit.Ignore;
@@ -328,7 +328,7 @@ public class KnowledgeBaseTest {
         AtomGraph atomGraph = new PGAtomGraph(g);
         Brain brain = new Brain(atomGraph);
         KnowledgeBase kb = new KnowledgeBase(atomGraph);
-        NoteParser parser = new NoteParser();
+        NoteReader parser = new NoteReader();
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
         Atom root = atomGraph.createAtom(filter, SemanticSynchrony.createRandomKey());

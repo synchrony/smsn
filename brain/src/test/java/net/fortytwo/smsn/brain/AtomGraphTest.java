@@ -5,11 +5,8 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;

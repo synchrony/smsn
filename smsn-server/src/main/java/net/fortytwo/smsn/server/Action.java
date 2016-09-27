@@ -12,7 +12,7 @@ import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import net.fortytwo.smsn.server.error.AuthorizationException;
 import net.fortytwo.smsn.server.error.BadRequestException;
@@ -112,7 +112,7 @@ public abstract class Action {
             throw new RequestProcessingException(e);
         }
         p.queries = new NoteQueries(p.brain);
-        p.parser = new NoteParser();
+        p.parser = new NoteReader();
         p.writer = new NoteWriter();
 
         if (null != p.height) {
@@ -245,7 +245,7 @@ public abstract class Action {
         public JSONObject jsonView;
         public Map<String, Object> map;
         public Integer maxResults;
-        public NoteParser parser;
+        public NoteReader parser;
         public String propertyName;
         public Object propertyValue;
         public NoteQueries queries;
