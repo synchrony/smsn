@@ -26,7 +26,7 @@ import net.fortytwo.smsn.brain.rdf.classes.WebPage;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.junit.Ignore;
@@ -54,6 +54,7 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
@@ -68,7 +69,11 @@ import static org.junit.Assert.fail;
 
 public class KnowledgeBaseTest extends BrainTestBase {
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
-    
+
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
+        return createNeo4jAtomGraph();
+    }
     @Test
     public void testAKASyntax() throws Exception {
         AtomClass t = AKAReference.class.newInstance();
@@ -325,7 +330,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
         AtomGraph atomGraph = createTinkerAtomGraph();
         Brain brain = new Brain(atomGraph);
         KnowledgeBase kb = new KnowledgeBase(atomGraph);
-        NoteParser parser = new NoteParser();
+        NoteReader parser = new NoteReader();
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
         Atom root = atomGraph.createAtom(filter, SemanticSynchrony.createRandomKey());

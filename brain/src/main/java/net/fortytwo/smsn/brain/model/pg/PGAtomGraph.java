@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.filtered.FilteredAtomGraph;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -20,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PGAtomGraph implements AtomGraph {
+
+    private static final String REDACTED_VALUE = "";
 
     private static final String thingNamespace;
 
@@ -72,7 +73,8 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public AtomGraph createFilteredGraph(Filter filter) {
-        return new FilteredAtomGraph(this, filter);
+        //return new FilteredAtomGraph(this, filter);
+        return copyGraph(filter);
     }
 
     @Override
@@ -273,7 +275,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     public PGAtomGraph copyGraph(final Filter filter) {
-        String edgeId;
+        Object edgeId;
         GraphWrapper newWrapper = new TinkerGraphWrapper(TinkerGraph.open());
         PGAtomGraph newGraph = new PGAtomGraph(newWrapper);
 
@@ -310,32 +312,31 @@ public class PGAtomGraph implements AtomGraph {
         if (null != newAtom) return newAtom;
 
         newAtom = (PGAtom) newGraph.createAtom(filter, original.getId());
+        newAtom.setSharability(original.getSharability());
 
         if (filter.isVisible(original)) {
             newAtom.setValue(original.getValue());
             newAtom.setWeight(original.getWeight());
             newAtom.setShortcut(original.getShortcut());
-            newAtom.setSharability(original.getSharability());
             newAtom.setPriority(original.getPriority());
             newAtom.setAlias(original.getAlias());
             newAtom.setCreated(original.getCreated());
+        } else {
+            newAtom.setValue(REDACTED_VALUE);
         }
 
         return newAtom;
     }
 
     private AtomList copyAtomList(final PGAtomList original, final Filter filter, final PGAtomGraph newGraph) {
-        String edgeId;
+        Object edgeId;
         PGAtomList originalCur = original, originalPrev = null;
         PGAtomList newHead = null, newCur, newPrev = null;
         while (null != originalCur) {
             newCur = (PGAtomList) newGraph.createAtomList(originalCur.getId());
             edgeId = getOutEdgeId(originalCur, SemanticSynchrony.FIRST);
-            Atom originalFirst = original.getFirst();
-            PGAtom newAtom = (PGAtom) newGraph.getAtom(originalFirst.getId());
-            if (null == newAtom) {
-                newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
-            }
+            Atom originalFirst = originalCur.getFirst();
+            PGAtom newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
             newCur.setFirst(newAtom, edgeId);
 
             if (null == newPrev) {
@@ -353,8 +354,9 @@ public class PGAtomGraph implements AtomGraph {
         return newHead;
     }
 
-    private String getOutEdgeId(final PGGraphEntity entity, final String label) {
-        return (String) entity.getExactlyOneEdge(label, Direction.OUT).id();
+    private Object getOutEdgeId(final PGGraphEntity entity, final String label) {
+        Object id = entity.getExactlyOneEdge(label, Direction.OUT).id();
+        return id;
     }
 
     private Vertex getVertex(Graph graph, String id) {

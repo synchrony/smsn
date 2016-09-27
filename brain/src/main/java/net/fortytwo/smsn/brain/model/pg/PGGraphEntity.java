@@ -43,7 +43,7 @@ abstract class PGGraphEntity {
         return vertex;
     }
 
-    protected void addOutEdge(final String id, final Vertex inVertex, final String label) {
+    protected void addOutEdge(final Object id, final Vertex inVertex, final String label) {
         // TODO: control the id of the edge
         asVertex().addEdge(label, inVertex);
     }
@@ -153,7 +153,7 @@ abstract class PGGraphEntity {
         Edge other = getAtMostOneEdge(label, direction);
         if (null == other) {
             throw new InvalidGraphException("atom vertex " + getId()
-                    + "is missing '" + label + "' " + direction + " edge");
+                    + " is missing '" + label + "' " + direction + " edge");
         }
         return other;
     }

@@ -1,31 +1,32 @@
 package net.fortytwo.smsn.brain.io.freeplane;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.graphml.GraphMLFormat;
 import net.fortytwo.smsn.brain.io.graphml.GraphMLWriter;
+import net.fortytwo.smsn.brain.model.AtomGraph;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import static org.junit.Assert.assertNotNull;
 
-public class FreeplaneReaderIT {
+public class FreeplaneReaderIT extends BrainTestBase {
     private final File mindMapDirectory = new File("/Users/josh/projects/notmine/mindmaps");
+
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
+        return createTinkerAtomGraph();
+    }
 
     @Test
     public void testTmp() throws Exception {
-        KeyIndexableGraph propertyGraph = new TinkerGraph();
-        AtomGraph atomGraph = new PGAtomGraph(propertyGraph);
         Brain brain = new Brain(atomGraph);
 
         Format format = Format.getFormat("fReePLAne");
@@ -46,13 +47,5 @@ public class FreeplaneReaderIT {
             context.setFormat(GraphMLFormat.getInstance());
             exporter.doExport(context);
         }
-    }
-
-    private int countAtoms(final AtomGraph atomGraph) {
-        int count = 0;
-        for (Atom ignored : atomGraph.getAllAtoms()) {
-            count++;
-        }
-        return count;
     }
 }

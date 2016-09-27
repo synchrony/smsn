@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NoteParser {
+public class NoteReader {
 
     // regex of valid id suffixes
     public static final Pattern ID = Pattern.compile("[a-zA-Z0-9-_]+");

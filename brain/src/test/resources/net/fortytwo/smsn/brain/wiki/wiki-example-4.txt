@@ -1,0 +1,76 @@
++ :-JfS2lc: some works by William James
+    @sharability 0.75
+    @weight      0.5
+    + :1btqdeO: The Principles of Psychology
+        @sharability 1
+        @weight      1
+        @alias       http://dbpedia.org/resource/The_Principles_of_Psychology
+    + :fBr8aRi: Essays in Radical Empiricism
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/Essays_in_Radical_Empiricism
+    + :5BrTnnb: The Varieties of Religious Experience
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/The_Varieties_of_Religious_Experience
++ :F2IiM-A: William James's family
+    @sharability 0.75
+    @weight      0.5
+    + :V8AOxEV: Henry James, Sr.
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/Henry_James,_Sr.
+    + :7uMtO21: Henry James
+        @sharability 1
+        @weight      0.75
+        @alias       http://dbpedia.org/resource/Henry_James
++ :Guz5RNC: the education of William and Henry James
+    @sharability 0.75
+    @weight      0.5
+    · :n3s0h_y: after an initial period of education by female tutors, the James boys' father sent them to a series of establishments in England, France, Switzerland, and Germany that "endeavored to teach them foreign languages, introduce them to arithmetic, and generally uncover their young talents"
+        @sharability 0.75
+        @weight      0.5
+    + :Jvj2yWW: "There could not be a more entertaining treat than dinner at the James house, when all the young people  were at home.  They were full of stories of the oddest kind, and discussed quiestions of morals or taste or literature with a vociferous vigor so great as sometimes to lead the young men to leave their seats and gesticulate on the floor.  I remember, in some of these heated discussions, it was not unusual for the sons to invoke humorous curses on their parent, one of which was, that "his mashed potatoes might always have lumps in them!"
+        @sharability 0.75
+        @weight      0.5
++ :2xMo3jU: William James's depression
+    @sharability 0.25
+    @weight      0.5
+    · :MDfAk2p: he suffered periods of depression during which he contemplated suicide for months on end
+        @sharability 0.25
+        @weight      0.5
+    + :5ObqhxT: depression (mood)
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/Depression_(mood)
++ :P0JsA0R: Natural Selection in the Brain
+    @sharability 0.75
+    @weight      0.5
+    · :Ez1ezKN: this is a section heading in an article from the October 1994 issue of Scientific American which I so vividly remember reading when I was a teenager.  I have just now (2015-01-02) found an online copy of the article, but it has stuck with me all these years.  The illustration, not in the online copy, shows a man deciding between an apple and a banana while correspondingly colored hexagons in a honeycomb like pattern above his head compete for a majority decision.  I referred to this article several years later in one of my journals, thinking that it had been written by one William James, but corrected myself; William H. Calvin had written the article, giving credit to James's ideas.
+        @sharability 0.5
+        @weight      0.5
+    · :sWgdmeq: William H. Calvin, "The Emergence of Intelligence," Scientific American Presents (November 1998) (web page)
+        @sharability 0.75
+        @weight      0.5
+        @alias       http://www.williamcalvin.com/1990s/1998SciAmer.htm
++ :VLd2wvL: stream of consciousness (psychology)
+    @sharability 1
+    @weight      0.5
+    @alias       http://dbpedia.org/resource/Stream_of_consciousness_(psychology)
+    · :EqZXkkL: the flow of thoughts in the conscious mind
+        @sharability 0.75
+        @weight      0.5
+    + :L50wNkz: train of thought
+        @sharability 1
+        @weight      0.5
+        @alias       http://dbpedia.org/resource/Train_of_thought
+    + :jkSMk-c: what evidence there is to suggest that consciousness is a succession of discrete events fits in perfectly with my view of thought and perception. I don't subscribe to the notion of a *stream* of consciousness.
+        @sharability 0.5
+        @weight      0.5
++ :p38hxdB: pragmatism
+    @sharability 1
+    @weight      0.5
+    @alias       http://dbpedia.org/resource/Pragmatism
+    · :bePvAXe: a philosophical tradition which considers thought to be a product of the interaction between organism and environment
+        @sharability 0.75
+        @weight      0.5

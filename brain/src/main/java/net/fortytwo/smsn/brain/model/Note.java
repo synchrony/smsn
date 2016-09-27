@@ -51,9 +51,11 @@ public class Note {
     }
 
     public void setValue(final String value) {
+        /*
         if (null != value && 0 == value.length()) {
             throw new IllegalArgumentException("empty value is not valid");
         }
+        */
 
         this.value = value;
     }

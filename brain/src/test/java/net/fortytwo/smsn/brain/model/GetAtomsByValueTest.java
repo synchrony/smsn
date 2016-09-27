@@ -1,12 +1,20 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.BrainTestBase;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
-public class GetAtomsByValueTest extends AtomGraphTest {
+public class GetAtomsByValueTest extends BrainTestBase {
     private Atom arthur;
+
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
+        return createNeo4jAtomGraph();
+    }
 
     @Before
     @Override

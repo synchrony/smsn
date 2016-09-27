@@ -1,14 +1,21 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.pg.PGAtom;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
-public class GetAtomsByAcronymTest extends AtomGraphTest {
+public class GetAtomsByAcronymTest extends BrainTestBase {
+
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
+        return createNeo4jAtomGraph();
+    }
 
     @Test
     public void testAcronymSearch() throws Exception {

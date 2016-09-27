@@ -44,7 +44,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public String getValue() {
-        return getRequiredProperty(SemanticSynchrony.VALUE);
+        return (String) getOptionalProperty(SemanticSynchrony.VALUE);
     }
 
     @Override
@@ -102,7 +102,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
         return setNotes(notes, null);
     }
 
-    public boolean setNotes(AtomList notes, final String edgeId) {
+    public boolean setNotes(AtomList notes, final Object edgeId) {
         boolean changed = removeNotes();
         if (null != notes) {
             addOutEdge(edgeId, ((PGGraphEntity) notes).asVertex(), SemanticSynchrony.NOTES);

@@ -1,10 +1,18 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.BrainTestBase;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class GetAtomsByIdTest extends AtomGraphTest {
+public class GetAtomsByIdTest extends BrainTestBase {
+
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
+        return createTinkerAtomGraph();
+    }
 
     @Test
     public void testGetAtoms() throws Exception {
