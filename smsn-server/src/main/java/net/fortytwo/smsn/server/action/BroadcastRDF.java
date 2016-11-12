@@ -22,9 +22,7 @@ public class BroadcastRDF extends Action {
 
     private final CoordinatorService coordinator;
 
-    public BroadcastRDF()
-            throws IOException, TypedProperties.PropertyException,
-            SailException, InterruptedException {
+    public BroadcastRDF() {
 
         coordinator = CoordinatorService.getInstance();
     }

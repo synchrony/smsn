@@ -31,6 +31,10 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         return key + "-index";
     }
 
+    public Neo4jGraphWrapper(final Neo4jGraph graph) {
+        super(graph);
+    }
+
     public Neo4jGraphWrapper(File dataDir) {
         super(createGraph(dataDir));
     }

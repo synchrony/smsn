@@ -23,16 +23,16 @@ public class GetView extends Action {
     }
 
     @Override
-    public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
+    public void parseRequest(final JSONObject request, final RequestParams params) throws JSONException {
         ViewRequest r;
 
-        r = new ViewRequest(request, p.user);
+        r = new ViewRequest(request, params.user);
 
-        p.height = r.getHeight();
-        p.rootId = r.getRootId();
-        p.styleName = r.getStyleName();
-        p.filter = r.getFilter();
-        p.includeTypes = r.isIncludeTypes();
+        params.height = r.getHeight();
+        params.rootId = r.getRootId();
+        params.styleName = r.getStyleName();
+        params.filter = r.getFilter();
+        params.includeTypes = r.isIncludeTypes();
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {

@@ -30,18 +30,18 @@ public class FindDuplicates extends Action {
     }
 
     @Override
-    public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
+    public void parseRequest(final JSONObject request, final RequestParams params) throws JSONException {
         FilteredResultsRequest r;
-        r = new FilteredResultsRequest(request, p.user);
+        r = new FilteredResultsRequest(request, params.user);
 
-        p.filter = r.getFilter();
+        params.filter = r.getFilter();
     }
 
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException {
-        List<String> ids = getDuplicates(p.brain.getAtomGraph(), p.filter);
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException {
+        List<String> ids = getDuplicates(params.brain.getAtomGraph(), params.filter);
 
         try {
-            addView(p.queries.customView(ids, p.filter), p);
+            addView(params.queries.customView(ids, params.filter), params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

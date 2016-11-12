@@ -48,11 +48,14 @@ public class CoordinatorService {
 
     private final SparqlStreamProcessor streamProcessor;
 
-    public static CoordinatorService getInstance()
-            throws IOException, TypedProperties.PropertyException, SailException, InterruptedException {
+    public static CoordinatorService getInstance() {
 
         if (null == INSTANCE) {
-            INSTANCE = new CoordinatorService();
+            try {
+                INSTANCE = new CoordinatorService();
+            } catch (IOException | TypedProperties.PropertyException e) {
+                throw new IllegalStateException(e);
+            }
         }
 
         return INSTANCE;
