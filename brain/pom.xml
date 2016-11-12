@@ -31,7 +31,6 @@
             <version>${tinkerpop.version}</version>
         </dependency>
 
-        <!-- TODO: use only in tests -->
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>neo4j-gremlin</artifactId>
@@ -42,12 +41,6 @@
             <artifactId>neo4j-tinkerpop-api-impl</artifactId>
             <version>${neo4j.tinkerpop.version}</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-lucene-index</artifactId>
-            <version>${neo4j.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>

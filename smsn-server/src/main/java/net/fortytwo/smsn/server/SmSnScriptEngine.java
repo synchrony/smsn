@@ -13,6 +13,7 @@ import net.fortytwo.smsn.server.action.GetHistory;
 import net.fortytwo.smsn.server.action.GetPriorities;
 import net.fortytwo.smsn.server.action.GetView;
 import net.fortytwo.smsn.server.action.InferTypes;
+import net.fortytwo.smsn.server.action.Ping;
 import net.fortytwo.smsn.server.action.PushEvent;
 import net.fortytwo.smsn.server.action.ReadGraph;
 import net.fortytwo.smsn.server.action.RemoveIsolatedAtoms;
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
 
 public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScriptEngine {
 
-    protected static final Logger logger = Logger.getLogger(SmSnPlugin.class.getName());
+    protected static final Logger logger = Logger.getLogger(SmSnScriptEngine.class.getName());
 
     private final Map<String, Action> actionsByName;
 
@@ -60,6 +61,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         add(new ReadGraph());
         add(new InferTypes());
         add(new GetPriorities());
+        add(new Ping());
         add(new PushEvent());
         add(new RemoveIsolatedAtoms());
         add(new EvaluateRippleQuery());
@@ -68,6 +70,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         add(new UpdateView());
         add(new GetView());
     }
+
 
     @Override
     public Object eval(String script, ScriptContext context) throws ScriptException {

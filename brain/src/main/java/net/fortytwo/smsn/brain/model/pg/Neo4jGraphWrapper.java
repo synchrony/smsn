@@ -5,6 +5,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -88,7 +89,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         GraphDatabaseService graphDb = getGraphDatabaseService();
         try (Transaction tx = graphDb.beginTx()) {
             Schema schema = graphDb.schema();
-            schema.indexFor(Label.label(SemanticSynchrony.ATOM))
+            schema.indexFor(DynamicLabel.label(SemanticSynchrony.ATOM))
                     .on(key)
                     .create();
             tx.success();
@@ -97,9 +98,9 @@ public class Neo4jGraphWrapper extends GraphWrapper {
 
     private boolean keyIndexExists(final String key) {
         GraphDatabaseService graphDb = getGraphDatabaseService();
-        try (Transaction tx = graphDb.beginTx()) {
+        try (Transaction ignored = graphDb.beginTx()) {
             Schema schema = graphDb.schema();
-            for (IndexDefinition definition : schema.getIndexes(Label.label(SemanticSynchrony.ATOM))) {
+            for (IndexDefinition definition : schema.getIndexes(DynamicLabel.label(SemanticSynchrony.ATOM))) {
                 for (String existingKey : definition.getPropertyKeys()) {
                     if (existingKey.equals(key)) return true;
                 }
