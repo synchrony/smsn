@@ -361,14 +361,14 @@ public class PGAtomGraph implements AtomGraph {
 
     private Vertex getVertex(Graph graph, String id) {
         // note: requires a key index for efficiency
-        Iterator<Vertex> vertices = graph.traversal().V().has(SemanticSynchrony.ID, id);
+        Iterator<Vertex> vertices = graph.traversal().V().has(SemanticSynchrony.ID_V, id);
         return vertices.hasNext() ? vertices.next() : null;
     }
 
     private Vertex createVertex(final String id, final String label) {
         Vertex vertex = propertyGraph.addVertex(T.label, label);
         // TODO: use id strategy
-        vertex.property(SemanticSynchrony.ID, getNonNullId(id));
+        vertex.property(SemanticSynchrony.ID_V, getNonNullId(id));
 
         return vertex;
     }

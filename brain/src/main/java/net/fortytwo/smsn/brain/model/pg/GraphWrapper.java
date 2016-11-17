@@ -14,7 +14,7 @@ public abstract class GraphWrapper {
         this.graph = graph;
 
         // TODO: add id strategy
-        createKeyIndex(SemanticSynchrony.ID);
+        createKeyIndex(SemanticSynchrony.ID_V);
         createKeyIndex(SemanticSynchrony.SHORTCUT);
 
         createFullTextIndex(SemanticSynchrony.VALUE);
@@ -58,7 +58,7 @@ public abstract class GraphWrapper {
     protected abstract Iterator<Vertex> queryByKeyValue(String key, String value);
 
     public Iterator<Vertex> queryById(final String id) {
-        return graph.traversal().V().has(SemanticSynchrony.ID, id);
+        return graph.traversal().V().has(SemanticSynchrony.ID_V, id);
     }
 
     public Iterator<Vertex> queryByValue(final String term) {

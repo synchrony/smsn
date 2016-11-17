@@ -49,7 +49,7 @@
         <httpcomponents.version>4.4</httpcomponents.version>
         <javaosc.version>0.3</javaosc.version>
         <junit.version>4.12</junit.version>
-        <lucene.version>5.5.0</lucene.version>
+        <lucene.version>3.6.2</lucene.version>
         <neo4j.version>2.3.3</neo4j.version>
         <neo4j.tinkerpop.version>0.3-2.3.3</neo4j.tinkerpop.version>
         <rdfagents.version>1.3</rdfagents.version>

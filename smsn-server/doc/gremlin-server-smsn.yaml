@@ -8,6 +8,7 @@ plugins:
   - tinkerpop.neo4j
   - smsn
 scriptEngines: {
+  smsn: {},
   gremlin-groovy: {
     imports: [java.lang.Math],
     staticImports: [java.lang.Math.PI],

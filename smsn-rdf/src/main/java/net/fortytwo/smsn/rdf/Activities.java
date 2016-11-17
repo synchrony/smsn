@@ -85,6 +85,7 @@ public class Activities {
      * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor     the person performing the action of pointing
      * @param referent  the thing referenced or physically pointed to
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForPointingGesture(final long timestamp,
@@ -111,6 +112,7 @@ public class Activities {
      *
      * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor     the person performing the gesture
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForBatonGesture(final long timestamp,
@@ -135,6 +137,7 @@ public class Activities {
      *
      * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor     the person performing the gesture
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandshakePulse(final long timestamp,
@@ -160,6 +163,7 @@ public class Activities {
      * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor1    one of the two people shaking hands
      * @param actor2    one of the two people shaking hands
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandshakeInteraction(final long timestamp,
@@ -190,6 +194,7 @@ public class Activities {
      * @param giver      the person giving the item
      * @param taker      the person receiving the item
      * @param thingGiven the item given
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHandoffInteraction(final long timestamp,
@@ -220,6 +225,7 @@ public class Activities {
      * @param timestamp the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor1    one of the two people clapping hands
      * @param actor2    one of the two people clapping hands
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForHighFiveInteraction(final long timestamp,
@@ -248,6 +254,7 @@ public class Activities {
      * @param timestamp        the moment at which the activity was recognized, in milliseconds since the Unix epoch
      * @param actor            the person attending to the item
      * @param focusOfAttention the object of attention
+     * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
     public static Dataset datasetForAttentionActivity(final long timestamp,

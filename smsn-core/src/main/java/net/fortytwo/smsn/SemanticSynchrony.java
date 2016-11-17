@@ -39,7 +39,8 @@ public class SemanticSynchrony {
 
     // the id property also used by ElementIdStrategy
     public static final String
-            ID = "__id";
+            ID_V = "idV",
+            ID_E = "idE";
 
     public static final String
             ATOM = "atom",

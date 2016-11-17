@@ -20,7 +20,7 @@ abstract class PGGraphEntity {
     private final Vertex vertex;
 
     protected String getId() {
-        VertexProperty<String> property = vertex.property(SemanticSynchrony.ID);
+        VertexProperty<String> property = vertex.property(SemanticSynchrony.ID_V);
         if (!property.isPresent()) {
             throw new IllegalStateException("missing id");
         }

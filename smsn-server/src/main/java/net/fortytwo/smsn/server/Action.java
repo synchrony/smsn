@@ -145,7 +145,8 @@ public abstract class Action {
             throw new IOException(e);
         }
 
-        p.map.put(Params.VIEW, toJettison(json));
+        p.map.put(Params.VIEW, json);
+        //p.map.put(Params.VIEW, toJettison(json));
     }
 
     public static float findMinAuthorizedSharability(final Principal user,

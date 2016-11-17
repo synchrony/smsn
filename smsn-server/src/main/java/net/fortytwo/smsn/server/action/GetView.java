@@ -35,16 +35,17 @@ public class GetView extends Action {
         params.includeTypes = r.isIncludeTypes();
     }
 
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final RequestParams params)
+            throws RequestProcessingException, BadRequestException {
 
-        Note n = p.queries.view(p.root, p.height, p.filter, p.style);
+        Note note = params.queries.view(params.root, params.height, params.filter, params.style);
         try {
-            addView(n, p);
+            addView(note, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(p.rootId);
+        addToHistory(params.rootId);
     }
 
     protected boolean doesRead() {
