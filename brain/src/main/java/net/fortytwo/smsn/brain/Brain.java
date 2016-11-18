@@ -28,6 +28,8 @@ public class Brain {
             INFERENCE_PERIOD = 1000L * 60,
             INFERENCE_INITIAL_WAIT = 1000L * 30;
 
+    private static final boolean RUN_BACKGROUND_TASKS = false;
+
     private final AtomGraph atomGraph;
 
     private final KnowledgeBase knowledgeBase;
@@ -74,6 +76,8 @@ public class Brain {
     }
 
     public void startBackgroundTasks() {
+        if (!RUN_BACKGROUND_TASKS) return;
+
         priorities.refreshQueue(atomGraph);
 
         knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);
