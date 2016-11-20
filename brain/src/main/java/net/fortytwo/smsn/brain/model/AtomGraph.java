@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -42,7 +43,29 @@ public interface AtomGraph {
 
     long getLastUpdate();
 
+    void begin();
     void commit();
+    void rollback();
 
     AtomGraph createFilteredGraph(Filter filter);
+
+    interface IORunnable {
+        void run() throws IOException;
+    }
+
+    static void wrapInTransaction(final AtomGraph graph, final IORunnable runnable) throws IOException {
+        graph.begin();
+
+        boolean success = false;
+        try {
+            runnable.run();
+            success = true;
+        } finally {
+            if (success) {
+                graph.commit();
+            } else {
+                graph.rollback();
+            }
+        }
+    }
 }

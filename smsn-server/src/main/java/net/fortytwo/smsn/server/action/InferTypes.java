@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
@@ -20,7 +21,7 @@ public class InferTypes extends Action {
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         // do *not* reset the knowledge base.  Build upon inference performed in previous iterations
-        KnowledgeBase kb = p.brain.getKnowledgeBase();
+        KnowledgeBase kb = p.getBrain().getKnowledgeBase();
         //kb.reset();
 
         long timeBefore = System.currentTimeMillis();

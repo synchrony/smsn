@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
@@ -25,7 +26,7 @@ public class SetProperties extends Action {
 
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException, BadRequestException {
-        SetPropertiesRequest r = new SetPropertiesRequest(request, p.user);
+        SetPropertiesRequest r = new SetPropertiesRequest(request, p.getUser());
 
         switch (r.name) {
             case SemanticSynchrony.WEIGHT: {
@@ -60,47 +61,47 @@ public class SetProperties extends Action {
                 throw new BadRequestException("unknown property: " + r.name);
         }
 
-        p.propertyName = r.name;
-        p.propertyValue = r.value;
-        p.rootId = r.id;
+        p.setPropertyName(r.name);
+        p.setPropertyValue(r.value);
+        p.setRootId(r.id);
 
         SemanticSynchrony.logInfo("SmSn set-properties on " + r.id + ": " + r.name + " <- " + r.value);
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        switch (p.propertyName) {
+        switch (p.getPropertyName()) {
             case SemanticSynchrony.WEIGHT:
-                p.root.setWeight((Float) p.propertyValue);
+                p.getRoot().setWeight((Float) p.getPropertyValue());
                 break;
             case SemanticSynchrony.SHARABILITY:
-                p.root.setSharability((Float) p.propertyValue);
+                p.getRoot().setSharability((Float) p.getPropertyValue());
                 break;
             case SemanticSynchrony.PRIORITY:
-                p.root.setPriority((Float) p.propertyValue);
-                p.brain.getPriorities().updatePriority(p.root);
+                p.getRoot().setPriority((Float) p.getPropertyValue());
+                p.getBrain().getPriorities().updatePriority(p.getRoot());
                 break;
             case SemanticSynchrony.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
-                String shortcut = (String) p.propertyValue;
-                for (Atom a : p.brain.getAtomGraph().getAtomsByShortcut(shortcut, p.filter)) {
+                String shortcut = (String) p.getPropertyValue();
+                for (Atom a : p.getBrain().getAtomGraph().getAtomsByShortcut(shortcut, p.getFilter())) {
                     a.setShortcut(null);
                 }
 
-                p.root.setShortcut(shortcut);
+                p.getRoot().setShortcut(shortcut);
                 break;
             default:
                 throw new IllegalStateException();
         }
 
-        p.brain.getAtomGraph().notifyOfUpdate();
+        p.getBrain().getAtomGraph().notifyOfUpdate();
 
-        p.map.put("key", p.brain.getAtomGraph().idOfAtom(p.root));
-        p.map.put("name", "" + p.propertyName);
-        p.map.put("value", "" + p.propertyValue);
+        p.getMap().put("key", p.getBrain().getAtomGraph().idOfAtom(p.getRoot()));
+        p.getMap().put("name", "" + p.getPropertyName());
+        p.getMap().put("value", "" + p.getPropertyValue());
 
-        ActivityLog log = p.brain.getActivityLog();
+        ActivityLog log = p.getBrain().getActivityLog();
         if (null != log) {
-            log.logSetProperties(p.root);
+            log.logSetProperties(p.getRoot());
         }
     }
 

@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
@@ -24,16 +25,16 @@ public class GetHistory extends Action {
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
         FilteredResultsRequest r;
-        r = new FilteredResultsRequest(request, p.user);
+        r = new FilteredResultsRequest(request, p.getUser());
 
-        p.filter = r.getFilter();
+        p.setFilter(r.getFilter());
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        List<String> ids = getHistory(p.brain.getAtomGraph(), p.filter);
+        List<String> ids = getHistory(p.getBrain().getAtomGraph(), p.getFilter());
 
         try {
-            addView(p.queries.customView(ids, p.filter), p);
+            addView(p.getQueries().customView(ids, p.getFilter()), p);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

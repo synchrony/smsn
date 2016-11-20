@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server.action;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.BasicSearchRequest;
@@ -27,21 +28,21 @@ public class EvaluateTextSearch extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        SearchRequest r = new SearchRequest(request, p.user);
+        SearchRequest r = new SearchRequest(request, p.getUser());
 
-        p.height = r.getHeight();
-        p.queryType = r.getQueryType();
-        p.query = r.getQuery();
-        p.styleName = r.getStyleName();
-        p.filter = r.getFilter();
-        p.valueCutoff = r.valueCutoff;
+        p.setHeight(r.getHeight());
+        p.setQueryType(r.getQueryType());
+        p.setQuery(r.getQuery());
+        p.setStyleName(r.getStyleName());
+        p.setFilter(r.getFilter());
+        p.setValueCutoff(r.valueCutoff);
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        if (null == p.valueCutoff) {
-            p.writer.setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
+        if (null == p.getValueCutoff()) {
+            p.getWriter().setValueLengthCutoff(DEFAULT_VALUE_LENGTH_CUTOFF);
         } else {
-            p.writer.setValueLengthCutoff(p.valueCutoff);
+            p.getWriter().setValueLengthCutoff(p.getValueCutoff());
         }
 
         try {
@@ -50,7 +51,7 @@ public class EvaluateTextSearch extends Action {
             throw new RequestProcessingException(e);
         }
 
-        p.map.put("title", p.query);
+        p.getMap().put("title", p.getQuery());
     }
 
     protected boolean doesRead() {
@@ -61,9 +62,9 @@ public class EvaluateTextSearch extends Action {
         return false;
     }
 
-    protected void addSearchResults(final RequestParams p) throws IOException {
-        Note n = p.queries.search(p.queryType, p.query, p.height, p.filter, p.style);
-        addView(n, p);
+    protected void addSearchResults(final RequestParams params) throws IOException {
+        Note n = params.getQueries().search(params.getQueryType(), params.getQuery(), params.getHeight(), params.getFilter(), params.getStyle());
+        addView(n, params);
     }
 
     protected class SearchRequest extends BasicSearchRequest {

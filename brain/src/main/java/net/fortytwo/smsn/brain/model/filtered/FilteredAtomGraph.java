@@ -122,8 +122,18 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
+    public void begin() {
+        baseGraph.begin();
+    }
+
+    @Override
     public void commit() {
         baseGraph.commit();
+    }
+
+    @Override
+    public void rollback() {
+        baseGraph.rollback();
     }
 
     @Override

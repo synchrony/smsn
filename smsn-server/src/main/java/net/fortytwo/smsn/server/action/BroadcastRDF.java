@@ -5,12 +5,11 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.CoordinatorService;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.util.TypedProperties;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.SailException;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -35,9 +34,9 @@ public class BroadcastRDF extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
         BroadcastRdfRequest r;
-        r = new BroadcastRdfRequest(request, p.user);
+        r = new BroadcastRdfRequest(request, p.getUser());
 
-        p.data = r.dataset;
+        p.setData(r.dataset);
 
         SemanticSynchrony.logInfo("smsn broadcast-rdf");
     }
@@ -47,7 +46,7 @@ public class BroadcastRDF extends Action {
         RDFFormat format = RDFFormat.NTRIPLES;
 
         try {
-            coordinator.pushUpdate(p.data, format);
+            coordinator.pushUpdate(p.getData(), format);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

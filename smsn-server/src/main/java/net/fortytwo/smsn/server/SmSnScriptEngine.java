@@ -136,7 +136,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
             throw new IllegalArgumentException("action not found");
         }
 
-        Action.RequestParams params = Action.createParams(graph);
+        RequestParams params = Action.createParams(graph);
 
         Action extension = actionsByName.get(action);
         if (null == extension) {
@@ -148,7 +148,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         extension.parseRequest(request, params);
 
         extension.handleRequestInternal(params);
-        return toJson(params.map);
+        return toJson(params.getMap());
     }
 
     private JSONObject toJson(final Map<String, Object> map) {

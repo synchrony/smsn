@@ -1,11 +1,9 @@
 package net.fortytwo.smsn.server;
 
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteHistory;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
@@ -69,70 +67,13 @@ public abstract class Action {
         parseRequest(new JSONObject(request), p);
     }
 
-    private void checkAuthorized(final RequestParams p) throws AuthorizationException {
-        if (doesWrite() && !canWrite(p.user)) {
-            throw new AuthorizationException("user does not have permission to for write operations");
-        }
+    public void handleRequestInternal(final RequestParams params) {
 
-        if (doesRead() && null == p.filter) {
-            throw new AuthorizationException("service reads from graph, but weight and sharability filter is not set");
-        }
-    }
+        setParams(params);
 
-    public void handleRequestInternal(final RequestParams params)
-            throws AuthorizationException, BadRequestException, RequestProcessingException {
+        wrapTransaction(params);
 
-        checkAuthorized(params);
-
-        params.map = new HashMap<>();
-
-        setWikiView(params);
-        setBrain(params);
-        setIO(params);
-        setHeight(params);
-        setFilter(params);
-        setRoot(params);
-        setTitle(params);
-        setStyle(params);
-
-        // Force manual transaction mode (provided that the graph is transactional)
-        boolean manual = doesWrite() && params.graphWrapper.isTransactional();
-
-        boolean normal = false;
-
-        try {
-            performTransaction(params);
-
-            normal = true;
-
-            // Note: currently, all activities are logged, but the log is not immediately flushed
-            //       unless the transaction succeeds.
-            if (null != params.brain.getActivityLog()) {
-                params.brain.getActivityLog().flush();
-            }
-        } finally {
-            if (doesWrite()) {
-                if (manual) {
-                    if (normal) {
-                        params.graphWrapper.commit();
-                    } else {
-                        SemanticSynchrony.logWarning("rolling back transaction");
-                        params.graphWrapper.rollback();
-                    }
-                } else if (!normal) {
-                    SemanticSynchrony.logWarning(
-                            "failed update of non-transactional graph. Inconsistent data is possible.");
-                }
-            }
-        }
-    }
-
-    protected org.codehaus.jettison.json.JSONObject toJettison(JSONObject j) throws IOException {
-        try {
-            return new org.codehaus.jettison.json.JSONObject(j.toString());
-        } catch (org.codehaus.jettison.json.JSONException e) {
-            throw new IOException(e);
-        }
+        logActivity(params);
     }
 
     protected void addView(final Note n,
@@ -140,13 +81,12 @@ public abstract class Action {
         JSONObject json;
 
         try {
-            json = p.writer.toJSON(n);
+            json = p.getWriter().toJSON(n);
         } catch (JSONException e) {
             throw new IOException(e);
         }
 
-        p.map.put(Params.VIEW, json);
-        //p.map.put(Params.VIEW, toJettison(json));
+        p.getMap().put(Params.VIEW, json);
     }
 
     public static float findMinAuthorizedSharability(final Principal user,
@@ -158,8 +98,8 @@ public abstract class Action {
 
     public static RequestParams createParams(final Neo4jGraph graph) {
         RequestParams p = new RequestParams();
-        p.graphWrapper = new Neo4jGraphWrapper(graph);
-        p.user = () -> "none";
+        p.setGraphWrapper(new Neo4jGraphWrapper(graph));
+        p.setUser(() -> "none");
 
         return p;
     }
@@ -177,13 +117,55 @@ public abstract class Action {
         return noteHistory.getHistory(100, true, graph, filter);
     }
 
+    private void wrapTransaction(final RequestParams params) {
+        try {
+            AtomGraph.wrapInTransaction(params.getBrain().getAtomGraph(), () -> performTransaction(params));
+        } catch (IOException e) {
+            throw new RequestProcessingException(e);
+        }
+    }
+
+    private void logActivity(final RequestParams params) {
+        // Note: currently, all activities are logged, but the log is not immediately flushed
+        //       unless the transaction succeeds.
+        if (null != params.getBrain().getActivityLog()) {
+            params.getBrain().getActivityLog().flush();
+        }
+    }
+
+    private void checkAuthorized(final RequestParams p) throws AuthorizationException {
+        if (doesWrite() && !canWrite(p.getUser())) {
+            throw new AuthorizationException("user does not have permission to for write operations");
+        }
+
+        if (doesRead() && null == p.getFilter()) {
+            throw new AuthorizationException("service reads from graph, but weight and sharability filter is not set");
+        }
+    }
+
+    private void setParams(final RequestParams params) {
+
+        checkAuthorized(params);
+
+        params.setMap(new HashMap<>());
+
+        setWikiView(params);
+        setBrain(params);
+        setIO(params);
+        setHeight(params);
+        setFilter(params);
+        setRoot(params);
+        setTitle(params);
+        setStyle(params);
+    }
+
     private void setWikiView(final RequestParams params) {
-        if (null != params.wikiView) {
+        if (null != params.getWikiView()) {
             // Force the use of the UTF-8 charset, which is apparently not chosen by Jersey
             // even when it is specified by the client in the Content-Type header, e.g.
             //    Content-Type: application/x-www-form-urlencoded;charset=UTF-8
             try {
-                params.wikiView = new String(params.wikiView.getBytes("UTF-8"));
+                params.setWikiView(new String(params.getWikiView().getBytes("UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 throw new RequestProcessingException(e);
             }
@@ -192,101 +174,73 @@ public abstract class Action {
 
     private void setBrain(final RequestParams params) {
         try {
-            params.brain = getBrain(params.graphWrapper);
+            params.setBrain(getBrain(params.getGraphWrapper()));
         } catch (Brain.BrainException e) {
             throw new RequestProcessingException(e);
         }
     }
 
     private void setIO(final RequestParams params) {
-        params.queries = new NoteQueries(params.brain);
-        params.parser = new NoteReader();
-        params.writer = new NoteWriter();
+        params.setQueries(new NoteQueries(params.getBrain()));
+        params.setParser(new NoteReader());
+        params.setWriter(new NoteWriter());
     }
 
     private void setHeight(final RequestParams params) {
-        if (null != params.height) {
-            if (params.height < 0) {
+        if (null != params.getHeight()) {
+            if (params.getHeight() < 0) {
                 throw new BadRequestException("height must be at least 0");
             }
 
-            if (params.height > MAX_VIEW_HEIGHT) {
+            if (params.getHeight() > MAX_VIEW_HEIGHT) {
                 throw new BadRequestException("height may not be more than 5");
             }
 
-            params.map.put(Params.HEIGHT, "" + params.height);
+            params.getMap().put(Params.HEIGHT, "" + params.getHeight());
         }
     }
 
     private void setFilter(final RequestParams params) {
-        if (null != params.filter) {
-            params.map.put(Params.MIN_SHARABILITY, "" + params.filter.getMinSharability());
-            params.map.put(Params.MAX_SHARABILITY, "" + params.filter.getMaxSharability());
-            params.map.put(Params.DEFAULT_SHARABILITY, "" + params.filter.getDefaultSharability());
-            params.map.put(Params.MIN_WEIGHT, "" + params.filter.getMinWeight());
-            params.map.put(Params.MAX_WEIGHT, "" + params.filter.getMaxWeight());
-            params.map.put(Params.DEFAULT_WEIGHT, "" + params.filter.getDefaultWeight());
+        if (null != params.getFilter()) {
+            params.getMap().put(Params.MIN_SHARABILITY, "" + params.getFilter().getMinSharability());
+            params.getMap().put(Params.MAX_SHARABILITY, "" + params.getFilter().getMaxSharability());
+            params.getMap().put(Params.DEFAULT_SHARABILITY, "" + params.getFilter().getDefaultSharability());
+            params.getMap().put(Params.MIN_WEIGHT, "" + params.getFilter().getMinWeight());
+            params.getMap().put(Params.MAX_WEIGHT, "" + params.getFilter().getMaxWeight());
+            params.getMap().put(Params.DEFAULT_WEIGHT, "" + params.getFilter().getDefaultWeight());
         }
     }
 
     private void setRoot(final RequestParams params) {
-        String rootId = params.rootId;
+        String rootId = params.getRootId();
 
         if (null != rootId) {
-            params.root = params.brain.getAtomGraph().getAtom(rootId);
+            params.setRoot(params.getBrain().getAtomGraph().getAtom(rootId));
 
-            if (null == params.root) {
+            if (null == params.getRoot()) {
                 throw new BadRequestException("root of view does not exist: " + rootId);
             }
 
-            if (null != params.filter && !params.filter.isVisible(params.root)) {
+            if (null != params.getFilter() && !params.getFilter().isVisible(params.getRoot())) {
                 throw new BadRequestException("root of view is not visible: " + rootId);
             }
 
-            params.map.put(Params.ROOT, rootId);
+            params.getMap().put(Params.ROOT, rootId);
         }
     }
 
     private void setTitle(final RequestParams params) {
-        params.map.put(Params.TITLE, null == params.root
-                || null == params.root.getValue()
-                || 0 == params.root.getValue().length() ? "[no title]" : params.root.getValue());
+        params.getMap().put(Params.TITLE, null == params.getRoot()
+                || null == params.getRoot().getValue()
+                || 0 == params.getRoot().getValue().length() ? "[no title]" : params.getRoot().getValue());
     }
 
     private void setStyle(final RequestParams params) {
-        String styleName = params.styleName;
+        String styleName = params.getStyleName();
 
         if (null != styleName) {
-            params.style = NoteQueries.lookupStyle(styleName);
-            params.map.put(Params.STYLE, params.style.getName());
+            params.setStyle(NoteQueries.lookupStyle(styleName));
+            params.getMap().put(Params.STYLE, params.getStyle().getName());
         }
-    }
-
-    public static class RequestParams {
-        public GraphWrapper graphWrapper;
-        public Brain brain;
-        public String data;
-        public Integer height;
-        public String file;
-        public Filter filter;
-        public String format;
-        public boolean includeTypes;
-        public JSONObject jsonView;
-        public Map<String, Object> map;
-        public Integer maxResults;
-        public NoteReader parser;
-        public String propertyName;
-        public Object propertyValue;
-        public NoteQueries queries;
-        public String query;
-        public NoteQueries.QueryType queryType;
-        public Atom root;
-        public String rootId;
-        public NoteQueries.ViewStyle style;
-        public String styleName;
-        public Principal user;
-        public Integer valueCutoff;
-        public String wikiView;
-        public NoteWriter writer;
     }
 }

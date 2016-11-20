@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server.action;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.Request;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.brain.io.BrainReader;
@@ -38,10 +39,10 @@ public class ReadGraph extends Action {
 
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
-        ImportRequest r = new ImportRequest(request, p.user);
+        ImportRequest r = new ImportRequest(request, p.getUser());
 
-        p.file = r.file;
-        p.format = r.format;
+        p.setFile(r.file);
+        p.setFormat(r.format);
     }
 
     private synchronized void beginImport(final Graph g, final String file) throws BadRequestException {
@@ -78,23 +79,23 @@ public class ReadGraph extends Action {
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        if (null == p.format) {
+        if (null == p.getFormat()) {
             throw new BadRequestException("format is required");
         }
 
-        Format format = Format.getFormat(p.format);
+        Format format = Format.getFormat(p.getFormat());
         BrainReader reader = Format.getReader(format);
 
-        beginImport(p.graphWrapper.getGraph(), p.file);
+        beginImport(p.getGraphWrapper().getGraph(), p.getFile());
 
         boolean success = false;
         try {
-            reader.doImport(new File(p.file), format, p.brain, true);
+            reader.doImport(new File(p.getFile()), format, p.getBrain(), true);
             success = true;
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         } finally {
-            finishImport(p.graphWrapper.getGraph(), p.file, success);
+            finishImport(p.getGraphWrapper().getGraph(), p.getFile(), success);
         }
     }
 

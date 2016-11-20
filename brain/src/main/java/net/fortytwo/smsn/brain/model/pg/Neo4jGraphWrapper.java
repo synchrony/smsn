@@ -17,6 +17,7 @@ import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.tinkerpop.api.Neo4jTx;
 import org.neo4j.tinkerpop.api.impl.Neo4jGraphAPIImpl;
 
 import java.io.File;
@@ -39,6 +40,9 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         super(createGraph(dataDir));
     }
 
+    //private Transaction transaction;
+    private Neo4jTx neo4jTx;
+
     @Override
     protected void updateIndex(Vertex updatedVertex, String key, Object value) {
         Node node = getGraphDatabaseService().getNodeById((Long) updatedVertex.id());
@@ -58,13 +62,39 @@ public class Neo4jGraphWrapper extends GraphWrapper {
     }
 
     @Override
+    public void begin() {
+        neo4jTx = getNeo4jGraph().getBaseGraph().tx();
+        //transaction = getGraphDatabaseService().beginTx();
+    }
+
+    @Override
     public void commit() {
-        getNeo4jGraph().getBaseGraph().tx().success();
+        checkNeo4jTransaction();
+
+        graph.tx().commit();
+
+        //transaction.success();
+
+        try {
+            neo4jTx.success();
+        } finally {
+            neo4jTx = null;
+        }
     }
 
     @Override
     public void rollback() {
-        getNeo4jGraph().getBaseGraph().tx().failure();
+        checkNeo4jTransaction();
+
+        graph.tx().rollback();
+
+        //transaction.close();
+
+        try {
+            neo4jTx.failure();
+        } finally {
+            neo4jTx = null;
+        }
     }
 
     @Override
@@ -93,6 +123,10 @@ public class Neo4jGraphWrapper extends GraphWrapper {
                     .create();
             tx.success();
         }
+    }
+
+    private void checkNeo4jTransaction() {
+        if (null == neo4jTx) throw new IllegalStateException("no active transaction");
     }
 
     private boolean keyIndexExists(final String key) {

@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server.action;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.RootedViewRequest;
@@ -26,26 +27,26 @@ public class GetView extends Action {
     public void parseRequest(final JSONObject request, final RequestParams params) throws JSONException {
         ViewRequest r;
 
-        r = new ViewRequest(request, params.user);
+        r = new ViewRequest(request, params.getUser());
 
-        params.height = r.getHeight();
-        params.rootId = r.getRootId();
-        params.styleName = r.getStyleName();
-        params.filter = r.getFilter();
-        params.includeTypes = r.isIncludeTypes();
+        params.setHeight(r.getHeight());
+        params.setRootId(r.getRootId());
+        params.setStyleName(r.getStyleName());
+        params.setFilter(r.getFilter());
+        params.setIncludeTypes(r.isIncludeTypes());
     }
 
     protected void performTransaction(final RequestParams params)
             throws RequestProcessingException, BadRequestException {
 
-        Note note = params.queries.view(params.root, params.height, params.filter, params.style);
+        Note note = params.getQueries().view(params.getRoot(), params.getHeight(), params.getFilter(), params.getStyle());
         try {
             addView(note, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(params.rootId);
+        addToHistory(params.getRootId());
     }
 
     protected boolean doesRead() {

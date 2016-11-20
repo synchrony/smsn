@@ -4,6 +4,7 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
@@ -24,20 +25,20 @@ public class PushEvent extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        PushEventRequest r = new PushEventRequest(request, p.user);
+        PushEventRequest r = new PushEventRequest(request, p.getUser());
 
-        p.jsonView = r.jsonView;
+        p.setJsonView(r.jsonView);
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         Note event = null;
         try {
-            event = p.parser.fromJSON(p.jsonView);
+            event = p.getParser().fromJSON(p.getJsonView());
         } catch (JSONException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.brain.getEventStack().push(event);
+        p.getBrain().getEventStack().push(event);
     }
 
     protected boolean doesRead() {

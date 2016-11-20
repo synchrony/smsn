@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.BasicSearchRequest;
@@ -23,12 +24,12 @@ public class EvaluateRippleQuery extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        BasicSearchRequest r = new BasicSearchRequest(request, p.user);
+        BasicSearchRequest r = new BasicSearchRequest(request, p.getUser());
 
-        p.height = r.getHeight();
-        p.query = r.getQuery();
-        p.styleName = r.getStyleName();
-        p.filter = r.getFilter();
+        p.setHeight(r.getHeight());
+        p.setQuery(r.getQuery());
+        p.setStyleName(r.getStyleName());
+        p.setFilter(r.getFilter());
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
@@ -38,7 +39,7 @@ public class EvaluateRippleQuery extends Action {
             throw new RequestProcessingException(e);
         }
 
-        p.map.put("title", p.query);
+        p.getMap().put("title", p.getQuery());
     }
 
     protected boolean doesRead() {
@@ -56,10 +57,10 @@ public class EvaluateRippleQuery extends Action {
         JSONObject json;
 
         try {
-            json = p.writer.toJSON(n);
+            json = p.getWriter().toJSON(n);
         } catch (JSONException e) {
             throw new IOException(e);
         }
-        p.map.put("view", json.toString());
+        p.getMap().put("view", json.toString());
     }
 }

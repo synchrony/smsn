@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.BasicViewRequest;
@@ -24,22 +25,22 @@ public class FindRoots extends Action {
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
         BasicViewRequest r;
-        r = new BasicViewRequest(request, p.user);
+        r = new BasicViewRequest(request, p.getUser());
 
-        p.height = r.getHeight();
-        p.styleName = r.getStyleName();
-        p.filter = r.getFilter();
+        p.setHeight(r.getHeight());
+        p.setStyleName(r.getStyleName());
+        p.setFilter(r.getFilter());
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        Note n = p.queries.findRootAtoms(p.filter, p.style, p.height - 1);
+        Note n = p.getQueries().findRootAtoms(p.getFilter(), p.getStyle(), p.getHeight() - 1);
         try {
             addView(n, p);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.map.put("title", "all roots");
+        p.getMap().put("title", "all roots");
     }
 
     protected boolean doesRead() {

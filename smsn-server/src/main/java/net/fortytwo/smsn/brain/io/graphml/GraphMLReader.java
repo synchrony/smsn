@@ -16,8 +16,8 @@ public class GraphMLReader extends BrainReader {
     }
 
     @Override
-    protected void importInternal(Context context)
-            throws IOException {
+    protected void importInternal(Context context) throws IOException {
+
         if (context.getAtomGraph() instanceof PGAtomGraph) {
             org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader r
                     = org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader.build().create();

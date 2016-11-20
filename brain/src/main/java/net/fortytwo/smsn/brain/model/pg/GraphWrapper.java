@@ -32,6 +32,8 @@ public abstract class GraphWrapper {
 
     public abstract boolean isTransactional();
 
+    public abstract void begin();
+
     public abstract void commit();
 
     public abstract void rollback();

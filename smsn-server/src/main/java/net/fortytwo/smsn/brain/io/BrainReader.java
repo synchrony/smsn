@@ -1,8 +1,9 @@
 package net.fortytwo.smsn.brain.io;
 
+import com.google.common.collect.Iterators;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Brain;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -46,20 +47,17 @@ public abstract class BrainReader {
 
         long before = System.currentTimeMillis();
 
-        importInternal(context);
-
         AtomGraph destGraph = context.getAtomGraph();
 
         // note: we assume the graph is small
-        destGraph.commit();
-
+        //AtomGraph.wrapInTransaction(destGraph, () -> importInternal(context));
+        //AtomGraph.wrapInTransaction(destGraph, () -> reindexVertices(destGraph));
+        importInternal(context);
         reindexVertices(destGraph);
 
-        // again, we assume the graph is small
-        destGraph.commit();
-
         long after = System.currentTimeMillis();
-        logger.info("imported " + context.getFormat() + " data in " + (after - before) + "ms");
+        logger.info("imported " + context.getFormat() + " data in " + (after - before) + " ms (before commit). " +
+                "Resulting graph has " + getSizeOf(context) + " atoms");
     }
 
     protected String getDefaultNodeName() {
@@ -68,6 +66,10 @@ public abstract class BrainReader {
 
     public void setDefaultNodeName(final String defaultNodeName) {
         this.defaultNodeName = defaultNodeName;
+    }
+
+    private long getSizeOf(final Context context) {
+        return Iterators.size(context.getAtomGraph().getAllAtoms().iterator());
     }
 
     private void importDirectoryRecursive(File dir, Format format, Brain brain) throws IOException {

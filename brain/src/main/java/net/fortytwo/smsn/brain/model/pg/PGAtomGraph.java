@@ -67,8 +67,18 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
+    public void begin() {
+        wrapper.begin();
+    }
+
+    @Override
     public void commit() {
-        propertyGraph.tx().commit();
+        wrapper.commit();
+    }
+
+    @Override
+    public void rollback() {
+        wrapper.rollback();
     }
 
     @Override
@@ -84,7 +94,7 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public Atom getAtom(final String key) {
-        Vertex v = getVertex(propertyGraph, key);
+        Vertex v = getVertex(key);
 
         return null == v ? null : getAtom(v);
     }
@@ -359,9 +369,9 @@ public class PGAtomGraph implements AtomGraph {
         return id;
     }
 
-    private Vertex getVertex(Graph graph, String id) {
+    private Vertex getVertex(String id) {
         // note: requires a key index for efficiency
-        Iterator<Vertex> vertices = graph.traversal().V().has(SemanticSynchrony.ID_V, id);
+        Iterator<Vertex> vertices = propertyGraph.traversal().V().has(SemanticSynchrony.ID_V, id);
         return vertices.hasNext() ? vertices.next() : null;
     }
 

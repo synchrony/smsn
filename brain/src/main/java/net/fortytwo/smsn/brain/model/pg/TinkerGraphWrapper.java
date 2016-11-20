@@ -38,6 +38,11 @@ public class TinkerGraphWrapper extends GraphWrapper {
     }
 
     @Override
+    public void begin() {
+        // do nothing
+    }
+
+    @Override
     public void commit() {
         // do nothing
     }

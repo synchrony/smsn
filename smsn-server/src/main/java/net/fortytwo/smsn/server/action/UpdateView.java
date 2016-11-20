@@ -4,6 +4,7 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.RootedViewRequest;
@@ -22,15 +23,15 @@ public class UpdateView extends Action {
 
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
         UpdateRequest r;
-        r = new UpdateRequest(request, p.user);
+        r = new UpdateRequest(request, p.getUser());
 
-        p.height = r.getHeight();
+        p.setHeight(r.getHeight());
         // note: may be null
-        p.rootId = r.getRootId();
-        p.styleName = r.getStyleName();
-        p.jsonView = r.jsonView;
-        p.wikiView = r.wikiView;
-        p.filter = r.getFilter();
+        p.setRootId(r.getRootId());
+        p.setStyleName(r.getStyleName());
+        p.setJsonView(r.jsonView);
+        p.setWikiView(r.wikiView);
+        p.setFilter(r.getFilter());
     }
 
     @Override
@@ -41,17 +42,17 @@ public class UpdateView extends Action {
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         Note rootNote;
 
-        if (null != p.wikiView) {
+        if (null != p.getWikiView()) {
             try {
-                try (InputStream in = new ByteArrayInputStream(p.wikiView.getBytes())) {
-                    rootNote = p.parser.fromWikiText(in);
+                try (InputStream in = new ByteArrayInputStream(p.getWikiView().getBytes())) {
+                    rootNote = p.getParser().fromWikiText(in);
                 }
             } catch (IOException | NoteReader.NoteParsingException e) {
                 throw new RequestProcessingException(e);
             }
-        } else if (null != p.jsonView) {
+        } else if (null != p.getJsonView()) {
             try {
-                rootNote = p.parser.fromJSON(p.jsonView);
+                rootNote = p.getParser().fromJSON(p.getJsonView());
             } catch (JSONException e) {
                 throw new RequestProcessingException(e);
             }
@@ -59,15 +60,15 @@ public class UpdateView extends Action {
             throw new IllegalStateException();
         }
 
-        rootNote.setId(p.rootId);
+        rootNote.setId(p.getRootId());
 
         // Apply the update
-        p.queries.update(rootNote, p.height, p.filter, p.style);
+        p.getQueries().update(rootNote, p.getHeight(), p.getFilter(), p.getStyle());
 
         // TODO: produce an appropriate view (e.g. a search) if the root is null
-        Note n = null == p.root
+        Note n = null == p.getRoot()
                 ? new Note()
-                : p.queries.view(p.root, p.height, p.filter, p.style);
+                : p.getQueries().view(p.getRoot(), p.getHeight(), p.getFilter(), p.getStyle());
         try {
             addView(n, p);
         } catch (IOException e) {

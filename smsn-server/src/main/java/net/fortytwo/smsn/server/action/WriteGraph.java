@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.brain.io.BrainWriter;
@@ -28,31 +29,31 @@ public class WriteGraph extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        WriteGraphRequest r = new WriteGraphRequest(request, p.user);
+        WriteGraphRequest r = new WriteGraphRequest(request, p.getUser());
 
-        p.filter = r.getFilter();
-        p.file = r.file;
-        p.format = r.format;
+        p.setFilter(r.getFilter());
+        p.setFile(r.file);
+        p.setFormat(r.format);
 
-        p.rootId = r.rootId;
-        p.height = r.height;
+        p.setRootId(r.rootId);
+        p.setHeight(r.height);
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        if (null == p.format) {
+        if (null == p.getFormat()) {
             throw new BadRequestException("format is required");
         }
 
         BrainWriter.Context context = new BrainWriter.Context();
-        context.setAtomGraph(p.brain.getAtomGraph());
-        context.setKnowledgeBase(p.brain.getKnowledgeBase());
-        context.setRootId(p.rootId);
-        context.setFilter(p.filter);
-        context.setFormat(Format.getFormat(p.format));
+        context.setAtomGraph(p.getBrain().getAtomGraph());
+        context.setKnowledgeBase(p.getBrain().getKnowledgeBase());
+        context.setRootId(p.getRootId());
+        context.setFilter(p.getFilter());
+        context.setFormat(Format.getFormat(p.getFormat()));
         BrainWriter writer = Format.getWriter(context.getFormat());
 
         try {
-            try (OutputStream destStream = new FileOutputStream(p.file)) {
+            try (OutputStream destStream = new FileOutputStream(p.getFile())) {
                 context.setDestStream(destStream);
                 writer.doExport(context);
             }

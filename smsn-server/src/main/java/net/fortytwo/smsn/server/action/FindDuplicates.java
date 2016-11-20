@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.Action;
+import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
 import org.json.JSONException;
@@ -32,16 +33,16 @@ public class FindDuplicates extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams params) throws JSONException {
         FilteredResultsRequest r;
-        r = new FilteredResultsRequest(request, params.user);
+        r = new FilteredResultsRequest(request, params.getUser());
 
-        params.filter = r.getFilter();
+        params.setFilter(r.getFilter());
     }
 
     protected void performTransaction(final RequestParams params) throws RequestProcessingException {
-        List<String> ids = getDuplicates(params.brain.getAtomGraph(), params.filter);
+        List<String> ids = getDuplicates(params.getBrain().getAtomGraph(), params.getFilter());
 
         try {
-            addView(params.queries.customView(ids, params.filter), params);
+            addView(params.getQueries().customView(ids, params.getFilter()), params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
