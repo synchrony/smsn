@@ -11,9 +11,11 @@ import net.fortytwo.smsn.brain.util.ListDiff;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -65,14 +67,15 @@ public class NoteQueries {
             brain.getActivityLog().logView(root);
         }
 
-        return viewInternal(root, height, filter, style, true);
+        return viewInternal(root, height, filter, style, true, null);
     }
 
     private Note viewInternal(final Atom root,
                               final int height,
                               final Filter filter,
                               final ViewStyle style,
-                              final boolean getProperties) {
+                              final boolean getProperties,
+                              final Map<String, Atom> cache) {
         if (null == root) {
             throw new IllegalStateException("null view root");
         }
@@ -81,8 +84,9 @@ public class NoteQueries {
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
+                addToCache(target, cache);
                 int h = filter.isVisible(target) ? height - 1 : 0;
-                Note cn = viewInternal(target, h, filter, style, getProperties);
+                Note cn = viewInternal(target, h, filter, style, getProperties, cache);
                 n.addChild(cn);
             }
         } else {
@@ -103,12 +107,12 @@ public class NoteQueries {
         Note n = new Note();
 
         for (String id : atomIds) {
-            Atom a = brain.getAtomGraph().getAtom(id);
+            Atom a = getAtomById(id);
             if (null == a) {
                 throw new IllegalArgumentException("no such atom: " + id);
             }
 
-            n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true));
+            n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true, null));
         }
 
         return n;
@@ -139,9 +143,15 @@ public class NoteQueries {
             throw new IllegalStateException("can't update in style " + style);
         }
 
-        updateInternal(rootNote, height, filter, style);
+        Map<String, Atom> cache = createCache();
+
+        updateInternal(rootNote, height, filter, style, cache);
 
         brain.getAtomGraph().notifyOfUpdate();
+    }
+
+    private void addToCache(final Atom atom, final Map<String, Atom> cache) {
+        if (null != cache) cache.put(atom.getId(), atom);
     }
 
     private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
@@ -165,33 +175,22 @@ public class NoteQueries {
     private void updateInternal(final Note rootNote,
                                 final int height,
                                 final Filter filter,
-                                final ViewStyle style) {
-        Atom rootAtom = getRequiredAtomForNote(rootNote);
+                                final ViewStyle style,
+                                final Map<String, Atom> cache) {
+        Atom rootAtom = getRequiredAtomForNote(rootNote, cache);
 
         // we are pre-ordered w.r.t. setting of properties
         setProperties(rootAtom, rootNote);
 
-        updateChildren(rootNote, rootAtom, height, filter, style);
-    }
-
-    private Atom getRequiredAtomForNote(final Note note) {
-        if (null == note.getId()) {
-            throw new InvalidUpdateException("note has no id");
-        }
-
-        Atom atom = brain.getAtomGraph().getAtom(note.getId());
-        if (null == atom) {
-            throw new InvalidUpdateException("no such atom: " + note);
-        }
-
-        return atom;
+        updateChildren(rootNote, rootAtom, height, filter, style, cache);
     }
 
     private void updateChildren(final Note rootNote,
                                 final Atom rootAtom,
                                 final int height,
                                 final Filter filter,
-                                final ViewStyle style) {
+                                final ViewStyle style,
+                                final Map<String, Atom> cache) {
 
         if (0 >= height || !filter.isVisible(rootAtom)) {
             return;
@@ -208,7 +207,7 @@ public class NoteQueries {
                     return;
                 }
 
-                Atom atom = getAtom(note, filter, childrenCreated);
+                Atom atom = getAtomForNote(note, filter, childrenCreated, cache);
 
                 rootAtom.addChildAt(atom, position);
 
@@ -231,13 +230,13 @@ public class NoteQueries {
 
                 // log this activity
                 if (null != brain.getActivityLog()) {
-                    Atom a = brain.getAtomGraph().getAtom(note.getId());
+                    Atom a = getAtomById(note.getId(), cache);
                     brain.getActivityLog().logUnlink(rootAtom, a);
                 }
             }
         };
 
-        List<Note> before = viewInternal(rootAtom, 1, filter, style, false).getChildren();
+        List<Note> before = viewInternal(rootAtom, 1, filter, style, false, cache).getChildren();
         List<Note> after = rootNote.getChildren();
         List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, noteComparator);
 
@@ -258,15 +257,37 @@ public class NoteQueries {
                     : height - 1;
 
             // TODO: verify that this can result in multiple log events per call to update()
-            updateInternal(n, h, filter, style);
+            updateInternal(n, h, filter, style, cache);
         }
     }
 
-    private Atom getAtom(final Note note, final Filter filter, final Set<String> created) {
-        // retrieve or create an atom for the note
-        // atoms are only created if they appear under a parent which is also an atom
+    private Map<String, Atom> createCache() {
+        return new HashMap<>();
+    }
+
+    private Atom getAtomById(final String id) {
+        return brain.getAtomGraph().getAtom(id);
+    }
+
+    // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved atoms
+    private Atom getAtomById(final String id, final Map<String, Atom> cache) {
+        Atom atom = cache.get(id);
+        if (null == atom) {
+            atom = brain.getAtomGraph().getAtom(id);
+            if (null != atom) cache.put(id, atom);
+        }
+        return atom;
+    }
+
+    // retrieve or create an atom for the note
+    // atoms are only created if they appear under a parent which is also an atom
+    private Atom getAtomForNote(final Note note,
+                                final Filter filter,
+                                final Set<String> created,
+                                final Map<String, Atom> cache) {
+
         String id = note.getId();
-        Atom atom = null == id ? null : brain.getAtomGraph().getAtom(id);
+        Atom atom = null == id ? null : getAtomById(id, cache);
 
         if (null == atom) {
             atom = createAtom(note.getId(), filter);
@@ -274,6 +295,19 @@ public class NoteQueries {
         }
         if (null == note.getId()) {
             note.setId(atom.getId());
+        }
+
+        return atom;
+    }
+
+    private Atom getRequiredAtomForNote(final Note note, final Map<String, Atom> cache) {
+        if (null == note.getId()) {
+            throw new InvalidUpdateException("note has no id");
+        }
+
+        Atom atom = getAtomById(note.getId(), cache);
+        if (null == atom) {
+            throw new InvalidUpdateException("no such atom: " + note);
         }
 
         return atom;
@@ -330,7 +364,7 @@ public class NoteQueries {
         }
 
         for (Atom a : results) {
-            Note n = viewInternal(a, height - 1, filter, style, true);
+            Note n = viewInternal(a, height - 1, filter, style, true, null);
             result.addChild(n);
         }
 
@@ -358,7 +392,7 @@ public class NoteQueries {
 
         for (Atom a : brain.getAtomGraph().getAllAtoms()) {
             if (filter.isVisible(a) && !isAdjacent(a, includeChildren, includeParents)) {
-                Note n = viewInternal(a, height, filter, style, true);
+                Note n = viewInternal(a, height, filter, style, true, null);
                 result.addChild(n);
             }
         }

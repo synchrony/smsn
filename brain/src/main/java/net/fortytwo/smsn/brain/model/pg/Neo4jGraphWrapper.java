@@ -41,7 +41,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
     }
 
     //private Transaction transaction;
-    private Neo4jTx neo4jTx;
+    //private Neo4jTx neo4jTx;
 
     @Override
     protected void updateIndex(Vertex updatedVertex, String key, Object value) {
@@ -104,9 +104,11 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         }
     }
 
+    /*
     private void checkNeo4jTransaction() {
         if (null == neo4jTx) throw new IllegalStateException("no active transaction");
     }
+    */
 
     private boolean keyIndexExists(final String key) {
         GraphDatabaseService graphDb = getGraphDatabaseService();

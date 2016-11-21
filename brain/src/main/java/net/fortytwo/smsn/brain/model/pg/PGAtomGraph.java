@@ -370,9 +370,12 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     private Vertex getVertex(String id) {
+        long now = System.currentTimeMillis();
         // note: requires a key index for efficiency
         Iterator<Vertex> vertices = propertyGraph.traversal().V().has(SemanticSynchrony.ID_V, id);
-        return vertices.hasNext() ? vertices.next() : null;
+        Vertex v = vertices.hasNext() ? vertices.next() : null;
+        System.out.println("retrieved vertex in " + (System.currentTimeMillis() - now) + " ms");
+        return v;
     }
 
     private Vertex createVertex(final String id, final String label) {

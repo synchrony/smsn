@@ -78,7 +78,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         Neo4jGraph graph = getNeo4jGraph(context);
 
         try {
-            return handleSmSnPayload(script, graph);
+            return handleRequest(script, graph);
         } catch (JSONException e) {
             throw new IllegalStateException(e);
         }
@@ -122,32 +122,32 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         actionsByName.put(action.getName(), action);
     }
 
-    private JSONObject handleSmSnPayload(String requestStr, Neo4jGraph graph) throws JSONException {
+    private JSONObject handleRequest(String requestStr, Neo4jGraph graph) throws JSONException {
         JSONObject request = new JSONObject(requestStr);
 
-        String action;
+        String actionName;
         try {
-            action = request.getString(Params.ACTION);
+            actionName = request.getString(Params.ACTION);
         } catch (JSONException e) {
             throw new IllegalStateException(e);
         }
 
-        if (null == action) {
+        if (null == actionName) {
             throw new IllegalArgumentException("action not found");
         }
 
         RequestParams params = Action.createParams(graph);
 
-        Action extension = actionsByName.get(action);
-        if (null == extension) {
-            throw new IllegalArgumentException("unsupported action: " + action);
+        Action action = actionsByName.get(actionName);
+        if (null == action) {
+            throw new IllegalArgumentException("unsupported action: " + actionName);
         }
 
-        SemanticSynchrony.logInfo("SmSn " + action);
 
-        extension.parseRequest(request, params);
+        action.parseRequest(request, params);
 
-        extension.handleRequestInternal(params);
+        action.handleRequest(params);
+
         return toJson(params.getMap());
     }
 

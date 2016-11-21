@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteHistory;
 import net.fortytwo.smsn.brain.NoteQueries;
@@ -67,11 +68,18 @@ public abstract class Action {
         parseRequest(new JSONObject(request), p);
     }
 
-    public void handleRequestInternal(final RequestParams params) {
+    public void handleRequest(final RequestParams params) {
 
         setParams(params);
 
+        SemanticSynchrony.logInfo("SmSn " + getName() + "...");
+        long before = System.currentTimeMillis();
+
         wrapTransaction(params);
+
+        long after = System.currentTimeMillis();
+
+        SemanticSynchrony.logInfo("...done in " + (after - before) + " ms");
 
         logActivity(params);
     }

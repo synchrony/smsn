@@ -41,6 +41,7 @@ public abstract class GraphWrapper {
     public abstract void shutdown();
 
     public void reindex(final Vertex vertex) {
+        updateIndex(vertex, SemanticSynchrony.ID_V);
         updateIndex(vertex, SemanticSynchrony.VALUE);
         updateIndex(vertex, SemanticSynchrony.ACRONYM);
     }
