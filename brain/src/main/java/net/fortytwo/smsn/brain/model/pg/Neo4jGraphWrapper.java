@@ -63,38 +63,17 @@ public class Neo4jGraphWrapper extends GraphWrapper {
 
     @Override
     public void begin() {
-        neo4jTx = getNeo4jGraph().getBaseGraph().tx();
-        //transaction = getGraphDatabaseService().beginTx();
+        graph.tx().readWrite();
     }
 
     @Override
     public void commit() {
-        checkNeo4jTransaction();
-
         graph.tx().commit();
-
-        //transaction.success();
-
-        try {
-            neo4jTx.success();
-        } finally {
-            neo4jTx = null;
-        }
     }
 
     @Override
     public void rollback() {
-        checkNeo4jTransaction();
-
         graph.tx().rollback();
-
-        //transaction.close();
-
-        try {
-            neo4jTx.failure();
-        } finally {
-            neo4jTx = null;
-        }
     }
 
     @Override
