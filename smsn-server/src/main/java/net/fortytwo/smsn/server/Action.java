@@ -43,23 +43,35 @@ public abstract class Action {
     protected abstract boolean doesWrite();
 
     private static final Map<Graph, Brain> brains = new HashMap<>();
+    private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
 
     private static final NoteHistory noteHistory = new NoteHistory();
 
     private synchronized static Brain getBrain(final GraphWrapper wrapper)
             throws Brain.BrainException {
 
-        Brain b = brains.get(wrapper.getGraph());
+        Brain brain = brains.get(wrapper.getGraph());
 
-        if (null == b) {
+        if (null == brain) {
             logger.info("instantiating Extend-o-Brain with base graph " + wrapper.getGraph());
             AtomGraph bg = new PGAtomGraph(wrapper);
-            b = new Brain(bg);
-            b.startBackgroundTasks();
-            brains.put(wrapper.getGraph(), b);
+            brain = new Brain(bg);
+            brain.startBackgroundTasks();
+            brains.put(wrapper.getGraph(), brain);
         }
 
-        return b;
+        return brain;
+    }
+
+    private synchronized static GraphWrapper getWrapper(final Neo4jGraph graph) {
+        GraphWrapper wrapper = wrappers.get(graph);
+
+        if (null == wrapper) {
+            wrapper = new Neo4jGraphWrapper(graph);
+            wrappers.put(graph, wrapper);
+        }
+
+        return wrapper;
     }
 
     public abstract void parseRequest(final JSONObject request, final RequestParams p) throws JSONException, BadRequestException;
@@ -70,16 +82,13 @@ public abstract class Action {
 
     public void handleRequest(final RequestParams params) {
 
-        setParams(params);
+        setNonTransactionalParams(params);
 
-        SemanticSynchrony.logInfo("SmSn " + getName() + "...");
         long before = System.currentTimeMillis();
-
         wrapTransaction(params);
-
         long after = System.currentTimeMillis();
 
-        SemanticSynchrony.logInfo("...done in " + (after - before) + " ms");
+        SemanticSynchrony.logInfo(getName() + " finished in " + (after - before) + " ms");
 
         logActivity(params);
     }
@@ -105,14 +114,20 @@ public abstract class Action {
     }
 
     public static RequestParams createParams(final Neo4jGraph graph) {
-        RequestParams p = new RequestParams();
-        p.setGraphWrapper(new Neo4jGraphWrapper(graph));
-        p.setUser(() -> "none");
+        RequestParams params = new RequestParams();
 
-        return p;
+        setGraphWrapper(params, graph);
+        params.setUser(() -> "none");
+
+        return params;
     }
 
-    protected boolean canWrite(final Principal user) {
+    private static void setGraphWrapper(final RequestParams params, final Neo4jGraph graph) {
+        GraphWrapper wrapper = getWrapper(graph);
+        params.setGraphWrapper(wrapper);
+    }
+
+    private boolean canWrite(final Principal user) {
         return true;
     }
 
@@ -127,7 +142,12 @@ public abstract class Action {
 
     private void wrapTransaction(final RequestParams params) {
         try {
-            AtomGraph.wrapInTransaction(params.getBrain().getAtomGraph(), () -> performTransaction(params));
+            AtomGraph.wrapInTransaction(params.getBrain().getAtomGraph(), () -> {
+                // must be done within the transaction, as it involves graph operations
+                setTransactionalParams(params);
+
+                performTransaction(params);
+            });
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
@@ -151,7 +171,7 @@ public abstract class Action {
         }
     }
 
-    private void setParams(final RequestParams params) {
+    private void setNonTransactionalParams(final RequestParams params) {
 
         checkAuthorized(params);
 
@@ -162,9 +182,12 @@ public abstract class Action {
         setIO(params);
         setHeight(params);
         setFilter(params);
+        setStyle(params);
+    }
+
+    private void setTransactionalParams(final RequestParams params) {
         setRoot(params);
         setTitle(params);
-        setStyle(params);
     }
 
     private void setWikiView(final RequestParams params) {

@@ -164,7 +164,7 @@ public class Note {
 
     @Override
     public String toString() {
-        return "note:" + (null == id ? "null" : id);
+        return "note[" + (null == id ? "null" : id) + "]";
     }
 
     public boolean getHasChildren() {

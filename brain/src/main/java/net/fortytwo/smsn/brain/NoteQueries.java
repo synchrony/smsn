@@ -292,6 +292,7 @@ public class NoteQueries {
         if (null == atom) {
             atom = createAtom(note.getId(), filter);
             created.add(atom.getId());
+            cache.put(atom.getId(), atom);
         }
         if (null == note.getId()) {
             note.setId(atom.getId());
@@ -307,7 +308,7 @@ public class NoteQueries {
 
         Atom atom = getAtomById(note.getId(), cache);
         if (null == atom) {
-            throw new InvalidUpdateException("no such atom: " + note);
+            throw new InvalidUpdateException("no such atom: " + note.getId());
         }
 
         return atom;

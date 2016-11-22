@@ -233,17 +233,17 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public List<Atom> getAtomsByValue(final String value, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.queryByValue(value), filter);
+        return filterVerticesToAtoms(wrapper.getVerticesByValue(value), filter);
     }
 
     @Override
     public List<Atom> getAtomsByAcronym(final String acronym, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.queryByAcronym(acronym), filter);
+        return filterVerticesToAtoms(wrapper.getVerticesByAcronym(acronym), filter);
     }
 
     @Override
     public List<Atom> getAtomsByShortcut(final String shortcut, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.queryByShortcut(shortcut), filter);
+        return filterVerticesToAtoms(wrapper.getVerticesByShortcut(shortcut), filter);
     }
 
     private void updateAcronym(final PGAtom atom, final Vertex asVertex) {
@@ -365,17 +365,11 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     private Object getOutEdgeId(final PGGraphEntity entity, final String label) {
-        Object id = entity.getExactlyOneEdge(label, Direction.OUT).id();
-        return id;
+        return entity.getExactlyOneEdge(label, Direction.OUT).id();
     }
 
     private Vertex getVertex(String id) {
-        long now = System.currentTimeMillis();
-        // note: requires a key index for efficiency
-        Iterator<Vertex> vertices = propertyGraph.traversal().V().has(SemanticSynchrony.ID_V, id);
-        Vertex v = vertices.hasNext() ? vertices.next() : null;
-        System.out.println("retrieved vertex in " + (System.currentTimeMillis() - now) + " ms");
-        return v;
+        return wrapper.getVertexById(id);
     }
 
     private Vertex createVertex(final String id, final String label) {

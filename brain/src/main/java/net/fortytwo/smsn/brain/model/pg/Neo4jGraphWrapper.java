@@ -17,11 +17,12 @@ import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.tinkerpop.api.Neo4jTx;
 import org.neo4j.tinkerpop.api.impl.Neo4jGraphAPIImpl;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +33,8 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         return key + "-index";
     }
 
+    private final Map<String, Index<Node>> indexCache = new HashMap<>();
+
     public Neo4jGraphWrapper(final Neo4jGraph graph) {
         super(graph);
     }
@@ -39,9 +42,6 @@ public class Neo4jGraphWrapper extends GraphWrapper {
     public Neo4jGraphWrapper(File dataDir) {
         super(createGraph(dataDir));
     }
-
-    //private Transaction transaction;
-    //private Neo4jTx neo4jTx;
 
     @Override
     protected void updateIndex(Vertex updatedVertex, String key, Object value) {
@@ -104,12 +104,6 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         }
     }
 
-    /*
-    private void checkNeo4jTransaction() {
-        if (null == neo4jTx) throw new IllegalStateException("no active transaction");
-    }
-    */
-
     private boolean keyIndexExists(final String key) {
         GraphDatabaseService graphDb = getGraphDatabaseService();
         try (Transaction ignored = graphDb.beginTx()) {
@@ -125,7 +119,23 @@ public class Neo4jGraphWrapper extends GraphWrapper {
     }
 
     @Override
-    protected Iterator<Vertex> queryByKeyValue(String key, String value) {
+    protected Vertex getVertexByKeyValue(String key, String value) {
+        Index<Node> index = getIndex(key);
+        IndexHits<Node> hits = index.query(key, value);
+        if (hits.hasNext()) {
+            Vertex next = nodeToVertex(hits.next());
+            if (hits.hasNext()) {
+                logger.warning("multiple atoms with " + key + " '" + value + "'");
+            }
+
+            return next;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    protected Iterator<Vertex> getVerticesByKeyValue(String key, String value) {
         Index<Node> index = getIndex(key);
         IndexHits<Node> hits = index.query(key, value);
 
@@ -178,8 +188,14 @@ public class Neo4jGraphWrapper extends GraphWrapper {
     }
 
     private Index<Node> getIndex(final String key) {
-        String indexName = indexNameForKey(key);
-        return getGraphDatabaseService().index().forNodes(indexName);
+        Index<Node> index = indexCache.get(key);
+        if (null == index) {
+            String indexName = indexNameForKey(key);
+            index = getGraphDatabaseService().index().forNodes(indexName);
+            if (null != index) indexCache.put(key, index);
+        }
+
+        return index;
     }
 
     private static void createAndShutdownGraphDatabaseService(File dataDir) {

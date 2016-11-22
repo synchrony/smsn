@@ -58,21 +58,23 @@ public abstract class GraphWrapper {
         return graph;
     }
 
-    protected abstract Iterator<Vertex> queryByKeyValue(String key, String value);
+    protected abstract Vertex getVertexByKeyValue(String key, String value);
 
-    public Iterator<Vertex> queryById(final String id) {
-        return graph.traversal().V().has(SemanticSynchrony.ID_V, id);
+    protected abstract Iterator<Vertex> getVerticesByKeyValue(String key, String value);
+
+    public Vertex getVertexById(final String id) {
+        return getVertexByKeyValue(SemanticSynchrony.ID_V, id);
     }
 
-    public Iterator<Vertex> queryByValue(final String term) {
-        return queryByKeyValue(SemanticSynchrony.VALUE, term);
+    public Iterator<Vertex> getVerticesByValue(final String term) {
+        return getVerticesByKeyValue(SemanticSynchrony.VALUE, term);
     }
 
-    public Iterator<Vertex> queryByAcronym(final String acronym) {
-        return queryByKeyValue(SemanticSynchrony.ACRONYM, acronym);
+    public Iterator<Vertex> getVerticesByAcronym(final String acronym) {
+        return getVerticesByKeyValue(SemanticSynchrony.ACRONYM, acronym);
     }
 
-    public Iterator<Vertex> queryByShortcut(final String shortcut) {
-        return graph.traversal().V().has(SemanticSynchrony.SHORTCUT, shortcut);
+    public Iterator<Vertex> getVerticesByShortcut(final String shortcut) {
+        return getVerticesByKeyValue(SemanticSynchrony.SHORTCUT, shortcut);
     }
 }

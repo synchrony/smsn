@@ -58,8 +58,15 @@ public class TinkerGraphWrapper extends GraphWrapper {
     }
 
     @Override
-    protected Iterator<Vertex> queryByKeyValue(String key, String value) {
-        throw new UnsupportedOperationException();
+    protected Vertex getVertexByKeyValue(String key, String value) {
+
+        Iterator<Vertex> vertices = getVerticesByKeyValue(key, value);
+        return vertices.hasNext() ? vertices.next() : null;
+    }
+
+    @Override
+    protected Iterator<Vertex> getVerticesByKeyValue(String key, String value) {
+        return graph.traversal().V().has(key, value);
     }
 
     private boolean hasVertexIndex(final String key) {
