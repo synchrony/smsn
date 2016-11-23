@@ -30,7 +30,7 @@ public abstract class BrainReader {
             throws IOException {
 
         if (!fileOrDir.exists()) {
-            throw new IllegalArgumentException("file or directory not found: " + fileOrDir.getName());
+            throw new IllegalArgumentException("file or directory not found: " + fileOrDir.getAbsolutePath());
         }
 
         if (fileOrDir.isDirectory()) {

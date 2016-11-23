@@ -88,7 +88,7 @@ public abstract class Action {
         wrapTransaction(params);
         long after = System.currentTimeMillis();
 
-        SemanticSynchrony.logInfo(getName() + " finished in " + (after - before) + " ms");
+        SemanticSynchrony.logInfo("completed " + getName() + " action in " + (after - before) + " ms");
 
         logActivity(params);
     }
