@@ -78,17 +78,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>net.fortytwo.stream</groupId>
-                <artifactId>stream42-sparql</artifactId>
-                <version>${stream42.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-codec</groupId>
-                        <artifactId>commons-codec</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
                 <!-- this is the version used by Android 2.2.1 -->
