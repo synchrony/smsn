@@ -85,7 +85,7 @@ public abstract class Action {
         setNonTransactionalParams(params);
 
         long before = System.currentTimeMillis();
-        wrapTransaction(params);
+        wrapTransactionAndExceptions(params);
         long after = System.currentTimeMillis();
 
         SemanticSynchrony.logInfo("completed " + getName() + " action in " + (after - before) + " ms");
@@ -140,7 +140,7 @@ public abstract class Action {
         return noteHistory.getHistory(100, true, graph, filter);
     }
 
-    private void wrapTransaction(final RequestParams params) {
+    private void wrapTransactionAndExceptions(final RequestParams params) {
         try {
             AtomGraph.wrapInTransaction(params.getBrain().getAtomGraph(), () -> {
                 // must be done within the transaction, as it involves graph operations
@@ -148,7 +148,7 @@ public abstract class Action {
 
                 performTransaction(params);
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RequestProcessingException(e);
         }
     }

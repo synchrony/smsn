@@ -90,6 +90,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         }
     }
 
+    /*
     @Override
     protected void createKeyIndex(String key) {
         if (keyIndexExists(key)) return;
@@ -117,6 +118,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
 
         return false;
     }
+    */
 
     @Override
     protected Vertex getVertexByKeyValue(String key, String value) {

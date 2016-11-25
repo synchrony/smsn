@@ -22,10 +22,12 @@ public class TinkerGraphWrapper extends GraphWrapper {
         }
     }
 
+    /*
     @Override
     protected void createKeyIndex(String key) {
         // do nothing
     }
+    */
 
     @Override
     protected void updateIndex(Vertex updatedVertex, String key, Object value) {

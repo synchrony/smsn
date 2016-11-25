@@ -14,8 +14,10 @@ public abstract class GraphWrapper {
         this.graph = graph;
 
         // TODO: add id strategy
-        createKeyIndex(SemanticSynchrony.ID_V);
-        createKeyIndex(SemanticSynchrony.SHORTCUT);
+        createExactIndex(SemanticSynchrony.ID_V, true);
+        createExactIndex(SemanticSynchrony.SHORTCUT, false);
+        //createKeyIndex(SemanticSynchrony.ID_V);
+        //createKeyIndex(SemanticSynchrony.SHORTCUT);
 
         createFullTextIndex(SemanticSynchrony.VALUE);
         createFullTextIndex(SemanticSynchrony.ACRONYM);
@@ -26,7 +28,7 @@ public abstract class GraphWrapper {
 
     protected abstract void createExactIndex(String key, boolean caseSensitive);
 
-    protected abstract void createKeyIndex(String key);
+    //protected abstract void createKeyIndex(String key);
 
     protected abstract void updateIndex(Vertex updatedVertex, String key, Object value);
 
