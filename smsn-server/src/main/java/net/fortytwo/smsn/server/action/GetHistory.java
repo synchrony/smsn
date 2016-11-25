@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server.action;
 
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
@@ -31,10 +32,10 @@ public class GetHistory extends Action {
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        List<String> ids = getHistory(p.getBrain().getAtomGraph(), p.getFilter());
+        Iterable<Atom> atoms = getHistory(p.getBrain().getAtomGraph(), p.getFilter());
 
         try {
-            addView(p.getQueries().customView(ids, p.getFilter()), p);
+            addView(p.getQueries().customView(atoms, p.getFilter()), p);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

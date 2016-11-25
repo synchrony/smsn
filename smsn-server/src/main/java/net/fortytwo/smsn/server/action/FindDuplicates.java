@@ -39,10 +39,12 @@ public class FindDuplicates extends Action {
     }
 
     protected void performTransaction(final RequestParams params) throws RequestProcessingException {
-        List<String> ids = getDuplicates(params.getBrain().getAtomGraph(), params.getFilter());
+        List<List<Atom>> dups = getDuplicates(params.getBrain().getAtomGraph(), params.getFilter());
+        List<Atom> flat = new LinkedList<>();
+        for (List<Atom> l : dups) flat.addAll(l);
 
         try {
-            addView(params.getQueries().customView(ids, params.getFilter()), params);
+            addView(params.getQueries().customView(flat, params.getFilter()), params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
@@ -70,30 +72,30 @@ public class FindDuplicates extends Action {
         }
     }
 
-    private List<String> getDuplicates(final AtomGraph graph,
+    private List<List<Atom>> getDuplicates(final AtomGraph graph,
                                        final Filter filter) throws RequestProcessingException {
-        Map<String, List<String>> m = new HashMap<>();
-        List<List<String>> dups = new LinkedList<>();
+        Map<String, List<Atom>> m = new HashMap<>();
+        List<List<Atom>> dups = new LinkedList<>();
         int total = 0;
 
         for (Atom a : graph.getAllAtoms()) {
             if (filter.isVisible(a)) {
                 String value = a.getValue();
                 if (null != value && 0 < value.length()) {
-                    String hash = null;
+                    String hash;
                     try {
                         hash = md5SumOf(value);
                     } catch (UnsupportedEncodingException e) {
                         throw new RequestProcessingException(e);
                     }
-                    List<String> ids = m.get(hash);
-                    if (null == ids) {
-                        ids = new LinkedList<>();
-                        m.put(hash, ids);
+                    List<Atom> atoms = m.get(hash);
+                    if (null == atoms) {
+                        atoms = new LinkedList<>();
+                        m.put(hash, atoms);
                     } else {
-                        if (1 == ids.size()) {
+                        if (1 == atoms.size()) {
                             total++;
-                            dups.add(ids);
+                            dups.add(atoms);
                         }
 
                         total++;
@@ -103,15 +105,12 @@ public class FindDuplicates extends Action {
                         }
                     }
 
-                    ids.add(a.getId());
+                    atoms.add(a);
                 }
             }
         }
 
-        List<String> allDups = new LinkedList<>();
-        dups.forEach(allDups::addAll);
-
-        return allDups;
+        return dups;
     }
 
     // copied from Ripple's StringUtils so as to avoid a dependency

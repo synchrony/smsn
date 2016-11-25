@@ -3,6 +3,7 @@ package net.fortytwo.smsn.brain.model;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.Note;
+import org.parboiled.common.Preconditions;
 
 public class Filter {
 
@@ -87,9 +88,7 @@ public class Filter {
     }
 
     public boolean isVisible(final Atom atom) {
-        if (null == atom) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgNotNull(atom, "atom");
 
         Float sharability = atom.getSharability();
         Float weight = atom.getWeight();

@@ -25,35 +25,29 @@ public class NoteHistory {
         totalVisits++;
     }
 
-    public List<String> getHistory(final int maxlen,
+    public Iterable<Atom> getHistory(final int maxlen,
                                    final boolean dedup,
                                    final AtomGraph graph,
                                    final Filter filter) {
-        Collection<String> r = dedup
+        Collection<Atom> atoms = dedup
                 ? new LinkedHashSet<>()
                 : new LinkedList<>();
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 
         for (int i = totalVisits - 1; i >= low; i--) {
-            if (r.size() >= maxlen) {
+            if (atoms.size() >= maxlen) {
                 break;
             }
 
             String id = visitedAtoms[i % CAPACITY];
 
-            Atom v = graph.getAtom(id);
-            if (null != v && filter.isVisible(v)) {
-                r.add(id);
+            Atom a = graph.getAtom(id);
+            if (null != a && filter.isVisible(a)) {
+                atoms.add(a);
             }
         }
 
-        if (dedup) {
-            List<String> s = new LinkedList<>();
-            s.addAll(r);
-            return s;
-        } else {
-            return (List<String>) r;
-        }
+        return atoms;
     }
 }

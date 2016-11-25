@@ -70,19 +70,14 @@ public class NoteQueries {
         return viewInternal(root, height, filter, style, true, null);
     }
 
-    public Note customView(final List<String> atomIds,
+    public Note customView(final Iterable<Atom> atoms,
                            final Filter filter) {
-        checkListOfIdsArg(atomIds);
+        checkAtomIterableArg(atoms);
         checkFilterArg(filter);
 
         Note n = new Note();
 
-        for (String id : atomIds) {
-            Atom a = getAtomById(id);
-            if (null == a) {
-                throw new IllegalArgumentException("no such atom: " + id);
-            }
-
+        for (Atom a : atoms) {
             n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true, null));
         }
 
@@ -231,6 +226,10 @@ public class NoteQueries {
 
     private void checkListOfIdsArg(final List<String> atomIds) {
         Preconditions.checkArgNotNull(atomIds, "atomIds");
+    }
+
+    private void checkAtomIterableArg(final Iterable<Atom> atoms) {
+        Preconditions.checkArgNotNull(atoms, "atoms");
     }
 
     private void checkFilterArg(final Filter filter) {

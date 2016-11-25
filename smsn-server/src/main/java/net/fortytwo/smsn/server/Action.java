@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteHistory;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
@@ -135,8 +136,8 @@ public abstract class Action {
         noteHistory.visit(rootId);
     }
 
-    protected List<String> getHistory(final AtomGraph graph,
-                                      final Filter filter) {
+    protected Iterable<Atom> getHistory(final AtomGraph graph,
+                                        final Filter filter) {
         return noteHistory.getHistory(100, true, graph, filter);
     }
 

@@ -12,11 +12,15 @@ import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.parboiled.common.Preconditions;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class PGAtomGraph implements AtomGraph {
 
@@ -99,12 +103,10 @@ public class PGAtomGraph implements AtomGraph {
         return null == v ? null : getAtom(v);
     }
 
-    public Atom getAtom(final Vertex v) {
-        if (null == v) {
-            throw new IllegalArgumentException("null vertex");
-        }
+    public Atom getAtom(final Vertex vertex) {
+        Preconditions.checkArgNotNull(vertex, "vertex");
 
-        return new PGAtomImpl(v);
+        return new PGAtomImpl(vertex);
     }
 
     @Override
@@ -156,18 +158,15 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public void removeIsolatedAtoms(final Filter filter) {
-        if (null == filter) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgNotNull(filter, "filter");
 
         List<Vertex> toRemove = new LinkedList<>();
 
         propertyGraph.vertices().forEachRemaining(v -> {
-            if (null != v.property("value")
+            if (isAtomVertex(v)
                     && !v.edges(Direction.IN).hasNext()
                     && !v.edges(Direction.OUT).hasNext()) {
-                Atom a = getAtom(v);
-                if (filter.isVisible(a)) {
+                if (filter.isVisible(getAtom(v))) {
                     toRemove.add(v);
                 }
             }
@@ -196,39 +195,10 @@ public class PGAtomGraph implements AtomGraph {
      */
     @Override
     public Iterable<Atom> getAllAtoms() {
-        return () -> new Iterator<Atom>() {
-            private final Iterator<Vertex> iter = getPropertyGraph().vertices();
-            private Atom next = null;
-
-            public boolean hasNext() {
-                if (null == next) {
-                    while (iter.hasNext()) {
-                        Vertex v = iter.next();
-
-                        // Here, a vertex is considered an atom if it has a creation timestamp
-                        if (v.property(SemanticSynchrony.CREATED).isPresent()) {
-                            next = getAtom(v);
-                            break;
-                        }
-                    }
-
-                    return null != next;
-                } else {
-                    return true;
-                }
-            }
-
-            public Atom next() {
-                hasNext();
-                Atom tmp = next;
-                next = null;
-                return tmp;
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
+        return () -> asFilteredStream(
+                getPropertyGraph().vertices(),
+                this::isAtomVertex)
+                .map(this::getAtom).iterator();
     }
 
     @Override
@@ -244,6 +214,11 @@ public class PGAtomGraph implements AtomGraph {
     @Override
     public List<Atom> getAtomsByShortcut(final String shortcut, final Filter filter) {
         return filterVerticesToAtoms(wrapper.getVerticesByShortcut(shortcut), filter);
+    }
+
+    private boolean isAtomVertex(final Vertex v) {
+        // Here, a vertex is considered an atom if it has a creation timestamp
+        return v.property(SemanticSynchrony.CREATED).isPresent();
     }
 
     private void updateAcronym(final PGAtom atom, final Vertex asVertex) {
@@ -382,6 +357,13 @@ public class PGAtomGraph implements AtomGraph {
 
     private String getNonNullId(final String id) {
         return null == id ? SemanticSynchrony.createRandomKey() : id;
+    }
+
+    private <A> Stream<A> asFilteredStream(Iterator<A> sourceIterator, Predicate<A> filter) {
+        Iterable<A> iterable = () -> sourceIterator;
+        Stream<A> stream = StreamSupport.stream(iterable.spliterator(), false);
+
+        return stream.filter(filter);
     }
 
     private class PGAtomImpl extends PGAtom {
