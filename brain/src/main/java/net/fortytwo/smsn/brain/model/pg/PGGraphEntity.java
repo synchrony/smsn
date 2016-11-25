@@ -96,7 +96,6 @@ abstract class PGGraphEntity {
             if (null == previousValue) {
                 return false;
             } else {
-                //vertex.property(name, null);
                 vertex.property(name).remove();
                 return true;
             }
