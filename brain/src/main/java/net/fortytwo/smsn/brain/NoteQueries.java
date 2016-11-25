@@ -8,6 +8,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
+import org.parboiled.common.Preconditions;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,9 +36,7 @@ public class NoteQueries {
      * @param brain the Extend-o-Brain instance to query and update
      */
     public NoteQueries(final Brain brain) {
-        if (null == brain) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgNotNull(brain, "brain");
 
         this.brain = brain;
     }
@@ -59,15 +58,232 @@ public class NoteQueries {
                      final int height,
                      final Filter filter,
                      final ViewStyle style) {
-        if (null == root || height < 0 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
+        checkRootArg(root);
+        checkHeightArg(height, 0);
+        checkFilterArg(filter);
+        checkStyleArg(style, false);
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logView(root);
         }
 
         return viewInternal(root, height, filter, style, true, null);
+    }
+
+    public Note customView(final List<String> atomIds,
+                           final Filter filter) {
+        checkListOfIdsArg(atomIds);
+        checkFilterArg(filter);
+
+        Note n = new Note();
+
+        for (String id : atomIds) {
+            Atom a = getAtomById(id);
+            if (null == a) {
+                throw new IllegalArgumentException("no such atom: " + id);
+            }
+
+            n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true, null));
+        }
+
+        return n;
+    }
+
+    /**
+     * Updates the graph.
+     *
+     * @param root the root of the note tree
+     * @param height   the maximum height of the tree which will be applied to the graph as an update.
+     *                 If height is 0, only the root node will be affected,
+     *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
+     * @param filter   a collection of criteria for atoms and links.
+     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param style    the adjacency style of the view
+     * @throws InvalidUpdateException if the update cannot be performed as specified
+     */
+    public void update(final Note root,
+                       final int height,
+                       final Filter filter,
+                       final ViewStyle style) {
+
+        checkRootArg(root);
+        checkHeightArg(height, 0);
+        checkFilterArg(filter);
+        checkStyleArg(style, true);
+
+        Map<String, Atom> cache = createCache();
+
+        updateInternal(root, height, filter, style, cache);
+
+        brain.getAtomGraph().notifyOfUpdate();
+    }
+
+    /**
+     * Performs a specified type of search, such as full text or acronym search
+     *
+     * @param queryType the type of search to perform
+     * @param query     the search query
+     * @param height    maximum height of the search results view.
+     *                  This must be at least 1, indicating a results node with search results as children.
+     *                  A height of 2 includes the children of the results, as well.
+     * @param filter    a collection of criteria for atoms and links.
+     *                  Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param style     the adjacency style of the view
+     * @return an ordered list of query results
+     */
+    public Note search(final QueryType queryType,
+                       final String query,
+                       final int height,
+                       final Filter filter,
+                       final ViewStyle style) {
+        checkQueryTypeArg(queryType);
+        checkQueryArg(query);
+        checkHeightArg(height, 1);
+        checkFilterArg(filter);
+        checkStyleArg(style, false);
+
+        Note result = new Note();
+
+        List<Atom> results;
+        switch (queryType) {
+            case FullText:
+                results = brain.getAtomGraph().getAtomsByValue(query, filter);
+                break;
+            case Acronym:
+                results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
+                break;
+            case Shortcut:
+                results = brain.getAtomGraph().getAtomsByShortcut(query, filter);
+                break;
+            default:
+                throw new IllegalStateException("unexpected query type: " + queryType);
+        }
+
+        for (Atom a : results) {
+            Note n = viewInternal(a, height - 1, filter, style, true, null);
+            result.addChild(n);
+        }
+
+        Collections.sort(result.getChildren(), new NoteComparator());
+
+        result.setValue(queryType.name() + " results for \"" + query + "\"");
+        return result;
+    }
+
+    public Note findRootAtoms(final Filter filter,
+                              final ViewStyle style,
+                              final int height) {
+        checkHeightArg(height, 0);
+        checkFilterArg(filter);
+        checkStyleArg(style, false);
+
+        boolean includeChildren = style.getDirection().equals(ViewStyle.Direction.Backward);
+        boolean includeParents = style.getDirection().equals(ViewStyle.Direction.Forward);
+
+        return findAtoms(filter, includeChildren, includeParents, height, style);
+    }
+
+    public Note findIsolatedAtoms(final Filter filter) {
+        return findAtoms(filter, true, true, 1, forwardViewStyle);
+    }
+
+    /**
+     * Generates a prioritized list of notes
+     *
+     * @param filter     a collection of criteria for atoms and links.
+     *                   Atoms and links which do not meet the criteria are not to appear in the view.
+     * @param maxResults the maximum number of results to return
+     * @param priorities the list of priorities to view
+     * @return a prioritized list of notes
+     */
+    public Note priorityView(final Filter filter,
+                             final int maxResults,
+                             final Priorities priorities) throws InvalidGraphException {
+        checkFilterArg(filter);
+        checkPrioritiesArg(priorities);
+        checkMaxResultsArg(maxResults);
+
+        Note result = new Note();
+        result.setValue("priority queue with up to " + maxResults + " results");
+
+        Queue<Atom> queue = priorities.getQueue();
+        int i = 0;
+        for (Atom a : queue) {
+            if (filter.isVisible(a)) {
+                result.addChild(toNote(a, true, true));
+
+                if (++i >= maxResults) {
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private void checkRootArg(final Atom root) {
+        Preconditions.checkArgNotNull(root, "root");
+    }
+
+    private void checkRootArg(final Note root) {
+        Preconditions.checkArgNotNull(root, "root");
+    }
+
+    private void checkListOfIdsArg(final List<String> atomIds) {
+        Preconditions.checkArgNotNull(atomIds, "atomIds");
+    }
+
+    private void checkFilterArg(final Filter filter) {
+        Preconditions.checkArgNotNull(filter, "filter");
+    }
+
+    private void checkStyleArg(final ViewStyle style, boolean isUpdate) {
+        Preconditions.checkArgNotNull(style, "style");
+
+        Preconditions.checkArgument(!isUpdate || style.addOnUpdate() || style.deleteOnUpdate(),
+                "can't update in style " + style);
+    }
+
+    private void checkHeightArg(final int height, final int min) {
+        Preconditions.checkArgument(height >= min, "invalid height for this operation");
+    }
+
+    private void checkMaxResultsArg(final int maxResults) {
+        Preconditions.checkArgument(maxResults >= 1, "invalid maxResults");
+    }
+
+    private void checkQueryTypeArg(final QueryType type) {
+        Preconditions.checkArgNotNull(type, "queryType");
+    }
+
+    private void checkQueryArg(final String query) {
+        Preconditions.checkArgNotNull(query, "query");
+    }
+
+    private void checkPrioritiesArg(final Priorities priorities) {
+        Preconditions.checkArgNotNull(priorities, "priorities");
+    }
+
+    private void addToCache(final Atom atom, final Map<String, Atom> cache) {
+        if (null != cache) cache.put(atom.getId(), atom);
+    }
+
+    private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
+            ? (null == b.getId() ? 0 : -1)
+            : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
+
+    private boolean hasChildren(final Atom root,
+                                final Filter filter,
+                                final ViewStyle style) {
+        // If the note is invisible, we can't see whether it has children.
+        if (!filter.isVisible(root)) {
+            return false;
+        }
+
+        // If the note is visible, we can see its children (although we will not be able to read the values of any
+        // children which are themselves invisible).
+        Iterable<Atom> children = style.getLinked(root, filter);
+        return children.iterator().hasNext();
     }
 
     private Note viewInternal(final Atom root,
@@ -96,80 +312,6 @@ public class NoteQueries {
         }
 
         return n;
-    }
-
-    public Note customView(final List<String> atomIds,
-                           final Filter filter) {
-        if (null == atomIds || null == filter) {
-            throw new IllegalArgumentException();
-        }
-
-        Note n = new Note();
-
-        for (String id : atomIds) {
-            Atom a = getAtomById(id);
-            if (null == a) {
-                throw new IllegalArgumentException("no such atom: " + id);
-            }
-
-            n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true, null));
-        }
-
-        return n;
-    }
-
-    /**
-     * Updates the graph.
-     *
-     * @param rootNote the root of the note tree
-     * @param height   the maximum height of the tree which will be applied to the graph as an update.
-     *                 If height is 0, only the root node will be affected,
-     *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
-     * @param filter   a collection of criteria for atoms and links.
-     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param style    the adjacency style of the view
-     * @throws InvalidUpdateException if the update cannot be performed as specified
-     */
-    public void update(final Note rootNote,
-                       final int height,
-                       final Filter filter,
-                       final ViewStyle style) {
-
-        if (null == rootNote || height < 0 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
-
-        if (!style.addOnUpdate() && !style.deleteOnUpdate()) {
-            throw new IllegalStateException("can't update in style " + style);
-        }
-
-        Map<String, Atom> cache = createCache();
-
-        updateInternal(rootNote, height, filter, style, cache);
-
-        brain.getAtomGraph().notifyOfUpdate();
-    }
-
-    private void addToCache(final Atom atom, final Map<String, Atom> cache) {
-        if (null != cache) cache.put(atom.getId(), atom);
-    }
-
-    private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
-            ? (null == b.getId() ? 0 : -1)
-            : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
-
-    private boolean hasChildren(final Atom root,
-                                final Filter filter,
-                                final ViewStyle style) {
-        // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root)) {
-            return false;
-        }
-
-        // If the note is visible, we can see its children (although we will not be able to read the values of any
-        // children which are themselves invisible).
-        Iterable<Atom> children = style.getLinked(root, filter);
-        return children.iterator().hasNext();
     }
 
     private void updateInternal(final Note rootNote,
@@ -325,56 +467,6 @@ public class NoteQueries {
         return a;
     }
 
-    /**
-     * Performs a specified type of search, such as full text or acronym search
-     *
-     * @param queryType the type of search to perform
-     * @param query     the search query
-     * @param height    maximum height of the search results view.
-     *                  This must be at least 1, indicating a results node with search results as children.
-     *                  A height of 2 includes the children of the results, as well.
-     * @param filter    a collection of criteria for atoms and links.
-     *                  Atoms and links which do not meet the criteria are not to appear in search results.
-     * @param style     the adjacency style of the view
-     * @return an ordered list of query results
-     */
-    public Note search(final QueryType queryType,
-                       final String query,
-                       final int height,
-                       final Filter filter,
-                       final ViewStyle style) {
-        if (null == query || height < 1 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
-
-        Note result = new Note();
-
-        List<Atom> results;
-        switch (queryType) {
-            case FullText:
-                results = brain.getAtomGraph().getAtomsByValue(query, filter);
-                break;
-            case Acronym:
-                results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
-                break;
-            case Shortcut:
-                results = brain.getAtomGraph().getAtomsByShortcut(query, filter);
-                break;
-            default:
-                throw new IllegalStateException("unexpected query type: " + queryType);
-        }
-
-        for (Atom a : results) {
-            Note n = viewInternal(a, height - 1, filter, style, true, null);
-            result.addChild(n);
-        }
-
-        Collections.sort(result.getChildren(), new NoteComparator());
-
-        result.setValue(queryType.name() + " results for \"" + query + "\"");
-        return result;
-    }
-
     private boolean isAdjacent(final Atom a, final boolean includeChildren, final boolean includeParents) {
         return (includeChildren && null != a.getNotes())
                 || (includeParents && a.getFirstOf().size() > 0);
@@ -399,54 +491,6 @@ public class NoteQueries {
         }
 
         Collections.sort(result.getChildren(), new NoteComparator());
-        return result;
-    }
-
-    public Note findRootAtoms(final Filter filter,
-                              final ViewStyle style,
-                              final int height) {
-
-        boolean includeChildren = style.getDirection().equals(ViewStyle.Direction.Backward);
-        boolean includeParents = style.getDirection().equals(ViewStyle.Direction.Forward);
-
-        return findAtoms(filter, includeChildren, includeParents, height, style);
-    }
-
-    public Note findIsolatedAtoms(final Filter filter) {
-        return findAtoms(filter, true, true, 1, forwardViewStyle);
-    }
-
-    /**
-     * Generates a prioritized list of notes
-     *
-     * @param filter     a collection of criteria for atoms and links.
-     *                   Atoms and links which do not meet the criteria are not to appear in the view.
-     * @param maxResults the maximum number of results to return
-     * @param priorities the list of priorities to view
-     * @return a prioritized list of notes
-     */
-    public Note priorityView(final Filter filter,
-                             final int maxResults,
-                             final Priorities priorities) throws InvalidGraphException {
-        if (null == filter || maxResults < 1 || null == priorities) {
-            throw new IllegalArgumentException();
-        }
-
-        Note result = new Note();
-        result.setValue("priority queue with up to " + maxResults + " results");
-
-        Queue<Atom> queue = priorities.getQueue();
-        int i = 0;
-        for (Atom a : queue) {
-            if (filter.isVisible(a)) {
-                result.addChild(toNote(a, true, true));
-
-                if (++i >= maxResults) {
-                    break;
-                }
-            }
-        }
-
         return result;
     }
 
