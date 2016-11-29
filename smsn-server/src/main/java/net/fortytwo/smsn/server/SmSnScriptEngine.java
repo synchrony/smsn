@@ -32,9 +32,11 @@ import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScriptEngine {
@@ -84,9 +86,18 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         }
     }
 
+    // note: this is a hack.  This is currently how config properties are loaded.
     @Override
     public Object eval(Reader reader, ScriptContext context) throws ScriptException {
-        throw new UnsupportedOperationException();
+        Properties properties = new Properties();
+        try {
+            properties.load(reader);
+        } catch (IOException e) {
+            throw new ScriptException(e);
+        }
+
+        SemanticSynchrony.addConfiguration(properties);
+        return "added " + properties.size() + " configurations properties";
     }
 
     @Override

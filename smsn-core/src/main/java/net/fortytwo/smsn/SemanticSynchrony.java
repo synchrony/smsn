@@ -147,8 +147,9 @@ public class SemanticSynchrony {
      * @param properties the new key/value pairs to add.
      *                   Note that a new value for a key already present in configuration will replace the old value
      */
-    private static void addConfiguration(final Properties properties) {
+    public static void addConfiguration(final Properties properties) {
         configuration.putAll(properties);
+        logger.info("added " + properties.size() + " configuration properties");
     }
 
     public static TypedProperties getConfiguration() {

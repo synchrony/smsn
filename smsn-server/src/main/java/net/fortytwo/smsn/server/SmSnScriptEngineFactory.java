@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.util.TypedProperties;
+import org.apache.tinkerpop.gremlin.jsr223.Customizer;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineManager;
@@ -96,6 +97,9 @@ public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
     @Override
     public void setCustomizerManager(GremlinScriptEngineManager manager) {
         // TODO
+
+        final List<Customizer> customizers =  manager.getCustomizers(ENGINE_NAME);
+
     }
 
     private String getVersion() {
