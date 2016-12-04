@@ -333,7 +333,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
         NoteReader parser = new NoteReader();
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
-        Atom root = atomGraph.createAtom(filter, SemanticSynchrony.createRandomKey());
+        Atom root = atomGraph.createAtom(filter, SemanticSynchrony.createRandomId());
         root.setValue("root");
         String rootId = root.getId();
 

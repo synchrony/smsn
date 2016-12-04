@@ -162,7 +162,7 @@ public class SemanticSynchrony {
      *
      * @return a new pseudo-random key
      */
-    public static String createRandomKey() {
+    public static String createRandomId() {
         byte[] bytes = new byte[KEY_DIGITS];
         for (int i = 0; i < KEY_DIGITS; i++) {
             int n = random.nextInt(64);

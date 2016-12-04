@@ -39,7 +39,7 @@ public class ReadGraph extends Action {
 
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
-        ImportRequest r = new ImportRequest(request, p.getUser());
+        ReadGraphRequest r = new ReadGraphRequest(request, p.getUser());
 
         p.setFile(r.file);
         p.setFormat(r.format);
@@ -110,12 +110,12 @@ public class ReadGraph extends Action {
         return true;
     }
 
-    private class ImportRequest extends Request {
+    private class ReadGraphRequest extends Request {
         private final String format;
         private final String file;
 
-        public ImportRequest(final JSONObject json,
-                             final Principal user) throws JSONException {
+        public ReadGraphRequest(final JSONObject json,
+                                final Principal user) throws JSONException {
             super(json, user);
 
             format = this.json.getString(Params.FORMAT);

@@ -103,7 +103,7 @@ public class FreeplaneReader extends BrainReader {
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
 
-        Atom atom = destGraph.createAtom(filter, SemanticSynchrony.createRandomKey());
+        Atom atom = destGraph.createAtom(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
         queries.update(rootNote, maxHeight, filter, NoteQueries.forwardViewStyle);
     }
@@ -224,7 +224,7 @@ public class FreeplaneReader extends BrainReader {
 
         private Note parseTree(Element nodeElement) {
             Note note = new Note();
-            note.setId(SemanticSynchrony.createRandomKey());
+            note.setId(SemanticSynchrony.createRandomId());
 
             String id = nodeElement.getAttribute(ATTR_ID);
             long created = getCreated(nodeElement);
@@ -290,7 +290,7 @@ public class FreeplaneReader extends BrainReader {
             if (null == note) {
                 note = new Note();
                 note.setValue(style + " (style)");
-                note.setId(SemanticSynchrony.createRandomKey());
+                note.setId(SemanticSynchrony.createRandomId());
                 styleNotes.put(style, note);
             }
             return note;

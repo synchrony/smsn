@@ -40,7 +40,7 @@ public abstract class MonitronEvent {
     }
 
     protected IRI coinEventIRI() {
-        return valueFactory.createIRI(Universe.NAMESPACE + "event-" + SemanticSynchrony.createRandomKey());
+        return valueFactory.createIRI(Universe.NAMESPACE + "event-" + SemanticSynchrony.createRandomId());
     }
 
     protected Literal toLiteral(final Date d) {

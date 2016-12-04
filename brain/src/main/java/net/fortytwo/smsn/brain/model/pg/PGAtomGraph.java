@@ -97,16 +97,10 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom getAtom(final String key) {
-        Vertex v = getVertex(key);
+    public Atom getAtom(final String id) {
+        Vertex v = wrapper.getVertexById(id);
 
         return null == v ? null : getAtom(v);
-    }
-
-    public Atom getAtom(final Vertex vertex) {
-        Preconditions.checkArgNotNull(vertex, "vertex");
-
-        return new PGAtomImpl(vertex);
     }
 
     @Override
@@ -208,12 +202,18 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public List<Atom> getAtomsByAcronym(final String acronym, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.getVerticesByAcronym(acronym), filter);
+        return filterVerticesToAtoms(wrapper.getVerticesByAcronym(acronym.toLowerCase()), filter);
     }
 
     @Override
     public List<Atom> getAtomsByShortcut(final String shortcut, final Filter filter) {
         return filterVerticesToAtoms(wrapper.getVerticesByShortcut(shortcut), filter);
+    }
+
+    private Atom getAtom(final Vertex vertex) {
+        Preconditions.checkArgNotNull(vertex, "vertex");
+
+        return new PGAtomImpl(vertex);
     }
 
     private boolean isAtomVertex(final Vertex v) {
@@ -238,7 +238,7 @@ public class PGAtomGraph implements AtomGraph {
     private String valueToAcronym(final String value) {
         // index only short, name-like values, avoiding free-form text if possible
         if (value.length() <= 100) {
-            String clean = value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
+            String clean = cleanForAcronym(value);
             StringBuilder acronym = new StringBuilder();
             boolean isInside = false;
             for (byte b : clean.getBytes()) {
@@ -276,6 +276,10 @@ public class PGAtomGraph implements AtomGraph {
         }
 
         return newGraph;
+    }
+
+    private String cleanForAcronym(final String value) {
+        return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 
     private List<Atom> filterVerticesToAtoms(final Iterator<Vertex> vertices, final Filter filter) {
@@ -343,10 +347,6 @@ public class PGAtomGraph implements AtomGraph {
         return entity.getExactlyOneEdge(label, Direction.OUT).id();
     }
 
-    private Vertex getVertex(String id) {
-        return wrapper.getVertexById(id);
-    }
-
     private Vertex createVertex(final String id, final String label) {
         Vertex vertex = propertyGraph.addVertex(T.label, label);
         // TODO: use id strategy
@@ -356,7 +356,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     private String getNonNullId(final String id) {
-        return null == id ? SemanticSynchrony.createRandomKey() : id;
+        return null == id ? SemanticSynchrony.createRandomId() : id;
     }
 
     private <A> Stream<A> asFilteredStream(Iterator<A> sourceIterator, Predicate<A> filter) {

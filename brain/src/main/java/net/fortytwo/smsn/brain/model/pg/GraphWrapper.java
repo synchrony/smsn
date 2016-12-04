@@ -5,34 +5,34 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Logger;
 
 public abstract class GraphWrapper {
+    private static final Logger logger = SemanticSynchrony.getLogger(GraphWrapper.class);
+
     protected final Graph graph;
+
+    private final Map<String, IndexWrapper> indices = new HashMap<>();
 
     protected GraphWrapper(Graph graph) {
         this.graph = graph;
 
         // TODO: add id strategy
-        createExactIndex(SemanticSynchrony.ID_V, true);
-        createExactIndex(SemanticSynchrony.SHORTCUT, false);
-        //createKeyIndex(SemanticSynchrony.ID_V);
-        //createKeyIndex(SemanticSynchrony.SHORTCUT);
+        add(createExactIndex(SemanticSynchrony.ID_V, true));
+        add(createExactIndex(SemanticSynchrony.SHORTCUT, true));
 
-        createFullTextIndex(SemanticSynchrony.VALUE);
-        createFullTextIndex(SemanticSynchrony.ACRONYM);
-        //createExactIndex(SemanticSynchrony.SHORTCUT, false);
+        add(createFullTextIndex(SemanticSynchrony.VALUE));
+        add(createFullTextIndex(SemanticSynchrony.ACRONYM));
     }
 
-    protected abstract void createFullTextIndex(String key);
+    protected abstract IndexWrapper createFullTextIndex(String key);
 
-    protected abstract void createExactIndex(String key, boolean caseSensitive);
-
-    //protected abstract void createKeyIndex(String key);
+    protected abstract IndexWrapper createExactIndex(String key, boolean caseSensitive);
 
     protected abstract void updateIndex(Vertex updatedVertex, String key, Object value);
-
-    public abstract boolean isTransactional();
 
     public abstract void begin();
 
@@ -49,21 +49,9 @@ public abstract class GraphWrapper {
         updateIndex(vertex, SemanticSynchrony.SHORTCUT);
     }
 
-    private void updateIndex(final Vertex vertex,
-                             final String key) {
-        VertexProperty property = vertex.property(key);
-        Object value = property.isPresent() ? property.value() : null;
-
-        updateIndex(vertex, key, value);
-    }
-
     public Graph getGraph() {
         return graph;
     }
-
-    protected abstract Vertex getVertexByKeyValue(String key, String value);
-
-    protected abstract Iterator<Vertex> getVerticesByKeyValue(String key, String value);
 
     public Vertex getVertexById(final String id) {
         return getVertexByKeyValue(SemanticSynchrony.ID_V, id);
@@ -80,4 +68,45 @@ public abstract class GraphWrapper {
     public Iterator<Vertex> getVerticesByShortcut(final String shortcut) {
         return getVerticesByKeyValue(SemanticSynchrony.SHORTCUT, shortcut);
     }
+
+    protected IndexWrapper getIndex(final String key) {
+        return indices.get(key);
+    }
+
+    private void add(final IndexWrapper index) {
+        indices.put(index.key, index);
+    }
+
+    private void updateIndex(final Vertex vertex,
+                             final String key) {
+        VertexProperty property = vertex.property(key);
+        Object value = property.isPresent() ? property.value() : null;
+
+        updateIndex(vertex, key, value);
+    }
+
+    private Iterator<Vertex> getFromIndex(final String key, final String value) {
+        IndexWrapper index = getIndex(key);
+        if (null == index) throw new IllegalStateException();
+        return index.get(value);
+    }
+
+    private Vertex getVertexByKeyValue(String key, String value) {
+        Iterator<Vertex> vertices = getFromIndex(key, value);
+        if (vertices.hasNext()) {
+            Vertex next = vertices.next();
+            if (vertices.hasNext()) {
+                logger.warning("multiple atoms with " + key + " '" + value + "'");
+            }
+
+            return next;
+        } else {
+            return null;
+        }
+    }
+
+    private Iterator<Vertex> getVerticesByKeyValue(String key, String value) {
+        return getFromIndex(key, value);
+    }
+
 }

@@ -66,7 +66,7 @@ public abstract class BrainTestBase {
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
         Note rootNote = parser.fromWikiText(NoteReader.class.getResourceAsStream(exampleFile));
-        rootNote.setId(SemanticSynchrony.createRandomKey());
+        rootNote.setId(SemanticSynchrony.createRandomId());
         Atom root = atomGraph.createAtom(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);
         return root;

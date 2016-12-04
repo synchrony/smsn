@@ -11,32 +11,22 @@ public class TinkerGraphWrapper extends GraphWrapper {
     }
 
     @Override
-    protected void createFullTextIndex(String key) {
-        // unsupported
+    protected IndexWrapper createFullTextIndex(String key) {
+        return new TinkerIndexWrapper(key);
     }
 
     @Override
-    protected void createExactIndex(String key, boolean caseSensitive) {
+    protected IndexWrapper createExactIndex(String key, boolean caseSensitive) {
         if (!hasVertexIndex(key)) {
             createVertexIndex(key);
         }
+        
+        return new TinkerIndexWrapper(key);
     }
-
-    /*
-    @Override
-    protected void createKeyIndex(String key) {
-        // do nothing
-    }
-    */
 
     @Override
     protected void updateIndex(Vertex updatedVertex, String key, Object value) {
         // do nothing
-    }
-
-    @Override
-    public boolean isTransactional() {
-        return false;
     }
 
     @Override
@@ -59,23 +49,33 @@ public class TinkerGraphWrapper extends GraphWrapper {
         // do nothing
     }
 
-    @Override
-    protected Vertex getVertexByKeyValue(String key, String value) {
-
-        Iterator<Vertex> vertices = getVerticesByKeyValue(key, value);
-        return vertices.hasNext() ? vertices.next() : null;
-    }
-
-    @Override
-    protected Iterator<Vertex> getVerticesByKeyValue(String key, String value) {
-        return graph.traversal().V().has(key, value);
-    }
-
     private boolean hasVertexIndex(final String key) {
         return ((TinkerGraph) graph).getIndexedKeys(Vertex.class).contains(key);
     }
 
     private void createVertexIndex(final String key) {
         ((TinkerGraph) graph).createIndex(key, Vertex.class);
+    }
+
+    private class TinkerIndexWrapper extends IndexWrapper {
+
+        public TinkerIndexWrapper(String key) {
+            super(key);
+        }
+
+        @Override
+        public Iterator<Vertex> get(String value) {
+            return graph.traversal().V().has(key, value);
+        }
+
+        @Override
+        public void add(Vertex vertex, String key, Object value) {
+            // do nothing
+        }
+
+        @Override
+        public void remove(Vertex vertex, String key) {
+            // do nothing
+        }
     }
 }
