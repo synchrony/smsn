@@ -2,7 +2,6 @@ package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
 import org.junit.Test;
-import org.neo4j.index.impl.lucene.ExactTxData;
 
 import java.io.IOException;
 
@@ -27,7 +26,7 @@ public class GetAtomsByIdTest extends BrainTestBase {
         }
 
         for (int i = 0; i < ids.length; i++) {
-            Atom atom = atomGraph.getAtom(ids[i]);
+            Atom atom = atomGraph.getAtomById(ids[i]);
             assertNotNull(atom);
             assertEquals("atom #" + (i+1), atom.getValue());
         }

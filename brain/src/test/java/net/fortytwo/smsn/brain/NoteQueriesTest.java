@@ -96,8 +96,8 @@ public class NoteQueriesTest extends BrainTestBase {
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "one", "two", "three");
 
-        Atom one = atomGraph.getAtom("N5KBOAq");
-        Atom two = atomGraph.getAtom("v8EuMtl");
+        Atom one = atomGraph.getAtomById("N5KBOAq");
+        Atom two = atomGraph.getAtomById("v8EuMtl");
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -111,7 +111,7 @@ public class NoteQueriesTest extends BrainTestBase {
         assertNotesEqual(root, "one", "three");
         // grandchildren have been added
         assertNotesEqual(one, "ten", "yellow");
-        Atom ten = atomGraph.getAtom("r4zU45R");
+        Atom ten = atomGraph.getAtomById("r4zU45R");
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -160,7 +160,7 @@ public class NoteQueriesTest extends BrainTestBase {
         queries.update(rootNote, 2, filter, style);
         // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
-        Atom three = atomGraph.getAtom("tOpwKho");
+        Atom three = atomGraph.getAtomById("tOpwKho");
         // ...therefore, the children of "three" can't be modified in this update operation
         // (so "red" has been ignored)
         assertNotesEqual(three);
@@ -207,7 +207,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = atomGraph.getAtom("001");
+        Atom one = atomGraph.getAtomById("001");
         assertNotNull(one);
         Assert.assertEquals(1, one.getNotes().toJavaList().size());
         for (int i = 0; i < 2; i++) {
@@ -228,7 +228,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = atomGraph.getAtom("001");
+        one = atomGraph.getAtomById("001");
         assertNotNull(one);
         Assert.assertEquals(1, one.getNotes().toJavaList().size());
         rootNote = queries.view(root, 2, filter, style);
@@ -247,7 +247,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = atomGraph.getAtom("001");
+        one = atomGraph.getAtomById("001");
         assertNotNull(one);
         Assert.assertEquals(1, one.getNotes().toJavaList().size());
         rootNote = queries.view(root, 2, filter, style);
@@ -268,7 +268,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = atomGraph.getAtom("001");
+        one = atomGraph.getAtomById("001");
         assertNotNull(one);
         Assert.assertEquals(2, one.getNotes().toJavaList().size());
         for (int i = 0; i < 2; i++) {
@@ -357,7 +357,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = atomGraph.getAtom("N5KBOAq");
+        Atom one = atomGraph.getAtomById("N5KBOAq");
         assertEquals(0.5f, one.getWeight());
         assertEquals(0.5f, one.getSharability());
 
@@ -386,7 +386,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = atomGraph.getAtom("N5KBOAq");
+        Atom one = atomGraph.getAtomById("N5KBOAq");
         assertEquals("http://example.org/ns/one", one.getAlias());
 
         s = "" +
@@ -413,7 +413,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = atomGraph.getAtom("0000001");
+        one = atomGraph.getAtomById("0000001");
         assertEquals(0.5f, one.getPriority());
 
         // setting priority to 0 has the effect of removing the priority property from the note
@@ -423,7 +423,7 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote = parser.fromWikiText(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = atomGraph.getAtom("0000001");
+        one = atomGraph.getAtomById("0000001");
         assertNull(one.getPriority());
     }
 
@@ -441,9 +441,9 @@ public class NoteQueriesTest extends BrainTestBase {
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, writeFilter, style);
 
-        Atom a1 = atomGraph.getAtom("0000001");
+        Atom a1 = atomGraph.getAtomById("0000001");
         assertEquals(1f, a1.getSharability());
-        Atom a2 = atomGraph.getAtom("0000002");
+        Atom a2 = atomGraph.getAtomById("0000002");
         assertEquals(0.5f, a2.getSharability());
 
         Note after = queries.view(root, 2, readFilter, style);
@@ -500,9 +500,9 @@ public class NoteQueriesTest extends BrainTestBase {
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = atomGraph.getAtom("001");
-        Atom a2 = atomGraph.getAtom("002");
-        Atom a3 = atomGraph.getAtom("003");
+        Atom a1 = atomGraph.getAtomById("001");
+        Atom a2 = atomGraph.getAtomById("002");
+        Atom a3 = atomGraph.getAtomById("003");
 
         assertEquals("one", a1.getValue());
         assertEquals("two", a2.getValue());
@@ -536,9 +536,9 @@ public class NoteQueriesTest extends BrainTestBase {
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = atomGraph.getAtom("001");
-        Atom a2 = atomGraph.getAtom("002");
-        Atom a3 = atomGraph.getAtom("003");
+        Atom a1 = atomGraph.getAtomById("001");
+        Atom a2 = atomGraph.getAtomById("002");
+        Atom a3 = atomGraph.getAtomById("003");
 
         assertEquals("one", a1.getValue());
         assertEquals("two", a2.getValue());
@@ -548,7 +548,7 @@ public class NoteQueriesTest extends BrainTestBase {
         a.setId(root.getId());
         queries.update(a, 2, filter, style);
 
-        Atom a4 = atomGraph.getAtom("004");
+        Atom a4 = atomGraph.getAtomById("004");
 
         assertEquals("four", a4.getValue());
         List<Atom> children = root.getNotes().toJavaList();

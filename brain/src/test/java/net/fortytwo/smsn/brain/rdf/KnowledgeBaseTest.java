@@ -363,39 +363,39 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
         kb.addDefaultClasses();
 
-        Atom einstein = atomGraph.getAtom("yOXFhhN");
-        Atom einsteinPapers = atomGraph.getAtom("Z5UUQn6");
-        Atom specialRelPaper = atomGraph.getAtom("mRwSsu2");
-        Atom bibtex = atomGraph.getAtom("xKWD1wC");
-        Atom einsteinQuotes = atomGraph.getAtom("5OfUlUN");
-        Atom einsteinQuotes2 = atomGraph.getAtom("vtdNdMF");
-        Atom einsteinFamily = atomGraph.getAtom("yWBqSc2");
-        Atom speedOfLight = atomGraph.getAtom("dDn4jt0");
-        Atom simultaneity = atomGraph.getAtom("x6rw4et");
-        Atom relativity = atomGraph.getAtom("-kKLYO8");
-        Atom paperPdf = atomGraph.getAtom("gsaYMBs");
-        Atom topics = atomGraph.getAtom("GORFdGO");
-        Atom ellipsis = atomGraph.getAtom("0MQ4h4a");
-        Atom quote = atomGraph.getAtom("-ngTO_3");
-        Atom h2g2 = atomGraph.getAtom("TT698yn");
-        Atom physics = atomGraph.getAtom("ynyUshJ");
+        Atom einstein = atomGraph.getAtomById("yOXFhhN");
+        Atom einsteinPapers = atomGraph.getAtomById("Z5UUQn6");
+        Atom specialRelPaper = atomGraph.getAtomById("mRwSsu2");
+        Atom bibtex = atomGraph.getAtomById("xKWD1wC");
+        Atom einsteinQuotes = atomGraph.getAtomById("5OfUlUN");
+        Atom einsteinQuotes2 = atomGraph.getAtomById("vtdNdMF");
+        Atom einsteinFamily = atomGraph.getAtomById("yWBqSc2");
+        Atom speedOfLight = atomGraph.getAtomById("dDn4jt0");
+        Atom simultaneity = atomGraph.getAtomById("x6rw4et");
+        Atom relativity = atomGraph.getAtomById("-kKLYO8");
+        Atom paperPdf = atomGraph.getAtomById("gsaYMBs");
+        Atom topics = atomGraph.getAtomById("GORFdGO");
+        Atom ellipsis = atomGraph.getAtomById("0MQ4h4a");
+        Atom quote = atomGraph.getAtomById("-ngTO_3");
+        Atom h2g2 = atomGraph.getAtomById("TT698yn");
+        Atom physics = atomGraph.getAtomById("ynyUshJ");
 
-        Atom john = atomGraph.getAtom("0rYY9z0");
+        Atom john = atomGraph.getAtomById("0rYY9z0");
 
         // The following are nested directly under Einstein's family
-        Atom hermann = atomGraph.getAtom("mPx8zEW");
-        Atom pauline = atomGraph.getAtom("PR8p9B5");
-        Atom maria = atomGraph.getAtom("b6jFIkg");
+        Atom hermann = atomGraph.getAtomById("mPx8zEW");
+        Atom pauline = atomGraph.getAtomById("PR8p9B5");
+        Atom maria = atomGraph.getAtomById("b6jFIkg");
         // The following are under Einstein's family, but also have Wikipedia links
-        Atom mileva = atomGraph.getAtom("U2RAPqU");
-        Atom elsa = atomGraph.getAtom("Wks2hZM");
+        Atom mileva = atomGraph.getAtomById("U2RAPqU");
+        Atom elsa = atomGraph.getAtomById("Wks2hZM");
         // The following are two degrees removed, under Einstein's family > Einstein's children
-        Atom lieserl = atomGraph.getAtom("Y3X-skF");
-        Atom hansAlbert = atomGraph.getAtom("6_sSpVa");
-        Atom eduard = atomGraph.getAtom("dleUIwo");
+        Atom lieserl = atomGraph.getAtomById("Y3X-skF");
+        Atom hansAlbert = atomGraph.getAtomById("6_sSpVa");
+        Atom eduard = atomGraph.getAtomById("dleUIwo");
 
-        Atom googleGlass = atomGraph.getAtom("ufIPR_C");
-        Atom sebastian = atomGraph.getAtom("-L7cCbN");
+        Atom googleGlass = atomGraph.getAtomById("ufIPR_C");
+        Atom sebastian = atomGraph.getAtomById("-L7cCbN");
 
         for (int i = 0; i < 4; i++) {
             System.out.println("#### ITERATION #" + (i + 1) + " ######");

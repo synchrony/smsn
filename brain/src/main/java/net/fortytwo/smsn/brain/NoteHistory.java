@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.model.Filter;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 
 public class NoteHistory {
     private static final int CAPACITY = 1000;
@@ -42,7 +41,7 @@ public class NoteHistory {
 
             String id = visitedAtoms[i % CAPACITY];
 
-            Atom a = graph.getAtom(id);
+            Atom a = graph.getAtomById(id);
             if (null != a && filter.isVisible(a)) {
                 atoms.add(a);
             }

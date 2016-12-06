@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -247,7 +246,7 @@ public abstract class Action {
         String rootId = params.getRootId();
 
         if (null != rootId) {
-            params.setRoot(params.getBrain().getAtomGraph().getAtom(rootId));
+            params.setRoot(params.getBrain().getAtomGraph().getAtomById(rootId));
 
             if (null == params.getRoot()) {
                 throw new BadRequestException("root of view does not exist: " + rootId);

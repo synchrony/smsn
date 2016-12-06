@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
@@ -139,21 +138,16 @@ public class Neo4jGraphWrapper extends GraphWrapper {
 
     private abstract class Neo4jIndexWrapper extends IndexWrapper {
         protected final Index<Node> index;
-        
+
         protected Neo4jIndexWrapper(String key, Index<Node> index) {
             super(key);
             this.index = index;
         }
-        
-        protected Iterator<Vertex> toVertexIterator(final IndexHits<Node> hits) {
-            return Iterators.transform(hits, new Function<Node, Vertex>() {
-                @Override
-                public Vertex apply(Node node) {
-                    return nodeToVertex(node);
-                }
-            });    
+
+        protected Iterator<Sortable<Vertex, Float>> toVertexIterator(final IndexHits<Node> hits) {
+            return Iterators.transform(hits, node -> new Sortable<>(nodeToVertex(node), hits.currentScore()));
         }
-        
+
         private Vertex nodeToVertex(final Node node) {
             return getNeo4jGraph().vertices(node.getId()).next();
         }
@@ -174,14 +168,14 @@ public class Neo4jGraphWrapper extends GraphWrapper {
             index.remove(asNode(vertex), key);
         }
     }
-    
+
     private class ExactIndexWrapper extends Neo4jIndexWrapper {
         public ExactIndexWrapper(String key, Index<Node> index) {
             super(key, index);
         }
 
         @Override
-        public Iterator<Vertex> get(final String value) {
+        public Iterator<Sortable<Vertex, Float>> get(final String value) {
             return toVertexIterator(index.get(key, value));
         }
     }
@@ -192,7 +186,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         }
 
         @Override
-        public Iterator<Vertex> get(final String value) {
+        public Iterator<Sortable<Vertex, Float>> get(final String value) {
             return toVertexIterator(index.query(key, value));
         }
     }

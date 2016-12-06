@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A graph of atoms and lists conforming to the Extend-o-Brain data model
@@ -17,13 +18,13 @@ public interface AtomGraph {
 
     Iterable<Atom> getAllAtoms();
 
-    Atom getAtom(String id);
+    Atom getAtomById(String id);
+
+    List<Atom> getAtomsByAcronym(String acronym, Filter filter);
 
     List<Atom> getAtomsByShortcut(String shortcut, Filter filter);
 
-    List<Atom> getAtomsByValue(String value, Filter filter);
-
-    List<Atom> getAtomsByAcronym(String acronym, Filter filter);
+    List<Atom> getAtomsByValueQuery(String value, Filter filter);
 
     String idOfAtom(Atom a);
 

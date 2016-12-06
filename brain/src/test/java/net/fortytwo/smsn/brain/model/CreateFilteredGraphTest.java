@@ -40,7 +40,7 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         assertTrue(publicFilter.isVisible(root));
         AtomGraph filteredGraph = atomGraph.createFilteredGraph(publicFilter);
         assertEquals(22, countAtoms(filteredGraph));
-        root = filteredGraph.getAtom(root.getId());
+        root = filteredGraph.getAtomById(root.getId());
         assertNotNull(root);
         assertEquals(0.5, root.getSharability(), 0);
         assertEquals("William James", root.getValue());

@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
@@ -64,8 +66,9 @@ public class TinkerGraphWrapper extends GraphWrapper {
         }
 
         @Override
-        public Iterator<Vertex> get(String value) {
-            return graph.traversal().V().has(key, value);
+        public Iterator<Sortable<Vertex, Float>> get(String value) {
+            Iterator<Vertex> simple = graph.traversal().V().has(key, value);
+            return Iterators.transform(simple, vertex -> new Sortable<>(vertex, 1f));
         }
 
         @Override

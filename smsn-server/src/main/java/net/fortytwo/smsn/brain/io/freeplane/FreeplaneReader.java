@@ -204,7 +204,7 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private Atom getAtom(final String id) {
-            return destGraph.getAtom(notesByFreeplaneId.get(id).getId());
+            return destGraph.getAtomById(notesByFreeplaneId.get(id).getId());
         }
 
         private void persistArrowLinks() throws InvalidGraphException {

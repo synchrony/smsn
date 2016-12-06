@@ -11,7 +11,7 @@ abstract class IndexWrapper {
         this.key = key;
     }
 
-    public abstract Iterator<Vertex> get(final String value);
+    public abstract Iterator<Sortable<Vertex, Float>> get(final String value);
 
     public abstract void add(final Vertex vertex, final String key, final Object value);
 

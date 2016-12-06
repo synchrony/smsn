@@ -67,8 +67,8 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom getAtom(String id) {
-        return wrapAtom(baseGraph.getAtom(id));
+    public Atom getAtomById(String id) {
+        return wrapAtom(baseGraph.getAtomById(id));
     }
 
     @Override
@@ -102,8 +102,8 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public List<Atom> getAtomsByValue(String value, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsByValue(value, filter));
+    public List<Atom> getAtomsByValueQuery(String value, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByValueQuery(value, filter));
     }
 
     @Override

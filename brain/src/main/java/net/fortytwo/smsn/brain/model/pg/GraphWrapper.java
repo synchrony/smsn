@@ -57,15 +57,15 @@ public abstract class GraphWrapper {
         return getVertexByKeyValue(SemanticSynchrony.ID_V, id);
     }
 
-    public Iterator<Vertex> getVerticesByValue(final String term) {
+    public Iterator<Sortable<Vertex, Float>> getVerticesByValue(final String term) {
         return getVerticesByKeyValue(SemanticSynchrony.VALUE, term);
     }
 
-    public Iterator<Vertex> getVerticesByAcronym(final String acronym) {
+    public Iterator<Sortable<Vertex, Float>> getVerticesByAcronym(final String acronym) {
         return getVerticesByKeyValue(SemanticSynchrony.ACRONYM, acronym);
     }
 
-    public Iterator<Vertex> getVerticesByShortcut(final String shortcut) {
+    public Iterator<Sortable<Vertex, Float>> getVerticesByShortcut(final String shortcut) {
         return getVerticesByKeyValue(SemanticSynchrony.SHORTCUT, shortcut);
     }
 
@@ -85,16 +85,16 @@ public abstract class GraphWrapper {
         updateIndex(vertex, key, value);
     }
 
-    private Iterator<Vertex> getFromIndex(final String key, final String value) {
+    private Iterator<Sortable<Vertex, Float>> getFromIndex(final String key, final String value) {
         IndexWrapper index = getIndex(key);
         if (null == index) throw new IllegalStateException();
         return index.get(value);
     }
 
     private Vertex getVertexByKeyValue(String key, String value) {
-        Iterator<Vertex> vertices = getFromIndex(key, value);
+        Iterator<Sortable<Vertex, Float>> vertices = getFromIndex(key, value);
         if (vertices.hasNext()) {
-            Vertex next = vertices.next();
+            Vertex next = vertices.next().getEntity();
             if (vertices.hasNext()) {
                 logger.warning("multiple atoms with " + key + " '" + value + "'");
             }
@@ -105,8 +105,7 @@ public abstract class GraphWrapper {
         }
     }
 
-    private Iterator<Vertex> getVerticesByKeyValue(String key, String value) {
+    private Iterator<Sortable<Vertex, Float>> getVerticesByKeyValue(String key, String value) {
         return getFromIndex(key, value);
     }
-
 }

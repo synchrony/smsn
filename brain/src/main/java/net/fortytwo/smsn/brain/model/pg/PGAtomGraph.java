@@ -14,11 +14,13 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.parboiled.common.Preconditions;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -97,7 +99,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom getAtom(final String id) {
+    public Atom getAtomById(final String id) {
         Vertex v = wrapper.getVertexById(id);
 
         return null == v ? null : getAtom(v);
@@ -196,18 +198,18 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public List<Atom> getAtomsByValue(final String value, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.getVerticesByValue(value), filter);
+    public List<Atom> getAtomsByValueQuery(final String query, final Filter filter) {
+        return filterAndSort(wrapper.getVerticesByValue(query), filter);
     }
 
     @Override
     public List<Atom> getAtomsByAcronym(final String acronym, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.getVerticesByAcronym(acronym.toLowerCase()), filter);
+        return filterAndSort(wrapper.getVerticesByAcronym(acronym.toLowerCase()), filter);
     }
 
     @Override
     public List<Atom> getAtomsByShortcut(final String shortcut, final Filter filter) {
-        return filterVerticesToAtoms(wrapper.getVerticesByShortcut(shortcut), filter);
+        return filterAndSort(wrapper.getVerticesByShortcut(shortcut), filter);
     }
 
     private Atom getAtom(final Vertex vertex) {
@@ -282,22 +284,31 @@ public class PGAtomGraph implements AtomGraph {
         return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 
-    private List<Atom> filterVerticesToAtoms(final Iterator<Vertex> vertices, final Filter filter) {
-        List<Atom> results = new LinkedList<>();
+    private List<Atom> filterAndSort(
+            final Iterator<Sortable<Vertex, Float>> unranked,
+            final Filter filter) {
 
-        vertices.forEachRemaining(v -> {
-            Atom a = getAtom(v);
+        List<Sortable<Atom, Float>> ranked = new LinkedList<>();
+        while (unranked.hasNext()) {
+            Sortable<Vertex, Float> in = unranked.next();
+            Atom a = getAtom(in.getEntity());
+            if (!filter.isVisible(a)) continue;
 
-            if (filter.isVisible(a)) {
-                results.add(a);
-            }
-        });
+            float nativeScore = in.getScore();
+            float weight = a.getWeight();
+            String value = a.getValue();
+            float lengthPenalty = Math.min(1.0f, 15.0f/value.length());
+            float score = nativeScore * weight * lengthPenalty;
+            ranked.add(new Sortable<>(a, score));
+        }
 
-        return results;
+        Collections.sort(ranked);
+
+        return ranked.stream().map(Sortable::getEntity).collect(Collectors.toList());
     }
 
     private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final AtomGraph newGraph) {
-        PGAtom newAtom = (PGAtom) newGraph.getAtom(original.getId());
+        PGAtom newAtom = (PGAtom) newGraph.getAtomById(original.getId());
         if (null != newAtom) return newAtom;
 
         newAtom = (PGAtom) newGraph.createAtom(filter, original.getId());
@@ -387,4 +398,5 @@ public class PGAtomGraph implements AtomGraph {
             return thisGraph;
         }
     }
+
 }

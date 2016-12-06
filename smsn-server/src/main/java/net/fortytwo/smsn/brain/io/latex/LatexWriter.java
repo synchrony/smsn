@@ -34,7 +34,7 @@ public class LatexWriter extends BrainWriter {
         String rootId = context.getRootId();
         Filter filter = context.getFilter();
 
-        Atom rootAtom = context.getAtomGraph().getAtom(rootId);
+        Atom rootAtom = context.getAtomGraph().getAtomById(rootId);
         if (null == rootAtom) {
             throw new IllegalStateException("no such atom: " + rootId);
         }

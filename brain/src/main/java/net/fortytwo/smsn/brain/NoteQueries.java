@@ -142,7 +142,7 @@ public class NoteQueries {
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getAtomGraph().getAtomsByValue(query, filter);
+                results = brain.getAtomGraph().getAtomsByValueQuery(query, filter);
                 break;
             case Acronym:
                 results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
@@ -158,8 +158,6 @@ public class NoteQueries {
             Note n = viewInternal(a, height - 1, filter, style, true, null);
             result.addChild(n);
         }
-
-        Collections.sort(result.getChildren(), new NoteComparator());
 
         result.setValue(queryType.name() + " results for \"" + query + "\"");
         return result;
@@ -267,9 +265,19 @@ public class NoteQueries {
         if (null != cache) cache.put(atom.getId(), atom);
     }
 
-    private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
+    private final Comparator<Note> compareById = (a, b) -> null == a.getId()
             ? (null == b.getId() ? 0 : -1)
             : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
+
+    private final Comparator<Note> compareByProperties = (a, b) -> {
+        int cmp = b.getWeight().compareTo(a.getWeight());
+
+        if (0 == cmp) {
+            cmp = b.getCreated().compareTo(a.getCreated());
+        }
+
+        return cmp;
+    };
 
     private boolean hasChildren(final Atom root,
                                 final Filter filter,
@@ -379,10 +387,10 @@ public class NoteQueries {
 
         List<Note> before = viewInternal(rootAtom, 1, filter, style, false, cache).getChildren();
         List<Note> after = rootNote.getChildren();
-        List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, noteComparator);
+        List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, compareById);
 
         // we are pre-ordered w.r.t. updating lists of children
-        ListDiff.applyDiff(before, after, lcs, noteComparator, editor);
+        ListDiff.applyDiff(before, after, lcs, compareById, editor);
 
         for (Note n : rootNote.getChildren()) {
             // upon adding children:
@@ -407,14 +415,14 @@ public class NoteQueries {
     }
 
     private Atom getAtomById(final String id) {
-        return brain.getAtomGraph().getAtom(id);
+        return brain.getAtomGraph().getAtomById(id);
     }
 
     // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved atoms
     private Atom getAtomById(final String id, final Map<String, Atom> cache) {
         Atom atom = cache.get(id);
         if (null == atom) {
-            atom = brain.getAtomGraph().getAtom(id);
+            atom = brain.getAtomGraph().getAtomById(id);
             if (null != atom) cache.put(id, atom);
         }
         return atom;
@@ -489,7 +497,7 @@ public class NoteQueries {
             }
         }
 
-        Collections.sort(result.getChildren(), new NoteComparator());
+        Collections.sort(result.getChildren(), compareByProperties);
         return result;
     }
 
@@ -606,20 +614,8 @@ public class NoteQueries {
         return note;
     }
 
-    private class NoteComparator implements Comparator<Note> {
-        public int compare(Note a, Note b) {
-            int cmp = b.getWeight().compareTo(a.getWeight());
-
-            if (0 == cmp) {
-                cmp = b.getCreated().compareTo(a.getCreated());
-            }
-
-            return cmp;
-        }
-    }
-
     public interface ViewStyle {
-        public enum Direction {Forward, Backward}
+        enum Direction {Forward, Backward}
 
         String getName();
 
