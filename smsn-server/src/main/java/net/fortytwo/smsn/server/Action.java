@@ -36,6 +36,8 @@ public abstract class Action {
 
     private static final int MAX_VIEW_HEIGHT = 7;
 
+    private static final String CREATE_NEW_ATOM = "create-new-atom";
+
     protected abstract void performTransaction(RequestParams p) throws BadRequestException, RequestProcessingException;
 
     protected abstract boolean doesRead();
@@ -242,11 +244,22 @@ public abstract class Action {
         }
     }
 
+    private Atom createNewRoot(final RequestParams params) {
+        Atom root = params.getBrain().getAtomGraph().createAtom(params.getFilter(), null);
+        root.setValue("life, the universe, and everything");
+        params.getBrain().getAtomGraph().reindexAtom(root);
+        return root;
+    }
+
     private void setRoot(final RequestParams params) {
         String rootId = params.getRootId();
 
         if (null != rootId) {
-            params.setRoot(params.getBrain().getAtomGraph().getAtomById(rootId));
+            Atom root = rootId.equals(CREATE_NEW_ATOM)
+                    ? createNewRoot(params)
+                    : params.getBrain().getAtomGraph().getAtomById(rootId);
+
+            params.setRoot(root);
 
             if (null == params.getRoot()) {
                 throw new BadRequestException("root of view does not exist: " + rootId);
@@ -256,7 +269,7 @@ public abstract class Action {
                 throw new BadRequestException("root of view is not visible: " + rootId);
             }
 
-            params.getMap().put(Params.ROOT, rootId);
+            params.getMap().put(Params.ROOT, root.getId());
         }
     }
 

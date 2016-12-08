@@ -154,7 +154,6 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
             throw new IllegalArgumentException("unsupported action: " + actionName);
         }
 
-
         action.parseRequest(request, params);
 
         action.handleRequest(params);
