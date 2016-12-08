@@ -1,18 +1,16 @@
 package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.CoordinatorService;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.BroadcastRdfRequest;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.rio.RDFFormat;
 
 import java.io.IOException;
-import java.security.Principal;
 
 /**
  * A service for broadcasting events modeled in RDF to all peers in the environment
@@ -61,13 +59,4 @@ public class BroadcastRDF extends Action {
         return false;
     }
 
-    protected class BroadcastRdfRequest extends Request {
-        public final String dataset;
-
-        public BroadcastRdfRequest(JSONObject json, Principal user) throws JSONException {
-            super(json, user);
-
-            dataset = this.json.getString(Params.DATASET);
-        }
-    }
 }

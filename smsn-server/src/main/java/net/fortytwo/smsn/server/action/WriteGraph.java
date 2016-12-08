@@ -1,20 +1,18 @@
 package net.fortytwo.smsn.server.action;
 
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.WriteGraphRequest;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.Principal;
 
 /**
  * A service for exporting an Extend-o-Brain graph to the file system
@@ -32,11 +30,11 @@ public class WriteGraph extends Action {
         WriteGraphRequest r = new WriteGraphRequest(request, p.getUser());
 
         p.setFilter(r.getFilter());
-        p.setFile(r.file);
-        p.setFormat(r.format);
+        p.setFile(r.getFile());
+        p.setFormat(r.getFormat());
 
-        p.setRootId(r.rootId);
-        p.setHeight(r.height);
+        p.setRootId(r.getRootId());
+        p.setHeight(r.getHeight());
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
@@ -71,22 +69,4 @@ public class WriteGraph extends Action {
         return false;
     }
 
-    private class WriteGraphRequest extends FilteredResultsRequest {
-        private final String format;
-        private final String file;
-
-        private final String rootId;
-        private final int height;
-
-        public WriteGraphRequest(final JSONObject json,
-                                 final Principal user) throws JSONException {
-            super(json, user);
-
-            format = this.json.getString(Params.FORMAT);
-            file = this.json.getString(Params.FILE);
-
-            rootId = this.json.optString(Params.ROOT);
-            height = this.json.optInt(Params.HEIGHT, 0);
-        }
-    }
 }

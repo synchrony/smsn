@@ -1,16 +1,13 @@
 package net.fortytwo.smsn.server.action;
 
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.PushEventRequest;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.security.Principal;
 
 /**
  * A service for receiving and internalizing events
@@ -50,13 +47,4 @@ public class PushEvent extends Action {
         return false;
     }
 
-    protected class PushEventRequest extends Request {
-        public final JSONObject jsonView;
-
-        public PushEventRequest(JSONObject jsonStr, Principal user) throws JSONException {
-            super(jsonStr, user);
-
-            jsonView = json.getJSONObject(Params.VIEW);
-        }
-    }
 }

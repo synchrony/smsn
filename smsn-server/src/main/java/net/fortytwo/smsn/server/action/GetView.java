@@ -6,7 +6,7 @@ import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.requests.RootedViewRequest;
+import net.fortytwo.smsn.server.action.requests.RootedViewRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 

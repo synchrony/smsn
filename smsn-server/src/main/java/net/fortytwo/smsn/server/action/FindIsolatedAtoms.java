@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
+import net.fortytwo.smsn.server.action.requests.FilteredResultsRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 

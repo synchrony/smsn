@@ -1,17 +1,15 @@
 package net.fortytwo.smsn.server.action;
 
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.SearchRequest;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.requests.BasicSearchRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.security.Principal;
 
 /**
  * A service for executing keyword search over an Extend-o-Brain graph
@@ -67,13 +65,4 @@ public class EvaluateTextSearch extends Action {
         addView(n, params);
     }
 
-    protected class SearchRequest extends BasicSearchRequest {
-        public final int valueCutoff;
-
-        public SearchRequest(JSONObject json, Principal user) throws JSONException {
-            super(json, user);
-
-            valueCutoff = this.json.getInt(Params.VALUE_CUTOFF);
-        }
-    }
 }

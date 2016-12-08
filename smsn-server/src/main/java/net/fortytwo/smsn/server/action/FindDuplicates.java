@@ -7,7 +7,8 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.requests.FilteredResultsRequest;
+import net.fortytwo.smsn.server.action.requests.FilteredResultsRequest;
+import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +30,7 @@ public class FindDuplicates extends Action {
     public String getName() {
         return "duplicates";
     }
-
+    
     @Override
     public void parseRequest(final JSONObject request, final RequestParams params) throws JSONException {
         FilteredResultsRequest r;

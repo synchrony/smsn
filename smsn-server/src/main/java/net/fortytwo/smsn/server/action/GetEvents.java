@@ -1,17 +1,15 @@
 package net.fortytwo.smsn.server.action;
 
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.GetEventsRequest;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -58,15 +56,5 @@ public class GetEvents extends Action {
 
     protected boolean doesWrite() {
         return false;
-    }
-
-    protected class GetEventsRequest extends Request {
-        public final int height;
-
-        public GetEventsRequest(JSONObject json, Principal user) throws JSONException {
-            super(json, user);
-
-            height = this.json.getInt(Params.HEIGHT);
-        }
     }
 }

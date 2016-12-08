@@ -1,9 +1,8 @@
 package net.fortytwo.smsn.server.action;
 
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.server.Action;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.ReadGraphRequest;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import net.fortytwo.smsn.brain.io.BrainReader;
@@ -14,7 +13,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -41,8 +39,8 @@ public class ReadGraph extends Action {
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
         ReadGraphRequest r = new ReadGraphRequest(request, p.getUser());
 
-        p.setFile(r.file);
-        p.setFormat(r.format);
+        p.setFile(r.getFile());
+        p.setFormat(r.getFormat());
     }
 
     private synchronized void beginImport(final Graph g, final String file) throws BadRequestException {
@@ -110,16 +108,4 @@ public class ReadGraph extends Action {
         return true;
     }
 
-    private class ReadGraphRequest extends Request {
-        private final String format;
-        private final String file;
-
-        public ReadGraphRequest(final JSONObject json,
-                                final Principal user) throws JSONException {
-            super(json, user);
-
-            format = this.json.getString(Params.FORMAT);
-            file = this.json.getString(Params.FILE);
-        }
-    }
 }

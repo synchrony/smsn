@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.server.requests;
+package net.fortytwo.smsn.server.action.requests;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;

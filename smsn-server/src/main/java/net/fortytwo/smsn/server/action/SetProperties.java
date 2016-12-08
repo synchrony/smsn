@@ -2,17 +2,14 @@ package net.fortytwo.smsn.server.action;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.action.requests.SetPropertiesRequest;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.security.Principal;
 
 /**
  * A service for setting the properties of an atom
@@ -28,9 +25,9 @@ public class SetProperties extends Action {
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException, BadRequestException {
         SetPropertiesRequest r = new SetPropertiesRequest(request, p.getUser());
 
-        switch (r.name) {
+        switch (r.getName()) {
             case SemanticSynchrony.WEIGHT: {
-                float f = (Float) r.value;
+                float f = (Float) r.getValue();
                 // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
                 if (f <= 0 || f > 1.0) {
                     throw new BadRequestException("weight is outside of range (0, 1]: " + f);
@@ -38,34 +35,34 @@ public class SetProperties extends Action {
                 break;
             }
             case SemanticSynchrony.SHARABILITY: {
-                float f = (Float) r.value;
+                float f = (Float) r.getValue();
                 if (f <= 0 || f > 1.0) {
                     throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
                 }
                 break;
             }
             case SemanticSynchrony.PRIORITY: {
-                float f = (Float) r.value;
+                float f = (Float) r.getValue();
                 if (f < 0 || f > 1.0) {
                     throw new BadRequestException("priority is outside of range [0, 1]: " + f);
                 }
                 break;
             }
             case SemanticSynchrony.SHORTCUT:
-                String s = (String) r.value;
+                String s = (String) r.getValue();
                 if (s.length() > 50) {
                     throw new BadRequestException("shortcut is too long: " + s);
                 }
                 break;
             default:
-                throw new BadRequestException("unknown property: " + r.name);
+                throw new BadRequestException("unknown property: " + r.getName());
         }
 
-        p.setPropertyName(r.name);
-        p.setPropertyValue(r.value);
-        p.setRootId(r.id);
+        p.setPropertyName(r.getName());
+        p.setPropertyValue(r.getValue());
+        p.setRootId(r.getId());
 
-        SemanticSynchrony.logInfo("SmSn set-properties on " + r.id + ": " + r.name + " <- " + r.value);
+        SemanticSynchrony.logInfo("SmSn set-properties on " + r.getId() + ": " + r.getName() + " <- " + r.getValue());
     }
 
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
@@ -111,22 +108,6 @@ public class SetProperties extends Action {
 
     protected boolean doesWrite() {
         return true;
-    }
-
-    protected class SetPropertiesRequest extends Request {
-        public final String id;
-        public final String name;
-        public final Object value;
-
-        public SetPropertiesRequest(JSONObject json, Principal user) throws JSONException {
-            super(json, user);
-
-            id = this.json.getString(Params.ID);
-            name = this.json.getString(Params.NAME);
-            value = name.equals(SemanticSynchrony.SHORTCUT)
-                    ? this.json.getString(Params.VALUE)
-                    : (float) this.json.getDouble(Params.VALUE);
-        }
     }
 
 }

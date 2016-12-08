@@ -5,7 +5,7 @@ import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.error.BadRequestException;
 import net.fortytwo.smsn.server.error.RequestProcessingException;
-import net.fortytwo.smsn.server.requests.BasicSearchRequest;
+import net.fortytwo.smsn.server.action.requests.BasicSearchRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
