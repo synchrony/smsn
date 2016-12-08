@@ -3,13 +3,13 @@ port: 8182
 scriptEvaluationTimeout: 300000
 channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer
 graphs: {
-  graph: conf/neo4j-joshkb.properties}
+  graph: conf/neo4j-example.properties}
 plugins:
   - tinkerpop.neo4j
   - smsn
 scriptEngines: {
   smsn: {
-    scripts: [conf/smsn.properties]
+    scripts: [conf/smsn-example.properties]
   },
   gremlin-groovy: {
     imports: [java.lang.Math],
