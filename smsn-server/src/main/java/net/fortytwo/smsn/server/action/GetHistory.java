@@ -25,7 +25,7 @@ public class GetHistory extends Action {
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
         FilteredResultsRequest r;
-        r = new FilteredResultsRequest(request, p.getUser());
+        r = new FilteredResultsRequest(request);
 
         p.setFilter(r.getFilter());
     }

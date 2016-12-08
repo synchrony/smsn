@@ -5,13 +5,11 @@ import net.fortytwo.smsn.server.Request;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Principal;
-
 public class PushEventRequest extends Request {
     public final JSONObject jsonView;
 
-    public PushEventRequest(JSONObject jsonStr, Principal user) throws JSONException {
-        super(jsonStr, user);
+    public PushEventRequest(JSONObject jsonStr) throws JSONException {
+        super(jsonStr);
 
         jsonView = json.getJSONObject(Params.VIEW);
     }

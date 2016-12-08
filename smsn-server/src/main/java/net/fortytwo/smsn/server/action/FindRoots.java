@@ -25,7 +25,7 @@ public class FindRoots extends Action {
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
         BasicViewRequest r;
-        r = new BasicViewRequest(request, p.getUser());
+        r = new BasicViewRequest(request);
 
         p.setHeight(r.getHeight());
         p.setStyleName(r.getStyleName());

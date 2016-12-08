@@ -32,7 +32,7 @@ public class BroadcastRDF extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
         BroadcastRdfRequest r;
-        r = new BroadcastRdfRequest(request, p.getUser());
+        r = new BroadcastRdfRequest(request);
 
         p.setData(r.dataset);
 

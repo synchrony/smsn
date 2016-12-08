@@ -6,15 +6,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 
 public class BasicSearchRequest extends BasicViewRequest {
 
     private String query;
     private final NoteQueries.QueryType queryType;
 
-    public BasicSearchRequest(JSONObject json, Principal user) throws JSONException {
-        super(json, user);
+    public BasicSearchRequest(JSONObject json) throws JSONException {
+        super(json);
 
         queryType = NoteQueries.QueryType.valueOf(this.json.getString(Params.QUERY_TYPE));
         if (null == queryType) {

@@ -22,7 +22,7 @@ public class PushEvent extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        PushEventRequest r = new PushEventRequest(request, p.getUser());
+        PushEventRequest r = new PushEventRequest(request);
 
         p.setJsonView(r.jsonView);
     }

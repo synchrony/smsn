@@ -24,7 +24,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -108,8 +107,7 @@ public abstract class Action {
         p.getMap().put(Params.VIEW, json);
     }
 
-    public static float findMinAuthorizedSharability(final Principal user,
-                                                     final float minSharability) {
+    public static float findMinAuthorizedSharability(final float minSharability) {
         float minAuth = 0f;
 
         return Math.max(minSharability, minAuth);
@@ -119,7 +117,6 @@ public abstract class Action {
         RequestParams params = new RequestParams();
 
         setGraphWrapper(params, graph);
-        params.setUser(() -> "none");
 
         return params;
     }
@@ -127,10 +124,6 @@ public abstract class Action {
     private static void setGraphWrapper(final RequestParams params, final Neo4jGraph graph) {
         GraphWrapper wrapper = getWrapper(graph);
         params.setGraphWrapper(wrapper);
-    }
-
-    private boolean canWrite(final Principal user) {
-        return true;
     }
 
     protected void addToHistory(final String rootId) {
@@ -164,7 +157,7 @@ public abstract class Action {
     }
 
     private void checkAuthorized(final RequestParams p) throws AuthorizationException {
-        if (doesWrite() && !canWrite(p.getUser())) {
+        if (doesWrite()) {
             throw new AuthorizationException("user does not have permission to for write operations");
         }
 

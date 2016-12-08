@@ -4,15 +4,12 @@ import net.fortytwo.smsn.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Principal;
-
 public class BasicViewRequest extends FilteredResultsRequest {
     private final int height;
     private final String styleName;
 
-    public BasicViewRequest(final JSONObject json,
-                            final Principal user) throws JSONException {
-        super(json, user);
+    public BasicViewRequest(final JSONObject json) throws JSONException {
+        super(json);
 
         height = this.json.getInt(Params.HEIGHT);
         styleName = this.json.getString(Params.STYLE);

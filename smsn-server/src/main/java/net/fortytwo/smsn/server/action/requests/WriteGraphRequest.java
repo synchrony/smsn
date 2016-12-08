@@ -4,8 +4,6 @@ import net.fortytwo.smsn.brain.Params;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Principal;
-
 public class WriteGraphRequest extends FilteredResultsRequest {
     private final String format;
     private final String file;
@@ -13,9 +11,8 @@ public class WriteGraphRequest extends FilteredResultsRequest {
     private final String rootId;
     private final int height;
 
-    public WriteGraphRequest(final JSONObject json,
-                             final Principal user) throws JSONException {
-        super(json, user);
+    public WriteGraphRequest(final JSONObject json) throws JSONException {
+        super(json);
 
         format = this.json.getString(Params.FORMAT);
         file = this.json.getString(Params.FILE);

@@ -27,7 +27,7 @@ public class WriteGraph extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        WriteGraphRequest r = new WriteGraphRequest(request, p.getUser());
+        WriteGraphRequest r = new WriteGraphRequest(request);
 
         p.setFilter(r.getFilter());
         p.setFile(r.getFile());

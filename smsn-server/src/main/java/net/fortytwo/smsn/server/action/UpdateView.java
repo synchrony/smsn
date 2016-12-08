@@ -21,7 +21,7 @@ public class UpdateView extends Action {
 
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
         UpdateRequest r;
-        r = new UpdateRequest(request, p.getUser());
+        r = new UpdateRequest(request);
 
         p.setHeight(r.getHeight());
         // note: may be null

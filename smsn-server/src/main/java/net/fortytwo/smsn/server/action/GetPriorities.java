@@ -24,7 +24,7 @@ public class GetPriorities extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        PrioritiesRequest r = new PrioritiesRequest(request, p.getUser());
+        PrioritiesRequest r = new PrioritiesRequest(request);
 
         p.setFilter(r.getFilter());
         p.setMaxResults(r.maxResults);

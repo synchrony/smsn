@@ -25,7 +25,7 @@ public class GetEvents extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        GetEventsRequest r = new GetEventsRequest(request, p.getUser());
+        GetEventsRequest r = new GetEventsRequest(request);
 
         p.setHeight(r.height);
     }

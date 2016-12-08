@@ -9,7 +9,6 @@ import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
 
-import java.security.Principal;
 import java.util.Map;
 
 public class RequestParams {
@@ -34,7 +33,6 @@ public class RequestParams {
     private String rootId;
     private NoteQueries.ViewStyle style;
     private String styleName;
-    private Principal user;
     private Integer valueCutoff;
     private String wikiView;
     private NoteWriter writer;
@@ -205,14 +203,6 @@ public class RequestParams {
 
     public void setStyleName(String styleName) {
         this.styleName = styleName;
-    }
-
-    public Principal getUser() {
-        return user;
-    }
-
-    public void setUser(Principal user) {
-        this.user = user;
     }
 
     public Integer getValueCutoff() {

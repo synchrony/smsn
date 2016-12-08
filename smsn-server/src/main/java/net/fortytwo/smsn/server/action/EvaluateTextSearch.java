@@ -26,7 +26,7 @@ public class EvaluateTextSearch extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        SearchRequest r = new SearchRequest(request, p.getUser());
+        SearchRequest r = new SearchRequest(request);
 
         p.setHeight(r.getHeight());
         p.setQueryType(r.getQueryType());

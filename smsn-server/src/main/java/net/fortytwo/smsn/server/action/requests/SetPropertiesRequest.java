@@ -6,15 +6,13 @@ import net.fortytwo.smsn.server.Request;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Principal;
-
 public class SetPropertiesRequest extends Request {
     private final String id;
     private final String name;
     private final Object value;
 
-    public SetPropertiesRequest(JSONObject json, Principal user) throws JSONException {
-        super(json, user);
+    public SetPropertiesRequest(JSONObject json) throws JSONException {
+        super(json);
 
         id = this.json.getString(Params.ID);
         name = this.json.getString(Params.NAME);

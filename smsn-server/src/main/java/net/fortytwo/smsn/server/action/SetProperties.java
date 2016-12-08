@@ -23,7 +23,7 @@ public class SetProperties extends Action {
 
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException, BadRequestException {
-        SetPropertiesRequest r = new SetPropertiesRequest(request, p.getUser());
+        SetPropertiesRequest r = new SetPropertiesRequest(request);
 
         switch (r.getName()) {
             case SemanticSynchrony.WEIGHT: {

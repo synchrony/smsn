@@ -37,7 +37,7 @@ public class ReadGraph extends Action {
 
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
-        ReadGraphRequest r = new ReadGraphRequest(request, p.getUser());
+        ReadGraphRequest r = new ReadGraphRequest(request);
 
         p.setFile(r.getFile());
         p.setFormat(r.getFormat());

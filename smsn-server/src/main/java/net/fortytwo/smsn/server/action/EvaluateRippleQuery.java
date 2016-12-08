@@ -24,7 +24,7 @@ public class EvaluateRippleQuery extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        BasicSearchRequest r = new BasicSearchRequest(request, p.getUser());
+        BasicSearchRequest r = new BasicSearchRequest(request);
 
         p.setHeight(r.getHeight());
         p.setQuery(r.getQuery());

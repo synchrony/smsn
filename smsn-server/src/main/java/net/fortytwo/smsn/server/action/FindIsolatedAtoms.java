@@ -24,7 +24,7 @@ public class FindIsolatedAtoms extends Action {
     @Override
     public void parseRequest(final JSONObject request, final RequestParams p) throws JSONException {
 
-        FilteredResultsRequest r = new FilteredResultsRequest(request, p.getUser());
+        FilteredResultsRequest r = new FilteredResultsRequest(request);
 
         p.setFilter(r.getFilter());
 
