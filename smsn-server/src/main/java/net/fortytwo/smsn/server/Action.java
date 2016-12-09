@@ -14,9 +14,9 @@ import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
-import net.fortytwo.smsn.server.error.AuthorizationException;
-import net.fortytwo.smsn.server.error.BadRequestException;
-import net.fortytwo.smsn.server.error.RequestProcessingException;
+import net.fortytwo.smsn.server.errors.AuthorizationException;
+import net.fortytwo.smsn.server.errors.BadRequestException;
+import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.json.JSONException;
@@ -28,25 +28,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public abstract class Action {
+public abstract class Action<R extends Request> {
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
-
-    public abstract String getName();
 
     private static final int MAX_VIEW_HEIGHT = 7;
 
     private static final String CREATE_NEW_ATOM = "create-new-atom";
+
+    private static final Map<Graph, Brain> brains = new HashMap<>();
+    private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
+
+    private static final NoteHistory noteHistory = new NoteHistory();
+
+    public abstract String getName();
 
     protected abstract void performTransaction(RequestParams p) throws BadRequestException, RequestProcessingException;
 
     protected abstract boolean doesRead();
 
     protected abstract boolean doesWrite();
-
-    private static final Map<Graph, Brain> brains = new HashMap<>();
-    private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
-
-    private static final NoteHistory noteHistory = new NoteHistory();
 
     private synchronized static Brain getBrain(final GraphWrapper wrapper)
             throws Brain.BrainException {
@@ -75,11 +75,7 @@ public abstract class Action {
         return wrapper;
     }
 
-    public abstract void parseRequest(final JSONObject request, final RequestParams p) throws JSONException, BadRequestException;
-
-    public void parseRequest(final String request, final RequestParams p) throws JSONException, BadRequestException {
-        parseRequest(new JSONObject(request), p);
-    }
+    public abstract void parseRequest(final R request, final RequestParams p) throws IOException, BadRequestException;
 
     public void handleRequest(final RequestParams params) {
 

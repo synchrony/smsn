@@ -1,17 +1,26 @@
 package net.fortytwo.smsn.server;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.tinkerpop.shaded.jackson.annotation.JsonTypeInfo;
 
-public class Request {
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-    protected final JSONObject json;
+/*
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CUSTOM,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "action")*/
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
+//@JsonTypeInfo(use = JsonTypeInfo.Id.MINIMAL_CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
+public abstract class Request implements Serializable {
+    @NotNull
+    private String action;
 
-    public Request(final JSONObject json) {
-        this.json = json;
+    public String getAction() {
+        return action;
     }
 
-    protected String optString(final String key) throws JSONException {
-        return json.has(key) ? json.getString(key) : null;
+    public void setAction(String action) {
+        this.action = action;
     }
 }

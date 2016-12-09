@@ -1,31 +1,30 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.server.action.BroadcastRDF;
-import net.fortytwo.smsn.server.action.EvaluateRippleQuery;
-import net.fortytwo.smsn.server.action.EvaluateTextSearch;
-import net.fortytwo.smsn.server.action.FindDuplicates;
-import net.fortytwo.smsn.server.action.FindIsolatedAtoms;
-import net.fortytwo.smsn.server.action.FindRoots;
-import net.fortytwo.smsn.server.action.GetEvents;
-import net.fortytwo.smsn.server.action.GetHistory;
-import net.fortytwo.smsn.server.action.GetPriorities;
-import net.fortytwo.smsn.server.action.GetView;
-import net.fortytwo.smsn.server.action.InferTypes;
-import net.fortytwo.smsn.server.action.Ping;
-import net.fortytwo.smsn.server.action.PushEvent;
-import net.fortytwo.smsn.server.action.ReadGraph;
-import net.fortytwo.smsn.server.action.RemoveIsolatedAtoms;
-import net.fortytwo.smsn.server.action.SetProperties;
-import net.fortytwo.smsn.server.action.UpdateView;
-import net.fortytwo.smsn.server.action.WriteGraph;
+import net.fortytwo.smsn.server.actions.BroadcastRDF;
+import net.fortytwo.smsn.server.actions.EvaluateRippleQuery;
+import net.fortytwo.smsn.server.actions.EvaluateTextSearch;
+import net.fortytwo.smsn.server.actions.FindDuplicates;
+import net.fortytwo.smsn.server.actions.FindIsolatedAtoms;
+import net.fortytwo.smsn.server.actions.FindRoots;
+import net.fortytwo.smsn.server.actions.GetEvents;
+import net.fortytwo.smsn.server.actions.GetHistory;
+import net.fortytwo.smsn.server.actions.GetPriorities;
+import net.fortytwo.smsn.server.actions.GetView;
+import net.fortytwo.smsn.server.actions.InferTypes;
+import net.fortytwo.smsn.server.actions.Ping;
+import net.fortytwo.smsn.server.actions.PushEvent;
+import net.fortytwo.smsn.server.actions.ReadGraph;
+import net.fortytwo.smsn.server.actions.RemoveIsolatedAtoms;
+import net.fortytwo.smsn.server.actions.SetProperties;
+import net.fortytwo.smsn.server.actions.UpdateView;
+import net.fortytwo.smsn.server.actions.WriteGraph;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
-import org.json.JSONException;
+import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import javax.script.AbstractScriptEngine;
@@ -46,6 +45,8 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     private final Map<String, Action> actionsByName;
 
     private final GremlinScriptEngineFactory factory;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SmSnScriptEngine(GremlinScriptEngineFactory factory) {
         this.factory = factory;
@@ -73,7 +74,6 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         add(new GetView());
     }
 
-
     @Override
     public Object eval(String script, ScriptContext context) throws ScriptException {
 
@@ -81,7 +81,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
 
         try {
             return handleRequest(script, graph);
-        } catch (JSONException e) {
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -133,32 +133,29 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         actionsByName.put(action.getName(), action);
     }
 
-    private JSONObject handleRequest(String requestStr, Neo4jGraph graph) throws JSONException {
-        JSONObject request = new JSONObject(requestStr);
-
-        String actionName;
-        try {
-            actionName = request.getString(Params.ACTION);
-        } catch (JSONException e) {
-            throw new IllegalStateException(e);
-        }
-
-        if (null == actionName) {
-            throw new IllegalArgumentException("action not found");
-        }
-
+    private JSONObject handleRequest(String requestStr, Neo4jGraph graph) throws IOException {
+        Request request = deserializeRequest(requestStr);
+        Action action = getAction(request);
         RequestParams params = Action.createParams(graph);
-
-        Action action = actionsByName.get(actionName);
-        if (null == action) {
-            throw new IllegalArgumentException("unsupported action: " + actionName);
-        }
 
         action.parseRequest(request, params);
 
         action.handleRequest(params);
 
         return toJson(params.getMap());
+    }
+
+    protected Request deserializeRequest(final String requestStr) throws IOException {
+        return objectMapper.readValue(requestStr, Request.class);
+    }
+
+    private Action getAction(final Request request) {
+        String actionName = request.getAction();
+        Action action = actionsByName.get(actionName);
+        if (null == action) {
+            throw new IllegalArgumentException("unsupported action: " + actionName);
+        }
+        return action;
     }
 
     private JSONObject toJson(final Map<String, Object> map) {
