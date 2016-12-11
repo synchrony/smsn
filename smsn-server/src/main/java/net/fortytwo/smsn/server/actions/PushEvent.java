@@ -3,7 +3,6 @@ package net.fortytwo.smsn.server.actions;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.PushEventRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.json.JSONException;
@@ -14,17 +13,22 @@ import java.io.IOException;
 /**
  * A service for receiving and internalizing events
  */
-public class PushEvent extends Action<PushEventRequest> {
+public class PushEvent extends Action {
 
-    @Override
-    public String getName() {
-        return "push-event";
+    private String view;
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
     }
 
     @Override
-    public void parseRequest(final PushEventRequest request, final RequestParams p) throws IOException {
+    public void parseRequest(final RequestParams p) throws IOException {
         try {
-            p.setJsonView(new JSONObject(request.getView()));
+            p.setJsonView(new JSONObject(getView()));
         } catch (JSONException e) {
             throw new IOException(e);
         }

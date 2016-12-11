@@ -1,6 +1,6 @@
-package net.fortytwo.smsn.server.actions.requests;
+package net.fortytwo.smsn.server.actions;
 
-public class RootedViewRequest extends BasicViewRequest {
+public abstract class RootedViewAction extends BasicViewAction {
 
     private String root;
 

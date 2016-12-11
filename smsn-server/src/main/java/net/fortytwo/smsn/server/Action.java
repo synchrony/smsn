@@ -14,21 +14,31 @@ import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
-import net.fortytwo.smsn.server.errors.AuthorizationException;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.shaded.jackson.annotation.JsonIgnoreProperties;
+import org.apache.tinkerpop.shaded.jackson.annotation.JsonTypeInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public abstract class Action<R extends Request> {
+/*
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CUSTOM,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "action")*/
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
+//@JsonTypeInfo(use = JsonTypeInfo.Id.MINIMAL_CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class Action {
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
 
     private static final int MAX_VIEW_HEIGHT = 7;
@@ -40,7 +50,18 @@ public abstract class Action<R extends Request> {
 
     private static final NoteHistory noteHistory = new NoteHistory();
 
-    public abstract String getName();
+    @NotNull
+    private String action;
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public abstract void parseRequest(final RequestParams p) throws IOException, BadRequestException;
 
     protected abstract void performTransaction(RequestParams p) throws BadRequestException, RequestProcessingException;
 
@@ -75,8 +96,6 @@ public abstract class Action<R extends Request> {
         return wrapper;
     }
 
-    public abstract void parseRequest(final R request, final RequestParams p) throws IOException, BadRequestException;
-
     public void handleRequest(final RequestParams params) {
 
         setNonTransactionalParams(params);
@@ -85,7 +104,7 @@ public abstract class Action<R extends Request> {
         wrapTransactionAndExceptions(params);
         long after = System.currentTimeMillis();
 
-        SemanticSynchrony.logInfo("completed " + getName() + " action in " + (after - before) + " ms");
+        SemanticSynchrony.logInfo("completed " + getClass().getSimpleName() + " action in " + (after - before) + " ms");
 
         logActivity(params);
     }
@@ -152,19 +171,7 @@ public abstract class Action<R extends Request> {
         }
     }
 
-    private void checkAuthorized(final RequestParams p) throws AuthorizationException {
-        if (doesWrite()) {
-            throw new AuthorizationException("user does not have permission to for write operations");
-        }
-
-        if (doesRead() && null == p.getFilter()) {
-            throw new AuthorizationException("service reads from graph, but weight and sharability filter is not set");
-        }
-    }
-
     private void setNonTransactionalParams(final RequestParams params) {
-
-        checkAuthorized(params);
 
         params.setMap(new HashMap<>());
 

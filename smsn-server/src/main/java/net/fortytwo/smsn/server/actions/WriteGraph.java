@@ -2,12 +2,11 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.WriteGraphRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
+import javax.validation.constraints.NotNull;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,21 +14,56 @@ import java.io.OutputStream;
 /**
  * A service for exporting an Extend-o-Brain graph to the file system
  */
-public class WriteGraph extends Action<WriteGraphRequest> {
+public class WriteGraph extends FilteredAction {
 
-    @Override
-    public String getName() {
-        return "export";
+    @NotNull
+    private String format;
+    @NotNull
+    private String file;
+    @NotNull
+    private String root;
+    private int height = 0;
+
+    public String getFormat() {
+        return format;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public String getRoot() {
+        return root;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public void setRoot(String root) {
+        this.root = root;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override
-    public void parseRequest(final WriteGraphRequest request, final RequestParams p) throws IOException {
-        p.setFilter(request.getFilter());
-        p.setFile(request.getFile());
-        p.setFormat(request.getFormat());
+    public void parseRequest(final RequestParams p) throws IOException {
+        p.setFilter(getFilter());
+        p.setFile(getFile());
+        p.setFormat(getFormat());
 
-        p.setRootId(request.getRoot());
-        p.setHeight(request.getHeight());
+        p.setRootId(getRoot());
+        p.setHeight(getHeight());
     }
 
     @Override

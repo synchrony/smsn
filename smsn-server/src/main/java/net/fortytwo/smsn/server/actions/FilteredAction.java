@@ -1,11 +1,11 @@
-package net.fortytwo.smsn.server.actions.requests;
+package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.server.Request;
+import net.fortytwo.smsn.server.Action;
 
 import javax.validation.constraints.NotNull;
 
-public class FilteredResultsRequest extends Request {
+abstract class FilteredAction extends Action {
     @NotNull
     private Filter filter;
 

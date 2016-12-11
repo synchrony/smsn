@@ -26,7 +26,7 @@ public class NoteQueries {
     protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());
 
     public enum QueryType {
-        FullText, Acronym, Shortcut
+        FullText, Acronym, Shortcut, Ripple
     }
 
     private final Brain brain;
@@ -242,7 +242,7 @@ public class NoteQueries {
     }
 
     private void checkHeightArg(final int height, final int min) {
-        Preconditions.checkArgument(height >= min, "invalid height for this operation");
+        Preconditions.checkArgument(height >= min, "height of " + height + "expecting >= " + min);
     }
 
     private void checkMaxResultsArg(final int maxResults) {

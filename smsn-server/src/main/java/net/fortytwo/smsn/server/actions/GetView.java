@@ -1,9 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.ViewRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -12,20 +10,25 @@ import java.io.IOException;
 /**
  * A service for retrieving hierarchical views of Extend-o-Brain graphs
  */
-public class GetView extends Action<ViewRequest> {
+public class GetView extends RootedViewAction {
 
-    @Override
-    public String getName() {
-        return "view";
+    private boolean includeTypes = false;
+
+    public boolean isIncludeTypes() {
+        return includeTypes;
+    }
+
+    public void setIncludeTypes(boolean includeTypes) {
+        this.includeTypes = includeTypes;
     }
 
     @Override
-    public void parseRequest(final ViewRequest request, final RequestParams params) throws IOException {
-        params.setHeight(request.getHeight());
-        params.setRootId(request.getRoot());
-        params.setStyleName(request.getStyle());
-        params.setFilter(request.getFilter());
-        params.setIncludeTypes(request.isIncludeTypes());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setHeight(getHeight());
+        params.setRootId(getRoot());
+        params.setStyleName(getStyle());
+        params.setFilter(getFilter());
+        params.setIncludeTypes(isIncludeTypes());
     }
 
     @Override

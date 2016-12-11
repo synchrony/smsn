@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.brain.model;
 
-import org.parboiled.common.Preconditions;
-
 import java.io.Serializable;
 
 public class Filter implements Serializable {
@@ -110,10 +108,8 @@ public class Filter implements Serializable {
     }
 
     public boolean isVisible(final Atom atom) {
-        Preconditions.checkArgNotNull(atom, "atom");
-
-        Float sharability = atom.getSharability();
-        Float weight = atom.getWeight();
+        float sharability = atom.getSharability();
+        float weight = atom.getWeight();
 
         // Strictly greater than the minimum, less than or equal to the maximum.
         // Values range from 0 (exclusive) to 1 (inclusive).

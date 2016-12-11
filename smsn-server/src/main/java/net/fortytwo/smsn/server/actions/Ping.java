@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.server.Action;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -9,15 +8,10 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 /**
  * A minimal "ping" service
  */
-public class Ping extends Action<Request> {
+public class Ping extends Action {
 
     @Override
-    public String getName() {
-        return "ping";
-    }
-
-    @Override
-    public void parseRequest(final Request request, final RequestParams p) {
+    public void parseRequest(final RequestParams p) {
     }
 
     @Override

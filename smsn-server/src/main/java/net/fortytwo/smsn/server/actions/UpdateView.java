@@ -1,15 +1,15 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.UpdateRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,33 +17,49 @@ import java.io.InputStream;
 /**
  * A service for updating an Extend-o-Brain graph
  */
-public class UpdateView extends Action<UpdateRequest> {
+public class UpdateView extends RootedViewAction {
+
+    @NotNull
+    private String view;
+    @NotNull
+    private Params.Format viewFormat;
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
+    public Params.Format getViewFormat() {
+        return viewFormat;
+    }
+
+    public void setViewFormat(Params.Format viewFormat) {
+        this.viewFormat = viewFormat;
+    }
 
     @Override
-    public void parseRequest(final UpdateRequest request, final RequestParams p) throws IOException {
-        p.setHeight(request.getHeight());
+    public void parseRequest(final RequestParams p) throws IOException {
+        p.setHeight(getHeight());
         // note: may be null
-        p.setRootId(request.getRoot());
-        p.setStyleName(request.getStyle());
+        p.setRootId(getRoot());
+        p.setStyleName(getStyle());
 
-        switch (request.getViewFormat()) {
+        switch (getViewFormat()) {
             case json:
                 try {
-                    p.setJsonView(new JSONObject(request.getView()));
+                    p.setJsonView(new JSONObject(getView()));
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
                 break;
             case wiki:
-                p.setWikiView(request.getView());
+                p.setWikiView(getView());
                 break;
         }
-        p.setFilter(request.getFilter());
-    }
-
-    @Override
-    public String getName() {
-        return "update";
+        p.setFilter(getFilter());
     }
 
     @Override

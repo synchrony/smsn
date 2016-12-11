@@ -1,6 +1,8 @@
 package net.fortytwo.smsn.brain;
 
 public interface Params {
+    public enum Format{json, wiki};
+
     public static final String
             ACTION = "action",
             DATASET = "dataset",

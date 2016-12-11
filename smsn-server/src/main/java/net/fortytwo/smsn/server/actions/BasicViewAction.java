@@ -1,13 +1,13 @@
-package net.fortytwo.smsn.server.actions.requests;
+package net.fortytwo.smsn.server.actions;
 
 import javax.validation.constraints.NotNull;
 
-public class BasicViewRequest extends FilteredResultsRequest {
+public abstract class BasicViewAction extends FilteredAction {
     private int height;
     @NotNull
     private String style;
 
-    public BasicViewRequest() {
+    public BasicViewAction() {
         super();
     }
 

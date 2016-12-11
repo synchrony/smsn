@@ -1,9 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.BasicViewRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -12,18 +10,13 @@ import java.io.IOException;
 /**
  * A service for finding root nodes of an Extend-o-Brain graph
  */
-public class FindRoots extends Action<BasicViewRequest> {
+public class FindRoots extends BasicViewAction {
 
     @Override
-    public String getName() {
-        return "find-roots";
-    }
-
-    @Override
-    public void parseRequest(final BasicViewRequest request, final RequestParams p) throws IOException {
-        p.setHeight(request.getHeight());
-        p.setStyleName(request.getStyle());
-        p.setFilter(request.getFilter());
+    public void parseRequest(final RequestParams p) throws IOException {
+        p.setHeight(getHeight());
+        p.setStyleName(getStyle());
+        p.setFilter(getFilter());
     }
 
     @Override

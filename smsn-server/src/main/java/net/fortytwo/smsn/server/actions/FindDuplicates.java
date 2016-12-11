@@ -4,9 +4,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.FilteredResultsRequest;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 import java.io.IOException;
@@ -21,7 +19,7 @@ import java.util.Map;
 /**
  * A service for identifying atoms with duplicate values.
  */
-public class FindDuplicates extends Action<FilteredResultsRequest> {
+public class FindDuplicates extends FilteredAction {
 
     private static final int MAX_DUPLICATES = 1000;
 
@@ -38,13 +36,8 @@ public class FindDuplicates extends Action<FilteredResultsRequest> {
     }
 
     @Override
-    public String getName() {
-        return "duplicates";
-    }
-
-    @Override
-    public void parseRequest(final FilteredResultsRequest request, final RequestParams params) throws IOException {
-        params.setFilter(request.getFilter());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFilter(getFilter());
     }
 
     @Override

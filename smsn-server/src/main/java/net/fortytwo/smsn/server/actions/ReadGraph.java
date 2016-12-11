@@ -4,11 +4,11 @@ import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.ReadGraphRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,19 +19,35 @@ import java.util.Set;
 /**
  * A service for importing an Extend-o-Brain subgraph
  */
-public class ReadGraph extends Action<ReadGraphRequest> {
+public class ReadGraph extends Action {
     private static final Map<Graph, Set<String>> importsInProgress = new HashMap<>();
     private static final Map<Graph, Set<String>> importsSucceeded = new HashMap<>();
 
-    @Override
-    public String getName() {
-        return "import";
+    @NotNull
+    private String format;
+    @NotNull
+    private String file;
+
+    public String getFormat() {
+        return format;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 
     @Override
-    public void parseRequest(final ReadGraphRequest request, final RequestParams p) throws IOException {
-        p.setFile(request.getFile());
-        p.setFormat(request.getFormat());
+    public void parseRequest(final RequestParams p) throws IOException {
+        p.setFile(getFile());
+        p.setFormat(getFormat());
     }
 
     @Override

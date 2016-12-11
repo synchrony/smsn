@@ -2,9 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.FilteredResultsRequest;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 import java.io.IOException;
@@ -12,16 +10,11 @@ import java.io.IOException;
 /**
  * A service for finding isolated atoms (i.e. atoms with no parents or children) in an Extend-o-Brain graph
  */
-public class FindIsolatedAtoms extends Action<FilteredResultsRequest> {
+public class FindIsolatedAtoms extends FilteredAction {
 
     @Override
-    public String getName() {
-        return "find-isolated-atoms";
-    }
-
-    @Override
-    public void parseRequest(final FilteredResultsRequest request, final RequestParams p) throws IOException {
-        p.setFilter(request.getFilter());
+    public void parseRequest(final RequestParams p) throws IOException {
+        p.setFilter(getFilter());
 
         SemanticSynchrony.logInfo("SmSn find-isolated-atoms");
     }

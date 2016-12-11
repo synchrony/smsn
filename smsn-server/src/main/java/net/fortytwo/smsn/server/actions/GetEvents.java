@@ -3,7 +3,6 @@ package net.fortytwo.smsn.server.actions;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
-import net.fortytwo.smsn.server.actions.requests.GetEventsRequest;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -13,16 +12,21 @@ import java.util.List;
 /**
  * A service for retrieving the stack of recently pushed events
  */
-public class GetEvents extends Action<GetEventsRequest> {
+public class GetEvents extends Action {
 
-    @Override
-    public String getName() {
-        return "get-events";
+    private int height;
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override
-    public void parseRequest(final GetEventsRequest request, final RequestParams p) throws IOException {
-        p.setHeight(request.getHeight());
+    public void parseRequest(final RequestParams p) throws IOException {
+        p.setHeight(getHeight());
     }
 
     @Override

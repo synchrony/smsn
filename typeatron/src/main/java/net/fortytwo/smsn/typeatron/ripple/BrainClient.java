@@ -187,7 +187,7 @@ public class BrainClient {
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VIEW, toJson(root));
-            requestJson.put(Params.VIEW_FORMAT, Params.JSON_FORMAT);
+            requestJson.put(Params.VIEW_FORMAT, Params.Format.json);
             requestJson.put(Params.FILTER, toJson(filter));
         } catch (JSONException e) {
             throw new BrainClientException(e);

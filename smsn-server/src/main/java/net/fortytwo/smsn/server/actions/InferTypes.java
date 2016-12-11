@@ -2,20 +2,14 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.server.Action;
-import net.fortytwo.smsn.server.Request;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
-public class InferTypes extends Action<Request> {
+public class InferTypes extends Action {
 
     @Override
-    public String getName() {
-        return "infer-types";
-    }
-
-    @Override
-    public void parseRequest(final Request request, final RequestParams p) {
+    public void parseRequest(final RequestParams p) {
     }
 
     @Override
