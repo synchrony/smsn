@@ -147,7 +147,7 @@ public abstract class Action {
 
     protected Iterable<Atom> getHistory(final AtomGraph graph,
                                         final Filter filter) {
-        return noteHistory.getHistory(100, true, graph, filter);
+        return noteHistory.getHistory(100, graph, filter);
     }
 
     private void wrapTransactionAndExceptions(final RequestParams params) {

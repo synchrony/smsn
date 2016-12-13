@@ -10,7 +10,7 @@ public abstract class RootedViewAction extends BasicViewAction {
 
     public void setRoot(String root) {
         // work around a Brain-mode quirk
-        if (root.equals("null")) root = null;
+        if (null != root && root.equals("null")) root = null;
 
         this.root = root;
     }

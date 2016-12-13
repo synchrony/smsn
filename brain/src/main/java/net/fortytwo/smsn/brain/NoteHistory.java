@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 public class NoteHistory {
@@ -20,17 +19,16 @@ public class NoteHistory {
     }
 
     public void visit(final String atomId) {
-        visitedAtoms[totalVisits % CAPACITY] = atomId;
-        totalVisits++;
+        // repeated actions upon the same atom count as a single visit
+        if (totalVisits == 0 || !atomId.equals(getLastVisit())) {
+            appendVisit(atomId);
+        }
     }
 
     public Iterable<Atom> getHistory(final int maxlen,
-                                   final boolean dedup,
-                                   final AtomGraph graph,
-                                   final Filter filter) {
-        Collection<Atom> atoms = dedup
-                ? new LinkedHashSet<>()
-                : new LinkedList<>();
+                                     final AtomGraph graph,
+                                     final Filter filter) {
+        Collection<Atom> atoms = new LinkedList<>();
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 
@@ -48,5 +46,14 @@ public class NoteHistory {
         }
 
         return atoms;
+    }
+
+    private String getLastVisit() {
+        return visitedAtoms[(totalVisits - 1) % CAPACITY];
+    }
+
+    private void appendVisit(final String atomId) {
+        visitedAtoms[totalVisits % CAPACITY] = atomId;
+        totalVisits++;
     }
 }
