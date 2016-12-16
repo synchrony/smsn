@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Atom;
@@ -7,7 +8,6 @@ import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,23 +32,44 @@ public class VCSWriter extends BrainWriter {
 
     @Override
     public void doExport(Context context) throws IOException {
-        File dir = context.getDestDirectory();
-        timeIt("cleared directory", () -> clearDirectory(dir));
+        File parentDir = context.getDestDirectory();
+        createDirectoryIfNotExists(parentDir);
 
-        timeIt("exported atoms as individual files", () -> doExport(context.getAtomGraph(), dir));
+        File[] dirs = createDirsBySharability(parentDir);
+
+        timeAction("exported atoms as individual files", () -> doExport(context.getAtomGraph(), dirs));
     }
 
-    private void clearDirectory(final File dir) throws IOException {
-        FileUtils.cleanDirectory(dir);
+    private File[] createDirsBySharability(final File parentDir) throws IOException {
+        File[] dirs = new File[]{
+                new File(parentDir, "private"),
+                new File(parentDir, "personal"),
+                new File(parentDir, "public"),
+                new File(parentDir, "universal")};
+        for (File d : dirs) {
+            createDirectoryIfNotExists(d);
+            timeAction("cleaned directory " + d, () -> cleanDirectory(d));
+        }
+        return dirs;
     }
 
-    private void doExport(final AtomGraph graph, final File dir) throws IOException {
+    private void doExport(final AtomGraph graph, final File[] dirs) throws IOException {
         for (Atom a : graph.getAllAtoms()) {
-            File atomFile = new File(dir, "atom" + a.getId() + ".txt");
+            File dir = chooseDirectoryForAtom(a, dirs);
+            File atomFile = new File(dir, "a" + a.getId());
             try (OutputStream out = new FileOutputStream(atomFile)) {
                 writeAtomToStream(a, out);
             }
         }
+    }
+
+    private File chooseDirectoryForAtom(final Atom a, File[] dirs) {
+        Float sharability = a.getSharability();
+        Preconditions.checkNotNull(sharability);
+        Preconditions.checkArgument(sharability > 0f && sharability <= 1.0f);
+
+        int index = (int) (sharability / 0.25f) - 1;
+        return dirs[index];
     }
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
@@ -59,7 +80,7 @@ public class VCSWriter extends BrainWriter {
             list = list.getRest();
         }
 
-        List<Note> notes = new  LinkedList<>();
+        List<Note> notes = new LinkedList<>();
         notes.add(note);
         noteWriter.toWikiText(notes, out, true);
     }
@@ -67,6 +88,7 @@ public class VCSWriter extends BrainWriter {
     private Note toNote(final Atom atom, final boolean withValueAndProperties) {
         Note note = new Note();
         note.setId(atom.getId());
+
         if (withValueAndProperties) {
             note.setValue(atom.getValue());
             note.setAlias(atom.getAlias());
@@ -79,13 +101,13 @@ public class VCSWriter extends BrainWriter {
         return note;
     }
 
-    private <E extends Exception> void timeIt(final String description,
-                                              final RunnableWithException<E> action) throws E {
+    private <E extends Exception> void timeAction(final String description,
+                                                  final RunnableWithException<E> action) throws E {
         long before = System.currentTimeMillis();
         action.run();
         long after = System.currentTimeMillis();
 
-        logger.info(description + " in " + (after-before) + " ms");
+        logger.info(description + " in " + (after - before) + " ms");
     }
 
     private interface RunnableWithException<E extends Exception> {

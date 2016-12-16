@@ -88,15 +88,6 @@ public class WriteGraph extends FilteredAction {
                     writer.doExport(context);
                 }
             } else {
-                if (file.exists()) {
-                    if (!file.isDirectory()) {
-                        throw new IllegalArgumentException("file " + file.getAbsolutePath() + " is not a directory");
-                    }
-                } else {
-                    if (!file.mkdirs()) {
-                        throw new RequestProcessingException("could not create directory " + file.getAbsolutePath());
-                    }
-                }
                 context.setDestDirectory(file);
                 writer.doExport(context);
             }
