@@ -6,7 +6,7 @@ public class LatexFormat extends Format {
     private static final LatexFormat instance = new LatexFormat();
 
     private LatexFormat() {
-        super("LaTeX", new String[]{"tex"});
+        super("LaTeX", Type.FileBased, "tex");
     }
 
     public static LatexFormat getInstance() {

@@ -23,7 +23,10 @@ public class RDFWriter extends BrainWriter {
 
         for (RDFFormat rdfFormat : new RDFFormatLoader().loadAll()) {
             List<String> fileExtensions = rdfFormat.getFileExtensions();
-            Format format = new Format(rdfFormat.getName(), fileExtensions.toArray(new String[fileExtensions.size()]));
+            Format format = new Format(
+                    rdfFormat.getName(),
+                    Format.Type.FileBased,
+                    fileExtensions.toArray(new String[fileExtensions.size()]));
             formats.add(format);
 
             rdfFormats.put(format, rdfFormat);

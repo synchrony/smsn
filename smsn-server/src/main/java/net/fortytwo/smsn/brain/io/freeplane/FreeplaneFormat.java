@@ -6,7 +6,7 @@ public class FreeplaneFormat extends Format {
     private static final FreeplaneFormat instance = new FreeplaneFormat();
 
     private FreeplaneFormat() {
-        super("Freeplane", new String[]{"mm"});
+        super("Freeplane", Type.FileBased, "mm");
     }
 
     public static FreeplaneFormat getInstance() {

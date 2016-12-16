@@ -7,7 +7,7 @@ public class GraphMLFormat extends Format {
     private static final GraphMLFormat instance = new GraphMLFormat();
 
     private GraphMLFormat() {
-        super("GraphML", new String[]{"graphml", "xml"});
+        super("GraphML", Type.FileBased, "graphml", "xml");
     }
 
     public static GraphMLFormat getInstance() {

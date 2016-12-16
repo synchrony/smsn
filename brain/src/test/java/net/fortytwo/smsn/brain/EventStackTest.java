@@ -116,6 +116,6 @@ public class EventStackTest {
         }
 
         NoteWriter w = new NoteWriter();
-        w.toWikiText(eventStack.getEvents(), System.out);
+        w.toWikiText(eventStack.getEvents(), System.out, false);
     }
 }

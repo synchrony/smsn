@@ -4,6 +4,7 @@ import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -21,6 +22,7 @@ public abstract class BrainWriter {
         private KnowledgeBase knowledgeBase;
         private String rootId;
         private Filter filter;
+        private File destDirectory;
         private OutputStream destStream;
         private Format format;
 
@@ -64,6 +66,14 @@ public abstract class BrainWriter {
 
         public void setDestStream(OutputStream destStream) {
             this.destStream = destStream;
+        }
+
+        public File getDestDirectory() {
+            return destDirectory;
+        }
+
+        public void setDestDirectory(File destDirectory) {
+            this.destDirectory = destDirectory;
         }
 
         public Format getFormat() {

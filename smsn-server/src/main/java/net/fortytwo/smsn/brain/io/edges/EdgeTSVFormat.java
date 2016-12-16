@@ -6,7 +6,7 @@ public class EdgeTSVFormat extends Format {
     private static final EdgeTSVFormat instance = new EdgeTSVFormat();
 
     private EdgeTSVFormat() {
-        super("Edges", new String[]{"tsv"});
+        super("Edges", Type.FileBased, "tsv");
     }
 
     public static EdgeTSVFormat getInstance() {

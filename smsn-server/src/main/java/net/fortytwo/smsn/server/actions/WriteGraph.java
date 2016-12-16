@@ -7,6 +7,7 @@ import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -68,21 +69,35 @@ public class WriteGraph extends FilteredAction {
 
     @Override
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        if (null == p.getFormat()) {
-            throw new BadRequestException("format is required");
-        }
+        Format format = getFormat(p);
 
         BrainWriter.Context context = new BrainWriter.Context();
         context.setAtomGraph(p.getBrain().getAtomGraph());
         context.setKnowledgeBase(p.getBrain().getKnowledgeBase());
         context.setRootId(p.getRootId());
         context.setFilter(p.getFilter());
-        context.setFormat(Format.getFormat(p.getFormat()));
-        BrainWriter writer = Format.getWriter(context.getFormat());
+        context.setFormat(format);
+        BrainWriter writer = Format.getWriter(format);
+
+        File file = new File(p.getFile());
 
         try {
-            try (OutputStream destStream = new FileOutputStream(p.getFile())) {
-                context.setDestStream(destStream);
+            if (format.getType().equals(Format.Type.FileBased)) {
+                try (OutputStream destStream = new FileOutputStream(file)) {
+                    context.setDestStream(destStream);
+                    writer.doExport(context);
+                }
+            } else {
+                if (file.exists()) {
+                    if (!file.isDirectory()) {
+                        throw new IllegalArgumentException("file " + file.getAbsolutePath() + " is not a directory");
+                    }
+                } else {
+                    if (!file.mkdirs()) {
+                        throw new RequestProcessingException("could not create directory " + file.getAbsolutePath());
+                    }
+                }
+                context.setDestDirectory(file);
                 writer.doExport(context);
             }
         } catch (IOException e) {
@@ -99,5 +114,13 @@ public class WriteGraph extends FilteredAction {
     @Override
     protected boolean doesWrite() {
         return false;
+    }
+
+    private Format getFormat(final RequestParams p) {
+        if (null == p.getFormat()) {
+            throw new BadRequestException("format is required");
+        }
+
+        return Format.getFormat(p.getFormat());
     }
 }
