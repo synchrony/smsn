@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.brain.io;
 
+import com.google.common.base.Preconditions;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -103,6 +105,7 @@ public class Format {
         ServiceLoader<BrainReader> loader = ServiceLoader.load(BrainReader.class);
         int count = 0;
         for (BrainReader reader : loader) {
+            Preconditions.checkNotNull(reader.getFormats());
             if (0 == reader.getFormats().size()) {
                 logger.warning("reader has no formats: " + reader);
             }

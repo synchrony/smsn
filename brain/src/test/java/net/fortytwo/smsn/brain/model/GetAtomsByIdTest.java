@@ -21,7 +21,7 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
         int count = 0;
         for (String id : ids) {
-            Atom atom = atomGraph.createAtom(filter, id);
+            Atom atom = atomGraph.createAtomWithProperties(filter, id);
             atom.setValue("atom #" + ++count);
         }
 
@@ -34,17 +34,17 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
     @Test
     public void testGetAtoms() throws Exception {
-        Atom chaos = atomGraph.createAtom(filter, null);
+        Atom chaos = atomGraph.createAtomWithProperties(filter, null);
         chaos.setValue("Chaos");
-        Atom tartarus = atomGraph.createAtom(filter, null);
+        Atom tartarus = atomGraph.createAtomWithProperties(filter, null);
         tartarus.setValue("Tartarus");
-        Atom gaia = atomGraph.createAtom(filter, null);
+        Atom gaia = atomGraph.createAtomWithProperties(filter, null);
         gaia.setValue("Gaia");
-        Atom eros = atomGraph.createAtom(filter, null);
+        Atom eros = atomGraph.createAtomWithProperties(filter, null);
         eros.setValue("Eros");
-        Atom nyx = atomGraph.createAtom(filter, null);
+        Atom nyx = atomGraph.createAtomWithProperties(filter, null);
         nyx.setValue("Nyx");
-        Atom erebus = atomGraph.createAtom(filter, null);
+        Atom erebus = atomGraph.createAtomWithProperties(filter, null);
         erebus.setValue("Erebus");
         AtomList children = atomGraph.createAtomList(tartarus, gaia, eros, nyx, erebus);
         chaos.setNotes(children);

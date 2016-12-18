@@ -72,8 +72,13 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom createAtom(Filter filter, String id) {
-        return wrapAtom(baseGraph.createAtom(filter, id));
+    public Atom createAtom(String id) {
+        return wrapAtom(baseGraph.createAtom(id));
+    }
+
+    @Override
+    public Atom createAtomWithProperties(Filter filter, String id) {
+        return wrapAtom(baseGraph.createAtomWithProperties(filter, id));
     }
 
     @Override

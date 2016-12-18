@@ -8,7 +8,6 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -107,7 +106,7 @@ public class PGAtomGraph implements AtomGraph {
 
     @Override
     public AtomList createAtomList(String id) {
-        Vertex vertex = createVertex(id, SemanticSynchrony.ATOM_LIST);
+        Vertex vertex = wrapper.createVertex(id, SemanticSynchrony.ATOM_LIST);
         return new PGAtomListImpl(vertex);
     }
 
@@ -135,13 +134,19 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom createAtom(final Filter filter,
-                           final String id) {
+    public Atom createAtom(final String id) {
+        Vertex vertex = wrapper.createVertex(id, SemanticSynchrony.ATOM);
 
-        Vertex vertex = createVertex(id, SemanticSynchrony.ATOM);
-        Atom atom = new PGAtomImpl(vertex);
+        return new PGAtomImpl(vertex);
+    }
+
+    @Override
+    public Atom createAtomWithProperties(final Filter filter,
+                                         final String id) {
+
+        Atom atom = createAtom(id);
+
         atom.setCreated(new Date().getTime());
-
         atom.setSharability(filter.getDefaultSharability());
         atom.setWeight(filter.getDefaultWeight());
 
@@ -311,7 +316,7 @@ public class PGAtomGraph implements AtomGraph {
         PGAtom newAtom = (PGAtom) newGraph.getAtomById(original.getId());
         if (null != newAtom) return newAtom;
 
-        newAtom = (PGAtom) newGraph.createAtom(filter, original.getId());
+        newAtom = (PGAtom) newGraph.createAtomWithProperties(filter, original.getId());
         newAtom.setSharability(original.getSharability());
 
         if (filter.isVisible(original)) {
@@ -356,18 +361,6 @@ public class PGAtomGraph implements AtomGraph {
 
     private Object getOutEdgeId(final PGGraphEntity entity, final String label) {
         return entity.getExactlyOneEdge(label, Direction.OUT).id();
-    }
-
-    private Vertex createVertex(final String id, final String label) {
-        Vertex vertex = propertyGraph.addVertex(T.label, label);
-        // TODO: use id strategy
-        vertex.property(SemanticSynchrony.ID_V, getNonNullId(id));
-
-        return vertex;
-    }
-
-    private String getNonNullId(final String id) {
-        return null == id ? SemanticSynchrony.createRandomId() : id;
     }
 
     private <A> Stream<A> asFilteredStream(Iterator<A> sourceIterator, Predicate<A> filter) {

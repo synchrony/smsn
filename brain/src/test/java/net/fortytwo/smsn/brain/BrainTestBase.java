@@ -67,7 +67,7 @@ public abstract class BrainTestBase {
 
         Note rootNote = parser.fromWikiText(NoteReader.class.getResourceAsStream(exampleFile));
         rootNote.setId(SemanticSynchrony.createRandomId());
-        Atom root = atomGraph.createAtom(filter, rootNote.getId());
+        Atom root = atomGraph.createAtomWithProperties(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);
         return root;
     }

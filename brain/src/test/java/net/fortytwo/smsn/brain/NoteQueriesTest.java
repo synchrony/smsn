@@ -494,7 +494,7 @@ public class NoteQueriesTest extends BrainTestBase {
         assertEquals("002", a.getChildren().get(1).getId());
         assertNull(a.getChildren().get(1).getValue());
 
-        Atom root = atomGraph.createAtom(filter, "000");
+        Atom root = atomGraph.createAtomWithProperties(filter, "000");
         root.setValue("root");
 
         b.setId(root.getId());
@@ -530,7 +530,7 @@ public class NoteQueriesTest extends BrainTestBase {
         Note b = parser.fromWikiText(before);
         Note a = parser.fromWikiText(after);
 
-        Atom root = atomGraph.createAtom(filter, "000");
+        Atom root = atomGraph.createAtomWithProperties(filter, "000");
         root.setValue("root");
 
         b.setId(root.getId());
@@ -564,14 +564,14 @@ public class NoteQueriesTest extends BrainTestBase {
         assertEquals(0, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom0 = atomGraph.createAtom(filter, "000");
+        Atom atom0 = atomGraph.createAtomWithProperties(filter, "000");
         atom0.setValue("0");
 
         assertEquals(1, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom1 = atomGraph.createAtom(filter, "001");
+        Atom atom1 = atomGraph.createAtomWithProperties(filter, "001");
         atom1.setValue("1");
 
         assertEquals(2, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
@@ -584,7 +584,7 @@ public class NoteQueriesTest extends BrainTestBase {
         assertEquals(1, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom2 = atomGraph.createAtom(filter, "002");
+        Atom atom2 = atomGraph.createAtomWithProperties(filter, "002");
         atom2.setValue("2");
 
         assertEquals(2, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
@@ -624,6 +624,6 @@ public class NoteQueriesTest extends BrainTestBase {
     }
 
     private Atom createAtom(String id) {
-        return atomGraph.createAtom(filter, id);
+        return atomGraph.createAtomWithProperties(filter, id);
     }
 }

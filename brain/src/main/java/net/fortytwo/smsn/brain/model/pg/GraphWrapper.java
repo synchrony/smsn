@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
@@ -42,6 +43,16 @@ public abstract class GraphWrapper {
 
     public abstract void shutdown();
 
+    public Vertex createVertex(final String id, final String label) {
+        Vertex vertex = graph.addVertex(T.label, label);
+        // TODO: use id strategy
+        vertex.property(SemanticSynchrony.ID_V, getNonNullId(id));
+        // TODO: use auto-indexing
+        updateIndex(vertex, SemanticSynchrony.ID_V);
+
+        return vertex;
+    }
+
     public void reindex(final Vertex vertex) {
         updateIndex(vertex, SemanticSynchrony.ID_V);
         updateIndex(vertex, SemanticSynchrony.VALUE);
@@ -73,6 +84,10 @@ public abstract class GraphWrapper {
         return indices.get(key);
     }
 
+    private String getNonNullId(final String id) {
+        return null == id ? SemanticSynchrony.createRandomId() : id;
+    }
+
     private void add(final IndexWrapper index) {
         indices.put(index.key, index);
     }
@@ -96,7 +111,7 @@ public abstract class GraphWrapper {
         if (vertices.hasNext()) {
             Vertex next = vertices.next().getEntity();
             if (vertices.hasNext()) {
-                logger.warning("multiple atoms with " + key + " '" + value + "'");
+                logger.warning("multiple vertices with " + key + " '" + value + "'");
             }
 
             return next;

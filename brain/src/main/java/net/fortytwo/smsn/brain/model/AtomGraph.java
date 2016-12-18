@@ -2,7 +2,6 @@ package net.fortytwo.smsn.brain.model;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * A graph of atoms and lists conforming to the Extend-o-Brain data model
@@ -30,7 +29,9 @@ public interface AtomGraph {
 
     String iriOfAtom(Atom a);
 
-    Atom createAtom(Filter filter, String id);
+    Atom createAtom(final String id);
+
+    Atom createAtomWithProperties(Filter filter, String id);
 
     AtomList createAtomList(String id);
 
@@ -45,7 +46,9 @@ public interface AtomGraph {
     long getLastUpdate();
 
     void begin();
+
     void commit();
+
     void rollback();
 
     AtomGraph createFilteredGraph(Filter filter);

@@ -19,11 +19,11 @@ public class GetAtomsByAcronymTest extends BrainTestBase {
 
     @Test
     public void testAcronymSearch() throws Exception {
-        Atom a = atomGraph.createAtom(filter, null);
+        Atom a = atomGraph.createAtomWithProperties(filter, null);
         a.setValue("Arthur\tP.  Dent ");
-        Atom t = atomGraph.createAtom(filter, null);
+        Atom t = atomGraph.createAtomWithProperties(filter, null);
         t.setValue("Arthur's moth-eaten towel");
-        Atom l = atomGraph.createAtom(filter, null);
+        Atom l = atomGraph.createAtomWithProperties(filter, null);
         l.setValue("ooooooooo0ooooooooo1ooooooooo2ooooooooo3ooooooooo4ooooooooo5ooooooooo6ooooooooo7" +
                 "ooooooooo8ooooooooo9oooooooooAoooooooooBoooooooooCoooooooooDoooooooooEoooooooooF");
         atomGraph.reindexAtom(a);

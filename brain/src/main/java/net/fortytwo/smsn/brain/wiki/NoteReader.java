@@ -26,13 +26,6 @@ public class NoteReader {
     private static final String VERBATIM_BLOCK_START_ESC = "\\{\\{\\{";
     private static final String VERBATIM_BLOCK_END_ESC = "\\}\\}\\}";
 
-    private static final String
-            ALIAS_PROP = "@alias",
-            PRIORITY_PROP = "@priority",
-            SHARABILITY_PROP = "@sharability",
-            SHORTCUT_PROP = "@shortcut",
-            WEIGHT_PROP = "@weight";
-
     private static final int MAX_BULLET_LENGTH = 1;
 
     // Tabs count as four spaces each.
@@ -173,7 +166,7 @@ public class NoteReader {
                 if (isProperty) {
                     // can "clear" alias or shortcut by writing "@alias" or "@shortcut" and nothing else;
                     // all other properties require an argument
-                    if (!(bullet.equals(ALIAS_PROP) || bullet.equals(SHORTCUT_PROP))) {
+                    if (!(bullet.equals("@alias") || bullet.equals("@shortcut"))) {
                         throw new NoteParsingException(
                                 lineNumber, "empty value for property candidate '" + bullet + "'");
                     }
@@ -189,54 +182,8 @@ public class NoteReader {
             if (isProperty) {
                 Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
-                switch (bullet) {
-                    case ALIAS_PROP:
-                        if (value.length() > 0) {
-                            n.setAlias(value);
-                        } else {
-                            n.setAlias(Note.CLEARME_VALUE);
-                        }
-                        break;
-                    case SHORTCUT_PROP:
-                        if (value.length() > 0) {
-                            n.setShortcut(value);
-                        } else {
-                            n.setShortcut(Note.CLEARME_VALUE);
-                        }
-                        break;
-                    case PRIORITY_PROP: {
-                        float val;
-                        try {
-                            val = Float.valueOf(value);
-                        } catch (NumberFormatException e) {
-                            throw new NoteParsingException(lineNumber, "invalid @priority value: " + value);
-                        }
-                        n.setPriority(val);
-                        break;
-                    }
-                    case SHARABILITY_PROP: {
-                        float val;
-                        try {
-                            val = Float.valueOf(value);
-                        } catch (NumberFormatException e) {
-                            throw new NoteParsingException(lineNumber, "invalid @sharability value: " + value);
-                        }
-                        n.setSharability(val);
-                        break;
-                    }
-                    case WEIGHT_PROP: {
-                        float val;
-                        try {
-                            val = Float.valueOf(value);
-                        } catch (NumberFormatException e) {
-                            throw new NoteParsingException(lineNumber, "invalid @weight value: " + value);
-                        }
-                        n.setWeight(val);
-                        break;
-                    }
-                    default:
-                        throw new NoteParsingException(lineNumber, "unknown property: " + bullet);
-                }
+                String key = bullet.substring(1);
+                parseProperty(n, key, value, lineNumber);
             } else {
                 Note n = new Note();
                 n.setValue(value);
@@ -257,6 +204,60 @@ public class NoteReader {
         return root;
     }
 
+    private float getFloat(final String key, final String value, final int lineNumber) throws NoteParsingException {
+        try {
+            return Float.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new NoteParsingException(lineNumber, "invalid @" + key + " value: " + value);
+        }
+    }
+
+    private long getLong(final String key, final String value, final int lineNumber) throws NoteParsingException {
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new NoteParsingException(lineNumber, "invalid @" + key + " value: " + value);
+        }
+    }
+
+    private void parseProperty(final Note note, final String key, final String value, int lineNumber)
+            throws NoteParsingException {
+
+        switch (key) {
+            case SemanticSynchrony.ALIAS:
+                if (value.length() > 0) {
+                    note.setAlias(value);
+                } else {
+                    note.setAlias(Note.CLEARME_VALUE);
+                }
+                break;
+            case SemanticSynchrony.CREATED:
+                note.setCreated(getLong(key, value, lineNumber));
+                break;
+            case SemanticSynchrony.PRIORITY: {
+                note.setPriority(getFloat(key, value, lineNumber));
+                break;
+            }
+            case SemanticSynchrony.SHARABILITY: {
+                note.setSharability(getFloat(key, value, lineNumber));
+                break;
+            }
+            case SemanticSynchrony.SHORTCUT:
+                if (value.length() > 0) {
+                    note.setShortcut(value);
+                } else {
+                    note.setShortcut(Note.CLEARME_VALUE);
+                }
+                break;
+            case SemanticSynchrony.WEIGHT: {
+                note.setWeight(getFloat(key, value, lineNumber));
+                break;
+            }
+            default:
+                throw new NoteParsingException(lineNumber, "unknown property: " + key);
+        }
+    }
+
     /**
      * Removes the verbatim block terminators ("{{{" and "}}}") from an atom value string.
      * This method does not check the value with respect to matching and non-nested terminators;
@@ -268,38 +269,38 @@ public class NoteReader {
         return escaped.replaceAll(VERBATIM_BLOCK_START_ESC, "").replaceAll(VERBATIM_BLOCK_END_ESC, "");
     }
 
-    public Note fromJSON(final JSONObject j) throws JSONException {
+    public Note fromJSON(final JSONObject json) throws JSONException {
         Note n = new Note();
 
-        if (j.has(NoteWriter.ID)) {
-            n.setId(j.getString(NoteWriter.ID));
+        if (json.has(NoteWriter.ID)) {
+            n.setId(json.getString(NoteWriter.ID));
         }
-        if (j.has(SemanticSynchrony.VALUE)) {
-            n.setValue(j.getString(SemanticSynchrony.VALUE));
+        if (json.has(SemanticSynchrony.VALUE)) {
+            n.setValue(json.getString(SemanticSynchrony.VALUE));
         }
-        if (j.has(SemanticSynchrony.ALIAS)) {
-            n.setAlias(j.getString(SemanticSynchrony.ALIAS));
+        if (json.has(SemanticSynchrony.ALIAS)) {
+            n.setAlias(json.getString(SemanticSynchrony.ALIAS));
         }
-        if (j.has(SemanticSynchrony.SHORTCUT)) {
-            n.setShortcut(j.getString(SemanticSynchrony.SHORTCUT));
+        if (json.has(SemanticSynchrony.SHORTCUT)) {
+            n.setShortcut(json.getString(SemanticSynchrony.SHORTCUT));
         }
-        if (j.has(SemanticSynchrony.SHARABILITY)) {
-            n.setSharability((float) j.getDouble(SemanticSynchrony.SHARABILITY));
+        if (json.has(SemanticSynchrony.SHARABILITY)) {
+            n.setSharability((float) json.getDouble(SemanticSynchrony.SHARABILITY));
         }
-        if (j.has(SemanticSynchrony.WEIGHT)) {
-            n.setWeight((float) j.getDouble(SemanticSynchrony.WEIGHT));
+        if (json.has(SemanticSynchrony.WEIGHT)) {
+            n.setWeight((float) json.getDouble(SemanticSynchrony.WEIGHT));
         }
-        if (j.has(SemanticSynchrony.PRIORITY)) {
-            n.setPriority((float) j.getDouble(SemanticSynchrony.PRIORITY));
+        if (json.has(SemanticSynchrony.PRIORITY)) {
+            n.setPriority((float) json.getDouble(SemanticSynchrony.PRIORITY));
         }
-        if (j.has(SemanticSynchrony.CREATED)) {
-            n.setCreated(j.getLong(SemanticSynchrony.CREATED));
+        if (json.has(SemanticSynchrony.CREATED)) {
+            n.setCreated(json.getLong(SemanticSynchrony.CREATED));
         }
-        if (j.has(NoteWriter.HAS_CHILDREN)) {
-            n.setHasChildren(j.optBoolean(NoteWriter.HAS_CHILDREN));
+        if (json.has(NoteWriter.HAS_CHILDREN)) {
+            n.setHasChildren(json.optBoolean(NoteWriter.HAS_CHILDREN));
         }
 
-        JSONArray a = j.optJSONArray(NoteWriter.CHILDREN);
+        JSONArray a = json.optJSONArray(NoteWriter.CHILDREN);
         if (null != a) {
             for (int i = 0; i < a.length(); i++) {
                 JSONObject jc = a.getJSONObject(i);

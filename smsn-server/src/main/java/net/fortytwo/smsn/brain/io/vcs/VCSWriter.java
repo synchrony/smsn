@@ -15,14 +15,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class VCSWriter extends BrainWriter {
+
     private static final List<Format> formats;
     private static final NoteWriter noteWriter = new NoteWriter();
 
     static {
         formats = new LinkedList<>();
-        formats.add(new Format("VCS", Format.Type.DirectoryBased));
+        formats.add(VCSFormat.getInstance());
     }
 
     @Override
@@ -35,22 +37,28 @@ public class VCSWriter extends BrainWriter {
         File parentDir = context.getDestDirectory();
         createDirectoryIfNotExists(parentDir);
 
-        File[] dirs = createDirsBySharability(parentDir);
+        File[] dirs = initializeDirectories(parentDir);
 
         timeAction("exported atoms as individual files", () -> doExport(context.getAtomGraph(), dirs));
     }
 
-    private File[] createDirsBySharability(final File parentDir) throws IOException {
-        File[] dirs = new File[]{
-                new File(parentDir, "private"),
-                new File(parentDir, "personal"),
-                new File(parentDir, "public"),
-                new File(parentDir, "universal")};
+    private File[] initializeDirectories(final File parentDir) throws IOException {
+        File[] dirs = VCSFormat.getDirsBySharability(parentDir);
         for (File d : dirs) {
             createDirectoryIfNotExists(d);
-            timeAction("cleaned directory " + d, () -> cleanDirectory(d));
+            timeAction("cleaned directory " + d, () -> clearDirectoryOfAtomData(d));
         }
         return dirs;
+    }
+
+    private void clearDirectoryOfAtomData(final File dir) {
+        for (File file : dir.listFiles()) {
+            if (VCSFormat.isAtomFile(file)) {
+                if (!file.delete()) {
+                    throw new IllegalStateException("failed to delete atom file " + file.getAbsolutePath());
+                }
+            }
+        }
     }
 
     private void doExport(final AtomGraph graph, final File[] dirs) throws IOException {

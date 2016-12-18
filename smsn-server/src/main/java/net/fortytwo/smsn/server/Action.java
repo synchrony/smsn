@@ -241,7 +241,7 @@ public abstract class Action {
     }
 
     private Atom createNewRoot(final RequestParams params) {
-        Atom root = params.getBrain().getAtomGraph().createAtom(params.getFilter(), null);
+        Atom root = params.getBrain().getAtomGraph().createAtomWithProperties(params.getFilter(), null);
         root.setValue("life, the universe, and everything");
         params.getBrain().getAtomGraph().reindexAtom(root);
         return root;

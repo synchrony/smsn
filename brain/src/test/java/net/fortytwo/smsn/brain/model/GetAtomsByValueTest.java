@@ -21,7 +21,7 @@ public class GetAtomsByValueTest extends BrainTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        arthur = atomGraph.createAtom(filter, null);
+        arthur = atomGraph.createAtomWithProperties(filter, null);
         arthur.setValue("Arthur Dent");
         atomGraph.reindexAtom(arthur);
     }

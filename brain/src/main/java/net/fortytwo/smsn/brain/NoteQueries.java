@@ -465,7 +465,7 @@ public class NoteQueries {
 
     private Atom createAtom(final String id,
                             final Filter filter) {
-        Atom a = brain.getAtomGraph().createAtom(filter, id);
+        Atom a = brain.getAtomGraph().createAtomWithProperties(filter, id);
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logCreate(a);
