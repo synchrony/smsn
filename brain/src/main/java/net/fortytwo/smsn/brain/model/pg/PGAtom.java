@@ -34,7 +34,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Long getCreated() {
-        return getRequiredProperty(SemanticSynchrony.CREATED);
+        return getOptionalProperty(SemanticSynchrony.CREATED);
     }
 
     @Override
@@ -64,7 +64,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Float getSharability() {
-        return getRequiredProperty(SemanticSynchrony.SHARABILITY);
+        return getOptionalProperty(SemanticSynchrony.SHARABILITY, 0f);
     }
 
     @Override
@@ -84,7 +84,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public Float getWeight() {
-        return getRequiredProperty(SemanticSynchrony.WEIGHT);
+        return getOptionalProperty(SemanticSynchrony.WEIGHT, 0f);
     }
 
     @Override

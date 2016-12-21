@@ -81,6 +81,11 @@ abstract class PGGraphEntity {
         return property.isPresent() ? property.value() : null;
     }
 
+    protected <T> T getOptionalProperty(String name, T defaultValue) {
+        T value = getOptionalProperty(name);
+        return null == value ? defaultValue : value;
+    }
+
     protected <T> T getRequiredProperty(String name) {
         T value = getOptionalProperty(name);
         if (null == value) {
