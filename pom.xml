@@ -53,7 +53,7 @@
         <neo4j.version>2.3.3</neo4j.version>
         <neo4j.tinkerpop.version>0.3-2.3.3</neo4j.tinkerpop.version>
         <rdfagents.version>1.3</rdfagents.version>
-        <ripple.version>1.4</ripple.version>
+        <ripple.version>1.5</ripple.version>
         <sesame.version>4.1.2</sesame.version>
         <stream42.version>1.1</stream42.version>
         <sesametools.version>1.10</sesametools.version>
