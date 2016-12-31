@@ -1,10 +1,16 @@
 Semantic Synchrony CHANGELOG
 ====================
 
-SmSn 1.2 SNAPSHOT
+SmSn 1.2 (Into the Future)
 ----------------------------------------
-SmSn 1.2.0 (NOT YET RELEASED)
+SmSn 1.2.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Added a VCS (version control system) graph reader and writer
+* Added a command to populate a new, empty graph
+* Cut down on graph index lookups through caching
+* Added a ping action
+* Migrated to Neo4j 2.3 and Lucene 3.6
+* Migrated from TinkerPop 2.6 to Apache TinkerPop 3.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SmSn 1.1 (More Brains)
