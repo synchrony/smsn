@@ -37,6 +37,15 @@ public class SemanticSynchrony {
     public static final String
             BRAIN_PORT = "net.fortytwo.smsn.server.brainPort";
 
+    // the id property also used by ElementIdStrategy
+    public static final String
+            ID_V = "idV",
+            ID_E = "idE";
+
+    public static final String
+            ATOM = "atom",
+            ATOM_LIST = "list";
+
     // core schema constants
     public static final String
             ALIAS = "alias",
@@ -138,8 +147,9 @@ public class SemanticSynchrony {
      * @param properties the new key/value pairs to add.
      *                   Note that a new value for a key already present in configuration will replace the old value
      */
-    private static void addConfiguration(final Properties properties) {
+    public static void addConfiguration(final Properties properties) {
         configuration.putAll(properties);
+        logger.info("added " + properties.size() + " configuration properties");
     }
 
     public static TypedProperties getConfiguration() {
@@ -152,7 +162,7 @@ public class SemanticSynchrony {
      *
      * @return a new pseudo-random key
      */
-    public static String createRandomKey() {
+    public static String createRandomId() {
         byte[] bytes = new byte[KEY_DIGITS];
         for (int i = 0; i < KEY_DIGITS; i++) {
             int n = random.nextInt(64);

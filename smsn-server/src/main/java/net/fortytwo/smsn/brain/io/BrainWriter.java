@@ -3,7 +3,10 @@ package net.fortytwo.smsn.brain.io;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
+import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -21,6 +24,7 @@ public abstract class BrainWriter {
         private KnowledgeBase knowledgeBase;
         private String rootId;
         private Filter filter;
+        private File destDirectory;
         private OutputStream destStream;
         private Format format;
 
@@ -66,6 +70,14 @@ public abstract class BrainWriter {
             this.destStream = destStream;
         }
 
+        public File getDestDirectory() {
+            return destDirectory;
+        }
+
+        public void setDestDirectory(File destDirectory) {
+            this.destDirectory = destDirectory;
+        }
+
         public Format getFormat() {
             return format;
         }
@@ -85,5 +97,21 @@ public abstract class BrainWriter {
                 return filteredGraph;
             }
         }
+    }
+
+    protected void createDirectoryIfNotExists(final File dir) {
+        if (dir.exists()) {
+            if (!dir.isDirectory()) {
+                throw new IllegalArgumentException("file " + dir.getAbsolutePath() + " is not a directory");
+            }
+        } else {
+            if (!dir.mkdirs()) {
+                throw new RequestProcessingException("could not create directory " + dir.getAbsolutePath());
+            }
+        }
+    }
+
+    protected void cleanDirectory(final File dir) throws IOException {
+        FileUtils.cleanDirectory(dir);
     }
 }

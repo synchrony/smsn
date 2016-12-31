@@ -67,13 +67,18 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom getAtom(String id) {
-        return wrapAtom(baseGraph.getAtom(id));
+    public Atom getAtomById(String id) {
+        return wrapAtom(baseGraph.getAtomById(id));
     }
 
     @Override
-    public Atom createAtom(Filter filter, String id) {
-        return wrapAtom(baseGraph.createAtom(filter, id));
+    public Atom createAtom(String id) {
+        return wrapAtom(baseGraph.createAtom(id));
+    }
+
+    @Override
+    public Atom createAtomWithProperties(Filter filter, String id) {
+        return wrapAtom(baseGraph.createAtomWithProperties(filter, id));
     }
 
     @Override
@@ -97,23 +102,23 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public List<Atom> getAtomsWithShortcut(String shortcut, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsWithShortcut(shortcut, filter));
+    public List<Atom> getAtomsByShortcut(String shortcut, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByShortcut(shortcut, filter));
     }
 
     @Override
-    public List<Atom> getAtomsByFulltextQuery(String query, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsByFulltextQuery(query, filter));
+    public List<Atom> getAtomsByValueQuery(String value, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByValueQuery(value, filter));
     }
 
     @Override
-    public List<Atom> getAtomsByAcronymQuery(String query, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsByAcronymQuery(query, filter));
+    public List<Atom> getAtomsByAcronym(String acronym, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByAcronym(acronym, filter));
     }
 
     @Override
-    public void addAtomToIndices(Atom a) {
-        baseGraph.addAtomToIndices(((FilteredAtom) a).baseAtom);
+    public void reindexAtom(Atom a) {
+        baseGraph.reindexAtom(((FilteredAtom) a).baseAtom);
     }
 
     @Override
@@ -122,8 +127,18 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
+    public void begin() {
+        baseGraph.begin();
+    }
+
+    @Override
     public void commit() {
         baseGraph.commit();
+    }
+
+    @Override
+    public void rollback() {
+        baseGraph.rollback();
     }
 
     @Override

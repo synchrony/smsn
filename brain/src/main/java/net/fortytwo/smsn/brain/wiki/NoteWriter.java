@@ -81,7 +81,8 @@ public class NoteWriter {
     }
 
     public void toWikiText(final List<Note> notes,
-                           final OutputStream out) {
+                           final OutputStream out,
+                           final boolean withProperties) {
         PrintStream p;
         try {
             p = new PrintStream(out, false, SemanticSynchrony.UTF8);
@@ -90,17 +91,15 @@ public class NoteWriter {
         }
 
         for (Note n : notes) {
-            printNote(n, 0, p);
+            printNote(n, 0, p, withProperties);
         }
     }
 
     private static void printNote(final Note n,
                                   final int indent,
-                                  final PrintStream p) {
-
-        for (int i = 0; i < indent; i++) {
-            p.print("    ");
-        }
+                                  final PrintStream p,
+                                  final boolean withProperties) {
+        indent(indent, p);
 
         p.print("* ");
 
@@ -110,12 +109,37 @@ public class NoteWriter {
             p.print(": ");
         }
 
-        p.print(sanitizeValue(n.getValue()));
+        if (null != n.getValue()) {
+            p.print(sanitizeValue(n.getValue()));
+        }
 
         p.print("\n");
 
+        int nextIndent = indent + 1;
+
+        if (withProperties) {
+            if (null != n.getAlias()) printProperty(SemanticSynchrony.ALIAS, n.getAlias(), nextIndent, p);
+            if (null != n.getCreated()) printProperty(SemanticSynchrony.CREATED, n.getCreated(), nextIndent, p);
+            if (null != n.getPriority()) printProperty(SemanticSynchrony.PRIORITY, n.getPriority(), nextIndent, p);
+            if (null != n.getSharability()) printProperty(SemanticSynchrony.SHARABILITY, n.getSharability(), nextIndent, p);
+            if (null != n.getShortcut()) printProperty(SemanticSynchrony.SHORTCUT, n.getShortcut(), nextIndent, p);
+            if (null != n.getWeight()) printProperty(SemanticSynchrony.WEIGHT, n.getWeight(), nextIndent, p);
+        }
+
         for (Note child : n.getChildren()) {
-            printNote(child, indent + 1, p);
+            printNote(child, nextIndent, p, withProperties);
+        }
+    }
+
+    private static void printProperty(final String key, final Object value, final int indent, final PrintStream p) {
+        indent(indent, p);
+
+        p.println("@" + key + " " + value);
+    }
+
+    private static void indent(final int indent, final PrintStream p) {
+        for (int i = 0; i < indent; i++) {
+            p.print("    ");
         }
     }
 

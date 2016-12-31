@@ -1,6 +1,8 @@
 package net.fortytwo.smsn.brain;
 
 public interface Params {
+    public enum Format{json, wiki};
+
     public static final String
             ACTION = "action",
             DATASET = "dataset",
@@ -28,12 +30,4 @@ public interface Params {
             VALUE_CUTOFF = "valueCutoff",
             VIEW = "view",
             VIEW_FORMAT = "viewFormat";
-
-    public static final String
-            JSON_FORMAT = "json",
-            WIKI_FORMAT = "wiki";
-
-    public enum Format {
-        Vertices, Edges, GraphML, Freeplane, LaTeX, PageRank, RDF, Web
-    }
 }

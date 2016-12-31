@@ -10,7 +10,7 @@
     <parent>
         <groupId>net.fortytwo.smsn</groupId>
         <artifactId>smsn-all</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
     </parent>
 
     <dependencies>
@@ -19,6 +19,34 @@
             <artifactId>smsn-rdf</artifactId>
             <version>${smsn.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>gremlin-core</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>tinkergraph-gremlin</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>neo4j-gremlin</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-tinkerpop-api-impl</artifactId>
+            <version>${neo4j.tinkerpop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-rio-api</artifactId>
@@ -26,45 +54,13 @@
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-memory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-rio-ntriples</artifactId>
             <version>${sesame.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-rexster-graph</artifactId>
-            <version>${tinkerpop.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- for StringEscapeUtils -->
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-neo4j-graph</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-core</artifactId>
-            <version>${tinkerpop.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-lucene-index</artifactId>
-            <version>${neo4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-memory</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
@@ -77,6 +73,17 @@
             <artifactId>sesame-queryalgebra-evaluation</artifactId>
             <version>${sesame.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- for StringEscapeUtils -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
         </dependency>
         <!-- Note: this dependency is used only for documentation.  Comment it out when not in use.
         <dependency>

@@ -2,7 +2,6 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.util.TypedProperties;
 
@@ -27,6 +26,8 @@ public class Brain {
     private static final long
             INFERENCE_PERIOD = 1000L * 60,
             INFERENCE_INITIAL_WAIT = 1000L * 30;
+
+    private static final boolean RUN_BACKGROUND_TASKS = false;
 
     private final AtomGraph atomGraph;
 
@@ -74,6 +75,8 @@ public class Brain {
     }
 
     public void startBackgroundTasks() {
+        if (!RUN_BACKGROUND_TASKS) return;
+
         priorities.refreshQueue(atomGraph);
 
         knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);

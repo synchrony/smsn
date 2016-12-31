@@ -8,12 +8,15 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
+import org.parboiled.common.Preconditions;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -23,7 +26,7 @@ public class NoteQueries {
     protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());
 
     public enum QueryType {
-        FullText, Acronym, Shortcut
+        FullText, Acronym, Shortcut, Ripple
     }
 
     private final Brain brain;
@@ -33,9 +36,7 @@ public class NoteQueries {
      * @param brain the Extend-o-Brain instance to query and update
      */
     public NoteQueries(final Brain brain) {
-        if (null == brain) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgNotNull(brain, "brain");
 
         this.brain = brain;
     }
@@ -57,58 +58,27 @@ public class NoteQueries {
                      final int height,
                      final Filter filter,
                      final ViewStyle style) {
-        if (null == root || height < 0 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
+        checkRootArg(root);
+        checkHeightArg(height, 0);
+        checkFilterArg(filter);
+        checkStyleArg(style, false);
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logView(root);
         }
 
-        return viewInternal(root, height, filter, style, true);
+        return viewInternal(root, height, filter, style, true, null);
     }
 
-    private Note viewInternal(final Atom root,
-                              final int height,
-                              final Filter filter,
-                              final ViewStyle style,
-                              final boolean getProperties) {
-        if (null == root) {
-            throw new IllegalStateException("null view root");
-        }
-
-        Note n = toNote(root, filter.isVisible(root), getProperties);
-
-        if (height > 0) {
-            for (Atom target : style.getLinked(root, filter)) {
-                int h = filter.isVisible(target) ? height - 1 : 0;
-                Note cn = viewInternal(target, h, filter, style, getProperties);
-                n.addChild(cn);
-            }
-        } else {
-            if (hasChildren(root, filter, style)) {
-                n.setHasChildren(true);
-            }
-        }
-
-        return n;
-    }
-
-    public Note customView(final List<String> atomIds,
+    public Note customView(final Iterable<Atom> atoms,
                            final Filter filter) {
-        if (null == atomIds || null == filter) {
-            throw new IllegalArgumentException();
-        }
+        checkAtomIterableArg(atoms);
+        checkFilterArg(filter);
 
         Note n = new Note();
 
-        for (String id : atomIds) {
-            Atom a = brain.getAtomGraph().getAtom(id);
-            if (null == a) {
-                throw new IllegalArgumentException("no such atom: " + id);
-            }
-
-            n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true));
+        for (Atom a : atoms) {
+            n.addChild(viewInternal(a, 0, filter, forwardViewStyle, true, null));
         }
 
         return n;
@@ -117,7 +87,7 @@ public class NoteQueries {
     /**
      * Updates the graph.
      *
-     * @param rootNote the root of the note tree
+     * @param root the root of the note tree
      * @param height   the maximum height of the tree which will be applied to the graph as an update.
      *                 If height is 0, only the root node will be affected,
      *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
@@ -126,168 +96,21 @@ public class NoteQueries {
      * @param style    the adjacency style of the view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
-    public void update(final Note rootNote,
+    public void update(final Note root,
                        final int height,
                        final Filter filter,
                        final ViewStyle style) {
 
-        if (null == rootNote || height < 0 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
+        checkRootArg(root);
+        checkHeightArg(height, 0);
+        checkFilterArg(filter);
+        checkStyleArg(style, true);
 
-        if (!style.addOnUpdate() && !style.deleteOnUpdate()) {
-            throw new IllegalStateException("can't update in style " + style);
-        }
+        Map<String, Atom> cache = createCache();
 
-        updateInternal(rootNote, height, filter, style);
+        updateInternal(root, height, filter, style, cache);
 
         brain.getAtomGraph().notifyOfUpdate();
-    }
-
-    private final Comparator<Note> noteComparator = (a, b) -> null == a.getId()
-            ? (null == b.getId() ? 0 : -1)
-            : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
-
-    private boolean hasChildren(final Atom root,
-                                final Filter filter,
-                                final ViewStyle style) {
-        // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root)) {
-            return false;
-        }
-
-        // If the note is visible, we can see its children (although we will not be able to read the values of any
-        // children which are themselves invisible).
-        Iterable<Atom> children = style.getLinked(root, filter);
-        return children.iterator().hasNext();
-    }
-
-    private void updateInternal(final Note rootNote,
-                                final int height,
-                                final Filter filter,
-                                final ViewStyle style) {
-        Atom rootAtom = getRequiredAtomForNote(rootNote);
-
-        // we are pre-ordered w.r.t. setting of properties
-        setProperties(rootAtom, rootNote);
-
-        updateChildren(rootNote, rootAtom, height, filter, style);
-    }
-
-    private Atom getRequiredAtomForNote(final Note note) {
-        if (null == note.getId()) {
-            throw new InvalidUpdateException("note has no id");
-        }
-
-        Atom atom = brain.getAtomGraph().getAtom(note.getId());
-        if (null == atom) {
-            throw new InvalidUpdateException("no such atom: " + note);
-        }
-
-        return atom;
-    }
-
-    private void updateChildren(final Note rootNote,
-                                final Atom rootAtom,
-                                final int height,
-                                final Filter filter,
-                                final ViewStyle style) {
-
-        if (0 >= height || !filter.isVisible(rootAtom)) {
-            return;
-        }
-
-        Set<String> childrenAdded = new HashSet<>();
-        Set<String> childrenCreated = new HashSet<>();
-
-        ListDiff.DiffEditor<Note> editor = new ListDiff.DiffEditor<Note>() {
-            @Override
-            public void add(final int position,
-                            final Note note) {
-                if (!style.addOnUpdate()) {
-                    return;
-                }
-
-                Atom atom = getAtom(note, filter, childrenCreated);
-
-                rootAtom.addChildAt(atom, position);
-
-                childrenAdded.add(atom.getId());
-
-                // log this activity
-                if (null != brain.getActivityLog()) {
-                    brain.getActivityLog().logLink(rootAtom, atom);
-                }
-            }
-
-            @Override
-            public void delete(final int position,
-                               final Note note) throws InvalidGraphException {
-                if (!style.deleteOnUpdate()) {
-                    return;
-                }
-
-                rootAtom.deleteChildAt(position);
-
-                // log this activity
-                if (null != brain.getActivityLog()) {
-                    Atom a = brain.getAtomGraph().getAtom(note.getId());
-                    brain.getActivityLog().logUnlink(rootAtom, a);
-                }
-            }
-        };
-
-        List<Note> before = viewInternal(rootAtom, 1, filter, style, false).getChildren();
-        List<Note> after = rootNote.getChildren();
-        List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, noteComparator);
-
-        // we are pre-ordered w.r.t. updating lists of children
-        ListDiff.applyDiff(before, after, lcs, noteComparator, editor);
-
-        for (Note n : rootNote.getChildren()) {
-            // upon adding children:
-            // for a child which is a newly created atom, also add grandchildren to one level, possibly recursively
-            // if a new child is a new atom, only update the child, not the grandchildren
-            // if a child is not new, update both the child and the grandchildren with decreasing height
-            int h = null == rootNote.getId()
-                    ? height - 1
-                    : childrenCreated.contains(n.getId())
-                    ? 1
-                    : childrenAdded.contains(n.getId())
-                    ? 0
-                    : height - 1;
-
-            // TODO: verify that this can result in multiple log events per call to update()
-            updateInternal(n, h, filter, style);
-        }
-    }
-
-    private Atom getAtom(final Note note, final Filter filter, final Set<String> created) {
-        // retrieve or create an atom for the note
-        // atoms are only created if they appear under a parent which is also an atom
-        String id = note.getId();
-        Atom atom = null == id ? null : brain.getAtomGraph().getAtom(id);
-
-        if (null == atom) {
-            atom = createAtom(note.getId(), filter);
-            created.add(atom.getId());
-        }
-        if (null == note.getId()) {
-            note.setId(atom.getId());
-        }
-
-        return atom;
-    }
-
-    private Atom createAtom(final String id,
-                            final Filter filter) {
-        Atom a = brain.getAtomGraph().createAtom(filter, id);
-
-        if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logCreate(a);
-        }
-
-        return a;
     }
 
     /**
@@ -308,68 +131,44 @@ public class NoteQueries {
                        final int height,
                        final Filter filter,
                        final ViewStyle style) {
-        if (null == query || height < 1 || null == filter || null == style) {
-            throw new IllegalArgumentException();
-        }
+        checkQueryTypeArg(queryType);
+        checkQueryArg(query);
+        checkHeightArg(height, 1);
+        checkFilterArg(filter);
+        checkStyleArg(style, false);
 
         Note result = new Note();
 
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getAtomGraph().getAtomsByFulltextQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByValueQuery(query, filter);
                 break;
             case Acronym:
-                results = brain.getAtomGraph().getAtomsByAcronymQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
                 break;
             case Shortcut:
-                results = brain.getAtomGraph().getAtomsWithShortcut(query, filter);
+                results = brain.getAtomGraph().getAtomsByShortcut(query, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);
         }
 
         for (Atom a : results) {
-            Note n = viewInternal(a, height - 1, filter, style, true);
+            Note n = viewInternal(a, height - 1, filter, style, true, null);
             result.addChild(n);
         }
 
-        Collections.sort(result.getChildren(), new NoteComparator());
-
         result.setValue(queryType.name() + " results for \"" + query + "\"");
-        return result;
-    }
-
-    private boolean isAdjacent(final Atom a, final boolean includeChildren, final boolean includeParents) {
-        return (includeChildren && null != a.getNotes())
-                || (includeParents && a.getFirstOf().size() > 0);
-    }
-
-    private Note findAtoms(final Filter filter,
-                           final boolean includeChildren,
-                           final boolean includeParents,
-                           int height,
-                           ViewStyle style) {
-        if (null == filter || height < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        Note result = new Note();
-
-        for (Atom a : brain.getAtomGraph().getAllAtoms()) {
-            if (filter.isVisible(a) && !isAdjacent(a, includeChildren, includeParents)) {
-                Note n = viewInternal(a, height, filter, style, true);
-                result.addChild(n);
-            }
-        }
-
-        Collections.sort(result.getChildren(), new NoteComparator());
         return result;
     }
 
     public Note findRootAtoms(final Filter filter,
                               final ViewStyle style,
                               final int height) {
+        checkHeightArg(height, 0);
+        checkFilterArg(filter);
+        checkStyleArg(style, false);
 
         boolean includeChildren = style.getDirection().equals(ViewStyle.Direction.Backward);
         boolean includeParents = style.getDirection().equals(ViewStyle.Direction.Forward);
@@ -393,9 +192,9 @@ public class NoteQueries {
     public Note priorityView(final Filter filter,
                              final int maxResults,
                              final Priorities priorities) throws InvalidGraphException {
-        if (null == filter || maxResults < 1 || null == priorities) {
-            throw new IllegalArgumentException();
-        }
+        checkFilterArg(filter);
+        checkPrioritiesArg(priorities);
+        checkMaxResultsArg(maxResults);
 
         Note result = new Note();
         result.setValue("priority queue with up to " + maxResults + " results");
@@ -412,6 +211,293 @@ public class NoteQueries {
             }
         }
 
+        return result;
+    }
+
+    private void checkRootArg(final Atom root) {
+        Preconditions.checkArgNotNull(root, "root");
+    }
+
+    private void checkRootArg(final Note root) {
+        Preconditions.checkArgNotNull(root, "root");
+    }
+
+    private void checkListOfIdsArg(final List<String> atomIds) {
+        Preconditions.checkArgNotNull(atomIds, "atomIds");
+    }
+
+    private void checkAtomIterableArg(final Iterable<Atom> atoms) {
+        Preconditions.checkArgNotNull(atoms, "atoms");
+    }
+
+    private void checkFilterArg(final Filter filter) {
+        Preconditions.checkArgNotNull(filter, "filter");
+    }
+
+    private void checkStyleArg(final ViewStyle style, boolean isUpdate) {
+        Preconditions.checkArgNotNull(style, "style");
+
+        Preconditions.checkArgument(!isUpdate || style.addOnUpdate() || style.deleteOnUpdate(),
+                "can't update in style " + style);
+    }
+
+    private void checkHeightArg(final int height, final int min) {
+        Preconditions.checkArgument(height >= min, "height of " + height + "expecting >= " + min);
+    }
+
+    private void checkMaxResultsArg(final int maxResults) {
+        Preconditions.checkArgument(maxResults >= 1, "invalid maxResults");
+    }
+
+    private void checkQueryTypeArg(final QueryType type) {
+        Preconditions.checkArgNotNull(type, "queryType");
+    }
+
+    private void checkQueryArg(final String query) {
+        Preconditions.checkArgNotNull(query, "query");
+    }
+
+    private void checkPrioritiesArg(final Priorities priorities) {
+        Preconditions.checkArgNotNull(priorities, "priorities");
+    }
+
+    private void addToCache(final Atom atom, final Map<String, Atom> cache) {
+        if (null != cache) cache.put(atom.getId(), atom);
+    }
+
+    private final Comparator<Note> compareById = (a, b) -> null == a.getId()
+            ? (null == b.getId() ? 0 : -1)
+            : (null == b.getId() ? 1 : a.getId().compareTo(b.getId()));
+
+    private final Comparator<Note> compareByProperties = (a, b) -> {
+        int cmp = b.getWeight().compareTo(a.getWeight());
+
+        if (0 == cmp) {
+            cmp = b.getCreated().compareTo(a.getCreated());
+        }
+
+        return cmp;
+    };
+
+    private boolean hasChildren(final Atom root,
+                                final Filter filter,
+                                final ViewStyle style) {
+        // If the note is invisible, we can't see whether it has children.
+        if (!filter.isVisible(root)) {
+            return false;
+        }
+
+        // If the note is visible, we can see its children (although we will not be able to read the values of any
+        // children which are themselves invisible).
+        Iterable<Atom> children = style.getLinked(root, filter);
+        return children.iterator().hasNext();
+    }
+
+    private Note viewInternal(final Atom root,
+                              final int height,
+                              final Filter filter,
+                              final ViewStyle style,
+                              final boolean getProperties,
+                              final Map<String, Atom> cache) {
+        if (null == root) {
+            throw new IllegalStateException("null view root");
+        }
+
+        Note n = toNote(root, filter.isVisible(root), getProperties);
+
+        if (height > 0) {
+            for (Atom target : style.getLinked(root, filter)) {
+                addToCache(target, cache);
+                int h = filter.isVisible(target) ? height - 1 : 0;
+                Note cn = viewInternal(target, h, filter, style, getProperties, cache);
+                n.addChild(cn);
+            }
+        } else {
+            if (hasChildren(root, filter, style)) {
+                n.setHasChildren(true);
+            }
+        }
+
+        return n;
+    }
+
+    private void updateInternal(final Note rootNote,
+                                final int height,
+                                final Filter filter,
+                                final ViewStyle style,
+                                final Map<String, Atom> cache) {
+        Atom rootAtom = getRequiredAtomForNote(rootNote, cache);
+
+        // we are pre-ordered w.r.t. setting of properties
+        setProperties(rootAtom, rootNote);
+
+        updateChildren(rootNote, rootAtom, height, filter, style, cache);
+    }
+
+    private void updateChildren(final Note rootNote,
+                                final Atom rootAtom,
+                                final int height,
+                                final Filter filter,
+                                final ViewStyle style,
+                                final Map<String, Atom> cache) {
+
+        if (0 >= height || !filter.isVisible(rootAtom)) {
+            return;
+        }
+
+        Set<String> childrenAdded = new HashSet<>();
+        Set<String> childrenCreated = new HashSet<>();
+
+        ListDiff.DiffEditor<Note> editor = new ListDiff.DiffEditor<Note>() {
+            @Override
+            public void add(final int position,
+                            final Note note) {
+                if (!style.addOnUpdate()) {
+                    return;
+                }
+
+                Atom atom = getAtomForNote(note, filter, childrenCreated, cache);
+
+                rootAtom.addChildAt(atom, position);
+
+                childrenAdded.add(atom.getId());
+
+                // log this activity
+                if (null != brain.getActivityLog()) {
+                    brain.getActivityLog().logLink(rootAtom, atom);
+                }
+            }
+
+            @Override
+            public void delete(final int position,
+                               final Note note) throws InvalidGraphException {
+                if (!style.deleteOnUpdate()) {
+                    return;
+                }
+
+                rootAtom.deleteChildAt(position);
+
+                // log this activity
+                if (null != brain.getActivityLog()) {
+                    Atom a = getAtomById(note.getId(), cache);
+                    brain.getActivityLog().logUnlink(rootAtom, a);
+                }
+            }
+        };
+
+        List<Note> before = viewInternal(rootAtom, 1, filter, style, false, cache).getChildren();
+        List<Note> after = rootNote.getChildren();
+        List<Note> lcs = ListDiff.longestCommonSubsequence(before, after, compareById);
+
+        // we are pre-ordered w.r.t. updating lists of children
+        ListDiff.applyDiff(before, after, lcs, compareById, editor);
+
+        for (Note n : rootNote.getChildren()) {
+            // upon adding children:
+            // for a child which is a newly created atom, also add grandchildren to one level, possibly recursively
+            // if a new child is a new atom, only update the child, not the grandchildren
+            // if a child is not new, update both the child and the grandchildren with decreasing height
+            int h = null == rootNote.getId()
+                    ? height - 1
+                    : childrenCreated.contains(n.getId())
+                    ? 1
+                    : childrenAdded.contains(n.getId())
+                    ? 0
+                    : height - 1;
+
+            // TODO: verify that this can result in multiple log events per call to update()
+            updateInternal(n, h, filter, style, cache);
+        }
+    }
+
+    private Map<String, Atom> createCache() {
+        return new HashMap<>();
+    }
+
+    private Atom getAtomById(final String id) {
+        return brain.getAtomGraph().getAtomById(id);
+    }
+
+    // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved atoms
+    private Atom getAtomById(final String id, final Map<String, Atom> cache) {
+        Atom atom = cache.get(id);
+        if (null == atom) {
+            atom = brain.getAtomGraph().getAtomById(id);
+            if (null != atom) cache.put(id, atom);
+        }
+        return atom;
+    }
+
+    // retrieve or create an atom for the note
+    // atoms are only created if they appear under a parent which is also an atom
+    private Atom getAtomForNote(final Note note,
+                                final Filter filter,
+                                final Set<String> created,
+                                final Map<String, Atom> cache) {
+
+        String id = note.getId();
+        Atom atom = null == id ? null : getAtomById(id, cache);
+
+        if (null == atom) {
+            atom = createAtom(note.getId(), filter);
+            created.add(atom.getId());
+            cache.put(atom.getId(), atom);
+        }
+        if (null == note.getId()) {
+            note.setId(atom.getId());
+        }
+
+        return atom;
+    }
+
+    private Atom getRequiredAtomForNote(final Note note, final Map<String, Atom> cache) {
+        if (null == note.getId()) {
+            throw new InvalidUpdateException("note has no id");
+        }
+
+        Atom atom = getAtomById(note.getId(), cache);
+        if (null == atom) {
+            throw new InvalidUpdateException("no such atom: " + note.getId());
+        }
+
+        return atom;
+    }
+
+    private Atom createAtom(final String id,
+                            final Filter filter) {
+        Atom a = brain.getAtomGraph().createAtomWithProperties(filter, id);
+
+        if (null != brain.getActivityLog()) {
+            brain.getActivityLog().logCreate(a);
+        }
+
+        return a;
+    }
+
+    private boolean isAdjacent(final Atom a, final boolean includeChildren, final boolean includeParents) {
+        return (includeChildren && null != a.getNotes())
+                || (includeParents && a.getFirstOf().size() > 0);
+    }
+
+    private Note findAtoms(final Filter filter,
+                           final boolean includeChildren,
+                           final boolean includeParents,
+                           int height,
+                           ViewStyle style) {
+        if (null == filter || height < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        Note result = new Note();
+
+        for (Atom a : brain.getAtomGraph().getAllAtoms()) {
+            if (filter.isVisible(a) && !isAdjacent(a, includeChildren, includeParents)) {
+                Note n = viewInternal(a, height, filter, style, true, null);
+                result.addChild(n);
+            }
+        }
+
+        Collections.sort(result.getChildren(), compareByProperties);
         return result;
     }
 
@@ -481,7 +567,7 @@ public class NoteQueries {
                 | setSharability(target, note.getSharability());
 
         if (changed) {
-            brain.getAtomGraph().addAtomToIndices(target);
+            brain.getAtomGraph().reindexAtom(target);
 
             if (null != brain.getActivityLog()) {
                 brain.getActivityLog().logSetProperties(target);
@@ -528,20 +614,8 @@ public class NoteQueries {
         return note;
     }
 
-    private class NoteComparator implements Comparator<Note> {
-        public int compare(Note a, Note b) {
-            int cmp = b.getWeight().compareTo(a.getWeight());
-
-            if (0 == cmp) {
-                cmp = b.getCreated().compareTo(a.getCreated());
-            }
-
-            return cmp;
-        }
-    }
-
     public interface ViewStyle {
-        public enum Direction {Forward, Backward}
+        enum Direction {Forward, Backward}
 
         String getName();
 

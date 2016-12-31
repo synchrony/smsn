@@ -1,10 +1,16 @@
 Semantic Synchrony CHANGELOG
 ====================
 
+SmSn 1.2 SNAPSHOT
+----------------------------------------
+SmSn 1.2.0 (NOT YET RELEASED)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 SmSn 1.1 (More Brains)
-------------------------------------
+----------------------------------------
 SmSn 1.1.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Created a unified BrainReader/BrainWriter framework for graph I/O
 * Minimized TinkerPop2 dependencies
 * Moved Brain-mode to a separate, GPL-licensed project
@@ -24,11 +30,11 @@ SmSn 1.1.0
 * Created v2.0 of Extend-o-Brain inference support
 * Added Linked Data and OSC support to the coordinator
 * Added a Ripple environment for use with the Typeatron
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SmSn 1.0 (Semantic Gadgets)
-------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Added a GraphML writer
 * Integrated the Typeatron with Brain-mode via emacsclient
 * Created a framework for inter-device discovery and communication
@@ -44,11 +50,11 @@ SmSn 1.0 (Semantic Gadgets)
 * Created Arduino-based libraries for the devices
 * Created Extend-o-Hand
 * Created the Monomanual Typeatron
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SmSn 0.x (Braaains)
-------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Prototype design of the Monomanual Typeatron
 * Added Emacspeak support to TinkerNotes (Brain-mode)
 * Moved to an ordered, list-based data model in Extend-o-Brain
@@ -70,4 +76,4 @@ SmSn 0.x (Braaains)
 * Created an Android library (later called the Brainstem)
 * Created MyOtherBrain (Extend-o-Brain) prototypes with Java, Flash/Flex, and JavaScript
 * Created a personal knowledge base ontology
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

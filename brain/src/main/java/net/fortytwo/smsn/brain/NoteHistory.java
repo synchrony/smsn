@@ -5,9 +5,7 @@ import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 
 public class NoteHistory {
     private static final int CAPACITY = 1000;
@@ -21,39 +19,41 @@ public class NoteHistory {
     }
 
     public void visit(final String atomId) {
-        visitedAtoms[totalVisits % CAPACITY] = atomId;
-        totalVisits++;
+        // repeated actions upon the same atom count as a single visit
+        if (totalVisits == 0 || !atomId.equals(getLastVisit())) {
+            appendVisit(atomId);
+        }
     }
 
-    public List<String> getHistory(final int maxlen,
-                                   final boolean dedup,
-                                   final AtomGraph graph,
-                                   final Filter filter) {
-        Collection<String> r = dedup
-                ? new LinkedHashSet<>()
-                : new LinkedList<>();
+    public Iterable<Atom> getHistory(final int maxlen,
+                                     final AtomGraph graph,
+                                     final Filter filter) {
+        Collection<Atom> atoms = new LinkedList<>();
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 
         for (int i = totalVisits - 1; i >= low; i--) {
-            if (r.size() >= maxlen) {
+            if (atoms.size() >= maxlen) {
                 break;
             }
 
             String id = visitedAtoms[i % CAPACITY];
 
-            Atom v = graph.getAtom(id);
-            if (null != v && filter.isVisible(v)) {
-                r.add(id);
+            Atom a = graph.getAtomById(id);
+            if (null != a && filter.isVisible(a)) {
+                atoms.add(a);
             }
         }
 
-        if (dedup) {
-            List<String> s = new LinkedList<>();
-            s.addAll(r);
-            return s;
-        } else {
-            return (List<String>) r;
-        }
+        return atoms;
+    }
+
+    private String getLastVisit() {
+        return visitedAtoms[(totalVisits - 1) % CAPACITY];
+    }
+
+    private void appendVisit(final String atomId) {
+        visitedAtoms[totalVisits % CAPACITY] = atomId;
+        totalVisits++;
     }
 }

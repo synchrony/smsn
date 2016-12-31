@@ -11,7 +11,7 @@
     <parent>
         <groupId>net.fortytwo.smsn</groupId>
         <artifactId>smsn-all</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
     </parent>
 
     <dependencies>
@@ -22,33 +22,38 @@
         </dependency>
         <dependency>
             <groupId>net.fortytwo.smsn</groupId>
+            <artifactId>brain</artifactId>
+            <type>test-jar</type>
+            <version>${smsn.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.smsn</groupId>
             <artifactId>smsn-p2p</artifactId>
             <version>${smsn.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop.rexster</groupId>
-            <artifactId>rexster-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-graph-jung</artifactId>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>gremlin-core</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
-        <!-- for the web page visit notification extension -->
         <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-sail-graph</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo.stream</groupId>
-            <artifactId>stream42-sparql</artifactId>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>gremlin-server</artifactId>
+            <version>${tinkerpop.version}</version>
         </dependency>
 
         <!-- temporary, because of the self-conflict within Rexster -->
+        <!--
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.3.3</version>
+        </dependency>-->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.1.0.Final</version>
         </dependency>
 
         <dependency>

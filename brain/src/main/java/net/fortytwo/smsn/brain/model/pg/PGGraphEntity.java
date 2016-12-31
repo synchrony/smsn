@@ -1,13 +1,15 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomList;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -18,7 +20,11 @@ abstract class PGGraphEntity {
     private final Vertex vertex;
 
     protected String getId() {
-        return (String) vertex.getId();
+        VertexProperty<String> property = vertex.property(SemanticSynchrony.ID_V);
+        if (!property.isPresent()) {
+            throw new IllegalStateException("missing id");
+        }
+        return property.value();
     }
 
     protected Graph getPropertyGraph() {
@@ -37,8 +43,9 @@ abstract class PGGraphEntity {
         return vertex;
     }
 
-    protected void addOutEdge(final String id, final Vertex inVertex, final String label) {
-        getPropertyGraph().addEdge(id, asVertex(), inVertex, label);
+    protected void addOutEdge(final Object id, final Vertex inVertex, final String label) {
+        // TODO: control the id of the edge
+        asVertex().addEdge(label, inVertex);
     }
 
     protected Atom asAtom(Vertex vertex) {
@@ -69,31 +76,37 @@ abstract class PGGraphEntity {
         };
     }
 
-    protected Object getOptionalProperty(String name) {
-        return vertex.getProperty(name);
+    protected <T> T getOptionalProperty(String name) {
+        VertexProperty<T> property = vertex.property(name);
+        return property.isPresent() ? property.value() : null;
     }
 
-    protected Object getRequiredProperty(String name) {
-        Object value = getOptionalProperty(name);
+    protected <T> T getOptionalProperty(String name, T defaultValue) {
+        T value = getOptionalProperty(name);
+        return null == value ? defaultValue : value;
+    }
+
+    protected <T> T getRequiredProperty(String name) {
+        T value = getOptionalProperty(name);
         if (null == value) {
             throw new InvalidGraphException("missing property '" + name + "' for atom vertex " + getId());
         }
         return value;
     }
 
-    private boolean setProperty(String name, Object value) {
-        Object previousValue = vertex.getProperty(name);
+    private <T> boolean setProperty(String name, T value) {
+        Object previousValue = vertex.property(name);
 
         if (null == value) {
             if (null == previousValue) {
                 return false;
             } else {
-                vertex.removeProperty(name);
+                vertex.property(name).remove();
                 return true;
             }
         } else {
             if (null == previousValue || !value.equals(previousValue)) {
-                vertex.setProperty(name, value);
+                vertex.property(name, value);
                 return true;
             } else {
                 return false;
@@ -115,20 +128,20 @@ abstract class PGGraphEntity {
     }
 
     protected void forAllVertices(final String label, final Direction direction, final Consumer<AtomList> consumer) {
-        vertex.getVertices(direction, label).forEach(vertex -> consumer.accept(vertexAsAtomList(vertex)));
+        vertex.vertices(direction, label).forEachRemaining(vertex -> consumer.accept(vertexAsAtomList(vertex)));
     }
 
     protected Vertex getAtMostOneVertex(final String label, final Direction direction) {
         Edge edge = getAtMostOneEdge(label, direction);
-        return null == edge ? null : edge.getVertex(direction.opposite());
+        return null == edge ? null : getVertex(edge, direction.opposite());
     }
 
     protected Vertex getExactlyOneVertex(final String label, final Direction direction) {
-        return getExactlyOneEdge(label, direction).getVertex(direction.opposite());
+        return getVertex(getExactlyOneEdge(label, direction), direction.opposite());
     }
 
     protected Edge getAtMostOneEdge(final String label, final Direction direction) {
-        Iterator<Edge> iter = vertex.getEdges(direction, label).iterator();
+        Iterator<Edge> iter = vertex.edges(direction, label);
         if (!iter.hasNext()) {
             return null;
         }
@@ -144,19 +157,22 @@ abstract class PGGraphEntity {
         Edge other = getAtMostOneEdge(label, direction);
         if (null == other) {
             throw new InvalidGraphException("atom vertex " + getId()
-                    + "is missing '" + label + "' " + direction + " edge");
+                    + " is missing '" + label + "' " + direction + " edge");
         }
         return other;
     }
 
     protected void forEachAdjacentVertex(final String label, Direction direction, Consumer<Vertex> consumer) {
-        vertex.getVertices(direction, label).forEach(consumer);
+        vertex.vertices(direction, label).forEachRemaining(consumer);
     }
 
     protected boolean removeEdge(final String label, Direction direction) {
         final Mutable<Boolean> changed = new Mutable<>(false);
-        asVertex().getEdges(direction, label).forEach(
-                edge -> {getPropertyGraph().removeEdge(edge); changed.value = true;});
+        asVertex().edges(direction, label).forEachRemaining(
+                edge -> {
+                    edge.remove();
+                    changed.value = true;
+                });
         return changed.value;
     }
 
@@ -165,6 +181,17 @@ abstract class PGGraphEntity {
 
         public Mutable(T value) {
             this.value = value;
+        }
+    }
+
+    private Vertex getVertex(final Edge edge, final Direction direction) {
+        switch (direction) {
+            case OUT:
+                return edge.outVertex();
+            case IN:
+                return edge.inVertex();
+            default:
+                throw new IllegalStateException();
         }
     }
 }

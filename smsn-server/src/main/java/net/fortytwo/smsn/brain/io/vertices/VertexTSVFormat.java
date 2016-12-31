@@ -6,7 +6,7 @@ public class VertexTSVFormat extends Format {
     private static final VertexTSVFormat instance = new VertexTSVFormat();
 
     private VertexTSVFormat() {
-        super("Vertices", new String[]{"tsv"});
+        super("Vertices", Type.FileBased, "tsv");
     }
 
     public static VertexTSVFormat getInstance() {

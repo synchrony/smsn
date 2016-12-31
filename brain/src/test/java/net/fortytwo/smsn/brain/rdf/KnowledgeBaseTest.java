@@ -1,15 +1,13 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.BrainTestBase;
+import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexReference;
@@ -28,7 +26,7 @@ import net.fortytwo.smsn.brain.rdf.classes.WebPage;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.junit.Ignore;
@@ -56,6 +54,7 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
@@ -68,9 +67,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class KnowledgeBaseTest {
+public class KnowledgeBaseTest extends BrainTestBase {
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
-    
+
+    @Override
+    protected AtomGraph createAtomGraph() throws IOException {
+        return createNeo4jAtomGraph();
+    }
     @Test
     public void testAKASyntax() throws Exception {
         AtomClass t = AKAReference.class.newInstance();
@@ -324,14 +327,13 @@ public class KnowledgeBaseTest {
     @Ignore  // TODO: restore me
     @Test
     public void testInference() throws Exception {
-        KeyIndexableGraph g = new TinkerGraph();
-        AtomGraph atomGraph = new PGAtomGraph(g);
+        AtomGraph atomGraph = createTinkerAtomGraph();
         Brain brain = new Brain(atomGraph);
         KnowledgeBase kb = new KnowledgeBase(atomGraph);
-        NoteParser parser = new NoteParser();
+        NoteReader parser = new NoteReader();
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
-        Atom root = atomGraph.createAtom(filter, SemanticSynchrony.createRandomKey());
+        Atom root = atomGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         root.setValue("root");
         String rootId = root.getId();
 
@@ -361,39 +363,39 @@ public class KnowledgeBaseTest {
 
         kb.addDefaultClasses();
 
-        Atom einstein = atomGraph.getAtom("yOXFhhN");
-        Atom einsteinPapers = atomGraph.getAtom("Z5UUQn6");
-        Atom specialRelPaper = atomGraph.getAtom("mRwSsu2");
-        Atom bibtex = atomGraph.getAtom("xKWD1wC");
-        Atom einsteinQuotes = atomGraph.getAtom("5OfUlUN");
-        Atom einsteinQuotes2 = atomGraph.getAtom("vtdNdMF");
-        Atom einsteinFamily = atomGraph.getAtom("yWBqSc2");
-        Atom speedOfLight = atomGraph.getAtom("dDn4jt0");
-        Atom simultaneity = atomGraph.getAtom("x6rw4et");
-        Atom relativity = atomGraph.getAtom("-kKLYO8");
-        Atom paperPdf = atomGraph.getAtom("gsaYMBs");
-        Atom topics = atomGraph.getAtom("GORFdGO");
-        Atom ellipsis = atomGraph.getAtom("0MQ4h4a");
-        Atom quote = atomGraph.getAtom("-ngTO_3");
-        Atom h2g2 = atomGraph.getAtom("TT698yn");
-        Atom physics = atomGraph.getAtom("ynyUshJ");
+        Atom einstein = atomGraph.getAtomById("yOXFhhN");
+        Atom einsteinPapers = atomGraph.getAtomById("Z5UUQn6");
+        Atom specialRelPaper = atomGraph.getAtomById("mRwSsu2");
+        Atom bibtex = atomGraph.getAtomById("xKWD1wC");
+        Atom einsteinQuotes = atomGraph.getAtomById("5OfUlUN");
+        Atom einsteinQuotes2 = atomGraph.getAtomById("vtdNdMF");
+        Atom einsteinFamily = atomGraph.getAtomById("yWBqSc2");
+        Atom speedOfLight = atomGraph.getAtomById("dDn4jt0");
+        Atom simultaneity = atomGraph.getAtomById("x6rw4et");
+        Atom relativity = atomGraph.getAtomById("-kKLYO8");
+        Atom paperPdf = atomGraph.getAtomById("gsaYMBs");
+        Atom topics = atomGraph.getAtomById("GORFdGO");
+        Atom ellipsis = atomGraph.getAtomById("0MQ4h4a");
+        Atom quote = atomGraph.getAtomById("-ngTO_3");
+        Atom h2g2 = atomGraph.getAtomById("TT698yn");
+        Atom physics = atomGraph.getAtomById("ynyUshJ");
 
-        Atom john = atomGraph.getAtom("0rYY9z0");
+        Atom john = atomGraph.getAtomById("0rYY9z0");
 
         // The following are nested directly under Einstein's family
-        Atom hermann = atomGraph.getAtom("mPx8zEW");
-        Atom pauline = atomGraph.getAtom("PR8p9B5");
-        Atom maria = atomGraph.getAtom("b6jFIkg");
+        Atom hermann = atomGraph.getAtomById("mPx8zEW");
+        Atom pauline = atomGraph.getAtomById("PR8p9B5");
+        Atom maria = atomGraph.getAtomById("b6jFIkg");
         // The following are under Einstein's family, but also have Wikipedia links
-        Atom mileva = atomGraph.getAtom("U2RAPqU");
-        Atom elsa = atomGraph.getAtom("Wks2hZM");
+        Atom mileva = atomGraph.getAtomById("U2RAPqU");
+        Atom elsa = atomGraph.getAtomById("Wks2hZM");
         // The following are two degrees removed, under Einstein's family > Einstein's children
-        Atom lieserl = atomGraph.getAtom("Y3X-skF");
-        Atom hansAlbert = atomGraph.getAtom("6_sSpVa");
-        Atom eduard = atomGraph.getAtom("dleUIwo");
+        Atom lieserl = atomGraph.getAtomById("Y3X-skF");
+        Atom hansAlbert = atomGraph.getAtomById("6_sSpVa");
+        Atom eduard = atomGraph.getAtomById("dleUIwo");
 
-        Atom googleGlass = atomGraph.getAtom("ufIPR_C");
-        Atom sebastian = atomGraph.getAtom("-L7cCbN");
+        Atom googleGlass = atomGraph.getAtomById("ufIPR_C");
+        Atom sebastian = atomGraph.getAtomById("-L7cCbN");
 
         for (int i = 0; i < 4; i++) {
             System.out.println("#### ITERATION #" + (i + 1) + " ######");

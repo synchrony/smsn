@@ -1,8 +1,10 @@
 package net.fortytwo.smsn.brain.io;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterators;
+import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.Brain;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -25,19 +27,21 @@ public abstract class BrainReader {
     public abstract List<Format> getFormats();
 
     public void doImport(
-            File fileOrDir, Format format, Brain brain, boolean recursive)
-            throws IOException {
+            File file, Format format, Brain brain, boolean recursive) throws IOException {
 
-        if (!fileOrDir.exists()) {
-            throw new IllegalArgumentException("file or directory not found: " + fileOrDir.getName());
-        }
+        assertFileExists(file);
 
-        if (fileOrDir.isDirectory()) {
-            if (recursive) {
-                importDirectoryRecursive(fileOrDir, format, brain);
-            }
+        if (format.getType().equals(Format.Type.DirectoryBased)) {
+            assertIsDirectory(file);
+            importDirectoryNonrecursive(file, format, brain);
         } else {
-            importSingleFile(fileOrDir, format, brain);
+            if (file.isDirectory()) {
+                if (recursive) {
+                    importDirectoryRecursive(file, format, brain);
+                }
+            } else {
+                importSingleFile(file, format, brain);
+            }
         }
     }
 
@@ -46,28 +50,49 @@ public abstract class BrainReader {
 
         long before = System.currentTimeMillis();
 
-        importInternal(context);
-
         AtomGraph destGraph = context.getAtomGraph();
 
         // note: we assume the graph is small
-        destGraph.commit();
-
+        importInternal(context);
         reindexVertices(destGraph);
 
-        // again, we assume the graph is small
-        destGraph.commit();
-
         long after = System.currentTimeMillis();
-        logger.info("imported " + context.getFormat() + " data in " + (after - before) + "ms");
+        logger.info("imported " + context.getFormat() + " data in " + (after - before) + " ms (before commit). " +
+                "Resulting graph has " + getSizeOf(context) + " atoms");
+    }
+
+    protected void assertFileExists(final File file) {
+        Preconditions.checkArgument(file.exists(), "directory " + file.getAbsolutePath() + " does not exist");
+    }
+
+    protected void assertIsDirectory(final File dir) {
+        Preconditions.checkArgument(dir.isDirectory(), "file " + dir.getAbsolutePath() + " is not a directory");
+    }
+
+    protected void assertDirectoryExists(final File dir) {
+        assertFileExists(dir);
+        assertIsDirectory(dir);
     }
 
     protected String getDefaultNodeName() {
         return defaultNodeName;
     }
 
-    public void setDefaultNodeName(final String defaultNodeName) {
+    private void setDefaultNodeName(final String defaultNodeName) {
         this.defaultNodeName = defaultNodeName;
+    }
+
+    private long getSizeOf(final Context context) {
+        return Iterators.size(context.getAtomGraph().getAllAtoms().iterator());
+    }
+
+    private void importDirectoryNonrecursive(File dir, Format format, Brain brain) throws IOException {
+        Context context = new Context();
+        context.setAtomGraph(brain.getAtomGraph());
+        context.setSourceDirectory(dir);
+        context.setFormat(format);
+
+        doImport(context);
     }
 
     private void importDirectoryRecursive(File dir, Format format, Brain brain) throws IOException {
@@ -105,13 +130,14 @@ public abstract class BrainReader {
     private void reindexVertices(AtomGraph destGraph) {
         for (Atom a : destGraph.getAllAtoms()) {
             String value = a.getValue();
-            if (null != value) destGraph.addAtomToIndices(a);
+            if (null != value) destGraph.reindexAtom(a);
         }
     }
 
     public static class Context {
         private AtomGraph atomGraph;
         private InputStream sourceStream;
+        private File sourceDirectory;
         private Format format;
 
         public AtomGraph getAtomGraph() {
@@ -136,6 +162,14 @@ public abstract class BrainReader {
 
         public void setFormat(Format format) {
             this.format = format;
+        }
+
+        public File getSourceDirectory() {
+            return sourceDirectory;
+        }
+
+        public void setSourceDirectory(File sourceDirectory) {
+            this.sourceDirectory = sourceDirectory;
         }
     }
 }

@@ -1,13 +1,7 @@
 package net.fortytwo.smsn.brain.io.graphml;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 
@@ -31,10 +25,8 @@ public class GraphMLWriter extends BrainWriter {
                 ? originalGraph
                 : originalGraph.copyGraph(context.getFilter());
 
-        com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter w
-                = new com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter(
-                newGraph.getPropertyGraph());
-        w.setNormalize(true);
-        w.outputGraph(context.getDestStream());
+        org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter writer
+                = org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter.build().normalize(true).create();
+        writer.writeGraph(context.getDestStream(), newGraph.getPropertyGraph());
     }
 }

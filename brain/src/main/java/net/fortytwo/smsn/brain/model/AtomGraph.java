@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -16,13 +17,21 @@ public interface AtomGraph {
 
     Iterable<Atom> getAllAtoms();
 
+    Atom getAtomById(String id);
+
+    List<Atom> getAtomsByAcronym(String acronym, Filter filter);
+
+    List<Atom> getAtomsByShortcut(String shortcut, Filter filter);
+
+    List<Atom> getAtomsByValueQuery(String value, Filter filter);
+
     String idOfAtom(Atom a);
 
     String iriOfAtom(Atom a);
 
-    Atom getAtom(String id);
+    Atom createAtom(final String id);
 
-    Atom createAtom(Filter filter, String id);
+    Atom createAtomWithProperties(Filter filter, String id);
 
     AtomList createAtomList(String id);
 
@@ -32,17 +41,35 @@ public interface AtomGraph {
 
     void notifyOfUpdate();
 
-    List<Atom> getAtomsWithShortcut(String shortcut, Filter filter);
-
-    List<Atom> getAtomsByFulltextQuery(String query, Filter filter);
-
-    List<Atom> getAtomsByAcronymQuery(String query, Filter filter);
-
-    void addAtomToIndices(Atom a);
+    void reindexAtom(Atom a);
 
     long getLastUpdate();
 
+    void begin();
+
     void commit();
 
+    void rollback();
+
     AtomGraph createFilteredGraph(Filter filter);
+
+    interface IORunnable {
+        void run() throws IOException;
+    }
+
+    static void wrapInTransaction(final AtomGraph graph, final IORunnable runnable) throws IOException {
+        graph.begin();
+
+        boolean success = false;
+        try {
+            runnable.run();
+            success = true;
+        } finally {
+            if (success) {
+                graph.commit();
+            } else {
+                graph.rollback();
+            }
+        }
+    }
 }

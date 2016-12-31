@@ -74,7 +74,7 @@ public class EventStack {
     // make the note look like it came from a graph (so it is compatible with Brain-mode views) by giving it an ID
     private void setIds(final Note n) {
         if (null == n.getId()) {
-            n.setId(SemanticSynchrony.createRandomKey());
+            n.setId(SemanticSynchrony.createRandomId());
         }
 
         n.getChildren().forEach(this::setIds);

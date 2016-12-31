@@ -51,9 +51,11 @@ public class Note {
     }
 
     public void setValue(final String value) {
+        /*
         if (null != value && 0 == value.length()) {
             throw new IllegalArgumentException("empty value is not valid");
         }
+        */
 
         this.value = value;
     }
@@ -76,7 +78,7 @@ public class Note {
     }
 
     public void setPriority(Float priority) {
-        if (null != priority && (priority < 0 || priority > 1.0)) {
+        if (null != priority && (priority < 0.0 || priority > 1.0)) {
             throw new IllegalArgumentException("priority is out of range: " + priority);
         }
 
@@ -88,7 +90,7 @@ public class Note {
     }
 
     public void setSharability(Float sharability) {
-        if (null != sharability && (sharability <= 0 || sharability > 1.0)) {
+        if (null != sharability && (sharability < 0.0 || sharability > 1.0)) {
             throw new IllegalArgumentException("sharability is out of range: " + sharability);
         }
 
@@ -100,7 +102,7 @@ public class Note {
     }
 
     public void setWeight(Float weight) {
-        if (null != weight && (weight <= 0 || weight > 1.0)) {
+        if (null != weight && (weight < 0.0 || weight > 1.0)) {
             throw new IllegalArgumentException("weight is out of range: " + weight);
         }
 
@@ -162,7 +164,7 @@ public class Note {
 
     @Override
     public String toString() {
-        return "note:" + (null == id ? "null" : id);
+        return "note[" + (null == id ? "null" : id) + "]";
     }
 
     public boolean getHasChildren() {

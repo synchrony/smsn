@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.brain.io;
 
+import com.google.common.base.Preconditions;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -7,6 +9,8 @@ import java.util.logging.Logger;
 
 public class Format {
     private static final Logger logger = Logger.getLogger(Format.class.getName());
+
+    public enum Type { FileBased, DirectoryBased }
 
     private static final Map<String, Format> formatsByNameLowercase;
     private static final Map<Format, BrainReader> readersByFormat;
@@ -20,9 +24,11 @@ public class Format {
     }
 
     private final String name;
+    private final Type type;
     private final String[] fileExtensions;
 
-    public Format(String name, String[] fileExtensions) {
+    public Format(String name, Type type, String... fileExtensions) {
+        this.type = type;
         this.name = name;
         this.fileExtensions = fileExtensions;
 
@@ -33,6 +39,10 @@ public class Format {
 
     public String getName() {
         return name;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public String[] getFileExtensions() {
@@ -95,6 +105,7 @@ public class Format {
         ServiceLoader<BrainReader> loader = ServiceLoader.load(BrainReader.class);
         int count = 0;
         for (BrainReader reader : loader) {
+            Preconditions.checkNotNull(reader.getFormats());
             if (0 == reader.getFormats().size()) {
                 logger.warning("reader has no formats: " + reader);
             }

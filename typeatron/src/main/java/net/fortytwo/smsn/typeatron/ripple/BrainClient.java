@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.wiki.NoteParser;
+import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.IOUtils;
@@ -50,7 +50,7 @@ public class BrainClient {
     private static final int DEFAULT_VALUE_CUTOFF = 100;
 
     private final NoteWriter noteWriter = new NoteWriter();
-    private final NoteParser noteParser = new NoteParser();
+    private final NoteReader noteReader = new NoteReader();
 
     private final HttpProcessor httpProcessor;
     private final HttpRequestExecutor httpExecutor;
@@ -143,7 +143,7 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    results[0] = noteParser.fromJSON(view);
+                    results[0] = noteReader.fromJSON(view);
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
@@ -187,7 +187,7 @@ public class BrainClient {
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VIEW, toJson(root));
-            requestJson.put(Params.VIEW_FORMAT, Params.JSON_FORMAT);
+            requestJson.put(Params.VIEW_FORMAT, Params.Format.json);
             requestJson.put(Params.FILTER, toJson(filter));
         } catch (JSONException e) {
             throw new BrainClientException(e);
@@ -316,7 +316,7 @@ public class BrainClient {
                     if (null != children) {
                         int length = children.length();
                         for (int i = 0; i < length; i++) {
-                            results.add(noteParser.fromJSON(children.getJSONObject(i)));
+                            results.add(noteReader.fromJSON(children.getJSONObject(i)));
                         }
                     }
                 } catch (JSONException e) {

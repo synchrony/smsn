@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.brain.util;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Comparator;
