@@ -7,6 +7,10 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -23,15 +27,13 @@ public class NoteWriterTest {
     }
 
     @Test
-    public void testNormal() throws Exception {
+    public void jsonOutputIsNormal() throws Exception {
         Note n = parser.fromWikiText("" +
                 "* foo\n" +
                 "   * bar\n" +
                 "   * quux\n");
 
         JSONObject j = writer.toJSON(n);
-
-        //System.out.println(j);
 
         assertTrue(j.getBoolean(NoteWriter.HAS_CHILDREN));
         JSONArray c = j.getJSONArray(NoteWriter.CHILDREN);
@@ -55,7 +57,7 @@ public class NoteWriterTest {
     }
 
     @Test
-    public void testTruncateLongValues() throws Exception {
+    public void longValuesAreTruncated() throws Exception {
         Note n = parser.fromWikiText("" +
                 "* this is a long line (well, not really)\n");
 
@@ -69,6 +71,33 @@ public class NoteWriterTest {
                     j.getJSONArray(NoteWriter.CHILDREN).getJSONObject(0).getString(SemanticSynchrony.VALUE));
         } finally {
             writer.setValueLengthCutoff(before);
+        }
+    }
+
+    @Test
+    public void verbatimBlocksArePreserved() throws Exception {
+        String text = "* {{{\n"
+                + "this\n"
+                + "  is a\n"
+                + "verbatim block\n" +
+                "}}}";
+        List<Note> notes = parser.fromWikiText(text).getChildren();
+        Note n = notes.get(0);
+
+        String value = n.getValue();
+        String[] lines = value.split("\\n");
+        assertEquals(3, lines.length);
+        assertEquals("this", lines[0]);
+        assertEquals("  is a", lines[1]);
+        assertEquals("verbatim block", lines[2]);
+
+        assertEquals(text + "\n", toWikiText(notes));
+    }
+
+    private String toWikiText(final List<Note> notes) throws IOException {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            writer.toWikiText(notes, outputStream, false);
+            return outputStream.toString();
         }
     }
 

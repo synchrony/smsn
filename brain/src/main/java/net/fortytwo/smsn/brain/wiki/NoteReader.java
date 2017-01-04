@@ -21,10 +21,8 @@ public class NoteReader {
     public static final Pattern ID = Pattern.compile("[a-zA-Z0-9-_]+");
     private static final Pattern ID_SUFFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
 
-    private static final String VERBATIM_BLOCK_START = "{{{";
-    private static final String VERBATIM_BLOCK_END = "}}}";
-    private static final String VERBATIM_BLOCK_START_ESC = "\\{\\{\\{";
-    private static final String VERBATIM_BLOCK_END_ESC = "\\}\\}\\}";
+    public static final String VERBATIM_BLOCK_START = "{{{";
+    public static final String VERBATIM_BLOCK_END = "}}}";
 
     private static final int MAX_BULLET_LENGTH = 1;
 
@@ -258,17 +256,6 @@ public class NoteReader {
         }
     }
 
-    /**
-     * Removes the verbatim block terminators ("{{{" and "}}}") from an atom value string.
-     * This method does not check the value with respect to matching and non-nested terminators;
-     * the value is assumed to be valid.
-     *
-     * @return the unescaped value
-     */
-    public static String unescapeValue(final String escaped) {
-        return escaped.replaceAll(VERBATIM_BLOCK_START_ESC, "").replaceAll(VERBATIM_BLOCK_END_ESC, "");
-    }
-
     public Note fromJSON(final JSONObject json) throws JSONException {
         Note n = new Note();
 
@@ -312,10 +299,6 @@ public class NoteReader {
     }
 
     public static class NoteParsingException extends Exception {
-        public NoteParsingException(final String message) {
-            super(message);
-        }
-
         public NoteParsingException(final int lineNumber,
                                     final String message) {
             super("line " + lineNumber + ": " + message);

@@ -32,11 +32,7 @@ public class VCSReader extends BrainReader {
         for (File d : dirs) assertDirectoryExists(d);
 
         for (File d : dirs) {
-            try {
-                readDirectory(d, context);
-            } catch (NoteReader.NoteParsingException e) {
-                throw new IOException(e);
-            }
+            readDirectory(d, context);
         }
     }
 
@@ -46,25 +42,34 @@ public class VCSReader extends BrainReader {
     }
 
     private void readDirectory(final File dir, final Context context)
-            throws IOException, NoteReader.NoteParsingException {
+            throws IOException {
         Helper helper = new Helper(context);
 
         for (File file : dir.listFiles()) {
             if (VCSFormat.isAtomFile(file)) {
-                Note rootNote;
-                try (InputStream in = new FileInputStream(file)) {
-                    rootNote = reader.fromWikiText(in);
-                    for (Note note : rootNote.getChildren()) {
-                        String id = note.getId();
-                        Preconditions.checkNotNull(id);
+                readAtomFile(file, helper);
+            }
+        }
+    }
 
-                        Atom atom = helper.resolveAtomReference(id);
-                        helper.setNote(note);
-                        helper.setAtom(atom);
-                        helper.updateAtom();
-                        //System.out.println("root\t" + rootNote.getId() + "\t" + rootNote.getValue());
-                    }
-                }
+    private void readAtomFile(final File file, final Helper helper) throws IOException {
+
+        Note rootNote;
+        try (InputStream in = new FileInputStream(file)) {
+            try {
+                rootNote = reader.fromWikiText(in);
+            } catch (NoteReader.NoteParsingException e) {
+                throw new IOException("parse error in file " + file, e);
+            }
+            for (Note note : rootNote.getChildren()) {
+                String id = note.getId();
+                Preconditions.checkNotNull(id);
+
+                Atom atom = helper.resolveAtomReference(id);
+                helper.setNote(note);
+                helper.setAtom(atom);
+                helper.updateAtom();
+                //System.out.println("root\t" + rootNote.getId() + "\t" + rootNote.getValue());
             }
         }
     }

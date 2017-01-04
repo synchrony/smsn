@@ -110,7 +110,7 @@ public class NoteWriter {
         }
 
         if (null != n.getValue()) {
-            p.print(sanitizeValue(n.getValue()));
+            p.print(escapeValue(sanitizeValue(n.getValue())));
         }
 
         p.print("\n");
@@ -143,6 +143,14 @@ public class NoteWriter {
         }
     }
 
+    private static String escapeValue(final String value) {
+        if (value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0) {
+            return NoteReader.VERBATIM_BLOCK_START + "\n" + value + "\n" + NoteReader.VERBATIM_BLOCK_END;
+        } else {
+            return value;
+        }
+    }
+
     private static String sanitizeValue(final String value) {
         return null == value ? ""
                 : !isValidValue(value)
@@ -160,7 +168,8 @@ public class NoteWriter {
 
     private static boolean isValidValue(final String value) {
         for (char c : value.toCharArray()) {
-            if (Character.isISOControl(c)) {
+            // newline is the only control character allowed
+            if (c != '\n' && c != '\r' && Character.isISOControl(c)) {
                 return false;
             }
         }
