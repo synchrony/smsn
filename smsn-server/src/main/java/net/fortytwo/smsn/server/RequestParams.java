@@ -2,11 +2,12 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.io.json.JsonReader;
+import net.fortytwo.smsn.brain.io.json.JsonWriter;
+import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -20,10 +21,8 @@ public class RequestParams {
     private Filter filter;
     private String format;
     private boolean includeTypes;
-    private JSONObject jsonView;
     private Map<String, Object> map;
     private Integer maxResults;
-    private NoteReader parser;
     private String propertyName;
     private Object propertyValue;
     private NoteQueries queries;
@@ -34,8 +33,10 @@ public class RequestParams {
     private NoteQueries.ViewStyle style;
     private String styleName;
     private Integer valueCutoff;
-    private String wikiView;
-    private NoteWriter writer;
+    private String view;
+    private WikiReader wikiReader;
+    private JsonReader jsonReader;
+    private JsonWriter jsonWriter;
 
     public GraphWrapper getGraphWrapper() {
         return graphWrapper;
@@ -101,14 +102,6 @@ public class RequestParams {
         this.includeTypes = includeTypes;
     }
 
-    public JSONObject getJsonView() {
-        return jsonView;
-    }
-
-    public void setJsonView(JSONObject jsonView) {
-        this.jsonView = jsonView;
-    }
-
     public Map<String, Object> getMap() {
         return map;
     }
@@ -123,14 +116,6 @@ public class RequestParams {
 
     public void setMaxResults(Integer maxResults) {
         this.maxResults = maxResults;
-    }
-
-    public NoteReader getParser() {
-        return parser;
-    }
-
-    public void setParser(NoteReader parser) {
-        this.parser = parser;
     }
 
     public String getPropertyName() {
@@ -213,19 +198,35 @@ public class RequestParams {
         this.valueCutoff = valueCutoff;
     }
 
-    public String getWikiView() {
-        return wikiView;
+    public String getView() {
+        return view;
     }
 
-    public void setWikiView(String wikiView) {
-        this.wikiView = wikiView;
+    public void setView(String wikiView) {
+        this.view = wikiView;
     }
 
-    public NoteWriter getWriter() {
-        return writer;
+    public JsonWriter getJsonWriter() {
+        return jsonWriter;
     }
 
-    public void setWriter(NoteWriter writer) {
-        this.writer = writer;
+    public void setJsonWriter(JsonWriter jsonWriter) {
+        this.jsonWriter = jsonWriter;
+    }
+
+    public WikiReader getWikiReader() {
+        return wikiReader;
+    }
+
+    public void setWikiReader(WikiReader wikiReader) {
+        this.wikiReader = wikiReader;
+    }
+
+    public JsonReader getJsonReader() {
+        return jsonReader;
+    }
+
+    public void setJsonReader(JsonReader jsonReader) {
+        this.jsonReader = jsonReader;
     }
 }

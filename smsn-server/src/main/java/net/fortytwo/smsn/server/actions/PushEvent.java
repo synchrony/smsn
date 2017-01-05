@@ -1,12 +1,11 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -27,19 +26,15 @@ public class PushEvent extends Action {
 
     @Override
     public void parseRequest(final RequestParams p) throws IOException {
-        try {
-            p.setJsonView(new JSONObject(getView()));
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
+        p.setView(getView());
     }
 
     @Override
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        Note event = null;
+        Note event;
         try {
-            event = p.getParser().fromJSON(p.getJsonView());
-        } catch (JSONException e) {
+            event = p.getJsonReader().parse(p.getView());
+        } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 

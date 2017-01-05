@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class SemanticSynchrony {
     public static final boolean
@@ -63,7 +64,9 @@ public class SemanticSynchrony {
             PRIORITY = "priority",
             SHORTCUT = "shortcut";
 
-    private static final int KEY_DIGITS = 7;
+    public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
+
+    private static final int ID_DIGITS = 7;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 
@@ -163,8 +166,8 @@ public class SemanticSynchrony {
      * @return a new pseudo-random key
      */
     public static String createRandomId() {
-        byte[] bytes = new byte[KEY_DIGITS];
-        for (int i = 0; i < KEY_DIGITS; i++) {
+        byte[] bytes = new byte[ID_DIGITS];
+        for (int i = 0; i < ID_DIGITS; i++) {
             int n = random.nextInt(64);
             int b = n < 26
                     ? 'A' + n

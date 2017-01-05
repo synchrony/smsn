@@ -3,11 +3,11 @@ package net.fortytwo.smsn.brain.io.vcs;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.io.wiki.WikiWriter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,12 +15,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class VCSWriter extends BrainWriter {
 
     private static final List<Format> formats;
-    private static final NoteWriter noteWriter = new NoteWriter();
+    private static final WikiWriter wikiWriter = new WikiWriter();
 
     static {
         formats = new LinkedList<>();
@@ -90,7 +89,7 @@ public class VCSWriter extends BrainWriter {
 
         List<Note> notes = new LinkedList<>();
         notes.add(note);
-        noteWriter.toWikiText(notes, out, true);
+        wikiWriter.toWikiText(notes, out, true);
     }
 
     private Note toNote(final Atom atom, final boolean withValueAndProperties) {

@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain.io;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -99,14 +98,14 @@ public abstract class BrainWriter {
         }
     }
 
-    protected void createDirectoryIfNotExists(final File dir) {
+    protected void createDirectoryIfNotExists(final File dir) throws IOException {
         if (dir.exists()) {
             if (!dir.isDirectory()) {
                 throw new IllegalArgumentException("file " + dir.getAbsolutePath() + " is not a directory");
             }
         } else {
             if (!dir.mkdirs()) {
-                throw new RequestProcessingException("could not create directory " + dir.getAbsolutePath());
+                throw new IOException("could not create directory " + dir.getAbsolutePath());
             }
         }
     }

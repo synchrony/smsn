@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
@@ -62,7 +61,7 @@ public class Search extends BasicViewAction {
 
     @Override
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        p.getWriter().setValueLengthCutoff(p.getValueCutoff());
+        p.getJsonWriter().setValueLengthCutoff(p.getValueCutoff());
 
         try {
             if (p.getQueryType().equals(NoteQueries.QueryType.Ripple)) {
@@ -98,11 +97,7 @@ public class Search extends BasicViewAction {
         //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
         JSONObject json;
 
-        try {
-            json = p.getWriter().toJSON(n);
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
+        json = p.getJsonWriter().toJson(n);
         p.getMap().put("view", json.toString());
     }
 }

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class Format {
     private static final Logger logger = Logger.getLogger(Format.class.getName());
 
-    public enum Type { FileBased, DirectoryBased }
+    public enum Type { InMemory, FileBased, DirectoryBased }
 
     private static final Map<String, Format> formatsByNameLowercase;
     private static final Map<Format, BrainReader> readersByFormat;

@@ -5,6 +5,9 @@ import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.NoteHistory;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.io.json.JsonReader;
+import net.fortytwo.smsn.brain.io.json.JsonWriter;
+import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -12,15 +15,12 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.shaded.jackson.annotation.JsonIgnoreProperties;
 import org.apache.tinkerpop.shaded.jackson.annotation.JsonTypeInfo;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
@@ -30,13 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/*
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.CUSTOM,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "action")*/
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
-//@JsonTypeInfo(use = JsonTypeInfo.Id.MINIMAL_CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class Action {
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
@@ -113,19 +107,9 @@ public abstract class Action {
                            final RequestParams p) throws IOException {
         JSONObject json;
 
-        try {
-            json = p.getWriter().toJSON(n);
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
+        json = p.getJsonWriter().toJson(n);
 
         p.getMap().put(Params.VIEW, json);
-    }
-
-    public static float findMinAuthorizedSharability(final float minSharability) {
-        float minAuth = 0f;
-
-        return Math.max(minSharability, minAuth);
     }
 
     public static RequestParams createParams(final Neo4jGraph graph) {
@@ -189,12 +173,12 @@ public abstract class Action {
     }
 
     private void setWikiView(final RequestParams params) {
-        if (null != params.getWikiView()) {
+        if (null != params.getView()) {
             // Force the use of the UTF-8 charset, which is apparently not chosen by Jersey
             // even when it is specified by the client in the Content-Type header, e.g.
             //    Content-Type: application/x-www-form-urlencoded;charset=UTF-8
             try {
-                params.setWikiView(new String(params.getWikiView().getBytes("UTF-8")));
+                params.setView(new String(params.getView().getBytes("UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 throw new RequestProcessingException(e);
             }
@@ -211,8 +195,9 @@ public abstract class Action {
 
     private void setIO(final RequestParams params) {
         params.setQueries(new NoteQueries(params.getBrain()));
-        params.setParser(new NoteReader());
-        params.setWriter(new NoteWriter());
+        params.setWikiReader(new WikiReader());
+        params.setJsonReader(new JsonReader());
+        params.setJsonWriter(new JsonWriter());
     }
 
     private void setHeight(final RequestParams params) {

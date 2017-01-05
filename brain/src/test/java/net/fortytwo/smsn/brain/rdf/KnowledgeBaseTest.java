@@ -26,7 +26,6 @@ import net.fortytwo.smsn.brain.rdf.classes.WebPage;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.junit.Ignore;
@@ -330,7 +329,6 @@ public class KnowledgeBaseTest extends BrainTestBase {
         AtomGraph atomGraph = createTinkerAtomGraph();
         Brain brain = new Brain(atomGraph);
         KnowledgeBase kb = new KnowledgeBase(atomGraph);
-        NoteReader parser = new NoteReader();
         NoteQueries queries = new NoteQueries(brain);
         Filter filter = new Filter();
         Atom root = atomGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
@@ -348,7 +346,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
                     sb.append(line).append("\n");
                 }
                 String text = sb.toString().trim();
-                Note rootNote = parser.fromWikiText(text);
+                Note rootNote = wikiReader.parse(text);
                 //System.out.println("children: " + rootNote.getChildren().size() + ", height: " + height);
                 for (Note c : rootNote.getChildren()) {
                     System.out.println("\t" + c.getValue());

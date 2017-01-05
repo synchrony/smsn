@@ -2,11 +2,11 @@ package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
 import org.parboiled.common.Preconditions;
 
 import java.io.File;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class VCSReader extends BrainReader {
     public enum OverwritePolicy {Preserve, Replace}
 
-    private final NoteReader reader = new NoteReader();
+    private final WikiReader reader = new WikiReader();
 
     private final OverwritePolicy policy = OverwritePolicy.Replace;
 
@@ -56,11 +56,7 @@ public class VCSReader extends BrainReader {
 
         Note rootNote;
         try (InputStream in = new FileInputStream(file)) {
-            try {
-                rootNote = reader.fromWikiText(in);
-            } catch (NoteReader.NoteParsingException e) {
-                throw new IOException("parse error in file " + file, e);
-            }
+            rootNote = reader.parse(in);
             for (Note note : rootNote.getChildren()) {
                 String id = note.getId();
                 Preconditions.checkNotNull(id);

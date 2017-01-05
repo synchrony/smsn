@@ -1,12 +1,13 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.io.json.JsonFormat;
+import net.fortytwo.smsn.brain.io.json.JsonReader;
+import net.fortytwo.smsn.brain.io.json.JsonWriter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.NoteQueries;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ConnectionReuseStrategy;
@@ -49,8 +50,8 @@ public class BrainClient {
 
     private static final int DEFAULT_VALUE_CUTOFF = 100;
 
-    private final NoteWriter noteWriter = new NoteWriter();
-    private final NoteReader noteReader = new NoteReader();
+    private final JsonReader jsonReader = new JsonReader();
+    private final JsonWriter jsonWriter = new JsonWriter();
 
     private final HttpProcessor httpProcessor;
     private final HttpRequestExecutor httpExecutor;
@@ -143,7 +144,8 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    results[0] = noteReader.fromJSON(view);
+                    // note: redundant serialization/deserialization
+                    results[0] = jsonReader.parse(view.toString());
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
@@ -189,7 +191,7 @@ public class BrainClient {
             requestJson.put(Params.VIEW, toJson(root));
             requestJson.put(Params.VIEW_FORMAT, Params.Format.json);
             requestJson.put(Params.FILTER, toJson(filter));
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             throw new BrainClientException(e);
         }
 
@@ -312,11 +314,11 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    JSONArray children = view.optJSONArray(NoteWriter.CHILDREN);
+                    JSONArray children = view.optJSONArray(JsonFormat.CHILDREN);
                     if (null != children) {
                         int length = children.length();
                         for (int i = 0; i < length; i++) {
-                            results.add(noteReader.fromJSON(children.getJSONObject(i)));
+                            results.add(jsonReader.parse(children.getJSONObject(i).toString()));
                         }
                     }
                 } catch (JSONException e) {
@@ -413,8 +415,8 @@ public class BrainClient {
         return json;
     }
 
-    private JSONObject toJson(final Note note) throws JSONException {
-        return noteWriter.toJSON(note);
+    private JSONObject toJson(final Note note) throws IOException {
+        return jsonWriter.toJson(note);
     }
 
     public class BrainClientException extends Exception {

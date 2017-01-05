@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -8,8 +9,7 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.After;
 import org.junit.Before;
@@ -24,8 +24,7 @@ public abstract class BrainTestBase {
     protected AtomGraph atomGraph;
     protected abstract AtomGraph createAtomGraph() throws IOException;
 
-    protected final NoteReader parser = new NoteReader();
-    protected final NoteWriter writer = new NoteWriter();
+    protected final WikiReader wikiReader = new WikiReader();
 
     protected Neo4jGraphWrapper graphWrapper;
     protected Filter filter = new Filter();
@@ -61,11 +60,11 @@ public abstract class BrainTestBase {
         }
     }
 
-    protected Atom importExample(final String exampleFile) throws IOException, NoteReader.NoteParsingException {
+    protected Atom importExample(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = parser.fromWikiText(NoteReader.class.getResourceAsStream(exampleFile));
+        Note rootNote = wikiReader.parse(NoteReader.class.getResourceAsStream(exampleFile));
         rootNote.setId(SemanticSynchrony.createRandomId());
         Atom root = atomGraph.createAtomWithProperties(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);

@@ -1,5 +1,6 @@
-package net.fortytwo.smsn.brain.wiki;
+package net.fortytwo.smsn.brain.io.wiki;
 
+import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Note;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,17 +14,17 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 
-public class NoteReaderTest {
-    private NoteReader parser;
+public class WikiReaderTest {
+    private WikiReader wikiReader = new WikiReader();
 
     @Before
     public void setUp() throws Exception {
-        parser = new NoteReader();
+        wikiReader = new WikiReader();
     }
 
     @Test
     public void testExample1() throws Exception {
-        List<Note> notes = parser.fromWikiText(
+        List<Note> notes = wikiReader.parse(
                 getClass().getResourceAsStream("wiki-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
@@ -58,7 +59,7 @@ public class NoteReaderTest {
 
     @Test
     public void testExample2() throws Exception {
-        Note root = parser.fromWikiText(getClass().getResourceAsStream("wiki-example-2.txt"));
+        Note root = wikiReader.parse(getClass().getResourceAsStream("wiki-example-2.txt"));
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());
@@ -80,7 +81,7 @@ public class NoteReaderTest {
         assertEquals(3, notes.size());
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testEmptyValuesNotAllowedForNewNotes() throws Exception {
         readNotes("* ");
     }
@@ -95,22 +96,22 @@ public class NoteReaderTest {
         readNotes("@alias ");
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testEmptyPriorityAttributeNotAllowed() throws Exception {
         readNotes("@priority ");
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testEmptySharabilityAttributeNotAllowed() throws Exception {
         readNotes("@sharability ");
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testEmptyWeightAttributeNotAllowed() throws Exception {
         readNotes("@weight ");
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testLineTruncationSequenceNotAllowed() throws Exception {
         readNotes("" +
                 "* this is a note whose value was truncated for readability [...]\n" +
@@ -167,7 +168,7 @@ public class NoteReaderTest {
         assertEquals("0001", notes.get(0).getId());
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testTextAfterVerbatimBlockStartIsInvalid() throws Exception {
         readNotes("* {{{ this is not OK\n" +
                 "because the value must be on separate lines from the verbatim block delimiters\n" +
@@ -179,14 +180,14 @@ public class NoteReaderTest {
         readNotes("* this is OK, because it is not actually a {{{ verbatim block }}}");
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testTextBeforeVerbatimBlockEndIsInvalid() throws Exception {
         readNotes("* {{{\n" +
                 "this is not OK, because the value must be on separate lines" +
                 "from the verbatim block delimiters}}}");
     }
 
-    @Test(expected = NoteReader.NoteParsingException.class)
+    @Test(expected = IOException.class)
     public void testTextAfterVerbatimBlockEndIsInvalid() throws Exception {
         readNotes("* {{{" +
                 "this is not OK, because the value must be completely\n" +
@@ -194,9 +195,9 @@ public class NoteReaderTest {
                 "}}} with no content outside");
     }
 
-    private List<Note> readNotes(final String s) throws IOException, NoteReader.NoteParsingException {
+    private List<Note> readNotes(final String s) throws IOException {
         try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
-            return parser.fromWikiText(in).getChildren();
+            return wikiReader.parse(in).getChildren();
         }
     }
 }

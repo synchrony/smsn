@@ -1,12 +1,12 @@
 package net.fortytwo.smsn.brain;
 
+import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.io.json.JsonWriter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,8 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class NoteQueriesTest extends BrainTestBase {
-    private NoteReader parser;
-    private final NoteWriter writer = new NoteWriter();
+    private final JsonWriter jsonWriter = new JsonWriter();
     private NoteQueries queries;
     private Filter filter;
 
@@ -37,7 +36,6 @@ public class NoteQueriesTest extends BrainTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        parser = new NoteReader();
         Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
         filter = new Filter();
@@ -73,7 +71,7 @@ public class NoteQueriesTest extends BrainTestBase {
         assertEquals("foo", after.getValue());
         assertEquals(1, after.getChildren().size());
 
-        JSONObject json = writer.toJSON(after);
+        JSONObject json = jsonWriter.toJson(after);
         //System.out.println(json.toString());
         JSONObject j = json.getJSONArray("children").getJSONObject(0);
         assertEquals("cheval \u00e0 phynances", j.getString("value"));
@@ -91,7 +89,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "* :N5KBOAq: one\n" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "one", "two", "three");
@@ -104,7 +102,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "    * :r4zU45R: ten\n" +
                 "    * yellow\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // "two" has been removed
@@ -119,7 +117,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "        * rabbit\n" +
                 "    * purple\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // depth is only two, so "rabbit" is not reachable
@@ -132,7 +130,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "        * rabbit\n" +
                 "        * kangaroo\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom green = one.getNotes().getRest().getFirst();
@@ -143,7 +141,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // "one" has been removed...
@@ -155,7 +153,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "* :tOpwKho: three\n" +
                 "    * red\n" +
                 "* :v8EuMtl: two\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // we swapped the order of "two" and "three"...
@@ -170,7 +168,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "    * elephant\n" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // duplicates are possible...
@@ -184,7 +182,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "* :v8EuMtl: two\n" +
                 "    * gorilla\n" +
                 "* :tOpwKho: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "two", "two", "three");
@@ -204,7 +202,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :001: one\n" +
                 "    * :001: one\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = atomGraph.getAtomById("001");
@@ -225,7 +223,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :001: one - updated\n" +
                 "    * :001: one\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("001");
@@ -244,7 +242,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :001: one\n" +
                 "    * :001: one - updated\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("001");
@@ -265,7 +263,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "* :001: one\n" +
                 "    * :001: one\n" +
                 "    * :002: two\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("001");
@@ -305,7 +303,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "        * :002: two\n" +
                 "    * :002: two\n" +
                 "    * :003: three\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 3, filter, style);
         rootNote = queries.view(root, 3, filter, style);
@@ -328,7 +326,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "        * :002: two\n" +
                 "        * :003: three\n" +
                 "    * :002: two\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 3, filter, style);
         rootNote = queries.view(root, 3, filter, style);
@@ -354,7 +352,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
         s = "" +
                 "* :N5KBOAq: one\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = atomGraph.getAtomById("N5KBOAq");
@@ -365,7 +363,7 @@ public class NoteQueriesTest extends BrainTestBase {
                 "* :N5KBOAq: one\n" +
                 "    @weight 0.75\n" +
                 "    @sharability 0.25\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertEquals(0.75f, one.getWeight());
@@ -383,7 +381,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @alias http://example.org/ns/one\n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = atomGraph.getAtomById("N5KBOAq");
@@ -392,7 +390,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @alias \n";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertNull(one.getAlias());
@@ -410,7 +408,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :0000001: one\n" +
                 "    @priority 0.5";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("0000001");
@@ -420,7 +418,7 @@ public class NoteQueriesTest extends BrainTestBase {
         s = "" +
                 "* :0000001: one\n" +
                 "    @priority 0";
-        rootNote = parser.fromWikiText(s);
+        rootNote = wikiReader.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("0000001");
@@ -434,7 +432,7 @@ public class NoteQueriesTest extends BrainTestBase {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = parser.fromWikiText(NoteReader.class.getResourceAsStream("wiki-example-3.txt"));
+        Note rootNote = wikiReader.parse(NoteReader.class.getResourceAsStream("wiki-example-3.txt"));
         Atom root = createAtom("0000000");
         root.setValue("root");
         root.setSharability(1.0f);
@@ -486,8 +484,8 @@ public class NoteQueriesTest extends BrainTestBase {
                 "* :002:\n" +
                 "* :003: THREE";
 
-        Note b = parser.fromWikiText(before);
-        Note a = parser.fromWikiText(after);
+        Note b = wikiReader.parse(before);
+        Note a = wikiReader.parse(after);
 
         // First, check that 'after' was parsed correctly
         assertEquals(3, a.getChildren().size());
@@ -527,8 +525,8 @@ public class NoteQueriesTest extends BrainTestBase {
         String after = "* :004: four\n" +
                 "* :002: two";
 
-        Note b = parser.fromWikiText(before);
-        Note a = parser.fromWikiText(after);
+        Note b = wikiReader.parse(before);
+        Note a = wikiReader.parse(after);
 
         Atom root = atomGraph.createAtomWithProperties(filter, "000");
         root.setValue("root");

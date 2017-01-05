@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
+import net.fortytwo.smsn.brain.io.wiki.WikiWriter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,7 +115,7 @@ public class EventStackTest {
             eventStack.push(eventStack.createGestureEvent(0 == i % 2 ? agent1 : agent2, new Date()));
         }
 
-        NoteWriter w = new NoteWriter();
+        WikiWriter w = new WikiWriter();
         w.toWikiText(eventStack.getEvents(), System.out, false);
     }
 }

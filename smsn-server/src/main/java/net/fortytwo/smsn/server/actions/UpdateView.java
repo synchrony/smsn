@@ -2,12 +2,11 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
@@ -47,18 +46,8 @@ public class UpdateView extends RootedViewAction {
         p.setRootId(getRoot());
         p.setStyleName(getStyle());
 
-        switch (getViewFormat()) {
-            case json:
-                try {
-                    p.setJsonView(new JSONObject(getView()));
-                } catch (JSONException e) {
-                    throw new IOException(e);
-                }
-                break;
-            case wiki:
-                p.setWikiView(getView());
-                break;
-        }
+        p.setView(getView());
+
         p.setFilter(getFilter());
     }
 
@@ -66,18 +55,18 @@ public class UpdateView extends RootedViewAction {
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         Note rootNote;
 
-        if (null != p.getWikiView()) {
+        if (null != p.getView()) {
             try {
-                try (InputStream in = new ByteArrayInputStream(p.getWikiView().getBytes())) {
-                    rootNote = p.getParser().fromWikiText(in);
+                try (InputStream in = new ByteArrayInputStream(p.getView().getBytes())) {
+                    rootNote = p.getWikiReader().parse(in);
                 }
-            } catch (IOException | NoteReader.NoteParsingException e) {
+            } catch (IOException e) {
                 throw new RequestProcessingException(e);
             }
-        } else if (null != p.getJsonView()) {
+        } else if (null != p.getView()) {
             try {
-                rootNote = p.getParser().fromJSON(p.getJsonView());
-            } catch (JSONException e) {
+                rootNote = p.getJsonReader().parse(p.getView());
+            } catch (IOException e) {
                 throw new RequestProcessingException(e);
             }
         } else {
