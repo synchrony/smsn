@@ -2,9 +2,11 @@ package net.fortytwo.smsn.brain.io;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -18,6 +20,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 public abstract class BrainReader {
+
     private static final Logger logger = Logger.getLogger(BrainReader.class.getName());
 
     protected abstract void importInternal(Context context) throws IOException;
@@ -25,6 +28,18 @@ public abstract class BrainReader {
     private String defaultNodeName;
 
     public abstract List<Format> getFormats();
+
+    private long transactionCounter = 0;
+    private final int transactionBufferSize;
+
+    protected BrainReader() {
+        try {
+            transactionBufferSize = SemanticSynchrony.getConfiguration().getInt(
+                    SemanticSynchrony.TRANSACTION_BUFFER_SIZE, 0);
+        } catch (TypedProperties.PropertyException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public void doImport(
             File file, Format format, Brain brain, boolean recursive) throws IOException {
@@ -52,13 +67,21 @@ public abstract class BrainReader {
 
         AtomGraph destGraph = context.getAtomGraph();
 
-        // note: we assume the graph is small
         importInternal(context);
-        reindexVertices(destGraph);
 
         long after = System.currentTimeMillis();
         logger.info("imported " + context.getFormat() + " data in " + (after - before) + " ms (before commit). " +
                 "Resulting graph has " + getSizeOf(context) + " atoms");
+    }
+
+    protected synchronized void addToIndices(final Atom atom, final AtomGraph graph) {
+        graph.reindexAtom(atom);
+
+        if (transactionBufferSize > 0 && transactionBufferSize == ++transactionCounter) {
+            graph.commit();
+            graph.begin();
+            transactionCounter = 0;
+        }
     }
 
     protected void assertFileExists(final File file) {
@@ -124,13 +147,6 @@ public abstract class BrainReader {
             context.setFormat(format);
 
             doImport(context);
-        }
-    }
-
-    private void reindexVertices(AtomGraph destGraph) {
-        for (Atom a : destGraph.getAllAtoms()) {
-            String value = a.getValue();
-            if (null != value) destGraph.reindexAtom(a);
         }
     }
 

@@ -18,12 +18,16 @@ public class SemanticSynchrony {
             SAFE = true,
             VERBOSE = true;
 
-    // configuration properties
+    // general configuration properties
     public static final String
             BASE_URI = "net.fortytwo.smsn.baseURI",
             ACTIVITY_LOG = "net.fortytwo.smsn.activityLog",
             ATOM_NAMESPACE = "net.fortytwo.smsn.atomNamespace",
             VERSION = "net.fortytwo.smsn.version";
+
+    // I/O properties
+    public static final String
+            TRANSACTION_BUFFER_SIZE = "net.fortytwo.smsn.io.transactionBufferSize";
 
     // P2P configuration properties
     public static final String

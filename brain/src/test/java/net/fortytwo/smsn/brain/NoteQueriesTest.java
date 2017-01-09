@@ -432,7 +432,7 @@ public class NoteQueriesTest extends BrainTestBase {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = wikiReader.parse(NoteReader.class.getResourceAsStream("wiki-example-3.txt"));
+        Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
         root.setValue("root");
         root.setSharability(1.0f);

@@ -106,6 +106,8 @@ public class FreeplaneReader extends BrainReader {
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
         queries.update(rootNote, maxHeight, filter, NoteQueries.forwardViewStyle);
+
+        addToIndices(atom, destGraph);
     }
 
     private void setText(Note note, String text) {

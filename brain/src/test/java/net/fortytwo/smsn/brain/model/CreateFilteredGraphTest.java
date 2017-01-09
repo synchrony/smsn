@@ -23,7 +23,7 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         assertEquals(0, countAtoms(atomGraph));
 
         // unfiltered
-        Atom root = importExample("wiki-example-4.txt");
+        Atom root = importAtomFromFile("io/wiki/wiki-example-4.txt");
         root.setValue("William James");
         assertEquals(0.5, root.getSharability(), 0);
         assertEquals(23, countAtoms(atomGraph));

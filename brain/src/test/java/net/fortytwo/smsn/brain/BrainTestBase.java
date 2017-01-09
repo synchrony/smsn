@@ -60,11 +60,15 @@ public abstract class BrainTestBase {
         }
     }
 
-    protected Atom importExample(final String exampleFile) throws IOException {
+    protected Note importNoteFromFile(final String exampleFile) throws IOException {
+        return wikiReader.parse(Brain.class.getResourceAsStream(exampleFile));
+    }
+
+    protected Atom importAtomFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
 
-        Note rootNote = wikiReader.parse(NoteReader.class.getResourceAsStream(exampleFile));
+        Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());
         Atom root = atomGraph.createAtomWithProperties(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);

@@ -65,7 +65,8 @@ public class VCSReader extends BrainReader {
                 helper.setNote(note);
                 helper.setAtom(atom);
                 helper.updateAtom();
-                //System.out.println("root\t" + rootNote.getId() + "\t" + rootNote.getValue());
+
+                addToIndices(atom, helper.context.getAtomGraph());
             }
         }
     }
