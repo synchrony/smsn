@@ -26,25 +26,30 @@ public class WikiReader extends NoteReader {
     private int currentIndentLevel;
     private String currentId;
     private String currentBullet;
+    private boolean currentLineIsInVerbatimBlock;
     
     @Override
     public Note parse(final InputStream inputStream) throws IOException {
         reset();
         bufferedReader = createReader(inputStream);
 
-        while ((currentLine = nextLine()) != null) {
+        while ((currentLine = bufferedReader.readLine()) != null) {
             parseInternal();
         }
 
+        checkNotInVerbatimBlock();
+        
         return root;
+    }
+
+    private void checkNotInVerbatimBlock() throws IOException {
+        if (currentLineIsInVerbatimBlock) {
+            parseError("unterminated verbatim block");
+        }
     }
 
     private BufferedReader createReader(final InputStream in) throws IOException {
         return new BufferedReader(new InputStreamReader(in, SemanticSynchrony.UTF8));
-    }
-
-    private String nextLine() throws IOException {
-        return bufferedReader.readLine();
     }
 
     private void reset() {
@@ -152,6 +157,8 @@ public class WikiReader extends NoteReader {
     }
 
     private void constructNote() throws IOException {
+        checkForEmptyValue();
+
         if (currentLineIsProperty) {
             Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
@@ -177,11 +184,17 @@ public class WikiReader extends NoteReader {
     private void parseInternal() throws IOException {
         incrementLineNumber();
 
-        if (lineIsEmpty()) return;
-
         replaceTabsWithSpaces();
 
-        validateLine();
+        if (currentLineIsInVerbatimBlock) {
+            parseVerbatimBlockLine();
+        } else {
+            parseSingleAtomLine();
+        }
+    }
+
+    private void parseSingleAtomLine() throws IOException {
+        if (lineIsEmpty()) return;
 
         findIndentLevel();
 
@@ -191,51 +204,33 @@ public class WikiReader extends NoteReader {
 
         parseId();
 
-        parseValue();
+        if (currentLine.trim().equals(WikiFormat.VERBATIM_BLOCK_START)) {
+            currentValue = "";
+            currentLineIsInVerbatimBlock = true;
+        } else {
+            validateLine();
 
-        checkForEmptyValue();
+            parseNormalValue();
 
-        constructNote();
+            constructNote();
+        }
     }
 
-    private void parseValue() throws IOException {
+    private void parseVerbatimBlockLine() throws IOException {
+        if (currentLine.trim().equals(WikiFormat.VERBATIM_BLOCK_END)) {
+            currentLineIsInVerbatimBlock = false;
+            constructNote();
+        } else {
+            if (currentValue.length() > 0) currentValue += "\n";
+            currentValue += currentLine;
+        }
+    }
+
+    private void parseNormalValue() throws IOException {
         currentValue = "";
         if (0 == currentLine.length()) return;
 
-        String lt = currentLine.trim();
-        if (!currentLineIsProperty && lt.startsWith(WikiFormat.VERBATIM_BLOCK_START)) {
-            if (lt.length() > 3) {
-                parseError("verbatim block must open with a line containing only '{{{'");
-            }
-
-            StringBuilder verbatimValue = new StringBuilder();
-            boolean first = true;
-            while (true) {
-                String nextLine = nextLine();
-                incrementLineNumber();
-                if (nextLine.contains(WikiFormat.VERBATIM_BLOCK_END)) {
-                    lt = nextLine.trim();
-                    if (lt.length() > 3) {
-                        parseError("verbatim block must close with a line containing only '}}}'");
-                    } else {
-                        break;
-                    }
-                } else {
-                    if (first) {
-                        first = false;
-                    } else {
-                        verbatimValue.append('\n');
-                    }
-                    verbatimValue.append(nextLine);
-                }
-            }
-
-            currentValue = verbatimValue.toString();
-        } else {
-            currentValue = currentLine;
-        }
-
-        currentValue = currentValue.trim();
+        currentValue = currentLine.trim();
     }
 
     private void incrementLineNumber() {

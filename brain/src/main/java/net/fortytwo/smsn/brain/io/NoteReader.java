@@ -7,7 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class NoteReader<T> {
+public abstract class NoteReader {
 
     public abstract Note parse(final InputStream inputStream) throws IOException;
 

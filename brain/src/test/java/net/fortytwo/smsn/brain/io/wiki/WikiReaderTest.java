@@ -181,7 +181,7 @@ public class WikiReaderTest {
     }
 
     @Test(expected = IOException.class)
-    public void testTextBeforeVerbatimBlockEndIsInvalid() throws Exception {
+    public void testTextBeforeVerbatimBlockDoesNotEndTheBlock() throws Exception {
         readNotes("* {{{\n" +
                 "this is not OK, because the value must be on separate lines" +
                 "from the verbatim block delimiters}}}");
