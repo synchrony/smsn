@@ -51,38 +51,7 @@ public class SetProperties extends Action {
     public void parseRequest(final RequestParams p)
             throws BadRequestException, IOException {
 
-        switch (getName()) {
-            case SemanticSynchrony.WEIGHT: {
-                float f = toFloat(getValue());
-                // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
-                if (f <= 0 || f > 1.0) {
-                    throw new BadRequestException("weight is outside of range (0, 1]: " + f);
-                }
-                break;
-            }
-            case SemanticSynchrony.SHARABILITY: {
-                float f = toFloat(getValue());
-                if (f <= 0 || f > 1.0) {
-                    throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
-                }
-                break;
-            }
-            case SemanticSynchrony.PRIORITY: {
-                float f = toFloat(getValue());
-                if (f < 0 || f > 1.0) {
-                    throw new BadRequestException("priority is outside of range [0, 1]: " + f);
-                }
-                break;
-            }
-            case SemanticSynchrony.SHORTCUT:
-                String s = (String) getValue();
-                if (s.length() > 50) {
-                    throw new BadRequestException("shortcut is too long: " + s);
-                }
-                break;
-            default:
-                throw new BadRequestException("unknown property: " + getName());
-        }
+        validateKeyValue();
 
         p.setPropertyName(getName());
         p.setPropertyValue(getValue());
@@ -91,9 +60,69 @@ public class SetProperties extends Action {
         SemanticSynchrony.logInfo("SmSn set-properties on " + getId() + ": " + getName() + " <- " + getValue());
     }
 
+    private void validateKeyValue() {
+        switch (getName()) {
+            case SemanticSynchrony.VALUE:
+                validateValue();
+                break;
+            case SemanticSynchrony.WEIGHT:
+                validateWeight();
+                break;
+            case SemanticSynchrony.SHARABILITY:
+                validateSharability();
+                break;
+            case SemanticSynchrony.PRIORITY:
+                validatePriority();
+                break;
+            case SemanticSynchrony.SHORTCUT:
+                validateShortcut();
+                break;
+            default:
+                throw new BadRequestException("unknown property: " + getName());
+        }
+    }
+
+    private void validateValue() {
+        if (((String) getValue()).trim().length() == 0) {
+            throw new BadRequestException("empty value");
+        }
+    }
+
+    private void validateWeight() {
+        float f = toFloat(getValue());
+        // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
+        if (f <= 0 || f > 1.0) {
+            throw new BadRequestException("weight is outside of range (0, 1]: " + f);
+        }
+    }
+
+    private void validateSharability() {
+        float f = toFloat(getValue());
+        if (f <= 0 || f > 1.0) {
+            throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
+        }
+    }
+
+    private void validatePriority() {
+        float f = toFloat(getValue());
+        if (f < 0 || f > 1.0) {
+            throw new BadRequestException("priority is outside of range [0, 1]: " + f);
+        }
+    }
+
+    private void validateShortcut() {
+        String s = (String) getValue();
+        if (s.length() > 50) {
+            throw new BadRequestException("shortcut is too long: " + s);
+        }
+    }
+
     @Override
     protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
         switch (p.getPropertyName()) {
+            case SemanticSynchrony.VALUE:
+                p.getRoot().setValue((String) p.getPropertyValue());
+                break;
             case SemanticSynchrony.WEIGHT:
                 p.getRoot().setWeight(toFloat(p.getPropertyValue()));
                 break;
@@ -117,6 +146,7 @@ public class SetProperties extends Action {
                 throw new IllegalStateException();
         }
 
+        p.getBrain().getAtomGraph().reindexAtom(p.getRoot());
         p.getBrain().getAtomGraph().notifyOfUpdate();
 
         p.getMap().put("key", p.getBrain().getAtomGraph().idOfAtom(p.getRoot()));

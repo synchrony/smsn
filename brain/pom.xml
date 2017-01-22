@@ -75,6 +75,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.atlassian.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+
         <!-- for StringEscapeUtils -->
         <dependency>
             <groupId>commons-lang</groupId>

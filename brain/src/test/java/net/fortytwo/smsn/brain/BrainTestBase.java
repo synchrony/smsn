@@ -6,10 +6,11 @@ import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
-import net.fortytwo.smsn.brain.io.NoteReader;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.After;
 import org.junit.Before;
@@ -18,29 +19,32 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import static org.junit.Assert.assertTrue;
+
 public abstract class BrainTestBase {
 
     protected NoteQueries queries;
     protected AtomGraph atomGraph;
-    protected abstract AtomGraph createAtomGraph() throws IOException;
-
     protected final WikiReader wikiReader = new WikiReader();
 
-    protected Neo4jGraphWrapper graphWrapper;
+    protected Graph graph;
+    protected GraphWrapper graphWrapper;
     protected Filter filter = new Filter();
     protected Collection<Atom> result;
 
+    protected abstract AtomGraph createAtomGraph() throws IOException;
+
     protected AtomGraph createTinkerAtomGraph() {
-        TinkerGraph g = TinkerGraph.open();
-        TinkerGraphWrapper wrapper = new TinkerGraphWrapper(g);
-        return new PGAtomGraph(wrapper);
+        graph = TinkerGraph.open();
+        graphWrapper = new TinkerGraphWrapper((TinkerGraph) graph);
+        return new PGAtomGraph(graphWrapper);
     }
 
     protected AtomGraph createNeo4jAtomGraph() throws IOException {
-        File dir = new File("/tmp/neo");
-        dir.delete();
+        File dir = createTempDirectory();
 
         graphWrapper = new Neo4jGraphWrapper(dir);
+        graph = graphWrapper.getGraph();
 
         return new PGAtomGraph(graphWrapper);
     }
@@ -81,5 +85,16 @@ public abstract class BrainTestBase {
             count++;
         }
         return count;
+    }
+
+    private File createTempDirectory() throws IOException {
+        File file = File.createTempFile("smsn-testing-", "");
+        file.delete();
+
+        file.mkdirs();
+        file.deleteOnExit();
+        assertTrue(file.exists());
+        assertTrue(file.isDirectory());
+        return file;
     }
 }

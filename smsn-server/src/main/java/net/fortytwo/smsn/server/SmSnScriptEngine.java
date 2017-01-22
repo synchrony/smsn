@@ -1,11 +1,13 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
-import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -34,7 +36,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     @Override
     public Object eval(String script, ScriptContext context) throws ScriptException {
 
-        Neo4jGraph graph = getNeo4jGraph(context);
+        Graph graph = getGraph(context);
 
         try {
             return handleRequest(script, graph);
@@ -77,22 +79,19 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         return factory;
     }
 
-    private Neo4jGraph getNeo4jGraph(final ScriptContext context) {
-        Neo4jGraph graph = (Neo4jGraph) context.getAttribute("graph");
+    private Graph getGraph(final ScriptContext context) {
+        Graph graph = (Graph) context.getAttribute("graph");
         if (null == graph) {
-            throw new IllegalStateException("expected Neo4j graph not found");
+            throw new IllegalStateException("expected graph not found");
         }
 
         return graph;
     }
 
-    private JSONObject handleRequest(String actionStr, Neo4jGraph graph) throws IOException {
+    private JSONObject handleRequest(String actionStr, final Graph graph) throws IOException {
         Action action = deserializeRequest(actionStr);
-        RequestParams params = Action.createParams(graph);
 
-        action.parseRequest(params);
-
-        action.handleRequest(params);
+        RequestParams params = new ActionPerformer(graph).perform(action);
 
         return toJson(params.getMap());
     }
@@ -103,5 +102,23 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
 
     private JSONObject toJson(final Map<String, Object> map) {
         return new JSONObject(map);
+    }
+
+    public static class ActionPerformer {
+        private final Graph graph;
+
+        public ActionPerformer(final Graph graph) {
+            this.graph = graph;
+        }
+
+        public RequestParams perform(final Action action) throws IOException {
+            RequestParams params = Action.createParams(graph);
+
+            action.parseRequest(params);
+
+            action.handleRequest(params);
+
+            return params;
+        }
     }
 }

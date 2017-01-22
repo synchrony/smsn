@@ -15,10 +15,12 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.apache.tinkerpop.shaded.jackson.annotation.JsonIgnoreProperties;
 import org.apache.tinkerpop.shaded.jackson.annotation.JsonTypeInfo;
 import org.json.JSONObject;
@@ -63,7 +65,7 @@ public abstract class Action {
 
     protected abstract boolean doesWrite();
 
-    private synchronized static Brain getBrain(final GraphWrapper wrapper)
+    public synchronized static Brain getBrain(final GraphWrapper wrapper)
             throws Brain.BrainException {
 
         Brain brain = brains.get(wrapper.getGraph());
@@ -79,15 +81,21 @@ public abstract class Action {
         return brain;
     }
 
-    private synchronized static GraphWrapper getWrapper(final Neo4jGraph graph) {
+    public synchronized static GraphWrapper getWrapper(final Graph graph) {
         GraphWrapper wrapper = wrappers.get(graph);
 
         if (null == wrapper) {
-            wrapper = new Neo4jGraphWrapper(graph);
+            wrapper = wrap(graph);
             wrappers.put(graph, wrapper);
         }
 
         return wrapper;
+    }
+
+    private static GraphWrapper wrap(final Graph graph) {
+        return graph instanceof TinkerGraph
+            ? new TinkerGraphWrapper((TinkerGraph) graph)
+            : new Neo4jGraphWrapper((Neo4jGraph) graph);
     }
 
     public void handleRequest(final RequestParams params) {
@@ -112,7 +120,7 @@ public abstract class Action {
         p.getMap().put(Params.VIEW, json);
     }
 
-    public static RequestParams createParams(final Neo4jGraph graph) {
+    public static RequestParams createParams(final Graph graph) {
         RequestParams params = new RequestParams();
 
         setGraphWrapper(params, graph);
@@ -120,7 +128,7 @@ public abstract class Action {
         return params;
     }
 
-    private static void setGraphWrapper(final RequestParams params, final Neo4jGraph graph) {
+    private static void setGraphWrapper(final RequestParams params, final Graph graph) {
         GraphWrapper wrapper = getWrapper(graph);
         params.setGraphWrapper(wrapper);
     }

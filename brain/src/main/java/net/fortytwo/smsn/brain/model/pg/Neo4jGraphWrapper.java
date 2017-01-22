@@ -93,15 +93,25 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         GraphDatabaseService graphDb = getGraphDatabaseService();
         IndexManager indexManager = graphDb.index();
         try (Transaction tx = graphDb.beginTx()) {
-            if (!indexManager.existsForNodes(indexName)) {
-                Index<Node> index = indexManager.forNodes(indexName,
-                        MapUtil.stringMap(keysAndValues));
+            boolean success = false;
+            try {
+                Index<Node> index;
+                if (!indexManager.existsForNodes(indexName)) {
+                    index = indexManager.forNodes(indexName,
+                            MapUtil.stringMap(keysAndValues));
 
-                tx.success();
-                logger.info("created Neo4j index '" + indexName + "'");
+                    logger.info("created Neo4j index '" + indexName + "'");
+                } else {
+                    index = indexManager.forNodes(indexName);
+                }
+                success = true;
                 return index;
-            } else {
-                return indexManager.forNodes(indexName);
+            } finally {
+                if (success) {
+                    tx.success();
+                } else {
+                    tx.failure();
+                }
             }
         }
     }

@@ -97,9 +97,7 @@ public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
     @Override
     public void setCustomizerManager(GremlinScriptEngineManager manager) {
         // TODO
-
         final List<Customizer> customizers =  manager.getCustomizers(ENGINE_NAME);
-
     }
 
     private String getVersion() {
