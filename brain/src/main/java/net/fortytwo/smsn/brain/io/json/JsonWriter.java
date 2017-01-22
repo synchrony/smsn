@@ -28,48 +28,49 @@ public class JsonWriter {
         }
     }
 
-    public JSONObject toJsonInternal(final Note n) throws JSONException {
+    public JSONObject toJsonInternal(final Note note) throws JSONException {
         JSONObject json = new JSONObject();
 
-        json.put(JsonFormat.ID, n.getId());
-        json.put(SemanticSynchrony.WEIGHT, n.getWeight());
-        json.put(SemanticSynchrony.SHARABILITY, n.getSharability());
-        json.put(SemanticSynchrony.CREATED, n.getCreated());
-        json.put(JsonFormat.HAS_CHILDREN, n.getHasChildren());
+        json.put(JsonFormat.ID, note.getId());
+        json.put(SemanticSynchrony.WEIGHT, note.getWeight());
+        json.put(SemanticSynchrony.SHARABILITY, note.getSharability());
+        json.put(SemanticSynchrony.CREATED, note.getCreated());
+        json.put(JsonFormat.NUMBER_OF_CHILDREN, note.getNumberOfChildren());
+        json.put(JsonFormat.NUMBER_OF_PARENTS, note.getNumberOfParents());
 
-        Float priority = n.getPriority();
+        Float priority = note.getPriority();
         if (null != priority && priority > 0) {
             json.put(SemanticSynchrony.PRIORITY, priority);
         }
 
-        String value = n.getValue();
+        String value = note.getValue();
         if (value != null && valueLengthCutoff > 0 && value.length() > valueLengthCutoff) {
             value = value.substring(0, valueLengthCutoff) + JsonFormat.VALUE_TRUNCATOR;
         }
         json.put(SemanticSynchrony.VALUE, value);
 
-        if (null != n.getAlias()) {
-            json.put(SemanticSynchrony.ALIAS, n.getAlias());
+        if (null != note.getAlias()) {
+            json.put(SemanticSynchrony.ALIAS, note.getAlias());
         }
 
-        if (null != n.getShortcut()) {
-            json.put(SemanticSynchrony.SHORTCUT, n.getShortcut());
+        if (null != note.getShortcut()) {
+            json.put(SemanticSynchrony.SHORTCUT, note.getShortcut());
         }
 
-        if (null != n.getMeta()) {
+        if (null != note.getMeta()) {
             JSONArray c = new JSONArray();
             json.put(JsonFormat.META, c);
             int i = 0;
-            for (String s : n.getMeta()) {
+            for (String s : note.getMeta()) {
                 c.put(i++, s);
             }
         }
 
-        if (0 < n.getChildren().size()) {
+        if (0 < note.getChildren().size()) {
             JSONArray c = new JSONArray();
             json.put(JsonFormat.CHILDREN, c);
             int i = 0;
-            for (Note child : n.getChildren()) {
+            for (Note child : note.getChildren()) {
                 c.put(i, toJsonInternal(child));
                 i++;
             }

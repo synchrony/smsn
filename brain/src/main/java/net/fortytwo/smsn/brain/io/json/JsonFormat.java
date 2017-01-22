@@ -7,6 +7,8 @@ public class JsonFormat extends Format {
     public static final String VALUE_TRUNCATOR = " [...]";
 
     public static final String CHILDREN = "children";
+    public static final String NUMBER_OF_CHILDREN = "numberOfChildren";
+    public static final String NUMBER_OF_PARENTS = "numberOfParents";
     public static final String HAS_CHILDREN = "hasChildren";
     public static final String ID = "id";
     public static final String META = "meta";

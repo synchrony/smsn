@@ -87,13 +87,13 @@ public class NoteQueries {
     /**
      * Updates the graph.
      *
-     * @param root the root of the note tree
-     * @param height   the maximum height of the tree which will be applied to the graph as an update.
-     *                 If height is 0, only the root node will be affected,
-     *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
-     * @param filter   a collection of criteria for atoms and links.
-     *                 Atoms and links which do not meet the criteria are not to be affected by the update.
-     * @param style    the adjacency style of the view
+     * @param root   the root of the note tree
+     * @param height the maximum height of the tree which will be applied to the graph as an update.
+     *               If height is 0, only the root node will be affected,
+     *               while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
+     * @param filter a collection of criteria for atoms and links.
+     *               Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param style  the adjacency style of the view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
     public void update(final Note root,
@@ -279,18 +279,19 @@ public class NoteQueries {
         return cmp;
     };
 
-    private boolean hasChildren(final Atom root,
-                                final Filter filter,
-                                final ViewStyle style) {
+    private int countChildren(final Atom root,
+                              final Filter filter,
+                              final ViewStyle style) {
         // If the note is invisible, we can't see whether it has children.
         if (!filter.isVisible(root)) {
-            return false;
+            return 0;
         }
 
         // If the note is visible, we can see its children (although we will not be able to read the values of any
         // children which are themselves invisible).
-        Iterable<Atom> children = style.getLinked(root, filter);
-        return children.iterator().hasNext();
+        int count = 0;
+        for (Atom ignored : style.getLinked(root, filter)) count++;
+        return count;
     }
 
     private Note viewInternal(final Atom root,
@@ -303,22 +304,22 @@ public class NoteQueries {
             throw new IllegalStateException("null view root");
         }
 
-        Note n = toNote(root, filter.isVisible(root), getProperties);
+        Note note = toNote(root, filter.isVisible(root), getProperties);
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
                 addToCache(target, cache);
                 int h = filter.isVisible(target) ? height - 1 : 0;
                 Note cn = viewInternal(target, h, filter, style, getProperties, cache);
-                n.addChild(cn);
-            }
-        } else {
-            if (hasChildren(root, filter, style)) {
-                n.setHasChildren(true);
+                note.addChild(cn);
             }
         }
 
-        return n;
+        // note: some duplicated work
+        note.setNumberOfChildren(countChildren(root, filter, style));
+        note.setNumberOfParents(countChildren(root, filter, style.getInverse()));
+
+        return note;
     }
 
     private void updateInternal(final Note rootNote,
@@ -626,6 +627,8 @@ public class NoteQueries {
         boolean deleteOnUpdate();
 
         Direction getDirection();
+
+        ViewStyle getInverse();
     }
 
     public static ViewStyle lookupStyle(final String name) {
@@ -676,6 +679,11 @@ public class NoteQueries {
         public Direction getDirection() {
             return Direction.Forward;
         }
+
+        @Override
+        public ViewStyle getInverse() {
+            return backwardViewStyle;
+        }
     };
 
     public static final ViewStyle forwardAddOnlyViewStyle = new ViewStyle() {
@@ -703,6 +711,11 @@ public class NoteQueries {
         @Override
         public Direction getDirection() {
             return Direction.Forward;
+        }
+
+        @Override
+        public ViewStyle getInverse() {
+            return backwardViewStyle;
         }
     };
 
@@ -746,6 +759,11 @@ public class NoteQueries {
         @Override
         public Direction getDirection() {
             return Direction.Backward;
+        }
+
+        @Override
+        public ViewStyle getInverse() {
+            return forwardViewStyle;
         }
     };
 

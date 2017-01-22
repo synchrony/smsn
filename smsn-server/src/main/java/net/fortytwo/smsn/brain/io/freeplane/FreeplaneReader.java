@@ -101,7 +101,7 @@ public class FreeplaneReader extends BrainReader {
 
         Brain brain = new Brain(destGraph);
         NoteQueries queries = new NoteQueries(brain);
-        Filter filter = new Filter();
+        Filter filter = Filter.noFilter();
 
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
@@ -248,7 +248,7 @@ public class FreeplaneReader extends BrainReader {
             setText(note, text);
 
             if (null != styleNote) {
-                note.setHasChildren(true);
+                //note.setHasChildren(true);
                 note.addChild(styleNote);
             }
 
@@ -268,7 +268,7 @@ public class FreeplaneReader extends BrainReader {
                 for (Element head : backlinkChildren) {
                     String headId = head.getAttribute(ATTR_DESTINATION);
                     if (null != headId) {
-                        note.setHasChildren(true);
+                        //note.setHasChildren(true);
                         heads.add(headId);
                     }
                 }
@@ -277,7 +277,7 @@ public class FreeplaneReader extends BrainReader {
             // note: non-content <hook> elements are ignored
             List<Element> treeChildren = getChildElements(nodeElement, ELEMENTNAME_NODE);
             if (0 != treeChildren.size()) {
-                note.setHasChildren(true);
+                //note.setHasChildren(true);
                 for (Element childElement : treeChildren) {
                     Note child = parseTree(childElement);
                     note.addChild(child);

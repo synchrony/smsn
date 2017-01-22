@@ -29,7 +29,7 @@ public abstract class BrainTestBase {
 
     protected Graph graph;
     protected GraphWrapper graphWrapper;
-    protected Filter filter = new Filter();
+    protected Filter filter = Filter.noFilter();
     protected Collection<Atom> result;
 
     protected abstract AtomGraph createAtomGraph() throws IOException;
@@ -54,7 +54,7 @@ public abstract class BrainTestBase {
         atomGraph = createAtomGraph();
         Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
-        filter = new Filter();
+        filter = Filter.noFilter();
     }
 
     @After

@@ -49,8 +49,11 @@ public class JsonReader extends NoteReader {
         if (json.has(SemanticSynchrony.CREATED)) {
             n.setCreated(json.getLong(SemanticSynchrony.CREATED));
         }
-        if (json.has(JsonFormat.HAS_CHILDREN)) {
-            n.setHasChildren(json.optBoolean(JsonFormat.HAS_CHILDREN));
+        if (json.has(JsonFormat.NUMBER_OF_CHILDREN)) {
+            n.setNumberOfChildren(json.optInt(JsonFormat.NUMBER_OF_CHILDREN));
+        }
+        if (json.has(JsonFormat.NUMBER_OF_PARENTS)) {
+            n.setNumberOfParents(json.optInt(JsonFormat.NUMBER_OF_PARENTS));
         }
 
         JSONArray a = json.optJSONArray(JsonFormat.CHILDREN);

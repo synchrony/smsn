@@ -330,7 +330,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
         Brain brain = new Brain(atomGraph);
         KnowledgeBase kb = new KnowledgeBase(atomGraph);
         NoteQueries queries = new NoteQueries(brain);
-        Filter filter = new Filter();
+        Filter filter = Filter.noFilter();
         Atom root = atomGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         root.setValue("root");
         String rootId = root.getId();

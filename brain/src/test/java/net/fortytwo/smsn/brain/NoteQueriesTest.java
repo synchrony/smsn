@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.json.JsonWriter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
@@ -16,8 +15,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -38,7 +35,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
         Brain brain = new Brain(atomGraph);
         queries = new NoteQueries(brain);
-        filter = new Filter();
+        filter = Filter.noFilter();
     }
 
     @Test
@@ -425,9 +422,31 @@ public class NoteQueriesTest extends BrainTestBase {
         assertNull(one.getPriority());
     }
 
+    @Test
+    public void childAndParentCountsAreCorrect() throws Exception {
+        Filter filter = Filter.noFilter();
+        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
+        Atom root = createAtom("0000000");
+        root.setValue("root");
+        root.setSharability(1.0f);
+        before.setId(root.getId());
+        queries.update(before, 2, filter, style);
+        Note after = queries.view(root, 2, filter, style);
+
+        assertEquals("root", after.getValue());
+        assertEquals(0, after.getNumberOfParents());
+        assertEquals(3, after.getNumberOfChildren());
+
+        Note child = after.getChildren().get(0);
+        assertEquals("this is a public note", child.getValue());
+        assertEquals(1, child.getNumberOfParents());
+        assertEquals(2, child.getNumberOfChildren());
+    }
+
     // TODO: test write behavior w.r.t. sharability filters
     @Test
-    public void testHideNonSharableItems() throws Exception {
+    public void nonSharableItemsAreHidden() throws Exception {
         Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
         NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
@@ -445,11 +464,12 @@ public class NoteQueriesTest extends BrainTestBase {
         assertEquals(0.5f, a2.getSharability());
 
         Note after = queries.view(root, 2, readFilter, style);
-        //writer.writeNotes(after.getChildren(), System.out);
-        assertTrue(after.getHasChildren());
+        Assert.assertEquals(3, after.getNumberOfChildren());
+        Assert.assertEquals(0, after.getNumberOfParents());
         List<Note> children = after.getChildren();
         Note n1 = children.get(0);
-        assertTrue(n1.getHasChildren());
+        Assert.assertEquals(2, n1.getNumberOfChildren());
+        Assert.assertEquals(1, n1.getNumberOfParents());
 
         // This note is "invisible".
         Note n4 = children.get(1);
@@ -457,18 +477,23 @@ public class NoteQueriesTest extends BrainTestBase {
         assertNull(n4.getValue());
         // This note has a child, but we can't see it.
         assertEquals(0, n4.getChildren().size());
-        // We can't even see whether the node has children or not.
-        assertFalse(n4.getHasChildren());
+        // We can't even count the parents or children.
+        Assert.assertEquals(0, n4.getNumberOfChildren());
+        Assert.assertEquals(0, n4.getNumberOfParents());
 
         Note n5 = children.get(2);
-        assertFalse(n5.getHasChildren());
+        // children exist, but are not visible
+        Assert.assertEquals(0, n5.getNumberOfChildren());
+        Assert.assertEquals(1, n5.getNumberOfParents());
 
         List<Note> grandChildren = n1.getChildren();
         assertEquals(2, grandChildren.size());
         Note n2 = grandChildren.get(0);
-        assertFalse(n2.getHasChildren());
+        Assert.assertEquals(0, n2.getNumberOfChildren());
+        Assert.assertEquals(0, n2.getNumberOfParents());
         Note n3 = grandChildren.get(1);
-        assertFalse(n3.getHasChildren());
+        Assert.assertEquals(0, n3.getNumberOfChildren());
+        Assert.assertEquals(1, n3.getNumberOfParents());
         assertNull(n2.getValue());
         assertEquals("this is a public child of a public note", n3.getValue());
     }

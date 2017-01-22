@@ -1,8 +1,6 @@
 package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.json.JsonFormat;
-import net.fortytwo.smsn.brain.io.json.JsonWriter;
 import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Note;
 import org.json.JSONArray;
@@ -11,9 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class JsonWriterTest {
     private WikiReader wikiReader;
@@ -27,30 +23,34 @@ public class JsonWriterTest {
 
     @Test
     public void jsonOutputIsNormal() throws Exception {
-        Note n = wikiReader.parse("" +
+        Note note = wikiReader.parse("" +
                 "* foo\n" +
                 "   * bar\n" +
                 "   * quux\n");
 
-        JSONObject j = jsonWriter.toJson(n);
+        JSONObject j = jsonWriter.toJson(note);
 
-        assertTrue(j.getBoolean(JsonFormat.HAS_CHILDREN));
+        assertEquals(0, j.getInt(JsonFormat.NUMBER_OF_CHILDREN));
+        assertEquals(0, j.getInt(JsonFormat.NUMBER_OF_PARENTS));
         JSONArray c = j.getJSONArray(JsonFormat.CHILDREN);
         assertEquals(1, c.length());
 
         JSONObject n1 = c.getJSONObject(0);
-        assertTrue(n1.getBoolean(JsonFormat.HAS_CHILDREN));
+        assertEquals(0, n1.getInt(JsonFormat.NUMBER_OF_CHILDREN));
+        assertEquals(0, n1.getInt(JsonFormat.NUMBER_OF_PARENTS));
         assertEquals("foo", n1.getString(SemanticSynchrony.VALUE));
         JSONArray c1 = n1.getJSONArray(JsonFormat.CHILDREN);
         assertEquals(2, c1.length());
 
         JSONObject n2 = c1.getJSONObject(0);
-        assertFalse(n2.getBoolean(JsonFormat.HAS_CHILDREN));
+        assertEquals(0, n2.getInt(JsonFormat.NUMBER_OF_CHILDREN));
+        assertEquals(0, n2.getInt(JsonFormat.NUMBER_OF_PARENTS));
         assertEquals("bar", n2.getString(SemanticSynchrony.VALUE));
         assertNull(n2.optJSONArray(JsonFormat.CHILDREN));
 
         JSONObject n3 = c1.getJSONObject(1);
-        assertFalse(n3.getBoolean(JsonFormat.HAS_CHILDREN));
+        assertEquals(0, n3.getInt(JsonFormat.NUMBER_OF_CHILDREN));
+        assertEquals(0, n3.getInt(JsonFormat.NUMBER_OF_PARENTS));
         assertEquals("quux", n3.getString(SemanticSynchrony.VALUE));
         assertNull(n3.optJSONArray(JsonFormat.CHILDREN));
     }

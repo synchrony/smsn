@@ -10,7 +10,8 @@ public class Note {
     public static final String CLEARME_VALUE = "_";
 
     private final List<Note> children;
-    private boolean hasChildren;
+    private int numberOfChildren;
+    private int numberOfParents;
     private String value;
     private String id;
     private Float weight;
@@ -37,7 +38,8 @@ public class Note {
         this.created = copy.created;
         this.alias = copy.alias;
 
-        this.hasChildren = copy.hasChildren;
+        this.numberOfChildren = copy.numberOfChildren;
+        this.numberOfParents = copy.numberOfParents;
         //this.type = copy.type;
         this.meta = copy.meta;
 
@@ -159,7 +161,22 @@ public class Note {
         }
 
         children.add(child);
-        hasChildren = true;
+    }
+
+    public int getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
+    public void setNumberOfChildren(int numberOfChildren) {
+        this.numberOfChildren = numberOfChildren;
+    }
+
+    public int getNumberOfParents() {
+        return numberOfParents;
+    }
+
+    public void setNumberOfParents(int numberOfParents) {
+        this.numberOfParents = numberOfParents;
     }
 
     @Override
@@ -167,15 +184,7 @@ public class Note {
         return "note[" + (null == id ? "null" : id) + "]";
     }
 
-    public boolean getHasChildren() {
-        return hasChildren;
-    }
-
-    public void setHasChildren(final boolean b) {
-        hasChildren = b;
-    }
-
-    // note: deliberately leaves hasChildren unaffected
+    // note: deliberately leaves numberOfChildren and numberOfParents unaffected
     public void truncate(final int depth) {
         if (depth <= 1) {
             children.clear();
