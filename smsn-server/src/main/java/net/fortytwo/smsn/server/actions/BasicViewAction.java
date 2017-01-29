@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.server.actions;
 
-import javax.validation.constraints.NotNull;
+import net.fortytwo.smsn.brain.NoteQueries;
 
 public abstract class BasicViewAction extends FilteredAction {
     private int height;
-    @NotNull
-    private String style;
+
+    private String style = NoteQueries.forwardViewStyle.getName();
 
     public BasicViewAction() {
         super();
