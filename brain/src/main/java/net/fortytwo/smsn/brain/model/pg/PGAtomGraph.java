@@ -244,7 +244,7 @@ public class PGAtomGraph implements AtomGraph {
 
     private String valueToAcronym(final String value) {
         // index only short, name-like values, avoiding free-form text if possible
-        if (value.length() <= 100) {
+        if (null != value && value.length() <= 100) {
             String clean = cleanForAcronym(value);
             StringBuilder acronym = new StringBuilder();
             boolean isInside = false;
