@@ -5,6 +5,8 @@ SmSn 1.3 SNAPSHOT
 ----------------------------------------
 SmSn 1.3.0 (NOT YET RELEASED)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Added parent and child counts to each atom in a view
+* Added transaction buffering support for graph import
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SmSn 1.2 (Into the Future)
