@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
-import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Note;
 import org.junit.Before;
 import org.junit.Test;
