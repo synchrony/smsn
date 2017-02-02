@@ -6,7 +6,7 @@ import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
@@ -50,7 +50,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                     return null;
                 } else if (sync) {
                     try {
-                        n = client.view(n, height, filter, NoteQueries.forwardViewStyle, false);
+                        n = client.view(n, height, filter, TreeViews.forwardViewStyle, false);
                     } catch (BrainClient.BrainClientException e) {
                         throw new RippleException(e);
                     }

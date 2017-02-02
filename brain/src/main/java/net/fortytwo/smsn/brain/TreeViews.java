@@ -21,9 +21,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class NoteQueries {
+public class TreeViews {
 
-    protected static final Logger logger = Logger.getLogger(NoteQueries.class.getName());
+    protected static final Logger logger = Logger.getLogger(TreeViews.class.getName());
 
     public enum QueryType {
         FullText, Acronym, Shortcut, Ripple
@@ -35,7 +35,7 @@ public class NoteQueries {
     /**
      * @param brain the Extend-o-Brain instance to query and update
      */
-    public NoteQueries(final Brain brain) {
+    public TreeViews(final Brain brain) {
         Preconditions.checkArgNotNull(brain, "brain");
 
         this.brain = brain;

@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.latex;
 
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Atom;
@@ -69,7 +69,7 @@ public class LatexWriter extends BrainWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Atom child : NoteQueries.forwardViewStyle.getLinked(root, filter)) {
+                    for (Atom child : TreeViews.forwardViewStyle.getLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }

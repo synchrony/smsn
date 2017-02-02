@@ -1,14 +1,13 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonReader;
 import net.fortytwo.smsn.brain.io.json.JsonWriter;
 import net.fortytwo.smsn.brain.io.wiki.WikiReader;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -25,12 +24,12 @@ public class RequestParams {
     private Integer maxResults;
     private String propertyName;
     private Object propertyValue;
-    private NoteQueries queries;
+    private TreeViews queries;
     private String query;
-    private NoteQueries.QueryType queryType;
+    private TreeViews.QueryType queryType;
     private Atom root;
     private String rootId;
-    private NoteQueries.ViewStyle style;
+    private TreeViews.ViewStyle style;
     private String styleName;
     private Integer valueCutoff;
     private String view;
@@ -134,11 +133,11 @@ public class RequestParams {
         this.propertyValue = propertyValue;
     }
 
-    public NoteQueries getQueries() {
+    public TreeViews getQueries() {
         return queries;
     }
 
-    public void setQueries(NoteQueries queries) {
+    public void setQueries(TreeViews queries) {
         this.queries = queries;
     }
 
@@ -150,11 +149,11 @@ public class RequestParams {
         this.query = query;
     }
 
-    public NoteQueries.QueryType getQueryType() {
+    public TreeViews.QueryType getQueryType() {
         return queryType;
     }
 
-    public void setQueryType(NoteQueries.QueryType queryType) {
+    public void setQueryType(TreeViews.QueryType queryType) {
         this.queryType = queryType;
     }
 
@@ -174,11 +173,11 @@ public class RequestParams {
         this.rootId = rootId;
     }
 
-    public NoteQueries.ViewStyle getStyle() {
+    public TreeViews.ViewStyle getStyle() {
         return style;
     }
 
-    public void setStyle(NoteQueries.ViewStyle style) {
+    public void setStyle(TreeViews.ViewStyle style) {
         this.style = style;
     }
 

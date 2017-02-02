@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import org.w3c.dom.Document;
@@ -100,12 +100,12 @@ public class FreeplaneReader extends BrainReader {
         int maxHeight = 1000;
 
         Brain brain = new Brain(destGraph);
-        NoteQueries queries = new NoteQueries(brain);
+        TreeViews queries = new TreeViews(brain);
         Filter filter = Filter.noFilter();
 
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
-        queries.update(rootNote, maxHeight, filter, NoteQueries.forwardViewStyle);
+        queries.update(rootNote, maxHeight, filter, TreeViews.forwardViewStyle);
 
         addToIndices(atom, destGraph);
     }

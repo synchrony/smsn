@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 
 public abstract class BasicViewAction extends FilteredAction {
     private int height;
 
-    private String style = NoteQueries.forwardViewStyle.getName();
+    private String style = TreeViews.forwardViewStyle.getName();
 
     public BasicViewAction() {
         super();

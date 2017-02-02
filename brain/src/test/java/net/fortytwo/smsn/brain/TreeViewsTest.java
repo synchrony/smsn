@@ -19,9 +19,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class NoteQueriesTest extends BrainTestBase {
+public class TreeViewsTest extends BrainTestBase {
     private final JsonWriter jsonWriter = new JsonWriter();
-    private NoteQueries queries;
+    private TreeViews queries;
     private Filter filter;
 
     @Override
@@ -34,13 +34,13 @@ public class NoteQueriesTest extends BrainTestBase {
         super.setUp();
 
         Brain brain = new Brain(atomGraph);
-        queries = new NoteQueries(brain);
+        queries = new TreeViews(brain);
         filter = Filter.noFilter();
     }
 
     @Test
     public void testEncoding() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
 
         Atom root = createAtom("11111");
         assertEquals("11111", root.getId());
@@ -76,7 +76,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testUpdateRecursion() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setValue("root");
         Note rootNote;
@@ -189,7 +189,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testPathologicalUpdateWithCycles() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("0000000");
         root.setValue("root");
         Note rootNote, child, grandChild;
@@ -341,7 +341,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testUpdateSharabilityOrWeight() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setValue("root");
         Note rootNote;
@@ -369,7 +369,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testUpdateAlias() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setValue("root");
         Note rootNote;
@@ -395,7 +395,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testUpdatePriority() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("0000000");
         root.setValue("root");
         Note rootNote;
@@ -425,7 +425,7 @@ public class NoteQueriesTest extends BrainTestBase {
     @Test
     public void childAndParentCountsAreCorrect() throws Exception {
         Filter filter = Filter.noFilter();
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
         root.setValue("root");
@@ -449,7 +449,7 @@ public class NoteQueriesTest extends BrainTestBase {
     public void nonSharableItemsAreHidden() throws Exception {
         Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
@@ -500,7 +500,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
 
         String before = "* :001: one\n" +
                 "* :002: two\n" +
@@ -542,7 +542,7 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testAddOnlyUpdate() throws Exception {
-        NoteQueries.ViewStyle style = NoteQueries.forwardAddOnlyViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardAddOnlyViewStyle;
 
         String before = "* :001: one\n" +
                 "* :002: two\n" +
@@ -583,41 +583,41 @@ public class NoteQueriesTest extends BrainTestBase {
 
     @Test
     public void testFindRootsAndIsolatedAtoms() throws Exception {
-        assertEquals(0, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
-        assertEquals(0, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
+        assertEquals(0, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
+        assertEquals(0, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom0 = atomGraph.createAtomWithProperties(filter, "000");
         atom0.setValue("0");
 
-        assertEquals(1, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
-        assertEquals(1, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom1 = atomGraph.createAtomWithProperties(filter, "001");
         atom1.setValue("1");
 
-        assertEquals(2, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(2, queries.findIsolatedAtoms(filter).getChildren().size());
 
         atom0.addChildAt(atom1, 0);
 
-        assertEquals(1, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
-        assertEquals(1, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom2 = atomGraph.createAtomWithProperties(filter, "002");
         atom2.setValue("2");
 
-        assertEquals(2, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
         atom0.addChildAt(atom2, 0);
 
-        assertEquals(1, queries.findRootAtoms(filter, NoteQueries.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, NoteQueries.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
     }
 

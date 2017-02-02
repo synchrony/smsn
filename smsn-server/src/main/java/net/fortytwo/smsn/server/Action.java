@@ -2,8 +2,8 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.NoteHistory;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.History;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.io.json.JsonReader;
 import net.fortytwo.smsn.brain.io.json.JsonWriter;
@@ -44,7 +44,7 @@ public abstract class Action {
     private static final Map<Graph, Brain> brains = new HashMap<>();
     private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
 
-    private static final NoteHistory noteHistory = new NoteHistory();
+    private static final History history = new History();
 
     @NotNull
     private String action;
@@ -134,12 +134,12 @@ public abstract class Action {
     }
 
     protected void addToHistory(final String rootId) {
-        noteHistory.visit(rootId);
+        history.visit(rootId);
     }
 
     protected Iterable<Atom> getHistory(final AtomGraph graph,
                                         final Filter filter) {
-        return noteHistory.getHistory(100, graph, filter);
+        return history.getHistory(100, graph, filter);
     }
 
     private void wrapTransactionAndExceptions(final RequestParams params) {
@@ -202,7 +202,7 @@ public abstract class Action {
     }
 
     private void setIO(final RequestParams params) {
-        params.setQueries(new NoteQueries(params.getBrain()));
+        params.setQueries(new TreeViews(params.getBrain()));
         params.setWikiReader(new WikiReader());
         params.setJsonReader(new JsonReader());
         params.setJsonWriter(new JsonWriter());
@@ -272,7 +272,7 @@ public abstract class Action {
         String styleName = params.getStyleName();
 
         if (null != styleName) {
-            params.setStyle(NoteQueries.lookupStyle(styleName));
+            params.setStyle(TreeViews.lookupStyle(styleName));
             params.getMap().put(Params.STYLE, params.getStyle().getName());
         }
     }

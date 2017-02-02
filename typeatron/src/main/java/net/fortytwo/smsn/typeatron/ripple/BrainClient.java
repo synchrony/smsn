@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.io.json.JsonReader;
 import net.fortytwo.smsn.brain.io.json.JsonWriter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.IOUtils;
@@ -110,7 +110,7 @@ public class BrainClient {
     public Note view(final Note root,
                      final int height,
                      final Filter filter,
-                     final NoteQueries.ViewStyle style,
+                     final TreeViews.ViewStyle style,
                      final boolean includeTypes) throws BrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
@@ -177,7 +177,7 @@ public class BrainClient {
     public void update(final Note root,
                        final int height,
                        final Filter filter,
-                       final NoteQueries.ViewStyle style) throws BrainClientException {
+                       final TreeViews.ViewStyle style) throws BrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -278,11 +278,11 @@ public class BrainClient {
      * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */
-    public List<Note> search(final NoteQueries.QueryType queryType,
+    public List<Note> search(final TreeViews.QueryType queryType,
                              final String query,
                              final int height,
                              final Filter filter,
-                             final NoteQueries.ViewStyle style) throws BrainClientException {
+                             final TreeViews.ViewStyle style) throws BrainClientException {
         if (null == queryType || null == query || 0 == query.length()
                 || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();

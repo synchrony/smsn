@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class BrainTestBase {
 
-    protected NoteQueries queries;
+    protected TreeViews queries;
     protected AtomGraph atomGraph;
     protected final WikiReader wikiReader = new WikiReader();
 
@@ -53,7 +53,7 @@ public abstract class BrainTestBase {
     public void setUp() throws Exception {
         atomGraph = createAtomGraph();
         Brain brain = new Brain(atomGraph);
-        queries = new NoteQueries(brain);
+        queries = new TreeViews(brain);
         filter = Filter.noFilter();
     }
 
@@ -70,7 +70,7 @@ public abstract class BrainTestBase {
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        NoteQueries.ViewStyle style = NoteQueries.forwardViewStyle;
+        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
 
         Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());

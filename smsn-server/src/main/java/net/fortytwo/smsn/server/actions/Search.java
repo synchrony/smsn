@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -18,11 +18,11 @@ public class Search extends BasicViewAction {
     @NotNull
     private String query;
     @NotNull
-    private NoteQueries.QueryType queryType;
+    private TreeViews.QueryType queryType;
 
     private int valueCutoff = 100;
 
-    public NoteQueries.QueryType getQueryType() {
+    public TreeViews.QueryType getQueryType() {
         return queryType;
     }
 
@@ -37,7 +37,7 @@ public class Search extends BasicViewAction {
         this.query = query;
     }
 
-    public void setQueryType(NoteQueries.QueryType queryType) {
+    public void setQueryType(TreeViews.QueryType queryType) {
         this.queryType = queryType;
     }
 
@@ -64,7 +64,7 @@ public class Search extends BasicViewAction {
         p.getJsonWriter().setValueLengthCutoff(p.getValueCutoff());
 
         try {
-            if (p.getQueryType().equals(NoteQueries.QueryType.Ripple)) {
+            if (p.getQueryType().equals(TreeViews.QueryType.Ripple)) {
                 addRippleResults(p);
             } else {
                 addSearchResults(p);

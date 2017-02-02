@@ -7,13 +7,13 @@ import net.fortytwo.smsn.brain.model.Filter;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class NoteHistory {
+public class History {
     private static final int CAPACITY = 1000;
 
     private final String[] visitedAtoms;
     private int totalVisits;
 
-    public NoteHistory() {
+    public History() {
         this.visitedAtoms = new String[CAPACITY];
         totalVisits = 0;
     }
