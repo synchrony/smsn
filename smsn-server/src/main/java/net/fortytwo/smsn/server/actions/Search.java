@@ -61,7 +61,7 @@ public class Search extends BasicViewAction {
 
     @Override
     protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
-        params.getJsonPrinter().setValueLengthCutoff(params.getValueCutoff());
+        params.getJsonPrinter().setTitleLengthCutoff(params.getValueCutoff());
 
         try {
             if (params.getQueryType().equals(TreeViews.QueryType.Ripple)) {

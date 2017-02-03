@@ -60,16 +60,37 @@ public class JsonPrinterTest {
         Note n = wikiParser.parse("" +
                 "* this is a long line (well, not really)\n");
 
-        int before = jsonPrinter.getValueLengthCutoff();
+        int before = jsonPrinter.getTitleLengthCutoff();
         try {
-            jsonPrinter.setValueLengthCutoff(10);
+            jsonPrinter.setTitleLengthCutoff(10);
 
             JSONObject j = jsonPrinter.toJson(n);
 
             assertEquals("this is a  [...]",
                     j.getJSONArray(JsonFormat.CHILDREN).getJSONObject(0).getString(SemanticSynchrony.TITLE));
         } finally {
-            jsonPrinter.setValueLengthCutoff(before);
+            jsonPrinter.setTitleLengthCutoff(before);
         }
+    }
+
+    @Test
+    public void noPageGivesNoPageAttribute() throws Exception {
+        Note n = new Note();
+        n.setTitle("Arthur Dent");
+
+        JSONObject j = jsonPrinter.toJson(n);
+        assertEquals("Arthur Dent", j.getString(SemanticSynchrony.TITLE));
+        assertNull(j.opt(SemanticSynchrony.PAGE));
+    }
+
+    @Test
+    public void pageGivesPageAttribute() throws Exception {
+        Note n = new Note();
+        n.setTitle("Arthur Dent");
+        n.setPage("12345");
+
+        JSONObject j = jsonPrinter.toJson(n);
+        assertEquals("Arthur Dent", j.getString(SemanticSynchrony.TITLE));
+        assertEquals("12345", j.getString(SemanticSynchrony.PAGE));
     }
 }

@@ -10,14 +10,14 @@ import java.io.IOException;
 
 public class JsonPrinter {
 
-    private int valueLengthCutoff = -1;
+    private int titleLengthCutoff = -1;
 
-    public int getValueLengthCutoff() {
-        return valueLengthCutoff;
+    public int getTitleLengthCutoff() {
+        return titleLengthCutoff;
     }
 
-    public void setValueLengthCutoff(int valueLengthCutoff) {
-        this.valueLengthCutoff = valueLengthCutoff;
+    public void setTitleLengthCutoff(int titleLengthCutoff) {
+        this.titleLengthCutoff = titleLengthCutoff;
     }
 
     public JSONObject toJson(final Note n) throws IOException {
@@ -43,11 +43,15 @@ public class JsonPrinter {
             json.put(SemanticSynchrony.PRIORITY, priority);
         }
 
-        String value = note.getTitle();
-        if (value != null && valueLengthCutoff > 0 && value.length() > valueLengthCutoff) {
-            value = value.substring(0, valueLengthCutoff) + JsonFormat.VALUE_TRUNCATOR;
+        String title = note.getTitle();
+        if (title != null && titleLengthCutoff > 0 && title.length() > titleLengthCutoff) {
+            title = title.substring(0, titleLengthCutoff) + JsonFormat.VALUE_TRUNCATOR;
         }
-        json.put(SemanticSynchrony.TITLE, value);
+        json.put(SemanticSynchrony.TITLE, title);
+
+        if (null != note.getPage()) {
+            json.put(SemanticSynchrony.PAGE, note.getPage());
+        }
 
         if (null != note.getAlias()) {
             json.put(SemanticSynchrony.ALIAS, note.getAlias());
