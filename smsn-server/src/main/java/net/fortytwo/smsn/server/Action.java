@@ -263,7 +263,7 @@ public abstract class Action {
     }
 
     private void setTitle(final RequestParams params) {
-        params.getMap().put(Params.TITLE, null == params.getRoot()
+        params.getMap().put(Params.VIEW_TITLE, null == params.getRoot()
                 || null == params.getRoot().getTitle()
                 || 0 == params.getRoot().getTitle().length() ? "[no title]" : params.getRoot().getTitle());
     }

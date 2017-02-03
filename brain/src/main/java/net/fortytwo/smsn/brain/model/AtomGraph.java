@@ -23,7 +23,7 @@ public interface AtomGraph {
 
     List<Atom> getAtomsByShortcut(String shortcut, Filter filter);
 
-    List<Atom> getAtomsByValueQuery(String value, Filter filter);
+    List<Atom> getAtomsByTitleQuery(String value, Filter filter);
 
     String idOfAtom(Atom a);
 

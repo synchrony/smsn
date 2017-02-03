@@ -20,7 +20,7 @@ public class Search extends BasicViewAction {
     @NotNull
     private TreeViews.QueryType queryType;
 
-    private int valueCutoff = 100;
+    private int titleCutoff = 100;
 
     public TreeViews.QueryType getQueryType() {
         return queryType;
@@ -41,12 +41,12 @@ public class Search extends BasicViewAction {
         this.queryType = queryType;
     }
 
-    public int getValueCutoff() {
-        return valueCutoff;
+    public int getTitleCutoff() {
+        return titleCutoff;
     }
 
-    public void setValueCutoff(int valueCutoff) {
-        this.valueCutoff = valueCutoff;
+    public void setTitleCutoff(int titleCutoff) {
+        this.titleCutoff = titleCutoff;
     }
 
     @Override
@@ -56,12 +56,12 @@ public class Search extends BasicViewAction {
         params.setQuery(getQuery());
         params.setStyleName(getStyle());
         params.setFilter(getFilter());
-        params.setValueCutoff(getValueCutoff());
+        params.setTitleCutoff(getTitleCutoff());
     }
 
     @Override
     protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
-        params.getJsonPrinter().setTitleLengthCutoff(params.getValueCutoff());
+        params.getJsonPrinter().setTitleLengthCutoff(params.getTitleCutoff());
 
         try {
             if (params.getQueryType().equals(TreeViews.QueryType.Ripple)) {

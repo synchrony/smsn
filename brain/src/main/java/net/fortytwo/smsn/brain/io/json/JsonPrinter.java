@@ -45,7 +45,7 @@ public class JsonPrinter {
 
         String title = note.getTitle();
         if (title != null && titleLengthCutoff > 0 && title.length() > titleLengthCutoff) {
-            title = title.substring(0, titleLengthCutoff) + JsonFormat.VALUE_TRUNCATOR;
+            title = title.substring(0, titleLengthCutoff) + JsonFormat.TITLE_TRUNCATOR;
         }
         json.put(SemanticSynchrony.TITLE, title);
 

@@ -28,65 +28,65 @@ public class GetAtomsByValueTest extends BrainTestBase {
 
     @Test
     public void nonMatchingValueFails() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Zaphod", filter);
+        result = atomGraph.getAtomsByTitleQuery("Zaphod", filter);
         assertEquals(0, result.size());
     }
 
     @Test
     public void completelyMatchingValueSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Arthur Dent", filter);
+        result = atomGraph.getAtomsByTitleQuery("Arthur Dent", filter);
         assertEquals(1, result.size());
     }
 
     @Test
     public void subsetOfWordsMatchingSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Arthur Beeblebrox", filter);
+        result = atomGraph.getAtomsByTitleQuery("Arthur Beeblebrox", filter);
         assertEquals(1, result.size());
     }
 
     @Test
     public void outOfOrderWordsSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Dent Arthur", filter);
+        result = atomGraph.getAtomsByTitleQuery("Dent Arthur", filter);
         assertEquals(1, result.size());
     }
 
     @Test
     public void partialValueSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Arthur", filter);
+        result = atomGraph.getAtomsByTitleQuery("Arthur", filter);
         assertEquals(1, result.size());
     }
 
     @Test
     public void partialWordFails() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Arth", filter);
+        result = atomGraph.getAtomsByTitleQuery("Arth", filter);
         assertEquals(0, result.size());
     }
 
     @Test
     public void matchingWildcardSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Arth*", filter);
+        result = atomGraph.getAtomsByTitleQuery("Arth*", filter);
         assertEquals(1, result.size());
     }
 
     @Test
     public void nonMatchingWildcardFails() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("Zaph*", filter);
+        result = atomGraph.getAtomsByTitleQuery("Zaph*", filter);
         assertEquals(0, result.size());
     }
 
     @Test
     public void caseInsensitiveMatchSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("ARTHUR Dent", filter);
+        result = atomGraph.getAtomsByTitleQuery("ARTHUR Dent", filter);
         assertEquals(1, result.size());
-        result = atomGraph.getAtomsByValueQuery("aRTHur", filter);
+        result = atomGraph.getAtomsByTitleQuery("aRTHur", filter);
         assertEquals(1, result.size());
-        result = atomGraph.getAtomsByValueQuery("*dENT", filter);
+        result = atomGraph.getAtomsByTitleQuery("*dENT", filter);
         assertEquals(1, result.size());
     }
 
     @Test
     public void quotedExactMatchSucceeds() throws Exception {
-        result = atomGraph.getAtomsByValueQuery("\"Arthur Dent\"", filter);
+        result = atomGraph.getAtomsByTitleQuery("\"Arthur Dent\"", filter);
         assertEquals(1, result.size());
         assertEquals(arthur.getId(), result.iterator().next().getId());
     }

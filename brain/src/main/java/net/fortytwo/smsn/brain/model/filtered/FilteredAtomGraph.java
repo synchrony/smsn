@@ -107,8 +107,8 @@ public class FilteredAtomGraph implements AtomGraph {
     }
 
     @Override
-    public List<Atom> getAtomsByValueQuery(String value, Filter filter) {
-        return wrapAtoms(baseGraph.getAtomsByValueQuery(value, filter));
+    public List<Atom> getAtomsByTitleQuery(String value, Filter filter) {
+        return wrapAtoms(baseGraph.getAtomsByTitleQuery(value, filter));
     }
 
     @Override

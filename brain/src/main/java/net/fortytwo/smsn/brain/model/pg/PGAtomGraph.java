@@ -203,7 +203,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public List<Atom> getAtomsByValueQuery(final String query, final Filter filter) {
+    public List<Atom> getAtomsByTitleQuery(final String query, final Filter filter) {
         return filterAndSort(wrapper.getVerticesByValue(query), filter);
     }
 

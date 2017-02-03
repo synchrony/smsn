@@ -71,8 +71,8 @@ public class WikiParser extends BrainParser {
     }
 
     private void validateLine() throws IOException {
-        if (currentLine.endsWith(JsonFormat.VALUE_TRUNCATOR)) {
-            parseError("line ends with the reserved truncation sequence \"" + JsonFormat.VALUE_TRUNCATOR + "\"");
+        if (currentLine.endsWith(JsonFormat.TITLE_TRUNCATOR)) {
+            parseError("line ends with the reserved truncation sequence \"" + JsonFormat.TITLE_TRUNCATOR + "\"");
         }
     }
 
@@ -262,7 +262,7 @@ public class WikiParser extends BrainParser {
                 if (value.length() > 0) {
                     note.setAlias(value);
                 } else {
-                    note.setAlias(Note.CLEARME_VALUE);
+                    note.setAlias(Note.CLEARME);
                 }
                 break;
             case SemanticSynchrony.CREATED:
@@ -280,7 +280,7 @@ public class WikiParser extends BrainParser {
                 if (value.length() > 0) {
                     note.setShortcut(value);
                 } else {
-                    note.setShortcut(Note.CLEARME_VALUE);
+                    note.setShortcut(Note.CLEARME);
                 }
                 break;
             case SemanticSynchrony.WEIGHT: {

@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.io.Format;
 
 public class JsonFormat extends Format {
 
-    public static final String VALUE_TRUNCATOR = " [...]";
+    public static final String TITLE_TRUNCATOR = " [...]";
 
     public static final String CHILDREN = "children";
     public static final String NUMBER_OF_CHILDREN = "numberOfChildren";

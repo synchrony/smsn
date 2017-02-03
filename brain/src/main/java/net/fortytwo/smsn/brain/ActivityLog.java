@@ -21,10 +21,6 @@ public class ActivityLog {
         log("view", a);
     }
 
-    public void logUpdate(final Atom a) {
-        log("change-value", a);
-    }
-
     public void logSetProperties(final Atom a) {
         log("set-props", a);
     }

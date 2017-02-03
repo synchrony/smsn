@@ -31,7 +31,7 @@ public class RequestParams {
     private String rootId;
     private TreeViews.ViewStyle style;
     private String styleName;
-    private Integer valueCutoff;
+    private Integer titleCutoff;
     private String view;
     private WikiParser wikiParser;
     private JsonParser jsonParser;
@@ -189,12 +189,12 @@ public class RequestParams {
         this.styleName = styleName;
     }
 
-    public Integer getValueCutoff() {
-        return valueCutoff;
+    public Integer getTitleCutoff() {
+        return titleCutoff;
     }
 
-    public void setValueCutoff(Integer valueCutoff) {
-        this.valueCutoff = valueCutoff;
+    public void setTitleCutoff(Integer titleCutoff) {
+        this.titleCutoff = titleCutoff;
     }
 
     public String getView() {

@@ -142,7 +142,7 @@ public class TreeViews {
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getAtomGraph().getAtomsByValueQuery(query, filter);
+                results = brain.getAtomGraph().getAtomsByTitleQuery(query, filter);
                 break;
             case Acronym:
                 results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
@@ -287,7 +287,7 @@ public class TreeViews {
             return 0;
         }
 
-        // If the note is visible, we can see its children (although we will not be able to read the values of any
+        // If the note is visible, we can see its children (although we will not be able to read the titles of any
         // children which are themselves invisible).
         int count = 0;
         for (Atom ignored : style.getLinked(root, filter)) count++;
@@ -502,16 +502,16 @@ public class TreeViews {
         return result;
     }
 
-    private boolean setValue(final Atom target,
-                             final String value) {
-        // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null values.
-        return null != value && target.setTitle(value);
+    private boolean setTitle(final Atom target,
+                             final String title) {
+        // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null titles.
+        return null != title && target.setTitle(title);
     }
 
     private boolean setAlias(final Atom target,
                              final String alias) {
         if (null != alias) {
-            if (alias.equals(Note.CLEARME_VALUE)) {
+            if (alias.equals(Note.CLEARME)) {
                 return target.setAlias(null);
             } else {
                 return target.setAlias(alias);
@@ -524,7 +524,7 @@ public class TreeViews {
     private boolean setShortcut(final Atom target,
                                 final String shortcut) {
         if (null != shortcut) {
-            if (shortcut.equals(Note.CLEARME_VALUE)) {
+            if (shortcut.equals(Note.CLEARME)) {
                 return target.setShortcut(null);
             } else {
                 return target.setShortcut(shortcut);
@@ -560,7 +560,7 @@ public class TreeViews {
 
     private void setProperties(final Atom target,
                                final Note note) throws InvalidGraphException, InvalidUpdateException {
-        boolean changed = setValue(target, note.getTitle())
+        boolean changed = setTitle(target, note.getTitle())
                 | setAlias(target, note.getAlias())
                 | setShortcut(target, note.getShortcut())
                 | setPriority(target, note.getPriority())
@@ -591,7 +591,7 @@ public class TreeViews {
             note.setAlias(atom.getAlias());
             note.setShortcut(atom.getShortcut());
 
-            // The convention for "invisible" notes is to leave the value blank,
+            // The convention for "invisible" notes is to leave the title blank,
             // as well as to avoid displaying any child notes.
             if (isVisible) {
                 note.setTitle(atom.getTitle());

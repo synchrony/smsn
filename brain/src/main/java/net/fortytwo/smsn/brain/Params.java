@@ -26,8 +26,8 @@ public interface Params {
             ROOT = "root",
             STYLE = "style",
             TITLE = "title",
-            VALUE = "value",
-            VALUE_CUTOFF = "valueCutoff",
+            TITLE_CUTOFF = "titleCutoff",
             VIEW = "view",
-            VIEW_FORMAT = "viewFormat";
+            VIEW_FORMAT = "viewFormat",
+            VIEW_TITLE = "title";
 }

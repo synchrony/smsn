@@ -241,7 +241,7 @@ public class BrainClient {
         try {
             requestJson.put(Params.ID, root.getId());
             requestJson.put(Params.NAME, name);
-            requestJson.put(Params.VALUE, value);
+            requestJson.put(Params.TITLE, value);
         } catch (JSONException e) {
             throw new BrainClientException(e);
         }
@@ -295,7 +295,7 @@ public class BrainClient {
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.FILTER, toJson(filter));
             requestJson.put(Params.STYLE, style.getName());
-            requestJson.put(Params.VALUE_CUTOFF, DEFAULT_VALUE_CUTOFF);
+            requestJson.put(Params.TITLE_CUTOFF, DEFAULT_VALUE_CUTOFF);
         } catch (JSONException e) {
             throw new BrainClientException(e);
         }
