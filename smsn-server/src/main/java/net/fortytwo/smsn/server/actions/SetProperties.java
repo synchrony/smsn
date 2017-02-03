@@ -63,7 +63,10 @@ public class SetProperties extends Action {
     private void validateKeyValue() {
         switch (getName()) {
             case SemanticSynchrony.TITLE:
-                validateValue();
+                validateTitle();
+                break;
+            case SemanticSynchrony.PAGE:
+                validatePage();
                 break;
             case SemanticSynchrony.WEIGHT:
                 validateWeight();
@@ -82,10 +85,14 @@ public class SetProperties extends Action {
         }
     }
 
-    private void validateValue() {
+    private void validateTitle() {
         if (((String) getValue()).trim().length() == 0) {
             throw new BadRequestException("empty value");
         }
+    }
+
+    private void validatePage() {
+        // nothing to do; every Markdown page is legal
     }
 
     private void validateWeight() {
@@ -117,11 +124,19 @@ public class SetProperties extends Action {
         }
     }
 
+    private String trimPage(final String page) {
+        String trimmed = page.trim();
+        return 0 == trimmed.length() ? null : trimmed;
+    }
+
     @Override
     protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         switch (params.getPropertyName()) {
             case SemanticSynchrony.TITLE:
                 params.getRoot().setTitle((String) params.getPropertyValue());
+                break;
+            case SemanticSynchrony.PAGE:
+                params.getRoot().setPage(trimPage((String) params.getPropertyValue()));
                 break;
             case SemanticSynchrony.WEIGHT:
                 params.getRoot().setWeight(toFloat(params.getPropertyValue()));

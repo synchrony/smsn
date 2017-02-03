@@ -2,22 +2,33 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.server.errors.BadRequestException;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class SetPropertiesTest extends ActionTestBase {
+    private Atom atom;
 
-    @Test
-    public void valueIsSetCorrectly() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+
         atomGraph.begin();
-        Atom atom = atomGraph.createAtom(null);
+        atom = atomGraph.createAtom(null);
         atom.setTitle("before");
+        atom.setPage("the page");
         atomGraph.commit();
 
         atom = atomGraph.getAtomById(atom.getId());
         assertEquals("before", atom.getTitle());
+        assertEquals("the page", atom.getPage());
+    }
+
+    @Test
+    public void titleIsSetCorrectly() throws Exception {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
@@ -28,6 +39,45 @@ public class SetPropertiesTest extends ActionTestBase {
 
         atom = atomGraph.getAtomById(atom.getId());
         assertEquals("after", atom.getTitle());
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void emptyTitleIsError() throws Exception {
+
+        SetProperties action = new SetProperties();
+        action.setId(atom.getId());
+        action.setName(SemanticSynchrony.TITLE);
+        action.setValue("  \n");
+
+        perform(action);
+    }
+
+    @Test
+    public void pageIsSetCorrectly() throws Exception {
+
+        SetProperties action = new SetProperties();
+        action.setId(atom.getId());
+        action.setName(SemanticSynchrony.PAGE);
+        action.setValue("after");
+
+        perform(action);
+
+        atom = atomGraph.getAtomById(atom.getId());
+        assertEquals("after", atom.getPage());
+    }
+
+    @Test
+    public void emptyPageBecomesNullPage() throws Exception {
+
+        SetProperties action = new SetProperties();
+        action.setId(atom.getId());
+        action.setName(SemanticSynchrony.PAGE);
+        action.setValue("  \n ");
+
+        perform(action);
+
+        atom = atomGraph.getAtomById(atom.getId());
+        assertNull(atom.getPage());
     }
 
     @Test
