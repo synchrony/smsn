@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.wiki.WikiReader;
+import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -25,7 +25,7 @@ public abstract class BrainTestBase {
 
     protected TreeViews queries;
     protected AtomGraph atomGraph;
-    protected final WikiReader wikiReader = new WikiReader();
+    protected final WikiParser wikiParser = new WikiParser();
 
     protected Graph graph;
     protected GraphWrapper graphWrapper;
@@ -65,7 +65,7 @@ public abstract class BrainTestBase {
     }
 
     protected Note importNoteFromFile(final String exampleFile) throws IOException {
-        return wikiReader.parse(Brain.class.getResourceAsStream(exampleFile));
+        return wikiParser.parse(Brain.class.getResourceAsStream(exampleFile));
     }
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {

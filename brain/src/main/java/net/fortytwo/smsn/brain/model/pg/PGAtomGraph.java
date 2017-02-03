@@ -229,7 +229,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     private void updateAcronym(final PGAtom atom, final Vertex asVertex) {
-        String value = atom.getValue();
+        String value = atom.getTitle();
         String acronym = valueToAcronym(value);
 
         VertexProperty<String> previousProperty = asVertex.property(SemanticSynchrony.ACRONYM);
@@ -301,7 +301,7 @@ public class PGAtomGraph implements AtomGraph {
 
             float nativeScore = in.getScore();
             float weight = a.getWeight();
-            String value = a.getValue();
+            String value = a.getTitle();
             float lengthPenalty = Math.min(1.0f, 15.0f/value.length());
             float score = nativeScore * weight * lengthPenalty;
             ranked.add(new Sortable<>(a, score));
@@ -320,14 +320,14 @@ public class PGAtomGraph implements AtomGraph {
         newAtom.setSharability(original.getSharability());
 
         if (filter.isVisible(original)) {
-            newAtom.setValue(original.getValue());
+            newAtom.setTitle(original.getTitle());
             newAtom.setWeight(original.getWeight());
             newAtom.setShortcut(original.getShortcut());
             newAtom.setPriority(original.getPriority());
             newAtom.setAlias(original.getAlias());
             newAtom.setCreated(original.getCreated());
         } else {
-            newAtom.setValue(REDACTED_VALUE);
+            newAtom.setTitle(REDACTED_VALUE);
         }
 
         return newAtom;

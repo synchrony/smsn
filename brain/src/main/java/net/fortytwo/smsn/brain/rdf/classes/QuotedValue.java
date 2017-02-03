@@ -37,7 +37,7 @@ public class QuotedValue extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, SmSnVocabulary.WORDORPHRASE);
 
         // note: a few atoms currently break this pattern, e.g. an atom with the value: "one", "two"
-        String d = a.getValue().substring(1, a.getValue().length() - 1).trim();
+        String d = a.getTitle().substring(1, a.getTitle().length() - 1).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(d)));
 
         return self;

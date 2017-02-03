@@ -24,12 +24,12 @@ public class CreateFilteredGraphTest extends BrainTestBase {
 
         // unfiltered
         Atom root = importAtomFromFile("io/wiki/wiki-example-4.txt");
-        root.setValue("William James");
+        root.setTitle("William James");
         assertEquals(0.5, root.getSharability(), 0);
         assertEquals(23, countAtoms(atomGraph));
         assertEquals(7, root.getNotes().toJavaList().size());
-        assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getValue());
-        assertEquals("William James's depression", root.getNotes().toJavaList().get(3).getValue());
+        assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getTitle());
+        assertEquals("William James's depression", root.getNotes().toJavaList().get(3).getTitle());
         assertEquals(0.75, root.getNotes().toJavaList().get(0).getSharability(), 0);
         assertEquals(0.25, root.getNotes().toJavaList().get(3).getSharability(), 0);
         assertEquals(3, root.getNotes().toJavaList().get(0).getNotes().toJavaList().size());
@@ -43,11 +43,11 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         root = filteredGraph.getAtomById(root.getId());
         assertNotNull(root);
         assertEquals(0.5, root.getSharability(), 0);
-        assertEquals("William James", root.getValue());
+        assertEquals("William James", root.getTitle());
 
         assertEquals(7, root.getNotes().toJavaList().size());
-        assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getValue());
-        assertEquals("", root.getNotes().toJavaList().get(3).getValue());
+        assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getTitle());
+        assertEquals("", root.getNotes().toJavaList().get(3).getTitle());
         assertEquals(0.75, root.getNotes().toJavaList().get(0).getSharability(), 0);
         assertEquals(0.25, root.getNotes().toJavaList().get(3).getSharability(), 0);
         assertEquals(3, root.getNotes().toJavaList().get(0).getNotes().toJavaList().size());

@@ -55,11 +55,11 @@ public class VertexWriter extends BrainWriter {
                     p.print("\t0\t0\t");
                 }
 
-                String value = a.getValue();
+                String value = a.getTitle();
                 if (null == value) {
                     logger.warning("note has null @value: " + a.getId());
                 } else {
-                    p.print(escapeValue(a.getValue()));
+                    p.print(escapeValue(a.getTitle()));
                 }
                 p.print('\t');
 

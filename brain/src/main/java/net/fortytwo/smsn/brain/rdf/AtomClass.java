@@ -85,7 +85,7 @@ public abstract class AtomClass {
             context.getHandler().handleStatement(
                     vf.createStatement(
                             context.getSubjectIri(), FOAF.NICK, vf.createLiteral(
-                                    AKAReference.extractAlias(object.getValue()))));
+                                    AKAReference.extractAlias(object.getTitle()))));
         }
     }
 

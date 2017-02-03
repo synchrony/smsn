@@ -53,6 +53,7 @@ The above header has an invisible link at the end of the line.
 
 ### [Header with embedded link](0-6kATH) and suffix
 
+This is a sentence about [Africa](Hqoj7-0).
 The above header is itself a link, and should be clickable.
 
 # Examples

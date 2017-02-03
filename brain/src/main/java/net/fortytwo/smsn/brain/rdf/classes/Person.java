@@ -71,7 +71,7 @@ public class Person extends AtomClass {
         RDFHandler handler = context.getHandler();
 
         IRI self = handleTypeAndAlias(a, context, FOAF.PERSON);
-        handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getTitle())));
 
         return self;
     }

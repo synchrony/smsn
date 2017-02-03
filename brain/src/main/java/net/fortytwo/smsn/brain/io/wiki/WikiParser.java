@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.io.BrainParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.model.Note;
 
@@ -12,12 +12,13 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 
-public class WikiReader extends NoteReader {
+public class WikiParser extends BrainParser {
 
     private Note root;
     private LinkedList<Note> hierarchy;
     private LinkedList<Integer> indentHierarachy;
     private BufferedReader bufferedReader;
+    private boolean useCanonicalFormat;
 
     private int lineNumber;
     private String currentValue;
@@ -26,26 +27,30 @@ public class WikiReader extends NoteReader {
     private int currentIndentLevel;
     private String currentId;
     private String currentBullet;
-    private boolean currentLineIsInVerbatimBlock;
-    
+    private boolean currentLineIsInPage;
+
+    public void setUseCanonicalFormat(boolean useCanonicalFormat) {
+        this.useCanonicalFormat = useCanonicalFormat;
+    }
+
     @Override
     public Note parse(final InputStream inputStream) throws IOException {
         reset();
         bufferedReader = createReader(inputStream);
 
         while ((currentLine = bufferedReader.readLine()) != null) {
-            parseInternal();
+            parseLine();
         }
 
-        checkNotInVerbatimBlock();
-        
+        if (currentLineIsInPage && !isEmptyPage(currentValue)) {
+            root.getChildren().get(0).setPage(currentValue);
+        }
+
         return root;
     }
 
-    private void checkNotInVerbatimBlock() throws IOException {
-        if (currentLineIsInVerbatimBlock) {
-            parseError("unterminated verbatim block");
-        }
+    private boolean isEmptyPage(final String page) {
+        return page.trim().length() == 0;
     }
 
     private BufferedReader createReader(final InputStream in) throws IOException {
@@ -57,6 +62,7 @@ public class WikiReader extends NoteReader {
         hierarchy = new LinkedList<>();
         indentHierarachy = new LinkedList<>();
         lineNumber = 0;
+        currentLineIsInPage = false;
     }
 
     private void replaceTabsWithSpaces() {
@@ -88,7 +94,7 @@ public class WikiReader extends NoteReader {
     }
 
     private boolean lineIsEmpty() {
-       return 0 == currentLine.trim().length();
+        return 0 == currentLine.trim().length();
     }
 
     private void checkForEmptyValue() throws IOException {
@@ -112,7 +118,7 @@ public class WikiReader extends NoteReader {
     private void parseError(final String message) throws IOException {
         throw new IOException("line " + lineNumber + ": " + message);
     }
-    
+
     private void parseBulletOrPropertyName() throws IOException {
         // parse bullet or property name
         int j = -1;
@@ -166,7 +172,7 @@ public class WikiReader extends NoteReader {
             parseProperty(n, key, currentValue, lineNumber);
         } else {
             Note n = new Note();
-            n.setValue(currentValue);
+            n.setTitle(currentValue);
 
             n.setId(currentId);
 
@@ -181,20 +187,28 @@ public class WikiReader extends NoteReader {
         }
     }
 
-    private void parseInternal() throws IOException {
+    private void parseLine() throws IOException {
         incrementLineNumber();
 
         replaceTabsWithSpaces();
 
-        if (currentLineIsInVerbatimBlock) {
-            parseVerbatimBlockLine();
+        if (currentLineIsInPage) {
+            if (!currentValue.isEmpty()) currentValue += "\n";
+            currentValue += currentLine;
         } else {
-            parseSingleAtomLine();
+            if (lineIsEmpty()) {
+                if (useCanonicalFormat) {
+                    currentLineIsInPage = true;
+                    currentValue = "";
+                }
+            } else {
+                parseStructuredLine();
+            }
         }
     }
 
-    private void parseSingleAtomLine() throws IOException {
-        if (lineIsEmpty()) return;
+    private void parseStructuredLine() throws IOException {
+
 
         findIndentLevel();
 
@@ -204,26 +218,11 @@ public class WikiReader extends NoteReader {
 
         parseId();
 
-        if (currentLine.trim().equals(WikiFormat.VERBATIM_BLOCK_START)) {
-            currentValue = "";
-            currentLineIsInVerbatimBlock = true;
-        } else {
-            validateLine();
+        validateLine();
 
-            parseNormalValue();
+        parseNormalValue();
 
-            constructNote();
-        }
-    }
-
-    private void parseVerbatimBlockLine() throws IOException {
-        if (currentLine.trim().equals(WikiFormat.VERBATIM_BLOCK_END)) {
-            currentLineIsInVerbatimBlock = false;
-            constructNote();
-        } else {
-            if (currentValue.length() > 0) currentValue += "\n";
-            currentValue += currentLine;
-        }
+        constructNote();
     }
 
     private void parseNormalValue() throws IOException {

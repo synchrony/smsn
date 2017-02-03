@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.io.wiki.WikiReader;
+import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class VCSReader extends BrainReader {
     public enum OverwritePolicy {Preserve, Replace}
 
-    private final WikiReader reader = new WikiReader();
+    private final WikiParser reader = new WikiParser();
 
     private final OverwritePolicy policy = OverwritePolicy.Replace;
 
@@ -98,10 +98,11 @@ public class VCSReader extends BrainReader {
         private void updateAtomProperties() {
             updateProperty(atom, note, Atom::getAlias, Note::getAlias, Atom::setAlias);
             updateProperty(atom, note, Atom::getCreated, Note::getCreated, Atom::setCreated);
+            updateProperty(atom, note, Atom::getPage, Note::getPage, Atom::setPage);
             updateProperty(atom, note, Atom::getPriority, Note::getPriority, Atom::setPriority);
             updateProperty(atom, note, Atom::getSharability, Note::getSharability, Atom::setSharability);
             updateProperty(atom, note, Atom::getShortcut, Note::getShortcut, Atom::setShortcut);
-            updateProperty(atom, note, Atom::getValue, Note::getValue, Atom::setValue);
+            updateProperty(atom, note, Atom::getTitle, Note::getTitle, Atom::setTitle);
             updateProperty(atom, note, Atom::getWeight, Note::getWeight, Atom::setWeight);
         }
 

@@ -2,11 +2,9 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.json.JSONException;
 
 import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
@@ -58,14 +56,14 @@ public class UpdateView extends RootedViewAction {
         if (null != params.getView()) {
             try {
                 try (InputStream in = new ByteArrayInputStream(params.getView().getBytes())) {
-                    rootNote = params.getWikiReader().parse(in);
+                    rootNote = params.getWikiParser().parse(in);
                 }
             } catch (IOException e) {
                 throw new RequestProcessingException(e);
             }
         } else if (null != params.getView()) {
             try {
-                rootNote = params.getJsonReader().parse(params.getView());
+                rootNote = params.getJsonParser().parse(params.getView());
             } catch (IOException e) {
                 throw new RequestProcessingException(e);
             }

@@ -22,30 +22,30 @@ public class GetAtomsByIdTest extends BrainTestBase {
         int count = 0;
         for (String id : ids) {
             Atom atom = atomGraph.createAtomWithProperties(filter, id);
-            atom.setValue("atom #" + ++count);
+            atom.setTitle("atom #" + ++count);
         }
 
         for (int i = 0; i < ids.length; i++) {
             Atom atom = atomGraph.getAtomById(ids[i]);
             assertNotNull(atom);
-            assertEquals("atom #" + (i+1), atom.getValue());
+            assertEquals("atom #" + (i+1), atom.getTitle());
         }
     }
 
     @Test
     public void testGetAtoms() throws Exception {
         Atom chaos = atomGraph.createAtomWithProperties(filter, null);
-        chaos.setValue("Chaos");
+        chaos.setTitle("Chaos");
         Atom tartarus = atomGraph.createAtomWithProperties(filter, null);
-        tartarus.setValue("Tartarus");
+        tartarus.setTitle("Tartarus");
         Atom gaia = atomGraph.createAtomWithProperties(filter, null);
-        gaia.setValue("Gaia");
+        gaia.setTitle("Gaia");
         Atom eros = atomGraph.createAtomWithProperties(filter, null);
-        eros.setValue("Eros");
+        eros.setTitle("Eros");
         Atom nyx = atomGraph.createAtomWithProperties(filter, null);
-        nyx.setValue("Nyx");
+        nyx.setTitle("Nyx");
         Atom erebus = atomGraph.createAtomWithProperties(filter, null);
-        erebus.setValue("Erebus");
+        erebus.setTitle("Erebus");
         AtomList children = atomGraph.createAtomList(tartarus, gaia, eros, nyx, erebus);
         chaos.setNotes(children);
 

@@ -111,7 +111,7 @@ public class FreeplaneReader extends BrainReader {
     }
 
     private void setText(Note note, String text) {
-        note.setValue(text);
+        note.setTitle(text);
     }
 
     private String getRichContent(final Element element) {
@@ -291,7 +291,7 @@ public class FreeplaneReader extends BrainReader {
             Note note = styleNotes.get(style);
             if (null == note) {
                 note = new Note();
-                note.setValue(style + " (style)");
+                note.setTitle(style + " (style)");
                 note.setId(SemanticSynchrony.createRandomId());
                 styleNotes.put(style, note);
             }

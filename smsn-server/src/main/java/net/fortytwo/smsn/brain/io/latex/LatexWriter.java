@@ -58,7 +58,7 @@ public class LatexWriter extends BrainWriter {
         }
 
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = root.getValue().trim();
+        String value = root.getTitle().trim();
 
         for (Serializer serializer : serializers) {
             if (serializer.matches(value)) {

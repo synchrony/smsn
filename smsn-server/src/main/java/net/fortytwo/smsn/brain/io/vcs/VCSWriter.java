@@ -3,7 +3,7 @@ package net.fortytwo.smsn.brain.io.vcs;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.io.wiki.WikiWriter;
+import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
@@ -19,7 +19,7 @@ import java.util.List;
 public class VCSWriter extends BrainWriter {
 
     private static final List<Format> formats;
-    private static final WikiWriter wikiWriter = new WikiWriter();
+    private static final WikiPrinter WIKI_PRINTER = new WikiPrinter();
 
     static {
         formats = new LinkedList<>();
@@ -87,9 +87,7 @@ public class VCSWriter extends BrainWriter {
             list = list.getRest();
         }
 
-        List<Note> notes = new LinkedList<>();
-        notes.add(note);
-        wikiWriter.toWikiText(notes, out, true);
+        WIKI_PRINTER.print(note, out, true);
     }
 
     private Note toNote(final Atom atom, final boolean withValueAndProperties) {
@@ -97,7 +95,8 @@ public class VCSWriter extends BrainWriter {
         note.setId(atom.getId());
 
         if (withValueAndProperties) {
-            note.setValue(atom.getValue());
+            note.setTitle(atom.getTitle());
+            note.setPage(atom.getPage());
             note.setAlias(atom.getAlias());
             note.setCreated(atom.getCreated());
             note.setPriority(atom.getPriority());

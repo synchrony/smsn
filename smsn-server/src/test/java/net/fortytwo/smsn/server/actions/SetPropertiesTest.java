@@ -13,28 +13,28 @@ public class SetPropertiesTest extends ActionTestBase {
     public void valueIsSetCorrectly() throws Exception {
         atomGraph.begin();
         Atom atom = atomGraph.createAtom(null);
-        atom.setValue("before");
+        atom.setTitle("before");
         atomGraph.commit();
 
         atom = atomGraph.getAtomById(atom.getId());
-        assertEquals("before", atom.getValue());
+        assertEquals("before", atom.getTitle());
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.VALUE);
+        action.setName(SemanticSynchrony.TITLE);
         action.setValue("after");
 
         perform(action);
 
         atom = atomGraph.getAtomById(atom.getId());
-        assertEquals("after", atom.getValue());
+        assertEquals("after", atom.getTitle());
     }
 
     @Test
     public void weightIsSetCorrectly() throws Exception {
         atomGraph.begin();
         Atom atom = atomGraph.createAtom(null);
-        atom.setValue("test");
+        atom.setTitle("test");
         atom.setWeight(0.25f);
         atomGraph.commit();
 
@@ -56,7 +56,7 @@ public class SetPropertiesTest extends ActionTestBase {
     public void sharabilityIsSetCorrectly() throws Exception {
         atomGraph.begin();
         Atom atom = atomGraph.createAtom(null);
-        atom.setValue("test");
+        atom.setTitle("test");
         atom.setSharability(0.25f);
         atomGraph.commit();
 
@@ -78,7 +78,7 @@ public class SetPropertiesTest extends ActionTestBase {
     public void priorityIsSetCorrectly() throws Exception {
         atomGraph.begin();
         Atom atom = atomGraph.createAtom(null);
-        atom.setValue("test");
+        atom.setTitle("test");
         atom.setPriority(0.25f);
         atomGraph.commit();
 
@@ -100,7 +100,7 @@ public class SetPropertiesTest extends ActionTestBase {
     public void shortcutIsSetCorrectly() throws Exception {
         atomGraph.begin();
         Atom atom = atomGraph.createAtom(null);
-        atom.setValue("test");
+        atom.setTitle("test");
         atomGraph.commit();
 
         atom = atomGraph.getAtomById(atom.getId());

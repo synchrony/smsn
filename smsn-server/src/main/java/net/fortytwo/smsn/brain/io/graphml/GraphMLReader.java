@@ -34,7 +34,7 @@ public class GraphMLReader extends BrainReader {
 
     private void addAllToIndices(AtomGraph destGraph) {
         for (Atom a : destGraph.getAllAtoms()) {
-            String value = a.getValue();
+            String value = a.getTitle();
             if (null != value) destGraph.reindexAtom(a);
         }
     }

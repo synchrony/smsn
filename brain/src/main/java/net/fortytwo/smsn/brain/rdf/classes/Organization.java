@@ -54,7 +54,7 @@ public class Organization extends AtomClass {
 
         IRI self = handleTypeAndAlias(a, context, FOAF.ORGANIZATION);
 
-        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getTitle())));
 
         return self;
     }

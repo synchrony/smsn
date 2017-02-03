@@ -81,7 +81,7 @@ public class Document extends AtomClass {
         // TODO: a more specific type than foaf:Document may be appropriate (WebPage also uses foaf:Document)
         IRI self = handleTypeAndAlias(a, context, FOAF.DOCUMENT);
 
-        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getTitle())));
 
         return self;
     }
@@ -89,7 +89,7 @@ public class Document extends AtomClass {
     private static class ISBNHandler implements FieldHandler {
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            String value = object.getValue();
+            String value = object.getTitle();
             IRI predicate;
 
             int i = value.indexOf(':');
@@ -128,7 +128,7 @@ public class Document extends AtomClass {
         // TODO: we no longer use this inline format
         @Override
         public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            String entry = object.getValue().trim();
+            String entry = object.getTitle().trim();
 
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(

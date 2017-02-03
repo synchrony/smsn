@@ -50,7 +50,7 @@ public class SetAtomValueMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't set @value of non-atom: " + no);
         } else {
-            setProperty(n, SemanticSynchrony.VALUE, value);
+            setProperty(n, SemanticSynchrony.TITLE, value);
 
             // put the atom back on the stack
             solutions.accept(stack.push(n));

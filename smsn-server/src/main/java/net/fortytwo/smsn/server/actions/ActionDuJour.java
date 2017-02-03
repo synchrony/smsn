@@ -21,15 +21,32 @@ public class ActionDuJour extends Action {
     @Override
     protected void performTransaction(RequestParams params) throws BadRequestException, RequestProcessingException {
         AtomGraph graph = params.getBrain().getAtomGraph();
-        checkForProblematicMultiLineAtoms(graph);
+        if (!hasProblematicMultiLineAtoms(graph)) {
+            migrateAtoms(graph);
+        }
     }
 
-    private void checkForProblematicMultiLineAtoms(final AtomGraph graph) {
+    private void migrateAtoms(final AtomGraph graph) {
+        int countMigrated = 0;
+        for (Atom atom : graph.getAllAtoms()) {
+            if (countValueLines(atom) > 1) {
+                atom.setPage(atom.getTitle());
+                atom.setTitle("RenameMe");
+                countMigrated++;
+            }
+        }
+        logger.info("migrated " + countMigrated + " topic nodes");
+    }
+
+    private boolean hasProblematicMultiLineAtoms(final AtomGraph graph) {
+        boolean problems = false;
         for (Atom atom : graph.getAllAtoms()) {
             if (isProblematicMultiLineAtom(atom)) {
                 System.out.println("atom cannot be migrated: " + atom.getId() + " (" + getValue(atom) + ")");
+                problems = true;
             }
         }
+        return problems;
     }
 
     private boolean isProblematicMultiLineAtom(final Atom atom) {
@@ -37,7 +54,7 @@ public class ActionDuJour extends Action {
     }
 
     private int countValueLines(final Atom atom) {
-        String value = atom.getValue();
+        String value = atom.getTitle();
         if (null == value) {
             logger.warning("atom with null value: " + atom.getId());
             return 0;
@@ -47,7 +64,7 @@ public class ActionDuJour extends Action {
     }
 
     private String getValue(final Atom atom) {
-        String value = atom.getValue();
+        String value = atom.getTitle();
         return value.length() > 30 ? value.substring(0,25) + "[...]" : value;
     }
 

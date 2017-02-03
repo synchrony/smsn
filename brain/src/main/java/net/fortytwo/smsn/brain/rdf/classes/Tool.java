@@ -67,7 +67,7 @@ public class Tool extends AtomClass {
         RDFHandler handler = context.getHandler();
 
         IRI self = handleTypeAndAlias(a, context, OWL.THING);
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getTitle())));
 
         return self;
     }

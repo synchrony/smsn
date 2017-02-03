@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.io.json.JsonWriter;
+import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class TreeViewsTest extends BrainTestBase {
-    private final JsonWriter jsonWriter = new JsonWriter();
+    private final JsonPrinter jsonPrinter = new JsonPrinter();
     private TreeViews queries;
     private Filter filter;
 
@@ -49,9 +49,9 @@ public class TreeViewsTest extends BrainTestBase {
         Note rootNote = new Note();
         rootNote.setId(root.getId());
         //superRoot.addChild(rootNote);
-        rootNote.setValue("foo");
+        rootNote.setTitle("foo");
         Note child = new Note();
-        child.setValue("cheval \u00e0 phynances");
+        child.setTitle("cheval \u00e0 phynances");
         rootNote.addChild(child);
         assertNull(child.getWeight());
         assertNull(child.getSharability());
@@ -65,20 +65,20 @@ public class TreeViewsTest extends BrainTestBase {
         Note after = queries.view(root, 1, filter, style);
 
         assertEquals("11111", after.getId());
-        assertEquals("foo", after.getValue());
+        assertEquals("foo", after.getTitle());
         assertEquals(1, after.getChildren().size());
 
-        JSONObject json = jsonWriter.toJson(after);
+        JSONObject json = jsonPrinter.toJson(after);
         //System.out.println(json.toString());
         JSONObject j = json.getJSONArray("children").getJSONObject(0);
-        assertEquals("cheval \u00e0 phynances", j.getString("value"));
+        assertEquals("cheval \u00e0 phynances", j.getString("title"));
     }
 
     @Test
     public void testUpdateRecursion() throws Exception {
         TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
-        root.setValue("root");
+        root.setTitle("root");
         Note rootNote;
         String s;
 
@@ -86,7 +86,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "* :N5KBOAq: one\n" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "one", "two", "three");
@@ -99,7 +99,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "    * :r4zU45R: ten\n" +
                 "    * yellow\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // "two" has been removed
@@ -114,7 +114,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "        * rabbit\n" +
                 "    * purple\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // depth is only two, so "rabbit" is not reachable
@@ -127,7 +127,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "        * rabbit\n" +
                 "        * kangaroo\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom green = one.getNotes().getRest().getFirst();
@@ -138,7 +138,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // "one" has been removed...
@@ -150,7 +150,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "* :tOpwKho: three\n" +
                 "    * red\n" +
                 "* :v8EuMtl: two\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // we swapped the order of "two" and "three"...
@@ -165,7 +165,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "    * elephant\n" +
                 "* :v8EuMtl: two\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         // duplicates are possible...
@@ -179,7 +179,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "* :v8EuMtl: two\n" +
                 "    * gorilla\n" +
                 "* :tOpwKho: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "two", "two", "three");
@@ -191,7 +191,7 @@ public class TreeViewsTest extends BrainTestBase {
     public void testPathologicalUpdateWithCycles() throws Exception {
         TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("0000000");
-        root.setValue("root");
+        root.setTitle("root");
         Note rootNote, child, grandChild;
         String s;
 
@@ -199,7 +199,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :001: one\n" +
                 "    * :001: one\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = atomGraph.getAtomById("001");
@@ -220,7 +220,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :001: one - updated\n" +
                 "    * :001: one\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("001");
@@ -230,7 +230,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
         Assert.assertEquals("001", child.getId());
-        Assert.assertEquals("one", child.getValue());
+        Assert.assertEquals("one", child.getTitle());
         assertEquals(1, child.getChildren().size());
         grandChild = child.getChildren().get(0);
         assertEquals("001", grandChild.getId());
@@ -239,7 +239,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :001: one\n" +
                 "    * :001: one - updated\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("001");
@@ -249,7 +249,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
         Assert.assertEquals("001", child.getId());
-        Assert.assertEquals("one - updated", child.getValue());
+        Assert.assertEquals("one - updated", child.getTitle());
         assertEquals(1, child.getChildren().size());
         grandChild = child.getChildren().get(0);
         assertEquals("001", grandChild.getId());
@@ -260,7 +260,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "* :001: one\n" +
                 "    * :001: one\n" +
                 "    * :002: two\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("001");
@@ -300,7 +300,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "        * :002: two\n" +
                 "    * :002: two\n" +
                 "    * :003: three\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 3, filter, style);
         rootNote = queries.view(root, 3, filter, style);
@@ -323,7 +323,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "        * :002: two\n" +
                 "        * :003: three\n" +
                 "    * :002: two\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 3, filter, style);
         rootNote = queries.view(root, 3, filter, style);
@@ -343,13 +343,13 @@ public class TreeViewsTest extends BrainTestBase {
     public void testUpdateSharabilityOrWeight() throws Exception {
         TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
-        root.setValue("root");
+        root.setTitle("root");
         Note rootNote;
         String s;
 
         s = "" +
                 "* :N5KBOAq: one\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = atomGraph.getAtomById("N5KBOAq");
@@ -360,7 +360,7 @@ public class TreeViewsTest extends BrainTestBase {
                 "* :N5KBOAq: one\n" +
                 "    @weight 0.75\n" +
                 "    @sharability 0.25\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertEquals(0.75f, one.getWeight());
@@ -371,14 +371,14 @@ public class TreeViewsTest extends BrainTestBase {
     public void testUpdateAlias() throws Exception {
         TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
-        root.setValue("root");
+        root.setTitle("root");
         Note rootNote;
         String s;
 
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @alias http://example.org/ns/one\n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = atomGraph.getAtomById("N5KBOAq");
@@ -387,7 +387,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @alias \n";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertNull(one.getAlias());
@@ -397,7 +397,7 @@ public class TreeViewsTest extends BrainTestBase {
     public void testUpdatePriority() throws Exception {
         TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("0000000");
-        root.setValue("root");
+        root.setTitle("root");
         Note rootNote;
         String s;
         Atom one;
@@ -405,7 +405,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :0000001: one\n" +
                 "    @priority 0.5";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("0000001");
@@ -415,7 +415,7 @@ public class TreeViewsTest extends BrainTestBase {
         s = "" +
                 "* :0000001: one\n" +
                 "    @priority 0";
-        rootNote = wikiReader.parse(s);
+        rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = atomGraph.getAtomById("0000001");
@@ -428,18 +428,18 @@ public class TreeViewsTest extends BrainTestBase {
         TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
         Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
-        root.setValue("root");
+        root.setTitle("root");
         root.setSharability(1.0f);
         before.setId(root.getId());
         queries.update(before, 2, filter, style);
         Note after = queries.view(root, 2, filter, style);
 
-        assertEquals("root", after.getValue());
+        assertEquals("root", after.getTitle());
         assertEquals(0, after.getNumberOfParents());
         assertEquals(3, after.getNumberOfChildren());
 
         Note child = after.getChildren().get(0);
-        assertEquals("this is a public note", child.getValue());
+        assertEquals("this is a public note", child.getTitle());
         assertEquals(1, child.getNumberOfParents());
         assertEquals(2, child.getNumberOfChildren());
     }
@@ -453,7 +453,7 @@ public class TreeViewsTest extends BrainTestBase {
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
-        root.setValue("root");
+        root.setTitle("root");
         root.setSharability(1.0f);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, writeFilter, style);
@@ -474,7 +474,7 @@ public class TreeViewsTest extends BrainTestBase {
         // This note is "invisible".
         Note n4 = children.get(1);
         // Its value appears as null.
-        assertNull(n4.getValue());
+        assertNull(n4.getTitle());
         // This note has a child, but we can't see it.
         assertEquals(0, n4.getChildren().size());
         // We can't even count the parents or children.
@@ -494,8 +494,8 @@ public class TreeViewsTest extends BrainTestBase {
         Note n3 = grandChildren.get(1);
         Assert.assertEquals(0, n3.getNumberOfChildren());
         Assert.assertEquals(1, n3.getNumberOfParents());
-        assertNull(n2.getValue());
-        assertEquals("this is a public child of a public note", n3.getValue());
+        assertNull(n2.getTitle());
+        assertEquals("this is a public child of a public note", n3.getTitle());
     }
 
     @Test
@@ -509,16 +509,16 @@ public class TreeViewsTest extends BrainTestBase {
                 "* :002:\n" +
                 "* :003: THREE";
 
-        Note b = wikiReader.parse(before);
-        Note a = wikiReader.parse(after);
+        Note b = wikiParser.parse(before);
+        Note a = wikiParser.parse(after);
 
         // First, check that 'after' was parsed correctly
         assertEquals(3, a.getChildren().size());
         assertEquals("002", a.getChildren().get(1).getId());
-        assertNull(a.getChildren().get(1).getValue());
+        assertNull(a.getChildren().get(1).getTitle());
 
         Atom root = atomGraph.createAtomWithProperties(filter, "000");
-        root.setValue("root");
+        root.setTitle("root");
 
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
@@ -527,17 +527,17 @@ public class TreeViewsTest extends BrainTestBase {
         Atom a2 = atomGraph.getAtomById("002");
         Atom a3 = atomGraph.getAtomById("003");
 
-        assertEquals("one", a1.getValue());
-        assertEquals("two", a2.getValue());
-        assertEquals("three", a3.getValue());
+        assertEquals("one", a1.getTitle());
+        assertEquals("two", a2.getTitle());
+        assertEquals("three", a3.getTitle());
 
         a.setId(root.getId());
         queries.update(a, 2, filter, style);
 
         // 002's value was unaffected by the update
-        assertEquals("ONE", a1.getValue());
-        assertEquals("two", a2.getValue());
-        assertEquals("THREE", a3.getValue());
+        assertEquals("ONE", a1.getTitle());
+        assertEquals("two", a2.getTitle());
+        assertEquals("THREE", a3.getTitle());
     }
 
     @Test
@@ -550,11 +550,11 @@ public class TreeViewsTest extends BrainTestBase {
         String after = "* :004: four\n" +
                 "* :002: two";
 
-        Note b = wikiReader.parse(before);
-        Note a = wikiReader.parse(after);
+        Note b = wikiParser.parse(before);
+        Note a = wikiParser.parse(after);
 
         Atom root = atomGraph.createAtomWithProperties(filter, "000");
-        root.setValue("root");
+        root.setTitle("root");
 
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
@@ -563,9 +563,9 @@ public class TreeViewsTest extends BrainTestBase {
         Atom a2 = atomGraph.getAtomById("002");
         Atom a3 = atomGraph.getAtomById("003");
 
-        assertEquals("one", a1.getValue());
-        assertEquals("two", a2.getValue());
-        assertEquals("three", a3.getValue());
+        assertEquals("one", a1.getTitle());
+        assertEquals("two", a2.getTitle());
+        assertEquals("three", a3.getTitle());
         assertEquals(3, root.getNotes().toJavaList().size());
 
         a.setId(root.getId());
@@ -573,12 +573,12 @@ public class TreeViewsTest extends BrainTestBase {
 
         Atom a4 = atomGraph.getAtomById("004");
 
-        assertEquals("four", a4.getValue());
+        assertEquals("four", a4.getTitle());
         List<Atom> children = root.getNotes().toJavaList();
         assertEquals(4, children.size());
-        assertEquals("four", children.get(0).getValue());
-        assertEquals("one", children.get(1).getValue());
-        assertEquals("two", children.get(2).getValue());
+        assertEquals("four", children.get(0).getTitle());
+        assertEquals("one", children.get(1).getTitle());
+        assertEquals("two", children.get(2).getTitle());
     }
 
     @Test
@@ -588,14 +588,14 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom0 = atomGraph.createAtomWithProperties(filter, "000");
-        atom0.setValue("0");
+        atom0.setTitle("0");
 
         assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom1 = atomGraph.createAtomWithProperties(filter, "001");
-        atom1.setValue("1");
+        atom1.setTitle("1");
 
         assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
         assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
@@ -608,7 +608,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom2 = atomGraph.createAtomWithProperties(filter, "002");
-        atom2.setValue("2");
+        atom2.setTitle("2");
 
         assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
         assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
@@ -628,7 +628,7 @@ public class TreeViewsTest extends BrainTestBase {
         int i = 0;
         AtomList cur = a.getNotes();
         while (null != cur) {
-            actual[i++] = cur.getFirst().getValue();
+            actual[i++] = cur.getFirst().getTitle();
             cur = cur.getRest();
         }
 

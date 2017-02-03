@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
-import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.io.BrainParser;
 import net.fortytwo.smsn.brain.model.Note;
 import org.commonmark.node.Document;
 import org.commonmark.node.Node;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class MarkdownReader extends NoteReader {
+public class MarkdownParser extends BrainParser {
     private boolean verbose;
 
     public void setVerbose(boolean verbose) {

@@ -5,9 +5,9 @@ import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.io.json.JsonReader;
-import net.fortytwo.smsn.brain.io.json.JsonWriter;
-import net.fortytwo.smsn.brain.io.wiki.WikiReader;
+import net.fortytwo.smsn.brain.io.json.JsonParser;
+import net.fortytwo.smsn.brain.io.json.JsonPrinter;
+import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -115,7 +115,7 @@ public abstract class Action {
                            final RequestParams params) throws IOException {
         JSONObject json;
 
-        json = params.getJsonWriter().toJson(n);
+        json = params.getJsonPrinter().toJson(n);
 
         params.getMap().put(Params.VIEW, json);
     }
@@ -203,9 +203,9 @@ public abstract class Action {
 
     private void setIO(final RequestParams params) {
         params.setQueries(new TreeViews(params.getBrain()));
-        params.setWikiReader(new WikiReader());
-        params.setJsonReader(new JsonReader());
-        params.setJsonWriter(new JsonWriter());
+        params.setWikiParser(new WikiParser());
+        params.setJsonParser(new JsonParser());
+        params.setJsonPrinter(new JsonPrinter());
     }
 
     private void setHeight(final RequestParams params) {
@@ -235,7 +235,7 @@ public abstract class Action {
 
     private Atom createNewRoot(final RequestParams params) {
         Atom root = params.getBrain().getAtomGraph().createAtomWithProperties(params.getFilter(), null);
-        root.setValue("life, the universe, and everything");
+        root.setTitle("life, the universe, and everything");
         params.getBrain().getAtomGraph().reindexAtom(root);
         return root;
     }
@@ -264,8 +264,8 @@ public abstract class Action {
 
     private void setTitle(final RequestParams params) {
         params.getMap().put(Params.TITLE, null == params.getRoot()
-                || null == params.getRoot().getValue()
-                || 0 == params.getRoot().getValue().length() ? "[no title]" : params.getRoot().getValue());
+                || null == params.getRoot().getTitle()
+                || 0 == params.getRoot().getTitle().length() ? "[no title]" : params.getRoot().getTitle());
     }
 
     private void setStyle(final RequestParams params) {

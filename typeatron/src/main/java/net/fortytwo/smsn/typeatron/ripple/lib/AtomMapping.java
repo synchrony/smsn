@@ -42,7 +42,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
 
         if (o instanceof Note) {
             Note n = (Note) o;
-            if (null != n.getValue() && !sync) {
+            if (null != n.getTitle() && !sync) {
                 return n;
             } else {
                 if (null == n.getId()) {

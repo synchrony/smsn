@@ -36,7 +36,7 @@ public class TODOTask extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, SmSnVocabulary.TODO);
 
         // assumes the prefix "TODO:"
-        String d = a.getValue().substring(5).trim();
+        String d = a.getTitle().substring(5).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.COMMENT, vf.createLiteral(d)));
 
         return self;

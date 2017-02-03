@@ -67,7 +67,7 @@ public class AddToStreamMapping extends AtomMapping {
         note.setSharability(filter.getDefaultSharability());
         note.setWeight(filter.getDefaultWeight());
         note.setCreated(System.currentTimeMillis());
-        note.setValue(value);
+        note.setTitle(value);
 
         Note streamNote = new Note();
         streamNote.setId(brainStream);

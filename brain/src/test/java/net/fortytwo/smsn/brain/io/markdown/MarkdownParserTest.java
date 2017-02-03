@@ -14,15 +14,15 @@ import java.io.InputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class MarkdownReaderTest {
+public class MarkdownParserTest {
 
     @Test
     public void commonMarkParsesSimpleMarkdown() {
         Parser parser = Parser.builder().build();
         Node document = parser.parse("This is *Sparta*");
         HtmlRenderer renderer = HtmlRenderer.builder().build();
-        String doc = renderer.render(document);  // "<p>This is <em>Sparta</em></p>\n"
-        System.out.println("doc: " + doc);
+        String doc = renderer.render(document);
+        assertEquals("<p>This is <em>Sparta</em></p>\n", doc);
     }
 
     @Test
@@ -30,8 +30,8 @@ public class MarkdownReaderTest {
         Parser parser = Parser.builder().build();
         Document document;
         Note root;
-        MarkdownReader reader = new MarkdownReader();
-        try (InputStream in = MarkdownReaderTest.class.getResourceAsStream("markdown-example-1.md")) {
+        MarkdownParser reader = new MarkdownParser();
+        try (InputStream in = MarkdownParserTest.class.getResourceAsStream("markdown-example-1.md")) {
             root = reader.parse(in);
         }
 
@@ -49,16 +49,16 @@ public class MarkdownReaderTest {
 
         assertEquals(3, root.getChildren().size());
         Note aLink = root.getChildren().get(0);
-        assertEquals("a link", aLink.getValue());
+        assertEquals("a link", aLink.getTitle());
         assertEquals("aaaaaaa", aLink.getId());
         Note anotherLink = root.getChildren().get(1);
-        assertEquals("another link", anotherLink.getValue());
+        assertEquals("another link", anotherLink.getTitle());
         assertEquals("bbbbbbb", anotherLink.getId());
         Note heading = root.getChildren().get(2);
-        assertEquals("this is a heading", heading.getValue());
+        assertEquals("this is a heading", heading.getTitle());
         assertEquals(1, heading.getChildren().size());
         Note linkUnder = heading.getChildren().get(0);
-        assertEquals("a link under the first heading", linkUnder.getValue());
+        assertEquals("a link under the first heading", linkUnder.getTitle());
         assertEquals("ccccccc", linkUnder.getId());
     }
 
@@ -70,7 +70,7 @@ public class MarkdownReaderTest {
 
         assertEquals(1, root.getChildren().size());
         Note aLink = root.getChildren().get(0);
-        assertEquals("a link", aLink.getValue());
+        assertEquals("a link", aLink.getTitle());
         assertEquals("0000000", aLink.getId());
     }
 
@@ -80,7 +80,7 @@ public class MarkdownReaderTest {
                 "* list item [with a link](http://example.org)");
 
         assertEquals(1, root.getChildren().size());
-        assertEquals("with a link", root.getChildren().get(0).getValue());
+        assertEquals("with a link", root.getChildren().get(0).getTitle());
     }
 
     @Test
@@ -93,16 +93,16 @@ public class MarkdownReaderTest {
         assertEquals(2, root.getChildren().size());
 
         Note withoutLink = root.getChildren().get(0);
-        assertEquals("heading with no link", withoutLink.getValue());
+        assertEquals("heading with no link", withoutLink.getTitle());
         assertNull(withoutLink.getId());
         assertEquals(1, withoutLink.getChildren().size());
 
         Note withALink = root.getChildren().get(1);
-        assertEquals("with a link", withALink.getValue());
+        assertEquals("with a link", withALink.getTitle());
         assertEquals("zzzzzzz", withALink.getId());
         assertEquals(1, withALink.getChildren().size());
         Note child = withALink.getChildren().get(0);
-        assertEquals("child of heading with a link", child.getValue());
+        assertEquals("child of heading with a link", child.getTitle());
         assertEquals("aaaaaaa", child.getId());
     }
 
@@ -119,23 +119,23 @@ public class MarkdownReaderTest {
         assertEquals(3, root.getChildren().size());
 
         Note simpleAtom = root.getChildren().get(0);
-        assertEquals("simple atom", simpleAtom.getValue());
+        assertEquals("simple atom", simpleAtom.getTitle());
         assertEquals(0, simpleAtom.getChildren().size());
         Note headingWithoutContent = root.getChildren().get(1);
-        assertEquals("heading without content", headingWithoutContent.getValue());
+        assertEquals("heading without content", headingWithoutContent.getTitle());
         assertEquals(0, headingWithoutContent.getChildren().size());
         Note headingWithContent = root.getChildren().get(2);
-        assertEquals("heading with content", headingWithContent.getValue());
+        assertEquals("heading with content", headingWithContent.getTitle());
         assertEquals(1, headingWithContent.getChildren().size());
         Note anotherAtom = headingWithContent.getChildren().get(0);
-        assertEquals("another atom", anotherAtom.getValue());
+        assertEquals("another atom", anotherAtom.getTitle());
         assertEquals(0, anotherAtom.getChildren().size());
     }
 
     private Note parse(final String content) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes());
 
-        MarkdownReader parser = new MarkdownReader();
+        MarkdownParser parser = new MarkdownParser();
         //parser.setVerbose(true);
         return parser.parse(input);
     }

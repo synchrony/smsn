@@ -25,7 +25,7 @@ public abstract class GraphWrapper {
         add(createExactIndex(SemanticSynchrony.ID_V, true));
         add(createExactIndex(SemanticSynchrony.SHORTCUT, true));
 
-        add(createFullTextIndex(SemanticSynchrony.VALUE));
+        add(createFullTextIndex(SemanticSynchrony.TITLE));
         add(createFullTextIndex(SemanticSynchrony.ACRONYM));
     }
 
@@ -55,7 +55,7 @@ public abstract class GraphWrapper {
 
     public void reindex(final Vertex vertex) {
         updateIndex(vertex, SemanticSynchrony.ID_V);
-        updateIndex(vertex, SemanticSynchrony.VALUE);
+        updateIndex(vertex, SemanticSynchrony.TITLE);
         updateIndex(vertex, SemanticSynchrony.ACRONYM);
         updateIndex(vertex, SemanticSynchrony.SHORTCUT);
     }
@@ -69,7 +69,7 @@ public abstract class GraphWrapper {
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByValue(final String term) {
-        return getVerticesByKeyValue(SemanticSynchrony.VALUE, term);
+        return getVerticesByKeyValue(SemanticSynchrony.TITLE, term);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByAcronym(final String acronym) {

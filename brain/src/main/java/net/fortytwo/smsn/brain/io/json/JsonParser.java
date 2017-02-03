@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.io.BrainParser;
 import net.fortytwo.smsn.brain.model.Note;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class JsonReader extends NoteReader {
+public class JsonParser extends BrainParser {
 
     @Override
     public Note parse(final InputStream in) throws IOException {
@@ -28,8 +28,8 @@ public class JsonReader extends NoteReader {
         if (json.has(JsonFormat.ID)) {
             n.setId(json.getString(JsonFormat.ID));
         }
-        if (json.has(SemanticSynchrony.VALUE)) {
-            n.setValue(json.getString(SemanticSynchrony.VALUE));
+        if (json.has(SemanticSynchrony.TITLE)) {
+            n.setTitle(json.getString(SemanticSynchrony.TITLE));
         }
         if (json.has(SemanticSynchrony.ALIAS)) {
             n.setAlias(json.getString(SemanticSynchrony.ALIAS));

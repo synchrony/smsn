@@ -159,7 +159,7 @@ public class TreeViews {
             result.addChild(n);
         }
 
-        result.setValue(queryType.name() + " results for \"" + query + "\"");
+        result.setTitle(queryType.name() + " results for \"" + query + "\"");
         return result;
     }
 
@@ -197,7 +197,7 @@ public class TreeViews {
         checkMaxResultsArg(maxResults);
 
         Note result = new Note();
-        result.setValue("priority queue with up to " + maxResults + " results");
+        result.setTitle("priority queue with up to " + maxResults + " results");
 
         Queue<Atom> queue = priorities.getQueue();
         int i = 0;
@@ -505,7 +505,7 @@ public class TreeViews {
     private boolean setValue(final Atom target,
                              final String value) {
         // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null values.
-        return null != value && target.setValue(value);
+        return null != value && target.setTitle(value);
     }
 
     private boolean setAlias(final Atom target,
@@ -560,7 +560,7 @@ public class TreeViews {
 
     private void setProperties(final Atom target,
                                final Note note) throws InvalidGraphException, InvalidUpdateException {
-        boolean changed = setValue(target, note.getValue())
+        boolean changed = setValue(target, note.getTitle())
                 | setAlias(target, note.getAlias())
                 | setShortcut(target, note.getShortcut())
                 | setPriority(target, note.getPriority())
@@ -594,7 +594,7 @@ public class TreeViews {
             // The convention for "invisible" notes is to leave the value blank,
             // as well as to avoid displaying any child notes.
             if (isVisible) {
-                note.setValue(atom.getValue());
+                note.setTitle(atom.getTitle());
             }
 
             if (null != brain.getKnowledgeBase()) {

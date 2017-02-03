@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
@@ -33,7 +32,7 @@ public class PushEvent extends Action {
     protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         Note event;
         try {
-            event = params.getJsonReader().parse(params.getView());
+            event = params.getJsonParser().parse(params.getView());
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

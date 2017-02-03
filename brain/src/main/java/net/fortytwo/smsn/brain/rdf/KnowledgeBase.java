@@ -367,7 +367,7 @@ public class KnowledgeBase {
         for (Atom subject : atomGraph.getAllAtoms()) {
             context.setSubject(subject);
 
-            String value = subject.getValue();
+            String value = subject.getTitle();
             String alias = subject.getAlias();
 
             List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
@@ -608,7 +608,7 @@ public class KnowledgeBase {
     private void viewInferredInternal(final Atom a,
                                       int indent) {
         for (int i = 0; i < indent; i++) System.out.print("\t");
-        String value = a.getValue();
+        String value = a.getTitle();
         String value50 = null == value
                 ? "[null]"
                 : value.length() > 50

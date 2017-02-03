@@ -57,9 +57,10 @@ public class SemanticSynchrony {
             CREATED = "created",
             FIRST = "first",
             NOTES = "notes",
+            PAGE = "page",
             REST = "rest",
             SHARABILITY = "sharability",
-            VALUE = "value",
+            TITLE = "title",
             WEIGHT = "weight";
 
     // extended schema constants

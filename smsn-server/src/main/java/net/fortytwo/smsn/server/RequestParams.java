@@ -2,9 +2,9 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.TreeViews;
-import net.fortytwo.smsn.brain.io.json.JsonReader;
-import net.fortytwo.smsn.brain.io.json.JsonWriter;
-import net.fortytwo.smsn.brain.io.wiki.WikiReader;
+import net.fortytwo.smsn.brain.io.json.JsonParser;
+import net.fortytwo.smsn.brain.io.json.JsonPrinter;
+import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
@@ -33,9 +33,9 @@ public class RequestParams {
     private String styleName;
     private Integer valueCutoff;
     private String view;
-    private WikiReader wikiReader;
-    private JsonReader jsonReader;
-    private JsonWriter jsonWriter;
+    private WikiParser wikiParser;
+    private JsonParser jsonParser;
+    private JsonPrinter jsonPrinter;
 
     public GraphWrapper getGraphWrapper() {
         return graphWrapper;
@@ -205,27 +205,27 @@ public class RequestParams {
         this.view = wikiView;
     }
 
-    public JsonWriter getJsonWriter() {
-        return jsonWriter;
+    public JsonPrinter getJsonPrinter() {
+        return jsonPrinter;
     }
 
-    public void setJsonWriter(JsonWriter jsonWriter) {
-        this.jsonWriter = jsonWriter;
+    public void setJsonPrinter(JsonPrinter jsonPrinter) {
+        this.jsonPrinter = jsonPrinter;
     }
 
-    public WikiReader getWikiReader() {
-        return wikiReader;
+    public WikiParser getWikiParser() {
+        return wikiParser;
     }
 
-    public void setWikiReader(WikiReader wikiReader) {
-        this.wikiReader = wikiReader;
+    public void setWikiParser(WikiParser wikiParser) {
+        this.wikiParser = wikiParser;
     }
 
-    public JsonReader getJsonReader() {
-        return jsonReader;
+    public JsonParser getJsonParser() {
+        return jsonParser;
     }
 
-    public void setJsonReader(JsonReader jsonReader) {
-        this.jsonReader = jsonReader;
+    public void setJsonParser(JsonParser jsonParser) {
+        this.jsonParser = jsonParser;
     }
 }

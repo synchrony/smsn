@@ -62,7 +62,7 @@ public class SetProperties extends Action {
 
     private void validateKeyValue() {
         switch (getName()) {
-            case SemanticSynchrony.VALUE:
+            case SemanticSynchrony.TITLE:
                 validateValue();
                 break;
             case SemanticSynchrony.WEIGHT:
@@ -120,8 +120,8 @@ public class SetProperties extends Action {
     @Override
     protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         switch (params.getPropertyName()) {
-            case SemanticSynchrony.VALUE:
-                params.getRoot().setValue((String) params.getPropertyValue());
+            case SemanticSynchrony.TITLE:
+                params.getRoot().setTitle((String) params.getPropertyValue());
                 break;
             case SemanticSynchrony.WEIGHT:
                 params.getRoot().setWeight(toFloat(params.getPropertyValue()));

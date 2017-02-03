@@ -66,7 +66,7 @@ class MarkdownVisitor implements Visitor {
         if (null != destination && 0 < destination.length() && null != (title = getLinkTitle(link))) {
             Note note = new Note();
             note.setId(link.getDestination());
-            note.setValue(title);
+            note.setTitle(title);
 
             addNote(note);
         }
@@ -177,12 +177,12 @@ class MarkdownVisitor implements Visitor {
                 String title = getLinkTitle(link);
                 if (null != title && null != link.getDestination() && 0 < link.getDestination().length()) {
                     note.setId(link.getDestination().trim());
-                    note.setValue(title);
+                    note.setTitle(title);
                     break;
                 }
             } else if (child instanceof Text) {
                 Text text = (Text) child;
-                note.setValue(text.getLiteral().trim());
+                note.setTitle(text.getLiteral().trim());
             }
             child = child.getNext();
         }

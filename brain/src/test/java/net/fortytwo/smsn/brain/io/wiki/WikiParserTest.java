@@ -13,52 +13,47 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 
-public class WikiReaderTest {
-    private WikiReader wikiReader = new WikiReader();
+public class WikiParserTest {
+    private WikiParser wikiParser = new WikiParser();
 
     @Before
     public void setUp() throws Exception {
-        wikiReader = new WikiReader();
+        wikiParser = new WikiParser();
     }
 
     @Test
     public void testExample1() throws Exception {
-        List<Note> notes = wikiReader.parse(
+        List<Note> notes = wikiParser.parse(
                 getClass().getResourceAsStream("wiki-example-1.txt")).getChildren();
         assertEquals(7, notes.size());
 
         Note indentation = notes.get(1);
         assertNull(indentation.getId());
-        assertEquals("indentation", indentation.getValue());
+        assertEquals("indentation", indentation.getTitle());
         assertEquals("and this", indentation.getChildren()
                 .get(2).getChildren()
                 .get(0).getChildren()
                 .get(0).getChildren()
-                .get(0).getValue());
+                .get(0).getTitle());
 
         Note atts = notes.get(3);
         assertEquals("http://example.org/ns/attributes", atts.getAlias());
         assertEquals(0.75f, atts.getWeight());
 
         Note ws = notes.get(4);
-        assertEquals(5, ws.getChildren().size());
-        Note verbatim = ws.getChildren().get(2);
-        assertEquals("newlines can be preserved with triple braces", verbatim.getValue());
-        assertEquals(1, verbatim.getChildren().size());
-        assertEquals("like this.\n" +
-                "Use as many lines of text as you need.", verbatim.getChildren().get(0).getValue());
+        assertEquals(4, ws.getChildren().size());
 
-        assertEquals("leading and trailing whitespace are ignored", ws.getChildren().get(3).getValue());
+        assertEquals("leading and trailing whitespace are ignored", ws.getChildren().get(2).getTitle());
 
         Note ids = notes.get(5);
-        assertEquals("ids", ids.getValue());
+        assertEquals("ids", ids.getTitle());
         assertEquals("0txXBm", ids.getChildren().get(0).getId());
         assertEquals("cE85nD", ids.getChildren().get(1).getId());
     }
 
     @Test
     public void testExample2() throws Exception {
-        Note root = wikiReader.parse(getClass().getResourceAsStream("wiki-example-2.txt"));
+        Note root = wikiParser.parse(getClass().getResourceAsStream("wiki-example-2.txt"));
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());
@@ -78,6 +73,40 @@ public class WikiReaderTest {
                         "\n" +        // empty line without additional whitespace
                         "* three");
         assertEquals(3, notes.size());
+    }
+
+    @Test(expected = IOException.class)
+    public void pageIsOnlyAllowedInCanonicalFormat() throws IOException {
+        wikiParser.setUseCanonicalFormat(false);
+        readNotes("* Arthur Dent\n" +
+                "\n" +
+                "He's a jerk.\n" +
+                "A complete kneebiter.");
+    }
+
+    @Test
+    public void nonEmptyPageIsCopiedVerbatim() throws Exception {
+        wikiParser.setUseCanonicalFormat(true);
+        List<Note> notes = readNotes("* Arthur Dent\n" +
+                "\n" +
+                "He's a jerk.\n" +
+                "A complete kneebiter.");
+        assertEquals(1, notes.size());
+        Note root = notes.get(0);
+        assertEquals("Arthur Dent", root.getTitle());
+        assertEquals("He's a jerk.\nA complete kneebiter.", root.getPage());
+    }
+
+    @Test
+    public void emptyPageIsIgnored() throws Exception {
+        wikiParser.setUseCanonicalFormat(true);
+        List<Note> notes = readNotes("* Arthur Dent\n" +
+                "\n" +
+                "   ");
+        assertEquals(1, notes.size());
+        Note root = notes.get(0);
+        assertEquals("Arthur Dent", root.getTitle());
+        assertNull(root.getPage());
     }
 
     @Test(expected = IOException.class)
@@ -146,57 +175,9 @@ public class WikiReaderTest {
         assertNotSame("123@456", notes.get(0).getId());
     }
 
-    @Test
-    public void testVerbatimBlocks() throws Exception {
-        List<Note> notes = readNotes("* {{{\n" +
-                "here is a verbatim block\n" +
-                "which spans two lines\n" +
-                "}}}");
-        assertEquals(1, notes.size());
-
-        notes = readNotes("* {{{\n" +
-                "here is a verbatim block all in one line (pointless, but permitted)\n" +
-                "}}}");
-        assertEquals(1, notes.size());
-
-        notes = readNotes("* :0001: {{{\n" +
-                "here is a verbatim block\n" +
-                "with an id\n" +
-                "}}}");
-        assertEquals(1, notes.size());
-        assertEquals("0001", notes.get(0).getId());
-    }
-
-    @Test(expected = IOException.class)
-    public void testTextAfterVerbatimBlockStartIsInvalid() throws Exception {
-        readNotes("* {{{ this is not OK\n" +
-                "because the value must be on separate lines from the verbatim block delimiters\n" +
-                "}}}");
-    }
-
-    @Test
-    public void testTextBeforeVerbatimBlockStartIsValid() throws Exception {
-        readNotes("* this is OK, because it is not actually a {{{ verbatim block }}}");
-    }
-
-    @Test(expected = IOException.class)
-    public void testTextBeforeVerbatimBlockDoesNotEndTheBlock() throws Exception {
-        readNotes("* {{{\n" +
-                "this is not OK, because the value must be on separate lines" +
-                "from the verbatim block delimiters}}}");
-    }
-
-    @Test(expected = IOException.class)
-    public void testTextAfterVerbatimBlockEndIsInvalid() throws Exception {
-        readNotes("* {{{" +
-                "this is not OK, because the value must be completely\n" +
-                "within the verbatim block delimiters,\n" +
-                "}}} with no content outside");
-    }
-
     private List<Note> readNotes(final String s) throws IOException {
         try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
-            return wikiReader.parse(in).getChildren();
+            return wikiParser.parse(in).getChildren();
         }
     }
 }

@@ -2,8 +2,8 @@ package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
-import net.fortytwo.smsn.brain.io.json.JsonReader;
-import net.fortytwo.smsn.brain.io.json.JsonWriter;
+import net.fortytwo.smsn.brain.io.json.JsonParser;
+import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.TreeViews;
@@ -50,8 +50,8 @@ public class BrainClient {
 
     private static final int DEFAULT_VALUE_CUTOFF = 100;
 
-    private final JsonReader jsonReader = new JsonReader();
-    private final JsonWriter jsonWriter = new JsonWriter();
+    private final JsonParser jsonParser = new JsonParser();
+    private final JsonPrinter jsonPrinter = new JsonPrinter();
 
     private final HttpProcessor httpProcessor;
     private final HttpRequestExecutor httpExecutor;
@@ -145,7 +145,7 @@ public class BrainClient {
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
                     // note: redundant serialization/deserialization
-                    results[0] = jsonReader.parse(view.toString());
+                    results[0] = jsonParser.parse(view.toString());
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
@@ -318,7 +318,7 @@ public class BrainClient {
                     if (null != children) {
                         int length = children.length();
                         for (int i = 0; i < length; i++) {
-                            results.add(jsonReader.parse(children.getJSONObject(i).toString()));
+                            results.add(jsonParser.parse(children.getJSONObject(i).toString()));
                         }
                     }
                 } catch (JSONException e) {
@@ -416,7 +416,7 @@ public class BrainClient {
     }
 
     private JSONObject toJson(final Note note) throws IOException {
-        return jsonWriter.toJson(note);
+        return jsonPrinter.toJson(note);
     }
 
     public class BrainClientException extends Exception {

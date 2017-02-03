@@ -34,7 +34,7 @@ public class GetEvents extends Action {
         List<Note> events = params.getBrain().getEventStack().getEvents();
 
         Note view = new Note();
-        view.setValue("event stack");
+        view.setTitle("event stack");
 
         for (Note n : events) {
             Note e = new Note(n);

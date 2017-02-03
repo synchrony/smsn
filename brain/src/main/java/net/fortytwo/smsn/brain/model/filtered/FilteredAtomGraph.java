@@ -183,13 +183,23 @@ public class FilteredAtomGraph implements AtomGraph {
         }
 
         @Override
-        public String getValue() {
-            return isVisible() ? baseAtom.getValue() : null;
+        public String getTitle() {
+            return isVisible() ? baseAtom.getTitle() : null;
         }
 
         @Override
-        public boolean setValue(String value) {
-            return isVisible() && baseAtom.setValue(value);
+        public boolean setTitle(String title) {
+            return isVisible() && baseAtom.setTitle(title);
+        }
+
+        @Override
+        public String getPage() {
+            return isVisible() ? baseAtom.getPage() : null;
+        }
+
+        @Override
+        public boolean setPage(String page) {
+            return isVisible() && baseAtom.setPage(page);
         }
 
         @Override

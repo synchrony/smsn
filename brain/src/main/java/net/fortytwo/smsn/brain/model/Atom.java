@@ -15,9 +15,13 @@ public interface Atom {
 
     boolean setCreated(Long created);
 
-    String getValue();
+    String getTitle();
 
-    boolean setValue(String value);
+    boolean setTitle(String title);
+
+    String getPage();
+
+    boolean setPage(String page);
 
     Float getPriority();
 

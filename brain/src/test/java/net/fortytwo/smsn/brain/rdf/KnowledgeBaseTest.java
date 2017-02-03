@@ -332,7 +332,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
         TreeViews queries = new TreeViews(brain);
         Filter filter = Filter.noFilter();
         Atom root = atomGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
-        root.setValue("root");
+        root.setTitle("root");
         String rootId = root.getId();
 
         try (InputStream in = getClass().getResourceAsStream("inference-example-1.txt")) {
@@ -346,12 +346,12 @@ public class KnowledgeBaseTest extends BrainTestBase {
                     sb.append(line).append("\n");
                 }
                 String text = sb.toString().trim();
-                Note rootNote = wikiReader.parse(text);
+                Note rootNote = wikiParser.parse(text);
                 //System.out.println("children: " + rootNote.getChildren().size() + ", height: " + height);
                 for (Note c : rootNote.getChildren()) {
-                    System.out.println("\t" + c.getValue());
+                    System.out.println("\t" + c.getTitle());
                     for (Note c2 : c.getChildren()) {
-                        System.out.println("\t\t" + c2.getValue());
+                        System.out.println("\t\t" + c2.getTitle());
                     }
                 }
                 rootNote.setId(rootId);

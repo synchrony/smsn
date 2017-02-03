@@ -36,8 +36,8 @@ public class WebPage extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, FOAF.DOCUMENT);
 
         // note: assumes that the value ends with "(web page)"
-        int i = a.getValue().lastIndexOf("(");
-        String d = a.getValue().substring(0, i).trim();
+        int i = a.getTitle().lastIndexOf("(");
+        String d = a.getTitle().substring(0, i).trim();
         handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(d)));
 
         return self;

@@ -22,7 +22,7 @@ public class GetAtomsByValueTest extends BrainTestBase {
         super.setUp();
 
         arthur = atomGraph.createAtomWithProperties(filter, null);
-        arthur.setValue("Arthur Dent");
+        arthur.setTitle("Arthur Dent");
         atomGraph.reindexAtom(arthur);
     }
 

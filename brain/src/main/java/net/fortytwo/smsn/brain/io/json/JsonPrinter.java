@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class JsonWriter {
+public class JsonPrinter {
 
     private int valueLengthCutoff = -1;
 
@@ -43,11 +43,11 @@ public class JsonWriter {
             json.put(SemanticSynchrony.PRIORITY, priority);
         }
 
-        String value = note.getValue();
+        String value = note.getTitle();
         if (value != null && valueLengthCutoff > 0 && value.length() > valueLengthCutoff) {
             value = value.substring(0, valueLengthCutoff) + JsonFormat.VALUE_TRUNCATOR;
         }
-        json.put(SemanticSynchrony.VALUE, value);
+        json.put(SemanticSynchrony.TITLE, value);
 
         if (null != note.getAlias()) {
             json.put(SemanticSynchrony.ALIAS, note.getAlias());
