@@ -9,13 +9,13 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 public class InferTypes extends Action {
 
     @Override
-    public void parseRequest(final RequestParams p) {
+    public void parseRequest(final RequestParams params) {
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         // do *not* reset the knowledge base.  Build upon inference performed in previous iterations
-        KnowledgeBase kb = p.getBrain().getKnowledgeBase();
+        KnowledgeBase kb = params.getBrain().getKnowledgeBase();
         //kb.reset();
 
         long timeBefore = System.currentTimeMillis();

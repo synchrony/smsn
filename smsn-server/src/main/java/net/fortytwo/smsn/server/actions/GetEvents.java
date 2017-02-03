@@ -25,25 +25,25 @@ public class GetEvents extends Action {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setHeight(getHeight());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setHeight(getHeight());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        List<Note> events = p.getBrain().getEventStack().getEvents();
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        List<Note> events = params.getBrain().getEventStack().getEvents();
 
         Note view = new Note();
         view.setValue("event stack");
 
         for (Note n : events) {
             Note e = new Note(n);
-            e.truncate(p.getHeight());
+            e.truncate(params.getHeight());
             view.addChild(e);
         }
 
         try {
-            addView(view, p);
+            addView(view, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

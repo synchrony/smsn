@@ -26,17 +26,17 @@ public class BroadcastRDF extends Action {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setData(getDataset());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setData(getDataset());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException {
         // TODO: take RDF format as an input parameter
         RDFFormat format = RDFFormat.NTRIPLES;
 
         try {
-            CoordinatorService.getInstance().pushUpdate(p.getData(), format);
+            CoordinatorService.getInstance().pushUpdate(params.getData(), format);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

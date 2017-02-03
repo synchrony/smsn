@@ -11,12 +11,12 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 public class Ping extends Action {
 
     @Override
-    public void parseRequest(final RequestParams p) {
+    public void parseRequest(final RequestParams params) {
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        p.getMap().put("time", String.valueOf(System.currentTimeMillis()));
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        params.getMap().put("time", String.valueOf(System.currentTimeMillis()));
     }
 
     @Override

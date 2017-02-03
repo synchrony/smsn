@@ -25,20 +25,20 @@ public class PushEvent extends Action {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setView(getView());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setView(getView());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         Note event;
         try {
-            event = p.getJsonReader().parse(p.getView());
+            event = params.getJsonReader().parse(params.getView());
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.getBrain().getEventStack().push(event);
+        params.getBrain().getEventStack().push(event);
     }
 
     @Override

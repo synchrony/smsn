@@ -45,30 +45,30 @@ public class ReadGraph extends Action {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFile(getFile());
-        p.setFormat(getFormat());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFile(getFile());
+        params.setFormat(getFormat());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        if (null == p.getFormat()) {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        if (null == params.getFormat()) {
             throw new BadRequestException("format is required");
         }
 
-        Format format = Format.getFormat(p.getFormat());
+        Format format = Format.getFormat(params.getFormat());
         BrainReader reader = Format.getReader(format);
 
-        beginImport(p.getGraphWrapper().getGraph(), p.getFile());
+        beginImport(params.getGraphWrapper().getGraph(), params.getFile());
 
         boolean success = false;
         try {
-            reader.doImport(new File(p.getFile()), format, p.getBrain(), true);
+            reader.doImport(new File(params.getFile()), format, params.getBrain(), true);
             success = true;
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         } finally {
-            finishImport(p.getGraphWrapper().getGraph(), p.getFile(), success);
+            finishImport(params.getGraphWrapper().getGraph(), params.getFile(), success);
         }
     }
 

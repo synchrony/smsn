@@ -13,22 +13,22 @@ import java.io.IOException;
 public class FindRoots extends BasicViewAction {
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setHeight(getHeight());
-        p.setStyleName(getStyle());
-        p.setFilter(getFilter());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setHeight(getHeight());
+        params.setStyleName(getStyle());
+        params.setFilter(getFilter());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        Note n = p.getQueries().findRootAtoms(p.getFilter(), p.getStyle(), p.getHeight() - 1);
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        Note n = params.getQueries().findRootAtoms(params.getFilter(), params.getStyle(), params.getHeight() - 1);
         try {
-            addView(n, p);
+            addView(n, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.getMap().put("title", "all roots");
+        params.getMap().put("title", "all roots");
     }
 
     @Override

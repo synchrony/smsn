@@ -28,17 +28,17 @@ public class GetPriorities extends FilteredAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFilter(getFilter());
-        p.setMaxResults(getMaxResults());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFilter(getFilter());
+        params.setMaxResults(getMaxResults());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
 
-        Note n = p.getQueries().priorityView(p.getFilter(), p.getMaxResults(), p.getBrain().getPriorities());
+        Note n = params.getQueries().priorityView(params.getFilter(), params.getMaxResults(), params.getBrain().getPriorities());
         try {
-            addView(n, p);
+            addView(n, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

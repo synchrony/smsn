@@ -40,32 +40,32 @@ public class UpdateView extends RootedViewAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setHeight(getHeight());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setHeight(getHeight());
         // note: may be null
-        p.setRootId(getRoot());
-        p.setStyleName(getStyle());
+        params.setRootId(getRoot());
+        params.setStyleName(getStyle());
 
-        p.setView(getView());
+        params.setView(getView());
 
-        p.setFilter(getFilter());
+        params.setFilter(getFilter());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         Note rootNote;
 
-        if (null != p.getView()) {
+        if (null != params.getView()) {
             try {
-                try (InputStream in = new ByteArrayInputStream(p.getView().getBytes())) {
-                    rootNote = p.getWikiReader().parse(in);
+                try (InputStream in = new ByteArrayInputStream(params.getView().getBytes())) {
+                    rootNote = params.getWikiReader().parse(in);
                 }
             } catch (IOException e) {
                 throw new RequestProcessingException(e);
             }
-        } else if (null != p.getView()) {
+        } else if (null != params.getView()) {
             try {
-                rootNote = p.getJsonReader().parse(p.getView());
+                rootNote = params.getJsonReader().parse(params.getView());
             } catch (IOException e) {
                 throw new RequestProcessingException(e);
             }
@@ -73,17 +73,17 @@ public class UpdateView extends RootedViewAction {
             throw new IllegalStateException();
         }
 
-        rootNote.setId(p.getRootId());
+        rootNote.setId(params.getRootId());
 
         // Apply the update
-        p.getQueries().update(rootNote, p.getHeight(), p.getFilter(), p.getStyle());
+        params.getQueries().update(rootNote, params.getHeight(), params.getFilter(), params.getStyle());
 
         // TODO: produce an appropriate view (e.g. a search) if the root is null
-        Note n = null == p.getRoot()
+        Note n = null == params.getRoot()
                 ? new Note()
-                : p.getQueries().view(p.getRoot(), p.getHeight(), p.getFilter(), p.getStyle());
+                : params.getQueries().view(params.getRoot(), params.getHeight(), params.getFilter(), params.getStyle());
         try {
-            addView(n, p);
+            addView(n, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

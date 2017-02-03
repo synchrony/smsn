@@ -48,14 +48,14 @@ public class SetProperties extends Action {
     }
 
     @Override
-    public void parseRequest(final RequestParams p)
+    public void parseRequest(final RequestParams params)
             throws BadRequestException, IOException {
 
         validateKeyValue();
 
-        p.setPropertyName(getName());
-        p.setPropertyValue(getValue());
-        p.setRootId(getId());
+        params.setPropertyName(getName());
+        params.setPropertyValue(getValue());
+        params.setRootId(getId());
 
         SemanticSynchrony.logInfo("SmSn set-properties on " + getId() + ": " + getName() + " <- " + getValue());
     }
@@ -118,44 +118,44 @@ public class SetProperties extends Action {
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        switch (p.getPropertyName()) {
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        switch (params.getPropertyName()) {
             case SemanticSynchrony.VALUE:
-                p.getRoot().setValue((String) p.getPropertyValue());
+                params.getRoot().setValue((String) params.getPropertyValue());
                 break;
             case SemanticSynchrony.WEIGHT:
-                p.getRoot().setWeight(toFloat(p.getPropertyValue()));
+                params.getRoot().setWeight(toFloat(params.getPropertyValue()));
                 break;
             case SemanticSynchrony.SHARABILITY:
-                p.getRoot().setSharability(toFloat(p.getPropertyValue()));
+                params.getRoot().setSharability(toFloat(params.getPropertyValue()));
                 break;
             case SemanticSynchrony.PRIORITY:
-                p.getRoot().setPriority(toFloat(p.getPropertyValue()));
-                p.getBrain().getPriorities().updatePriority(p.getRoot());
+                params.getRoot().setPriority(toFloat(params.getPropertyValue()));
+                params.getBrain().getPriorities().updatePriority(params.getRoot());
                 break;
             case SemanticSynchrony.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
-                String shortcut = (String) p.getPropertyValue();
-                for (Atom a : p.getBrain().getAtomGraph().getAtomsByShortcut(shortcut, p.getFilter())) {
+                String shortcut = (String) params.getPropertyValue();
+                for (Atom a : params.getBrain().getAtomGraph().getAtomsByShortcut(shortcut, params.getFilter())) {
                     a.setShortcut(null);
                 }
 
-                p.getRoot().setShortcut(shortcut);
+                params.getRoot().setShortcut(shortcut);
                 break;
             default:
                 throw new IllegalStateException();
         }
 
-        p.getBrain().getAtomGraph().reindexAtom(p.getRoot());
-        p.getBrain().getAtomGraph().notifyOfUpdate();
+        params.getBrain().getAtomGraph().reindexAtom(params.getRoot());
+        params.getBrain().getAtomGraph().notifyOfUpdate();
 
-        p.getMap().put("key", p.getBrain().getAtomGraph().idOfAtom(p.getRoot()));
-        p.getMap().put("name", "" + p.getPropertyName());
-        p.getMap().put("value", "" + p.getPropertyValue());
+        params.getMap().put("key", params.getBrain().getAtomGraph().idOfAtom(params.getRoot()));
+        params.getMap().put("name", "" + params.getPropertyName());
+        params.getMap().put("value", "" + params.getPropertyValue());
 
-        ActivityLog log = p.getBrain().getActivityLog();
+        ActivityLog log = params.getBrain().getActivityLog();
         if (null != log) {
-            log.logSetProperties(p.getRoot());
+            log.logSetProperties(params.getRoot());
         }
     }
 

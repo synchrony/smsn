@@ -13,16 +13,16 @@ import java.io.IOException;
 public class GetHistory extends FilteredAction {
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFilter(getFilter());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFilter(getFilter());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        Iterable<Atom> atoms = getHistory(p.getBrain().getAtomGraph(), p.getFilter());
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        Iterable<Atom> atoms = getHistory(params.getBrain().getAtomGraph(), params.getFilter());
 
         try {
-            addView(p.getQueries().customView(atoms, p.getFilter()), p);
+            addView(params.getQueries().customView(atoms, params.getFilter()), params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

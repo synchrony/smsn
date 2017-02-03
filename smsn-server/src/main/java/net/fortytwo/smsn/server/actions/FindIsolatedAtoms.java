@@ -13,22 +13,22 @@ import java.io.IOException;
 public class FindIsolatedAtoms extends FilteredAction {
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFilter(getFilter());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFilter(getFilter());
 
         SemanticSynchrony.logInfo("SmSn find-isolated-atoms");
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException {
-        Note n = p.getQueries().findIsolatedAtoms(p.getFilter());
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException {
+        Note n = params.getQueries().findIsolatedAtoms(params.getFilter());
         try {
-            addView(n, p);
+            addView(n, params);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.getMap().put("title", "isolated atoms");
+        params.getMap().put("title", "isolated atoms");
     }
 
     @Override

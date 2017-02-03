@@ -57,9 +57,9 @@ public abstract class Action {
         this.action = action;
     }
 
-    public abstract void parseRequest(final RequestParams p) throws IOException, BadRequestException;
+    public abstract void parseRequest(final RequestParams params) throws IOException, BadRequestException;
 
-    protected abstract void performTransaction(RequestParams p) throws BadRequestException, RequestProcessingException;
+    protected abstract void performTransaction(RequestParams params) throws BadRequestException, RequestProcessingException;
 
     protected abstract boolean doesRead();
 
@@ -112,12 +112,12 @@ public abstract class Action {
     }
 
     protected void addView(final Note n,
-                           final RequestParams p) throws IOException {
+                           final RequestParams params) throws IOException {
         JSONObject json;
 
-        json = p.getJsonWriter().toJson(n);
+        json = params.getJsonWriter().toJson(n);
 
-        p.getMap().put(Params.VIEW, json);
+        params.getMap().put(Params.VIEW, json);
     }
 
     public static RequestParams createParams(final Graph graph) {

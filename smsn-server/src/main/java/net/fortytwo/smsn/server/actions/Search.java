@@ -50,30 +50,30 @@ public class Search extends BasicViewAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setHeight(getHeight());
-        p.setQueryType(getQueryType());
-        p.setQuery(getQuery());
-        p.setStyleName(getStyle());
-        p.setFilter(getFilter());
-        p.setValueCutoff(getValueCutoff());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setHeight(getHeight());
+        params.setQueryType(getQueryType());
+        params.setQuery(getQuery());
+        params.setStyleName(getStyle());
+        params.setFilter(getFilter());
+        params.setValueCutoff(getValueCutoff());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        p.getJsonWriter().setValueLengthCutoff(p.getValueCutoff());
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        params.getJsonWriter().setValueLengthCutoff(params.getValueCutoff());
 
         try {
-            if (p.getQueryType().equals(TreeViews.QueryType.Ripple)) {
-                addRippleResults(p);
+            if (params.getQueryType().equals(TreeViews.QueryType.Ripple)) {
+                addRippleResults(params);
             } else {
-                addSearchResults(p);
+                addSearchResults(params);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.getMap().put("title", p.getQuery());
+        params.getMap().put("title", params.getQuery());
     }
 
     @Override

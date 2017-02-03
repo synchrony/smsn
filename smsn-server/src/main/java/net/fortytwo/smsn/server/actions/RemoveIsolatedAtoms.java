@@ -12,13 +12,13 @@ import java.io.IOException;
 public class RemoveIsolatedAtoms extends FilteredAction {
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFilter(getFilter());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFilter(getFilter());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        p.getBrain().getAtomGraph().removeIsolatedAtoms(p.getFilter());
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        params.getBrain().getAtomGraph().removeIsolatedAtoms(params.getFilter());
     }
 
     @Override

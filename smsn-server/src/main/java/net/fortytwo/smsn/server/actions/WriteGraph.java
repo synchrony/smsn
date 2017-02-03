@@ -58,28 +58,28 @@ public class WriteGraph extends FilteredAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFilter(getFilter());
-        p.setFile(getFile());
-        p.setFormat(getFormat());
+    public void parseRequest(final RequestParams params) throws IOException {
+        params.setFilter(getFilter());
+        params.setFile(getFile());
+        params.setFormat(getFormat());
 
-        p.setRootId(getRoot());
-        p.setHeight(getHeight());
+        params.setRootId(getRoot());
+        params.setHeight(getHeight());
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        Format format = getFormat(p);
+    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
+        Format format = getFormat(params);
 
         BrainWriter.Context context = new BrainWriter.Context();
-        context.setAtomGraph(p.getBrain().getAtomGraph());
-        context.setKnowledgeBase(p.getBrain().getKnowledgeBase());
-        context.setRootId(p.getRootId());
-        context.setFilter(p.getFilter());
+        context.setAtomGraph(params.getBrain().getAtomGraph());
+        context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
+        context.setRootId(params.getRootId());
+        context.setFilter(params.getFilter());
         context.setFormat(format);
         BrainWriter writer = Format.getWriter(format);
 
-        File file = new File(p.getFile());
+        File file = new File(params.getFile());
 
         try {
             if (format.getType().equals(Format.Type.FileBased)) {
