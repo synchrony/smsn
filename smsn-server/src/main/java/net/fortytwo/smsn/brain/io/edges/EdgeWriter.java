@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
 import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -20,22 +21,30 @@ public class EdgeWriter extends BrainWriter {
 
     @Override
     public void doExport(Context context) throws IOException {
-        AtomGraph sourceGraph = context.getFilteredGraph();
+        AtomGraph sourceGraph = context.getAtomGraph();
         PrintStream p = new PrintStream(context.getDestStream());
+        Filter filter = context.getFilter();
 
         p.println("from\tto");
 
-        for (Atom a : sourceGraph.getAllAtoms()) {
-            if (null != a) {
-                AtomList l = a.getNotes();
+        for (Atom fromAtom : sourceGraph.getAllAtoms()) {
+            if (null != fromAtom && filter.isVisible(fromAtom)) {
+                AtomList l = fromAtom.getNotes();
                 while (null != l) {
-                    p.print(a.getId());
-                    p.print('\t');
-                    p.print(l.getFirst().getId());
-                    p.print('\n');
+                    Atom toAtom = l.getFirst();
+                    if (filter.isVisible(toAtom)) {
+                        printEdge(p, fromAtom, toAtom);
+                    }
                     l = l.getRest();
                 }
             }
         }
+    }
+
+    private void printEdge(final PrintStream p, final Atom fromAtom, final Atom toAtom) {
+        p.print(fromAtom.getId());
+        p.print('\t');
+        p.print(toAtom.getId());
+        p.print('\n');
     }
 }
