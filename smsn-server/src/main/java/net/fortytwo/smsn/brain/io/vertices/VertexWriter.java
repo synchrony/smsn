@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
@@ -24,16 +25,16 @@ public class VertexWriter extends BrainWriter {
     @Override
     public void doExport(Context context) throws IOException {
 
-        AtomGraph sourceGraph = context.getFilteredGraph();
+        AtomGraph sourceGraph = context.getAtomGraph();
+        Filter filter = context.getFilter();
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
         p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
 
         for (Atom a : sourceGraph.getAllAtoms()) {
-            Long c = a.getCreated();
-            if (null != c) {
-                p.print(c);
+            if (isTrueAtom(a) && filter.isVisible(a)) {
+                p.print(a.getCreated());
                 p.print('\t');
                 p.print(a.getId());
                 p.print('\t');
@@ -71,6 +72,10 @@ public class VertexWriter extends BrainWriter {
                 p.print('\n');
             }
         }
+    }
+
+    private boolean isTrueAtom(final Atom a) {
+        return null != a.getCreated();
     }
 
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.
