@@ -508,6 +508,12 @@ public class TreeViews {
         return null != title && target.setTitle(title);
     }
 
+    private boolean setPage(final Atom target,
+                            final String page) {
+        // Note: can't delete page with a view update
+        return null != page && target.setPage(page);
+    }
+
     private boolean setAlias(final Atom target,
                              final String alias) {
         if (null != alias) {
@@ -561,6 +567,7 @@ public class TreeViews {
     private void setProperties(final Atom target,
                                final Note note) throws InvalidGraphException, InvalidUpdateException {
         boolean changed = setTitle(target, note.getTitle())
+                | setPage(target, note.getPage())
                 | setAlias(target, note.getAlias())
                 | setShortcut(target, note.getShortcut())
                 | setPriority(target, note.getPriority())
@@ -591,10 +598,11 @@ public class TreeViews {
             note.setAlias(atom.getAlias());
             note.setShortcut(atom.getShortcut());
 
-            // The convention for "invisible" notes is to leave the title blank,
+            // The convention for "invisible" notes is to leave the title and page blank,
             // as well as to avoid displaying any child notes.
             if (isVisible) {
                 note.setTitle(atom.getTitle());
+                note.setPage(atom.getPage());
             }
 
             if (null != brain.getKnowledgeBase()) {
