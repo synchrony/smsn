@@ -15,13 +15,7 @@ public interface Atom {
 
     boolean setCreated(Long created);
 
-    // TODO: temporary
-    String getValue();
-
     String getTitle();
-
-    // TODO: temporary
-    boolean setValue(String value);
 
     boolean setTitle(String title);
 

@@ -42,20 +42,9 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
         return setRequiredProperty(SemanticSynchrony.CREATED, created);
     }
 
-    // TODO
-    @Override
-    public String getValue() { return (String) getOptionalProperty("value"); }
-    // TODO
-    @Override
-    public boolean setValue(final String value) {
-        return setOptionalProperty("value", value);
-    }
-
     @Override
     public String getTitle() {
-        return (String) getOptionalProperty(SemanticSynchrony.TITLE);
-        // TODO: restore this
-        //return (String) getRequiredProperty(SemanticSynchrony.TITLE);
+        return (String) getRequiredProperty(SemanticSynchrony.TITLE);
     }
 
     @Override
@@ -123,7 +112,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
         return setNotes(notes, null);
     }
 
-    public boolean setNotes(AtomList notes, final Object edgeId) {
+    boolean setNotes(AtomList notes, final Object edgeId) {
         boolean changed = removeNotes();
         if (null != notes) {
             addOutEdge(edgeId, ((PGGraphEntity) notes).asVertex(), SemanticSynchrony.NOTES);
@@ -133,12 +122,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public void forFirstOf(Consumer<AtomList> consumer) {
-        forEachAdjacentVertex(SemanticSynchrony.FIRST, Direction.IN, new Consumer<Vertex>() {
-            @Override
-            public void accept(Vertex vertex) {
-                consumer.accept(asAtomList(vertex));
-            }
-        });
+        forEachAdjacentVertex(SemanticSynchrony.FIRST, Direction.IN, vertex -> consumer.accept(asAtomList(vertex)));
     }
 
     @Override
