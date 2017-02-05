@@ -30,10 +30,13 @@ public class ActionDuJour extends Action {
         int countMigrated = 0;
         for (Atom atom : graph.getAllAtoms()) {
             if (countValueLines(atom) > 1) {
-                atom.setPage(atom.getTitle());
+                atom.setPage(atom.getValue());
                 atom.setTitle("RenameMe");
                 countMigrated++;
+            } else if (null != atom.getValue()) {
+                atom.setTitle(atom.getValue());
             }
+            atom.setValue(null);
         }
         logger.info("migrated " + countMigrated + " topic nodes");
     }
@@ -50,13 +53,23 @@ public class ActionDuJour extends Action {
     }
 
     private boolean isProblematicMultiLineAtom(final Atom atom) {
-        return countValueLines(atom) > 1 && (null != atom.getNotes());
+        return countTitleLines(atom) > 1 || countValueLines(atom) > 1 && (null != atom.getNotes());
+    }
+
+    private int countTitleLines(final Atom atom) {
+        String title = atom.getTitle();
+        if (null == title) {
+            //logger.warning("atom with null title: " + atom.getId());
+            return 0;
+        }
+        String[] a = title.split("\\n");
+        return a.length;
     }
 
     private int countValueLines(final Atom atom) {
-        String value = atom.getTitle();
+        String value = atom.getValue();
         if (null == value) {
-            logger.warning("atom with null value: " + atom.getId());
+            //logger.warning("atom with null value: " + atom.getId());
             return 0;
         }
         String[] a = value.split("\\n");

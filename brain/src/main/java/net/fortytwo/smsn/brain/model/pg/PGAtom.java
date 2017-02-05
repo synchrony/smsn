@@ -42,9 +42,20 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
         return setRequiredProperty(SemanticSynchrony.CREATED, created);
     }
 
+    // TODO
+    @Override
+    public String getValue() { return (String) getOptionalProperty("value"); }
+    // TODO
+    @Override
+    public boolean setValue(final String value) {
+        return setOptionalProperty("value", value);
+    }
+
     @Override
     public String getTitle() {
-        return (String) getRequiredProperty(SemanticSynchrony.TITLE);
+        return (String) getOptionalProperty(SemanticSynchrony.TITLE);
+        // TODO: restore this
+        //return (String) getRequiredProperty(SemanticSynchrony.TITLE);
     }
 
     @Override

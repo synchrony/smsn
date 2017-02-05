@@ -21,9 +21,14 @@ import java.util.function.Function;
 public class VCSReader extends BrainReader {
     public enum OverwritePolicy {Preserve, Replace}
 
-    private final WikiParser reader = new WikiParser();
+    private final WikiParser reader;
 
     private final OverwritePolicy policy = OverwritePolicy.Replace;
+
+    public VCSReader() {
+        reader = new WikiParser();
+        reader.setUseCanonicalFormat(true);
+    }
 
     @Override
     protected void importInternal(Context context) throws IOException {

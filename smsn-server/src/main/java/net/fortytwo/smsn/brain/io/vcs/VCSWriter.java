@@ -19,7 +19,12 @@ import java.util.List;
 public class VCSWriter extends BrainWriter {
 
     private static final List<Format> formats;
-    private static final WikiPrinter WIKI_PRINTER = new WikiPrinter();
+    private static final WikiPrinter wikiPrinter;
+
+    static {
+        wikiPrinter = new WikiPrinter();
+        wikiPrinter.setUseCanonicalFormat(true);
+    }
 
     static {
         formats = new LinkedList<>();
@@ -87,7 +92,7 @@ public class VCSWriter extends BrainWriter {
             list = list.getRest();
         }
 
-        WIKI_PRINTER.print(note, out, true);
+        wikiPrinter.print(note, out, true);
     }
 
     private Note toNote(final Atom atom, final boolean withValueAndProperties) {
