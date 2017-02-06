@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain;
 
+import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Atom;
 import net.fortytwo.smsn.brain.model.AtomGraph;
@@ -72,6 +73,21 @@ public class TreeViewsTest extends BrainTestBase {
         //System.out.println(json.toString());
         JSONObject j = json.getJSONArray("children").getJSONObject(0);
         assertEquals("cheval \u00e0 phynances", j.getString("title"));
+    }
+
+    @Test(expected = InvalidUpdateException.class)
+    public void updateWithPageAndChildrenIsRejected() throws Exception {
+        Atom root = createAtom("11111");
+
+        Note note = new Note();
+        note.setId(root.getId());
+        note.setTitle("Arthur Dent");
+        note.setPage("He's a jerk.\nA complete kneebiter.");
+        Note child = new Note();
+        child.setTitle("Random");
+        note.addChild(child);
+
+        queries.update(note, 5, new Filter(), TreeViews.forwardViewStyle);
     }
 
     @Test

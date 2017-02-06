@@ -327,12 +327,20 @@ public class TreeViews {
                                 final Filter filter,
                                 final ViewStyle style,
                                 final Map<String, Atom> cache) {
+        validateNote(rootNote);
+
         Atom rootAtom = getRequiredAtomForNote(rootNote, cache);
 
         // we are pre-ordered w.r.t. setting of properties
         setProperties(rootAtom, rootNote);
 
         updateChildren(rootNote, rootAtom, height, filter, style, cache);
+    }
+
+    private void validateNote(final Note note) {
+        if (null != note.getPage() && 0 < note.getChildren().size()) {
+            throw new InvalidUpdateException("atom with page cannot have children");
+        }
     }
 
     private void updateChildren(final Note rootNote,
