@@ -32,33 +32,33 @@ public class JsonPrinter {
         JSONObject json = new JSONObject();
 
         json.put(JsonFormat.ID, note.getId());
-        json.put(SemanticSynchrony.WEIGHT, note.getWeight());
-        json.put(SemanticSynchrony.SHARABILITY, note.getSharability());
-        json.put(SemanticSynchrony.CREATED, note.getCreated());
+        json.put(SemanticSynchrony.PropertyKeys.WEIGHT, note.getWeight());
+        json.put(SemanticSynchrony.PropertyKeys.SHARABILITY, note.getSharability());
+        json.put(SemanticSynchrony.PropertyKeys.CREATED, note.getCreated());
         json.put(JsonFormat.NUMBER_OF_CHILDREN, note.getNumberOfChildren());
         json.put(JsonFormat.NUMBER_OF_PARENTS, note.getNumberOfParents());
 
         Float priority = note.getPriority();
         if (null != priority && priority > 0) {
-            json.put(SemanticSynchrony.PRIORITY, priority);
+            json.put(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
         }
 
         String title = note.getTitle();
         if (title != null && titleLengthCutoff > 0 && title.length() > titleLengthCutoff) {
             title = title.substring(0, titleLengthCutoff) + JsonFormat.TITLE_TRUNCATOR;
         }
-        json.put(SemanticSynchrony.TITLE, title);
+        json.put(SemanticSynchrony.PropertyKeys.TITLE, title);
 
         if (null != note.getPage()) {
-            json.put(SemanticSynchrony.PAGE, note.getPage());
+            json.put(SemanticSynchrony.PropertyKeys.PAGE, note.getPage());
         }
 
         if (null != note.getAlias()) {
-            json.put(SemanticSynchrony.ALIAS, note.getAlias());
+            json.put(SemanticSynchrony.PropertyKeys.ALIAS, note.getAlias());
         }
 
         if (null != note.getShortcut()) {
-            json.put(SemanticSynchrony.SHORTCUT, note.getShortcut());
+            json.put(SemanticSynchrony.PropertyKeys.SHORTCUT, note.getShortcut());
         }
 
         if (null != note.getMeta()) {

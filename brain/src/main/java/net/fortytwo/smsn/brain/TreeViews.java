@@ -2,14 +2,16 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.io.markdown.MarkdownParser;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
 import org.parboiled.common.Preconditions;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ public class TreeViews {
 
     private final Brain brain;
     //private final QueryEngine rippleQueryEngine;
+    private final MarkdownParser markdownParser = new MarkdownParser();
 
     /**
      * @param brain the Extend-o-Brain instance to query and update
@@ -110,7 +113,7 @@ public class TreeViews {
 
         updateInternal(root, height, filter, style, cache);
 
-        brain.getAtomGraph().notifyOfUpdate();
+        brain.getTopicGraph().notifyOfUpdate();
     }
 
     /**
@@ -142,13 +145,13 @@ public class TreeViews {
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getAtomGraph().getAtomsByTitleQuery(query, filter);
+                results = brain.getTopicGraph().getAtomsByTitleQuery(query, filter);
                 break;
             case Acronym:
-                results = brain.getAtomGraph().getAtomsByAcronym(query, filter);
+                results = brain.getTopicGraph().getAtomsByAcronym(query, filter);
                 break;
             case Shortcut:
-                results = brain.getAtomGraph().getAtomsByShortcut(query, filter);
+                results = brain.getTopicGraph().getAtomsByShortcut(query, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);
@@ -212,6 +215,17 @@ public class TreeViews {
         }
 
         return result;
+    }
+
+    public void updatePage(final Atom atom,
+                           final String page) throws IOException {
+        Note pageRoot = markdownParser.parse(page);
+
+
+    }
+
+    private void deleteMarkdownTree(final Atom atom) {
+
     }
 
     private void checkRootArg(final Atom root) {
@@ -424,14 +438,14 @@ public class TreeViews {
     }
 
     private Atom getAtomById(final String id) {
-        return brain.getAtomGraph().getAtomById(id);
+        return brain.getTopicGraph().getAtomById(id);
     }
 
     // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved atoms
     private Atom getAtomById(final String id, final Map<String, Atom> cache) {
         Atom atom = cache.get(id);
         if (null == atom) {
-            atom = brain.getAtomGraph().getAtomById(id);
+            atom = brain.getTopicGraph().getAtomById(id);
             if (null != atom) cache.put(id, atom);
         }
         return atom;
@@ -474,7 +488,7 @@ public class TreeViews {
 
     private Atom createAtom(final String id,
                             final Filter filter) {
-        Atom a = brain.getAtomGraph().createAtomWithProperties(filter, id);
+        Atom a = brain.getTopicGraph().createAtomWithProperties(filter, id);
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logCreate(a);
@@ -499,7 +513,7 @@ public class TreeViews {
 
         Note result = new Note();
 
-        for (Atom a : brain.getAtomGraph().getAllAtoms()) {
+        for (Atom a : brain.getTopicGraph().getAllAtoms()) {
             if (filter.isVisible(a) && !isAdjacent(a, includeChildren, includeParents)) {
                 Note n = viewInternal(a, height, filter, style, true, null);
                 result.addChild(n);
@@ -519,7 +533,7 @@ public class TreeViews {
     private boolean setPage(final Atom target,
                             final String page) {
         // Note: can't delete page with a view update
-        return null != page && target.setPage(page);
+        return null != page && target.setText(page);
     }
 
     private boolean setAlias(final Atom target,
@@ -583,7 +597,7 @@ public class TreeViews {
                 | setSharability(target, note.getSharability());
 
         if (changed) {
-            brain.getAtomGraph().reindexAtom(target);
+            brain.getTopicGraph().reindexAtom(target);
 
             if (null != brain.getActivityLog()) {
                 brain.getActivityLog().logSetProperties(target);
@@ -610,13 +624,13 @@ public class TreeViews {
             // as well as to avoid displaying any child notes.
             if (isVisible) {
                 note.setTitle(atom.getTitle());
-                note.setPage(atom.getPage());
+                note.setPage(atom.getText());
             }
 
             if (null != brain.getKnowledgeBase()) {
                 List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(atom);
                 if (null != entries && entries.size() > 0) {
-                    List<String> meta = new LinkedList<>();
+                    List<String> meta = new java.util.LinkedList();
                     for (KnowledgeBase.AtomClassEntry e : entries) {
                         String ann = "class " + e.getInferredClassName()
                                 + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore();
@@ -659,7 +673,7 @@ public class TreeViews {
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
     // TODO: see also BrainGraph.toList
-    public static Iterable<Atom> toIterable(AtomList l) {
+    public static Iterable<Atom> toIterable(EntityList<Atom> l) {
         List<Atom> ll = new LinkedList<>();
         while (null != l) {
             ll.add(l.getFirst());
@@ -746,14 +760,14 @@ public class TreeViews {
                                         final Filter filter) {
             List<Atom> results = new LinkedList<>();
             root.forFirstOf(list -> {
-                AtomList cur = list;
-                AtomList prev = null;
+                EntityList<Atom> cur = list;
+                EntityList<Atom> prev = null;
                 while (null != cur) {
                     prev = cur;
                     cur = cur.getRestOf();
                 }
 
-                Atom a = prev.getNotesOf();
+                Atom a = prev.getFirst().getSubject(prev);
                 if (filter.isVisible(a)) {
                     results.add(a);
                 }

@@ -2,9 +2,9 @@ package net.fortytwo.smsn.brain.io.edges;
 
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class EdgeWriter extends BrainWriter {
 
     @Override
     public void doExport(Context context) throws IOException {
-        AtomGraph sourceGraph = context.getAtomGraph();
+        TopicGraph sourceGraph = context.getTopicGraph();
         PrintStream p = new PrintStream(context.getDestStream());
         Filter filter = context.getFilter();
 
@@ -29,7 +29,7 @@ public class EdgeWriter extends BrainWriter {
 
         for (Atom fromAtom : sourceGraph.getAllAtoms()) {
             if (null != fromAtom && filter.isVisible(fromAtom)) {
-                AtomList l = fromAtom.getNotes();
+                EntityList<Atom> l = fromAtom.getNotes();
                 while (null != l) {
                     Atom toAtom = l.getFirst();
                     if (filter.isVisible(toAtom)) {

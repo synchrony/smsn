@@ -52,7 +52,7 @@ public class SetAtomWeightMapping extends AtomMapping {
         } else {
             Float f = sharabilityOrWeightFromArgument(value, mc);
 
-            setProperty(n, SemanticSynchrony.WEIGHT, "" + f);
+            setProperty(n, SemanticSynchrony.PropertyKeys.WEIGHT, "" + f);
 
             // put the atom back on the stack
             solutions.accept(stack.push(n));

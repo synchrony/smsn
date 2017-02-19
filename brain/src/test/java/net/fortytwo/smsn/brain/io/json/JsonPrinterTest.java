@@ -38,20 +38,20 @@ public class JsonPrinterTest {
         JSONObject n1 = c.getJSONObject(0);
         assertEquals(0, n1.getInt(JsonFormat.NUMBER_OF_CHILDREN));
         assertEquals(0, n1.getInt(JsonFormat.NUMBER_OF_PARENTS));
-        assertEquals("foo", n1.getString(SemanticSynchrony.TITLE));
+        assertEquals("foo", n1.getString(SemanticSynchrony.PropertyKeys.TITLE));
         JSONArray c1 = n1.getJSONArray(JsonFormat.CHILDREN);
         assertEquals(2, c1.length());
 
         JSONObject n2 = c1.getJSONObject(0);
         assertEquals(0, n2.getInt(JsonFormat.NUMBER_OF_CHILDREN));
         assertEquals(0, n2.getInt(JsonFormat.NUMBER_OF_PARENTS));
-        assertEquals("bar", n2.getString(SemanticSynchrony.TITLE));
+        assertEquals("bar", n2.getString(SemanticSynchrony.PropertyKeys.TITLE));
         assertNull(n2.optJSONArray(JsonFormat.CHILDREN));
 
         JSONObject n3 = c1.getJSONObject(1);
         assertEquals(0, n3.getInt(JsonFormat.NUMBER_OF_CHILDREN));
         assertEquals(0, n3.getInt(JsonFormat.NUMBER_OF_PARENTS));
-        assertEquals("quux", n3.getString(SemanticSynchrony.TITLE));
+        assertEquals("quux", n3.getString(SemanticSynchrony.PropertyKeys.TITLE));
         assertNull(n3.optJSONArray(JsonFormat.CHILDREN));
     }
 
@@ -67,7 +67,7 @@ public class JsonPrinterTest {
             JSONObject j = jsonPrinter.toJson(n);
 
             assertEquals("this is a  [...]",
-                    j.getJSONArray(JsonFormat.CHILDREN).getJSONObject(0).getString(SemanticSynchrony.TITLE));
+                    j.getJSONArray(JsonFormat.CHILDREN).getJSONObject(0).getString(SemanticSynchrony.PropertyKeys.TITLE));
         } finally {
             jsonPrinter.setTitleLengthCutoff(before);
         }
@@ -79,8 +79,8 @@ public class JsonPrinterTest {
         n.setTitle("Arthur Dent");
 
         JSONObject j = jsonPrinter.toJson(n);
-        assertEquals("Arthur Dent", j.getString(SemanticSynchrony.TITLE));
-        assertNull(j.opt(SemanticSynchrony.PAGE));
+        assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));
+        assertNull(j.opt(SemanticSynchrony.PropertyKeys.PAGE));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class JsonPrinterTest {
         n.setPage("12345");
 
         JSONObject j = jsonPrinter.toJson(n);
-        assertEquals("Arthur Dent", j.getString(SemanticSynchrony.TITLE));
-        assertEquals("12345", j.getString(SemanticSynchrony.PAGE));
+        assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));
+        assertEquals("12345", j.getString(SemanticSynchrony.PropertyKeys.PAGE));
     }
 }

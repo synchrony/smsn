@@ -72,7 +72,7 @@ public class WriteGraph extends FilteredAction {
         Format format = getFormat(params);
 
         BrainWriter.Context context = new BrainWriter.Context();
-        context.setAtomGraph(params.getBrain().getAtomGraph());
+        context.setTopicGraph(params.getBrain().getTopicGraph());
         context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
         context.setRootId(params.getRootId());
         context.setFilter(params.getFilter());

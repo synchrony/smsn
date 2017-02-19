@@ -2,8 +2,8 @@ package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
@@ -62,7 +62,7 @@ public class FreeplaneReader extends BrainReader {
         return Arrays.asList(FreeplaneFormat.getInstance());
     }
 
-    private final Map<AtomGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
+    private final Map<TopicGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
 
     private final FreeplaneXMLParser xmlParser;
 
@@ -81,10 +81,10 @@ public class FreeplaneReader extends BrainReader {
             throw new IOException(e);
         }
 
-        getParserInstanceFor(context.getAtomGraph()).parseDOMToGraph(doc);
+        getParserInstanceFor(context.getTopicGraph()).parseDOMToGraph(doc);
     }
 
-    private ParserInstance getParserInstanceFor(final AtomGraph destGraph) {
+    private ParserInstance getParserInstanceFor(final TopicGraph destGraph) {
         ParserInstance instance = parserInstancesByGraph.get(destGraph);
         if (null == instance) {
             instance = new ParserInstance(destGraph);
@@ -94,7 +94,7 @@ public class FreeplaneReader extends BrainReader {
         return instance;
     }
 
-    private void persistNote(final AtomGraph destGraph, final Note rootNote)
+    private void persistNote(final TopicGraph destGraph, final Note rootNote)
             throws Brain.BrainException {
 
         int maxHeight = 1000;
@@ -177,12 +177,12 @@ public class FreeplaneReader extends BrainReader {
     }
 
     private class ParserInstance {
-        private final AtomGraph destGraph;
+        private final TopicGraph destGraph;
         private final Map<String, List<String>> arrowLinks = new HashMap<>();
         private final Map<String, Note> notesByFreeplaneId = new HashMap<>();
         private final Map<String, Note> styleNotes = new HashMap<>();
 
-        public ParserInstance(AtomGraph destGraph) {
+        public ParserInstance(TopicGraph destGraph) {
             this.destGraph = destGraph;
         }
 

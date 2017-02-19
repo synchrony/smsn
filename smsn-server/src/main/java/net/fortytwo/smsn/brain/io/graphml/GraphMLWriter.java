@@ -3,7 +3,7 @@ package net.fortytwo.smsn.brain.io.graphml;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,10 +18,10 @@ public class GraphMLWriter extends BrainWriter {
 
     @Override
     public void doExport(Context context) throws IOException {
-        if (!(context.getAtomGraph() instanceof PGAtomGraph)) throw new UnsupportedOperationException();
-        PGAtomGraph originalGraph = (PGAtomGraph) context.getAtomGraph();
+        if (!(context.getTopicGraph() instanceof PGTopicGraph)) throw new UnsupportedOperationException();
+        PGTopicGraph originalGraph = (PGTopicGraph) context.getTopicGraph();
         Filter filter = context.getFilter();
-        PGAtomGraph newGraph = null == filter || filter.isTrivial()
+        PGTopicGraph newGraph = null == filter || filter.isTrivial()
                 ? originalGraph
                 : originalGraph.copyGraph(context.getFilter());
 

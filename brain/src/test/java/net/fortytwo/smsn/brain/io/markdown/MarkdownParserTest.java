@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
 import net.fortytwo.smsn.brain.model.Note;
-import org.commonmark.node.Document;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -27,15 +26,11 @@ public class MarkdownParserTest {
 
     @Test
     public void completeExampleParsedCorrectly() throws IOException {
-        Parser parser = Parser.builder().build();
-        Document document;
         Note root;
-        MarkdownParser reader = new MarkdownParser();
+        MarkdownParser parser = new MarkdownParser();
         try (InputStream in = MarkdownParserTest.class.getResourceAsStream("markdown-example-1.md")) {
-            root = reader.parse(in);
+            root = parser.parse(in);
         }
-
-        //mdParser.setVerbose(true);
 
         assertEquals(7, root.getChildren().size());
     }

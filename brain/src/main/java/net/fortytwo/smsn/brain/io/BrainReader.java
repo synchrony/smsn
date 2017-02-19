@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.FilenameUtils;
 
@@ -65,7 +65,7 @@ public abstract class BrainReader {
 
         long before = System.currentTimeMillis();
 
-        AtomGraph destGraph = context.getAtomGraph();
+        TopicGraph destGraph = context.getTopicGraph();
 
         importInternal(context);
 
@@ -74,7 +74,7 @@ public abstract class BrainReader {
                 "Resulting graph has " + getSizeOf(context) + " atoms");
     }
 
-    protected synchronized void addToIndices(final Atom atom, final AtomGraph graph) {
+    protected synchronized void addToIndices(final Atom atom, final TopicGraph graph) {
         graph.reindexAtom(atom);
 
         if (transactionBufferSize > 0 && transactionBufferSize == ++transactionCounter) {
@@ -106,12 +106,12 @@ public abstract class BrainReader {
     }
 
     private long getSizeOf(final Context context) {
-        return Iterators.size(context.getAtomGraph().getAllAtoms().iterator());
+        return Iterators.size(context.getTopicGraph().getAllAtoms().iterator());
     }
 
     private void importDirectoryNonrecursive(File dir, Format format, Brain brain) throws IOException {
         Context context = new Context();
-        context.setAtomGraph(brain.getAtomGraph());
+        context.setTopicGraph(brain.getTopicGraph());
         context.setSourceDirectory(dir);
         context.setFormat(format);
 
@@ -142,7 +142,7 @@ public abstract class BrainReader {
             setDefaultNodeName(file.getName());
 
             Context context = new Context();
-            context.setAtomGraph(brain.getAtomGraph());
+            context.setTopicGraph(brain.getTopicGraph());
             context.setSourceStream(sourceStream);
             context.setFormat(format);
 
@@ -151,17 +151,17 @@ public abstract class BrainReader {
     }
 
     public static class Context {
-        private AtomGraph atomGraph;
+        private TopicGraph topicGraph;
         private InputStream sourceStream;
         private File sourceDirectory;
         private Format format;
 
-        public AtomGraph getAtomGraph() {
-            return atomGraph;
+        public TopicGraph getTopicGraph() {
+            return topicGraph;
         }
 
-        public void setAtomGraph(AtomGraph atomGraph) {
-            this.atomGraph = atomGraph;
+        public void setTopicGraph(TopicGraph topicGraph) {
+            this.topicGraph = topicGraph;
         }
 
         public InputStream getSourceStream() {

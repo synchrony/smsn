@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,15 +16,15 @@ public class SetPropertiesTest extends ActionTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        atomGraph.begin();
-        atom = atomGraph.createAtom(null);
+        topicGraph.begin();
+        atom = topicGraph.createAtom(null);
         atom.setTitle("before");
-        atom.setPage("the page");
-        atomGraph.commit();
+        atom.setText("the page");
+        topicGraph.commit();
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals("before", atom.getTitle());
-        assertEquals("the page", atom.getPage());
+        assertEquals("the page", atom.getText());
     }
 
     @Test
@@ -32,12 +32,12 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.TITLE);
+        action.setName(SemanticSynchrony.PropertyKeys.TITLE);
         action.setValue("after");
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals("after", atom.getTitle());
     }
 
@@ -46,7 +46,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.TITLE);
+        action.setName(SemanticSynchrony.PropertyKeys.TITLE);
         action.setValue("  \n");
 
         perform(action);
@@ -57,13 +57,13 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.PAGE);
+        action.setName(SemanticSynchrony.PropertyKeys.PAGE);
         action.setValue("after");
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
-        assertEquals("after", atom.getPage());
+        atom = topicGraph.getAtomById(atom.getId());
+        assertEquals("after", atom.getText());
     }
 
     @Test
@@ -71,99 +71,99 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.PAGE);
+        action.setName(SemanticSynchrony.PropertyKeys.PAGE);
         action.setValue("  \n ");
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
-        assertNull(atom.getPage());
+        atom = topicGraph.getAtomById(atom.getId());
+        assertNull(atom.getText());
     }
 
     @Test
     public void weightIsSetCorrectly() throws Exception {
-        atomGraph.begin();
-        Atom atom = atomGraph.createAtom(null);
+        topicGraph.begin();
+        Atom atom = topicGraph.createAtom(null);
         atom.setTitle("test");
         atom.setWeight(0.25f);
-        atomGraph.commit();
+        topicGraph.commit();
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals(0.25f, atom.getWeight(), 0.0f);
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.WEIGHT);
+        action.setName(SemanticSynchrony.PropertyKeys.WEIGHT);
         action.setValue(0.5);
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals(0.5f, atom.getWeight(), 0.0f);
     }
 
     @Test
     public void sharabilityIsSetCorrectly() throws Exception {
-        atomGraph.begin();
-        Atom atom = atomGraph.createAtom(null);
+        topicGraph.begin();
+        Atom atom = topicGraph.createAtom(null);
         atom.setTitle("test");
         atom.setSharability(0.25f);
-        atomGraph.commit();
+        topicGraph.commit();
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals(0.25f, atom.getSharability(), 0.0f);
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.SHARABILITY);
+        action.setName(SemanticSynchrony.PropertyKeys.SHARABILITY);
         action.setValue(0.5);
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals(0.5f, atom.getSharability(), 0.0f);
     }
 
     @Test
     public void priorityIsSetCorrectly() throws Exception {
-        atomGraph.begin();
-        Atom atom = atomGraph.createAtom(null);
+        topicGraph.begin();
+        Atom atom = topicGraph.createAtom(null);
         atom.setTitle("test");
         atom.setPriority(0.25f);
-        atomGraph.commit();
+        topicGraph.commit();
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals(0.25f, atom.getPriority(), 0.0f);
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.PRIORITY);
+        action.setName(SemanticSynchrony.PropertyKeys.PRIORITY);
         action.setValue(0.5);
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals(0.5f, atom.getPriority(), 0.0f);
     }
 
     @Test
     public void shortcutIsSetCorrectly() throws Exception {
-        atomGraph.begin();
-        Atom atom = atomGraph.createAtom(null);
+        topicGraph.begin();
+        Atom atom = topicGraph.createAtom(null);
         atom.setTitle("test");
-        atomGraph.commit();
+        topicGraph.commit();
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertNull(atom.getShortcut());
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.SHORTCUT);
+        action.setName(SemanticSynchrony.PropertyKeys.SHORTCUT);
         action.setValue("after");
 
         perform(action);
 
-        atom = atomGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId());
         assertEquals("after", atom.getShortcut());
     }
 }

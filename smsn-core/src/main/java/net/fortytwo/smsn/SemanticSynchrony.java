@@ -42,32 +42,47 @@ public class SemanticSynchrony {
     public static final String
             BRAIN_PORT = "net.fortytwo.smsn.server.brainPort";
 
-    // the id property also used by ElementIdStrategy
-    public static final String
-            ID_V = "idV",
-            ID_E = "idE";
+    public interface VertexLabels {
+        String
+                ATOM = "atom",
+                LIST = "list",
+                LINK = "link",
+                PAGE = "page",
+                TOPIC = "topic",
+                TREE = "tree";
+    }
 
-    public static final String
-            ATOM = "atom",
-            ATOM_LIST = "list";
+    public interface EdgeLabels {
+        String
+                CHILDREN = "children",
+                CONTEXT = "context",
+                FIRST = "first",
+                KEY = "key",
+                NOTES = "notes",
+                REST = "rest",
+                TARGET = "target",
+                TOPIC = "topic",
+                TREE = "tree",
+                VALUE = "value";
+    }
 
-    // core schema constants
-    public static final String
-            ALIAS = "alias",
-            CREATED = "created",
-            FIRST = "first",
-            NOTES = "notes",
-            PAGE = "page",
-            REST = "rest",
-            SHARABILITY = "sharability",
-            TITLE = "title",
-            WEIGHT = "weight";
-
-    // extended schema constants
-    public static final String
-            ACRONYM = "acronym",
-            PRIORITY = "priority",
-            SHORTCUT = "shortcut";
+    public interface PropertyKeys {
+        String
+                ACRONYM = "acronym",
+                ALIAS = "alias",
+                CREATED = "created",
+                FORMAT = "format",
+                // the id property also used by ElementIdStrategy
+                ID_V = "idV",
+                LABEL = "label",
+                PAGE = "page",
+                PRIORITY = "priority",
+                SHARABILITY = "sharability",
+                SHORTCUT = "shortcut",
+                TEXT = "text",
+                TITLE = "title",
+                WEIGHT = "weight";
+    }
 
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 

@@ -22,11 +22,11 @@ public abstract class GraphWrapper {
         this.graph = graph;
 
         // TODO: add id strategy
-        add(createExactIndex(SemanticSynchrony.ID_V, true));
-        add(createExactIndex(SemanticSynchrony.SHORTCUT, true));
+        add(createExactIndex(SemanticSynchrony.PropertyKeys.ID_V, true));
+        add(createExactIndex(SemanticSynchrony.PropertyKeys.SHORTCUT, true));
 
-        add(createFullTextIndex(SemanticSynchrony.TITLE));
-        add(createFullTextIndex(SemanticSynchrony.ACRONYM));
+        add(createFullTextIndex(SemanticSynchrony.PropertyKeys.TITLE));
+        add(createFullTextIndex(SemanticSynchrony.PropertyKeys.ACRONYM));
     }
 
     protected abstract IndexWrapper createFullTextIndex(String key);
@@ -46,18 +46,18 @@ public abstract class GraphWrapper {
     public Vertex createVertex(final String id, final String label) {
         Vertex vertex = graph.addVertex(T.label, label);
         // TODO: use id strategy
-        vertex.property(SemanticSynchrony.ID_V, getNonNullId(id));
+        vertex.property(SemanticSynchrony.PropertyKeys.ID_V, getNonNullId(id));
         // TODO: use auto-indexing
-        updateIndex(vertex, SemanticSynchrony.ID_V);
+        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ID_V);
 
         return vertex;
     }
 
     public void reindex(final Vertex vertex) {
-        updateIndex(vertex, SemanticSynchrony.ID_V);
-        updateIndex(vertex, SemanticSynchrony.TITLE);
-        updateIndex(vertex, SemanticSynchrony.ACRONYM);
-        updateIndex(vertex, SemanticSynchrony.SHORTCUT);
+        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ID_V);
+        updateIndex(vertex, SemanticSynchrony.PropertyKeys.TITLE);
+        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ACRONYM);
+        updateIndex(vertex, SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
 
     public Graph getGraph() {
@@ -65,19 +65,19 @@ public abstract class GraphWrapper {
     }
 
     public Vertex getVertexById(final String id) {
-        return getVertexByKeyValue(SemanticSynchrony.ID_V, id);
+        return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID_V, id);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByValue(final String term) {
-        return getVerticesByKeyValue(SemanticSynchrony.TITLE, term);
+        return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.TITLE, term);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByAcronym(final String acronym) {
-        return getVerticesByKeyValue(SemanticSynchrony.ACRONYM, acronym);
+        return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.ACRONYM, acronym);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByShortcut(final String shortcut) {
-        return getVerticesByKeyValue(SemanticSynchrony.SHORTCUT, shortcut);
+        return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
     }
 
     protected IndexWrapper getIndex(final String key) {

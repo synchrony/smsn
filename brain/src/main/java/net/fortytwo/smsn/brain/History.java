@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.util.Collection;
@@ -26,7 +26,7 @@ public class History {
     }
 
     public Iterable<Atom> getHistory(final int maxlen,
-                                     final AtomGraph graph,
+                                     final TopicGraph graph,
                                      final Filter filter) {
         Collection<Atom> atoms = new LinkedList<>();
 

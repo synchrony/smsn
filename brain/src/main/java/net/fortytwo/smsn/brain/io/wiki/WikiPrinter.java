@@ -71,12 +71,12 @@ public class WikiPrinter {
     }
 
     private static void printProperties(final Note n, final PrintStream p, final int nextIndent) {
-        if (null != n.getAlias()) printProperty(SemanticSynchrony.ALIAS, n.getAlias(), nextIndent, p);
-        if (null != n.getCreated()) printProperty(SemanticSynchrony.CREATED, n.getCreated(), nextIndent, p);
-        if (null != n.getPriority()) printProperty(SemanticSynchrony.PRIORITY, n.getPriority(), nextIndent, p);
-        if (null != n.getSharability()) printProperty(SemanticSynchrony.SHARABILITY, n.getSharability(), nextIndent, p);
-        if (null != n.getShortcut()) printProperty(SemanticSynchrony.SHORTCUT, n.getShortcut(), nextIndent, p);
-        if (null != n.getWeight()) printProperty(SemanticSynchrony.WEIGHT, n.getWeight(), nextIndent, p);
+        if (null != n.getAlias()) printProperty(SemanticSynchrony.PropertyKeys.ALIAS, n.getAlias(), nextIndent, p);
+        if (null != n.getCreated()) printProperty(SemanticSynchrony.PropertyKeys.CREATED, n.getCreated(), nextIndent, p);
+        if (null != n.getPriority()) printProperty(SemanticSynchrony.PropertyKeys.PRIORITY, n.getPriority(), nextIndent, p);
+        if (null != n.getSharability()) printProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, n.getSharability(), nextIndent, p);
+        if (null != n.getShortcut()) printProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, n.getShortcut(), nextIndent, p);
+        if (null != n.getWeight()) printProperty(SemanticSynchrony.PropertyKeys.WEIGHT, n.getWeight(), nextIndent, p);
     }
 
     private static void printProperty(final String key, final Object value, final int indent, final PrintStream p) {

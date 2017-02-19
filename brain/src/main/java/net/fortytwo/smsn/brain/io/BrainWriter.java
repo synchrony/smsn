@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io;
 
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import org.apache.commons.io.FileUtils;
@@ -19,7 +19,7 @@ public abstract class BrainWriter {
     public abstract void doExport(Context context) throws IOException;
 
     public static class Context {
-        private AtomGraph atomGraph;
+        private TopicGraph topicGraph;
         private KnowledgeBase knowledgeBase;
         private String rootId;
         private Filter filter;
@@ -27,7 +27,7 @@ public abstract class BrainWriter {
         private OutputStream destStream;
         private Format format;
 
-        private AtomGraph filteredGraph;
+        private TopicGraph filteredGraph;
 
         public KnowledgeBase getKnowledgeBase() {
             return knowledgeBase;
@@ -37,12 +37,12 @@ public abstract class BrainWriter {
             this.knowledgeBase = knowledgeBase;
         }
 
-        public AtomGraph getAtomGraph() {
-            return atomGraph;
+        public TopicGraph getTopicGraph() {
+            return topicGraph;
         }
 
-        public void setAtomGraph(AtomGraph atomGraph) {
-            this.atomGraph = atomGraph;
+        public void setTopicGraph(TopicGraph topicGraph) {
+            this.topicGraph = topicGraph;
         }
 
         public String getRootId() {
@@ -85,12 +85,12 @@ public abstract class BrainWriter {
             this.format = format;
         }
 
-        public AtomGraph getFilteredGraph() {
+        public TopicGraph getFilteredGraph() {
             if (null == filter) {
-                return atomGraph;
+                return topicGraph;
             } else {
                 if (null == filteredGraph) {
-                    filteredGraph = atomGraph.createFilteredGraph(filter);
+                    filteredGraph = topicGraph.createFilteredGraph(filter);
                 }
 
                 return filteredGraph;

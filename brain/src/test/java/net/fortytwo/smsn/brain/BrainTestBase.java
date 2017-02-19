@@ -2,13 +2,13 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class BrainTestBase {
 
     protected TreeViews queries;
-    protected AtomGraph atomGraph;
+    protected TopicGraph topicGraph;
     protected final WikiParser wikiParser = new WikiParser();
 
     protected Graph graph;
@@ -32,27 +32,27 @@ public abstract class BrainTestBase {
     protected Filter filter = Filter.noFilter();
     protected Collection<Atom> result;
 
-    protected abstract AtomGraph createAtomGraph() throws IOException;
+    protected abstract TopicGraph createAtomGraph() throws IOException;
 
-    protected AtomGraph createTinkerAtomGraph() {
+    protected TopicGraph createTinkerAtomGraph() {
         graph = TinkerGraph.open();
         graphWrapper = new TinkerGraphWrapper((TinkerGraph) graph);
-        return new PGAtomGraph(graphWrapper);
+        return new PGTopicGraph(graphWrapper);
     }
 
-    protected AtomGraph createNeo4jAtomGraph() throws IOException {
+    protected TopicGraph createNeo4jAtomGraph() throws IOException {
         File dir = createTempDirectory();
 
         graphWrapper = new Neo4jGraphWrapper(dir);
         graph = graphWrapper.getGraph();
 
-        return new PGAtomGraph(graphWrapper);
+        return new PGTopicGraph(graphWrapper);
     }
 
     @Before
     public void setUp() throws Exception {
-        atomGraph = createAtomGraph();
-        Brain brain = new Brain(atomGraph);
+        topicGraph = createAtomGraph();
+        Brain brain = new Brain(topicGraph);
         queries = new TreeViews(brain);
         filter = Filter.noFilter();
     }
@@ -74,14 +74,14 @@ public abstract class BrainTestBase {
 
         Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());
-        Atom root = atomGraph.createAtomWithProperties(filter, rootNote.getId());
+        Atom root = topicGraph.createAtomWithProperties(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);
         return root;
     }
 
-    protected int countAtoms(final AtomGraph atomGraph) {
+    protected int countAtoms(final TopicGraph topicGraph) {
         int count = 0;
-        for (Atom a : atomGraph.getAllAtoms()) {
+        for (Atom a : topicGraph.getAllAtoms()) {
             count++;
         }
         return count;

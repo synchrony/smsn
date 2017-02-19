@@ -1,19 +1,18 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class PGAtom extends PGGraphEntity implements Atom {
+public abstract class PGAtom extends PGEntity implements Atom {
 
-    protected PGAtom(final Vertex vertex) {
+    public PGAtom(final Vertex vertex) {
         super(vertex);
     }
 
@@ -23,118 +22,120 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
     }
 
     @Override
+    public boolean setId(final String id) {
+        String atomId = null == id ? SemanticSynchrony.createRandomId() : id;
+        return setRequiredProperty(SemanticSynchrony.PropertyKeys.ID_V, atomId);
+    }
+
+    @Override
     public String getAlias() {
-        return getOptionalProperty(SemanticSynchrony.ALIAS);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS);
     }
 
     @Override
     public boolean setAlias(String alias) {
-        return setOptionalProperty(SemanticSynchrony.ALIAS, alias);
+        return setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
     }
 
     @Override
     public Long getCreated() {
-        return getOptionalProperty(SemanticSynchrony.CREATED);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.CREATED);
     }
 
     @Override
     public boolean setCreated(Long created) {
-        return setRequiredProperty(SemanticSynchrony.CREATED, created);
+        return setRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
     }
 
     @Override
     public String getTitle() {
-        return (String) getRequiredProperty(SemanticSynchrony.TITLE);
+        return (String) getRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE);
     }
 
     @Override
     public boolean setTitle(String title) {
-        return setRequiredProperty(SemanticSynchrony.TITLE, title);
+        return setRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE, title);
     }
 
     @Override
-    public String getPage() {
-        return (String) getOptionalProperty(SemanticSynchrony.PAGE);
+    public String getText() {
+        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE);
     }
 
     @Override
-    public boolean setPage(String page) {
-        return setOptionalProperty(SemanticSynchrony.PAGE, page);
+    public boolean setText(String text) {
+        return setOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE, text);
     }
 
     @Override
     public Float getPriority() {
-        return getOptionalProperty(SemanticSynchrony.PRIORITY);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY);
     }
 
     @Override
     public boolean setPriority(Float priority) {
-        return setOptionalProperty(SemanticSynchrony.PRIORITY, priority);
+        return setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
     }
 
     @Override
     public Float getSharability() {
-        return getOptionalProperty(SemanticSynchrony.SHARABILITY, 0f);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, 0f);
     }
 
     @Override
     public boolean setSharability(Float sharability) {
-        return setRequiredProperty(SemanticSynchrony.SHARABILITY, sharability);
+        return setRequiredProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, sharability);
     }
 
     @Override
     public String getShortcut() {
-        return getOptionalProperty(SemanticSynchrony.SHORTCUT);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
 
     @Override
     public boolean setShortcut(String shortcut) {
-        return setOptionalProperty(SemanticSynchrony.SHORTCUT, shortcut);
+        return setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
     }
 
     @Override
     public Float getWeight() {
-        return getOptionalProperty(SemanticSynchrony.WEIGHT, 0f);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, 0f);
     }
 
     @Override
     public boolean setWeight(Float weight) {
-        return setRequiredProperty(SemanticSynchrony.WEIGHT, weight);
+        return setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
     }
 
     @Override
-    public AtomList getNotes() {
-        return asAtomList(getAtMostOneVertex(SemanticSynchrony.NOTES, Direction.OUT));
+    public EntityList<Atom> getNotes() {
+        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfAtoms(v));
     }
 
     @Override
-    public boolean setNotes(AtomList notes) {
-        return setNotes(notes, null);
-    }
-
-    boolean setNotes(AtomList notes, final Object edgeId) {
+    public boolean setNotes(EntityList<Atom> notes) {
         boolean changed = removeNotes();
         if (null != notes) {
-            addOutEdge(edgeId, ((PGGraphEntity) notes).asVertex(), SemanticSynchrony.NOTES);
+            addOutEdge(((PGEntity) notes).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
         }
         return changed;
     }
 
     @Override
-    public void forFirstOf(Consumer<AtomList> consumer) {
-        forEachAdjacentVertex(SemanticSynchrony.FIRST, Direction.IN, vertex -> consumer.accept(asAtomList(vertex)));
+    public void forFirstOf(Consumer<EntityList<Atom>> consumer) {
+        forEachAdjacentVertex(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
+                vertex -> consumer.accept(getGraph().asListOfAtoms(vertex)));
     }
 
     @Override
     public void addChildAt(final Atom child, int position) {
         // create a list node for the atom and insert it
-        AtomList list = createList();
-        list.setFirst(child);
+        EntityList<Atom> list = getGraph().createListOfAtoms(child);
         if (0 == position) {
             list.setRest(getNotes());
             setNotes(list);
         } else {
-            AtomList prev = getNotes();
+            EntityList<Atom> prev = getNotes();
             for (int i = 1; i < position; i++) {
                 prev = prev.getRest();
             }
@@ -146,7 +147,7 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
     @Override
     public void deleteChildAt(int position) {
-        AtomList list = getNotes();
+        EntityList<Atom> list = getNotes();
 
         // remove the atom's list node
         if (0 == position) {
@@ -154,30 +155,41 @@ public abstract class PGAtom extends PGGraphEntity implements Atom {
 
             deleteListNode(list);
         } else {
-            AtomList prev = list;
+            EntityList<Atom> prev = list;
             for (int i = 1; i < position; i++) {
                 prev = prev.getRest();
             }
 
-            AtomList l = prev.getRest();
+            EntityList<Atom> l = prev.getRest();
             prev.setRest(l.getRest());
             deleteListNode(l);
         }
     }
 
     @Override
-    public Collection<AtomList> getFirstOf() {
-        List<AtomList> result = new LinkedList<>();
-        forAllVertices(SemanticSynchrony.FIRST, Direction.IN, result::add);
+    public Collection<EntityList<Atom>> getFirstOf() {
+        List<EntityList<Atom>> result = new java.util.LinkedList<>();
+        forAllVertices(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
+                vertex -> result.add(getGraph().asListOfAtoms(vertex)));
 
         return result;
     }
 
-    private void deleteListNode(final AtomList l) {
-        ((PGGraphEntity) l).asVertex().remove();
+    @Override
+    public Atom getSubject(EntityList<Atom> notes) {
+        return ((PGEntity) notes).getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN, v -> getGraph().asAtom(v));
+    }
+
+    @Override
+    public void destroy() {
+        destroyInternal();
+    }
+
+    private void deleteListNode(final EntityList<Atom> l) {
+        ((PGEntity) l).asVertex().remove();
     }
 
     private boolean removeNotes() {
-        return removeEdge(SemanticSynchrony.NOTES, Direction.OUT);
+        return removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
     }
 }

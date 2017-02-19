@@ -4,16 +4,15 @@ import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Note;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
 
 public class VCSWriter extends BrainWriter {
@@ -27,7 +26,7 @@ public class VCSWriter extends BrainWriter {
     }
 
     static {
-        formats = new LinkedList<>();
+        formats = new java.util.LinkedList();
         formats.add(VCSFormat.getInstance());
     }
 
@@ -43,7 +42,7 @@ public class VCSWriter extends BrainWriter {
 
         File[] dirs = initializeDirectories(parentDir);
 
-        timeAction("exported atoms as individual files", () -> doExport(context.getAtomGraph(), dirs));
+        timeAction("exported atoms as individual files", () -> doExport(context.getTopicGraph(), dirs));
     }
 
     private File[] initializeDirectories(final File parentDir) throws IOException {
@@ -65,7 +64,7 @@ public class VCSWriter extends BrainWriter {
         }
     }
 
-    private void doExport(final AtomGraph graph, final File[] dirs) throws IOException {
+    private void doExport(final TopicGraph graph, final File[] dirs) throws IOException {
         for (Atom a : graph.getAllAtoms()) {
             File dir = chooseDirectoryForAtom(a, dirs);
             File atomFile = new File(dir, "a" + a.getId());
@@ -86,7 +85,7 @@ public class VCSWriter extends BrainWriter {
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
         Note note = toNote(atom, true);
-        AtomList list = atom.getNotes();
+        EntityList<Atom> list = atom.getNotes();
         while (null != list) {
             note.getChildren().add(toNote(list.getFirst(), false));
             list = list.getRest();
@@ -101,7 +100,7 @@ public class VCSWriter extends BrainWriter {
 
         if (withValueAndProperties) {
             note.setTitle(atom.getTitle());
-            note.setPage(atom.getPage());
+            note.setPage(atom.getText());
             note.setAlias(atom.getAlias());
             note.setCreated(atom.getCreated());
             note.setPriority(atom.getPriority());

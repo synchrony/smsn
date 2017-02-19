@@ -3,8 +3,8 @@ package net.fortytwo.smsn.brain.io.vertices;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
@@ -25,7 +25,7 @@ public class VertexWriter extends BrainWriter {
     @Override
     public void doExport(Context context) throws IOException {
 
-        AtomGraph sourceGraph = context.getAtomGraph();
+        TopicGraph sourceGraph = context.getTopicGraph();
         Filter filter = context.getFilter();
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());

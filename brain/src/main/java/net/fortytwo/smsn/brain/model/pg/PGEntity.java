@@ -1,79 +1,60 @@
 package net.fortytwo.smsn.brain.model.pg;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomList;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-abstract class PGGraphEntity {
-    protected abstract PGAtomGraph getAtomGraph();
+abstract class PGEntity {
 
     private final Vertex vertex;
 
+    protected PGEntity(final Vertex vertex) {
+        this.vertex = vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGEntity && ((PGEntity) other).vertex.id().equals(vertex.id());
+    }
+
+    @Override
+    public int hashCode() {
+        return vertex.id().hashCode();
+    }
+
+    public void remove() {
+        vertex.remove();
+    }
+
+    protected abstract PGTopicGraph getGraph();
+
     protected String getId() {
-        VertexProperty<String> property = vertex.property(SemanticSynchrony.ID_V);
+        VertexProperty<String> property = vertex.property(SemanticSynchrony.PropertyKeys.ID_V);
         if (!property.isPresent()) {
             throw new IllegalStateException("missing id");
         }
         return property.value();
     }
 
-    protected Graph getPropertyGraph() {
-        return getAtomGraph().getPropertyGraph();
-    }
-
-    protected AtomList createList() {
-        return getAtomGraph().createAtomList();
-    }
-
-    protected PGGraphEntity(Vertex vertex) {
-        this.vertex = vertex;
-    }
-
     public Vertex asVertex() {
         return vertex;
     }
 
-    protected void addOutEdge(final Object id, final Vertex inVertex, final String label) {
-        // TODO: control the id of the edge
+    protected void addOutEdge(final Vertex inVertex, final String label) {
         asVertex().addEdge(label, inVertex);
     }
 
-    protected Atom asAtom(Vertex vertex) {
-        return vertexAsAtom(vertex);
-    }
-
-    protected AtomList asAtomList(Vertex vertex) {
-        return vertexAsAtomList(vertex);
-    }
-
-    protected Atom vertexAsAtom(final Vertex vertex) {
-        PGAtomGraph atomGraph = getAtomGraph();
-        return null == vertex ? null : new PGAtom(vertex) {
-            @Override
-            protected PGAtomGraph getAtomGraph() {
-                return atomGraph;
-            }
-        };
-    }
-
-    protected AtomList vertexAsAtomList(final Vertex vertex) {
-        PGAtomGraph atomGraph = getAtomGraph();
-        return null == vertex ? null : new PGAtomList(vertex) {
-            @Override
-            protected PGAtomGraph getAtomGraph() {
-                return atomGraph;
-            }
-        };
+    protected <T> T toEntity(final Vertex vertex, final Function<Vertex, T> constructor) {
+        return null == vertex ? null : constructor.apply(vertex);
     }
 
     protected <T> T getOptionalProperty(String name) {
@@ -89,7 +70,7 @@ abstract class PGGraphEntity {
     protected <T> T getRequiredProperty(String name) {
         T value = getOptionalProperty(name);
         if (null == value) {
-            throw new InvalidGraphException("missing property '" + name + "' for atom vertex " + getId());
+            throw new InvalidGraphException("missing property '" + name + "' for vertex " + getId());
         }
         return value;
     }
@@ -120,43 +101,73 @@ abstract class PGGraphEntity {
 
     protected boolean setRequiredProperty(String name, Object value) {
         if (null == value) {
-            throw new InvalidUpdateException("can't clear required property '" + name
+            throw new IllegalArgumentException("can't clear required property '" + name
                     + "' on atom vertex " + getId());
         }
 
         return setProperty(name, value);
     }
 
-    protected void forAllVertices(final String label, final Direction direction, final Consumer<AtomList> consumer) {
-        vertex.vertices(direction, label).forEachRemaining(vertex -> consumer.accept(vertexAsAtomList(vertex)));
+    protected boolean setRequiredEntity(final String label, final Object other) {
+        return setEntity(label, other, true);
     }
 
-    protected Vertex getAtMostOneVertex(final String label, final Direction direction) {
+    protected boolean setOptionalEntity(final String label, final Object other) {
+        return setEntity(label, other, false);
+    }
+
+    private boolean setEntity(final String label, final Object other, final boolean required) {
+        Preconditions.checkArgument(!required || null != other);
+
+        boolean changed = removeEdge(label, Direction.OUT);
+        if (null != other) {
+            addOutEdge(((PGEntity) other).asVertex(), label);
+            changed = true;
+        }
+        return changed;
+    }
+
+    protected void forAllVertices(final String label, final Direction direction, final Consumer<Vertex> consumer) {
+        vertex.vertices(direction, label).forEachRemaining(consumer);
+    }
+
+    private Vertex getAtMostOneVertex(final String label, final Direction direction) {
         Edge edge = getAtMostOneEdge(label, direction);
         return null == edge ? null : getVertex(edge, direction.opposite());
     }
 
-    protected Vertex getExactlyOneVertex(final String label, final Direction direction) {
+    private Vertex getExactlyOneVertex(final String label, final Direction direction) {
         return getVertex(getExactlyOneEdge(label, direction), direction.opposite());
     }
 
-    protected Edge getAtMostOneEdge(final String label, final Direction direction) {
+    protected <T> T getExactlyOneEntity(
+            final String label, final Direction direction, final Function<Vertex, T> constructor) {
+        return constructor.apply(getExactlyOneVertex(label, direction));
+    }
+
+    protected <T> T getAtMostOneEntity(
+            final String label, final Direction direction, final Function<Vertex, T> constructor) {
+        Vertex vertex = getAtMostOneVertex(label, direction);
+        return null == vertex ? null : constructor.apply(vertex);
+    }
+
+    private Edge getAtMostOneEdge(final String label, final Direction direction) {
         Iterator<Edge> iter = vertex.edges(direction, label);
         if (!iter.hasNext()) {
             return null;
         }
         Edge result = iter.next();
         if (iter.hasNext()) {
-            throw new InvalidGraphException("atom vertex " + getId()
+            throw new InvalidGraphException("vertex " + getId()
                     + " has more than one '" + label + "' " + direction + " edge");
         }
         return result;
     }
 
-    protected Edge getExactlyOneEdge(final String label, final Direction direction) {
+    private Edge getExactlyOneEdge(final String label, final Direction direction) {
         Edge other = getAtMostOneEdge(label, direction);
         if (null == other) {
-            throw new InvalidGraphException("atom vertex " + getId()
+            throw new InvalidGraphException("vertex " + getId()
                     + " is missing '" + label + "' " + direction + " edge");
         }
         return other;
@@ -164,6 +175,10 @@ abstract class PGGraphEntity {
 
     protected void forEachAdjacentVertex(final String label, Direction direction, Consumer<Vertex> consumer) {
         vertex.vertices(direction, label).forEachRemaining(consumer);
+    }
+
+    protected boolean hasAdjacentVertex(final String label, Direction direction) {
+        return vertex.vertices(direction, label).hasNext();
     }
 
     protected boolean removeEdge(final String label, Direction direction) {
@@ -174,6 +189,10 @@ abstract class PGGraphEntity {
                     changed.value = true;
                 });
         return changed.value;
+    }
+
+    protected void destroyInternal() {
+        vertex.remove();
     }
 
     private static class Mutable<T> {

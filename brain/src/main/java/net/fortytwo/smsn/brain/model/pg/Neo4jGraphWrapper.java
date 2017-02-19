@@ -137,9 +137,9 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         GraphDatabaseService graphDb = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(dataDir)
                 .setConfig(GraphDatabaseSettings.node_keys_indexable,
-                        SemanticSynchrony.TITLE +
-                                "," + SemanticSynchrony.ACRONYM +
-                                "," + SemanticSynchrony.SHORTCUT)
+                        SemanticSynchrony.PropertyKeys.TITLE +
+                                "," + SemanticSynchrony.PropertyKeys.ACRONYM +
+                                "," + SemanticSynchrony.PropertyKeys.SHORTCUT)
                 .setConfig(GraphDatabaseSettings.node_auto_indexing, "true").
                         newGraphDatabase();
 

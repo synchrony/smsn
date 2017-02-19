@@ -3,7 +3,7 @@ package net.fortytwo.smsn.brain.io.latex;
 import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class LatexWriter extends BrainWriter {
         String rootId = context.getRootId();
         Filter filter = context.getFilter();
 
-        Atom rootAtom = context.getAtomGraph().getAtomById(rootId);
+        Atom rootAtom = context.getTopicGraph().getAtomById(rootId);
         if (null == rootAtom) {
             throw new IllegalStateException("no such atom: " + rootId);
         }

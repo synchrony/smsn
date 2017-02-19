@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -42,7 +42,7 @@ public class FindDuplicates extends FilteredAction {
 
     @Override
     protected void performTransaction(final RequestParams params) throws RequestProcessingException {
-        List<List<Atom>> dups = getDuplicates(params.getBrain().getAtomGraph(), params.getFilter());
+        List<List<Atom>> dups = getDuplicates(params.getBrain().getTopicGraph(), params.getFilter());
         List<Atom> flat = new LinkedList<>();
         for (List<Atom> l : dups) flat.addAll(l);
 
@@ -63,7 +63,7 @@ public class FindDuplicates extends FilteredAction {
         return false;
     }
 
-    private List<List<Atom>> getDuplicates(final AtomGraph graph,
+    private List<List<Atom>> getDuplicates(final TopicGraph graph,
                                        final Filter filter) throws RequestProcessingException {
         Map<String, List<Atom>> m = new HashMap<>();
         List<List<Atom>> dups = new LinkedList<>();

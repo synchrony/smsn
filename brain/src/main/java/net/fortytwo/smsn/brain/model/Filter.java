@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.model.entities.Atom;
+
 import java.io.Serializable;
 
 public class Filter implements Serializable {

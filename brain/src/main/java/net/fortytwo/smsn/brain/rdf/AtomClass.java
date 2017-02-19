@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import org.openrdf.model.IRI;
@@ -48,7 +48,7 @@ public abstract class AtomClass {
     protected IRI handleTypeAndAlias(final Atom a,
                                      final RDFizationContext context,
                                      final IRI type) throws RDFHandlerException {
-        IRI self = context.getValueFactory().createIRI(context.getAtomGraph().iriOfAtom(a));
+        IRI self = context.getValueFactory().createIRI(context.getTopicGraph().iriOfAtom(a));
 
         context.getHandler().handleStatement(context.getValueFactory().createStatement(self, RDF.TYPE, type));
 

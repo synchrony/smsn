@@ -8,13 +8,13 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -72,7 +72,7 @@ public abstract class Action {
 
         if (null == brain) {
             logger.info("instantiating Extend-o-Brain with base graph " + wrapper.getGraph());
-            AtomGraph bg = new PGAtomGraph(wrapper);
+            TopicGraph bg = new PGTopicGraph(wrapper);
             brain = new Brain(bg);
             brain.startBackgroundTasks();
             brains.put(wrapper.getGraph(), brain);
@@ -137,14 +137,14 @@ public abstract class Action {
         history.visit(rootId);
     }
 
-    protected Iterable<Atom> getHistory(final AtomGraph graph,
+    protected Iterable<Atom> getHistory(final TopicGraph graph,
                                         final Filter filter) {
         return history.getHistory(100, graph, filter);
     }
 
     private void wrapTransactionAndExceptions(final RequestParams params) {
         try {
-            AtomGraph.wrapInTransaction(params.getBrain().getAtomGraph(), () -> {
+            TopicGraph.wrapInTransaction(params.getBrain().getTopicGraph(), () -> {
                 // must be done within the transaction, as it involves graph operations
                 setTransactionalParams(params);
 
@@ -234,9 +234,9 @@ public abstract class Action {
     }
 
     private Atom createNewRoot(final RequestParams params) {
-        Atom root = params.getBrain().getAtomGraph().createAtomWithProperties(params.getFilter(), null);
+        Atom root = params.getBrain().getTopicGraph().createAtomWithProperties(params.getFilter(), null);
         root.setTitle("life, the universe, and everything");
-        params.getBrain().getAtomGraph().reindexAtom(root);
+        params.getBrain().getTopicGraph().reindexAtom(root);
         return root;
     }
 
@@ -246,7 +246,7 @@ public abstract class Action {
         if (null != rootId) {
             Atom root = rootId.equals(CREATE_NEW_ATOM)
                     ? createNewRoot(params)
-                    : params.getBrain().getAtomGraph().getAtomById(rootId);
+                    : params.getBrain().getTopicGraph().getAtomById(rootId);
 
             params.setRoot(root);
 

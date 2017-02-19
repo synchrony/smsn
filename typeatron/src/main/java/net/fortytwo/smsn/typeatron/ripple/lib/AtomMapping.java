@@ -7,7 +7,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.TreeViews;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
@@ -105,6 +105,6 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
             }
         }
 
-        return valueFactory.createIRI(PGAtomGraph.iriForId(n.getId()));
+        return valueFactory.createIRI(PGTopicGraph.iriForId(n.getId()));
     }
 }

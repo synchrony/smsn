@@ -1,29 +1,35 @@
 package net.fortytwo.smsn.brain.model.pg;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Entity;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.parboiled.common.Preconditions;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class PGAtomGraph implements AtomGraph {
+public class PGTopicGraph implements TopicGraph {
 
     private static final String REDACTED_VALUE = "";
 
@@ -39,14 +45,12 @@ public class PGAtomGraph implements AtomGraph {
 
     private final GraphWrapper wrapper;
     private final Graph propertyGraph;
-    private final PGAtomGraph thisGraph;
 
     private long lastUpdate;
 
-    public PGAtomGraph(final GraphWrapper wrapper) {
+    public PGTopicGraph(final GraphWrapper wrapper) {
         this.wrapper = wrapper;
         this.propertyGraph = wrapper.getGraph();
-        thisGraph = this;
     }
 
     public Graph getPropertyGraph() {
@@ -87,7 +91,7 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public AtomGraph createFilteredGraph(Filter filter) {
+    public TopicGraph createFilteredGraph(Filter filter) {
         //return new FilteredAtomGraph(this, filter);
         return copyGraph(filter);
     }
@@ -101,32 +105,26 @@ public class PGAtomGraph implements AtomGraph {
     public Atom getAtomById(final String id) {
         Vertex v = wrapper.getVertexById(id);
 
-        return null == v ? null : getAtom(v);
+        return null == v ? null : asAtom(v);
     }
 
-    @Override
-    public AtomList createAtomList(String id) {
-        Vertex vertex = wrapper.createVertex(id, SemanticSynchrony.ATOM_LIST);
-        return new PGAtomListImpl(vertex);
-    }
+    private <T extends Entity> EntityList<T> createListOfEntities(final String vertexLabel,
+                                                   final Function<Vertex, EntityList<T>> constructor,
+                                                   final T[] elements) {
+        Preconditions.checkArgument(elements.length > 0);
 
-    @Override
-    public AtomList createAtomList(final Atom... elements) {
-        if (0 == elements.length) {
-            throw new IllegalArgumentException("empty list");
-        }
+        EntityList<T> last = null;
+        EntityList<T> head = null;
+        for (T el : elements) {
+            EntityList<T> cur = createEntity(null, vertexLabel, constructor);
+            cur.setFirst(el);
 
-        AtomList last = null;
-        AtomList head = null;
-        for (Atom a : elements) {
-            AtomList cur = createAtomList();
             if (null == head) {
                 head = cur;
             }
             if (last != null) {
                 last.setRest(cur);
             }
-            cur.setFirst(a);
             last = cur;
         }
 
@@ -134,10 +132,56 @@ public class PGAtomGraph implements AtomGraph {
     }
 
     @Override
-    public Atom createAtom(final String id) {
-        Vertex vertex = wrapper.createVertex(id, SemanticSynchrony.ATOM);
+    public EntityList<Link> createListOfLinks(final Link... elements) {
+        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinks, elements);
+    }
 
-        return new PGAtomImpl(vertex);
+    @Override
+    public EntityList<KeyValueTree<Link, EntityList<Link>>> createListOfTrees(
+            KeyValueTree<Link, EntityList<Link>>... elements) {
+        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinkTrees, elements);
+    }
+
+    @Override
+    public EntityList<Atom> createListOfAtoms(final Atom... elements) {
+        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfAtoms, elements);
+    }
+
+    @Override
+    public Topic createTopic(final String topicId) {
+        Topic topic = createEntity(null, SemanticSynchrony.VertexLabels.TOPIC, this::asTopic);
+        topic.setId(topicId);
+        return topic;
+    }
+
+    @Override
+    public Page createPage(final Link topicLink) {
+        Topic topic = topicLink.getTarget();
+        Page page = createEntity(null, SemanticSynchrony.VertexLabels.PAGE, this::asPage);
+        page.setPrimaryTopic(topic);
+        page.setTopicTree(createTopicTree(topicLink));
+        return page;
+    }
+
+    @Override
+    public Link createLink(Topic target, String label) {
+        Link link = createEntity(null, SemanticSynchrony.VertexLabels.LINK, this::asLink);
+        link.setTarget(target);
+        link.setLabel(label);
+        return link;
+    }
+
+    @Override
+    public KeyValueTree<Link, EntityList<Link>> createTopicTree(final Link link) {
+        KeyValueTree<Link, EntityList<Link>> tree
+                = createEntity(null, SemanticSynchrony.VertexLabels.TREE, this::asLinkTree);
+        tree.setKey(link);
+        return tree;
+    }
+
+    @Override
+    public Atom createAtom(final String id) {
+        return createEntity(id, SemanticSynchrony.VertexLabels.ATOM, this::asAtom);
     }
 
     @Override
@@ -153,13 +197,93 @@ public class PGAtomGraph implements AtomGraph {
         return atom;
     }
 
-    public AtomList createAtomList() {
-        return createAtomList((String) null);
+    public Topic asTopic(final Vertex vertex) {
+        Preconditions.checkNotNull(vertex, "vertex");
+
+        return new PGTopic(vertex) {
+            @Override
+            protected PGTopicGraph getGraph() {
+                return PGTopicGraph.this;
+            }
+        };
+    }
+
+    public Link asLink(final Vertex vertex) {
+        Preconditions.checkNotNull(vertex, "vertex");
+
+        return new PGLink(vertex) {
+            @Override
+            protected PGTopicGraph getGraph() {
+                return PGTopicGraph.this;
+            }
+        };
+    }
+
+    public Page asPage(final Vertex vertex) {
+        Preconditions.checkNotNull(vertex, "vertex");
+
+        return new PGPage(vertex) {
+            @Override
+            protected PGTopicGraph getGraph() {
+                return PGTopicGraph.this;
+            }
+        };
+    }
+
+    public Atom asAtom(final Vertex vertex) {
+        Preconditions.checkNotNull(vertex, "vertex");
+
+        return new PGAtom(vertex) {
+            @Override
+            protected PGTopicGraph getGraph() {
+                return PGTopicGraph.this;
+            }
+        };
+    }
+
+    public <T extends Entity> EntityList<T> asEntityList(final Vertex vertex, final Function<Vertex, T> constructor) {
+        Preconditions.checkNotNull(vertex, "vertex");
+
+        return new PGEntityList<T>(vertex, constructor) {
+            @Override
+            protected PGTopicGraph getGraph() {
+                return PGTopicGraph.this;
+            }
+        };
+    }
+
+    public <K extends Entity, V extends Entity> KeyValueTree<K, V> asEntityTree(final Vertex vertex,
+                                                  final Function<Vertex, K> keyConstructor,
+                                                  final Function<Vertex, V> valueConstructor) {
+        Preconditions.checkNotNull(vertex, "vertex");
+
+        return new PGKeyValueTree<K, V>(vertex, keyConstructor, valueConstructor) {
+            @Override
+            protected PGTopicGraph getGraph() {
+                return PGTopicGraph.this;
+            }
+        };
+    }
+
+    public EntityList<Link> asListOfLinks(final Vertex vertex) {
+        return asEntityList(vertex, this::asLink);
+    }
+
+    public EntityList<KeyValueTree<Link, EntityList<Link>>> asListOfLinkTrees(final Vertex vertex) {
+        return asEntityList(vertex, this::asLinkTree);
+    }
+
+    public EntityList<Atom> asListOfAtoms(final Vertex vertex) {
+        return asEntityList(vertex, this::asAtom);
+    }
+
+    public KeyValueTree<Link, EntityList<Link>> asLinkTree(final Vertex vertex) {
+        return asEntityTree(vertex, this::asLink, this::asListOfLinks);
     }
 
     @Override
     public void removeIsolatedAtoms(final Filter filter) {
-        Preconditions.checkArgNotNull(filter, "filter");
+        Preconditions.checkNotNull(filter, "filter");
 
         List<Vertex> toRemove = new LinkedList<>();
 
@@ -167,7 +291,7 @@ public class PGAtomGraph implements AtomGraph {
             if (isAtomVertex(v)
                     && !v.edges(Direction.IN).hasNext()
                     && !v.edges(Direction.OUT).hasNext()) {
-                if (filter.isVisible(getAtom(v))) {
+                if (filter.isVisible(asAtom(v))) {
                     toRemove.add(v);
                 }
             }
@@ -199,7 +323,7 @@ public class PGAtomGraph implements AtomGraph {
         return () -> asFilteredStream(
                 getPropertyGraph().vertices(),
                 this::isAtomVertex)
-                .map(this::getAtom).iterator();
+                .map(this::asAtom).iterator();
     }
 
     @Override
@@ -217,28 +341,22 @@ public class PGAtomGraph implements AtomGraph {
         return filterAndSort(wrapper.getVerticesByShortcut(shortcut), filter);
     }
 
-    private Atom getAtom(final Vertex vertex) {
-        Preconditions.checkArgNotNull(vertex, "vertex");
-
-        return new PGAtomImpl(vertex);
-    }
-
     private boolean isAtomVertex(final Vertex v) {
         // Here, a vertex is considered an atom if it has a creation timestamp
-        return v.property(SemanticSynchrony.CREATED).isPresent();
+        return v.property(SemanticSynchrony.PropertyKeys.CREATED).isPresent();
     }
 
     private void updateAcronym(final PGAtom atom, final Vertex asVertex) {
         String value = atom.getTitle();
         String acronym = valueToAcronym(value);
 
-        VertexProperty<String> previousProperty = asVertex.property(SemanticSynchrony.ACRONYM);
+        VertexProperty<String> previousProperty = asVertex.property(SemanticSynchrony.PropertyKeys.ACRONYM);
         if (null != previousProperty) {
             previousProperty.remove();
         }
 
         if (null != acronym) {
-            asVertex.property(SemanticSynchrony.ACRONYM, acronym);
+            asVertex.property(SemanticSynchrony.PropertyKeys.ACRONYM, acronym);
         }
     }
 
@@ -266,23 +384,27 @@ public class PGAtomGraph implements AtomGraph {
         }
     }
 
-    public PGAtomGraph copyGraph(final Filter filter) {
-        Object edgeId;
+    public PGTopicGraph copyGraph(final Filter filter) {
         GraphWrapper newWrapper = new TinkerGraphWrapper(TinkerGraph.open());
-        PGAtomGraph newGraph = new PGAtomGraph(newWrapper);
+        PGTopicGraph newGraph = new PGTopicGraph(newWrapper);
 
         for (Atom originalAtom : getAllAtoms()) {
             if (filter.isVisible(originalAtom)) {
                 PGAtom newAtom = findOrCopyAtom(originalAtom, filter, newGraph);
-                PGAtomList notes = (PGAtomList) originalAtom.getNotes();
+                PGEntityList<Atom> notes = (PGEntityList<Atom>) originalAtom.getNotes();
                 if (null != notes) {
-                    edgeId = getOutEdgeId((PGAtom) originalAtom, SemanticSynchrony.NOTES);
-                    newAtom.setNotes(copyAtomList(notes, filter, newGraph), edgeId);
+                    newAtom.setNotes(copyAtomList(notes, filter, newGraph));
                 }
             }
         }
 
         return newGraph;
+    }
+
+    private <T> T createEntity(final String id, final String label, final Function<Vertex, T> constructor) {
+        Vertex vertex = wrapper.createVertex(id, label);
+
+        return constructor.apply(vertex);
     }
 
     private String cleanForAcronym(final String value) {
@@ -296,13 +418,13 @@ public class PGAtomGraph implements AtomGraph {
         List<Sortable<Atom, Float>> ranked = new LinkedList<>();
         while (unranked.hasNext()) {
             Sortable<Vertex, Float> in = unranked.next();
-            Atom a = getAtom(in.getEntity());
+            Atom a = asAtom(in.getEntity());
             if (!filter.isVisible(a)) continue;
 
             float nativeScore = in.getScore();
             float weight = a.getWeight();
             String value = a.getTitle();
-            float lengthPenalty = Math.min(1.0f, 15.0f/value.length());
+            float lengthPenalty = Math.min(1.0f, 15.0f / value.length());
             float score = nativeScore * weight * lengthPenalty;
             ranked.add(new Sortable<>(a, score));
         }
@@ -312,7 +434,7 @@ public class PGAtomGraph implements AtomGraph {
         return ranked.stream().map(Sortable::getEntity).collect(Collectors.toList());
     }
 
-    private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final AtomGraph newGraph) {
+    private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final TopicGraph newGraph) {
         PGAtom newAtom = (PGAtom) newGraph.getAtomById(original.getId());
         if (null != newAtom) return newAtom;
 
@@ -333,34 +455,25 @@ public class PGAtomGraph implements AtomGraph {
         return newAtom;
     }
 
-    private AtomList copyAtomList(final PGAtomList original, final Filter filter, final PGAtomGraph newGraph) {
-        Object edgeId;
-        PGAtomList originalCur = original, originalPrev = null;
-        PGAtomList newHead = null, newCur, newPrev = null;
+    private EntityList<Atom> copyAtomList(final PGEntityList<Atom> original, final Filter filter, final PGTopicGraph newGraph) {
+        PGEntityList<Atom> originalCur = original;
+        PGEntityList<Atom> newHead = null, newCur, newPrev = null;
         while (null != originalCur) {
-            newCur = (PGAtomList) newGraph.createAtomList(originalCur.getId());
-            edgeId = getOutEdgeId(originalCur, SemanticSynchrony.FIRST);
             Atom originalFirst = originalCur.getFirst();
             PGAtom newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
-            newCur.setFirst(newAtom, edgeId);
+            newCur = (PGEntityList<Atom>) newGraph.createListOfAtoms(newAtom);
 
             if (null == newPrev) {
                 newHead = newCur;
             } else {
-                edgeId = getOutEdgeId(originalPrev, SemanticSynchrony.REST);
-                newPrev.setRest(newCur, edgeId);
+                newPrev.setRest(newCur);
             }
 
             newPrev = newCur;
-            originalPrev = originalCur;
-            originalCur = (PGAtomList) originalCur.getRest();
+            originalCur = (PGEntityList<Atom>) originalCur.getRest();
         }
 
         return newHead;
-    }
-
-    private Object getOutEdgeId(final PGGraphEntity entity, final String label) {
-        return entity.getExactlyOneEdge(label, Direction.OUT).id();
     }
 
     private <A> Stream<A> asFilteredStream(Iterator<A> sourceIterator, Predicate<A> filter) {
@@ -369,27 +482,4 @@ public class PGAtomGraph implements AtomGraph {
 
         return stream.filter(filter);
     }
-
-    private class PGAtomImpl extends PGAtom {
-        protected PGAtomImpl(Vertex vertex) {
-            super(vertex);
-        }
-
-        @Override
-        protected PGAtomGraph getAtomGraph() {
-            return thisGraph;
-        }
-    }
-
-    private class PGAtomListImpl extends PGAtomList {
-        public PGAtomListImpl(Vertex vertex) {
-            super(vertex);
-        }
-
-        @Override
-        protected PGAtomGraph getAtomGraph() {
-            return thisGraph;
-        }
-    }
-
 }

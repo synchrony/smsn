@@ -28,26 +28,26 @@ public class JsonParser extends BrainParser {
         if (json.has(JsonFormat.ID)) {
             n.setId(json.getString(JsonFormat.ID));
         }
-        if (json.has(SemanticSynchrony.TITLE)) {
-            n.setTitle(json.getString(SemanticSynchrony.TITLE));
+        if (json.has(SemanticSynchrony.PropertyKeys.TITLE)) {
+            n.setTitle(json.getString(SemanticSynchrony.PropertyKeys.TITLE));
         }
-        if (json.has(SemanticSynchrony.ALIAS)) {
-            n.setAlias(json.getString(SemanticSynchrony.ALIAS));
+        if (json.has(SemanticSynchrony.PropertyKeys.ALIAS)) {
+            n.setAlias(json.getString(SemanticSynchrony.PropertyKeys.ALIAS));
         }
-        if (json.has(SemanticSynchrony.SHORTCUT)) {
-            n.setShortcut(json.getString(SemanticSynchrony.SHORTCUT));
+        if (json.has(SemanticSynchrony.PropertyKeys.SHORTCUT)) {
+            n.setShortcut(json.getString(SemanticSynchrony.PropertyKeys.SHORTCUT));
         }
-        if (json.has(SemanticSynchrony.SHARABILITY)) {
-            n.setSharability((float) json.getDouble(SemanticSynchrony.SHARABILITY));
+        if (json.has(SemanticSynchrony.PropertyKeys.SHARABILITY)) {
+            n.setSharability((float) json.getDouble(SemanticSynchrony.PropertyKeys.SHARABILITY));
         }
-        if (json.has(SemanticSynchrony.WEIGHT)) {
-            n.setWeight((float) json.getDouble(SemanticSynchrony.WEIGHT));
+        if (json.has(SemanticSynchrony.PropertyKeys.WEIGHT)) {
+            n.setWeight((float) json.getDouble(SemanticSynchrony.PropertyKeys.WEIGHT));
         }
-        if (json.has(SemanticSynchrony.PRIORITY)) {
-            n.setPriority((float) json.getDouble(SemanticSynchrony.PRIORITY));
+        if (json.has(SemanticSynchrony.PropertyKeys.PRIORITY)) {
+            n.setPriority((float) json.getDouble(SemanticSynchrony.PropertyKeys.PRIORITY));
         }
-        if (json.has(SemanticSynchrony.CREATED)) {
-            n.setCreated(json.getLong(SemanticSynchrony.CREATED));
+        if (json.has(SemanticSynchrony.PropertyKeys.CREATED)) {
+            n.setCreated(json.getLong(SemanticSynchrony.PropertyKeys.CREATED));
         }
         if (json.has(JsonFormat.NUMBER_OF_CHILDREN)) {
             n.setNumberOfChildren(json.optInt(JsonFormat.NUMBER_OF_CHILDREN));

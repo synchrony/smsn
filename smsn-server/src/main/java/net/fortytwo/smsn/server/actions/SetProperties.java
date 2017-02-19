@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.RequestParams;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -62,22 +62,22 @@ public class SetProperties extends Action {
 
     private void validateKeyValue() {
         switch (getName()) {
-            case SemanticSynchrony.TITLE:
+            case SemanticSynchrony.PropertyKeys.TITLE:
                 validateTitle();
                 break;
-            case SemanticSynchrony.PAGE:
+            case SemanticSynchrony.PropertyKeys.PAGE:
                 validatePage();
                 break;
-            case SemanticSynchrony.WEIGHT:
+            case SemanticSynchrony.PropertyKeys.WEIGHT:
                 validateWeight();
                 break;
-            case SemanticSynchrony.SHARABILITY:
+            case SemanticSynchrony.PropertyKeys.SHARABILITY:
                 validateSharability();
                 break;
-            case SemanticSynchrony.PRIORITY:
+            case SemanticSynchrony.PropertyKeys.PRIORITY:
                 validatePriority();
                 break;
-            case SemanticSynchrony.SHORTCUT:
+            case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 validateShortcut();
                 break;
             default:
@@ -132,26 +132,26 @@ public class SetProperties extends Action {
     @Override
     protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         switch (params.getPropertyName()) {
-            case SemanticSynchrony.TITLE:
+            case SemanticSynchrony.PropertyKeys.TITLE:
                 params.getRoot().setTitle((String) params.getPropertyValue());
                 break;
-            case SemanticSynchrony.PAGE:
-                params.getRoot().setPage(trimPage((String) params.getPropertyValue()));
+            case SemanticSynchrony.PropertyKeys.PAGE:
+                params.getRoot().setText(trimPage((String) params.getPropertyValue()));
                 break;
-            case SemanticSynchrony.WEIGHT:
+            case SemanticSynchrony.PropertyKeys.WEIGHT:
                 params.getRoot().setWeight(toFloat(params.getPropertyValue()));
                 break;
-            case SemanticSynchrony.SHARABILITY:
+            case SemanticSynchrony.PropertyKeys.SHARABILITY:
                 params.getRoot().setSharability(toFloat(params.getPropertyValue()));
                 break;
-            case SemanticSynchrony.PRIORITY:
+            case SemanticSynchrony.PropertyKeys.PRIORITY:
                 params.getRoot().setPriority(toFloat(params.getPropertyValue()));
                 params.getBrain().getPriorities().updatePriority(params.getRoot());
                 break;
-            case SemanticSynchrony.SHORTCUT:
+            case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) params.getPropertyValue();
-                for (Atom a : params.getBrain().getAtomGraph().getAtomsByShortcut(shortcut, params.getFilter())) {
+                for (Atom a : params.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, params.getFilter())) {
                     a.setShortcut(null);
                 }
 
@@ -161,10 +161,10 @@ public class SetProperties extends Action {
                 throw new IllegalStateException();
         }
 
-        params.getBrain().getAtomGraph().reindexAtom(params.getRoot());
-        params.getBrain().getAtomGraph().notifyOfUpdate();
+        params.getBrain().getTopicGraph().reindexAtom(params.getRoot());
+        params.getBrain().getTopicGraph().notifyOfUpdate();
 
-        params.getMap().put("key", params.getBrain().getAtomGraph().idOfAtom(params.getRoot()));
+        params.getMap().put("key", params.getBrain().getTopicGraph().idOfAtom(params.getRoot()));
         params.getMap().put("name", "" + params.getPropertyName());
         params.getMap().put("value", "" + params.getPropertyValue());
 

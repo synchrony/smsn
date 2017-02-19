@@ -1,12 +1,19 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+
 import java.io.IOException;
 import java.util.List;
 
 /**
  * A graph of atoms and lists conforming to the Extend-o-Brain data model
  */
-public interface AtomGraph {
+public interface TopicGraph {
 
     /**
      * The configurable namespace into which things, i.e. classified atoms, are mapped
@@ -29,13 +36,24 @@ public interface AtomGraph {
 
     String iriOfAtom(Atom a);
 
-    Atom createAtom(final String id);
+    Topic createTopic(String id);
+
+    Page createPage(Link topicLink);
+
+    Link createLink(Topic target, String label);
+
+    KeyValueTree<Link, EntityList<Link>> createTopicTree(Link link);
+
+    Atom createAtom(String id);
 
     Atom createAtomWithProperties(Filter filter, String id);
 
-    AtomList createAtomList(String id);
+    EntityList<Link> createListOfLinks(Link... elements);
 
-    AtomList createAtomList(Atom... elements);
+    EntityList<KeyValueTree<Link, EntityList<Link>>> createListOfTrees(
+            KeyValueTree<Link, EntityList<Link>>... elements);
+
+    EntityList<Atom> createListOfAtoms(Atom... elements);
 
     void removeIsolatedAtoms(Filter filter);
 
@@ -51,13 +69,13 @@ public interface AtomGraph {
 
     void rollback();
 
-    AtomGraph createFilteredGraph(Filter filter);
+    TopicGraph createFilteredGraph(Filter filter);
 
     interface IORunnable {
         void run() throws IOException;
     }
 
-    static void wrapInTransaction(final AtomGraph graph, final IORunnable runnable) throws IOException {
+    static void wrapInTransaction(final TopicGraph graph, final IORunnable runnable) throws IOException {
         graph.begin();
 
         boolean success = false;

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.util.TypedProperties;
 
@@ -29,7 +29,7 @@ public class Brain {
 
     private static final boolean RUN_BACKGROUND_TASKS = false;
 
-    private final AtomGraph atomGraph;
+    private final TopicGraph topicGraph;
 
     private final KnowledgeBase knowledgeBase;
 
@@ -39,10 +39,10 @@ public class Brain {
 
     private final EventStack eventStack;
 
-    public Brain(final AtomGraph atomGraph) throws BrainException {
-        this.atomGraph = atomGraph;
+    public Brain(final TopicGraph topicGraph) throws BrainException {
+        this.topicGraph = topicGraph;
 
-        knowledgeBase = new KnowledgeBase(atomGraph);
+        knowledgeBase = new KnowledgeBase(topicGraph);
 
         try {
             knowledgeBase.addDefaultClasses();
@@ -77,13 +77,13 @@ public class Brain {
     public void startBackgroundTasks() {
         if (!RUN_BACKGROUND_TASKS) return;
 
-        priorities.refreshQueue(atomGraph);
+        priorities.refreshQueue(topicGraph);
 
         knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);
     }
 
-    public AtomGraph getAtomGraph() {
-        return atomGraph;
+    public TopicGraph getTopicGraph() {
+        return topicGraph;
     }
 
     public KnowledgeBase getKnowledgeBase() {

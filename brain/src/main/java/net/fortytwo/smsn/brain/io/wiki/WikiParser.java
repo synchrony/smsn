@@ -258,32 +258,32 @@ public class WikiParser extends BrainParser {
             throws IOException {
 
         switch (key) {
-            case SemanticSynchrony.ALIAS:
+            case SemanticSynchrony.PropertyKeys.ALIAS:
                 if (value.length() > 0) {
                     note.setAlias(value);
                 } else {
                     note.setAlias(Note.CLEARME);
                 }
                 break;
-            case SemanticSynchrony.CREATED:
+            case SemanticSynchrony.PropertyKeys.CREATED:
                 note.setCreated(getLong(key, value, lineNumber));
                 break;
-            case SemanticSynchrony.PRIORITY: {
+            case SemanticSynchrony.PropertyKeys.PRIORITY: {
                 note.setPriority(getFloat(key, value, lineNumber));
                 break;
             }
-            case SemanticSynchrony.SHARABILITY: {
+            case SemanticSynchrony.PropertyKeys.SHARABILITY: {
                 note.setSharability(getFloat(key, value, lineNumber));
                 break;
             }
-            case SemanticSynchrony.SHORTCUT:
+            case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 if (value.length() > 0) {
                     note.setShortcut(value);
                 } else {
                     note.setShortcut(Note.CLEARME);
                 }
                 break;
-            case SemanticSynchrony.WEIGHT: {
+            case SemanticSynchrony.PropertyKeys.WEIGHT: {
                 note.setWeight(getFloat(key, value, lineNumber));
                 break;
             }

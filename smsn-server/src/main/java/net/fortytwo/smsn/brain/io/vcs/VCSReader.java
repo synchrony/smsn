@@ -3,9 +3,9 @@ package net.fortytwo.smsn.brain.io.vcs;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Note;
 import org.parboiled.common.Preconditions;
 
@@ -71,7 +71,7 @@ public class VCSReader extends BrainReader {
                 helper.setAtom(atom);
                 helper.updateAtom();
 
-                addToIndices(atom, helper.context.getAtomGraph());
+                addToIndices(atom, helper.context.getTopicGraph());
             }
         }
     }
@@ -103,7 +103,7 @@ public class VCSReader extends BrainReader {
         private void updateAtomProperties() {
             updateProperty(atom, note, Atom::getAlias, Note::getAlias, Atom::setAlias);
             updateProperty(atom, note, Atom::getCreated, Note::getCreated, Atom::setCreated);
-            updateProperty(atom, note, Atom::getPage, Note::getPage, Atom::setPage);
+            updateProperty(atom, note, Atom::getText, Note::getPage, Atom::setText);
             updateProperty(atom, note, Atom::getPriority, Note::getPriority, Atom::setPriority);
             updateProperty(atom, note, Atom::getSharability, Note::getSharability, Atom::setSharability);
             updateProperty(atom, note, Atom::getShortcut, Note::getShortcut, Atom::setShortcut);
@@ -130,12 +130,11 @@ public class VCSReader extends BrainReader {
         }
 
         private void removeAllChildren() {
-            AtomList list = atom.getNotes();
+            EntityList<Atom> list = atom.getNotes();
             if (null != list) {
                 while (null != list) {
-                    AtomList rest = list.getRest();
-                    list.setFirst(null);
-                    list.setRest(null);
+                    EntityList<Atom> rest = list.getRest();
+                    list.destroy();
                     list = rest;
                 }
 
@@ -143,23 +142,17 @@ public class VCSReader extends BrainReader {
             }
         }
 
-        private AtomList createAtomList() {
-            AtomList list = null;
-            List<Note> children = note.getChildren();
-            if (null != children) {
-                for (int i = children.size() - 1; i >= 0; i--) {
-                    Note child = children.get(i);
-                    AtomList cur = context.getAtomGraph().createAtomList((String) null);
-                    cur.setFirst(resolveAtomReference(child.getId()));
-                    cur.setRest(list);
-                    list = cur;
-                }
+        private EntityList<Atom> createAtomList() {
+            Atom[] atoms = new Atom[note.getChildren().size()];
+            int i = 0;
+            for (Note child : note.getChildren()) {
+                atoms[i++] = resolveAtomReference(child.getId());
             }
-            return list;
+            return context.getTopicGraph().createListOfAtoms(atoms);
         }
 
         private Atom resolveAtomReference(final String id) {
-            AtomGraph graph = context.getAtomGraph();
+            TopicGraph graph = context.getTopicGraph();
             Atom atom = graph.getAtomById(id);
             if (null == atom) {
                 atom = graph.createAtom(id);

@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -25,7 +25,7 @@ public class Priorities {
         return queue;
     }
 
-    public void refreshQueue(final AtomGraph graph) {
+    public void refreshQueue(final TopicGraph graph) {
         queue.clear();
 
         new Thread(() -> {

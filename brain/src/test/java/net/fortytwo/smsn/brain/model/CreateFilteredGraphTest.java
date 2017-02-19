@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -13,20 +14,20 @@ import static org.junit.Assert.assertTrue;
 public class CreateFilteredGraphTest extends BrainTestBase {
 
     @Override
-    protected AtomGraph createAtomGraph() throws IOException {
+    protected TopicGraph createAtomGraph() throws IOException {
         return createTinkerAtomGraph();
         //return createNeo4jAtomGraph();
     }
 
     @Test
     public void testFilteredCopy() throws Exception {
-        assertEquals(0, countAtoms(atomGraph));
+        assertEquals(0, countAtoms(topicGraph));
 
         // unfiltered
         Atom root = importAtomFromFile("io/wiki/wiki-example-4.txt");
         root.setTitle("William James");
         assertEquals(0.5, root.getSharability(), 0);
-        assertEquals(23, countAtoms(atomGraph));
+        assertEquals(23, countAtoms(topicGraph));
         assertEquals(7, root.getNotes().toJavaList().size());
         assertEquals("some works by William James", root.getNotes().toJavaList().get(0).getTitle());
         assertEquals("William James's depression", root.getNotes().toJavaList().get(3).getTitle());
@@ -38,7 +39,7 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         // filtered
         Filter publicFilter = new Filter(0f, 1f, 0.5f, 0.25f, 1f, 0.5f);
         assertTrue(publicFilter.isVisible(root));
-        AtomGraph filteredGraph = atomGraph.createFilteredGraph(publicFilter);
+        TopicGraph filteredGraph = topicGraph.createFilteredGraph(publicFilter);
         assertEquals(22, countAtoms(filteredGraph));
         root = filteredGraph.getAtomById(root.getId());
         assertNotNull(root);

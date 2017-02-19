@@ -1,11 +1,13 @@
-package net.fortytwo.smsn.brain.model;
+package net.fortytwo.smsn.brain.model.entities;
 
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public interface Atom {
+public interface Atom extends Entity {
 
     String getId();
+
+    boolean setId(String id);
 
     String getAlias();
 
@@ -19,9 +21,9 @@ public interface Atom {
 
     boolean setTitle(String title);
 
-    String getPage();
+    String getText();
 
-    boolean setPage(String page);
+    boolean setText(String text);
 
     Float getPriority();
 
@@ -39,15 +41,18 @@ public interface Atom {
 
     boolean setWeight(Float weight);
 
-    AtomList getNotes();
+    EntityList<Atom> getNotes();
 
-    boolean setNotes(AtomList notes);
+    boolean setNotes(EntityList<Atom> notes);
 
-    void forFirstOf(Consumer<AtomList> consumer);
+    void forFirstOf(Consumer<EntityList<Atom>> consumer);
 
     void addChildAt(final Atom child, int position);
 
     void deleteChildAt(int position);
 
-    Collection<AtomList> getFirstOf();
+    Collection<EntityList<Atom>> getFirstOf();
+
+    // TODO: temporary solution
+    Atom getSubject(EntityList<Atom> notes);
 }

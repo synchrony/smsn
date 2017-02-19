@@ -52,7 +52,7 @@ public class SetAtomSharabilityMapping extends AtomMapping {
         } else {
             Float f = sharabilityOrWeightFromArgument(value, mc);
 
-            setProperty(n, SemanticSynchrony.SHARABILITY, "" + f);
+            setProperty(n, SemanticSynchrony.PropertyKeys.SHARABILITY, "" + f);
 
             // put the atom back on the stack
             solutions.accept(stack.push(n));
