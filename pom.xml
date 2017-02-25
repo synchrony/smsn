@@ -57,7 +57,7 @@
         <sesame.version>4.1.2</sesame.version>
         <stream42.version>1.2</stream42.version>
         <sesametools.version>1.10</sesametools.version>
-        <tinkerpop.version>3.2.3</tinkerpop.version>
+        <tinkerpop.version>3.2.4</tinkerpop.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
