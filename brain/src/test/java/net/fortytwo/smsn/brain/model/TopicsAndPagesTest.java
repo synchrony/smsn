@@ -166,6 +166,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
 
         page.destroy();
 
+        // Arthur is still here, as it is also referenced by page2
         assertTrue(graph.traversal().V(arthurId).hasNext());
         assertFalse(graph.traversal().V(pageId).hasNext());
         assertTrue(graph.traversal().V(page2Id).hasNext());

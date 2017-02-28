@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
+import net.fortytwo.smsn.server.actions.NoAction;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode;
@@ -18,6 +19,7 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -97,6 +99,17 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     }
 
     private Action deserializeRequest(final String requestStr) throws IOException {
+        String trimmed = requestStr.trim();
+
+        if (!trimmed.startsWith("{")) {
+            if ("1+1".equals(trimmed)) {
+                // this is ServerGremlinExecutor's warmup script hack; ignore
+                return new NoAction();
+            } else {
+                throw new IllegalArgumentException("non-SmSn script: " + trimmed);
+            }
+        }
+
         return objectMapper.readValue(requestStr, Action.class);
     }
 

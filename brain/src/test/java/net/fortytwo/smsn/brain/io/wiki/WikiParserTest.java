@@ -175,6 +175,12 @@ public class WikiParserTest {
         assertNotSame("123@456", notes.get(0).getId());
     }
 
+    @Test
+    public void unicodeIsHandledAsExpected() throws IOException {
+        List<Note> notes = readNotes("+ :UAk6ejU: foo bar\n\u00b7 :hSsMqzT: quux\n");
+        assertEquals(2, notes.size());
+    }
+
     private List<Note> readNotes(final String s) throws IOException {
         try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
             return wikiParser.parse(in).getChildren();

@@ -2,9 +2,7 @@ package net.fortytwo.smsn.brain.model.entities;
 
 import java.util.List;
 
-public interface EntityList<T extends Entity> extends Entity {
-
-    String getId();
+public interface EntityList<T> extends Entity {
 
     T getFirst();
 

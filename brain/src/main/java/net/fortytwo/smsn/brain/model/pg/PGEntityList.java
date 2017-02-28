@@ -21,11 +21,6 @@ public abstract class PGEntityList<T extends Entity> extends PGEntity implements
     }
 
     @Override
-    public String getId() {
-        return super.getId();
-    }
-
-    @Override
     public T getFirst() {
         return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.FIRST, Direction.OUT, constructor);
     }
