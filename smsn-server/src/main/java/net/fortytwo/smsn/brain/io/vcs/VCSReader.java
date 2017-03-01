@@ -143,6 +143,8 @@ public class VCSReader extends BrainReader {
         }
 
         private EntityList<Atom> createAtomList() {
+            if (0 == note.getChildren().size()) return null;
+
             Atom[] atoms = new Atom[note.getChildren().size()];
             int i = 0;
             for (Note child : note.getChildren()) {

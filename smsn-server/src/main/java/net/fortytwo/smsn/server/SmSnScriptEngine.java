@@ -27,6 +27,8 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
 
     protected static final Logger logger = Logger.getLogger(SmSnScriptEngine.class.getName());
 
+    private static final String WARMUP_SCRIPT = "1+1";
+
     private final GremlinScriptEngineFactory factory;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -102,7 +104,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         String trimmed = requestStr.trim();
 
         if (!trimmed.startsWith("{")) {
-            if ("1+1".equals(trimmed)) {
+            if (WARMUP_SCRIPT.equals(trimmed)) {
                 // this is ServerGremlinExecutor's warmup script hack; ignore
                 return new NoAction();
             } else {
