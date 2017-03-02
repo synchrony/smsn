@@ -3,10 +3,10 @@ package net.fortytwo.smsn.brain.io.vcs;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import org.parboiled.common.Preconditions;
 
 import java.io.File;
@@ -15,15 +15,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class VCSReader extends BrainReader {
-    public enum OverwritePolicy {Preserve, Replace}
 
     private final WikiParser reader;
-
-    private final OverwritePolicy policy = OverwritePolicy.Replace;
 
     public VCSReader() {
         reader = new WikiParser();
@@ -50,9 +48,12 @@ public class VCSReader extends BrainReader {
             throws IOException {
         Helper helper = new Helper(context);
 
-        for (File file : dir.listFiles()) {
-            if (VCSFormat.isAtomFile(file)) {
-                readAtomFile(file, helper);
+        File[] files = dir.listFiles();
+        if (null != files) {
+            for (File file : files) {
+                if (VCSFormat.isAtomFile(file)) {
+                    readAtomFile(file, helper);
+                }
             }
         }
     }
@@ -78,13 +79,11 @@ public class VCSReader extends BrainReader {
 
     private class Helper {
         private final Context context;
-        private final boolean doReplace;
         private Atom atom;
         private Note note;
 
         private Helper(Context context) {
             this.context = context;
-            this.doReplace = policy.equals(OverwritePolicy.Replace);
         }
 
         public void setAtom(Atom atom) {
@@ -112,9 +111,10 @@ public class VCSReader extends BrainReader {
         }
 
         private void updateAtomChildren() {
-            if (doReplace || null == atom.getNotes()) {
-                removeAllChildren();
-                atom.setNotes(createAtomList());
+            removeAllChildren();
+            Optional<EntityList<Atom>> newChildren = createAtomList();
+            if (newChildren.isPresent()) {
+                atom.setNotes(newChildren.get());
             }
         }
 
@@ -124,7 +124,7 @@ public class VCSReader extends BrainReader {
                                         final Function<Note, T> noteGetter,
                                         final BiConsumer<Atom, T> atomSetter) {
             T value = noteGetter.apply(note);
-            if (null != value && (doReplace || null == atomGetter.apply(atom))) {
+            if (null != value) {
                 atomSetter.accept(atom, value);
             }
         }
@@ -142,15 +142,15 @@ public class VCSReader extends BrainReader {
             }
         }
 
-        private EntityList<Atom> createAtomList() {
-            if (0 == note.getChildren().size()) return null;
+        private Optional<EntityList<Atom>> createAtomList() {
+            if (0 == note.getChildren().size()) return Optional.empty();
 
             Atom[] atoms = new Atom[note.getChildren().size()];
             int i = 0;
             for (Note child : note.getChildren()) {
                 atoms[i++] = resolveAtomReference(child.getId());
             }
-            return context.getTopicGraph().createListOfAtoms(atoms);
+            return Optional.of(context.getTopicGraph().createListOfAtoms(atoms));
         }
 
         private Atom resolveAtomReference(final String id) {
