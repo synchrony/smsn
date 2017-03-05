@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.ViewStyle;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
@@ -110,7 +111,7 @@ public class BrainClient {
     public Note view(final Note root,
                      final int height,
                      final Filter filter,
-                     final TreeViews.ViewStyle style,
+                     final ViewStyle style,
                      final boolean includeTypes) throws BrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
@@ -177,7 +178,7 @@ public class BrainClient {
     public void update(final Note root,
                        final int height,
                        final Filter filter,
-                       final TreeViews.ViewStyle style) throws BrainClientException {
+                       final ViewStyle style) throws BrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -282,7 +283,7 @@ public class BrainClient {
                              final String query,
                              final int height,
                              final Filter filter,
-                             final TreeViews.ViewStyle style) throws BrainClientException {
+                             final ViewStyle style) throws BrainClientException {
         if (null == queryType || null == query || 0 == query.length()
                 || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -314,7 +315,7 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    JSONArray children = view.optJSONArray(JsonFormat.CHILDREN);
+                    JSONArray children = view.optJSONArray(JsonFormat.Keys.CHILDREN);
                     if (null != children) {
                         int length = children.length();
                         for (int i = 0; i < length; i++) {

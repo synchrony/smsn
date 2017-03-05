@@ -70,7 +70,7 @@ public abstract class BrainTestBase {
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
 
         Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());
@@ -79,12 +79,16 @@ public abstract class BrainTestBase {
         return root;
     }
 
-    protected int countAtoms(final TopicGraph topicGraph) {
+    protected int countAtoms(final TopicGraph graph) {
         int count = 0;
-        for (Atom a : topicGraph.getAllAtoms()) {
+        for (Atom a : graph.getAllAtoms()) {
             count++;
         }
         return count;
+    }
+
+    protected int countAtoms() {
+        return countAtoms(topicGraph);
     }
 
     private File createTempDirectory() throws IOException {

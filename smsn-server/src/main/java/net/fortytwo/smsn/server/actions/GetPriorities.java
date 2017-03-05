@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -15,10 +15,6 @@ public class GetPriorities extends FilteredAction {
 
     private int maxResults = 100;
 
-    public int getMaxResults() {
-        return maxResults;
-    }
-
     public void setMaxResults(int maxResults) {
         if (maxResults <= 0) {
             throw new IllegalArgumentException(Params.MAX_RESULTS + " parameter must be a positive integer");
@@ -28,17 +24,11 @@ public class GetPriorities extends FilteredAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setFilter(getFilter());
-        params.setMaxResults(getMaxResults());
-    }
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
 
-    @Override
-    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
-
-        Note n = params.getQueries().priorityView(params.getFilter(), params.getMaxResults(), params.getBrain().getPriorities());
+        Note n = context.getQueries().priorityView(filter, maxResults, context.getBrain().getPriorities());
         try {
-            addView(n, params);
+            addView(n, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

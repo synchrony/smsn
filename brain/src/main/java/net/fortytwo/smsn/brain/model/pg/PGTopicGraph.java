@@ -343,7 +343,8 @@ public class PGTopicGraph implements TopicGraph {
 
     private boolean isAtomVertex(final Vertex v) {
         // Here, a vertex is considered an atom if it has a creation timestamp
-        return v.property(SemanticSynchrony.PropertyKeys.CREATED).isPresent();
+        String label = v.label();
+        return null != label && label.equals(SemanticSynchrony.VertexLabels.ATOM);
     }
 
     private void updateAcronym(final PGAtom atom, final Vertex asVertex) {

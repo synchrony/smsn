@@ -645,22 +645,6 @@ public class TreeViews {
         return note;
     }
 
-    public interface ViewStyle {
-        enum Direction {Forward, Backward}
-
-        String getName();
-
-        Iterable<Atom> getLinked(Atom root, Filter filter);
-
-        boolean addOnUpdate();
-
-        boolean deleteOnUpdate();
-
-        Direction getDirection();
-
-        ViewStyle getInverse();
-    }
-
     public static ViewStyle lookupStyle(final String name) {
         for (ViewStyle style : viewStyles) {
             if (name.equals(style.getName())) {

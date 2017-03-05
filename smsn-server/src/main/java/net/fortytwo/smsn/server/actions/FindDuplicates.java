@@ -1,10 +1,10 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 import java.io.IOException;
@@ -36,18 +36,13 @@ public class FindDuplicates extends FilteredAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setFilter(getFilter());
-    }
-
-    @Override
-    protected void performTransaction(final RequestParams params) throws RequestProcessingException {
-        List<List<Atom>> dups = getDuplicates(params.getBrain().getTopicGraph(), params.getFilter());
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException {
+        List<List<Atom>> dups = getDuplicates(context.getBrain().getTopicGraph(), filter);
         List<Atom> flat = new LinkedList<>();
         for (List<Atom> l : dups) flat.addAll(l);
 
         try {
-            addView(params.getQueries().customView(flat, params.getFilter()), params);
+            addView(context.getQueries().customView(flat, filter), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
@@ -64,18 +59,18 @@ public class FindDuplicates extends FilteredAction {
     }
 
     private List<List<Atom>> getDuplicates(final TopicGraph graph,
-                                       final Filter filter) throws RequestProcessingException {
+                                           final Filter filter) throws RequestProcessingException {
         Map<String, List<Atom>> m = new HashMap<>();
         List<List<Atom>> dups = new LinkedList<>();
         int total = 0;
 
         for (Atom a : graph.getAllAtoms()) {
             if (filter.isVisible(a)) {
-                String value = a.getTitle();
-                if (null != value && 0 < value.length()) {
+                String title = a.getTitle();
+                if (null != title && 0 < title.length()) {
                     String hash;
                     try {
-                        hash = md5SumOf(value);
+                        hash = md5SumOf(title);
                     } catch (UnsupportedEncodingException e) {
                         throw new RequestProcessingException(e);
                     }

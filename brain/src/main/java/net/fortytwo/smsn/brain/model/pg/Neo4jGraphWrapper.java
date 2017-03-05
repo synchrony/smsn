@@ -100,7 +100,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
                     index = indexManager.forNodes(indexName,
                             MapUtil.stringMap(keysAndValues));
 
-                    logger.info("created Neo4j index '" + indexName + "'");
+                    logger.fine("created Neo4j index '" + indexName + "'");
                 } else {
                     index = indexManager.forNodes(indexName);
                 }

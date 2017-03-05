@@ -41,7 +41,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testEncoding() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
 
         Atom root = createAtom("11111");
         assertEquals("11111", root.getId());
@@ -92,7 +92,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdateRecursion() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setTitle("root");
         Note rootNote;
@@ -205,7 +205,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testPathologicalUpdateWithCycles() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("0000000");
         root.setTitle("root");
         Note rootNote, child, grandChild;
@@ -357,7 +357,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdateSharabilityOrWeight() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setTitle("root");
         Note rootNote;
@@ -385,7 +385,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdateAlias() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("wXu5g4v");
         root.setTitle("root");
         Note rootNote;
@@ -411,7 +411,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdatePriority() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
         Atom root = createAtom("0000000");
         root.setTitle("root");
         Note rootNote;
@@ -441,7 +441,7 @@ public class TreeViewsTest extends BrainTestBase {
     @Test
     public void childAndParentCountsAreCorrect() throws Exception {
         Filter filter = Filter.noFilter();
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
         Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
         root.setTitle("root");
@@ -465,7 +465,7 @@ public class TreeViewsTest extends BrainTestBase {
     public void nonSharableItemsAreHidden() throws Exception {
         Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
@@ -516,7 +516,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = TreeViews.forwardViewStyle;
 
         String before = "* :001: one\n" +
                 "* :002: two\n" +
@@ -558,7 +558,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testAddOnlyUpdate() throws Exception {
-        TreeViews.ViewStyle style = TreeViews.forwardAddOnlyViewStyle;
+        ViewStyle style = TreeViews.forwardAddOnlyViewStyle;
 
         String before = "* :001: one\n" +
                 "* :002: two\n" +

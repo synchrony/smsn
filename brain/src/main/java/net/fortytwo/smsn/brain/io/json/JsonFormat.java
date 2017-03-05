@@ -6,11 +6,13 @@ public class JsonFormat extends Format {
 
     public static final String TITLE_TRUNCATOR = " [...]";
 
-    public static final String CHILDREN = "children";
-    public static final String NUMBER_OF_CHILDREN = "numberOfChildren";
-    public static final String NUMBER_OF_PARENTS = "numberOfParents";
-    public static final String ID = "id";
-    public static final String META = "meta";
+    public interface Keys {
+        String CHILDREN = "children";
+        String NUMBER_OF_CHILDREN = "numberOfChildren";
+        String NUMBER_OF_PARENTS = "numberOfParents";
+        String ID = "id";
+        String META = "meta";
+    }
 
     private static final JsonFormat instance = new JsonFormat();
 

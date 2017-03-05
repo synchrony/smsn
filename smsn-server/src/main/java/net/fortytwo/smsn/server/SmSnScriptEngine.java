@@ -1,8 +1,6 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.server.actions.NoAction;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
@@ -19,7 +17,6 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -95,7 +92,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     private JSONObject handleRequest(String actionStr, final Graph graph) throws IOException {
         Action action = deserializeRequest(actionStr);
 
-        RequestParams params = new ActionPerformer(graph).perform(action);
+        ActionContext params = new ActionPerformer(graph).perform(action);
 
         return toJson(params.getMap());
     }
@@ -126,14 +123,12 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
             this.graph = graph;
         }
 
-        public RequestParams perform(final Action action) throws IOException {
-            RequestParams params = Action.createParams(graph);
+        public ActionContext perform(final Action action) throws IOException {
+            ActionContext context = Action.createcontext(graph);
 
-            action.parseRequest(params);
+            action.handleRequest(context);
 
-            action.handleRequest(params);
-
-            return params;
+            return context;
         }
     }
 }

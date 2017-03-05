@@ -1,8 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 import java.io.IOException;
@@ -13,22 +12,15 @@ import java.io.IOException;
 public class FindIsolatedAtoms extends FilteredAction {
 
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setFilter(getFilter());
-
-        SemanticSynchrony.logInfo("SmSn find-isolated-atoms");
-    }
-
-    @Override
-    protected void performTransaction(final RequestParams params) throws RequestProcessingException {
-        Note n = params.getQueries().findIsolatedAtoms(params.getFilter());
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException {
+        Note n = context.getQueries().findIsolatedAtoms(filter);
         try {
-            addView(n, params);
+            addView(n, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        params.getMap().put("title", "isolated atoms");
+        context.getMap().put("title", "isolated atoms");
     }
 
     @Override

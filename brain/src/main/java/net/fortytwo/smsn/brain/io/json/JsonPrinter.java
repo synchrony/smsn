@@ -31,12 +31,12 @@ public class JsonPrinter {
     public JSONObject toJsonInternal(final Note note) throws JSONException {
         JSONObject json = new JSONObject();
 
-        json.put(JsonFormat.ID, note.getId());
+        json.put(JsonFormat.Keys.ID, note.getId());
         json.put(SemanticSynchrony.PropertyKeys.WEIGHT, note.getWeight());
         json.put(SemanticSynchrony.PropertyKeys.SHARABILITY, note.getSharability());
         json.put(SemanticSynchrony.PropertyKeys.CREATED, note.getCreated());
-        json.put(JsonFormat.NUMBER_OF_CHILDREN, note.getNumberOfChildren());
-        json.put(JsonFormat.NUMBER_OF_PARENTS, note.getNumberOfParents());
+        json.put(JsonFormat.Keys.NUMBER_OF_CHILDREN, note.getNumberOfChildren());
+        json.put(JsonFormat.Keys.NUMBER_OF_PARENTS, note.getNumberOfParents());
 
         Float priority = note.getPriority();
         if (null != priority && priority > 0) {
@@ -63,7 +63,7 @@ public class JsonPrinter {
 
         if (null != note.getMeta()) {
             JSONArray c = new JSONArray();
-            json.put(JsonFormat.META, c);
+            json.put(JsonFormat.Keys.META, c);
             int i = 0;
             for (String s : note.getMeta()) {
                 c.put(i++, s);
@@ -72,7 +72,7 @@ public class JsonPrinter {
 
         if (0 < note.getChildren().size()) {
             JSONArray c = new JSONArray();
-            json.put(JsonFormat.CHILDREN, c);
+            json.put(JsonFormat.Keys.CHILDREN, c);
             int i = 0;
             for (Note child : note.getChildren()) {
                 c.put(i, toJsonInternal(child));

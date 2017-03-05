@@ -25,8 +25,8 @@ public class JsonParser extends BrainParser {
     private Note parse(final JSONObject json) throws JSONException {
         Note n = new Note();
 
-        if (json.has(JsonFormat.ID)) {
-            n.setId(json.getString(JsonFormat.ID));
+        if (json.has(JsonFormat.Keys.ID)) {
+            n.setId(json.getString(JsonFormat.Keys.ID));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.TITLE)) {
             n.setTitle(json.getString(SemanticSynchrony.PropertyKeys.TITLE));
@@ -49,14 +49,14 @@ public class JsonParser extends BrainParser {
         if (json.has(SemanticSynchrony.PropertyKeys.CREATED)) {
             n.setCreated(json.getLong(SemanticSynchrony.PropertyKeys.CREATED));
         }
-        if (json.has(JsonFormat.NUMBER_OF_CHILDREN)) {
-            n.setNumberOfChildren(json.optInt(JsonFormat.NUMBER_OF_CHILDREN));
+        if (json.has(JsonFormat.Keys.NUMBER_OF_CHILDREN)) {
+            n.setNumberOfChildren(json.optInt(JsonFormat.Keys.NUMBER_OF_CHILDREN));
         }
-        if (json.has(JsonFormat.NUMBER_OF_PARENTS)) {
-            n.setNumberOfParents(json.optInt(JsonFormat.NUMBER_OF_PARENTS));
+        if (json.has(JsonFormat.Keys.NUMBER_OF_PARENTS)) {
+            n.setNumberOfParents(json.optInt(JsonFormat.Keys.NUMBER_OF_PARENTS));
         }
 
-        JSONArray a = json.optJSONArray(JsonFormat.CHILDREN);
+        JSONArray a = json.optJSONArray(JsonFormat.Keys.CHILDREN);
         if (null != a) {
             for (int i = 0; i < a.length(); i++) {
                 JSONObject jc = a.getJSONObject(i);

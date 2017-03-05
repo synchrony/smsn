@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server.actions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.server.errors.BadRequestException;
+import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,11 +21,14 @@ public class SetPropertiesTest extends ActionTestBase {
         atom = topicGraph.createAtom(null);
         atom.setTitle("before");
         atom.setText("the page");
+        assertEquals(1, countAtoms());
         topicGraph.commit();
 
         atom = topicGraph.getAtomById(atom.getId());
         assertEquals("before", atom.getTitle());
         assertEquals("the page", atom.getText());
+
+        assertEquals(1, countAtoms());
     }
 
     @Test
@@ -41,7 +45,7 @@ public class SetPropertiesTest extends ActionTestBase {
         assertEquals("after", atom.getTitle());
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test(expected = RequestProcessingException.class)
     public void emptyTitleIsError() throws Exception {
 
         SetProperties action = new SetProperties();

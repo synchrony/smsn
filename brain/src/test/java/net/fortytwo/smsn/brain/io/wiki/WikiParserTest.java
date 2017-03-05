@@ -181,6 +181,31 @@ public class WikiParserTest {
         assertEquals(2, notes.size());
     }
 
+    /*
+original:
++ :UAk6ejU: goya goya\\n    \\u00b7 :_8UG7N6: nimbwana\\n
+   \\u00b7 :vPXpqj1: nole\\n    \\u00b7 :AGebVR5: nole\\n+ :hSsMqzT: nanonao\\
+n    \\u00b7 :L5g2mUg: gorbalev\\n    \\u00b7 :gd_BOrG: and another\\n. new
+
+unwrapped:
++ :UAk6ejU: goya goya\\n    \\u00b7 :_8UG7N6: nimbwana\\n   \\u00b7 :vPXpqj1: nole\\n    \\u00b7 :AGebVR5: nole\\n+ :hSsMqzT: nanonao\\n    \\u00b7 :L5g2mUg: gorbalev\\n    \\u00b7 :gd_BOrG: and another\\n. new
+
+unescaped
++ :UAk6ejU: goya goya\n    \u00b7 :_8UG7N6: nimbwana\n   \u00b7 :vPXpqj1: nole\n    \u00b7 :AGebVR5: nole\n+ :hSsMqzT: nanonao\n    \u00b7 :L5g2mUg: gorbalev\n    \u00b7 :gd_BOrG: and another\n. new
+
+inside unwrapped
++ :UAk6ejU: goya goya\\n    \\u00b7 :_8UG7N6: nimbwana\\n    \\u00b7 :vPXpqj1: nole\\n    \\u00b7 :AGebVR5: nole\\n+ :hSsMqzT: nanonao\\n   \\u00b7 :L5g2mUg: gorbalev\\n    \\u00b7 :gd_BOrG: and another\\n. new
+
+inside unescaped
++ :UAk6ejU: goya goya\n    \u00b7 :_8UG7N6: nimbwana\n    \u00b7 :vPXpqj1: nole\n    \u00b7 :AGebVR5: nole\n+ :hSsMqzT: nanonao\n   \u00b7 :L5g2mUg: gorbalev\n    \u00b7 :gd_BOrG: and another\n. new
+     */
+    @Test
+    public void testOther() throws Exception {
+        List<Note> notes = readNotes(
+                "+ :UAk6ejU: goya goya\n    \u00b7 :_8UG7N6: nimbwana\n    \u00b7 :vPXpqj1: nole\n    \u00b7 :AGebVR5: nole\n+ :hSsMqzT: nanonao\n   \u00b7 :L5g2mUg: gorbalev\n    \u00b7 :gd_BOrG: and another\n. new"        );
+        assertEquals(3, notes.size());
+    }
+
     private List<Note> readNotes(final String s) throws IOException {
         try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
             return wikiParser.parse(in).getChildren();

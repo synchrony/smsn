@@ -1,29 +1,31 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.TreeViews;
+import net.fortytwo.smsn.brain.ViewStyle;
+import net.fortytwo.smsn.server.errors.BadRequestException;
 
 public abstract class BasicViewAction extends FilteredAction {
-    private int height;
+    protected int height;
 
-    private String style = TreeViews.forwardViewStyle.getName();
+    protected ViewStyle style = TreeViews.forwardViewStyle;
 
     public BasicViewAction() {
         super();
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
     public void setHeight(int height) {
         this.height = height;
+
+        if (height < 0) {
+            throw new BadRequestException("height must be at least 0");
+        }
+
+        if (height > MAX_VIEW_HEIGHT) {
+            throw new BadRequestException("height may not be more than 5");
+        }
     }
 
-    public void setStyle(String style) {
-        this.style = style;
+    public void setStyle(final String styleName) {
+        this.style = TreeViews.lookupStyle(styleName);
     }
 }

@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.json.JSONObject;
@@ -22,14 +22,6 @@ public class Search extends BasicViewAction {
 
     private int titleCutoff = 100;
 
-    public TreeViews.QueryType getQueryType() {
-        return queryType;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
     public void setQuery(String query) {
         // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
         //query = new String(query.getBytes(), "UTF-8");
@@ -41,30 +33,18 @@ public class Search extends BasicViewAction {
         this.queryType = queryType;
     }
 
-    public int getTitleCutoff() {
-        return titleCutoff;
-    }
-
     public void setTitleCutoff(int titleCutoff) {
         this.titleCutoff = titleCutoff;
     }
 
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setHeight(getHeight());
-        params.setQueryType(getQueryType());
-        params.setQuery(getQuery());
-        params.setStyleName(getStyle());
-        params.setFilter(getFilter());
-        params.setTitleCutoff(getTitleCutoff());
-    }
+    protected void performTransaction(final ActionContext params)
+            throws RequestProcessingException, BadRequestException {
 
-    @Override
-    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
-        params.getJsonPrinter().setTitleLengthCutoff(params.getTitleCutoff());
+        params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
         try {
-            if (params.getQueryType().equals(TreeViews.QueryType.Ripple)) {
+            if (queryType.equals(TreeViews.QueryType.Ripple)) {
                 addRippleResults(params);
             } else {
                 addSearchResults(params);
@@ -73,7 +53,7 @@ public class Search extends BasicViewAction {
             throw new RequestProcessingException(e);
         }
 
-        params.getMap().put("title", params.getQuery());
+        params.getMap().put("title", query);
     }
 
     @Override
@@ -86,15 +66,15 @@ public class Search extends BasicViewAction {
         return false;
     }
 
-    private void addSearchResults(final RequestParams params) throws IOException {
-        Note n = params.getQueries().search(params.getQueryType(), params.getQuery(), params.getHeight(), params.getFilter(), params.getStyle());
+    private void addSearchResults(final ActionContext params) throws IOException {
+        Note n = params.getQueries().search(queryType, query, height, filter, style);
         addView(n, params);
     }
 
-    private void addRippleResults(final RequestParams p) throws IOException {
+    private void addRippleResults(final ActionContext p) throws IOException {
         // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
         Note n = new Note();
-        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
+        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, style);
         JSONObject json;
 
         json = p.getJsonPrinter().toJson(n);

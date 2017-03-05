@@ -3,8 +3,8 @@ package net.fortytwo.smsn.server;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
@@ -27,7 +27,6 @@ import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,29 +36,18 @@ import java.util.logging.Logger;
 public abstract class Action {
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
 
-    private static final int MAX_VIEW_HEIGHT = 7;
+    protected static final int MAX_VIEW_HEIGHT = 7;
 
-    private static final String CREATE_NEW_ATOM = "create-new-atom";
+    protected static final String CREATE_NEW_ATOM = "create-new-atom";
 
     private static final Map<Graph, Brain> brains = new HashMap<>();
     private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
 
     private static final History history = new History();
 
-    @NotNull
-    private String action;
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public abstract void parseRequest(final RequestParams params) throws IOException, BadRequestException;
-
-    protected abstract void performTransaction(RequestParams params) throws BadRequestException, RequestProcessingException;
+    // override in subclasses
+    protected void performTransaction(final ActionContext context)
+            throws BadRequestException, RequestProcessingException {}
 
     protected abstract boolean doesRead();
 
@@ -98,39 +86,36 @@ public abstract class Action {
             : new Neo4jGraphWrapper((Neo4jGraph) graph);
     }
 
-    public void handleRequest(final RequestParams params) {
-
-        setNonTransactionalParams(params);
+    public void handleRequest(final ActionContext context) {
 
         long before = System.currentTimeMillis();
-        wrapTransactionAndExceptions(params);
+        wrapTransactionAndExceptions(context);
         long after = System.currentTimeMillis();
 
         SemanticSynchrony.logInfo("completed " + getClass().getSimpleName() + " action in " + (after - before) + " ms");
 
-        logActivity(params);
+        logActivity(context);
     }
 
     protected void addView(final Note n,
-                           final RequestParams params) throws IOException {
+                           final ActionContext context) throws IOException {
         JSONObject json;
 
-        json = params.getJsonPrinter().toJson(n);
+        json = context.getJsonPrinter().toJson(n);
 
-        params.getMap().put(Params.VIEW, json);
+        context.getMap().put(Params.VIEW, json);
     }
 
-    public static RequestParams createParams(final Graph graph) {
-        RequestParams params = new RequestParams();
+    public static ActionContext createcontext(final Graph graph) {
+        ActionContext context = new ActionContext();
 
-        setGraphWrapper(params, graph);
+        context.setMap(new HashMap<>());
 
-        return params;
-    }
+        setGraphWrapper(context, graph);
+        setBrain(context);
+        setIO(context);
 
-    private static void setGraphWrapper(final RequestParams params, final Graph graph) {
-        GraphWrapper wrapper = getWrapper(graph);
-        params.setGraphWrapper(wrapper);
+        return context;
     }
 
     protected void addToHistory(final String rootId) {
@@ -142,138 +127,47 @@ public abstract class Action {
         return history.getHistory(100, graph, filter);
     }
 
-    private void wrapTransactionAndExceptions(final RequestParams params) {
-        try {
-            TopicGraph.wrapInTransaction(params.getBrain().getTopicGraph(), () -> {
-                // must be done within the transaction, as it involves graph operations
-                setTransactionalParams(params);
+    private void wrapTransactionAndExceptions(final ActionContext context) {
+        setTitle(context, "[no title]");
 
-                performTransaction(params);
+        try {
+            TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> {
+                performTransaction(context);
             });
         } catch (Exception e) {
             throw new RequestProcessingException(e);
         }
     }
 
-    private void logActivity(final RequestParams params) {
+    private void logActivity(final ActionContext context) {
         // Note: currently, all activities are logged, but the log is not immediately flushed
         //       unless the transaction succeeds.
-        if (null != params.getBrain().getActivityLog()) {
-            params.getBrain().getActivityLog().flush();
+        if (null != context.getBrain().getActivityLog()) {
+            context.getBrain().getActivityLog().flush();
         }
     }
 
-    private void setNonTransactionalParams(final RequestParams params) {
-
-        params.setMap(new HashMap<>());
-
-        setWikiView(params);
-        setBrain(params);
-        setIO(params);
-        setHeight(params);
-        setFilter(params);
-        setStyle(params);
-    }
-
-    private void setTransactionalParams(final RequestParams params) {
-        setRoot(params);
-        setTitle(params);
-    }
-
-    private void setWikiView(final RequestParams params) {
-        if (null != params.getView()) {
-            // Force the use of the UTF-8 charset, which is apparently not chosen by Jersey
-            // even when it is specified by the client in the Content-Type header, e.g.
-            //    Content-Type: application/x-www-form-urlencoded;charset=UTF-8
-            try {
-                params.setView(new String(params.getView().getBytes("UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                throw new RequestProcessingException(e);
-            }
-        }
-    }
-
-    private void setBrain(final RequestParams params) {
+    private static void setBrain(final ActionContext context) {
         try {
-            params.setBrain(getBrain(params.getGraphWrapper()));
+            context.setBrain(getBrain(context.getGraphWrapper()));
         } catch (Brain.BrainException e) {
             throw new RequestProcessingException(e);
         }
     }
 
-    private void setIO(final RequestParams params) {
-        params.setQueries(new TreeViews(params.getBrain()));
-        params.setWikiParser(new WikiParser());
-        params.setJsonParser(new JsonParser());
-        params.setJsonPrinter(new JsonPrinter());
+    private static void setIO(final ActionContext context) {
+        context.setQueries(new TreeViews(context.getBrain()));
+        context.setWikiParser(new WikiParser());
+        context.setJsonParser(new JsonParser());
+        context.setJsonPrinter(new JsonPrinter());
     }
 
-    private void setHeight(final RequestParams params) {
-        if (null != params.getHeight()) {
-            if (params.getHeight() < 0) {
-                throw new BadRequestException("height must be at least 0");
-            }
-
-            if (params.getHeight() > MAX_VIEW_HEIGHT) {
-                throw new BadRequestException("height may not be more than 5");
-            }
-
-            params.getMap().put(Params.HEIGHT, "" + params.getHeight());
-        }
+    private static void setGraphWrapper(final ActionContext context, final Graph graph) {
+        GraphWrapper wrapper = getWrapper(graph);
+        context.setGraphWrapper(wrapper);
     }
 
-    private void setFilter(final RequestParams params) {
-        if (null != params.getFilter()) {
-            params.getMap().put(Params.MIN_SHARABILITY, "" + params.getFilter().getMinSharability());
-            params.getMap().put(Params.MAX_SHARABILITY, "" + params.getFilter().getMaxSharability());
-            params.getMap().put(Params.DEFAULT_SHARABILITY, "" + params.getFilter().getDefaultSharability());
-            params.getMap().put(Params.MIN_WEIGHT, "" + params.getFilter().getMinWeight());
-            params.getMap().put(Params.MAX_WEIGHT, "" + params.getFilter().getMaxWeight());
-            params.getMap().put(Params.DEFAULT_WEIGHT, "" + params.getFilter().getDefaultWeight());
-        }
-    }
-
-    private Atom createNewRoot(final RequestParams params) {
-        Atom root = params.getBrain().getTopicGraph().createAtomWithProperties(params.getFilter(), null);
-        root.setTitle("life, the universe, and everything");
-        params.getBrain().getTopicGraph().reindexAtom(root);
-        return root;
-    }
-
-    private void setRoot(final RequestParams params) {
-        String rootId = params.getRootId();
-
-        if (null != rootId) {
-            Atom root = rootId.equals(CREATE_NEW_ATOM)
-                    ? createNewRoot(params)
-                    : params.getBrain().getTopicGraph().getAtomById(rootId);
-
-            params.setRoot(root);
-
-            if (null == params.getRoot()) {
-                throw new BadRequestException("root of view does not exist: " + rootId);
-            }
-
-            if (null != params.getFilter() && !params.getFilter().isVisible(params.getRoot())) {
-                throw new BadRequestException("root of view is not visible: " + rootId);
-            }
-
-            params.getMap().put(Params.ROOT, root.getId());
-        }
-    }
-
-    private void setTitle(final RequestParams params) {
-        params.getMap().put(Params.VIEW_TITLE, null == params.getRoot()
-                || null == params.getRoot().getTitle()
-                || 0 == params.getRoot().getTitle().length() ? "[no title]" : params.getRoot().getTitle());
-    }
-
-    private void setStyle(final RequestParams params) {
-        String styleName = params.getStyleName();
-
-        if (null != styleName) {
-            params.setStyle(TreeViews.lookupStyle(styleName));
-            params.getMap().put(Params.STYLE, params.getStyle().getName());
-        }
+    protected void setTitle(final ActionContext context, final String title) {
+        context.getMap().put(Params.VIEW_TITLE, title);
     }
 }

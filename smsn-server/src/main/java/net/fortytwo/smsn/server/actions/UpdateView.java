@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -21,16 +21,8 @@ public class UpdateView extends RootedViewAction {
     @NotNull
     private Params.Format viewFormat;
 
-    public String getView() {
-        return view;
-    }
-
     public void setView(String view) {
         this.view = view;
-    }
-
-    public Params.Format getViewFormat() {
-        return viewFormat;
     }
 
     public void setViewFormat(Params.Format viewFormat) {
@@ -38,50 +30,51 @@ public class UpdateView extends RootedViewAction {
     }
 
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setHeight(getHeight());
-        // note: may be null
-        params.setRootId(getRoot());
-        params.setStyleName(getStyle());
+    protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
+        super.performTransaction(params);
 
-        params.setView(getView());
-
-        params.setFilter(getFilter());
-    }
-
-    @Override
-    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
         Note rootNote;
 
-        if (null != params.getView()) {
-            try {
-                try (InputStream in = new ByteArrayInputStream(params.getView().getBytes())) {
-                    rootNote = params.getWikiParser().parse(in);
-                }
-            } catch (IOException e) {
-                throw new RequestProcessingException(e);
-            }
-        } else if (null != params.getView()) {
-            try {
-                rootNote = params.getJsonParser().parse(params.getView());
-            } catch (IOException e) {
-                throw new RequestProcessingException(e);
-            }
-        } else {
-            throw new IllegalStateException();
+        switch (viewFormat) {
+            case json:
+                rootNote = parseJson(params);
+                break;
+            case wiki:
+                rootNote = parseWikiText(params);
+                break;
+            default:
+                throw new IllegalStateException();
         }
 
-        rootNote.setId(params.getRootId());
+        rootNote.setId(root);
 
         // Apply the update
-        params.getQueries().update(rootNote, params.getHeight(), params.getFilter(), params.getStyle());
+        params.getQueries().update(rootNote, height, filter, style);
 
         // TODO: produce an appropriate view (e.g. a search) if the root is null
-        Note n = null == params.getRoot()
+        Note n = null == rootAtom
                 ? new Note()
-                : params.getQueries().view(params.getRoot(), params.getHeight(), params.getFilter(), params.getStyle());
+                : params.getQueries().view(rootAtom, height, filter, style);
         try {
             addView(n, params);
+        } catch (IOException e) {
+            throw new RequestProcessingException(e);
+        }
+    }
+
+    private Note parseWikiText(final ActionContext params) {
+        try {
+            try (InputStream in = new ByteArrayInputStream(view.getBytes())) {
+                return params.getWikiParser().parse(in);
+            }
+        } catch (IOException e) {
+            throw new RequestProcessingException(e);
+        }
+    }
+
+    private Note parseJson(final ActionContext params) {
+        try {
+            return params.getJsonParser().parse(view);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

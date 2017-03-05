@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -13,16 +13,11 @@ import java.io.IOException;
 public class GetHistory extends FilteredAction {
 
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setFilter(getFilter());
-    }
-
-    @Override
-    protected void performTransaction(final RequestParams params) throws RequestProcessingException, BadRequestException {
-        Iterable<Atom> atoms = getHistory(params.getBrain().getTopicGraph(), params.getFilter());
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
+        Iterable<Atom> atoms = getHistory(context.getBrain().getTopicGraph(), filter);
 
         try {
-            addView(params.getQueries().customView(atoms, params.getFilter()), params);
+            addView(context.getQueries().customView(atoms, filter), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
