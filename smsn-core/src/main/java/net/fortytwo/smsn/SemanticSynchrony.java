@@ -180,7 +180,7 @@ public class SemanticSynchrony {
     }
 
     /**
-     * Creates a pseudo-random Base64 SmSn key.
+     * Creates a pseudo-random Base62 SmSn key.
      * These keys are typically used as ids of atoms and list elements in Extend-o-Brain.
      *
      * @return a new pseudo-random key
@@ -188,15 +188,12 @@ public class SemanticSynchrony {
     public static String createRandomId() {
         byte[] bytes = new byte[ID_DIGITS];
         for (int i = 0; i < ID_DIGITS; i++) {
-            int n = random.nextInt(64);
+            int n = random.nextInt(62);
             int b = n < 26
                     ? 'A' + n
                     : n < 52
                     ? 'a' + n - 26
-                    : n < 62
-                    ? '0' + n - 52
-                    : n < 63
-                    ? '-' : '_';
+                    : '0' + n - 52;
             bytes[i] = (byte) b;
         }
 
