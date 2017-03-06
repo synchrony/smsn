@@ -37,12 +37,12 @@ public class FindDuplicates extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
-        List<List<Atom>> dups = getDuplicates(context.getBrain().getTopicGraph(), filter);
+        List<List<Atom>> dups = getDuplicates(context.getBrain().getTopicGraph(), getFilter());
         List<Atom> flat = new LinkedList<>();
         for (List<Atom> l : dups) flat.addAll(l);
 
         try {
-            addView(context.getQueries().customView(flat, filter), context);
+            addView(context.getQueries().customView(flat, getFilter()), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

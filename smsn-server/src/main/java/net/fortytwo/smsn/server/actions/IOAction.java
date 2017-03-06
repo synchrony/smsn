@@ -7,12 +7,20 @@ import java.io.File;
 
 public abstract class IOAction extends FilteredAction {
     @NotNull
-    protected Format format;
+    private Format format;
     @NotNull
-    protected File file;
+    private File file;
+
+    public Format getFormat() {
+        return notNull(format);
+    }
 
     public void setFormat(String format) {
         this.format = Format.getFormat(format);
+    }
+
+    public File getFile() {
+        return notNull(file);
     }
 
     public void setFile(String file) {

@@ -13,18 +13,18 @@ import java.io.IOException;
 public class GetView extends RootedViewAction {
 
     @Override
-    protected void performTransaction(final ActionContext conte)
+    protected void performTransaction(final ActionContext context)
             throws RequestProcessingException, BadRequestException {
-        super.performTransaction(conte);
+        super.performTransaction(context);
 
-        Note note = conte.getQueries().view(rootAtom, height, filter, style);
+        Note note = context.getQueries().view(getRoot(), height, getFilter(), style);
         try {
-            addView(note, conte);
+            addView(note, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(root);
+        addToHistory(getRoot().getId());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.latex;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
@@ -32,6 +33,7 @@ public class LatexWriter extends BrainWriter {
     @Override
     public void doExport(Context context) throws IOException {
         String rootId = context.getRootId();
+        Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
         Atom rootAtom = context.getTopicGraph().getAtomById(rootId);

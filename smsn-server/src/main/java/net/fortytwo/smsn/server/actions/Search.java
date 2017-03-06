@@ -20,6 +20,14 @@ public class Search extends BasicViewAction {
     @NotNull
     private TreeViews.QueryType queryType;
 
+    private String getQuery() {
+        return notNull(query);
+    }
+
+    private TreeViews.QueryType getQueryType() {
+        return notNull(queryType);
+    }
+
     private int titleCutoff = 100;
 
     public void setQuery(String query) {
@@ -44,7 +52,7 @@ public class Search extends BasicViewAction {
         params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
         try {
-            if (queryType.equals(TreeViews.QueryType.Ripple)) {
+            if (getQueryType().equals(TreeViews.QueryType.Ripple)) {
                 addRippleResults(params);
             } else {
                 addSearchResults(params);
@@ -53,7 +61,7 @@ public class Search extends BasicViewAction {
             throw new RequestProcessingException(e);
         }
 
-        params.getMap().put("title", query);
+        params.getMap().put("title", getQuery());
     }
 
     @Override
@@ -67,7 +75,7 @@ public class Search extends BasicViewAction {
     }
 
     private void addSearchResults(final ActionContext params) throws IOException {
-        Note n = params.getQueries().search(queryType, query, height, filter, style);
+        Note n = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
         addView(n, params);
     }
 

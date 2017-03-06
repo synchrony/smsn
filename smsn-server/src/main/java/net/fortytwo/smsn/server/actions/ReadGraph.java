@@ -22,22 +22,22 @@ public class ReadGraph extends IOAction {
 
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
-        if (null == format) {
+        if (null == getFormat()) {
             throw new BadRequestException("format is required");
         }
 
-        BrainReader reader = Format.getReader(format);
+        BrainReader reader = Format.getReader(getFormat());
 
-        beginImport(params.getGraphWrapper().getGraph(), file.getAbsolutePath());
+        beginImport(params.getGraphWrapper().getGraph(), getFile().getAbsolutePath());
 
         boolean success = false;
         try {
-            reader.doImport(file, format, params.getBrain(), true);
+            reader.doImport(getFile(), getFormat(), params.getBrain(), true);
             success = true;
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         } finally {
-            finishImport(params.getGraphWrapper().getGraph(), file.getAbsolutePath(), success);
+            finishImport(params.getGraphWrapper().getGraph(), getFile().getAbsolutePath(), success);
         }
     }
 

@@ -7,10 +7,14 @@ import javax.validation.constraints.NotNull;
 
 public abstract class RootedViewAction extends BasicViewAction {
 
-    protected String root;
-
     @NotNull
-    protected Atom rootAtom;
+    private String root;
+
+    private Atom rootAtom;
+
+    public Atom getRoot() {
+        return notNull(rootAtom);
+    }
 
     public void setRoot(String root) {
         // work around for a Brain-mode quirk

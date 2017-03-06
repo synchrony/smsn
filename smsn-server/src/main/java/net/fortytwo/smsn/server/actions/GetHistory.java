@@ -14,10 +14,10 @@ public class GetHistory extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
-        Iterable<Atom> atoms = getHistory(context.getBrain().getTopicGraph(), filter);
+        Iterable<Atom> atoms = getHistory(context.getBrain().getTopicGraph(), getFilter());
 
         try {
-            addView(context.getQueries().customView(atoms, filter), context);
+            addView(context.getQueries().customView(atoms, getFilter()), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

@@ -66,18 +66,23 @@ public class VCSWriter extends BrainWriter {
 
     private void doExport(final TopicGraph graph, final File[] dirs) throws IOException {
         for (Atom a : graph.getAllAtoms()) {
-            File dir = chooseDirectoryForAtom(a, dirs);
-            File atomFile = new File(dir, "a" + a.getId());
-            try (OutputStream out = new FileOutputStream(atomFile)) {
-                writeAtomToStream(a, out);
+            if (isAtomWithPage(a)) {
+                File dir = chooseDirectoryForAtom(a, dirs);
+                File atomFile = new File(dir, "a" + a.getId());
+                try (OutputStream out = new FileOutputStream(atomFile)) {
+                    writeAtomToStream(a, out);
+                }
             }
         }
     }
 
+    private boolean isAtomWithPage(final Atom a) {
+        return a.getSharability() > 0f;
+    }
+
     private File chooseDirectoryForAtom(final Atom a, File[] dirs) {
         Float sharability = a.getSharability();
-        Preconditions.checkNotNull(sharability);
-        Preconditions.checkArgument(sharability > 0f && sharability <= 1.0f);
+        Preconditions.checkArgument(sharability > 0f && sharability <= 1.0f, a.getId());
 
         int index = (int) (sharability / 0.25f) - 1;
         return dirs[index];

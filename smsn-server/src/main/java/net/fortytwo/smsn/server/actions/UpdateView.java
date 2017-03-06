@@ -21,6 +21,14 @@ public class UpdateView extends RootedViewAction {
     @NotNull
     private Params.Format viewFormat;
 
+    private String getView() {
+        return notNull(view);
+    }
+
+    private Params.Format getViewFormat() {
+        return notNull(viewFormat);
+    }
+
     public void setView(String view) {
         this.view = view;
     }
@@ -35,7 +43,7 @@ public class UpdateView extends RootedViewAction {
 
         Note rootNote;
 
-        switch (viewFormat) {
+        switch (getViewFormat()) {
             case json:
                 rootNote = parseJson(params);
                 break;
@@ -46,15 +54,15 @@ public class UpdateView extends RootedViewAction {
                 throw new IllegalStateException();
         }
 
-        rootNote.setId(root);
+        rootNote.setId(getRoot().getId());
 
         // Apply the update
-        params.getQueries().update(rootNote, height, filter, style);
+        params.getQueries().update(rootNote, height, getFilter(), style);
 
         // TODO: produce an appropriate view (e.g. a search) if the root is null
-        Note n = null == rootAtom
+        Note n = null == getRoot()
                 ? new Note()
-                : params.getQueries().view(rootAtom, height, filter, style);
+                : params.getQueries().view(getRoot(), height, getFilter(), style);
         try {
             addView(n, params);
         } catch (IOException e) {
@@ -64,7 +72,7 @@ public class UpdateView extends RootedViewAction {
 
     private Note parseWikiText(final ActionContext params) {
         try {
-            try (InputStream in = new ByteArrayInputStream(view.getBytes())) {
+            try (InputStream in = new ByteArrayInputStream(getView().getBytes())) {
                 return params.getWikiParser().parse(in);
             }
         } catch (IOException e) {
@@ -74,7 +82,7 @@ public class UpdateView extends RootedViewAction {
 
     private Note parseJson(final ActionContext params) {
         try {
-            return params.getJsonParser().parse(view);
+            return params.getJsonParser().parse(getView());
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

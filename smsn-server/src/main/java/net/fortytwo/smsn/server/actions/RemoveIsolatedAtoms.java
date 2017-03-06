@@ -11,7 +11,7 @@ public class RemoveIsolatedAtoms extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
-        params.getBrain().getTopicGraph().removeIsolatedAtoms(filter);
+        params.getBrain().getTopicGraph().removeIsolatedAtoms(getFilter());
     }
 
     @Override

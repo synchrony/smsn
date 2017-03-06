@@ -26,7 +26,7 @@ public class GetPriorities extends FilteredAction {
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
 
-        Note n = context.getQueries().priorityView(filter, maxResults, context.getBrain().getPriorities());
+        Note n = context.getQueries().priorityView(getFilter(), maxResults, context.getBrain().getPriorities());
         try {
             addView(n, context);
         } catch (IOException e) {

@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
@@ -169,5 +170,10 @@ public abstract class Action {
 
     protected void setTitle(final ActionContext context, final String title) {
         context.getMap().put(Params.VIEW_TITLE, title);
+    }
+
+    protected <T> T notNull(T object) {
+        Preconditions.checkNotNull(object, "action is missing a required field");
+        return object;
     }
 }

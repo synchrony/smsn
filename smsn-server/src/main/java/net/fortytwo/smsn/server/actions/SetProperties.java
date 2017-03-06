@@ -21,6 +21,18 @@ public class SetProperties extends FilteredAction {
     @NotNull
     private Object value;
 
+    private String getId() {
+        return notNull(id);
+    }
+
+    private String getName() {
+        return notNull(name);
+    }
+
+    private Object getValue() {
+        return notNull(value);
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -34,7 +46,7 @@ public class SetProperties extends FilteredAction {
     }
 
     private void validateKeyValue() {
-        switch (name) {
+        switch (getName()) {
             case SemanticSynchrony.PropertyKeys.TITLE:
                 validateTitle();
                 break;
@@ -59,7 +71,7 @@ public class SetProperties extends FilteredAction {
     }
 
     private void validateTitle() {
-        if (((String) value).trim().length() == 0) {
+        if (((String) getValue()).trim().length() == 0) {
             throw new BadRequestException("empty value");
         }
     }
@@ -69,7 +81,7 @@ public class SetProperties extends FilteredAction {
     }
 
     private void validateWeight() {
-        float f = toFloat(value);
+        float f = toFloat(getValue());
         // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
         if (f <= 0 || f > 1.0) {
             throw new BadRequestException("weight is outside of range (0, 1]: " + f);
@@ -77,21 +89,21 @@ public class SetProperties extends FilteredAction {
     }
 
     private void validateSharability() {
-        float f = toFloat(value);
+        float f = toFloat(getValue());
         if (f <= 0 || f > 1.0) {
             throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
         }
     }
 
     private void validatePriority() {
-        float f = toFloat(value);
+        float f = toFloat(getValue());
         if (f < 0 || f > 1.0) {
             throw new BadRequestException("priority is outside of range [0, 1]: " + f);
         }
     }
 
     private void validateShortcut() {
-        String s = (String) value;
+        String s = (String) getValue();
         if (s.length() > 50) {
             throw new BadRequestException("shortcut is too long: " + s);
         }
@@ -106,9 +118,10 @@ public class SetProperties extends FilteredAction {
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
         validateKeyValue();
 
-        Atom root = getRoot(id, params);
+        Atom root = getRoot(getId(), params);
+        Object value = getValue();
 
-        switch (name) {
+        switch (getName()) {
             case SemanticSynchrony.PropertyKeys.TITLE:
                 root.setTitle((String) value);
                 break;
@@ -128,7 +141,7 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
-                for (Atom a : params.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, filter)) {
+                for (Atom a : params.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
                     a.setShortcut(null);
                 }
 
@@ -142,7 +155,7 @@ public class SetProperties extends FilteredAction {
         params.getBrain().getTopicGraph().notifyOfUpdate();
 
         params.getMap().put("key", params.getBrain().getTopicGraph().idOfAtom(root));
-        params.getMap().put("name", name);
+        params.getMap().put("name", getName());
         params.getMap().put("value", value.toString());
 
         ActivityLog log = params.getBrain().getActivityLog();

@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.vertices;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
@@ -27,6 +28,7 @@ public class VertexWriter extends BrainWriter {
 
         TopicGraph sourceGraph = context.getTopicGraph();
         Filter filter = context.getFilter();
+        Preconditions.checkNotNull(filter);
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 

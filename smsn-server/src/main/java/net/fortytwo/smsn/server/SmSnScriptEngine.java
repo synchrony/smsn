@@ -28,7 +28,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
 
     private final GremlinScriptEngineFactory factory;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = createObjectMapper();
 
     public SmSnScriptEngine(GremlinScriptEngineFactory factory) {
         this.factory = factory;
@@ -107,13 +107,19 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
             } else {
                 throw new IllegalArgumentException("non-SmSn script: " + trimmed);
             }
+        } else {
+            return objectMapper.readValue(requestStr, Action.class);
         }
-
-        return objectMapper.readValue(requestStr, Action.class);
     }
 
     private JSONObject toJson(final Map<String, Object> map) {
         return new JSONObject(map);
+    }
+
+    private static ObjectMapper createObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        // add any configuration here
+        return objectMapper;
     }
 
     public static class ActionPerformer {

@@ -6,7 +6,6 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
-import javax.validation.constraints.NotNull;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,8 +15,12 @@ import java.io.OutputStream;
  */
 public class WriteGraph extends IOAction {
 
-    @NotNull
+    // note: may be null
     private String rootId;
+
+    private String getRootId() {
+        return rootId;
+    }
 
     public void setRootId(String rootId) {
         this.rootId = rootId;
@@ -29,19 +32,19 @@ public class WriteGraph extends IOAction {
         BrainWriter.Context context = new BrainWriter.Context();
         context.setTopicGraph(params.getBrain().getTopicGraph());
         context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
-        context.setRootId(rootId);
-        context.setFilter(filter);
-        context.setFormat(format);
-        BrainWriter writer = Format.getWriter(format);
+        context.setRootId(getRootId());
+        context.setFilter(getFilter());
+        context.setFormat(getFormat());
+        BrainWriter writer = Format.getWriter(getFormat());
 
         try {
-            if (format.getType().equals(Format.Type.FileBased)) {
-                try (OutputStream destStream = new FileOutputStream(file)) {
+            if (getFormat().getType().equals(Format.Type.FileBased)) {
+                try (OutputStream destStream = new FileOutputStream(getFile())) {
                     context.setDestStream(destStream);
                     writer.doExport(context);
                 }
             } else {
-                context.setDestDirectory(file);
+                context.setDestDirectory(getFile());
                 writer.doExport(context);
             }
         } catch (IOException e) {

@@ -13,7 +13,7 @@ public class FindIsolatedAtoms extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
-        Note n = context.getQueries().findIsolatedAtoms(filter);
+        Note n = context.getQueries().findIsolatedAtoms(getFilter());
         try {
             addView(n, context);
         } catch (IOException e) {

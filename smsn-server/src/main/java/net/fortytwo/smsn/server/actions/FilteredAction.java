@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
@@ -11,10 +12,10 @@ import javax.validation.constraints.NotNull;
 
 abstract class FilteredAction extends Action {
     @NotNull
-    protected Filter filter;
+    private Filter filter;
 
     public Filter getFilter() {
-        return filter;
+        return notNull(filter);
     }
 
     public void setFilter(final Filter filter) {
@@ -39,7 +40,7 @@ abstract class FilteredAction extends Action {
     }
 
     private Atom createNewRoot(final ActionContext context) {
-        Atom root = context.getBrain().getTopicGraph().createAtomWithProperties(filter, null);
+        Atom root = context.getBrain().getTopicGraph().createAtomWithProperties(getFilter(), null);
         root.setTitle("life, the universe, and everything");
         context.getBrain().getTopicGraph().reindexAtom(root);
         return root;
