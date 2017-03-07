@@ -106,19 +106,19 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public KeyValueTree<Link, EntityList<Link>> getTopicTree() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.TREE, Direction.OUT, v -> getGraph().asLinkTree(v));
+    public KeyValueTree<Link, EntityList<Link>> getContent() {
+        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.CONTENT, Direction.OUT, v -> getGraph().asLinkTree(v));
     }
 
     @Override
-    public boolean setTopicTree(KeyValueTree<Link, EntityList<Link>> tree) {
-        return setRequiredEntity(SemanticSynchrony.EdgeLabels.TREE, tree);
+    public boolean setContent(KeyValueTree<Link, EntityList<Link>> tree) {
+        return setRequiredEntity(SemanticSynchrony.EdgeLabels.CONTENT, tree);
     }
 
     @Override
     public void destroy() {
         // a page does not own its primary topic, but it does own its topic tree
-        getTopicTree().destroy();
+        getContent().destroy();
 
         destroyInternal();
     }

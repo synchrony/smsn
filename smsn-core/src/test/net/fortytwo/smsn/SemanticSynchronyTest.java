@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class SemanticSynchronyTest {
-    private static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7}");
+    private static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9]{7}");
 
     @Test
     public void testConfigurationProperties() throws Exception {

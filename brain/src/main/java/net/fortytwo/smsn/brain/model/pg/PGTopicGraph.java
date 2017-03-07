@@ -159,7 +159,7 @@ public class PGTopicGraph implements TopicGraph {
         Topic topic = topicLink.getTarget();
         Page page = createEntity(null, SemanticSynchrony.VertexLabels.PAGE, this::asPage);
         page.setPrimaryTopic(topic);
-        page.setTopicTree(createTopicTree(topicLink));
+        page.setContent(createTopicTree(topicLink));
         return page;
     }
 

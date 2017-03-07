@@ -15,7 +15,7 @@ public class ActionDuJour extends Action {
 
     @Override
     protected void performTransaction(ActionContext context) throws BadRequestException, RequestProcessingException {
-        // nothing to do; add an "action du jour" as needed
+        // add an "action du jour" as needed
 
         findAnomalousAtoms(context);
     }

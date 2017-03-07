@@ -62,7 +62,7 @@ public class SemanticSynchrony {
                 REST = "rest",
                 TARGET = "target",
                 TOPIC = "topic",
-                TREE = "tree",
+                CONTENT = "tree",
                 VALUE = "value";
     }
 

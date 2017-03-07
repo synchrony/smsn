@@ -38,7 +38,7 @@ public interface Page extends Entity {
 
     boolean setPrimaryTopic(Topic topic);
 
-    KeyValueTree<Link, EntityList<Link>> getTopicTree();
+    KeyValueTree<Link, EntityList<Link>> getContent();
 
-    boolean setTopicTree(KeyValueTree<Link, EntityList<Link>> tree);
+    boolean setContent(KeyValueTree<Link, EntityList<Link>> tree);
 }
