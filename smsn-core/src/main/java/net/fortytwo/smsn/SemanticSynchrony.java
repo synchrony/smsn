@@ -86,7 +86,7 @@ public class SemanticSynchrony {
 
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
-    private static final int ID_DIGITS = 7;
+    private static final int ID_DIGITS = 16;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 
@@ -185,7 +185,11 @@ public class SemanticSynchrony {
      *
      * @return a new pseudo-random key
      */
-    public static String createRandomId() {
+    public static String migrateId(final String original) {
+        if (null != original) {
+            random.setSeed(original.length() + original.hashCode());
+        }
+
         byte[] bytes = new byte[ID_DIGITS];
         for (int i = 0; i < ID_DIGITS; i++) {
             int n = random.nextInt(62);
@@ -198,6 +202,10 @@ public class SemanticSynchrony {
         }
 
         return new String(bytes);
+    }
+
+    public static String createRandomId() {
+        return migrateId(null);
     }
 
     /**

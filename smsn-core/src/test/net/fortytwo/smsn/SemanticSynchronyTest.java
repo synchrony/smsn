@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class SemanticSynchronyTest {
-    private static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9]{7}");
+    private static final Pattern NEW_ID_PATTERN = Pattern.compile("[a-zA-Z0-9]{16}");
 
     @Test
     public void testConfigurationProperties() throws Exception {
@@ -58,12 +58,26 @@ public class SemanticSynchronyTest {
         int total = 100;
         for (int i = 0; i < total; i++) {
             String id = SemanticSynchrony.createRandomId();
-            assertTrue(ID_PATTERN.matcher(id).matches());
+            assertTrue(NEW_ID_PATTERN.matcher(id).matches());
             ids.add(id);
             //System.out.println(id);
         }
 
         // no duplicates
         assertEquals(total, ids.size());
+    }
+
+    @Test
+    public void migratedIdsAreConsistent() {
+        for (int i = 0; i < 3; i++) {
+            assertMigratedIdEquals("eodxY8InPB5UYLqO", "9zVbkI_");
+            assertMigratedIdEquals("LYkiOeeBZiDq718D", "ZGVYTCA");
+            assertMigratedIdEquals("OhOt7yg71kBYkI22", "1HHHl9e");
+        }
+    }
+
+    private void assertMigratedIdEquals(final String expected, final String original) {
+        String actual = SemanticSynchrony.migrateId(original);
+        assertEquals(expected, actual);
     }
 }

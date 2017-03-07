@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
@@ -17,7 +18,15 @@ public class ActionDuJour extends Action {
     protected void performTransaction(ActionContext context) throws BadRequestException, RequestProcessingException {
         // add an "action du jour" as needed
 
-        findAnomalousAtoms(context);
+        migrateIds(context);
+
+        //findAnomalousAtoms(context);
+    }
+
+    private void migrateIds(final ActionContext context) {
+        for (Atom a : context.getBrain().getTopicGraph().getAllAtoms()) {
+            a.setId(SemanticSynchrony.migrateId(a.getId()));
+        }
     }
 
     private void findAnomalousAtoms(final ActionContext context) {
