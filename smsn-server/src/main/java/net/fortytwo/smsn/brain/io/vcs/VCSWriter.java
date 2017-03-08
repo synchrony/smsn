@@ -68,12 +68,16 @@ public class VCSWriter extends BrainWriter {
         for (Atom a : graph.getAllAtoms()) {
             if (isAtomWithPage(a)) {
                 File dir = chooseDirectoryForAtom(a, dirs);
-                File atomFile = new File(dir, "a" + a.getId());
+                File atomFile = new File(dir, fileNameForAtom(a));
                 try (OutputStream out = new FileOutputStream(atomFile)) {
                     writeAtomToStream(a, out);
                 }
             }
         }
+    }
+
+    private String fileNameForAtom(final Atom a) {
+        return a.getId();
     }
 
     private boolean isAtomWithPage(final Atom a) {
