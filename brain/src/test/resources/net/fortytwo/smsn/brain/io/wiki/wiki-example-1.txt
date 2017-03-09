@@ -30,7 +30,7 @@
         * blank lines don't matter
 
     * ids
-        * :0txXBm: each note has a base-64 id, which is indicated with an infix after the bullet
+        * :0txXBm: each note has a base-62 id, which is indicated with an infix after the bullet
         *    :cE85nD:    the id is optional, and it is treated as white space
 
         * :69qkF3: blank lines still don't matter

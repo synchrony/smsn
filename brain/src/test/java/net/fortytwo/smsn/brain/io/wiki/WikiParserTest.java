@@ -152,24 +152,26 @@ public class WikiParserTest {
                 "+ :COAZgCU: justice\n" +
                 "+ :g20vP2u: prudence\n" +
                 "+ :Ifkv0cj: temperance\n" +
-                "+ :rAr-qLh: detachment\n" +
-                "+ :pXOAO_S: sincerity\n");
+                "+ :rArdqLh: detachment\n" +
+                "+ :pXOAOuS: sincerity\n");
         assertEquals(6, notes.size());
         assertEquals("LTWrf62", notes.get(0).getId());
-        assertEquals("rAr-qLh", notes.get(4).getId());
+        assertEquals("rArdqLh", notes.get(4).getId());
 
         notes = readNotes("" +
-                "* :a:        short IDs are OK, although 7-byte IDs are 'standard'\n" +
-                "* :aaaaaaaa: longer IDs are OK, too");
-        assertEquals(2, notes.size());
-        assertEquals("a", notes.get(0).getId());
+                "* :aaaaa:        IDs as short as 5 bytes are OK, although 16-byte IDs are 'standard'\n" +
+                "* :aaaaaaaa: longer IDs are OK, too\n" +
+                "* :a: this is not an ID");
+        assertEquals(3, notes.size());
+        assertEquals("aaaaa", notes.get(0).getId());
         assertEquals("aaaaaaaa", notes.get(1).getId());
+        assertNull(notes.get(2).getId());
     }
 
     @Test
     public void testInvalidIdCharacters() throws Exception {
         List<Note> notes = readNotes("" +
-                "* :123@456: the 'ID' of this note contains a character not in [A-Za-z0-9-_]\n" +
+                "* :123@456: the 'ID' of this note contains a character not in [A-Za-z0-9]\n" +
                 "* it does not actually become an ID; just more value text");
         assertEquals(2, notes.size());
         assertNotSame("123@456", notes.get(0).getId());
@@ -179,31 +181,6 @@ public class WikiParserTest {
     public void unicodeIsHandledAsExpected() throws IOException {
         List<Note> notes = readNotes("+ :UAk6ejU: foo bar\n\u00b7 :hSsMqzT: quux\n");
         assertEquals(2, notes.size());
-    }
-
-    /*
-original:
-+ :UAk6ejU: goya goya\\n    \\u00b7 :_8UG7N6: nimbwana\\n
-   \\u00b7 :vPXpqj1: nole\\n    \\u00b7 :AGebVR5: nole\\n+ :hSsMqzT: nanonao\\
-n    \\u00b7 :L5g2mUg: gorbalev\\n    \\u00b7 :gd_BOrG: and another\\n. new
-
-unwrapped:
-+ :UAk6ejU: goya goya\\n    \\u00b7 :_8UG7N6: nimbwana\\n   \\u00b7 :vPXpqj1: nole\\n    \\u00b7 :AGebVR5: nole\\n+ :hSsMqzT: nanonao\\n    \\u00b7 :L5g2mUg: gorbalev\\n    \\u00b7 :gd_BOrG: and another\\n. new
-
-unescaped
-+ :UAk6ejU: goya goya\n    \u00b7 :_8UG7N6: nimbwana\n   \u00b7 :vPXpqj1: nole\n    \u00b7 :AGebVR5: nole\n+ :hSsMqzT: nanonao\n    \u00b7 :L5g2mUg: gorbalev\n    \u00b7 :gd_BOrG: and another\n. new
-
-inside unwrapped
-+ :UAk6ejU: goya goya\\n    \\u00b7 :_8UG7N6: nimbwana\\n    \\u00b7 :vPXpqj1: nole\\n    \\u00b7 :AGebVR5: nole\\n+ :hSsMqzT: nanonao\\n   \\u00b7 :L5g2mUg: gorbalev\\n    \\u00b7 :gd_BOrG: and another\\n. new
-
-inside unescaped
-+ :UAk6ejU: goya goya\n    \u00b7 :_8UG7N6: nimbwana\n    \u00b7 :vPXpqj1: nole\n    \u00b7 :AGebVR5: nole\n+ :hSsMqzT: nanonao\n   \u00b7 :L5g2mUg: gorbalev\n    \u00b7 :gd_BOrG: and another\n. new
-     */
-    @Test
-    public void testOther() throws Exception {
-        List<Note> notes = readNotes(
-                "+ :UAk6ejU: goya goya\n    \u00b7 :_8UG7N6: nimbwana\n    \u00b7 :vPXpqj1: nole\n    \u00b7 :AGebVR5: nole\n+ :hSsMqzT: nanonao\n   \u00b7 :L5g2mUg: gorbalev\n    \u00b7 :gd_BOrG: and another\n. new"        );
-        assertEquals(3, notes.size());
     }
 
     private List<Note> readNotes(final String s) throws IOException {

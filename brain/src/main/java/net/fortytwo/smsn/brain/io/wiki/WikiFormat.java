@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class WikiFormat extends Format {
     // regex of valid id suffixes
-    static final Pattern ID_INFIX = Pattern.compile(":[a-zA-Z0-9-_]+:");
+    static final Pattern ID_INFIX = Pattern.compile(":[a-zA-Z0-9]{5,}:");
 
     static final String VERBATIM_BLOCK_START = "{{{";
     static final String VERBATIM_BLOCK_END = "}}}";

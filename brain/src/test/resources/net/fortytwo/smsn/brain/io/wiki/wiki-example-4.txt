@@ -1,4 +1,4 @@
-+ :-JfS2lc: some works by William James
++ :dJfS2lc: some works by William James
     @sharability 0.75
     @weight      0.5
     + :1btqdeO: The Principles of Psychology
@@ -13,7 +13,7 @@
         @sharability 1
         @weight      0.5
         @alias       http://dbpedia.org/resource/The_Varieties_of_Religious_Experience
-+ :F2IiM-A: William James's family
++ :F2IiMdA: William James's family
     @sharability 0.75
     @weight      0.5
     + :V8AOxEV: Henry James, Sr.
@@ -27,7 +27,7 @@
 + :Guz5RNC: the education of William and Henry James
     @sharability 0.75
     @weight      0.5
-    · :n3s0h_y: after an initial period of education by female tutors, the James boys' father sent them to a series of establishments in England, France, Switzerland, and Germany that "endeavored to teach them foreign languages, introduce them to arithmetic, and generally uncover their young talents"
+    · :n3s0huy: after an initial period of education by female tutors, the James boys' father sent them to a series of establishments in England, France, Switzerland, and Germany that "endeavored to teach them foreign languages, introduce them to arithmetic, and generally uncover their young talents"
         @sharability 0.75
         @weight      0.5
     + :Jvj2yWW: "There could not be a more entertaining treat than dinner at the James house, when all the young people  were at home.  They were full of stories of the oddest kind, and discussed quiestions of morals or taste or literature with a vociferous vigor so great as sometimes to lead the young men to leave their seats and gesticulate on the floor.  I remember, in some of these heated discussions, it was not unusual for the sons to invoke humorous curses on their parent, one of which was, that "his mashed potatoes might always have lumps in them!"
@@ -64,7 +64,7 @@
         @sharability 1
         @weight      0.5
         @alias       http://dbpedia.org/resource/Train_of_thought
-    + :jkSMk-c: what evidence there is to suggest that consciousness is a succession of discrete events fits in perfectly with my view of thought and perception. I don't subscribe to the notion of a *stream* of consciousness.
+    + :jkSMkdc: what evidence there is to suggest that consciousness is a succession of discrete events fits in perfectly with my view of thought and perception. I don't subscribe to the notion of a *stream* of consciousness.
         @sharability 0.5
         @weight      0.5
 + :p38hxdB: pragmatism

@@ -213,84 +213,84 @@ public class TreeViewsTest extends BrainTestBase {
 
         // OK to create an atom which is its own parent
         s = "" +
-                "* :001: one\n" +
-                "    * :001: one\n";
+                "* :000001: one\n" +
+                "    * :000001: one\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = topicGraph.getAtomById("001");
+        Atom one = topicGraph.getAtomById("000001");
         assertNotNull(one);
         Assert.assertEquals(1, one.getNotes().toJavaList().size());
         for (int i = 0; i < 2; i++) {
             assertEquals(1, rootNote.getChildren().size());
             child = rootNote.getChildren().get(0);
-            Assert.assertEquals("001", child.getId());
+            Assert.assertEquals("000001", child.getId());
             assertEquals(1, child.getChildren().size());
             grandChild = child.getChildren().get(0);
-            assertEquals("001", grandChild.getId());
+            assertEquals("000001", grandChild.getId());
 
             rootNote = queries.view(root, 2, filter, style);
         }
 
         // setting properties at the higher level has no effect, as we are pre-ordered w.r.t. updating of properties
         s = "" +
-                "* :001: one - updated\n" +
-                "    * :001: one\n";
+                "* :000001: one - updated\n" +
+                "    * :000001: one\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("001");
+        one = topicGraph.getAtomById("000001");
         assertNotNull(one);
         Assert.assertEquals(1, one.getNotes().toJavaList().size());
         rootNote = queries.view(root, 2, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
-        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("000001", child.getId());
         Assert.assertEquals("one", child.getTitle());
         assertEquals(1, child.getChildren().size());
         grandChild = child.getChildren().get(0);
-        assertEquals("001", grandChild.getId());
+        assertEquals("000001", grandChild.getId());
 
         // setting properties at the lower level (the last visited) does have an effect
         s = "" +
-                "* :001: one\n" +
-                "    * :001: one - updated\n";
+                "* :000001: one\n" +
+                "    * :000001: one - updated\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("001");
+        one = topicGraph.getAtomById("000001");
         assertNotNull(one);
         Assert.assertEquals(1, one.getNotes().toJavaList().size());
         rootNote = queries.view(root, 2, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
-        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("000001", child.getId());
         Assert.assertEquals("one - updated", child.getTitle());
         assertEquals(1, child.getChildren().size());
         grandChild = child.getChildren().get(0);
-        assertEquals("001", grandChild.getId());
+        assertEquals("000001", grandChild.getId());
 
         // the preorder rule does not apply when the link from parent to child is not repeated in the view;
         // the children of an atom are updated only once
         s = "" +
-                "* :001: one\n" +
-                "    * :001: one\n" +
-                "    * :002: two\n";
+                "* :000001: one\n" +
+                "    * :000001: one\n" +
+                "    * :000002: two\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("001");
+        one = topicGraph.getAtomById("000001");
         assertNotNull(one);
         Assert.assertEquals(2, one.getNotes().toJavaList().size());
         for (int i = 0; i < 2; i++) {
             assertEquals(1, rootNote.getChildren().size());
             child = rootNote.getChildren().get(0);
-            Assert.assertEquals("001", child.getId());
+            Assert.assertEquals("000001", child.getId());
             assertEquals(2, child.getChildren().size());
             grandChild = child.getChildren().get(0);
-            assertEquals("001", grandChild.getId());
+            assertEquals("000001", grandChild.getId());
             grandChild = child.getChildren().get(1);
-            assertEquals("002", grandChild.getId());
+            assertEquals("000002", grandChild.getId());
 
             rootNote = queries.view(root, 2, filter, style);
         }
@@ -299,59 +299,59 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = queries.view(root, 3, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
-        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("000001", child.getId());
         assertEquals(2, child.getChildren().size());
         grandChild = child.getChildren().get(0);
-        assertEquals("001", grandChild.getId());
+        assertEquals("000001", grandChild.getId());
         Assert.assertEquals(2, grandChild.getChildren().size());
         grandChild = child.getChildren().get(1);
-        assertEquals("002", grandChild.getId());
+        assertEquals("000002", grandChild.getId());
         Assert.assertEquals(0, grandChild.getChildren().size());
 
         // adding or removing at the higher level has no effect, as we are pre-ordered w.r.t. updating of children
         s = "" +
-                "* :001: one\n" +
-                "    * :001: one\n" +
-                "        * :001: one\n" +
-                "        * :002: two\n" +
-                "    * :002: two\n" +
-                "    * :003: three\n";
+                "* :000001: one\n" +
+                "    * :000001: one\n" +
+                "        * :000001: one\n" +
+                "        * :000002: two\n" +
+                "    * :000002: two\n" +
+                "    * :000003: three\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 3, filter, style);
         rootNote = queries.view(root, 3, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
-        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("000001", child.getId());
         assertEquals(2, child.getChildren().size());
         grandChild = child.getChildren().get(0);
-        assertEquals("001", grandChild.getId());
+        assertEquals("000001", grandChild.getId());
         Assert.assertEquals(2, grandChild.getChildren().size());
         grandChild = child.getChildren().get(1);
-        assertEquals("002", grandChild.getId());
+        assertEquals("000002", grandChild.getId());
         Assert.assertEquals(0, grandChild.getChildren().size());
 
         // adding or removing children at the lower level (the last visited) does have an effect
         s = "" +
-                "* :001: one\n" +
-                "    * :001: one\n" +
-                "        * :001: one\n" +
-                "        * :002: two\n" +
-                "        * :003: three\n" +
-                "    * :002: two\n";
+                "* :000001: one\n" +
+                "    * :000001: one\n" +
+                "        * :000001: one\n" +
+                "        * :000002: two\n" +
+                "        * :000003: three\n" +
+                "    * :000002: two\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 3, filter, style);
         rootNote = queries.view(root, 3, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
-        Assert.assertEquals("001", child.getId());
+        Assert.assertEquals("000001", child.getId());
         assertEquals(3, child.getChildren().size());
         grandChild = child.getChildren().get(0);
-        assertEquals("001", grandChild.getId());
+        assertEquals("000001", grandChild.getId());
         Assert.assertEquals(3, grandChild.getChildren().size());
         grandChild = child.getChildren().get(1);
-        assertEquals("002", grandChild.getId());
+        assertEquals("000002", grandChild.getId());
         Assert.assertEquals(0, grandChild.getChildren().size());
     }
 
@@ -518,30 +518,30 @@ public class TreeViewsTest extends BrainTestBase {
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
         ViewStyle style = TreeViews.forwardViewStyle;
 
-        String before = "* :001: one\n" +
-                "* :002: two\n" +
-                "* :003: three";
-        String after = "* :001: ONE\n" +
-                "* :002:\n" +
-                "* :003: THREE";
+        String before = "* :000001: one\n" +
+                "* :000002: two\n" +
+                "* :000003: three";
+        String after = "* :000001: ONE\n" +
+                "* :000002:\n" +
+                "* :000003: THREE";
 
         Note b = wikiParser.parse(before);
         Note a = wikiParser.parse(after);
 
         // First, check that 'after' was parsed correctly
         assertEquals(3, a.getChildren().size());
-        assertEquals("002", a.getChildren().get(1).getId());
+        assertEquals("000002", a.getChildren().get(1).getId());
         assertNull(a.getChildren().get(1).getTitle());
 
-        Atom root = topicGraph.createAtomWithProperties(filter, "000");
+        Atom root = topicGraph.createAtomWithProperties(filter, "000000");
         root.setTitle("root");
 
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = topicGraph.getAtomById("001");
-        Atom a2 = topicGraph.getAtomById("002");
-        Atom a3 = topicGraph.getAtomById("003");
+        Atom a1 = topicGraph.getAtomById("000001");
+        Atom a2 = topicGraph.getAtomById("000002");
+        Atom a3 = topicGraph.getAtomById("000003");
 
         assertEquals("one", a1.getTitle());
         assertEquals("two", a2.getTitle());
@@ -550,7 +550,7 @@ public class TreeViewsTest extends BrainTestBase {
         a.setId(root.getId());
         queries.update(a, 2, filter, style);
 
-        // 002's value was unaffected by the update
+        // 000002's value was unaffected by the update
         assertEquals("ONE", a1.getTitle());
         assertEquals("two", a2.getTitle());
         assertEquals("THREE", a3.getTitle());
@@ -560,24 +560,24 @@ public class TreeViewsTest extends BrainTestBase {
     public void testAddOnlyUpdate() throws Exception {
         ViewStyle style = TreeViews.forwardAddOnlyViewStyle;
 
-        String before = "* :001: one\n" +
-                "* :002: two\n" +
-                "* :003: three";
-        String after = "* :004: four\n" +
-                "* :002: two";
+        String before = "* :000001: one\n" +
+                "* :000002: two\n" +
+                "* :000003: three";
+        String after = "* :000004: four\n" +
+                "* :000002: two";
 
         Note b = wikiParser.parse(before);
         Note a = wikiParser.parse(after);
 
-        Atom root = topicGraph.createAtomWithProperties(filter, "000");
+        Atom root = topicGraph.createAtomWithProperties(filter, "000000");
         root.setTitle("root");
 
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = topicGraph.getAtomById("001");
-        Atom a2 = topicGraph.getAtomById("002");
-        Atom a3 = topicGraph.getAtomById("003");
+        Atom a1 = topicGraph.getAtomById("000001");
+        Atom a2 = topicGraph.getAtomById("000002");
+        Atom a3 = topicGraph.getAtomById("000003");
 
         assertEquals("one", a1.getTitle());
         assertEquals("two", a2.getTitle());
@@ -587,7 +587,7 @@ public class TreeViewsTest extends BrainTestBase {
         a.setId(root.getId());
         queries.update(a, 2, filter, style);
 
-        Atom a4 = topicGraph.getAtomById("004");
+        Atom a4 = topicGraph.getAtomById("000004");
 
         assertEquals("four", a4.getTitle());
         List<Atom> children = root.getNotes().toJavaList();
@@ -603,14 +603,14 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(0, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom0 = topicGraph.createAtomWithProperties(filter, "000");
+        Atom atom0 = topicGraph.createAtomWithProperties(filter, "000000");
         atom0.setTitle("0");
 
         assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom1 = topicGraph.createAtomWithProperties(filter, "001");
+        Atom atom1 = topicGraph.createAtomWithProperties(filter, "000001");
         atom1.setTitle("1");
 
         assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
@@ -623,7 +623,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom2 = topicGraph.createAtomWithProperties(filter, "002");
+        Atom atom2 = topicGraph.createAtomWithProperties(filter, "000002");
         atom2.setTitle("2");
 
         assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());

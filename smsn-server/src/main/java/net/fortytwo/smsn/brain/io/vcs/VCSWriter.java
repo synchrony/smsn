@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.List;
 
 public class VCSWriter extends BrainWriter {
@@ -26,7 +27,7 @@ public class VCSWriter extends BrainWriter {
     }
 
     static {
-        formats = new java.util.LinkedList();
+        formats = new LinkedList<>();
         formats.add(VCSFormat.getInstance());
     }
 
