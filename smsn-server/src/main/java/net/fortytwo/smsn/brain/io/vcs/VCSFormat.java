@@ -15,7 +15,7 @@ public class VCSFormat extends Format {
                 new File(parentDir, "universal")};
     }
 
-    private static final Pattern ATOM_FILENAME_PATTERN = Pattern.compile("a[a-zA-Z0-9-_]{5,}");
+    private static final Pattern ATOM_FILENAME_PATTERN = Pattern.compile("[a-zA-Z0-9]{5,}");
 
     private static final VCSFormat instance = new VCSFormat();
 
