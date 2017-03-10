@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.server.actions.NoAction;
+import org.apache.commons.io.IOUtils;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode;
@@ -16,6 +17,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -42,22 +44,51 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         try {
             return handleRequest(script, graph);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new ScriptException(e);
         }
     }
 
-    // note: this is a hack.  This is currently how config properties are loaded.
     @Override
     public Object eval(Reader reader, ScriptContext context) throws ScriptException {
-        Properties properties = new Properties();
+        Graph graph = getGraph(context);
+
         try {
-            properties.load(reader);
+            String expression = readerToString(reader);
+            return handleRequest(expression, graph);
         } catch (IOException e) {
             throw new ScriptException(e);
         }
+    }
+
+    private Action readAsJson(final String expression) throws IOException {
+        return objectMapper.readValue(expression, Action.class);
+    }
+
+    private Action readAsProperties(final String expression) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new StringReader(expression));
 
         SemanticSynchrony.addConfiguration(properties);
-        return "added " + properties.size() + " configurations properties";
+
+        logger.info("added " + properties.size() + " configurations properties");
+        return new NoAction();
+    }
+
+    private Action readAsWarmupScript(final String expression) {
+        // this is ServerGremlinExecutor's warmup script hack; ignore
+        return new NoAction();
+    }
+
+    private boolean isWarmupScript(final String expression) {
+        return WARMUP_SCRIPT.equals(expression);
+    }
+
+    private boolean isJson(final String expression) {
+        return expression.startsWith("{");
+    }
+
+    private String readerToString(final Reader reader) throws IOException {
+        return IOUtils.toString(reader);
     }
 
     @Override
@@ -98,17 +129,15 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     }
 
     private Action deserializeRequest(final String requestStr) throws IOException {
-        String trimmed = requestStr.trim();
+        String expression = requestStr.trim();
 
-        if (!trimmed.startsWith("{")) {
-            if (WARMUP_SCRIPT.equals(trimmed)) {
-                // this is ServerGremlinExecutor's warmup script hack; ignore
-                return new NoAction();
-            } else {
-                throw new IllegalArgumentException("non-SmSn script: " + trimmed);
-            }
+        if (isWarmupScript(expression)) {
+            return readAsWarmupScript(expression);
+        } else if (isJson(expression)) {
+            return readAsJson(expression);
         } else {
-            return objectMapper.readValue(requestStr, Action.class);
+            // note: this is a hack.  This is currently how config properties are loaded.
+            return readAsProperties(expression);
         }
     }
 

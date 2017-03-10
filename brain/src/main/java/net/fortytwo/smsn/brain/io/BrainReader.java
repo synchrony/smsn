@@ -65,8 +65,6 @@ public abstract class BrainReader {
 
         long before = System.currentTimeMillis();
 
-        TopicGraph destGraph = context.getTopicGraph();
-
         importInternal(context);
 
         long after = System.currentTimeMillis();
@@ -77,6 +75,10 @@ public abstract class BrainReader {
     protected synchronized void addToIndices(final Atom atom, final TopicGraph graph) {
         graph.reindexAtom(atom);
 
+        checkAndCommit(graph);
+    }
+
+    private void checkAndCommit(final TopicGraph graph) {
         if (transactionBufferSize > 0 && transactionBufferSize == ++transactionCounter) {
             graph.commit();
             graph.begin();
