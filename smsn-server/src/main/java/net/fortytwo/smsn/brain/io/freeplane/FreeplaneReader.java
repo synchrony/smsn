@@ -1,15 +1,15 @@
 package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.error.InvalidGraphException;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.Brain;
+import net.fortytwo.smsn.brain.TreeViews;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
+import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.TreeViews;
-import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,20 +35,24 @@ import java.util.stream.Collectors;
 
 public class FreeplaneReader extends BrainReader {
 
-    private static final String
-            ELEMENTNAME_ARROWLINK = "arrowlink",
-            ELEMENTNAME_BODY = "body",
-            ELEMENTNAME_MAP = "map",
-            ELEMENTNAME_NODE = "node",
-            ELEMENTNAME_RICHCONTENT = "richcontent";
+    private interface Elmt {
+        String
+                ARROWLINK = "arrowlink",
+                BODY = "body",
+                MAP = "map",
+                NODE = "node",
+                RICHCONTENT = "richcontent";
+    }
 
-    private static final String
-            ATTR_CREATED = "CREATED",
-            ATTR_DESTINATION = "DESTINATION",
-            ATTR_ID = "ID",
-            ATTR_MODIFIED = "MODIFIED",
-            ATTR_LOCALIZED_STYLE_REF = "LOCALIZED_STYLE_REF",
-            ATTR_TEXT = "TEXT";
+    private interface Attr {
+        String
+                CREATED = "CREATED",
+                DESTINATION = "DESTINATION",
+                ID = "ID",
+                MODIFIED = "MODIFIED",
+                LOCALIZED_STYLE_REF = "LOCALIZED_STYLE_REF",
+                TEXT = "TEXT";
+    }
 
     //private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     //private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
@@ -110,17 +114,21 @@ public class FreeplaneReader extends BrainReader {
         addToIndices(atom, destGraph);
     }
 
-    private void setText(Note note, String text) {
+    private void setTextOrTitle(Note note, String text) {
+        if (text.contains("\n")) {
+            note.setPage(text);
+            note.setTitle("RenameMe");
+        }
         note.setTitle(text);
     }
 
     private String getRichContent(final Element element) {
-        Element content = getSingleElement(element, ELEMENTNAME_RICHCONTENT);
+        Element content = getSingleElement(element, Elmt.RICHCONTENT);
         if (null == content) {
             return null;
         }
 
-        Element body = getSingleElement(content, ELEMENTNAME_BODY);
+        Element body = getSingleElement(content, Elmt.BODY);
         return body == null
                 ? null
                 : body.getTextContent();
@@ -158,15 +166,15 @@ public class FreeplaneReader extends BrainReader {
     }
 
     private long getCreated(final Element element) {
-        return getTimestamp(element, ATTR_CREATED);
+        return getTimestamp(element, Attr.CREATED);
     }
 
     private long getModified(final Element element) {
-        return getTimestamp(element, ATTR_MODIFIED);
+        return getTimestamp(element, Attr.MODIFIED);
     }
 
     private String getStyle(final Element element) {
-        return element.getAttribute(ATTR_LOCALIZED_STYLE_REF);
+        return element.getAttribute(Attr.LOCALIZED_STYLE_REF);
     }
 
     private long getTimestamp(final Element element, final String attrName) {
@@ -189,7 +197,7 @@ public class FreeplaneReader extends BrainReader {
         private void parseDOMToGraph(Document document) throws IOException, InvalidGraphException {
             Element root = document.getDocumentElement();
 
-            if (!root.getTagName().equals(ELEMENTNAME_MAP)) {
+            if (!root.getTagName().equals(Elmt.MAP)) {
                 throw new IllegalArgumentException("root of mind map XML must be called 'map'");
             }
 
@@ -228,7 +236,7 @@ public class FreeplaneReader extends BrainReader {
             Note note = new Note();
             note.setId(SemanticSynchrony.createRandomId());
 
-            String id = nodeElement.getAttribute(ATTR_ID);
+            String id = nodeElement.getAttribute(Attr.ID);
             long created = getCreated(nodeElement);
             long modified = getModified(nodeElement);
 
@@ -238,14 +246,14 @@ public class FreeplaneReader extends BrainReader {
             note.setCreated(created);
             // TODO: make id and modified date into property values
 
-            String text = nodeElement.getAttribute(ATTR_TEXT);
+            String text = nodeElement.getAttribute(Attr.TEXT);
             if (null == text || 0 == text.length()) {
                 text = getRichContent(nodeElement);
                 if (null == text) {
                     text = getDefaultNodeName();
                 }
             }
-            setText(note, text);
+            setTextOrTitle(note, text);
 
             if (null != styleNote) {
                 //note.setHasChildren(true);
@@ -257,8 +265,20 @@ public class FreeplaneReader extends BrainReader {
             return note;
         }
 
+        private void fixIllegalNote(final Note note) {
+            if (null != note.getPage() && note.getChildren().size() > 0) {
+                note.setTitle(note.getPage().replaceAll("\\n", "\\n"));
+                logger.warning("atom has both text and children");
+            }
+        }
+
+        private String titlePreview(final String title) {
+            int n = title.length();
+            return n > 30 ?
+        }
+
         private void parseChildren(final Note note, final Element nodeElement, String nodeId) {
-            List<Element> backlinkChildren = getChildElements(nodeElement, ELEMENTNAME_ARROWLINK);
+            List<Element> backlinkChildren = getChildElements(nodeElement, Elmt.ARROWLINK);
             if (0 != backlinkChildren.size()) {
                 List<String> heads = arrowLinks.get(nodeId);
                 if (null == heads) {
@@ -266,7 +286,7 @@ public class FreeplaneReader extends BrainReader {
                     arrowLinks.put(nodeId, heads);
                 }
                 for (Element head : backlinkChildren) {
-                    String headId = head.getAttribute(ATTR_DESTINATION);
+                    String headId = head.getAttribute(Attr.DESTINATION);
                     if (null != headId) {
                         //note.setHasChildren(true);
                         heads.add(headId);
@@ -275,7 +295,7 @@ public class FreeplaneReader extends BrainReader {
             }
 
             // note: non-content <hook> elements are ignored
-            List<Element> treeChildren = getChildElements(nodeElement, ELEMENTNAME_NODE);
+            List<Element> treeChildren = getChildElements(nodeElement, Elmt.NODE);
             if (0 != treeChildren.size()) {
                 //note.setHasChildren(true);
                 for (Element childElement : treeChildren) {

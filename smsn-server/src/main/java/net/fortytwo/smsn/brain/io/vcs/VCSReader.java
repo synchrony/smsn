@@ -51,8 +51,12 @@ public class VCSReader extends BrainReader {
         File[] files = dir.listFiles();
         if (null != files) {
             for (File file : files) {
-                if (VCSFormat.isAtomFile(file)) {
-                    readAtomFile(file, helper);
+                try {
+                    if (VCSFormat.isAtomFile(file)) {
+                        readAtomFile(file, helper);
+                    }
+                } catch (IOException e) {
+                    throw new IOException("failed to load file " + file.getAbsolutePath(), e);
                 }
             }
         }
