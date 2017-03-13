@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 public abstract class BrainReader {
 
-    private static final Logger logger = Logger.getLogger(BrainReader.class.getName());
+    protected static final Logger logger = Logger.getLogger(BrainReader.class.getName());
 
     protected abstract void importInternal(Context context) throws IOException;
 

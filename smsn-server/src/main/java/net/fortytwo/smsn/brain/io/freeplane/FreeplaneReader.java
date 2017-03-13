@@ -262,19 +262,21 @@ public class FreeplaneReader extends BrainReader {
 
             parseChildren(note, nodeElement, id);
 
+            makeLegal(note);
+
             return note;
         }
 
-        private void fixIllegalNote(final Note note) {
+        private void makeLegal(final Note note) {
             if (null != note.getPage() && note.getChildren().size() > 0) {
                 note.setTitle(note.getPage().replaceAll("\\n", "\\n"));
-                logger.warning("atom has both text and children");
+                logger.warning("note had both children and multi-line text (collapsed): "
+                        + titlePreview(note.getTitle()));
             }
         }
 
         private String titlePreview(final String title) {
-            int n = title.length();
-            return n > 30 ?
+            return title.length() > 30 ? title.substring(0, 25) + "[...]" : title;
         }
 
         private void parseChildren(final Note note, final Element nodeElement, String nodeId) {
