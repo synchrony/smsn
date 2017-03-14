@@ -76,7 +76,7 @@ public class VCSReader extends BrainReader {
                 helper.setAtom(atom);
                 helper.updateAtom();
 
-                addToIndices(atom, helper.context.getTopicGraph());
+                checkAndCommit(helper.context.getTopicGraph());
             }
         }
     }

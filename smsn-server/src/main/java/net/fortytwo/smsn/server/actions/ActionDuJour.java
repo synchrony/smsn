@@ -28,7 +28,6 @@ public class ActionDuJour extends Action {
         TopicGraph graph = context.getBrain().getTopicGraph();
         for (Atom a : graph.getAllAtoms()) {
             a.setId(SemanticSynchrony.migrateId(a.getId()));
-            graph.reindexAtom(a);
         }
     }
 

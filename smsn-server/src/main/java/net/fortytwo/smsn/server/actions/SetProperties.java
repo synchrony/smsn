@@ -51,7 +51,7 @@ public class SetProperties extends FilteredAction {
                 validateTitle();
                 break;
             case SemanticSynchrony.PropertyKeys.PAGE:
-                validatePage();
+                // nothing to do; every Markdown page is valid
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
                 validateWeight();
@@ -74,10 +74,6 @@ public class SetProperties extends FilteredAction {
         if (((String) getValue()).trim().length() == 0) {
             throw new BadRequestException("empty value");
         }
-    }
-
-    private void validatePage() {
-        // nothing to do; every Markdown page is legal
     }
 
     private void validateWeight() {
@@ -151,7 +147,6 @@ public class SetProperties extends FilteredAction {
                 throw new IllegalStateException();
         }
 
-        params.getBrain().getTopicGraph().reindexAtom(root);
         params.getBrain().getTopicGraph().notifyOfUpdate();
 
         params.getMap().put("key", params.getBrain().getTopicGraph().idOfAtom(root));

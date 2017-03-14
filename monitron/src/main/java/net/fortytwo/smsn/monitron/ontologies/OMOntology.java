@@ -4,9 +4,9 @@ import net.fortytwo.rdfagents.RDFAgents;
 import org.openrdf.model.IRI;
 
 public interface OMOntology {
-    public static final String NAMESPACE = "http://def.seegrid.csiro.au/ontology/om/om-lite#";
+    String NAMESPACE = "http://def.seegrid.csiro.au/ontology/om/om-lite#";
 
-    public static final IRI
+    IRI
             FEATURE_OF_INTEREST = RDFAgents.createIRI(NAMESPACE + "featureOfInterest"),
             MEASUREMENT = RDFAgents.createIRI(NAMESPACE + "Measurement"),
             OBSERVATION = RDFAgents.createIRI(NAMESPACE + "Observation"),

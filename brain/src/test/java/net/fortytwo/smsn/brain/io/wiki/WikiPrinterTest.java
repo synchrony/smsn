@@ -12,12 +12,10 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class WikiPrinterTest {
-    private WikiParser wikiParser;
     private WikiPrinter wikiPrinter;
 
     @Before
     public void setUp() {
-        wikiParser = new WikiParser();
         wikiPrinter = new WikiPrinter();
     }
 

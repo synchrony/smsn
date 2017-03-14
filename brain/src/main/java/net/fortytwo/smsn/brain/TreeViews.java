@@ -3,15 +3,14 @@ package net.fortytwo.smsn.brain;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.io.markdown.MarkdownParser;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
 import org.parboiled.common.Preconditions;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -215,17 +214,6 @@ public class TreeViews {
         }
 
         return result;
-    }
-
-    public void updatePage(final Atom atom,
-                           final String page) throws IOException {
-        Note pageRoot = markdownParser.parse(page);
-
-
-    }
-
-    private void deleteMarkdownTree(final Atom atom) {
-
     }
 
     private void checkRootArg(final Atom root) {
@@ -524,84 +512,75 @@ public class TreeViews {
         return result;
     }
 
-    private boolean setTitle(final Atom target,
+    private void setTitle(final Atom target,
                              final String title) {
         // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null titles.
-        return null != title && target.setTitle(title);
+        if (null != title) target.setTitle(title);
     }
 
-    private boolean setPage(final Atom target,
+    private void setPage(final Atom target,
                             final String page) {
         // Note: can't delete page with a view update
-        return null != page && target.setText(page);
+        if (null != page) target.setText(page);
     }
 
-    private boolean setAlias(final Atom target,
+    private void setAlias(final Atom target,
                              final String alias) {
         if (null != alias) {
             if (alias.equals(Note.CLEARME)) {
-                return target.setAlias(null);
+                 target.setAlias(null);
             } else {
-                return target.setAlias(alias);
+                 target.setAlias(alias);
             }
-        } else {
-            return false;
         }
     }
 
-    private boolean setShortcut(final Atom target,
-                                final String shortcut) {
+    private void setShortcut(final Atom target,
+                             final String shortcut) {
         if (null != shortcut) {
             if (shortcut.equals(Note.CLEARME)) {
-                return target.setShortcut(null);
+                target.setShortcut(null);
             } else {
-                return target.setShortcut(shortcut);
+                target.setShortcut(shortcut);
             }
-        } else {
-            return false;
         }
     }
 
-    private boolean setPriority(final Atom target,
+    private void setPriority(final Atom target,
                                 Float priority) {
         if (null != priority) {
             if (0 == priority) priority = null;
 
-            if (target.setPriority(priority)) {
+            Float previousPriority = target.getPriority();
+            target.setPriority(priority);
+            if (null == previousPriority || !previousPriority.equals(priority)) {
                 brain.getPriorities().updatePriority(target);
-                return true;
             }
         }
-
-        return false;
     }
 
-    private boolean setSharability(final Atom target,
+    private void setSharability(final Atom target,
                                    final Float sharability) {
-        return null != sharability && target.setSharability(sharability);
+        if (null != sharability) target.setSharability(sharability);
     }
 
-    private boolean setWeight(final Atom target,
-                              final Float weight) {
-        return null != weight && target.setWeight(weight);
+    private void setWeight(final Atom target,
+                           final Float weight) {
+        if (null != weight) target.setWeight(weight);
     }
 
     private void setProperties(final Atom target,
                                final Note note) throws InvalidGraphException, InvalidUpdateException {
-        boolean changed = setTitle(target, note.getTitle())
-                | setPage(target, note.getPage())
-                | setAlias(target, note.getAlias())
-                | setShortcut(target, note.getShortcut())
-                | setPriority(target, note.getPriority())
-                | setWeight(target, note.getWeight())
-                | setSharability(target, note.getSharability());
+        setTitle(target, note.getTitle());
+        setPage(target, note.getPage());
+        setAlias(target, note.getAlias());
+        setShortcut(target, note.getShortcut());
+        setPriority(target, note.getPriority());
+        setWeight(target, note.getWeight());
+        setSharability(target, note.getSharability());
 
-        if (changed) {
-            brain.getTopicGraph().reindexAtom(target);
-
-            if (null != brain.getActivityLog()) {
-                brain.getActivityLog().logSetProperties(target);
-            }
+        if (null != brain.getActivityLog()) {
+            brain.getActivityLog().logSetProperties(target);
         }
     }
 

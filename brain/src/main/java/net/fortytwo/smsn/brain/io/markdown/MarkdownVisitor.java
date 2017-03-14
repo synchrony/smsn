@@ -32,7 +32,7 @@ class MarkdownVisitor implements Visitor {
 
     private final Stack<Note> headings = new Stack<>();
     private int currentDepth;
-    private Note root;
+    private final Note root;
     private final boolean verbose;
 
     public Note getRoot() {

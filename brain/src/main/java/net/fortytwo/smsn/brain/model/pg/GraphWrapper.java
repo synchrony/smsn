@@ -53,13 +53,6 @@ public abstract class GraphWrapper {
         return vertex;
     }
 
-    public void reindex(final Vertex vertex) {
-        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ID_V);
-        updateIndex(vertex, SemanticSynchrony.PropertyKeys.TITLE);
-        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ACRONYM);
-        updateIndex(vertex, SemanticSynchrony.PropertyKeys.SHORTCUT);
-    }
-
     public Graph getGraph() {
         return graph;
     }
@@ -92,8 +85,8 @@ public abstract class GraphWrapper {
         indices.put(index.key, index);
     }
 
-    private void updateIndex(final Vertex vertex,
-                             final String key) {
+    public void updateIndex(final Vertex vertex,
+                            final String key) {
         VertexProperty property = vertex.property(key);
         Object value = property.isPresent() ? property.value() : null;
 

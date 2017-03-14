@@ -5,21 +5,21 @@ import org.openrdf.model.IRI;
 
 public interface Universe {
 
-    public static final String NAMESPACE = "http://fortytwo.net/2012/08/universe#";
+    String NAMESPACE = "http://fortytwo.net/2012/08/universe#";
 
     // environment
-    public static final IRI
+    IRI
             BUILDING_1 = RDFAgents.createIRI(NAMESPACE + "winslowBuilding"),
             APARTMENT_1 = RDFAgents.createIRI(NAMESPACE + "apartment_1"),
             ROOM_1 = RDFAgents.createIRI(NAMESPACE + "room_1");
 
     // agents
-    public static final IRI
+    IRI
             MONITRON_1 = RDFAgents.createIRI(NAMESPACE + "monitron_1"),
             EDDIE_4 = RDFAgents.createIRI(NAMESPACE + "eddie_4");
 
     // sensors
-    public static final IRI
+    IRI
             BOSCH_BMP085_1_BAROMETER = RDFAgents.createIRI(NAMESPACE + "bosch-bmp085_1_barometer"),
             AVAGO_ADJD_S311_CR999_1 = RDFAgents.createIRI(NAMESPACE + "avago-adjd-s311-cr999_1"),
             MAXDETECT_RHT03_1_HYGROMETER = RDFAgents.createIRI(NAMESPACE + "maxdetect-rht03_1_hygrometer"),
@@ -31,7 +31,7 @@ public interface Universe {
             MAXDETECT_RHT03_1_THERMOMETER = RDFAgents.createIRI(NAMESPACE + "maxdetect-rht03_1_thermometer"),
             MURATA_7BB_20_6L0_1 = RDFAgents.createIRI(NAMESPACE + "murata-7bb-20-6l0_1");
 
-    public static final String
+    String
             OM_SENSOR_7BB206L0_VIBRN = "/om/sensor/7bb206l0/vibr",
             OM_SENSOR_ADJDS311CR999_BLUE = "/om/sensor/adjds311cr999/blue",
             OM_SENSOR_ADJDS311CR999_GREEN = "/om/sensor/adjds311cr999/green",

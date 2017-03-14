@@ -111,7 +111,7 @@ public class FreeplaneReader extends BrainReader {
         rootNote.setId(atom.getId());
         queries.update(rootNote, maxHeight, filter, TreeViews.forwardViewStyle);
 
-        addToIndices(atom, destGraph);
+        checkAndCommit(destGraph);
     }
 
     private void setTextOrTitle(Note note, String text) {

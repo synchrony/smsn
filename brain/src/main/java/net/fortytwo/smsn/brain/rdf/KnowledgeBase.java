@@ -107,7 +107,7 @@ public class KnowledgeBase {
             return entries;
         } else {
             // sort in descending order by total score, putting the top-ranked class first
-            List<KnowledgeBase.AtomClassEntry> helper = new java.util.LinkedList();
+            List<KnowledgeBase.AtomClassEntry> helper = new java.util.LinkedList<>();
             helper.addAll(entries);
             Collections.sort(helper, KnowledgeBase.AtomClassificationComparator.INSTANCE);
             return helper;
@@ -370,7 +370,7 @@ public class KnowledgeBase {
             String alias = subject.getAlias();
 
             List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
-            List<AtomClassEntry> newEntries = new java.util.LinkedList();
+            List<AtomClassEntry> newEntries = new java.util.LinkedList<>();
 
             for (AtomClass clazz : classes.values()) {
                 /* DO NOT REMOVE
@@ -378,7 +378,7 @@ public class KnowledgeBase {
                     System.out.println("break point here");
                 }//*/
 
-                List<AtomClassEntry> evidenceEntries = new java.util.LinkedList();
+                List<AtomClassEntry> evidenceEntries = new java.util.LinkedList<>();
 
                 Collection<RdfizationCallback> callbacks = null == handler
                         ? null : new java.util.LinkedList();
@@ -553,7 +553,7 @@ public class KnowledgeBase {
             // perform rdfization, choosing at most one classification
             if (null != handler && (null == filter || filter.isVisible(subject))) {
                 if (newEntries.size() > 0) {
-                    List<AtomClassEntry> helper = new java.util.LinkedList();
+                    List<AtomClassEntry> helper = new java.util.LinkedList<>();
                     helper.addAll(newEntries);
                     Collections.sort(helper, totalScoreDescending);
                     AtomClassEntry best = helper.get(0);

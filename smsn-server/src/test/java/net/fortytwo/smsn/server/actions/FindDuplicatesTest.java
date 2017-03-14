@@ -16,11 +16,6 @@ import static org.junit.Assert.assertNull;
 public class FindDuplicatesTest extends ActionTestBase {
     private Atom atom1, atom2, atom3;
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     @Test
     public void noResultsIfNoDuplicates() throws Exception {
         atom1 = createAtomWithTitle("one");

@@ -18,9 +18,9 @@ public interface TopicGraph {
     /**
      * The configurable namespace into which things, i.e. classified atoms, are mapped
      */
-    static final String PROP_THING_NAMESPACE = "net.fortytwo.smsn.brain.thingNamespace";
+    String PROP_THING_NAMESPACE = "net.fortytwo.smsn.brain.thingNamespace";
 
-    static final String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
+    String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
 
     Iterable<Atom> getAllAtoms();
 

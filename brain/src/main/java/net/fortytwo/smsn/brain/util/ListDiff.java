@@ -110,7 +110,7 @@ public class ListDiff {
         }
     }
 
-    public static interface DiffEditor<T> {
+    public interface DiffEditor<T> {
         void add(int position, T letter);
 
         void delete(int position, T letter);

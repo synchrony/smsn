@@ -9,7 +9,7 @@ import static org.junit.Assert.assertNull;
 public class ChordedKeyerTest {
 
     private ChordedKeyer keyer;
-    private boolean[] keyState = new boolean[5];
+    private final boolean[] keyState = new boolean[5];
 
     private ChordedKeyer.Mode lastMode;
     private String lastSymbol;

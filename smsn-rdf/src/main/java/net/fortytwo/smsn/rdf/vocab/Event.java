@@ -8,16 +8,16 @@ import org.openrdf.model.IRI;
  * This class was created on 2013-09-19 from Event Ontology version published 25th October 2007
  */
 public interface Event {
-    public static final String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";
+    String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";
 
     // classes
-    public static final IRI
+    IRI
             Event = RDFAgents.createIRI(NAMESPACE + "Event"),
             Factor = RDFAgents.createIRI(NAMESPACE + "Factor"),
             Product = RDFAgents.createIRI(NAMESPACE + "Product");
 
     // properties
-    public static final IRI
+    IRI
             agent = RDFAgents.createIRI(NAMESPACE + "agent"),
             agent_in = RDFAgents.createIRI(NAMESPACE + "agent_in"),
             factor = RDFAgents.createIRI(NAMESPACE + "factor"),

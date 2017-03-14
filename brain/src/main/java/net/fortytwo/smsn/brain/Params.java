@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 public interface Params {
-    enum Format{json, wiki};
+    enum Format{json, wiki}
 
     String
             ACTION = "action",

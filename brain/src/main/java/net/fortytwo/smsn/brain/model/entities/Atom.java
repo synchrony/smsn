@@ -7,43 +7,43 @@ public interface Atom extends Entity {
 
     String getId();
 
-    boolean setId(String id);
+    void setId(String id);
 
     String getAlias();
 
-    boolean setAlias(String alias);
+    void setAlias(String alias);
 
     Long getCreated();
 
-    boolean setCreated(Long created);
+    void setCreated(Long created);
 
     String getTitle();
 
-    boolean setTitle(String title);
+    void setTitle(String title);
 
     String getText();
 
-    boolean setText(String text);
+    void setText(String text);
 
     Float getPriority();
 
-    boolean setPriority(Float priority);
+    void setPriority(Float priority);
 
     Float getSharability();
 
-    boolean setSharability(Float sharability);
+    void setSharability(Float sharability);
 
     String getShortcut();
 
-    boolean setShortcut(String shortcut);
+    void setShortcut(String shortcut);
 
     Float getWeight();
 
-    boolean setWeight(Float weight);
+    void setWeight(Float weight);
 
     EntityList<Atom> getNotes();
 
-    boolean setNotes(EntityList<Atom> notes);
+    void setNotes(EntityList<Atom> notes);
 
     void forFirstOf(Consumer<EntityList<Atom>> consumer);
 

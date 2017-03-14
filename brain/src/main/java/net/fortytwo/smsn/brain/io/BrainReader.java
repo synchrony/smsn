@@ -72,13 +72,7 @@ public abstract class BrainReader {
                 "Resulting graph has " + getSizeOf(context) + " atoms");
     }
 
-    protected synchronized void addToIndices(final Atom atom, final TopicGraph graph) {
-        graph.reindexAtom(atom);
-
-        checkAndCommit(graph);
-    }
-
-    private void checkAndCommit(final TopicGraph graph) {
+    protected synchronized void checkAndCommit(final TopicGraph graph) {
         if (transactionBufferSize > 0 && transactionBufferSize == ++transactionCounter) {
             graph.commit();
             graph.begin();

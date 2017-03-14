@@ -27,11 +27,9 @@ public abstract class MonitronEvent {
         }
     }
 
-    private final Context context;
     protected final ValueFactory valueFactory;
 
     public MonitronEvent(final Context context) {
-        this.context = context;
         this.valueFactory = context.getValueFactory();
     }
 

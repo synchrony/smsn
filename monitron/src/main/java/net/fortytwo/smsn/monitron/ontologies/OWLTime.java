@@ -4,9 +4,9 @@ import net.fortytwo.rdfagents.RDFAgents;
 import org.openrdf.model.IRI;
 
 public interface OWLTime {
-    public static final String NAMESPACE = "http://www.w3.org/2006/time#";
+    String NAMESPACE = "http://www.w3.org/2006/time#";
 
-    public static final IRI
+    IRI
             AFTER = RDFAgents.createIRI(NAMESPACE + "after"),
             BEFORE = RDFAgents.createIRI(NAMESPACE + "before"),
             HAS_BEGINNING = RDFAgents.createIRI(NAMESPACE + "hasBeginning"),

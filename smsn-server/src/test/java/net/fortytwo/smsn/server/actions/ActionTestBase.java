@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public abstract class ActionTestBase extends BrainTestBase {
-    private SmSnScriptEngineFactory scriptEngineFactory = new SmSnScriptEngineFactory();
+    private final SmSnScriptEngineFactory scriptEngineFactory = new SmSnScriptEngineFactory();
     private SmSnScriptEngine scriptEngine = new SmSnScriptEngine(scriptEngineFactory);
 
     @Override

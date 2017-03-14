@@ -27,9 +27,6 @@ public class GetAtomsByAcronymTest extends BrainTestBase {
         Atom l = topicGraph.createAtomWithProperties(filter, null);
         l.setTitle("ooooooooo0ooooooooo1ooooooooo2ooooooooo3ooooooooo4ooooooooo5ooooooooo6ooooooooo7" +
                 "ooooooooo8ooooooooo9oooooooooAoooooooooBoooooooooCoooooooooDoooooooooEoooooooooF");
-        topicGraph.reindexAtom(a);
-        topicGraph.reindexAtom(t);
-        topicGraph.reindexAtom(l);
 
         Collection<Atom> result;
 

@@ -8,10 +8,10 @@ import org.openrdf.model.IRI;
  * This class was created on 2013-10-16 from Timeline Ontology version 1.0 published 29th October 2007
  */
 public interface Timeline {
-    public static final String NAMESPACE = "http://purl.org/NET/c4dm/timeline.owl#";
+    String NAMESPACE = "http://purl.org/NET/c4dm/timeline.owl#";
 
     // classes
-    public static final IRI
+    IRI
             AbstractInstant = RDFAgents.createIRI(NAMESPACE + "AbstractInstant"),
             AbstractInterval = RDFAgents.createIRI(NAMESPACE + "AbstractInterval"),
             AbstractTimeLine = RDFAgents.createIRI(NAMESPACE + "AbstractTimeLine"),
@@ -36,7 +36,7 @@ public interface Timeline {
             UniformWindowingMap = RDFAgents.createIRI(NAMESPACE + "UniformWindowingMap");
 
     // properties
-    public static final IRI
+    IRI
             after = RDFAgents.createIRI(NAMESPACE + "after"),
             at = RDFAgents.createIRI(NAMESPACE + "at"),
             atDate = RDFAgents.createIRI(NAMESPACE + "atDate"),
@@ -79,6 +79,6 @@ public interface Timeline {
             windowLength = RDFAgents.createIRI(NAMESPACE + "windowLength");
 
     // individuals
-    public static final IRI
+    IRI
             universaltimeline = RDFAgents.createIRI(NAMESPACE + "universaltimeline");
 }

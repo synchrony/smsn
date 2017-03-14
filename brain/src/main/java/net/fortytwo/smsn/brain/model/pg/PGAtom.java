@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,9 +23,11 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setId(final String id) {
+    public void setId(final String id) {
         String atomId = null == id ? SemanticSynchrony.createRandomId() : id;
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.ID_V, atomId);
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.ID_V, atomId);
+
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.ID_V);
     }
 
     @Override
@@ -33,8 +36,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setAlias(String alias) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
+    public void setAlias(String alias) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
     }
 
     @Override
@@ -43,8 +46,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setCreated(Long created) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
+    public void setCreated(Long created) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
     }
 
     @Override
@@ -53,8 +56,11 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setTitle(String title) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE, title);
+    public void setTitle(String title) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE, title);
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.TITLE);
+
+        updateAcronym();
     }
 
     @Override
@@ -63,8 +69,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setText(String text) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE, text);
+    public void setText(String text) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE, text);
     }
 
     @Override
@@ -73,8 +79,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setPriority(Float priority) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
+    public void setPriority(Float priority) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
     }
 
     @Override
@@ -83,8 +89,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setSharability(Float sharability) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, sharability);
+    public void setSharability(Float sharability) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, sharability);
     }
 
     @Override
@@ -93,8 +99,10 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setShortcut(String shortcut) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
+    public void setShortcut(String shortcut) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
+
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
 
     @Override
@@ -103,8 +111,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setWeight(Float weight) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+    public void setWeight(Float weight) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
     }
 
     @Override
@@ -113,12 +121,11 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public boolean setNotes(EntityList<Atom> notes) {
-        boolean changed = removeNotes();
+    public void setNotes(EntityList<Atom> notes) {
+        removeNotes();
         if (null != notes) {
             addOutEdge(((PGEntity) notes).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
         }
-        return changed;
     }
 
     @Override
@@ -191,5 +198,49 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     private boolean removeNotes() {
         return removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
+    }
+
+    private void updateAcronym() {
+        Vertex vertex = asVertex();
+        String value = getTitle();
+        String acronym = valueToAcronym(value);
+
+        VertexProperty<String> previousProperty = vertex.property(SemanticSynchrony.PropertyKeys.ACRONYM);
+        if (null != previousProperty) {
+            previousProperty.remove();
+        }
+
+        if (null != acronym) {
+            vertex.property(SemanticSynchrony.PropertyKeys.ACRONYM, acronym);
+            getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.ACRONYM);
+        }
+    }
+
+    private String valueToAcronym(final String value) {
+        // index only short, name-like values, avoiding free-form text if possible
+        if (null != value && value.length() <= 100) {
+            String clean = cleanForAcronym(value);
+            StringBuilder acronym = new StringBuilder();
+            boolean isInside = false;
+            for (byte b : clean.getBytes()) {
+                // TODO: support international letter characters as such
+                if (b >= 'a' && b <= 'z') {
+                    if (!isInside) {
+                        acronym.append((char) b);
+                        isInside = true;
+                    }
+                } else if (' ' == b) {
+                    isInside = false;
+                }
+            }
+
+            return acronym.toString();
+        } else {
+            return null;
+        }
+    }
+
+    private String cleanForAcronym(final String value) {
+        return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 }

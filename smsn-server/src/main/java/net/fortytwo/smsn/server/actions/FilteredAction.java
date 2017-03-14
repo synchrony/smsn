@@ -42,7 +42,6 @@ abstract class FilteredAction extends Action {
     private Atom createNewRoot(final ActionContext context) {
         Atom root = context.getBrain().getTopicGraph().createAtomWithProperties(getFilter(), null);
         root.setTitle("life, the universe, and everything");
-        context.getBrain().getTopicGraph().reindexAtom(root);
         return root;
     }
 }

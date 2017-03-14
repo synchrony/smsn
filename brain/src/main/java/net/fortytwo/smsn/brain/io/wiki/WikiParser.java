@@ -17,7 +17,6 @@ public class WikiParser extends BrainParser {
     private Note root;
     private LinkedList<Note> hierarchy;
     private LinkedList<Integer> indentHierarachy;
-    private BufferedReader bufferedReader;
     private boolean useCanonicalFormat;
 
     private int lineNumber;
@@ -36,7 +35,7 @@ public class WikiParser extends BrainParser {
     @Override
     public Note parse(final InputStream inputStream) throws IOException {
         reset();
-        bufferedReader = createReader(inputStream);
+        BufferedReader bufferedReader = createReader(inputStream);
 
         while ((currentLine = bufferedReader.readLine()) != null) {
             parseLine();

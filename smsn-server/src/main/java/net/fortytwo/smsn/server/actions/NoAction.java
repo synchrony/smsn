@@ -11,11 +11,6 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 public class NoAction extends Action {
 
     @Override
-    protected void performTransaction(ActionContext params) throws BadRequestException, RequestProcessingException {
-        // nothing to do
-    }
-
-    @Override
     protected boolean doesRead() {
         return false;
     }

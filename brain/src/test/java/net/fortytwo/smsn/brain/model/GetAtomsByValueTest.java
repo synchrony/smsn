@@ -24,7 +24,6 @@ public class GetAtomsByValueTest extends BrainTestBase {
 
         arthur = topicGraph.createAtomWithProperties(filter, null);
         arthur.setTitle("Arthur Dent");
-        topicGraph.reindexAtom(arthur);
     }
 
     @Test

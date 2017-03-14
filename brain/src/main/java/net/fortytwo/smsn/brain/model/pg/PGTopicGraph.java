@@ -307,11 +307,14 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public void reindexAtom(final Atom atom) {
-        Vertex vertex = ((PGAtom) atom).asVertex();
-
-        updateAcronym((PGAtom) atom, vertex);
-
-        wrapper.reindex(vertex);
+        updateIndex(atom, SemanticSynchrony.PropertyKeys.ID_V);
+        updateIndex(atom, SemanticSynchrony.PropertyKeys.TITLE);
+        updateIndex(atom, SemanticSynchrony.PropertyKeys.ACRONYM);
+        updateIndex(atom, SemanticSynchrony.PropertyKeys.SHORTCUT);
+    }
+    
+    void updateIndex(final Atom atom, final String key) {
+        wrapper.updateIndex(((PGAtom) atom).asVertex(), key);
     }
 
     /**
@@ -346,44 +349,6 @@ public class PGTopicGraph implements TopicGraph {
         return null != label && label.equals(SemanticSynchrony.VertexLabels.ATOM);
     }
 
-    private void updateAcronym(final PGAtom atom, final Vertex asVertex) {
-        String value = atom.getTitle();
-        String acronym = valueToAcronym(value);
-
-        VertexProperty<String> previousProperty = asVertex.property(SemanticSynchrony.PropertyKeys.ACRONYM);
-        if (null != previousProperty) {
-            previousProperty.remove();
-        }
-
-        if (null != acronym) {
-            asVertex.property(SemanticSynchrony.PropertyKeys.ACRONYM, acronym);
-        }
-    }
-
-    private String valueToAcronym(final String value) {
-        // index only short, name-like values, avoiding free-form text if possible
-        if (null != value && value.length() <= 100) {
-            String clean = cleanForAcronym(value);
-            StringBuilder acronym = new StringBuilder();
-            boolean isInside = false;
-            for (byte b : clean.getBytes()) {
-                // TODO: support international letter characters as such
-                if (b >= 'a' && b <= 'z') {
-                    if (!isInside) {
-                        acronym.append((char) b);
-                        isInside = true;
-                    }
-                } else if (' ' == b) {
-                    isInside = false;
-                }
-            }
-
-            return acronym.toString();
-        } else {
-            return null;
-        }
-    }
-
     public PGTopicGraph copyGraph(final Filter filter) {
         GraphWrapper newWrapper = new TinkerGraphWrapper(TinkerGraph.open());
         PGTopicGraph newGraph = new PGTopicGraph(newWrapper);
@@ -405,10 +370,6 @@ public class PGTopicGraph implements TopicGraph {
         Vertex vertex = wrapper.createVertex(id, label);
 
         return constructor.apply(vertex);
-    }
-
-    private String cleanForAcronym(final String value) {
-        return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 
     private List<Atom> filterAndSort(

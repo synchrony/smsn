@@ -4,9 +4,9 @@ import net.fortytwo.rdfagents.RDFAgents;
 import org.openrdf.model.IRI;
 
 public interface EventOntology {
-    public static final String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";
+    String NAMESPACE = "http://purl.org/NET/c4dm/event.owl#";
 
-    public static final IRI
+    IRI
             EVENT = RDFAgents.createIRI(NAMESPACE + "Event"),
             PLACE = RDFAgents.createIRI(NAMESPACE + "place"),
             SUB_EVENT = RDFAgents.createIRI(NAMESPACE + "sub_event"),

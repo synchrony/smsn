@@ -5,7 +5,7 @@ import org.json.JSONObject;
 public interface MessageHandler {
     void handle(JSONObject message) throws MessageHandlerException;
 
-    public class MessageHandlerException extends Exception {
+    class MessageHandlerException extends Exception {
         public MessageHandlerException(final String message) {
             super(message);
         }
