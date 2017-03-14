@@ -2,14 +2,11 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.server.Action;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 
-import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,56 +16,28 @@ import java.util.Set;
 /**
  * A service for importing an Extend-o-Brain subgraph
  */
-public class ReadGraph extends Action {
+public class ReadGraph extends IOAction {
     private static final Map<Graph, Set<String>> importsInProgress = new HashMap<>();
     private static final Map<Graph, Set<String>> importsSucceeded = new HashMap<>();
 
-    @NotNull
-    private String format;
-    @NotNull
-    private String file;
-
-    public String getFormat() {
-        return format;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setFile(getFile());
-        p.setFormat(getFormat());
-    }
-
-    @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        if (null == p.getFormat()) {
+    protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
+        if (null == getFormat()) {
             throw new BadRequestException("format is required");
         }
 
-        Format format = Format.getFormat(p.getFormat());
-        BrainReader reader = Format.getReader(format);
+        BrainReader reader = Format.getReader(getFormat());
 
-        beginImport(p.getGraphWrapper().getGraph(), p.getFile());
+        beginImport(params.getGraphWrapper().getGraph(), getFile().getAbsolutePath());
 
         boolean success = false;
         try {
-            reader.doImport(new File(p.getFile()), format, p.getBrain(), true);
+            reader.doImport(getFile(), getFormat(), params.getBrain(), true);
             success = true;
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         } finally {
-            finishImport(p.getGraphWrapper().getGraph(), p.getFile(), success);
+            finishImport(params.getGraphWrapper().getGraph(), getFile().getAbsolutePath(), success);
         }
     }
 

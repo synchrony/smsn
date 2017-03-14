@@ -9,10 +9,10 @@ import org.openrdf.model.IRI;
  * a small subset of the vocabulary.
  */
 public interface FOAF {
-    public static final String NAMESPACE = "http://xmlns.com/foaf/0.1/";
+    String NAMESPACE = "http://xmlns.com/foaf/0.1/";
 
     // TODO: add the rest of the classes
-    public static final IRI
+    IRI
             ACCOUNTNAME = RDFAgents.createIRI(NAMESPACE + "accountName"),
             ACCOUNTSERVICEHOMEPAGE = RDFAgents.createIRI(NAMESPACE + "accountServiceHomepage"),
             AGE = RDFAgents.createIRI(NAMESPACE + "age"),

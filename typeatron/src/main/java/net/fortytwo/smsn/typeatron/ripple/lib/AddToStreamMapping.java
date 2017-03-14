@@ -4,7 +4,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.smsn.util.TypedProperties;
 import net.fortytwo.flow.Sink;
@@ -67,14 +67,14 @@ public class AddToStreamMapping extends AtomMapping {
         note.setSharability(filter.getDefaultSharability());
         note.setWeight(filter.getDefaultWeight());
         note.setCreated(System.currentTimeMillis());
-        note.setValue(value);
+        note.setTitle(value);
 
         Note streamNote = new Note();
         streamNote.setId(brainStream);
         streamNote.addChild(note);
 
         try {
-            client.update(streamNote, 1, filter, NoteQueries.forwardAddOnlyViewStyle);
+            client.update(streamNote, 1, filter, TreeViews.forwardAddOnlyViewStyle);
         } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }

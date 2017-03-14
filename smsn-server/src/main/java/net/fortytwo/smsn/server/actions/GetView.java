@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -12,37 +12,19 @@ import java.io.IOException;
  */
 public class GetView extends RootedViewAction {
 
-    private boolean includeTypes = false;
-
-    public boolean isIncludeTypes() {
-        return includeTypes;
-    }
-
-    public void setIncludeTypes(boolean includeTypes) {
-        this.includeTypes = includeTypes;
-    }
-
     @Override
-    public void parseRequest(final RequestParams params) throws IOException {
-        params.setHeight(getHeight());
-        params.setRootId(getRoot());
-        params.setStyleName(getStyle());
-        params.setFilter(getFilter());
-        params.setIncludeTypes(isIncludeTypes());
-    }
-
-    @Override
-    protected void performTransaction(final RequestParams params)
+    protected void performTransaction(final ActionContext context)
             throws RequestProcessingException, BadRequestException {
+        super.performTransaction(context);
 
-        Note note = params.getQueries().view(params.getRoot(), params.getHeight(), params.getFilter(), params.getStyle());
+        Note note = context.getQueries().view(getRoot(), height, getFilter(), style);
         try {
-            addView(note, params);
+            addView(note, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(params.getRootId());
+        addToHistory(getRoot().getId());
     }
 
     @Override

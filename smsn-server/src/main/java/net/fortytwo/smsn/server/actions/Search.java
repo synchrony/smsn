@@ -1,11 +1,10 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
@@ -19,17 +18,17 @@ public class Search extends BasicViewAction {
     @NotNull
     private String query;
     @NotNull
-    private NoteQueries.QueryType queryType;
+    private TreeViews.QueryType queryType;
 
-    private int valueCutoff = 100;
-
-    public NoteQueries.QueryType getQueryType() {
-        return queryType;
+    private String getQuery() {
+        return notNull(query);
     }
 
-    public String getQuery() {
-        return query;
+    private TreeViews.QueryType getQueryType() {
+        return notNull(queryType);
     }
+
+    private int titleCutoff = 100;
 
     public void setQuery(String query) {
         // TODO: this doesn't solve the problem (that you can't search on queries with extended characters)
@@ -38,43 +37,31 @@ public class Search extends BasicViewAction {
         this.query = query;
     }
 
-    public void setQueryType(NoteQueries.QueryType queryType) {
+    public void setQueryType(TreeViews.QueryType queryType) {
         this.queryType = queryType;
     }
 
-    public int getValueCutoff() {
-        return valueCutoff;
-    }
-
-    public void setValueCutoff(int valueCutoff) {
-        this.valueCutoff = valueCutoff;
+    public void setTitleCutoff(int titleCutoff) {
+        this.titleCutoff = titleCutoff;
     }
 
     @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setHeight(getHeight());
-        p.setQueryType(getQueryType());
-        p.setQuery(getQuery());
-        p.setStyleName(getStyle());
-        p.setFilter(getFilter());
-        p.setValueCutoff(getValueCutoff());
-    }
+    protected void performTransaction(final ActionContext params)
+            throws RequestProcessingException, BadRequestException {
 
-    @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException, BadRequestException {
-        p.getWriter().setValueLengthCutoff(p.getValueCutoff());
+        params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
         try {
-            if (p.getQueryType().equals(NoteQueries.QueryType.Ripple)) {
-                addRippleResults(p);
+            if (getQueryType().equals(TreeViews.QueryType.Ripple)) {
+                addRippleResults(params);
             } else {
-                addSearchResults(p);
+                addSearchResults(params);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        p.getMap().put("title", p.getQuery());
+        params.getMap().put("title", getQuery());
     }
 
     @Override
@@ -87,22 +74,18 @@ public class Search extends BasicViewAction {
         return false;
     }
 
-    private void addSearchResults(final RequestParams params) throws IOException {
-        Note n = params.getQueries().search(params.getQueryType(), params.getQuery(), params.getHeight(), params.getFilter(), params.getStyle());
+    private void addSearchResults(final ActionContext params) throws IOException {
+        Note n = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
         addView(n, params);
     }
 
-    private void addRippleResults(final RequestParams p) throws IOException {
+    private void addRippleResults(final ActionContext p) throws IOException {
         // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
         Note n = new Note();
-        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, p.style);
+        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, style);
         JSONObject json;
 
-        try {
-            json = p.getWriter().toJSON(n);
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
+        json = p.getJsonPrinter().toJson(n);
         p.getMap().put("view", json.toString());
     }
 }

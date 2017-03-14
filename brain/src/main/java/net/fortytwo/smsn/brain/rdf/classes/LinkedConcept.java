@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
@@ -50,7 +50,7 @@ public class LinkedConcept extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, OWL.THING);
 
         // note: we assume short, name-like values for linked atoms
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getTitle())));
 
         return self;
     }

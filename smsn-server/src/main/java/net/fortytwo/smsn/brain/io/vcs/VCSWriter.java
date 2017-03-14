@@ -3,11 +3,11 @@ package net.fortytwo.smsn.brain.io.vcs;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomGraph;
-import net.fortytwo.smsn.brain.model.AtomList;
+import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,12 +15,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class VCSWriter extends BrainWriter {
 
     private static final List<Format> formats;
-    private static final NoteWriter noteWriter = new NoteWriter();
+    private static final WikiPrinter wikiPrinter;
+
+    static {
+        wikiPrinter = new WikiPrinter();
+        wikiPrinter.setUseCanonicalFormat(true);
+    }
 
     static {
         formats = new LinkedList<>();
@@ -39,7 +43,7 @@ public class VCSWriter extends BrainWriter {
 
         File[] dirs = initializeDirectories(parentDir);
 
-        timeAction("exported atoms as individual files", () -> doExport(context.getAtomGraph(), dirs));
+        timeAction("exported atoms as individual files", () -> doExport(context.getTopicGraph(), dirs));
     }
 
     private File[] initializeDirectories(final File parentDir) throws IOException {
@@ -61,20 +65,29 @@ public class VCSWriter extends BrainWriter {
         }
     }
 
-    private void doExport(final AtomGraph graph, final File[] dirs) throws IOException {
+    private void doExport(final TopicGraph graph, final File[] dirs) throws IOException {
         for (Atom a : graph.getAllAtoms()) {
-            File dir = chooseDirectoryForAtom(a, dirs);
-            File atomFile = new File(dir, "a" + a.getId());
-            try (OutputStream out = new FileOutputStream(atomFile)) {
-                writeAtomToStream(a, out);
+            if (isAtomWithPage(a)) {
+                File dir = chooseDirectoryForAtom(a, dirs);
+                File atomFile = new File(dir, fileNameForAtom(a));
+                try (OutputStream out = new FileOutputStream(atomFile)) {
+                    writeAtomToStream(a, out);
+                }
             }
         }
     }
 
+    private String fileNameForAtom(final Atom a) {
+        return a.getId();
+    }
+
+    private boolean isAtomWithPage(final Atom a) {
+        return a.getSharability() > 0f;
+    }
+
     private File chooseDirectoryForAtom(final Atom a, File[] dirs) {
         Float sharability = a.getSharability();
-        Preconditions.checkNotNull(sharability);
-        Preconditions.checkArgument(sharability > 0f && sharability <= 1.0f);
+        Preconditions.checkArgument(sharability > 0f && sharability <= 1.0f, a.getId());
 
         int index = (int) (sharability / 0.25f) - 1;
         return dirs[index];
@@ -82,15 +95,13 @@ public class VCSWriter extends BrainWriter {
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
         Note note = toNote(atom, true);
-        AtomList list = atom.getNotes();
+        EntityList<Atom> list = atom.getNotes();
         while (null != list) {
             note.getChildren().add(toNote(list.getFirst(), false));
             list = list.getRest();
         }
 
-        List<Note> notes = new LinkedList<>();
-        notes.add(note);
-        noteWriter.toWikiText(notes, out, true);
+        wikiPrinter.print(note, out, true);
     }
 
     private Note toNote(final Atom atom, final boolean withValueAndProperties) {
@@ -98,7 +109,8 @@ public class VCSWriter extends BrainWriter {
         note.setId(atom.getId());
 
         if (withValueAndProperties) {
-            note.setValue(atom.getValue());
+            note.setTitle(atom.getTitle());
+            note.setPage(atom.getText());
             note.setAlias(atom.getAlias());
             note.setCreated(atom.getCreated());
             note.setPriority(atom.getPriority());

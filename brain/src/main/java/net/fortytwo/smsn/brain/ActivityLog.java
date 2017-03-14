@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,10 +19,6 @@ public class ActivityLog {
 
     public void logView(final Atom a) {
         log("view", a);
-    }
-
-    public void logUpdate(final Atom a) {
-        log("change-value", a);
     }
 
     public void logSetProperties(final Atom a) {

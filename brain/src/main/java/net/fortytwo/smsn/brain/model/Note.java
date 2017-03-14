@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 public class Note {
     // A special value, for incoming notes only,
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
-    public static final String CLEARME_VALUE = "_";
+    public static final String CLEARME = "_";
 
     private final List<Note> children;
-    private boolean hasChildren;
-    private String value;
+    private int numberOfChildren;
+    private int numberOfParents;
+    private String title;
+    private String page;
     private String id;
     private Float weight;
     private Float sharability;
@@ -29,7 +31,8 @@ public class Note {
     public Note(final Note copy) {
         this();
 
-        this.value = copy.value;
+        this.title = copy.title;
+        this.page = copy.page;
         this.id = copy.id;
         this.weight = copy.weight;
         this.sharability = copy.sharability;
@@ -37,7 +40,8 @@ public class Note {
         this.created = copy.created;
         this.alias = copy.alias;
 
-        this.hasChildren = copy.hasChildren;
+        this.numberOfChildren = copy.numberOfChildren;
+        this.numberOfParents = copy.numberOfParents;
         //this.type = copy.type;
         this.meta = copy.meta;
 
@@ -46,18 +50,20 @@ public class Note {
         }
     }
 
-    public String getValue() {
-        return value;
+    public String getTitle() {
+        return title;
     }
 
-    public void setValue(final String value) {
-        /*
-        if (null != value && 0 == value.length()) {
-            throw new IllegalArgumentException("empty value is not valid");
-        }
-        */
+    public void setTitle(final String title) {
+        this.title = title;
+    }
 
-        this.value = value;
+    public String getPage() {
+        return page;
+    }
+
+    public void setPage(String page) {
+        this.page = page;
     }
 
     public String getId() {
@@ -159,7 +165,22 @@ public class Note {
         }
 
         children.add(child);
-        hasChildren = true;
+    }
+
+    public int getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
+    public void setNumberOfChildren(int numberOfChildren) {
+        this.numberOfChildren = numberOfChildren;
+    }
+
+    public int getNumberOfParents() {
+        return numberOfParents;
+    }
+
+    public void setNumberOfParents(int numberOfParents) {
+        this.numberOfParents = numberOfParents;
     }
 
     @Override
@@ -167,15 +188,7 @@ public class Note {
         return "note[" + (null == id ? "null" : id) + "]";
     }
 
-    public boolean getHasChildren() {
-        return hasChildren;
-    }
-
-    public void setHasChildren(final boolean b) {
-        hasChildren = b;
-    }
-
-    // note: deliberately leaves hasChildren unaffected
+    // note: deliberately leaves numberOfChildren and numberOfParents unaffected
     public void truncate(final int depth) {
         if (depth <= 1) {
             children.clear();

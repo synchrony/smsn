@@ -8,6 +8,7 @@ function httpGet(theUrl)
     return xmlHttp.responseText;
 }
 
+/* Web page logging in SmSn is disabled for now
 chrome.history.onVisited.addListener(function(result) {
     // This is an id for the visited page, not the event
     //var id = result.id;
@@ -24,3 +25,4 @@ chrome.history.onVisited.addListener(function(result) {
 
     httpGet(serviceCallUrl);
 });
+*/

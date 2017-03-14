@@ -45,7 +45,7 @@ public class GetAtomValueMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't get @value of non-atom: " + first);
         } else {
-            String value = n.getValue();
+            String value = n.getTitle();
             if (null == value) {
                 logger.warning("atom note has no @value: " + n);
             } else {

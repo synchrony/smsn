@@ -11,6 +11,6 @@
   "permissions": [
     "history",
     "tabs",
-    "http://localhost"
+    "http://localhost:8182/"
   ]
 }

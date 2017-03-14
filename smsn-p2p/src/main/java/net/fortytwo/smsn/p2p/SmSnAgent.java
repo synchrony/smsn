@@ -28,7 +28,6 @@ public class SmSnAgent {
 
     private final IRI agentIri;
     private final DatasetFactory factory = new DatasetFactory();
-    private final ValueFactory vf = factory.getValueFactory();
 
     private ServiceBroadcastListener listener;
 
@@ -51,6 +50,7 @@ public class SmSnAgent {
                      final boolean listenForServices) {
         logger.log(Level.INFO, "creating SmSn agent with IRI " + agentIri);
 
+        ValueFactory vf = factory.getValueFactory();
         this.agentIri = vf.createIRI(agentIri);
 
         coordinatorConnection = new Connection();

@@ -1,9 +1,9 @@
 package net.fortytwo.smsn.brain;
 
 public interface Params {
-    public enum Format{json, wiki};
+    enum Format{json, wiki}
 
-    public static final String
+    String
             ACTION = "action",
             DATASET = "dataset",
             DEFAULT_SHARABILITY = "defaultSharability",
@@ -26,8 +26,8 @@ public interface Params {
             ROOT = "root",
             STYLE = "style",
             TITLE = "title",
-            VALUE = "value",
-            VALUE_CUTOFF = "valueCutoff",
+            TITLE_CUTOFF = "titleCutoff",
             VIEW = "view",
-            VIEW_FORMAT = "viewFormat";
+            VIEW_FORMAT = "viewFormat",
+            VIEW_TITLE = "title";
 }

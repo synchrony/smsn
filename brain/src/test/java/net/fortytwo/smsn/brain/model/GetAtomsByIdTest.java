@@ -1,6 +1,8 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -11,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 public class GetAtomsByIdTest extends BrainTestBase {
 
     @Override
-    protected AtomGraph createAtomGraph() throws IOException {
+    protected TopicGraph createAtomGraph() throws IOException {
         return createTinkerAtomGraph();
     }
 
@@ -21,32 +23,32 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
         int count = 0;
         for (String id : ids) {
-            Atom atom = atomGraph.createAtomWithProperties(filter, id);
-            atom.setValue("atom #" + ++count);
+            Atom atom = topicGraph.createAtomWithProperties(filter, id);
+            atom.setTitle("atom #" + ++count);
         }
 
         for (int i = 0; i < ids.length; i++) {
-            Atom atom = atomGraph.getAtomById(ids[i]);
+            Atom atom = topicGraph.getAtomById(ids[i]);
             assertNotNull(atom);
-            assertEquals("atom #" + (i+1), atom.getValue());
+            assertEquals("atom #" + (i + 1), atom.getTitle());
         }
     }
 
     @Test
     public void testGetAtoms() throws Exception {
-        Atom chaos = atomGraph.createAtomWithProperties(filter, null);
-        chaos.setValue("Chaos");
-        Atom tartarus = atomGraph.createAtomWithProperties(filter, null);
-        tartarus.setValue("Tartarus");
-        Atom gaia = atomGraph.createAtomWithProperties(filter, null);
-        gaia.setValue("Gaia");
-        Atom eros = atomGraph.createAtomWithProperties(filter, null);
-        eros.setValue("Eros");
-        Atom nyx = atomGraph.createAtomWithProperties(filter, null);
-        nyx.setValue("Nyx");
-        Atom erebus = atomGraph.createAtomWithProperties(filter, null);
-        erebus.setValue("Erebus");
-        AtomList children = atomGraph.createAtomList(tartarus, gaia, eros, nyx, erebus);
+        Atom chaos = topicGraph.createAtomWithProperties(filter, null);
+        chaos.setTitle("Chaos");
+        Atom tartarus = topicGraph.createAtomWithProperties(filter, null);
+        tartarus.setTitle("Tartarus");
+        Atom gaia = topicGraph.createAtomWithProperties(filter, null);
+        gaia.setTitle("Gaia");
+        Atom eros = topicGraph.createAtomWithProperties(filter, null);
+        eros.setTitle("Eros");
+        Atom nyx = topicGraph.createAtomWithProperties(filter, null);
+        nyx.setTitle("Nyx");
+        Atom erebus = topicGraph.createAtomWithProperties(filter, null);
+        erebus.setTitle("Erebus");
+        EntityList<Atom> children = topicGraph.createListOfAtoms(tartarus, gaia, eros, nyx, erebus);
         chaos.setNotes(children);
 
         //System.out.println(chaos.getId());
@@ -54,7 +56,7 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
         // getAtoms returns a list of only atom vertices, excluding list vertices
         int count = 0;
-        Iterable<Atom> atoms = atomGraph.getAllAtoms();
+        Iterable<Atom> atoms = topicGraph.getAllAtoms();
         for (Atom a : atoms) {
             count++;
             //System.out.println(a.getId());

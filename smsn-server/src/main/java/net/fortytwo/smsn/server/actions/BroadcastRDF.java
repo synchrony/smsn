@@ -1,8 +1,9 @@
 package net.fortytwo.smsn.server.actions;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.CoordinatorService;
-import net.fortytwo.smsn.server.RequestParams;
+import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.openrdf.rio.RDFFormat;
 
@@ -17,26 +18,21 @@ public class BroadcastRDF extends Action {
     @NotNull
     private String dataset;
 
-    public String getDataset() {
-        return dataset;
-    }
-
     public void setDataset(String dataset) {
         this.dataset = dataset;
     }
 
-    @Override
-    public void parseRequest(final RequestParams p) throws IOException {
-        p.setData(getDataset());
+    public String getDataset() {
+        return notNull(dataset);
     }
 
     @Override
-    protected void performTransaction(final RequestParams p) throws RequestProcessingException {
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException {
         // TODO: take RDF format as an input parameter
         RDFFormat format = RDFFormat.NTRIPLES;
 
         try {
-            CoordinatorService.getInstance().pushUpdate(p.getData(), format);
+            CoordinatorService.getInstance().pushUpdate(getDataset(), format);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

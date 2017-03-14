@@ -11,18 +11,23 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class SemanticSynchrony {
     public static final boolean
             SAFE = true,
             VERBOSE = true;
 
-    // configuration properties
+    // general configuration properties
     public static final String
             BASE_URI = "net.fortytwo.smsn.baseURI",
             ACTIVITY_LOG = "net.fortytwo.smsn.activityLog",
             ATOM_NAMESPACE = "net.fortytwo.smsn.atomNamespace",
             VERSION = "net.fortytwo.smsn.version";
+
+    // I/O properties
+    public static final String
+            TRANSACTION_BUFFER_SIZE = "net.fortytwo.smsn.io.transactionBufferSize";
 
     // P2P configuration properties
     public static final String
@@ -37,33 +42,51 @@ public class SemanticSynchrony {
     public static final String
             BRAIN_PORT = "net.fortytwo.smsn.server.brainPort";
 
-    // the id property also used by ElementIdStrategy
-    public static final String
-            ID_V = "idV",
-            ID_E = "idE";
+    public interface VertexLabels {
+        String
+                ATOM = "atom",
+                LIST = "list",
+                LINK = "link",
+                PAGE = "page",
+                TOPIC = "topic",
+                TREE = "tree";
+    }
 
-    public static final String
-            ATOM = "atom",
-            ATOM_LIST = "list";
+    public interface EdgeLabels {
+        String
+                CHILDREN = "children",
+                CONTEXT = "context",
+                FIRST = "first",
+                KEY = "key",
+                NOTES = "notes",
+                REST = "rest",
+                TARGET = "target",
+                TOPIC = "topic",
+                CONTENT = "tree",
+                VALUE = "value";
+    }
 
-    // core schema constants
-    public static final String
-            ALIAS = "alias",
-            CREATED = "created",
-            FIRST = "first",
-            NOTES = "notes",
-            REST = "rest",
-            SHARABILITY = "sharability",
-            VALUE = "value",
-            WEIGHT = "weight";
+    public interface PropertyKeys {
+        String
+                ACRONYM = "acronym",
+                ALIAS = "alias",
+                CREATED = "created",
+                FORMAT = "format",
+                // the id property also used by ElementIdStrategy
+                ID_V = "idV",
+                LABEL = "label",
+                PAGE = "page",
+                PRIORITY = "priority",
+                SHARABILITY = "sharability",
+                SHORTCUT = "shortcut",
+                TEXT = "text",
+                TITLE = "title",
+                WEIGHT = "weight";
+    }
 
-    // extended schema constants
-    public static final String
-            ACRONYM = "acronym",
-            PRIORITY = "priority",
-            SHORTCUT = "shortcut";
+    public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
-    private static final int KEY_DIGITS = 7;
+    private static final int ID_DIGITS = 16;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 
@@ -157,27 +180,32 @@ public class SemanticSynchrony {
     }
 
     /**
-     * Creates a pseudo-random Base64 SmSn key.
+     * Creates a pseudo-random Base62 SmSn key.
      * These keys are typically used as ids of atoms and list elements in Extend-o-Brain.
      *
      * @return a new pseudo-random key
      */
-    public static String createRandomId() {
-        byte[] bytes = new byte[KEY_DIGITS];
-        for (int i = 0; i < KEY_DIGITS; i++) {
-            int n = random.nextInt(64);
+    public static String migrateId(final String original) {
+        if (null != original) {
+            random.setSeed(original.length() + original.hashCode());
+        }
+
+        byte[] bytes = new byte[ID_DIGITS];
+        for (int i = 0; i < ID_DIGITS; i++) {
+            int n = random.nextInt(62);
             int b = n < 26
                     ? 'A' + n
                     : n < 52
                     ? 'a' + n - 26
-                    : n < 62
-                    ? '0' + n - 52
-                    : n < 63
-                    ? '-' : '_';
+                    : '0' + n - 52;
             bytes[i] = (byte) b;
         }
 
         return new String(bytes);
+    }
+
+    public static String createRandomId() {
+        return migrateId(null);
     }
 
     /**

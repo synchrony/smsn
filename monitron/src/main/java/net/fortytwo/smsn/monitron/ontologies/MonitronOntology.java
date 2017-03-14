@@ -5,10 +5,10 @@ import org.openrdf.model.IRI;
 
 public interface MonitronOntology {
 
-    public static final String NAMESPACE = "http://fortytwo.net/2012/08/monitron#";
+    String NAMESPACE = "http://fortytwo.net/2012/08/monitron#";
 
     // classes
-    public static final IRI
+    IRI
             AIR_TEMPERATURE_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "AirTemperatureObservation"),
             ATMOSPHERIC_PRESSURE_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "AtmosphericPressureObservation"),
             COLOR = RDFAgents.createIRI(NAMESPACE + "Color"),
@@ -21,12 +21,12 @@ public interface MonitronOntology {
             VIBRATION_LEVEL_OBSERVATION = RDFAgents.createIRI(NAMESPACE + "VibrationLevelObservation");
 
     // UnitOfMeasurement individuals
-    public static final IRI
+    IRI
             DEGREES_CELSIUS = RDFAgents.createIRI(NAMESPACE + "degreesCelsius"),
             PASCALS = RDFAgents.createIRI(NAMESPACE + "pascals");
 
     // Property individuals
-    public static final IRI
+    IRI
             AIR_TEMPERATURE = RDFAgents.createIRI(NAMESPACE + "airTemperature"),
             ATMOSPHERIC_PRESSURE = RDFAgents.createIRI(NAMESPACE + "atmosphericPressure"),
             BLUE_LIGHT_LEVEL = RDFAgents.createIRI(NAMESPACE + "blueLightLevel"),

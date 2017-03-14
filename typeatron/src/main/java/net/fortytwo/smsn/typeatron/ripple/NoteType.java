@@ -6,7 +6,7 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.StackMapping;
 import net.fortytwo.ripple.model.types.SimpleType;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.model.pg.PGAtomGraph;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
@@ -33,7 +33,7 @@ public class NoteType extends SimpleType<Note> {
         // In the latter case, the resource will only be accessible in an interactive setting if the thing is a public,
         // classified atom and the knowledge base has been appropriately published as Linked Data.
         return null == instance.getAlias()
-                ? null == instance.getId() ? null : valueFactory.createIRI(PGAtomGraph.iriForId(instance.getId()))
+                ? null == instance.getId() ? null : valueFactory.createIRI(PGTopicGraph.iriForId(instance.getId()))
                 : valueFactory.createIRI(instance.getAlias());
     }
 

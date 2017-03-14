@@ -1,6 +1,19 @@
 Semantic Synchrony CHANGELOG
 ====================
 
+SmSn 1.3 (Join the Army)
+----------------------------------------
+SmSn 1.3.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Support client connections via WebSocket
+* Use a Base-62 character set [0-9A-Za-z] for IDs
+* Additional validation in server actions
+* Provide Markdown page views
+* Added support for topics-and-pages data model
+* Added parent and child counts to each atom in a view
+* Added transaction buffering support for graph import
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 SmSn 1.2 (Into the Future)
 ----------------------------------------
 SmSn 1.2.0

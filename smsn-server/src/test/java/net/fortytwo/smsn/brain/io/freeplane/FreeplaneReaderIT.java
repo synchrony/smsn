@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.graphml.GraphMLFormat;
 import net.fortytwo.smsn.brain.io.graphml.GraphMLWriter;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,13 +21,13 @@ public class FreeplaneReaderIT extends BrainTestBase {
     private final File mindMapDirectory = new File("/Users/josh/projects/notmine/mindmaps");
 
     @Override
-    protected AtomGraph createAtomGraph() throws IOException {
+    protected TopicGraph createAtomGraph() throws IOException {
         return createTinkerAtomGraph();
     }
 
     @Test
     public void testTmp() throws Exception {
-        Brain brain = new Brain(atomGraph);
+        Brain brain = new Brain(topicGraph);
 
         Format format = Format.getFormat("fReePLAne");
         assertNotNull(format);
@@ -36,12 +36,12 @@ public class FreeplaneReaderIT extends BrainTestBase {
 
         reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain, true);
 
-        System.out.println("# atoms: " + countAtoms(atomGraph));
+        System.out.println("# atoms: " + countAtoms());
 
         BrainWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(new File("/tmp/mindMap.xml"))) {
             BrainWriter.Context context = new BrainWriter.Context();
-            context.setAtomGraph(brain.getAtomGraph());
+            context.setTopicGraph(brain.getTopicGraph());
             context.setKnowledgeBase(brain.getKnowledgeBase());
             context.setDestStream(out);
             context.setFormat(GraphMLFormat.getInstance());

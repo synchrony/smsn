@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
@@ -54,7 +54,7 @@ public class Topic extends AtomClass {
 
         IRI self = handleTypeAndAlias(a, context, OWL.THING);
 
-        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getTitle())));
 
         return self;
     }

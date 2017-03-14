@@ -7,10 +7,10 @@ import org.openrdf.model.IRI;
  * The Semantic Synchrony gesture/activity ontology as a collection of terms
  */
 public interface SmSnActivityOntology {
-    public static final String NAMESPACE = "http://fortytwo.net/2015/smsn/activity#";
+    String NAMESPACE = "http://fortytwo.net/2015/smsn/activity#";
 
     // OSC addresses shared between modules.  These are the OSC equivalents of the ontology classes.
-    public static final String
+    String
             EXO_ACTIVITY_ATTENTION = "/smsn/activity/attention",
             EXO_ACTIVITY_GIVE = "/smsn/activity/give",
             EXO_ACTIVITY_HANDOFF = "/smsn/activity/handoff",
@@ -19,7 +19,7 @@ public interface SmSnActivityOntology {
             EXO_ACTIVITY_POINT = "/smsn/activity/point";
 
     // classes
-    public static final IRI
+    IRI
             Activity = RDFAgents.createIRI(NAMESPACE + "Activity"),
             Attention = RDFAgents.createIRI(NAMESPACE + "Attention"),
             BatonGesture = RDFAgents.createIRI(NAMESPACE + "BatonGesture"),
@@ -33,7 +33,7 @@ public interface SmSnActivityOntology {
             Point = RDFAgents.createIRI(NAMESPACE + "Point");
 
     // properties
-    public static final IRI
+    IRI
             actor = RDFAgents.createIRI(NAMESPACE + "actor"),
             focusOfAttention = RDFAgents.createIRI(NAMESPACE + "focusOfAttention"),
             giver = RDFAgents.createIRI(NAMESPACE + "giver"),

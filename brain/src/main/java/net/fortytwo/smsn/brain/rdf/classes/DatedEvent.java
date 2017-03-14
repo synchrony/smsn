@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
@@ -44,7 +44,7 @@ public class DatedEvent extends AtomClass {
 
         IRI self = handleTypeAndAlias(a, context, net.fortytwo.smsn.rdf.vocab.Event.Event);
 
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getValue())));
+        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getTitle())));
 
         return self;
     }
@@ -64,7 +64,7 @@ public class DatedEvent extends AtomClass {
             ValueFactory vf = context.getValueFactory();
             RDFHandler h = context.getHandler();
 
-            String dateStr = object.getValue();
+            String dateStr = object.getTitle();
 
             Literal dateValue = vf.createLiteral(dateStr, XMLSchema.DATE);
 

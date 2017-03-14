@@ -1,11 +1,13 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.server.actions.NoAction;
+import org.apache.commons.io.IOUtils;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
-import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -15,6 +17,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -23,9 +26,11 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
 
     protected static final Logger logger = Logger.getLogger(SmSnScriptEngine.class.getName());
 
+    private static final String WARMUP_SCRIPT = "1+1";
+
     private final GremlinScriptEngineFactory factory;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = createObjectMapper();
 
     public SmSnScriptEngine(GremlinScriptEngineFactory factory) {
         this.factory = factory;
@@ -34,27 +39,56 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     @Override
     public Object eval(String script, ScriptContext context) throws ScriptException {
 
-        Neo4jGraph graph = getNeo4jGraph(context);
+        Graph graph = getGraph(context);
 
         try {
             return handleRequest(script, graph);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new ScriptException(e);
         }
     }
 
-    // note: this is a hack.  This is currently how config properties are loaded.
     @Override
     public Object eval(Reader reader, ScriptContext context) throws ScriptException {
-        Properties properties = new Properties();
+        Graph graph = getGraph(context);
+
         try {
-            properties.load(reader);
+            String expression = readerToString(reader);
+            return handleRequest(expression, graph);
         } catch (IOException e) {
             throw new ScriptException(e);
         }
+    }
+
+    private Action readAsJson(final String expression) throws IOException {
+        return objectMapper.readValue(expression, Action.class);
+    }
+
+    private Action readAsProperties(final String expression) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new StringReader(expression));
 
         SemanticSynchrony.addConfiguration(properties);
-        return "added " + properties.size() + " configurations properties";
+
+        logger.info("added " + properties.size() + " configurations properties");
+        return new NoAction();
+    }
+
+    private Action readAsWarmupScript(final String expression) {
+        // this is ServerGremlinExecutor's warmup script hack; ignore
+        return new NoAction();
+    }
+
+    private boolean isWarmupScript(final String expression) {
+        return WARMUP_SCRIPT.equals(expression);
+    }
+
+    private boolean isJson(final String expression) {
+        return expression.startsWith("{");
+    }
+
+    private String readerToString(final Reader reader) throws IOException {
+        return IOUtils.toString(reader);
     }
 
     @Override
@@ -77,31 +111,59 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         return factory;
     }
 
-    private Neo4jGraph getNeo4jGraph(final ScriptContext context) {
-        Neo4jGraph graph = (Neo4jGraph) context.getAttribute("graph");
+    private Graph getGraph(final ScriptContext context) {
+        Graph graph = (Graph) context.getAttribute("graph");
         if (null == graph) {
-            throw new IllegalStateException("expected Neo4j graph not found");
+            throw new IllegalStateException("expected graph not found");
         }
 
         return graph;
     }
 
-    private JSONObject handleRequest(String actionStr, Neo4jGraph graph) throws IOException {
+    private JSONObject handleRequest(String actionStr, final Graph graph) throws IOException {
         Action action = deserializeRequest(actionStr);
-        RequestParams params = Action.createParams(graph);
 
-        action.parseRequest(params);
-
-        action.handleRequest(params);
+        ActionContext params = new ActionPerformer(graph).perform(action);
 
         return toJson(params.getMap());
     }
 
     private Action deserializeRequest(final String requestStr) throws IOException {
-        return objectMapper.readValue(requestStr, Action.class);
+        String expression = requestStr.trim();
+
+        if (isWarmupScript(expression)) {
+            return readAsWarmupScript(expression);
+        } else if (isJson(expression)) {
+            return readAsJson(expression);
+        } else {
+            // note: this is a hack.  This is currently how config properties are loaded.
+            return readAsProperties(expression);
+        }
     }
 
     private JSONObject toJson(final Map<String, Object> map) {
         return new JSONObject(map);
+    }
+
+    private static ObjectMapper createObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        // add any configuration here
+        return objectMapper;
+    }
+
+    public static class ActionPerformer {
+        private final Graph graph;
+
+        public ActionPerformer(final Graph graph) {
+            this.graph = graph;
+        }
+
+        public ActionContext perform(final Action action) throws IOException {
+            ActionContext context = Action.createcontext(graph);
+
+            action.handleRequest(context);
+
+            return context;
+        }
     }
 }

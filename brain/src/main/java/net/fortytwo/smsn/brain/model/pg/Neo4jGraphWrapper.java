@@ -93,15 +93,25 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         GraphDatabaseService graphDb = getGraphDatabaseService();
         IndexManager indexManager = graphDb.index();
         try (Transaction tx = graphDb.beginTx()) {
-            if (!indexManager.existsForNodes(indexName)) {
-                Index<Node> index = indexManager.forNodes(indexName,
-                        MapUtil.stringMap(keysAndValues));
+            boolean success = false;
+            try {
+                Index<Node> index;
+                if (!indexManager.existsForNodes(indexName)) {
+                    index = indexManager.forNodes(indexName,
+                            MapUtil.stringMap(keysAndValues));
 
-                tx.success();
-                logger.info("created Neo4j index '" + indexName + "'");
+                    logger.fine("created Neo4j index '" + indexName + "'");
+                } else {
+                    index = indexManager.forNodes(indexName);
+                }
+                success = true;
                 return index;
-            } else {
-                return indexManager.forNodes(indexName);
+            } finally {
+                if (success) {
+                    tx.success();
+                } else {
+                    tx.failure();
+                }
             }
         }
     }
@@ -127,9 +137,9 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         GraphDatabaseService graphDb = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(dataDir)
                 .setConfig(GraphDatabaseSettings.node_keys_indexable,
-                        SemanticSynchrony.VALUE +
-                                "," + SemanticSynchrony.ACRONYM +
-                                "," + SemanticSynchrony.SHORTCUT)
+                        SemanticSynchrony.PropertyKeys.TITLE +
+                                "," + SemanticSynchrony.PropertyKeys.ACRONYM +
+                                "," + SemanticSynchrony.PropertyKeys.SHORTCUT)
                 .setConfig(GraphDatabaseSettings.node_auto_indexing, "true").
                         newGraphDatabase();
 

@@ -1,9 +1,10 @@
 package net.fortytwo.smsn.brain.io.latex;
 
-import net.fortytwo.smsn.brain.NoteQueries;
+import com.google.common.base.Preconditions;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
@@ -32,9 +33,10 @@ public class LatexWriter extends BrainWriter {
     @Override
     public void doExport(Context context) throws IOException {
         String rootId = context.getRootId();
+        Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
-        Atom rootAtom = context.getAtomGraph().getAtomById(rootId);
+        Atom rootAtom = context.getTopicGraph().getAtomById(rootId);
         if (null == rootAtom) {
             throw new IllegalStateException("no such atom: " + rootId);
         }
@@ -58,7 +60,7 @@ public class LatexWriter extends BrainWriter {
         }
 
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = root.getValue().trim();
+        String value = root.getTitle().trim();
 
         for (Serializer serializer : serializers) {
             if (serializer.matches(value)) {
@@ -69,7 +71,7 @@ public class LatexWriter extends BrainWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Atom child : NoteQueries.forwardViewStyle.getLinked(root, filter)) {
+                    for (Atom child : TreeViews.forwardViewStyle.getLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }

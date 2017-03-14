@@ -2,9 +2,9 @@ package net.fortytwo.smsn.brain.rdf;
 
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Atom;
-import net.fortytwo.smsn.brain.model.AtomList;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
@@ -52,7 +52,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +64,7 @@ import java.util.logging.Logger;
 public class KnowledgeBase {
     private static final Logger logger = SemanticSynchrony.getLogger(KnowledgeBase.class);
 
-    private final AtomGraph atomGraph;
+    private final TopicGraph topicGraph;
 
     private final Map<Class<? extends AtomClass>, AtomClass> classes;
 
@@ -73,8 +72,8 @@ public class KnowledgeBase {
 
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-    public KnowledgeBase(final AtomGraph atomGraph) {
-        this.atomGraph = atomGraph;
+    public KnowledgeBase(final TopicGraph topicGraph) {
+        this.topicGraph = topicGraph;
         this.atomClassifications = new HashMap<>();
         this.classes = new HashMap<>();
     }
@@ -108,7 +107,7 @@ public class KnowledgeBase {
             return entries;
         } else {
             // sort in descending order by total score, putting the top-ranked class first
-            List<KnowledgeBase.AtomClassEntry> helper = new LinkedList<>();
+            List<KnowledgeBase.AtomClassEntry> helper = new java.util.LinkedList<>();
             helper.addAll(entries);
             Collections.sort(helper, KnowledgeBase.AtomClassificationComparator.INSTANCE);
             return helper;
@@ -191,7 +190,7 @@ public class KnowledgeBase {
             }
             logger.info("completed warm-up inference");
 
-            long lastUpdate = atomGraph.getLastUpdate();
+            long lastUpdate = topicGraph.getLastUpdate();
 
             while (true) {
                 try {
@@ -201,7 +200,7 @@ public class KnowledgeBase {
                 }
 
                 // only repeat the inference step if there have been updates in the meantime
-                long u = atomGraph.getLastUpdate();
+                long u = topicGraph.getLastUpdate();
                 if (u > lastUpdate) {
                     try {
                         logger.info("performing class inference");
@@ -356,7 +355,7 @@ public class KnowledgeBase {
     public synchronized void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();
 
-        RDFizationContext context = new RDFizationContext(atomGraph, handler, valueFactory);
+        RDFizationContext context = new RDFizationContext(topicGraph, handler, valueFactory);
 
         // class entries are sorted in descending order based on out-score rather than total score so as to avoid
         // feedback -- see match().  The final score for a class and atom is the sum of out-score and in-score.
@@ -364,14 +363,14 @@ public class KnowledgeBase {
         Comparator totalScoreDescending = new AtomClassificationComparator();
 
         // classify or re-classify each atom
-        for (Atom subject : atomGraph.getAllAtoms()) {
+        for (Atom subject : topicGraph.getAllAtoms()) {
             context.setSubject(subject);
 
-            String value = subject.getValue();
+            String value = subject.getTitle();
             String alias = subject.getAlias();
 
             List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
-            List<AtomClassEntry> newEntries = new LinkedList<>();
+            List<AtomClassEntry> newEntries = new java.util.LinkedList<>();
 
             for (AtomClass clazz : classes.values()) {
                 /* DO NOT REMOVE
@@ -379,10 +378,10 @@ public class KnowledgeBase {
                     System.out.println("break point here");
                 }//*/
 
-                List<AtomClassEntry> evidenceEntries = new LinkedList<>();
+                List<AtomClassEntry> evidenceEntries = new java.util.LinkedList<>();
 
                 Collection<RdfizationCallback> callbacks = null == handler
-                        ? null : new LinkedList<>();
+                        ? null : new java.util.LinkedList();
 
                 AtomCollectionMemory memory = clazz.isCollectionClass()
                         ? new AtomCollectionMemory(subject.getId())
@@ -406,7 +405,7 @@ public class KnowledgeBase {
                 int outScore = 0;
 
                 if (null != clazz.memberRegex) {
-                    AtomList cur = subject.getNotes();
+                    EntityList<Atom> cur = subject.getNotes();
                     Atom first = null;
                     int eli = 0;
                     AtomRegex.El el = null;
@@ -554,7 +553,7 @@ public class KnowledgeBase {
             // perform rdfization, choosing at most one classification
             if (null != handler && (null == filter || filter.isVisible(subject))) {
                 if (newEntries.size() > 0) {
-                    List<AtomClassEntry> helper = new LinkedList<>();
+                    List<AtomClassEntry> helper = new java.util.LinkedList<>();
                     helper.addAll(newEntries);
                     Collections.sort(helper, totalScoreDescending);
                     AtomClassEntry best = helper.get(0);
@@ -589,7 +588,7 @@ public class KnowledgeBase {
 
     private long countAtoms() {
         long count = 0;
-        for (Atom a : atomGraph.getAllAtoms()) {
+        for (Atom a : topicGraph.getAllAtoms()) {
             count++;
         }
         return count;
@@ -608,7 +607,7 @@ public class KnowledgeBase {
     private void viewInferredInternal(final Atom a,
                                       int indent) {
         for (int i = 0; i < indent; i++) System.out.print("\t");
-        String value = a.getValue();
+        String value = a.getTitle();
         String value50 = null == value
                 ? "[null]"
                 : value.length() > 50
@@ -617,7 +616,7 @@ public class KnowledgeBase {
         System.out.println("* :" + a.getId() + ": " + value50);
         List<AtomClassEntry> entries = atomClassifications.get(a);
         if (null != entries) {
-            List<AtomClassEntry> helper = new LinkedList<>();
+            List<AtomClassEntry> helper = new java.util.LinkedList();
             helper.addAll(entries);
             Collections.sort(helper, AtomClassificationComparator.INSTANCE);
             for (AtomClassEntry e : helper) {
@@ -628,9 +627,9 @@ public class KnowledgeBase {
         }
         indent++;
         if (indent < 2) {
-            AtomList notes = a.getNotes();
+            EntityList<Atom> notes = a.getNotes();
             if (null != notes) {
-                AtomList cur = notes;
+                EntityList<Atom> cur = notes;
                 while (null != cur) {
                     viewInferredInternal(cur.getFirst(), indent);
                     cur = cur.getRest();

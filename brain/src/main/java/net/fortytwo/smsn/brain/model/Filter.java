@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.model.entities.Atom;
+
 import java.io.Serializable;
 
 public class Filter implements Serializable {
@@ -7,6 +9,10 @@ public class Filter implements Serializable {
     private float minSharability, maxSharability;
     private float minWeight, maxWeight;
     private float defaultSharability, defaultWeight;
+
+    public static Filter noFilter() {
+        return new Filter();
+    }
 
     public Filter() {
         this(0f, 1f, 0.5f, 0f, 1f, 0.5f);

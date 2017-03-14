@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
+import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,14 +47,14 @@ public class EventStackTest {
         //assertEquals(5, countVertices(g));
 
         Note e = events.get(0);
-        assertEquals("person 1 did something", e.getValue());
+        assertEquals("person 1 did something", e.getTitle());
         List<Note> kids = e.getChildren();
         assertEquals(2, kids.size());
         Note person = kids.get(0);
         Note time = kids.get(1);
-        assertEquals("person 1", person.getValue());
+        assertEquals("person 1", person.getTitle());
         assertEquals(agent1, person.getAlias());
-        assertEquals(2, time.getValue().indexOf(":"));
+        assertEquals(2, time.getTitle().indexOf(":"));
 
         eventStack.push(eventStack.createGestureEvent(agent2, new Date()));
         assertEquals(2, events.size());
@@ -65,7 +65,7 @@ public class EventStackTest {
         e = events.get(0);
         kids = e.getChildren();
         person = kids.get(0);
-        assertEquals("person 2", person.getValue());
+        assertEquals("person 2", person.getTitle());
         assertEquals(agent2, person.getAlias());
 
         // push another event from agent #1 and verify that he is given the same routine name
@@ -76,7 +76,7 @@ public class EventStackTest {
         e = events.get(0);
         kids = e.getChildren();
         person = kids.get(0);
-        assertEquals("person 1", person.getValue());
+        assertEquals("person 1", person.getTitle());
         assertEquals(agent1, person.getAlias());
 
         // fill to capacity
@@ -115,7 +115,9 @@ public class EventStackTest {
             eventStack.push(eventStack.createGestureEvent(0 == i % 2 ? agent1 : agent2, new Date()));
         }
 
-        NoteWriter w = new NoteWriter();
-        w.toWikiText(eventStack.getEvents(), System.out, false);
+        WikiPrinter w = new WikiPrinter();
+        for (Note event : eventStack.getEvents()) {
+            w.print(event, System.out, false);
+        }
     }
 }

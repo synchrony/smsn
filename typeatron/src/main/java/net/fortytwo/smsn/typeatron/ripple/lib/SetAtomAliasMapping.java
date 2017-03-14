@@ -50,7 +50,7 @@ public class SetAtomAliasMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't set @alias of non-atom: " + no);
         } else {
-            setProperty(n, SemanticSynchrony.ALIAS, value);
+            setProperty(n, SemanticSynchrony.PropertyKeys.ALIAS, value);
 
             // put the atom back on the stack
             solutions.accept(stack.push(n));

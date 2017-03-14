@@ -147,7 +147,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
             throw new RippleException(e);
         }
 
-        Filter defaultFilter = new Filter();
+        Filter defaultFilter = Filter.noFilter();
         // brain stream atoms begin with low weight, and with private rather than personal sharability
         Filter brainstreamFilter = new Filter(0f, 1f, 0.25f, 0f, 1f, 0.25f);
 

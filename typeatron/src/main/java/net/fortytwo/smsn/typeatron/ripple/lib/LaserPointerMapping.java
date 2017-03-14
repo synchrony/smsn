@@ -54,7 +54,7 @@ public class LaserPointerMapping extends AtomMapping {
             IRI iri = iriOf(n);
 
             // value is informational; it is used only for development/debugging purposes
-            String value = n.getValue();
+            String value = n.getTitle();
 
             logger.log(Level.INFO, "pointing to " + iri + " (" + value + ")");
 

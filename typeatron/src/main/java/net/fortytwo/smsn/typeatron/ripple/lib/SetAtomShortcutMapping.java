@@ -50,7 +50,7 @@ public class SetAtomShortcutMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't set @shortcut of non-atom: " + no);
         } else {
-            setProperty(n, SemanticSynchrony.SHORTCUT, value);
+            setProperty(n, SemanticSynchrony.PropertyKeys.SHORTCUT, value);
 
             // put the atom back on the stack
             solutions.accept(stack.push(n));

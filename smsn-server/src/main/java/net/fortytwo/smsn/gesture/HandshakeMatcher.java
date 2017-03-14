@@ -22,7 +22,7 @@ public class HandshakeMatcher {
 
     private final Map<IRI, HandshakeSequence> handshakesByActor;
     private final Stack<HandshakeSequence> latestHandshakeSequences;
-    private Collection<HandshakeSequence> cleanupBuffer = new LinkedList<>();
+    private final Collection<HandshakeSequence> cleanupBuffer = new LinkedList<>();
 
     private HandshakeHandler handler;
 

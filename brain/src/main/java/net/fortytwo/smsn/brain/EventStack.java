@@ -43,15 +43,15 @@ public class EventStack {
 
         //Atom gesture = createAtom();
         Note gesture = new Note();
-        gesture.setValue(personName + " did something");
+        gesture.setTitle(personName + " did something");
 
         // note: there will be duplicate people atoms in the in-memory graph
         Note person = new Note();
-        person.setValue(personName);
+        person.setTitle(personName);
         person.setAlias(expressedBy);
 
         Note time = new Note();
-        time.setValue(EVENT_TIME_FORMAT.format(recognizedAt));
+        time.setTitle(EVENT_TIME_FORMAT.format(recognizedAt));
 
         gesture.addChild(person);
         gesture.addChild(time);

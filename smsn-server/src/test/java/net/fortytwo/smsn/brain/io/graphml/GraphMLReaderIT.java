@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.AtomGraph;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,13 +21,13 @@ public class GraphMLReaderIT extends BrainTestBase {
     private final File outputFile = new File("/tmp/smsn-out.xml");
 
     @Override
-    protected AtomGraph createAtomGraph() throws IOException {
+    protected TopicGraph createAtomGraph() throws IOException {
         return createNeo4jAtomGraph();
     }
 
     @Test
     public void testTmp() throws Exception {
-        Brain brain = new Brain(atomGraph);
+        Brain brain = new Brain(topicGraph);
 
         Format format = Format.getFormat("graphml");
         assertNotNull(format);
@@ -36,12 +36,12 @@ public class GraphMLReaderIT extends BrainTestBase {
 
         reader.doImport(inputFile, GraphMLFormat.getInstance(), brain, true);
 
-        System.out.println("# atoms: " + countAtoms(atomGraph));
+        System.out.println("# atoms: " + countAtoms());
 
         BrainWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(outputFile)) {
             BrainWriter.Context context = new BrainWriter.Context();
-            context.setAtomGraph(brain.getAtomGraph());
+            context.setTopicGraph(brain.getTopicGraph());
             context.setKnowledgeBase(brain.getKnowledgeBase());
             context.setDestStream(out);
             context.setFormat(GraphMLFormat.getInstance());

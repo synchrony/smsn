@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
@@ -37,7 +37,7 @@ public class QuotedValue extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, SmSnVocabulary.WORDORPHRASE);
 
         // note: a few atoms currently break this pattern, e.g. an atom with the value: "one", "two"
-        String d = a.getValue().substring(1, a.getValue().length() - 1).trim();
+        String d = a.getTitle().substring(1, a.getTitle().length() - 1).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(d)));
 
         return self;

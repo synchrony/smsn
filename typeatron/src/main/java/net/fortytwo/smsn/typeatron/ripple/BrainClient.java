@@ -1,12 +1,14 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.ViewStyle;
+import net.fortytwo.smsn.brain.io.json.JsonFormat;
+import net.fortytwo.smsn.brain.io.json.JsonParser;
+import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.NoteQueries;
+import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.wiki.NoteReader;
-import net.fortytwo.smsn.brain.wiki.NoteWriter;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ConnectionReuseStrategy;
@@ -49,8 +51,8 @@ public class BrainClient {
 
     private static final int DEFAULT_VALUE_CUTOFF = 100;
 
-    private final NoteWriter noteWriter = new NoteWriter();
-    private final NoteReader noteReader = new NoteReader();
+    private final JsonParser jsonParser = new JsonParser();
+    private final JsonPrinter jsonPrinter = new JsonPrinter();
 
     private final HttpProcessor httpProcessor;
     private final HttpRequestExecutor httpExecutor;
@@ -109,7 +111,7 @@ public class BrainClient {
     public Note view(final Note root,
                      final int height,
                      final Filter filter,
-                     final NoteQueries.ViewStyle style,
+                     final ViewStyle style,
                      final boolean includeTypes) throws BrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
@@ -143,7 +145,8 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    results[0] = noteReader.fromJSON(view);
+                    // note: redundant serialization/deserialization
+                    results[0] = jsonParser.parse(view.toString());
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
@@ -175,7 +178,7 @@ public class BrainClient {
     public void update(final Note root,
                        final int height,
                        final Filter filter,
-                       final NoteQueries.ViewStyle style) throws BrainClientException {
+                       final ViewStyle style) throws BrainClientException {
 
         if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -189,7 +192,7 @@ public class BrainClient {
             requestJson.put(Params.VIEW, toJson(root));
             requestJson.put(Params.VIEW_FORMAT, Params.Format.json);
             requestJson.put(Params.FILTER, toJson(filter));
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             throw new BrainClientException(e);
         }
 
@@ -239,7 +242,7 @@ public class BrainClient {
         try {
             requestJson.put(Params.ID, root.getId());
             requestJson.put(Params.NAME, name);
-            requestJson.put(Params.VALUE, value);
+            requestJson.put(Params.TITLE, value);
         } catch (JSONException e) {
             throw new BrainClientException(e);
         }
@@ -276,11 +279,11 @@ public class BrainClient {
      * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */
-    public List<Note> search(final NoteQueries.QueryType queryType,
+    public List<Note> search(final TreeViews.QueryType queryType,
                              final String query,
                              final int height,
                              final Filter filter,
-                             final NoteQueries.ViewStyle style) throws BrainClientException {
+                             final ViewStyle style) throws BrainClientException {
         if (null == queryType || null == query || 0 == query.length()
                 || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
@@ -293,7 +296,7 @@ public class BrainClient {
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.FILTER, toJson(filter));
             requestJson.put(Params.STYLE, style.getName());
-            requestJson.put(Params.VALUE_CUTOFF, DEFAULT_VALUE_CUTOFF);
+            requestJson.put(Params.TITLE_CUTOFF, DEFAULT_VALUE_CUTOFF);
         } catch (JSONException e) {
             throw new BrainClientException(e);
         }
@@ -312,11 +315,11 @@ public class BrainClient {
                     JSONObject json = new JSONObject(
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
-                    JSONArray children = view.optJSONArray(NoteWriter.CHILDREN);
+                    JSONArray children = view.optJSONArray(JsonFormat.Keys.CHILDREN);
                     if (null != children) {
                         int length = children.length();
                         for (int i = 0; i < length; i++) {
-                            results.add(noteReader.fromJSON(children.getJSONObject(i)));
+                            results.add(jsonParser.parse(children.getJSONObject(i).toString()));
                         }
                     }
                 } catch (JSONException e) {
@@ -413,8 +416,8 @@ public class BrainClient {
         return json;
     }
 
-    private JSONObject toJson(final Note note) throws JSONException {
-        return noteWriter.toJSON(note);
+    private JSONObject toJson(final Note note) throws IOException {
+        return jsonPrinter.toJson(note);
     }
 
     public class BrainClientException extends Exception {

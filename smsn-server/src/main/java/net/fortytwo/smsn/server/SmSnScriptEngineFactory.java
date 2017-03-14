@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.util.TypedProperties;
+import org.apache.tinkerpop.gremlin.driver.ser.SerTokens;
 import org.apache.tinkerpop.gremlin.jsr223.Customizer;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
@@ -18,7 +19,6 @@ public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
 
     private static final String ENGINE_NAME = "smsn";
     private static final String LANGUAGE_NAME = "smsn";
-    private static final String JSON = "application/json";
     private static final List<String> EXTENSIONS = Collections.singletonList("json");
 
     @Override
@@ -38,7 +38,7 @@ public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
 
     @Override
     public List<String> getMimeTypes() {
-        return Collections.singletonList(JSON);
+        return Collections.singletonList(SerTokens.MIME_JSON);
     }
 
     @Override
@@ -97,9 +97,7 @@ public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
     @Override
     public void setCustomizerManager(GremlinScriptEngineManager manager) {
         // TODO
-
         final List<Customizer> customizers =  manager.getCustomizers(ENGINE_NAME);
-
     }
 
     private String getVersion() {

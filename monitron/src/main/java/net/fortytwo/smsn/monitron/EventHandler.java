@@ -5,7 +5,7 @@ import net.fortytwo.smsn.monitron.events.MonitronEvent;
 public interface EventHandler {
     void handleEvent(final MonitronEvent e) throws EventHandlingException;
 
-    static class EventHandlingException extends Exception {
+    class EventHandlingException extends Exception {
         public EventHandlingException(final Throwable cause) {
             super(cause);
         }

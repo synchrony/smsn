@@ -26,7 +26,7 @@ public class HandoffMatcher {
     private long lastWarning = 0;
 
     private final Stack<Handoff> latestHandoffs;
-    private Collection<Handoff> cleanupBuffer = new LinkedList<>();
+    private final Collection<Handoff> cleanupBuffer = new LinkedList<>();
     private final Map<IRI, ThingGiven> thingsGivenByActor;
 
     // a handoff must occur this many milliseconds after the "give" setup event

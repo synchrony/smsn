@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import net.fortytwo.smsn.brain.model.Atom;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 
 import java.util.Collection;
 import java.util.LinkedList;
