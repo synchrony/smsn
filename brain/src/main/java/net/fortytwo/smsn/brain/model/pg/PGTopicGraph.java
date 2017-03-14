@@ -312,7 +312,7 @@ public class PGTopicGraph implements TopicGraph {
         updateIndex(atom, SemanticSynchrony.PropertyKeys.ACRONYM);
         updateIndex(atom, SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
-    
+
     void updateIndex(final Atom atom, final String key) {
         wrapper.updateIndex(((PGAtom) atom).asVertex(), key);
     }
