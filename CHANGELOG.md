@@ -1,9 +1,9 @@
 Semantic Synchrony CHANGELOG
 ====================
 
-SmSn 1.3 SNAPSHOT
+SmSn 1.3 (Join the Army)
 ----------------------------------------
-SmSn 1.3.0 (NOT YET RELEASED)
+SmSn 1.3.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Support client connections via WebSocket
 * Use a Base-62 character set [0-9A-Za-z] for IDs
