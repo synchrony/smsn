@@ -7,6 +7,8 @@ import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,13 +37,13 @@ public class TreeViewsTest extends BrainTestBase {
         super.setUp();
 
         Brain brain = new Brain(topicGraph);
-        queries = new TreeViews(brain);
         filter = Filter.noFilter();
+        queries = new TreeViews(brain);
     }
 
     @Test
     public void testEncoding() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
 
         Atom root = createAtom("11111");
         assertEquals("11111", root.getId());
@@ -87,12 +89,12 @@ public class TreeViewsTest extends BrainTestBase {
         child.setTitle("Random");
         note.addChild(child);
 
-        queries.update(note, 5, new Filter(), TreeViews.forwardViewStyle);
+        queries.update(note, 5, new Filter(), ViewStyle.FORWARD);
     }
 
     @Test
     public void testUpdateRecursion() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
         Atom root = createAtom("wXu5g4v");
         root.setTitle("root");
         Note rootNote;
@@ -205,7 +207,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testPathologicalUpdateWithCycles() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
         Atom root = createAtom("0000000");
         root.setTitle("root");
         Note rootNote, child, grandChild;
@@ -357,7 +359,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdateSharabilityOrWeight() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
         Atom root = createAtom("wXu5g4v");
         root.setTitle("root");
         Note rootNote;
@@ -385,7 +387,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdateAlias() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
         Atom root = createAtom("wXu5g4v");
         root.setTitle("root");
         Note rootNote;
@@ -411,7 +413,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdatePriority() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
         Atom root = createAtom("0000000");
         root.setTitle("root");
         Note rootNote;
@@ -441,7 +443,7 @@ public class TreeViewsTest extends BrainTestBase {
     @Test
     public void childAndParentCountsAreCorrect() throws Exception {
         Filter filter = Filter.noFilter();
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
         Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
         root.setTitle("root");
@@ -465,7 +467,7 @@ public class TreeViewsTest extends BrainTestBase {
     public void nonSharableItemsAreHidden() throws Exception {
         Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000");
@@ -516,7 +518,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
 
         String before = "* :000001: one\n" +
                 "* :000002: two\n" +
@@ -558,7 +560,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testAddOnlyUpdate() throws Exception {
-        ViewStyle style = TreeViews.forwardAddOnlyViewStyle;
+        ViewStyle style = ViewStyle.FORWARD_ADD_ONLY;
 
         String before = "* :000001: one\n" +
                 "* :000002: two\n" +
@@ -599,41 +601,41 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testFindRootsAndIsolatedAtoms() throws Exception {
-        assertEquals(0, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(0, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(0, queries.findRootAtoms(filter, ViewStyle.FORWARD, 1).getChildren().size());
+        assertEquals(0, queries.findRootAtoms(filter, ViewStyle.BACKWARD, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom0 = topicGraph.createAtomWithProperties(filter, "000000");
         atom0.setTitle("0");
 
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.FORWARD, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.BACKWARD, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom1 = topicGraph.createAtomWithProperties(filter, "000001");
         atom1.setTitle("1");
 
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.FORWARD, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.BACKWARD, 1).getChildren().size());
         assertEquals(2, queries.findIsolatedAtoms(filter).getChildren().size());
 
         atom0.addChildAt(atom1, 0);
 
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.FORWARD, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.BACKWARD, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
         Atom atom2 = topicGraph.createAtomWithProperties(filter, "000002");
         atom2.setTitle("2");
 
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.FORWARD, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.BACKWARD, 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
         atom0.addChildAt(atom2, 0);
 
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.FORWARD, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.BACKWARD, 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
     }
 

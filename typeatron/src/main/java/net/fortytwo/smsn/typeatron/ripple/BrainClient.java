@@ -1,13 +1,13 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.ViewStyle;
+import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.IOUtils;

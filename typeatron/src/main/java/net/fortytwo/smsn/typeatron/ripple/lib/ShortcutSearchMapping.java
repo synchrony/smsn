@@ -2,7 +2,8 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.TreeViews;
+import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -50,7 +51,7 @@ public class ShortcutSearchMapping extends AtomMapping {
 
     private List<Note> shortcutSearch(final String shortcut) throws RippleException {
         try {
-            return client.search(TreeViews.QueryType.Shortcut, shortcut, 1, filter, TreeViews.forwardViewStyle);
+            return client.search(TreeViews.QueryType.Shortcut, shortcut, 1, filter, ViewStyle.FORWARD);
         } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }

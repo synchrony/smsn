@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.TreeViews;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -109,7 +110,7 @@ public class FreeplaneReader extends BrainReader {
 
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
-        queries.update(rootNote, maxHeight, filter, TreeViews.forwardViewStyle);
+        queries.update(rootNote, maxHeight, filter, ViewStyle.FORWARD);
 
         checkAndCommit(destGraph);
     }

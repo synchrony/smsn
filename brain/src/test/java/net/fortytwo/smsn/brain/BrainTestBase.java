@@ -10,6 +10,8 @@ import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
+import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.After;
@@ -70,7 +72,7 @@ public abstract class BrainTestBase {
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.FORWARD;
 
         Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());

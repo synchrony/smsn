@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;

@@ -10,8 +10,10 @@ public class Filter implements Serializable {
     private float minWeight, maxWeight;
     private float defaultSharability, defaultWeight;
 
+    private static final Filter NO_FILTER = new Filter();
+
     public static Filter noFilter() {
-        return new Filter();
+        return NO_FILTER;
     }
 
     public Filter() {

@@ -4,13 +4,9 @@ public interface Params {
     enum Format{json, wiki}
 
     String
-            ACTION = "action",
-            DATASET = "dataset",
             DEFAULT_SHARABILITY = "defaultSharability",
             DEFAULT_WEIGHT = "defaultWeight",
-            FILE = "file",
             FILTER = "filter",
-            FORMAT = "format",
             HEIGHT = "height",
             ID = "id",
             INCLUDE_TYPES = "includeTypes",

@@ -1,13 +1,12 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.TreeViews;
-import net.fortytwo.smsn.brain.ViewStyle;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 
 public abstract class BasicViewAction extends FilteredAction {
     protected int height;
 
-    protected ViewStyle style = TreeViews.forwardViewStyle;
+    protected ViewStyle style = ViewStyle.FORWARD;
 
     public BasicViewAction() {
         super();
@@ -26,6 +25,6 @@ public abstract class BasicViewAction extends FilteredAction {
     }
 
     public void setStyle(final String styleName) {
-        this.style = TreeViews.lookupStyle(styleName);
+        this.style = ViewStyle.lookupStyle(styleName);
     }
 }

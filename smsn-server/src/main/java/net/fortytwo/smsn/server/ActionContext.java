@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.TreeViews;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;

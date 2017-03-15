@@ -3,11 +3,11 @@ package net.fortytwo.smsn.brain.rdf;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexReference;
@@ -329,7 +329,6 @@ public class KnowledgeBaseTest extends BrainTestBase {
         TopicGraph topicGraph = createTinkerAtomGraph();
         Brain brain = new Brain(topicGraph);
         KnowledgeBase kb = new KnowledgeBase(topicGraph);
-        TreeViews queries = new TreeViews(brain);
         Filter filter = Filter.noFilter();
         Atom root = topicGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         root.setTitle("root");
@@ -355,7 +354,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
                     }
                 }
                 rootNote.setId(rootId);
-                queries.update(rootNote, height, filter, TreeViews.forwardViewStyle);
+                queries.update(rootNote, height, filter, ViewStyle.FORWARD);
             }
         }
 

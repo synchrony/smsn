@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.brain.io.latex;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -71,7 +71,7 @@ public class LatexWriter extends BrainWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Atom child : TreeViews.forwardViewStyle.getLinked(root, filter)) {
+                    for (Atom child : ViewStyle.FORWARD.getLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }
