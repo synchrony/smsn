@@ -72,7 +72,7 @@ public abstract class BrainTestBase {
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        ViewStyle style = ViewStyle.FORWARD;
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());

@@ -50,7 +50,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                     return null;
                 } else if (sync) {
                     try {
-                        n = client.view(n, height, filter, ViewStyle.FORWARD, false);
+                        n = client.view(n, height, filter, ViewStyle.Basic.Forward.getStyle(), false);
                     } catch (BrainClient.BrainClientException e) {
                         throw new RippleException(e);
                     }

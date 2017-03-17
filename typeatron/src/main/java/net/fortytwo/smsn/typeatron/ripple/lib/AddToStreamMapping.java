@@ -74,7 +74,7 @@ public class AddToStreamMapping extends AtomMapping {
         streamNote.addChild(note);
 
         try {
-            client.update(streamNote, 1, filter, ViewStyle.FORWARD_ADD_ONLY);
+            client.update(streamNote, 1, filter, ViewStyle.Basic.ForwardReadOnly.getStyle());
         } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }

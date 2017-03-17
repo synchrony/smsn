@@ -354,7 +354,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
                     }
                 }
                 rootNote.setId(rootId);
-                queries.update(rootNote, height, filter, ViewStyle.FORWARD);
+                queries.update(rootNote, height, filter, ViewStyle.Basic.Forward.getStyle());
             }
         }
 

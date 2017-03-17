@@ -79,7 +79,7 @@ public class TreeViews {
         Note n = new Note();
 
         for (Atom a : atoms) {
-            n.addChild(viewInternal(a, 0, filter, ViewStyle.FORWARD, true, null));
+            n.addChild(viewInternal(a, 0, filter, ViewStyle.Basic.Forward.getStyle(), true, null));
         }
 
         return n;
@@ -178,7 +178,7 @@ public class TreeViews {
     }
 
     public Note findIsolatedAtoms(final Filter filter) {
-        return findAtoms(filter, true, true, 1, ViewStyle.FORWARD);
+        return findAtoms(filter, true, true, 1, ViewStyle.Basic.Forward.getStyle());
     }
 
     /**

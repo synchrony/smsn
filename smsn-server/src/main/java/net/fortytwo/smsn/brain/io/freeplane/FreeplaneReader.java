@@ -110,7 +110,7 @@ public class FreeplaneReader extends BrainReader {
 
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
-        queries.update(rootNote, maxHeight, filter, ViewStyle.FORWARD);
+        queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
         checkAndCommit(destGraph);
     }

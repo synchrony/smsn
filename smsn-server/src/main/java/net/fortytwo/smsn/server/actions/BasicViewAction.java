@@ -6,7 +6,7 @@ import net.fortytwo.smsn.server.errors.BadRequestException;
 public abstract class BasicViewAction extends FilteredAction {
     protected int height;
 
-    protected ViewStyle style = ViewStyle.FORWARD;
+    protected ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
     public BasicViewAction() {
         super();
@@ -25,6 +25,6 @@ public abstract class BasicViewAction extends FilteredAction {
     }
 
     public void setStyle(final String styleName) {
-        this.style = ViewStyle.lookupStyle(styleName);
+        this.style = ViewStyle.Basic.lookup(styleName);
     }
 }

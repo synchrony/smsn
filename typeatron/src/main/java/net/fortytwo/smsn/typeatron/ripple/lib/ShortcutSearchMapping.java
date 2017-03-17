@@ -51,7 +51,8 @@ public class ShortcutSearchMapping extends AtomMapping {
 
     private List<Note> shortcutSearch(final String shortcut) throws RippleException {
         try {
-            return client.search(TreeViews.QueryType.Shortcut, shortcut, 1, filter, ViewStyle.FORWARD);
+            return client.search(
+                    TreeViews.QueryType.Shortcut, shortcut, 1, filter, ViewStyle.Basic.Forward.getStyle());
         } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }

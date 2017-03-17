@@ -71,7 +71,7 @@ public class LatexWriter extends BrainWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Atom child : ViewStyle.FORWARD.getLinked(root, filter)) {
+                    for (Atom child : ViewStyle.Basic.Forward.getStyle().getLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }
