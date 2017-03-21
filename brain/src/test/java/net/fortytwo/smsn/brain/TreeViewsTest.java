@@ -560,7 +560,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testAddOnlyUpdate() throws Exception {
-        ViewStyle style = ViewStyle.Basic.ForwardReadOnly.getStyle();
+        ViewStyle style = ViewStyle.Basic.ForwardAddOnly.getStyle();
 
         String before = "* :000001: one\n" +
                 "* :000002: two\n" +

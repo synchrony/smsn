@@ -12,15 +12,13 @@ public interface ViewStyle {
     enum Direction {Forward, Backward}
 
     enum Basic {
-        Forward("forward", createForwardStyle()),
-        ForwardReadOnly("forward-add-only", createForwardAddOnlyStyle()),
-        Backward("backward", createBackwardStyle());
+        Forward(createForwardStyle()),
+        ForwardAddOnly(createForwardAddOnlyStyle()),
+        Backward(createBackwardStyle());
 
-        private final String name;
         private final ViewStyle style;
 
-        Basic(final String name, final ViewStyle style) {
-            this.name = name;
+        Basic(final ViewStyle style) {
             this.style = style;
         }
 
