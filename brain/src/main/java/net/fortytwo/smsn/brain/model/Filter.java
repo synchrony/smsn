@@ -68,9 +68,8 @@ public class Filter implements Serializable {
         float sharability = atom.getSharability();
         float weight = atom.getWeight();
 
-        // Strictly greater than the minimum, less than or equal to the maximum.
-        // Values range from 0 (exclusive) to 1 (inclusive).
-        return sharability > minSharability
-                && weight > minWeight;
+        // This criterion includes the minimum; if the minimum is 0.25,
+        // items with a value of 0.25 and greater will be visible.
+        return sharability >= minSharability && weight >= minWeight;
     }
 }
