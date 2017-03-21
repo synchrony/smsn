@@ -71,7 +71,7 @@ public abstract class BrainTestBase {
     }
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {
-        Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        Filter writeFilter = Filter.noFilter();
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         Note rootNote = importNoteFromFile(exampleFile);

@@ -408,9 +408,7 @@ public class BrainClient {
     private JSONObject toJson(final Filter filter) throws JSONException {
         JSONObject json = new JSONObject();
         json.put(Params.MIN_SHARABILITY, filter.getMinSharability());
-        json.put(Params.MAX_SHARABILITY, filter.getMaxSharability());
         json.put(Params.MIN_WEIGHT, filter.getMinWeight());
-        json.put(Params.MAX_WEIGHT, filter.getMaxWeight());
         json.put(Params.DEFAULT_SHARABILITY, filter.getDefaultSharability());
         json.put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
         return json;

@@ -37,7 +37,7 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         assertEquals(2, root.getNotes().toJavaList().get(3).getNotes().toJavaList().size());
 
         // filtered
-        Filter publicFilter = new Filter(0f, 1f, 0.5f, 0.25f, 1f, 0.5f);
+        Filter publicFilter = new Filter(0f, 0.5f, 0.25f, 0.5f);
         assertTrue(publicFilter.isVisible(root));
         TopicGraph filteredGraph = topicGraph.createFilteredGraph(publicFilter);
         assertEquals(22, countAtoms(filteredGraph));

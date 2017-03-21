@@ -149,7 +149,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
         Filter defaultFilter = Filter.noFilter();
         // brain stream atoms begin with low weight, and with private rather than personal sharability
-        Filter brainstreamFilter = new Filter(0f, 1f, 0.25f, 0f, 1f, 0.25f);
+        Filter brainstreamFilter = new Filter(0f, 0.25f, 0f, 0.25f);
 
         // environment-dependent library
         add(new SpeakMapping(environment), "s", "speak");

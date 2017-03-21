@@ -465,8 +465,8 @@ public class TreeViewsTest extends BrainTestBase {
     // TODO: test write behavior w.r.t. sharability filters
     @Test
     public void nonSharableItemsAreHidden() throws Exception {
-        Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
-        Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
+        Filter readFilter = new Filter(0f, 0.5f, 0.75f, 0.75f);
+        Filter writeFilter = Filter.noFilter();
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
