@@ -1,3 +1,9 @@
+# Welcome!
+
+If you're new to Semantic Synchrony, check out [the wiki](https://github.com/synchrony/smsn/wiki).
+
+# Components
+
 Semantic Synchrony is a collection of interrelated projects in hardware and software for context-aware computing with semantics.  It contains:
 
 * **Extend-o-Brain**: a [personal knowledge base](http://en.wikipedia.org/wiki/Personal_knowledge_base) with a wiki interface and [Semantic Web](http://en.wikipedia.org/wiki/Semantic_Web) interoperability.  It connects to a [TinkerPop](https://tinkerpop.apache.org/)-compatible graph database and includes an [Emacs](http://www.gnu.org/software/emacs/) major mode called [Brain-mode](https://github.com/joshsh/brain-mode) (think [Org-mode](http://en.wikipedia.org/wiki/Org-mode) with a [graph](http://en.wikipedia.org/wiki/Graph_%28mathematics%29) of notes instead of a hierarchy).  See [Extend-o-Brain installation](https://github.com/joshsh/smsn/wiki/Extend-o-Brain-installation).
