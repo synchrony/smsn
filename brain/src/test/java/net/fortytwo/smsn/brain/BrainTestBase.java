@@ -29,6 +29,7 @@ public abstract class BrainTestBase {
     protected TopicGraph topicGraph;
     protected final WikiParser wikiParser = new WikiParser();
 
+    protected Brain brain;
     protected Graph graph;
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
@@ -54,7 +55,7 @@ public abstract class BrainTestBase {
     @Before
     public void setUp() throws Exception {
         topicGraph = createAtomGraph();
-        Brain brain = new Brain(topicGraph);
+        brain = new Brain(topicGraph);
         queries = new TreeViews(brain);
         filter = Filter.noFilter();
     }

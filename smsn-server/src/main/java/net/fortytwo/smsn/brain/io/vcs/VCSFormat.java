@@ -7,12 +7,19 @@ import java.util.regex.Pattern;
 
 public class VCSFormat extends Format {
 
+    public interface DirectoryNames {
+        String PRIVATE = "private";
+        String PERSONAL = "personal";
+        String PUBLIC = "public";
+        String UNIVERSAL = "universal";
+    }
+
     public static File[] getDirsBySharability(final File parentDir) {
         return new File[]{
-                new File(parentDir, "private"),
-                new File(parentDir, "personal"),
-                new File(parentDir, "public"),
-                new File(parentDir, "universal")};
+                new File(parentDir, DirectoryNames.PRIVATE),
+                new File(parentDir, DirectoryNames.PERSONAL),
+                new File(parentDir, DirectoryNames.PUBLIC),
+                new File(parentDir, DirectoryNames.UNIVERSAL)};
     }
 
     private static final Pattern ATOM_FILENAME_PATTERN = Pattern.compile("[a-zA-Z0-9]{5,}");

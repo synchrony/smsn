@@ -84,6 +84,20 @@ public class SemanticSynchrony {
                 WEIGHT = "weight";
     }
 
+    public interface Weight {
+        float WEAK = 0.25f;
+        float DEFAULT = 0.5f;
+        float STRONG = 0.75f;
+        float FULL = 1.0f;
+    }
+
+    public interface Sharability {
+        float PRIVATE = 0.25f;
+        float PERSONAL = 0.5f;
+        float PUBLIC = 0.75f;
+        float UNIVERSAL = 1.0f;
+    }
+
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
     private static final int ID_DIGITS = 16;
