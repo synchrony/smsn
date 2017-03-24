@@ -1,6 +1,6 @@
 # Welcome!
 
-Why would you want to keep or contribute to a knowledge graph? Check out [Praise for or Welcome to Knowledge Graphs](https://github.com/synchrony/praise-for-or-welcome-to-knowledge-graphs).
+Why would you want to keep or contribute to a knowledge graph? Check out [Praise and Hopes for Knowledge Graphs](https://github.com/synchrony/praise-for-or-welcome-to-knowledge-graphs).
 
 If you're new to Semantic Synchrony, check out [the wiki](https://github.com/synchrony/smsn/wiki).
 
