@@ -15,7 +15,6 @@ import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.util.Collections;
@@ -23,6 +22,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -102,10 +102,10 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Atom getAtomById(final String id) {
+    public Optional<Atom> getAtomById(final String id) {
         Vertex v = wrapper.getVertexById(id);
 
-        return null == v ? null : asAtom(v);
+        return null == v ? Optional.empty() : Optional.of(asAtom(v));
     }
 
     private <T extends Entity> EntityList<T> createListOfEntities(final String vertexLabel,
@@ -291,7 +291,7 @@ public class PGTopicGraph implements TopicGraph {
             if (isAtomVertex(v)
                     && !v.edges(Direction.IN).hasNext()
                     && !v.edges(Direction.OUT).hasNext()) {
-                if (filter.isVisible(asAtom(v))) {
+                if (filter.test(asAtom(v))) {
                     toRemove.add(v);
                 }
             }
@@ -331,7 +331,7 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public List<Atom> getAtomsByTitleQuery(final String query, final Filter filter) {
-        return filterAndSort(wrapper.getVerticesByValue(query), filter);
+        return filterAndSort(wrapper.getVerticesByTitle(query), filter);
     }
 
     @Override
@@ -354,11 +354,11 @@ public class PGTopicGraph implements TopicGraph {
         PGTopicGraph newGraph = new PGTopicGraph(newWrapper);
 
         for (Atom originalAtom : getAllAtoms()) {
-            if (filter.isVisible(originalAtom)) {
+            if (filter.test(originalAtom)) {
                 PGAtom newAtom = findOrCopyAtom(originalAtom, filter, newGraph);
-                PGEntityList<Atom> notes = (PGEntityList<Atom>) originalAtom.getNotes();
+                PGEntityList<Atom> notes = (PGEntityList<Atom>) originalAtom.getChildren();
                 if (null != notes) {
-                    newAtom.setNotes(copyAtomList(notes, filter, newGraph));
+                    newAtom.setChildren(copyAtomList(notes, filter, newGraph));
                 }
             }
         }
@@ -380,7 +380,7 @@ public class PGTopicGraph implements TopicGraph {
         while (unranked.hasNext()) {
             Sortable<Vertex, Float> in = unranked.next();
             Atom a = asAtom(in.getEntity());
-            if (!filter.isVisible(a)) continue;
+            if (!filter.test(a)) continue;
 
             float nativeScore = in.getScore();
             float weight = a.getWeight();
@@ -396,13 +396,12 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final TopicGraph newGraph) {
-        PGAtom newAtom = (PGAtom) newGraph.getAtomById(original.getId());
-        if (null != newAtom) return newAtom;
-
-        newAtom = (PGAtom) newGraph.createAtomWithProperties(filter, original.getId());
+        Optional<Atom> opt = newGraph.getAtomById(original.getId());
+        if (opt.isPresent()) return (PGAtom) opt.get();
+        PGAtom newAtom = (PGAtom) newGraph.createAtomWithProperties(filter, original.getId());
         newAtom.setSharability(original.getSharability());
 
-        if (filter.isVisible(original)) {
+        if (filter.test(original)) {
             newAtom.setTitle(original.getTitle());
             newAtom.setWeight(original.getWeight());
             newAtom.setShortcut(original.getShortcut());

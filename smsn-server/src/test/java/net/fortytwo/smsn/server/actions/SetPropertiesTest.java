@@ -23,7 +23,7 @@ public class SetPropertiesTest extends ActionTestBase {
         assertEquals(1, countAtoms());
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals("before", atom.getTitle());
         assertEquals("the page", atom.getText());
 
@@ -40,7 +40,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals("after", atom.getTitle());
     }
 
@@ -65,7 +65,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals("after", atom.getText());
     }
 
@@ -79,7 +79,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertNull(atom.getText());
     }
 
@@ -90,7 +90,7 @@ public class SetPropertiesTest extends ActionTestBase {
         atom.setWeight(0.25f);
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals(0.25f, atom.getWeight(), 0.0f);
 
         SetProperties action = createAction();
@@ -100,7 +100,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals(0.5f, atom.getWeight(), 0.0f);
     }
 
@@ -111,7 +111,7 @@ public class SetPropertiesTest extends ActionTestBase {
         atom.setSharability(0.25f);
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals(0.25f, atom.getSharability(), 0.0f);
 
         SetProperties action = createAction();
@@ -121,7 +121,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals(0.5f, atom.getSharability(), 0.0f);
     }
 
@@ -132,7 +132,7 @@ public class SetPropertiesTest extends ActionTestBase {
         atom.setPriority(0.25f);
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals(0.25f, atom.getPriority(), 0.0f);
 
         SetProperties action = createAction();
@@ -142,7 +142,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals(0.5f, atom.getPriority(), 0.0f);
     }
 
@@ -152,7 +152,7 @@ public class SetPropertiesTest extends ActionTestBase {
         Atom atom = createAtomWithTitle("test");
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertNull(atom.getShortcut());
 
         SetProperties action = createAction();
@@ -162,7 +162,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId());
+        atom = topicGraph.getAtomById(atom.getId()).get();
         assertEquals("after", atom.getShortcut());
     }
 

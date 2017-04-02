@@ -72,7 +72,6 @@ public class SemanticSynchrony {
                 ALIAS = "alias",
                 CREATED = "created",
                 FORMAT = "format",
-                // the id property also used by ElementIdStrategy
                 ID_V = "idV",
                 LABEL = "label",
                 PAGE = "page",
@@ -96,6 +95,14 @@ public class SemanticSynchrony {
         float PERSONAL = 0.5f;
         float PUBLIC = 0.75f;
         float UNIVERSAL = 1.0f;
+    }
+
+    public interface Priority {
+        float NONE = 0.0f;
+        float LOW = 0.25f;
+        float MEDIUM = 0.5f;
+        float HIGH = 0.75f;
+        float HIGHEST = 1.0f;
     }
 
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");

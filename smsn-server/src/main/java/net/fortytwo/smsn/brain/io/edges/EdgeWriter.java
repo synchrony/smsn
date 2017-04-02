@@ -28,11 +28,11 @@ public class EdgeWriter extends BrainWriter {
         p.println("from\tto");
 
         for (Atom fromAtom : sourceGraph.getAllAtoms()) {
-            if (null != fromAtom && filter.isVisible(fromAtom)) {
-                EntityList<Atom> l = fromAtom.getNotes();
+            if (null != fromAtom && filter.test(fromAtom)) {
+                EntityList<Atom> l = fromAtom.getChildren();
                 while (null != l) {
                     Atom toAtom = l.getFirst();
-                    if (filter.isVisible(toAtom)) {
+                    if (filter.test(toAtom)) {
                         printEdge(p, fromAtom, toAtom);
                     }
                     l = l.getRest();

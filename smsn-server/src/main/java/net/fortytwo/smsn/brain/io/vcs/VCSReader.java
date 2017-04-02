@@ -118,7 +118,7 @@ public class VCSReader extends BrainReader {
             removeAllChildren();
             Optional<EntityList<Atom>> newChildren = createAtomList();
             if (newChildren.isPresent()) {
-                atom.setNotes(newChildren.get());
+                atom.setChildren(newChildren.get());
             }
         }
 
@@ -134,7 +134,7 @@ public class VCSReader extends BrainReader {
         }
 
         private void removeAllChildren() {
-            EntityList<Atom> list = atom.getNotes();
+            EntityList<Atom> list = atom.getChildren();
             if (null != list) {
                 while (null != list) {
                     EntityList<Atom> rest = list.getRest();
@@ -142,7 +142,7 @@ public class VCSReader extends BrainReader {
                     list = rest;
                 }
 
-                atom.setNotes(null);
+                atom.setChildren(null);
             }
         }
 
@@ -159,8 +159,10 @@ public class VCSReader extends BrainReader {
 
         private Atom resolveAtomReference(final String id) {
             TopicGraph graph = context.getTopicGraph();
-            Atom atom = graph.getAtomById(id);
-            if (null == atom) {
+            Optional<Atom> opt = graph.getAtomById(id);
+            if (opt.isPresent()) {
+                atom = opt.get();
+            } else {
                 atom = graph.createAtom(id);
             }
             return atom;

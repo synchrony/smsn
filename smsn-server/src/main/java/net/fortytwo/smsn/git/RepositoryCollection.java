@@ -25,10 +25,14 @@ public class RepositoryCollection {
         Preconditions.checkArgument(directory.isDirectory());
         this.directory = directory;
 
-        SmSnGitRepository privateRepo = createRepository(VCSFormat.DirectoryNames.PRIVATE);
-        SmSnGitRepository personalRepo = createRepository(VCSFormat.DirectoryNames.PERSONAL);
-        SmSnGitRepository publicRepo = createRepository(VCSFormat.DirectoryNames.PUBLIC);
-        SmSnGitRepository universalRepo = createRepository(VCSFormat.DirectoryNames.UNIVERSAL);
+        SmSnGitRepository privateRepo = createRepository(
+                SemanticSynchrony.Sharability.PRIVATE, VCSFormat.DirectoryNames.PRIVATE);
+        SmSnGitRepository personalRepo = createRepository(
+                SemanticSynchrony.Sharability.PERSONAL, VCSFormat.DirectoryNames.PERSONAL);
+        SmSnGitRepository publicRepo = createRepository(
+                SemanticSynchrony.Sharability.PUBLIC, VCSFormat.DirectoryNames.PUBLIC);
+        SmSnGitRepository universalRepo = createRepository(
+                SemanticSynchrony.Sharability.UNIVERSAL, VCSFormat.DirectoryNames.UNIVERSAL);
 
         repositories = new SmSnGitRepository[]{universalRepo, publicRepo, personalRepo, privateRepo};
     }
@@ -55,7 +59,7 @@ public class RepositoryCollection {
         return parent;
     }
 
-    private SmSnGitRepository createRepository(final String name) throws IOException {
-        return new SmSnGitRepository(brain, new File(directory, name));
+    private SmSnGitRepository createRepository(final float sharability, final String name) throws IOException {
+        return new SmSnGitRepository(brain, new File(directory, name), sharability);
     }
 }

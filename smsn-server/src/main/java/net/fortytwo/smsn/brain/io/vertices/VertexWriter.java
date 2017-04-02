@@ -35,7 +35,7 @@ public class VertexWriter extends BrainWriter {
         p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
 
         for (Atom a : sourceGraph.getAllAtoms()) {
-            if (isTrueAtom(a) && filter.isVisible(a)) {
+            if (isTrueAtom(a) && filter.test(a)) {
                 p.print(a.getCreated());
                 p.print('\t');
                 p.print(a.getId());

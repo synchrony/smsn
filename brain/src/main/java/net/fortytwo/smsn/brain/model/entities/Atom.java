@@ -41,9 +41,9 @@ public interface Atom extends Entity {
 
     void setWeight(Float weight);
 
-    EntityList<Atom> getNotes();
+    EntityList<Atom> getChildren();
 
-    void setNotes(EntityList<Atom> notes);
+    void setChildren(EntityList<Atom> notes);
 
     void forFirstOf(Consumer<EntityList<Atom>> consumer);
 
@@ -53,6 +53,5 @@ public interface Atom extends Entity {
 
     Collection<EntityList<Atom>> getFirstOf();
 
-    // TODO: temporary solution
     Atom getSubject(EntityList<Atom> notes);
 }

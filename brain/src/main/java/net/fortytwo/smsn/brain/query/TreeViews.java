@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -203,7 +204,7 @@ public class TreeViews {
         Queue<Atom> queue = priorities.getQueue();
         int i = 0;
         for (Atom a : queue) {
-            if (filter.isVisible(a)) {
+            if (filter.test(a)) {
                 result.addChild(toNote(a, true, true));
 
                 if (++i >= maxResults) {
@@ -221,10 +222,6 @@ public class TreeViews {
 
     private void checkRootArg(final Note root) {
         Preconditions.checkArgNotNull(root, "root");
-    }
-
-    private void checkListOfIdsArg(final List<String> atomIds) {
-        Preconditions.checkArgNotNull(atomIds, "atomIds");
     }
 
     private void checkAtomIterableArg(final Iterable<Atom> atoms) {
@@ -284,7 +281,7 @@ public class TreeViews {
                               final Filter filter,
                               final ViewStyle style) {
         // If the note is invisible, we can't see whether it has children.
-        if (!filter.isVisible(root)) {
+        if (!filter.test(root)) {
             return 0;
         }
 
@@ -301,16 +298,14 @@ public class TreeViews {
                               final ViewStyle style,
                               final boolean getProperties,
                               final Map<String, Atom> cache) {
-        if (null == root) {
-            throw new IllegalStateException("null view root");
-        }
+        Preconditions.checkNotNull(root);
 
-        Note note = toNote(root, filter.isVisible(root), getProperties);
+        Note note = toNote(root, filter.test(root), getProperties);
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
                 addToCache(target, cache);
-                int h = filter.isVisible(target) ? height - 1 : 0;
+                int h = filter.test(target) ? height - 1 : 0;
                 Note cn = viewInternal(target, h, filter, style, getProperties, cache);
                 note.addChild(cn);
             }
@@ -351,7 +346,7 @@ public class TreeViews {
                                 final ViewStyle style,
                                 final Map<String, Atom> cache) {
 
-        if (0 >= height || !filter.isVisible(rootAtom)) {
+        if (0 >= height || !filter.test(rootAtom)) {
             return;
         }
 
@@ -390,7 +385,9 @@ public class TreeViews {
                 // log this activity
                 if (null != brain.getActivityLog()) {
                     Atom a = getAtomById(note.getId(), cache);
-                    brain.getActivityLog().logUnlink(rootAtom, a);
+                    if (null != a) {
+                        brain.getActivityLog().logUnlink(rootAtom, a);
+                    }
                 }
             }
         };
@@ -424,17 +421,17 @@ public class TreeViews {
         return new HashMap<>();
     }
 
-    private Atom getAtomById(final String id) {
-        return brain.getTopicGraph().getAtomById(id);
-    }
-
     // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved atoms
     private Atom getAtomById(final String id, final Map<String, Atom> cache) {
         Atom atom = cache.get(id);
         if (null == atom) {
-            atom = brain.getTopicGraph().getAtomById(id);
-            if (null != atom) cache.put(id, atom);
+            Optional<Atom> opt = brain.getTopicGraph().getAtomById(id);
+            if (opt.isPresent()) {
+                atom = opt.get();
+                cache.put(id, atom);
+            }
         }
+
         return atom;
     }
 
@@ -485,7 +482,7 @@ public class TreeViews {
     }
 
     private boolean isAdjacent(final Atom a, final boolean includeChildren, final boolean includeParents) {
-        return (includeChildren && null != a.getNotes())
+        return (includeChildren && null != a.getChildren())
                 || (includeParents && a.getFirstOf().size() > 0);
     }
 
@@ -501,7 +498,7 @@ public class TreeViews {
         Note result = new Note();
 
         for (Atom a : brain.getTopicGraph().getAllAtoms()) {
-            if (filter.isVisible(a) && !isAdjacent(a, includeChildren, includeParents)) {
+            if (filter.test(a) && !isAdjacent(a, includeChildren, includeParents)) {
                 Note n = viewInternal(a, height, filter, style, true, null);
                 result.addChild(n);
             }

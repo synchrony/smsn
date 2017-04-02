@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
@@ -20,6 +21,7 @@ import org.junit.Before;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -92,6 +94,10 @@ public abstract class BrainTestBase {
 
     protected int countAtoms() {
         return countAtoms(topicGraph);
+    }
+
+    protected static List<Atom> childList(final Atom atom) {
+        return EntityList.toJavaList(atom.getChildren());
     }
 
     private File createTempDirectory() throws IOException {

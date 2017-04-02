@@ -61,7 +61,7 @@ public abstract class GraphWrapper {
         return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID_V, id);
     }
 
-    public Iterator<Sortable<Vertex, Float>> getVerticesByValue(final String term) {
+    public Iterator<Sortable<Vertex, Float>> getVerticesByTitle(final String term) {
         return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.TITLE, term);
     }
 

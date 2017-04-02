@@ -226,7 +226,7 @@ public class KnowledgeBase {
         alreadyHandled.add(memory.getAtomId());
 
         // only rdfize fields with a known class
-        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.isVisible(a)).forEach(a -> {
+        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.test(a)).forEach(a -> {
             // only rdfize fields with a known class
             if (isClassified(a)) {
                 fieldHandler.handle(a, context);
@@ -312,7 +312,7 @@ public class KnowledgeBase {
                                         handleAllMembers(entry.memory, fieldHandler, context,
                                                 new HashSet<>(), filter);
                                     }
-                                } else if (null == filter || filter.isVisible(childAtom)) {
+                                } else if (null == filter || filter.test(childAtom)) {
                                     // only rdfize fields with a known class
                                     if (isClassified(entries)) {
                                         fieldHandler.handle(childAtom, context);
@@ -405,7 +405,7 @@ public class KnowledgeBase {
                 int outScore = 0;
 
                 if (null != clazz.memberRegex) {
-                    EntityList<Atom> cur = subject.getNotes();
+                    EntityList<Atom> cur = subject.getChildren();
                     Atom first = null;
                     int eli = 0;
                     AtomRegex.El el = null;
@@ -551,7 +551,7 @@ public class KnowledgeBase {
             }
 
             // perform rdfization, choosing at most one classification
-            if (null != handler && (null == filter || filter.isVisible(subject))) {
+            if (null != handler && (null == filter || filter.test(subject))) {
                 if (newEntries.size() > 0) {
                     List<AtomClassEntry> helper = new java.util.LinkedList<>();
                     helper.addAll(newEntries);
@@ -627,7 +627,7 @@ public class KnowledgeBase {
         }
         indent++;
         if (indent < 2) {
-            EntityList<Atom> notes = a.getNotes();
+            EntityList<Atom> notes = a.getChildren();
             if (null != notes) {
                 EntityList<Atom> cur = notes;
                 while (null != cur) {

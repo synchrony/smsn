@@ -28,8 +28,7 @@ public class GetAtomsByIdTest extends BrainTestBase {
         }
 
         for (int i = 0; i < ids.length; i++) {
-            Atom atom = topicGraph.getAtomById(ids[i]);
-            assertNotNull(atom);
+            Atom atom = topicGraph.getAtomById(ids[i]).get();
             assertEquals("atom #" + (i + 1), atom.getTitle());
         }
     }
@@ -49,7 +48,7 @@ public class GetAtomsByIdTest extends BrainTestBase {
         Atom erebus = topicGraph.createAtomWithProperties(filter, null);
         erebus.setTitle("Erebus");
         EntityList<Atom> children = topicGraph.createListOfAtoms(tartarus, gaia, eros, nyx, erebus);
-        chaos.setNotes(children);
+        chaos.setChildren(children);
 
         //System.out.println(chaos.getId());
         //System.out.println(chaos.getValue());

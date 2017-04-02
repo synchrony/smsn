@@ -65,7 +65,7 @@ public class FindDuplicates extends FilteredAction {
         int total = 0;
 
         for (Atom a : graph.getAllAtoms()) {
-            if (filter.isVisible(a)) {
+            if (filter.test(a)) {
                 String title = a.getTitle();
                 if (null != title && 0 < title.length()) {
                     String hash;

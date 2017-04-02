@@ -9,6 +9,7 @@ import net.fortytwo.smsn.brain.model.entities.Topic;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A graph of atoms and lists conforming to the Extend-o-Brain data model
@@ -24,7 +25,7 @@ public interface TopicGraph {
 
     Iterable<Atom> getAllAtoms();
 
-    Atom getAtomById(String id);
+    Optional<Atom> getAtomById(String id);
 
     List<Atom> getAtomsByAcronym(String acronym, Filter filter);
 

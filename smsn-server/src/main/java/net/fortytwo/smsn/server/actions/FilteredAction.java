@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.server.actions;
 
-import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
@@ -9,6 +8,7 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 abstract class FilteredAction extends Action {
     @NotNull
@@ -23,11 +23,19 @@ abstract class FilteredAction extends Action {
     }
 
     protected Atom getRoot(final String rootId, final ActionContext context) {
-        Atom root = rootId.equals(CREATE_NEW_ATOM)
-                ? createNewRoot(context)
-                : context.getBrain().getTopicGraph().getAtomById(rootId);
+        Atom root;
+        if (rootId.equals(CREATE_NEW_ATOM)) {
+            root = createNewRoot(context);
+        } else {
+            Optional<Atom> opt = context.getBrain().getTopicGraph().getAtomById(rootId);
+            if (opt.isPresent()) {
+                root = opt.get();
+            } else {
+                throw new IllegalArgumentException("no such root: " + rootId);
+            }
+        }
 
-        if (null != filter && !filter.isVisible(root)) {
+        if (null != filter && !filter.test(root)) {
             throw new BadRequestException("root of view is not visible: " + rootId);
         }
 

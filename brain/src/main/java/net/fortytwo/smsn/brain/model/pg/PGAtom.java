@@ -10,6 +10,7 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class PGAtom extends PGEntity implements Atom {
 
@@ -116,12 +117,12 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public EntityList<Atom> getNotes() {
+    public EntityList<Atom> getChildren() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfAtoms(v));
     }
 
     @Override
-    public void setNotes(EntityList<Atom> notes) {
+    public void setChildren(EntityList<Atom> notes) {
         removeNotes();
         if (null != notes) {
             addOutEdge(((PGEntity) notes).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
@@ -139,10 +140,10 @@ public abstract class PGAtom extends PGEntity implements Atom {
         // create a list node for the atom and insert it
         EntityList<Atom> list = getGraph().createListOfAtoms(child);
         if (0 == position) {
-            list.setRest(getNotes());
-            setNotes(list);
+            list.setRest(getChildren());
+            setChildren(list);
         } else {
-            EntityList<Atom> prev = getNotes();
+            EntityList<Atom> prev = getChildren();
             for (int i = 1; i < position; i++) {
                 prev = prev.getRest();
             }
@@ -154,11 +155,11 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public void deleteChildAt(int position) {
-        EntityList<Atom> list = getNotes();
+        EntityList<Atom> list = getChildren();
 
         // remove the atom's list node
         if (0 == position) {
-            setNotes(list.getRest());
+            setChildren(list.getRest());
 
             deleteListNode(list);
         } else {
@@ -184,7 +185,9 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public Atom getSubject(EntityList<Atom> notes) {
-        return ((PGEntity) notes).getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN, v -> getGraph().asAtom(v));
+        PGEntity entity = (PGEntity) notes;
+        return entity.getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN,
+                vertex -> getGraph().asAtom(vertex));
     }
 
     @Override

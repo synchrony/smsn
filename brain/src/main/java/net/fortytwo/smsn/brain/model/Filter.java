@@ -4,8 +4,9 @@ import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 
 import java.io.Serializable;
+import java.util.function.Predicate;
 
-public class Filter implements Serializable {
+public class Filter implements Predicate<Atom>, Serializable {
 
     private float minSharability;
     private float minWeight;
@@ -17,7 +18,7 @@ public class Filter implements Serializable {
         return NO_FILTER;
     }
 
-    public Filter() {
+    private Filter() {
         this(0f, 0.5f, 0f, 0.5f);
     }
 
@@ -64,7 +65,8 @@ public class Filter implements Serializable {
         return minSharability == 0 && minWeight == 0;
     }
 
-    public boolean isVisible(final Atom atom) {
+    @Override
+    public boolean test(final Atom atom) {
         float sharability = atom.getSharability();
         float weight = atom.getWeight();
 

@@ -95,7 +95,7 @@ public class VCSWriter extends BrainWriter {
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
         Note note = toNote(atom, true);
-        EntityList<Atom> list = atom.getNotes();
+        EntityList<Atom> list = atom.getChildren();
         while (null != list) {
             note.getChildren().add(toNote(list.getFirst(), false));
             list = list.getRest();

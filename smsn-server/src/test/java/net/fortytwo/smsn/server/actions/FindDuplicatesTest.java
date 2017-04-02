@@ -47,7 +47,7 @@ public class FindDuplicatesTest extends ActionTestBase {
         atom3 = createAtomWithTitle("earth");
         topicGraph.commit();
 
-        Atom atom = topicGraph.getAtomById(atom1.getId());
+        Atom atom = topicGraph.getAtomById(atom1.getId()).get();
         assertEquals("earth", atom.getTitle());
         assertEquals(3, countAtoms());
 

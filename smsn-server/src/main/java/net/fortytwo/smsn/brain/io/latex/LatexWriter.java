@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class LatexWriter extends BrainWriter {
@@ -36,12 +37,12 @@ public class LatexWriter extends BrainWriter {
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
-        Atom rootAtom = context.getTopicGraph().getAtomById(rootId);
-        if (null == rootAtom) {
+        Optional<Atom> opt = context.getTopicGraph().getAtomById(rootId);
+        if (!opt.isPresent()) {
             throw new IllegalStateException("no such atom: " + rootId);
         }
 
-        writeLatex(rootAtom, filter, 0, 0, context.getDestStream());
+        writeLatex(opt.get(), filter, 0, 0, context.getDestStream());
     }
 
     private void writeLatex(final Atom root,
@@ -50,7 +51,7 @@ public class LatexWriter extends BrainWriter {
                             final int sectionLevel,
                             final OutputStream out) throws IOException {
 
-        if (!filter.isVisible(root)) {
+        if (!filter.test(root)) {
             return;
         }
 

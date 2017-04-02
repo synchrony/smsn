@@ -3,7 +3,7 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
+import net.fortytwo.smsn.brain.model.AtomBase;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.entities.Atom;
@@ -28,16 +28,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-public class SmSnGitRepository {
+public class SmSnGitRepository extends AtomBase {
 
     private static final Logger logger = Logger.getLogger(SmSnGitRepository.class.getName());
 
     private static final ThreadLocal<DateFormat> dateFormat = ThreadLocal.withInitial(
             () -> new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
 
-    private static final String DELETED_PATH = "/dev/null";
-
-    private final float directorySharability;
+    private final float sharability;
     private final Repository repository;
     private final Git git;
     private final File directory;
@@ -50,8 +48,9 @@ public class SmSnGitRepository {
         return dateFormat.get().format(new Date(timeStamp));
     }
 
-    public SmSnGitRepository(final Brain brain, final File directory) throws IOException {
+    public SmSnGitRepository(final Brain brain, final File directory, final float sharability) throws IOException {
         this.brain = brain;
+        this.sharability = sharability;
         treeViews = new TreeViews(brain);
 
         // TODO
@@ -75,8 +74,24 @@ public class SmSnGitRepository {
                 .build();
 
         git = new Git(repository);
+    }
 
-        directorySharability = findDirectorySharability(directory);
+    Git getGit() {
+        return git;
+    }
+
+    @Override
+    public Float getSharability() {
+        return sharability;
+    }
+
+    @Override
+    public String getTitle() {
+        return "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis());
+    }
+
+    public Brain getBrain() {
+        return brain;
     }
 
     public Note getHistory(final Limits limits) throws IOException, GitAPIException {
@@ -87,8 +102,8 @@ public class SmSnGitRepository {
 
         Note repoNote = new Note();
         repoNote.setId(SemanticSynchrony.createRandomId());
-        repoNote.setTitle("repository " + directory.getName() + " at " + formatDate(now));
-        repoNote.setSharability(directorySharability);
+        repoNote.setTitle(getTitle());
+        repoNote.setSharability(sharability);
         repoNote.setWeight(SemanticSynchrony.Weight.DEFAULT);
         repoNote.setCreated(now);
 
@@ -128,7 +143,7 @@ public class SmSnGitRepository {
         commitNote.setCreated(getTimeStamp(commit));
         commitNote.setTitle(createTitleFor(commit));
         commitNote.setWeight(SemanticSynchrony.Weight.DEFAULT);
-        commitNote.setSharability(directorySharability);
+        commitNote.setSharability(sharability);
 
         if (!isMergeCommit(commit)) {
             addDiffNotes(commitNote, commit, limits);
@@ -182,24 +197,24 @@ public class SmSnGitRepository {
     }
 
     private Note toAtomNote(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
-        Atom atom = brain.getTopicGraph().getAtomById(id);
+        Optional<Atom> opt = brain.getTopicGraph().getAtomById(id);
 
         Note note;
-        if (null == atom) {
+        if (opt.isPresent()) {
+            note = treeViews.view(opt.get(), 0, filter, ViewStyle.Basic.Forward.getStyle());
+        } else {
             note = new Note();
             note.setId(id);
             note.setCreated(timestamp);
             note.setTitle(titleForMissingAtom(changeType));
             note.setWeight(SemanticSynchrony.Weight.DEFAULT);
-            note.setSharability(directorySharability);
-        } else {
-            note = treeViews.view(atom, 0, filter, ViewStyle.Basic.Forward.getStyle());
+            note.setSharability(sharability);
         }
 
         return note;
     }
 
-    private String titleForMissingAtom(final DiffEntry.ChangeType changeType) {
+    public static String titleForMissingAtom(final DiffEntry.ChangeType changeType) {
         if (changeType == DiffEntry.ChangeType.DELETE) {
             return "[deleted]";
         } else if (changeType == DiffEntry.ChangeType.RENAME) {
@@ -209,7 +224,7 @@ public class SmSnGitRepository {
         }
     }
 
-    private String toId(final String path) {
+    public static String toId(final String path) {
         String[] parts = path.split("/");
         return parts[parts.length - 1].trim();
     }
@@ -228,7 +243,7 @@ public class SmSnGitRepository {
         return dateLabel + " " + authorLabel + ": " + message;
     }
 
-    private long getTimeStamp(final RevCommit commit) {
+    public static long getTimeStamp(final RevCommit commit) {
         return commit.getCommitTime() * 1000L;
     }
 
@@ -243,21 +258,6 @@ public class SmSnGitRepository {
     private PersonIdent getAuthorOrCommitter(final RevCommit revCommit) {
         PersonIdent author = revCommit.getAuthorIdent();
         return null == author ? revCommit.getCommitterIdent() : author;
-    }
-
-    private static float findDirectorySharability(final File file) {
-        switch (file.getName()) {
-            case VCSFormat.DirectoryNames.PRIVATE:
-                return SemanticSynchrony.Sharability.PRIVATE;
-            case VCSFormat.DirectoryNames.PERSONAL:
-                return SemanticSynchrony.Sharability.PERSONAL;
-            case VCSFormat.DirectoryNames.PUBLIC:
-                return SemanticSynchrony.Sharability.PUBLIC;
-            case VCSFormat.DirectoryNames.UNIVERSAL:
-                return SemanticSynchrony.Sharability.UNIVERSAL;
-            default:
-                throw new IllegalArgumentException("not a SmSn directory: " + file.getAbsolutePath());
-        }
     }
 
     public static class Limits {

@@ -46,7 +46,7 @@ public interface ViewStyle {
                 @Override
                 public Iterable<Atom> getLinked(final Atom root,
                                                 final Filter filter) {
-                    return TreeViews.toIterable(root.getNotes());
+                    return TreeViews.toIterable(root.getChildren());
                 }
 
                 @Override
@@ -81,7 +81,7 @@ public interface ViewStyle {
                 @Override
                 public Iterable<Atom> getLinked(final Atom root,
                                                 final Filter filter) {
-                    return TreeViews.toIterable(root.getNotes());
+                    return TreeViews.toIterable(root.getChildren());
                 }
 
                 @Override
@@ -125,8 +125,8 @@ public interface ViewStyle {
                             cur = cur.getRestOf();
                         }
 
-                        Atom a = prev.getFirst().getSubject(prev);
-                        if (filter.isVisible(a)) {
+                        Atom a = root.getSubject(prev);
+                        if (filter.test(a)) {
                             results.add(a);
                         }
                     });

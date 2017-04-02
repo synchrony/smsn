@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model.entities;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public interface EntityList<T> extends Entity {
@@ -14,5 +15,13 @@ public interface EntityList<T> extends Entity {
 
     EntityList<T> getRestOf();
 
-    List<T> toJavaList();
+    static <T> List<T> toJavaList(EntityList<T> list) {
+        List<T> javaList = new LinkedList<T>();
+        EntityList<T> cur = list;
+        while (null != cur) {
+            javaList.add(cur.getFirst());
+            cur = cur.getRest();
+        }
+        return javaList;
+    }
 }

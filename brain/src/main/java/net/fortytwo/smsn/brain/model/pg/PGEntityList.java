@@ -48,17 +48,6 @@ public abstract class PGEntityList<T extends Entity> extends PGEntity implements
     }
 
     @Override
-    public List<T> toJavaList() {
-        List<T> list = new LinkedList<T>();
-        EntityList<T> cur = this;
-        while (null != cur) {
-            list.add(cur.getFirst());
-            cur = cur.getRest();
-        }
-        return list;
-    }
-
-    @Override
     public void destroy() {
         // a list owns each list element
         getFirst().destroy();
