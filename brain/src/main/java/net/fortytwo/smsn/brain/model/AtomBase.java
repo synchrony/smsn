@@ -12,9 +12,9 @@ public class AtomBase implements Atom {
     private String id = SemanticSynchrony.createRandomId();
     private long created = System.currentTimeMillis();
     private String title = "atom " + id;
-    private float sharability = SemanticSynchrony.Sharability.PUBLIC;
-    private float weight = SemanticSynchrony.Weight.DEFAULT;
-    private float priority = SemanticSynchrony.Priority.NONE;
+    private Float sharability = SemanticSynchrony.Sharability.PUBLIC;
+    private Float weight = SemanticSynchrony.Weight.DEFAULT;
+    private Float priority = SemanticSynchrony.Priority.NONE;
 
     @Override
     public void destroy() {

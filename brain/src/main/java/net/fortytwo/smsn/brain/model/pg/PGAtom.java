@@ -86,7 +86,7 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public Float getSharability() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, 0f);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHARABILITY);
     }
 
     @Override
@@ -108,7 +108,7 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public Float getWeight() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, 0f);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT);
     }
 
     @Override

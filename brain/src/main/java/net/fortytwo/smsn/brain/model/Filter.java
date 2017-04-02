@@ -67,8 +67,10 @@ public class Filter implements Predicate<Atom>, Serializable {
 
     @Override
     public boolean test(final Atom atom) {
-        float sharability = atom.getSharability();
-        float weight = atom.getWeight();
+        Float sharability = atom.getSharability();
+        Float weight = atom.getWeight();
+
+        if (null == sharability || null == weight) return false;
 
         // This criterion includes the minimum; if the minimum is 0.25,
         // items with a value of 0.25 and greater will be visible.
