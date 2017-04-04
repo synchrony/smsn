@@ -1,15 +1,18 @@
 host: localhost
 port: 8182
 scriptEvaluationTimeout: 300000
-channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer
+
+# Uncomment to use HTTP rather than WebSocket
+#channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer
+
 graphs: {
-  graph: conf/neo4j-example.properties}
+  graph: conf/neo4j-smsn.properties}
 plugins:
   - tinkerpop.neo4j
   - smsn
 scriptEngines: {
   smsn: {
-    scripts: [conf/smsn-example.properties]
+    scripts: [conf/smsn.properties]
   },
   gremlin-groovy: {
     imports: [java.lang.Math],
