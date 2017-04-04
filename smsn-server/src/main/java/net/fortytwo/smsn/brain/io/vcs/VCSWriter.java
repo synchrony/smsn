@@ -82,7 +82,7 @@ public class VCSWriter extends BrainWriter {
     }
 
     private boolean isAtomWithPage(final Atom a) {
-        return a.getSharability() > 0f;
+        return null != a.getSharability() && a.getSharability() > 0f;
     }
 
     private File chooseDirectoryForAtom(final Atom a, File[] dirs) {

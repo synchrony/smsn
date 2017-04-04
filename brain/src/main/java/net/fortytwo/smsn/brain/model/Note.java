@@ -187,15 +187,4 @@ public class Note {
     public String toString() {
         return "note[" + (null == id ? "null" : id) + "]";
     }
-
-    // note: deliberately leaves numberOfChildren and numberOfParents unaffected
-    public void truncate(final int depth) {
-        if (depth <= 1) {
-            children.clear();
-        } else {
-            for (Note c : children) {
-                c.truncate(depth - 1);
-            }
-        }
-    }
 }
