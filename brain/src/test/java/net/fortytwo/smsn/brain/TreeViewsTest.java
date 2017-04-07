@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
@@ -458,9 +459,8 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(2, child.getNumberOfChildren());
     }
 
-    // TODO: test write behavior w.r.t. sharability filters
     @Test
-    public void nonSharableItemsAreHidden() throws Exception {
+    public void invisibleAtomsAreExcludedFromViews() throws Exception {
         Filter readFilter = new Filter(0f, 0.5f, 0.75f, 0.75f);
         Filter writeFilter = Filter.noFilter();
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
@@ -478,38 +478,90 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(0.5f, a2.get().getSharability());
 
         Note after = queries.view(root, 2, readFilter, style);
-        Assert.assertEquals(3, after.getNumberOfChildren());
+        // the second atom in the list simply does not appear
+        Assert.assertEquals(2, after.getNumberOfChildren());
         Assert.assertEquals(0, after.getNumberOfParents());
         List<Note> children = after.getChildren();
         Note n1 = children.get(0);
-        Assert.assertEquals(2, n1.getNumberOfChildren());
+        Assert.assertEquals(1, n1.getNumberOfChildren());
         Assert.assertEquals(1, n1.getNumberOfParents());
 
-        // This note is "invisible".
-        Note n4 = children.get(1);
-        // Its value appears as null.
-        assertNull(n4.getTitle());
-        // This note has a child, but we can't see it.
-        assertEquals(0, n4.getChildren().size());
-        // We can't even count the parents or children.
-        Assert.assertEquals(0, n4.getNumberOfChildren());
-        Assert.assertEquals(0, n4.getNumberOfParents());
-
-        Note n5 = children.get(2);
-        // children exist, but are not visible
+        Note n5 = children.get(1);
+        // children are not visible
         Assert.assertEquals(0, n5.getNumberOfChildren());
         Assert.assertEquals(1, n5.getNumberOfParents());
 
         List<Note> grandChildren = n1.getChildren();
-        assertEquals(2, grandChildren.size());
-        Note n2 = grandChildren.get(0);
-        Assert.assertEquals(0, n2.getNumberOfChildren());
-        Assert.assertEquals(0, n2.getNumberOfParents());
-        Note n3 = grandChildren.get(1);
+        assertEquals(1, grandChildren.size());
+        Note n3 = grandChildren.get(0);
         Assert.assertEquals(0, n3.getNumberOfChildren());
         Assert.assertEquals(1, n3.getNumberOfParents());
-        assertNull(n2.getTitle());
         assertEquals("this is a public child of a public note", n3.getTitle());
+    }
+
+    @Test
+    public void invisibleAtomsAreSkippedDuringWrites() throws Exception {
+        Filter readFilter = Filter.noFilter();
+        Filter writeFilter = new Filter(0f, 0.5f, 0.75f, 0.75f);
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+
+        Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
+        Atom root = createAtom("0000000");
+        root.setTitle("note 0");
+        root.setSharability(1.0f);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 2, Filter.noFilter(), style);
+        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+
+        assertEquals(3, rootNote.getNumberOfChildren());
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals(0.5f, rootNote.getChildren().get(1).getSharability(), 0f);
+
+        rootNote = queries.view(root, 2, writeFilter, style);
+        Note toAdd = new Note();
+        toAdd.setId("0000007");
+        toAdd.setTitle("note 7");
+        toAdd.setSharability(SemanticSynchrony.Sharability.UNIVERSAL);
+        rootNote.getChildren().add(0, toAdd);
+        queries.update(rootNote, 2, writeFilter, style);
+
+        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+        assertEquals(4, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        rootNote = queries.view(root, 2, writeFilter, style);
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        rootNote.getChildren().remove(2);
+        queries.update(rootNote, 2, writeFilter, style);
+
+        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+        assertEquals("this is a protected note", rootNote.getChildren().get(2).getTitle());
+        rootNote = queries.view(root, 2, writeFilter, style);
+        assertEquals(2, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+
+        toAdd = new Note();
+        toAdd.setId("0000008");
+        toAdd.setTitle("note 8");
+        toAdd.setSharability(SemanticSynchrony.Sharability.UNIVERSAL);
+        rootNote.getChildren().add(2, toAdd);
+        queries.update(rootNote, 2, writeFilter, style);
+
+        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+        assertEquals(4, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+        assertEquals("this is a protected note", rootNote.getChildren().get(2).getTitle());
+        assertEquals("note 8", rootNote.getChildren().get(3).getTitle());
+        rootNote = queries.view(root, 2, writeFilter, style);
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+        assertEquals("note 8", rootNote.getChildren().get(2).getTitle());
     }
 
     @Test

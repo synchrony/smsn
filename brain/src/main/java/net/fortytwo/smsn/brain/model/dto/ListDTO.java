@@ -45,4 +45,13 @@ public class ListDTO<T> implements EntityList<T> {
     public EntityList<T> getRestOf() {
         throw new UnsupportedOperationException();
     }
+
+
+    public static <T> EntityList<T> fromArray(final T... elements) {
+        EntityList<T> list = null;
+        for (int i = elements.length - 1; i >= 0; i--) {
+            list = new ListDTO<T>(elements[i], list);
+        }
+        return list;
+    }
 }

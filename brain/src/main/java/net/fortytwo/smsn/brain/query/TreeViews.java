@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 public class TreeViews {
@@ -80,7 +81,9 @@ public class TreeViews {
         Note n = new Note();
 
         for (Atom a : atoms) {
-            n.addChild(viewInternal(a, 0, filter, ViewStyle.Basic.Forward.getStyle(), true, null));
+            if (filter.test(a)) {
+                n.addChild(viewInternal(a, 0, filter, ViewStyle.Basic.Forward.getStyle(), true, null));
+            }
         }
 
         return n;
@@ -157,8 +160,10 @@ public class TreeViews {
         }
 
         for (Atom a : results) {
-            Note n = viewInternal(a, height - 1, filter, style, true, null);
-            result.addChild(n);
+            if (filter.test(a)) {
+                Note n = viewInternal(a, height - 1, filter, style, true, null);
+                result.addChild(n);
+            }
         }
 
         result.setTitle(queryType.name() + " results for \"" + query + "\"");
@@ -304,10 +309,11 @@ public class TreeViews {
 
         if (height > 0) {
             for (Atom target : style.getLinked(root, filter)) {
-                addToCache(target, cache);
-                int h = filter.test(target) ? height - 1 : 0;
-                Note cn = viewInternal(target, h, filter, style, getProperties, cache);
-                note.addChild(cn);
+                if (filter.test(target)) {
+                    addToCache(target, cache);
+                    Note cn = viewInternal(target, height - 1, filter, style, getProperties, cache);
+                    note.addChild(cn);
+                }
             }
         }
 
@@ -339,6 +345,28 @@ public class TreeViews {
         }
     }
 
+    public static <T> int indexOfNthVisible(final EntityList<T> list, final int position, final Predicate<T> filter) {
+        EntityList<T> cur = list;
+
+        int index = 0, count = 0;
+        while (null != cur) {
+            if (filter.test(cur.getFirst())) count++;
+            if (count > position) break;
+            cur = cur.getRest();
+            index++;
+        }
+
+        return index;
+    }
+
+    private void addAtomAt(final Atom parent, final Atom child, final int position, final Filter filter) {
+        parent.addChildAt(child, indexOfNthVisible(parent.getChildren(), position, filter));
+    }
+
+    private void removeAtomAt(final Atom parent, final int position, final Filter filter) {
+        parent.deleteChildAt(indexOfNthVisible(parent.getChildren(), position, filter));
+    }
+
     private void updateChildren(final Note rootNote,
                                 final Atom rootAtom,
                                 final int height,
@@ -363,7 +391,7 @@ public class TreeViews {
 
                 Atom atom = getAtomForNote(note, filter, childrenCreated, cache);
 
-                rootAtom.addChildAt(atom, position);
+                addAtomAt(rootAtom, atom, position, filter);
 
                 childrenAdded.add(atom.getId());
 
@@ -380,7 +408,7 @@ public class TreeViews {
                     return;
                 }
 
-                rootAtom.deleteChildAt(position);
+                removeAtomAt(rootAtom, position, filter);
 
                 // log this activity
                 if (null != brain.getActivityLog()) {
@@ -622,14 +650,17 @@ public class TreeViews {
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
     // TODO: see also BrainGraph.toList
-    public static Iterable<Atom> toIterable(EntityList<Atom> l) {
-        List<Atom> ll = new LinkedList<>();
-        while (null != l) {
-            ll.add(l.getFirst());
-            l = l.getRest();
+    public static Iterable<Atom> toFilteredIterable(final EntityList<Atom> list, final Filter filter) {
+        EntityList<Atom> cur = list;
+        List<Atom> javaList = new LinkedList<>();
+        while (null != cur) {
+            if (filter.test(cur.getFirst())) {
+                javaList.add(cur.getFirst());
+            }
+            cur = cur.getRest();
         }
 
-        return ll;
+        return javaList;
     }
 
 }
