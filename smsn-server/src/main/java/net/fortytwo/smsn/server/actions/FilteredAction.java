@@ -22,10 +22,11 @@ abstract class FilteredAction extends Action {
         this.filter = filter;
     }
 
-    protected Atom getRoot(final String rootId, final ActionContext context) {
+    protected Atom getRoot(String rootId, final ActionContext context) {
         Atom root;
         if (rootId.equals(CREATE_NEW_ATOM)) {
             root = createNewRoot(context);
+            rootId = root.getId();
         } else {
             Optional<Atom> opt = context.getBrain().getTopicGraph().getAtomById(rootId);
             if (opt.isPresent()) {
