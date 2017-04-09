@@ -52,10 +52,6 @@ abstract class PGEntity {
         asVertex().addEdge(label, inVertex);
     }
 
-    protected <T> T toEntity(final Vertex vertex, final Function<Vertex, T> constructor) {
-        return null == vertex ? null : constructor.apply(vertex);
-    }
-
     protected <T> T getOptionalProperty(String name) {
         VertexProperty<T> property = vertex.property(name);
         return property.isPresent() ? property.value() : null;

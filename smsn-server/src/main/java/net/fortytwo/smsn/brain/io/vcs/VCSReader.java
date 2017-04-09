@@ -104,18 +104,17 @@ public class VCSReader extends BrainReader {
         }
 
         private void updateAtomProperties() {
-            updateProperty(atom, note, Atom::getAlias, Note::getAlias, Atom::setAlias);
-            updateProperty(atom, note, Atom::getCreated, Note::getCreated, Atom::setCreated);
-            updateProperty(atom, note, Atom::getText, Note::getPage, Atom::setText);
-            updateProperty(atom, note, Atom::getPriority, Note::getPriority, Atom::setPriority);
-            updateProperty(atom, note, Atom::getSharability, Note::getSharability, Atom::setSharability);
-            updateProperty(atom, note, Atom::getShortcut, Note::getShortcut, Atom::setShortcut);
-            updateProperty(atom, note, Atom::getTitle, Note::getTitle, Atom::setTitle);
-            updateProperty(atom, note, Atom::getWeight, Note::getWeight, Atom::setWeight);
+            updateProperty(atom, note, Note::getAlias, Atom::setAlias);
+            updateProperty(atom, note, Note::getCreated, Atom::setCreated);
+            updateProperty(atom, note, Note::getPage, Atom::setText);
+            updateProperty(atom, note, Note::getPriority, Atom::setPriority);
+            updateProperty(atom, note, Note::getSharability, Atom::setSharability);
+            updateProperty(atom, note, Note::getShortcut, Atom::setShortcut);
+            updateProperty(atom, note, Note::getTitle, Atom::setTitle);
+            updateProperty(atom, note, Note::getWeight, Atom::setWeight);
         }
 
         private void updateAtomChildren() {
-            removeAllChildren();
             Optional<EntityList<Atom>> newChildren = createAtomList();
             if (newChildren.isPresent()) {
                 atom.setChildren(newChildren.get());
@@ -124,25 +123,11 @@ public class VCSReader extends BrainReader {
 
         private <T> void updateProperty(final Atom atom,
                                         final Note note,
-                                        final Function<Atom, T> atomGetter,
                                         final Function<Note, T> noteGetter,
                                         final BiConsumer<Atom, T> atomSetter) {
             T value = noteGetter.apply(note);
             if (null != value) {
                 atomSetter.accept(atom, value);
-            }
-        }
-
-        private void removeAllChildren() {
-            EntityList<Atom> list = atom.getChildren();
-            if (null != list) {
-                while (null != list) {
-                    EntityList<Atom> rest = list.getRest();
-                    list.destroy();
-                    list = rest;
-                }
-
-                atom.setChildren(null);
             }
         }
 
@@ -160,12 +145,13 @@ public class VCSReader extends BrainReader {
         private Atom resolveAtomReference(final String id) {
             TopicGraph graph = context.getTopicGraph();
             Optional<Atom> opt = graph.getAtomById(id);
+            Atom referenced;
             if (opt.isPresent()) {
-                atom = opt.get();
+                referenced = opt.get();
             } else {
-                atom = graph.createAtom(id);
+                referenced = graph.createAtom(id);
             }
-            return atom;
+            return referenced;
         }
     }
 }

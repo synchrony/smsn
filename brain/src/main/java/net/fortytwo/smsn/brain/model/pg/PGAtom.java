@@ -10,7 +10,6 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public abstract class PGAtom extends PGEntity implements Atom {
 
@@ -122,11 +121,10 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public void setChildren(EntityList<Atom> notes) {
-        removeNotes();
-        if (null != notes) {
-            addOutEdge(((PGEntity) notes).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
-        }
+    public void setChildren(EntityList<Atom> children) {
+        removeAllChildren();
+
+        setChildrenInternal(children);
     }
 
     @Override
@@ -141,7 +139,7 @@ public abstract class PGAtom extends PGEntity implements Atom {
         EntityList<Atom> list = getGraph().createListOfAtoms(child);
         if (0 == position) {
             list.setRest(getChildren());
-            setChildren(list);
+            setChildrenInternal(list);
         } else {
             EntityList<Atom> prev = getChildren();
             for (int i = 1; i < position; i++) {
@@ -159,9 +157,9 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
         // remove the atom's list node
         if (0 == position) {
-            setChildren(list.getRest());
+            setChildrenInternal(list.getRest());
 
-            deleteListNode(list);
+            deleteEntity(list);
         } else {
             EntityList<Atom> prev = list;
             for (int i = 1; i < position; i++) {
@@ -170,7 +168,24 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
             EntityList<Atom> l = prev.getRest();
             prev.setRest(l.getRest());
-            deleteListNode(l);
+            deleteEntity(l);
+        }
+    }
+
+    private void setChildrenInternal(EntityList<Atom> children) {
+        removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
+
+        if (null != children) {
+            addOutEdge(((PGEntity) children).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
+        }
+    }
+
+    private void removeAllChildren() {
+        EntityList<Atom> cur = getChildren();
+        while (null != cur) {
+            EntityList<Atom> rest = cur.getRest();
+            deleteEntity(cur);
+            cur = rest;
         }
     }
 
@@ -195,12 +210,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
         destroyInternal();
     }
 
-    private void deleteListNode(final EntityList<Atom> l) {
+    private void deleteEntity(final EntityList<Atom> l) {
         ((PGEntity) l).asVertex().remove();
-    }
-
-    private boolean removeNotes() {
-        return removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
     }
 
     private void updateAcronym() {

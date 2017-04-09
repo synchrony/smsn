@@ -356,9 +356,9 @@ public class PGTopicGraph implements TopicGraph {
         for (Atom originalAtom : getAllAtoms()) {
             if (filter.test(originalAtom)) {
                 PGAtom newAtom = findOrCopyAtom(originalAtom, filter, newGraph);
-                PGEntityList<Atom> notes = (PGEntityList<Atom>) originalAtom.getChildren();
-                if (null != notes) {
-                    newAtom.setChildren(copyAtomList(notes, filter, newGraph));
+                PGEntityList<Atom> children = (PGEntityList<Atom>) originalAtom.getChildren();
+                if (null != children) {
+                    newAtom.setChildren(copyAtomList(children, filter, newGraph));
                 }
             }
         }

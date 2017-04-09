@@ -100,7 +100,7 @@ public abstract class BrainTestBase {
         return EntityList.toJavaList(atom.getChildren());
     }
 
-    private File createTempDirectory() throws IOException {
+    protected File createTempDirectory() throws IOException {
         File file = File.createTempFile("smsn-testing-", "");
         file.delete();
 
