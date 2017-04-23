@@ -53,6 +53,7 @@ public abstract class BrainTestBase {
         File dir = createTempDirectory();
 
         graphWrapper = new Neo4jGraphWrapper(dir);
+        graphWrapper.begin();
         graph = graphWrapper.getGraph();
 
         return new PGTopicGraph(graphWrapper);
@@ -86,6 +87,16 @@ public abstract class BrainTestBase {
         Atom root = topicGraph.createAtomWithProperties(filter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);
         return root;
+    }
+
+    protected Atom createAtom(final String title) {
+        return createAtom(SemanticSynchrony.createRandomId(), title);
+    }
+
+    protected Atom createAtom(final String id, final String title) {
+        Atom atom = topicGraph.createAtomWithProperties(filter, id);
+        atom.setTitle(title);
+        return atom;
     }
 
     protected int countAtoms(final TopicGraph graph) {

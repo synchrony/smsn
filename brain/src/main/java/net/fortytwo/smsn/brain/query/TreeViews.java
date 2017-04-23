@@ -142,18 +142,20 @@ public class TreeViews {
         checkFilterArg(filter);
         checkStyleArg(style, false);
 
+        String rewrittenQuery = rewriteQuery(query);
+
         Note result = new Note();
 
         List<Atom> results;
         switch (queryType) {
             case FullText:
-                results = brain.getTopicGraph().getAtomsByTitleQuery(query, filter);
+                results = brain.getTopicGraph().getAtomsByTitleQuery(rewrittenQuery, filter);
                 break;
             case Acronym:
-                results = brain.getTopicGraph().getAtomsByAcronym(query, filter);
+                results = brain.getTopicGraph().getAtomsByAcronym(rewrittenQuery, filter);
                 break;
             case Shortcut:
-                results = brain.getTopicGraph().getAtomsByShortcut(query, filter);
+                results = brain.getTopicGraph().getAtomsByShortcut(rewrittenQuery, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);
@@ -646,6 +648,32 @@ public class TreeViews {
         }
 
         return note;
+    }
+
+    private String rewriteQuery(final String original) {
+        String[] parts = original.trim().split("[ \t\n\r]+");
+        StringBuilder sb = new StringBuilder();
+        String lastPart = null;
+        for (String part : parts) {
+            if (null == lastPart) {
+                sb.append(part);
+            } else {
+                if (!isSpecialToken(part) && !isSpecialToken(lastPart)) {
+                    sb.append(" AND");
+                }
+
+                sb.append(" ");
+                sb.append(part);
+            }
+
+            lastPart = part;
+        }
+
+        return sb.toString();
+    }
+
+    private boolean isSpecialToken(final String token) {
+        return token.equals("AND") || token.equals("OR");
     }
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
