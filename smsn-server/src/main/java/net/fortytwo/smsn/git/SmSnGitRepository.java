@@ -10,11 +10,13 @@ import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.GitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
@@ -28,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-public class SmSnGitRepository extends AtomBase {
+public class SmSnGitRepository extends AtomBase implements AbstractRepository {
 
     private static final Logger logger = Logger.getLogger(SmSnGitRepository.class.getName());
 
@@ -81,6 +83,39 @@ public class SmSnGitRepository extends AtomBase {
     }
 
     @Override
+    public void addAll() throws RepositoryException {
+        performOperation(getGit().add()
+                    .addFilepattern("."));
+    }
+
+    @Override
+    public void commitAll(final String message) throws RepositoryException {
+        performOperation(getGit().commit()
+                    .setMessage(message)
+                    .setAllowEmpty(false)
+                    .setAll(true));
+    }
+
+    @Override
+    public void pull() throws RepositoryException {
+        performOperation(getGit().pull()
+                    .setStrategy(MergeStrategy.RESOLVE));
+    }
+
+    @Override
+    public void push() throws RepositoryException {
+        performOperation(getGit().push());
+    }
+
+    @Override
+    public void cycle(final String message) throws RepositoryException {
+        addAll();
+        commitAll(message);
+        pull();
+        push();
+    }
+
+    @Override
     public Float getSharability() {
         return sharability;
     }
@@ -123,6 +158,14 @@ public class SmSnGitRepository extends AtomBase {
 
     public void close() {
         repository.close();
+    }
+
+    private void performOperation(final GitCommand command) throws RepositoryException {
+        try {
+            command.call();
+        } catch (GitAPIException e) {
+            throw new RepositoryException(e);
+        }
     }
 
     private void verifyCanRead() {

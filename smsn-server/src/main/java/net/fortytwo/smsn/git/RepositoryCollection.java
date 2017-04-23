@@ -10,7 +10,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import java.io.File;
 import java.io.IOException;
 
-public class RepositoryCollection {
+public class RepositoryCollection implements AbstractRepository {
 
     private final File directory;
 
@@ -37,6 +37,31 @@ public class RepositoryCollection {
         repositories = new SmSnGitRepository[]{universalRepo, publicRepo, personalRepo, privateRepo};
     }
 
+    @Override
+    public void addAll() throws RepositoryException {
+        forEach(AbstractRepository::addAll);
+    }
+
+    @Override
+    public void commitAll(String message) throws RepositoryException {
+        forEach(repo -> repo.commitAll(message));
+    }
+
+    @Override
+    public void pull() throws RepositoryException {
+        forEach(AbstractRepository::pull);
+    }
+
+    @Override
+    public void push() throws RepositoryException {
+        forEach(AbstractRepository::push);
+    }
+
+    @Override
+    public void cycle(final String message) throws RepositoryException {
+        forEach(repo -> repo.cycle(message));
+    }
+
     public Note getHistory(final SmSnGitRepository.Limits limits) throws IOException, GitAPIException {
         long now = System.currentTimeMillis();
 
@@ -59,7 +84,18 @@ public class RepositoryCollection {
         return parent;
     }
 
+    private void forEach(final ConsumerWithException<AbstractRepository, RepositoryException> consumer)
+            throws RepositoryException {
+        for (SmSnGitRepository repo : repositories) {
+            consumer.accept(repo);
+        }
+    }
+
     private SmSnGitRepository createRepository(final float sharability, final String name) throws IOException {
         return new SmSnGitRepository(brain, new File(directory, name), sharability);
+    }
+
+    private interface ConsumerWithException<T, E extends Exception> {
+        void accept(T t) throws E;
     }
 }

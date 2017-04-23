@@ -27,6 +27,10 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class BrainTestBase {
 
+    protected static final String ARTHUR_ID = "bxSoyLUM4w4RfitB";
+    protected static final String FORD_ID = "QoTIPwLOID58u3Lr";
+    protected static final String ZAPHOD_ID = "RqAUSvwi1H878V5j";
+
     protected TreeViews queries;
     protected TopicGraph topicGraph;
     protected final WikiParser wikiParser = new WikiParser();
