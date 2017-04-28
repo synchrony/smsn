@@ -9,6 +9,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RepositoryCollection implements AbstractRepository {
 
@@ -62,6 +64,41 @@ public class RepositoryCollection implements AbstractRepository {
         forEach(repo -> repo.cycle(message));
     }
 
+    @Override
+    public Set<String> getAdded() throws RepositoryException {
+        return unionOf(AbstractRepository::getAdded);
+    }
+
+    @Override
+    public Set<String> getRemoved() throws RepositoryException {
+        return unionOf(AbstractRepository::getRemoved);
+    }
+
+    @Override
+    public Set<String> getUntracked() throws RepositoryException {
+        return unionOf(AbstractRepository::getUntracked);
+    }
+
+    @Override
+    public Set<String> getChanged() throws RepositoryException {
+        return unionOf(AbstractRepository::getChanged);
+    }
+
+    @Override
+    public Set<String> getModified() throws RepositoryException {
+        return unionOf(AbstractRepository::getModified);
+    }
+
+    @Override
+    public Set<String> getConflicting() throws RepositoryException {
+        return unionOf(AbstractRepository::getConflicting);
+    }
+
+    @Override
+    public Set<String> getMissing() throws RepositoryException {
+        return unionOf(AbstractRepository::getMissing);
+    }
+
     public Note getHistory(final SmSnGitRepository.Limits limits) throws IOException, GitAPIException {
         long now = System.currentTimeMillis();
 
@@ -84,6 +121,15 @@ public class RepositoryCollection implements AbstractRepository {
         return parent;
     }
 
+    private <R> Set<R> unionOf(FunctionWithException<AbstractRepository, Set<R>, RepositoryException> function)
+            throws RepositoryException {
+        Set<R> result = new HashSet<>();
+        for (SmSnGitRepository repo : repositories) {
+            result.addAll(function.apply(repo));
+        }
+        return result;
+    }
+
     private void forEach(final ConsumerWithException<AbstractRepository, RepositoryException> consumer)
             throws RepositoryException {
         for (SmSnGitRepository repo : repositories) {
@@ -95,7 +141,19 @@ public class RepositoryCollection implements AbstractRepository {
         return new SmSnGitRepository(brain, new File(directory, name), sharability);
     }
 
+    private void checkReadyForExport() {
+
+    }
+
+    private void checkReadyForImport() {
+
+    }
+
     private interface ConsumerWithException<T, E extends Exception> {
         void accept(T t) throws E;
+    }
+
+    private interface FunctionWithException<D, R, E extends Exception> {
+        R apply(D d) throws E, RepositoryException;
     }
 }

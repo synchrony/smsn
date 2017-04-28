@@ -101,12 +101,35 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         //repo.push();
     }
 
+    @Test
+    public void historyDoesntBreak() throws Exception {
+        addFile(testNote(ARTHUR_ID, "Arthur Dent"));
+        repo.addAll();
+        repo.commitAll("first commit");
+        addFile(testNote(FORD_ID, "Ford Prefect"));
+        addFile(testNote(ZAPHOD_ID, "Zaphod Beeblebrox"));
+        repo.addAll();
+        repo.commitAll("second commit");
+
+        Note history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
+        assertEquals(2, history.getChildren().size());
+        Note secondCommit = history.getChildren().get(0);
+        Note firstCommit = history.getChildren().get(1);
+        assertTrue(firstCommit.getTitle().endsWith("first commit"));
+        assertTrue(secondCommit.getTitle().endsWith("second commit"));
+        /* TODO: test interned atoms
+        assertEquals(1, firstCommit.getChildren().size());
+        assertEquals(2, secondCommit.getChildren().size());
+        assertEquals("Arthur Dent", firstCommit.getChildren().get(0).getTitle());
+        */
+    }
+
     private int countUntracked() throws GitAPIException {
         return git.status().call().getUntracked().size();
     }
 
-    private int countAdded() throws GitAPIException {
-        return git.status().call().getAdded().size();
+    private int countAdded() throws AbstractRepository.RepositoryException {
+        return repo.getAdded().size();
     }
 
     private boolean hasCommits() throws IOException {
