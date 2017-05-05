@@ -1,4 +1,4 @@
-package net.fortytwo.smsn.util.slip;
+package net.fortytwo.smsn.p2p.osc.slip;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -7,7 +7,6 @@ import net.fortytwo.smsn.config.Service;
 import java.io.IOException;
 import java.net.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TypeatronMusicControl {
 
@@ -58,7 +57,6 @@ public class TypeatronMusicControl {
         OSCMessage m = new OSCMessage(address);
 
         try {
-
             byte[] buffer = m.getByteArray();
             DatagramPacket packet
                     = new DatagramPacket(buffer, buffer.length, musicControlAddress, musicControlPort);

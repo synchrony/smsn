@@ -2,6 +2,7 @@ package net.fortytwo.smsn.p2p.osc;
 
 import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCMessage;
+import net.fortytwo.smsn.p2p.osc.slip.SlipOscSender;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

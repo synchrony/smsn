@@ -1,7 +1,8 @@
-package net.fortytwo.smsn.p2p.osc;
+package net.fortytwo.smsn.p2p.osc.udp;
 
 import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCPortOut;
+import net.fortytwo.smsn.p2p.osc.OscSender;
 
 import java.io.IOException;
 import java.net.InetAddress;
