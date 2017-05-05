@@ -66,7 +66,7 @@
     <modules>
         <module>smsn-core</module>
         <module>brain</module>
-        <module>smsn-p2p</module>
+        <module>smsn-services</module>
         <module>smsn-rdf</module>
         <module>smsn-server</module>
         <module>smsn-devices</module>

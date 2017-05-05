@@ -59,7 +59,7 @@ public class QueryEngineWrapper {
 
     private void newConnection(final Connection c) {
         c.registerHandler(ProxySparqlStreamProcessor.TAG_SPARQL_QUERY, message -> {
-            if (SemanticSynchrony.VERBOSE) {
+            if (SemanticSynchrony.getConfiguration().isVerbose()) {
                 logger.info("received query message from "
                         + c.getSocket().getRemoteSocketAddress() + ": " + message);
             }
@@ -131,7 +131,7 @@ public class QueryEngineWrapper {
         j.put(ProxySparqlStreamProcessor.MAPPING, bindings);
         j.put(ProxySparqlStreamProcessor.EXPIRATION_TIME, expirationTime);
 
-        if (SemanticSynchrony.VERBOSE) {
+        if (SemanticSynchrony.getConfiguration().isVerbose()) {
             logger.info("sending query result message to " + c.getSocket().getRemoteSocketAddress() + ": " + j);
         }
 
@@ -140,7 +140,7 @@ public class QueryEngineWrapper {
     }
 
     private void handleDatasetMessage(final JSONObject message) throws SimpleJSONRDFFormat.ParseError {
-        if (SemanticSynchrony.VERBOSE) {
+        if (SemanticSynchrony.getConfiguration().isVerbose()) {
             logger.info("received dataset message: " + message);
         }
 

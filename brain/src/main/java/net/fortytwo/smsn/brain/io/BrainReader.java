@@ -4,9 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -33,12 +31,7 @@ public abstract class BrainReader {
     private final int transactionBufferSize;
 
     protected BrainReader() {
-        try {
-            transactionBufferSize = SemanticSynchrony.getConfiguration().getInt(
-                    SemanticSynchrony.TRANSACTION_BUFFER_SIZE, 0);
-        } catch (TypedProperties.PropertyException e) {
-            throw new IllegalStateException(e);
-        }
+        transactionBufferSize = SemanticSynchrony.getConfiguration().getTransactionBufferSize();
     }
 
     public void doImport(

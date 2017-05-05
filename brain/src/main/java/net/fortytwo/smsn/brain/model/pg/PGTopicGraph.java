@@ -2,27 +2,15 @@ package net.fortytwo.smsn.brain.model.pg;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.Entity;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.brain.model.entities.*;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -33,15 +21,7 @@ public class PGTopicGraph implements TopicGraph {
 
     private static final String REDACTED_VALUE = "";
 
-    private static final String thingNamespace;
-
-    static {
-        try {
-            thingNamespace = SemanticSynchrony.getConfiguration().getString(PROP_THING_NAMESPACE, DEFAULT_THING_NAMESPACE);
-        } catch (TypedProperties.PropertyException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    private static final String thingNamespace = SemanticSynchrony.getConfiguration().getThingNamespace();
 
     private final GraphWrapper wrapper;
     private final Graph propertyGraph;

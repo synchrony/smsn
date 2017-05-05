@@ -132,7 +132,7 @@
             <!-- for embedded images NAME="ExternalObject" -->
             <xs:attribute name='URI'  type='xs:anyURI' use='optional'/>
             <xs:attribute name='SIZE' type='xs:decimal' use='optional'/>
-            <!-- for map config info NAME="MapStyle" -->
+            <!-- for configurationnfig info NAME="MapStyle" -->
             <xs:attribute name='max_node_width'  type='xs:integer' use='optional'/>
             <xs:attribute name='zoom' type='xs:decimal' use='optional'/>
             <!-- for equations NAME="plugins/latex/LatexNodeHook.properties" -->

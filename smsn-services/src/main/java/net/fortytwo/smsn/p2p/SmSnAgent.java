@@ -43,7 +43,7 @@ public class SmSnAgent {
     private int coordinatorOscPort;
 
     public SmSnAgent(final boolean listenForServices) {
-        this(SemanticSynchrony.getConfiguration().getProperty(SemanticSynchrony.P2P_AGENT_IRI), listenForServices);
+        this(SemanticSynchrony.getConfiguration().getServices().getAgentIri(), listenForServices);
     }
 
     public SmSnAgent(final String agentIri,
@@ -62,7 +62,7 @@ public class SmSnAgent {
         if (listenForServices) {
             listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
                 public void receivedServiceDescription(InetAddress address, ServiceDescription description) {
-                    if (SemanticSynchrony.VERBOSE) {
+                    if (SemanticSynchrony.getConfiguration().isVerbose()) {
                         logger.log(Level.FINE, "received broadcast message from " + address.getHostAddress()
                                 + ": version=" + description.getVersion()
                                 + ", endpoint=" + description.getEndpoint()
@@ -94,7 +94,7 @@ public class SmSnAgent {
 
                         coordinatorConnection.start(socket);
                     } else {
-                        if (SemanticSynchrony.VERBOSE) {
+                        if (SemanticSynchrony.getConfiguration().isVerbose()) {
                             logger.log(Level.FINE, "ignoring broadcast message due to existing connection to "
                                     + coordinatorService.address.getHostAddress());
                         }

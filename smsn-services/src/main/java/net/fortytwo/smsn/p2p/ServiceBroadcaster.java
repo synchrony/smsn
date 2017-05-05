@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.p2p;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.config.Service;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,19 +47,15 @@ public class ServiceBroadcaster {
     }
 
     private void sendBroadcastMessages() {
+        Service config = SemanticSynchrony.getConfiguration().getServices().getBroadcast();
+
         String address;
         int port;
         long broadcastInterval;
 
-        try {
-            address = SemanticSynchrony.getConfiguration().getString(SemanticSynchrony.P2P_BROADCAST_ADDRESS);
-            port = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_BROADCAST_PORT);
-            broadcastInterval = SemanticSynchrony.getConfiguration().getLong(SemanticSynchrony.P2P_BROADCAST_INTERVAL);
-        } catch (TypedProperties.PropertyException e) {
-            logger.severe("error accessing config properties when sending broadcast message: " + e.getMessage());
-            e.printStackTrace(System.err);
-            return;
-        }
+        address = config.getHost();
+        port = config.getPort();
+        broadcastInterval = config.getInterval();
 
         JSONObject j;
         try {

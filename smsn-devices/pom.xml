@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>net.fortytwo.smsn</groupId>
-            <artifactId>smsn-p2p</artifactId>
+            <artifactId>smsn-services</artifactId>
             <version>${smsn.version}</version>
         </dependency>
 

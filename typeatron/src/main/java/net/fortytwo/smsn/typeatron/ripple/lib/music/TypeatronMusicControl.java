@@ -2,14 +2,10 @@ package net.fortytwo.smsn.typeatron.ripple.lib.music;
 
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.config.Service;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,11 +22,11 @@ public class TypeatronMusicControl {
 
     private boolean enabled;
 
-    public TypeatronMusicControl() throws TypedProperties.PropertyException, SocketException, UnknownHostException {
-        TypedProperties conf = SemanticSynchrony.getConfiguration();
-        String s = conf.getString(MUSIC_CONTROL_ADDRESS, null);
+    public TypeatronMusicControl() throws SocketException, UnknownHostException {
+        Service conf = SemanticSynchrony.getConfiguration().getServices().getMusic();
+        String s = conf.getHost();
         musicControlAddress = null == s ? null : InetAddress.getByName(s);
-        musicControlPort = conf.getInt(MUSIC_CONTROL_PORT, 0);
+        musicControlPort = conf.getPort();
 
         if (null != musicControlAddress && musicControlPort > 0) {
             musicOscSocket = new DatagramSocket();

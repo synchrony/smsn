@@ -9,7 +9,6 @@ import net.fortytwo.smsn.p2p.ServiceBroadcaster;
 import net.fortytwo.smsn.p2p.ServiceDescription;
 import net.fortytwo.smsn.p2p.sparql.QueryEngineWrapper;
 import net.fortytwo.smsn.gesture.GesturalServer;
-import net.fortytwo.smsn.util.TypedProperties;
 import net.fortytwo.stream.StreamProcessor;
 import net.fortytwo.stream.sparql.SparqlStreamProcessor;
 import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;
@@ -53,7 +52,7 @@ public class CoordinatorService {
         if (null == INSTANCE) {
             try {
                 INSTANCE = new CoordinatorService();
-            } catch (IOException | TypedProperties.PropertyException e) {
+            } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
         }
@@ -62,15 +61,15 @@ public class CoordinatorService {
     }
 
     private CoordinatorService()
-            throws IOException, TypedProperties.PropertyException, SailException {
+            throws IOException, SailException {
 
-        int oscPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_OSC_PORT);
-        int pubsubPort = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_PUBSUB_PORT);
+        int oscPort = SemanticSynchrony.getConfiguration().getServices().getOsc().getPort();
+        int pubsubPort = SemanticSynchrony.getConfiguration().getServices().getPubSub().getPort();
 
         streamProcessor = new SHJSparqlStreamProcessor();
         QueryEngineWrapper wrapper = new QueryEngineWrapper(streamProcessor);
 
-        if (SemanticSynchrony.VERBOSE) {
+        if (SemanticSynchrony.getConfiguration().isVerbose()) {
             streamProcessor.setDoPerformanceMetrics(true);
             streamProcessor.setDoUseCompactLogFormat(false);
         }
@@ -97,14 +96,14 @@ public class CoordinatorService {
         GesturalServer gesturalServer = new GesturalServer(oscPort, h);
         gesturalServer.start();
 
-        // SPARQL pub/sub via SmSn P2P
+        // SPARQL pub/sub via SmSn Services
         ConnectionHost ch = new ConnectionHost(pubsubPort);
         ch.addNotifier(wrapper.getNotifier());
         ch.addNotifier(PingAnswerer::new);
         ch.start();
 
         // begin advertising the service now that the query engine is available
-        ServiceDescription d = new ServiceDescription(SemanticSynchrony.getConfiguration().getProperty(SemanticSynchrony.VERSION),
+        ServiceDescription d = new ServiceDescription(SemanticSynchrony.getConfiguration().getVersion(),
                 BROADCAST_ENDPOINT,
                 oscPort,
                 pubsubPort);
@@ -122,7 +121,7 @@ public class CoordinatorService {
             throw new IOException(e);
         }
 
-        if (SemanticSynchrony.VERBOSE) {
+        if (SemanticSynchrony.getConfiguration().isVerbose()) {
             logger.info("received a dataset with " + count + " statements");
         }
     }

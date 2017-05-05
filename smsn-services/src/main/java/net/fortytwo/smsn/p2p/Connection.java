@@ -129,7 +129,7 @@ public class Connection {
 
         String s = message.toString();
 
-        if (SemanticSynchrony.VERBOSE) {
+        if (SemanticSynchrony.getConfiguration().isVerbose()) {
             logger.info("sending message to " + socket.getRemoteSocketAddress() + ": " + s);
         }
 
@@ -155,7 +155,7 @@ public class Connection {
                 break;
             }
 
-            if (SemanticSynchrony.VERBOSE) {
+            if (SemanticSynchrony.getConfiguration().isVerbose()) {
                 logger.info("received message from " + socket.getRemoteSocketAddress() + ": " + line);
             }
 

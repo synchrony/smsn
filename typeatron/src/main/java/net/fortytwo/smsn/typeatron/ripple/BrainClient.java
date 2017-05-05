@@ -9,7 +9,7 @@ import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.config.Service;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpEntity;
@@ -62,22 +62,14 @@ public class BrainClient {
     private final String baseUrl;
 
     public BrainClient() throws BrainClientException {
-        TypedProperties config = SemanticSynchrony.getConfiguration();
-        if (null == config) {
-            throw new IllegalStateException();
-        }
-
         // note: constructor will fail if any of these properties are not defined
         String serverName;
         int serverPort;
         String graph;
-        try {
-            serverName = config.getString(PROP_SERVER_NAME);
-            serverPort = config.getInt(PROP_SERVER_PORT);
-            graph = config.getString(PROP_GRAPH);
-        } catch (TypedProperties.PropertyException e) {
-            throw new BrainClientException(e);
-        }
+        Service config = SemanticSynchrony.getConfiguration().getServices().getServer();
+        serverName = config.getHost();
+        serverPort = config.getPort();
+        graph = config.getGraph();
 
         baseUrl = "/graphs/" + graph + "/smsn/";
 
@@ -167,12 +159,13 @@ public class BrainClient {
 
     /**
      * Updates the graph
-     *  @param root   the root of the subgraph to be updated
-     * @param height   the maximum height of the tree which will be applied to the graph as an update.
-     *                 If height is 0, only the root node will be affected,
-     *                 while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
+     *
+     * @param root   the root of the subgraph to be updated
+     * @param height the maximum height of the tree which will be applied to the graph as an update.
+     *               If height is 0, only the root node will be affected,
+     *               while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
      * @param filter a collection of criteria for atoms and links.
- *               Atoms and links which do not meet the criteria are not to be affected by the update.
+     *               Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      */
     public void update(final Note root,

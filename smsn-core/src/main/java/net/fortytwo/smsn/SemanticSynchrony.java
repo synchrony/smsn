@@ -1,12 +1,9 @@
 package net.fortytwo.smsn;
 
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.config.Configuration;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.io.*;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -14,33 +11,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class SemanticSynchrony {
-    public static final boolean
-            SAFE = true,
-            VERBOSE = true;
-
-    // general configuration properties
-    public static final String
-            BASE_URI = "net.fortytwo.smsn.baseURI",
-            ACTIVITY_LOG = "net.fortytwo.smsn.activityLog",
-            ATOM_NAMESPACE = "net.fortytwo.smsn.atomNamespace",
-            VERSION = "net.fortytwo.smsn.version";
-
-    // I/O properties
-    public static final String
-            TRANSACTION_BUFFER_SIZE = "net.fortytwo.smsn.io.transactionBufferSize";
-
-    // P2P configuration properties
-    public static final String
-            P2P_AGENT_IRI = "net.fortytwo.smsn.p2p.agentIri",
-            P2P_BROADCAST_ADDRESS = "net.fortytwo.smsn.p2p.broadcastAddress",
-            P2P_BROADCAST_PORT = "net.fortytwo.smsn.p2p.broadcastPort",
-            P2P_BROADCAST_INTERVAL = "net.fortytwo.smsn.p2p.broadcastInterval",
-            P2P_OSC_PORT = "net.fortytwo.smsn.p2p.oscPort",
-            P2P_PUBSUB_PORT = "net.fortytwo.smsn.p2p.pubsubPort";
-
-    // other service properties
-    public static final String
-            BRAIN_PORT = "net.fortytwo.smsn.server.brainPort";
 
     public interface VertexLabels {
         String
@@ -114,10 +84,10 @@ public class SemanticSynchrony {
     private static final Random random = new Random();
 
     private static final String
-            DEFAULT_PROPERTIES = "smsn-default.properties",
-            WORKING_DIR_PROPERTIES = "smsn.properties";
+            SMSN_YAML = "smsn.yaml",
+            SMSN_DEFAULT_YAML = "smsn-default.yaml";
 
-    public static final Logger logger;
+    public static Logger logger;
 
     public static final String UTF8 = "UTF-8";
 
@@ -125,33 +95,12 @@ public class SemanticSynchrony {
             GESTURE_TTL = 1, // we consider gestural events to be valid only for 1 second (the minimum TTL)
             ATTENTION_TTL = 5; // we consider attention to be valid for several seconds
 
-    private static final TypedProperties configuration;
+    private static Configuration configuration;
 
     static {
         try {
-            // logging configuration
-            {
-                try (InputStream in = SemanticSynchrony.class.getResourceAsStream("logging.properties")) {
-                    LogManager.getLogManager().reset();
-                    LogManager.getLogManager().readConfiguration(in);
-                }
-                logger = getLogger(SemanticSynchrony.class);
-            }
-
-            configuration = new TypedProperties();
-
-            // first load SmSn's internal default properties
-            configuration.load(SemanticSynchrony.class.getResourceAsStream(DEFAULT_PROPERTIES));
-
-            // attempt to load additional properties from a user-provided file in the current directory
-            File f = new File(WORKING_DIR_PROPERTIES);
-            if (f.exists()) {
-                addConfiguration(f);
-            } else {
-                logger.info("using default Semantic Synchrony configuration");
-            }
-
-            // further properties may be added later with addProperties()
+            loadLoggingConfiguration();
+            loadYamlFromDefaultLocation();
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -161,43 +110,36 @@ public class SemanticSynchrony {
         return Logger.getLogger(c.getName());
     }
 
-    /**
-     * Adds the properties found at a given file path to the SmSn configuration.
-     * These add to or replace SmSn's default properties and any properties found in a smsn.properties file
-     * in the current directory.
-     *
-     * @param file the file path to the configuration properties to add
-     * @throws java.io.IOException if the file does not exist or can't be loaded
-     */
-    public static void addConfiguration(final File file) throws IOException {
-        if (file.exists()) {
-            logger.info("loading Semantic Synchrony configuration at " + file.getAbsoluteFile());
-            Properties p = new Properties();
-            try (InputStream in = new FileInputStream(file)) {
-                p.load(in);
-            }
-
-            addConfiguration(p);
-        } else {
-            throw new IOException("properties file does not exist: " + file);
-        }
+    public static void readConfigurationYaml(final InputStream input) throws IOException {
+        configuration = new Yaml().loadAs(input, Configuration.class);
     }
 
-    /**
-     * Adds the given properties to the SmSn configuration.
-     * These add to or replace SmSn's default properties and any properties found in a smsn.properties file
-     * in the current directory.
-     *
-     * @param properties the new key/value pairs to add.
-     *                   Note that a new value for a key already present in configuration will replace the old value
-     */
-    public static void addConfiguration(final Properties properties) {
-        configuration.putAll(properties);
-        logger.info("added " + properties.size() + " configuration properties");
-    }
-
-    public static TypedProperties getConfiguration() {
+    public static Configuration getConfiguration() {
         return configuration;
+    }
+
+    private static void loadLoggingConfiguration() throws IOException {
+        try (InputStream in = SemanticSynchrony.class.getResourceAsStream("logging.properties")) {
+            if (null == in) throw new IllegalStateException();
+            LogManager.getLogManager().reset();
+            LogManager.getLogManager().readConfiguration(in);
+        }
+        logger = getLogger(SemanticSynchrony.class);
+    }
+
+    private static void loadYamlFromDefaultLocation() throws IOException {
+        File f = new File(SMSN_YAML);
+        if (f.exists() && !f.isDirectory() && f.canRead()) {
+            logger.info("loading Semantic Synchrony configuration at " + f.getAbsolutePath());
+            try (InputStream input = new FileInputStream(f)) {
+                readConfigurationYaml(input);
+            }
+        } else {
+            logger.info("using default Semantic Synchrony configuration");
+            try (InputStream input = SemanticSynchrony.class.getResourceAsStream(SMSN_DEFAULT_YAML)) {
+                readConfigurationYaml(input);
+            }
+        }
     }
 
     /**

@@ -1,9 +1,7 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.tinkerpop.gremlin.driver.ser.SerTokens;
-import org.apache.tinkerpop.gremlin.jsr223.Customizer;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineManager;
@@ -11,7 +9,6 @@ import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineManager;
 import javax.script.ScriptEngine;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
@@ -96,16 +93,9 @@ public class SmSnScriptEngineFactory implements GremlinScriptEngineFactory {
 
     @Override
     public void setCustomizerManager(GremlinScriptEngineManager manager) {
-        // TODO
-        final List<Customizer> customizers =  manager.getCustomizers(ENGINE_NAME);
     }
 
     private String getVersion() {
-        try {
-            return SemanticSynchrony.getConfiguration().getString(SemanticSynchrony.VERSION);
-        } catch (TypedProperties.PropertyException e) {
-            logger.log(Level.WARNING, "couldn't get version", e);
-            return "?";
-        }
+        return SemanticSynchrony.getConfiguration().getVersion();
     }
 }

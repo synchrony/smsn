@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.p2p;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.config.Service;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -44,8 +44,10 @@ public class ServiceBroadcastListener {
         stopped = true;
     }
 
-    private void listenForCoordinatorBroadcast() throws TypedProperties.PropertyException {
-        int port = SemanticSynchrony.getConfiguration().getInt(SemanticSynchrony.P2P_BROADCAST_PORT);
+    private void listenForCoordinatorBroadcast() {
+        Service config = SemanticSynchrony.getConfiguration().getServices().getBroadcast();
+
+        int port = config.getPort();
 
         byte[] buffer = new byte[BROADCAST_MAX_LENGTH];
         try {
@@ -81,7 +83,6 @@ public class ServiceBroadcastListener {
     }
 
     public interface EventHandler {
-        void receivedServiceDescription(InetAddress address,
-                                        ServiceDescription description);
+        void receivedServiceDescription(InetAddress address, ServiceDescription description);
     }
 }

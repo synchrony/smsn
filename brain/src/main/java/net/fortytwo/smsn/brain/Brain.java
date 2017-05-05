@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import net.fortytwo.smsn.util.TypedProperties;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -50,19 +49,16 @@ public class Brain {
             throw new BrainException(e);
         }
 
-        File logFile;
-        try {
-            logFile = SemanticSynchrony.getConfiguration().getFile(SemanticSynchrony.ACTIVITY_LOG, null);
-        } catch (TypedProperties.PropertyException e) {
-            throw new BrainException(e);
-        }
+        String filePath = SemanticSynchrony.getConfiguration().getActivityLog();
 
-        if (null == logFile) {
+        if (null == filePath) {
             logger.warning("no activity log specified");
             activityLog = null;
         } else {
-            logger.info("will use activity log at " + logFile.getPath());
+            logger.info("will use activity log at " + filePath);
             try {
+                File logFile = new File(filePath);
+                createDirectories(logFile);
                 activityLog = new ActivityLog(new FileWriter(logFile, true));
             } catch (IOException e) {
                 throw new BrainException(e);
@@ -106,5 +102,9 @@ public class Brain {
         public BrainException(final Throwable cause) {
             super(cause);
         }
+    }
+
+    private void createDirectories(final File file) {
+        file.getParentFile().mkdirs();
     }
 }
