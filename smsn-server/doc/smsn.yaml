@@ -1,0 +1,26 @@
+# Comment this out to use a single transaction per read;
+# this ensures consistency in the case of failure, but is memory-intensive
+transactionBufferSize: 100
+
+# The activity log is a flat file to which a stream
+# of view and edit operations are recorded. Move it to a permanent location.
+activityLog: "data/activity.log"
+
+# Add or remove data sources as needed.  Names and locations must be unique.
+sources:
+  -
+    location: data/sources/private
+    name: "private"
+    sharability: 0.25
+  -
+    location: data/sources/personal
+    name: "personal"
+    sharability: 0.5
+  -
+    location: data/sources/public
+    name: "public"
+    sharability: 0.75
+  -
+    location: data/sources/universal
+    name: "universal"
+    sharability: 1.0
