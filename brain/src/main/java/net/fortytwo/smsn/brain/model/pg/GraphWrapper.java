@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public abstract class GraphWrapper {
-    private static final Logger logger = SemanticSynchrony.getLogger(GraphWrapper.class);
 
     protected final Graph graph;
 
@@ -104,7 +103,7 @@ public abstract class GraphWrapper {
         if (vertices.hasNext()) {
             Vertex next = vertices.next().getEntity();
             if (vertices.hasNext()) {
-                logger.warning("multiple vertices with " + key + " '" + value + "'");
+                SemanticSynchrony.getLogger().warning("multiple vertices with " + key + " '" + value + "'");
             }
 
             return next;

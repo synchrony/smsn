@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * A service for identifying atoms with duplicate values.
@@ -86,7 +87,8 @@ public class FindDuplicates extends FilteredAction {
 
                         total++;
                         if (total > MAX_DUPLICATES) {
-                            SemanticSynchrony.logInfo("showing only the first " + MAX_DUPLICATES + " duplicates");
+                            SemanticSynchrony.getLogger().log(Level.INFO, "showing only the first "
+                                    + MAX_DUPLICATES + " duplicates");
                             break;
                         }
                     }

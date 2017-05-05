@@ -10,11 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TypeatronMusicControl {
-    private final Logger logger = SemanticSynchrony.getLogger(TypeatronMusicControl.class);
-
-    private static final String
-            MUSIC_CONTROL_ADDRESS = "net.fortytwo.smsn.typeatron.musicControlAddress",
-            MUSIC_CONTROL_PORT = "net.fortytwo.smsn.typeatron.musicControlPort";
 
     private final InetAddress musicControlAddress;
     private final int musicControlPort;
@@ -70,11 +65,11 @@ public class TypeatronMusicControl {
             musicOscSocket.send(packet);
 
             // TODO: temporary
-            logger.log(Level.INFO, "sent music control OSC datagram to " + musicControlAddress + ":" + musicControlPort);
+            SemanticSynchrony.getLogger().log(Level.INFO, "sent music control OSC datagram to " + musicControlAddress + ":" + musicControlPort);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "error in sending OSC datagram to coordinator", e);
-        } catch (Throwable t) {
-            logger.log(Level.SEVERE, "unexpected error in sending OSC datagram to coordinator", t);
+            SemanticSynchrony.getLogger().log(Level.SEVERE, "error in sending OSC datagram to coordinator", e);
+        } catch (Exception e) {
+            SemanticSynchrony.getLogger().log(Level.SEVERE, "unexpected error in sending OSC datagram to coordinator", e);
         }
     }
 }

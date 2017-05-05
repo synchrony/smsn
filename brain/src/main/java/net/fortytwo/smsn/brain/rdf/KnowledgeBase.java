@@ -62,7 +62,6 @@ import java.util.logging.Logger;
  * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
  */
 public class KnowledgeBase {
-    private static final Logger logger = SemanticSynchrony.getLogger(KnowledgeBase.class);
 
     private final TopicGraph topicGraph;
 
@@ -177,18 +176,18 @@ public class KnowledgeBase {
             try {
                 Thread.sleep(initialWait);
             } catch (InterruptedException e) {
-                logger.log(Level.WARNING, "interrupted", e);
+                SemanticSynchrony.getLogger().log(Level.WARNING, "interrupted", e);
             }
 
             for (int i = 0; i < totalSteps; i++) {
                 try {
-                    logger.info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
+                    SemanticSynchrony.getLogger().info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
                     inferClasses(null, null);
                 } catch (RDFHandlerException e) {
-                    logger.log(Level.WARNING, "error in warm-up inference", e);
+                    SemanticSynchrony.getLogger().log(Level.WARNING, "error in warm-up inference", e);
                 }
             }
-            logger.info("completed warm-up inference");
+            SemanticSynchrony.getLogger().info("completed warm-up inference");
 
             long lastUpdate = topicGraph.getLastUpdate();
 
@@ -203,10 +202,10 @@ public class KnowledgeBase {
                 long u = topicGraph.getLastUpdate();
                 if (u > lastUpdate) {
                     try {
-                        logger.info("performing class inference");
+                        SemanticSynchrony.getLogger().info("performing class inference");
                         inferClasses(null, null);
                     } catch (RDFHandlerException e) {
-                        logger.log(Level.WARNING, "class inference failed. Will keep trying", e);
+                        SemanticSynchrony.getLogger().log(Level.WARNING, "class inference failed. Will keep trying", e);
                     }
                     lastUpdate = u;
                 }
@@ -582,7 +581,7 @@ public class KnowledgeBase {
         long total = countAtoms();
 
         long endTime = System.currentTimeMillis();
-        logger.info("classified " + typed + " of " + total + " atoms ("
+        SemanticSynchrony.getLogger().info("classified " + typed + " of " + total + " atoms ("
                 + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 
@@ -641,7 +640,7 @@ public class KnowledgeBase {
     public void exportRDF(final OutputStream out,
                           final RDFFormat format,
                           final Filter filter) throws SailException, RDFHandlerException {
-        logger.info("exporting RDF in format " + format);
+        SemanticSynchrony.getLogger().info("exporting RDF in format " + format);
         long startTime, endTime;
         Sail dedupSail = new MemoryStore();
         dedupSail.initialize();
@@ -658,7 +657,7 @@ public class KnowledgeBase {
 
                 h0.endRDF();
                 endTime = System.currentTimeMillis();
-                logger.info("inferred classes and generated RDF in " + (endTime - startTime) + "ms");
+                SemanticSynchrony.getLogger().info("inferred classes and generated RDF in " + (endTime - startTime) + "ms");
 
                 sc.commit();
                 sc.begin();
@@ -674,7 +673,7 @@ public class KnowledgeBase {
                 }
                 h.endRDF();
                 endTime = System.currentTimeMillis();
-                logger.info("wrote triples to disk in " + (endTime - startTime) + "ms");
+                SemanticSynchrony.getLogger().info("wrote triples to disk in " + (endTime - startTime) + "ms");
             } finally {
                 sc.rollback();
                 sc.close();

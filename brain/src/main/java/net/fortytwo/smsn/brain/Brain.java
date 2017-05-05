@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 public class Brain {
-    private static final Logger logger = SemanticSynchrony.getLogger(Brain.class);
 
     /**
      * A configuration property indicating a special atom to which notes may be prepended
@@ -52,10 +51,10 @@ public class Brain {
         String filePath = SemanticSynchrony.getConfiguration().getActivityLog();
 
         if (null == filePath) {
-            logger.warning("no activity log specified");
+            SemanticSynchrony.getLogger().warning("no activity log specified");
             activityLog = null;
         } else {
-            logger.info("will use activity log at " + filePath);
+            SemanticSynchrony.getLogger().info("will use activity log at " + filePath);
             try {
                 File logFile = new File(filePath);
                 createDirectories(logFile);

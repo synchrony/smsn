@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
@@ -94,7 +95,8 @@ public abstract class Action {
         wrapTransactionAndExceptions(context);
         long after = System.currentTimeMillis();
 
-        SemanticSynchrony.logInfo("completed " + getClass().getSimpleName() + " action in " + (after - before) + " ms");
+        SemanticSynchrony.getLogger().log(Level.INFO, "completed " + getClass().getSimpleName()
+                + " action in " + (after - before) + " ms");
 
         logActivity(context);
     }

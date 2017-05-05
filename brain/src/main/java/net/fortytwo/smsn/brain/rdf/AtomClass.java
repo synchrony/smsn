@@ -10,6 +10,7 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFHandlerException;
 
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public abstract class AtomClass {
@@ -58,7 +59,7 @@ public abstract class AtomClass {
             try {
                 aliasIRI = context.getValueFactory().createIRI(a.getAlias());
             } catch (Exception e) {
-                SemanticSynchrony.logWarning("alias is not a valid IRI: " + a.getAlias(), e);
+                SemanticSynchrony.getLogger().log(Level.WARNING, "alias is not a valid IRI: " + a.getAlias(), e);
                 aliasIRI = null;
             }
 

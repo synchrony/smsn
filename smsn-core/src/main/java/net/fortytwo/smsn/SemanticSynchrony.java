@@ -3,9 +3,11 @@ package net.fortytwo.smsn;
 import net.fortytwo.smsn.config.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -87,7 +89,7 @@ public class SemanticSynchrony {
             SMSN_YAML = "smsn.yaml",
             SMSN_DEFAULT_YAML = "smsn-default.yaml";
 
-    public static Logger logger;
+    private static Logger logger;
 
     public static final String UTF8 = "UTF-8";
 
@@ -104,6 +106,10 @@ public class SemanticSynchrony {
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public static Logger getLogger(final Class c) {
@@ -194,23 +200,5 @@ public class SemanticSynchrony {
             }
         }
         return sb.toString();
-    }
-
-    public static void logInfo(final String message) {
-        logger.log(Level.INFO, message);
-    }
-
-    public static void logWarning(final String message) {
-        logger.log(Level.WARNING, message);
-    }
-
-    public static void logWarning(final String message,
-                                  final Throwable thrown) {
-        logger.log(Level.WARNING, message, thrown);
-    }
-
-    public static void logSevere(final String message,
-                                 final Throwable thrown) {
-        logger.log(Level.SEVERE, message, thrown);
     }
 }
