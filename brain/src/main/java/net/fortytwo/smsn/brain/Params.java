@@ -4,6 +4,7 @@ public interface Params {
     enum Format{json, wiki}
 
     String
+            CONFIGURATION = "configuration",
             DEFAULT_SHARABILITY = "defaultSharability",
             DEFAULT_WEIGHT = "defaultWeight",
             FILTER = "filter",

@@ -54,4 +54,8 @@ public interface Atom extends Entity {
     Collection<EntityList<Atom>> getFirstOf();
 
     Atom getSubject(EntityList<Atom> notes);
+
+    String getSource();
+
+    void setSource(String source);
 }

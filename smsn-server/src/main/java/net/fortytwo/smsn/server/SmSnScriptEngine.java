@@ -141,7 +141,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         return new JSONObject(map);
     }
 
-    private static ObjectMapper createObjectMapper() {
+    public static ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         // add any configuration here
         return objectMapper;

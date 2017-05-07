@@ -25,15 +25,19 @@ sources:
     location: data/sources/private
     name: "private"
     sharability: 0.25
+    displayColor: 0xff0000
   -
     location: data/sources/personal
     name: "personal"
     sharability: 0.5
+    displayColor: 0xffff00
   -
     location: data/sources/public
     name: "public"
     sharability: 0.75
+    displayColor: 0x00ff00
   -
     location: data/sources/universal
     name: "universal"
     sharability: 1.0
+    displayColor: 0x0000ff

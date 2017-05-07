@@ -18,6 +18,16 @@ public class SemanticSynchronyTest {
         Configuration conf = SemanticSynchrony.getConfiguration();
 
         assertEquals("http://example.org/things/", conf.getThingNamespace());
+
+        assertEquals("private", conf.getSources().get(0).getName());
+        assertEquals("personal", conf.getSources().get(1).getName());
+        assertEquals("public", conf.getSources().get(2).getName());
+        assertEquals("universal", conf.getSources().get(3).getName());
+
+        assertEquals(0xff0000, (int) conf.getSources().get(0).getDisplayColor());
+        assertEquals(0xffff00, (int) conf.getSources().get(1).getDisplayColor());
+        assertEquals(0x00ff00, (int) conf.getSources().get(2).getDisplayColor());
+        assertEquals(0x0000ff, (int) conf.getSources().get(3).getDisplayColor());
     }
     
     @Test

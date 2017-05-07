@@ -128,6 +128,16 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
+    public String getSource() {
+        return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+    }
+
+    @Override
+    public void setSource(final String source) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+    }
+
+    @Override
     public void forFirstOf(Consumer<EntityList<Atom>> consumer) {
         forEachAdjacentVertex(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
                 vertex -> consumer.accept(getGraph().asListOfAtoms(vertex)));

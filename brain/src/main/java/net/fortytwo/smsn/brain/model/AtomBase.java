@@ -15,6 +15,7 @@ public class AtomBase implements Atom {
     private Float sharability = SemanticSynchrony.Sharability.PUBLIC;
     private Float weight = SemanticSynchrony.Weight.DEFAULT;
     private Float priority = SemanticSynchrony.Priority.NONE;
+    private String source = "public";
 
     @Override
     public void destroy() {
@@ -136,5 +137,15 @@ public class AtomBase implements Atom {
     @Override
     public Atom getSubject(EntityList<Atom> notes) {
         return null;
+    }
+
+    @Override
+    public String getSource() {
+        return source;
+    }
+
+    @Override
+    public void setSource(String source) {
+        this.source = source;
     }
 }
