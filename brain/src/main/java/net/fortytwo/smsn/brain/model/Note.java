@@ -1,13 +1,47 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.SemanticSynchrony;
+
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Note {
     // A special value, for incoming notes only,
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
     public static final String CLEARME = "_";
+
+    public static final Map<String, Property> propertiesByKey;
+
+    static {
+        propertiesByKey = new HashMap<>();
+        for (Property prop : new Property[]{
+                new Property<>(true, SemanticSynchrony.PropertyKeys.ALIAS,
+                        Note::getAlias, Note::setAlias, s -> s),
+                new Property<>(true, SemanticSynchrony.PropertyKeys.CREATED,
+                        Note::getCreated, Note::setCreated, Long::valueOf),
+                new Property<>(false, SemanticSynchrony.PropertyKeys.PAGE,
+                        Note::getPage, Note::setPage, s -> s),
+                new Property<>(true, SemanticSynchrony.PropertyKeys.PRIORITY,
+                        Note::getPriority, Note::setPriority, Float::valueOf),
+                new Property<>(true, SemanticSynchrony.PropertyKeys.SHARABILITY,
+                        Note::getSharability, Note::setSharability, Float::valueOf),
+                new Property<>(true, SemanticSynchrony.PropertyKeys.SOURCE,
+                        Note::getSource, Note::setSource, s -> s),
+                new Property<>(true, SemanticSynchrony.PropertyKeys.SHORTCUT,
+                        Note::getShortcut, Note::setShortcut, s -> s),
+                new Property<>(false, SemanticSynchrony.PropertyKeys.TITLE,
+                        Note::getTitle, Note::setTitle, s -> s),
+                new Property<>(true, SemanticSynchrony.PropertyKeys.WEIGHT,
+                        Note::getWeight, Note::setWeight, Float::valueOf),
+        }) {
+            propertiesByKey.put(prop.propertyKey, prop);
+        }
+    }
 
     private final List<Note> children;
     private int numberOfChildren;
@@ -21,6 +55,7 @@ public class Note {
     private Long created;
     private String alias;
     private String shortcut;
+    private String source;
     //private String type;
     private List<String> meta;
 
@@ -114,7 +149,15 @@ public class Note {
 
         this.weight = weight;
     }
+    
+    public String getSource() {
+        return source;
+    }
 
+    public void setSource(String source) {
+        this.source = source;
+    }
+    
     public Long getCreated() {
         return created;
     }
@@ -186,5 +229,45 @@ public class Note {
     @Override
     public String toString() {
         return "note[" + (null == id ? "null" : id) + "]";
+    }
+
+    public static class Property<T> {
+        private final boolean isAnnotationProperty;
+        private final String propertyKey;
+        private final Function<Note, T> getter;
+        private final BiConsumer<Note, T> setter;
+        private final Function<String, T> fromString;
+
+        private Property(final boolean isAnnotationProperty,
+                         final String propertyKey,
+                         final Function<Note, T> getter,
+                         final BiConsumer<Note, T> setter,
+                         final Function<String, T> fromString) {
+            this.isAnnotationProperty = isAnnotationProperty;
+            this.propertyKey = propertyKey;
+            this.getter = getter;
+            this.setter = setter;
+            this.fromString = fromString;
+        }
+
+        public boolean isAnnotationProperty() {
+            return isAnnotationProperty;
+        }
+
+        public String getPropertyKey() {
+            return propertyKey;
+        }
+
+        public Function<Note, T> getGetter() {
+            return getter;
+        }
+
+        public BiConsumer<Note, T> getSetter() {
+            return setter;
+        }
+
+        public Function<String, T> getFromString() {
+            return fromString;
+        }
     }
 }

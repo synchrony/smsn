@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
@@ -168,7 +169,7 @@ public class WikiParser extends BrainParser {
             Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
 
             String key = currentBullet.substring(1);
-            parseProperty(n, key, currentValue, lineNumber);
+            parseProperty(n, key, currentValue);
         } else {
             Note n = new Note();
             n.setTitle(currentValue);
@@ -207,8 +208,6 @@ public class WikiParser extends BrainParser {
     }
 
     private void parseStructuredLine() throws IOException {
-
-
         findIndentLevel();
 
         updateHierarchy();
@@ -235,59 +234,25 @@ public class WikiParser extends BrainParser {
         lineNumber++;
     }
 
-    private float getFloat(final String key, final String value, final int lineNumber) throws IOException {
-        try {
-            return Float.valueOf(value);
-        } catch (NumberFormatException e) {
-            parseError("invalid @" + key + " value: " + value);
-            return 0f;
-        }
-    }
-
-    private long getLong(final String key, final String value, final int lineNumber) throws IOException {
-        try {
-            return Long.valueOf(value);
-        } catch (NumberFormatException e) {
-            parseError("invalid @" + key + " value: " + value);
-            return 0L;
-        }
-    }
-
-    private void parseProperty(final Note note, final String key, final String value, int lineNumber)
+    private void parseProperty(final Note note, final String key, String rawValue)
             throws IOException {
 
-        switch (key) {
-            case SemanticSynchrony.PropertyKeys.ALIAS:
-                if (value.length() > 0) {
-                    note.setAlias(value);
-                } else {
-                    note.setAlias(Note.CLEARME);
-                }
-                break;
-            case SemanticSynchrony.PropertyKeys.CREATED:
-                note.setCreated(getLong(key, value, lineNumber));
-                break;
-            case SemanticSynchrony.PropertyKeys.PRIORITY: {
-                note.setPriority(getFloat(key, value, lineNumber));
-                break;
-            }
-            case SemanticSynchrony.PropertyKeys.SHARABILITY: {
-                note.setSharability(getFloat(key, value, lineNumber));
-                break;
-            }
-            case SemanticSynchrony.PropertyKeys.SHORTCUT:
-                if (value.length() > 0) {
-                    note.setShortcut(value);
-                } else {
-                    note.setShortcut(Note.CLEARME);
-                }
-                break;
-            case SemanticSynchrony.PropertyKeys.WEIGHT: {
-                note.setWeight(getFloat(key, value, lineNumber));
-                break;
-            }
-            default:
-                parseError("unknown property: " + key);
+        if (rawValue.length() == 0) {
+            rawValue = Note.CLEARME;
         }
+
+        Note.Property prop = Note.propertiesByKey.get(key);
+        Preconditions.checkNotNull(prop);
+
+        Object typeSafeValue;
+
+        try {
+            typeSafeValue = prop.getFromString().apply(rawValue);
+        } catch (Exception e) {
+            parseError("invalid @" + key + " value: " + rawValue);
+            return;
+        }
+
+        prop.getSetter().accept(note, typeSafeValue);
     }
 }
