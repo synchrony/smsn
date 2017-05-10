@@ -95,5 +95,4 @@ public class WikiPrinter {
             return value;
         }
     }
-
 }

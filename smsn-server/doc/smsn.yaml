@@ -10,17 +10,21 @@ activityLog: "data/activity.log"
 sources:
   -
     location: data/sources/private
-    name: "private"
+    name: private
     sharability: 0.25
+    displayColor: 0xff0000
   -
     location: data/sources/personal
-    name: "personal"
+    name: personal
     sharability: 0.5
+    displayColor: 0xffc000
   -
     location: data/sources/public
-    name: "public"
+    name: public
     sharability: 0.75
+    displayColor: 0x00e000
   -
     location: data/sources/universal
-    name: "universal"
+    name: universal
     sharability: 1.0
+    displayColor: 0x0000ff
