@@ -112,7 +112,6 @@ public class VCSWriter extends BrainWriter {
             note.setAlias(atom.getAlias());
             note.setCreated(atom.getCreated());
             note.setPriority(atom.getPriority());
-            note.setSource(atom.getSource());
             note.setShortcut(atom.getShortcut());
             note.setWeight(atom.getWeight());
         }
