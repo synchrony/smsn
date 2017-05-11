@@ -48,7 +48,6 @@ public class SemanticSynchrony {
                 LABEL = "label",
                 PAGE = "page",
                 PRIORITY = "priority",
-                SHARABILITY = "sharability",
                 SHORTCUT = "shortcut",
                 SOURCE = "source",
                 TEXT = "text",

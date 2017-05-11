@@ -7,6 +7,7 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.config.DataSource;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -21,8 +22,6 @@ import static org.junit.Assert.assertEquals;
 
 public class VCSReaderTest extends BrainTestBase {
 
-    private final String arthurId = "bxSoyLUM4w4RfitB";
-    private final String fordId = "QoTIPwLOID58u3Lr";
     @Override
     protected TopicGraph createAtomGraph() throws IOException {
         return createNeo4jAtomGraph();
@@ -45,10 +44,10 @@ public class VCSReaderTest extends BrainTestBase {
 
         assertEquals(2, countAtoms());
 
-        Atom arthur = topicGraph.getAtomById(arthurId).get();
-        assertEquals(arthurId, arthur.getId());
+        Atom arthur = topicGraph.getAtomById(ARTHUR_ID).get();
+        assertEquals(ARTHUR_ID, arthur.getId());
         assertEquals("Arthur Dent", arthur.getTitle());
-        assertEquals(SemanticSynchrony.Sharability.UNIVERSAL, arthur.getSharability(), 0f);
+        assertEquals(DefaultSources.UNIVERSAL, arthur.getSource());
 
         assertEquals(1, countChildren(arthur));
         assertEquals("Ford Prefect (character)", arthur.getChildren().getFirst().getTitle());
@@ -67,8 +66,14 @@ public class VCSReaderTest extends BrainTestBase {
         File publicDir = new File(dir, "public"); publicDir.mkdir();
         File universalDir = new File(dir, "universal"); universalDir.mkdir();
 
-        copyVCSFileToDirectory(arthurId, universalDir);
-        copyVCSFileToDirectory(fordId, universalDir);
+        List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
+        sources.get(0).setLocation(privateDir.getAbsolutePath());
+        sources.get(1).setLocation(personalDir.getAbsolutePath());
+        sources.get(2).setLocation(publicDir.getAbsolutePath());
+        sources.get(3).setLocation(universalDir.getAbsolutePath());
+
+        copyVCSFileToDirectory(ARTHUR_ID, universalDir);
+        copyVCSFileToDirectory(FORD_ID, universalDir);
 
         return dir;
     }

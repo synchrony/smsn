@@ -1,25 +1,22 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.config.DataSource;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class VCSFormat extends Format {
 
-    public interface DirectoryNames {
-        String PRIVATE = "private";
-        String PERSONAL = "personal";
-        String PUBLIC = "public";
-        String UNIVERSAL = "universal";
-    }
-
-    public static File[] getDirsBySharability(final File parentDir) {
-        return new File[]{
-                new File(parentDir, DirectoryNames.PRIVATE),
-                new File(parentDir, DirectoryNames.PERSONAL),
-                new File(parentDir, DirectoryNames.PUBLIC),
-                new File(parentDir, DirectoryNames.UNIVERSAL)};
+    public static Map<String, File> getDirsBySharability() {
+        Map<String, File> dirs = new HashMap<>();
+        for (DataSource dataSource : SemanticSynchrony.getConfiguration().getSources()) {
+            dirs.put(dataSource.getName(), new File(dataSource.getLocation()));
+        }
+        return dirs;
     }
 
     private static final Pattern ATOM_FILENAME_PATTERN = Pattern.compile("[a-zA-Z0-9]{5,}");

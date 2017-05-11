@@ -149,7 +149,8 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
         Filter defaultFilter = Filter.noFilter();
         // brain stream atoms begin with low weight, and with private rather than personal sharability
-        Filter brainstreamFilter = new Filter(0f, 0.25f, 0f, 0.25f);
+        // TODO: don't hard-code the source
+        Filter brainstreamFilter = new Filter(0f, 0.25f, 0f, "private");
 
         // environment-dependent library
         add(new SpeakMapping(environment), "s", "speak");
@@ -170,12 +171,12 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         add(new GetAtomChildrenMapping(exoBrainClient, defaultFilter), "@n");
         add(new GetAtomCreatedMapping(exoBrainClient, defaultFilter), "@c");
         add(new GetAtomIdMapping(exoBrainClient, defaultFilter), "@i");
-        add(new GetAtomSharabilityMapping(exoBrainClient, defaultFilter), "@y");
+        add(new GetAtomSourceMapping(exoBrainClient, defaultFilter), "@y");
         add(new GetAtomShortcutMapping(exoBrainClient, defaultFilter), "@t");
         add(new GetAtomValueMapping(exoBrainClient, defaultFilter), "@v", "v");
         add(new GetAtomWeightMapping(exoBrainClient, defaultFilter), "@w");
         add(new SetAtomAliasMapping(exoBrainClient, defaultFilter), "a@");
-        add(new SetAtomSharabilityMapping(exoBrainClient, defaultFilter), "y@");
+        add(new SetAtomSourceMapping(exoBrainClient, defaultFilter), "y@");
         add(new SetAtomShortcutMapping(exoBrainClient, defaultFilter), "t@", "sh");  // TODO: mismatch/redundancy
         add(new SetAtomValueMapping(exoBrainClient, defaultFilter), "v@");
         add(new SetAtomWeightMapping(exoBrainClient, defaultFilter), "w@");

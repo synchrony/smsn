@@ -10,18 +10,18 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class GetAtomSharabilityMapping extends AtomMapping {
+public class GetAtomSourceMapping extends AtomMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomSharabilityMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetAtomSourceMapping.class.getName());
 
-    public GetAtomSharabilityMapping(final BrainClient client,
-                                     final Filter filter) {
+    public GetAtomSourceMapping(final BrainClient client,
+                                final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "get-atom-sharability"
+                SmSnLibrary.NS_2014_12 + "get-atom-source"
         };
     }
 
@@ -30,7 +30,7 @@ public class GetAtomSharabilityMapping extends AtomMapping {
     }
 
     public String getComment() {
-        return "gets the @sharability property of an atom";
+        return "gets the @source property of an atom";
     }
 
     public void apply(RippleList stack,
@@ -43,9 +43,9 @@ public class GetAtomSharabilityMapping extends AtomMapping {
         Note n = toNote(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't get @sharability of non-atom: " + first);
+            logger.warning("can't get @source of non-atom: " + first);
         } else {
-            Float value = n.getSharability();
+            String value = n.getSource();
             if (null != value) {
                 // put both the @sharability property and the (synced) atom back on the stack
                 solutions.accept(stack.push(n).push(value));

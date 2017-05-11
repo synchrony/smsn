@@ -71,7 +71,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
         }
     }
 
-    protected Float sharabilityOrWeightFromArgument(final Object arg, final ModelConnection mc)
+    protected Float weightFromArgument(final Object arg, final ModelConnection mc)
             throws RippleException {
 
         String asString = mc.toString(arg);

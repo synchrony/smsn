@@ -11,7 +11,7 @@ public class PageDTO implements Page {
     private String format;
     private String text;
     private Float weight;
-    private Float sharability;
+    private String source;
     private Float priority;
     private Long created;
     private String alias;
@@ -80,13 +80,13 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public Float getSharability() {
-        return sharability;
+    public String getSource() {
+        return source;
     }
 
     @Override
-    public boolean setSharability(Float sharability) {
-        this.sharability = sharability;
+    public boolean setSource(String source) {
+        this.source = source;
         return false;
     }
 

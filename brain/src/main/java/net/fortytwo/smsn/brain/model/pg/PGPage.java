@@ -66,13 +66,13 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public Float getSharability() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, 0f);
+    public String getSource() {
+        return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
     }
 
     @Override
-    public boolean setSharability(Float sharability) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, sharability);
+    public boolean setSource(String source) {
+        return setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
     }
 
     @Override

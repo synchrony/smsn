@@ -43,8 +43,8 @@ public class SmSnCommit extends AtomBase {
     }
 
     @Override
-    public Float getSharability() {
-        return repository.getSharability();
+    public String getSource() {
+        return repository.getSource();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class SmSnCommit extends AtomBase {
             atom.setCreated(timestamp);
             atom.setTitle(SmSnGitRepository.titleForMissingAtom(changeType));
             atom.setWeight(SemanticSynchrony.Weight.DEFAULT);
-            atom.setSharability(this.getSharability());
+            atom.setSource(this.getSource());
         }
 
         return atom;

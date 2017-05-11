@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -39,7 +40,12 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         repoDir = createTempDirectory();
         init();
 
-        repo = new SmSnGitRepository(brain, repoDir, SemanticSynchrony.Sharability.PUBLIC);
+        DataSource dataSource = new DataSource();
+        dataSource.setName(DefaultSources.PUBLIC);
+        dataSource.setLocation(repoDir.getAbsolutePath());
+        dataSource.setSharability(0.75f);
+
+        repo = new SmSnGitRepository(brain, dataSource);
         git = repo.getGit();
         assertNotNull(git.getRepository().getRef(Constants.HEAD));
         assertTrue(git.status().call().isClean());
@@ -155,7 +161,7 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
 
         note.setId(id);
         note.setTitle(title);
-        note.setSharability(SemanticSynchrony.Sharability.PUBLIC);
+        note.setSource(DefaultSources.PUBLIC);
         note.setWeight(SemanticSynchrony.Weight.DEFAULT);
         note.setCreated(System.currentTimeMillis());
 

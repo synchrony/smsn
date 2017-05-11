@@ -242,7 +242,9 @@ public class WikiParser extends BrainParser {
         }
 
         Note.Property prop = Note.propertiesByKey.get(key);
-        Preconditions.checkNotNull(prop);
+        if (null == prop) {
+            return;
+        }
 
         Object typeSafeValue;
 
@@ -253,6 +255,6 @@ public class WikiParser extends BrainParser {
             return;
         }
 
-        prop.getSetter().accept(note, typeSafeValue);
+        prop.getNoteSetter().accept(note, typeSafeValue);
     }
 }

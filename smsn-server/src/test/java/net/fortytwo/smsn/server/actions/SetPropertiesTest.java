@@ -105,24 +105,24 @@ public class SetPropertiesTest extends ActionTestBase {
     }
 
     @Test
-    public void sharabilityIsSetCorrectly() throws Exception {
+    public void sourceIsSetCorrectly() throws Exception {
         topicGraph.begin();
         Atom atom = createAtomWithTitle("test");
-        atom.setSharability(0.25f);
+        atom.setSource(DefaultSources.PRIVATE);
         topicGraph.commit();
 
         atom = topicGraph.getAtomById(atom.getId()).get();
-        assertEquals(0.25f, atom.getSharability(), 0.0f);
+        assertEquals(DefaultSources.PRIVATE, atom.getSource());
 
         SetProperties action = createAction();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.PropertyKeys.SHARABILITY);
-        action.setValue(0.5);
+        action.setName(SemanticSynchrony.PropertyKeys.SOURCE);
+        action.setValue(DefaultSources.PERSONAL);
 
         perform(action);
 
         atom = topicGraph.getAtomById(atom.getId()).get();
-        assertEquals(0.5f, atom.getSharability(), 0.0f);
+        assertEquals(DefaultSources.PERSONAL, atom.getSource());
     }
 
     @Test

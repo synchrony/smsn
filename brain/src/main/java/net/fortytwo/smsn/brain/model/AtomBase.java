@@ -12,9 +12,9 @@ public class AtomBase implements Atom {
     private String id = SemanticSynchrony.createRandomId();
     private long created = System.currentTimeMillis();
     private String title = "atom " + id;
-    private Float sharability = SemanticSynchrony.Sharability.PUBLIC;
     private Float weight = SemanticSynchrony.Weight.DEFAULT;
     private Float priority = SemanticSynchrony.Priority.NONE;
+    // TODO: don't hard-code the default source
     private String source = "public";
 
     @Override
@@ -77,16 +77,6 @@ public class AtomBase implements Atom {
     @Override
     public void setPriority(Float priority) {
         this.priority = priority;
-    }
-
-    @Override
-    public Float getSharability() {
-        return sharability;
-    }
-
-    @Override
-    public void setSharability(Float sharability) {
-        this.sharability = sharability;
     }
 
     @Override

@@ -22,9 +22,9 @@ public interface Page extends Entity {
 
     boolean setPriority(Float priority);
 
-    Float getSharability();
+    String getSource();
 
-    boolean setSharability(Float sharability);
+    boolean setSource(String source);
 
     String getShortcut();
 

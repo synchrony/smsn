@@ -1,12 +1,12 @@
 * :0000001: this is a public note
-    @sharability 1.0
+    @source universal
     * :0000002: this is a protected child of a public note
-        @sharability 0.5
+        @source personal
     * :0000003: this is a public child of a public note
-        @sharability 1.0
+        @source universal
 * :0000004: this is a protected note
-    @sharability 0.5
+    @source personal
     * this is a child of a protected note
-        @sharability 1.0
+        @source universal
 * :0000005: this is another public note
-    @sharability 1.0
+    @source universal

@@ -31,6 +31,14 @@ public abstract class BrainTestBase {
     protected static final String FORD_ID = "QoTIPwLOID58u3Lr";
     protected static final String ZAPHOD_ID = "RqAUSvwi1H878V5j";
 
+    protected interface DefaultSources {
+        String
+                PRIVATE = "private",
+                PERSONAL = "personal",
+                PUBLIC = "public",
+                UNIVERSAL = "universal";
+    }
+
     protected TreeViews queries;
     protected TopicGraph topicGraph;
     protected final WikiParser wikiParser = new WikiParser();
@@ -39,6 +47,7 @@ public abstract class BrainTestBase {
     protected Graph graph;
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
+    protected ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
     protected Collection<Atom> result;
 
     protected abstract TopicGraph createAtomGraph() throws IOException;

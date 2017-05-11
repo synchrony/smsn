@@ -5,11 +5,14 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class RepositoryCollection implements AbstractRepository {
@@ -17,7 +20,7 @@ public class RepositoryCollection implements AbstractRepository {
     private final File directory;
 
     private final Brain brain;
-    private final SmSnGitRepository[] repositories;
+    private final Map<String, SmSnGitRepository> repositoriesBySource;
 
     public RepositoryCollection(final Brain brain, final File directory) throws IOException {
         this.brain = brain;
@@ -27,16 +30,10 @@ public class RepositoryCollection implements AbstractRepository {
         Preconditions.checkArgument(directory.isDirectory());
         this.directory = directory;
 
-        SmSnGitRepository privateRepo = createRepository(
-                SemanticSynchrony.Sharability.PRIVATE, VCSFormat.DirectoryNames.PRIVATE);
-        SmSnGitRepository personalRepo = createRepository(
-                SemanticSynchrony.Sharability.PERSONAL, VCSFormat.DirectoryNames.PERSONAL);
-        SmSnGitRepository publicRepo = createRepository(
-                SemanticSynchrony.Sharability.PUBLIC, VCSFormat.DirectoryNames.PUBLIC);
-        SmSnGitRepository universalRepo = createRepository(
-                SemanticSynchrony.Sharability.UNIVERSAL, VCSFormat.DirectoryNames.UNIVERSAL);
-
-        repositories = new SmSnGitRepository[]{universalRepo, publicRepo, personalRepo, privateRepo};
+        repositoriesBySource = new HashMap<>();
+        for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
+            repositoriesBySource.put(source.getName(), createRepository(source));
+        }
     }
 
     @Override
@@ -104,19 +101,20 @@ public class RepositoryCollection implements AbstractRepository {
 
         Note parent = new Note();
         parent.setId(SemanticSynchrony.createRandomId());
-        parent.setSharability(SemanticSynchrony.Sharability.PUBLIC);
+        // TODO: don't hard-code a source
+        parent.setSource("public");
         parent.setWeight(SemanticSynchrony.Weight.DEFAULT);
         parent.setCreated(now);
 
         parent.setTitle("Git history for " + directory.getName()
                 + " at " + SmSnGitRepository.formatDate(now));
 
-        for (SmSnGitRepository repo : repositories) {
+        for (SmSnGitRepository repo : repositoriesBySource.values()) {
             Note repoHistory = repo.getHistory(limits);
             parent.addChild(repoHistory);
         }
 
-        parent.setNumberOfChildren(repositories.length);
+        parent.setNumberOfChildren(repositoriesBySource.size());
 
         return parent;
     }
@@ -124,7 +122,7 @@ public class RepositoryCollection implements AbstractRepository {
     private <R> Set<R> unionOf(FunctionWithException<AbstractRepository, Set<R>, RepositoryException> function)
             throws RepositoryException {
         Set<R> result = new HashSet<>();
-        for (SmSnGitRepository repo : repositories) {
+        for (SmSnGitRepository repo : repositoriesBySource.values()) {
             result.addAll(function.apply(repo));
         }
         return result;
@@ -132,13 +130,13 @@ public class RepositoryCollection implements AbstractRepository {
 
     private void forEach(final ConsumerWithException<AbstractRepository, RepositoryException> consumer)
             throws RepositoryException {
-        for (SmSnGitRepository repo : repositories) {
+        for (SmSnGitRepository repo : repositoriesBySource.values()) {
             consumer.accept(repo);
         }
     }
 
-    private SmSnGitRepository createRepository(final float sharability, final String name) throws IOException {
-        return new SmSnGitRepository(brain, new File(directory, name), sharability);
+    private SmSnGitRepository createRepository(final DataSource dataSource) throws IOException {
+        return new SmSnGitRepository(brain, dataSource);
     }
 
     private void checkReadyForExport() {

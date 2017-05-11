@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
@@ -7,6 +8,7 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.config.DataSource;
 import org.parboiled.common.Preconditions;
 
 import java.io.File;
@@ -30,12 +32,8 @@ public class VCSReader extends BrainReader {
 
     @Override
     protected void importInternal(Context context) throws IOException {
-        File[] dirs = VCSFormat.getDirsBySharability(context.getSourceDirectory());
-
-        for (File d : dirs) assertDirectoryExists(d);
-
-        for (File d : dirs) {
-            readDirectory(d, context);
+        for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
+            readDataSource(source, context);
         }
     }
 
@@ -44,8 +42,12 @@ public class VCSReader extends BrainReader {
         return Arrays.asList(VCSFormat.getInstance());
     }
 
-    private void readDirectory(final File dir, final Context context)
-            throws IOException {
+    private void readDataSource(final DataSource dataSource, final Context context) throws IOException {
+        String location = dataSource.getLocation();
+        Preconditions.checkNotNull(location);
+        File dir = new File(location);
+        assertDirectoryExists(dir);
+
         Helper helper = new Helper(context);
 
         File[] files = dir.listFiles();
@@ -53,7 +55,7 @@ public class VCSReader extends BrainReader {
             for (File file : files) {
                 try {
                     if (VCSFormat.isAtomFile(file)) {
-                        readAtomFile(file, helper);
+                        readAtomFile(file, helper, dataSource);
                     }
                 } catch (IOException e) {
                     throw new IOException("failed to load file " + file.getAbsolutePath(), e);
@@ -62,12 +64,12 @@ public class VCSReader extends BrainReader {
         }
     }
 
-    private void readAtomFile(final File file, final Helper helper) throws IOException {
-
+    private void readAtomFile(final File file, final Helper helper, final DataSource source) throws IOException {
         Note rootNote;
         try (InputStream in = new FileInputStream(file)) {
             rootNote = reader.parse(in);
             for (Note note : rootNote.getChildren()) {
+                note.setSource(source.getName());
                 String id = note.getId();
                 Preconditions.checkNotNull(id);
 
@@ -108,8 +110,9 @@ public class VCSReader extends BrainReader {
             updateProperty(atom, note, Note::getCreated, Atom::setCreated);
             updateProperty(atom, note, Note::getPage, Atom::setText);
             updateProperty(atom, note, Note::getPriority, Atom::setPriority);
-            updateProperty(atom, note, Note::getSharability, Atom::setSharability);
+            updateProperty(atom, note, Note::getSource, Atom::setSource);
             updateProperty(atom, note, Note::getShortcut, Atom::setShortcut);
+            updateProperty(atom, note, Note::getSource, Atom::setSource);
             updateProperty(atom, note, Note::getTitle, Atom::setTitle);
             updateProperty(atom, note, Note::getWeight, Atom::setWeight);
         }

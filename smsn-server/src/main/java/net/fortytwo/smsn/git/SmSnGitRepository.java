@@ -9,6 +9,7 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
+import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.GitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -38,7 +39,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
     private static final ThreadLocal<DateFormat> dateFormat = ThreadLocal.withInitial(
             () -> new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
 
-    private final float sharability;
+    private final DataSource dataSource;
     private final Repository repository;
     private final Git git;
     private final File directory;
@@ -51,18 +52,18 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         return dateFormat.get().format(new Date(timeStamp));
     }
 
-    public SmSnGitRepository(final Brain brain, final File directory, final float sharability) throws IOException {
+    public SmSnGitRepository(final Brain brain, final DataSource dataSource) throws IOException {
         this.brain = brain;
-        this.sharability = sharability;
+        this.dataSource = dataSource;
         treeViews = new TreeViews(brain);
 
         // TODO
         this.filter = Filter.noFilter();
 
+        directory = new File(dataSource.getLocation());
         Preconditions.checkNotNull(directory);
-        Preconditions.checkArgument(directory.isDirectory());
         Preconditions.checkArgument(directory.exists());
-        this.directory = directory;
+        Preconditions.checkArgument(directory.isDirectory());
 
         File gitDirectory = new File(directory, ".git");
         Preconditions.checkArgument(gitDirectory.exists());
@@ -158,8 +159,8 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
     }
 
     @Override
-    public Float getSharability() {
-        return sharability;
+    public String getSource() {
+        return dataSource.getName();
     }
 
     @Override
@@ -180,7 +181,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         Note repoNote = new Note();
         repoNote.setId(SemanticSynchrony.createRandomId());
         repoNote.setTitle(getTitle());
-        repoNote.setSharability(sharability);
+        repoNote.setSource(dataSource.getName());
         repoNote.setWeight(SemanticSynchrony.Weight.DEFAULT);
         repoNote.setCreated(now);
 
@@ -236,7 +237,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         commitNote.setCreated(getTimeStamp(commit));
         commitNote.setTitle(createTitleFor(commit));
         commitNote.setWeight(SemanticSynchrony.Weight.DEFAULT);
-        commitNote.setSharability(sharability);
+        commitNote.setSource(dataSource.getName());
 
         if (!isMergeCommit(commit)) {
             addDiffNotes(commitNote, commit, limits);
@@ -301,7 +302,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
             note.setCreated(timestamp);
             note.setTitle(titleForMissingAtom(changeType));
             note.setWeight(SemanticSynchrony.Weight.DEFAULT);
-            note.setSharability(sharability);
+            note.setSource(dataSource.getName());
         }
 
         return note;

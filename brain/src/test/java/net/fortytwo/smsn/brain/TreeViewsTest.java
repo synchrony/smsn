@@ -45,7 +45,7 @@ public class TreeViewsTest extends BrainTestBase {
         child.setTitle("cheval \u00e0 phynances");
         rootNote.addChild(child);
         assertNull(child.getWeight());
-        assertNull(child.getSharability());
+        assertNull(child.getSource());
         assertNull(child.getCreated());
         //System.out.println(before.getTargetValue());
 
@@ -340,7 +340,7 @@ public class TreeViewsTest extends BrainTestBase {
     }
 
     @Test
-    public void testUpdateSharabilityOrWeight() throws Exception {
+    public void testUpdateSourceOrWeight() throws Exception {
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
         Atom root = createAtom("wXu5g4v", "root");
         Note rootNote;
@@ -353,17 +353,17 @@ public class TreeViewsTest extends BrainTestBase {
         queries.update(rootNote, 2, filter, style);
         Atom one = topicGraph.getAtomById("N5KBOAq").get();
         assertEquals(0.5f, one.getWeight());
-        assertEquals(0.5f, one.getSharability());
+        assertEquals(DefaultSources.PERSONAL, one.getSource());
 
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @weight 0.75\n" +
-                "    @sharability 0.25\n";
+                "    @source private\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertEquals(0.75f, one.getWeight());
-        assertEquals(0.25f, one.getSharability());
+        assertEquals(DefaultSources.PRIVATE, one.getSource());
     }
 
     @Test
@@ -416,19 +416,18 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = topicGraph.getAtomById("0000001").get();
-        assertNull(one.getPriority());
+        // TODO: allow removal of this property altogether
+        assertEquals(0.0f, one.getPriority());
     }
 
     @Test
     public void childAndParentCountsAreCorrect() throws Exception {
-        Filter filter = Filter.noFilter();
-        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
         Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000", "root");
-        root.setSharability(1.0f);
+        root.setSource(DefaultSources.UNIVERSAL);
         before.setId(root.getId());
-        queries.update(before, 2, filter, style);
-        Note after = queries.view(root, 2, filter, style);
+        queries.update(before, 2, filter, viewStyle);
+        Note after = queries.view(root, 2, filter, viewStyle);
 
         assertEquals("root", after.getTitle());
         assertEquals(0, after.getNumberOfParents());
@@ -441,21 +440,27 @@ public class TreeViewsTest extends BrainTestBase {
     }
 
     @Test
+    public void sourceIsCorrect() throws Exception {
+
+
+    }
+
+    @Test
     public void invisibleAtomsAreExcludedFromViews() throws Exception {
-        Filter readFilter = new Filter(0f, 0.5f, 0.75f, 0.75f);
+        Filter readFilter = new Filter(0f, 0.5f, 0.75f, DefaultSources.PUBLIC);
         Filter writeFilter = Filter.noFilter();
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000", "root");
-        root.setSharability(1.0f);
+        root.setSource(DefaultSources.UNIVERSAL);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, writeFilter, style);
 
         Optional<Atom> a1 = topicGraph.getAtomById("0000001");
-        assertEquals(1f, a1.get().getSharability());
+        assertEquals(DefaultSources.UNIVERSAL, a1.get().getSource());
         Optional<Atom> a2 = topicGraph.getAtomById("0000002");
-        assertEquals(0.5f, a2.get().getSharability());
+        assertEquals(DefaultSources.PERSONAL, a2.get().getSource());
 
         Note after = queries.view(root, 2, readFilter, style);
         // the second atom in the list simply does not appear
@@ -482,29 +487,31 @@ public class TreeViewsTest extends BrainTestBase {
     @Test
     public void invisibleAtomsAreSkippedDuringWrites() throws Exception {
         Filter readFilter = Filter.noFilter();
-        Filter writeFilter = new Filter(0f, 0.5f, 0.75f, 0.75f);
+        Filter writeFilter = new Filter(0f, 0.5f, 0.75f, DefaultSources.PUBLIC);
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
+        // three items in the private view
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
         Atom root = createAtom("0000000", "note 0");
-        root.setSharability(1.0f);
+        root.setSource(DefaultSources.UNIVERSAL);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, Filter.noFilter(), style);
-        rootNote = queries.view(root, 2, Filter.noFilter(), style);
-
+        rootNote = queries.view(root, 2, readFilter, style);
         assertEquals(3, rootNote.getNumberOfChildren());
         assertEquals(3, rootNote.getChildren().size());
-        assertEquals(0.5f, rootNote.getChildren().get(1).getSharability(), 0f);
+        assertEquals(DefaultSources.PERSONAL, rootNote.getChildren().get(1).getSource());
 
+        // add an atom in the public view
         rootNote = queries.view(root, 2, writeFilter, style);
         Note toAdd = new Note();
         toAdd.setId("0000007");
         toAdd.setTitle("note 7");
-        toAdd.setSharability(SemanticSynchrony.Sharability.UNIVERSAL);
+        toAdd.setSource(DefaultSources.UNIVERSAL);
         rootNote.getChildren().add(0, toAdd);
         queries.update(rootNote, 2, writeFilter, style);
 
-        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+        // four total items in the private view
+        rootNote = queries.view(root, 2, readFilter, style);
         assertEquals(4, rootNote.getChildren().size());
         assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
         rootNote = queries.view(root, 2, writeFilter, style);
@@ -513,7 +520,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote.getChildren().remove(2);
         queries.update(rootNote, 2, writeFilter, style);
 
-        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+        rootNote = queries.view(root, 2, readFilter, style);
         assertEquals(3, rootNote.getChildren().size());
         assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
         assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
@@ -526,11 +533,11 @@ public class TreeViewsTest extends BrainTestBase {
         toAdd = new Note();
         toAdd.setId("0000008");
         toAdd.setTitle("note 8");
-        toAdd.setSharability(SemanticSynchrony.Sharability.UNIVERSAL);
+        toAdd.setSource(DefaultSources.UNIVERSAL);
         rootNote.getChildren().add(2, toAdd);
         queries.update(rootNote, 2, writeFilter, style);
 
-        rootNote = queries.view(root, 2, Filter.noFilter(), style);
+        rootNote = queries.view(root, 2, readFilter, style);
         assertEquals(4, rootNote.getChildren().size());
         assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
         assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());

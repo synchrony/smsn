@@ -402,7 +402,7 @@ public class BrainClient {
         JSONObject json = new JSONObject();
         json.put(Params.MIN_SHARABILITY, filter.getMinSharability());
         json.put(Params.MIN_WEIGHT, filter.getMinWeight());
-        json.put(Params.DEFAULT_SHARABILITY, filter.getDefaultSharability());
+        json.put(Params.DEFAULT_SOURCE, filter.getDefaultSource());
         json.put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
         return json;
     }

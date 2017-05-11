@@ -142,9 +142,8 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     }
 
     public static ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
         // add any configuration here
-        return objectMapper;
+        return new ObjectMapper();
     }
 
     public static class ActionPerformer {
@@ -155,7 +154,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         }
 
         public ActionContext perform(final Action action) throws IOException {
-            ActionContext context = Action.createcontext(graph);
+            ActionContext context = Action.createContext(graph);
 
             action.handleRequest(context);
 

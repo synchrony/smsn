@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.entities.Atom;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,24 +21,30 @@ public class Note {
     static {
         propertiesByKey = new HashMap<>();
         for (Property prop : new Property[]{
-                new Property<>(true, SemanticSynchrony.PropertyKeys.ALIAS,
-                        Note::getAlias, Note::setAlias, s -> s),
-                new Property<>(true, SemanticSynchrony.PropertyKeys.CREATED,
-                        Note::getCreated, Note::setCreated, Long::valueOf),
-                new Property<>(false, SemanticSynchrony.PropertyKeys.PAGE,
-                        Note::getPage, Note::setPage, s -> s),
-                new Property<>(true, SemanticSynchrony.PropertyKeys.PRIORITY,
-                        Note::getPriority, Note::setPriority, Float::valueOf),
-                new Property<>(true, SemanticSynchrony.PropertyKeys.SHARABILITY,
-                        Note::getSharability, Note::setSharability, Float::valueOf),
-                new Property<>(true, SemanticSynchrony.PropertyKeys.SOURCE,
-                        Note::getSource, Note::setSource, s -> s),
-                new Property<>(true, SemanticSynchrony.PropertyKeys.SHORTCUT,
-                        Note::getShortcut, Note::setShortcut, s -> s),
-                new Property<>(false, SemanticSynchrony.PropertyKeys.TITLE,
-                        Note::getTitle, Note::setTitle, s -> s),
-                new Property<>(true, SemanticSynchrony.PropertyKeys.WEIGHT,
-                        Note::getWeight, Note::setWeight, Float::valueOf),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.ALIAS,
+                        Note::getAlias, Note::setAlias,
+                        Atom::getAlias, Atom::setAlias, s -> s),
+                new Property<>(false,true, SemanticSynchrony.PropertyKeys.CREATED,
+                        Note::getCreated, Note::setCreated,
+                        Atom::getCreated, Atom::setCreated, Long::valueOf),
+                new Property<>(true,false, SemanticSynchrony.PropertyKeys.PAGE,
+                        Note::getPage, Note::setPage,
+                        Atom::getText, Atom::setText, s -> s),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.PRIORITY,
+                        Note::getPriority, Note::setPriority,
+                        Atom::getPriority, Atom::setPriority, Float::valueOf),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.SOURCE,
+                        Note::getSource, Note::setSource,
+                        Atom::getSource, Atom::setSource, s -> s),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.SHORTCUT,
+                        Note::getShortcut, Note::setShortcut,
+                        Atom::getShortcut, Atom::setShortcut, s -> s),
+                new Property<>(true,false, SemanticSynchrony.PropertyKeys.TITLE,
+                        Note::getTitle, Note::setTitle,
+                        Atom::getTitle, Atom::setTitle, s -> s),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.WEIGHT,
+                        Note::getWeight, Note::setWeight,
+                        Atom::getWeight, Atom::setWeight, Float::valueOf),
         }) {
             propertiesByKey.put(prop.propertyKey, prop);
         }
@@ -124,18 +131,6 @@ public class Note {
         }
 
         this.priority = priority;
-    }
-
-    public Float getSharability() {
-        return sharability;
-    }
-
-    public void setSharability(Float sharability) {
-        if (null != sharability && (sharability < 0.0 || sharability > 1.0)) {
-            throw new IllegalArgumentException("sharability is out of range: " + sharability);
-        }
-
-        this.sharability = sharability;
     }
 
     public Float getWeight() {
@@ -232,21 +227,30 @@ public class Note {
     }
 
     public static class Property<T> {
+        private final boolean isSettable;
         private final boolean isAnnotationProperty;
         private final String propertyKey;
-        private final Function<Note, T> getter;
-        private final BiConsumer<Note, T> setter;
+        private final Function<Note, T> noteGetter;
+        private final BiConsumer<Note, T> noteSetter;
+        private final Function<Atom, T> atomGetter;
+        private final BiConsumer<Atom, T> atomSetter;
         private final Function<String, T> fromString;
 
-        private Property(final boolean isAnnotationProperty,
+        private Property(final boolean isSettable,
+                         final boolean isAnnotationProperty,
                          final String propertyKey,
-                         final Function<Note, T> getter,
-                         final BiConsumer<Note, T> setter,
+                         final Function<Note, T> noteGetter,
+                         final BiConsumer<Note, T> noteSetter,
+                         final Function<Atom, T> atomGetter,
+                         final BiConsumer<Atom, T> atomSetter,
                          final Function<String, T> fromString) {
+            this.isSettable = isSettable;
             this.isAnnotationProperty = isAnnotationProperty;
             this.propertyKey = propertyKey;
-            this.getter = getter;
-            this.setter = setter;
+            this.noteGetter = noteGetter;
+            this.noteSetter = noteSetter;
+            this.atomGetter = atomGetter;
+            this.atomSetter = atomSetter;
             this.fromString = fromString;
         }
 
@@ -258,16 +262,28 @@ public class Note {
             return propertyKey;
         }
 
-        public Function<Note, T> getGetter() {
-            return getter;
+        public Function<Note, T> getNoteGetter() {
+            return noteGetter;
         }
 
-        public BiConsumer<Note, T> getSetter() {
-            return setter;
+        public BiConsumer<Note, T> getNoteSetter() {
+            return noteSetter;
+        }
+
+        public Function<Atom, T> getAtomGetter() {
+            return atomGetter;
+        }
+
+        public BiConsumer<Atom, T> getAtomSetter() {
+            return atomSetter;
         }
 
         public Function<String, T> getFromString() {
             return fromString;
+        }
+
+        public boolean isSettable() {
+            return isSettable;
         }
     }
 }

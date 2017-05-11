@@ -32,7 +32,7 @@ public class VertexWriter extends BrainWriter {
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
-        p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
+        p.println("created\tid\tweight\tsource\tclass\tout\tin\tvalue\talias");
 
         for (Atom a : sourceGraph.getAllAtoms()) {
             if (isTrueAtom(a) && filter.test(a)) {
@@ -42,7 +42,7 @@ public class VertexWriter extends BrainWriter {
                 p.print('\t');
                 p.print(a.getWeight());
                 p.print('\t');
-                p.print(a.getSharability());
+                p.print(a.getSource());
                 p.print('\t');
 
                 List<KnowledgeBase.AtomClassEntry> entries = sourceKb.getClassInfo(a);

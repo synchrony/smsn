@@ -171,7 +171,7 @@ public class PGTopicGraph implements TopicGraph {
         Atom atom = createAtom(id);
 
         atom.setCreated(new Date().getTime());
-        atom.setSharability(filter.getDefaultSharability());
+        atom.setSource(filter.getDefaultSource());
         atom.setWeight(filter.getDefaultWeight());
 
         return atom;
@@ -379,7 +379,7 @@ public class PGTopicGraph implements TopicGraph {
         Optional<Atom> opt = newGraph.getAtomById(original.getId());
         if (opt.isPresent()) return (PGAtom) opt.get();
         PGAtom newAtom = (PGAtom) newGraph.createAtomWithProperties(filter, original.getId());
-        newAtom.setSharability(original.getSharability());
+        newAtom.setSource(original.getSource());
 
         if (filter.test(original)) {
             newAtom.setTitle(original.getTitle());

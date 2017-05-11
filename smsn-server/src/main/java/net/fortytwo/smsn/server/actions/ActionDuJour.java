@@ -34,7 +34,7 @@ public class ActionDuJour extends Action {
     private void findAnomalousAtoms(final ActionContext context) {
         for (Atom a : context.getBrain().getTopicGraph().getAllAtoms()) {
             checkNotNull(a, Atom::getId, "id");
-            checkNotNull(a, Atom::getSharability, "sharability");
+            checkNotNull(a, Atom::getSource, "source");
             checkNotNull(a, Atom::getWeight, "weight");
             checkNotNull(a, Atom::getCreated, "created");
             checkNotNull(a, Atom::getTitle, "title");

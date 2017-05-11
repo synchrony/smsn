@@ -5,7 +5,7 @@ public interface Params {
 
     String
             CONFIGURATION = "configuration",
-            DEFAULT_SHARABILITY = "defaultSharability",
+            DEFAULT_SOURCE = "defaultSource",
             DEFAULT_WEIGHT = "defaultWeight",
             FILTER = "filter",
             HEIGHT = "height",
@@ -21,6 +21,7 @@ public interface Params {
             QUERY_TYPE = "queryType",
             REQUEST = "request",
             ROOT = "root",
+            SOURCE = "source",
             STYLE = "style",
             TITLE = "title",
             TITLE_CUTOFF = "titleCutoff",

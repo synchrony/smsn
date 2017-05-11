@@ -503,6 +503,7 @@ public class TreeViews {
     private Atom createAtom(final String id,
                             final Filter filter) {
         Atom a = brain.getTopicGraph().createAtomWithProperties(filter, id);
+        a.setSource(filter.getDefaultSource());
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logCreate(a);
@@ -538,72 +539,19 @@ public class TreeViews {
         return result;
     }
 
-    private void setTitle(final Atom target,
-                             final String title) {
-        // Note: "fake" root nodes, as well as no-op or invisible nodes, come with null titles.
-        if (null != title) target.setTitle(title);
-    }
-
-    private void setPage(final Atom target,
-                            final String page) {
-        // Note: can't delete page with a view update
-        if (null != page) target.setText(page);
-    }
-
-    private void setAlias(final Atom target,
-                             final String alias) {
-        if (null != alias) {
-            if (alias.equals(Note.CLEARME)) {
-                 target.setAlias(null);
-            } else {
-                 target.setAlias(alias);
-            }
-        }
-    }
-
-    private void setShortcut(final Atom target,
-                             final String shortcut) {
-        if (null != shortcut) {
-            if (shortcut.equals(Note.CLEARME)) {
-                target.setShortcut(null);
-            } else {
-                target.setShortcut(shortcut);
-            }
-        }
-    }
-
-    private void setPriority(final Atom target,
-                                Float priority) {
-        if (null != priority) {
-            if (0 == priority) priority = null;
-
-            Float previousPriority = target.getPriority();
-            target.setPriority(priority);
-            if (null == previousPriority || !previousPriority.equals(priority)) {
-                brain.getPriorities().updatePriority(target);
-            }
-        }
-    }
-
-    private void setSharability(final Atom target,
-                                   final Float sharability) {
-        if (null != sharability) target.setSharability(sharability);
-    }
-
-    private void setWeight(final Atom target,
-                           final Float weight) {
-        if (null != weight) target.setWeight(weight);
-    }
-
     private void setProperties(final Atom target,
                                final Note note) throws InvalidGraphException, InvalidUpdateException {
-        setTitle(target, note.getTitle());
-        setPage(target, note.getPage());
-        setAlias(target, note.getAlias());
-        setShortcut(target, note.getShortcut());
-        setPriority(target, note.getPriority());
-        setWeight(target, note.getWeight());
-        setSharability(target, note.getSharability());
+        for (Note.Property prop : Note.propertiesByKey.values()) {
+            if (prop.isSettable()) {
+                Object value = prop.getNoteGetter().apply(note);
+                if (null != value) {
+                    if (value.equals(Note.CLEARME)) {
+                        value = null;
+                    }
+                    prop.getAtomSetter().accept(target, value);
+                }
+            }
+        }
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logSetProperties(target);
@@ -619,7 +567,7 @@ public class TreeViews {
 
         if (getProperties) {
             note.setWeight(atom.getWeight());
-            note.setSharability(atom.getSharability());
+            note.setSource(atom.getSource());
             note.setPriority(atom.getPriority());
             note.setCreated(atom.getCreated());
             note.setAlias(atom.getAlias());

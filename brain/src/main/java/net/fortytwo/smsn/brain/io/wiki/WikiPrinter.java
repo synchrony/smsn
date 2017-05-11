@@ -73,7 +73,7 @@ public class WikiPrinter {
     private static void printProperties(final Note n, final PrintStream p, final int indent) {
         for (Note.Property prop : Note.propertiesByKey.values()) {
             if (prop.isAnnotationProperty()) {
-                Object value = prop.getGetter().apply(n);
+                Object value = prop.getNoteGetter().apply(n);
                 if (null != value) {
                     indent(indent, p);
                     p.println("@" + prop.getPropertyKey() + " " + value);

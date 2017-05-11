@@ -58,7 +58,7 @@ public class AddToStreamMapping extends AtomMapping {
     private void prepend(final String value) throws RippleException {
         Note note = new Note();
         note.setId(SemanticSynchrony.createRandomId());
-        note.setSharability(filter.getDefaultSharability());
+        note.setSource(filter.getDefaultSource());
         note.setWeight(filter.getDefaultWeight());
         note.setCreated(System.currentTimeMillis());
         note.setTitle(value);

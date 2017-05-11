@@ -84,16 +84,6 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
-    public Float getSharability() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHARABILITY);
-    }
-
-    @Override
-    public void setSharability(Float sharability) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, sharability);
-    }
-
-    @Override
     public String getShortcut() {
         return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
@@ -116,6 +106,16 @@ public abstract class PGAtom extends PGEntity implements Atom {
     }
 
     @Override
+    public String getSource() {
+        return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+    }
+
+    @Override
+    public void setSource(final String source) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+    }
+
+    @Override
     public EntityList<Atom> getChildren() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfAtoms(v));
     }
@@ -125,16 +125,6 @@ public abstract class PGAtom extends PGEntity implements Atom {
         removeAllChildren();
 
         setChildrenInternal(children);
-    }
-
-    @Override
-    public String getSource() {
-        return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
-    }
-
-    @Override
-    public void setSource(final String source) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
     }
 
     @Override

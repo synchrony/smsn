@@ -56,8 +56,8 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.WEIGHT:
                 validateWeight();
                 break;
-            case SemanticSynchrony.PropertyKeys.SHARABILITY:
-                validateSharability();
+            case SemanticSynchrony.PropertyKeys.SOURCE:
+                validateSource();
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
                 validatePriority();
@@ -84,10 +84,10 @@ public class SetProperties extends FilteredAction {
         }
     }
 
-    private void validateSharability() {
-        float f = toFloat(getValue());
-        if (f <= 0 || f > 1.0) {
-            throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
+    private void validateSource() {
+        String source = (String) getValue();
+        if (source.trim().length() == 0) {
+            throw new BadRequestException("empty source");
         }
     }
 
@@ -127,8 +127,8 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.WEIGHT:
                 root.setWeight(toFloat(value));
                 break;
-            case SemanticSynchrony.PropertyKeys.SHARABILITY:
-                root.setSharability(toFloat(value));
+            case SemanticSynchrony.PropertyKeys.SOURCE:
+                root.setSource((String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
                 root.setPriority(toFloat(value));

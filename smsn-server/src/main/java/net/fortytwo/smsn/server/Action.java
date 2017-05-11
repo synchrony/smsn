@@ -103,14 +103,12 @@ public abstract class Action {
 
     protected void addView(final Note n,
                            final ActionContext context) throws IOException {
-        JSONObject json;
-
-        json = context.getJsonPrinter().toJson(n);
+        JSONObject json = context.getJsonPrinter().toJson(n);
 
         context.getMap().put(Params.VIEW, json);
     }
 
-    public static ActionContext createcontext(final Graph graph) {
+    public static ActionContext createContext(final Graph graph) {
         ActionContext context = new ActionContext();
 
         context.setMap(new HashMap<>());

@@ -11,29 +11,29 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class SetAtomSharabilityMapping extends AtomMapping {
+public class SetAtomSourceMapping extends AtomMapping {
 
-    private static final Logger logger = Logger.getLogger(SetAtomSharabilityMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(SetAtomSourceMapping.class.getName());
 
-    public SetAtomSharabilityMapping(final BrainClient client,
-                                     final Filter filter) {
+    public SetAtomSourceMapping(final BrainClient client,
+                                final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "set-atom-sharability"
+                SmSnLibrary.NS_2014_12 + "set-atom-source"
         };
     }
 
     public Parameter[] getParameters() {
         return new Parameter[]{
                 new Parameter("atom", "the reference atom", true),
-                new Parameter("sharability", "the new sharability", true)};
+                new Parameter("source", "the new data source", true)};
     }
 
     public String getComment() {
-        return "sets the @sharability property of an atom";
+        return "sets the @source property of an atom";
     }
 
     public void apply(RippleList stack,
@@ -50,9 +50,7 @@ public class SetAtomSharabilityMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't set @shortcut of non-atom: " + no);
         } else {
-            Float f = sharabilityOrWeightFromArgument(value, mc);
-
-            setProperty(n, SemanticSynchrony.PropertyKeys.SHARABILITY, "" + f);
+            setProperty(n, SemanticSynchrony.PropertyKeys.SOURCE, "" + value);
 
             // put the atom back on the stack
             solutions.accept(stack.push(n));

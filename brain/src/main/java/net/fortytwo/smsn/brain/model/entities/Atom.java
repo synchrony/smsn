@@ -29,10 +29,6 @@ public interface Atom extends Entity {
 
     void setPriority(Float priority);
 
-    Float getSharability();
-
-    void setSharability(Float sharability);
-
     String getShortcut();
 
     void setShortcut(String shortcut);
