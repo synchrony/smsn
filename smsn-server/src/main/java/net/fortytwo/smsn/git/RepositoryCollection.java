@@ -103,7 +103,7 @@ public class RepositoryCollection implements AbstractRepository {
         parent.setId(SemanticSynchrony.createRandomId());
         // TODO: don't hard-code a source
         parent.setSource("public");
-        parent.setWeight(SemanticSynchrony.Weight.DEFAULT);
+        parent.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
         parent.setCreated(now);
 
         parent.setTitle("Git history for " + directory.getName()

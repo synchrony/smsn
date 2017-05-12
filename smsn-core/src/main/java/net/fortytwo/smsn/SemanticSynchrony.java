@@ -1,12 +1,15 @@
 package net.fortytwo.smsn;
 
 import net.fortytwo.smsn.config.Configuration;
+import net.fortytwo.smsn.config.DataSource;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -55,27 +58,8 @@ public class SemanticSynchrony {
                 WEIGHT = "weight";
     }
 
-    public interface Weight {
-        float WEAK = 0.25f;
-        float DEFAULT = 0.5f;
-        float STRONG = 0.75f;
-        float FULL = 1.0f;
-    }
-
-    public interface Sharability {
-        float PRIVATE = 0.25f;
-        float PERSONAL = 0.5f;
-        float PUBLIC = 0.75f;
-        float UNIVERSAL = 1.0f;
-    }
-
-    public interface Priority {
-        float NONE = 0.0f;
-        float LOW = 0.25f;
-        float MEDIUM = 0.5f;
-        float HIGH = 0.75f;
-        float HIGHEST = 1.0f;
-    }
+    public static final float DEFAULT_WEIGHT = 0.5f;
+    public static final float DEFAULT_PRIORITY = 0f;
 
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
@@ -98,6 +82,7 @@ public class SemanticSynchrony {
             ATTENTION_TTL = 5; // we consider attention to be valid for several seconds
 
     private static Configuration configuration;
+    private static Map<String, DataSource> dataSourcesByName;
 
     static {
         try {
@@ -114,6 +99,14 @@ public class SemanticSynchrony {
 
     public static Logger getLogger(final Class c) {
         return Logger.getLogger(c.getName());
+    }
+
+    public static DataSource getDataSourceByName(final String name) {
+        DataSource source = dataSourcesByName.get(name);
+        if (null == source) {
+            throw new IllegalArgumentException("no such data source: " + name);
+        }
+        return source;
     }
 
     public static void readConfigurationYaml(final InputStream input) throws IOException {
@@ -145,6 +138,15 @@ public class SemanticSynchrony {
             try (InputStream input = SemanticSynchrony.class.getResourceAsStream(SMSN_DEFAULT_YAML)) {
                 readConfigurationYaml(input);
             }
+        }
+
+        createSourceMap();
+    }
+
+    private static void createSourceMap() {
+        dataSourcesByName = new HashMap<>();
+        for (DataSource source : configuration.getSources()) {
+            dataSourcesByName.put(source.getName(), source);
         }
     }
 

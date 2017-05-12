@@ -1,13 +1,20 @@
 package net.fortytwo.smsn.server.actions;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.config.DataSource;
+import net.fortytwo.smsn.git.SmSnGitRepository;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -19,9 +26,33 @@ public class ActionDuJour extends Action {
     protected void performTransaction(ActionContext context) throws BadRequestException, RequestProcessingException {
         // add an "action du jour" as needed
 
-        //migrateIds(context);
+        try {
+            //migrateIds(context);
 
-        //findAnomalousAtoms(context);
+            //findAnomalousAtoms(context);
+
+            assignSources(context);
+        } catch (Exception e) {
+            throw new RequestProcessingException(e);
+        }
+    }
+
+    private void assignSources(ActionContext context) throws IOException {
+        for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
+            File dir = new File(source.getLocation());
+            Preconditions.checkArgument(dir.exists() && dir.isDirectory());
+            TopicGraph graph = context.getBrain().getTopicGraph();
+            for (File file : dir.listFiles()) {
+                if (VCSFormat.isAtomFile(file)) {
+                    String id = file.getName();
+                    Optional<Atom> opt = graph.getAtomById(id);
+                    Preconditions.checkArgument(opt.isPresent());
+                    opt.get().setSource(source.getName());
+                }
+            }
+            //SmSnGitRepository repo = new SmSnGitRepository(context.getBrain(), source);
+
+        }
     }
 
     private void migrateIds(final ActionContext context) {

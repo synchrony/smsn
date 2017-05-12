@@ -126,7 +126,7 @@ public class SmSnCommit extends AtomBase {
             atom.setId(id);
             atom.setCreated(timestamp);
             atom.setTitle(SmSnGitRepository.titleForMissingAtom(changeType));
-            atom.setWeight(SemanticSynchrony.Weight.DEFAULT);
+            atom.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
             atom.setSource(this.getSource());
         }
 

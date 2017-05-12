@@ -162,7 +162,7 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         note.setId(id);
         note.setTitle(title);
         note.setSource(DefaultSources.PUBLIC);
-        note.setWeight(SemanticSynchrony.Weight.DEFAULT);
+        note.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
         note.setCreated(System.currentTimeMillis());
 
         return note;

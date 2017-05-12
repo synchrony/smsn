@@ -6,6 +6,7 @@ import java.io.Serializable;
 public class DataSource implements Serializable {
 
     private String name;
+    private String code;
     private String location;
     private Float sharability;
     private Integer displayColor;
@@ -14,8 +15,16 @@ public class DataSource implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(final String name) {
+        this.name = name.trim();
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code.trim();
     }
 
     public String getLocation() {
@@ -23,7 +32,7 @@ public class DataSource implements Serializable {
     }
 
     public void setLocation(String location) {
-        this.location = location;
+        this.location = location.trim();
     }
 
     public Float getSharability() {
@@ -34,20 +43,39 @@ public class DataSource implements Serializable {
         this.sharability = sharability;
     }
 
+    public Integer getDisplayColor() {
+        return displayColor;
+    }
+
+    public void setDisplayColor(Integer displayColor) {
+        this.displayColor = displayColor;
+    }
+
     public void validate() {
         validateName();
+        validateCode();
         validateLocation();
         validateSharability();
+        validateDisplayColor();
     }
 
     private void validateName() {
-        if (null == name || 0 == name.trim().length()) {
+        if (null == name || 0 == name.length()) {
             throw new IllegalArgumentException("missing name");
         }
     }
 
+    private void validateCode() {
+        if (null == code || 0 == code.length()) {
+            throw new IllegalArgumentException("missing code");
+        }
+        if (1 < code.length()) {
+            throw new IllegalArgumentException("code must be a single character");
+        }
+    }
+
     private void validateLocation() {
-        if (null == location || 0 == location.trim().length()) {
+        if (null == location || 0 == location.length()) {
             throw new IllegalArgumentException("missing location");
         }
 
@@ -72,11 +100,13 @@ public class DataSource implements Serializable {
         }
     }
 
-    public Integer getDisplayColor() {
-        return displayColor;
-    }
+    private void validateDisplayColor() {
+        if (null == displayColor) {
+            throw new IllegalArgumentException("missing displayColor");
+        }
 
-    public void setDisplayColor(Integer displayColor) {
-        this.displayColor = displayColor;
+        if (displayColor < 0 || displayColor > 0xffffff) {
+            throw new IllegalArgumentException("displayColor out of 24-bit range");
+        }
     }
 }

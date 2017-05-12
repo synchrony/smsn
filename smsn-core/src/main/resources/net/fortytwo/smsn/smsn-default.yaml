@@ -1,10 +1,10 @@
 # Default Semantic Synchrony configuration
 
-version: "${project.version}"
+version: ${project.version}
 
 services:
   broadcast:
-    host: "255.255.255.255"
+    host: 255.255.255.255
     port: 42000
     interval: 5000
   pubSub:
@@ -18,26 +18,30 @@ transactionBufferSize: 100
 
 # The activity log is a flat file to which a stream
 # of view and edit operations are recorded. Move it to a permanent location.
-activityLog: "data/activity.log"
+activityLog: data/activity.log
 
 sources:
   -
     location: data/sources/private
-    name: "private"
+    name: private
+    code: a
     sharability: 0.25
     displayColor: 0xff0000
   -
     location: data/sources/personal
-    name: "personal"
+    name: personal
+    code: s
     sharability: 0.5
-    displayColor: 0xffff00
+    displayColor: 0xffc000
   -
     location: data/sources/public
-    name: "public"
+    name: public
+    code: d
     sharability: 0.75
-    displayColor: 0x00ff00
+    displayColor: 0x00e000
   -
     location: data/sources/universal
-    name: "universal"
+    name: universal
+    code: f
     sharability: 1.0
     displayColor: 0x0000ff

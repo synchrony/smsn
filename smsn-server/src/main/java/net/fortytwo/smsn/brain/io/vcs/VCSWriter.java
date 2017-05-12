@@ -114,6 +114,9 @@ public class VCSWriter extends BrainWriter {
             note.setPriority(atom.getPriority());
             note.setShortcut(atom.getShortcut());
             note.setWeight(atom.getWeight());
+
+            // TODO: temporary
+            note.setSource(atom.getSource());
         }
         return note;
     }

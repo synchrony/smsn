@@ -12,8 +12,8 @@ public class AtomBase implements Atom {
     private String id = SemanticSynchrony.createRandomId();
     private long created = System.currentTimeMillis();
     private String title = "atom " + id;
-    private Float weight = SemanticSynchrony.Weight.DEFAULT;
-    private Float priority = SemanticSynchrony.Priority.NONE;
+    private Float weight = SemanticSynchrony.DEFAULT_WEIGHT;
+    private Float priority = SemanticSynchrony.DEFAULT_PRIORITY;
     // TODO: don't hard-code the default source
     private String source = "public";
 

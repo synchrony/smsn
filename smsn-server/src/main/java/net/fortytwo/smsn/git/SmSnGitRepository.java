@@ -182,7 +182,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         repoNote.setId(SemanticSynchrony.createRandomId());
         repoNote.setTitle(getTitle());
         repoNote.setSource(dataSource.getName());
-        repoNote.setWeight(SemanticSynchrony.Weight.DEFAULT);
+        repoNote.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
         repoNote.setCreated(now);
 
         Iterable<RevCommit> log = git.log().call();
@@ -236,7 +236,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         commitNote.setId(SemanticSynchrony.createRandomId());
         commitNote.setCreated(getTimeStamp(commit));
         commitNote.setTitle(createTitleFor(commit));
-        commitNote.setWeight(SemanticSynchrony.Weight.DEFAULT);
+        commitNote.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
         commitNote.setSource(dataSource.getName());
 
         if (!isMergeCommit(commit)) {
@@ -301,7 +301,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
             note.setId(id);
             note.setCreated(timestamp);
             note.setTitle(titleForMissingAtom(changeType));
-            note.setWeight(SemanticSynchrony.Weight.DEFAULT);
+            note.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
             note.setSource(dataSource.getName());
         }
 
