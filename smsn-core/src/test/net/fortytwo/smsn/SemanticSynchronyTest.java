@@ -25,8 +25,8 @@ public class SemanticSynchronyTest {
         assertEquals("universal", conf.getSources().get(3).getName());
 
         assertEquals(0xff0000, (int) conf.getSources().get(0).getDisplayColor());
-        assertEquals(0xffff00, (int) conf.getSources().get(1).getDisplayColor());
-        assertEquals(0x00ff00, (int) conf.getSources().get(2).getDisplayColor());
+        assertEquals(0xffc000, (int) conf.getSources().get(1).getDisplayColor());
+        assertEquals(0x00e000, (int) conf.getSources().get(2).getDisplayColor());
         assertEquals(0x0000ff, (int) conf.getSources().get(3).getDisplayColor());
     }
     

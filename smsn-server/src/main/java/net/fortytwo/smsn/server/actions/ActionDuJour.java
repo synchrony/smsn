@@ -5,12 +5,13 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.pg.PGAtom;
 import net.fortytwo.smsn.config.DataSource;
-import net.fortytwo.smsn.git.SmSnGitRepository;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.apache.tinkerpop.gremlin.structure.Property;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +32,41 @@ public class ActionDuJour extends Action {
 
             //findAnomalousAtoms(context);
 
-            assignSources(context);
+            //sharabilityToSource(context);
         } catch (Exception e) {
             throw new RequestProcessingException(e);
         }
+    }
+
+    private void sharabilityToSource(final ActionContext context) {
+        for (Atom atom : context.getBrain().getTopicGraph().getAllAtoms()) {
+            String source = sourceForSharability(atom);
+            if (null != source) {
+                atom.setSource(source);
+            }
+        }
+    }
+
+    private String sourceForSharability(final Atom atom) {
+        Property<Float> sharability = ((PGAtom) atom).asVertex().property("sharability");
+        if (sharability.isPresent()) {
+            switch ((int) (sharability.value() * 4)) {
+                case 0:
+                    throw new IllegalStateException();
+                case 1:
+                    return "private";
+                case 2:
+                    return "personal";
+                case 3:
+                    return "public";
+                case 4:
+                    return "universal";
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        return null;
     }
 
     private void assignSources(ActionContext context) throws IOException {
@@ -72,7 +104,7 @@ public class ActionDuJour extends Action {
         }
     }
 
-    private <T> void checkNotNull(final Atom a, final Function<Atom, T> accessor,  final String name) {
+    private <T> void checkNotNull(final Atom a, final Function<Atom, T> accessor, final String name) {
         T value = accessor.apply(a);
         if (null == value) {
             System.out.println("atom " + a.getId() + " has null " + name);
