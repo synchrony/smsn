@@ -47,12 +47,12 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public void setCreated(Long created) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
     }
 
     @Override
     public String getTitle() {
-        return (String) getRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE);
+        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TITLE);
     }
 
     @Override
@@ -102,17 +102,17 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public void setWeight(Float weight) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
     }
 
     @Override
     public String getSource() {
-        return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SOURCE);
     }
 
     @Override
     public void setSource(final String source) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
     }
 
     @Override

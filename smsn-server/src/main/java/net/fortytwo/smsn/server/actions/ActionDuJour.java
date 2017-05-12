@@ -40,9 +40,20 @@ public class ActionDuJour extends Action {
 
     private void sharabilityToSource(final ActionContext context) {
         for (Atom atom : context.getBrain().getTopicGraph().getAllAtoms()) {
-            String source = sourceForSharability(atom);
-            if (null != source) {
-                atom.setSource(source);
+            Property<String> source1 = ((PGAtom) atom).asVertex().property("source");
+            if (!source1.isPresent()) {
+                System.out.println("atom " + atom.getId() + " has no source. Title: " + atom.getTitle());
+                Property<Float> sharability = ((PGAtom) atom).asVertex().property("sharability");
+                if (sharability.isPresent()) {
+                    System.out.println("\tsharability: " + sharability.value());
+                } else {
+                    System.out.println("\tno sharability");
+                }
+
+                String source = sourceForSharability(atom);
+                if (null != source) {
+                    atom.setSource(source);
+                }
             }
         }
     }
