@@ -16,7 +16,6 @@ public class PageDTO implements Page {
     private Long created;
     private String alias;
     private String shortcut;
-    //private List<String> meta;
     private KeyValueTree<Link, EntityList<Link>> topicTree;
 
     @Override

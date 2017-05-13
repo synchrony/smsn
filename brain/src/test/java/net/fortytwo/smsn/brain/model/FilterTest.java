@@ -18,10 +18,19 @@ public class FilterTest extends BrainTestBase {
         assertFalse(filter.test(createAtom(DefaultSources.UNIVERSAL, 0.4f)));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void missingSourceIsIllegal() {
+    @Test
+    public void missingNonessentialPropertiesAreTolerated() {
         Filter filter = Filter.noFilter();
-        assertFalse(filter.test(createAtom(null, 1.0f)));
+
+        Atom atom = createAtom("public", 0.75f);
+        atom.setTitle(null);
+        assertTrue(filter.test(atom));
+    }
+
+    @Test
+    public void missingSourceFailsTest() throws Exception {
+        Filter filter = Filter.noFilter();
+        assertFalse(filter.test(createAtom(null, (Float) 0.75f)));
     }
 
     @Test

@@ -88,14 +88,11 @@ public class Filter implements Predicate<Atom>, Serializable {
 
         // This criterion includes the minimum; if the minimum is 0.25,
         // items with a value of 0.25 and greater will be visible.
-        boolean value = sharability >= minSharability && weight >= minWeight;
-        return value;
+        return sharability >= minSharability && weight >= minWeight;
     }
 
     private Float getSharability(final Atom atom) {
         String source = atom.getSource();
-        Preconditions.checkNotNull(source);
-        Float value = sharabilityBySource.get(source);
-        return value;
+        return null == source ? null : sharabilityBySource.get(source);
     }
 }
