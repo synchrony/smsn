@@ -17,7 +17,7 @@ function copyTabToClipboard(tab, cachingId) {
         // Note: the extra indent saves on keystrokes when pasting the text into Brain-mode
         //       (when it is pasted to an indented position in the tree)
         text += "* " + title + "\n"
-            + "                @sharability 1\n"
+            + "                @source universal\n"
             + "                @alias " + url;
     } else {
         text += "* " + tab.title + " (web page)\n"

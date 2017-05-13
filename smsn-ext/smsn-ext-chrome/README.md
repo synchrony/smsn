@@ -12,7 +12,7 @@ or
 
 ```
 * Personal knowledge base
-                @sharability 1
+                @source "universal"
                 @alias http://dbpedia.org/resource/Personal_knowledge_base
 ```
 
