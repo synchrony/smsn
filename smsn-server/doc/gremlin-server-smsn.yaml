@@ -1,3 +1,5 @@
+# Example Gremlin Server configuration file for use with SmSn
+
 host: localhost
 port: 8182
 scriptEvaluationTimeout: 300000
@@ -12,7 +14,7 @@ plugins:
   - smsn
 scriptEngines: {
   smsn: {
-    scripts: [conf/smsn.properties]
+    scripts: [conf/smsn.yaml]
   },
   gremlin-groovy: {
     imports: [java.lang.Math],

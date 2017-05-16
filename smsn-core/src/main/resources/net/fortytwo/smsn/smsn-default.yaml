@@ -1,4 +1,4 @@
-# Default Semantic Synchrony configuration
+# default Semantic Synchrony configuration
 
 version: ${project.version}
 
