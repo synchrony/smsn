@@ -312,8 +312,8 @@ public class KnowledgeBase {
      * Performs SmSn type inference on the knowledge base, optionally generating an RDF representation
      *
      * @param handler a handler for generated RDF statements (may be null)
-     * @param filter  an optional sharability filter for generated results.
-     *                Type inference is performed on the entire knowledge base without regard to sharability,
+     * @param filter  an optional filter for generated results.
+     *                Type inference is performed on the entire knowledge base without regard to source,
      *                but generated RDF statements are limited to those subjects which are sharable according to
      *                the filter.
      * @throws org.openrdf.rio.RDFHandlerException if a downstream error occurs

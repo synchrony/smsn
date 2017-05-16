@@ -15,7 +15,7 @@ SmSn 1.4 (NOT YET RELEASED)
 * Generalized data sources
 * Added a Git history view action
 * Use an inclusive criterion [min,inf) rather than an exclusive criterion (min,inf) in visibility filters
-* Eliminated max sharability and max weight from filters
+* Eliminated visibility maximums from filters
 ****************************************
 
 SmSn 1.3 (Join the Army)

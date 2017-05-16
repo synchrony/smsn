@@ -57,7 +57,6 @@ public class Note {
     private String page;
     private String id;
     private Float weight;
-    private Float sharability;
     private Float priority;
     private Long created;
     private String alias;
@@ -77,7 +76,6 @@ public class Note {
         this.page = copy.page;
         this.id = copy.id;
         this.weight = copy.weight;
-        this.sharability = copy.sharability;
         this.priority = copy.priority;
         this.created = copy.created;
         this.alias = copy.alias;

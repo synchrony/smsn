@@ -88,12 +88,12 @@ public abstract class BrainTestBase {
     }
 
     protected Atom importAtomFromFile(final String exampleFile) throws IOException {
-        Filter writeFilter = Filter.noFilter();
+        Filter writeFilter = new Filter(0f, 0.5f, DefaultSources.PRIVATE, DefaultSources.PERSONAL);
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         Note rootNote = importNoteFromFile(exampleFile);
         rootNote.setId(SemanticSynchrony.createRandomId());
-        Atom root = topicGraph.createAtomWithProperties(filter, rootNote.getId());
+        Atom root = topicGraph.createAtomWithProperties(writeFilter, rootNote.getId());
         queries.update(rootNote, 5, writeFilter, style);
         return root;
     }

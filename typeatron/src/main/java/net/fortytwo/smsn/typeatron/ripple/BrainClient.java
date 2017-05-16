@@ -124,7 +124,6 @@ public class BrainClient {
         List<NameValuePair> params = new LinkedList<>();
         params.add(new BasicNameValuePair(Params.REQUEST, requestJson.toString()));
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
-        System.out.println("parameter string: " + paramStr);
         String path = baseUrl + "view?" + paramStr;
 
         final Note[] results = new Note[1];
@@ -399,12 +398,16 @@ public class BrainClient {
     }
 
     private JSONObject toJson(final Filter filter) throws JSONException {
+        // TODO: restore if necessary
+        /*
         JSONObject json = new JSONObject();
         json.put(Params.MIN_SHARABILITY, filter.getMinSharability());
         json.put(Params.MIN_WEIGHT, filter.getMinWeight());
         json.put(Params.DEFAULT_SOURCE, filter.getDefaultSource());
         json.put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
         return json;
+        */
+        return null;
     }
 
     private JSONObject toJson(final Note note) throws IOException {

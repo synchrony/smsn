@@ -138,8 +138,8 @@ public class WikiParserTest extends BrainTestBase {
     }
 
     @Test(expected = IOException.class)
-    public void testEmptySharabilityAttributeNotAllowed() throws Exception {
-        readNotes("@sharability ");
+    public void testEmptySourceAttributeNotAllowed() throws Exception {
+        readNotes("@source ");
     }
 
     @Test(expected = IOException.class)

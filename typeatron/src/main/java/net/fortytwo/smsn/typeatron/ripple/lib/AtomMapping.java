@@ -90,7 +90,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                 if (f == 0.25f || f == 0.5f || f == 0.75f || f == 1.0f) {
                     return f;
                 } else {
-                    throw new RippleException("illegal sharability or weight value: " + f);
+                    throw new RippleException("illegal weight value: " + f);
                 }
         }
     }

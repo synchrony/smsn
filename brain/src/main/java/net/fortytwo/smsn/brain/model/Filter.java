@@ -7,24 +7,31 @@ import net.fortytwo.smsn.config.DataSource;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
 public class Filter implements Predicate<Atom>, Serializable {
 
-    private static final Map<String, Float> sharabilityBySource;
+    private static final Map<String, Integer> sourceToIndex;
 
     static {
-        sharabilityBySource = new HashMap<>();
-        for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
-            sharabilityBySource.put(source.getName(), source.getSharability());
+        sourceToIndex = new HashMap<>();
+        List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
+        Preconditions.checkNotNull(sources);
+        Preconditions.checkArgument(sources.size() > 0);
+        for (int i = 0; i < sources.size(); i++) {
+            DataSource source = sources.get(i);
+            sourceToIndex.put(source.getName(), i);
         }
     }
 
-    private float minSharability;
     private float minWeight;
     private float defaultWeight;
+    private String minSource;
     private String defaultSource;
+
+    private Integer minSourceIndex;
 
     private static final Filter NO_FILTER = new Filter();
 
@@ -32,39 +39,68 @@ public class Filter implements Predicate<Atom>, Serializable {
         return NO_FILTER;
     }
 
-    private Filter() {
-        // TODO: don't hard-code a source
-        this(0f, 0.5f, 0f, "personal");
+    public float getMinWeight() {
+        return minWeight;
     }
 
-    public Filter(final float minWeight,
-                  float defaultWeight,
-                  final float minSharability,
-                  final String defaultSource) {
+    public String getMinSource() {
+        return minSource;
+    }
 
-        Preconditions.checkNotNull(defaultSource);
-        checkBetweenZeroAndOne(minSharability);
+    public void setMinWeight(float minWeight) {
+        this.minWeight = minWeight;
+    }
+
+    public void setDefaultWeight(float defaultWeight) {
+        this.defaultWeight = defaultWeight;
+    }
+
+    public void setMinSource(String minSource) {
+        this.minSource = minSource;
+        this.minSourceIndex = indexForSource(minSource);
+    }
+
+    public void setDefaultSource(String defaultSource) {
+        this.defaultSource = defaultSource;
+    }
+
+    private static int indexForSource(final String source) {
+        Integer index = sourceToIndex.get(source);
+        Preconditions.checkNotNull(index);
+        return index;
+    }
+
+    private Filter(final float minWeight,
+                   final float defaultWeight,
+                   final int minSourceIndex,
+                   final String defaultSource) {
+
         checkBetweenZeroAndOne(minWeight);
         checkBetweenZeroAndOne(defaultWeight);
-
         Preconditions.checkArgument(defaultWeight >= minWeight, "default weight greater than minimum");
 
-        this.minSharability = minSharability;
+        Preconditions.checkNotNull(defaultSource);
+        indexForSource(defaultSource);
+
+        this.minSourceIndex = minSourceIndex;
         this.defaultSource = defaultSource;
         this.minWeight = minWeight;
         this.defaultWeight = defaultWeight;
     }
 
+    private Filter() {
+        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
+    }
+
+    public Filter(final float minWeight,
+                  final float defaultWeight,
+                  final String minSource,
+                  final String defaultSource) {
+        this(minWeight, defaultWeight, indexForSource(minSource), defaultSource);
+    }
+
     private void checkBetweenZeroAndOne(final float value) {
         Preconditions.checkArgument(value >= 0f && value <= 1f, "argument outside of range [0, 1]");
-    }
-
-    public float getMinSharability() {
-        return minSharability;
-    }
-
-    public float getMinWeight() {
-        return minWeight;
     }
 
     public String getDefaultSource() {
@@ -76,23 +112,23 @@ public class Filter implements Predicate<Atom>, Serializable {
     }
 
     public boolean isTrivial() {
-        return minSharability == 0 && minWeight == 0;
+        return minSourceIndex == 0 && minWeight == 0;
     }
 
     @Override
     public boolean test(final Atom atom) {
-        Float sharability = getSharability(atom);
+        Integer sourceIndex = getSourceIndexFor(atom);
         Float weight = atom.getWeight();
 
-        if (null == sharability || null == weight) return false;
+        if (null == sourceIndex || null == weight) return false;
 
-        // This criterion includes the minimum; if the minimum is 0.25,
+        // The weight criterion includes the minimum; if the minimum is 0.25,
         // items with a value of 0.25 and greater will be visible.
-        return sharability >= minSharability && weight >= minWeight;
+        return sourceIndex >= minSourceIndex && weight >= minWeight;
     }
 
-    private Float getSharability(final Atom atom) {
+    private Integer getSourceIndexFor(final Atom atom) {
         String source = atom.getSource();
-        return null == source ? null : sharabilityBySource.get(source);
+        return null == source ? null : sourceToIndex.get(source);
     }
 }

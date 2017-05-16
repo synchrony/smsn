@@ -13,7 +13,7 @@ public class FilterTest extends BrainTestBase {
 
     @Test
     public void minimumWeightIsInclusive() throws Exception {
-        Filter filter = new Filter(0.5f, 0.5f, 0.5f, DefaultSources.PERSONAL);
+        Filter filter = new Filter(0.5f, 0.5f, DefaultSources.PERSONAL, DefaultSources.PERSONAL);
         assertTrue(filter.test(createAtom(DefaultSources.UNIVERSAL, 0.5f)));
         assertFalse(filter.test(createAtom(DefaultSources.UNIVERSAL, 0.4f)));
     }

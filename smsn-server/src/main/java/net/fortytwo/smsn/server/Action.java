@@ -38,7 +38,6 @@ public abstract class Action {
 
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
 
-
     protected static final int MAX_VIEW_HEIGHT = 7;
 
     protected static final String CREATE_NEW_ATOM = "create-new-atom";

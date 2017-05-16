@@ -12,7 +12,7 @@ import java.util.Optional;
 
 abstract class FilteredAction extends Action {
     @NotNull
-    private Filter filter;
+    private Filter filter = Filter.noFilter();
 
     public Filter getFilter() {
         return notNull(filter);
@@ -46,6 +46,13 @@ abstract class FilteredAction extends Action {
                 ? "[no title]" : root.getTitle());
 
         return root;
+    }
+
+    protected void setFilterParams(final ActionContext context) {
+        context.getMap().put(Params.DEFAULT_SOURCE, filter.getDefaultSource());
+        context.getMap().put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
+        context.getMap().put(Params.MIN_SOURCE, filter.getMinSource());
+        context.getMap().put(Params.MIN_WEIGHT, filter.getMinWeight());
     }
 
     private Atom createNewRoot(final ActionContext context) {

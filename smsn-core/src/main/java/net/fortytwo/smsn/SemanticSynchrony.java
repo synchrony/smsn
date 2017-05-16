@@ -83,6 +83,7 @@ public class SemanticSynchrony {
 
     private static Configuration configuration;
     private static Map<String, DataSource> dataSourcesByName;
+    private static Map<String, DataSource> dataSourcesByCode;
 
     static {
         try {
@@ -105,6 +106,14 @@ public class SemanticSynchrony {
         DataSource source = dataSourcesByName.get(name);
         if (null == source) {
             throw new IllegalArgumentException("no such data source: " + name);
+        }
+        return source;
+    }
+
+    public static DataSource getDataSourceByCode(final String code) {
+        DataSource source = dataSourcesByCode.get(code);
+        if (null == source) {
+            throw new IllegalArgumentException("no such data source: " + code);
         }
         return source;
     }
@@ -145,8 +154,10 @@ public class SemanticSynchrony {
 
     private static void createSourceMap() {
         dataSourcesByName = new HashMap<>();
+        dataSourcesByCode = new HashMap<>();
         for (DataSource source : configuration.getSources()) {
             dataSourcesByName.put(source.getName(), source);
+            dataSourcesByCode.put(source.getCode(), source);
         }
     }
 

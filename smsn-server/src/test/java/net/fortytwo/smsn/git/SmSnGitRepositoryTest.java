@@ -43,7 +43,6 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         DataSource dataSource = new DataSource();
         dataSource.setName(DefaultSources.PUBLIC);
         dataSource.setLocation(repoDir.getAbsolutePath());
-        dataSource.setSharability(0.75f);
 
         repo = new SmSnGitRepository(brain, dataSource);
         git = repo.getGit();

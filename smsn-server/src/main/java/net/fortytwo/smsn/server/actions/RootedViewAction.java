@@ -24,11 +24,13 @@ public abstract class RootedViewAction extends BasicViewAction {
     }
 
     @Override
-    protected void performTransaction(final ActionContext params) {
-        super.performTransaction(params);
+    protected void performTransaction(final ActionContext context) {
+        super.performTransaction(context);
+
+        setFilterParams(context);
 
         if (null != root) {
-            rootAtom = getRoot(root, params);
+            rootAtom = getRoot(root, context);
         }
     }
 }

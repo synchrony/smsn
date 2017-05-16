@@ -111,10 +111,11 @@ public class SetProperties extends FilteredAction {
     }
 
     @Override
-    protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         validateKeyValue();
 
-        Atom root = getRoot(getId(), params);
+        Atom root = getRoot(getId(), context);
+        setFilterParams(context);
         Object value = getValue();
 
         switch (getName()) {
@@ -132,12 +133,12 @@ public class SetProperties extends FilteredAction {
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
                 root.setPriority(toFloat(value));
-                params.getBrain().getPriorities().updatePriority(root);
+                context.getBrain().getPriorities().updatePriority(root);
                 break;
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
-                for (Atom a : params.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
+                for (Atom a : context.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
                     a.setShortcut(null);
                 }
 
@@ -147,13 +148,13 @@ public class SetProperties extends FilteredAction {
                 throw new IllegalStateException();
         }
 
-        params.getBrain().getTopicGraph().notifyOfUpdate();
+        context.getBrain().getTopicGraph().notifyOfUpdate();
 
-        params.getMap().put("key", params.getBrain().getTopicGraph().idOfAtom(root));
-        params.getMap().put("name", getName());
-        params.getMap().put("value", value.toString());
+        context.getMap().put("key", context.getBrain().getTopicGraph().idOfAtom(root));
+        context.getMap().put("name", getName());
+        context.getMap().put("value", value.toString());
 
-        ActivityLog log = params.getBrain().getActivityLog();
+        ActivityLog log = context.getBrain().getActivityLog();
         if (null != log) {
             log.logSetProperties(root);
         }

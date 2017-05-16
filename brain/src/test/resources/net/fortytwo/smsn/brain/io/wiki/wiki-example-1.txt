@@ -19,9 +19,9 @@
     * attributes
         @alias http://example.org/ns/attributes
         @weight 0.75
-        * three attributes are allowed: @alias, @weight, and @sharability
+        * three attributes are allowed: @alias, @weight, and @source
         * the @alias attribute defines an alternative URI for the topic of the note, while
-        * @weight and @sharability expect numeric values
+        * @weight expects numeric values, whereas @source expects a string-valued data source name
     * white space
         * tab characters are converted to four spaces each: "    "
         * all other whitespace characters count as single spaces: " "

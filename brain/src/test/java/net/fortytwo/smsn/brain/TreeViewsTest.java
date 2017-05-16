@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -353,7 +352,7 @@ public class TreeViewsTest extends BrainTestBase {
         queries.update(rootNote, 2, filter, style);
         Atom one = topicGraph.getAtomById("N5KBOAq").get();
         assertEquals(0.5f, one.getWeight());
-        assertEquals(DefaultSources.PERSONAL, one.getSource());
+        assertEquals(DefaultSources.PRIVATE, one.getSource());
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -447,7 +446,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void invisibleAtomsAreExcludedFromViews() throws Exception {
-        Filter readFilter = new Filter(0f, 0.5f, 0.75f, DefaultSources.PUBLIC);
+        Filter readFilter = new Filter(0f, 0.5f, DefaultSources.PUBLIC, DefaultSources.PUBLIC);
         Filter writeFilter = Filter.noFilter();
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
@@ -487,7 +486,7 @@ public class TreeViewsTest extends BrainTestBase {
     @Test
     public void invisibleAtomsAreSkippedDuringWrites() throws Exception {
         Filter readFilter = Filter.noFilter();
-        Filter writeFilter = new Filter(0f, 0.5f, 0.75f, DefaultSources.PUBLIC);
+        Filter writeFilter = new Filter(0f, 0.5f, DefaultSources.PUBLIC, DefaultSources.PUBLIC);
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         // three items in the private view

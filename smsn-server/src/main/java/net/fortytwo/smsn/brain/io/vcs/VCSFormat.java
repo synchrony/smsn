@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class VCSFormat extends Format {
 
-    public static Map<String, File> getDirsBySharability() {
+    public static Map<String, File> getDirsBySource() {
         Map<String, File> dirs = new HashMap<>();
         for (DataSource dataSource : SemanticSynchrony.getConfiguration().getSources()) {
             dirs.put(dataSource.getName(), new File(dataSource.getLocation()));

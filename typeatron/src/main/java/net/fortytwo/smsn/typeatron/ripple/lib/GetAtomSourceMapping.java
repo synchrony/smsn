@@ -47,7 +47,7 @@ public class GetAtomSourceMapping extends AtomMapping {
         } else {
             String value = n.getSource();
             if (null != value) {
-                // put both the @sharability property and the (synced) atom back on the stack
+                // put both the @source property and the (synced) atom back on the stack
                 solutions.accept(stack.push(n).push(value));
             }
         }
