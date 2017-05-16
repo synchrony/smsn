@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
-import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;

@@ -34,7 +34,7 @@ public class GraphMLReaderIT extends BrainTestBase {
         BrainReader reader = Format.getReader(format);
         assertNotNull(reader);
 
-        reader.doImport(inputFile, GraphMLFormat.getInstance(), brain, true);
+        reader.doImport(inputFile, GraphMLFormat.getInstance(), brain);
 
         System.out.println("# atoms: " + countAtoms());
 

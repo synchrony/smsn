@@ -251,7 +251,7 @@ public class FreeplaneReader extends BrainReader {
             if (null == text || 0 == text.length()) {
                 text = getRichContent(nodeElement);
                 if (null == text) {
-                    text = getDefaultNodeName();
+                    text = "[no text]";
                 }
             }
             setTextOrTitle(note, text);

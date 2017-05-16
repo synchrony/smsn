@@ -19,7 +19,7 @@ public class WikiFormat extends Format {
     private static final WikiFormat instance = new WikiFormat();
 
     private WikiFormat() {
-        super("Wiki", Type.InMemory);
+        super("Wiki", Type.Internal);
     }
 
     public static WikiFormat getInstance() {

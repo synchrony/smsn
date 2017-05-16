@@ -34,7 +34,7 @@ public class FreeplaneReaderIT extends BrainTestBase {
         BrainReader reader = Format.getReader(format);
         assertNotNull(reader);
 
-        reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain, true);
+        reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain);
 
         System.out.println("# atoms: " + countAtoms());
 

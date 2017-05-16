@@ -24,7 +24,7 @@ public class VCSFormat extends Format {
     private static final VCSFormat instance = new VCSFormat();
 
     private VCSFormat() {
-        super("VCS", Type.DirectoryBased);
+        super("VCS", Type.Complex);
     }
 
     public static VCSFormat getInstance() {

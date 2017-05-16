@@ -20,6 +20,8 @@ public class ReadGraph extends IOAction {
     private static final Map<Graph, Set<String>> importsInProgress = new HashMap<>();
     private static final Map<Graph, Set<String>> importsSucceeded = new HashMap<>();
 
+    private static final String DEFAULT = "default";
+
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
         if (null == getFormat()) {
@@ -28,16 +30,17 @@ public class ReadGraph extends IOAction {
 
         BrainReader reader = Format.getReader(getFormat());
 
-        beginImport(params.getGraphWrapper().getGraph(), getFile().getAbsolutePath());
+        String lockId = findLockId();
+        beginImport(params.getGraphWrapper().getGraph(), lockId);
 
         boolean success = false;
         try {
-            reader.doImport(getFile(), getFormat(), params.getBrain(), true);
+            reader.doImport(getFile(), getFormat(), params.getBrain());
             success = true;
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         } finally {
-            finishImport(params.getGraphWrapper().getGraph(), getFile().getAbsolutePath(), success);
+            finishImport(params.getGraphWrapper().getGraph(), lockId, success);
         }
     }
 
@@ -54,36 +57,36 @@ public class ReadGraph extends IOAction {
         return true;
     }
 
-    private static synchronized void beginImport(final Graph g, final String file) throws BadRequestException {
+    private static synchronized void beginImport(final Graph g, final String lockId) throws BadRequestException {
         Set<String> files = importsSucceeded.get(g);
-        if (null != files && files.contains(file)) {
-            throw new BadRequestException("graph at " + file + " has already been imported successfully");
+        if (null != files && files.contains(lockId)) {
+            throw new BadRequestException("graph at " + lockId + " has already been imported successfully");
         }
 
         files = importsInProgress.get(g);
         if (null != files) {
-            if (files.contains(file)) {
-                throw new BadRequestException("graph at " + file + " is currently being imported");
+            if (files.contains(lockId)) {
+                throw new BadRequestException("graph at " + lockId + " is currently being imported");
             }
         } else {
             files = new HashSet<>();
         }
-        files.add(file);
+        files.add(lockId);
     }
 
-    private static synchronized void finishImport(final Graph g, final String file, final boolean success) {
+    private static synchronized void finishImport(final Graph g, final String lockId, final boolean success) {
         Set<String> files = importsInProgress.get(g);
         if (null != files) {
-            files.remove(file);
+            files.remove(lockId);
         }
 
         if (success) {
-            files = importsSucceeded.get(g);
-            if (null == files) {
-                files = new HashSet<>();
-                importsSucceeded.put(g, files);
-            }
-            files.add(file);
+            files = importsSucceeded.computeIfAbsent(g, k -> new HashSet<>());
+            files.add(lockId);
         }
+    }
+
+    private String findLockId() {
+        return null != getFile() ? getFile().getAbsolutePath() : DEFAULT;
     }
 }
