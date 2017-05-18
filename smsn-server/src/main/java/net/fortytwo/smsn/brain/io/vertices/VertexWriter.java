@@ -32,7 +32,7 @@ public class VertexWriter extends BrainWriter {
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
-        p.println("created\tid\tweight\tsource\tclass\tout\tin\tvalue\talias");
+        p.println("created\tid\tweight\tsource\tclass\tout\tin\ttitle\talias");
 
         for (Atom a : sourceGraph.getAllAtoms()) {
             if (isTrueAtom(a) && filter.test(a)) {
@@ -60,7 +60,7 @@ public class VertexWriter extends BrainWriter {
 
                 String value = a.getTitle();
                 if (null == value) {
-                    logger.warning("note has null @value: " + a.getId());
+                    logger.warning("note has null @title: " + a.getId());
                 } else {
                     p.print(escapeValue(a.getTitle()));
                 }
