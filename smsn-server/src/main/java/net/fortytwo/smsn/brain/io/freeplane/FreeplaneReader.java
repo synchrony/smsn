@@ -125,16 +125,39 @@ public class FreeplaneReader extends BrainReader {
         }
     }
 
+    private String trim(String text) {
+        if (null == text) {
+            return null;
+        }
+        text = text.trim();
+        if (0 == text.length()) {
+            return null;
+        } else {
+            return text;
+        }
+    }
+
+    private String getText(final Element nodeElement) {
+        String text = trim(nodeElement.getAttribute(Attr.TEXT));
+        if (null != text) {
+            return text;
+        }
+
+        text = trim(getRichContent(nodeElement));
+        if (null != text) {
+            return text;
+        }
+
+        return "[no text]";
+    }
+
     private String getRichContent(final Element element) {
         Element content = getSingleElement(element, Elmt.RICHCONTENT);
         if (null == content) {
             return null;
         }
 
-        Element body = getSingleElement(content, Elmt.BODY);
-        return body == null
-                ? null
-                : body.getTextContent();
+        return content.getTextContent();
     }
 
     private Element getSingleElement(final Element parent, final String name) {
@@ -262,17 +285,9 @@ public class FreeplaneReader extends BrainReader {
             root.setCreated(created);
             // TODO: make id and modified date into property values
 
-            String text = nodeElement.getAttribute(Attr.TEXT);
-            if (null == text || 0 == text.length()) {
-                text = getRichContent(nodeElement);
-                if (null == text) {
-                    text = "[no text]";
-                }
-            }
-            setTextOrTitle(root, text);
+            setTextOrTitle(root, getText(nodeElement));
 
             if (null != styleNote) {
-                //note.setHasChildren(true);
                 root.addChild(styleNote);
             }
 
