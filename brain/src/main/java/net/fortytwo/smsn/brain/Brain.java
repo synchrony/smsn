@@ -54,7 +54,7 @@ public class Brain {
             SemanticSynchrony.getLogger().warning("no activity log specified");
             activityLog = null;
         } else {
-            SemanticSynchrony.getLogger().info("will use activity log at " + filePath);
+            SemanticSynchrony.getLogger().fine("using activity log at " + filePath);
             try {
                 File logFile = new File(filePath);
                 createDirectories(logFile);
