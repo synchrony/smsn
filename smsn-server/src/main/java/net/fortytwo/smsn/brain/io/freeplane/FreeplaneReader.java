@@ -2,7 +2,6 @@ package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
@@ -10,6 +9,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -110,6 +110,7 @@ public class FreeplaneReader extends BrainReader {
 
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
+
         queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
         checkAndCommit(destGraph);
@@ -118,9 +119,10 @@ public class FreeplaneReader extends BrainReader {
     private void setTextOrTitle(Note note, String text) {
         if (text.contains("\n")) {
             note.setPage(text);
-            note.setTitle("RenameMe");
+            note.setTitle("[multiple lines]");
+        } else {
+            note.setTitle(text);
         }
-        note.setTitle(text);
     }
 
     private String getRichContent(final Element element) {
