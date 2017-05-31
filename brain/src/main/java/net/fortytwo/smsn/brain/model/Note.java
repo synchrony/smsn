@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class Note {
     // A special value, for incoming notes only,
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
-    public static final String CLEARME = "_";
+    public static final String CLEARME = "c l e a r m e";
 
     public static final Map<String, Property> propertiesByKey;
 

@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals("cheval \u00e0 phynances", j.getString("title"));
     }
 
+    @Ignore
     @Test(expected = InvalidUpdateException.class)
     public void updateWithPageAndChildrenIsRejected() throws Exception {
         Atom root = createAtom("11111", "root");
@@ -77,6 +79,28 @@ public class TreeViewsTest extends BrainTestBase {
         note.addChild(child);
 
         queries.update(note, 5, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
+    }
+
+    @Test
+    public void updateWithPageAndChildrenIsAccepted() throws Exception {
+        Atom root = createAtom("11111", "root");
+
+        Note note = new Note();
+        note.setId(root.getId());
+        note.setTitle("Arthur Dent");
+        note.setPage("He's a jerk.\nA complete kneebiter.");
+        Note child = new Note();
+        child.setTitle("Random");
+        note.addChild(child);
+
+        queries.update(note, 5, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
+
+        Atom ad = topicGraph.getAtomById(root.getId()).get();
+        assertEquals("Arthur Dent", ad.getTitle());
+        assertEquals("He's a jerk.\nA complete kneebiter.", ad.getText());
+        assertEquals(1, EntityList.toJavaList(ad.getChildren()).size());
+        Atom random = ad.getChildren().getFirst();
+        assertEquals("Random", random.getTitle());
     }
 
     @Test

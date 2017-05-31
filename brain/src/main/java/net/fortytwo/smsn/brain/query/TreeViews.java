@@ -331,7 +331,6 @@ public class TreeViews {
                                 final Filter filter,
                                 final ViewStyle style,
                                 final Map<String, Atom> cache) {
-        validateNote(rootNote);
 
         Atom rootAtom = getRequiredAtomForNote(rootNote, cache);
 
@@ -339,12 +338,6 @@ public class TreeViews {
         setProperties(rootAtom, rootNote);
 
         updateChildren(rootNote, rootAtom, height, filter, style, cache);
-    }
-
-    private void validateNote(final Note note) {
-        if (null != note.getPage() && 0 < note.getChildren().size()) {
-            throw new InvalidUpdateException("atom with page cannot have children");
-        }
     }
 
     public static <T> int indexOfNthVisible(final EntityList<T> list, final int position, final Predicate<T> filter) {
