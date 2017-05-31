@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class Note {
     // A special value, for incoming notes only,
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
-    public static final String CLEARME = "c l e a r m e";
+    public static final String CLEARME = "C.L.E.A.R.M.E";
 
     public static final Map<String, Property> propertiesByKey;
 
@@ -28,7 +28,7 @@ public class Note {
                         Note::getCreated, Note::setCreated,
                         Atom::getCreated, Atom::setCreated, Long::valueOf),
                 new Property<>(true,false, SemanticSynchrony.PropertyKeys.PAGE,
-                        Note::getPage, Note::setPage,
+                        Note::getText, Note::setText,
                         Atom::getText, Atom::setText, s -> s),
                 new Property<>(true,true, SemanticSynchrony.PropertyKeys.PRIORITY,
                         Note::getPriority, Note::setPriority,
@@ -54,7 +54,7 @@ public class Note {
     private int numberOfChildren;
     private int numberOfParents;
     private String title;
-    private String page;
+    private String text;
     private String id;
     private Float weight;
     private Float priority;
@@ -73,7 +73,7 @@ public class Note {
         this();
 
         this.title = copy.title;
-        this.page = copy.page;
+        this.text = copy.text;
         this.id = copy.id;
         this.weight = copy.weight;
         this.priority = copy.priority;
@@ -98,12 +98,12 @@ public class Note {
         this.title = title;
     }
 
-    public String getPage() {
-        return page;
+    public String getText() {
+        return text;
     }
 
-    public void setPage(String page) {
-        this.page = page;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getId() {

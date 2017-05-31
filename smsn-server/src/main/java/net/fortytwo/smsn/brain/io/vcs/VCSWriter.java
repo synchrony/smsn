@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
@@ -9,7 +8,6 @@ import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.config.DataSource;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -110,7 +108,7 @@ public class VCSWriter extends BrainWriter {
 
         if (withValueAndProperties) {
             note.setTitle(atom.getTitle());
-            note.setPage(atom.getText());
+            note.setText(atom.getText());
             note.setAlias(atom.getAlias());
             note.setCreated(atom.getCreated());
             note.setPriority(atom.getPriority());

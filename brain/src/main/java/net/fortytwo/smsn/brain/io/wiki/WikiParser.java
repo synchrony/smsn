@@ -42,7 +42,7 @@ public class WikiParser extends BrainParser {
         }
 
         if (currentLineIsInPage && !isEmptyPage(currentValue)) {
-            root.getChildren().get(0).setPage(currentValue);
+            root.getChildren().get(0).setText(currentValue);
         }
 
         return root;

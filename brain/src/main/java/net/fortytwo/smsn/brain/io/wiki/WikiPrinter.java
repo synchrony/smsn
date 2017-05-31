@@ -60,9 +60,9 @@ public class WikiPrinter {
             printInternal(child, nextIndent, p, withProperties);
         }
 
-        if (useCanonicalFormat && !isEmptyPage(note.getPage())) {
+        if (useCanonicalFormat && !isEmptyPage(note.getText())) {
             p.println();
-            p.print(note.getPage());
+            p.print(note.getText());
         }
     }
 

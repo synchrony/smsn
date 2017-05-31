@@ -102,7 +102,7 @@ public class WikiParserTest extends BrainTestBase {
         assertEquals(1, notes.size());
         Note root = notes.get(0);
         assertEquals("Arthur Dent", root.getTitle());
-        assertEquals("He's a jerk.\nA complete kneebiter.", root.getPage());
+        assertEquals("He's a jerk.\nA complete kneebiter.", root.getText());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class WikiParserTest extends BrainTestBase {
         assertEquals(1, notes.size());
         Note root = notes.get(0);
         assertEquals("Arthur Dent", root.getTitle());
-        assertNull(root.getPage());
+        assertNull(root.getText());
     }
 
     @Test(expected = IOException.class)

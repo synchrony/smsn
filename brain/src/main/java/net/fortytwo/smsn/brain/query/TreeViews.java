@@ -570,7 +570,7 @@ public class TreeViews {
             // as well as to avoid displaying any child notes.
             if (isVisible) {
                 note.setTitle(atom.getTitle());
-                note.setPage(atom.getText());
+                note.setText(atom.getText());
             }
 
             if (null != brain.getKnowledgeBase()) {

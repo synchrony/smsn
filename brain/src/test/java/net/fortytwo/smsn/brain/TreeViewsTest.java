@@ -73,7 +73,7 @@ public class TreeViewsTest extends BrainTestBase {
         Note note = new Note();
         note.setId(root.getId());
         note.setTitle("Arthur Dent");
-        note.setPage("He's a jerk.\nA complete kneebiter.");
+        note.setText("He's a jerk.\nA complete kneebiter.");
         Note child = new Note();
         child.setTitle("Random");
         note.addChild(child);
@@ -88,7 +88,7 @@ public class TreeViewsTest extends BrainTestBase {
         Note note = new Note();
         note.setId(root.getId());
         note.setTitle("Arthur Dent");
-        note.setPage("He's a jerk.\nA complete kneebiter.");
+        note.setText("He's a jerk.\nA complete kneebiter.");
         Note child = new Note();
         child.setTitle("Random");
         note.addChild(child);

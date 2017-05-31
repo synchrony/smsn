@@ -108,7 +108,7 @@ public class VCSReader extends BrainReader {
         private void updateAtomProperties() {
             updateProperty(atom, note, Note::getAlias, Atom::setAlias);
             updateProperty(atom, note, Note::getCreated, Atom::setCreated);
-            updateProperty(atom, note, Note::getPage, Atom::setText);
+            updateProperty(atom, note, Note::getText, Atom::setText);
             updateProperty(atom, note, Note::getPriority, Atom::setPriority);
             updateProperty(atom, note, Note::getSource, Atom::setSource);
             updateProperty(atom, note, Note::getShortcut, Atom::setShortcut);

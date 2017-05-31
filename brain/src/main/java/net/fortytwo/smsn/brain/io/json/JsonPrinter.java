@@ -49,8 +49,8 @@ public class JsonPrinter {
         }
         json.put(SemanticSynchrony.PropertyKeys.TITLE, title);
 
-        if (null != note.getPage()) {
-            json.put(SemanticSynchrony.PropertyKeys.PAGE, note.getPage());
+        if (null != note.getText()) {
+            json.put(SemanticSynchrony.PropertyKeys.PAGE, note.getText());
         }
 
         if (null != note.getAlias()) {

@@ -118,7 +118,7 @@ public class FreeplaneReader extends BrainReader {
 
     private void setTextOrTitle(Note note, String text) {
         if (text.contains("\n")) {
-            note.setPage(text);
+            note.setText(text);
             note.setTitle("[multiple lines]");
         } else {
             note.setTitle(text);
@@ -284,8 +284,8 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private void makeLegal(final Note note) {
-            if (null != note.getPage() && note.getChildren().size() > 0) {
-                note.setTitle(note.getPage().replaceAll("\\n", "\\n"));
+            if (null != note.getText() && note.getChildren().size() > 0) {
+                note.setTitle(note.getText().replaceAll("\\n", "\\n"));
                 logger.warning("note had both children and multi-line text (collapsed): "
                         + titlePreview(note.getTitle()));
             }

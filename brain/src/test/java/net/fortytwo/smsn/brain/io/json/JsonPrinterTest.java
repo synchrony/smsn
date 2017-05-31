@@ -87,7 +87,7 @@ public class JsonPrinterTest {
     public void pageGivesPageAttribute() throws Exception {
         Note n = new Note();
         n.setTitle("Arthur Dent");
-        n.setPage("12345");
+        n.setText("12345");
 
         JSONObject j = jsonPrinter.toJson(n);
         assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));
