@@ -198,15 +198,28 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private void parseDOMToGraph(Document document) throws IOException, InvalidGraphException {
-            Element root = document.getDocumentElement();
-
-            if (!root.getTagName().equals(Elmt.MAP)) {
+            Element mapNode = document.getDocumentElement();
+            if (!mapNode.getTagName().equals(Elmt.MAP)) {
                 throw new IllegalArgumentException("root of mind map XML must be called 'map'");
+            }
+            NodeList children = mapNode.getChildNodes();
+            Element rootNode = null;
+            for (int i = 0; i < children.getLength(); i++) {
+                Node child = children.item(i);
+                if (child instanceof Element) {
+                    if (null != rootNode) {
+                        throw new IllegalArgumentException("multiple root nodes");
+                    }
+                    rootNode = (Element) child;
+                }
+            }
+            if (null == rootNode) {
+                throw new IllegalArgumentException("no root node");
             }
 
             resetArrowLinks();
 
-            Note mindMapAsNote = parseTree(root);
+            Note mindMapAsNote = parseTree(rootNode);
             try {
                 persistNote(destGraph, mindMapAsNote);
             } catch (Brain.BrainException e) {
@@ -236,8 +249,8 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private Note parseTree(Element nodeElement) {
-            Note note = new Note();
-            note.setId(SemanticSynchrony.createRandomId());
+            Note root = new Note();
+            root.setId(SemanticSynchrony.createRandomId());
 
             String id = nodeElement.getAttribute(Attr.ID);
             long created = getCreated(nodeElement);
@@ -245,8 +258,8 @@ public class FreeplaneReader extends BrainReader {
 
             Note styleNote = getStyleNote(getStyle(nodeElement));
 
-            notesByFreeplaneId.put(id, note);
-            note.setCreated(created);
+            notesByFreeplaneId.put(id, root);
+            root.setCreated(created);
             // TODO: make id and modified date into property values
 
             String text = nodeElement.getAttribute(Attr.TEXT);
@@ -256,18 +269,18 @@ public class FreeplaneReader extends BrainReader {
                     text = "[no text]";
                 }
             }
-            setTextOrTitle(note, text);
+            setTextOrTitle(root, text);
 
             if (null != styleNote) {
                 //note.setHasChildren(true);
-                note.addChild(styleNote);
+                root.addChild(styleNote);
             }
 
-            parseChildren(note, nodeElement, id);
+            parseChildren(root, nodeElement, id);
 
-            makeLegal(note);
+            makeLegal(root);
 
-            return note;
+            return root;
         }
 
         private void makeLegal(final Note note) {
