@@ -60,7 +60,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.PropertyKeys.PAGE);
+        action.setName(SemanticSynchrony.PropertyKeys.TEXT);
         action.setValue("after");
 
         perform(action);
@@ -74,7 +74,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(atom.getId());
-        action.setName(SemanticSynchrony.PropertyKeys.PAGE);
+        action.setName(SemanticSynchrony.PropertyKeys.TEXT);
         action.setValue("  \n ");
 
         perform(action);

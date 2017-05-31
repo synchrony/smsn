@@ -27,7 +27,7 @@ public class Note {
                 new Property<>(false,true, SemanticSynchrony.PropertyKeys.CREATED,
                         Note::getCreated, Note::setCreated,
                         Atom::getCreated, Atom::setCreated, Long::valueOf),
-                new Property<>(true,false, SemanticSynchrony.PropertyKeys.PAGE,
+                new Property<>(true,false, SemanticSynchrony.PropertyKeys.TEXT,
                         Note::getText, Note::setText,
                         Atom::getText, Atom::setText, s -> s),
                 new Property<>(true,true, SemanticSynchrony.PropertyKeys.PRIORITY,

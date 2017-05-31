@@ -50,7 +50,7 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.TITLE:
                 validateTitle();
                 break;
-            case SemanticSynchrony.PropertyKeys.PAGE:
+            case SemanticSynchrony.PropertyKeys.TEXT:
                 // nothing to do; every Markdown page is valid
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
@@ -122,7 +122,7 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.TITLE:
                 root.setTitle((String) value);
                 break;
-            case SemanticSynchrony.PropertyKeys.PAGE:
+            case SemanticSynchrony.PropertyKeys.TEXT:
                 root.setText(trimPage((String) value));
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:

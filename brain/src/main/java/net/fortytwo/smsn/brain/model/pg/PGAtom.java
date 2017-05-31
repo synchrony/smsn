@@ -65,12 +65,12 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public String getText() {
-        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE);
+        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT);
     }
 
     @Override
     public void setText(String text) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE, text);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
     }
 
     @Override

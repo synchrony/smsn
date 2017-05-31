@@ -49,7 +49,6 @@ public class SemanticSynchrony {
                 FORMAT = "format",
                 ID_V = "idV",
                 LABEL = "label",
-                PAGE = "page",
                 PRIORITY = "priority",
                 SHORTCUT = "shortcut",
                 SOURCE = "source",
