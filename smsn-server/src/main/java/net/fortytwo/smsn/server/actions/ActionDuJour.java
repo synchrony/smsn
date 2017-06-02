@@ -12,6 +12,8 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.structure.Property;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,8 @@ public class ActionDuJour extends Action {
         // add an "action du jour" as needed
 
         try {
+            pageToText(context);
+
             //migrateIds(context);
 
             //findAnomalousAtoms(context);
@@ -35,6 +39,18 @@ public class ActionDuJour extends Action {
             //sharabilityToSource(context);
         } catch (Exception e) {
             throw new RequestProcessingException(e);
+        }
+    }
+
+    private void pageToText(final ActionContext context) {
+        for (Atom atom : context.getBrain().getTopicGraph().getAllAtoms()) {
+            Vertex v = ((PGAtom) atom).asVertex();
+            VertexProperty<String> prop = v.property("page");
+            if (prop.isPresent()) {
+                String text = prop.value();
+                prop.remove();
+                v.property(SemanticSynchrony.PropertyKeys.TEXT, text);
+            }
         }
     }
 
