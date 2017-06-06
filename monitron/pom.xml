@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
-            <artifactId>rdfagents-jade</artifactId>
+            <artifactId>rdfagents-core</artifactId>
             <version>${rdfagents.version}</version>
         </dependency>
         <dependency>

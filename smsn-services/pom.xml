@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>net.fortytwo.rdfagents</groupId>
-            <artifactId>rdfagents-jade</artifactId>
+            <artifactId>rdfagents-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.illposed.osc</groupId>

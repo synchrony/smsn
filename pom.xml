@@ -100,7 +100,8 @@
             </dependency>
             <dependency>
                 <groupId>net.fortytwo.rdfagents</groupId>
-                <artifactId>rdfagents-jade</artifactId>
+                <artifactId>rdfagents-core</artifactId>
+                <!--<artifactId>rdfagents-jade</artifactId>-->
                 <version>${rdfagents.version}</version>
                 <exclusions>
                     <!-- exclude the XMPP MTP, which is currently not used by Brainstem
