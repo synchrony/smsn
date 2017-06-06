@@ -5,7 +5,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.TreeViews;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
@@ -26,15 +26,16 @@ import org.apache.tinkerpop.shaded.jackson.annotation.JsonIgnoreProperties;
 import org.apache.tinkerpop.shaded.jackson.annotation.JsonTypeInfo;
 import org.json.JSONObject;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "action")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class Action {
+
     protected static final Logger logger = Logger.getLogger(Action.class.getName());
 
     protected static final int MAX_VIEW_HEIGHT = 7;
@@ -93,21 +94,20 @@ public abstract class Action {
         wrapTransactionAndExceptions(context);
         long after = System.currentTimeMillis();
 
-        SemanticSynchrony.logInfo("completed " + getClass().getSimpleName() + " action in " + (after - before) + " ms");
+        SemanticSynchrony.getLogger().log(Level.INFO, "completed " + getClass().getSimpleName()
+                + " action in " + (after - before) + " ms");
 
         logActivity(context);
     }
 
     protected void addView(final Note n,
                            final ActionContext context) throws IOException {
-        JSONObject json;
-
-        json = context.getJsonPrinter().toJson(n);
+        JSONObject json = context.getJsonPrinter().toJson(n);
 
         context.getMap().put(Params.VIEW, json);
     }
 
-    public static ActionContext createcontext(final Graph graph) {
+    public static ActionContext createContext(final Graph graph) {
         ActionContext context = new ActionContext();
 
         context.setMap(new HashMap<>());
@@ -132,9 +132,7 @@ public abstract class Action {
         setTitle(context, "[no title]");
 
         try {
-            TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> {
-                performTransaction(context);
-            });
+            TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> performTransaction(context));
         } catch (Exception e) {
             throw new RequestProcessingException(e);
         }

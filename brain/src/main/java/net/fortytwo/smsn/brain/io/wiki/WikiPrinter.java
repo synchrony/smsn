@@ -31,9 +31,9 @@ public class WikiPrinter {
     }
 
     private void printInternal(final Note note,
-                                      final int indent,
-                                      final PrintStream p,
-                                      final boolean withProperties) {
+                               final int indent,
+                               final PrintStream p,
+                               final boolean withProperties) {
         indent(indent, p);
 
         p.print("* ");
@@ -60,9 +60,9 @@ public class WikiPrinter {
             printInternal(child, nextIndent, p, withProperties);
         }
 
-        if (useCanonicalFormat && !isEmptyPage(note.getPage())) {
+        if (useCanonicalFormat && !isEmptyPage(note.getText())) {
             p.println();
-            p.print(note.getPage());
+            p.print(note.getText());
         }
     }
 
@@ -70,19 +70,14 @@ public class WikiPrinter {
         return null == page || page.trim().length() == 0;
     }
 
-    private static void printProperties(final Note n, final PrintStream p, final int nextIndent) {
-        if (null != n.getAlias()) printProperty(SemanticSynchrony.PropertyKeys.ALIAS, n.getAlias(), nextIndent, p);
-        if (null != n.getCreated()) printProperty(SemanticSynchrony.PropertyKeys.CREATED, n.getCreated(), nextIndent, p);
-        if (null != n.getPriority()) printProperty(SemanticSynchrony.PropertyKeys.PRIORITY, n.getPriority(), nextIndent, p);
-        if (null != n.getSharability()) printProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, n.getSharability(), nextIndent, p);
-        if (null != n.getShortcut()) printProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, n.getShortcut(), nextIndent, p);
-        if (null != n.getWeight()) printProperty(SemanticSynchrony.PropertyKeys.WEIGHT, n.getWeight(), nextIndent, p);
-    }
-
-    private static void printProperty(final String key, final Object value, final int indent, final PrintStream p) {
-        indent(indent, p);
-
-        p.println("@" + key + " " + value);
+    private static void printProperties(final Note n, final PrintStream p, final int indent) {
+        Note.propertiesByKey.values().stream().filter(Note.Property::isAnnotationProperty).forEach(prop -> {
+            Object value = prop.getNoteGetter().apply(n);
+            if (null != value) {
+                indent(indent, p);
+                p.println("@" + prop.getPropertyKey() + " " + value);
+            }
+        });
     }
 
     private static void indent(final int indent, final PrintStream p) {

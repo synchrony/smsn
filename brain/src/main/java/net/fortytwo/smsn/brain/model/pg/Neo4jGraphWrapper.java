@@ -19,10 +19,8 @@ import org.neo4j.tinkerpop.api.impl.Neo4jGraphAPIImpl;
 import java.io.File;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Neo4jGraphWrapper extends GraphWrapper {
-    private static final Logger logger = SemanticSynchrony.getLogger(Neo4jGraphWrapper.class);
 
     private static String indexNameForKey(final String key) {
         return key + "-index";
@@ -84,7 +82,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
         try {
             getNeo4jGraph().close();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "failed to shut down Neo4j graph properly", e);
+            SemanticSynchrony.getLogger().log(Level.WARNING, "failed to shut down Neo4j graph properly", e);
         }
     }
 
@@ -100,7 +98,7 @@ public class Neo4jGraphWrapper extends GraphWrapper {
                     index = indexManager.forNodes(indexName,
                             MapUtil.stringMap(keysAndValues));
 
-                    logger.fine("created Neo4j index '" + indexName + "'");
+                    SemanticSynchrony.getLogger().fine("created Neo4j index '" + indexName + "'");
                 } else {
                     index = indexManager.forNodes(indexName);
                 }

@@ -2,7 +2,6 @@ package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
@@ -10,6 +9,8 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,6 +28,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +65,7 @@ public class FreeplaneReader extends BrainReader {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(FreeplaneFormat.getInstance());
+        return Collections.singletonList(FreeplaneFormat.getInstance());
     }
 
     private final Map<TopicGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();
@@ -109,17 +111,45 @@ public class FreeplaneReader extends BrainReader {
 
         Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
         rootNote.setId(atom.getId());
-        queries.update(rootNote, maxHeight, filter, TreeViews.forwardViewStyle);
+
+        queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
         checkAndCommit(destGraph);
     }
 
     private void setTextOrTitle(Note note, String text) {
         if (text.contains("\n")) {
-            note.setPage(text);
-            note.setTitle("RenameMe");
+            note.setText(text);
+            note.setTitle("[multiple lines]");
+        } else {
+            note.setTitle(text);
         }
-        note.setTitle(text);
+    }
+
+    private String trim(String text) {
+        if (null == text) {
+            return null;
+        }
+        text = text.trim();
+        if (0 == text.length()) {
+            return null;
+        } else {
+            return text;
+        }
+    }
+
+    private String getText(final Element nodeElement) {
+        String text = trim(nodeElement.getAttribute(Attr.TEXT));
+        if (null != text) {
+            return text;
+        }
+
+        text = trim(getRichContent(nodeElement));
+        if (null != text) {
+            return text;
+        }
+
+        return "[no text]";
     }
 
     private String getRichContent(final Element element) {
@@ -128,10 +158,7 @@ public class FreeplaneReader extends BrainReader {
             return null;
         }
 
-        Element body = getSingleElement(content, Elmt.BODY);
-        return body == null
-                ? null
-                : body.getTextContent();
+        return content.getTextContent();
     }
 
     private Element getSingleElement(final Element parent, final String name) {
@@ -195,15 +222,28 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private void parseDOMToGraph(Document document) throws IOException, InvalidGraphException {
-            Element root = document.getDocumentElement();
-
-            if (!root.getTagName().equals(Elmt.MAP)) {
+            Element mapNode = document.getDocumentElement();
+            if (!mapNode.getTagName().equals(Elmt.MAP)) {
                 throw new IllegalArgumentException("root of mind map XML must be called 'map'");
+            }
+            NodeList children = mapNode.getChildNodes();
+            Element rootNode = null;
+            for (int i = 0; i < children.getLength(); i++) {
+                Node child = children.item(i);
+                if (child instanceof Element) {
+                    if (null != rootNode) {
+                        throw new IllegalArgumentException("multiple root nodes");
+                    }
+                    rootNode = (Element) child;
+                }
+            }
+            if (null == rootNode) {
+                throw new IllegalArgumentException("no root node");
             }
 
             resetArrowLinks();
 
-            Note mindMapAsNote = parseTree(root);
+            Note mindMapAsNote = parseTree(rootNode);
             try {
                 persistNote(destGraph, mindMapAsNote);
             } catch (Brain.BrainException e) {
@@ -214,7 +254,7 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private Atom getAtom(final String id) {
-            return destGraph.getAtomById(notesByFreeplaneId.get(id).getId());
+            return destGraph.getAtomById(notesByFreeplaneId.get(id).getId()).get();
         }
 
         private void persistArrowLinks() throws InvalidGraphException {
@@ -233,8 +273,8 @@ public class FreeplaneReader extends BrainReader {
         }
 
         private Note parseTree(Element nodeElement) {
-            Note note = new Note();
-            note.setId(SemanticSynchrony.createRandomId());
+            Note root = new Note();
+            root.setId(SemanticSynchrony.createRandomId());
 
             String id = nodeElement.getAttribute(Attr.ID);
             long created = getCreated(nodeElement);
@@ -242,34 +282,26 @@ public class FreeplaneReader extends BrainReader {
 
             Note styleNote = getStyleNote(getStyle(nodeElement));
 
-            notesByFreeplaneId.put(id, note);
-            note.setCreated(created);
+            notesByFreeplaneId.put(id, root);
+            root.setCreated(created);
             // TODO: make id and modified date into property values
 
-            String text = nodeElement.getAttribute(Attr.TEXT);
-            if (null == text || 0 == text.length()) {
-                text = getRichContent(nodeElement);
-                if (null == text) {
-                    text = getDefaultNodeName();
-                }
-            }
-            setTextOrTitle(note, text);
+            setTextOrTitle(root, getText(nodeElement));
 
             if (null != styleNote) {
-                //note.setHasChildren(true);
-                note.addChild(styleNote);
+                root.addChild(styleNote);
             }
 
-            parseChildren(note, nodeElement, id);
+            parseChildren(root, nodeElement, id);
 
-            makeLegal(note);
+            makeLegal(root);
 
-            return note;
+            return root;
         }
 
         private void makeLegal(final Note note) {
-            if (null != note.getPage() && note.getChildren().size() > 0) {
-                note.setTitle(note.getPage().replaceAll("\\n", "\\n"));
+            if (null != note.getText() && note.getChildren().size() > 0) {
+                note.setTitle(note.getText().replaceAll("\\n", "\\n"));
                 logger.warning("note had both children and multi-line text (collapsed): "
                         + titlePreview(note.getTitle()));
             }

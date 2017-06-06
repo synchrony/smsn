@@ -1,11 +1,10 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -52,9 +51,7 @@ public class Search extends BasicViewAction {
         params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
         try {
-            if (getQueryType().equals(TreeViews.QueryType.Ripple)) {
-                addRippleResults(params);
-            } else {
+            if (!getQueryType().equals(TreeViews.QueryType.Ripple)) {
                 addSearchResults(params);
             }
         } catch (IOException e) {
@@ -77,15 +74,5 @@ public class Search extends BasicViewAction {
     private void addSearchResults(final ActionContext params) throws IOException {
         Note n = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
         addView(n, params);
-    }
-
-    private void addRippleResults(final ActionContext p) throws IOException {
-        // TODO: restore Ripple after dealing with Android/Dalvik + dependency issues
-        Note n = new Note();
-        //Note n = p.queries.rippleQuery(p.query, p.depth, p.filter, style);
-        JSONObject json;
-
-        json = p.getJsonPrinter().toJson(n);
-        p.getMap().put("view", json.toString());
     }
 }

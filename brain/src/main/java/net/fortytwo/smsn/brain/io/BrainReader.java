@@ -4,9 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.util.TypedProperties;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -25,38 +23,37 @@ public abstract class BrainReader {
 
     protected abstract void importInternal(Context context) throws IOException;
 
-    private String defaultNodeName;
-
     public abstract List<Format> getFormats();
 
     private long transactionCounter = 0;
     private final int transactionBufferSize;
 
     protected BrainReader() {
-        try {
-            transactionBufferSize = SemanticSynchrony.getConfiguration().getInt(
-                    SemanticSynchrony.TRANSACTION_BUFFER_SIZE, 0);
-        } catch (TypedProperties.PropertyException e) {
-            throw new IllegalStateException(e);
-        }
+        transactionBufferSize = SemanticSynchrony.getConfiguration().getTransactionBufferSize();
     }
 
     public void doImport(
-            File file, Format format, Brain brain, boolean recursive) throws IOException {
+            File file, Format format, Brain brain) throws IOException {
 
-        assertFileExists(file);
+        switch (format.getType()) {
 
-        if (format.getType().equals(Format.Type.DirectoryBased)) {
-            assertIsDirectory(file);
-            importDirectoryNonrecursive(file, format, brain);
+            case Internal:
+                break;
+            case FileBased:
+                break;
+            case Complex:
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+
+        if (format.getType().equals(Format.Type.Complex)) {
+            importComplex(format, brain);
         } else {
-            if (file.isDirectory()) {
-                if (recursive) {
-                    importDirectoryRecursive(file, format, brain);
-                }
-            } else {
-                importSingleFile(file, format, brain);
-            }
+            Preconditions.checkNotNull(file);
+            Preconditions.checkArgument(file.exists(), "file " + file.getAbsolutePath() + " does not exist");
+
+            importFile(file, format, brain);
         }
     }
 
@@ -80,11 +77,11 @@ public abstract class BrainReader {
         }
     }
 
-    protected void assertFileExists(final File file) {
+    private void assertFileExists(final File file) {
         Preconditions.checkArgument(file.exists(), "directory " + file.getAbsolutePath() + " does not exist");
     }
 
-    protected void assertIsDirectory(final File dir) {
+    private void assertIsDirectory(final File dir) {
         Preconditions.checkArgument(dir.isDirectory(), "file " + dir.getAbsolutePath() + " is not a directory");
     }
 
@@ -93,56 +90,48 @@ public abstract class BrainReader {
         assertIsDirectory(dir);
     }
 
-    protected String getDefaultNodeName() {
-        return defaultNodeName;
-    }
-
-    private void setDefaultNodeName(final String defaultNodeName) {
-        this.defaultNodeName = defaultNodeName;
-    }
-
     private long getSizeOf(final Context context) {
         return Iterators.size(context.getTopicGraph().getAllAtoms().iterator());
     }
 
-    private void importDirectoryNonrecursive(File dir, Format format, Brain brain) throws IOException {
+    private void importComplex(final Format format, final Brain brain) throws IOException {
         Context context = new Context();
         context.setTopicGraph(brain.getTopicGraph());
-        context.setSourceDirectory(dir);
         context.setFormat(format);
 
         doImport(context);
     }
 
-    private void importDirectoryRecursive(File dir, Format format, Brain brain) throws IOException {
+    private void importDirectory(final File dir, final Format format, final Brain brain) throws IOException {
         Set<String> extensions = new HashSet<>();
         Collections.addAll(extensions, format.getFileExtensions());
         for (File file : dir.listFiles()) {
             if (!file.isHidden()) {
                 if (file.isDirectory()) {
-                    importDirectoryRecursive(file, format, brain);
+                    importDirectory(file, format, brain);
                 } else {
                     String ext = FilenameUtils.getExtension(file.getName());
                     if (extensions.contains(ext)) {
-                        setDefaultNodeName(file.getName());
-                        importSingleFile(file, format, brain);
+                        importFile(file, format, brain);
                     }
                 }
             }
         }
     }
 
-    private void importSingleFile(File file, Format format, Brain brain) throws IOException {
+    private void importFile(File file, Format format, Brain brain) throws IOException {
         logger.info("importing file " + file);
-        try (InputStream sourceStream = new FileInputStream(file)) {
-            setDefaultNodeName(file.getName());
+        if (file.isDirectory()) {
+            importDirectory(file, format, brain);
+        } else {
+            try (InputStream sourceStream = new FileInputStream(file)) {
+                Context context = new Context();
+                context.setTopicGraph(brain.getTopicGraph());
+                context.setSourceStream(sourceStream);
+                context.setFormat(format);
 
-            Context context = new Context();
-            context.setTopicGraph(brain.getTopicGraph());
-            context.setSourceStream(sourceStream);
-            context.setFormat(format);
-
-            doImport(context);
+                doImport(context);
+            }
         }
     }
 

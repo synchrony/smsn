@@ -6,7 +6,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.p2p.osc.OscSender;
-import net.fortytwo.smsn.p2p.osc.UdpOscSender;
+import net.fortytwo.smsn.p2p.osc.udp.UdpOscSender;
 import net.fortytwo.smsn.rdf.Activities;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import org.apache.commons.lang.StringUtils;

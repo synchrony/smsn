@@ -1,16 +1,14 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.TreeViews;
-import net.fortytwo.smsn.typeatron.ripple.BrainClient;
-import net.fortytwo.smsn.util.TypedProperties;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
+import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.query.ViewStyle;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
 import java.util.logging.Logger;
 
@@ -20,13 +18,9 @@ public class AddToStreamMapping extends AtomMapping {
     private final String brainStream;
 
     public AddToStreamMapping(final BrainClient client,
-                              final Filter filter) throws RippleException {
+                              final Filter filter) {
         super(client, filter);
-        try {
-            brainStream = SemanticSynchrony.getConfiguration().getString(Brain.PROP_BRAINSTREAM, null);
-        } catch (TypedProperties.PropertyException e) {
-            throw new RippleException(e);
-        }
+        brainStream = SemanticSynchrony.getConfiguration().getBrainstream();
     }
 
     public String[] getIdentifiers() {
@@ -64,7 +58,7 @@ public class AddToStreamMapping extends AtomMapping {
     private void prepend(final String value) throws RippleException {
         Note note = new Note();
         note.setId(SemanticSynchrony.createRandomId());
-        note.setSharability(filter.getDefaultSharability());
+        note.setSource(filter.getDefaultSource());
         note.setWeight(filter.getDefaultWeight());
         note.setCreated(System.currentTimeMillis());
         note.setTitle(value);
@@ -74,7 +68,7 @@ public class AddToStreamMapping extends AtomMapping {
         streamNote.addChild(note);
 
         try {
-            client.update(streamNote, 1, filter, TreeViews.forwardAddOnlyViewStyle);
+            client.update(streamNote, 1, filter, ViewStyle.Basic.ForwardAddOnly.getStyle());
         } catch (BrainClient.BrainClientException e) {
             throw new RippleException(e);
         }

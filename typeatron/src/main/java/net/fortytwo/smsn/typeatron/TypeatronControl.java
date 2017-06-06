@@ -180,18 +180,16 @@ public class TypeatronControl extends SmSnDeviceControl {
             throw new DeviceInitializationException(e);
         }
         
-        oscReceiver.register(absoluteAddress(OSC_KEYS), new OscMessageHandler() {
-            public void handle(final OSCMessage message) {
-                List<Object> args = message.getArguments();
-                if (wrongArgs(OSC_KEYS, 1, args.size())) {
-                    return;
-                }
+        oscReceiver.register(absoluteAddress(OSC_KEYS), message -> {
+            List<Object> args = message.getArguments();
+            if (wrongArgs(OSC_KEYS, 1, args.size())) {
+                return;
+            }
 
-                try {
-                    keyer.nextInputState(((String) args.get(0)).getBytes());
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "failed to relay Typeatron input", e);
-                }
+            try {
+                keyer.nextInputState(((String) args.get(0)).getBytes());
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "failed to relay Typeatron input", e);
             }
         });
 
@@ -209,37 +207,35 @@ public class TypeatronControl extends SmSnDeviceControl {
         });
         */
 
-        oscReceiver.register(absoluteAddress(OSC_PHOTO_DATA), new OscMessageHandler() {
-            public void handle(OSCMessage message) {
-                List<Object> args = message.getArguments();
-                if (wrongArgs(OSC_PHOTO_DATA, 7, args.size())) {
-                    return;
-                }
+        oscReceiver.register(absoluteAddress(OSC_PHOTO_DATA), message -> {
+            List<Object> args = message.getArguments();
+            if (wrongArgs(OSC_PHOTO_DATA, 7, args.size())) {
+                return;
+            }
 
-                // workaround for unavailable Xerces dependency:
-                // make startTime and endTime into xsd:long instead of xsd:dateTime
-                long startTime = ((Date) args.get(0)).getTime();
-                long endTime = ((Date) args.get(1)).getTime();
+            // workaround for unavailable Xerces dependency:
+            // make startTime and endTime into xsd:long instead of xsd:dateTime
+            long startTime = ((Date) args.get(0)).getTime();
+            long endTime = ((Date) args.get(1)).getTime();
 
-                Integer numberOfMeasurements = (Integer) args.get(2);
-                Float minValue = (Float) args.get(3);
-                Float maxValue = (Float) args.get(4);
-                Float mean = (Float) args.get(5);
-                Float variance = (Float) args.get(6);
+            Integer numberOfMeasurements = (Integer) args.get(2);
+            Float minValue = (Float) args.get(3);
+            Float maxValue = (Float) args.get(4);
+            Float mean = (Float) args.get(5);
+            Float variance = (Float) args.get(6);
 
-                try {
-                    rippleSession.push(startTime,
-                            endTime,
-                            numberOfMeasurements,
-                            minValue,
-                            maxValue,
-                            variance,
-                            mean);
-                } catch (RippleException e) {
-                    logger.log(Level.SEVERE,
-                            "Ripple error while pushing photoresistor observation: " + e.getMessage());
-                    e.printStackTrace(System.err);
-                }
+            try {
+                rippleSession.push(startTime,
+                        endTime,
+                        numberOfMeasurements,
+                        minValue,
+                        maxValue,
+                        variance,
+                        mean);
+            } catch (RippleException e) {
+                logger.log(Level.SEVERE,
+                        "Ripple error while pushing photoresistor observation: " + e.getMessage());
+                e.printStackTrace(System.err);
             }
         });
 

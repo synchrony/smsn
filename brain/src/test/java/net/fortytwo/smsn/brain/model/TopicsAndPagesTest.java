@@ -59,7 +59,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
         EntityList<Link> parentLinks = topicGraph.createListOfLinks(earthLink, teaLink);
         tree.setValue(parentLinks);
 
-        Link secondLink = page.getContent().getValue().toJavaList().get(1);
+        Link secondLink = EntityList.toJavaList(page.getContent().getValue()).get(1);
         assertEquals("Tea", secondLink.getLabel());
         assertEquals("tea", secondLink.getTarget().getId());
 

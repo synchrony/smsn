@@ -2,38 +2,13 @@ package net.fortytwo.smsn.brain.rdf;
 
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
-import net.fortytwo.smsn.brain.rdf.classes.AbstractEvent;
-import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
-import net.fortytwo.smsn.brain.rdf.classes.BibtexReference;
+import net.fortytwo.smsn.brain.rdf.classes.*;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
-import net.fortytwo.smsn.brain.rdf.classes.DatedEvent;
-import net.fortytwo.smsn.brain.rdf.classes.Document;
-import net.fortytwo.smsn.brain.rdf.classes.ISBNReference;
-import net.fortytwo.smsn.brain.rdf.classes.LinkedConcept;
-import net.fortytwo.smsn.brain.rdf.classes.Organization;
-import net.fortytwo.smsn.brain.rdf.classes.Person;
-import net.fortytwo.smsn.brain.rdf.classes.QuotedValue;
-import net.fortytwo.smsn.brain.rdf.classes.RFIDReference;
-import net.fortytwo.smsn.brain.rdf.classes.TODOTask;
-import net.fortytwo.smsn.brain.rdf.classes.Tool;
-import net.fortytwo.smsn.brain.rdf.classes.Topic;
-import net.fortytwo.smsn.brain.rdf.classes.URLReference;
-import net.fortytwo.smsn.brain.rdf.classes.Usage;
-import net.fortytwo.smsn.brain.rdf.classes.WebPage;
-import net.fortytwo.smsn.brain.rdf.classes.collections.AttendedEventsCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.Log;
-import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.QuotedValueCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.TODOCollection;
-import net.fortytwo.smsn.brain.rdf.classes.collections.TopicCollection;
+import net.fortytwo.smsn.brain.rdf.classes.collections.*;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
@@ -47,22 +22,13 @@ import org.openrdf.sail.SailException;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
  */
 public class KnowledgeBase {
-    private static final Logger logger = SemanticSynchrony.getLogger(KnowledgeBase.class);
 
     private final TopicGraph topicGraph;
 
@@ -177,18 +143,18 @@ public class KnowledgeBase {
             try {
                 Thread.sleep(initialWait);
             } catch (InterruptedException e) {
-                logger.log(Level.WARNING, "interrupted", e);
+                SemanticSynchrony.getLogger().log(Level.WARNING, "interrupted", e);
             }
 
             for (int i = 0; i < totalSteps; i++) {
                 try {
-                    logger.info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
+                    SemanticSynchrony.getLogger().info("performing warm-up inference step #" + (i + 1) + "/" + totalSteps);
                     inferClasses(null, null);
                 } catch (RDFHandlerException e) {
-                    logger.log(Level.WARNING, "error in warm-up inference", e);
+                    SemanticSynchrony.getLogger().log(Level.WARNING, "error in warm-up inference", e);
                 }
             }
-            logger.info("completed warm-up inference");
+            SemanticSynchrony.getLogger().info("completed warm-up inference");
 
             long lastUpdate = topicGraph.getLastUpdate();
 
@@ -203,10 +169,10 @@ public class KnowledgeBase {
                 long u = topicGraph.getLastUpdate();
                 if (u > lastUpdate) {
                     try {
-                        logger.info("performing class inference");
+                        SemanticSynchrony.getLogger().info("performing class inference");
                         inferClasses(null, null);
                     } catch (RDFHandlerException e) {
-                        logger.log(Level.WARNING, "class inference failed. Will keep trying", e);
+                        SemanticSynchrony.getLogger().log(Level.WARNING, "class inference failed. Will keep trying", e);
                     }
                     lastUpdate = u;
                 }
@@ -226,7 +192,7 @@ public class KnowledgeBase {
         alreadyHandled.add(memory.getAtomId());
 
         // only rdfize fields with a known class
-        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.isVisible(a)).forEach(a -> {
+        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.test(a)).forEach(a -> {
             // only rdfize fields with a known class
             if (isClassified(a)) {
                 fieldHandler.handle(a, context);
@@ -312,7 +278,7 @@ public class KnowledgeBase {
                                         handleAllMembers(entry.memory, fieldHandler, context,
                                                 new HashSet<>(), filter);
                                     }
-                                } else if (null == filter || filter.isVisible(childAtom)) {
+                                } else if (null == filter || filter.test(childAtom)) {
                                     // only rdfize fields with a known class
                                     if (isClassified(entries)) {
                                         fieldHandler.handle(childAtom, context);
@@ -346,8 +312,8 @@ public class KnowledgeBase {
      * Performs SmSn type inference on the knowledge base, optionally generating an RDF representation
      *
      * @param handler a handler for generated RDF statements (may be null)
-     * @param filter  an optional sharability filter for generated results.
-     *                Type inference is performed on the entire knowledge base without regard to sharability,
+     * @param filter  an optional filter for generated results.
+     *                Type inference is performed on the entire knowledge base without regard to source,
      *                but generated RDF statements are limited to those subjects which are sharable according to
      *                the filter.
      * @throws org.openrdf.rio.RDFHandlerException if a downstream error occurs
@@ -405,7 +371,7 @@ public class KnowledgeBase {
                 int outScore = 0;
 
                 if (null != clazz.memberRegex) {
-                    EntityList<Atom> cur = subject.getNotes();
+                    EntityList<Atom> cur = subject.getChildren();
                     Atom first = null;
                     int eli = 0;
                     AtomRegex.El el = null;
@@ -551,7 +517,7 @@ public class KnowledgeBase {
             }
 
             // perform rdfization, choosing at most one classification
-            if (null != handler && (null == filter || filter.isVisible(subject))) {
+            if (null != handler && (null == filter || filter.test(subject))) {
                 if (newEntries.size() > 0) {
                     List<AtomClassEntry> helper = new java.util.LinkedList<>();
                     helper.addAll(newEntries);
@@ -560,9 +526,7 @@ public class KnowledgeBase {
                     if (best.isNonTrivial()) {
                         AtomClass clazz = classes.get(best.getInferredClass());
                         clazz.toRDF(subject, context);
-                        for (RdfizationCallback callback : best.callbacks) {
-                            callback.execute();
-                        }
+                        best.callbacks.forEach(RdfizationCallback::execute);
                     }
                 }
             }
@@ -582,7 +546,7 @@ public class KnowledgeBase {
         long total = countAtoms();
 
         long endTime = System.currentTimeMillis();
-        logger.info("classified " + typed + " of " + total + " atoms ("
+        SemanticSynchrony.getLogger().info("classified " + typed + " of " + total + " atoms ("
                 + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 
@@ -627,7 +591,7 @@ public class KnowledgeBase {
         }
         indent++;
         if (indent < 2) {
-            EntityList<Atom> notes = a.getNotes();
+            EntityList<Atom> notes = a.getChildren();
             if (null != notes) {
                 EntityList<Atom> cur = notes;
                 while (null != cur) {
@@ -641,7 +605,7 @@ public class KnowledgeBase {
     public void exportRDF(final OutputStream out,
                           final RDFFormat format,
                           final Filter filter) throws SailException, RDFHandlerException {
-        logger.info("exporting RDF in format " + format);
+        SemanticSynchrony.getLogger().info("exporting RDF in format " + format);
         long startTime, endTime;
         Sail dedupSail = new MemoryStore();
         dedupSail.initialize();
@@ -658,7 +622,7 @@ public class KnowledgeBase {
 
                 h0.endRDF();
                 endTime = System.currentTimeMillis();
-                logger.info("inferred classes and generated RDF in " + (endTime - startTime) + "ms");
+                SemanticSynchrony.getLogger().info("inferred classes and generated RDF in " + (endTime - startTime) + "ms");
 
                 sc.commit();
                 sc.begin();
@@ -674,7 +638,7 @@ public class KnowledgeBase {
                 }
                 h.endRDF();
                 endTime = System.currentTimeMillis();
-                logger.info("wrote triples to disk in " + (endTime - startTime) + "ms");
+                SemanticSynchrony.getLogger().info("wrote triples to disk in " + (endTime - startTime) + "ms");
             } finally {
                 sc.rollback();
                 sc.close();

@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.server.actions;
 
-import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
@@ -9,10 +8,11 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 abstract class FilteredAction extends Action {
     @NotNull
-    private Filter filter;
+    private Filter filter = Filter.noFilter();
 
     public Filter getFilter() {
         return notNull(filter);
@@ -22,12 +22,21 @@ abstract class FilteredAction extends Action {
         this.filter = filter;
     }
 
-    protected Atom getRoot(final String rootId, final ActionContext context) {
-        Atom root = rootId.equals(CREATE_NEW_ATOM)
-                ? createNewRoot(context)
-                : context.getBrain().getTopicGraph().getAtomById(rootId);
+    protected Atom getRoot(String rootId, final ActionContext context) {
+        Atom root;
+        if (rootId.equals(CREATE_NEW_ATOM)) {
+            root = createNewRoot(context);
+            rootId = root.getId();
+        } else {
+            Optional<Atom> opt = context.getBrain().getTopicGraph().getAtomById(rootId);
+            if (opt.isPresent()) {
+                root = opt.get();
+            } else {
+                throw new IllegalArgumentException("no such root: " + rootId);
+            }
+        }
 
-        if (null != filter && !filter.isVisible(root)) {
+        if (null != filter && !filter.test(root)) {
             throw new BadRequestException("root of view is not visible: " + rootId);
         }
 
@@ -37,6 +46,13 @@ abstract class FilteredAction extends Action {
                 ? "[no title]" : root.getTitle());
 
         return root;
+    }
+
+    protected void setFilterParams(final ActionContext context) {
+        context.getMap().put(Params.DEFAULT_SOURCE, filter.getDefaultSource());
+        context.getMap().put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
+        context.getMap().put(Params.MIN_SOURCE, filter.getMinSource());
+        context.getMap().put(Params.MIN_WEIGHT, filter.getMinWeight());
     }
 
     private Atom createNewRoot(final ActionContext context) {

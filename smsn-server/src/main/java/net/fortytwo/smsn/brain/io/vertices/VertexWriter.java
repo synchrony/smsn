@@ -12,6 +12,7 @@ import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,7 +21,7 @@ public class VertexWriter extends BrainWriter {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(VertexTSVFormat.getInstance());
+        return Collections.singletonList(VertexTSVFormat.getInstance());
     }
 
     @Override
@@ -32,17 +33,17 @@ public class VertexWriter extends BrainWriter {
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
-        p.println("created\tid\tweight\tsharability\tclass\tout\tin\tvalue\talias");
+        p.println("created\tid\tweight\tsource\tclass\tout\tin\ttitle\talias");
 
         for (Atom a : sourceGraph.getAllAtoms()) {
-            if (isTrueAtom(a) && filter.isVisible(a)) {
+            if (isTrueAtom(a) && filter.test(a)) {
                 p.print(a.getCreated());
                 p.print('\t');
                 p.print(a.getId());
                 p.print('\t');
                 p.print(a.getWeight());
                 p.print('\t');
-                p.print(a.getSharability());
+                p.print(a.getSource());
                 p.print('\t');
 
                 List<KnowledgeBase.AtomClassEntry> entries = sourceKb.getClassInfo(a);
@@ -60,7 +61,7 @@ public class VertexWriter extends BrainWriter {
 
                 String value = a.getTitle();
                 if (null == value) {
-                    logger.warning("note has null @value: " + a.getId());
+                    logger.warning("note has null @title: " + a.getId());
                 } else {
                     p.print(escapeValue(a.getTitle()));
                 }

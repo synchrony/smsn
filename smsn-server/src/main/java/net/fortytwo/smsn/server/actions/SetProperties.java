@@ -50,14 +50,14 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.TITLE:
                 validateTitle();
                 break;
-            case SemanticSynchrony.PropertyKeys.PAGE:
+            case SemanticSynchrony.PropertyKeys.TEXT:
                 // nothing to do; every Markdown page is valid
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
                 validateWeight();
                 break;
-            case SemanticSynchrony.PropertyKeys.SHARABILITY:
-                validateSharability();
+            case SemanticSynchrony.PropertyKeys.SOURCE:
+                validateSource();
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
                 validatePriority();
@@ -84,10 +84,10 @@ public class SetProperties extends FilteredAction {
         }
     }
 
-    private void validateSharability() {
-        float f = toFloat(getValue());
-        if (f <= 0 || f > 1.0) {
-            throw new BadRequestException("sharability is outside of range (0, 1]: " + f);
+    private void validateSource() {
+        String source = (String) getValue();
+        if (source.trim().length() == 0) {
+            throw new BadRequestException("empty source");
         }
     }
 
@@ -111,33 +111,34 @@ public class SetProperties extends FilteredAction {
     }
 
     @Override
-    protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         validateKeyValue();
 
-        Atom root = getRoot(getId(), params);
+        Atom root = getRoot(getId(), context);
+        setFilterParams(context);
         Object value = getValue();
 
         switch (getName()) {
             case SemanticSynchrony.PropertyKeys.TITLE:
                 root.setTitle((String) value);
                 break;
-            case SemanticSynchrony.PropertyKeys.PAGE:
+            case SemanticSynchrony.PropertyKeys.TEXT:
                 root.setText(trimPage((String) value));
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
                 root.setWeight(toFloat(value));
                 break;
-            case SemanticSynchrony.PropertyKeys.SHARABILITY:
-                root.setSharability(toFloat(value));
+            case SemanticSynchrony.PropertyKeys.SOURCE:
+                root.setSource((String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
                 root.setPriority(toFloat(value));
-                params.getBrain().getPriorities().updatePriority(root);
+                context.getBrain().getPriorities().updatePriority(root);
                 break;
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
-                for (Atom a : params.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
+                for (Atom a : context.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
                     a.setShortcut(null);
                 }
 
@@ -147,13 +148,13 @@ public class SetProperties extends FilteredAction {
                 throw new IllegalStateException();
         }
 
-        params.getBrain().getTopicGraph().notifyOfUpdate();
+        context.getBrain().getTopicGraph().notifyOfUpdate();
 
-        params.getMap().put("key", params.getBrain().getTopicGraph().idOfAtom(root));
-        params.getMap().put("name", getName());
-        params.getMap().put("value", value.toString());
+        context.getMap().put("key", context.getBrain().getTopicGraph().idOfAtom(root));
+        context.getMap().put("name", getName());
+        context.getMap().put("value", value.toString());
 
-        ActivityLog log = params.getBrain().getActivityLog();
+        ActivityLog log = context.getBrain().getActivityLog();
         if (null != log) {
             log.logSetProperties(root);
         }

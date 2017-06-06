@@ -1,6 +1,6 @@
 package net.fortytwo.smsn;
 
-import net.fortytwo.smsn.util.TypedProperties;
+import net.fortytwo.smsn.config.Configuration;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -8,27 +8,31 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class SemanticSynchronyTest {
     private static final Pattern NEW_ID_PATTERN = Pattern.compile("[a-zA-Z0-9]{16}");
 
     @Test
-    public void testConfigurationProperties() throws Exception {
-        TypedProperties props = SemanticSynchrony.getConfiguration();
+    public void testConfiguration() throws Exception {
+        Configuration conf = SemanticSynchrony.getConfiguration();
 
-        assertNull(props.getString("org.example.someOtherProperty", null));
-        
-        props.load(SemanticSynchronyTest.class.getResourceAsStream("additional.props"));
+        assertEquals("http://example.org/things/", conf.getThingNamespace());
 
-        assertEquals("some other value", props.getString("org.example.someOtherProperty"));
-        assertEquals(42, props.getInt("org.example.yetAnotherProperty"));
+        assertEquals("private", conf.getSources().get(0).getName());
+        assertEquals("personal", conf.getSources().get(1).getName());
+        assertEquals("public", conf.getSources().get(2).getName());
+        assertEquals("universal", conf.getSources().get(3).getName());
+
+        assertEquals(0xff0000, (int) conf.getSources().get(0).getColor());
+        assertEquals(0xffc000, (int) conf.getSources().get(1).getColor());
+        assertEquals(0x00e000, (int) conf.getSources().get(2).getColor());
+        assertEquals(0x0000ff, (int) conf.getSources().get(3).getColor());
     }
     
     @Test
     public void testVersionInfo() throws Exception {
-        String version = SemanticSynchrony.getConfiguration().getString(SemanticSynchrony.VERSION);
+        String version = SemanticSynchrony.getConfiguration().getVersion();
         int i = version.indexOf('.');
         int majorVersion = Integer.valueOf(version.substring(0, i));
         assertTrue(majorVersion >= 1);

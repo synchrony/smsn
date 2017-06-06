@@ -15,11 +15,8 @@ import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScriptEngine {
@@ -64,13 +61,12 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         return objectMapper.readValue(expression, Action.class);
     }
 
-    private Action readAsProperties(final String expression) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new StringReader(expression));
+    private Action readAsYaml(final String expression) throws IOException {
+        try (InputStream input = new StringBufferInputStream(expression)) {
+            SemanticSynchrony.readConfigurationYaml(input);
+        }
 
-        SemanticSynchrony.addConfiguration(properties);
-
-        logger.info("added " + properties.size() + " configurations properties");
+        logger.info("added configuration");
         return new NoAction();
     }
 
@@ -136,8 +132,8 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         } else if (isJson(expression)) {
             return readAsJson(expression);
         } else {
-            // note: this is a hack.  This is currently how config properties are loaded.
-            return readAsProperties(expression);
+            // note: this is a hack.  This is currently how SmSn config YAML is loaded via Gremlin Server.
+            return readAsYaml(expression);
         }
     }
 
@@ -145,10 +141,9 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         return new JSONObject(map);
     }
 
-    private static ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public static ObjectMapper createObjectMapper() {
         // add any configuration here
-        return objectMapper;
+        return new ObjectMapper();
     }
 
     public static class ActionPerformer {
@@ -158,8 +153,8 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
             this.graph = graph;
         }
 
-        public ActionContext perform(final Action action) throws IOException {
-            ActionContext context = Action.createcontext(graph);
+        public ActionContext perform(final Action action) {
+            ActionContext context = Action.createContext(graph);
 
             action.handleRequest(context);
 

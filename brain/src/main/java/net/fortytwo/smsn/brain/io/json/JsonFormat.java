@@ -17,7 +17,7 @@ public class JsonFormat extends Format {
     private static final JsonFormat instance = new JsonFormat();
 
     private JsonFormat() {
-        super("JSON", Type.InMemory);
+        super("JSON", Type.Internal);
     }
 
     public static JsonFormat getInstance() {

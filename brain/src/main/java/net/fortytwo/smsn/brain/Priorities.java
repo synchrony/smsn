@@ -7,14 +7,11 @@ import net.fortytwo.smsn.brain.model.TopicGraph;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.logging.Logger;
 
 /**
  * A dynamically updated list of atoms ordered by their priority value
  */
 public class Priorities {
-    private static final Logger logger = SemanticSynchrony.getLogger(Priorities.class);
-
     private final PriorityQueue<Atom> queue;
 
     public Priorities() {
@@ -29,7 +26,7 @@ public class Priorities {
         queue.clear();
 
         new Thread(() -> {
-            logger.info("generating priority queue");
+            SemanticSynchrony.getLogger().info("generating priority queue");
             long startTime = System.currentTimeMillis();
 
             for (Atom a : graph.getAllAtoms()) {
@@ -39,7 +36,7 @@ public class Priorities {
             }
 
             long endTime = System.currentTimeMillis();
-            logger.info("\tfinished generating priority queue in " + (endTime - startTime) + "ms");
+            SemanticSynchrony.getLogger().info("\tfinished generating priority queue in " + (endTime - startTime) + "ms");
         }).start();
     }
 

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class VCSWriter extends BrainWriter {
 
@@ -38,17 +39,14 @@ public class VCSWriter extends BrainWriter {
 
     @Override
     public void doExport(Context context) throws IOException {
-        File parentDir = context.getDestDirectory();
-        createDirectoryIfNotExists(parentDir);
-
-        File[] dirs = initializeDirectories(parentDir);
+        Map<String, File> dirs = initializeDirectories();
 
         timeAction("exported atoms as individual files", () -> doExport(context.getTopicGraph(), dirs));
     }
 
-    private File[] initializeDirectories(final File parentDir) throws IOException {
-        File[] dirs = VCSFormat.getDirsBySharability(parentDir);
-        for (File d : dirs) {
+    private Map<String, File> initializeDirectories() throws IOException {
+        Map<String, File> dirs = VCSFormat.getDirsBySource();
+        for (File d : dirs.values()) {
             createDirectoryIfNotExists(d);
             timeAction("cleaned directory " + d, () -> clearDirectoryOfAtomData(d));
         }
@@ -65,7 +63,7 @@ public class VCSWriter extends BrainWriter {
         }
     }
 
-    private void doExport(final TopicGraph graph, final File[] dirs) throws IOException {
+    private void doExport(final TopicGraph graph, final Map<String, File> dirs) throws IOException {
         for (Atom a : graph.getAllAtoms()) {
             if (isAtomWithPage(a)) {
                 File dir = chooseDirectoryForAtom(a, dirs);
@@ -82,20 +80,20 @@ public class VCSWriter extends BrainWriter {
     }
 
     private boolean isAtomWithPage(final Atom a) {
-        return a.getSharability() > 0f;
+        return null != a.getSource();
     }
 
-    private File chooseDirectoryForAtom(final Atom a, File[] dirs) {
-        Float sharability = a.getSharability();
-        Preconditions.checkArgument(sharability > 0f && sharability <= 1.0f, a.getId());
-
-        int index = (int) (sharability / 0.25f) - 1;
-        return dirs[index];
+    private File chooseDirectoryForAtom(final Atom a, Map<String, File> dirs) {
+        String source = a.getSource();
+        Preconditions.checkNotNull(source);
+        File dir = dirs.get(source);
+        Preconditions.checkNotNull(dir);
+        return dir;
     }
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
         Note note = toNote(atom, true);
-        EntityList<Atom> list = atom.getNotes();
+        EntityList<Atom> list = atom.getChildren();
         while (null != list) {
             note.getChildren().add(toNote(list.getFirst(), false));
             list = list.getRest();
@@ -110,11 +108,10 @@ public class VCSWriter extends BrainWriter {
 
         if (withValueAndProperties) {
             note.setTitle(atom.getTitle());
-            note.setPage(atom.getText());
+            note.setText(atom.getText());
             note.setAlias(atom.getAlias());
             note.setCreated(atom.getCreated());
             note.setPriority(atom.getPriority());
-            note.setSharability(atom.getSharability());
             note.setShortcut(atom.getShortcut());
             note.setWeight(atom.getWeight());
         }

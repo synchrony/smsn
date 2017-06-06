@@ -1,0 +1,24 @@
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <key id="labelV" for="node" attr.name="labelV" attr.type="string"/>
+  <key id="labelE" for="edge" attr.name="labelE" attr.type="string"/>
+  <key id="idV" for="node" attr.name="idV" attr.type="string"/>
+  <key id="idE" for="edge" attr.name="idE" attr.type="string"/>
+  <key id="alias" for="node" attr.name="alias" attr.type="string"/>
+  <key id="created" for="node" attr.name="created" attr.type="long"/>
+  <key id="priority" for="node" attr.name="priority" attr.type="float"/>
+  <key id="source" for="node" attr.name="source" attr.type="string"/>
+  <key id="shortcut" for="node" attr.name="shortcut" attr.type="string"/>
+  <key id="type" for="node" attr.name="type" attr.type="string"/>
+  <key id="value" for="node" attr.name="value" attr.type="string"/>
+  <key id="weight" for="node" attr.name="weight" attr.type="float"/>
+  <graph id="G" edgedefault="directed">
+    <node id="-------">
+      <data key="created">1480024268780</data>
+      <data key="source">personal</data>
+      <data key="value">root of an empty knowledge graph</data>
+      <data key="weight">0.5</data>
+      <data key="labelV">vertex</data>
+      <data key="idV">-------</data>
+    </node>
+  </graph>
+</graphml>

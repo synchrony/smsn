@@ -6,8 +6,6 @@ import net.fortytwo.smsn.brain.model.entities.EntityList;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 
 public abstract class PGEntityList<T extends Entity> extends PGEntity implements EntityList<T> {
@@ -45,17 +43,6 @@ public abstract class PGEntityList<T extends Entity> extends PGEntity implements
     public EntityList<T> getRestOf() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.REST, Direction.IN,
                 vertex -> getGraph().asEntityList(vertex, constructor));
-    }
-
-    @Override
-    public List<T> toJavaList() {
-        List<T> list = new LinkedList<T>();
-        EntityList<T> cur = this;
-        while (null != cur) {
-            list.add(cur.getFirst());
-            cur = cur.getRest();
-        }
-        return list;
     }
 
     @Override

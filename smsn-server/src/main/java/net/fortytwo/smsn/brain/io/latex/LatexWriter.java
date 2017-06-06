@@ -1,17 +1,19 @@
 package net.fortytwo.smsn.brain.io.latex;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class LatexWriter extends BrainWriter {
@@ -27,7 +29,7 @@ public class LatexWriter extends BrainWriter {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(LatexFormat.getInstance());
+        return Collections.singletonList(LatexFormat.getInstance());
     }
 
     @Override
@@ -36,12 +38,12 @@ public class LatexWriter extends BrainWriter {
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
-        Atom rootAtom = context.getTopicGraph().getAtomById(rootId);
-        if (null == rootAtom) {
+        Optional<Atom> opt = context.getTopicGraph().getAtomById(rootId);
+        if (!opt.isPresent()) {
             throw new IllegalStateException("no such atom: " + rootId);
         }
 
-        writeLatex(rootAtom, filter, 0, 0, context.getDestStream());
+        writeLatex(opt.get(), filter, 0, 0, context.getDestStream());
     }
 
     private void writeLatex(final Atom root,
@@ -50,7 +52,7 @@ public class LatexWriter extends BrainWriter {
                             final int sectionLevel,
                             final OutputStream out) throws IOException {
 
-        if (!filter.isVisible(root)) {
+        if (!filter.test(root)) {
             return;
         }
 
@@ -71,7 +73,7 @@ public class LatexWriter extends BrainWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Atom child : TreeViews.forwardViewStyle.getLinked(root, filter)) {
+                    for (Atom child : ViewStyle.Basic.Forward.getStyle().getLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }

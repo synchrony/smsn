@@ -4,20 +4,15 @@ public interface Params {
     enum Format{json, wiki}
 
     String
-            ACTION = "action",
-            DATASET = "dataset",
-            DEFAULT_SHARABILITY = "defaultSharability",
+            CONFIGURATION = "configuration",
+            DEFAULT_SOURCE = "defaultSource",
             DEFAULT_WEIGHT = "defaultWeight",
-            FILE = "file",
             FILTER = "filter",
-            FORMAT = "format",
             HEIGHT = "height",
             ID = "id",
             INCLUDE_TYPES = "includeTypes",
             MAX_RESULTS = "maxResults",
-            MAX_SHARABILITY = "maxSharability",
-            MAX_WEIGHT = "maxWeight",
-            MIN_SHARABILITY = "minSharability",
+            MIN_SOURCE = "minSource",
             MIN_WEIGHT = "minWeight",
             NAME = "name",
             QUERY = "query",

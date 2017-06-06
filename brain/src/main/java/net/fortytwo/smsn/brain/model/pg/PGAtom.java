@@ -47,12 +47,12 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public void setCreated(Long created) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
     }
 
     @Override
     public String getTitle() {
-        return (String) getRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE);
+        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TITLE);
     }
 
     @Override
@@ -65,12 +65,12 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public String getText() {
-        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE);
+        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT);
     }
 
     @Override
     public void setText(String text) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.PAGE, text);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
     }
 
     @Override
@@ -81,16 +81,6 @@ public abstract class PGAtom extends PGEntity implements Atom {
     @Override
     public void setPriority(Float priority) {
         setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
-    }
-
-    @Override
-    public Float getSharability() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, 0f);
-    }
-
-    @Override
-    public void setSharability(Float sharability) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.SHARABILITY, sharability);
     }
 
     @Override
@@ -107,25 +97,34 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public Float getWeight() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, 0f);
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT);
     }
 
     @Override
     public void setWeight(Float weight) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
     }
 
     @Override
-    public EntityList<Atom> getNotes() {
+    public String getSource() {
+        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+    }
+
+    @Override
+    public void setSource(final String source) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+    }
+
+    @Override
+    public EntityList<Atom> getChildren() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfAtoms(v));
     }
 
     @Override
-    public void setNotes(EntityList<Atom> notes) {
-        removeNotes();
-        if (null != notes) {
-            addOutEdge(((PGEntity) notes).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
-        }
+    public void setChildren(EntityList<Atom> children) {
+        removeAllChildren();
+
+        setChildrenInternal(children);
     }
 
     @Override
@@ -139,10 +138,10 @@ public abstract class PGAtom extends PGEntity implements Atom {
         // create a list node for the atom and insert it
         EntityList<Atom> list = getGraph().createListOfAtoms(child);
         if (0 == position) {
-            list.setRest(getNotes());
-            setNotes(list);
+            list.setRest(getChildren());
+            setChildrenInternal(list);
         } else {
-            EntityList<Atom> prev = getNotes();
+            EntityList<Atom> prev = getChildren();
             for (int i = 1; i < position; i++) {
                 prev = prev.getRest();
             }
@@ -154,13 +153,13 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public void deleteChildAt(int position) {
-        EntityList<Atom> list = getNotes();
+        EntityList<Atom> list = getChildren();
 
         // remove the atom's list node
         if (0 == position) {
-            setNotes(list.getRest());
+            setChildrenInternal(list.getRest());
 
-            deleteListNode(list);
+            deleteEntity(list);
         } else {
             EntityList<Atom> prev = list;
             for (int i = 1; i < position; i++) {
@@ -169,7 +168,24 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
             EntityList<Atom> l = prev.getRest();
             prev.setRest(l.getRest());
-            deleteListNode(l);
+            deleteEntity(l);
+        }
+    }
+
+    private void setChildrenInternal(EntityList<Atom> children) {
+        removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
+
+        if (null != children) {
+            addOutEdge(((PGEntity) children).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
+        }
+    }
+
+    private void removeAllChildren() {
+        EntityList<Atom> cur = getChildren();
+        while (null != cur) {
+            EntityList<Atom> rest = cur.getRest();
+            deleteEntity(cur);
+            cur = rest;
         }
     }
 
@@ -184,7 +200,9 @@ public abstract class PGAtom extends PGEntity implements Atom {
 
     @Override
     public Atom getSubject(EntityList<Atom> notes) {
-        return ((PGEntity) notes).getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN, v -> getGraph().asAtom(v));
+        PGEntity entity = (PGEntity) notes;
+        return entity.getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN,
+                vertex -> getGraph().asAtom(vertex));
     }
 
     @Override
@@ -192,12 +210,8 @@ public abstract class PGAtom extends PGEntity implements Atom {
         destroyInternal();
     }
 
-    private void deleteListNode(final EntityList<Atom> l) {
+    private void deleteEntity(final EntityList<Atom> l) {
         ((PGEntity) l).asVertex().remove();
-    }
-
-    private boolean removeNotes() {
-        return removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
     }
 
     private void updateAcronym() {

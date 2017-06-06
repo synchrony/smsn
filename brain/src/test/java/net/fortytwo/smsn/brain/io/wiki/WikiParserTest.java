@@ -1,6 +1,8 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
+import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,11 +15,17 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 
-public class WikiParserTest {
+public class WikiParserTest extends BrainTestBase {
     private WikiParser wikiParser = new WikiParser();
+
+    @Override
+    protected TopicGraph createAtomGraph() throws IOException {
+        return createTinkerAtomGraph();
+    }
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         wikiParser = new WikiParser();
     }
 
@@ -57,7 +65,7 @@ public class WikiParserTest {
 
         assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
         assertEquals(1.0f, root.getWeight());
-        assertEquals(0.75f, root.getSharability());
+        assertEquals(DefaultSources.PUBLIC, root.getSource());
         assertEquals(0.5f, root.getPriority());
 
         assertEquals(1, root.getChildren().size());
@@ -94,7 +102,7 @@ public class WikiParserTest {
         assertEquals(1, notes.size());
         Note root = notes.get(0);
         assertEquals("Arthur Dent", root.getTitle());
-        assertEquals("He's a jerk.\nA complete kneebiter.", root.getPage());
+        assertEquals("He's a jerk.\nA complete kneebiter.", root.getText());
     }
 
     @Test
@@ -106,7 +114,7 @@ public class WikiParserTest {
         assertEquals(1, notes.size());
         Note root = notes.get(0);
         assertEquals("Arthur Dent", root.getTitle());
-        assertNull(root.getPage());
+        assertNull(root.getText());
     }
 
     @Test(expected = IOException.class)
@@ -130,8 +138,8 @@ public class WikiParserTest {
     }
 
     @Test(expected = IOException.class)
-    public void testEmptySharabilityAttributeNotAllowed() throws Exception {
-        readNotes("@sharability ");
+    public void testEmptySourceAttributeNotAllowed() throws Exception {
+        readNotes("@source ");
     }
 
     @Test(expected = IOException.class)

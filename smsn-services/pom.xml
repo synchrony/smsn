@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>smsn-services</artifactId>
+    <name>Semantic Synchrony P2P</name>
+
+    <parent>
+        <groupId>net.fortytwo.smsn</groupId>
+        <artifactId>smsn-all</artifactId>
+        <version>1.4</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.fortytwo.smsn</groupId>
+            <artifactId>smsn-rdf</artifactId>
+            <version>${smsn.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-api</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <!-- note: SPARQL implementations themselves are not needed -->
+        <dependency>
+            <groupId>net.fortytwo.stream</groupId>
+            <artifactId>stream42-sparql</artifactId>
+            <version>${stream42.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.rdfagents</groupId>
+            <artifactId>rdfagents-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.illposed.osc</groupId>
+            <artifactId>javaosc-core</artifactId>
+            <version>${javaosc.version}</version>
+        </dependency>
+        <!-- this is the HTTP client available in Android, so we begin using it here -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

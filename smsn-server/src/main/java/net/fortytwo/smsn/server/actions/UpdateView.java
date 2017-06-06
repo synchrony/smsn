@@ -38,17 +38,17 @@ public class UpdateView extends RootedViewAction {
     }
 
     @Override
-    protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
-        super.performTransaction(params);
+    protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
+        super.performTransaction(context);
 
         Note rootNote;
 
         switch (getViewFormat()) {
             case json:
-                rootNote = parseJson(params);
+                rootNote = parseJson(context);
                 break;
             case wiki:
-                rootNote = parseWikiText(params);
+                rootNote = parseWikiText(context);
                 break;
             default:
                 throw new IllegalStateException();
@@ -57,14 +57,14 @@ public class UpdateView extends RootedViewAction {
         rootNote.setId(getRoot().getId());
 
         // Apply the update
-        params.getQueries().update(rootNote, height, getFilter(), style);
+        context.getQueries().update(rootNote, height, getFilter(), style);
 
         // TODO: produce an appropriate view (e.g. a search) if the root is null
         Note n = null == getRoot()
                 ? new Note()
-                : params.getQueries().view(getRoot(), height, getFilter(), style);
+                : context.getQueries().view(getRoot(), height, getFilter(), style);
         try {
-            addView(n, params);
+            addView(n, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

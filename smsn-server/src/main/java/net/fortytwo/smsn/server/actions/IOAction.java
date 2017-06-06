@@ -20,7 +20,7 @@ public abstract class IOAction extends FilteredAction {
     }
 
     public File getFile() {
-        return notNull(file);
+        return file;
     }
 
     public void setFile(String file) {

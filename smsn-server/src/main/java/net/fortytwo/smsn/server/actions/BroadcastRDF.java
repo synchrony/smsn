@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.server.actions;
 
-import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.CoordinatorService;
 import net.fortytwo.smsn.server.ActionContext;

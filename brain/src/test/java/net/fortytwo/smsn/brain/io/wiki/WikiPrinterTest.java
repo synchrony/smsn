@@ -6,9 +6,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class WikiPrinterTest {
@@ -26,7 +24,7 @@ public class WikiPrinterTest {
         Note note = new Note();
         note.setId("123");
         note.setTitle("Arthur Dent");
-        note.setPage("He's a jerk.\nA complete kneebiter.");
+        note.setText("He's a jerk.\nA complete kneebiter.");
 
         assertEquals("* :123: Arthur Dent\n", toWikiText(note));
     }
@@ -50,7 +48,7 @@ public class WikiPrinterTest {
         note.setId("123");
         note.setTitle("Arthur Dent");
         note.setAlias("http://example.org/ArthurDent");
-        note.setPage("He's a jerk.\nA complete kneebiter.");
+        note.setText("He's a jerk.\nA complete kneebiter.");
         Note child = new Note();
         child.setId("abc");
         note.addChild(child);
@@ -70,7 +68,7 @@ public class WikiPrinterTest {
         Note note = new Note();
         note.setId("123");
         note.setTitle("Arthur Dent");
-        note.setPage("");
+        note.setText("");
 
         assertEquals("* :123: Arthur Dent\n", toWikiText(note));
     }
@@ -82,7 +80,7 @@ public class WikiPrinterTest {
         Note note = new Note();
         note.setId("123");
         note.setTitle("Arthur Dent");
-        note.setPage("  \n ");
+        note.setText("  \n ");
 
         assertEquals("* :123: Arthur Dent\n", toWikiText(note));
     }
@@ -93,7 +91,7 @@ public class WikiPrinterTest {
 
         Note note = new Note();
         note.setTitle("Life, the Universe, and Everything");
-        note.setPage("The regular early morning yell of horror was the sound of Arthur Dent waking\n" +
+        note.setText("The regular early morning yell of horror was the sound of Arthur Dent waking\n" +
                 "up and suddenly remembering where he was.");
 
         String text = "* Life, the Universe, and Everything\n" +

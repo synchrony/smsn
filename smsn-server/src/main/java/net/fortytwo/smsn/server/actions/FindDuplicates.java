@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * A service for identifying atoms with duplicate values.
@@ -39,7 +40,7 @@ public class FindDuplicates extends FilteredAction {
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
         List<List<Atom>> dups = getDuplicates(context.getBrain().getTopicGraph(), getFilter());
         List<Atom> flat = new LinkedList<>();
-        for (List<Atom> l : dups) flat.addAll(l);
+        dups.forEach(flat::addAll);
 
         try {
             addView(context.getQueries().customView(flat, getFilter()), context);
@@ -65,7 +66,7 @@ public class FindDuplicates extends FilteredAction {
         int total = 0;
 
         for (Atom a : graph.getAllAtoms()) {
-            if (filter.isVisible(a)) {
+            if (filter.test(a)) {
                 String title = a.getTitle();
                 if (null != title && 0 < title.length()) {
                     String hash;
@@ -86,7 +87,8 @@ public class FindDuplicates extends FilteredAction {
 
                         total++;
                         if (total > MAX_DUPLICATES) {
-                            SemanticSynchrony.logInfo("showing only the first " + MAX_DUPLICATES + " duplicates");
+                            SemanticSynchrony.getLogger().log(Level.INFO, "showing only the first "
+                                    + MAX_DUPLICATES + " duplicates");
                             break;
                         }
                     }

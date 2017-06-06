@@ -96,7 +96,7 @@ public class BrainModeClient {
         functions.put("C-c C-I f", new EmacsFunction("smsn-find-isolated-atoms", false));
         functions.put("C-c C-I r", new EmacsFunction("smsn-remove-isolated-atoms", false));
         functions.put("C-c C-a C-p", new EmacsFunction("smsn-insert-attr-priority", true));
-        functions.put("C-c C-a C-s", new EmacsFunction("smsn-insert-attr-sharability", true));
+        functions.put("C-c C-a C-s", new EmacsFunction("smsn-insert-attr-source", true));
         functions.put("C-c C-a C-w", new EmacsFunction("smsn-insert-attr-weight", true));
         functions.put("C-c C-a d", new EmacsFunction("smsn-insert-current-date", false));
         functions.put("C-c C-a s", new EmacsFunction("smsn-insert-current-time-with-seconds", false));
@@ -113,8 +113,8 @@ public class BrainModeClient {
         functions.put("C-c C-r C-b t", new EmacsFunction("smsn-visit-in-twitter 'current-root-value", false));
         functions.put("C-c C-r C-b w", new EmacsFunction("smsn-visit-in-wikipedia 'current-root-value", false));
         functions.put("C-c C-r C-b y", new EmacsFunction("smsn-visit-in-youtube 'current-root-value", false));
-        functions.put("C-c C-s C-d", new EmacsFunction("smsn-set-default-sharability", true));
-        functions.put("C-c C-s C-m", new EmacsFunction("smsn-set-min-sharability", true));
+        functions.put("C-c C-s C-d", new EmacsFunction("smsn-set-default-source", true));
+        functions.put("C-c C-s C-m", new EmacsFunction("smsn-set-min-source", true));
         functions.put("C-c C-t C-a b", new EmacsFunction("smsn-visit-target-alias", false));
         functions.put("C-c C-t C-b a", new EmacsFunction("smsn-visit-in-amazon 'current-target-value", false));
         functions.put("C-c C-t C-b e", new EmacsFunction("smsn-visit-in-ebay 'current-target-value", false));
@@ -126,7 +126,7 @@ public class BrainModeClient {
         functions.put("C-c C-t C-b w", new EmacsFunction("smsn-visit-in-wikipedia 'current-target-value", false));
         functions.put("C-c C-t C-b y", new EmacsFunction("smsn-visit-in-youtube 'current-target-value", false));
         functions.put("C-c C-t C-p", new EmacsFunction("smsn-set-target-priority", true));
-        functions.put("C-c C-t C-s", new EmacsFunction("smsn-set-target-sharability", true));
+        functions.put("C-c C-t C-s", new EmacsFunction("smsn-set-target-source", true));
         functions.put("C-c C-t C-w", new EmacsFunction("smsn-set-target-weight", true));
         functions.put("C-c C-t a", new EmacsFunction("smsn-visit-as-url 'current-target-value", false));
         functions.put("C-c C-t c", new EmacsFunction("smsn-copy-target-value-to-clipboard", false));

@@ -2,48 +2,38 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class TreeViewsTest extends BrainTestBase {
     private final JsonPrinter jsonPrinter = new JsonPrinter();
-    private TreeViews queries;
-    private Filter filter;
 
     @Override
     protected TopicGraph createAtomGraph() throws IOException {
         return createTinkerAtomGraph();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-
-        Brain brain = new Brain(topicGraph);
-        queries = new TreeViews(brain);
-        filter = Filter.noFilter();
-    }
-
     @Test
     public void testEncoding() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
-        Atom root = createAtom("11111");
+        Atom root = createAtom("11111", "root");
         assertEquals("11111", root.getId());
 
         //Note superRoot = new Note();
@@ -55,7 +45,7 @@ public class TreeViewsTest extends BrainTestBase {
         child.setTitle("cheval \u00e0 phynances");
         rootNote.addChild(child);
         assertNull(child.getWeight());
-        assertNull(child.getSharability());
+        assertNull(child.getSource());
         assertNull(child.getCreated());
         //System.out.println(before.getTargetValue());
 
@@ -75,26 +65,48 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals("cheval \u00e0 phynances", j.getString("title"));
     }
 
+    @Ignore
     @Test(expected = InvalidUpdateException.class)
     public void updateWithPageAndChildrenIsRejected() throws Exception {
-        Atom root = createAtom("11111");
+        Atom root = createAtom("11111", "root");
 
         Note note = new Note();
         note.setId(root.getId());
         note.setTitle("Arthur Dent");
-        note.setPage("He's a jerk.\nA complete kneebiter.");
+        note.setText("He's a jerk.\nA complete kneebiter.");
         Note child = new Note();
         child.setTitle("Random");
         note.addChild(child);
 
-        queries.update(note, 5, new Filter(), TreeViews.forwardViewStyle);
+        queries.update(note, 5, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
+    }
+
+    @Test
+    public void updateWithPageAndChildrenIsAccepted() throws Exception {
+        Atom root = createAtom("11111", "root");
+
+        Note note = new Note();
+        note.setId(root.getId());
+        note.setTitle("Arthur Dent");
+        note.setText("He's a jerk.\nA complete kneebiter.");
+        Note child = new Note();
+        child.setTitle("Random");
+        note.addChild(child);
+
+        queries.update(note, 5, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
+
+        Atom ad = topicGraph.getAtomById(root.getId()).get();
+        assertEquals("Arthur Dent", ad.getTitle());
+        assertEquals("He's a jerk.\nA complete kneebiter.", ad.getText());
+        assertEquals(1, EntityList.toJavaList(ad.getChildren()).size());
+        Atom random = ad.getChildren().getFirst();
+        assertEquals("Random", random.getTitle());
     }
 
     @Test
     public void testUpdateRecursion() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
-        Atom root = createAtom("wXu5g4v");
-        root.setTitle("root");
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+        Atom root = createAtom("wXu5g4v", "root");
         Note rootNote;
         String s;
 
@@ -107,8 +119,8 @@ public class TreeViewsTest extends BrainTestBase {
         queries.update(rootNote, 2, filter, style);
         assertNotesEqual(root, "one", "two", "three");
 
-        Atom one = topicGraph.getAtomById("N5KBOAq");
-        Atom two = topicGraph.getAtomById("v8EuMtl");
+        Atom one = topicGraph.getAtomById("N5KBOAq").get();
+        Atom two = topicGraph.getAtomById("v8EuMtl").get();
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -122,7 +134,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertNotesEqual(root, "one", "three");
         // grandchildren have been added
         assertNotesEqual(one, "ten", "yellow");
-        Atom ten = topicGraph.getAtomById("r4zU45R");
+        Atom ten = topicGraph.getAtomById("r4zU45R").get();
 
         s = "" +
                 "* :N5KBOAq: one\n" +
@@ -146,7 +158,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom green = one.getNotes().getRest().getFirst();
+        Atom green = one.getChildren().getRest().getFirst();
         // "rabbit" and "kangaroo" are added beneath "green" even though they're
         // deeper than 2 steps in the tree, because "green" is a new note
         assertNotesEqual(green, "rabbit", "kangaroo");
@@ -171,7 +183,7 @@ public class TreeViewsTest extends BrainTestBase {
         queries.update(rootNote, 2, filter, style);
         // we swapped the order of "two" and "three"...
         assertNotesEqual(root, "three", "two");
-        Atom three = topicGraph.getAtomById("tOpwKho");
+        Atom three = topicGraph.getAtomById("tOpwKho").get();
         // ...therefore, the children of "three" can't be modified in this update operation
         // (so "red" has been ignored)
         assertNotesEqual(three);
@@ -205,9 +217,8 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testPathologicalUpdateWithCycles() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
-        Atom root = createAtom("0000000");
-        root.setTitle("root");
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+        Atom root = createAtom("0000000", "root");
         Note rootNote, child, grandChild;
         String s;
 
@@ -218,9 +229,8 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = topicGraph.getAtomById("000001");
-        assertNotNull(one);
-        Assert.assertEquals(1, one.getNotes().toJavaList().size());
+        Atom one = topicGraph.getAtomById("000001").get();
+        Assert.assertEquals(1, EntityList.toJavaList(one.getChildren()).size());
         for (int i = 0; i < 2; i++) {
             assertEquals(1, rootNote.getChildren().size());
             child = rootNote.getChildren().get(0);
@@ -239,9 +249,8 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("000001");
-        assertNotNull(one);
-        Assert.assertEquals(1, one.getNotes().toJavaList().size());
+        one = topicGraph.getAtomById("000001").get();
+        Assert.assertEquals(1, EntityList.toJavaList(one.getChildren()).size());
         rootNote = queries.view(root, 2, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
@@ -258,9 +267,8 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("000001");
-        assertNotNull(one);
-        Assert.assertEquals(1, one.getNotes().toJavaList().size());
+        one = topicGraph.getAtomById("000001").get();
+        Assert.assertEquals(1, EntityList.toJavaList(one.getChildren()).size());
         rootNote = queries.view(root, 2, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
@@ -279,9 +287,8 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("000001");
-        assertNotNull(one);
-        Assert.assertEquals(2, one.getNotes().toJavaList().size());
+        one = topicGraph.getAtomById("000001").get();
+        Assert.assertEquals(2, EntityList.toJavaList(one.getChildren()).size());
         for (int i = 0; i < 2; i++) {
             assertEquals(1, rootNote.getChildren().size());
             child = rootNote.getChildren().get(0);
@@ -356,10 +363,9 @@ public class TreeViewsTest extends BrainTestBase {
     }
 
     @Test
-    public void testUpdateSharabilityOrWeight() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
-        Atom root = createAtom("wXu5g4v");
-        root.setTitle("root");
+    public void testUpdateSourceOrWeight() throws Exception {
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+        Atom root = createAtom("wXu5g4v", "root");
         Note rootNote;
         String s;
 
@@ -368,26 +374,25 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = topicGraph.getAtomById("N5KBOAq");
+        Atom one = topicGraph.getAtomById("N5KBOAq").get();
         assertEquals(0.5f, one.getWeight());
-        assertEquals(0.5f, one.getSharability());
+        assertEquals(DefaultSources.PRIVATE, one.getSource());
 
         s = "" +
                 "* :N5KBOAq: one\n" +
                 "    @weight 0.75\n" +
-                "    @sharability 0.25\n";
+                "    @source private\n";
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         assertEquals(0.75f, one.getWeight());
-        assertEquals(0.25f, one.getSharability());
+        assertEquals(DefaultSources.PRIVATE, one.getSource());
     }
 
     @Test
     public void testUpdateAlias() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
-        Atom root = createAtom("wXu5g4v");
-        root.setTitle("root");
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+        Atom root = createAtom("wXu5g4v", "root");
         Note rootNote;
         String s;
 
@@ -397,7 +402,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        Atom one = topicGraph.getAtomById("N5KBOAq");
+        Atom one = topicGraph.getAtomById("N5KBOAq").get();
         assertEquals("http://example.org/ns/one", one.getAlias());
 
         s = "" +
@@ -411,9 +416,8 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testUpdatePriority() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
-        Atom root = createAtom("0000000");
-        root.setTitle("root");
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+        Atom root = createAtom("0000000", "root");
         Note rootNote;
         String s;
         Atom one;
@@ -424,7 +428,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("0000001");
+        one = topicGraph.getAtomById("0000001").get();
         assertEquals(0.5f, one.getPriority());
 
         // setting priority to 0 has the effect of removing the priority property from the note
@@ -434,21 +438,19 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote = wikiParser.parse(s);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
-        one = topicGraph.getAtomById("0000001");
-        assertNull(one.getPriority());
+        one = topicGraph.getAtomById("0000001").get();
+        // TODO: allow removal of this property altogether
+        assertEquals(0.0f, one.getPriority());
     }
 
     @Test
     public void childAndParentCountsAreCorrect() throws Exception {
-        Filter filter = Filter.noFilter();
-        ViewStyle style = TreeViews.forwardViewStyle;
         Note before = importNoteFromFile("io/wiki/wiki-example-3.txt");
-        Atom root = createAtom("0000000");
-        root.setTitle("root");
-        root.setSharability(1.0f);
+        Atom root = createAtom("0000000", "root");
+        root.setSource(DefaultSources.UNIVERSAL);
         before.setId(root.getId());
-        queries.update(before, 2, filter, style);
-        Note after = queries.view(root, 2, filter, style);
+        queries.update(before, 2, filter, viewStyle);
+        Note after = queries.view(root, 2, filter, viewStyle);
 
         assertEquals("root", after.getTitle());
         assertEquals(0, after.getNumberOfParents());
@@ -460,63 +462,114 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals(2, child.getNumberOfChildren());
     }
 
-    // TODO: test write behavior w.r.t. sharability filters
     @Test
-    public void nonSharableItemsAreHidden() throws Exception {
-        Filter readFilter = new Filter(0f, 1f, 0.5f, 0.75f, 1f, 0.75f);
-        Filter writeFilter = new Filter(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-        ViewStyle style = TreeViews.forwardViewStyle;
+    public void invisibleAtomsAreExcludedFromViews() throws Exception {
+        Filter readFilter = new Filter(0f, 0.5f, DefaultSources.PUBLIC, DefaultSources.PUBLIC);
+        Filter writeFilter = Filter.noFilter();
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
-        Atom root = createAtom("0000000");
-        root.setTitle("root");
-        root.setSharability(1.0f);
+        Atom root = createAtom("0000000", "root");
+        root.setSource(DefaultSources.UNIVERSAL);
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, writeFilter, style);
 
-        Atom a1 = topicGraph.getAtomById("0000001");
-        assertEquals(1f, a1.getSharability());
-        Atom a2 = topicGraph.getAtomById("0000002");
-        assertEquals(0.5f, a2.getSharability());
+        Optional<Atom> a1 = topicGraph.getAtomById("0000001");
+        assertEquals(DefaultSources.UNIVERSAL, a1.get().getSource());
+        Optional<Atom> a2 = topicGraph.getAtomById("0000002");
+        assertEquals(DefaultSources.PERSONAL, a2.get().getSource());
 
         Note after = queries.view(root, 2, readFilter, style);
-        Assert.assertEquals(3, after.getNumberOfChildren());
+        // the second atom in the list simply does not appear
+        Assert.assertEquals(2, after.getNumberOfChildren());
         Assert.assertEquals(0, after.getNumberOfParents());
         List<Note> children = after.getChildren();
         Note n1 = children.get(0);
-        Assert.assertEquals(2, n1.getNumberOfChildren());
+        Assert.assertEquals(1, n1.getNumberOfChildren());
         Assert.assertEquals(1, n1.getNumberOfParents());
 
-        // This note is "invisible".
-        Note n4 = children.get(1);
-        // Its value appears as null.
-        assertNull(n4.getTitle());
-        // This note has a child, but we can't see it.
-        assertEquals(0, n4.getChildren().size());
-        // We can't even count the parents or children.
-        Assert.assertEquals(0, n4.getNumberOfChildren());
-        Assert.assertEquals(0, n4.getNumberOfParents());
-
-        Note n5 = children.get(2);
-        // children exist, but are not visible
+        Note n5 = children.get(1);
+        // children are not visible
         Assert.assertEquals(0, n5.getNumberOfChildren());
         Assert.assertEquals(1, n5.getNumberOfParents());
 
         List<Note> grandChildren = n1.getChildren();
-        assertEquals(2, grandChildren.size());
-        Note n2 = grandChildren.get(0);
-        Assert.assertEquals(0, n2.getNumberOfChildren());
-        Assert.assertEquals(0, n2.getNumberOfParents());
-        Note n3 = grandChildren.get(1);
+        assertEquals(1, grandChildren.size());
+        Note n3 = grandChildren.get(0);
         Assert.assertEquals(0, n3.getNumberOfChildren());
         Assert.assertEquals(1, n3.getNumberOfParents());
-        assertNull(n2.getTitle());
         assertEquals("this is a public child of a public note", n3.getTitle());
     }
 
     @Test
+    public void invisibleAtomsAreSkippedDuringWrites() throws Exception {
+        Filter readFilter = Filter.noFilter();
+        Filter writeFilter = new Filter(0f, 0.5f, DefaultSources.PUBLIC, DefaultSources.PUBLIC);
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
+
+        // three items in the private view
+        Note rootNote = importNoteFromFile("io/wiki/wiki-example-3.txt");
+        Atom root = createAtom("0000000", "note 0");
+        root.setSource(DefaultSources.UNIVERSAL);
+        rootNote.setId(root.getId());
+        queries.update(rootNote, 2, Filter.noFilter(), style);
+        rootNote = queries.view(root, 2, readFilter, style);
+        assertEquals(3, rootNote.getNumberOfChildren());
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals(DefaultSources.PERSONAL, rootNote.getChildren().get(1).getSource());
+
+        // add an atom in the public view
+        rootNote = queries.view(root, 2, writeFilter, style);
+        Note toAdd = new Note();
+        toAdd.setId("0000007");
+        toAdd.setTitle("note 7");
+        toAdd.setSource(DefaultSources.UNIVERSAL);
+        rootNote.getChildren().add(0, toAdd);
+        queries.update(rootNote, 2, writeFilter, style);
+
+        // four total items in the private view
+        rootNote = queries.view(root, 2, readFilter, style);
+        assertEquals(4, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        rootNote = queries.view(root, 2, writeFilter, style);
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        rootNote.getChildren().remove(2);
+        queries.update(rootNote, 2, writeFilter, style);
+
+        rootNote = queries.view(root, 2, readFilter, style);
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+        assertEquals("this is a protected note", rootNote.getChildren().get(2).getTitle());
+        rootNote = queries.view(root, 2, writeFilter, style);
+        assertEquals(2, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+
+        toAdd = new Note();
+        toAdd.setId("0000008");
+        toAdd.setTitle("note 8");
+        toAdd.setSource(DefaultSources.UNIVERSAL);
+        rootNote.getChildren().add(2, toAdd);
+        queries.update(rootNote, 2, writeFilter, style);
+
+        rootNote = queries.view(root, 2, readFilter, style);
+        assertEquals(4, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+        assertEquals("this is a protected note", rootNote.getChildren().get(2).getTitle());
+        assertEquals("note 8", rootNote.getChildren().get(3).getTitle());
+        rootNote = queries.view(root, 2, writeFilter, style);
+        assertEquals(3, rootNote.getChildren().size());
+        assertEquals("note 7", rootNote.getChildren().get(0).getTitle());
+        assertEquals("this is a public note", rootNote.getChildren().get(1).getTitle());
+        assertEquals("note 8", rootNote.getChildren().get(2).getTitle());
+    }
+
+    @Test
     public void testDontOverwriteNotesWithEmptyValues() throws Exception {
-        ViewStyle style = TreeViews.forwardViewStyle;
+        ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         String before = "* :000001: one\n" +
                 "* :000002: two\n" +
@@ -533,15 +586,14 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals("000002", a.getChildren().get(1).getId());
         assertNull(a.getChildren().get(1).getTitle());
 
-        Atom root = topicGraph.createAtomWithProperties(filter, "000000");
-        root.setTitle("root");
+        Atom root = createAtom("000000", "root");
 
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = topicGraph.getAtomById("000001");
-        Atom a2 = topicGraph.getAtomById("000002");
-        Atom a3 = topicGraph.getAtomById("000003");
+        Atom a1 = topicGraph.getAtomById("000001").get();
+        Atom a2 = topicGraph.getAtomById("000002").get();
+        Atom a3 = topicGraph.getAtomById("000003").get();
 
         assertEquals("one", a1.getTitle());
         assertEquals("two", a2.getTitle());
@@ -558,7 +610,7 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testAddOnlyUpdate() throws Exception {
-        ViewStyle style = TreeViews.forwardAddOnlyViewStyle;
+        ViewStyle style = ViewStyle.Basic.ForwardAddOnly.getStyle();
 
         String before = "* :000001: one\n" +
                 "* :000002: two\n" +
@@ -569,28 +621,27 @@ public class TreeViewsTest extends BrainTestBase {
         Note b = wikiParser.parse(before);
         Note a = wikiParser.parse(after);
 
-        Atom root = topicGraph.createAtomWithProperties(filter, "000000");
-        root.setTitle("root");
+        Atom root = createAtom("000000", "root");
 
         b.setId(root.getId());
         queries.update(b, 2, filter, style);
 
-        Atom a1 = topicGraph.getAtomById("000001");
-        Atom a2 = topicGraph.getAtomById("000002");
-        Atom a3 = topicGraph.getAtomById("000003");
+        Atom a1 = topicGraph.getAtomById("000001").get();
+        Atom a2 = topicGraph.getAtomById("000002").get();
+        Atom a3 = topicGraph.getAtomById("000003").get();
 
         assertEquals("one", a1.getTitle());
         assertEquals("two", a2.getTitle());
         assertEquals("three", a3.getTitle());
-        assertEquals(3, root.getNotes().toJavaList().size());
+        assertEquals(3, EntityList.toJavaList(root.getChildren()).size());
 
         a.setId(root.getId());
         queries.update(a, 2, filter, style);
 
-        Atom a4 = topicGraph.getAtomById("000004");
+        Atom a4 = topicGraph.getAtomById("000004").get();
 
         assertEquals("four", a4.getTitle());
-        List<Atom> children = root.getNotes().toJavaList();
+        List<Atom> children = EntityList.toJavaList(root.getChildren());
         assertEquals(4, children.size());
         assertEquals("four", children.get(0).getTitle());
         assertEquals("one", children.get(1).getTitle());
@@ -599,41 +650,38 @@ public class TreeViewsTest extends BrainTestBase {
 
     @Test
     public void testFindRootsAndIsolatedAtoms() throws Exception {
-        assertEquals(0, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(0, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(0, queries.findRootAtoms(filter, ViewStyle.Basic.Forward.getStyle(), 1).getChildren().size());
+        assertEquals(0, queries.findRootAtoms(filter, ViewStyle.Basic.Backward.getStyle(), 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom0 = topicGraph.createAtomWithProperties(filter, "000000");
-        atom0.setTitle("0");
+        Atom atom0 = createAtom("000000", "0");
 
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.Basic.Forward.getStyle(), 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.Basic.Backward.getStyle(), 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom1 = topicGraph.createAtomWithProperties(filter, "000001");
-        atom1.setTitle("1");
+        Atom atom1 = createAtom("000001", "1");
 
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.Basic.Forward.getStyle(), 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.Basic.Backward.getStyle(), 1).getChildren().size());
         assertEquals(2, queries.findIsolatedAtoms(filter).getChildren().size());
 
         atom0.addChildAt(atom1, 0);
 
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.Basic.Forward.getStyle(), 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.Basic.Backward.getStyle(), 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
 
-        Atom atom2 = topicGraph.createAtomWithProperties(filter, "000002");
-        atom2.setTitle("2");
+        Atom atom2 = createAtom("000002", "2");
 
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.Basic.Forward.getStyle(), 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.Basic.Backward.getStyle(), 1).getChildren().size());
         assertEquals(1, queries.findIsolatedAtoms(filter).getChildren().size());
 
         atom0.addChildAt(atom2, 0);
 
-        assertEquals(1, queries.findRootAtoms(filter, TreeViews.forwardViewStyle, 1).getChildren().size());
-        assertEquals(2, queries.findRootAtoms(filter, TreeViews.backwardViewStyle, 1).getChildren().size());
+        assertEquals(1, queries.findRootAtoms(filter, ViewStyle.Basic.Forward.getStyle(), 1).getChildren().size());
+        assertEquals(2, queries.findRootAtoms(filter, ViewStyle.Basic.Backward.getStyle(), 1).getChildren().size());
         assertEquals(0, queries.findIsolatedAtoms(filter).getChildren().size());
     }
 
@@ -642,7 +690,7 @@ public class TreeViewsTest extends BrainTestBase {
         String[] actual = new String[countNotes(a)];
 
         int i = 0;
-        EntityList<Atom> cur = a.getNotes();
+        EntityList<Atom> cur = a.getChildren();
         while (null != cur) {
             actual[i++] = cur.getFirst().getTitle();
             cur = cur.getRest();
@@ -652,7 +700,7 @@ public class TreeViewsTest extends BrainTestBase {
     }
 
     private int countNotes(final Atom a) {
-        EntityList cur = a.getNotes();
+        EntityList cur = a.getChildren();
         int count = 0;
         while (cur != null) {
             count++;
@@ -660,9 +708,5 @@ public class TreeViewsTest extends BrainTestBase {
         }
 
         return count;
-    }
-
-    private Atom createAtom(String id) {
-        return topicGraph.createAtomWithProperties(filter, id);
     }
 }

@@ -9,10 +9,8 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public abstract class GraphWrapper {
-    private static final Logger logger = SemanticSynchrony.getLogger(GraphWrapper.class);
 
     protected final Graph graph;
 
@@ -61,7 +59,7 @@ public abstract class GraphWrapper {
         return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID_V, id);
     }
 
-    public Iterator<Sortable<Vertex, Float>> getVerticesByValue(final String term) {
+    public Iterator<Sortable<Vertex, Float>> getVerticesByTitle(final String term) {
         return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.TITLE, term);
     }
 
@@ -104,7 +102,7 @@ public abstract class GraphWrapper {
         if (vertices.hasNext()) {
             Vertex next = vertices.next().getEntity();
             if (vertices.hasNext()) {
-                logger.warning("multiple vertices with " + key + " '" + value + "'");
+                SemanticSynchrony.getLogger().warning("multiple vertices with " + key + " '" + value + "'");
             }
 
             return next;

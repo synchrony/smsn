@@ -74,23 +74,23 @@ public class JsonPrinterTest {
     }
 
     @Test
-    public void noPageGivesNoPageAttribute() throws Exception {
+    public void noTextGivesNoTextAttribute() throws Exception {
         Note n = new Note();
         n.setTitle("Arthur Dent");
 
         JSONObject j = jsonPrinter.toJson(n);
         assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));
-        assertNull(j.opt(SemanticSynchrony.PropertyKeys.PAGE));
+        assertNull(j.opt(SemanticSynchrony.PropertyKeys.TEXT));
     }
 
     @Test
-    public void pageGivesPageAttribute() throws Exception {
+    public void textGivesTextAttribute() throws Exception {
         Note n = new Note();
         n.setTitle("Arthur Dent");
-        n.setPage("12345");
+        n.setText("12345");
 
         JSONObject j = jsonPrinter.toJson(n);
         assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));
-        assertEquals("12345", j.getString(SemanticSynchrony.PropertyKeys.PAGE));
+        assertEquals("12345", j.getString(SemanticSynchrony.PropertyKeys.TEXT));
     }
 }

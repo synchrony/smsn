@@ -6,8 +6,8 @@ import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.TreeViews;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
@@ -50,7 +50,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                     return null;
                 } else if (sync) {
                     try {
-                        n = client.view(n, height, filter, TreeViews.forwardViewStyle, false);
+                        n = client.view(n, height, filter, ViewStyle.Basic.Forward.getStyle(), false);
                     } catch (BrainClient.BrainClientException e) {
                         throw new RippleException(e);
                     }
@@ -71,7 +71,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
         }
     }
 
-    protected Float sharabilityOrWeightFromArgument(final Object arg, final ModelConnection mc)
+    protected Float weightFromArgument(final Object arg, final ModelConnection mc)
             throws RippleException {
 
         String asString = mc.toString(arg);
@@ -90,7 +90,7 @@ public abstract class AtomMapping extends PrimitiveStackMapping {
                 if (f == 0.25f || f == 0.5f || f == 0.75f || f == 1.0f) {
                     return f;
                 } else {
-                    throw new RippleException("illegal sharability or weight value: " + f);
+                    throw new RippleException("illegal weight value: " + f);
                 }
         }
     }

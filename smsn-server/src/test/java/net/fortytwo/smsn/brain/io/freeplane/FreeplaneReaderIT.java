@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class FreeplaneReaderIT extends BrainTestBase {
     private final File mindMapDirectory = new File("/Users/josh/projects/notmine/mindmaps");
+    private final File mindMapFile = new File("/tmp/1.mm");
 
     @Override
     protected TopicGraph createAtomGraph() throws IOException {
@@ -34,7 +35,8 @@ public class FreeplaneReaderIT extends BrainTestBase {
         BrainReader reader = Format.getReader(format);
         assertNotNull(reader);
 
-        reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain, true);
+        //reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain);
+        reader.doImport(mindMapFile, FreeplaneFormat.getInstance(), brain);
 
         System.out.println("# atoms: " + countAtoms());
 

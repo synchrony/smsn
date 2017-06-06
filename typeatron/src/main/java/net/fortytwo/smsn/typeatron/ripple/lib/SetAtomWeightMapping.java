@@ -50,7 +50,7 @@ public class SetAtomWeightMapping extends AtomMapping {
         if (null == n) {
             logger.warning("can't set @weight of non-atom: " + no);
         } else {
-            Float f = sharabilityOrWeightFromArgument(value, mc);
+            Float f = weightFromArgument(value, mc);
 
             setProperty(n, SemanticSynchrony.PropertyKeys.WEIGHT, "" + f);
 

@@ -33,7 +33,7 @@ public class JsonPrinter {
 
         json.put(JsonFormat.Keys.ID, note.getId());
         json.put(SemanticSynchrony.PropertyKeys.WEIGHT, note.getWeight());
-        json.put(SemanticSynchrony.PropertyKeys.SHARABILITY, note.getSharability());
+        json.put(SemanticSynchrony.PropertyKeys.SOURCE, note.getSource());
         json.put(SemanticSynchrony.PropertyKeys.CREATED, note.getCreated());
         json.put(JsonFormat.Keys.NUMBER_OF_CHILDREN, note.getNumberOfChildren());
         json.put(JsonFormat.Keys.NUMBER_OF_PARENTS, note.getNumberOfParents());
@@ -49,8 +49,8 @@ public class JsonPrinter {
         }
         json.put(SemanticSynchrony.PropertyKeys.TITLE, title);
 
-        if (null != note.getPage()) {
-            json.put(SemanticSynchrony.PropertyKeys.PAGE, note.getPage());
+        if (null != note.getText()) {
+            json.put(SemanticSynchrony.PropertyKeys.TEXT, note.getText());
         }
 
         if (null != note.getAlias()) {

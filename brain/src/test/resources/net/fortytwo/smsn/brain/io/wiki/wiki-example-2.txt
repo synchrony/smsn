@@ -1,6 +1,6 @@
 @alias http://example.org/ns/top-level-attributes-are-allowed
 @weight 1
-@sharability 0.75
+@source public
 @priority 0.5
 * this is a child
     * this is a grandchild

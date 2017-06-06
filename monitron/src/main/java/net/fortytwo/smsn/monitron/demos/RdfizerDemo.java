@@ -33,9 +33,7 @@ public class RdfizerDemo {
             RDFWriter w = Rio.createWriter(RDFFormat.NQUADS, System.out);
             try {
                 w.startRDF();
-                for (Statement s : e.toRDF().getStatements()) {
-                    w.handleStatement(s);
-                }
+                e.toRDF().getStatements().forEach(w::handleStatement);
                 w.endRDF();
             } catch (RDFHandlerException e1) {
                 throw new EventHandler.EventHandlingException(e1);

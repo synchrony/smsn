@@ -1,125 +1,134 @@
 package net.fortytwo.smsn.brain.model;
 
+import com.google.common.base.Preconditions;
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.config.DataSource;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
-public class Filter implements Serializable {
+public class Filter implements Predicate<Atom>, Serializable {
 
-    private float minSharability, maxSharability;
-    private float minWeight, maxWeight;
-    private float defaultSharability, defaultWeight;
+    private static final Map<String, Integer> sourceToIndex;
+
+    static {
+        sourceToIndex = new HashMap<>();
+        List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
+        Preconditions.checkNotNull(sources);
+        Preconditions.checkArgument(sources.size() > 0);
+        for (int i = 0; i < sources.size(); i++) {
+            DataSource source = sources.get(i);
+            sourceToIndex.put(source.getName(), i);
+        }
+    }
+
+    private float minWeight;
+    private float defaultWeight;
+    private String minSource;
+    private String defaultSource;
+
+    private Integer minSourceIndex;
+
+    private static final Filter NO_FILTER = new Filter();
 
     public static Filter noFilter() {
-        return new Filter();
-    }
-
-    public Filter() {
-        this(0f, 1f, 0.5f, 0f, 1f, 0.5f);
-    }
-
-    public Filter(final float minWeight,
-                  final float maxWeight,
-                  float defaultWeight,
-                  final float minSharability,
-                  final float maxSharability,
-                  float defaultSharability) {
-        if (minSharability < 0 || maxSharability > 1) {
-            throw new IllegalArgumentException("minimum and maximum sharability must lie between 0 and 1 (inclusive)");
-        }
-
-        if (maxSharability < minSharability) {
-            throw new IllegalArgumentException(
-                    "maximum sharability must be greater than or equal to minimum sharability");
-        }
-
-        if (defaultSharability <= 0) {
-            defaultSharability = (maxSharability + minSharability) / 2f;
-        } else if (defaultSharability < minSharability || defaultSharability > maxSharability) {
-            throw new IllegalArgumentException("default sharability must lie between min and max sharability");
-        }
-
-        if (minWeight < 0 || maxWeight > 1) {
-            throw new IllegalArgumentException("minimum and maximum weight must lie between 0 and 1 (inclusive)");
-        }
-
-        if (maxWeight < minWeight) {
-            throw new IllegalArgumentException("maximum weight must be greater than or equal to minimum weight");
-        }
-
-        if (defaultWeight <= 0) {
-            defaultWeight = (maxWeight + minWeight) / 2f;
-        } else if (defaultWeight < minWeight || defaultSharability > maxWeight) {
-            throw new IllegalArgumentException("default weight must lie between min and max weight");
-        }
-
-        this.minSharability = minSharability;
-        this.maxSharability = maxSharability;
-        this.defaultSharability = defaultSharability;
-        this.minWeight = minWeight;
-        this.maxWeight = maxWeight;
-        this.defaultWeight = defaultWeight;
-    }
-
-    public float getMinSharability() {
-        return minSharability;
-    }
-
-    public float getMaxSharability() {
-        return maxSharability;
+        return NO_FILTER;
     }
 
     public float getMinWeight() {
         return minWeight;
     }
 
-    public float getMaxWeight() {
-        return maxWeight;
-    }
-
-    public float getDefaultSharability() {
-        return defaultSharability;
-    }
-
-    public float getDefaultWeight() {
-        return defaultWeight;
-    }
-
-    public void setMinSharability(float minSharability) {
-        this.minSharability = minSharability;
-    }
-
-    public void setMaxSharability(float maxSharability) {
-        this.maxSharability = maxSharability;
+    public String getMinSource() {
+        return minSource;
     }
 
     public void setMinWeight(float minWeight) {
         this.minWeight = minWeight;
     }
 
-    public void setMaxWeight(float maxWeight) {
-        this.maxWeight = maxWeight;
-    }
-
-    public void setDefaultSharability(float defaultSharability) {
-        this.defaultSharability = defaultSharability;
-    }
-
     public void setDefaultWeight(float defaultWeight) {
         this.defaultWeight = defaultWeight;
     }
 
-    public boolean isTrivial() {
-        return minSharability == 0 && minWeight == 0;
+    public void setMinSource(String minSource) {
+        this.minSource = minSource;
+        this.minSourceIndex = indexForSource(minSource);
     }
 
-    public boolean isVisible(final Atom atom) {
-        float sharability = atom.getSharability();
-        float weight = atom.getWeight();
+    public void setDefaultSource(String defaultSource) {
+        this.defaultSource = defaultSource;
+    }
 
-        // Strictly greater than the minimum, less than or equal to the maximum.
-        // Values range from 0 (exclusive) to 1 (inclusive).
-        return sharability > minSharability && sharability <= maxSharability
-                && weight > minWeight && weight <= maxWeight;
+    private static int indexForSource(final String source) {
+        Integer index = sourceToIndex.get(source);
+        Preconditions.checkNotNull(index);
+        return index;
+    }
+
+    private Filter(final float minWeight,
+                   final float defaultWeight,
+                   final int minSourceIndex,
+                   final String defaultSource) {
+
+        checkBetweenZeroAndOne(minWeight);
+        checkBetweenZeroAndOne(defaultWeight);
+        Preconditions.checkArgument(defaultWeight >= minWeight, "default weight greater than minimum");
+
+        Preconditions.checkNotNull(defaultSource);
+        indexForSource(defaultSource);
+
+        this.minSourceIndex = minSourceIndex;
+        this.defaultSource = defaultSource;
+        this.minWeight = minWeight;
+        this.defaultWeight = defaultWeight;
+    }
+
+    private Filter() {
+        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
+    }
+
+    public Filter(final float minWeight,
+                  final float defaultWeight,
+                  final String minSource,
+                  final String defaultSource) {
+        this(minWeight, defaultWeight, indexForSource(minSource), defaultSource);
+    }
+
+    private void checkBetweenZeroAndOne(final float value) {
+        Preconditions.checkArgument(value >= 0f && value <= 1f, "argument outside of range [0, 1]");
+    }
+
+    public String getDefaultSource() {
+        return defaultSource;
+    }
+
+    public float getDefaultWeight() {
+        return defaultWeight;
+    }
+
+    public boolean isTrivial() {
+        return minSourceIndex == 0 && minWeight == 0;
+    }
+
+    @Override
+    public boolean test(final Atom atom) {
+        Integer sourceIndex = getSourceIndexFor(atom);
+        Float weight = atom.getWeight();
+
+        if (null == sourceIndex || null == weight) return false;
+
+        // The weight criterion includes the minimum; if the minimum is 0.25,
+        // items with a value of 0.25 and greater will be visible.
+        return sourceIndex >= minSourceIndex && weight >= minWeight;
+    }
+
+    private Integer getSourceIndexFor(final Atom atom) {
+        String source = atom.getSource();
+        return null == source ? null : sourceToIndex.get(source);
     }
 }

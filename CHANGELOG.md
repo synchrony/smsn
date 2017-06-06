@@ -1,10 +1,27 @@
 Semantic Synchrony CHANGELOG
-====================
+========================================
+
+SmSn 1.4 (Pogo Stilts)
+----------------------------------------
+****************************************
+* Refined Freeplane reader
+* Made @title and @source optional properties
+* Use generalized data sources configured on the server side
+* Replaced @sharability with @source for data management and visibility
+* Use YAML, rather than properties files, for configuration
+* Use AND semantics by default in text search
+* Added basic support for Git 'cycle'
+* Exclude invisible atoms entirely from views, and skip them during updates
+* Let visibility filters exclude nonexistent atoms
+* Generalized data sources
+* Added a Git history view action
+* Use an inclusive criterion [min,inf) rather than an exclusive criterion (min,inf) in visibility filters
+* Eliminated visibility maximums from filters
+****************************************
 
 SmSn 1.3 (Join the Army)
 ----------------------------------------
-SmSn 1.3.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 * Support client connections via WebSocket
 * Use a Base-62 character set [0-9A-Za-z] for IDs
 * Additional validation in server actions
@@ -12,24 +29,22 @@ SmSn 1.3.0
 * Added support for topics-and-pages data model
 * Added parent and child counts to each atom in a view
 * Added transaction buffering support for graph import
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 
 SmSn 1.2 (Into the Future)
 ----------------------------------------
-SmSn 1.2.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 * Added a VCS (version control system) graph reader and writer
 * Added a command to populate a new, empty graph
 * Cut down on graph index lookups through caching
 * Added a ping action
 * Migrated to Neo4j 2.3 and Lucene 3.6
 * Migrated from TinkerPop 2.6 to Apache TinkerPop 3.2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 
 SmSn 1.1 (More Brains)
 ----------------------------------------
-SmSn 1.1.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 * Created a unified BrainReader/BrainWriter framework for graph I/O
 * Minimized TinkerPop2 dependencies
 * Moved Brain-mode to a separate, GPL-licensed project
@@ -49,11 +64,11 @@ SmSn 1.1.0
 * Created v2.0 of Extend-o-Brain inference support
 * Added Linked Data and OSC support to the coordinator
 * Added a Ripple environment for use with the Typeatron
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 
 SmSn 1.0 (Semantic Gadgets)
 ----------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 * Added a GraphML writer
 * Integrated the Typeatron with Brain-mode via emacsclient
 * Created a framework for inter-device discovery and communication
@@ -69,11 +84,11 @@ SmSn 1.0 (Semantic Gadgets)
 * Created Arduino-based libraries for the devices
 * Created Extend-o-Hand
 * Created the Monomanual Typeatron
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 
 SmSn 0.x (Braaains)
 ----------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************
 * Prototype design of the Monomanual Typeatron
 * Added Emacspeak support to TinkerNotes (Brain-mode)
 * Moved to an ordered, list-based data model in Extend-o-Brain
@@ -95,4 +110,4 @@ SmSn 0.x (Braaains)
 * Created an Android library (later called the Brainstem)
 * Created MyOtherBrain (Extend-o-Brain) prototypes with Java, Flash/Flex, and JavaScript
 * Created a personal knowledge base ontology
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************

@@ -11,13 +11,18 @@
     <parent>
         <groupId>net.fortytwo.smsn</groupId>
         <artifactId>smsn-all</artifactId>
-        <version>1.3</version>
+        <version>1.4</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.15</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -34,39 +39,17 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/smsn-default.properties</include>
+                    <include>**/smsn-default.yaml</include>
                 </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>**/smsn-default.properties</exclude>
+                    <exclude>**/smsn-default.yaml</exclude>
                 </excludes>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
 
     <repositories>

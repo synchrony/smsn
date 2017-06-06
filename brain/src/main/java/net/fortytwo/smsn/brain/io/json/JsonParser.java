@@ -37,8 +37,8 @@ public class JsonParser extends BrainParser {
         if (json.has(SemanticSynchrony.PropertyKeys.SHORTCUT)) {
             n.setShortcut(json.getString(SemanticSynchrony.PropertyKeys.SHORTCUT));
         }
-        if (json.has(SemanticSynchrony.PropertyKeys.SHARABILITY)) {
-            n.setSharability((float) json.getDouble(SemanticSynchrony.PropertyKeys.SHARABILITY));
+        if (json.has(SemanticSynchrony.PropertyKeys.SOURCE)) {
+            n.setSource(json.getString(SemanticSynchrony.PropertyKeys.SOURCE));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.WEIGHT)) {
             n.setWeight((float) json.getDouble(SemanticSynchrony.PropertyKeys.WEIGHT));
