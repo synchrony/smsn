@@ -11,7 +11,7 @@
 
     <groupId>net.fortytwo.smsn</groupId>
     <artifactId>smsn-all</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
     <packaging>pom</packaging>
     <name>Semantic Synchrony</name>
     <description>An experiment in cognitive and sensory augmentation</description>
@@ -48,7 +48,7 @@
     </contributors>
 
     <properties>
-        <smsn.version>1.4-SNAPSHOT</smsn.version>
+        <smsn.version>1.4</smsn.version>
         <httpcomponents.version>4.4</httpcomponents.version>
         <javaosc.version>0.3</javaosc.version>
         <junit.version>4.12</junit.version>
