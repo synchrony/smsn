@@ -1,7 +1,7 @@
 Semantic Synchrony CHANGELOG
 ========================================
 
-SmSn 1.4 (NOT YET RELEASED)
+SmSn 1.4 (Pogo Stilts)
 ----------------------------------------
 ****************************************
 * Refined Freeplane reader
