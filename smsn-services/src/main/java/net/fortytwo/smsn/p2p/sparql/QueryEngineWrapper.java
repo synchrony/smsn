@@ -40,13 +40,11 @@ public class QueryEngineWrapper {
 
         connectionsByQueryId = new HashMap<>();
 
-        datasetHandler = new MessageHandler() {
-            public void handle(final JSONObject message) {
-                try {
-                    handleDatasetMessage(message);
-                } catch (SimpleJSONRDFFormat.ParseError e) {
-                    logger.log(Level.WARNING, "invalid dataset message: " + message, e);
-                }
+        datasetHandler = message -> {
+            try {
+                handleDatasetMessage(message);
+            } catch (SimpleJSONRDFFormat.ParseError e) {
+                logger.log(Level.WARNING, "invalid dataset message: " + message, e);
             }
         };
 

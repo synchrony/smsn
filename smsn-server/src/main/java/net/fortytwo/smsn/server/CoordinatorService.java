@@ -77,12 +77,7 @@ public class CoordinatorService {
         // TODO: make the base Sail configurable (e.g. disable it, or make it a persistent NativeStore)
         MemoryStore sail = new MemoryStore();
         sail.initialize();
-        LinkedDataCache.DataStore store = new LinkedDataCache.DataStore() {
-            @Override
-            public Consumer<Statement> createConsumer(SailConnection sc) {
-                return statement -> streamProcessor.addInputs(LINKED_DATA_TTL, statement);
-            }
-        };
+        LinkedDataCache.DataStore store = sc -> statement -> streamProcessor.addInputs(LINKED_DATA_TTL, statement);
         LinkedDataCache cache = LinkedDataCache.createDefault(sail);
         cache.setDataStore(store);
         streamProcessor.setLinkedDataCache(cache);

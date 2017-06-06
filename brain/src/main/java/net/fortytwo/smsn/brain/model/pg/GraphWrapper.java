@@ -9,7 +9,6 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public abstract class GraphWrapper {
 

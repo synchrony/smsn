@@ -3,7 +3,6 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -139,19 +138,11 @@ public class RepositoryCollection implements AbstractRepository {
         return new SmSnGitRepository(brain, dataSource);
     }
 
-    private void checkReadyForExport() {
-
-    }
-
-    private void checkReadyForImport() {
-
-    }
-
     private interface ConsumerWithException<T, E extends Exception> {
         void accept(T t) throws E;
     }
 
     private interface FunctionWithException<D, R, E extends Exception> {
-        R apply(D d) throws E, RepositoryException;
+        R apply(D d) throws E;
     }
 }

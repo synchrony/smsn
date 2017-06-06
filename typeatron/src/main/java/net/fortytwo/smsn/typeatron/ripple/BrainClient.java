@@ -61,7 +61,7 @@ public class BrainClient {
 
     private final String baseUrl;
 
-    public BrainClient() throws BrainClientException {
+    public BrainClient() {
         // note: constructor will fail if any of these properties are not defined
         String serverName;
         int serverPort;
@@ -397,7 +397,7 @@ public class BrainClient {
         void handle(HttpResponse response) throws IOException;
     }
 
-    private JSONObject toJson(final Filter filter) throws JSONException {
+    private JSONObject toJson(final Filter filter) {
         // TODO: restore if necessary
         /*
         JSONObject json = new JSONObject();

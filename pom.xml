@@ -14,11 +14,11 @@
     <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Semantic Synchrony</name>
-    <description>An exercise in augmented perception</description>
-    <url>https://github.com/joshsh/smsn</url>
+    <description>An experiment in cognitive and sensory augmentation</description>
+    <url>https://github.com/synchrony/smsn</url>
 
     <issueManagement>
-        <url>https://github.com/joshsh/smsn/issues</url>
+        <url>https://github.com/synchrony/smsn/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -31,18 +31,21 @@
     </licenses>
 
     <scm>
-        <url>git@github.com:joshsh/smsn.git</url>
-        <connection>scm:git:git@github.com:joshsh/smsn.git</connection>
-        <developerConnection>scm:git:git@github.com:joshsh/smsn.git</developerConnection>
+        <url>git@github.com:synchrony/smsn.git</url>
+        <connection>scm:git:git@github.com:synchrony/smsn.git</connection>
+        <developerConnection>scm:git:git@github.com:synchrony/smsn.git</developerConnection>
     </scm>
 
-    <developers>
-        <developer>
+    <contributors>
+        <contributor>
             <name>Joshua Shinavier</name>
             <email>josh@fortytwo.net</email>
-            <id>joshsh</id>
-        </developer>
-    </developers>
+        </contributor>
+        <contributor>
+            <name>Jeffrey Brown</name>
+            <email>jeffbrown.the@gmail.com</email>
+        </contributor>
+    </contributors>
 
     <properties>
         <smsn.version>1.4-SNAPSHOT</smsn.version>
@@ -241,14 +244,5 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <repositories>
-        <!-- temporary, for SesameStream snapshots -->
-        <repository>
-            <id>fortytwo</id>
-            <name>fortytwo.net Maven repository</name>
-            <url>http://fortytwo.net/maven2</url>
-        </repository>
-    </repositories>
 
 </project>

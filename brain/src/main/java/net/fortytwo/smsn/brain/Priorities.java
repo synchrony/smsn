@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.model.TopicGraph;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.logging.Logger;
 
 /**
  * A dynamically updated list of atoms ordered by their priority value

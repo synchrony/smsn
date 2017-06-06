@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.*;
 import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -277,10 +278,8 @@ public class PGTopicGraph implements TopicGraph {
             }
         });
 
-        for (Vertex v : toRemove) {
-            // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
-            v.remove();
-        }
+        // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
+        toRemove.forEach(Element::remove);
 
         notifyOfUpdate();
     }

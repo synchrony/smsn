@@ -153,7 +153,7 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
             this.graph = graph;
         }
 
-        public ActionContext perform(final Action action) throws IOException {
+        public ActionContext perform(final Action action) {
             ActionContext context = Action.createContext(graph);
 
             action.handleRequest(context);

@@ -1,6 +1,5 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;

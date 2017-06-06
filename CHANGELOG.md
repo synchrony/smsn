@@ -4,6 +4,7 @@ Semantic Synchrony CHANGELOG
 SmSn 1.4 (NOT YET RELEASED)
 ----------------------------------------
 ****************************************
+* Refined Freeplane reader
 * Made @title and @source optional properties
 * Use generalized data sources configured on the server side
 * Replaced @sharability with @source for data management and visibility

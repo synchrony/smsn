@@ -6,7 +6,6 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.server.ActionContext;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

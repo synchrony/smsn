@@ -28,6 +28,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class FreeplaneReader extends BrainReader {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(FreeplaneFormat.getInstance());
+        return Collections.singletonList(FreeplaneFormat.getInstance());
     }
 
     private final Map<TopicGraph, ParserInstance> parserInstancesByGraph = new HashMap<>();

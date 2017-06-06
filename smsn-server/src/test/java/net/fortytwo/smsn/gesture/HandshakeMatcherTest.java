@@ -37,13 +37,10 @@ public class HandshakeMatcherTest {
     private final IRI actor2 = valueFactory.createIRI(BASE_IRI + "a2");
 
     public HandshakeMatcherTest() {
-        HandshakeMatcher.HandshakeHandler handler = new HandshakeMatcher.HandshakeHandler() {
-            @Override
-            public void handle(HandshakeMatcher.HandshakeSequence left, HandshakeMatcher.HandshakeSequence right, long timestamp) {
-                totalMatches++;
-                matches.add("" + left.actor + "," + right.actor);
-                //System.out.println("handshake: " + left.actor + " and " + right.actor + " at " + timestamp);
-            }
+        HandshakeMatcher.HandshakeHandler handler = (left, right, timestamp) -> {
+            totalMatches++;
+            matches.add("" + left.actor + "," + right.actor);
+            //System.out.println("handshake: " + left.actor + " and " + right.actor + " at " + timestamp);
         };
 
         server = new HandshakeMatcher(handler);
@@ -118,9 +115,9 @@ public class HandshakeMatcherTest {
     public void testPerformance() throws Exception {
         int nShakes = 10000;
         int nPeaks = 5;
-        long interShakeGap = 1000l;
-        long interPeakGap = 160l;
-        long offset = 10l;
+        long interShakeGap = 1000L;
+        long interPeakGap = 160L;
+        long offset = 10L;
 
         handshakeCount = 0;
         server.setHandler((left, right, time) -> handshakeCount++);

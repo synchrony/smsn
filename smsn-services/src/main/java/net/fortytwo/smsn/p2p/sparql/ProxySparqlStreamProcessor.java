@@ -52,14 +52,12 @@ public class ProxySparqlStreamProcessor extends RDFStreamProcessor<String, Proxy
         queriesById = new HashMap<>();
         handlers = new HashMap<>();
 
-        connection.registerHandler(TAG_SPARQL_RESULT, new MessageHandler() {
-            public void handle(final JSONObject result) {
-                try {
-                    handleSparqlResultJSON(result);
-                } catch (SimpleJSONRDFFormat.ParseError e) {
-                    logger.warning("invalid SPARQL query result: " + result);
-                    e.printStackTrace(System.err);
-                }
+        connection.registerHandler(TAG_SPARQL_RESULT, result -> {
+            try {
+                handleSparqlResultJSON(result);
+            } catch (SimpleJSONRDFFormat.ParseError e) {
+                logger.warning("invalid SPARQL query result: " + result);
+                e.printStackTrace(System.err);
             }
         });
     }

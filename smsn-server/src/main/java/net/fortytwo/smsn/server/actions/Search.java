@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;

@@ -19,7 +19,6 @@ import org.neo4j.tinkerpop.api.impl.Neo4jGraphAPIImpl;
 import java.io.File;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Neo4jGraphWrapper extends GraphWrapper {
 

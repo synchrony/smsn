@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -39,7 +40,7 @@ public class VCSReader extends BrainReader {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(VCSFormat.getInstance());
+        return Collections.singletonList(VCSFormat.getInstance());
     }
 
     private void readDataSource(final DataSource dataSource, final Context context) throws IOException {

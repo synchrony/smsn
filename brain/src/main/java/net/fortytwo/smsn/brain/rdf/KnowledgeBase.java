@@ -526,9 +526,7 @@ public class KnowledgeBase {
                     if (best.isNonTrivial()) {
                         AtomClass clazz = classes.get(best.getInferredClass());
                         clazz.toRDF(subject, context);
-                        for (RdfizationCallback callback : best.callbacks) {
-                            callback.execute();
-                        }
+                        best.callbacks.forEach(RdfizationCallback::execute);
                     }
                 }
             }

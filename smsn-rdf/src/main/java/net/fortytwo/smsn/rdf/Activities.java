@@ -311,19 +311,4 @@ public class Activities {
     private static Statement createStatement(Resource subject, IRI predicate, Value object, Resource graph) {
         return vf.createStatement(subject, predicate, object, graph);
     }
-
-    public static void main(final String[] args) throws Exception {
-        Dataset d = Activities.datasetForHandshakePulse(new Date().getTime(),
-                RDFAgents.createIRI("http://fortytwo.net/josh/things/CybU2QN"));
-
-        OutputStream os = System.out;
-        RDFWriter w = new NTriplesWriter(os);
-        try {
-            w.startRDF();
-            d.getStatements().forEach(w::handleStatement);
-            w.endRDF();
-        } catch (RDFHandlerException e) {
-            throw new IOException(e);
-        }
-    }
 }

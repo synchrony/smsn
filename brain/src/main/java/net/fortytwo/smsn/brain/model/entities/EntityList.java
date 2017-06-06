@@ -16,7 +16,7 @@ public interface EntityList<T> extends Entity {
     EntityList<T> getRestOf();
 
     static <T> List<T> toJavaList(EntityList<T> list) {
-        List<T> javaList = new LinkedList<T>();
+        List<T> javaList = new LinkedList<>();
         EntityList<T> cur = list;
         while (null != cur) {
             javaList.add(cur.getFirst());

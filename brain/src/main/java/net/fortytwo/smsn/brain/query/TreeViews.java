@@ -161,12 +161,10 @@ public class TreeViews {
                 throw new IllegalStateException("unexpected query type: " + queryType);
         }
 
-        for (Atom a : results) {
-            if (filter.test(a)) {
-                Note n = viewInternal(a, height - 1, filter, style, true, null);
-                result.addChild(n);
-            }
-        }
+        results.stream().filter(filter::test).forEachOrdered(a -> {
+            Note n = viewInternal(a, height - 1, filter, style, true, null);
+            result.addChild(n);
+        });
 
         result.setTitle(queryType.name() + " results for \"" + query + "\"");
         return result;
@@ -599,7 +597,7 @@ public class TreeViews {
             if (null == lastPart) {
                 sb.append(part);
             } else {
-                if (!isSpecialToken(part) && !isSpecialToken(lastPart)) {
+                if (isNormalToken(part) && isNormalToken(lastPart)) {
                     sb.append(" AND");
                 }
 
@@ -613,8 +611,8 @@ public class TreeViews {
         return sb.toString();
     }
 
-    private boolean isSpecialToken(final String token) {
-        return token.equals("AND") || token.equals("OR");
+    private boolean isNormalToken(final String token) {
+        return !token.equals("AND") && !token.equals("OR");
     }
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration

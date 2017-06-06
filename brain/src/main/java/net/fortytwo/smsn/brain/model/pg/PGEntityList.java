@@ -6,8 +6,6 @@ import net.fortytwo.smsn.brain.model.entities.EntityList;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 
 public abstract class PGEntityList<T extends Entity> extends PGEntity implements EntityList<T> {

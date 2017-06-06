@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class Brain {
 

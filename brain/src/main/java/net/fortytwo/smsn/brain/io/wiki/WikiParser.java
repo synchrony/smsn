@@ -222,7 +222,7 @@ public class WikiParser extends BrainParser {
         constructNote();
     }
 
-    private void parseNormalValue() throws IOException {
+    private void parseNormalValue() {
         currentValue = "";
         if (0 == currentLine.length()) return;
 

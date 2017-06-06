@@ -26,22 +26,22 @@ public class ExampleBroadcaster {
 
         String content;
 
-        if (false) {
-            ValueFactory vf = SimpleValueFactory.getInstance();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            RDFWriter w = Rio.createWriter(RDFFormat.NTRIPLES, bos);
-            w.startRDF();
-            w.handleStatement(vf.createStatement(RDF.TYPE, RDFS.LABEL, vf.createLiteral("type")));
-            w.handleStatement(vf.createStatement(RDF.TYPE, RDFS.CLASS, RDF.PROPERTY));
-            w.endRDF();
-            content = bos.toString();
-        } else {
-            content = "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://fortytwo.net/2013/smsn/gesture#GenericBatonGesture> .\n" +
-                    "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://fortytwo.net/2013/smsn/gesture#expressedBy> <http://example.org/ns#bob> .\n" +
-                    "<urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/NET/c4dm/timeline.owl#Instant> .\n" +
-                    "<urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> <http://purl.org/NET/c4dm/timeline.owl#at> \"2013-11-25T07:06:35-0500\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n" +
-                    "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://fortytwo.net/2013/smsn/gesture#recognizedAt> <urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> .\n";
-        }
+        ValueFactory vf = SimpleValueFactory.getInstance();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        RDFWriter w = Rio.createWriter(RDFFormat.NTRIPLES, bos);
+        w.startRDF();
+        w.handleStatement(vf.createStatement(RDF.TYPE, RDFS.LABEL, vf.createLiteral("type")));
+        w.handleStatement(vf.createStatement(RDF.TYPE, RDFS.CLASS, RDF.PROPERTY));
+        w.endRDF();
+        content = bos.toString();
+
+        /*
+        content = "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://fortytwo.net/2013/smsn/gesture#GenericBatonGesture> .\n" +
+                "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://fortytwo.net/2013/smsn/gesture#expressedBy> <http://example.org/ns#bob> .\n" +
+                "<urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/NET/c4dm/timeline.owl#Instant> .\n" +
+                "<urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> <http://purl.org/NET/c4dm/timeline.owl#at> \"2013-11-25T07:06:35-0500\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n" +
+                "<urn:uuid:426097f7-8840-49fe-a460-a234d62856fd> <http://fortytwo.net/2013/smsn/gesture#recognizedAt> <urn:uuid:ef191699-2663-4e4e-8c09-57b705f28d21> .\n";
+        */
 
         HttpClient client = new DefaultHttpClient();
 

@@ -73,7 +73,7 @@ public interface TopicGraph {
     TopicGraph createFilteredGraph(Filter filter);
 
     interface IORunnable {
-        void run() throws IOException;
+        void run();
     }
 
     static void wrapInTransaction(final TopicGraph graph, final IORunnable runnable) throws IOException {

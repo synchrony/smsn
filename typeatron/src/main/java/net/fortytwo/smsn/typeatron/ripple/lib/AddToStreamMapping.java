@@ -18,7 +18,7 @@ public class AddToStreamMapping extends AtomMapping {
     private final String brainStream;
 
     public AddToStreamMapping(final BrainClient client,
-                              final Filter filter) throws RippleException {
+                              final Filter filter) {
         super(client, filter);
         brainStream = SemanticSynchrony.getConfiguration().getBrainstream();
     }

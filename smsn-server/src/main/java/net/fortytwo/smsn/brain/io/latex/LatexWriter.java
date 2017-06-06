@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.query.ViewStyle;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class LatexWriter extends BrainWriter {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(LatexFormat.getInstance());
+        return Collections.singletonList(LatexFormat.getInstance());
     }
 
     @Override

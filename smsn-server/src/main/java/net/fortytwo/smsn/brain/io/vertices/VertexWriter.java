@@ -12,6 +12,7 @@ import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,7 +21,7 @@ public class VertexWriter extends BrainWriter {
 
     @Override
     public List<Format> getFormats() {
-        return Arrays.asList(VertexTSVFormat.getInstance());
+        return Collections.singletonList(VertexTSVFormat.getInstance());
     }
 
     @Override

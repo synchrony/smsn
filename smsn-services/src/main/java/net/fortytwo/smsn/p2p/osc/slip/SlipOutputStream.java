@@ -38,21 +38,18 @@ public class SlipOutputStream {
         queue = threaded ? new LinkedBlockingQueue<>() : null;
 
         if (threaded) {
-            thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        while (!Thread.currentThread().isInterrupted()) {
-                            // blocks until a packet is available
-                            byte[] packet = queue.take();
+            thread = new Thread(() -> {
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        // blocks until a packet is available
+                        byte[] packet = queue.take();
 
-                            sendInternal(packet);
-                        }
-                    } catch (IOException e) {
-                        logger.log(Level.SEVERE, "I/O exception while writing SLIP packet", e);
-                    } catch (Throwable t) {
-                        logger.log(Level.SEVERE, "unexpected error in ThreadedSlipOutputStream. Quitting thread", t);
+                        sendInternal(packet);
                     }
+                } catch (IOException e) {
+                    logger.log(Level.SEVERE, "I/O exception while writing SLIP packet", e);
+                } catch (Throwable t) {
+                    logger.log(Level.SEVERE, "unexpected error in ThreadedSlipOutputStream. Quitting thread", t);
                 }
             });
             thread.start();

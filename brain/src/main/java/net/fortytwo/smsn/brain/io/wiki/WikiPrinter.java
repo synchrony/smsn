@@ -71,15 +71,13 @@ public class WikiPrinter {
     }
 
     private static void printProperties(final Note n, final PrintStream p, final int indent) {
-        for (Note.Property prop : Note.propertiesByKey.values()) {
-            if (prop.isAnnotationProperty()) {
-                Object value = prop.getNoteGetter().apply(n);
-                if (null != value) {
-                    indent(indent, p);
-                    p.println("@" + prop.getPropertyKey() + " " + value);
-                }
+        Note.propertiesByKey.values().stream().filter(Note.Property::isAnnotationProperty).forEach(prop -> {
+            Object value = prop.getNoteGetter().apply(n);
+            if (null != value) {
+                indent(indent, p);
+                p.println("@" + prop.getPropertyKey() + " " + value);
             }
-        }
+        });
     }
 
     private static void indent(final int indent, final PrintStream p) {

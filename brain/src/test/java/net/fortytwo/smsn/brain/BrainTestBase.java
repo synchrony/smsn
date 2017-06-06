@@ -47,7 +47,7 @@ public abstract class BrainTestBase {
     protected Graph graph;
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
-    protected ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
+    protected final ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
     protected Collection<Atom> result;
 
     protected abstract TopicGraph createAtomGraph() throws IOException;

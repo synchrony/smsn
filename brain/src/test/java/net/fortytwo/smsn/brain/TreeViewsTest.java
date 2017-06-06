@@ -463,12 +463,6 @@ public class TreeViewsTest extends BrainTestBase {
     }
 
     @Test
-    public void sourceIsCorrect() throws Exception {
-
-
-    }
-
-    @Test
     public void invisibleAtomsAreExcludedFromViews() throws Exception {
         Filter readFilter = new Filter(0f, 0.5f, DefaultSources.PUBLIC, DefaultSources.PUBLIC);
         Filter writeFilter = Filter.noFilter();

@@ -140,13 +140,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
 
     public TypeatronDictionaryMapping(final SideEffects environment,
                                       final TypeatronControl typeatron) throws RippleException {
-        BrainClient exoBrainClient;
-        try {
-            exoBrainClient = new BrainClient();
-        } catch (BrainClient.BrainClientException e) {
-            throw new RippleException(e);
-        }
-
+        BrainClient exoBrainClient = new BrainClient();
         Filter defaultFilter = Filter.noFilter();
         // brain stream atoms begin with low weight, and with private rather than personal source
         // TODO: don't hard-code the source

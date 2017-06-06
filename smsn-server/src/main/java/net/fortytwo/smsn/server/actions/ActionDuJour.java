@@ -30,7 +30,7 @@ public class ActionDuJour extends Action {
         // add an "action du jour" as needed
 
         try {
-            pageToText(context);
+            //pageToText(context);
 
             //migrateIds(context);
 
@@ -96,7 +96,7 @@ public class ActionDuJour extends Action {
         return null;
     }
 
-    private void assignSources(ActionContext context) throws IOException {
+    private void assignSources(ActionContext context) {
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
             File dir = new File(source.getLocation());
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());

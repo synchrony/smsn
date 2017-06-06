@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.git;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
-
 import java.util.Set;
 
 public interface AbstractRepository {

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SmSnGitRepositoryTest extends BrainTestBase {
-    private WikiPrinter printer = new WikiPrinter();
+    private final WikiPrinter printer = new WikiPrinter();
     private File repoDir;
     private SmSnGitRepository repo;
     private Git git;
@@ -92,18 +92,6 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         assertEquals(1, countCommits());
         assertEquals(0, countAdded());
         assertEquals("First commit", git.log().call().iterator().next().getFullMessage());
-    }
-
-    @Test
-    public void mockPullIsCorrect() throws Exception {
-        // TODO: mock test pull
-        //repo.pull();
-    }
-
-    @Test
-    public void mockPushIsCorrect() throws Exception {
-        // TODO: mock test push
-        //repo.push();
     }
 
     @Test

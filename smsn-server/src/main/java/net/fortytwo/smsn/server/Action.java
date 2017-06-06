@@ -132,9 +132,7 @@ public abstract class Action {
         setTitle(context, "[no title]");
 
         try {
-            TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> {
-                performTransaction(context);
-            });
+            TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> performTransaction(context));
         } catch (Exception e) {
             throw new RequestProcessingException(e);
         }

@@ -117,7 +117,7 @@ public class SemanticSynchrony {
         return source;
     }
 
-    public static void readConfigurationYaml(final InputStream input) throws IOException {
+    public static void readConfigurationYaml(final InputStream input) {
         configuration = new Yaml().loadAs(input, Configuration.class);
     }
 

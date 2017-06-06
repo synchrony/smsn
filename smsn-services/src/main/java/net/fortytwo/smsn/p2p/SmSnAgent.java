@@ -60,44 +60,42 @@ public class SmSnAgent {
         streamProcessor = new ProxySparqlStreamProcessor(coordinatorConnection);
 
         if (listenForServices) {
-            listener = new ServiceBroadcastListener(new ServiceBroadcastListener.EventHandler() {
-                public void receivedServiceDescription(InetAddress address, ServiceDescription description) {
-                    if (SemanticSynchrony.getConfiguration().isVerbose()) {
-                        logger.log(Level.FINE, "received broadcast message from " + address.getHostAddress()
-                                + ": version=" + description.getVersion()
-                                + ", endpoint=" + description.getEndpoint()
-                                + ", pub/sub port=" + description.getPubsubPort());
+            listener = new ServiceBroadcastListener((address, description) -> {
+                if (SemanticSynchrony.getConfiguration().isVerbose()) {
+                    logger.log(Level.FINE, "received broadcast message from " + address.getHostAddress()
+                            + ": version=" + description.getVersion()
+                            + ", endpoint=" + description.getEndpoint()
+                            + ", pub/sub port=" + description.getPubsubPort());
+                }
+
+                // The first broadcast message is used to discover the service and create a connection.
+                // Subsequent messages are used only if the connection is lost.
+                if (!coordinatorConnection.isActive()) {
+                    coordinatorService = new Service();
+                    coordinatorService.address = address;
+                    coordinatorService.description = description;
+
+                    Socket socket;
+                    try {
+                        logger.log(Level.INFO, "opening socket connection to coordinator");
+                        socket = new Socket(address, coordinatorService.description.getPubsubPort());
+                    } catch (IOException e) {
+                        logger.log(Level.INFO, "failed to open socket connection to coordinator", e);
+                        return;
                     }
 
-                    // The first broadcast message is used to discover the service and create a connection.
-                    // Subsequent messages are used only if the connection is lost.
-                    if (!coordinatorConnection.isActive()) {
-                        coordinatorService = new Service();
-                        coordinatorService.address = address;
-                        coordinatorService.description = description;
+                    try {
+                        streamProcessor.notifyConnectionOpen();
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "error on query engine notification", e);
+                        return;
+                    }
 
-                        Socket socket;
-                        try {
-                            logger.log(Level.INFO, "opening socket connection to coordinator");
-                            socket = new Socket(address, coordinatorService.description.getPubsubPort());
-                        } catch (IOException e) {
-                            logger.log(Level.INFO, "failed to open socket connection to coordinator", e);
-                            return;
-                        }
-
-                        try {
-                            streamProcessor.notifyConnectionOpen();
-                        } catch (IOException e) {
-                            logger.log(Level.WARNING, "error on query engine notification", e);
-                            return;
-                        }
-
-                        coordinatorConnection.start(socket);
-                    } else {
-                        if (SemanticSynchrony.getConfiguration().isVerbose()) {
-                            logger.log(Level.FINE, "ignoring broadcast message due to existing connection to "
-                                    + coordinatorService.address.getHostAddress());
-                        }
+                    coordinatorConnection.start(socket);
+                } else {
+                    if (SemanticSynchrony.getConfiguration().isVerbose()) {
+                        logger.log(Level.FINE, "ignoring broadcast message due to existing connection to "
+                                + coordinatorService.address.getHostAddress());
                     }
                 }
             });

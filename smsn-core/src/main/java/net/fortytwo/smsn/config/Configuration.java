@@ -17,10 +17,6 @@ public class Configuration implements Serializable {
     private Services services = new Services();
     private List<DataSource> sources = new LinkedList<>();
 
-    public void validate() {
-
-    }
-
     public Services getServices() {
         return services;
     }

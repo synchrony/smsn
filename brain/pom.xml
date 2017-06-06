@@ -30,7 +30,6 @@
             <artifactId>tinkergraph-gremlin</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>neo4j-gremlin</artifactId>
@@ -75,6 +74,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- TODO: temporary -->
         <dependency>
             <groupId>com.atlassian.commonmark</groupId>
             <artifactId>commonmark</artifactId>

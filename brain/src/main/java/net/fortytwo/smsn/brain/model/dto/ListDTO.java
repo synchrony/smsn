@@ -2,9 +2,6 @@ package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.brain.model.entities.EntityList;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class ListDTO<T> implements EntityList<T> {
     private T first;
     private EntityList<T> rest;
@@ -50,7 +47,7 @@ public class ListDTO<T> implements EntityList<T> {
     public static <T> EntityList<T> fromArray(final T... elements) {
         EntityList<T> list = null;
         for (int i = elements.length - 1; i >= 0; i--) {
-            list = new ListDTO<T>(elements[i], list);
+            list = new ListDTO<>(elements[i], list);
         }
         return list;
     }

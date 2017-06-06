@@ -30,7 +30,7 @@ public class FilterTest extends BrainTestBase {
     @Test
     public void missingSourceFailsTest() throws Exception {
         Filter filter = Filter.noFilter();
-        assertFalse(filter.test(createAtom(null, (Float) 0.75f)));
+        assertFalse(filter.test(createAtom(null, 0.75f)));
     }
 
     @Test

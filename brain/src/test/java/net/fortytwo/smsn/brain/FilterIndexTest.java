@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import static org.junit.Assert.assertEquals;
 
 public class FilterIndexTest {
-    private Predicate<Integer> filter = i -> i != 0;
+    private final Predicate<Integer> filter = i -> i != 0;
 
     @Test
     public void nilListGetsZero() {
