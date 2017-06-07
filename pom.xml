@@ -89,6 +89,7 @@
             <dependency>
                 <groupId>net.fortytwo.rdfagents</groupId>
                 <artifactId>rdfagents-core</artifactId>
+                <!--<artifactId>rdfagents-jade</artifactId>-->
                 <version>${rdfagents.version}</version>
                 <exclusions>
                     <!-- conflict with SesameStream -->
@@ -96,14 +97,6 @@
                         <groupId>com.fasterxml.jackson.core</groupId>
                         <artifactId>jackson-core</artifactId>
                     </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>net.fortytwo.rdfagents</groupId>
-                <artifactId>rdfagents-core</artifactId>
-                <!--<artifactId>rdfagents-jade</artifactId>-->
-                <version>${rdfagents.version}</version>
-                <exclusions>
                     <!-- exclude the XMPP MTP, which is currently not used by Brainstem
                          and which contains a Crimson XML dependency which is incompatible with Android -->
                     <exclusion>
