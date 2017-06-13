@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.model.entities.EntityTree;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -15,13 +15,6 @@ import java.util.Optional;
  * A graph of atoms and lists conforming to the Extend-o-Brain data model
  */
 public interface TopicGraph {
-
-    /**
-     * The configurable namespace into which things, i.e. classified atoms, are mapped
-     */
-    String PROP_THING_NAMESPACE = "net.fortytwo.smsn.brain.thingNamespace";
-
-    String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
 
     Iterable<Atom> getAllAtoms();
 
@@ -39,11 +32,11 @@ public interface TopicGraph {
 
     Topic createTopic(String id);
 
-    Page createPage(Link topicLink);
+    Page createPage(Link root);
 
-    Link createLink(Topic target, String label);
+    Link createLink(Topic target, String label, Role role);
 
-    KeyValueTree<Link, EntityList<Link>> createTopicTree(Link link);
+    EntityTree<Link> createTopicTree(Link link);
 
     Atom createAtom(String id);
 
@@ -51,8 +44,8 @@ public interface TopicGraph {
 
     EntityList<Link> createListOfLinks(Link... elements);
 
-    EntityList<KeyValueTree<Link, EntityList<Link>>> createListOfTrees(
-            KeyValueTree<Link, EntityList<Link>>... elements);
+    EntityList<EntityTree<Link>> createListOfTrees(
+            EntityTree<Link>... elements);
 
     EntityList<Atom> createListOfAtoms(Atom... elements);
 

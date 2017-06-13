@@ -15,6 +15,10 @@ public interface EntityList<T> extends Entity {
 
     EntityList<T> getRestOf();
 
+    int length();
+
+    T get(int index);
+
     static <T> List<T> toJavaList(EntityList<T> list) {
         List<T> javaList = new LinkedList<>();
         EntityList<T> cur = list;

@@ -1,13 +1,12 @@
 package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.model.entities.EntityTree;
 
-public class TreeDTO<K, V> implements KeyValueTree<K, V> {
+public class TreeDTO<T> implements EntityTree<T> {
 
-    private K key;
-    private V value;
-    private EntityList<KeyValueTree<K, V>> children;
+    private T value;
+    private EntityList<EntityTree<T>> children;
 
     @Override
     public void destroy() {
@@ -15,35 +14,39 @@ public class TreeDTO<K, V> implements KeyValueTree<K, V> {
     }
 
     @Override
-    public K getKey() {
-        return key;
-    }
-
-    @Override
-    public boolean setKey(K key) {
-        this.key = key;
-        return false;
-    }
-
-    @Override
-    public V getValue() {
+    public T getValue() {
         return value;
     }
 
     @Override
-    public boolean setValue(V value) {
+    public void setValue(T value) {
         this.value = value;
-        return false;
     }
 
     @Override
-    public EntityList<KeyValueTree<K, V>> getChildren() {
+    public EntityList<EntityTree<T>> getChildren() {
         return children;
     }
 
     @Override
-    public boolean setChildren(EntityList<KeyValueTree<K, V>> children) {
+    public void setChildren(EntityList<EntityTree<T>> children) {
         this.children = children;
-        return false;
+    }
+
+    static <T> void appendChild(EntityTree<T> tree, EntityTree<T> child) {
+        EntityList<EntityTree<T>> toInsert = new ListDTO<>(child, null);
+
+        EntityList<EntityTree<T>> cur = tree.getChildren();
+        EntityList<EntityTree<T>> prev = null;
+        while (null != cur) {
+            prev = cur;
+            cur = cur.getRest();
+        }
+
+        if (null == prev) {
+            tree.setChildren(toInsert);
+        } else {
+            prev.setRest(toInsert);
+        }
     }
 }

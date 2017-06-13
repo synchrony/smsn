@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Note {
+
     // A special value, for incoming notes only,
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
     public static final String CLEARME = "C.L.E.A.R.M.E";
@@ -62,8 +63,9 @@ public class Note {
     private String alias;
     private String shortcut;
     private String source;
-    //private String type;
     private List<String> meta;
+
+    private Role role;
 
     public Note() {
         children = new LinkedList<>();
@@ -82,7 +84,7 @@ public class Note {
 
         this.numberOfChildren = copy.numberOfChildren;
         this.numberOfParents = copy.numberOfParents;
-        //this.type = copy.type;
+        this.role = copy.role;
         this.meta = copy.meta;
 
         if (null != copy.children) {
@@ -150,7 +152,15 @@ public class Note {
     public void setSource(String source) {
         this.source = source;
     }
-    
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public Long getCreated() {
         return created;
     }

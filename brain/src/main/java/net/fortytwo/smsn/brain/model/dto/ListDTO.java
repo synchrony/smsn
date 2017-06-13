@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.EntityTree;
 
 public class ListDTO<T> implements EntityList<T> {
     private T first;
@@ -43,6 +44,15 @@ public class ListDTO<T> implements EntityList<T> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public int length() {
+        return null == rest ? 1 : 1 + rest.length();
+    }
+
+    @Override
+    public T get(int index) {
+        return 0 == index ? first : rest.get(index - 1);
+    }
 
     public static <T> EntityList<T> fromArray(final T... elements) {
         EntityList<T> list = null;

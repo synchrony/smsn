@@ -1,16 +1,18 @@
 package net.fortytwo.smsn.brain.model.entities;
 
+import net.fortytwo.smsn.brain.model.Role;
+
 public interface Link extends Entity {
+
+    Role getRole();
+
+    void setRole(Role role);
 
     Topic getTarget();
 
-    boolean setTarget(Topic target);
+    void setTarget(Topic target);
 
     String getLabel();
 
-    boolean setLabel(String label);
-
-    Page getContext();
-
-    boolean setContext(Page page);
+    void setLabel(String label);
 }

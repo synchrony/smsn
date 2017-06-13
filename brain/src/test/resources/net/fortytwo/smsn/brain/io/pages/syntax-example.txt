@@ -1,0 +1,45 @@
+@alias http://example.org/alias-url-for-this-page
+@shortcut se
+@weight 0.75
+@priority 0.5
+* basic syntax
+    * Semantic Synchrony uses a slight variant of wiki list syntax
+    * basically, you have nested notes with attribute-value pairs, bulleted lines, and free-form text
+    * attributes appears at the top of the document
+    * a tree of bulleted lines appears in the middle of the document
+    * free-form text comes at the end
+* indentation
+    * all white space before the bullet is indentation
+    * it determines the degree of nesting
+    * nodes can be nested to any degree
+        * like this...
+            * and this...
+                * and this
+    * a child must be indented more than its parent
+      * and identically to its siblings
+      * but it can be indented differently than its cousins
+* white space
+    * tab characters are converted to four spaces each: "    "
+    * all other whitespace characters count as single spaces: " "
+    * 	 leading and/or trailing whitespace is trimmed
+
+    * blank lines don't matter
+* ids
+    * :0txXBm: each topic has a base-62 id, which is indicated with an infix after the bullet
+    *    :cE85nD:    the id is optional, and it is treated as white space
+* ordinary bullets
+    * the asterisk is the default bullet, but
+    - other single characters can also be bullets
+    *  at least one space is required between bullet and value
+    *        but more spaces are OK, too
+    * these bullets mark a node as the subject or object of a statement
+-- heading bullets
+    * heading nodes begin with the heading bullet "--"
+    * they are syntactically equivalent to bulleted nodes ("*"), but they have different semantics
+    * a heading node represents a relationship
+    -- :gzScm: additional comments
+        * the above heading has an id (which identifies it with a topic)
+```
+Unstructured text may be included after three backticks at the bottom of the page.
+```
+Additional backticks are ignored; they are not necessary and are not included in the page text.

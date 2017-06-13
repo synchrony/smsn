@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.model.entities.EntityTree;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -39,51 +39,52 @@ public class TopicsAndPagesTest extends BrainTestBase {
         earthTopic = topicGraph.createTopic("earth");
         teaTopic = topicGraph.createTopic("tea");
 
-        friendsLink = topicGraph.createLink(friendTopic, "friends");
-        arthurLink = topicGraph.createLink(arthurTopic, "Arthur P. Dent");
-        fordLink = topicGraph.createLink(fordTopic, "Ford Prefect");
-        zaphodLink = topicGraph.createLink(zaphodTopic, "Zaphod Beeblebrox");
-        earthLink = topicGraph.createLink(earthTopic, "The Earth");
-        teaLink = topicGraph.createLink(teaTopic, "Tea");
+        friendsLink = topicGraph.createLink(friendTopic, "friends", Role.Verb);
+        arthurLink = topicGraph.createLink(arthurTopic, "Arthur P. Dent", Role.Noun);
+        fordLink = topicGraph.createLink(fordTopic, "Ford Prefect", Role.Noun);
+        zaphodLink = topicGraph.createLink(zaphodTopic, "Zaphod Beeblebrox", Role.Verb);
+        earthLink = topicGraph.createLink(earthTopic, "The Earth", Role.Noun);
+        teaLink = topicGraph.createLink(teaTopic, "Tea", Role.Noun);
     }
 
     @Test
     public void ordinaryPageAndTopicTreeAreAllowed() {
         Page page = topicGraph.createPage(arthurLink);
         page.setText("a page about Arthur");
-
+        EntityTree<Link> tree = page.getContent();
+        tree.setValue(arthurLink);
+        tree.setChildren(topicGraph.createListOfTrees(
+                topicGraph.createTopicTree(teaLink)));
         assertEquals("a page about Arthur", page.getText());
-        assertEquals("Arthur P. Dent", page.getContent().getKey().getLabel());
+        assertEquals("Arthur P. Dent", page.getContent().getValue().getLabel());
 
-        KeyValueTree<Link, EntityList<Link>> tree = page.getContent();
-        EntityList<Link> parentLinks = topicGraph.createListOfLinks(earthLink, teaLink);
-        tree.setValue(parentLinks);
-
-        Link secondLink = EntityList.toJavaList(page.getContent().getValue()).get(1);
+        Link secondLink = page.getContent().getChildren().get(0).getValue();
         assertEquals("Tea", secondLink.getLabel());
         assertEquals("tea", secondLink.getTarget().getId());
 
-        KeyValueTree<Link, EntityList<Link>> friendsTree = topicGraph.createTopicTree(friendsLink);
-        EntityList<Link> childLinks = topicGraph.createListOfLinks(fordLink, zaphodLink);
-        friendsTree.setValue(childLinks);
-        EntityList<KeyValueTree<Link, EntityList<Link>>> children = topicGraph.createListOfTrees(friendsTree);
+        EntityTree<Link> friendsTree = topicGraph.createTopicTree(friendsLink);
+        EntityList<EntityTree<Link>> childLinks = topicGraph.createListOfTrees(
+                topicGraph.createTopicTree(fordLink),
+                topicGraph.createTopicTree(zaphodLink));
+        friendsTree.setChildren(childLinks);
+        EntityList<EntityTree<Link>> children = topicGraph.createListOfTrees(friendsTree);
         tree.setChildren(children);
 
-        assertEquals("friends", page.getContent().getChildren().getFirst().getKey().getLabel());
-        assertEquals("Ford Prefect", page.getContent().getChildren().getFirst().getValue().getFirst().getLabel());
+        assertEquals("friends", page.getContent().getChildren().get(0).getValue().getLabel());
+        assertEquals("Ford Prefect",
+                page.getContent().getChildren().get(0).getChildren().get(0).getValue().getLabel());
 
         page.destroy();
-
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void linkWithoutTargetIsNotAllowed() {
-        topicGraph.createLink(null, "nowhere");
+        topicGraph.createLink(null, "nowhere", Role.Noun);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void linkWithoutLabelIsNotAllowed() {
-        topicGraph.createLink(arthurTopic, null);
+        topicGraph.createLink(arthurTopic, null, Role.Noun);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -93,8 +94,8 @@ public class TopicsAndPagesTest extends BrainTestBase {
         page.setContent(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void treeWithoutKeyIsNotAllowed() {
+    @Test(expected = NullPointerException.class)
+    public void treeWithoutValueIsNotAllowed() {
         topicGraph.createTopicTree(null);
     }
 
@@ -108,21 +109,10 @@ public class TopicsAndPagesTest extends BrainTestBase {
         topicGraph.createListOfTrees();
     }
 
-    @Test
-    public void treeWithoutChildrenOrLinksIsAllowed() {
-        Page page = topicGraph.createPage(arthurLink);
-        KeyValueTree<Link, EntityList<Link>> tree = page.getContent();
-
-        tree.setChildren(null);
-        tree.setValue(null);
-
-        page.destroy();
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void settingTreeTopicToNullIsNotAllowed() {
-        KeyValueTree<Link, EntityList<Link>> tree = topicGraph.createTopicTree(arthurLink);
-        tree.setKey(null);
+        EntityTree<Link> tree = topicGraph.createTopicTree(arthurLink);
+        tree.setValue(null);
     }
 
     @Test
@@ -134,30 +124,33 @@ public class TopicsAndPagesTest extends BrainTestBase {
         Object pageId = ((PGPage) page).asVertex().id();
         assertTrue(graph.traversal().V(pageId).hasNext());
 
-        page.getContent().setValue(
-                topicGraph.createListOfLinks(
-                        topicGraph.createLink(arthurTopic, "Arthur as a top-level link")));
-
         page.getContent().setChildren(
                 topicGraph.createListOfTrees(
                         topicGraph.createTopicTree(
-                                topicGraph.createLink(arthurTopic, "Arthur as a header"))));
-        page.getContent().getChildren().getFirst().setValue(
-                topicGraph.createListOfLinks(
-                        topicGraph.createLink(arthurTopic, "Arthur as a second-level link")));
+                                topicGraph.createLink(arthurTopic, "Arthur as a top-level link", Role.Noun)),
+                        topicGraph.createTopicTree(
+                                topicGraph.createLink(arthurTopic, "Arthur as a header", Role.Verb))));
+        page.getContent().getChildren().get(1).setChildren(
+                topicGraph.createListOfTrees(
+                        topicGraph.createTopicTree(
+                                topicGraph.createLink(arthurTopic, "Arthur as a second-level link", Role.Noun))));
 
-        assertEquals(arthurTopic, page.getContent().getKey().getTarget());
-        assertEquals("Arthur P. Dent", page.getContent().getKey().getLabel());
-        assertEquals(arthurTopic, page.getContent().getValue().getFirst().getTarget());
-        assertEquals("Arthur as a top-level link", page.getContent().getValue().getFirst().getLabel());
-        assertEquals(arthurTopic, page.getContent().getChildren().getFirst().getKey().getTarget());
-        assertEquals("Arthur as a header", page.getContent().getChildren().getFirst().getKey().getLabel());
-        assertEquals(arthurTopic, page.getContent().getChildren().getFirst().getValue().getFirst().getTarget());
+        assertEquals(arthurTopic, page.getContent().getValue().getTarget());
+        assertEquals("Arthur P. Dent", page.getContent().getValue().getLabel());
+        assertEquals(Role.Noun, page.getContent().getValue().getRole());
+        assertEquals(arthurTopic, page.getContent().getChildren().get(0).getValue().getTarget());
+        assertEquals("Arthur as a top-level link", page.getContent().getChildren().get(0).getValue().getLabel());
+        assertEquals(Role.Noun, page.getContent().getChildren().get(0).getValue().getRole());
+        assertEquals(arthurTopic, page.getContent().getChildren().get(1).getValue().getTarget());
+        assertEquals("Arthur as a header", page.getContent().getChildren().get(1).getValue().getLabel());
+        assertEquals(Role.Verb, page.getContent().getChildren().get(1).getValue().getRole());
+        assertEquals(arthurTopic, page.getContent().getChildren().get(1).getChildren().get(0).getValue().getTarget());
         assertEquals("Arthur as a second-level link",
-                page.getContent().getChildren().getFirst().getValue().getFirst().getLabel());
+                page.getContent().getChildren().get(1).getChildren().get(0).getValue().getLabel());
+        assertEquals(Role.Noun, page.getContent().getChildren().get(1).getChildren().get(0).getValue().getRole());
 
         // before destroying the page, create another page about Arthur
-        Page page2 = topicGraph.createPage(topicGraph.createLink(arthurTopic, "Arthur Philip Dent"));
+        Page page2 = topicGraph.createPage(topicGraph.createLink(arthurTopic, "Arthur Philip Dent", Role.Noun));
         Object page2Id = ((PGPage) page2).asVertex().id();
 
         assertTrue(graph.traversal().V(arthurId).hasNext());

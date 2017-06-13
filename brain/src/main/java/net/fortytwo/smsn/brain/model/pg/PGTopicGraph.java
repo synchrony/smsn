@@ -3,15 +3,27 @@ package net.fortytwo.smsn.brain.model.pg;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.*;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Entity;
+import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -90,8 +102,8 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     private <T extends Entity> EntityList<T> createListOfEntities(final String vertexLabel,
-                                                   final Function<Vertex, EntityList<T>> constructor,
-                                                   final T[] elements) {
+                                                                  final Function<Vertex, EntityList<T>> constructor,
+                                                                  final T[] elements) {
         Preconditions.checkArgument(elements.length > 0);
 
         EntityList<T> last = null;
@@ -118,8 +130,8 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public EntityList<KeyValueTree<Link, EntityList<Link>>> createListOfTrees(
-            KeyValueTree<Link, EntityList<Link>>... elements) {
+    public EntityList<EntityTree<Link>> createListOfTrees(
+            EntityTree<Link>... elements) {
         return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinkTrees, elements);
     }
 
@@ -139,24 +151,25 @@ public class PGTopicGraph implements TopicGraph {
     public Page createPage(final Link topicLink) {
         Topic topic = topicLink.getTarget();
         Page page = createEntity(null, SemanticSynchrony.VertexLabels.PAGE, this::asPage);
-        page.setPrimaryTopic(topic);
         page.setContent(createTopicTree(topicLink));
         return page;
     }
 
     @Override
-    public Link createLink(Topic target, String label) {
+    public Link createLink(final Topic target, final String label, final Role role) {
         Link link = createEntity(null, SemanticSynchrony.VertexLabels.LINK, this::asLink);
         link.setTarget(target);
         link.setLabel(label);
+        link.setRole(role);
         return link;
     }
 
     @Override
-    public KeyValueTree<Link, EntityList<Link>> createTopicTree(final Link link) {
-        KeyValueTree<Link, EntityList<Link>> tree
+    public EntityTree<Link> createTopicTree(final Link link) {
+        Preconditions.checkNotNull(link);
+        EntityTree<Link> tree
                 = createEntity(null, SemanticSynchrony.VertexLabels.TREE, this::asLinkTree);
-        tree.setKey(link);
+        tree.setValue(link);
         return tree;
     }
 
@@ -233,12 +246,11 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public <K extends Entity, V extends Entity> KeyValueTree<K, V> asEntityTree(final Vertex vertex,
-                                                  final Function<Vertex, K> keyConstructor,
-                                                  final Function<Vertex, V> valueConstructor) {
+    public <T extends Entity> EntityTree<T> asEntityTree(final Vertex vertex,
+                                                         final Function<Vertex, T> constructor) {
         Preconditions.checkNotNull(vertex, "vertex");
 
-        return new PGKeyValueTree<K, V>(vertex, keyConstructor, valueConstructor) {
+        return new PGTree<T>(vertex, constructor) {
             @Override
             protected PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
@@ -250,7 +262,7 @@ public class PGTopicGraph implements TopicGraph {
         return asEntityList(vertex, this::asLink);
     }
 
-    public EntityList<KeyValueTree<Link, EntityList<Link>>> asListOfLinkTrees(final Vertex vertex) {
+    public EntityList<EntityTree<Link>> asListOfLinkTrees(final Vertex vertex) {
         return asEntityList(vertex, this::asLinkTree);
     }
 
@@ -258,8 +270,8 @@ public class PGTopicGraph implements TopicGraph {
         return asEntityList(vertex, this::asAtom);
     }
 
-    public KeyValueTree<Link, EntityList<Link>> asLinkTree(final Vertex vertex) {
-        return asEntityTree(vertex, this::asLink, this::asListOfLinks);
+    public EntityTree<Link> asLinkTree(final Vertex vertex) {
+        return asEntityTree(vertex, this::asLink);
     }
 
     @Override

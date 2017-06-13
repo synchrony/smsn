@@ -29,6 +29,7 @@ public class WikiParserTest extends BrainTestBase {
         wikiParser = new WikiParser();
     }
 
+    // TODO
     @Test
     public void testExample1() throws Exception {
         List<Note> notes = wikiParser.parse(
@@ -59,6 +60,7 @@ public class WikiParserTest extends BrainTestBase {
         assertEquals("cE85nD", ids.getChildren().get(1).getId());
     }
 
+    // TODO
     @Test
     public void testExample2() throws Exception {
         Note root = wikiParser.parse(getClass().getResourceAsStream("wiki-example-2.txt"));
@@ -93,7 +95,7 @@ public class WikiParserTest extends BrainTestBase {
     }
 
     @Test
-    public void nonEmptyPageIsCopiedVerbatim() throws Exception {
+    public void nonEmptyTextIsCopiedVerbatim() throws Exception {
         wikiParser.setUseCanonicalFormat(true);
         List<Note> notes = readNotes("* Arthur Dent\n" +
                 "\n" +
@@ -106,7 +108,7 @@ public class WikiParserTest extends BrainTestBase {
     }
 
     @Test
-    public void emptyPageIsIgnored() throws Exception {
+    public void emptyTextIsIgnored() throws Exception {
         wikiParser.setUseCanonicalFormat(true);
         List<Note> notes = readNotes("* Arthur Dent\n" +
                 "\n" +

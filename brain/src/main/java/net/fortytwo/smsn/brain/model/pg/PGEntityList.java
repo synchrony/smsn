@@ -46,6 +46,16 @@ public abstract class PGEntityList<T extends Entity> extends PGEntity implements
     }
 
     @Override
+    public int length() {
+        return null == getRest() ? 1 : 1 + getRest().length();
+    }
+
+    @Override
+    public T get(final int index) {
+        return 0 == index ? getFirst() : getRest().get(index - 1);
+    }
+
+    @Override
     public void destroy() {
         // a list owns each list element
         getFirst().destroy();

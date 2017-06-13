@@ -1,44 +1,61 @@
 package net.fortytwo.smsn.brain.model.entities;
 
+import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Property;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public interface Page extends Entity {
 
-    String getFormat();
+    Map<String, Property> propertiesByKey = createPropertiesByKey();
 
-    boolean setFormat(String format);
-
+    static Map<String, Property> createPropertiesByKey() {
+        Map<String, Property> propertiesByKey = new LinkedHashMap<>();
+        for (Property prop : new Property[]{
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.ALIAS,
+                        Page::getAlias, Page::setAlias, s -> s),
+                new Property<>(true,false, SemanticSynchrony.PropertyKeys.TEXT,
+                        Page::getText, Page::setText, s -> s),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.SOURCE,
+                        Page::getSource, Page::setSource, s -> s),
+                new Property<>(true,true, SemanticSynchrony.PropertyKeys.SHORTCUT,
+                        Page::getShortcut, Page::setShortcut, s -> s),
+                new Property<>(true, true, SemanticSynchrony.PropertyKeys.WEIGHT,
+                        Page::getWeight, Page::setWeight, Float::valueOf),
+                new Property<>(true, true, SemanticSynchrony.PropertyKeys.PRIORITY,
+                        Page::getPriority, Page::setPriority, Float::valueOf),
+        }) {
+            propertiesByKey.put(prop.getPropertyKey(), prop);
+        }
+        return propertiesByKey;
+    }
+    
     String getText();
 
-    boolean setText(String text);
+    void setText(String text);
 
     String getAlias();
 
-    boolean setAlias(String alias);
-
-    Long getCreated();
-
-    boolean setCreated(Long created);
-
-    Float getPriority();
-
-    boolean setPriority(Float priority);
+    void setAlias(String alias);
 
     String getSource();
 
-    boolean setSource(String source);
+    void setSource(String source);
 
     String getShortcut();
 
-    boolean setShortcut(String shortcut);
+    void setShortcut(String shortcut);
+
+    EntityTree<Link> getContent();
+
+    void setContent(EntityTree<Link> tree);
 
     Float getWeight();
 
-    boolean setWeight(Float weight);
+    void setWeight(Float weight);
 
-    Topic getPrimaryTopic();
+    Float getPriority();
 
-    boolean setPrimaryTopic(Topic topic);
-
-    KeyValueTree<Link, EntityList<Link>> getContent();
-
-    boolean setContent(KeyValueTree<Link, EntityList<Link>> tree);
+    void setPriority(Float priority);
 }
