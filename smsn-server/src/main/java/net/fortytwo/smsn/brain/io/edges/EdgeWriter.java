@@ -4,12 +4,11 @@ import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.Filter;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class EdgeWriter extends BrainWriter {
 
         for (Atom fromAtom : sourceGraph.getAllAtoms()) {
             if (null != fromAtom && filter.test(fromAtom)) {
-                EntityList<Atom> l = fromAtom.getChildren();
+                ListNode<Atom> l = fromAtom.getChildren();
                 while (null != l) {
                     Atom toAtom = l.getFirst();
                     if (filter.test(toAtom)) {

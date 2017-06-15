@@ -3,7 +3,7 @@ package net.fortytwo.smsn.brain.model.entities;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public interface Atom extends Entity {
+public interface Atom extends Node {
 
     String getId();
 
@@ -37,19 +37,19 @@ public interface Atom extends Entity {
 
     void setWeight(Float weight);
 
-    EntityList<Atom> getChildren();
+    ListNode<Atom> getChildren();
 
-    void setChildren(EntityList<Atom> notes);
+    void setChildren(ListNode<Atom> notes);
 
-    void forFirstOf(Consumer<EntityList<Atom>> consumer);
+    void forFirstOf(Consumer<ListNode<Atom>> consumer);
 
     void addChildAt(final Atom child, int position);
 
     void deleteChildAt(int position);
 
-    Collection<EntityList<Atom>> getFirstOf();
+    Collection<ListNode<Atom>> getFirstOf();
 
-    Atom getSubject(EntityList<Atom> notes);
+    Atom getSubject(ListNode<Atom> notes);
 
     String getSource();
 

@@ -2,11 +2,11 @@ package net.fortytwo.smsn.brain.io.pages;
 
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.ListDTO;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeDTO;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -77,13 +77,13 @@ public class PagePrinterTest {
     public void nounAndVerbBulletsAreDistinguished() throws Exception {
         Page page = new PageDTO();
         page.setContent(createTree("123", "Arthur Dent", Role.Noun));
-        EntityTree<Link> content = page.getContent();
-        EntityTree<Link> node1 = createTree(null, "Arthur Philip Dent", Role.Noun);
-        EntityTree<Link> node2 = createTree("12345", "friends", Role.Verb);
-        EntityTree<Link> node3 = createTree("00000", "Ford Prefect", Role.Noun);
-        EntityTree<Link> node4 = createTree(null, "Slartibartfast", Role.Noun);
-        content.setChildren(ListDTO.fromArray(node1, node2));
-        node2.setChildren(ListDTO.fromArray(node3, node4));
+        TreeNode<Link> content = page.getContent();
+        TreeNode<Link> node1 = createTree(null, "Arthur Philip Dent", Role.Noun);
+        TreeNode<Link> node2 = createTree("12345", "friends", Role.Verb);
+        TreeNode<Link> node3 = createTree("00000", "Ford Prefect", Role.Noun);
+        TreeNode<Link> node4 = createTree(null, "Slartibartfast", Role.Noun);
+        content.setChildren(ListNodeDTO.fromArray(node1, node2));
+        node2.setChildren(ListNodeDTO.fromArray(node3, node4));
 
         assertEquals("* :123: Arthur Dent\n" +
                 "    * Arthur Philip Dent\n" +
@@ -92,7 +92,7 @@ public class PagePrinterTest {
                 "        * Slartibartfast\n", write(page));
     }
 
-    private EntityTree<Link> createTree(final String id, final String label, final Role role) {
+    private TreeNode<Link> createTree(final String id, final String label, final Role role) {
         Link link = new LinkDTO();
         link.setRole(role);
         link.setLabel(label);
@@ -101,7 +101,7 @@ public class PagePrinterTest {
             topic.setId(id);
             link.setTarget(topic);
         }
-        EntityTree<Link> tree = new TreeDTO<>();
+        TreeNode<Link> tree = new TreeNodeDTO<>();
         tree.setValue(link);
         return tree;
     }

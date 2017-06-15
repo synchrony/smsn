@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -74,12 +74,12 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public EntityTree<Link> getContent() {
+    public TreeNode<Link> getContent() {
         return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.CONTENT, Direction.OUT, v -> getGraph().asLinkTree(v));
     }
 
     @Override
-    public void setContent(EntityTree<Link> tree) {
+    public void setContent(TreeNode<Link> tree) {
         setRequiredEntity(SemanticSynchrony.EdgeLabels.CONTENT, tree);
     }
 

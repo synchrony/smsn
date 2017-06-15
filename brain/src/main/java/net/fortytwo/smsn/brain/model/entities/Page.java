@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.model.Property;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public interface Page extends Entity {
+public interface Page extends Node {
 
     Map<String, Property> propertiesByKey = createPropertiesByKey();
 
@@ -47,9 +47,9 @@ public interface Page extends Entity {
 
     void setShortcut(String shortcut);
 
-    EntityTree<Link> getContent();
+    TreeNode<Link> getContent();
 
-    void setContent(EntityTree<Link> tree);
+    void setContent(TreeNode<Link> tree);
 
     Float getWeight();
 

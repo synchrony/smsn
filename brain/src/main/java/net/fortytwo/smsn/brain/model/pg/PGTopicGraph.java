@@ -6,9 +6,9 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.Entity;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.Node;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -101,15 +101,15 @@ public class PGTopicGraph implements TopicGraph {
         return null == v ? Optional.empty() : Optional.of(asAtom(v));
     }
 
-    private <T extends Entity> EntityList<T> createListOfEntities(final String vertexLabel,
-                                                                  final Function<Vertex, EntityList<T>> constructor,
-                                                                  final T[] elements) {
+    private <T extends Node> ListNode<T> createListOfEntities(final String vertexLabel,
+                                                              final Function<Vertex, ListNode<T>> constructor,
+                                                              final T[] elements) {
         Preconditions.checkArgument(elements.length > 0);
 
-        EntityList<T> last = null;
-        EntityList<T> head = null;
+        ListNode<T> last = null;
+        ListNode<T> head = null;
         for (T el : elements) {
-            EntityList<T> cur = createEntity(null, vertexLabel, constructor);
+            ListNode<T> cur = createEntity(null, vertexLabel, constructor);
             cur.setFirst(el);
 
             if (null == head) {
@@ -125,18 +125,18 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public EntityList<Link> createListOfLinks(final Link... elements) {
+    public ListNode<Link> createListOfLinks(final Link... elements) {
         return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinks, elements);
     }
 
     @Override
-    public EntityList<EntityTree<Link>> createListOfTrees(
-            EntityTree<Link>... elements) {
+    public ListNode<TreeNode<Link>> createListOfTrees(
+            TreeNode<Link>... elements) {
         return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinkTrees, elements);
     }
 
     @Override
-    public EntityList<Atom> createListOfAtoms(final Atom... elements) {
+    public ListNode<Atom> createListOfAtoms(final Atom... elements) {
         return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfAtoms, elements);
     }
 
@@ -165,9 +165,9 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public EntityTree<Link> createTopicTree(final Link link) {
+    public TreeNode<Link> createTopicTree(final Link link) {
         Preconditions.checkNotNull(link);
-        EntityTree<Link> tree
+        TreeNode<Link> tree
                 = createEntity(null, SemanticSynchrony.VertexLabels.TREE, this::asLinkTree);
         tree.setValue(link);
         return tree;
@@ -235,10 +235,10 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public <T extends Entity> EntityList<T> asEntityList(final Vertex vertex, final Function<Vertex, T> constructor) {
+    public <T extends Node> ListNode<T> asEntityList(final Vertex vertex, final Function<Vertex, T> constructor) {
         Preconditions.checkNotNull(vertex, "vertex");
 
-        return new PGEntityList<T>(vertex, constructor) {
+        return new PGListNode<T>(vertex, constructor) {
             @Override
             protected PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
@@ -246,11 +246,11 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public <T extends Entity> EntityTree<T> asEntityTree(final Vertex vertex,
-                                                         final Function<Vertex, T> constructor) {
+    public <T extends Node> TreeNode<T> asEntityTree(final Vertex vertex,
+                                                     final Function<Vertex, T> constructor) {
         Preconditions.checkNotNull(vertex, "vertex");
 
-        return new PGTree<T>(vertex, constructor) {
+        return new PGTreeNode<T>(vertex, constructor) {
             @Override
             protected PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
@@ -258,19 +258,19 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public EntityList<Link> asListOfLinks(final Vertex vertex) {
+    public ListNode<Link> asListOfLinks(final Vertex vertex) {
         return asEntityList(vertex, this::asLink);
     }
 
-    public EntityList<EntityTree<Link>> asListOfLinkTrees(final Vertex vertex) {
+    public ListNode<TreeNode<Link>> asListOfLinkTrees(final Vertex vertex) {
         return asEntityList(vertex, this::asLinkTree);
     }
 
-    public EntityList<Atom> asListOfAtoms(final Vertex vertex) {
+    public ListNode<Atom> asListOfAtoms(final Vertex vertex) {
         return asEntityList(vertex, this::asAtom);
     }
 
-    public EntityTree<Link> asLinkTree(final Vertex vertex) {
+    public TreeNode<Link> asLinkTree(final Vertex vertex) {
         return asEntityTree(vertex, this::asLink);
     }
 
@@ -347,7 +347,7 @@ public class PGTopicGraph implements TopicGraph {
         for (Atom originalAtom : getAllAtoms()) {
             if (filter.test(originalAtom)) {
                 PGAtom newAtom = findOrCopyAtom(originalAtom, filter, newGraph);
-                PGEntityList<Atom> children = (PGEntityList<Atom>) originalAtom.getChildren();
+                PGListNode<Atom> children = (PGListNode<Atom>) originalAtom.getChildren();
                 if (null != children) {
                     newAtom.setChildren(copyAtomList(children, filter, newGraph));
                 }
@@ -406,13 +406,13 @@ public class PGTopicGraph implements TopicGraph {
         return newAtom;
     }
 
-    private EntityList<Atom> copyAtomList(final PGEntityList<Atom> original, final Filter filter, final PGTopicGraph newGraph) {
-        PGEntityList<Atom> originalCur = original;
-        PGEntityList<Atom> newHead = null, newCur, newPrev = null;
+    private ListNode<Atom> copyAtomList(final PGListNode<Atom> original, final Filter filter, final PGTopicGraph newGraph) {
+        PGListNode<Atom> originalCur = original;
+        PGListNode<Atom> newHead = null, newCur, newPrev = null;
         while (null != originalCur) {
             Atom originalFirst = originalCur.getFirst();
             PGAtom newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
-            newCur = (PGEntityList<Atom>) newGraph.createListOfAtoms(newAtom);
+            newCur = (PGListNode<Atom>) newGraph.createListOfAtoms(newAtom);
 
             if (null == newPrev) {
                 newHead = newCur;
@@ -421,7 +421,7 @@ public class PGTopicGraph implements TopicGraph {
             }
 
             newPrev = newCur;
-            originalCur = (PGEntityList<Atom>) originalCur.getRest();
+            originalCur = (PGListNode<Atom>) originalCur.getRest();
         }
 
         return newHead;

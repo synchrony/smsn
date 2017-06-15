@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
@@ -121,7 +121,7 @@ public abstract class BrainTestBase {
     }
 
     protected static List<Atom> childList(final Atom atom) {
-        return EntityList.toJavaList(atom.getChildren());
+        return ListNode.toJavaList(atom.getChildren());
     }
 
     protected File createTempDirectory() throws IOException {

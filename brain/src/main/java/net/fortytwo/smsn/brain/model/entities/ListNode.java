@@ -3,25 +3,25 @@ package net.fortytwo.smsn.brain.model.entities;
 import java.util.LinkedList;
 import java.util.List;
 
-public interface EntityList<T> extends Entity {
+public interface ListNode<T> extends Node {
 
     T getFirst();
 
     boolean setFirst(T first);
 
-    EntityList<T> getRest();
+    ListNode<T> getRest();
 
-    boolean setRest(EntityList<T> rest);
+    boolean setRest(ListNode<T> rest);
 
-    EntityList<T> getRestOf();
+    ListNode<T> getRestOf();
 
     int length();
 
     T get(int index);
 
-    static <T> List<T> toJavaList(EntityList<T> list) {
+    static <T> List<T> toJavaList(ListNode<T> list) {
         List<T> javaList = new LinkedList<>();
-        EntityList<T> cur = list;
+        ListNode<T> cur = list;
         while (null != cur) {
             javaList.add(cur.getFirst());
             cur = cur.getRest();

@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -98,7 +98,7 @@ public class TreeViewsTest extends BrainTestBase {
         Atom ad = topicGraph.getAtomById(root.getId()).get();
         assertEquals("Arthur Dent", ad.getTitle());
         assertEquals("He's a jerk.\nA complete kneebiter.", ad.getText());
-        assertEquals(1, EntityList.toJavaList(ad.getChildren()).size());
+        assertEquals(1, ListNode.toJavaList(ad.getChildren()).size());
         Atom random = ad.getChildren().getFirst();
         assertEquals("Random", random.getTitle());
     }
@@ -230,7 +230,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         Atom one = topicGraph.getAtomById("000001").get();
-        Assert.assertEquals(1, EntityList.toJavaList(one.getChildren()).size());
+        Assert.assertEquals(1, ListNode.toJavaList(one.getChildren()).size());
         for (int i = 0; i < 2; i++) {
             assertEquals(1, rootNote.getChildren().size());
             child = rootNote.getChildren().get(0);
@@ -250,7 +250,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = topicGraph.getAtomById("000001").get();
-        Assert.assertEquals(1, EntityList.toJavaList(one.getChildren()).size());
+        Assert.assertEquals(1, ListNode.toJavaList(one.getChildren()).size());
         rootNote = queries.view(root, 2, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
@@ -268,7 +268,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = topicGraph.getAtomById("000001").get();
-        Assert.assertEquals(1, EntityList.toJavaList(one.getChildren()).size());
+        Assert.assertEquals(1, ListNode.toJavaList(one.getChildren()).size());
         rootNote = queries.view(root, 2, filter, style);
         assertEquals(1, rootNote.getChildren().size());
         child = rootNote.getChildren().get(0);
@@ -288,7 +288,7 @@ public class TreeViewsTest extends BrainTestBase {
         rootNote.setId(root.getId());
         queries.update(rootNote, 2, filter, style);
         one = topicGraph.getAtomById("000001").get();
-        Assert.assertEquals(2, EntityList.toJavaList(one.getChildren()).size());
+        Assert.assertEquals(2, ListNode.toJavaList(one.getChildren()).size());
         for (int i = 0; i < 2; i++) {
             assertEquals(1, rootNote.getChildren().size());
             child = rootNote.getChildren().get(0);
@@ -633,7 +633,7 @@ public class TreeViewsTest extends BrainTestBase {
         assertEquals("one", a1.getTitle());
         assertEquals("two", a2.getTitle());
         assertEquals("three", a3.getTitle());
-        assertEquals(3, EntityList.toJavaList(root.getChildren()).size());
+        assertEquals(3, ListNode.toJavaList(root.getChildren()).size());
 
         a.setId(root.getId());
         queries.update(a, 2, filter, style);
@@ -641,7 +641,7 @@ public class TreeViewsTest extends BrainTestBase {
         Atom a4 = topicGraph.getAtomById("000004").get();
 
         assertEquals("four", a4.getTitle());
-        List<Atom> children = EntityList.toJavaList(root.getChildren());
+        List<Atom> children = ListNode.toJavaList(root.getChildren());
         assertEquals(4, children.size());
         assertEquals("four", children.get(0).getTitle());
         assertEquals("one", children.get(1).getTitle());
@@ -690,7 +690,7 @@ public class TreeViewsTest extends BrainTestBase {
         String[] actual = new String[countNotes(a)];
 
         int i = 0;
-        EntityList<Atom> cur = a.getChildren();
+        ListNode<Atom> cur = a.getChildren();
         while (null != cur) {
             actual[i++] = cur.getFirst().getTitle();
             cur = cur.getRest();
@@ -700,7 +700,7 @@ public class TreeViewsTest extends BrainTestBase {
     }
 
     private int countNotes(final Atom a) {
-        EntityList cur = a.getChildren();
+        ListNode cur = a.getChildren();
         int count = 0;
         while (cur != null) {
             count++;

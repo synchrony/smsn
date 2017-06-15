@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -51,7 +51,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
     public void ordinaryPageAndTopicTreeAreAllowed() {
         Page page = topicGraph.createPage(arthurLink);
         page.setText("a page about Arthur");
-        EntityTree<Link> tree = page.getContent();
+        TreeNode<Link> tree = page.getContent();
         tree.setValue(arthurLink);
         tree.setChildren(topicGraph.createListOfTrees(
                 topicGraph.createTopicTree(teaLink)));
@@ -62,12 +62,12 @@ public class TopicsAndPagesTest extends BrainTestBase {
         assertEquals("Tea", secondLink.getLabel());
         assertEquals("tea", secondLink.getTarget().getId());
 
-        EntityTree<Link> friendsTree = topicGraph.createTopicTree(friendsLink);
-        EntityList<EntityTree<Link>> childLinks = topicGraph.createListOfTrees(
+        TreeNode<Link> friendsTree = topicGraph.createTopicTree(friendsLink);
+        ListNode<TreeNode<Link>> childLinks = topicGraph.createListOfTrees(
                 topicGraph.createTopicTree(fordLink),
                 topicGraph.createTopicTree(zaphodLink));
         friendsTree.setChildren(childLinks);
-        EntityList<EntityTree<Link>> children = topicGraph.createListOfTrees(friendsTree);
+        ListNode<TreeNode<Link>> children = topicGraph.createListOfTrees(friendsTree);
         tree.setChildren(children);
 
         assertEquals("friends", page.getContent().getChildren().get(0).getValue().getLabel());
@@ -111,7 +111,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
 
     @Test(expected = IllegalArgumentException.class)
     public void settingTreeTopicToNullIsNotAllowed() {
-        EntityTree<Link> tree = topicGraph.createTopicTree(arthurLink);
+        TreeNode<Link> tree = topicGraph.createTopicTree(arthurLink);
         tree.setValue(null);
     }
 

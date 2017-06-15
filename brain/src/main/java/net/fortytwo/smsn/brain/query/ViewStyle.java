@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.query;
 
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -118,8 +118,8 @@ public interface ViewStyle {
                                                 final Filter filter) {
                     List<Atom> results = new LinkedList<>();
                     root.forFirstOf(list -> {
-                        EntityList<Atom> cur = list;
-                        EntityList<Atom> prev = null;
+                        ListNode<Atom> cur = list;
+                        ListNode<Atom> prev = null;
                         while (null != cur) {
                             prev = cur;
                             cur = cur.getRestOf();

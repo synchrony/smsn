@@ -5,7 +5,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.rdf.classes.*;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
 import net.fortytwo.smsn.brain.rdf.classes.collections.*;
@@ -371,7 +371,7 @@ public class KnowledgeBase {
                 int outScore = 0;
 
                 if (null != clazz.memberRegex) {
-                    EntityList<Atom> cur = subject.getChildren();
+                    ListNode<Atom> cur = subject.getChildren();
                     Atom first = null;
                     int eli = 0;
                     AtomRegex.El el = null;
@@ -591,9 +591,9 @@ public class KnowledgeBase {
         }
         indent++;
         if (indent < 2) {
-            EntityList<Atom> notes = a.getChildren();
+            ListNode<Atom> notes = a.getChildren();
             if (null != notes) {
-                EntityList<Atom> cur = notes;
+                ListNode<Atom> cur = notes;
                 while (null != cur) {
                     viewInferredInternal(cur.getFirst(), indent);
                     cur = cur.getRest();

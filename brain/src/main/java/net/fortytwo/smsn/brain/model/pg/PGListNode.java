@@ -1,19 +1,19 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Entity;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.Node;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.function.Function;
 
-public abstract class PGEntityList<T extends Entity> extends PGEntity implements EntityList<T> {
+public abstract class PGListNode<T extends Node> extends PGEntity implements ListNode<T> {
 
     private final Function<Vertex, T> constructor;
 
-    public PGEntityList(final Vertex vertex,
-                        final Function<Vertex, T> constructor) {
+    public PGListNode(final Vertex vertex,
+                      final Function<Vertex, T> constructor) {
         super(vertex);
         this.constructor = constructor;
     }
@@ -29,18 +29,18 @@ public abstract class PGEntityList<T extends Entity> extends PGEntity implements
     }
 
     @Override
-    public EntityList<T> getRest() {
+    public ListNode<T> getRest() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.REST, Direction.OUT,
                 vertex -> getGraph().asEntityList(vertex, constructor));
     }
 
     @Override
-    public boolean setRest(EntityList<T> rest) {
+    public boolean setRest(ListNode<T> rest) {
         return setOptionalEntity(SemanticSynchrony.EdgeLabels.REST, rest);
     }
 
     @Override
-    public EntityList<T> getRestOf() {
+    public ListNode<T> getRestOf() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.REST, Direction.IN,
                 vertex -> getGraph().asEntityList(vertex, constructor));
     }
@@ -61,7 +61,7 @@ public abstract class PGEntityList<T extends Entity> extends PGEntity implements
         getFirst().destroy();
 
         // the head of a list has exclusive ownership of the tail
-        EntityList<T> rest = getRest();
+        ListNode<T> rest = getRest();
         if (null != rest) {
             rest.destroy();
         }

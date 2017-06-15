@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 import net.fortytwo.smsn.brain.util.ListDiff;
 import org.parboiled.common.Preconditions;
@@ -338,8 +338,8 @@ public class TreeViews {
         updateChildren(rootNote, rootAtom, height, filter, style, cache);
     }
 
-    public static <T> int indexOfNthVisible(final EntityList<T> list, final int position, final Predicate<T> filter) {
-        EntityList<T> cur = list;
+    public static <T> int indexOfNthVisible(final ListNode<T> list, final int position, final Predicate<T> filter) {
+        ListNode<T> cur = list;
 
         int index = 0, count = 0;
         while (null != cur) {
@@ -617,8 +617,8 @@ public class TreeViews {
 
     // TODO: switch to a true linked-list model so that we won't have to create temporary collections for iteration
     // TODO: see also BrainGraph.toList
-    public static Iterable<Atom> toFilteredIterable(final EntityList<Atom> list, final Filter filter) {
-        EntityList<Atom> cur = list;
+    public static Iterable<Atom> toFilteredIterable(final ListNode<Atom> list, final Filter filter) {
+        ListNode<Atom> cur = list;
         List<Atom> javaList = new LinkedList<>();
         while (null != cur) {
             if (filter.test(cur.getFirst())) {

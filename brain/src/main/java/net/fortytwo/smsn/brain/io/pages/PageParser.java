@@ -6,12 +6,12 @@ import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.ListDTO;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeDTO;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -29,7 +29,7 @@ public class PageParser {
     private enum State {Properties, Content, Text}
 
     private Page page;
-    private Stack<Stack<EntityTree<Link>>> nodeHierarchy = new Stack<>();
+    private Stack<Stack<TreeNode<Link>>> nodeHierarchy = new Stack<>();
     private Stack<Integer> indentHierarachy = new Stack<>();
 
     private int lineNumber;
@@ -65,7 +65,7 @@ public class PageParser {
         page = new PageDTO();
         page.setSource(source);
         nodeHierarchy.push(new Stack<>());
-        EntityTree<Link> root = constructTreeNode(topicId, Role.Noun, label);
+        TreeNode<Link> root = constructTreeNode(topicId, Role.Noun, label);
         page.setContent(root);
         nodeHierarchy.peek().push(root);
     }
@@ -154,8 +154,8 @@ public class PageParser {
     private void adjustHierarchy(final int indentLevel) {
         while (indentLevel < indentHierarachy.peek()) {
             indentHierarachy.pop();
-            Stack<EntityTree<Link>> siblings = nodeHierarchy.pop();
-            EntityTree<Link> parent = nodeHierarchy.peek().peek();
+            Stack<TreeNode<Link>> siblings = nodeHierarchy.pop();
+            TreeNode<Link> parent = nodeHierarchy.peek().peek();
             addChildren(parent, siblings);
         }
 
@@ -165,20 +165,20 @@ public class PageParser {
         }
     }
 
-    private void addToHierarchy(final EntityTree<Link> tree) {
+    private void addToHierarchy(final TreeNode<Link> tree) {
         adjustHierarchy(findIndentLevel());
 
         nodeHierarchy.peek().push(tree);
     }
 
-    private void addChildren(final EntityTree<Link> parent, Stack<EntityTree<Link>> children) {
+    private void addChildren(final TreeNode<Link> parent, Stack<TreeNode<Link>> children) {
         if (children.isEmpty()) {
             return;
         }
 
-        EntityList<EntityTree<Link>> cur = null;
+        ListNode<TreeNode<Link>> cur = null;
         while (!children.isEmpty()) {
-            cur = new ListDTO<>(children.pop(), cur);
+            cur = new ListNodeDTO<>(children.pop(), cur);
         }
         parent.setChildren(cur);
     }
@@ -265,7 +265,7 @@ public class PageParser {
             label = rest;
         }
 
-        EntityTree<Link> tree = constructTreeNode(id, roleForBullet(bullet), label);
+        TreeNode<Link> tree = constructTreeNode(id, roleForBullet(bullet), label);
         addToHierarchy(tree);
     }
 
@@ -298,7 +298,7 @@ public class PageParser {
                 : Role.Noun;
     }
 
-    private EntityTree<Link> constructTreeNode(final String topicId, final Role role, final String label)
+    private TreeNode<Link> constructTreeNode(final String topicId, final Role role, final String label)
             throws IOException {
         Link link = new LinkDTO();
         link.setRole(role);
@@ -311,7 +311,7 @@ public class PageParser {
 
         validateLink(link);
 
-        EntityTree<Link> treeNode = new TreeDTO<>();
+        TreeNode<Link> treeNode = new TreeNodeDTO<>();
         treeNode.setValue(link);
         return treeNode;
     }

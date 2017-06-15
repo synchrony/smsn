@@ -7,7 +7,7 @@ import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.config.DataSource;
 import org.parboiled.common.Preconditions;
 
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -119,7 +118,7 @@ public class VCSReader extends BrainReader {
         }
 
         private void updateAtomChildren() {
-            Optional<EntityList<Atom>> newChildren = createAtomList();
+            Optional<ListNode<Atom>> newChildren = createAtomList();
             if (newChildren.isPresent()) {
                 atom.setChildren(newChildren.get());
             }
@@ -135,7 +134,7 @@ public class VCSReader extends BrainReader {
             }
         }
 
-        private Optional<EntityList<Atom>> createAtomList() {
+        private Optional<ListNode<Atom>> createAtomList() {
             if (0 == note.getChildren().size()) return Optional.empty();
 
             Atom[] atoms = new Atom[note.getChildren().size()];

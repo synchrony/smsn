@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.dto.ListDTO;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import org.junit.Test;
 
@@ -57,11 +57,11 @@ public class FilterIndexTest {
     }
 
     private int indexFor(final int position, final Integer[] array) {
-        EntityList<Integer> list = toEntityList(array);
+        ListNode<Integer> list = toEntityList(array);
         return TreeViews.indexOfNthVisible(list, position, filter);
     }
 
-    private EntityList<Integer> toEntityList(final Integer[] array) {
-        return ListDTO.fromArray(array);
+    private ListNode<Integer> toEntityList(final Integer[] array) {
+        return ListNodeDTO.fromArray(array);
     }
 }

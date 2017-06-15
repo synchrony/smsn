@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.entities.Atom;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.Note;
 
 import java.io.File;
@@ -93,7 +93,7 @@ public class VCSWriter extends BrainWriter {
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
         Note note = toNote(atom, true);
-        EntityList<Atom> list = atom.getChildren();
+        ListNode<Atom> list = atom.getChildren();
         while (null != list) {
             note.getChildren().add(toNote(list.getFirst(), false));
             list = list.getRest();

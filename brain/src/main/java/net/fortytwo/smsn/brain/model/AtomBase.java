@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -99,16 +99,16 @@ public class AtomBase implements Atom {
     }
 
     @Override
-    public EntityList<Atom> getChildren() {
+    public ListNode<Atom> getChildren() {
         return null;
     }
 
     @Override
-    public void setChildren(EntityList<Atom> notes) {
+    public void setChildren(ListNode<Atom> notes) {
     }
 
     @Override
-    public void forFirstOf(Consumer<EntityList<Atom>> consumer) {
+    public void forFirstOf(Consumer<ListNode<Atom>> consumer) {
     }
 
     @Override
@@ -120,12 +120,12 @@ public class AtomBase implements Atom {
     }
 
     @Override
-    public Collection<EntityList<Atom>> getFirstOf() {
+    public Collection<ListNode<Atom>> getFirstOf() {
         return null;
     }
 
     @Override
-    public Atom getSubject(EntityList<Atom> notes) {
+    public Atom getSubject(ListNode<Atom> notes) {
         return null;
     }
 

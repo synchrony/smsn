@@ -3,8 +3,8 @@ package net.fortytwo.smsn.brain.io.pages;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 
@@ -34,7 +34,7 @@ public class PagePrinter {
         }
     }
 
-    private void printInternal(final EntityTree<Link> tree,
+    private void printInternal(final TreeNode<Link> tree,
                                final int indent,
                                final PrintStream ps) {
         indent(indent);
@@ -45,20 +45,20 @@ public class PagePrinter {
 
         int nextIndent = indent + 1;
 
-        EntityList<EntityTree<Link>> cur = tree.getChildren();
+        ListNode<TreeNode<Link>> cur = tree.getChildren();
         while (null != cur) {
             printInternal(cur.getFirst(), nextIndent, ps);
             cur = cur.getRest();
         }
     }
 
-    private void printTitle(final EntityTree<Link> tree) {
+    private void printTitle(final TreeNode<Link> tree) {
         if (null != tree.getValue().getLabel()) {
             printStream.print(escapeValue(tree.getValue().getLabel()));
         }
     }
 
-    private void printId(final EntityTree<Link> tree) {
+    private void printId(final TreeNode<Link> tree) {
         if (null != tree.getValue().getTarget()) {
             printStream.print(":");
             printStream.print(tree.getValue().getTarget().getId());
@@ -66,7 +66,7 @@ public class PagePrinter {
         }
     }
 
-    private void printBullet(final EntityTree<Link> tree) {
+    private void printBullet(final TreeNode<Link> tree) {
         Role role = tree.getValue().getRole();
         switch (role) {
             case Noun:
@@ -82,7 +82,7 @@ public class PagePrinter {
     }
 
     private void printContent(final Page page) {
-        EntityTree<Link> content = page.getContent();
+        TreeNode<Link> content = page.getContent();
         if (null != content) {
             printInternal(content, 0, printStream);
         }

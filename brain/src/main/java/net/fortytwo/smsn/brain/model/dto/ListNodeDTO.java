@@ -1,13 +1,12 @@
 package net.fortytwo.smsn.brain.model.dto;
 
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 
-public class ListDTO<T> implements EntityList<T> {
+public class ListNodeDTO<T> implements ListNode<T> {
     private T first;
-    private EntityList<T> rest;
+    private ListNode<T> rest;
 
-    public ListDTO(final T first, final EntityList<T> rest) {
+    public ListNodeDTO(final T first, final ListNode<T> rest) {
         this.first = first;
         this.rest = rest;
     }
@@ -29,18 +28,18 @@ public class ListDTO<T> implements EntityList<T> {
     }
 
     @Override
-    public EntityList<T> getRest() {
+    public ListNode<T> getRest() {
         return rest;
     }
 
     @Override
-    public boolean setRest(EntityList<T> rest) {
+    public boolean setRest(ListNode<T> rest) {
         this.rest = rest;
         return false;
     }
 
     @Override
-    public EntityList<T> getRestOf() {
+    public ListNode<T> getRestOf() {
         throw new UnsupportedOperationException();
     }
 
@@ -54,10 +53,10 @@ public class ListDTO<T> implements EntityList<T> {
         return 0 == index ? first : rest.get(index - 1);
     }
 
-    public static <T> EntityList<T> fromArray(final T... elements) {
-        EntityList<T> list = null;
+    public static <T> ListNode<T> fromArray(final T... elements) {
+        ListNode<T> list = null;
         for (int i = elements.length - 1; i >= 0; i--) {
-            list = new ListDTO<>(elements[i], list);
+            list = new ListNodeDTO<>(elements[i], list);
         }
         return list;
     }

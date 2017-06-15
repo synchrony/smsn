@@ -3,9 +3,9 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.AtomBase;
-import net.fortytwo.smsn.brain.model.dto.ListDTO;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -48,7 +48,7 @@ public class SmSnCommit extends AtomBase {
     }
 
     @Override
-    public EntityList<Atom> getChildren() {
+    public ListNode<Atom> getChildren() {
         Optional<RevCommit> parent = getParent(commit);
         if (!parent.isPresent()) return null;
 
@@ -77,10 +77,10 @@ public class SmSnCommit extends AtomBase {
         return 0 == parents.length ? Optional.empty() : Optional.of(parents[0]);
     }
 
-    private EntityList<Atom> getDiffs(final RevCommit oldCommit, final RevCommit newCommit)
+    private ListNode<Atom> getDiffs(final RevCommit oldCommit, final RevCommit newCommit)
             throws IOException, GitAPIException {
         Git git = repository.getGit();
-        EntityList<Atom> list = null, cur = null;
+        ListNode<Atom> list = null, cur = null;
 
         ObjectReader reader = git.getRepository().newObjectReader();
         CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
@@ -111,8 +111,8 @@ public class SmSnCommit extends AtomBase {
         return list;
     }
 
-    private EntityList<Atom> creatList(final Atom first, final EntityList<Atom> rest) {
-        return new ListDTO<>(first, rest);
+    private ListNode<Atom> creatList(final Atom first, final ListNode<Atom> rest) {
+        return new ListNodeDTO<>(first, rest);
     }
 
     private Atom changedAtom(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {

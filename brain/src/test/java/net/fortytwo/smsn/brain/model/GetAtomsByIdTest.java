@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class GetAtomsByIdTest extends BrainTestBase {
         nyx.setTitle("Nyx");
         Atom erebus = topicGraph.createAtomWithProperties(filter, null);
         erebus.setTitle("Erebus");
-        EntityList<Atom> children = topicGraph.createListOfAtoms(tartarus, gaia, eros, nyx, erebus);
+        ListNode<Atom> children = topicGraph.createListOfAtoms(tartarus, gaia, eros, nyx, erebus);
         chaos.setChildren(children);
 
         //System.out.println(chaos.getId());

@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.model.entities;
 
-public interface Topic extends Entity {
+public interface Topic extends Node {
 
     String getId();
 

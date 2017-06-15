@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.config.DataSource;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -54,8 +54,8 @@ public class VCSReaderTest extends BrainTestBase {
     }
 
     private long countChildren(final Atom a) {
-        EntityList<Atom> children = a.getChildren();
-        return null == children ? 0 : EntityList.toJavaList(children).size();
+        ListNode<Atom> children = a.getChildren();
+        return null == children ? 0 : ListNode.toJavaList(children).size();
     }
 
     private File createTestDirectory() throws IOException {

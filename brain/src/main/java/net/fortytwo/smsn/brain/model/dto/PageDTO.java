@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.model.dto;
 
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 
@@ -13,7 +13,7 @@ public class PageDTO implements Page {
     private Float weight;
     private Float priority;
 
-    private EntityTree<Link> content;
+    private TreeNode<Link> content;
 
     @Override
     public void destroy() {
@@ -61,12 +61,12 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public EntityTree<Link> getContent() {
+    public TreeNode<Link> getContent() {
         return content;
     }
 
     @Override
-    public void setContent(EntityTree<Link> tree) {
+    public void setContent(TreeNode<Link> tree) {
         content = tree;
     }
 

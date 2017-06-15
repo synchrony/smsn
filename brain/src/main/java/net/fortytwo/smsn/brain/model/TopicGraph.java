@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -36,18 +36,18 @@ public interface TopicGraph {
 
     Link createLink(Topic target, String label, Role role);
 
-    EntityTree<Link> createTopicTree(Link link);
+    TreeNode<Link> createTopicTree(Link link);
 
     Atom createAtom(String id);
 
     Atom createAtomWithProperties(Filter filter, String id);
 
-    EntityList<Link> createListOfLinks(Link... elements);
+    ListNode<Link> createListOfLinks(Link... elements);
 
-    EntityList<EntityTree<Link>> createListOfTrees(
-            EntityTree<Link>... elements);
+    ListNode<TreeNode<Link>> createListOfTrees(
+            TreeNode<Link>... elements);
 
-    EntityList<Atom> createListOfAtoms(Atom... elements);
+    ListNode<Atom> createListOfAtoms(Atom... elements);
 
     void removeIsolatedAtoms(Filter filter);
 

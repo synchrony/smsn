@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import org.junit.Before;
@@ -96,11 +96,11 @@ public class PageParserTest extends BrainTestBase {
         assertEquals(Role.Noun, page.getContent().getValue().getRole());
         assertEquals(Role.Noun, page.getContent().getChildren().get(0).getValue().getRole());
 
-        EntityTree<Link> header = page.getContent().getChildren().get(5);
+        TreeNode<Link> header = page.getContent().getChildren().get(5);
         assertEquals(Role.Verb, header.getValue().getRole());
         assertEquals(Role.Noun, header.getChildren().get(0).getValue().getRole());
 
-        EntityTree<Link> subHeader = header.getChildren().get(3);
+        TreeNode<Link> subHeader = header.getChildren().get(3);
         assertEquals(Role.Verb, subHeader.getValue().getRole());
         assertEquals("gzScm", subHeader.getValue().getTarget().getId());
         assertEquals("additional comments", subHeader.getValue().getLabel());
@@ -112,7 +112,7 @@ public class PageParserTest extends BrainTestBase {
     public void testEmptyLinesAreIgnored() throws Exception {
         Page page = getExample();
 
-        EntityTree<Link> whitespaceNode = page.getContent().getChildren().get(2);
+        TreeNode<Link> whitespaceNode = page.getContent().getChildren().get(2);
         assertEquals("white space", whitespaceNode.getValue().getLabel());
         assertEquals(4, whitespaceNode.getChildren().length());
         assertEquals("blank lines don't matter", whitespaceNode.getChildren().get(3).getValue().getLabel());
@@ -122,7 +122,7 @@ public class PageParserTest extends BrainTestBase {
     public void testWhitespaceIsTrimmed() throws Exception {
         Page page = getExample();
 
-        EntityTree<Link> whitespaceNode = page.getContent().getChildren().get(2);
+        TreeNode<Link> whitespaceNode = page.getContent().getChildren().get(2);
         assertEquals("white space", whitespaceNode.getValue().getLabel());
         assertEquals("leading and/or trailing whitespace is trimmed",
                 whitespaceNode.getChildren().get(2).getValue().getLabel());
@@ -228,11 +228,11 @@ public class PageParserTest extends BrainTestBase {
     public void singleCharacterBulletsAreInterchangeable() throws Exception {
         Page page = getExample();
 
-        EntityTree<Link> tree = page.getContent().getChildren().get(4);
+        TreeNode<Link> tree = page.getContent().getChildren().get(4);
         assertEquals("ordinary bullets", tree.getValue().getLabel());
         assertEquals(5, tree.getChildren().length());
         for (int i = 0; i < tree.getChildren().length(); i++) {
-            EntityTree<Link> child = tree.getChildren().get(i);
+            TreeNode<Link> child = tree.getChildren().get(i);
             assertEquals(Role.Noun, child.getValue().getRole());
         }
     }
@@ -241,7 +241,7 @@ public class PageParserTest extends BrainTestBase {
     public void indentationIsRespected() throws Exception {
         Page page = getExample();
 
-        EntityTree<Link> indentation = page.getContent().getChildren().get(1);
+        TreeNode<Link> indentation = page.getContent().getChildren().get(1);
         assertNull(indentation.getValue().getTarget());
         assertEquals("indentation", indentation.getValue().getLabel());
         assertEquals("and this", indentation.getChildren()
@@ -255,7 +255,7 @@ public class PageParserTest extends BrainTestBase {
     public void idsAreParsedCorrectly() throws Exception {
         Page page = getExample();
 
-        EntityTree<Link> ids = page.getContent().getChildren().get(3);
+        TreeNode<Link> ids = page.getContent().getChildren().get(3);
         assertEquals("ids", ids.getValue().getLabel());
         assertEquals("0txXBm", ids.getChildren().get(0).getValue().getTarget().getId());
         assertEquals("cE85nD", ids.getChildren().get(1).getValue().getTarget().getId());

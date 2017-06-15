@@ -1,12 +1,12 @@
 package net.fortytwo.smsn.brain.model.dto;
 
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 
-public class TreeDTO<T> implements EntityTree<T> {
+public class TreeNodeDTO<T> implements TreeNode<T> {
 
     private T value;
-    private EntityList<EntityTree<T>> children;
+    private ListNode<TreeNode<T>> children;
 
     @Override
     public void destroy() {
@@ -24,20 +24,20 @@ public class TreeDTO<T> implements EntityTree<T> {
     }
 
     @Override
-    public EntityList<EntityTree<T>> getChildren() {
+    public ListNode<TreeNode<T>> getChildren() {
         return children;
     }
 
     @Override
-    public void setChildren(EntityList<EntityTree<T>> children) {
+    public void setChildren(ListNode<TreeNode<T>> children) {
         this.children = children;
     }
 
-    static <T> void appendChild(EntityTree<T> tree, EntityTree<T> child) {
-        EntityList<EntityTree<T>> toInsert = new ListDTO<>(child, null);
+    static <T> void appendChild(TreeNode<T> tree, TreeNode<T> child) {
+        ListNode<TreeNode<T>> toInsert = new ListNodeDTO<>(child, null);
 
-        EntityList<EntityTree<T>> cur = tree.getChildren();
-        EntityList<EntityTree<T>> prev = null;
+        ListNode<TreeNode<T>> cur = tree.getChildren();
+        ListNode<TreeNode<T>> prev = null;
         while (null != cur) {
             prev = cur;
             cur = cur.getRest();

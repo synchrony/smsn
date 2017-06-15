@@ -1,20 +1,20 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Entity;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.EntityTree;
+import net.fortytwo.smsn.brain.model.entities.Node;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.function.Function;
 
-public abstract class PGTree<T extends Entity> extends PGEntity implements EntityTree<T> {
+public abstract class PGTreeNode<T extends Node> extends PGEntity implements TreeNode<T> {
 
     private final Function<Vertex, T> constructor;
 
-    public PGTree(Vertex vertex,
-                  Function<Vertex, T> constructor) {
+    public PGTreeNode(Vertex vertex,
+                      Function<Vertex, T> constructor) {
         super(vertex);
         this.constructor = constructor;
     }
@@ -30,14 +30,14 @@ public abstract class PGTree<T extends Entity> extends PGEntity implements Entit
     }
 
     @Override
-    public EntityList<EntityTree<T>> getChildren() {
+    public ListNode<TreeNode<T>> getChildren() {
         return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.CHILDREN, Direction.OUT,
                 v -> getGraph().asEntityList(v,
                         vertex -> getGraph().asEntityTree(vertex, constructor)));
     }
 
     @Override
-    public void setChildren(EntityList<EntityTree<T>> children) {
+    public void setChildren(ListNode<TreeNode<T>> children) {
         setOptionalEntity(SemanticSynchrony.EdgeLabels.CHILDREN, children);
     }
 
@@ -50,7 +50,7 @@ public abstract class PGTree<T extends Entity> extends PGEntity implements Entit
         }
 
         // a tree owns its children
-        EntityList<EntityTree<T>> children = getChildren();
+        ListNode<TreeNode<T>> children = getChildren();
         if (null != children) {
             children.destroy();
         }
