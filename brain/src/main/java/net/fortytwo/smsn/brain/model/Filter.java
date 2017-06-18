@@ -66,7 +66,7 @@ public class Filter implements Predicate<Atom>, Serializable {
 
     private static int indexForSource(final String source) {
         Integer index = sourceToIndex.get(source);
-        Preconditions.checkNotNull(index);
+        Preconditions.checkNotNull(index, "data source '" + source + "' does not exist");
         return index;
     }
 
