@@ -129,6 +129,6 @@ public class Filter implements Predicate<Atom>, Serializable {
 
     private Integer getSourceIndexFor(final Atom atom) {
         String source = atom.getSource();
-        return null == source ? null : sourceToIndex.get(source);
+        return null == source ? null : indexForSource(source);
     }
 }

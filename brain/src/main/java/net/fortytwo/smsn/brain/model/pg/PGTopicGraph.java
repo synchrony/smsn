@@ -322,17 +322,17 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public List<Atom> getAtomsByTitleQuery(final String query, final Filter filter) {
-        return filterAndSort(wrapper.getVerticesByTitle(query), filter);
+        return filterAndSort(wrapper.getVerticesByTitle(query), filter, query);
     }
 
     @Override
-    public List<Atom> getAtomsByAcronym(final String acronym, final Filter filter) {
-        return filterAndSort(wrapper.getVerticesByAcronym(acronym.toLowerCase()), filter);
+    public List<Atom> getAtomsByAcronym(final String query, final Filter filter) {
+        return filterAndSort(wrapper.getVerticesByAcronym(query.toLowerCase()), filter, query);
     }
 
     @Override
-    public List<Atom> getAtomsByShortcut(final String shortcut, final Filter filter) {
-        return filterAndSort(wrapper.getVerticesByShortcut(shortcut), filter);
+    public List<Atom> getAtomsByShortcut(final String query, final Filter filter) {
+        return filterAndSort(wrapper.getVerticesByShortcut(query), filter, query);
     }
 
     private boolean isAtomVertex(final Vertex v) {
@@ -365,7 +365,8 @@ public class PGTopicGraph implements TopicGraph {
 
     private List<Atom> filterAndSort(
             final Iterator<Sortable<Vertex, Float>> unranked,
-            final Filter filter) {
+            final Filter filter,
+            final String query) {
 
         List<Sortable<Atom, Float>> ranked = new LinkedList<>();
         while (unranked.hasNext()) {
@@ -373,17 +374,25 @@ public class PGTopicGraph implements TopicGraph {
             Atom a = asAtom(in.getEntity());
             if (!filter.test(a)) continue;
 
-            float nativeScore = in.getScore();
-            float weight = a.getWeight();
-            String value = a.getTitle();
-            float lengthPenalty = Math.min(1.0f, 15.0f / value.length());
-            float score = nativeScore * weight * lengthPenalty;
-            ranked.add(new Sortable<>(a, score));
+            ranked.add(new Sortable<>(a, findScore(in, a, query)));
         }
 
         Collections.sort(ranked);
 
         return ranked.stream().map(Sortable::getEntity).collect(Collectors.toList());
+    }
+
+    private float findScore(final Sortable<Vertex, Float> in, final Atom a, final String query) {
+        float nativeScore = in.getScore();
+        float weight = a.getWeight();
+
+        String title = a.getTitle();
+        float lengthPenalty = Math.min(1.0f, query.length() / title.length());
+
+        Float priority = a.getPriority();
+        float priorityBonus = null == priority ? 1f : 1f + priority;
+
+        return nativeScore * weight * lengthPenalty * priorityBonus;
     }
 
     private PGAtom findOrCopyAtom(final Atom original, final Filter filter, final TopicGraph newGraph) {
