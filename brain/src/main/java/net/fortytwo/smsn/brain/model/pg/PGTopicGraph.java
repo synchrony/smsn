@@ -387,7 +387,7 @@ public class PGTopicGraph implements TopicGraph {
         float weight = a.getWeight();
 
         String title = a.getTitle();
-        float lengthPenalty = Math.min(1.0f, query.length() / title.length());
+        float lengthPenalty = Math.min(1.0f, 1.0f * query.length() / title.length());
 
         Float priority = a.getPriority();
         float priorityBonus = null == priority ? 1f : 1f + priority;
