@@ -57,6 +57,7 @@ public class VCSReaderTest extends BrainTestBase {
         assertEquals(ARTHUR_ID, arthur.getId());
         assertEquals("Arthur Dent", arthur.getTitle());
         assertEquals(DefaultSources.UNIVERSAL, arthur.getSource());
+        assertEquals(1344485170113L, (long) arthur.getCreated());
         assertEquals("He's a jerk.", arthur.getText());
 
         assertEquals(1, countChildren(arthur));

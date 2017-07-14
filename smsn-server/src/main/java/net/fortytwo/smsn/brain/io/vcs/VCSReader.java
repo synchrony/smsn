@@ -77,10 +77,6 @@ public class VCSReader extends BrainReader {
         try (InputStream in = new FileInputStream(file)) {
             page = reader.parse(in);
             String rootId = idFromFileName(file);
-            //TopicDTO topic = new TopicDTO();
-            //topic.setId(rootId);
-            //Topic target = page.getContent().getValue().getTarget();
-            //String rootId = target.getId();
             Atom root = helper.resolveAtomReference(rootId);
 
             for (TreeNode<Link> note : TreeViews.getChildrenAsList(page.getContent())) {
@@ -119,6 +115,7 @@ public class VCSReader extends BrainReader {
         }
 
         private void updateAtomProperties() {
+            updatePageProperty(atom, page, p -> page.getCreated(), Atom::setCreated);
             updatePageProperty(atom, page, p -> page.getText(), Atom::setText);
             updatePageProperty(atom, page, p -> page.getAlias(), Atom::setAlias);
             updatePageProperty(atom, page, p -> page.getPriority(), Atom::setPriority);

@@ -95,27 +95,6 @@ public class VCSWriterTest extends BrainTestBase {
         Atom random = ad.getChildren().getFirst();
         assertEquals("Ford Prefect", random.getTitle());
 
-        /*
-        page = PageDTO.createTransitional();
-        page.setSource(source);
-
-        Atom arthurAtom = createAtom(ARTHUR_ID, "Arthur Dent");
-        arthurAtom.setSource(source);
-
-
-        tree = createNode(ARTHUR_ID, "Arthur Dent");
-        tree.getValue().setPage(page);
-        tree.addChild(fordTree);
-        tree.addChild(zaphodTree);
-        page.setText("He's a jerk.");
-        queries.update(tree, Integer.MAX_VALUE, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
-
-        Atom a = topicGraph.getAtomById(tree.getValue().getTarget().getId()).get();
-        assertNotNull(a);
-        assertEquals(2, ListNode.toJavaList(a.getChildren()).size());
-        assertEquals(DefaultSources.PUBLIC, a.getSource());
-        */
-
         File dir = doExport();
         assertEquals(4, dir.listFiles().length);
         File publicDir = new File(dir, "public");
