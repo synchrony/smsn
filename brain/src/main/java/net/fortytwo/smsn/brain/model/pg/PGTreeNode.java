@@ -55,4 +55,48 @@ public abstract class PGTreeNode<T extends Node> extends PGEntity implements Tre
             children.destroy();
         }
     }
+
+    // TODO: use of addChild is currently inefficient.  Use stack rather than queue semantics.
+    @Override
+    public void addChild(TreeNode<T> child) {
+        appendChild(this, child);
+    }
+
+    @Override
+    public int getNumberOfChildren() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setNumberOfChildren(int numberOfChildren) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getNumberOfParents() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setNumberOfParents(int numberOfParents) {
+        throw new UnsupportedOperationException();
+    }
+
+    private void appendChild(TreeNode<T> tree, TreeNode<T> child) {
+        ListNode<TreeNode<T>> toInsert = getGraph().createListNode(child, null,
+                vertex -> getGraph().asEntityTree(vertex, constructor));
+
+        ListNode<TreeNode<T>> cur = tree.getChildren();
+        ListNode<TreeNode<T>> prev = null;
+        while (null != cur) {
+            prev = cur;
+            cur = cur.getRest();
+        }
+
+        if (null == prev) {
+            tree.setChildren(toInsert);
+        } else {
+            prev.setRest(toInsert);
+        }
+    }
 }

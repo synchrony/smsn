@@ -44,6 +44,16 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
+    public Long getCreated() {
+        return getRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED);
+    }
+
+    @Override
+    public void setCreated(Long created) {
+        setRequiredEntity(SemanticSynchrony.PropertyKeys.CREATED, created);
+    }
+
+    @Override
     public String getSource() {
         return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
     }

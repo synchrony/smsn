@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
 public class GetAtomsByAcronymTest extends BrainTestBase {
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
 
     @Test

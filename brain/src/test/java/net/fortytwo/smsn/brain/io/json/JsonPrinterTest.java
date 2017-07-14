@@ -2,7 +2,10 @@ package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -17,18 +20,18 @@ public class JsonPrinterTest {
 
     @Before
     public void setUp() {
-        wikiParser = new WikiParser();
+        wikiParser =  new WikiParser();
         jsonPrinter = new JsonPrinter();
     }
 
     @Test
     public void jsonOutputIsNormal() throws Exception {
-        Note note = wikiParser.parse("" +
+        TreeNode<Link> tree = wikiParser.parse("" +
                 "* foo\n" +
                 "   * bar\n" +
-                "   * quux\n");
+                "   * quux\n").getContent();
 
-        JSONObject j = jsonPrinter.toJson(note);
+        JSONObject j = jsonPrinter.toJson(tree);
 
         assertEquals(0, j.getInt(JsonFormat.Keys.NUMBER_OF_CHILDREN));
         assertEquals(0, j.getInt(JsonFormat.Keys.NUMBER_OF_PARENTS));
@@ -57,8 +60,8 @@ public class JsonPrinterTest {
 
     @Test
     public void longValuesAreTruncated() throws Exception {
-        Note n = wikiParser.parse("" +
-                "* this is a long line (well, not really)\n");
+        TreeNode<Link> n = wikiParser.parse("" +
+                "* this is a long line (well, not really)\n").getContent();
 
         int before = jsonPrinter.getTitleLengthCutoff();
         try {
@@ -75,8 +78,8 @@ public class JsonPrinterTest {
 
     @Test
     public void noTextGivesNoTextAttribute() throws Exception {
-        Note n = new Note();
-        n.setTitle("Arthur Dent");
+        TreeNode<Link> n = TreeNodeDTO.createEmptyNode();
+        TreeViews.setTitle(n, "Arthur Dent");
 
         JSONObject j = jsonPrinter.toJson(n);
         assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));
@@ -85,9 +88,9 @@ public class JsonPrinterTest {
 
     @Test
     public void textGivesTextAttribute() throws Exception {
-        Note n = new Note();
-        n.setTitle("Arthur Dent");
-        n.setText("12345");
+        TreeNode<Link> n = TreeNodeDTO.createEmptyNode();
+        TreeViews.setTitle(n, "Arthur Dent");
+        TreeViews.setText(n, "12345");
 
         JSONObject j = jsonPrinter.toJson(n);
         assertEquals("Arthur Dent", j.getString(SemanticSynchrony.PropertyKeys.TITLE));

@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Node;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Node;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
@@ -24,8 +24,8 @@ public abstract class PGListNode<T extends Node> extends PGEntity implements Lis
     }
 
     @Override
-    public boolean setFirst(T first) {
-        return setRequiredEntity(SemanticSynchrony.EdgeLabels.FIRST, first);
+    public void setFirst(T first) {
+        setRequiredEntity(SemanticSynchrony.EdgeLabels.FIRST, first);
     }
 
     @Override
@@ -35,8 +35,8 @@ public abstract class PGListNode<T extends Node> extends PGEntity implements Lis
     }
 
     @Override
-    public boolean setRest(ListNode<T> rest) {
-        return setOptionalEntity(SemanticSynchrony.EdgeLabels.REST, rest);
+    public void setRest(ListNode<T> rest) {
+        setOptionalEntity(SemanticSynchrony.EdgeLabels.REST, rest);
     }
 
     @Override
@@ -52,7 +52,18 @@ public abstract class PGListNode<T extends Node> extends PGEntity implements Lis
 
     @Override
     public T get(final int index) {
-        return 0 == index ? getFirst() : getRest().get(index - 1);
+        return ListNode.get(this, index);
+    }
+
+    @Override
+    public ListNode<T> add(int index, T toAdd) {
+        return ListNode.add(this, index, toAdd,
+                (t, tListNode) -> getGraph().createListNode(t, tListNode, constructor));
+    }
+
+    @Override
+    public ListNode<T> remove(int index) {
+        return ListNode.remove(this, index);
     }
 
     @Override

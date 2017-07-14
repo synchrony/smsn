@@ -1,188 +1,95 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.BrainParser;
+import net.fortytwo.smsn.brain.io.PageParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.Property;
+import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.dto.LinkDTO;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
+import net.fortytwo.smsn.brain.model.dto.PageDTO;
+import net.fortytwo.smsn.brain.model.dto.TopicDTO;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
+import java.util.Stack;
 import java.util.regex.Matcher;
 
-public class WikiParser extends BrainParser {
+public class WikiParser extends PageParser {
 
-    private Note root;
-    private LinkedList<Note> hierarchy;
-    private LinkedList<Integer> indentHierarachy;
-    private boolean useCanonicalFormat;
+    private enum State {Properties, Content, Text}
+
+    private Page page;
+    private final Stack<Stack<TreeNode<Link>>> nodeHierarchy = new Stack<>();
+    private final Stack<Integer> indentHierarachy = new Stack<>();
 
     private int lineNumber;
-    private String currentValue;
+    private String currentText;
     private String currentLine;
-    private boolean currentLineIsProperty;
-    private int currentIndentLevel;
-    private String currentId;
-    private String currentBullet;
-    private boolean currentLineIsInPage;
-
-    public void setUseCanonicalFormat(boolean useCanonicalFormat) {
-        this.useCanonicalFormat = useCanonicalFormat;
-    }
+    private String currentLineTrimmed;
+    private State currentState;
 
     @Override
-    public Note parse(final InputStream inputStream) throws IOException {
-        reset();
-        BufferedReader bufferedReader = createReader(inputStream);
+    public Page parse(final InputStream inputStream) throws IOException {
+        return parseInternal(inputStream);
+    }
 
-        while ((currentLine = bufferedReader.readLine()) != null) {
+    private Page parseInternal(final InputStream inputStream)
+            throws IOException {
+        reset();
+
+        BufferedReader br = createReader(inputStream);
+        while ((currentLine = br.readLine()) != null) {
             parseLine();
         }
 
-        if (currentLineIsInPage && !isEmptyPage(currentValue)) {
-            root.getChildren().get(0).setText(currentValue);
+        finishText();
+
+        adjustHierarchy(-1);
+
+        return page;
+    }
+
+    private Page createPage() {
+        // TODO: supply id externally
+        Topic topic = new TopicDTO();
+        topic.setId(null);
+        Link link = new LinkDTO();
+        link.setRole(Role.Noun);
+        // TODO: set label externally
+        link.setLabel(null);
+        link.setTarget(topic);
+        TreeNode<Link> content = new TreeNodeDTO<>();
+        content.setValue(link);
+
+        Page page = new PageDTO();
+        page.setContent(content);
+        // TODO: set source externally
+
+        return page;
+    }
+
+    private Page copyPage() {
+        Page copy = new PageDTO();
+
+        for (Property prop : Page.propertiesByKey.values()) {
+            prop.getSetter().accept(copy, prop.getGetter().apply(page));
         }
 
-        return root;
+        return copy;
     }
 
-    private boolean isEmptyPage(final String page) {
-        return page.trim().length() == 0;
-    }
-
-    private BufferedReader createReader(final InputStream in) throws IOException {
-        return new BufferedReader(new InputStreamReader(in, SemanticSynchrony.UTF8));
-    }
-
-    private void reset() {
-        root = new Note();
-        hierarchy = new LinkedList<>();
-        indentHierarachy = new LinkedList<>();
-        lineNumber = 0;
-        currentLineIsInPage = false;
-    }
-
-    private void replaceTabsWithSpaces() {
-        // Tabs count as four spaces each.
-        currentLine = currentLine.replaceAll("[\\t]", WikiFormat.TAB_REPLACEMENT);
-    }
-
-    private void validateLine() throws IOException {
-        if (currentLine.endsWith(JsonFormat.TITLE_TRUNCATOR)) {
-            parseError("line ends with the reserved truncation sequence \"" + JsonFormat.TITLE_TRUNCATOR + "\"");
-        }
-    }
-
-    private void findIndentLevel() {
-        currentIndentLevel = 0;
-        if (currentLine.length() > 0) {
-            while (' ' == currentLine.charAt(currentIndentLevel)) {
-                currentIndentLevel++;
-            }
-            currentLine = currentLine.substring(currentIndentLevel);
-        }
-    }
-
-    private void updateHierarchy() {
-        while (0 < hierarchy.size() && indentHierarachy.getLast() >= currentIndentLevel) {
-            hierarchy.removeLast();
-            indentHierarachy.removeLast();
-        }
-    }
-
-    private boolean lineIsEmpty() {
-        return 0 == currentLine.trim().length();
-    }
-
-    private void checkForEmptyValue() throws IOException {
-        if (0 == currentValue.length()) {
-            if (currentLineIsProperty) {
-                // can "clear" alias or shortcut by writing "@alias" or "@shortcut" and nothing else;
-                // all other properties require an argument
-                if (!(currentBullet.equals("@alias") || currentBullet.equals("@shortcut"))) {
-                    parseError("empty value for property candidate '" + currentBullet + "'");
-                }
-            } else if (null == currentId) {
-                parseError("empty value for new note");
-            } else {
-                // Empty note values are allowed for existing notes.
-                // They signify that an existing note's value should not be overwritten.
-                currentValue = null;
-            }
-        }
-    }
-
-    private void parseError(final String message) throws IOException {
-        throw new IOException("line " + lineNumber + ": " + message);
-    }
-
-    private void parseBulletOrPropertyName() throws IOException {
-        // parse bullet or property name
-        int j = -1;
-        for (int i = 0; i < currentLine.length(); i++) {
-            char c = currentLine.charAt(i);
-            if (' ' == c) {
-                j = i;
-                break;
-            }
-        }
-        if (j < 0) {
-            j = currentLine.length();
-        }
-
-        currentBullet = currentLine.substring(0, j);
-        if (currentBullet.startsWith("@") && currentBullet.length() > 1) {
-            currentLineIsProperty = true;
-        } else {
-            currentLineIsProperty = false;
-
-            if (currentBullet.length() > WikiFormat.MAX_BULLET_LENGTH) {
-                parseError("bullet is too long: " + currentBullet);
-            }
-        }
-
-        // skip white space between bullet and value
-        while (j < currentLine.length() && ' ' == currentLine.charAt(j)) {
-            j++;
-        }
-        currentLine = currentLine.substring(j);
-    }
-
-    private void parseId() {
-        currentId = null;
-        if (!currentLineIsProperty) {
-            Matcher m = WikiFormat.ID_INFIX.matcher(currentLine);
-            if (m.find() && 0 == m.start()) {
-                currentId = currentLine.substring(1, m.end() - 1);
-                currentLine = currentLine.substring(m.end()).trim();
-            }
-        }
-    }
-
-    private void constructNote() throws IOException {
-        checkForEmptyValue();
-
-        if (currentLineIsProperty) {
-            Note n = 0 == hierarchy.size() ? root : hierarchy.get(hierarchy.size() - 1);
-
-            String key = currentBullet.substring(1);
-            parseProperty(n, key, currentValue);
-        } else {
-            Note n = new Note();
-            n.setTitle(currentValue);
-
-            n.setId(currentId);
-
-            if (0 < hierarchy.size()) {
-                hierarchy.get(hierarchy.size() - 1).addChild(n);
-            } else {
-                root.addChild(n);
-            }
-
-            hierarchy.add(n);
-            indentHierarachy.add(currentIndentLevel);
+    private void finishText() {
+        if (State.Text == currentState && !isEmptyText(currentText)) {
+            page.setText(currentText);
         }
     }
 
@@ -191,69 +98,275 @@ public class WikiParser extends BrainParser {
 
         replaceTabsWithSpaces();
 
-        if (currentLineIsInPage) {
-            if (!currentValue.isEmpty()) currentValue += "\n";
-            currentValue += currentLine;
-        } else {
-            if (lineIsEmpty()) {
-                if (useCanonicalFormat) {
-                    currentLineIsInPage = true;
-                    currentValue = "";
+        currentLineTrimmed = currentLine.trim();
+
+        if (currentLineIsEmpty()) {
+            if (State.Text != currentState) {
+                currentState = State.Text;
+                return;
+            }
+        }
+
+        switch (currentState) {
+            case Properties:
+                if (!currentLineIsEmpty()) {
+                    if (currentLineIsProperty()) {
+                        parsePropertyLine(page);
+                        break;
+                    } else {
+                        // note: falls through to "Content" case
+                        currentState = State.Content;
+                    }
                 }
+            case Content:
+                if (!currentLineIsEmpty()) {
+                    validateContentLine();
+                    parseContentLine();
+                }
+                break;
+            case Text:
+                if (!currentText.isEmpty()) currentText += "\n";
+                currentText += currentLine;
+                break;
+        }
+    }
+
+    private boolean isEmptyText(final String page) {
+        return page.trim().length() == 0;
+    }
+
+    private BufferedReader createReader(final InputStream in) throws IOException {
+        return new BufferedReader(new InputStreamReader(in, SemanticSynchrony.UTF8));
+    }
+
+    private void reset() {
+        nodeHierarchy.clear();
+        indentHierarachy.clear();
+        indentHierarachy.push(-1);
+
+        currentState = State.Properties;
+        currentText = "";
+        lineNumber = 0;
+
+        page = createPage();
+        nodeHierarchy.push(new Stack<>());
+        nodeHierarchy.peek().push(page.getContent());
+    }
+
+    private void replaceTabsWithSpaces() {
+        // Tabs count as four spaces each.
+        currentLine = currentLine.replaceAll("[\\t]", WikiFormat.TAB_REPLACEMENT);
+    }
+
+    private void validateContentLine() throws IOException {
+        if (currentLine.endsWith(JsonFormat.TITLE_TRUNCATOR)) {
+            parseError("line ends with the reserved truncation sequence \"" + JsonFormat.TITLE_TRUNCATOR + "\"");
+        }
+    }
+
+    private int findIndentLevel() {
+        int level = 0;
+        if (null != currentLine && currentLine.length() > 0) {
+            while (' ' == currentLine.charAt(level)) {
+                level++;
+            }
+        }
+        return level;
+    }
+
+    private void adjustHierarchy(final int indentLevel) {
+        while (indentLevel < indentHierarachy.peek()) {
+            indentHierarachy.pop();
+            Stack<TreeNode<Link>> siblings = nodeHierarchy.pop();
+            TreeNode<Link> parent = nodeHierarchy.peek().peek();
+            addChildren(parent, siblings);
+        }
+
+        if (indentLevel > indentHierarachy.peek()) {
+            indentHierarachy.push(indentLevel);
+            nodeHierarchy.push(new Stack<>());
+        }
+    }
+
+    private TreeNode<Link> getCurrentNode() {
+        return nodeHierarchy.peek().peek();
+    }
+
+    private void addToHierarchy(final TreeNode<Link> tree) {
+        adjustHierarchy(findIndentLevel());
+
+        nodeHierarchy.peek().push(tree);
+    }
+
+    private void addChildren(final TreeNode<Link> parent, Stack<TreeNode<Link>> children) {
+        if (children.isEmpty()) {
+            return;
+        }
+
+        ListNode<TreeNode<Link>> cur = null;
+        while (!children.isEmpty()) {
+            cur = new ListNodeDTO<>(children.pop(), cur);
+        }
+        parent.setChildren(cur);
+    }
+
+    private boolean currentLineIsEmpty() {
+        return currentLineTrimmed.isEmpty();
+    }
+
+    private boolean currentLineIsProperty() {
+        return currentLineTrimmed.startsWith("@");
+    }
+
+    private boolean currentLineIsTextDelimiter() {
+        return currentLineIsEmpty();
+    }
+
+    private void validateLink(Link link) throws IOException {
+        if (null != link.getLabel() && 0 == link.getLabel().length()) {
+            if (null == link.getTarget()) {
+                parseError("empty label in placeholder link");
             } else {
-                parseStructuredLine();
+                // Empty labels are allowed for existing links.
+                // They signify that an existing link's label should not be overwritten.
+                link.setLabel(null);
             }
         }
     }
 
-    private void parseStructuredLine() throws IOException {
-        findIndentLevel();
-
-        updateHierarchy();
-
-        parseBulletOrPropertyName();
-
-        parseId();
-
-        validateLine();
-
-        parseNormalValue();
-
-        constructNote();
+    private void parseError(final String message) throws IOException {
+        throw new IOException("line " + lineNumber + ": " + message);
     }
 
-    private void parseNormalValue() {
-        currentValue = "";
-        if (0 == currentLine.length()) return;
+    private void parsePropertyLine(final Page page) throws IOException {
+        String key;
+        String value;
 
-        currentValue = currentLine.trim();
+        int firstSpace = currentLineTrimmed.indexOf(' ');
+        if (-1 == firstSpace) {
+            key = currentLineTrimmed.substring(1);
+            value = "";
+        } else if (firstSpace < 2) {
+            key = null;
+            value = null;
+            parseError("empty property key");
+        } else {
+            key = currentLineTrimmed.substring(1, firstSpace).trim();
+            value = currentLineTrimmed.substring(firstSpace).trim();
+        }
+
+        checkForEmptyPropertyValue(key, value);
+
+        setProperty(page, key, value);
+    }
+
+    private void checkForEmptyPropertyValue(final String key, final String value) throws IOException {
+        if (value.isEmpty()) {
+            // can "clear" alias or shortcut by writing "@alias" or "@shortcut" and nothing else;
+            // all other properties require an argument
+            if (!(key.equals("alias") || key.equals("shortcut"))) {
+                parseError("empty value for property @" + key);
+            }
+        }
+    }
+
+    private void parseContentLine() throws IOException {
+        if (currentLineTrimmed.startsWith("@")) {
+            parseContentPropertyLine();
+        } else {
+            parseContentTitleLine();
+        }
+    }
+
+    private void parseContentPropertyLine() throws IOException {
+        parsePropertyLine(getCurrentNode().getValue().getPage());
+    }
+
+    private void parseContentTitleLine() throws IOException {
+        int firstSpace = currentLineTrimmed.indexOf(' ');
+        if (-1 == firstSpace) {
+            parseError("missing item bullet");
+        } else if (firstSpace > 2) {
+            parseError("bullet is too long");
+        }
+
+        String bullet = currentLineTrimmed.substring(0, firstSpace);
+        String rest = currentLineTrimmed.substring(firstSpace).trim();
+
+        String id;
+        String label;
+        Matcher matcher = WikiFormat.ID_INFIX.matcher(rest);
+        if (matcher.find() && 0 == matcher.start()) {
+            id = rest.substring(1, matcher.end() - 1);
+            label = rest.substring(matcher.end()).trim();
+        } else {
+            id = null;
+            label = rest;
+        }
+
+        TreeNode<Link> tree = constructTreeNode(id, roleForBullet(bullet), label);
+        addToHierarchy(tree);
+    }
+
+    private <T> void setProperty(final Page page, final String key, String value) throws IOException {
+        if (value.length() == 0) {
+            value = WikiFormat.CLEARME;
+        }
+
+        // TODO: transitional
+        if (key.equals("id")) {
+            page.getContent().getValue().getTarget().setId(value);
+        } else if (key.equals("title")) {
+            page.getContent().getValue().setLabel(value);
+        } else {
+            Property<Page, T> prop = (Property<Page, T>) Page.propertiesByKey.get(key);
+            if (null == prop) {
+                // unknown properties are quietly ignored
+                return;
+            }
+
+            T typeSafeValue;
+
+            try {
+                typeSafeValue = prop.getFromString().apply(value);
+            } catch (Exception e) {
+                parseError("invalid value for @" + key + " property: " + value);
+                return;
+            }
+
+            prop.getSetter().accept(page, typeSafeValue);
+        }
+    }
+
+    private Role roleForBullet(final String bullet) {
+        return bullet.equals(WikiFormat.VERB_BULLET)
+                ? Role.Verb
+                : Role.Noun;
+    }
+
+    private TreeNode<Link> constructTreeNode(final String topicId, final Role role, final String label)
+            throws IOException {
+        Link link = new LinkDTO();
+        link.setRole(role);
+        link.setLabel(label);
+        if (null != topicId) {
+            Topic target = new TopicDTO();
+            if (null != topicId) {
+                target.setId(topicId);
+            }
+            link.setTarget(target);
+        }
+        //link.setPage(page);
+        link.setPage(copyPage());
+
+        validateLink(link);
+
+        TreeNode<Link> treeNode = new TreeNodeDTO<>();
+        treeNode.setValue(link);
+        return treeNode;
     }
 
     private void incrementLineNumber() {
         lineNumber++;
-    }
-
-    private void parseProperty(final Note note, final String key, String rawValue)
-            throws IOException {
-
-        if (rawValue.length() == 0) {
-            rawValue = Note.CLEARME;
-        }
-
-        Note.Property prop = Note.propertiesByKey.get(key);
-        if (null == prop) {
-            return;
-        }
-
-        Object typeSafeValue;
-
-        try {
-            typeSafeValue = prop.getFromString().apply(rawValue);
-        } catch (Exception e) {
-            parseError("invalid @" + key + " value: " + rawValue);
-            return;
-        }
-
-        prop.getNoteSetter().accept(note, typeSafeValue);
     }
 }

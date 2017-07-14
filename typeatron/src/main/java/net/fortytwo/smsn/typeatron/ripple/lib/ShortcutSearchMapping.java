@@ -1,7 +1,8 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
@@ -43,13 +44,13 @@ public class ShortcutSearchMapping extends AtomMapping {
         String shortcut = mc.toString(stack.getFirst());
         stack = stack.getRest();
 
-        List<Note> results = shortcutSearch(shortcut);
-        for (Note n : results) {
+        List<TreeNode<Link>> results = shortcutSearch(shortcut);
+        for (TreeNode<Link> n : results) {
             solutions.accept(stack.push(n));
         }
     }
 
-    private List<Note> shortcutSearch(final String shortcut) throws RippleException {
+    private List<TreeNode<Link>> shortcutSearch(final String shortcut) throws RippleException {
         try {
             return client.search(
                     TreeViews.QueryType.Shortcut, shortcut, 1, filter, ViewStyle.Basic.Forward.getStyle());

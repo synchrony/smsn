@@ -1,3 +1,5 @@
+@id 12345
+@title SmSn syntax example
 @alias http://example.org/alias-url-for-this-page
 @shortcut se
 @weight 0.75
@@ -22,7 +24,6 @@
     * tab characters are converted to four spaces each: "    "
     * all other whitespace characters count as single spaces: " "
     * 	 leading and/or trailing whitespace is trimmed
-
     * blank lines don't matter
 * ids
     * :0txXBm: each topic has a base-62 id, which is indicated with an infix after the bullet
@@ -39,7 +40,12 @@
     * a heading node represents a relationship
     -- :gzScm: additional comments
         * the above heading has an id (which identifies it with a topic)
-```
-Unstructured text may be included after three backticks at the bottom of the page.
-```
-Additional backticks are ignored; they are not necessary and are not included in the page text.
+* embedded properties
+    @source another-source
+    @weight 0.75
+    @priority 0.5
+    @alias http://example.org/alias-url-for-this-note
+    @shortcut ep
+
+Unstructured text may be included after the first blank line.
+Any number of lines of text are allowed.

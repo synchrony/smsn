@@ -30,13 +30,11 @@ public class SemanticSynchrony {
     public interface EdgeLabels {
         String
                 CHILDREN = "children",
-                CONTEXT = "context",
                 FIRST = "first",
-                KEY = "key",
                 NOTES = "notes",
+                PAGE = "page",
                 REST = "rest",
                 TARGET = "target",
-                TOPIC = "topic",
                 CONTENT = "tree",
                 VALUE = "value";
     }

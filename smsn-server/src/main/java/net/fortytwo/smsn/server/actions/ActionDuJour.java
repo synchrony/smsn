@@ -16,7 +16,6 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 

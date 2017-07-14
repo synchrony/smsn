@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -72,7 +73,7 @@ public class Search extends BasicViewAction {
     }
 
     private void addSearchResults(final ActionContext params) throws IOException {
-        Note n = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
-        addView(n, params);
+        TreeNode<Link> tree = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
+        addView(tree, params);
     }
 }

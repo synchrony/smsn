@@ -1,7 +1,9 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -41,13 +43,13 @@ public class GetAtomChildrenMapping extends AtomMapping {
         Object first = stack.getFirst();
         stack = stack.getRest();
 
-        Note n = toNote(first, 1, true);
+        TreeNode<Link> n = toTree(first, 1, true);
 
         if (null == n) {
             logger.warning("can't get children of non-atom: " + first);
         } else {
-            List<Note> children = n.getChildren();
-            if (null != children) {
+            List<TreeNode<Link>> children = TreeViews.getChildrenAsList(n);
+            if (null != children && 0 != children.size()) {
                 RippleList cur = mc.list();
                 for (int i = children.size() - 1; i >= 0; i--) {
                     cur = cur.push(children.get(i));

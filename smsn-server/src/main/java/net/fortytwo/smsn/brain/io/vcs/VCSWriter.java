@@ -4,10 +4,20 @@ import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.io.BrainWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.dto.LinkDTO;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
+import net.fortytwo.smsn.brain.model.dto.PageDTO;
+import net.fortytwo.smsn.brain.model.dto.TopicDTO;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,12 +30,6 @@ import java.util.Map;
 public class VCSWriter extends BrainWriter {
 
     private static final List<Format> formats;
-    private static final WikiPrinter wikiPrinter;
-
-    static {
-        wikiPrinter = new WikiPrinter();
-        wikiPrinter.setUseCanonicalFormat(true);
-    }
 
     static {
         formats = new LinkedList<>();
@@ -92,30 +96,36 @@ public class VCSWriter extends BrainWriter {
     }
 
     private void writeAtomToStream(final Atom atom, final OutputStream out) {
-        Note note = toNote(atom, true);
-        ListNode<Atom> list = atom.getChildren();
-        while (null != list) {
-            note.getChildren().add(toNote(list.getFirst(), false));
-            list = list.getRest();
+        TreeNode<Link> tree = new TreeNodeDTO<>();
+        Topic topic = new TopicDTO();
+        topic.setId(atom.getId());
+        Link link = new LinkDTO();
+        link.setTarget(topic);
+        link.setLabel(atom.getTitle());
+        link.setRole(Role.Noun);
+        tree.setValue(link);
+
+        ListNode<Atom> cur = atom.getChildren();
+        while (null != cur) {
+            tree.addChild(toTree(cur.getFirst()));
+            cur = cur.getRest();
         }
 
-        wikiPrinter.print(note, out, true);
+        Page page = PageDTO.createTransitional();
+        page.setContent(tree);
+        page.setCreated(atom.getCreated());
+        page.setShortcut(atom.getShortcut());
+        page.setText(atom.getText());
+        page.setAlias(atom.getAlias());
+        page.setPriority(atom.getPriority());
+        page.setWeight(atom.getWeight());
+        new WikiPrinter(out).print(page);
     }
 
-    private Note toNote(final Atom atom, final boolean withValueAndProperties) {
-        Note note = new Note();
-        note.setId(atom.getId());
-
-        if (withValueAndProperties) {
-            note.setTitle(atom.getTitle());
-            note.setText(atom.getText());
-            note.setAlias(atom.getAlias());
-            note.setCreated(atom.getCreated());
-            note.setPriority(atom.getPriority());
-            note.setShortcut(atom.getShortcut());
-            note.setWeight(atom.getWeight());
-        }
-        return note;
+    private TreeNode<Link> toTree(final Atom atom) {
+        TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
+        TreeViews.setId(tree, atom.getId());
+        return tree;
     }
 
     private <E extends Exception> void timeAction(final String description,

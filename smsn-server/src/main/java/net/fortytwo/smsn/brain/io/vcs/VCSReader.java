@@ -4,10 +4,15 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.config.DataSource;
 import org.parboiled.common.Preconditions;
 
@@ -27,7 +32,6 @@ public class VCSReader extends BrainReader {
 
     public VCSReader() {
         reader = new WikiParser();
-        reader.setUseCanonicalFormat(true);
     }
 
     @Override
@@ -64,29 +68,38 @@ public class VCSReader extends BrainReader {
         }
     }
 
+    private String idFromFileName(final File file) {
+        return file.getName();
+    }
+
     private void readAtomFile(final File file, final Helper helper, final DataSource source) throws IOException {
-        Note rootNote;
+        Page page;
         try (InputStream in = new FileInputStream(file)) {
-            rootNote = reader.parse(in);
-            for (Note note : rootNote.getChildren()) {
-                note.setSource(source.getName());
-                String id = note.getId();
+            page = reader.parse(in);
+            String rootId = idFromFileName(file);
+            //TopicDTO topic = new TopicDTO();
+            //topic.setId(rootId);
+            //Topic target = page.getContent().getValue().getTarget();
+            //String rootId = target.getId();
+            Atom root = helper.resolveAtomReference(rootId);
+
+            for (TreeNode<Link> note : TreeViews.getChildrenAsList(page.getContent())) {
+                String id = TreeViews.getId(note);
                 Preconditions.checkNotNull(id);
-
-                Atom atom = helper.resolveAtomReference(id);
-                helper.setNote(note);
-                helper.setAtom(atom);
-                helper.updateAtom();
-
-                checkAndCommit(helper.context.getTopicGraph());
             }
+            page.setSource(source.getName());
+            helper.setAtom(root);
+            helper.setPage(page);
+            helper.updateAtom();
+
+            checkAndCommit(helper.context.getTopicGraph());
         }
     }
 
     private class Helper {
         private final Context context;
         private Atom atom;
-        private Note note;
+        private Page page;
 
         private Helper(Context context) {
             this.context = context;
@@ -96,8 +109,8 @@ public class VCSReader extends BrainReader {
             this.atom = atom;
         }
 
-        public void setNote(Note note) {
-            this.note = note;
+        public void setPage(Page page) {
+            this.page = page;
         }
 
         private void updateAtom() {
@@ -106,15 +119,16 @@ public class VCSReader extends BrainReader {
         }
 
         private void updateAtomProperties() {
-            updateProperty(atom, note, Note::getAlias, Atom::setAlias);
-            updateProperty(atom, note, Note::getCreated, Atom::setCreated);
-            updateProperty(atom, note, Note::getText, Atom::setText);
-            updateProperty(atom, note, Note::getPriority, Atom::setPriority);
-            updateProperty(atom, note, Note::getSource, Atom::setSource);
-            updateProperty(atom, note, Note::getShortcut, Atom::setShortcut);
-            updateProperty(atom, note, Note::getSource, Atom::setSource);
-            updateProperty(atom, note, Note::getTitle, Atom::setTitle);
-            updateProperty(atom, note, Note::getWeight, Atom::setWeight);
+            updatePageProperty(atom, page, p -> page.getText(), Atom::setText);
+            updatePageProperty(atom, page, p -> page.getAlias(), Atom::setAlias);
+            updatePageProperty(atom, page, p -> page.getPriority(), Atom::setPriority);
+            updatePageProperty(atom, page, p -> page.getSource(), Atom::setSource);
+            updatePageProperty(atom, page, p -> page.getShortcut(), Atom::setShortcut);
+            updatePageProperty(atom, page, p -> page.getText(), Atom::setText);
+            updatePageProperty(atom, page, p -> page.getWeight(), Atom::setWeight);
+
+            TreeNode<Link> tree = page.getContent();
+            updateTreeProperty(atom, tree, TreeViews::getTitle, Atom::setTitle);
         }
 
         private void updateAtomChildren() {
@@ -124,10 +138,20 @@ public class VCSReader extends BrainReader {
             }
         }
 
-        private <T> void updateProperty(final Atom atom,
-                                        final Note note,
-                                        final Function<Note, T> noteGetter,
-                                        final BiConsumer<Atom, T> atomSetter) {
+        private <T> void updatePageProperty(final Atom atom,
+                                            final Page page,
+                                            final Function<Page, T> noteGetter,
+                                            final BiConsumer<Atom, T> atomSetter) {
+            T value = noteGetter.apply(page);
+            if (null != value) {
+                atomSetter.accept(atom, value);
+            }
+        }
+
+        private <T> void updateTreeProperty(final Atom atom,
+                                            final TreeNode<Link> note,
+                                            final Function<TreeNode<Link>, T> noteGetter,
+                                            final BiConsumer<Atom, T> atomSetter) {
             T value = noteGetter.apply(note);
             if (null != value) {
                 atomSetter.accept(atom, value);
@@ -135,12 +159,12 @@ public class VCSReader extends BrainReader {
         }
 
         private Optional<ListNode<Atom>> createAtomList() {
-            if (0 == note.getChildren().size()) return Optional.empty();
+            if (0 == TreeViews.countChildren(page.getContent())) return Optional.empty();
 
-            Atom[] atoms = new Atom[note.getChildren().size()];
+            Atom[] atoms = new Atom[TreeViews.countChildren(page.getContent())];
             int i = 0;
-            for (Note child : note.getChildren()) {
-                atoms[i++] = resolveAtomReference(child.getId());
+            for (TreeNode<Link> child : TreeViews.getChildrenAsList(page.getContent())) {
+                atoms[i++] = resolveAtomReference(TreeViews.getId(child));
             }
             return Optional.of(context.getTopicGraph().createListOfAtoms(atoms));
         }

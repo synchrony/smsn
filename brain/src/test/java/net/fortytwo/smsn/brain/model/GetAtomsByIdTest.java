@@ -12,8 +12,8 @@ import static org.junit.Assert.assertEquals;
 public class GetAtomsByIdTest extends BrainTestBase {
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 
     @Test

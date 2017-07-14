@@ -101,36 +101,18 @@ public class PGTopicGraph implements TopicGraph {
         return null == v ? Optional.empty() : Optional.of(asAtom(v));
     }
 
-    private <T extends Node> ListNode<T> createListOfEntities(final String vertexLabel,
-                                                              final Function<Vertex, ListNode<T>> constructor,
-                                                              final T[] elements) {
-        Preconditions.checkArgument(elements.length > 0);
-
-        ListNode<T> last = null;
-        ListNode<T> head = null;
-        for (T el : elements) {
-            ListNode<T> cur = createEntity(null, vertexLabel, constructor);
-            cur.setFirst(el);
-
-            if (null == head) {
-                head = cur;
-            }
-            if (last != null) {
-                last.setRest(cur);
-            }
-            last = cur;
-        }
-
-        return head;
-    }
-
     @Override
     public ListNode<Link> createListOfLinks(final Link... elements) {
         return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinks, elements);
     }
 
     @Override
-    public ListNode<TreeNode<Link>> createListOfTrees(
+    public ListNode<Topic> createListOfTopics(final Topic... elements) {
+        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfTopics, elements);
+    }
+
+    @Override
+    public ListNode<TreeNode<Link>> createListOfLinkTrees(
             TreeNode<Link>... elements) {
         return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinkTrees, elements);
     }
@@ -149,7 +131,6 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public Page createPage(final Link topicLink) {
-        Topic topic = topicLink.getTarget();
         Page page = createEntity(null, SemanticSynchrony.VertexLabels.PAGE, this::asPage);
         page.setContent(createTopicTree(topicLink));
         return page;
@@ -189,6 +170,14 @@ public class PGTopicGraph implements TopicGraph {
         atom.setWeight(filter.getDefaultWeight());
 
         return atom;
+    }
+
+    public <T extends Node> ListNode<T> createListNode(
+            final T first, final ListNode<T> rest, final Function<Vertex, T> constructor) {
+        ListNode<T> list = createListOfEntities(SemanticSynchrony.VertexLabels.LIST,
+                vertex -> asEntityList(vertex, constructor), first);
+        list.setRest(rest);
+        return list;
     }
 
     public Topic asTopic(final Vertex vertex) {
@@ -256,6 +245,10 @@ public class PGTopicGraph implements TopicGraph {
                 return PGTopicGraph.this;
             }
         };
+    }
+
+    public ListNode<Topic> asListOfTopics(final Vertex vertex) {
+        return asEntityList(vertex, this::asTopic);
     }
 
     public ListNode<Link> asListOfLinks(final Vertex vertex) {
@@ -333,6 +326,29 @@ public class PGTopicGraph implements TopicGraph {
     @Override
     public List<Atom> getAtomsByShortcut(final String query, final Filter filter) {
         return filterAndSort(wrapper.getVerticesByShortcut(query), filter, query);
+    }
+
+    private <T extends Node> ListNode<T> createListOfEntities(final String vertexLabel,
+                                                              final Function<Vertex, ListNode<T>> constructor,
+                                                              final T... elements) {
+        Preconditions.checkArgument(elements.length > 0);
+
+        ListNode<T> last = null;
+        ListNode<T> head = null;
+        for (T el : elements) {
+            ListNode<T> cur = createEntity(null, vertexLabel, constructor);
+            cur.setFirst(el);
+
+            if (null == head) {
+                head = cur;
+            }
+            if (last != null) {
+                last.setRest(cur);
+            }
+            last = cur;
+        }
+
+        return head;
     }
 
     private boolean isAtomVertex(final Vertex v) {

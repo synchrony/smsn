@@ -9,7 +9,6 @@ import net.fortytwo.smsn.brain.query.ViewStyle;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;

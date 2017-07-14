@@ -1,8 +1,10 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.junit.Test;
@@ -16,13 +18,13 @@ import static org.junit.Assert.assertTrue;
 public class SearchTest extends BrainTestBase {
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
 
     @Test
     public void emptyGraphHasNoSearchResults() throws Exception {
-        assertEquals(0, search("nothing").getChildren().size());
+        assertChildCount(0, search("nothing"));
     }
 
     @Test
@@ -30,9 +32,9 @@ public class SearchTest extends BrainTestBase {
         createAtom(ARTHUR_ID, "Arthur Dent");
         createAtom(FORD_ID, "Ford");
 
-        Note results = search("Arthur");
-        assertEquals(1, results.getChildren().size());
-        assertEquals(ARTHUR_ID, results.getChildren().get(0).getId());
+        TreeNode<Link> results = search("Arthur");
+        assertChildCount(1, results);
+        assertEquals(ARTHUR_ID, TreeViews.getId(results.getChildren().get(0)));
     }
 
     @Test
@@ -40,13 +42,13 @@ public class SearchTest extends BrainTestBase {
         createAtom(ARTHUR_ID, "Arthur Dent");
         createAtom("Random Frequent Flyer Dent");
 
-        assertEquals(1, search("Arthur").getChildren().size());
-        assertEquals(1, search("Flyer").getChildren().size());
-        assertEquals(2, search("Dent").getChildren().size());
+        assertChildCount(1, search("Arthur"));
+        assertChildCount(1, search("Flyer"));
+        assertChildCount(2, search("Dent"));
 
-        assertEquals(2, search("Arthur OR Dent").getChildren().size());
-        assertEquals(1, search("Arthur AND Dent").getChildren().size());
-        assertEquals(1, search("Arthur Dent").getChildren().size());
+        assertChildCount(2, search("Arthur OR Dent"));
+        assertChildCount(1, search("Arthur AND Dent"));
+        assertChildCount(1, search("Arthur Dent"));
     }
 
     @Test
@@ -54,10 +56,10 @@ public class SearchTest extends BrainTestBase {
         createAtom("Arthur");
         createAtom("Arthur Dent");
 
-        Note results = search("arthur");
-        assertEquals(2, results.getChildren().size());
-        assertEquals("Arthur", results.getChildren().get(0).getTitle());
-        assertEquals("Arthur Dent", results.getChildren().get(1).getTitle());
+        TreeNode<Link> results = search("arthur");
+        assertChildCount(2, results);
+        assertEquals("Arthur", TreeViews.getTitle(results.getChildren().get(0)));
+        assertEquals("Arthur Dent", TreeViews.getTitle(results.getChildren().get(1)));
     }
 
     @Test
@@ -68,12 +70,12 @@ public class SearchTest extends BrainTestBase {
             a.setWeight(random.nextFloat());
         }
 
-        Note results = search("Lintilla");
-        assertEquals(10, results.getChildren().size());
+        TreeNode<Link> results = search("Lintilla");
+        assertChildCount(10, results);
         float lastWeight = 1f;
-        for (Note result : results.getChildren()) {
-            assertEquals("Lintilla", result.getTitle());
-            float weight = result.getWeight();
+        for (TreeNode<Link> result : ListNode.toJavaList(results.getChildren())) {
+            assertEquals("Lintilla", TreeViews.getTitle(result));
+            float weight = TreeViews.getWeight(result);
             assertTrue(weight <= lastWeight);
             lastWeight = weight;
         }
@@ -89,18 +91,18 @@ public class SearchTest extends BrainTestBase {
             }
         }
 
-        Note results = search("Lintilla");
-        assertEquals(10, results.getChildren().size());
+        TreeNode<Link> results = search("Lintilla");
+        assertChildCount(10, results);
         float lastPriority = 1f;
-        for (Note result : results.getChildren()) {
-            assertEquals("Lintilla", result.getTitle());
-            float priority = null == result.getPriority() ? 0f : result.getPriority();
+        for (TreeNode<Link> result : ListNode.toJavaList(results.getChildren())) {
+            assertEquals("Lintilla", TreeViews.getTitle(result));
+            float priority = null == TreeViews.getPriority(result) ? 0f : TreeViews.getPriority(result);
             assertTrue(priority <= lastPriority);
             lastPriority = priority;
         }
     }
 
-    private Note search(final String query) {
+    private TreeNode<Link> search(final String query) {
         return queries.search(TreeViews.QueryType.FullText, query, 1, filter, ViewStyle.Basic.Forward.getStyle());
     }
 }

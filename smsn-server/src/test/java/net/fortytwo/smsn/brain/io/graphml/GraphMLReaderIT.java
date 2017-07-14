@@ -21,8 +21,8 @@ public class GraphMLReaderIT extends BrainTestBase {
     private final File outputFile = new File("/tmp/smsn-out.xml");
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
 
     @Test

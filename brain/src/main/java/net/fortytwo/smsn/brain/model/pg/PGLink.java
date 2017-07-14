@@ -3,6 +3,7 @@ package net.fortytwo.smsn.brain.model.pg;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -42,6 +43,17 @@ public abstract class PGLink extends PGEntity implements Link {
     @Override
     public void setLabel(String label) {
         setRequiredProperty(SemanticSynchrony.PropertyKeys.LABEL, label);
+    }
+
+    @Override
+    public Page getPage() {
+        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.PAGE, Direction.OUT,
+                vertex -> getGraph().asPage(vertex));
+    }
+
+    @Override
+    public void setPage(Page page) {
+        setRequiredEntity(SemanticSynchrony.EdgeLabels.PAGE, page);
     }
 
     @Override

@@ -6,8 +6,6 @@ import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.config.DataSource;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -19,16 +17,24 @@ import java.io.OutputStream;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class VCSReaderTest extends BrainTestBase {
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
 
     @Test
-    public void interconnectedFilesAreReadCorrectly() throws IOException {
+    public void formatIsCorrect() {
+        List<Format> formats = new VCSReader().getFormats();
+        assertEquals(1, formats.size());
+        assertEquals("VCS", formats.get(0).getName());
+    }
+
+    @Test
+    public void interdependentFilesAreReadCorrectly() throws Exception {
         VCSReader reader = new VCSReader();
         List<Format> formats = reader.getFormats();
         assertEquals(1, formats.size());
@@ -38,7 +44,10 @@ public class VCSReaderTest extends BrainTestBase {
 
         BrainReader.Context context = new BrainReader.Context();
         context.setFormat(formats.get(0));
-        context.setSourceDirectory(createTestDirectory());
+        context.setSourceDirectory(createVCSTestDirectory());
+        File universalDir = new File(SemanticSynchrony.getConfiguration().getSources().get(3).getLocation());
+        copyVCSFileToDirectory(ARTHUR_ID, universalDir);
+        copyVCSFileToDirectory(FORD_ID, universalDir);
         context.setTopicGraph(topicGraph);
         reader.doImport(context);
 
@@ -48,34 +57,12 @@ public class VCSReaderTest extends BrainTestBase {
         assertEquals(ARTHUR_ID, arthur.getId());
         assertEquals("Arthur Dent", arthur.getTitle());
         assertEquals(DefaultSources.UNIVERSAL, arthur.getSource());
+        assertEquals("He's a jerk.", arthur.getText());
 
         assertEquals(1, countChildren(arthur));
-        assertEquals("Ford Prefect (character)", arthur.getChildren().getFirst().getTitle());
-    }
-
-    private long countChildren(final Atom a) {
-        ListNode<Atom> children = a.getChildren();
-        return null == children ? 0 : ListNode.toJavaList(children).size();
-    }
-
-    private File createTestDirectory() throws IOException {
-        File dir = createTempDirectory();
-
-        File privateDir = new File(dir, "private"); privateDir.mkdir();
-        File personalDir = new File(dir, "personal"); personalDir.mkdir();
-        File publicDir = new File(dir, "public"); publicDir.mkdir();
-        File universalDir = new File(dir, "universal"); universalDir.mkdir();
-
-        List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
-        sources.get(0).setLocation(privateDir.getAbsolutePath());
-        sources.get(1).setLocation(personalDir.getAbsolutePath());
-        sources.get(2).setLocation(publicDir.getAbsolutePath());
-        sources.get(3).setLocation(universalDir.getAbsolutePath());
-
-        copyVCSFileToDirectory(ARTHUR_ID, universalDir);
-        copyVCSFileToDirectory(FORD_ID, universalDir);
-
-        return dir;
+        Atom ford = arthur.getChildren().getFirst();
+        assertEquals("Ford Prefect (character)", ford.getTitle());
+        assertNull(ford.getText());
     }
 
     private void copyVCSFileToDirectory(final String atomId, final File dir) throws IOException {

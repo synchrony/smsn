@@ -1,10 +1,14 @@
 package net.fortytwo.smsn.brain.model.dto;
 
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 
 public class PageDTO implements Page {
+
+    public static final String TRANSITIONAL_ID = "IGNORED";
+    public static final String TRANSITIONAL_TITLE = "IGNORED";
 
     private String text;
     private String source;
@@ -12,6 +16,9 @@ public class PageDTO implements Page {
     private String shortcut;
     private Float weight;
     private Float priority;
+
+    // TODO: temporary
+    private Long created;
 
     private TreeNode<Link> content;
 
@@ -88,5 +95,28 @@ public class PageDTO implements Page {
     @Override
     public void setPriority(Float priority) {
         this.priority = priority;
+    }
+
+    @Override
+    public Long getCreated() {
+        return created;
+    }
+
+    @Override
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public static Page createTransitional() {
+        Page page = new PageDTO();
+        Link link = new LinkDTO();
+        Topic topic = new TopicDTO();
+        topic.setId(TRANSITIONAL_ID);
+        link.setTarget(topic);
+        link.setLabel(TRANSITIONAL_TITLE);
+        TreeNode<Link> content = new TreeNodeDTO<>();
+        content.setValue(link);
+        page.setContent(content);
+        return page;
     }
 }

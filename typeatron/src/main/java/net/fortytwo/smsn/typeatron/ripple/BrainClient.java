@@ -1,14 +1,15 @@
 package net.fortytwo.smsn.typeatron.ripple;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.query.TreeViews;
-import net.fortytwo.smsn.brain.query.ViewStyle;
+import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
-import net.fortytwo.smsn.brain.Params;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.config.Service;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ConnectionReuseStrategy;
@@ -100,23 +101,22 @@ public class BrainClient {
      * @param style  the adjacency style of the view
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
-    public Note view(final Note root,
+    public TreeNode<Link> view(final TreeNode<Link> root,
                      final int height,
                      final Filter filter,
                      final ViewStyle style,
                      final boolean includeTypes) throws BrainClientException {
 
-        if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
+        if (null == root || null == TreeViews.getId(root) || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
-            requestJson.put(Params.ROOT, root.getId());
+            requestJson.put(Params.ROOT, TreeViews.getId(root));
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.INCLUDE_TYPES, includeTypes);
-            requestJson.put(Params.FILTER, toJson(filter));
         } catch (JSONException e) {
             throw new BrainClientException(e);
         }
@@ -126,7 +126,7 @@ public class BrainClient {
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "view?" + paramStr;
 
-        final Note[] results = new Note[1];
+        final TreeNode<Link>[] results = new TreeNode[1];
 
         HttpResponseHandler handler = response -> {
             int code = response.getStatusLine().getStatusCode();
@@ -137,7 +137,8 @@ public class BrainClient {
                             IOUtils.toString(response.getEntity().getContent(), SemanticSynchrony.UTF8));
                     JSONObject view = json.getJSONObject(Params.VIEW);
                     // note: redundant serialization/deserialization
-                    results[0] = jsonParser.parse(view.toString());
+                    // TODO: restore
+                    //results[0] = jsonParser.parse(view.toString());
                 } catch (JSONException e) {
                     throw new IOException(e);
                 }
@@ -167,23 +168,22 @@ public class BrainClient {
      *               Atoms and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      */
-    public void update(final Note root,
+    public void update(final TreeNode<Link> root,
                        final int height,
                        final Filter filter,
                        final ViewStyle style) throws BrainClientException {
 
-        if (null == root || null == root.getId() || height < 0 || null == filter || null == style) {
+        if (null == root || null == TreeViews.getId(root) || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
-            requestJson.put(Params.ROOT, root.getId());
+            requestJson.put(Params.ROOT, TreeViews.getId(root));
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VIEW, toJson(root));
             requestJson.put(Params.VIEW_FORMAT, Params.Format.json);
-            requestJson.put(Params.FILTER, toJson(filter));
         } catch (IOException | JSONException e) {
             throw new BrainClientException(e);
         }
@@ -221,18 +221,18 @@ public class BrainClient {
         }
     }
 
-    public void setProperty(final Note root,
+    public void setProperty(final TreeNode<Link> root,
                             final String name,
                             final String value) throws BrainClientException {
         // TODO: add ability to clear property values
-        if (null == root || null == root.getId()
+        if (null == root || null == TreeViews.getId(root)
                 || null == name || 0 == name.length() || null == value || 0 == value.length()) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
-            requestJson.put(Params.ID, root.getId());
+            requestJson.put(Params.ID, TreeViews.getId(root));
             requestJson.put(Params.NAME, name);
             requestJson.put(Params.TITLE, value);
         } catch (JSONException e) {
@@ -271,7 +271,7 @@ public class BrainClient {
      * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */
-    public List<Note> search(final TreeViews.QueryType queryType,
+    public List<TreeNode<Link>> search(final TreeViews.QueryType queryType,
                              final String query,
                              final int height,
                              final Filter filter,
@@ -286,7 +286,6 @@ public class BrainClient {
             requestJson.put(Params.QUERY_TYPE, queryType.name());
             requestJson.put(Params.QUERY, query);
             requestJson.put(Params.HEIGHT, height);
-            requestJson.put(Params.FILTER, toJson(filter));
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.TITLE_CUTOFF, DEFAULT_VALUE_CUTOFF);
         } catch (JSONException e) {
@@ -297,7 +296,7 @@ public class BrainClient {
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "search?" + paramStr;
 
-        final List<Note> results = new LinkedList<>();
+        final List<TreeNode<Link>> results = new LinkedList<>();
 
         HttpResponseHandler handler = response -> {
             int code = response.getStatusLine().getStatusCode();
@@ -311,7 +310,8 @@ public class BrainClient {
                     if (null != children) {
                         int length = children.length();
                         for (int i = 0; i < length; i++) {
-                            results.add(jsonParser.parse(children.getJSONObject(i).toString()));
+                            // TODO: restore
+                            //results.add(jsonParser.parse(children.getJSONObject(i).toString()));
                         }
                     }
                 } catch (JSONException e) {
@@ -397,21 +397,8 @@ public class BrainClient {
         void handle(HttpResponse response) throws IOException;
     }
 
-    private JSONObject toJson(final Filter filter) {
-        // TODO: restore if necessary
-        /*
-        JSONObject json = new JSONObject();
-        json.put(Params.MIN_SHARABILITY, filter.getMinSharability());
-        json.put(Params.MIN_WEIGHT, filter.getMinWeight());
-        json.put(Params.DEFAULT_SOURCE, filter.getDefaultSource());
-        json.put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
-        return json;
-        */
-        return null;
-    }
-
-    private JSONObject toJson(final Note note) throws IOException {
-        return jsonPrinter.toJson(note);
+    private JSONObject toJson(final TreeNode<Link> tree) throws IOException {
+        return jsonPrinter.toJson(tree);
     }
 
     public class BrainClientException extends Exception {

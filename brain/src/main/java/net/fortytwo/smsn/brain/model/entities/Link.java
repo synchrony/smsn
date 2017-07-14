@@ -15,4 +15,8 @@ public interface Link extends Node {
     String getLabel();
 
     void setLabel(String label);
+
+    Page getPage();
+
+    void setPage(final Page page);
 }

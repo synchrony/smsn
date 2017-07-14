@@ -9,7 +9,6 @@ import net.fortytwo.smsn.SmSnDeviceControl;
 import net.fortytwo.smsn.brain.BrainModeClient;
 import net.fortytwo.smsn.p2p.SideEffects;
 import net.fortytwo.smsn.p2p.SmSnAgent;
-import net.fortytwo.smsn.p2p.osc.OscMessageHandler;
 import net.fortytwo.smsn.p2p.osc.OscReceiver;
 import net.fortytwo.smsn.rdf.Activities;
 import net.fortytwo.smsn.typeatron.ripple.RippleSession;

@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 public class CreateFilteredGraphTest extends BrainTestBase {
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
         //return createNeo4jAtomGraph();
     }
 

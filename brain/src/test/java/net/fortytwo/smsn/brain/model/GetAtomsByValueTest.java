@@ -13,8 +13,8 @@ public class GetAtomsByValueTest extends BrainTestBase {
     private Atom arthur;
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
 
     @Before

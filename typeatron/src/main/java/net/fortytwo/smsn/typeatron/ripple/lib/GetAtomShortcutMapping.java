@@ -1,7 +1,9 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -40,12 +42,12 @@ public class GetAtomShortcutMapping extends AtomMapping {
         Object first = stack.getFirst();
         stack = stack.getRest();
 
-        Note n = toNote(first, 0, true);
+        TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
             logger.warning("can't get @shortcut of non-atom: " + first);
         } else {
-            String value = n.getShortcut();
+            String value = TreeViews.getShortcut(n);
             if (null != value) {
                 // put both the @shortcut property and the (synced) atom back on the stack
                 solutions.accept(stack.push(n).push(value));

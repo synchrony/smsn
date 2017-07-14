@@ -44,8 +44,9 @@ public interface TopicGraph {
 
     ListNode<Link> createListOfLinks(Link... elements);
 
-    ListNode<TreeNode<Link>> createListOfTrees(
-            TreeNode<Link>... elements);
+    ListNode<Topic> createListOfTopics(Topic... elements);
+
+    ListNode<TreeNode<Link>> createListOfLinkTrees(TreeNode<Link>... elements);
 
     ListNode<Atom> createListOfAtoms(Atom... elements);
 
@@ -69,7 +70,7 @@ public interface TopicGraph {
         void run();
     }
 
-    static void wrapInTransaction(final TopicGraph graph, final IORunnable runnable) throws IOException {
+    static void wrapInTransaction(final TopicGraph graph, final IORunnable runnable) {
         graph.begin();
 
         boolean success = false;

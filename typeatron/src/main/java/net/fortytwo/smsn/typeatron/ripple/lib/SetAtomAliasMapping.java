@@ -2,7 +2,8 @@ package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
@@ -45,7 +46,7 @@ public class SetAtomAliasMapping extends AtomMapping {
         Object no = stack.getFirst();
         stack = stack.getRest();
 
-        Note n = toNote(no, 0, false);
+        TreeNode<Link> n = toTree(no, 0, false);
 
         if (null == n) {
             logger.warning("can't set @alias of non-atom: " + no);

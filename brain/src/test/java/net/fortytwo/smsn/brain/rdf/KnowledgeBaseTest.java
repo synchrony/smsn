@@ -3,10 +3,13 @@ package net.fortytwo.smsn.brain.rdf;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.brain.rdf.classes.BibtexEntry;
@@ -70,8 +73,8 @@ public class KnowledgeBaseTest extends BrainTestBase {
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
     @Test
     public void testAKASyntax() throws Exception {
@@ -326,7 +329,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
     @Ignore  // TODO: restore me
     @Test
     public void testInference() throws Exception {
-        TopicGraph topicGraph = createTinkerAtomGraph();
+        TopicGraph topicGraph = createTinkerTopicGraph();
         Brain brain = new Brain(topicGraph);
         KnowledgeBase kb = new KnowledgeBase(topicGraph);
         Filter filter = Filter.noFilter();
@@ -345,16 +348,16 @@ public class KnowledgeBaseTest extends BrainTestBase {
                     sb.append(line).append("\n");
                 }
                 String text = sb.toString().trim();
-                Note rootNote = wikiParser.parse(text);
+                TreeNode<Link> rootNode = parseToTree(text);
                 //System.out.println("children: " + rootNote.getChildren().size() + ", height: " + height);
-                for (Note c : rootNote.getChildren()) {
-                    System.out.println("\t" + c.getTitle());
-                    for (Note c2 : c.getChildren()) {
-                        System.out.println("\t\t" + c2.getTitle());
+                for (TreeNode<Link> c : ListNode.toJavaList(rootNode.getChildren())) {
+                    System.out.println("\t" + TreeViews.getTitle(c));
+                    for (TreeNode<Link> c2 : ListNode.toJavaList(c.getChildren())) {
+                        System.out.println("\t\t" + TreeViews.getTitle(c2));
                     }
                 }
-                rootNote.setId(rootId);
-                queries.update(rootNote, height, filter, ViewStyle.Basic.Forward.getStyle());
+                TreeViews.setId(rootNode, rootId);
+                queries.update(rootNode, height, filter, ViewStyle.Basic.Forward.getStyle());
             }
         }
 

@@ -22,8 +22,8 @@ public class FreeplaneReaderIT extends BrainTestBase {
     private final File mindMapFile = new File("/tmp/1.mm");
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 
     @Test

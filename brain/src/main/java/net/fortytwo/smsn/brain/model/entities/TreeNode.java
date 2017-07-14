@@ -9,4 +9,14 @@ public interface TreeNode<T> extends Node {
     ListNode<TreeNode<T>> getChildren();
 
     void setChildren(ListNode<TreeNode<T>> children);
+
+    void addChild(TreeNode<T> child);
+
+    int getNumberOfChildren();
+
+    void setNumberOfChildren(int numberOfChildren);
+
+    int getNumberOfParents();
+
+    void setNumberOfParents(int numberOfParents);
 }

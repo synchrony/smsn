@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.p2p.sparql;
 
 import net.fortytwo.smsn.p2p.Connection;
-import net.fortytwo.smsn.p2p.MessageHandler;
 import net.fortytwo.stream.BasicSubscription;
 import net.fortytwo.stream.sparql.RDFStreamProcessor;
 import org.json.JSONArray;

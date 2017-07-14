@@ -18,12 +18,12 @@ public abstract class ActionTestBase extends BrainTestBase {
     private SmSnScriptEngine scriptEngine = new SmSnScriptEngine(scriptEngineFactory);
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
+    protected TopicGraph createTopicGraph() throws IOException {
         //return createNeo4jAtomGraph();
-        return createTinkerAtomGraph();
+        return createTinkerTopicGraph();
     }
 
-    protected ActionContext perform(final Action action) throws IOException {
+    protected ActionContext perform(final Action action) {
         SmSnScriptEngine.ActionPerformer performer = new SmSnScriptEngine.ActionPerformer(graph);
         return performer.perform(action);
     }

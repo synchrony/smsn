@@ -5,18 +5,19 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
@@ -100,9 +101,9 @@ public abstract class Action {
         logActivity(context);
     }
 
-    protected void addView(final Note n,
+    protected void addView(final TreeNode<Link> view,
                            final ActionContext context) throws IOException {
-        JSONObject json = context.getJsonPrinter().toJson(n);
+        JSONObject json = context.getJsonPrinter().toJson(view);
 
         context.getMap().put(Params.VIEW, json);
     }

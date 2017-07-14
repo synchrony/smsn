@@ -5,45 +5,48 @@ import net.fortytwo.ripple.io.RipplePrintStream;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.StackMapping;
 import net.fortytwo.ripple.model.types.SimpleType;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
 
-public class NoteType extends SimpleType<Note> {
+public class TreeType extends SimpleType<TreeNode<Link>> {
 
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-    public NoteType() {
-        super(Note.class);
+    public TreeType() {
+        super(TreeNode.class);
     }
 
     @Override
-    public boolean isInstance(Note instance) {
+    public boolean isInstance(TreeNode<Link> instance) {
         return true;
     }
 
     @Override
-    public Value toRDF(Note instance, ModelConnection mc) throws RippleException {
+    public Value toRDF(TreeNode<Link> instance, ModelConnection mc) throws RippleException {
         // if the note has an alias, use that as its IRI.
         // Otherwise, use the "thing" IRI based on its ID
         // This has the effect of mapping to an externally-defined resource if the given atom has an alias,
         // otherwise mapping to a reference to a thing described in the personal knowledge base.
         // In the latter case, the resource will only be accessible in an interactive setting if the thing is a public,
         // classified atom and the knowledge base has been appropriately published as Linked Data.
-        return null == instance.getAlias()
-                ? null == instance.getId() ? null : valueFactory.createIRI(PGTopicGraph.iriForId(instance.getId()))
-                : valueFactory.createIRI(instance.getAlias());
+        return null == TreeViews.getAlias(instance)
+                ? null == TreeViews.getId(instance) ? null : valueFactory.createIRI(
+                        PGTopicGraph.iriForId(TreeViews.getId(instance)))
+                : valueFactory.createIRI(TreeViews.getAlias(instance));
     }
 
     @Override
-    public StackMapping getMapping(Note instance) {
+    public StackMapping getMapping(TreeNode<Link> instance) {
         return null;
     }
 
     @Override
-    public void print(Note instance, RipplePrintStream p, ModelConnection mc) throws RippleException {
+    public void print(TreeNode<Link> instance, RipplePrintStream p, ModelConnection mc) throws RippleException {
         p.print(instance);
     }
 
@@ -53,11 +56,11 @@ public class NoteType extends SimpleType<Note> {
     }
 
     @Override
-    public int compare(Note o1, Note o2, ModelConnection mc) {
+    public int compare(TreeNode<Link> o1, TreeNode<Link> o2, ModelConnection mc) {
         // compare by unique id
         // note: an alternative is comparison by creation time
-        return null == o1.getId()
-                ? null == o2.getId() ? 0 : -1
-                : null == o2.getId() ? 1 : o1.getId().compareTo(o2.getId());
+        return null == TreeViews.getId(o1)
+                ? null == TreeViews.getId(o2) ? 0 : -1
+                : null == TreeViews.getId(o2) ? 1 : TreeViews.getId(o1).compareTo(TreeViews.getId(o2));
     }
 }

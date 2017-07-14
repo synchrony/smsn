@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.pg.PGPage;
 import net.fortytwo.smsn.brain.model.pg.PGTopic;
 import org.junit.Before;
@@ -19,25 +18,17 @@ import static org.junit.Assert.assertTrue;
 
 public class TopicsAndPagesTest extends BrainTestBase {
 
-    private Topic arthurTopic, fordTopic, zaphodTopic, friendTopic, earthTopic, teaTopic;
     private Link friendsLink, arthurLink, fordLink, zaphodLink, earthLink, teaLink;
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createNeo4jAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createNeo4jTopicGraph();
     }
 
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
-
-        arthurTopic = topicGraph.createTopic("arthur");
-        fordTopic = topicGraph.createTopic("ford");
-        zaphodTopic = topicGraph.createTopic("zaphod");
-        friendTopic = topicGraph.createTopic("friend");
-        earthTopic = topicGraph.createTopic("earth");
-        teaTopic = topicGraph.createTopic("tea");
 
         friendsLink = topicGraph.createLink(friendTopic, "friends", Role.Verb);
         arthurLink = topicGraph.createLink(arthurTopic, "Arthur P. Dent", Role.Noun);
@@ -53,7 +44,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
         page.setText("a page about Arthur");
         TreeNode<Link> tree = page.getContent();
         tree.setValue(arthurLink);
-        tree.setChildren(topicGraph.createListOfTrees(
+        tree.setChildren(topicGraph.createListOfLinkTrees(
                 topicGraph.createTopicTree(teaLink)));
         assertEquals("a page about Arthur", page.getText());
         assertEquals("Arthur P. Dent", page.getContent().getValue().getLabel());
@@ -63,11 +54,11 @@ public class TopicsAndPagesTest extends BrainTestBase {
         assertEquals("tea", secondLink.getTarget().getId());
 
         TreeNode<Link> friendsTree = topicGraph.createTopicTree(friendsLink);
-        ListNode<TreeNode<Link>> childLinks = topicGraph.createListOfTrees(
+        ListNode<TreeNode<Link>> childLinks = topicGraph.createListOfLinkTrees(
                 topicGraph.createTopicTree(fordLink),
                 topicGraph.createTopicTree(zaphodLink));
         friendsTree.setChildren(childLinks);
-        ListNode<TreeNode<Link>> children = topicGraph.createListOfTrees(friendsTree);
+        ListNode<TreeNode<Link>> children = topicGraph.createListOfLinkTrees(friendsTree);
         tree.setChildren(children);
 
         assertEquals("friends", page.getContent().getChildren().get(0).getValue().getLabel());
@@ -106,7 +97,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyListOfSubtreesIsNotAllowed() {
-        topicGraph.createListOfTrees();
+        topicGraph.createListOfLinkTrees();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -125,13 +116,13 @@ public class TopicsAndPagesTest extends BrainTestBase {
         assertTrue(graph.traversal().V(pageId).hasNext());
 
         page.getContent().setChildren(
-                topicGraph.createListOfTrees(
+                topicGraph.createListOfLinkTrees(
                         topicGraph.createTopicTree(
                                 topicGraph.createLink(arthurTopic, "Arthur as a top-level link", Role.Noun)),
                         topicGraph.createTopicTree(
                                 topicGraph.createLink(arthurTopic, "Arthur as a header", Role.Verb))));
         page.getContent().getChildren().get(1).setChildren(
-                topicGraph.createListOfTrees(
+                topicGraph.createListOfLinkTrees(
                         topicGraph.createTopicTree(
                                 topicGraph.createLink(arthurTopic, "Arthur as a second-level link", Role.Noun))));
 

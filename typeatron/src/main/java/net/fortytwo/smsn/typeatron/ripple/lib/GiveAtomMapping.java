@@ -6,7 +6,9 @@ import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
@@ -46,7 +48,7 @@ public class GiveAtomMapping extends AtomMapping {
                       final ModelConnection mc) throws RippleException {
 
         Object first = stack.getFirst();
-        Note n = toNote(first, 0, true);
+        TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
             logger.warning("can't give non-atom: " + first);
@@ -54,7 +56,7 @@ public class GiveAtomMapping extends AtomMapping {
             IRI iri = iriOf(n);
 
             // value is informational; it is used only for development/debugging purposes
-            String value = n.getTitle();
+            String value = TreeViews.getTitle(n);
 
             logger.log(Level.INFO, "preparing to give " + iri + " (" + value + ")");
 

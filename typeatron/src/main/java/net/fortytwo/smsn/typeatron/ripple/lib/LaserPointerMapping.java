@@ -1,7 +1,9 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
@@ -44,7 +46,7 @@ public class LaserPointerMapping extends AtomMapping {
                       final Sink<RippleList> solutions,
                       final ModelConnection mc) throws RippleException {
         Object first = stack.getFirst();
-        Note n = toNote(first, 0, true);
+        TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
             logger.warning("can't point to non-atom: " + first);
@@ -54,7 +56,7 @@ public class LaserPointerMapping extends AtomMapping {
             IRI iri = iriOf(n);
 
             // value is informational; it is used only for development/debugging purposes
-            String value = n.getTitle();
+            String value = TreeViews.getTitle(n);
 
             logger.log(Level.INFO, "pointing to " + iri + " (" + value + ")");
 

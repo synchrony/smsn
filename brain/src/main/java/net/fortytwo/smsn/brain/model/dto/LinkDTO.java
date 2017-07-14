@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
 public class LinkDTO implements Link {
@@ -9,6 +10,7 @@ public class LinkDTO implements Link {
     private Role role = Role.Noun;
     private Topic target;
     private String label;
+    private Page page;
 
     @Override
     public void destroy() {
@@ -43,5 +45,15 @@ public class LinkDTO implements Link {
     @Override
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @Override
+    public Page getPage() {
+        return page;
+    }
+
+    @Override
+    public void setPage(Page page) {
+        this.page = page;
     }
 }

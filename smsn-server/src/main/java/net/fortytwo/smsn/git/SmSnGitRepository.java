@@ -5,8 +5,12 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.AtomBase;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.config.DataSource;
@@ -172,18 +176,18 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         return brain;
     }
 
-    public Note getHistory(final Limits limits) throws IOException, GitAPIException {
+    public TreeNode<Link> getHistory(final Limits limits) throws IOException, GitAPIException {
         long now = System.currentTimeMillis();
 
         String branch = repository.getBranch();
         logger.info("getting history for branch " + branch + " in " + directory.getAbsolutePath());
 
-        Note repoNote = new Note();
-        repoNote.setId(SemanticSynchrony.createRandomId());
-        repoNote.setTitle(getTitle());
-        repoNote.setSource(dataSource.getName());
-        repoNote.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
-        repoNote.setCreated(now);
+        TreeNode<Link> repoNote = TreeNodeDTO.createEmptyNode();
+        TreeViews.setId(repoNote, SemanticSynchrony.createRandomId());
+        TreeViews.setTitle(repoNote, getTitle());
+        TreeViews.setSource(repoNote, dataSource.getName());
+        TreeViews.setWeight(repoNote, SemanticSynchrony.DEFAULT_WEIGHT);
+        TreeViews.setCreated(repoNote, now);
 
         Iterable<RevCommit> log = git.log().call();
         int count = 0;
@@ -191,11 +195,11 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
             if (limits.getMaxDiffsPerRepository().isPresent() && ++count > limits.getMaxDiffsPerRepository().get())
                 break;
 
-            Note commitNote = toNote(commit, limits);
+            TreeNode<Link> commitNote = toNote(commit, limits);
             repoNote.addChild(commitNote);
         }
 
-        repoNote.setNumberOfChildren(repoNote.getChildren().size());
+        repoNote.setNumberOfChildren(repoNote.getChildren().length());
         return repoNote;
     }
 
@@ -231,24 +235,29 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         return commit.getFullMessage().startsWith("Merge branch");
     }
 
-    private Note toNote(final RevCommit commit, final Limits limits) throws IOException, GitAPIException {
-        Note commitNote = new Note();
-        commitNote.setId(SemanticSynchrony.createRandomId());
-        commitNote.setCreated(getTimeStamp(commit));
-        commitNote.setTitle(createTitleFor(commit));
-        commitNote.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
-        commitNote.setSource(dataSource.getName());
+    private TreeNode<Link> toNote(final RevCommit commit, final Limits limits) throws IOException, GitAPIException {
+        TreeNode<Link> commitNote = TreeNodeDTO.createEmptyNode();
+        TreeViews.setId(commitNote, SemanticSynchrony.createRandomId());
+        TreeViews.setCreated(commitNote, getTimeStamp(commit));
+        TreeViews.setTitle(commitNote, createTitleFor(commit));
+        TreeViews.setWeight(commitNote, SemanticSynchrony.DEFAULT_WEIGHT);
+        TreeViews.setSource(commitNote, dataSource.getName());
 
         if (!isMergeCommit(commit)) {
             addDiffNotes(commitNote, commit, limits);
         }
 
         commitNote.setNumberOfParents(1);
-        commitNote.setNumberOfChildren(commitNote.getChildren().size());
+        commitNote.setNumberOfChildren(countChildren(commitNote));
         return commitNote;
     }
 
-    private void addDiffNotes(final Note commitNote, final RevCommit commit, final Limits limits)
+    private int countChildren(final TreeNode<Link> node) {
+        ListNode<TreeNode<Link>> children = node.getChildren();
+        return null == children ? 0 : children.length();
+    }
+
+    private void addDiffNotes(final TreeNode<Link> commitNote, final RevCommit commit, final Limits limits)
             throws IOException, GitAPIException {
         Optional<RevCommit> parent = getParent(commit);
         if (!parent.isPresent()) return;
@@ -256,7 +265,7 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
         addDiffNotes(commitNote, parent.get(), commit, limits);
     }
 
-    private void addDiffNotes(final Note commitNote, final RevCommit oldCommit, final RevCommit newCommit,
+    private void addDiffNotes(final TreeNode<Link> commitNote, final RevCommit oldCommit, final RevCommit newCommit,
                               final Limits limits)
             throws IOException, GitAPIException {
 
@@ -284,25 +293,25 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
             String newPath = diffEntry.getNewPath();
 
             String id = toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
-            Note changeNote = toAtomNote(id, getTimeStamp(newCommit), changeType);
+            TreeNode<Link> changeNote = toAtomNote(id, getTimeStamp(newCommit), changeType);
 
             commitNote.addChild(changeNote);
         }
     }
 
-    private Note toAtomNote(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
+    private TreeNode<Link> toAtomNote(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
         Optional<Atom> opt = brain.getTopicGraph().getAtomById(id);
 
-        Note note;
+        TreeNode<Link> note;
         if (opt.isPresent()) {
             note = treeViews.view(opt.get(), 0, filter, ViewStyle.Basic.Forward.getStyle());
         } else {
-            note = new Note();
-            note.setId(id);
-            note.setCreated(timestamp);
-            note.setTitle(titleForMissingAtom(changeType));
-            note.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
-            note.setSource(dataSource.getName());
+            note = brain.getTopicGraph().createTopicTree(brain.getTopicGraph().createLink(null, null, Role.Noun));
+            TreeViews.setId(note, id);
+            TreeViews.setCreated(note, timestamp);
+            TreeViews.setTitle(note, titleForMissingAtom(changeType));
+            TreeViews.setWeight(note, SemanticSynchrony.DEFAULT_WEIGHT);
+            TreeViews.setSource(note, dataSource.getName());
         }
 
         return note;

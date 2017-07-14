@@ -11,7 +11,6 @@ import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;

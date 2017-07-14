@@ -4,7 +4,6 @@ import net.fortytwo.smsn.brain.rdf.AtomCollection;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.classes.DatedEvent;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 

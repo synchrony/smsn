@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -17,9 +18,9 @@ public class GetView extends RootedViewAction {
             throws RequestProcessingException, BadRequestException {
         super.performTransaction(context);
 
-        Note note = context.getQueries().view(getRoot(), height, getFilter(), style);
+        TreeNode<Link> tree = context.getQueries().view(getRoot(), height, getFilter(), style);
         try {
-            addView(note, context);
+            addView(tree, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

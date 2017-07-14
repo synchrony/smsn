@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain.rdf.classes;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.SimpleAtomClass;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 

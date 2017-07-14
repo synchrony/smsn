@@ -67,7 +67,7 @@ public class FilterTest extends BrainTestBase {
     }
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 }

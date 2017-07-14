@@ -2,6 +2,8 @@ package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 
+import java.util.function.BiFunction;
+
 public class ListNodeDTO<T> implements ListNode<T> {
     private T first;
     private ListNode<T> rest;
@@ -22,9 +24,8 @@ public class ListNodeDTO<T> implements ListNode<T> {
     }
 
     @Override
-    public boolean setFirst(T first) {
+    public void setFirst(T first) {
         this.first = first;
-        return false;
     }
 
     @Override
@@ -33,9 +34,8 @@ public class ListNodeDTO<T> implements ListNode<T> {
     }
 
     @Override
-    public boolean setRest(ListNode<T> rest) {
+    public void setRest(ListNode<T> rest) {
         this.rest = rest;
-        return false;
     }
 
     @Override
@@ -50,7 +50,17 @@ public class ListNodeDTO<T> implements ListNode<T> {
 
     @Override
     public T get(int index) {
-        return 0 == index ? first : rest.get(index - 1);
+        return ListNode.get(this, index);
+    }
+
+    @Override
+    public ListNode<T> add(int index, final T toAdd) {
+        return ListNode.add(this, index, toAdd, (BiFunction<T, ListNode<T>, ListNode<T>>) ListNodeDTO::new);
+    }
+
+    @Override
+    public ListNode<T> remove(int index) {
+        return ListNode.remove(this, index);
     }
 
     public static <T> ListNode<T> fromArray(final T... elements) {
