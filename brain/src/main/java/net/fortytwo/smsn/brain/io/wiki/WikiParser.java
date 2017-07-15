@@ -93,6 +93,10 @@ public class WikiParser extends PageParser {
         }
     }
 
+    private void toTextState() {
+        currentState = State.Text;
+    }
+
     private void parseLine() throws IOException {
         incrementLineNumber();
 
@@ -102,7 +106,7 @@ public class WikiParser extends PageParser {
 
         if (currentLineIsEmpty()) {
             if (State.Text != currentState) {
-                currentState = State.Text;
+                toTextState();
                 return;
             }
         }
@@ -218,10 +222,6 @@ public class WikiParser extends PageParser {
         return currentLineTrimmed.startsWith("@");
     }
 
-    private boolean currentLineIsTextDelimiter() {
-        return currentLineIsEmpty();
-    }
-
     private void validateLink(Link link) throws IOException {
         if (null != link.getLabel() && 0 == link.getLabel().length()) {
             if (null == link.getTarget()) {
@@ -264,7 +264,7 @@ public class WikiParser extends PageParser {
         if (value.isEmpty()) {
             // can "clear" alias or shortcut by writing "@alias" or "@shortcut" and nothing else;
             // all other properties require an argument
-            if (!(key.equals("alias") || key.equals("shortcut"))) {
+            if (!(key.equals("alias") || key.equals("shortcut") || key.equals("text"))) {
                 parseError("empty value for property @" + key);
             }
         }
@@ -309,6 +309,11 @@ public class WikiParser extends PageParser {
     }
 
     private <T> void setProperty(final Page page, final String key, String value) throws IOException {
+        if (key.equals(SemanticSynchrony.PropertyKeys.TEXT)) {
+            toTextState();
+            return;
+        }
+
         if (value.length() == 0) {
             value = WikiFormat.CLEARME;
         }

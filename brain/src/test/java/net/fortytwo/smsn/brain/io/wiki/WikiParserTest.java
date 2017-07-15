@@ -42,6 +42,16 @@ public class WikiParserTest extends BrainTestBase {
     }
 
     @Test
+    public void textBeginsWithProperty() throws IOException {
+        Page page = wikiParser.parse("* Arthur\n" +
+                "@text\n" +
+                "Here is some text about Arthur.");
+
+        assertEquals("Arthur", page.getContent().getChildren().getFirst().getValue().getLabel());
+        assertEquals("Here is some text about Arthur.", page.getText());
+    }
+
+    @Test
     public void textIsCopiedVerbatim() throws Exception {
         Page page = getExample();
 
