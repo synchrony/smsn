@@ -93,7 +93,7 @@ public class WikiPrinter {
 
     private void printText(final Page page) {
         if (!isEmptyText(page.getText())) {
-            printStream.println("");
+            printStream.println("@text");
             printStream.print(page.getText());
         }
     }

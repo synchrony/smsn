@@ -101,7 +101,7 @@ public class ActionDuJour extends Action {
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());
             TopicGraph graph = context.getBrain().getTopicGraph();
             for (File file : dir.listFiles()) {
-                if (VCSFormat.isAtomFile(file)) {
+                if (VCSFormat.isSmSnFile(file)) {
                     String id = file.getName();
                     Optional<Atom> opt = graph.getAtomById(id);
                     Preconditions.checkArgument(opt.isPresent());

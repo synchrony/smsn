@@ -51,7 +51,7 @@ public class WikiPrinterTest {
 
         assertEquals("@id 12345\n" +
                 "@title Arthur Dent\n" +
-                "\n" +
+                "@text\n" +
                 "The regular early morning yell of horror was the sound of Arthur Dent waking\n" +
                 "up and suddenly remembering where he was.", write(page));
     }

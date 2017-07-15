@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.config.DataSource;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class VCSFormat extends Format {
         return dirs;
     }
 
-    private static final Pattern ATOM_FILENAME_PATTERN = Pattern.compile("[a-zA-Z0-9]{5,}");
+    private static final Pattern SMSN_FILENAME_PATTERN = Pattern.compile("[a-zA-Z0-9]{5,}.smsn");
 
     private static final VCSFormat instance = new VCSFormat();
 
@@ -31,7 +32,11 @@ public class VCSFormat extends Format {
         return instance;
     }
 
-    public static boolean isAtomFile(final File file) {
-        return ATOM_FILENAME_PATTERN.matcher(file.getName()).matches();
+    public static boolean isSmSnFile(final File file) {
+        return SMSN_FILENAME_PATTERN.matcher(file.getName()).matches();
+    }
+
+    public static String fileNameForTopic(final Topic topic) {
+        return topic.getId() + ".smsn";
     }
 }

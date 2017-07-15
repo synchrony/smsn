@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
@@ -59,7 +58,7 @@ public class VCSWriter extends BrainWriter {
 
     private void clearDirectoryOfAtomData(final File dir) {
         for (File file : dir.listFiles()) {
-            if (VCSFormat.isAtomFile(file)) {
+            if (VCSFormat.isSmSnFile(file)) {
                 if (!file.delete()) {
                     throw new IllegalStateException("failed to delete atom file " + file.getAbsolutePath());
                 }
@@ -71,8 +70,8 @@ public class VCSWriter extends BrainWriter {
         for (Atom a : graph.getAllAtoms()) {
             if (isAtomWithPage(a)) {
                 File dir = chooseDirectoryForAtom(a, dirs);
-                File atomFile = new File(dir, fileNameForAtom(a));
-                try (OutputStream out = new FileOutputStream(atomFile)) {
+                File pageFile = new File(dir, fileNameForAtom(a));
+                try (OutputStream out = new FileOutputStream(pageFile)) {
                     writeAtomToStream(a, out);
                 }
             }
@@ -80,7 +79,10 @@ public class VCSWriter extends BrainWriter {
     }
 
     private String fileNameForAtom(final Atom a) {
-        return a.getId();
+        // TODO
+        Topic topic = new TopicDTO();
+        topic.setId(a.getId());
+        return VCSFormat.fileNameForTopic(topic);
     }
 
     private boolean isAtomWithPage(final Atom a) {

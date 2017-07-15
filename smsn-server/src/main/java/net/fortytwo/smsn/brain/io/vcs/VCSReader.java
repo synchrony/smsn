@@ -56,8 +56,8 @@ public class VCSReader extends BrainReader {
         if (null != files) {
             for (File file : files) {
                 try {
-                    if (VCSFormat.isAtomFile(file)) {
-                        readAtomFile(file, helper, dataSource);
+                    if (VCSFormat.isSmSnFile(file)) {
+                        readPage(file, helper, dataSource);
                     }
                 } catch (IOException e) {
                     throw new IOException("failed to load file " + file.getAbsolutePath(), e);
@@ -67,10 +67,11 @@ public class VCSReader extends BrainReader {
     }
 
     private String idFromFileName(final File file) {
-        return file.getName();
+        String fileName = file.getName();
+        return fileName.substring(0, fileName.indexOf("."));
     }
 
-    private void readAtomFile(final File file, final Helper helper, final DataSource source) throws IOException {
+    private void readPage(final File file, final Helper helper, final DataSource source) throws IOException {
         Page page;
         try (InputStream in = new FileInputStream(file)) {
             page = reader.parse(in);

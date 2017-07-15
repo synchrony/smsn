@@ -99,7 +99,7 @@ public class VCSWriterTest extends BrainTestBase {
         assertEquals(4, dir.listFiles().length);
         File publicDir = new File(dir, "public");
         assertTrue(publicDir.exists() && publicDir.isDirectory());
-        File arthurFile = new File(publicDir, root.getId());
+        File arthurFile = new File(publicDir, root.getId() + ".smsn");
         assertTrue(arthurFile.exists());
         List<String> lines = readLines(arthurFile);
         assertEquals(9, lines.size());
@@ -109,7 +109,7 @@ public class VCSWriterTest extends BrainTestBase {
         assertEquals("@weight 0.5", lines.get(3));
         assertEquals("* :" + fordTopic.getId() + ": ", lines.get(4));
         assertEquals("* :" + zaphodTopic.getId() + ": ", lines.get(5));
-        assertEquals("", lines.get(6));
+        assertEquals("@text", lines.get(6));
         assertEquals("He's a jerk.", lines.get(7));
     }
 

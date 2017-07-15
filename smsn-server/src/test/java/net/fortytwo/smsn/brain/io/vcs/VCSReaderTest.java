@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.io.BrainReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -46,8 +47,8 @@ public class VCSReaderTest extends BrainTestBase {
         context.setFormat(formats.get(0));
         context.setSourceDirectory(createVCSTestDirectory());
         File universalDir = new File(SemanticSynchrony.getConfiguration().getSources().get(3).getLocation());
-        copyVCSFileToDirectory(ARTHUR_ID, universalDir);
-        copyVCSFileToDirectory(FORD_ID, universalDir);
+        copyVCSFileToDirectory(arthurTopic, universalDir);
+        copyVCSFileToDirectory(fordTopic, universalDir);
         context.setTopicGraph(topicGraph);
         reader.doImport(context);
 
@@ -66,9 +67,10 @@ public class VCSReaderTest extends BrainTestBase {
         assertNull(ford.getText());
     }
 
-    private void copyVCSFileToDirectory(final String atomId, final File dir) throws IOException {
-        try (InputStream in = VCSReaderTest.class.getResourceAsStream(atomId)) {
-            try (OutputStream out = new FileOutputStream(new File(dir, atomId))) {
+    private void copyVCSFileToDirectory(final Topic topic, final File dir) throws IOException {
+        String fileName = VCSFormat.fileNameForTopic(topic);
+        try (InputStream in = VCSReaderTest.class.getResourceAsStream(fileName)) {
+            try (OutputStream out = new FileOutputStream(new File(dir, fileName))) {
                 IOUtils.copy(in, out);
             }
         }
