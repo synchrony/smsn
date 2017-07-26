@@ -65,7 +65,7 @@ public abstract class BrainTestBase {
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
     protected final ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
-    protected Collection<Atom> result;
+    protected Collection<Atom> queryResult;
 
     @Before
     public void setUp() throws Exception {
