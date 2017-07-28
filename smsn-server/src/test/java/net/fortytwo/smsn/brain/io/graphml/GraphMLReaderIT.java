@@ -2,8 +2,8 @@ package net.fortytwo.smsn.brain.io.graphml;
 
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.io.BrainReader;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import org.junit.Test;
@@ -31,21 +31,21 @@ public class GraphMLReaderIT extends BrainTestBase {
 
         Format format = Format.getFormat("graphml");
         assertNotNull(format);
-        BrainReader reader = Format.getReader(format);
+        NoteReader reader = Format.getReader(format);
         assertNotNull(reader);
 
         reader.doImport(inputFile, GraphMLFormat.getInstance(), brain);
 
-        System.out.println("# atoms: " + countAtoms());
+        System.out.println("# atoms: " + countNotes());
 
-        BrainWriter exporter = new GraphMLWriter();
+        NoteWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(outputFile)) {
-            BrainWriter.Context context = new BrainWriter.Context();
+            NoteWriter.Context context = new NoteWriter.Context();
             context.setTopicGraph(brain.getTopicGraph());
             context.setKnowledgeBase(brain.getKnowledgeBase());
             context.setDestStream(out);
             context.setFormat(GraphMLFormat.getInstance());
-            exporter.doExport(context);
+            exporter.doWrite(context);
         }
     }
 }

@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.io.graphml;
 
-import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class GraphMLReader extends BrainReader {
+public class GraphMLReader extends NoteReader {
 
     @Override
     public List<Format> getFormats() {
@@ -33,9 +33,9 @@ public class GraphMLReader extends BrainReader {
     }
 
     private void addAllToIndices(TopicGraph destGraph) {
-        for (Atom a : destGraph.getAllAtoms()) {
+        for (Note a : destGraph.getAllNotes()) {
             String value = a.getTitle();
-            if (null != value) destGraph.reindexAtom(a);
+            if (null != value) destGraph.reindex(a);
         }
     }
 }

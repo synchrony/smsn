@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.query;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 
 import java.util.LinkedList;
@@ -44,7 +44,7 @@ public interface ViewStyle {
                 }
 
                 @Override
-                public Iterable<Atom> getLinked(final Atom root,
+                public Iterable<Note> getLinked(final Note root,
                                                 final Filter filter) {
                     return TreeViews.toFilteredIterable(root.getChildren(), filter);
                 }
@@ -79,7 +79,7 @@ public interface ViewStyle {
                 }
 
                 @Override
-                public Iterable<Atom> getLinked(final Atom root,
+                public Iterable<Note> getLinked(final Note root,
                                                 final Filter filter) {
                     return TreeViews.toFilteredIterable(root.getChildren(), filter);
                 }
@@ -114,18 +114,18 @@ public interface ViewStyle {
                 }
 
                 @Override
-                public Iterable<Atom> getLinked(final Atom root,
+                public Iterable<Note> getLinked(final Note root,
                                                 final Filter filter) {
-                    List<Atom> results = new LinkedList<>();
+                    List<Note> results = new LinkedList<>();
                     root.forFirstOf(list -> {
-                        ListNode<Atom> cur = list;
-                        ListNode<Atom> prev = null;
+                        ListNode<Note> cur = list;
+                        ListNode<Note> prev = null;
                         while (null != cur) {
                             prev = cur;
                             cur = cur.getRestOf();
                         }
 
-                        Atom a = root.getSubject(prev);
+                        Note a = root.getSubject(prev);
                         if (filter.test(a)) {
                             results.add(a);
                         }
@@ -159,7 +159,7 @@ public interface ViewStyle {
 
     String getName();
 
-    Iterable<Atom> getLinked(Atom root, Filter filter);
+    Iterable<Note> getLinked(Note root, Filter filter);
 
     boolean addOnUpdate();
 

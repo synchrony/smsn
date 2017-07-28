@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.config.DataSource;
 
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class Filter implements Predicate<Atom>, Serializable {
+public class Filter implements Predicate<Note>, Serializable {
 
     private static final Map<String, Integer> sourceToIndex;
 
@@ -116,7 +116,7 @@ public class Filter implements Predicate<Atom>, Serializable {
     }
 
     @Override
-    public boolean test(final Atom atom) {
+    public boolean test(final Note atom) {
         Integer sourceIndex = getSourceIndexFor(atom);
         Float weight = atom.getWeight();
 
@@ -127,7 +127,7 @@ public class Filter implements Predicate<Atom>, Serializable {
         return sourceIndex >= minSourceIndex && weight >= minWeight;
     }
 
-    private Integer getSourceIndexFor(final Atom atom) {
+    private Integer getSourceIndexFor(final Note atom) {
         String source = atom.getSource();
         return null == source ? null : indexForSource(source);
     }

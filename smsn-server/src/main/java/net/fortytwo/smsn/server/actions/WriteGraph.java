@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -29,23 +29,23 @@ public class WriteGraph extends IOAction {
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
 
-        BrainWriter.Context context = new BrainWriter.Context();
+        NoteWriter.Context context = new NoteWriter.Context();
         context.setTopicGraph(params.getBrain().getTopicGraph());
         context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
         context.setRootId(getRootId());
         context.setFilter(getFilter());
         context.setFormat(getFormat());
-        BrainWriter writer = Format.getWriter(getFormat());
+        NoteWriter writer = Format.getWriter(getFormat());
 
         try {
             if (getFormat().getType().equals(Format.Type.FileBased)) {
                 try (OutputStream destStream = new FileOutputStream(getFile())) {
                     context.setDestStream(destStream);
-                    writer.doExport(context);
+                    writer.doWrite(context);
                 }
             } else {
                 context.setDestDirectory(getFile());
-                writer.doExport(context);
+                writer.doWrite(context);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);

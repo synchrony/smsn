@@ -1,15 +1,19 @@
-package net.fortytwo.smsn.brain.model;
+package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class AtomBase implements Atom {
+public class NoteDTO implements Note {
 
     private String id = SemanticSynchrony.createRandomId();
+    private Topic topic;
+    private Tag tag;
     private long created = System.currentTimeMillis();
     private String title = "atom " + id;
     private Float weight = SemanticSynchrony.DEFAULT_WEIGHT;
@@ -29,6 +33,14 @@ public class AtomBase implements Atom {
     @Override
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(final Tag tag) {
+        this.tag = tag;
     }
 
     @Override
@@ -99,20 +111,30 @@ public class AtomBase implements Atom {
     }
 
     @Override
-    public ListNode<Atom> getChildren() {
+    public Topic getTopic() {
+        return topic;
+    }
+
+    @Override
+    public void setTopic(final Topic topic) {
+        this.topic = topic;
+    }
+
+    @Override
+    public ListNode<Note> getChildren() {
         return null;
     }
 
     @Override
-    public void setChildren(ListNode<Atom> notes) {
+    public void setChildren(ListNode<Note> notes) {
     }
 
     @Override
-    public void forFirstOf(Consumer<ListNode<Atom>> consumer) {
+    public void forFirstOf(Consumer<ListNode<Note>> consumer) {
     }
 
     @Override
-    public void addChildAt(Atom child, int position) {
+    public void addChildAt(Note child, int position) {
     }
 
     @Override
@@ -120,12 +142,12 @@ public class AtomBase implements Atom {
     }
 
     @Override
-    public Collection<ListNode<Atom>> getFirstOf() {
+    public Collection<ListNode<Note>> getFirstOf() {
         return null;
     }
 
     @Override
-    public Atom getSubject(ListNode<Atom> notes) {
+    public Note getSubject(ListNode<Note> notes) {
         return null;
     }
 

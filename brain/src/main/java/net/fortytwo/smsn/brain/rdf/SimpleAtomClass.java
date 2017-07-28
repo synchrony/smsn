@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.openrdf.model.IRI;
 import org.openrdf.rio.RDFHandlerException;
 
@@ -20,7 +20,7 @@ public abstract class SimpleAtomClass extends AtomClass {
         return false;
     }
 
-    public IRI toRDF(final Atom a,
+    public IRI toRDF(final Note a,
                      final RDFizationContext context) throws RDFHandlerException {
         // Some classes are meaningful only as fields of other classes.
         // They are not identified by URIs, and they are not the subjects of RDF statements.

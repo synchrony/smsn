@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
@@ -34,14 +34,14 @@ public class AbstractEvent extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         // TODO
         return null;
     }
 
     private static class InteractorHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // TODO
         }
     }

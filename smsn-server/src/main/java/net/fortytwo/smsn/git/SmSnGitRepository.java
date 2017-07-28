@@ -3,11 +3,11 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.AtomBase;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class SmSnGitRepository extends AtomBase implements AbstractRepository {
+public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
 
     private static final Logger logger = Logger.getLogger(SmSnGitRepository.class.getName());
 
@@ -293,20 +293,20 @@ public class SmSnGitRepository extends AtomBase implements AbstractRepository {
             String newPath = diffEntry.getNewPath();
 
             String id = toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
-            TreeNode<Link> changeNote = toAtomNote(id, getTimeStamp(newCommit), changeType);
+            TreeNode<Link> changeNote = toTreeNode(id, getTimeStamp(newCommit), changeType);
 
             commitNote.addChild(changeNote);
         }
     }
 
-    private TreeNode<Link> toAtomNote(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
-        Optional<Atom> opt = brain.getTopicGraph().getAtomById(id);
+    private TreeNode<Link> toTreeNode(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
+        Optional<Note> opt = brain.getTopicGraph().getNotesById(id);
 
         TreeNode<Link> note;
         if (opt.isPresent()) {
             note = treeViews.view(opt.get(), 0, filter, ViewStyle.Basic.Forward.getStyle());
         } else {
-            note = brain.getTopicGraph().createTopicTree(brain.getTopicGraph().createLink(null, null, Role.Noun));
+            note = brain.getTopicGraph().createTopicTree(brain.getTopicGraph().createLink(null, null, null));
             TreeViews.setId(note, id);
             TreeViews.setCreated(note, timestamp);
             TreeViews.setTitle(note, titleForMissingAtom(changeType));

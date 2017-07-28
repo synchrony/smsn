@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -66,7 +66,7 @@ public class SearchTest extends BrainTestBase {
     public void higherWeightScoresHigher() throws Exception {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
-            Atom a = createAtom("Lintilla");
+            Note a = createAtom("Lintilla");
             a.setWeight(random.nextFloat());
         }
 
@@ -85,7 +85,7 @@ public class SearchTest extends BrainTestBase {
     public void higherPriorityScoresHigher() throws Exception {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
-            Atom a = createAtom("Lintilla");
+            Note a = createAtom("Lintilla");
             if (random.nextBoolean()) {
                 a.setPriority(random.nextFloat());
             }

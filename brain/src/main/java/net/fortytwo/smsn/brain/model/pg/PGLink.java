@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -14,14 +14,13 @@ public abstract class PGLink extends PGEntity implements Link {
         super(vertex);
     }
 
-    @Override
-    public Role getRole() {
-        return Role.valueOf(getRequiredProperty(SemanticSynchrony.PropertyKeys.ROLE));
+    public Tag getTag() {
+        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.TAG);
+        return null == name ? null : Tag.valueOf(name);
     }
 
-    @Override
-    public void setRole(final Role role) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.ROLE, role.name());
+    public void setTag(final Tag tag) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.TAG, null == tag ? null : tag.name());
     }
 
     @Override

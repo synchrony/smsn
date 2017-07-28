@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -28,7 +28,7 @@ public class ReadGraph extends IOAction {
             throw new BadRequestException("format is required");
         }
 
-        BrainReader reader = Format.getReader(getFormat());
+        NoteReader reader = Format.getReader(getFormat());
 
         String lockId = findLockId();
         beginImport(params.getGraphWrapper().getGraph(), lockId);

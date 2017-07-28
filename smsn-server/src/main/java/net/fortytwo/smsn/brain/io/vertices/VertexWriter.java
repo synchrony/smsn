@@ -2,9 +2,9 @@ package net.fortytwo.smsn.brain.io.vertices;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class VertexWriter extends BrainWriter {
+public class VertexWriter extends NoteWriter {
     private static final Logger logger = Logger.getLogger(VertexWriter.class.getName());
 
     @Override
@@ -24,7 +24,7 @@ public class VertexWriter extends BrainWriter {
     }
 
     @Override
-    public void doExport(Context context) throws IOException {
+    public void doWrite(Context context) throws IOException {
 
         TopicGraph sourceGraph = context.getTopicGraph();
         Filter filter = context.getFilter();
@@ -34,7 +34,7 @@ public class VertexWriter extends BrainWriter {
 
         p.println("created\tid\tweight\tsource\tclass\tout\tin\ttitle\talias");
 
-        for (Atom a : sourceGraph.getAllAtoms()) {
+        for (Note a : sourceGraph.getAllNotes()) {
             if (isTrueAtom(a) && filter.test(a)) {
                 p.print(a.getCreated());
                 p.print('\t');
@@ -76,7 +76,7 @@ public class VertexWriter extends BrainWriter {
         }
     }
 
-    private boolean isTrueAtom(final Atom a) {
+    private boolean isTrueAtom(final Note a) {
         return null != a.getCreated();
     }
 

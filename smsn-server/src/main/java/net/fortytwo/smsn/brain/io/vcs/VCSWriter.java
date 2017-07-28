@@ -1,16 +1,16 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Page;
@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class VCSWriter extends BrainWriter {
+public class VCSWriter extends NoteWriter {
 
     private static final List<Format> formats;
 
@@ -41,7 +41,7 @@ public class VCSWriter extends BrainWriter {
     }
 
     @Override
-    public void doExport(Context context) throws IOException {
+    public void doWrite(Context context) throws IOException {
         Map<String, File> dirs = initializeDirectories();
 
         timeAction("exported atoms as individual files", () -> doExport(context.getTopicGraph(), dirs));
@@ -67,7 +67,7 @@ public class VCSWriter extends BrainWriter {
     }
 
     private void doExport(final TopicGraph graph, final Map<String, File> dirs) throws IOException {
-        for (Atom a : graph.getAllAtoms()) {
+        for (Note a : graph.getAllNotes()) {
             if (isAtomWithPage(a)) {
                 File dir = chooseDirectoryForAtom(a, dirs);
                 File pageFile = new File(dir, fileNameForAtom(a));
@@ -78,18 +78,18 @@ public class VCSWriter extends BrainWriter {
         }
     }
 
-    private String fileNameForAtom(final Atom a) {
+    private String fileNameForAtom(final Note a) {
         // TODO
         Topic topic = new TopicDTO();
         topic.setId(a.getId());
         return VCSFormat.fileNameForTopic(topic);
     }
 
-    private boolean isAtomWithPage(final Atom a) {
+    private boolean isAtomWithPage(final Note a) {
         return null != a.getSource();
     }
 
-    private File chooseDirectoryForAtom(final Atom a, Map<String, File> dirs) {
+    private File chooseDirectoryForAtom(final Note a, Map<String, File> dirs) {
         String source = a.getSource();
         Preconditions.checkNotNull(source);
         File dir = dirs.get(source);
@@ -97,17 +97,16 @@ public class VCSWriter extends BrainWriter {
         return dir;
     }
 
-    private void writeAtomToStream(final Atom atom, final OutputStream out) {
+    private void writeAtomToStream(final Note atom, final OutputStream out) {
         TreeNode<Link> tree = new TreeNodeDTO<>();
         Topic topic = new TopicDTO();
         topic.setId(atom.getId());
         Link link = new LinkDTO();
         link.setTarget(topic);
         link.setLabel(atom.getTitle());
-        link.setRole(Role.Noun);
         tree.setValue(link);
 
-        ListNode<Atom> cur = atom.getChildren();
+        ListNode<Note> cur = atom.getChildren();
         while (null != cur) {
             tree.addChild(toTree(cur.getFirst()));
             cur = cur.getRest();
@@ -124,7 +123,7 @@ public class VCSWriter extends BrainWriter {
         new WikiPrinter(out).print(page);
     }
 
-    private TreeNode<Link> toTree(final Atom atom) {
+    private TreeNode<Link> toTree(final Note atom) {
         TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
         TreeViews.setId(tree, atom.getId());
         return tree;

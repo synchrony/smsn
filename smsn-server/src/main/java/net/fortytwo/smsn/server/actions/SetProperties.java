@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -114,7 +114,7 @@ public class SetProperties extends FilteredAction {
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         validateKeyValue();
 
-        Atom root = getRoot(getId(), context);
+        Note root = getRoot(getId(), context);
         setFilterParams(context);
         Object value = getValue();
 
@@ -138,7 +138,7 @@ public class SetProperties extends FilteredAction {
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
-                for (Atom a : context.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
+                for (Note a : context.getBrain().getTopicGraph().getNotesByShortcut(shortcut, getFilter())) {
                     a.setShortcut(null);
                 }
 
@@ -150,7 +150,7 @@ public class SetProperties extends FilteredAction {
 
         context.getBrain().getTopicGraph().notifyOfUpdate();
 
-        context.getMap().put("key", context.getBrain().getTopicGraph().idOfAtom(root));
+        context.getMap().put("key", context.getBrain().getTopicGraph().idOf(root));
         context.getMap().put("name", getName());
         context.getMap().put("value", value.toString());
 

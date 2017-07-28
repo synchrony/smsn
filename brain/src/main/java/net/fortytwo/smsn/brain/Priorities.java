@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 
 import java.util.Comparator;
@@ -12,13 +12,13 @@ import java.util.Queue;
  * A dynamically updated list of atoms ordered by their priority value
  */
 public class Priorities {
-    private final PriorityQueue<Atom> queue;
+    private final PriorityQueue<Note> queue;
 
     public Priorities() {
         queue = new PriorityQueue<>(1, new AtomPriorityComparator());
     }
 
-    public Queue<Atom> getQueue() {
+    public Queue<Note> getQueue() {
         return queue;
     }
 
@@ -29,7 +29,7 @@ public class Priorities {
             SemanticSynchrony.getLogger().info("generating priority queue");
             long startTime = System.currentTimeMillis();
 
-            for (Atom a : graph.getAllAtoms()) {
+            for (Note a : graph.getAllNotes()) {
                 if (null != a.getPriority()) {
                     updatePriority(a);
                 }
@@ -40,7 +40,7 @@ public class Priorities {
         }).start();
     }
 
-    public void updatePriority(final Atom a) {
+    public void updatePriority(final Note a) {
         queue.remove(a);
         if (null != a.getPriority()) {
             queue.add(a);
@@ -48,8 +48,8 @@ public class Priorities {
     }
 
     // order primarily by descending priority, secondarily by descending weight
-    private static class AtomPriorityComparator implements Comparator<Atom> {
-        public int compare(final Atom a, final Atom b) {
+    private static class AtomPriorityComparator implements Comparator<Note> {
+        public int compare(final Note a, final Note b) {
             Float pa = a.getPriority();
             Float pb = b.getPriority();
 

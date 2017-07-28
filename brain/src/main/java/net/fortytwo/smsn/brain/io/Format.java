@@ -13,8 +13,8 @@ public class Format {
     public enum Type {Internal, FileBased, Complex }
 
     private static final Map<String, Format> formatsByNameLowercase;
-    private static final Map<Format, BrainReader> readersByFormat;
-    private static final Map<Format, BrainWriter> writersByFormat;
+    private static final Map<Format, NoteReader> readersByFormat;
+    private static final Map<Format, NoteWriter> writersByFormat;
     private static boolean initialized;
 
     static {
@@ -66,10 +66,10 @@ public class Format {
         return format;
     }
 
-    public static BrainReader getReader(final Format format) {
+    public static NoteReader getReader(final Format format) {
         checkInitialized();
 
-        BrainReader reader = readersByFormat.get(format);
+        NoteReader reader = readersByFormat.get(format);
 
         if (null == reader) {
             throw new IllegalStateException();
@@ -78,12 +78,12 @@ public class Format {
         return reader;
     }
 
-    public static BrainWriter getWriter(final Format format) {
+    public static NoteWriter getWriter(final Format format) {
         if (null == format) throw new IllegalArgumentException();
 
         checkInitialized();
 
-        BrainWriter writer = writersByFormat.get(format);
+        NoteWriter writer = writersByFormat.get(format);
 
         if (null == writer) {
             throw new IllegalStateException("no writer for format " + format);
@@ -102,9 +102,9 @@ public class Format {
     }
 
     private static void initializeReaders() {
-        ServiceLoader<BrainReader> loader = ServiceLoader.load(BrainReader.class);
+        ServiceLoader<NoteReader> loader = ServiceLoader.load(NoteReader.class);
         int count = 0;
-        for (BrainReader reader : loader) {
+        for (NoteReader reader : loader) {
             Preconditions.checkNotNull(reader.getFormats());
             if (0 == reader.getFormats().size()) {
                 logger.warning("reader has no formats: " + reader);
@@ -120,9 +120,9 @@ public class Format {
     }
 
     private static void initializeWriters() {
-        ServiceLoader<BrainWriter> loader = ServiceLoader.load(BrainWriter.class);
+        ServiceLoader<NoteWriter> loader = ServiceLoader.load(NoteWriter.class);
         int count = 0;
-        for (BrainWriter writer : loader) {
+        for (NoteWriter writer : loader) {
             if (0 == writer.getFormats().size()) {
                 logger.warning("writer has no formats: " + writer);
             }

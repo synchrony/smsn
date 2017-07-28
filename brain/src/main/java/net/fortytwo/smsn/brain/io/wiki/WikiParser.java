@@ -4,7 +4,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.PageParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.model.Property;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
@@ -63,7 +63,6 @@ public class WikiParser extends PageParser {
         Topic topic = new TopicDTO();
         topic.setId(null);
         Link link = new LinkDTO();
-        link.setRole(Role.Noun);
         // TODO: set label externally
         link.setLabel(null);
         link.setTarget(topic);
@@ -304,7 +303,7 @@ public class WikiParser extends PageParser {
             label = rest;
         }
 
-        TreeNode<Link> tree = constructTreeNode(id, roleForBullet(bullet), label);
+        TreeNode<Link> tree = constructTreeNode(id, tagForBullet(bullet), label);
         addToHierarchy(tree);
     }
 
@@ -343,16 +342,16 @@ public class WikiParser extends PageParser {
         }
     }
 
-    private Role roleForBullet(final String bullet) {
-        return bullet.equals(WikiFormat.VERB_BULLET)
-                ? Role.Verb
-                : Role.Noun;
+    private Tag tagForBullet(final String bullet) {
+        return bullet.equals(WikiFormat.LABEL_BULLET)
+                ? Tag.Label
+                : null;
     }
 
-    private TreeNode<Link> constructTreeNode(final String topicId, final Role role, final String label)
+    private TreeNode<Link> constructTreeNode(final String topicId, final Tag tag, final String label)
             throws IOException {
         Link link = new LinkDTO();
-        link.setRole(role);
+        link.setTag(tag);
         link.setLabel(label);
         if (null != topicId) {
             Topic target = new TopicDTO();

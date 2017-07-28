@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.SmSnScriptEngine;
@@ -32,8 +32,8 @@ public abstract class ActionTestBase extends BrainTestBase {
         return (JSONObject) context.getMap().get(Params.VIEW);
     }
 
-    protected Atom createAtomWithTitle(final String title) {
-        Atom atom = topicGraph.createAtomWithProperties(Filter.noFilter(), null);
+    protected Note createAtomWithTitle(final String title) {
+        Note atom = topicGraph.createNoteWithProperties(Filter.noFilter(), null);
         atom.setTitle(title);
         return atom;
     }

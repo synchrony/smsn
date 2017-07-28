@@ -1,20 +1,17 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.junit.Test;
@@ -69,7 +66,7 @@ public class VCSWriterTest extends BrainTestBase {
     public void singlePageIsWrittenCorrectly() throws Exception {
         String source = DefaultSources.PUBLIC;
 
-        Atom root = createAtom("11111", "change me");
+        Note root = createAtom("11111", "change me");
         root.setSource(source);
 
         TreeNode<Link> tree = createTreeDTO(root.getId(), "Arthur Dent");
@@ -87,12 +84,12 @@ public class VCSWriterTest extends BrainTestBase {
 
         queries.update(tree, Integer.MAX_VALUE, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
 
-        Atom ad = topicGraph.getAtomById(root.getId()).get();
+        Note ad = topicGraph.getNotesById(root.getId()).get();
         assertEquals(DefaultSources.PUBLIC, ad.getSource());
         assertEquals("Arthur Dent", ad.getTitle());
         assertEquals("He's a jerk.\nA complete kneebiter.", ad.getText());
         assertEquals(2, ListNode.toJavaList(ad.getChildren()).size());
-        Atom random = ad.getChildren().getFirst();
+        Note random = ad.getChildren().getFirst();
         assertEquals("Ford Prefect", random.getTitle());
 
         File dir = doExport();
@@ -139,11 +136,11 @@ public class VCSWriterTest extends BrainTestBase {
         VCSWriter writer = new VCSWriter();
 
         File dir = createVCSTestDirectory();
-        BrainWriter.Context context = new BrainWriter.Context();
+        NoteWriter.Context context = new NoteWriter.Context();
         context.setDestDirectory(dir);
         context.setTopicGraph(topicGraph);
 
-        writer.doExport(context);
+        writer.doWrite(context);
         return dir;
     }
 }

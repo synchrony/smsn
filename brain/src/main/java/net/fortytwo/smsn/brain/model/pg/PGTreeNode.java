@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Node;
+import net.fortytwo.smsn.brain.model.entities.Entity;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -9,7 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.function.Function;
 
-public abstract class PGTreeNode<T extends Node> extends PGEntity implements TreeNode<T> {
+public abstract class PGTreeNode<T extends Entity> extends PGEntity implements TreeNode<T> {
 
     private final Function<Vertex, T> constructor;
 

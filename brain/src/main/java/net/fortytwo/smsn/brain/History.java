@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 
@@ -26,10 +26,10 @@ public class History {
         }
     }
 
-    public Iterable<Atom> getHistory(final int maxlen,
+    public Iterable<Note> getHistory(final int maxlen,
                                      final TopicGraph graph,
                                      final Filter filter) {
-        Collection<Atom> atoms = new LinkedList<>();
+        Collection<Note> atoms = new LinkedList<>();
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 
@@ -40,7 +40,7 @@ public class History {
 
             String id = visitedAtoms[i % CAPACITY];
 
-            Optional<Atom> a = graph.getAtomById(id);
+            Optional<Note> a = graph.getNotesById(id);
             if (a.isPresent() && filter.test(a.get())) {
                 atoms.add(a.get());
             }

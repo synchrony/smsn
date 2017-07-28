@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.model.entities;
 
-public interface TreeNode<T> extends Node {
+public interface TreeNode<T> extends Entity {
 
     T getValue();
 

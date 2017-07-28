@@ -2,7 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class SetPropertiesTest extends ActionTestBase {
-    private Atom atom;
+    private Note atom;
 
     @Before
     public void setUp() throws Exception {
@@ -20,14 +20,14 @@ public class SetPropertiesTest extends ActionTestBase {
         topicGraph.begin();
         atom = createAtomWithTitle("before");
         atom.setText("the page");
-        assertEquals(1, countAtoms());
+        assertEquals(1, countNotes());
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals("before", atom.getTitle());
         assertEquals("the page", atom.getText());
 
-        assertEquals(1, countAtoms());
+        assertEquals(1, countNotes());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals("after", atom.getTitle());
     }
 
@@ -65,7 +65,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals("after", atom.getText());
     }
 
@@ -79,18 +79,18 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertNull(atom.getText());
     }
 
     @Test
     public void weightIsSetCorrectly() throws Exception {
         topicGraph.begin();
-        Atom atom = createAtomWithTitle("test");
+        Note atom = createAtomWithTitle("test");
         atom.setWeight(0.25f);
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals(0.25f, atom.getWeight(), 0.0f);
 
         SetProperties action = createAction();
@@ -100,18 +100,18 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals(0.5f, atom.getWeight(), 0.0f);
     }
 
     @Test
     public void sourceIsSetCorrectly() throws Exception {
         topicGraph.begin();
-        Atom atom = createAtomWithTitle("test");
+        Note atom = createAtomWithTitle("test");
         atom.setSource(DefaultSources.PRIVATE);
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals(DefaultSources.PRIVATE, atom.getSource());
 
         SetProperties action = createAction();
@@ -121,18 +121,18 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals(DefaultSources.PERSONAL, atom.getSource());
     }
 
     @Test
     public void priorityIsSetCorrectly() throws Exception {
         topicGraph.begin();
-        Atom atom = createAtomWithTitle("test");
+        Note atom = createAtomWithTitle("test");
         atom.setPriority(0.25f);
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals(0.25f, atom.getPriority(), 0.0f);
 
         SetProperties action = createAction();
@@ -142,17 +142,17 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals(0.5f, atom.getPriority(), 0.0f);
     }
 
     @Test
     public void shortcutIsSetCorrectly() throws Exception {
         topicGraph.begin();
-        Atom atom = createAtomWithTitle("test");
+        Note atom = createAtomWithTitle("test");
         topicGraph.commit();
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertNull(atom.getShortcut());
 
         SetProperties action = createAction();
@@ -162,7 +162,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        atom = topicGraph.getAtomById(atom.getId()).get();
+        atom = topicGraph.getNotesById(atom.getId()).get();
         assertEquals("after", atom.getShortcut());
     }
 

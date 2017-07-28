@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.openrdf.model.IRI;
 import org.openrdf.rio.RDFHandlerException;
 
@@ -20,7 +20,7 @@ public abstract class AtomCollection extends AtomClass {
         return true;
     }
 
-    public IRI toRDF(final Atom a,
+    public IRI toRDF(final Note a,
                      final RDFizationContext context) throws RDFHandlerException {
         // Collections do not have URIs and do not have associated RDF statements.
         // Instead, statements are distributed over the members of the collection.

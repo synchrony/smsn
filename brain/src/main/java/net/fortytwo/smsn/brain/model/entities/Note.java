@@ -2,35 +2,38 @@ package net.fortytwo.smsn.brain.model.entities;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
+import net.fortytwo.smsn.brain.model.Tag;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public interface Atom extends Node {
+public interface Note extends Entity {
 
-    Map<String, Property<Atom, ?>> propertiesByKey = createPropertiesByKey();
+    Map<String, Property<Note, ?>> propertiesByKey = createPropertiesByKey();
 
-    static Map<String, Property<Atom, ?>> createPropertiesByKey() {
-        Map<String, Property<Atom, ?>> propertiesByKey = new LinkedHashMap<>();
-        for (Property<Atom, ?> prop : new Property[]{
+    static Map<String, Property<Note, ?>> createPropertiesByKey() {
+        Map<String, Property<Note, ?>> propertiesByKey = new LinkedHashMap<>();
+        for (Property<Note, ?> prop : new Property[]{
+                new Property<>(true, true, SemanticSynchrony.PropertyKeys.TAG,
+                        Note::getTag, Note::setTag, Tag::valueOf),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.ALIAS,
-                        Atom::getAlias, Atom::setAlias, s -> s),
+                        Note::getAlias, Note::setAlias, s -> s),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.CREATED,
-                        Atom::getCreated, Atom::setCreated, Long::valueOf),
+                        Note::getCreated, Note::setCreated, Long::valueOf),
                 new Property<>(true, false, SemanticSynchrony.PropertyKeys.TEXT,
-                        Atom::getText, Atom::setText, s -> s),
+                        Note::getText, Note::setText, s -> s),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.SOURCE,
-                        Atom::getSource, Atom::setSource, s -> s),
+                        Note::getSource, Note::setSource, s -> s),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.SHORTCUT,
-                        Atom::getShortcut, Atom::setShortcut, s -> s),
+                        Note::getShortcut, Note::setShortcut, s -> s),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.TITLE,
-                        Atom::getTitle, Atom::setTitle, s -> s),
+                        Note::getTitle, Note::setTitle, s -> s),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.WEIGHT,
-                        Atom::getWeight, Atom::setWeight, Float::valueOf),
+                        Note::getWeight, Note::setWeight, Float::valueOf),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.PRIORITY,
-                        Atom::getPriority, Atom::setPriority, Float::valueOf),
+                        Note::getPriority, Note::setPriority, Float::valueOf),
         }) {
             propertiesByKey.put(prop.getPropertyKey(), prop);
         }
@@ -40,6 +43,10 @@ public interface Atom extends Node {
     String getId();
 
     void setId(String id);
+
+    Tag getTag();
+
+    void setTag(Tag tag);
 
     String getAlias();
 
@@ -73,17 +80,21 @@ public interface Atom extends Node {
 
     void setSource(String source);
 
-    ListNode<Atom> getChildren();
+    Topic getTopic();
 
-    void setChildren(ListNode<Atom> notes);
+    void setTopic(Topic topic);
 
-    void forFirstOf(Consumer<ListNode<Atom>> consumer);
+    ListNode<Note> getChildren();
 
-    void addChildAt(final Atom child, int position);
+    void setChildren(ListNode<Note> notes);
+
+    void forFirstOf(Consumer<ListNode<Note>> consumer);
+
+    void addChildAt(final Note child, int position);
 
     void deleteChildAt(int position);
 
-    Collection<ListNode<Atom>> getFirstOf();
+    Collection<ListNode<Note>> getFirstOf();
 
-    Atom getSubject(ListNode<Atom> notes);
+    Note getSubject(ListNode<Note> notes);
 }

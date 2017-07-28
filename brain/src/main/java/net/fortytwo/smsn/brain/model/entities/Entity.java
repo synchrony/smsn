@@ -1,5 +1,5 @@
 package net.fortytwo.smsn.brain.model.entities;
 
-public interface Node {
+public interface Entity {
     void destroy();
 }

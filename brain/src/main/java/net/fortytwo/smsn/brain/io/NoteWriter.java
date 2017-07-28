@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain.io;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +10,13 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
-public abstract class BrainWriter {
-    protected static final Logger logger = Logger.getLogger(BrainWriter.class.getName());
+public abstract class NoteWriter {
+
+    protected static final Logger logger = Logger.getLogger(NoteWriter.class.getName());
 
     public abstract List<Format> getFormats();
 
-    public abstract void doExport(Context context) throws IOException;
+    public abstract void doWrite(Context context) throws IOException;
 
     public static class Context {
         private TopicGraph topicGraph;
@@ -26,8 +26,6 @@ public abstract class BrainWriter {
         private File destDirectory;
         private OutputStream destStream;
         private Format format;
-
-        private TopicGraph filteredGraph;
 
         public KnowledgeBase getKnowledgeBase() {
             return knowledgeBase;
@@ -84,18 +82,6 @@ public abstract class BrainWriter {
         public void setFormat(Format format) {
             this.format = format;
         }
-
-        public TopicGraph getFilteredGraph() {
-            if (null == filter) {
-                return topicGraph;
-            } else {
-                if (null == filteredGraph) {
-                    filteredGraph = topicGraph.createFilteredGraph(filter);
-                }
-
-                return filteredGraph;
-            }
-        }
     }
 
     protected void createDirectoryIfNotExists(final File dir) throws IOException {
@@ -108,9 +94,5 @@ public abstract class BrainWriter {
                 throw new IOException("could not create directory " + dir.getAbsolutePath());
             }
         }
-    }
-
-    protected void cleanDirectory(final File dir) throws IOException {
-        FileUtils.cleanDirectory(dir);
     }
 }

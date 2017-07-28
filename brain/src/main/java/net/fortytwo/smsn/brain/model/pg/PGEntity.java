@@ -65,7 +65,7 @@ abstract class PGEntity {
     protected <T> T getRequiredProperty(String name) {
         T value = getOptionalProperty(name);
         if (null == value) {
-            throw new InvalidGraphException("missing property '" + name + "' for vertex " + getId());
+            throw new InvalidGraphException("missing property '" + name + "' for " + this);
         }
         return value;
     }
@@ -207,5 +207,14 @@ abstract class PGEntity {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    @Override
+    public String toString() {
+        String className = getClass().getSimpleName();
+        if (0 == className.length()) {
+            className = "vertex";
+        }
+        return className + "[" + getId() + "]";
     }
 }

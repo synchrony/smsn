@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
@@ -30,7 +30,7 @@ public class WikiPrinterTest {
     @Test
     public void propertiesPrecedeContent() throws Exception {
         Page page = new PageDTO();
-        page.setContent(createTree("123", "Arthur Dent", Role.Noun));
+        page.setContent(createTree("123", "Arthur Dent", null));
         page.setAlias("http://example.org/ArthurDent");
         page.setPriority(1.0f);
         page.setShortcut("ad");
@@ -45,7 +45,7 @@ public class WikiPrinterTest {
     @Test
     public void textFollowsContent() throws Exception {
         Page page = new PageDTO();
-        page.setContent(createTree("12345", "Arthur Dent", Role.Noun));
+        page.setContent(createTree("12345", "Arthur Dent", null));
         page.setText("The regular early morning yell of horror was the sound of Arthur Dent waking\n" +
                 "up and suddenly remembering where he was.");
 
@@ -59,7 +59,7 @@ public class WikiPrinterTest {
     @Test
     public void textIsOptional() throws Exception {
         Page page = new PageDTO();
-        page.setContent(createTree("12345", "Arthur Dent", Role.Noun));
+        page.setContent(createTree("12345", "Arthur Dent", null));
         page.setText(null);
 
         assertEquals("@id 12345\n" +
@@ -69,7 +69,7 @@ public class WikiPrinterTest {
     @Test
     public void emptyPageIsIgnored() throws Exception {
         Page page = new PageDTO();
-        page.setContent(createTree("12345", "Arthur Dent", Role.Noun));
+        page.setContent(createTree("12345", "Arthur Dent", null));
         page.setText("  \n ");
 
         assertEquals("@id 12345\n" +
@@ -79,12 +79,12 @@ public class WikiPrinterTest {
     @Test
     public void nounAndVerbBulletsAreDistinguished() throws Exception {
         Page page = new PageDTO();
-        page.setContent(createTree("123", "Arthur Dent", Role.Noun));
+        page.setContent(createTree("123", "Arthur Dent", null));
         TreeNode<Link> content = page.getContent();
-        TreeNode<Link> node1 = createTree(null, "Arthur Philip Dent", Role.Noun);
-        TreeNode<Link> node2 = createTree("12345", "friends", Role.Verb);
-        TreeNode<Link> node3 = createTree("00000", "Ford Prefect", Role.Noun);
-        TreeNode<Link> node4 = createTree(null, "Slartibartfast", Role.Noun);
+        TreeNode<Link> node1 = createTree(null, "Arthur Philip Dent", null);
+        TreeNode<Link> node2 = createTree("12345", "friends", Tag.Label);
+        TreeNode<Link> node3 = createTree("00000", "Ford Prefect", null);
+        TreeNode<Link> node4 = createTree(null, "Slartibartfast", null);
         content.setChildren(ListNodeDTO.fromArray(node1, node2));
         node2.setChildren(ListNodeDTO.fromArray(node3, node4));
 
@@ -96,9 +96,9 @@ public class WikiPrinterTest {
                 "    * Slartibartfast\n", write(page));
     }
 
-    private TreeNode<Link> createTree(final String id, final String label, final Role role) {
+    private TreeNode<Link> createTree(final String id, final String label, final Tag tag) {
         Link link = new LinkDTO();
-        link.setRole(role);
+        link.setTag(tag);
         link.setLabel(label);
         if (null != id) {
             Topic topic = new TopicDTO();

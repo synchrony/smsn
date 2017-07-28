@@ -2,17 +2,20 @@ package net.fortytwo.smsn.brain.model.entities;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
+import net.fortytwo.smsn.brain.model.Tag;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public interface Page extends Node {
+public interface Page extends Entity {
 
     Map<String, Property<Page, ?>> propertiesByKey = createPropertiesByKey();
 
     static Map<String, Property<Page, ?>> createPropertiesByKey() {
         Map<String, Property<Page, ?>> propertiesByKey = new LinkedHashMap<>();
         for (Property<Page, ?> prop : new Property[]{
+                new Property<>(true, true, SemanticSynchrony.PropertyKeys.TAG,
+                        Page::getTag, Page::setTag, Tag::valueOf),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.ALIAS,
                         Page::getAlias, Page::setAlias, s -> s),
                 new Property<>(false, true, SemanticSynchrony.PropertyKeys.CREATED,
@@ -32,6 +35,10 @@ public interface Page extends Node {
         }
         return propertiesByKey;
     }
+
+    Tag getTag();
+
+    void setTag(Tag tag);
 
     String getText();
 

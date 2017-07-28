@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 
 import javax.validation.constraints.NotNull;
@@ -10,9 +10,9 @@ public abstract class RootedViewAction extends BasicViewAction {
     @NotNull
     private String root;
 
-    private Atom rootAtom;
+    private Note rootAtom;
 
-    public Atom getRoot() {
+    public Note getRoot() {
         return notNull(rootAtom);
     }
 

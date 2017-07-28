@@ -2,7 +2,8 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -22,13 +23,13 @@ abstract class FilteredAction extends Action {
         this.filter = filter;
     }
 
-    protected Atom getRoot(String rootId, final ActionContext context) {
-        Atom root;
+    protected Note getRoot(String rootId, final ActionContext context) {
+        Note root;
         if (rootId.equals(CREATE_NEW_ATOM)) {
             root = createNewRoot(context);
             rootId = root.getId();
         } else {
-            Optional<Atom> opt = context.getBrain().getTopicGraph().getAtomById(rootId);
+            Optional<Note> opt = context.getBrain().getTopicGraph().getNotesById(rootId);
             if (opt.isPresent()) {
                 root = opt.get();
             } else {
@@ -55,8 +56,8 @@ abstract class FilteredAction extends Action {
         context.getMap().put(Params.MIN_WEIGHT, filter.getMinWeight());
     }
 
-    private Atom createNewRoot(final ActionContext context) {
-        Atom root = context.getBrain().getTopicGraph().createAtomWithProperties(getFilter(), null);
+    private Note createNewRoot(final ActionContext context) {
+        Note root = context.getBrain().getTopicGraph().createNoteWithProperties(getFilter(), null);
         root.setTitle("life, the universe, and everything");
         return root;
     }

@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
@@ -66,16 +66,17 @@ public class WikiPrinter {
     }
 
     private void printBullet(final TreeNode<Link> tree) {
-        Role role = tree.getValue().getRole();
-        switch (role) {
-            case Noun:
-                printStream.print(WikiFormat.NOUN_BULLET);
-                break;
-            case Verb:
-                printStream.print(WikiFormat.VERB_BULLET);
-                break;
-            default:
-                throw new IllegalStateException();
+        Tag tag = tree.getValue().getTag();
+        if (null == tag) {
+            printStream.print(WikiFormat.NODE_BULLET);
+        } else {
+            switch (tag) {
+                case Label:
+                    printStream.print(WikiFormat.LABEL_BULLET);
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
         }
         printStream.print(" ");
     }

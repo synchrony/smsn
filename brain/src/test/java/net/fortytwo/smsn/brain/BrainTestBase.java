@@ -3,21 +3,21 @@ package net.fortytwo.smsn.brain;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
-import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.config.DataSource;
@@ -65,7 +65,7 @@ public abstract class BrainTestBase {
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
     protected final ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
-    protected Collection<Atom> result;
+    protected Collection<Note> result;
 
     @Before
     public void setUp() throws Exception {
@@ -113,23 +113,23 @@ public abstract class BrainTestBase {
         return parseToTree(Brain.class.getResourceAsStream(exampleFile));
     }
 
-    protected Atom importAtomFromFile(final String exampleFile) throws IOException {
+    protected Note importAtomFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 0.5f, DefaultSources.PRIVATE, DefaultSources.PERSONAL);
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
         TreeNode<Link> rootNode = importNodeFromFile(exampleFile);
         TreeViews.setId(rootNode, SemanticSynchrony.createRandomId());
-        Atom root = topicGraph.createAtomWithProperties(writeFilter, TreeViews.getId(rootNode));
+        Note root = topicGraph.createNoteWithProperties(writeFilter, TreeViews.getId(rootNode));
         queries.update(rootNode, 5, writeFilter, style);
         return root;
     }
 
-    protected Atom createAtom(final String title) {
+    protected Note createAtom(final String title) {
         return createAtom(SemanticSynchrony.createRandomId(), title);
     }
 
-    protected Atom createAtom(final String id, final String title) {
-        Atom atom = topicGraph.createAtomWithProperties(filter, id);
+    protected Note createAtom(final String id, final String title) {
+        Note atom = topicGraph.createNoteWithProperties(filter, id);
         atom.setTitle(title);
         return atom;
     }
@@ -148,26 +148,34 @@ public abstract class BrainTestBase {
         Topic topic = createTopicDTO(topicId);
         Link link = new LinkDTO();
         link.setTarget(topic);
-        link.setRole(Role.Noun);
         link.setLabel(label);
         TreeNode<Link> tree = new TreeNodeDTO<>();
         tree.setValue(link);
         return tree;
     }
 
-    protected int countAtoms(final TopicGraph graph) {
+    protected Note createNote(final String id) {
+        Note note = topicGraph.createNoteWithProperties(filter, id );
+        return note;
+    }
+
+    protected Note createNote() {
+        return createNote(null);
+    }
+
+    protected int countNotes(final TopicGraph graph) {
         int count = 0;
-        for (Atom ignored : graph.getAllAtoms()) {
+        for (Note ignored : graph.getAllNotes()) {
             count++;
         }
         return count;
     }
 
-    protected int countAtoms() {
-        return countAtoms(topicGraph);
+    protected int countNotes() {
+        return countNotes(topicGraph);
     }
 
-    protected static List<Atom> childList(final Atom atom) {
+    protected static List<Note> childList(final Note atom) {
         return ListNode.toJavaList(atom.getChildren());
     }
 
@@ -209,12 +217,12 @@ public abstract class BrainTestBase {
         return page;
     }
 
-    protected void assertNodesEqual(final Atom a,
+    protected void assertNodesEqual(final Note a,
                                     final String... expected) {
         String[] actual = new String[(int) countChildren(a)];
 
         int i = 0;
-        ListNode<Atom> cur = a.getChildren();
+        ListNode<Note> cur = a.getChildren();
         while (null != cur) {
             actual[i++] = cur.getFirst().getTitle();
             cur = cur.getRest();
@@ -223,8 +231,8 @@ public abstract class BrainTestBase {
         assertArrayEquals(expected, actual);
     }
 
-    protected long countChildren(final Atom a) {
-        ListNode<Atom> children = a.getChildren();
+    protected long countChildren(final Note a) {
+        ListNode<Note> children = a.getChildren();
         return null == children ? 0 : ListNode.toJavaList(children).size();
     }
 

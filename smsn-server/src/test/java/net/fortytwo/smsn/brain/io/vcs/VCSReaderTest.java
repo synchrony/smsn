@@ -2,10 +2,10 @@ package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -41,9 +41,9 @@ public class VCSReaderTest extends BrainTestBase {
         assertEquals(1, formats.size());
         assertEquals("VCS", formats.get(0).getName());
 
-        assertEquals(0, countAtoms());
+        assertEquals(0, countNotes());
 
-        BrainReader.Context context = new BrainReader.Context();
+        NoteReader.Context context = new NoteReader.Context();
         context.setFormat(formats.get(0));
         context.setSourceDirectory(createVCSTestDirectory());
         File universalDir = new File(SemanticSynchrony.getConfiguration().getSources().get(3).getLocation());
@@ -52,9 +52,9 @@ public class VCSReaderTest extends BrainTestBase {
         context.setTopicGraph(topicGraph);
         reader.doImport(context);
 
-        assertEquals(2, countAtoms());
+        assertEquals(2, countNotes());
 
-        Atom arthur = topicGraph.getAtomById(ARTHUR_ID).get();
+        Note arthur = topicGraph.getNotesById(ARTHUR_ID).get();
         assertEquals(ARTHUR_ID, arthur.getId());
         assertEquals("Arthur Dent", arthur.getTitle());
         assertEquals(DefaultSources.UNIVERSAL, arthur.getSource());
@@ -62,7 +62,7 @@ public class VCSReaderTest extends BrainTestBase {
         assertEquals("He's a jerk.", arthur.getText());
 
         assertEquals(1, countChildren(arthur));
-        Atom ford = arthur.getChildren().getFirst();
+        Note ford = arthur.getChildren().getFirst();
         assertEquals("Ford Prefect (character)", ford.getTitle());
         assertNull(ford.getText());
     }

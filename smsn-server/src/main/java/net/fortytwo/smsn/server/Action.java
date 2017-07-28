@@ -10,13 +10,13 @@ import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
-import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -124,7 +124,7 @@ public abstract class Action {
         history.visit(rootId);
     }
 
-    protected Iterable<Atom> getHistory(final TopicGraph graph,
+    protected Iterable<Note> getHistory(final TopicGraph graph,
                                         final Filter filter) {
         return history.getHistory(100, graph, filter);
     }

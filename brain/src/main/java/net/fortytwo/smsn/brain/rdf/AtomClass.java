@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.rdf.classes.AKAReference;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import org.openrdf.model.IRI;
@@ -44,12 +44,12 @@ public abstract class AtomClass {
 
     protected abstract boolean isCollectionClass();
 
-    public abstract IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException;
+    public abstract IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException;
 
-    protected IRI handleTypeAndAlias(final Atom a,
+    protected IRI handleTypeAndAlias(final Note a,
                                      final RDFizationContext context,
                                      final IRI type) throws RDFHandlerException {
-        IRI self = context.getValueFactory().createIRI(context.getTopicGraph().iriOfAtom(a));
+        IRI self = context.getValueFactory().createIRI(context.getTopicGraph().iriOf(a));
 
         context.getHandler().handleStatement(context.getValueFactory().createStatement(self, RDF.TYPE, type));
 
@@ -73,12 +73,12 @@ public abstract class AtomClass {
     }
 
     public interface FieldHandler {
-        void handle(Atom object, RDFizationContext context) throws RDFHandlerException;
+        void handle(Note object, RDFizationContext context) throws RDFHandlerException;
     }
 
     public static class NickHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
 
             // TODO: this is an abuse of foaf:nick even when the domain is foaf:Person as it is here...
@@ -92,7 +92,7 @@ public abstract class AtomClass {
 
     public static class PageHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -104,7 +104,7 @@ public abstract class AtomClass {
 
     public static class RFIDHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // TODO
 
             // note: there are no relevant properties in the BTC 2014 matching "rfid":
@@ -115,7 +115,7 @@ public abstract class AtomClass {
 
     public static class DocumentsAboutTopicHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(

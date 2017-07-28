@@ -2,13 +2,13 @@ package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Node;
+import net.fortytwo.smsn.brain.model.entities.Entity;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.function.Function;
 
-public abstract class PGListNode<T extends Node> extends PGEntity implements ListNode<T> {
+public abstract class PGListNode<T extends Entity> extends PGEntity implements ListNode<T> {
 
     private final Function<Vertex, T> constructor;
 

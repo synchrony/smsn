@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.model.pg;
 
-class Sortable<T, C extends Comparable<C>> implements Comparable<Sortable<T, C>> {
+public class Sortable<T, C extends Comparable<C>> implements Comparable<Sortable<T, C>> {
     private final T entity;
     private C score;
 

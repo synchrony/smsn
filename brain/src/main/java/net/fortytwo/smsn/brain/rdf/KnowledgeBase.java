@@ -4,7 +4,7 @@ import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.rdf.classes.*;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
@@ -34,7 +34,7 @@ public class KnowledgeBase {
 
     private final Map<Class<? extends AtomClass>, AtomClass> classes;
 
-    private final Map<Atom, List<AtomClassEntry>> atomClassifications;
+    private final Map<Note, List<AtomClassEntry>> atomClassifications;
 
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
@@ -66,7 +66,7 @@ public class KnowledgeBase {
      * @return either null (if the atom has not been classified)
      * or a list of classifications of the given atom, sorted in descending order by score
      */
-    public List<AtomClassEntry> getClassInfo(final Atom a) {
+    public List<AtomClassEntry> getClassInfo(final Note a) {
         List<AtomClassEntry> entries = atomClassifications.get(a);
 
         if (null == entries || 0 == entries.size()) {
@@ -223,7 +223,7 @@ public class KnowledgeBase {
         }
     }
 
-    private boolean isClassified(final Atom atom) {
+    private boolean isClassified(final Note atom) {
         /*
         if (atom.asVertex().getId().equals("ynyUshJ")) {
             System.out.println("break here");
@@ -235,7 +235,7 @@ public class KnowledgeBase {
     /*
     Matches the children of an atom against an atom regex element (class or wildcard with quantifier)
      */
-    private MatchResult match(final Atom childAtom,
+    private MatchResult match(final Note childAtom,
                               final AtomRegex.El el,
                               final List<AtomClassEntry> evidenceEntries,
                               final AtomCollectionMemory memory,
@@ -329,7 +329,7 @@ public class KnowledgeBase {
         Comparator totalScoreDescending = new AtomClassificationComparator();
 
         // classify or re-classify each atom
-        for (Atom subject : topicGraph.getAllAtoms()) {
+        for (Note subject : topicGraph.getAllNotes()) {
             context.setSubject(subject);
 
             String value = subject.getTitle();
@@ -371,8 +371,8 @@ public class KnowledgeBase {
                 int outScore = 0;
 
                 if (null != clazz.memberRegex) {
-                    ListNode<Atom> cur = subject.getChildren();
-                    Atom first = null;
+                    ListNode<Note> cur = subject.getChildren();
+                    Note first = null;
                     int eli = 0;
                     AtomRegex.El el = null;
                     AtomRegex.Modifier mod = null;
@@ -552,7 +552,7 @@ public class KnowledgeBase {
 
     private long countAtoms() {
         long count = 0;
-        for (Atom a : topicGraph.getAllAtoms()) {
+        for (Note a : topicGraph.getAllNotes()) {
             count++;
         }
         return count;
@@ -564,11 +564,11 @@ public class KnowledgeBase {
      *
      * @param a the atom to view
      */
-    public void viewInferred(final Atom a) {
+    public void viewInferred(final Note a) {
         viewInferredInternal(a, 0);
     }
 
-    private void viewInferredInternal(final Atom a,
+    private void viewInferredInternal(final Note a,
                                       int indent) {
         for (int i = 0; i < indent; i++) System.out.print("\t");
         String value = a.getTitle();
@@ -591,9 +591,9 @@ public class KnowledgeBase {
         }
         indent++;
         if (indent < 2) {
-            ListNode<Atom> notes = a.getChildren();
+            ListNode<Note> notes = a.getChildren();
             if (null != notes) {
-                ListNode<Atom> cur = notes;
+                ListNode<Note> cur = notes;
                 while (null != cur) {
                     viewInferredInternal(cur.getFirst(), indent);
                     cur = cur.getRest();

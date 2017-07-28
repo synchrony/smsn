@@ -2,9 +2,9 @@ package net.fortytwo.smsn.git;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.AtomBase;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class SmSnCommit extends AtomBase {
+public class SmSnCommit extends NoteDTO {
     private final SmSnGitRepository repository;
     private final RevCommit commit;
 
@@ -48,7 +48,7 @@ public class SmSnCommit extends AtomBase {
     }
 
     @Override
-    public ListNode<Atom> getChildren() {
+    public ListNode<Note> getChildren() {
         Optional<RevCommit> parent = getParent(commit);
         if (!parent.isPresent()) return null;
 
@@ -77,10 +77,10 @@ public class SmSnCommit extends AtomBase {
         return 0 == parents.length ? Optional.empty() : Optional.of(parents[0]);
     }
 
-    private ListNode<Atom> getDiffs(final RevCommit oldCommit, final RevCommit newCommit)
+    private ListNode<Note> getDiffs(final RevCommit oldCommit, final RevCommit newCommit)
             throws IOException, GitAPIException {
         Git git = repository.getGit();
-        ListNode<Atom> list = null, cur = null;
+        ListNode<Note> list = null, cur = null;
 
         ObjectReader reader = git.getRepository().newObjectReader();
         CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
@@ -103,7 +103,7 @@ public class SmSnCommit extends AtomBase {
             String newPath = diffEntry.getNewPath();
 
             String id = SmSnGitRepository.toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
-            Atom changedAtom = changedAtom(id, SmSnGitRepository.getTimeStamp(newCommit), changeType);
+            Note changedAtom = changedAtom(id, SmSnGitRepository.getTimeStamp(newCommit), changeType);
 
             list = creatList(changedAtom, list);
         }
@@ -111,18 +111,18 @@ public class SmSnCommit extends AtomBase {
         return list;
     }
 
-    private ListNode<Atom> creatList(final Atom first, final ListNode<Atom> rest) {
+    private ListNode<Note> creatList(final Note first, final ListNode<Note> rest) {
         return new ListNodeDTO<>(first, rest);
     }
 
-    private Atom changedAtom(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
-        Optional<Atom> opt = repository.getBrain().getTopicGraph().getAtomById(id);
-        Atom atom;
+    private Note changedAtom(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
+        Optional<Note> opt = repository.getBrain().getTopicGraph().getNotesById(id);
+        Note atom;
 
         if (opt.isPresent()) {
             atom = opt.get();
         } else {
-            atom = new AtomBase();
+            atom = new NoteDTO();
             atom.setId(id);
             atom.setCreated(timestamp);
             atom.setTitle(SmSnGitRepository.titleForMissingAtom(changeType));

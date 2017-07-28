@@ -10,8 +10,8 @@ public class WikiFormat extends Format {
     // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
     public static final String CLEARME = "C.L.E.A.R.M.E";
 
-    static final String NOUN_BULLET = "*";
-    static final String VERB_BULLET = "--";
+    static final String NODE_BULLET = "*";
+    static final String LABEL_BULLET = "--";
 
     // regex of valid id suffixes
     static final Pattern ID_INFIX = Pattern.compile(":[a-zA-Z0-9]{5,}:");

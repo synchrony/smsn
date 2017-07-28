@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public abstract class BrainReader {
+public abstract class NoteReader {
 
-    protected static final Logger logger = Logger.getLogger(BrainReader.class.getName());
+    protected static final Logger logger = Logger.getLogger(NoteReader.class.getName());
 
     protected abstract void importInternal(Context context) throws IOException;
 
@@ -28,7 +28,7 @@ public abstract class BrainReader {
     private long transactionCounter = 0;
     private final int transactionBufferSize;
 
-    protected BrainReader() {
+    protected NoteReader() {
         transactionBufferSize = SemanticSynchrony.getConfiguration().getTransactionBufferSize();
     }
 
@@ -91,7 +91,7 @@ public abstract class BrainReader {
     }
 
     private long getSizeOf(final Context context) {
-        return Iterators.size(context.getTopicGraph().getAllAtoms().iterator());
+        return Iterators.size(context.getTopicGraph().getAllNotes().iterator());
     }
 
     private void importComplex(final Format format, final Brain brain) throws IOException {

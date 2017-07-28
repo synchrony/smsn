@@ -3,7 +3,7 @@ package net.fortytwo.smsn.server.actions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class FindDuplicatesTest extends ActionTestBase {
-    private Atom atom1, atom2, atom3;
+    private Note atom1, atom2, atom3;
 
     @Test
     public void noResultsIfNoDuplicates() throws Exception {
@@ -46,9 +46,9 @@ public class FindDuplicatesTest extends ActionTestBase {
         atom3 = createAtomWithTitle("earth");
         topicGraph.commit();
 
-        Atom atom = topicGraph.getAtomById(atom1.getId()).get();
+        Note atom = topicGraph.getNotesById(atom1.getId()).get();
         assertEquals("earth", atom.getTitle());
-        assertEquals(3, countAtoms());
+        assertEquals(3, countNotes());
 
         ActionContext context = perform(createAction());
         JSONObject view = getView(context);

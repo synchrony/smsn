@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.graphml;
 
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class GraphMLWriter extends BrainWriter {
+public class GraphMLWriter extends NoteWriter {
 
     @Override
     public List<Format> getFormats() {
@@ -17,7 +17,7 @@ public class GraphMLWriter extends BrainWriter {
     }
 
     @Override
-    public void doExport(Context context) throws IOException {
+    public void doWrite(Context context) throws IOException {
         if (!(context.getTopicGraph() instanceof PGTopicGraph)) throw new UnsupportedOperationException();
         PGTopicGraph originalGraph = (PGTopicGraph) context.getTopicGraph();
         Filter filter = context.getFilter();

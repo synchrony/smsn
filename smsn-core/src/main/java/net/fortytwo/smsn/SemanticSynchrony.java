@@ -35,6 +35,7 @@ public class SemanticSynchrony {
                 PAGE = "page",
                 REST = "rest",
                 TARGET = "target",
+                TOPIC = "topic",
                 CONTENT = "tree",
                 VALUE = "value";
     }
@@ -47,7 +48,7 @@ public class SemanticSynchrony {
                 ID_V = "idV",
                 LABEL = "label",
                 PRIORITY = "priority",
-                ROLE = "role",
+                TAG = "tag",
                 SHORTCUT = "shortcut",
                 SOURCE = "source",
                 TEXT = "text",

@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.pg.PGAtom;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.pg.PGNote;
 import net.fortytwo.smsn.config.DataSource;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
@@ -42,8 +42,8 @@ public class ActionDuJour extends Action {
     }
 
     private void pageToText(final ActionContext context) {
-        for (Atom atom : context.getBrain().getTopicGraph().getAllAtoms()) {
-            Vertex v = ((PGAtom) atom).asVertex();
+        for (Note atom : context.getBrain().getTopicGraph().getAllNotes()) {
+            Vertex v = ((PGNote) atom).asVertex();
             VertexProperty<String> prop = v.property("page");
             if (prop.isPresent()) {
                 String text = prop.value();
@@ -54,11 +54,11 @@ public class ActionDuJour extends Action {
     }
 
     private void sharabilityToSource(final ActionContext context) {
-        for (Atom atom : context.getBrain().getTopicGraph().getAllAtoms()) {
-            Property<String> source1 = ((PGAtom) atom).asVertex().property("source");
+        for (Note atom : context.getBrain().getTopicGraph().getAllNotes()) {
+            Property<String> source1 = ((PGNote) atom).asVertex().property("source");
             if (!source1.isPresent()) {
                 System.out.println("atom " + atom.getId() + " has no source. Title: " + atom.getTitle());
-                Property<Float> sharability = ((PGAtom) atom).asVertex().property("sharability");
+                Property<Float> sharability = ((PGNote) atom).asVertex().property("sharability");
                 if (sharability.isPresent()) {
                     System.out.println("\tsharability: " + sharability.value());
                 } else {
@@ -73,8 +73,8 @@ public class ActionDuJour extends Action {
         }
     }
 
-    private String sourceForSharability(final Atom atom) {
-        Property<Float> sharability = ((PGAtom) atom).asVertex().property("sharability");
+    private String sourceForSharability(final Note atom) {
+        Property<Float> sharability = ((PGNote) atom).asVertex().property("sharability");
         if (sharability.isPresent()) {
             switch ((int) (sharability.value() * 4)) {
                 case 0:
@@ -103,7 +103,7 @@ public class ActionDuJour extends Action {
             for (File file : dir.listFiles()) {
                 if (VCSFormat.isSmSnFile(file)) {
                     String id = file.getName();
-                    Optional<Atom> opt = graph.getAtomById(id);
+                    Optional<Note> opt = graph.getNotesById(id);
                     Preconditions.checkArgument(opt.isPresent());
                     opt.get().setSource(source.getName());
                 }
@@ -115,22 +115,22 @@ public class ActionDuJour extends Action {
 
     private void migrateIds(final ActionContext context) {
         TopicGraph graph = context.getBrain().getTopicGraph();
-        for (Atom a : graph.getAllAtoms()) {
+        for (Note a : graph.getAllNotes()) {
             a.setId(SemanticSynchrony.migrateId(a.getId()));
         }
     }
 
     private void findAnomalousAtoms(final ActionContext context) {
-        for (Atom a : context.getBrain().getTopicGraph().getAllAtoms()) {
-            checkNotNull(a, Atom::getId, "id");
-            checkNotNull(a, Atom::getSource, "source");
-            checkNotNull(a, Atom::getWeight, "weight");
-            checkNotNull(a, Atom::getCreated, "created");
-            checkNotNull(a, Atom::getTitle, "title");
+        for (Note a : context.getBrain().getTopicGraph().getAllNotes()) {
+            checkNotNull(a, Note::getId, "id");
+            checkNotNull(a, Note::getSource, "source");
+            checkNotNull(a, Note::getWeight, "weight");
+            checkNotNull(a, Note::getCreated, "created");
+            checkNotNull(a, Note::getTitle, "title");
         }
     }
 
-    private <T> void checkNotNull(final Atom a, final Function<Atom, T> accessor, final String name) {
+    private <T> void checkNotNull(final Note a, final Function<Note, T> accessor, final String name) {
         T value = accessor.apply(a);
         if (null == value) {
             System.out.println("atom " + a.getId() + " has null " + name);

@@ -1,7 +1,8 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class FilterTest extends BrainTestBase {
     public void missingNonessentialPropertiesAreTolerated() {
         Filter filter = Filter.noFilter();
 
-        Atom atom = createAtom("public", 0.75f);
+        Note atom = createAtom("public", 0.75f);
         atom.setTitle(null);
         assertTrue(filter.test(atom));
     }
@@ -59,8 +60,8 @@ public class FilterTest extends BrainTestBase {
         assertTrue(filter.test(createAtom(DefaultSources.UNIVERSAL, 1.0f)));
     }
 
-    private Atom createAtom(final String source, final Float weight) {
-        Atom atom = new AtomBase();
+    private Note createAtom(final String source, final Float weight) {
+        Note atom = new NoteDTO();
         atom.setSource(source);
         atom.setWeight(weight);
         return atom;

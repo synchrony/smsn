@@ -8,6 +8,6 @@ public class PGListNodeTest extends ListNodeTestBase {
 
     @Override
     protected ListNode<Topic> createListNode(final Topic... elements) {
-        return topicGraph.createListOfTopics(elements);
+        return topicGraph.toList(elements);
     }
 }

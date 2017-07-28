@@ -36,7 +36,7 @@ public class VCSFormatTest {
         File dir = new File("/tmp");
         assertFalse(VCSFormat.isSmSnFile(new File(dir, "a1_234567")));
     }
-    
+
     @Test
     public void topicsMapToExpectedFileNames() {
         assertEquals("12345.smsn", VCSFormat.fileNameForTopic(createTopic("12345")));

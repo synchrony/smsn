@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import org.junit.Test;
 
@@ -22,31 +22,31 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
         int count = 0;
         for (String id : ids) {
-            Atom atom = topicGraph.createAtomWithProperties(filter, id);
+            Note atom = createNote(id);
             atom.setTitle("atom #" + ++count);
         }
 
         for (int i = 0; i < ids.length; i++) {
-            Atom atom = topicGraph.getAtomById(ids[i]).get();
+            Note atom = topicGraph.getNotesById(ids[i]).get();
             assertEquals("atom #" + (i + 1), atom.getTitle());
         }
     }
 
     @Test
     public void testGetAtoms() throws Exception {
-        Atom chaos = topicGraph.createAtomWithProperties(filter, null);
+        Note chaos = createNote();
         chaos.setTitle("Chaos");
-        Atom tartarus = topicGraph.createAtomWithProperties(filter, null);
+        Note tartarus = createNote();
         tartarus.setTitle("Tartarus");
-        Atom gaia = topicGraph.createAtomWithProperties(filter, null);
+        Note gaia = createNote();
         gaia.setTitle("Gaia");
-        Atom eros = topicGraph.createAtomWithProperties(filter, null);
+        Note eros = createNote();
         eros.setTitle("Eros");
-        Atom nyx = topicGraph.createAtomWithProperties(filter, null);
+        Note nyx = createNote();
         nyx.setTitle("Nyx");
-        Atom erebus = topicGraph.createAtomWithProperties(filter, null);
+        Note erebus = createNote();
         erebus.setTitle("Erebus");
-        ListNode<Atom> children = topicGraph.createListOfAtoms(tartarus, gaia, eros, nyx, erebus);
+        ListNode<Note> children = topicGraph.createListOfNotes(tartarus, gaia, eros, nyx, erebus);
         chaos.setChildren(children);
 
         //System.out.println(chaos.getId());
@@ -54,8 +54,8 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
         // getAtoms returns a list of only atom vertices, excluding list vertices
         int count = 0;
-        Iterable<Atom> atoms = topicGraph.getAllAtoms();
-        for (Atom a : atoms) {
+        Iterable<Note> atoms = topicGraph.getAllNotes();
+        for (Note a : atoms) {
             count++;
             //System.out.println(a.getId());
             //System.out.println(a.getValue());

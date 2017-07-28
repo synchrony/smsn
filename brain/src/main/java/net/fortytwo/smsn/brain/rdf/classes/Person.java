@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomCollection;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
@@ -66,7 +66,7 @@ public class Person extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
@@ -78,7 +78,7 @@ public class Person extends AtomClass {
 
     private static class MadeHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -89,14 +89,14 @@ public class Person extends AtomClass {
 
     private static class QuotationHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // TODO
         }
     }
 
     private static class InterestHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -106,7 +106,7 @@ public class Person extends AtomClass {
 
     private static class KnowsHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -116,7 +116,7 @@ public class Person extends AtomClass {
 
     private static class BirthdayHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // technically, this is a misuse of foaf:birthday, which expects
             // string values of the form mm-dd, eg. '12-31', as opposed to
             // Extend-o-Brain's structured date values, which are represented
@@ -133,7 +133,7 @@ public class Person extends AtomClass {
 
     private static class ThingsOwnedHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             context.getHandler().handleStatement(
                     context.getValueFactory().createStatement(
                             context.iriOf(object), DBpediaOntology.owner, context.getSubjectIri()));
@@ -142,7 +142,7 @@ public class Person extends AtomClass {
 
     public static class AttendedEventsHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // TODO
         }
     }

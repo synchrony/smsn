@@ -1,6 +1,9 @@
-package net.fortytwo.smsn.brain.model.pg;
+package net.fortytwo.smsn.brain.model.pg.tg;
 
 import com.google.common.collect.Iterators;
+import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.IndexWrapper;
+import net.fortytwo.smsn.brain.model.pg.Sortable;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 

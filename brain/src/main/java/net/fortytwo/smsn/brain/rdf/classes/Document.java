@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.rdf.AtomClass;
 import net.fortytwo.smsn.brain.rdf.AtomRegex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
@@ -74,7 +74,7 @@ public class Document extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
@@ -88,7 +88,7 @@ public class Document extends AtomClass {
 
     private static class ISBNHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             String value = object.getTitle();
             IRI predicate;
 
@@ -127,7 +127,7 @@ public class Document extends AtomClass {
     private static class BibtexEntryHandler implements FieldHandler {
         // TODO: we no longer use this inline format
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             String entry = object.getTitle().trim();
 
             ValueFactory vf = context.getValueFactory();
@@ -138,7 +138,7 @@ public class Document extends AtomClass {
 
     private static class MakerHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -149,7 +149,7 @@ public class Document extends AtomClass {
 
     private static class TopicHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -162,7 +162,7 @@ public class Document extends AtomClass {
 
     private static class NoteHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // TODO
         }
     }

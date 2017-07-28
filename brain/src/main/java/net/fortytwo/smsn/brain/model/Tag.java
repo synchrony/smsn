@@ -1,3 +1,3 @@
 package net.fortytwo.smsn.brain.model;
 
-public enum Role {Noun, Verb}
+public enum Tag {Root, Label}

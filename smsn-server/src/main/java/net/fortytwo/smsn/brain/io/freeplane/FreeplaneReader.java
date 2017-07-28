@@ -3,12 +3,13 @@ package net.fortytwo.smsn.brain.io.freeplane;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
-import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
@@ -36,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class FreeplaneReader extends BrainReader {
+public class FreeplaneReader extends NoteReader {
 
     private interface Elmt {
         String
@@ -110,8 +111,8 @@ public class FreeplaneReader extends BrainReader {
         TreeViews queries = new TreeViews(brain);
         Filter filter = Filter.noFilter();
 
-        Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
-        TreeViews.setId(rootNote, atom.getId());
+        Note note = destGraph.createNoteWithProperties(filter, SemanticSynchrony.createRandomId());
+        TreeViews.setId(rootNote, note.getId());
 
         queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
@@ -254,16 +255,16 @@ public class FreeplaneReader extends BrainReader {
             persistArrowLinks();
         }
 
-        private Atom getAtom(final String id) {
-            return destGraph.getAtomById(TreeViews.getId(notesByFreeplaneId.get(id))).get();
+        private Note getAtom(final String id) {
+            return destGraph.getNotesById(TreeViews.getId(notesByFreeplaneId.get(id))).get();
         }
 
         private void persistArrowLinks() throws InvalidGraphException {
             for (Map.Entry<String, List<String>> link : arrowLinks.entrySet()) {
-                Atom tailAtom = getAtom(link.getKey());
+                Note tailAtom = getAtom(link.getKey());
                 List<String> heads = link.getValue();
                 for (String head : heads) {
-                    Atom headAtom = getAtom(head);
+                    Note headAtom = getAtom(head);
                     tailAtom.addChildAt(headAtom, 0);
                 }
             }

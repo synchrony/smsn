@@ -1,7 +1,10 @@
-package net.fortytwo.smsn.brain.model.pg;
+package net.fortytwo.smsn.brain.model.pg.neo4j;
 
 import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.IndexWrapper;
+import net.fortytwo.smsn.brain.model.pg.Sortable;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;

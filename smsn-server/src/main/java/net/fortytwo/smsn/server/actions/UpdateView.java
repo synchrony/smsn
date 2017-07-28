@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -66,7 +66,7 @@ public class UpdateView extends RootedViewAction {
         TopicGraph graph = context.getBrain().getTopicGraph();
         // TODO: produce an appropriate view (e.g. a search) if the root is null
         TreeNode<Link> n = null == getRoot()
-                ? graph.createTopicTree(graph.createLink(null, null, Role.Noun))
+                ? graph.createTopicTree(graph.createLink(null, null, null))
                 : context.getQueries().view(getRoot(), height, getFilter(), style);
         try {
             addView(n, context);

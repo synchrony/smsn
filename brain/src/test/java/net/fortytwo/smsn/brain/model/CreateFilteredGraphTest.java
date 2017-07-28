@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,13 +20,13 @@ public class CreateFilteredGraphTest extends BrainTestBase {
 
     @Test
     public void testFilteredCopy() throws Exception {
-        assertEquals(0, countAtoms(topicGraph));
+        assertEquals(0, countNotes(topicGraph));
 
         // unfiltered
-        Atom root = importAtomFromFile("io/wiki/wiki-example-4.txt");
+        Note root = importAtomFromFile("io/wiki/wiki-example-4.txt");
         root.setTitle("William James");
         assertEquals(DefaultSources.PERSONAL, root.getSource());
-        assertEquals(23, countAtoms(topicGraph));
+        assertEquals(23, countNotes(topicGraph));
         assertEquals(7, childList(root).size());
         assertEquals("some works by William James", childList(root).get(0).getTitle());
         assertEquals("William James's depression", childList(root).get(3).getTitle());
@@ -39,8 +39,8 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         Filter publicFilter = new Filter(0f, 0.5f, DefaultSources.PERSONAL, DefaultSources.PERSONAL);
         assertTrue(publicFilter.test(root));
         TopicGraph filteredGraph = topicGraph.createFilteredGraph(publicFilter);
-        assertEquals(22, countAtoms(filteredGraph));
-        root = filteredGraph.getAtomById(root.getId()).get();
+        assertEquals(22, countNotes(filteredGraph));
+        root = filteredGraph.getNotesById(root.getId()).get();
         assertEquals(DefaultSources.PERSONAL, root.getSource());
         assertEquals("William James", root.getTitle());
 

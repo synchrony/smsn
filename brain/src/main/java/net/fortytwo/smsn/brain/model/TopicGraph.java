@@ -1,60 +1,59 @@
 package net.fortytwo.smsn.brain.model;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * A graph of atoms and lists conforming to the Extend-o-Brain data model
+ * A graph of notes and lists conforming to the SmSn data model
  */
 public interface TopicGraph {
 
-    Iterable<Atom> getAllAtoms();
+    Iterable<Note> getAllNotes();
 
-    Optional<Atom> getAtomById(String id);
+    Optional<Note> getNotesById(String id);
 
-    List<Atom> getAtomsByAcronym(String acronym, Filter filter);
+    List<Note> getNotesByAcronym(String acronym, Filter filter);
 
-    List<Atom> getAtomsByShortcut(String shortcut, Filter filter);
+    List<Note> getNotesByShortcut(String shortcut, Filter filter);
 
-    List<Atom> getAtomsByTitleQuery(String value, Filter filter);
+    List<Note> getNotesByTitleQuery(String value, Filter filter);
 
-    String idOfAtom(Atom a);
+    String idOf(Note a);
 
-    String iriOfAtom(Atom a);
+    String iriOf(Note a);
 
     Topic createTopic(String id);
 
     Page createPage(Link root);
 
-    Link createLink(Topic target, String label, Role role);
+    Link createLink(Topic target, String label, Tag tag);
 
     TreeNode<Link> createTopicTree(Link link);
 
-    Atom createAtom(String id);
+    Note createNote(String id);
 
-    Atom createAtomWithProperties(Filter filter, String id);
+    Note createNoteWithProperties(Filter filter, String id);
 
-    ListNode<Link> createListOfLinks(Link... elements);
+    ListNode<Link> toList(Link... elements);
 
-    ListNode<Topic> createListOfTopics(Topic... elements);
+    ListNode<Topic> toList(Topic... elements);
 
-    ListNode<TreeNode<Link>> createListOfLinkTrees(TreeNode<Link>... elements);
+    ListNode<TreeNode<Link>> toList(TreeNode<Link>... elements);
 
-    ListNode<Atom> createListOfAtoms(Atom... elements);
+    ListNode<Note> createListOfNotes(Note... elements);
 
-    void removeIsolatedAtoms(Filter filter);
+    void removeIsolatedNotes(Filter filter);
 
     void notifyOfUpdate();
 
-    void reindexAtom(Atom a);
+    void reindex(Note a);
 
     long getLastUpdate();
 

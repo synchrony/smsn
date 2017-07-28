@@ -1,13 +1,13 @@
 package net.fortytwo.smsn.brain.model.dto;
 
-import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
 public class LinkDTO implements Link {
 
-    private Role role = Role.Noun;
+    private Tag tag;
     private Topic target;
     private String label;
     private Page page;
@@ -17,14 +17,12 @@ public class LinkDTO implements Link {
         // nothing to do
     }
 
-    @Override
-    public Role getRole() {
-        return role;
+    public Tag getTag() {
+        return tag;
     }
 
-    @Override
-    public void setRole(Role role) {
-        this.role = role;
+    public void setTag(Tag tag) {
+        this.tag = tag;
     }
 
     @Override
