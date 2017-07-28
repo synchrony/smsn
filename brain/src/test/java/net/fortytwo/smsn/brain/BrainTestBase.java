@@ -3,20 +3,19 @@ package net.fortytwo.smsn.brain;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
+import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
@@ -65,7 +64,7 @@ public abstract class BrainTestBase {
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
     protected final ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
-    protected Collection<Note> result;
+    protected Collection<Note> queryResult;
 
     @Before
     public void setUp() throws Exception {

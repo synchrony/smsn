@@ -28,66 +28,66 @@ public class GetAtomsByValueTest extends BrainTestBase {
 
     @Test
     public void nonMatchingValueFails() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Zaphod", filter);
-        assertEquals(0, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Zaphod", filter);
+        assertEquals(0, queryResult.size());
     }
 
     @Test
     public void completelyMatchingValueSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Arthur Dent", filter);
-        assertEquals(1, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Arthur Dent", filter);
+        assertEquals(1, queryResult.size());
     }
 
     @Test
     public void subsetOfWordsMatchingSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Arthur Beeblebrox", filter);
-        assertEquals(1, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Arthur Beeblebrox", filter);
+        assertEquals(1, queryResult.size());
     }
 
     @Test
     public void outOfOrderWordsSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Dent Arthur", filter);
-        assertEquals(1, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Dent Arthur", filter);
+        assertEquals(1, queryResult.size());
     }
 
     @Test
     public void partialValueSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Arthur", filter);
-        assertEquals(1, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Arthur", filter);
+        assertEquals(1, queryResult.size());
     }
 
     @Test
     public void partialWordFails() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Arth", filter);
-        assertEquals(0, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Arth", filter);
+        assertEquals(0, queryResult.size());
     }
 
     @Test
     public void matchingWildcardSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Arth*", filter);
-        assertEquals(1, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Arth*", filter);
+        assertEquals(1, queryResult.size());
     }
 
     @Test
     public void nonMatchingWildcardFails() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("Zaph*", filter);
-        assertEquals(0, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("Zaph*", filter);
+        assertEquals(0, queryResult.size());
     }
 
     @Test
     public void caseInsensitiveMatchSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("ARTHUR Dent", filter);
-        assertEquals(1, result.size());
-        result = topicGraph.getNotesByTitleQuery("aRTHur", filter);
-        assertEquals(1, result.size());
-        result = topicGraph.getNotesByTitleQuery("*dENT", filter);
-        assertEquals(1, result.size());
+        queryResult = topicGraph.getNotesByTitleQuery("ARTHUR Dent", filter);
+        assertEquals(1, queryResult.size());
+        queryResult = topicGraph.getNotesByTitleQuery("aRTHur", filter);
+        assertEquals(1, queryResult.size());
+        queryResult = topicGraph.getNotesByTitleQuery("*dENT", filter);
+        assertEquals(1, queryResult.size());
     }
 
     @Test
     public void quotedExactMatchSucceeds() throws Exception {
-        result = topicGraph.getNotesByTitleQuery("\"Arthur Dent\"", filter);
-        assertEquals(1, result.size());
-        assertEquals(arthur.getId(), result.iterator().next().getId());
+        queryResult = topicGraph.getNotesByTitleQuery("\"Arthur Dent\"", filter);
+        assertEquals(1, queryResult.size());
+        assertEquals(arthur.getId(), queryResult.iterator().next().getId());
     }
 }
