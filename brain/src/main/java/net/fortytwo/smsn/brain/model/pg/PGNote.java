@@ -1,20 +1,31 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public abstract class PGNote extends PGEntity implements Note {
+
+    private static final Map<String, Consumer<PGNote>> setterTriggersByPropertyKey;
+
+    static {
+        setterTriggersByPropertyKey = new HashMap<>();
+        setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.TITLE, PGNote::titleUpdated);
+        setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.SHORTCUT, PGNote::shortcutUpdated);
+    }
 
     public PGNote(final Vertex vertex) {
         super(vertex);
@@ -68,11 +79,9 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     @Override
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         setRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE, title);
-        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.TITLE);
-
-        updateAcronym();
+        titleUpdated();
     }
 
     @Override
@@ -101,10 +110,9 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     @Override
-    public void setShortcut(String shortcut) {
+    public void setShortcut(final String shortcut) {
         setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
-
-        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.SHORTCUT);
+        shortcutUpdated();
     }
 
     @Override
@@ -280,12 +288,48 @@ public abstract class PGNote extends PGEntity implements Note {
         return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 
-    private <T> void getProperty(final Property<Note, T> property) {
-        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
-
+    private void titleUpdated() {
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.TITLE);
+        updateAcronym();
     }
 
-    private <T> void setProperty(final Property<Note, T> property) {
+    private void shortcutUpdated() {
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.SHORTCUT);
+    }
 
+    private <V> V getProperty(final Property<Note, V> property) {
+        V value = getOptionalProperty(property.getKey());
+        if (null == value) {
+            if (null != property.getDefaultValue()) {
+                return property.getDefaultValue();
+            } else if (property.isRequired()) {
+                throw new InvalidGraphException("missing property '" + property.getKey() + "' for " + this);
+            } else {
+                return null;
+            }
+        } else {
+            return value;
+        }
+    }
+
+    private <V> void setProperty(final Property<Note, V> property, final V value) {
+        V internalValue;
+        if (null == value) {
+            if (property.isRequired()) {
+                throw new IllegalArgumentException("cannot set required property " + property.getKey() + " to null");
+            } else {
+                internalValue = null;
+            }
+        } else if (null != property.getDefaultValue() && property.getDefaultValue().equals(value)) {
+            internalValue = null;
+        } else {
+            internalValue = value;
+        }
+
+        setOptionalProperty(property.getKey(), internalValue);
+        Consumer<PGNote> trigger = setterTriggersByPropertyKey.get(property.getKey());
+        if (null != trigger) {
+            trigger.accept(this);
+        }
     }
 }

@@ -97,7 +97,7 @@ abstract class PGEntity {
     protected boolean setRequiredProperty(String name, Object value) {
         if (null == value) {
             throw new IllegalArgumentException("can't clear required property '" + name
-                    + "' on atom vertex " + getId());
+                    + "' on note vertex " + getId());
         }
 
         return setProperty(name, value);

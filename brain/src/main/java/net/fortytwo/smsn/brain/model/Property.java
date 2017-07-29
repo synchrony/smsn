@@ -4,8 +4,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class Property<T, V> {
-    private boolean isSettable;
-    private boolean isAnnotationProperty;
+    private boolean isRequired = false;
+    private boolean isSettable = true;
+    private boolean isAnnotationProperty = true;
     private String key;
     private Function<T, V> getter;
     private BiConsumer<T, V> setter;
@@ -42,72 +43,66 @@ public class Property<T, V> {
         return defaultValue;
     }
 
+    public boolean isRequired() {
+        return isRequired;
+    }
+
     public static class Builder<T, V> {
-        private boolean isSettable = true;
-        private boolean isAnnotationProperty = true;
-        private String key;
-        private Function<T, V> getter;
-        private BiConsumer<T, V> setter;
-        private Function<String, V> fromString;
-        private V defaultValue;
+        private final Property<T, V> property = new Property<>();
 
         public Property<T, V> build() {
             checkIsReady();
 
-            Property<T, V> property = new Property<>();
-            property.isSettable = isSettable;
-            property.isAnnotationProperty = isAnnotationProperty;
-            property.key = key;
-            property.getter = getter;
-            property.setter = setter;
-            property.fromString = fromString;
-            property.defaultValue = defaultValue;
-
             return property;
         }
 
+        public Builder<T, V> isRequired(final boolean isRequired) {
+            property.isRequired = isRequired;
+            return this;
+        }
+
         public Builder<T, V> isSettable(final boolean isSettable) {
-            this.isSettable = isSettable;
+            property.isSettable = isSettable;
             return this;
         }
 
         public Builder<T, V> isAnnotationProperty(final boolean isAnnotationProperty) {
-            this.isAnnotationProperty = isAnnotationProperty;
+            property.isAnnotationProperty = isAnnotationProperty;
             return this;
         }
 
         public Builder<T, V> key(final String key) {
-            this.key = key;
+            property.key = key;
             return this;
         }
 
         public Builder<T, V> getter(final Function<T, V> getter) {
-            this.getter = getter;
+            property.getter = getter;
             return this;
         }
 
         public Builder<T, V> setter(final BiConsumer<T, V> setter) {
-            this.setter = setter;
+            property.setter = setter;
             return this;
         }
 
         public Builder<T, V> fromString(final Function<String, V> fromString) {
-            this.fromString = fromString;
+            property.fromString = fromString;
             return this;
         }
 
         public Builder<T, V> defaultValue(final V defaultValue) {
-            this.defaultValue = defaultValue;
+            property.defaultValue = defaultValue;
             return this;
         }
 
         private void checkIsReady() {
-            checkNotNull(key, "property key");
-            checkNotNull(getter, "getter");
-            if (isSettable) {
-                checkNotNull(setter, "setter");
+            checkNotNull(property.key, "property key");
+            checkNotNull(property.getter, "getter");
+            if (property.isSettable) {
+                checkNotNull(property.setter, "setter");
             }
-            checkNotNull(fromString, "from-string");
+            checkNotNull(property.fromString, "from-string");
         }
 
         private <S> void checkNotNull(final S value, final String name) {
