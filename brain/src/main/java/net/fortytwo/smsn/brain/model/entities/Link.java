@@ -1,12 +1,12 @@
 package net.fortytwo.smsn.brain.model.entities;
 
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 
 public interface Link extends Entity {
 
-    Tag getTag();
+    Role getRole();
 
-    void setTag(Tag tag);
+    void setRole(Role role);
 
     Topic getTarget();
 

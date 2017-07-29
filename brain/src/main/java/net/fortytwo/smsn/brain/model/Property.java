@@ -10,19 +10,22 @@ public class Property<T, V> {
     private final Function<T, V> getter;
     private final BiConsumer<T, V> setter;
     private final Function<String, V> fromString;
+    private final V defaultValue;
 
     public Property(final boolean isSettable,
                      final boolean isAnnotationProperty,
                      final String propertyKey,
                      final Function<T, V> getter,
                      final BiConsumer<T, V> setter,
-                     final Function<String, V> fromString) {
+                     final Function<String, V> fromString,
+                    final V defaultValue) {
         this.isSettable = isSettable;
         this.isAnnotationProperty = isAnnotationProperty;
         this.propertyKey = propertyKey;
         this.getter = getter;
         this.setter = setter;
         this.fromString = fromString;
+        this.defaultValue = defaultValue;
     }
 
     public boolean isAnnotationProperty() {
@@ -47,5 +50,9 @@ public class Property<T, V> {
 
     public boolean isSettable() {
         return isSettable;
+    }
+
+    public V getDefaultValue() {
+        return defaultValue;
     }
 }

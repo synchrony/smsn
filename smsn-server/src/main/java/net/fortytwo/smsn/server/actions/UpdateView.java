@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.Tag;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;

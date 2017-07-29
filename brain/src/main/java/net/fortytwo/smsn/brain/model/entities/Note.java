@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model.entities;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -16,24 +16,24 @@ public interface Note extends Entity {
     static Map<String, Property<Note, ?>> createPropertiesByKey() {
         Map<String, Property<Note, ?>> propertiesByKey = new LinkedHashMap<>();
         for (Property<Note, ?> prop : new Property[]{
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.TAG,
-                        Note::getTag, Note::setTag, Tag::valueOf),
+                new Property<>(true, true, SemanticSynchrony.PropertyKeys.ROLE,
+                        Note::getRole, Note::setRole, Role::valueOf, Role.Entity),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.ALIAS,
-                        Note::getAlias, Note::setAlias, s -> s),
+                        Note::getAlias, Note::setAlias, s -> s, null),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.CREATED,
-                        Note::getCreated, Note::setCreated, Long::valueOf),
+                        Note::getCreated, Note::setCreated, Long::valueOf, null),
                 new Property<>(true, false, SemanticSynchrony.PropertyKeys.TEXT,
-                        Note::getText, Note::setText, s -> s),
+                        Note::getText, Note::setText, s -> s, null),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.SOURCE,
-                        Note::getSource, Note::setSource, s -> s),
+                        Note::getSource, Note::setSource, s -> s, null),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.SHORTCUT,
-                        Note::getShortcut, Note::setShortcut, s -> s),
+                        Note::getShortcut, Note::setShortcut, s -> s, null),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.TITLE,
-                        Note::getTitle, Note::setTitle, s -> s),
+                        Note::getTitle, Note::setTitle, s -> s, null),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.WEIGHT,
-                        Note::getWeight, Note::setWeight, Float::valueOf),
+                        Note::getWeight, Note::setWeight, Float::valueOf, 0.5f),
                 new Property<>(true, true, SemanticSynchrony.PropertyKeys.PRIORITY,
-                        Note::getPriority, Note::setPriority, Float::valueOf),
+                        Note::getPriority, Note::setPriority, Float::valueOf, 0.5f),
         }) {
             propertiesByKey.put(prop.getPropertyKey(), prop);
         }
@@ -44,9 +44,9 @@ public interface Note extends Entity {
 
     void setId(String id);
 
-    Tag getTag();
+    Role getRole();
 
-    void setTag(Tag tag);
+    void setRole(Role role);
 
     String getAlias();
 

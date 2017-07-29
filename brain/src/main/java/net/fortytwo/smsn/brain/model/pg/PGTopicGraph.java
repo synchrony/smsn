@@ -3,7 +3,7 @@ package net.fortytwo.smsn.brain.model.pg;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Entity;
@@ -138,11 +138,11 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Link createLink(final Topic target, final String label, final Tag tag) {
+    public Link createLink(final Topic target, final String label, final Role role) {
         Link link = createEntity(null, SemanticSynchrony.VertexLabels.LINK, this::asLink);
         link.setTarget(target);
         link.setLabel(label);
-        link.setTag(tag);
+        link.setRole(role);
         return link;
     }
 

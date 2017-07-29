@@ -33,7 +33,7 @@ public interface TopicGraph {
 
     Page createPage(Link root);
 
-    Link createLink(Topic target, String label, Tag tag);
+    Link createLink(Topic target, String label, Role role);
 
     TreeNode<Link> createTopicTree(Link link);
 

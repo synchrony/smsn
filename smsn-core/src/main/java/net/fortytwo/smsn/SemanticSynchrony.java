@@ -48,7 +48,7 @@ public class SemanticSynchrony {
                 ID_V = "idV",
                 LABEL = "label",
                 PRIORITY = "priority",
-                TAG = "tag",
+                ROLE = "role",
                 SHORTCUT = "shortcut",
                 SOURCE = "source",
                 TEXT = "text",

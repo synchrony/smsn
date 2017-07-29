@@ -4,7 +4,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.PageParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.model.Property;
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
@@ -342,16 +342,16 @@ public class WikiParser extends PageParser {
         }
     }
 
-    private Tag tagForBullet(final String bullet) {
+    private Role tagForBullet(final String bullet) {
         return bullet.equals(WikiFormat.LABEL_BULLET)
-                ? Tag.Label
+                ? Role.Relation
                 : null;
     }
 
-    private TreeNode<Link> constructTreeNode(final String topicId, final Tag tag, final String label)
+    private TreeNode<Link> constructTreeNode(final String topicId, final Role role, final String label)
             throws IOException {
         Link link = new LinkDTO();
-        link.setTag(tag);
+        link.setRole(role);
         link.setLabel(label);
         if (null != topicId) {
             Topic target = new TopicDTO();

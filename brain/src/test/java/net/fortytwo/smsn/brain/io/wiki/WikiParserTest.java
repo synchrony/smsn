@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
@@ -84,15 +84,15 @@ public class WikiParserTest extends BrainTestBase {
     @Test
     public void testRoleIsRespected() throws Exception {
         Page page = getExample();
-        assertNull(page.getContent().getValue().getTag());
-        assertNull(page.getContent().getChildren().get(0).getValue().getTag());
+        assertNull(page.getContent().getValue().getRole());
+        assertNull(page.getContent().getChildren().get(0).getValue().getRole());
 
         TreeNode<Link> header = page.getContent().getChildren().get(5);
-        assertEquals(Tag.Label, header.getValue().getTag());
-        assertNull(header.getChildren().get(0).getValue().getTag());
+        assertEquals(Role.Relation, header.getValue().getRole());
+        assertNull(header.getChildren().get(0).getValue().getRole());
 
         TreeNode<Link> subHeader = header.getChildren().get(3);
-        assertEquals(Tag.Label, subHeader.getValue().getTag());
+        assertEquals(Role.Relation, subHeader.getValue().getRole());
         assertEquals("gzScm", subHeader.getValue().getTarget().getId());
         assertEquals("additional comments", subHeader.getValue().getLabel());
         assertEquals(1, subHeader.getChildren().length());
@@ -222,7 +222,7 @@ public class WikiParserTest extends BrainTestBase {
         assertEquals(5, tree.getChildren().length());
         for (int i = 0; i < tree.getChildren().length(); i++) {
             TreeNode<Link> child = tree.getChildren().get(i);
-            assertNull(child.getValue().getTag());
+            assertNull(child.getValue().getRole());
         }
     }
 

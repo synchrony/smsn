@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.model.dto;
 
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
@@ -11,7 +11,7 @@ public class PageDTO implements Page {
     public static final String TRANSITIONAL_ID = "IGNORED";
     public static final String TRANSITIONAL_TITLE = "IGNORED";
 
-    private Tag tag;
+    private Role role;
     private String text;
     private String source;
     private String alias;
@@ -29,12 +29,12 @@ public class PageDTO implements Page {
         // nothing to do
     }
 
-    public Tag getTag() {
-        return tag;
+    public Role getRole() {
+        return role;
     }
 
-    public void setTag(final Tag tag) {
-        this.tag = tag;
+    public void setRole(final Role role) {
+        this.role = role;
     }
 
 

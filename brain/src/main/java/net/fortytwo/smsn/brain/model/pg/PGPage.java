@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
@@ -14,13 +14,13 @@ public abstract class PGPage extends PGEntity implements Page {
         super(vertex);
     }
 
-    public Tag getTag() {
-        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.TAG);
-        return null == name ? null : Tag.valueOf(name);
+    public Role getRole() {
+        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
+        return null == name ? null : Role.valueOf(name);
     }
 
-    public void setTag(final Tag tag) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.TAG, null == tag ? null : tag.name());
+    public void setRole(final Role role) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
     }
 
     @Override

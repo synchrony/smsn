@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Tag;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -13,7 +13,7 @@ public class NoteDTO implements Note {
 
     private String id = SemanticSynchrony.createRandomId();
     private Topic topic;
-    private Tag tag;
+    private Role role;
     private long created = System.currentTimeMillis();
     private String title = "atom " + id;
     private Float weight = SemanticSynchrony.DEFAULT_WEIGHT;
@@ -35,12 +35,12 @@ public class NoteDTO implements Note {
         this.id = id;
     }
 
-    public Tag getTag() {
-        return tag;
+    public Role getRole() {
+        return role;
     }
 
-    public void setTag(final Tag tag) {
-        this.tag = tag;
+    public void setRole(final Role role) {
+        this.role = role;
     }
 
     @Override

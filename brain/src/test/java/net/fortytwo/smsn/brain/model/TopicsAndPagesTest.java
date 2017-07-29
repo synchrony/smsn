@@ -31,10 +31,10 @@ public class TopicsAndPagesTest extends BrainTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        friendsLink = topicGraph.createLink(friendTopic, "friends", Tag.Label);
+        friendsLink = topicGraph.createLink(friendTopic, "friends", Role.Relation);
         arthurLink = topicGraph.createLink(arthurTopic, "Arthur P. Dent", null);
         fordLink = topicGraph.createLink(fordTopic, "Ford Prefect", null);
-        zaphodLink = topicGraph.createLink(zaphodTopic, "Zaphod Beeblebrox", Tag.Label);
+        zaphodLink = topicGraph.createLink(zaphodTopic, "Zaphod Beeblebrox", Role.Relation);
         earthLink = topicGraph.createLink(earthTopic, "The Earth", null);
         teaLink = topicGraph.createLink(teaTopic, "Tea", null);
     }
@@ -121,7 +121,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
                         topicGraph.createTopicTree(
                                 topicGraph.createLink(arthurTopic, "Arthur as a top-level link", null)),
                         topicGraph.createTopicTree(
-                                topicGraph.createLink(arthurTopic, "Arthur as a header", Tag.Label))));
+                                topicGraph.createLink(arthurTopic, "Arthur as a header", Role.Relation))));
         page.getContent().getChildren().get(1).setChildren(
                 topicGraph.toList(
                         topicGraph.createTopicTree(
@@ -129,17 +129,17 @@ public class TopicsAndPagesTest extends BrainTestBase {
 
         assertEquals(arthurTopic, page.getContent().getValue().getTarget());
         assertEquals("Arthur P. Dent", page.getContent().getValue().getLabel());
-        assertNull(page.getContent().getValue().getTag());
+        assertNull(page.getContent().getValue().getRole());
         assertEquals(arthurTopic, page.getContent().getChildren().get(0).getValue().getTarget());
         assertEquals("Arthur as a top-level link", page.getContent().getChildren().get(0).getValue().getLabel());
-        assertNull(page.getContent().getChildren().get(0).getValue().getTag());
+        assertNull(page.getContent().getChildren().get(0).getValue().getRole());
         assertEquals(arthurTopic, page.getContent().getChildren().get(1).getValue().getTarget());
         assertEquals("Arthur as a header", page.getContent().getChildren().get(1).getValue().getLabel());
-        assertEquals(Tag.Label, page.getContent().getChildren().get(1).getValue().getTag());
+        assertEquals(Role.Relation, page.getContent().getChildren().get(1).getValue().getRole());
         assertEquals(arthurTopic, page.getContent().getChildren().get(1).getChildren().get(0).getValue().getTarget());
         assertEquals("Arthur as a second-level link",
                 page.getContent().getChildren().get(1).getChildren().get(0).getValue().getLabel());
-        assertNull(page.getContent().getChildren().get(1).getChildren().get(0).getValue().getTag());
+        assertNull(page.getContent().getChildren().get(1).getChildren().get(0).getValue().getRole());
 
         // before destroying the page, create another page about Arthur
         Page page2 = topicGraph.createPage(topicGraph.createLink(arthurTopic, "Arthur Philip Dent", null));
