@@ -14,24 +14,61 @@ public interface Page extends Entity {
     static Map<String, Property<Page, ?>> createPropertiesByKey() {
         Map<String, Property<Page, ?>> propertiesByKey = new LinkedHashMap<>();
         for (Property<Page, ?> prop : new Property[]{
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.ROLE,
-                        Page::getRole, Page::setRole, Role::valueOf, Role.Entity),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.ALIAS,
-                        Page::getAlias, Page::setAlias, s -> s, null),
-                new Property<>(false, true, SemanticSynchrony.PropertyKeys.CREATED,
-                        Page::getCreated, Page::setCreated, Long::valueOf, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.SOURCE,
-                        Page::getSource, Page::setSource, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.SHORTCUT,
-                        Page::getShortcut, Page::setShortcut, s -> s, null),
-                new Property<>(true, false, SemanticSynchrony.PropertyKeys.TEXT,
-                        Page::getText, Page::setText, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.WEIGHT,
-                        Page::getWeight, Page::setWeight, Float::valueOf, 0.5f),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.PRIORITY,
-                        Page::getPriority, Page::setPriority, Float::valueOf, 0.5f),
+                new Property.Builder<Page, Role>()
+                        .key(SemanticSynchrony.PropertyKeys.ROLE)
+                        .getter(Page::getRole)
+                        .setter(Page::setRole)
+                        .fromString(Role::valueOf)
+                        .defaultValue(Role.Entity)
+                        .build(),
+                new Property.Builder<Page, String>()
+                        .key(SemanticSynchrony.PropertyKeys.ALIAS)
+                        .getter(Page::getAlias)
+                        .setter(Page::setAlias)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Page, Long>()
+                        .key(SemanticSynchrony.PropertyKeys.CREATED)
+                        .isSettable(false)
+                        .getter(Page::getCreated)
+                        .setter(Page::setCreated)
+                        .fromString(Long::valueOf)
+                        .build(),
+                new Property.Builder<Page, String>()
+                        .key(SemanticSynchrony.PropertyKeys.TEXT)
+                        .isAnnotationProperty(false)
+                        .getter(Page::getText)
+                        .setter(Page::setText)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Page, String>()
+                        .key(SemanticSynchrony.PropertyKeys.SOURCE)
+                        .getter(Page::getSource)
+                        .setter(Page::setSource)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Page, String>()
+                        .key(SemanticSynchrony.PropertyKeys.SHORTCUT)
+                        .getter(Page::getShortcut)
+                        .setter(Page::setShortcut)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Page, Float>()
+                        .key(SemanticSynchrony.PropertyKeys.WEIGHT)
+                        .getter(Page::getWeight)
+                        .setter(Page::setWeight)
+                        .fromString(Float::valueOf)
+                        .defaultValue(0.5f)
+                        .build(),
+                new Property.Builder<Page, Float>()
+                        .key(SemanticSynchrony.PropertyKeys.PRIORITY)
+                        .getter(Page::getPriority)
+                        .setter(Page::setPriority)
+                        .fromString(Float::valueOf)
+                        .defaultValue(0.5f)
+                        .build()
         }) {
-            propertiesByKey.put(prop.getPropertyKey(), prop);
+            propertiesByKey.put(prop.getKey(), prop);
         }
         return propertiesByKey;
     }

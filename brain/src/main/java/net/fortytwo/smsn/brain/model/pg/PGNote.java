@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
@@ -277,5 +278,14 @@ public abstract class PGNote extends PGEntity implements Note {
 
     private String cleanForAcronym(final String value) {
         return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
+    }
+
+    private <T> void getProperty(final Property<Note, T> property) {
+        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
+
+    }
+
+    private <T> void setProperty(final Property<Note, T> property) {
+
     }
 }

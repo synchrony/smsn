@@ -16,26 +16,67 @@ public interface Note extends Entity {
     static Map<String, Property<Note, ?>> createPropertiesByKey() {
         Map<String, Property<Note, ?>> propertiesByKey = new LinkedHashMap<>();
         for (Property<Note, ?> prop : new Property[]{
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.ROLE,
-                        Note::getRole, Note::setRole, Role::valueOf, Role.Entity),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.ALIAS,
-                        Note::getAlias, Note::setAlias, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.CREATED,
-                        Note::getCreated, Note::setCreated, Long::valueOf, null),
-                new Property<>(true, false, SemanticSynchrony.PropertyKeys.TEXT,
-                        Note::getText, Note::setText, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.SOURCE,
-                        Note::getSource, Note::setSource, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.SHORTCUT,
-                        Note::getShortcut, Note::setShortcut, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.TITLE,
-                        Note::getTitle, Note::setTitle, s -> s, null),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.WEIGHT,
-                        Note::getWeight, Note::setWeight, Float::valueOf, 0.5f),
-                new Property<>(true, true, SemanticSynchrony.PropertyKeys.PRIORITY,
-                        Note::getPriority, Note::setPriority, Float::valueOf, 0.5f),
+                new Property.Builder<Note, Role>()
+                        .key(SemanticSynchrony.PropertyKeys.ROLE)
+                        .getter(Note::getRole)
+                        .setter(Note::setRole)
+                        .fromString(Role::valueOf)
+                        .defaultValue(Role.Entity)
+                        .build(),
+                new Property.Builder<Note, String>()
+                        .key(SemanticSynchrony.PropertyKeys.ALIAS)
+                        .getter(Note::getAlias)
+                        .setter(Note::setAlias)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Note, Long>()
+                        .key(SemanticSynchrony.PropertyKeys.CREATED)
+                        .isSettable(false)
+                        .getter(Note::getCreated)
+                        .setter(Note::setCreated)
+                        .fromString(Long::valueOf)
+                        .build(),
+                new Property.Builder<Note, String>()
+                        .key(SemanticSynchrony.PropertyKeys.TEXT)
+                        .isAnnotationProperty(false)
+                        .getter(Note::getText)
+                        .setter(Note::setText)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Note, String>()
+                        .key(SemanticSynchrony.PropertyKeys.SOURCE)
+                        .getter(Note::getSource)
+                        .setter(Note::setSource)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Note, String>()
+                        .key(SemanticSynchrony.PropertyKeys.SHORTCUT)
+                        .getter(Note::getShortcut)
+                        .setter(Note::setShortcut)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Note, String>()
+                        .key(SemanticSynchrony.PropertyKeys.TITLE)
+                        .getter(Note::getTitle)
+                        .setter(Note::setTitle)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Note, Float>()
+                        .key(SemanticSynchrony.PropertyKeys.WEIGHT)
+                        .getter(Note::getWeight)
+                        .setter(Note::setWeight)
+                        .fromString(Float::valueOf)
+                        .defaultValue(0.5f)
+                        .build(),
+                new Property.Builder<Note, Float>()
+                        .key(SemanticSynchrony.PropertyKeys.PRIORITY)
+                        .getter(Note::getPriority)
+                        .setter(Note::setPriority)
+                        .fromString(Float::valueOf)
+                        .defaultValue(0.5f)
+                        .build()
         }) {
-            propertiesByKey.put(prop.getPropertyKey(), prop);
+            propertiesByKey.put(prop.getKey(), prop);
         }
         return propertiesByKey;
     }

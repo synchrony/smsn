@@ -110,7 +110,7 @@ public class WikiPrinter {
         Page.propertiesByKey.values().stream().filter(Property::isAnnotationProperty).forEach(prop -> {
             Object value = prop.getGetter().apply(page);
             if (null != value) {
-                printProperty(prop.getPropertyKey(), value);
+                printProperty(prop.getKey(), value);
             }
         });
     }
