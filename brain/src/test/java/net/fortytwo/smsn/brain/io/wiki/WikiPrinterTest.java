@@ -51,9 +51,10 @@ public class WikiPrinterTest {
 
         assertEquals("@id 12345\n" +
                 "@title Arthur Dent\n" +
-                "@text\n" +
+                "@text ```\n" +
                 "The regular early morning yell of horror was the sound of Arthur Dent waking\n" +
-                "up and suddenly remembering where he was.", write(page));
+                "up and suddenly remembering where he was.\n" +
+                "```\n", write(page));
     }
 
     @Test
@@ -67,13 +68,27 @@ public class WikiPrinterTest {
     }
 
     @Test
-    public void emptyPageIsIgnored() throws Exception {
+    public void emptyTextIsIgnored() throws Exception {
         Page page = new PageDTO();
         page.setContent(createTree("12345", "Arthur Dent", null));
         page.setText("  \n ");
 
         assertEquals("@id 12345\n" +
                 "@title Arthur Dent\n", write(page));
+    }
+
+    @Test
+    public void trailingTextWhitespaceIsIgnored() throws Exception {
+        Page page = new PageDTO();
+        page.setContent(createTree("12345", "Arthur Dent", null));
+        page.setText("one\ntwo\n\n  \t\n ");
+
+        assertEquals("@id 12345\n" +
+                "@title Arthur Dent\n" +
+                "@text ```\n" +
+                "one\n" +
+                "two\n" +
+                "```\n", write(page));
     }
 
     @Test

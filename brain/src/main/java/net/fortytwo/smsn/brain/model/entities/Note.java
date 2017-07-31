@@ -16,14 +16,6 @@ public interface Note extends Entity {
     static Map<String, Property<Note, ?>> createPropertiesByKey() {
         Map<String, Property<Note, ?>> propertiesByKey = new LinkedHashMap<>();
         for (Property<Note, ?> prop : new Property[]{
-                new Property.Builder<Note, Role>()
-                        .key(SemanticSynchrony.PropertyKeys.ROLE)
-                        .isRequired(true)
-                        .getter(Note::getRole)
-                        .setter(Note::setRole)
-                        .fromString(Role::valueOf)
-                        .defaultValue(Role.Entity)
-                        .build(),
                 new Property.Builder<Note, String>()
                         .key(SemanticSynchrony.PropertyKeys.ALIAS)
                         .getter(Note::getAlias)
@@ -39,10 +31,34 @@ public interface Note extends Entity {
                         .fromString(Long::valueOf)
                         .build(),
                 new Property.Builder<Note, String>()
-                        .key(SemanticSynchrony.PropertyKeys.TEXT)
+                        .key(SemanticSynchrony.PropertyKeys.ID)
+                        .isRequired(true)
+                        .isSettable(false)
                         .isAnnotationProperty(false)
-                        .getter(Note::getText)
-                        .setter(Note::setText)
+                        .getter(Note::getId)
+                        .setter(Note::setId)
+                        .fromString(s -> s)
+                        .build(),
+                new Property.Builder<Note, Float>()
+                        .key(SemanticSynchrony.PropertyKeys.PRIORITY)
+                        .isRequired(true)
+                        .getter(Note::getPriority)
+                        .setter(Note::setPriority)
+                        .fromString(Float::valueOf)
+                        .defaultValue(0f)
+                        .build(),
+                new Property.Builder<Note, Role>()
+                        .key(SemanticSynchrony.PropertyKeys.ROLE)
+                        .isRequired(true)
+                        .getter(Note::getRole)
+                        .setter(Note::setRole)
+                        .fromString(Role::valueOf)
+                        .defaultValue(Role.Entity)
+                        .build(),
+                new Property.Builder<Note, String>()
+                        .key(SemanticSynchrony.PropertyKeys.SHORTCUT)
+                        .getter(Note::getShortcut)
+                        .setter(Note::setShortcut)
                         .fromString(s -> s)
                         .build(),
                 new Property.Builder<Note, String>()
@@ -53,9 +69,10 @@ public interface Note extends Entity {
                         .fromString(s -> s)
                         .build(),
                 new Property.Builder<Note, String>()
-                        .key(SemanticSynchrony.PropertyKeys.SHORTCUT)
-                        .getter(Note::getShortcut)
-                        .setter(Note::setShortcut)
+                        .key(SemanticSynchrony.PropertyKeys.TEXT)
+                        //.isAnnotationProperty(false)
+                        .getter(Note::getText)
+                        .setter(Note::setText)
                         .fromString(s -> s)
                         .build(),
                 new Property.Builder<Note, String>()
@@ -73,59 +90,14 @@ public interface Note extends Entity {
                         .fromString(Float::valueOf)
                         .defaultValue(0.5f)
                         .build(),
-                new Property.Builder<Note, Float>()
-                        .key(SemanticSynchrony.PropertyKeys.PRIORITY)
-                        .isRequired(true)
-                        .getter(Note::getPriority)
-                        .setter(Note::setPriority)
-                        .fromString(Float::valueOf)
-                        .defaultValue(0.5f)
-                        .build()
         }) {
             propertiesByKey.put(prop.getKey(), prop);
         }
         return propertiesByKey;
     }
 
-    String getId();
-
-    void setId(String id);
-
-    Role getRole();
-
-    void setRole(Role role);
-
-    String getAlias();
-
-    void setAlias(String alias);
-
-    Long getCreated();
-
-    void setCreated(Long created);
-
-    String getTitle();
-
-    void setTitle(String title);
-
-    String getText();
-
-    void setText(String text);
-
-    Float getPriority();
-
-    void setPriority(Float priority);
-
-    String getShortcut();
-
-    void setShortcut(String shortcut);
-
-    Float getWeight();
-
-    void setWeight(Float weight);
-
-    String getSource();
-
-    void setSource(String source);
+    <V> V getProperty(String key);
+    <V> void setProperty(String key, V value);
 
     Topic getTopic();
 
@@ -144,4 +116,84 @@ public interface Note extends Entity {
     Collection<ListNode<Note>> getFirstOf();
 
     Note getSubject(ListNode<Note> notes);
+
+    static String getId(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.ID);
+    }
+
+    static void setId(Note note, String id) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.ID, id);
+    }
+
+    static Role getRole(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.ROLE);
+    }
+
+    static void setRole(Note note, Role role) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.ROLE, role);
+    }
+
+    static String getAlias(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.ALIAS);
+    }
+
+    static void setAlias(Note note, String alias) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
+    }
+
+    static Long getCreated(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.CREATED);
+    }
+
+    static void setCreated(Note note, Long created) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
+    }
+
+    static String getTitle(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.TITLE);
+    }
+
+    static void setTitle(Note note, String title) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.TITLE, title);
+    }
+
+    static String getText(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.TEXT);
+    }
+
+    static void setText(Note note, String text) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
+    }
+
+    static Float getPriority(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.PRIORITY);
+    }
+
+    static void setPriority(Note note, Float priority) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
+    }
+
+    static String getShortcut(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.SHORTCUT);
+    }
+
+    static void setShortcut(Note note, String shortcut) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
+    }
+
+    static Float getWeight(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.WEIGHT);
+    }
+
+    static void setWeight(Note note, Float weight) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+    }
+
+    static String getSource(Note note) {
+        return note.getProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+    }
+
+    static void setSource(Note note, String source) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+    }
 }

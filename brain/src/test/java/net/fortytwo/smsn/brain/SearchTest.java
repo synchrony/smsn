@@ -29,8 +29,8 @@ public class SearchTest extends BrainTestBase {
 
     @Test
     public void partialMatchSucceeds() throws Exception {
-        createAtom(ARTHUR_ID, "Arthur Dent");
-        createAtom(FORD_ID, "Ford");
+        createNote(ARTHUR_ID, "Arthur Dent");
+        createNote(FORD_ID, "Ford");
 
         TreeNode<Link> results = search("Arthur");
         assertChildCount(1, results);
@@ -39,8 +39,8 @@ public class SearchTest extends BrainTestBase {
 
     @Test
     public void spaceSeparatedTokensHaveAndSemantics() throws Exception {
-        createAtom(ARTHUR_ID, "Arthur Dent");
-        createAtom("Random Frequent Flyer Dent");
+        createNote(ARTHUR_ID, "Arthur Dent");
+        createNoteWithTitle("Random Frequent Flyer Dent");
 
         assertChildCount(1, search("Arthur"));
         assertChildCount(1, search("Flyer"));
@@ -53,8 +53,8 @@ public class SearchTest extends BrainTestBase {
 
     @Test
     public void moreExactMatchScoresHigher() throws Exception {
-        createAtom("Arthur");
-        createAtom("Arthur Dent");
+        createNoteWithTitle("Arthur");
+        createNoteWithTitle("Arthur Dent");
 
         TreeNode<Link> results = search("arthur");
         assertChildCount(2, results);
@@ -66,8 +66,8 @@ public class SearchTest extends BrainTestBase {
     public void higherWeightScoresHigher() throws Exception {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
-            Note a = createAtom("Lintilla");
-            a.setWeight(random.nextFloat());
+            Note a = createNoteWithTitle("Lintilla");
+            Note.setWeight(a, random.nextFloat());
         }
 
         TreeNode<Link> results = search("Lintilla");
@@ -85,9 +85,9 @@ public class SearchTest extends BrainTestBase {
     public void higherPriorityScoresHigher() throws Exception {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
-            Note a = createAtom("Lintilla");
+            Note a = createNoteWithTitle("Lintilla");
             if (random.nextBoolean()) {
-                a.setPriority(random.nextFloat());
+                Note.setPriority(a, random.nextFloat());
             }
         }
 

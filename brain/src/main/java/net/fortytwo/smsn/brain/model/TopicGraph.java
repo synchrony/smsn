@@ -17,7 +17,7 @@ public interface TopicGraph {
 
     Iterable<Note> getAllNotes();
 
-    Optional<Note> getNotesById(String id);
+    Optional<Note> getNoteById(String id);
 
     List<Note> getNotesByAcronym(String acronym, Filter filter);
 

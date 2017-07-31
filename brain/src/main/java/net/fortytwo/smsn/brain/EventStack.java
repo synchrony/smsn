@@ -33,9 +33,6 @@ public class EventStack {
 
     public void clear() {
         stack.clear();
-        //for (Atom event : stack) {
-        //    deleteEvent(event);
-        //}
     }
 
     public TreeNode<Link> createGestureEvent(final String expressedBy,
@@ -44,11 +41,10 @@ public class EventStack {
         // Use this temporary name only if no actual name is discoverable
         String personName = personNames.getRoutineName(expressedBy);
 
-        //Atom gesture = createAtom();
         TreeNode<Link> gesture = TreeNodeDTO.createEmptyNode();
         TreeViews.setTitle(gesture, personName + " did something");
 
-        // note: there will be duplicate people atoms in the in-memory graph
+        // note: there will be duplicate people notes in the in-memory graph
         TreeNode<Link> person = TreeNodeDTO.createEmptyNode();
         TreeViews.setTitle(person, personName);
         TreeViews.setAlias(person, expressedBy);
@@ -67,8 +63,6 @@ public class EventStack {
 
         while (stack.size() >= capacity) {
             stack.removeLast();
-            //Atom event = stack.removeLast();
-            //deleteEvent(event);
         }
 
         stack.push(n);

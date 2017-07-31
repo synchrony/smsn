@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.openrdf.model.IRI;
@@ -12,7 +12,7 @@ import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
-public class QuotedValue extends AtomClass {
+public class QuotedValue extends NoteClass {
 
     public QuotedValue() {
         super(
@@ -36,8 +36,8 @@ public class QuotedValue extends AtomClass {
 
         IRI self = handleTypeAndAlias(a, context, SmSnVocabulary.WORDORPHRASE);
 
-        // note: a few atoms currently break this pattern, e.g. an atom with the value: "one", "two"
-        String d = a.getTitle().substring(1, a.getTitle().length() - 1).trim();
+        // note: a few notes currently break this pattern, e.g. a note with the value: "one", "two"
+        String d = Note.getTitle(a).substring(1, Note.getTitle(a).length() - 1).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(d)));
 
         return self;

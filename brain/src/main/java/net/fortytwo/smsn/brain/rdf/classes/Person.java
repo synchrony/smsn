@@ -1,9 +1,9 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomCollection;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteCollection;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentCollection;
@@ -20,7 +20,7 @@ import org.openrdf.rio.RDFHandlerException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class Person extends AtomClass {
+public class Person extends NoteClass {
 
     public Person() {
         super(
@@ -29,34 +29,34 @@ public class Person extends AtomClass {
                 // (e.g. Chinese or certain European names)
                 Pattern.compile("[A-Z].{1,49}"),
                 null,
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new NickHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new PageHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(new NickHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AKAReference.class),
+                        new NoteReqex.El(new PageHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, WebPage.class),
 
-                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+                        new NoteReqex.El(new DocumentsAboutTopicHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
 
-                        new AtomRegex.El(new MadeHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, WorksCollection.class),
-                        new AtomRegex.El(new QuotationHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, QuotedValueCollection.class),
-                        new AtomRegex.El(new InterestHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, InterestsCollection.class),
-                        new AtomRegex.El(new KnowsHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, SocialNetworkCollection.class),
-                        new AtomRegex.El(new BirthdayHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DatedEvent.Birthday.class),
-                        new AtomRegex.El(new AttendedEventsHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, PersonalEventsCollection.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrOne, PersonalStuffCollection.class),
+                        new NoteReqex.El(new MadeHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, WorksCollection.class),
+                        new NoteReqex.El(new QuotationHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, QuotedValueCollection.class),
+                        new NoteReqex.El(new InterestHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, InterestsCollection.class),
+                        new NoteReqex.El(new KnowsHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, SocialNetworkCollection.class),
+                        new NoteReqex.El(new BirthdayHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, DatedEvent.Birthday.class),
+                        new NoteReqex.El(new AttendedEventsHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, PersonalEventsCollection.class),
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrOne, PersonalStuffCollection.class),
                         // TODO: when the person passed away
                         // TODO: the person's contact information
                         // TODO: things mentioned by the person
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 
@@ -71,7 +71,7 @@ public class Person extends AtomClass {
         RDFHandler handler = context.getHandler();
 
         IRI self = handleTypeAndAlias(a, context, FOAF.PERSON);
-        handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(a.getTitle())));
+        handler.handleStatement(vf.createStatement(self, FOAF.NAME, vf.createLiteral(Note.getTitle(a))));
 
         return self;
     }
@@ -172,31 +172,31 @@ public class Person extends AtomClass {
         }
     }
 
-    public static class PersonalEventsCollection extends AtomCollection {
+    public static class PersonalEventsCollection extends NoteCollection {
 
         public PersonalEventsCollection() {
             super("personal-events",
                     Pattern.compile(".+ (logs|events)"),
                     null,
-                    new AtomRegex(Arrays.asList(
-                            new AtomRegex.El(null,
-                                    AtomRegex.Modifier.ZeroOrMore, GenericCollection.class),
-                            new AtomRegex.El(null,
-                                    AtomRegex.Modifier.ZeroOrMore))));
+                    new NoteReqex(Arrays.asList(
+                            new NoteReqex.El(null,
+                                    NoteReqex.Modifier.ZeroOrMore, GenericCollection.class),
+                            new NoteReqex.El(null,
+                                    NoteReqex.Modifier.ZeroOrMore))));
         }
     }
 
-    public static class PersonalStuffCollection extends AtomCollection {
+    public static class PersonalStuffCollection extends NoteCollection {
 
         public PersonalStuffCollection() {
             super("personal-stuff",
                     Pattern.compile("(my|.+'s) stuff"),
                     null,
-                    new AtomRegex(Arrays.asList(
-                            new AtomRegex.El(new ThingsOwnedHandler(),
-                                    AtomRegex.Modifier.ZeroOrOne, BelongingsCollection.class),
-                            new AtomRegex.El(null,
-                                    AtomRegex.Modifier.ZeroOrMore))));
+                    new NoteReqex(Arrays.asList(
+                            new NoteReqex.El(new ThingsOwnedHandler(),
+                                    NoteReqex.Modifier.ZeroOrOne, BelongingsCollection.class),
+                            new NoteReqex.El(null,
+                                    NoteReqex.Modifier.ZeroOrMore))));
         }
     }
 

@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import org.openrdf.model.IRI;
@@ -15,7 +15,7 @@ import org.openrdf.rio.RDFHandlerException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class LinkedConcept extends AtomClass {
+public class LinkedConcept extends NoteClass {
 
     public LinkedConcept() {
         super(
@@ -23,17 +23,17 @@ public class LinkedConcept extends AtomClass {
                 Pattern.compile("[a-zA-Z0-9].+"),
                 // TODO: support concepts from datasets other than DBpedia
                 Pattern.compile("http://dbpedia.org/resource/.+"),
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new NickHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new PageHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(new NickHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AKAReference.class),
+                        new NoteReqex.El(new PageHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, WebPage.class),
 
-                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+                        new NoteReqex.El(new DocumentsAboutTopicHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
 
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 
@@ -49,8 +49,8 @@ public class LinkedConcept extends AtomClass {
 
         IRI self = handleTypeAndAlias(a, context, OWL.THING);
 
-        // note: we assume short, name-like values for linked atoms
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getTitle())));
+        // note: we assume short, name-like values for linked notes
+        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(Note.getTitle(a))));
 
         return self;
     }

@@ -9,13 +9,13 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
- * A dynamically updated list of atoms ordered by their priority value
+ * A dynamically updated list of notes ordered by their priority value
  */
 public class Priorities {
     private final PriorityQueue<Note> queue;
 
     public Priorities() {
-        queue = new PriorityQueue<>(1, new AtomPriorityComparator());
+        queue = new PriorityQueue<>(1, new NotePriorityComparator());
     }
 
     public Queue<Note> getQueue() {
@@ -30,7 +30,7 @@ public class Priorities {
             long startTime = System.currentTimeMillis();
 
             for (Note a : graph.getAllNotes()) {
-                if (null != a.getPriority()) {
+                if (null != Note.getPriority(a)) {
                     updatePriority(a);
                 }
             }
@@ -42,16 +42,16 @@ public class Priorities {
 
     public void updatePriority(final Note a) {
         queue.remove(a);
-        if (null != a.getPriority()) {
+        if (null != Note.getPriority(a)) {
             queue.add(a);
         }
     }
 
     // order primarily by descending priority, secondarily by descending weight
-    private static class AtomPriorityComparator implements Comparator<Note> {
+    private static class NotePriorityComparator implements Comparator<Note> {
         public int compare(final Note a, final Note b) {
-            Float pa = a.getPriority();
-            Float pb = b.getPriority();
+            Float pa = Note.getPriority(a);
+            Float pb = Note.getPriority(b);
 
             if (null == pa) {
                 return null == pb || 0 == pb ? 0 : -1;
@@ -60,7 +60,7 @@ public class Priorities {
             } else {
                 int c = pa.compareTo(pb);
                 return 0 == c
-                        ? b.getWeight().compareTo(a.getWeight())
+                        ? Note.getWeight(b).compareTo(Note.getWeight(a))
                         : c;
             }
         }

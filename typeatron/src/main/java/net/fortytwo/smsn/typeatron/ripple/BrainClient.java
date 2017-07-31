@@ -91,13 +91,13 @@ public class BrainClient {
     /**
      * Generates a view of the graph.
      *
-     * @param root   the root atom of the view
+     * @param root   the root note of the view
      * @param height the height of the view.
      *               A view of height 0 contains only the root,
      *               while a view of height 1 also contains all children of the root,
      *               a view of height 2 all grandchildren, etc.
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to appear in the view.
+     * @param filter a collection of criteria for notes and links.
+     *               Notes and links which do not meet the criteria are not to appear in the view.
      * @param style  the adjacency style of the view
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
@@ -164,8 +164,8 @@ public class BrainClient {
      * @param height the maximum height of the tree which will be applied to the graph as an update.
      *               If height is 0, only the root node will be affected,
      *               while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param filter a collection of criteria for notes and links.
+     *               Notes and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      */
     public void update(final TreeNode<Link> root,
@@ -266,8 +266,8 @@ public class BrainClient {
      * @param queryType the type of search to perform
      * @param query     the search query
      * @param height    maximum height of the search results view
-     * @param filter    a collection of criteria for atoms and links.
-     *                  Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param filter    a collection of criteria for notes and links.
+     *                  Notes and links which do not meet the criteria are not to appear in search results.
      * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */

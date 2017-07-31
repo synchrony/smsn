@@ -1,38 +1,38 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.flow.Sink;
-import net.fortytwo.ripple.RippleException;
-import net.fortytwo.ripple.model.ModelConnection;
-import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
+import net.fortytwo.flow.Sink;
+import net.fortytwo.ripple.RippleException;
+import net.fortytwo.ripple.model.ModelConnection;
+import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class GetAtomAliasMapping extends AtomMapping {
+public class GetNoteCreatedMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomAliasMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetNoteCreatedMapping.class.getName());
 
-    public GetAtomAliasMapping(final BrainClient client,
-                               final Filter filter) {
+    public GetNoteCreatedMapping(final BrainClient client,
+                                 final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "get-atom-alias"
+                SmSnLibrary.NS_2014_12 + "get-note-created"
         };
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("atom", "the reference atom", true)};
+        return new Parameter[]{new Parameter("note", "the reference note", true)};
     }
 
     public String getComment() {
-        return "gets the @alias property of an atom";
+        return "gets the @created property of a note";
     }
 
     public void apply(RippleList stack,
@@ -45,11 +45,11 @@ public class GetAtomAliasMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't get @alias of non-atom: " + first);
+            logger.warning("can't get @created of non-note: " + first);
         } else {
-            String value = TreeViews.getAlias(n);
+            Long value = TreeViews.getCreated(n);
             if (null != value) {
-                // put both the @alias value and the (synced) atom back on the stack
+                // put both the @created property and the (synced) note back on the stack
                 solutions.accept(stack.push(n).push(value));
             }
         }

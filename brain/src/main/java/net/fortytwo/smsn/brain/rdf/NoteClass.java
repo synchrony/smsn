@@ -13,17 +13,17 @@ import org.openrdf.rio.RDFHandlerException;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-public abstract class AtomClass {
+public abstract class NoteClass {
 
     protected String name;
     protected Pattern valueRegex;
     protected final Pattern aliasRegex;
-    protected final AtomRegex memberRegex;
+    protected final NoteReqex memberRegex;
 
-    protected AtomClass(final String name,
+    protected NoteClass(final String name,
                         final Pattern valueRegex,
                         final Pattern aliasRegex,
-                        final AtomRegex memberRegex) {
+                        final NoteReqex memberRegex) {
         this.name = name;
         this.valueRegex = valueRegex;
         this.aliasRegex = aliasRegex;
@@ -53,19 +53,20 @@ public abstract class AtomClass {
 
         context.getHandler().handleStatement(context.getValueFactory().createStatement(self, RDF.TYPE, type));
 
-        if (null != a.getAlias()) {
+        if (null != Note.getAlias(a)) {
             IRI aliasIRI;
 
             try {
-                aliasIRI = context.getValueFactory().createIRI(a.getAlias());
+                aliasIRI = context.getValueFactory().createIRI(Note.getAlias(a));
             } catch (Exception e) {
-                SemanticSynchrony.getLogger().log(Level.WARNING, "alias is not a valid IRI: " + a.getAlias(), e);
+                SemanticSynchrony.getLogger().log(Level.WARNING, "alias is not a valid IRI: " + Note.getAlias(a), e);
                 aliasIRI = null;
             }
 
             if (null != aliasIRI) {
                 context.getHandler().handleStatement(
-                        context.getValueFactory().createStatement(self, OWL.SAMEAS, context.getValueFactory().createIRI(a.getAlias())));
+                        context.getValueFactory().createStatement(self, OWL.SAMEAS,
+                                context.getValueFactory().createIRI(Note.getAlias(a))));
             }
         }
 
@@ -86,7 +87,7 @@ public abstract class AtomClass {
             context.getHandler().handleStatement(
                     vf.createStatement(
                             context.getSubjectIri(), FOAF.NICK, vf.createLiteral(
-                                    AKAReference.extractAlias(object.getTitle()))));
+                                    AKAReference.extractAlias(Note.getTitle(object)))));
         }
     }
 

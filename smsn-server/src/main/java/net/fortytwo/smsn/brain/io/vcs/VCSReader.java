@@ -76,16 +76,16 @@ public class VCSReader extends NoteReader {
         try (InputStream in = new FileInputStream(file)) {
             page = reader.parse(in);
             String rootId = idFromFileName(file);
-            Note root = helper.resolveAtomReference(rootId);
+            Note root = helper.resolveNoteReference(rootId);
 
             for (TreeNode<Link> note : TreeViews.getChildrenAsList(page.getContent())) {
                 String id = TreeViews.getId(note);
                 Preconditions.checkNotNull(id);
             }
             page.setSource(source.getName());
-            helper.setAtom(root);
+            helper.setNote(root);
             helper.setPage(page);
-            helper.updateAtom();
+            helper.updateNote();
 
             checkAndCommit(helper.context.getTopicGraph());
         }
@@ -93,81 +93,81 @@ public class VCSReader extends NoteReader {
 
     private class Helper {
         private final Context context;
-        private Note atom;
+        private Note note;
         private Page page;
 
         private Helper(Context context) {
             this.context = context;
         }
 
-        public void setAtom(Note atom) {
-            this.atom = atom;
+        public void setNote(Note note) {
+            this.note = note;
         }
 
         public void setPage(Page page) {
             this.page = page;
         }
 
-        private void updateAtom() {
-            updateAtomProperties();
-            updateAtomChildren();
+        private void updateNote() {
+            updateNoteProperties();
+            updateNoteChildren();
         }
 
-        private void updateAtomProperties() {
-            updatePageProperty(atom, page, p -> page.getCreated(), Note::setCreated);
-            updatePageProperty(atom, page, p -> page.getText(), Note::setText);
-            updatePageProperty(atom, page, p -> page.getAlias(), Note::setAlias);
-            updatePageProperty(atom, page, p -> page.getPriority(), Note::setPriority);
-            updatePageProperty(atom, page, p -> page.getSource(), Note::setSource);
-            updatePageProperty(atom, page, p -> page.getShortcut(), Note::setShortcut);
-            updatePageProperty(atom, page, p -> page.getText(), Note::setText);
-            updatePageProperty(atom, page, p -> page.getWeight(), Note::setWeight);
+        private void updateNoteProperties() {
+            updatePageProperty(note, page, p -> page.getCreated(), Note::setCreated);
+            updatePageProperty(note, page, p -> page.getText(), Note::setText);
+            updatePageProperty(note, page, p -> page.getAlias(), Note::setAlias);
+            updatePageProperty(note, page, p -> page.getPriority(), Note::setPriority);
+            updatePageProperty(note, page, p -> page.getSource(), Note::setSource);
+            updatePageProperty(note, page, p -> page.getShortcut(), Note::setShortcut);
+            updatePageProperty(note, page, p -> page.getText(), Note::setText);
+            updatePageProperty(note, page, p -> page.getWeight(), Note::setWeight);
 
             TreeNode<Link> tree = page.getContent();
-            updateTreeProperty(atom, tree, TreeViews::getTitle, Note::setTitle);
+            updateTreeProperty(note, tree, TreeViews::getTitle, Note::setTitle);
         }
 
-        private void updateAtomChildren() {
-            Optional<ListNode<Note>> newChildren = createAtomList();
+        private void updateNoteChildren() {
+            Optional<ListNode<Note>> newChildren = createNoteList();
             if (newChildren.isPresent()) {
-                atom.setChildren(newChildren.get());
+                note.setChildren(newChildren.get());
             }
         }
 
-        private <T> void updatePageProperty(final Note atom,
+        private <T> void updatePageProperty(final Note note,
                                             final Page page,
                                             final Function<Page, T> noteGetter,
-                                            final BiConsumer<Note, T> atomSetter) {
+                                            final BiConsumer<Note, T> noteSetter) {
             T value = noteGetter.apply(page);
             if (null != value) {
-                atomSetter.accept(atom, value);
+                noteSetter.accept(note, value);
             }
         }
 
-        private <T> void updateTreeProperty(final Note atom,
-                                            final TreeNode<Link> note,
+        private <T> void updateTreeProperty(final Note note,
+                                            final TreeNode<Link> node,
                                             final Function<TreeNode<Link>, T> noteGetter,
-                                            final BiConsumer<Note, T> atomSetter) {
-            T value = noteGetter.apply(note);
+                                            final BiConsumer<Note, T> noteSetter) {
+            T value = noteGetter.apply(node);
             if (null != value) {
-                atomSetter.accept(atom, value);
+                noteSetter.accept(note, value);
             }
         }
 
-        private Optional<ListNode<Note>> createAtomList() {
+        private Optional<ListNode<Note>> createNoteList() {
             if (0 == TreeViews.countChildren(page.getContent())) return Optional.empty();
 
-            Note[] atoms = new Note[TreeViews.countChildren(page.getContent())];
+            Note[] notes = new Note[TreeViews.countChildren(page.getContent())];
             int i = 0;
             for (TreeNode<Link> child : TreeViews.getChildrenAsList(page.getContent())) {
-                atoms[i++] = resolveAtomReference(TreeViews.getId(child));
+                notes[i++] = resolveNoteReference(TreeViews.getId(child));
             }
-            return Optional.of(context.getTopicGraph().createListOfNotes(atoms));
+            return Optional.of(context.getTopicGraph().createListOfNotes(notes));
         }
 
-        private Note resolveAtomReference(final String id) {
+        private Note resolveNoteReference(final String id) {
             TopicGraph graph = context.getTopicGraph();
-            Optional<Note> opt = graph.getNotesById(id);
+            Optional<Note> opt = graph.getNoteById(id);
             Note referenced;
             if (opt.isPresent()) {
                 referenced = opt.get();

@@ -27,13 +27,13 @@ public class EdgeWriter extends NoteWriter {
 
         p.println("from\tto");
 
-        for (Note fromAtom : sourceGraph.getAllNotes()) {
-            if (null != fromAtom && filter.test(fromAtom)) {
-                ListNode<Note> l = fromAtom.getChildren();
+        for (Note fromNote : sourceGraph.getAllNotes()) {
+            if (null != fromNote && filter.test(fromNote)) {
+                ListNode<Note> l = fromNote.getChildren();
                 while (null != l) {
-                    Note toAtom = l.getFirst();
-                    if (filter.test(toAtom)) {
-                        printEdge(p, fromAtom, toAtom);
+                    Note toNote = l.getFirst();
+                    if (filter.test(toNote)) {
+                        printEdge(p, fromNote, toNote);
                     }
                     l = l.getRest();
                 }
@@ -41,10 +41,10 @@ public class EdgeWriter extends NoteWriter {
         }
     }
 
-    private void printEdge(final PrintStream p, final Note fromAtom, final Note toAtom) {
-        p.print(fromAtom.getId());
+    private void printEdge(final PrintStream p, final Note fromNote, final Note toNote) {
+        p.print(Note.getId(fromNote));
         p.print('\t');
-        p.print(toAtom.getId());
+        p.print(Note.getId(toNote));
         p.print('\n');
     }
 }

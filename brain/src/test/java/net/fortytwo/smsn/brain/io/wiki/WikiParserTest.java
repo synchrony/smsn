@@ -44,19 +44,22 @@ public class WikiParserTest extends BrainTestBase {
     @Test
     public void textBeginsWithProperty() throws IOException {
         Page page = wikiParser.parse("* Arthur\n" +
-                "@text\n" +
-                "Here is some text about Arthur.");
+                "    @text ```\n" +
+                "Here is some text about Arthur.\n" +
+                "```\n");
 
         assertEquals("Arthur", page.getContent().getChildren().getFirst().getValue().getLabel());
-        assertEquals("Here is some text about Arthur.", page.getText());
+        Page embeddedPage = page.getContent().getChildren().getFirst().getValue().getPage();
+
+        assertEquals("Here is some text about Arthur.", embeddedPage.getText());
     }
 
     @Test
     public void textIsCopiedVerbatim() throws Exception {
         Page page = getExample();
 
-        assertEquals("Unstructured text may be included after the first blank line.\n" +
-                        "Any number of lines of text are allowed.",
+        assertEquals("Unstructured text may be included between triple backticks, similar to Markdown.\n" +
+                        "Any number of lines of text is allowed.",
                 page.getText());
     }
 

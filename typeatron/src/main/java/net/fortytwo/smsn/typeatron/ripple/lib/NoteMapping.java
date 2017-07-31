@@ -18,15 +18,15 @@ import org.openrdf.model.impl.SimpleValueFactory;
 
 import java.util.logging.Logger;
 
-public abstract class AtomMapping extends PrimitiveStackMapping {
-    private static final Logger logger = Logger.getLogger(GetAtomValueMapping.class.getName());
+public abstract class NoteMapping extends PrimitiveStackMapping {
+    private static final Logger logger = Logger.getLogger(GetNoteValueMapping.class.getName());
 
     private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     protected final BrainClient client;
     protected final Filter filter;
 
-    protected AtomMapping(final BrainClient client,
+    protected NoteMapping(final BrainClient client,
                           final Filter filter) {
         this.client = client;
         this.filter = filter;

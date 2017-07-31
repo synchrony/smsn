@@ -142,7 +142,7 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
                                       final TypeatronControl typeatron) throws RippleException {
         BrainClient exoBrainClient = new BrainClient();
         Filter defaultFilter = Filter.noFilter();
-        // brain stream atoms begin with low weight, and with private rather than personal source
+        // brain stream notes begin with low weight, and with private rather than personal source
         // TODO: don't hard-code the source
         Filter brainstreamFilter = new Filter(0f, 0.25f, "private", "private");
 
@@ -161,23 +161,23 @@ public class TypeatronDictionaryMapping extends PrimitiveStackMapping {
         //add(new DictionaryGetMapping(userDictionary), "o");
 
         // Extend-o-Brain
-        add(new GetAtomAliasMapping(exoBrainClient, defaultFilter), "@a");
-        add(new GetAtomChildrenMapping(exoBrainClient, defaultFilter), "@n");
-        add(new GetAtomCreatedMapping(exoBrainClient, defaultFilter), "@c");
-        add(new GetAtomIdMapping(exoBrainClient, defaultFilter), "@i");
-        add(new GetAtomSourceMapping(exoBrainClient, defaultFilter), "@y");
-        add(new GetAtomShortcutMapping(exoBrainClient, defaultFilter), "@t");
-        add(new GetAtomValueMapping(exoBrainClient, defaultFilter), "@v", "v");
-        add(new GetAtomWeightMapping(exoBrainClient, defaultFilter), "@w");
-        add(new SetAtomAliasMapping(exoBrainClient, defaultFilter), "a@");
-        add(new SetAtomSourceMapping(exoBrainClient, defaultFilter), "y@");
-        add(new SetAtomShortcutMapping(exoBrainClient, defaultFilter), "t@", "sh");  // TODO: mismatch/redundancy
-        add(new SetAtomValueMapping(exoBrainClient, defaultFilter), "v@");
-        add(new SetAtomWeightMapping(exoBrainClient, defaultFilter), "w@");
+        add(new GetNoteAliasMapping(exoBrainClient, defaultFilter), "@a");
+        add(new GetNoteChildrenMapping(exoBrainClient, defaultFilter), "@n");
+        add(new GetNoteCreatedMapping(exoBrainClient, defaultFilter), "@c");
+        add(new GetNoteIdMapping(exoBrainClient, defaultFilter), "@i");
+        add(new GetNoteSourceMapping(exoBrainClient, defaultFilter), "@y");
+        add(new GetNoteShortcutMapping(exoBrainClient, defaultFilter), "@t");
+        add(new GetNoteValueMapping(exoBrainClient, defaultFilter), "@v", "v");
+        add(new GetNoteWeightMapping(exoBrainClient, defaultFilter), "@w");
+        add(new SetNoteAliasMapping(exoBrainClient, defaultFilter), "a@");
+        add(new SetNoteSourceMapping(exoBrainClient, defaultFilter), "y@");
+        add(new SetNoteShortcutMapping(exoBrainClient, defaultFilter), "t@", "sh");  // TODO: mismatch/redundancy
+        add(new SetNoteValueMapping(exoBrainClient, defaultFilter), "v@");
+        add(new SetNoteWeightMapping(exoBrainClient, defaultFilter), "w@");
         add(new ShortcutSearchMapping(exoBrainClient, defaultFilter), "o", "shortcut-search");
         add(new AddToStreamMapping(exoBrainClient, brainstreamFilter), "a", "append");
         // TODO: temporary/change
-        add(new GiveAtomMapping(exoBrainClient, defaultFilter, typeatron), "g", "give");
+        add(new GiveNoteMapping(exoBrainClient, defaultFilter, typeatron), "g", "give");
 
         // Typeatron music
         add(new EnableMusicMapping(typeatron.getMusic()), "me");

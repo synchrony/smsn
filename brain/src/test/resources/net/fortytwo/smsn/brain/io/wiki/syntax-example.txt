@@ -4,6 +4,10 @@
 @shortcut se
 @weight 0.75
 @priority 0.5
+@text ```
+Unstructured text may be included between triple backticks, similar to Markdown.
+Any number of lines of text is allowed.
+```
 * basic syntax
     * Semantic Synchrony uses a slight variant of wiki list syntax
     * basically, you have nested notes with attribute-value pairs, bulleted lines, and free-form text
@@ -47,5 +51,3 @@
     @alias http://example.org/alias-url-for-this-note
     @shortcut ep
 
-Unstructured text may be included after the first blank line.
-Any number of lines of text are allowed.

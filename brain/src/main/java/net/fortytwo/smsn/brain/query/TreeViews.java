@@ -13,9 +13,9 @@ import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -57,13 +57,13 @@ public class TreeViews {
     /**
      * Generates a view of the graph.
      *
-     * @param root   the root atom of the view
+     * @param root   the root note of the view
      * @param height the maximum height of the view.
      *               A view of height 0 contains only the root,
      *               while a view of height 1 also contains all children of the root,
      *               a view of height 2 all grandchildren, etc.
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to appear in the view.
+     * @param filter a collection of criteria for notes and links.
+     *               Notes and links which do not meet the criteria are not to appear in the view.
      * @param style  the adjacency style of the view
      * @return a partial view of the graph as a tree of <code>TreeNode</code> objects
      */
@@ -83,14 +83,14 @@ public class TreeViews {
         return viewInternal(root, height, filter, style, true, null);
     }
 
-    public TreeNode<Link> customView(final Iterable<Note> atoms,
+    public TreeNode<Link> customView(final Iterable<Note> notes,
                                      final Filter filter) {
-        checkAtomIterableArg(atoms);
+        checkNoteIterableArg(notes);
         checkFilterArg(filter);
 
         TreeNode<Link> n = createTreeNode();
 
-        for (Note a : atoms) {
+        for (Note a : notes) {
             if (filter.test(a)) {
                 n.addChild(viewInternal(a, 0, filter, ViewStyle.Basic.Forward.getStyle(), true, null));
             }
@@ -106,8 +106,8 @@ public class TreeViews {
      * @param height the maximum height of the tree which will be applied to the graph as an update.
      *               If height is 0, only the root node will be affected,
      *               while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
-     * @param filter a collection of criteria for atoms and links.
-     *               Atoms and links which do not meet the criteria are not to be affected by the update.
+     * @param filter a collection of criteria for notes and links.
+     *               Notes and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      * @throws InvalidUpdateException if the update cannot be performed as specified
      */
@@ -136,8 +136,8 @@ public class TreeViews {
      * @param height    maximum height of the search results view.
      *                  This must be at least 1, indicating a results node with search results as children.
      *                  A height of 2 includes the children of the results, as well.
-     * @param filter    a collection of criteria for atoms and links.
-     *                  Atoms and links which do not meet the criteria are not to appear in search results.
+     * @param filter    a collection of criteria for notes and links.
+     *                  Notes and links which do not meet the criteria are not to appear in search results.
      * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */
@@ -180,7 +180,7 @@ public class TreeViews {
         return result;
     }
 
-    public TreeNode<Link> findRootAtoms(final Filter filter,
+    public TreeNode<Link> findRootNotes(final Filter filter,
                                         final ViewStyle style,
                                         final int height) {
         checkHeightArg(height, 0);
@@ -190,18 +190,18 @@ public class TreeViews {
         boolean includeChildren = style.getDirection().equals(ViewStyle.Direction.Backward);
         boolean includeParents = style.getDirection().equals(ViewStyle.Direction.Forward);
 
-        return findAtoms(filter, includeChildren, includeParents, height, style);
+        return findNotes(filter, includeChildren, includeParents, height, style);
     }
 
-    public TreeNode<Link> findIsolatedAtoms(final Filter filter) {
-        return findAtoms(filter, true, true, 1, ViewStyle.Basic.Forward.getStyle());
+    public TreeNode<Link> findIsolatedNotes(final Filter filter) {
+        return findNotes(filter, true, true, 1, ViewStyle.Basic.Forward.getStyle());
     }
 
     /**
      * Generates a prioritized list of notes
      *
-     * @param filter     a collection of criteria for atoms and links.
-     *                   Atoms and links which do not meet the criteria are not to appear in the view.
+     * @param filter     a collection of criteria for nots and links.
+     *                   Notes and links which do not meet the criteria are not to appear in the view.
      * @param maxResults the maximum number of results to return
      * @param priorities the list of priorities to view
      * @return a prioritized list of notes
@@ -239,8 +239,8 @@ public class TreeViews {
         Preconditions.checkArgNotNull(root, "root");
     }
 
-    private void checkAtomIterableArg(final Iterable<Note> atoms) {
-        Preconditions.checkArgNotNull(atoms, "atoms");
+    private void checkNoteIterableArg(final Iterable<Note> notes) {
+        Preconditions.checkArgNotNull(notes, "notes");
     }
 
     private void checkFilterArg(final Filter filter) {
@@ -274,8 +274,8 @@ public class TreeViews {
         Preconditions.checkArgNotNull(priorities, "priorities");
     }
 
-    private void addToCache(final Note atom, final Map<String, Note> cache) {
-        if (null != cache) cache.put(atom.getId(), atom);
+    private void addToCache(final Note note, final Map<String, Note> cache) {
+        if (null != cache) cache.put(Note.getId(note), note);
     }
 
     private final Comparator<TreeNode<Link>> compareById = (a, b) -> null == getId(a)
@@ -340,12 +340,12 @@ public class TreeViews {
                                 final ViewStyle style,
                                 final Map<String, Note> cache) {
 
-        Note rootAtom = getRequiredAtomForNode(rootNode, cache);
+        Note rootNote = getRequiredNoteForNode(rootNode, cache);
 
         // we are pre-ordered w.r.t. setting of properties
-        setAtomProperties(rootNode, rootAtom);
+        setNoteProperties(rootNode, rootNote);
 
-        updateChildren(rootNode, rootAtom, height, filter, style, cache);
+        updateChildren(rootNode, rootNote, height, filter, style, cache);
     }
 
     public static <T> int indexOfNthVisible(final ListNode<T> list, final int position, final Predicate<T> filter) {
@@ -362,22 +362,22 @@ public class TreeViews {
         return index;
     }
 
-    private void addAtomAt(final Note parent, final Note child, final int position, final Filter filter) {
+    private void addNoteAt(final Note parent, final Note child, final int position, final Filter filter) {
         parent.addChildAt(child, indexOfNthVisible(parent.getChildren(), position, filter));
     }
 
-    private void removeAtomAt(final Note parent, final int position, final Filter filter) {
+    private void removeNoteAt(final Note parent, final int position, final Filter filter) {
         parent.deleteChildAt(indexOfNthVisible(parent.getChildren(), position, filter));
     }
 
-    private void updateChildren(final TreeNode<Link> rootNote,
-                                final Note rootAtom,
+    private void updateChildren(final TreeNode<Link> rootNode,
+                                final Note rootNote,
                                 final int height,
                                 final Filter filter,
                                 final ViewStyle style,
                                 final Map<String, Note> cache) {
 
-        if (0 >= height || !filter.test(rootAtom)) {
+        if (0 >= height || !filter.test(rootNote)) {
             return;
         }
 
@@ -387,20 +387,20 @@ public class TreeViews {
         ListDiff.DiffEditor<TreeNode<Link>> editor = new ListDiff.DiffEditor<TreeNode<Link>>() {
             @Override
             public void add(final int position,
-                            final TreeNode<Link> note) {
+                            final TreeNode<Link> node) {
                 if (!style.addOnUpdate()) {
                     return;
                 }
 
-                Note atom = getAtomForNode(note, filter, childrenCreated, cache);
+                Note note = getNoteForNode(node, filter, childrenCreated, cache);
 
-                addAtomAt(rootAtom, atom, position, filter);
+                addNoteAt(rootNote, note, position, filter);
 
-                childrenAdded.add(atom.getId());
+                childrenAdded.add(Note.getId(note));
 
                 // log this activity
                 if (null != brain.getActivityLog()) {
-                    brain.getActivityLog().logLink(rootAtom, atom);
+                    brain.getActivityLog().logLink(rootNote, note);
                 }
             }
 
@@ -411,31 +411,31 @@ public class TreeViews {
                     return;
                 }
 
-                removeAtomAt(rootAtom, position, filter);
+                removeNoteAt(rootNote, position, filter);
 
                 // log this activity
                 if (null != brain.getActivityLog()) {
-                    Note a = getAtomById(getId(note), cache);
+                    Note a = getNoteById(getId(note), cache);
                     if (null != a) {
-                        brain.getActivityLog().logUnlink(rootAtom, a);
+                        brain.getActivityLog().logUnlink(rootNote, a);
                     }
                 }
             }
         };
 
-        List<TreeNode<Link>> before = toJavaList(viewInternal(rootAtom, 1, filter, style, false, cache).getChildren());
-        List<TreeNode<Link>> after = toJavaList(rootNote.getChildren());
+        List<TreeNode<Link>> before = toJavaList(viewInternal(rootNote, 1, filter, style, false, cache).getChildren());
+        List<TreeNode<Link>> after = toJavaList(rootNode.getChildren());
         List<TreeNode<Link>> lcs = ListDiff.longestCommonSubsequence(before, after, compareById);
 
         // we are pre-ordered w.r.t. updating lists of children
         ListDiff.applyDiff(before, after, lcs, compareById, editor);
 
-        for (TreeNode<Link> n : toJavaList(rootNote.getChildren())) {
+        for (TreeNode<Link> n : toJavaList(rootNode.getChildren())) {
             // upon adding children:
-            // for a child which is a newly created atom, also add grandchildren to one level, possibly recursively
-            // if a new child is a new atom, only update the child, not the grandchildren
+            // for a child which is a newly created note, also add grandchildren to one level, possibly recursively
+            // if a new child is a new note, only update the child, not the grandchildren
             // if a child is not new, update both the child and the grandchildren with decreasing height
-            int h = null == getId(rootNote)
+            int h = null == getId(rootNode)
                     ? height - 1
                     : childrenCreated.contains(getId(n))
                     ? 1
@@ -457,59 +457,59 @@ public class TreeViews {
         return new HashMap<>();
     }
 
-    // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved atoms
-    private Note getAtomById(final String id, final Map<String, Note> cache) {
-        Note atom = cache.get(id);
-        if (null == atom) {
-            Optional<Note> opt = brain.getTopicGraph().getNotesById(id);
+    // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved notes
+    private Note getNoteById(final String id, final Map<String, Note> cache) {
+        Note note = cache.get(id);
+        if (null == note) {
+            Optional<Note> opt = brain.getTopicGraph().getNoteById(id);
             if (opt.isPresent()) {
-                atom = opt.get();
-                cache.put(id, atom);
+                note = opt.get();
+                cache.put(id, note);
             }
         }
 
-        return atom;
+        return note;
     }
 
-    // retrieve or create an atom for the node
-    // atoms are only created if they appear under a parent which is also an atom
-    private Note getAtomForNode(final TreeNode<Link> node,
+    // retrieve or create an note for the node
+    // notes are only created if they appear under a parent which is also an note
+    private Note getNoteForNode(final TreeNode<Link> node,
                                 final Filter filter,
                                 final Set<String> created,
                                 final Map<String, Note> cache) {
 
         String id = getId(node);
-        Note atom = null == id ? null : getAtomById(id, cache);
+        Note note = null == id ? null : getNoteById(id, cache);
 
-        if (null == atom) {
-            atom = createAtom(getId(node), filter);
-            created.add(atom.getId());
-            cache.put(atom.getId(), atom);
+        if (null == note) {
+            note = createNote(getId(node), filter);
+            created.add(Note.getId(note));
+            cache.put(Note.getId(note), note);
         }
         if (null == getId(node)) {
-            setId(node, atom.getId());
+            setId(node, Note.getId(note));
         }
 
-        return atom;
+        return note;
     }
 
-    private Note getRequiredAtomForNode(final TreeNode<Link> node, final Map<String, Note> cache) {
+    private Note getRequiredNoteForNode(final TreeNode<Link> node, final Map<String, Note> cache) {
         if (null == getId(node)) {
             throw new InvalidUpdateException("note has no id");
         }
 
-        Note atom = getAtomById(getId(node), cache);
-        if (null == atom) {
-            throw new InvalidUpdateException("no such atom: " + getId(node));
+        Note note = getNoteById(getId(node), cache);
+        if (null == note) {
+            throw new InvalidUpdateException("no such note: " + getId(node));
         }
 
-        return atom;
+        return note;
     }
 
-    private Note createAtom(final String id,
+    private Note createNote(final String id,
                             final Filter filter) {
         Note a = brain.getTopicGraph().createNoteWithProperties(filter, id);
-        a.setSource(filter.getDefaultSource());
+        Note.setSource(a, filter.getDefaultSource());
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logCreate(a);
@@ -523,7 +523,7 @@ public class TreeViews {
                 || (includeParents && a.getFirstOf().size() > 0);
     }
 
-    private TreeNode<Link> findAtoms(final Filter filter,
+    private TreeNode<Link> findNotes(final Filter filter,
                                      final boolean includeChildren,
                                      final boolean includeParents,
                                      int height,
@@ -556,49 +556,51 @@ public class TreeViews {
         node.setChildren(ListNodeDTO.fromArray(array));
     }
 
-    private void setAtomProperties(final TreeNode<Link> fromNode,
-                                   final Note toAtom)
+    private void setNoteProperties(final TreeNode<Link> fromNode,
+                                   final Note toNote)
             throws InvalidGraphException, InvalidUpdateException {
 
         for (String key : Note.propertiesByKey.keySet()) {
-            setAtomProperty(fromNode, toAtom, key);
+            setNoteProperty(fromNode, toNote, key);
         }
 
         if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logSetProperties(toAtom);
+            brain.getActivityLog().logSetProperties(toNote);
         }
     }
 
-    private <T> void setAtomProperty(
-            final TreeNode<Link> fromNode, final Note toAtom, final String key) {
+    private <T> void setNoteProperty(
+            final TreeNode<Link> fromNode, final Note toNote, final String key) {
 
         Page page = fromNode.getValue().getPage();
-        Property<Note, T> atomProp = (Property<Note, T>) Note.propertiesByKey.get(key);
+        Property<Note, T> noteProp = (Property<Note, T>) Note.propertiesByKey.get(key);
         Property<Page, T> pageProp = (Property<Page, T>) Page.propertiesByKey.get(key);
         T value = null;
         if (null == pageProp) {
-           if (key.equals(SemanticSynchrony.PropertyKeys.TITLE)) {
-               value = (T) fromNode.getValue().getLabel();
-           } else {
-               throw new InvalidUpdateException("no such property: " + key);
-           }
+            if (key.equals(SemanticSynchrony.PropertyKeys.TITLE)) {
+                value = (T) fromNode.getValue().getLabel();
+            } else if (key.equals(SemanticSynchrony.PropertyKeys.ID)) {
+                value = (T) fromNode.getValue().getTarget().getId();
+            } else {
+                throw new InvalidUpdateException("no such property: " + key);
+            }
         } else {
             if (null != page) {
                 value = pageProp.getGetter().apply(page);
             }
         }
-        
+
         if (null != value) {
             if (value.equals(WikiFormat.CLEARME)) {
                 value = null;
             }
-            atomProp.getSetter().accept(toAtom, value);
+            noteProp.getSetter().accept(toNote, value);
         }
     }
 
-    private static void setNodeProperties(final Note fromAtom,
-                                   final TreeNode<Link> toNode,
-                                   final boolean isVisible) {
+    private static void setNodeProperties(final Note from,
+                                          final TreeNode<Link> to,
+                                          final boolean isVisible) {
         for (String key : Note.propertiesByKey.keySet()) {
             // The convention for "invisible" notes is to leave the title and page blank,
             // as well as to avoid displaying any child notes.
@@ -606,19 +608,22 @@ public class TreeViews {
                     (!key.equals(SemanticSynchrony.PropertyKeys.TITLE)
                             && !key.equals(SemanticSynchrony.PropertyKeys.TEXT))) {
                 if (key.equals(SemanticSynchrony.PropertyKeys.TITLE)) {
-                    toNode.getValue().setLabel(fromAtom.getTitle());
+                    to.getValue().setLabel(Note.getTitle(from));
                 } else {
-                    setNodeProperty(fromAtom, toNode, key);
+                    setNodeProperty(from, to, key);
                 }
             }
         }
     }
 
-    private static <T> void setNodeProperty(final Note fromAtom, final TreeNode<Link> toNode, final String key) {
-        Property<Page, T> pageProp = (Property<Page, T>) Page.propertiesByKey.get(key);
-        Property<Note, T> atomProp = (Property<Note, T>) Note.propertiesByKey.get(key);
+    private static <T> void setNodeProperty(final Note fromNote, final TreeNode<Link> toNode, final String key) {
+        // TODO: temporary
+        if (!key.equals(SemanticSynchrony.PropertyKeys.ID)) {
+            Property<Page, T> pageProp = (Property<Page, T>) Page.propertiesByKey.get(key);
+            Property<Note, T> noteProp = (Property<Note, T>) Note.propertiesByKey.get(key);
 
-        pageProp.getSetter().accept(toNode.getValue().getPage(), atomProp.getGetter().apply(fromAtom));
+            pageProp.getSetter().accept(toNode.getValue().getPage(), noteProp.getGetter().apply(fromNote));
+        }
     }
 
     public static String getId(final TreeNode<Link> node) {
@@ -716,22 +721,22 @@ public class TreeViews {
         node.getValue().getPage().setPriority(priority);
     }
 
-    private static TreeNode<Link> toTreeNode(final Note atom,
-                                      final boolean isVisible,
-                                      final boolean getProperties) throws InvalidGraphException {
+    private static TreeNode<Link> toTreeNode(final Note note,
+                                             final boolean isVisible,
+                                             final boolean getProperties) throws InvalidGraphException {
         TreeNode<Link> node = createTreeNode();
 
-        setId(node, atom.getId());
+        setId(node, Note.getId(note));
 
         if (getProperties) {
-            setNodeProperties(atom, node, isVisible);
+            setNodeProperties(note, node, isVisible);
 
             /* TODO: restore metadata
             if (null != brain.getKnowledgeBase()) {
-                List<KnowledgeBase.AtomClassEntry> entries = brain.getKnowledgeBase().getClassInfo(atom);
+                List<KnowledgeBase.NoteClassEntry> entries = brain.getKnowledgeBase().getClassInfo(note);
                 if (null != entries && entries.size() > 0) {
                     List<String> meta = new LinkedList<>();
-                    for (KnowledgeBase.AtomClassEntry e : entries) {
+                    for (KnowledgeBase.NoteClassEntry e : entries) {
                         String ann = "class " + e.getInferredClassName()
                                 + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore();
                         meta.add(ann);

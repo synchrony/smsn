@@ -3,12 +3,14 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.dto.LinkDTO;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
@@ -56,6 +58,8 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
     }
 
     public SmSnGitRepository(final Brain brain, final DataSource dataSource) throws IOException {
+        super();
+
         this.brain = brain;
         this.dataSource = dataSource;
         treeViews = new TreeViews(brain);
@@ -81,6 +85,9 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
                 .build();
 
         git = new Git(repository);
+
+        Note.setSource(this, dataSource.getName());
+        Note.setTitle(this, "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis()));
     }
 
     Git getGit() {
@@ -161,16 +168,6 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
         return wrap(() -> git.status().call().getMissing());
     }
 
-    @Override
-    public String getSource() {
-        return dataSource.getName();
-    }
-
-    @Override
-    public String getTitle() {
-        return "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis());
-    }
-
     public Brain getBrain() {
         return brain;
     }
@@ -183,7 +180,7 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
 
         TreeNode<Link> repoNote = TreeNodeDTO.createEmptyNode();
         TreeViews.setId(repoNote, SemanticSynchrony.createRandomId());
-        TreeViews.setTitle(repoNote, getTitle());
+        TreeViews.setTitle(repoNote, Note.getTitle(this));
         TreeViews.setSource(repoNote, dataSource.getName());
         TreeViews.setWeight(repoNote, SemanticSynchrony.DEFAULT_WEIGHT);
         TreeViews.setCreated(repoNote, now);
@@ -299,16 +296,20 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
     }
 
     private TreeNode<Link> toTreeNode(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
-        Optional<Note> opt = brain.getTopicGraph().getNotesById(id);
+        Optional<Note> opt = brain.getTopicGraph().getNoteById(id);
 
         TreeNode<Link> note;
         if (opt.isPresent()) {
             note = treeViews.view(opt.get(), 0, filter, ViewStyle.Basic.Forward.getStyle());
         } else {
-            note = brain.getTopicGraph().createTopicTree(brain.getTopicGraph().createLink(null, null, null));
+            note = new TreeNodeDTO<>();
+            Link link = new LinkDTO();
+            note.setValue(link);
+            link.setPage(new PageDTO());
+            //note = brain.getTopicGraph().createTopicTree(brain.getTopicGraph().createLink(null, null, null));
             TreeViews.setId(note, id);
             TreeViews.setCreated(note, timestamp);
-            TreeViews.setTitle(note, titleForMissingAtom(changeType));
+            TreeViews.setTitle(note, titleForMissingNote(changeType));
             TreeViews.setWeight(note, SemanticSynchrony.DEFAULT_WEIGHT);
             TreeViews.setSource(note, dataSource.getName());
         }
@@ -316,7 +317,7 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
         return note;
     }
 
-    public static String titleForMissingAtom(final DiffEntry.ChangeType changeType) {
+    public static String titleForMissingNote(final DiffEntry.ChangeType changeType) {
         if (changeType == DiffEntry.ChangeType.DELETE) {
             return "[deleted]";
         } else if (changeType == DiffEntry.ChangeType.RENAME) {

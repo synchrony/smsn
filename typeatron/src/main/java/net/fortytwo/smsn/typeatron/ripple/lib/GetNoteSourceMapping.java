@@ -12,27 +12,27 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class GetAtomValueMapping extends AtomMapping {
+public class GetNoteSourceMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomValueMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetNoteSourceMapping.class.getName());
 
-    public GetAtomValueMapping(final BrainClient client,
-                               final Filter filter) {
+    public GetNoteSourceMapping(final BrainClient client,
+                                final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "get-atom-value"
+                SmSnLibrary.NS_2014_12 + "get-note-source"
         };
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("atom", "the reference atom", true)};
+        return new Parameter[]{new Parameter("note", "the reference note", true)};
     }
 
     public String getComment() {
-        return "gets the @value property of an atom";
+        return "gets the @source property of a note";
     }
 
     public void apply(RippleList stack,
@@ -45,13 +45,11 @@ public class GetAtomValueMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't get @value of non-atom: " + first);
+            logger.warning("can't get @source of non-note: " + first);
         } else {
-            String value = TreeViews.getTitle(n);
-            if (null == value) {
-                logger.warning("atom note has no @value: " + n);
-            } else {
-                // put both the @value property and the (synced) atom back on the stack
+            String value = TreeViews.getSource(n);
+            if (null != value) {
+                // put both the @source property and the (synced) note back on the stack
                 solutions.accept(stack.push(n).push(value));
             }
         }

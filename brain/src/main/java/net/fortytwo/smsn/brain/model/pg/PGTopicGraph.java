@@ -52,7 +52,7 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     public String idOf(final Note a) {
-        return a.getId();
+        return Note.getId(a);
     }
 
     // TODO: move me
@@ -86,7 +86,6 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public TopicGraph createFilteredGraph(Filter filter) {
-        //return new FilteredAtomGraph(this, filter);
         return copyGraph(filter);
     }
 
@@ -96,10 +95,10 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Optional<Note> getNotesById(final String id) {
+    public Optional<Note> getNoteById(final String id) {
         Vertex v = wrapper.getVertexById(id);
 
-        return null == v ? Optional.empty() : Optional.of(asAtom(v));
+        return null == v ? Optional.empty() : Optional.of(asNote(v));
     }
 
     @Override
@@ -120,7 +119,7 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public ListNode<Note> createListOfNotes(final Note... elements) {
-        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfAtoms, elements);
+        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfNotes, elements);
     }
 
     @Override
@@ -157,20 +156,20 @@ public class PGTopicGraph implements TopicGraph {
 
     @Override
     public Note createNote(final String id) {
-        return createEntity(id, SemanticSynchrony.VertexLabels.ATOM, this::asAtom);
+        return createEntity(id, SemanticSynchrony.VertexLabels.NOTE, this::asNote);
     }
 
     @Override
     public Note createNoteWithProperties(final Filter filter,
                                          final String id) {
 
-        Note atom = createNote(id);
+        Note note = createNote(id);
 
-        atom.setCreated(new Date().getTime());
-        atom.setSource(filter.getDefaultSource());
-        atom.setWeight(filter.getDefaultWeight());
+        Note.setCreated(note, new Date().getTime());
+        Note.setSource(note, filter.getDefaultSource());
+        Note.setWeight(note, filter.getDefaultWeight());
 
-        return atom;
+        return note;
     }
 
     public <T extends Entity> ListNode<T> createListNode(
@@ -214,7 +213,7 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public Note asAtom(final Vertex vertex) {
+    public Note asNote(final Vertex vertex) {
         Preconditions.checkNotNull(vertex, "vertex");
 
         return new PGNote(vertex) {
@@ -260,8 +259,8 @@ public class PGTopicGraph implements TopicGraph {
         return asEntityList(vertex, this::asLinkTree);
     }
 
-    public ListNode<Note> asListOfAtoms(final Vertex vertex) {
-        return asEntityList(vertex, this::asAtom);
+    public ListNode<Note> asListOfNotes(final Vertex vertex) {
+        return asEntityList(vertex, this::asNote);
     }
 
     public TreeNode<Link> asLinkTree(final Vertex vertex) {
@@ -275,10 +274,10 @@ public class PGTopicGraph implements TopicGraph {
         List<Vertex> toRemove = new LinkedList<>();
 
         propertyGraph.vertices().forEachRemaining(v -> {
-            if (isAtomVertex(v)
+            if (isNoteVertex(v)
                     && !v.edges(Direction.IN).hasNext()
                     && !v.edges(Direction.OUT).hasNext()) {
-                if (filter.test(asAtom(v))) {
+                if (filter.test(asNote(v))) {
                     toRemove.add(v);
                 }
             }
@@ -291,27 +290,27 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public void reindex(final Note atom) {
-        updateIndex(atom, SemanticSynchrony.PropertyKeys.ID_V);
-        updateIndex(atom, SemanticSynchrony.PropertyKeys.TITLE);
-        updateIndex(atom, SemanticSynchrony.PropertyKeys.ACRONYM);
-        updateIndex(atom, SemanticSynchrony.PropertyKeys.SHORTCUT);
+    public void reindex(final Note note) {
+        updateIndex(note, SemanticSynchrony.PropertyKeys.ID);
+        updateIndex(note, SemanticSynchrony.PropertyKeys.TITLE);
+        updateIndex(note, SemanticSynchrony.PropertyKeys.ACRONYM);
+        updateIndex(note, SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
 
-    void updateIndex(final Note atom, final String key) {
-        wrapper.updateIndex(((PGNote) atom).asVertex(), key);
+    void updateIndex(final Note note, final String key) {
+        wrapper.updateIndex(((PGNote) note).asVertex(), key);
     }
 
     /**
-     * @return an Iterable of all atoms in the knowledge base, as opposed to all vertices
-     * (many of which are list nodes rather than atoms)
+     * @return an Iterable of all notes in the knowledge base, as opposed to all vertices
+     * (many of which are list nodes rather than notes)
      */
     @Override
     public Iterable<Note> getAllNotes() {
         return () -> asFilteredStream(
                 getPropertyGraph().vertices(),
-                this::isAtomVertex)
-                .map(this::asAtom).iterator();
+                this::isNoteVertex)
+                .map(this::asNote).iterator();
     }
 
     @Override
@@ -352,21 +351,21 @@ public class PGTopicGraph implements TopicGraph {
         return head;
     }
 
-    private boolean isAtomVertex(final Vertex v) {
+    private boolean isNoteVertex(final Vertex v) {
         String label = v.label();
-        return null != label && label.equals(SemanticSynchrony.VertexLabels.ATOM);
+        return null != label && label.equals(SemanticSynchrony.VertexLabels.NOTE);
     }
 
     public PGTopicGraph copyGraph(final Filter filter) {
         GraphWrapper newWrapper = new TinkerGraphWrapper(TinkerGraph.open());
         PGTopicGraph newGraph = new PGTopicGraph(newWrapper);
 
-        for (Note originalAtom : getAllNotes()) {
-            if (filter.test(originalAtom)) {
-                PGNote newAtom = findOrCopyAtom(originalAtom, filter, newGraph);
-                PGListNode<Note> children = (PGListNode<Note>) originalAtom.getChildren();
+        for (Note original : getAllNotes()) {
+            if (filter.test(original)) {
+                PGNote newNote = findOrCopy(original, filter, newGraph);
+                PGListNode<Note> children = (PGListNode<Note>) original.getChildren();
                 if (null != children) {
-                    newAtom.setChildren(copyAtomList(children, filter, newGraph));
+                    newNote.setChildren(copyNoteList(children, filter, newGraph));
                 }
             }
         }
@@ -388,7 +387,7 @@ public class PGTopicGraph implements TopicGraph {
         List<Sortable<Note, Float>> ranked = new LinkedList<>();
         while (unranked.hasNext()) {
             Sortable<Vertex, Float> in = unranked.next();
-            Note a = asAtom(in.getEntity());
+            Note a = asNote(in.getEntity());
             if (!filter.test(a)) continue;
 
             ranked.add(new Sortable<>(a, findScore(in, a, query)));
@@ -401,44 +400,45 @@ public class PGTopicGraph implements TopicGraph {
 
     private float findScore(final Sortable<Vertex, Float> in, final Note a, final String query) {
         float nativeScore = in.getScore();
-        float weight = a.getWeight();
+        float weight = Note.getWeight(a);
 
-        String title = a.getTitle();
+        String title = Note.getTitle(a);
         float lengthPenalty = Math.min(1.0f, 1.0f * query.length() / title.length());
 
-        Float priority = a.getPriority();
+        Float priority = Note.getPriority(a);
         float priorityBonus = null == priority ? 1f : 1f + priority;
 
         return nativeScore * weight * lengthPenalty * priorityBonus;
     }
 
-    private PGNote findOrCopyAtom(final Note original, final Filter filter, final TopicGraph newGraph) {
-        Optional<Note> opt = newGraph.getNotesById(original.getId());
+    // TODO: copy properties directly
+    private PGNote findOrCopy(final Note original, final Filter filter, final TopicGraph newGraph) {
+        Optional<Note> opt = newGraph.getNoteById(Note.getId(original));
         if (opt.isPresent()) return (PGNote) opt.get();
-        PGNote newNote = (PGNote) newGraph.createNoteWithProperties(filter, original.getId());
-        newNote.setSource(original.getSource());
+        PGNote newNote = (PGNote) newGraph.createNoteWithProperties(filter, Note.getId(original));
+        Note.setSource(newNote, Note.getSource(original));
 
         if (filter.test(original)) {
-            newNote.setTitle(original.getTitle());
-            newNote.setWeight(original.getWeight());
-            newNote.setShortcut(original.getShortcut());
-            newNote.setPriority(original.getPriority());
-            newNote.setAlias(original.getAlias());
-            newNote.setCreated(original.getCreated());
+            Note.setTitle(newNote, Note.getTitle(original));
+            Note.setWeight(newNote, Note.getWeight(original));
+            Note.setShortcut(newNote, Note.getShortcut(original));
+            Note.setPriority(newNote, Note.getPriority(original));
+            Note.setAlias(newNote, Note.getAlias(original));
+            Note.setCreated(newNote, Note.getCreated(original));
         } else {
-            newNote.setTitle(REDACTED_VALUE);
+            Note.setTitle(newNote, REDACTED_VALUE);
         }
 
         return newNote;
     }
 
-    private ListNode<Note> copyAtomList(final PGListNode<Note> original, final Filter filter, final PGTopicGraph newGraph) {
+    private ListNode<Note> copyNoteList(final PGListNode<Note> original, final Filter filter, final PGTopicGraph newGraph) {
         PGListNode<Note> originalCur = original;
         PGListNode<Note> newHead = null, newCur, newPrev = null;
         while (null != originalCur) {
             Note originalFirst = originalCur.getFirst();
-            PGNote newAtom = findOrCopyAtom(originalFirst, filter, newGraph);
-            newCur = (PGListNode<Note>) newGraph.createListOfNotes(newAtom);
+            PGNote newNote = findOrCopy(originalFirst, filter, newGraph);
+            newCur = (PGListNode<Note>) newGraph.createListOfNotes(newNote);
 
             if (null == newPrev) {
                 newHead = newCur;

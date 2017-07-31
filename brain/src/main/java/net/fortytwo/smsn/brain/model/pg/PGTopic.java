@@ -13,13 +13,13 @@ public abstract class PGTopic extends PGEntity implements Topic {
 
     @Override
     public String getId() {
-        return super.getId();
+        return getRequiredProperty(SemanticSynchrony.PropertyKeys.ID);
     }
 
     @Override
     public void setId(final String id) {
-        String atomId = null == id ? SemanticSynchrony.createRandomId() : id;
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.ID_V, atomId);
+        String noteId = null == id ? SemanticSynchrony.createRandomId() : id;
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.ID, noteId);
     }
 
     @Override

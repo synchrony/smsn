@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server.actions;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.ActionContext;
@@ -57,7 +58,7 @@ public class UpdateView extends RootedViewAction {
                 throw new IllegalStateException();
         }
 
-        TreeViews.setId(view, getRoot().getId());
+        TreeViews.setId(view, Note.getId(getRoot()));
 
         // Apply the update
         context.getQueries().update(view, height, getFilter(), style);

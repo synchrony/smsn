@@ -12,27 +12,27 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class GetAtomShortcutMapping extends AtomMapping {
+public class GetNoteWeightMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomShortcutMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetNoteWeightMapping.class.getName());
 
-    public GetAtomShortcutMapping(final BrainClient client,
-                                  final Filter filter) {
+    public GetNoteWeightMapping(final BrainClient client,
+                                final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "get-atom-shortcut"
+                SmSnLibrary.NS_2014_12 + "get-note-weight"
         };
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("atom", "the reference atom", true)};
+        return new Parameter[]{new Parameter("note", "the reference note", true)};
     }
 
     public String getComment() {
-        return "gets the @shortcut property of an atom";
+        return "gets the @weight property of a note";
     }
 
     public void apply(RippleList stack,
@@ -45,11 +45,11 @@ public class GetAtomShortcutMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't get @shortcut of non-atom: " + first);
+            logger.warning("can't get @weight of non-note: " + first);
         } else {
-            String value = TreeViews.getShortcut(n);
+            Float value = TreeViews.getWeight(n);
             if (null != value) {
-                // put both the @shortcut property and the (synced) atom back on the stack
+                // put both the @weight property and the (synced) note back on the stack
                 solutions.accept(stack.push(n).push(value));
             }
         }

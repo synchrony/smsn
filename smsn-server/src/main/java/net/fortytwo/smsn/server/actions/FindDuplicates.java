@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * A service for identifying atoms with duplicate values.
+ * A service for identifying notes with duplicate values.
  */
 public class FindDuplicates extends FilteredAction {
 
@@ -67,7 +67,7 @@ public class FindDuplicates extends FilteredAction {
 
         for (Note a : graph.getAllNotes()) {
             if (filter.test(a)) {
-                String title = a.getTitle();
+                String title = Note.getTitle(a);
                 if (null != title && 0 < title.length()) {
                     String hash;
                     try {
@@ -75,14 +75,14 @@ public class FindDuplicates extends FilteredAction {
                     } catch (UnsupportedEncodingException e) {
                         throw new RequestProcessingException(e);
                     }
-                    List<Note> atoms = m.get(hash);
-                    if (null == atoms) {
-                        atoms = new LinkedList<>();
-                        m.put(hash, atoms);
+                    List<Note> notes = m.get(hash);
+                    if (null == notes) {
+                        notes = new LinkedList<>();
+                        m.put(hash, notes);
                     } else {
-                        if (1 == atoms.size()) {
+                        if (1 == notes.size()) {
                             total++;
-                            dups.add(atoms);
+                            dups.add(notes);
                         }
 
                         total++;
@@ -93,7 +93,7 @@ public class FindDuplicates extends FilteredAction {
                         }
                     }
 
-                    atoms.add(a);
+                    notes.add(a);
                 }
             }
         }

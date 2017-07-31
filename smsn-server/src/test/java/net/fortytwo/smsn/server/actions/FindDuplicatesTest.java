@@ -13,12 +13,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class FindDuplicatesTest extends ActionTestBase {
-    private Note atom1, atom2, atom3;
+    private Note note1, note2, note3;
 
     @Test
     public void noResultsIfNoDuplicates() throws Exception {
-        atom1 = createAtomWithTitle("one");
-        atom2 = createAtomWithTitle("two");
+        note1 = createNoteWithTitle("one");
+        note2 = createNoteWithTitle("two");
 
         ActionContext context = perform(createAction());
         JSONObject view = getView(context);
@@ -28,9 +28,9 @@ public class FindDuplicatesTest extends ActionTestBase {
 
     @Test
     public void noResultsIfInexactMatch() throws Exception {
-        atom1 = createAtomWithTitle("earth");
-        atom2 = createAtomWithTitle("Earth");
-        atom3 = createAtomWithTitle("ear th");
+        note1 = createNoteWithTitle("earth");
+        note2 = createNoteWithTitle("Earth");
+        note3 = createNoteWithTitle("ear th");
 
         ActionContext context = perform(createAction());
         JSONObject view = getView(context);
@@ -41,13 +41,13 @@ public class FindDuplicatesTest extends ActionTestBase {
     @Test
     public void resultsForExactMatch() throws Exception {
         topicGraph.begin();
-        atom1 = createAtomWithTitle("earth");
-        atom2 = createAtomWithTitle("earth");
-        atom3 = createAtomWithTitle("earth");
+        note1 = createNoteWithTitle("earth");
+        note2 = createNoteWithTitle("earth");
+        note3 = createNoteWithTitle("earth");
         topicGraph.commit();
 
-        Note atom = topicGraph.getNotesById(atom1.getId()).get();
-        assertEquals("earth", atom.getTitle());
+        Note note = topicGraph.getNoteById(Note.getId(note1)).get();
+        assertEquals("earth", Note.getTitle(note));
         assertEquals(3, countNotes());
 
         ActionContext context = perform(createAction());

@@ -10,10 +10,10 @@ public abstract class RootedViewAction extends BasicViewAction {
     @NotNull
     private String root;
 
-    private Note rootAtom;
+    private Note rootNote;
 
     public Note getRoot() {
-        return notNull(rootAtom);
+        return notNull(rootNote);
     }
 
     public void setRoot(String root) {
@@ -30,7 +30,7 @@ public abstract class RootedViewAction extends BasicViewAction {
         setFilterParams(context);
 
         if (null != root) {
-            rootAtom = getRoot(root, context);
+            rootNote = getRoot(root, context);
         }
     }
 }

@@ -43,23 +43,23 @@ public class VCSWriter extends NoteWriter {
     public void doWrite(Context context) throws IOException {
         Map<String, File> dirs = initializeDirectories();
 
-        timeAction("exported atoms as individual files", () -> doExport(context.getTopicGraph(), dirs));
+        timeAction("exported notes as individual files", () -> doExport(context.getTopicGraph(), dirs));
     }
 
     private Map<String, File> initializeDirectories() throws IOException {
         Map<String, File> dirs = VCSFormat.getDirsBySource();
         for (File d : dirs.values()) {
             createDirectoryIfNotExists(d);
-            timeAction("cleaned directory " + d, () -> clearDirectoryOfAtomData(d));
+            timeAction("cleaned directory " + d, () -> clearDirectoryOfSmSnData(d));
         }
         return dirs;
     }
 
-    private void clearDirectoryOfAtomData(final File dir) {
+    private void clearDirectoryOfSmSnData(final File dir) {
         for (File file : dir.listFiles()) {
             if (VCSFormat.isSmSnFile(file)) {
                 if (!file.delete()) {
-                    throw new IllegalStateException("failed to delete atom file " + file.getAbsolutePath());
+                    throw new IllegalStateException("failed to delete SmSn file " + file.getAbsolutePath());
                 }
             }
         }
@@ -67,45 +67,45 @@ public class VCSWriter extends NoteWriter {
 
     private void doExport(final TopicGraph graph, final Map<String, File> dirs) throws IOException {
         for (Note a : graph.getAllNotes()) {
-            if (isAtomWithPage(a)) {
-                File dir = chooseDirectoryForAtom(a, dirs);
-                File pageFile = new File(dir, fileNameForAtom(a));
+            if (isNoteWithPage(a)) {
+                File dir = chooseDirectoryForNote(a, dirs);
+                File pageFile = new File(dir, fileNameForNote(a));
                 try (OutputStream out = new FileOutputStream(pageFile)) {
-                    writeAtomToStream(a, out);
+                    writeNoteToStream(a, out);
                 }
             }
         }
     }
 
-    private String fileNameForAtom(final Note a) {
+    private String fileNameForNote(final Note a) {
         // TODO
         Topic topic = new TopicDTO();
-        topic.setId(a.getId());
+        topic.setId(Note.getId(a));
         return VCSFormat.fileNameForTopic(topic);
     }
 
-    private boolean isAtomWithPage(final Note a) {
-        return null != a.getSource();
+    private boolean isNoteWithPage(final Note a) {
+        return null != Note.getSource(a);
     }
 
-    private File chooseDirectoryForAtom(final Note a, Map<String, File> dirs) {
-        String source = a.getSource();
+    private File chooseDirectoryForNote(final Note a, Map<String, File> dirs) {
+        String source = Note.getSource(a);
         Preconditions.checkNotNull(source);
         File dir = dirs.get(source);
         Preconditions.checkNotNull(dir);
         return dir;
     }
 
-    private void writeAtomToStream(final Note atom, final OutputStream out) {
+    private void writeNoteToStream(final Note note, final OutputStream out) {
         TreeNode<Link> tree = new TreeNodeDTO<>();
         Topic topic = new TopicDTO();
-        topic.setId(atom.getId());
+        topic.setId(Note.getId(note));
         Link link = new LinkDTO();
         link.setTarget(topic);
-        link.setLabel(atom.getTitle());
+        link.setLabel(Note.getTitle(note));
         tree.setValue(link);
 
-        ListNode<Note> cur = atom.getChildren();
+        ListNode<Note> cur = note.getChildren();
         while (null != cur) {
             tree.addChild(toTree(cur.getFirst()));
             cur = cur.getRest();
@@ -113,18 +113,18 @@ public class VCSWriter extends NoteWriter {
 
         Page page = PageDTO.createTransitional();
         page.setContent(tree);
-        page.setCreated(atom.getCreated());
-        page.setShortcut(atom.getShortcut());
-        page.setText(atom.getText());
-        page.setAlias(atom.getAlias());
-        page.setPriority(atom.getPriority());
-        page.setWeight(atom.getWeight());
+        page.setCreated(Note.getCreated(note));
+        page.setShortcut(Note.getShortcut(note));
+        page.setText(Note.getText(note));
+        page.setAlias(Note.getAlias(note));
+        page.setPriority(Note.getPriority(note));
+        page.setWeight(Note.getWeight(note));
         new WikiPrinter(out).print(page);
     }
 
-    private TreeNode<Link> toTree(final Note atom) {
+    private TreeNode<Link> toTree(final Note note) {
         TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(tree, atom.getId());
+        TreeViews.setId(tree, Note.getId(note));
         return tree;
     }
 

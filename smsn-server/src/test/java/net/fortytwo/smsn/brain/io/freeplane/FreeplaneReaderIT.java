@@ -38,7 +38,7 @@ public class FreeplaneReaderIT extends BrainTestBase {
         //reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain);
         reader.doImport(mindMapFile, FreeplaneFormat.getInstance(), brain);
 
-        System.out.println("# atoms: " + countNotes());
+        System.out.println("# notes: " + countNotes());
 
         NoteWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(new File("/tmp/mindMap.xml"))) {

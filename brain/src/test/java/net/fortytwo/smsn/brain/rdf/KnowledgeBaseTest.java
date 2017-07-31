@@ -78,7 +78,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
     }
     @Test
     public void testAKASyntax() throws Exception {
-        AtomClass t = AKAReference.class.newInstance();
+        NoteClass t = AKAReference.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("aka \"Ix\"").matches());
         assertTrue(t.getValueRegex().matcher("brand name \"Ix\"").matches());
@@ -95,7 +95,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testBibtexReferenceSyntax() throws Exception {
-        AtomClass t = BibtexReference.class.newInstance();
+        NoteClass t = BibtexReference.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("\\cite{schmoe2015nonsense}").matches());
         assertTrue(t.getValueRegex().matcher("\\cite{moronconf2015:nonsense}").matches());
@@ -117,7 +117,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testBibtexEntrySyntax() throws Exception {
-        AtomClass t = BibtexEntry.class.newInstance();
+        NoteClass t = BibtexEntry.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("@article{...}").matches());
         assertTrue(t.getValueRegex().matcher("@article{}").matches());
@@ -139,7 +139,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testDateSyntax() throws Exception {
-        AtomClass t = Date.class.newInstance();
+        NoteClass t = Date.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("2013-09-17").matches());
         assertFalse(t.getValueRegex().matcher("2013 09 17").matches());
@@ -149,7 +149,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testDocumentCollectionSyntax() throws Exception {
-        AtomClass t = DocumentCollection.class.newInstance();
+        NoteClass t = DocumentCollection.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("some books I have read").matches());
         assertFalse(t.getValueRegex().matcher("books on tape").matches());
@@ -163,7 +163,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testDocumentSyntax() throws Exception {
-        AtomClass t = Document.class.newInstance();
+        NoteClass t = Document.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("War and Peace").matches());
         assertTrue(t.getValueRegex().matcher("War & Peace").matches());
@@ -173,7 +173,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testGenericCollectionSyntax() throws Exception {
-        AtomClass t = GenericCollection.class.newInstance();
+        NoteClass t = GenericCollection.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("some things I think about").matches());
         assertFalse(t.getValueRegex().matcher("things I think about").matches());
@@ -199,7 +199,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testISBNSyntax() throws Exception {
-        AtomClass t = ISBNReference.class.newInstance();
+        NoteClass t = ISBNReference.class.newInstance();
 
         // valid ISBN-10
         assertTrue(t.getValueRegex().matcher("ISBN: 0-674-01846-X").matches());
@@ -232,7 +232,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testLinkedConceptSyntax() throws Exception {
-        AtomClass t = LinkedConcept.class.newInstance();
+        NoteClass t = LinkedConcept.class.newInstance();
 
         assertTrue(t.getAliasRegex().matcher("http://dbpedia.org/resource/Fish").matches());
         assertFalse(t.getAliasRegex().matcher("http://example.org/resource/Fish").matches());
@@ -243,7 +243,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testPersonCollectionSyntax() throws Exception {
-        AtomClass t= PersonCollection.class.newInstance();
+        NoteClass t= PersonCollection.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("some people from here and there").matches());
         assertFalse(t.getValueRegex().matcher("people, places, and things").matches());
@@ -255,7 +255,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testPersonSyntax() throws Exception {
-        AtomClass t = Person.class.newInstance();
+        NoteClass t = Person.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("Arthur Dent").matches());
         assertFalse(t.getValueRegex().matcher("arthur dent").matches());
@@ -264,7 +264,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testQuotedValueSyntax() throws Exception {
-        AtomClass t = QuotedValue.class.newInstance();
+        NoteClass t = QuotedValue.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("\"Belgium\"").matches());
         assertFalse(t.getValueRegex().matcher(" \"Belgium\"").matches());
@@ -275,7 +275,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testRFIDSyntax() throws Exception {
-        AtomClass t = RFIDReference.class.newInstance();
+        NoteClass t = RFIDReference.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("RFID: E200 1021 3707 0148 2440 1C7C").matches());
         assertFalse(t.getValueRegex().matcher("RFID: 12345").matches());
@@ -284,7 +284,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testTODOSyntax() throws Exception {
-        AtomClass t = TODOTask.class.newInstance();
+        NoteClass t = TODOTask.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("TODO: get it done").matches());
         assertFalse(t.getValueRegex().matcher("todo: get it done").matches());
@@ -293,7 +293,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testToolSyntax() throws Exception {
-        AtomClass t = Tool.class.newInstance();
+        NoteClass t = Tool.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("Extend-o-Brain").matches());
         assertFalse(t.getValueRegex().matcher("...not a tool").matches());
@@ -303,7 +303,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testURLSyntax() throws Exception {
-        AtomClass t = URLReference.class.newInstance();
+        NoteClass t = URLReference.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("http://example.org/foobar").matches());
         assertTrue(t.getValueRegex().matcher("https://example.org/foobar").matches());
@@ -312,7 +312,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testUsageSyntax() throws Exception {
-        AtomClass t = Usage.class.newInstance();
+        NoteClass t = Usage.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("Extend-o-Brain usage").matches());
         assertFalse(t.getValueRegex().matcher("how to use Extend-o-Brain").matches());
@@ -320,7 +320,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
     @Test
     public void testWebPageSyntax() throws Exception {
-        AtomClass t = WebPage.class.newInstance();
+        NoteClass t = WebPage.class.newInstance();
 
         assertTrue(t.getValueRegex().matcher("The Least Known Page on the Web (web page)").matches());
         assertFalse(t.getValueRegex().matcher("The Least Known Page on the Web").matches());
@@ -334,8 +334,8 @@ public class KnowledgeBaseTest extends BrainTestBase {
         KnowledgeBase kb = new KnowledgeBase(topicGraph);
         Filter filter = Filter.noFilter();
         Note root = createNote(SemanticSynchrony.createRandomId());
-        root.setTitle("root");
-        String rootId = root.getId();
+        Note.setTitle(root, "root");
+        String rootId = Note.getId(root);
 
         try (InputStream in = getClass().getResourceAsStream("inference-example-1.txt")) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -363,39 +363,39 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
         kb.addDefaultClasses();
 
-        Note einstein = topicGraph.getNotesById("yOXFhhN").get();
-        Note einsteinPapers = topicGraph.getNotesById("Z5UUQn6").get();
-        Note specialRelPaper = topicGraph.getNotesById("mRwSsu2").get();
-        Note bibtex = topicGraph.getNotesById("xKWD1wC").get();
-        Note einsteinQuotes = topicGraph.getNotesById("5OfUlUN").get();
-        Note einsteinQuotes2 = topicGraph.getNotesById("vtdNdMF").get();
-        Note einsteinFamily = topicGraph.getNotesById("yWBqSc2").get();
-        Note speedOfLight = topicGraph.getNotesById("dDn4jt0").get();
-        Note simultaneity = topicGraph.getNotesById("x6rw4et").get();
-        Note relativity = topicGraph.getNotesById("-kKLYO8").get();
-        Note paperPdf = topicGraph.getNotesById("gsaYMBs").get();
-        Note topics = topicGraph.getNotesById("GORFdGO").get();
-        Note ellipsis = topicGraph.getNotesById("0MQ4h4a").get();
-        Note quote = topicGraph.getNotesById("-ngTO_3").get();
-        Note h2g2 = topicGraph.getNotesById("TT698yn").get();
-        Note physics = topicGraph.getNotesById("ynyUshJ").get();
+        Note einstein = topicGraph.getNoteById("yOXFhhN").get();
+        Note einsteinPapers = topicGraph.getNoteById("Z5UUQn6").get();
+        Note specialRelPaper = topicGraph.getNoteById("mRwSsu2").get();
+        Note bibtex = topicGraph.getNoteById("xKWD1wC").get();
+        Note einsteinQuotes = topicGraph.getNoteById("5OfUlUN").get();
+        Note einsteinQuotes2 = topicGraph.getNoteById("vtdNdMF").get();
+        Note einsteinFamily = topicGraph.getNoteById("yWBqSc2").get();
+        Note speedOfLight = topicGraph.getNoteById("dDn4jt0").get();
+        Note simultaneity = topicGraph.getNoteById("x6rw4et").get();
+        Note relativity = topicGraph.getNoteById("-kKLYO8").get();
+        Note paperPdf = topicGraph.getNoteById("gsaYMBs").get();
+        Note topics = topicGraph.getNoteById("GORFdGO").get();
+        Note ellipsis = topicGraph.getNoteById("0MQ4h4a").get();
+        Note quote = topicGraph.getNoteById("-ngTO_3").get();
+        Note h2g2 = topicGraph.getNoteById("TT698yn").get();
+        Note physics = topicGraph.getNoteById("ynyUshJ").get();
 
-        Note john = topicGraph.getNotesById("0rYY9z0").get();
+        Note john = topicGraph.getNoteById("0rYY9z0").get();
 
         // The following are nested directly under Einstein's family
-        Note hermann = topicGraph.getNotesById("mPx8zEW").get();
-        Note pauline = topicGraph.getNotesById("PR8p9B5").get();
-        Note maria = topicGraph.getNotesById("b6jFIkg").get();
+        Note hermann = topicGraph.getNoteById("mPx8zEW").get();
+        Note pauline = topicGraph.getNoteById("PR8p9B5").get();
+        Note maria = topicGraph.getNoteById("b6jFIkg").get();
         // The following are under Einstein's family, but also have Wikipedia links
-        Note mileva = topicGraph.getNotesById("U2RAPqU").get();
-        Note elsa = topicGraph.getNotesById("Wks2hZM").get();
+        Note mileva = topicGraph.getNoteById("U2RAPqU").get();
+        Note elsa = topicGraph.getNoteById("Wks2hZM").get();
         // The following are two degrees removed, under Einstein's family > Einstein's children
-        Note lieserl = topicGraph.getNotesById("Y3X-skF").get();
-        Note hansAlbert = topicGraph.getNotesById("6_sSpVa").get();
-        Note eduard = topicGraph.getNotesById("dleUIwo").get();
+        Note lieserl = topicGraph.getNoteById("Y3X-skF").get();
+        Note hansAlbert = topicGraph.getNoteById("6_sSpVa").get();
+        Note eduard = topicGraph.getNoteById("dleUIwo").get();
 
-        Note googleGlass = topicGraph.getNotesById("ufIPR_C").get();
-        Note sebastian = topicGraph.getNotesById("-L7cCbN").get();
+        Note googleGlass = topicGraph.getNoteById("ufIPR_C").get();
+        Note sebastian = topicGraph.getNoteById("-L7cCbN").get();
 
         for (int i = 0; i < 4; i++) {
             System.out.println("#### ITERATION #" + (i + 1) + " ######");
@@ -484,10 +484,10 @@ public class KnowledgeBaseTest extends BrainTestBase {
         }
     }
 
-    private void assertClassEquals(final String className, final Note atom, final KnowledgeBase kb) {
-        List<KnowledgeBase.AtomClassEntry> entries = kb.getClassInfo(atom);
+    private void assertClassEquals(final String className, final Note note, final KnowledgeBase kb) {
+        List<KnowledgeBase.NoteClassEntry> entries = kb.getClassInfo(note);
         assertTrue(null != entries && entries.size() > 0);
-        assertEquals(className, kb.getClassInfo(atom).get(0).getInferredClassName());
+        assertEquals(className, kb.getClassInfo(note).get(0).getInferredClassName());
     }
 
     private final Comparator<Value> valueComparator = new ValueComparator();

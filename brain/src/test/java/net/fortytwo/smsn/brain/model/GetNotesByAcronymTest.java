@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
-public class GetAtomsByAcronymTest extends BrainTestBase {
+public class GetNotesByAcronymTest extends BrainTestBase {
 
     @Override
     protected TopicGraph createTopicGraph() throws IOException {
@@ -21,11 +21,11 @@ public class GetAtomsByAcronymTest extends BrainTestBase {
     @Test
     public void testAcronymSearch() throws Exception {
         Note a = createNote();
-        a.setTitle("Arthur\tP.  Dent ");
+        Note.setTitle(a, "Arthur\tP.  Dent ");
         Note t = createNote();
-        t.setTitle("Arthur's moth-eaten towel");
+        Note.setTitle(t, "Arthur's moth-eaten towel");
         Note l = createNote();
-        l.setTitle("ooooooooo0ooooooooo1ooooooooo2ooooooooo3ooooooooo4ooooooooo5ooooooooo6ooooooooo7" +
+        Note.setTitle(l, "ooooooooo0ooooooooo1ooooooooo2ooooooooo3ooooooooo4ooooooooo5ooooooooo6ooooooooo7" +
                 "ooooooooo8ooooooooo9oooooooooAoooooooooBoooooooooCoooooooooDoooooooooEoooooooooF");
 
         Collection<Note> result;
@@ -38,25 +38,25 @@ public class GetAtomsByAcronymTest extends BrainTestBase {
         result = topicGraph.getNotesByAcronym("o", filter);
         assertEquals(0, result.size());
 
-        for (Note atom : topicGraph.getAllNotes()) {
-            System.out.println(atom.getId() + ": "
-                    + ((PGNote) atom).asVertex().property(SemanticSynchrony.PropertyKeys.ACRONYM));
+        for (Note note : topicGraph.getAllNotes()) {
+            System.out.println(Note.getId(note) + ": "
+                    + ((PGNote) note).asVertex().property(SemanticSynchrony.PropertyKeys.ACRONYM));
         }
 
         // exact acronym match
         // capitalization, punctuation, and idiosyncrasies of white space are ignored
         result = topicGraph.getNotesByAcronym("apd", filter);
         assertEquals(1, result.size());
-        assertEquals(a.getId(), result.iterator().next().getId());
+        assertEquals(Note.getId(a), Note.getId(result.iterator().next()));
 
         // hyphens and underscores are treated as white space, while apostrophes and other punctuation are ignored
         result = topicGraph.getNotesByAcronym("amet", filter);
         assertEquals(1, result.size());
-        assertEquals(t.getId(), result.iterator().next().getId());
+        assertEquals(Note.getId(t), Note.getId(result.iterator().next()));
 
         // acronym search is case insensitive
         result = topicGraph.getNotesByAcronym("APD", filter);
         assertEquals(1, result.size());
-        assertEquals(a.getId(), result.iterator().next().getId());
+        assertEquals(Note.getId(a), Note.getId(result.iterator().next()));
     }
 }

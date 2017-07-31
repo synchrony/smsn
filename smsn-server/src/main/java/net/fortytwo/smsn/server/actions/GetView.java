@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -25,7 +26,7 @@ public class GetView extends RootedViewAction {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(getRoot().getId());
+        addToHistory(Note.getId(getRoot()));
     }
 
     @Override

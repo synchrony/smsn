@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AtomRegex {
+public class NoteReqex {
 
     public enum Modifier {
         ZeroOrOne, ZeroOrMore, One, OneOrMore
@@ -13,7 +13,7 @@ public class AtomRegex {
 
     private final List<El> elements;
 
-    public AtomRegex(List<El> elements) {
+    public NoteReqex(List<El> elements) {
         this.elements = elements;
     }
 
@@ -22,15 +22,15 @@ public class AtomRegex {
     }
 
     public static class El {
-        private final AtomClass.FieldHandler fieldHandler;
+        private final NoteClass.FieldHandler fieldHandler;
         private final Modifier modifier;
-        private final Set<Class<? extends AtomClass>> alternatives;
+        private final Set<Class<? extends NoteClass>> alternatives;
         private final int weight;
 
         public El(final int weight,
-                  final AtomClass.FieldHandler fieldHandler,
+                  final NoteClass.FieldHandler fieldHandler,
                   final Modifier modifier,
-                  final Class<? extends AtomClass>... alternatives) {
+                  final Class<? extends NoteClass>... alternatives) {
             this.weight = weight;
             this.fieldHandler = fieldHandler;
             this.modifier = modifier;
@@ -38,13 +38,13 @@ public class AtomRegex {
             Collections.addAll(this.alternatives, alternatives);
         }
 
-        public El(final AtomClass.FieldHandler fieldHandler,
+        public El(final NoteClass.FieldHandler fieldHandler,
                   final Modifier modifier,
-                  final Class<? extends AtomClass>... alternatives) {
+                  final Class<? extends NoteClass>... alternatives) {
             this(0 == alternatives.length ? 0 : 1, fieldHandler, modifier, alternatives);
         }
 
-        public AtomClass.FieldHandler getFieldHandler() {
+        public NoteClass.FieldHandler getFieldHandler() {
             return fieldHandler;
         }
 
@@ -52,7 +52,7 @@ public class AtomRegex {
             return modifier;
         }
 
-        public Set<Class<? extends AtomClass>> getAlternatives() {
+        public Set<Class<? extends NoteClass>> getAlternatives() {
             return alternatives;
         }
 

@@ -34,7 +34,7 @@ public class GraphMLReader extends NoteReader {
 
     private void addAllToIndices(TopicGraph destGraph) {
         for (Note a : destGraph.getAllNotes()) {
-            String value = a.getTitle();
+            String value = Note.getTitle(a);
             if (null != value) destGraph.reindex(a);
         }
     }

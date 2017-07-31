@@ -47,14 +47,14 @@ public class ActivityLog {
         out.close();
     }
 
-    private void log(final String action, final Note... a) {
+    private void log(final String action, final Note... notes) {
         try {
             out.append("")
                     .append("").append(String.valueOf(System.currentTimeMillis()))
                     .append("\t").append(action);
 
-            for (Note atom : a) {
-                out.append("\t").append(atom.getId());
+            for (Note note : notes) {
+                out.append("\t").append(Note.getId(note));
             }
 
             out.append("\n");

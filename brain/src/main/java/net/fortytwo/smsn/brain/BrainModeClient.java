@@ -93,8 +93,8 @@ public class BrainModeClient {
         functions.put("right", new EmacsFunction("smsn-forward-char", false));
 
         // Brain-mode specific functions
-        functions.put("C-c C-I f", new EmacsFunction("smsn-find-isolated-atoms", false));
-        functions.put("C-c C-I r", new EmacsFunction("smsn-remove-isolated-atoms", false));
+        functions.put("C-c C-I f", new EmacsFunction("smsn-find-isolated-notes", false));
+        functions.put("C-c C-I r", new EmacsFunction("smsn-remove-isolated-notes", false));
         functions.put("C-c C-a C-p", new EmacsFunction("smsn-insert-attr-priority", true));
         functions.put("C-c C-a C-s", new EmacsFunction("smsn-insert-attr-source", true));
         functions.put("C-c C-a C-w", new EmacsFunction("smsn-insert-attr-weight", true));
@@ -130,7 +130,7 @@ public class BrainModeClient {
         functions.put("C-c C-t C-w", new EmacsFunction("smsn-set-target-weight", true));
         functions.put("C-c C-t a", new EmacsFunction("smsn-visit-as-url 'current-target-value", false));
         functions.put("C-c C-t c", new EmacsFunction("smsn-copy-target-value-to-clipboard", false));
-        functions.put("C-c C-t i", new EmacsFunction("smsn-atom-info 'current-target", false));
+        functions.put("C-c C-t i", new EmacsFunction("smsn-note-info 'current-target", false));
         functions.put("C-c C-t l", new EmacsFunction("smsn-preview-target-latex-math", false));
         functions.put("C-c C-t r", new EmacsFunction("smsn-copy-target-reference-to-clipboard", false));
         functions.put("C-c C-v ;", new EmacsFunction("smsn-toggle-truncate-lines", false));
@@ -161,7 +161,7 @@ public class BrainModeClient {
         functions.put("C-c v", new EmacsFunction("smsn-events", false));
 
         // extended Brain-mode mappings, not available as Emacs key mappings
-        functions.put("C-c c", new EmacsFunction("atom-id-at-point", false));
+        functions.put("C-c c", new EmacsFunction("note-id-at-point", false));
 
         // Emacspeak functions, not available in all environments
         // Note that the actual Emacspeak shortcuts begin with C-e

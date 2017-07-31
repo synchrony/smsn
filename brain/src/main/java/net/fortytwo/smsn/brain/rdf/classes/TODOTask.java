@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.SmSnVocabulary;
 import org.openrdf.model.IRI;
@@ -12,7 +12,7 @@ import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
-public class TODOTask extends AtomClass {
+public class TODOTask extends NoteClass {
 
     public TODOTask() {
         super(
@@ -36,7 +36,7 @@ public class TODOTask extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, SmSnVocabulary.TODO);
 
         // assumes the prefix "TODO:"
-        String d = a.getTitle().substring(5).trim();
+        String d = Note.getTitle(a).substring(5).trim();
         handler.handleStatement(vf.createStatement(self, RDFS.COMMENT, vf.createLiteral(d)));
 
         return self;

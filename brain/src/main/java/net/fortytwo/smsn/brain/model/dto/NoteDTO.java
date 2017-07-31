@@ -1,113 +1,45 @@
 package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Role;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class NoteDTO implements Note {
 
-    private String id = SemanticSynchrony.createRandomId();
+    private final Map<String, Object> propertyMap;
     private Topic topic;
-    private Role role;
-    private long created = System.currentTimeMillis();
-    private String title = "atom " + id;
-    private Float weight = SemanticSynchrony.DEFAULT_WEIGHT;
-    private Float priority = SemanticSynchrony.DEFAULT_PRIORITY;
-    // TODO: don't hard-code the default source
-    private String source = "public";
+
+    public NoteDTO() {
+        propertyMap = new HashMap<>();
+
+        String id = SemanticSynchrony.createRandomId();
+        Note.setId(this, id);
+        Note.setTitle(this, "note " + id);
+        Note.setCreated(this, System.currentTimeMillis());
+        Note.setWeight(this, SemanticSynchrony.DEFAULT_WEIGHT);
+        Note.setPriority(this, SemanticSynchrony.DEFAULT_PRIORITY);
+        // TODO: don't hard-code the default source
+        Note.setSource(this, "public");
+    }
 
     @Override
     public void destroy() {
     }
 
     @Override
-    public String getId() {
-        return id;
+    public <V> V getProperty(String key) {
+        return (V) propertyMap.get(key);
     }
 
     @Override
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(final Role role) {
-        this.role = role;
-    }
-
-    @Override
-    public String getAlias() {
-        return null;
-    }
-
-    @Override
-    public void setAlias(String alias) {
-    }
-
-    @Override
-    public Long getCreated() {
-        return created;
-    }
-
-    @Override
-    public void setCreated(Long created) {
-        this.created = created;
-    }
-
-    @Override
-    public String getTitle() {
-        return title;
-    }
-
-    @Override
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @Override
-    public String getText() {
-        return null;
-    }
-
-    @Override
-    public void setText(String text) {
-    }
-
-    @Override
-    public Float getPriority() {
-        return priority;
-    }
-
-    @Override
-    public void setPriority(Float priority) {
-        this.priority = priority;
-    }
-
-    @Override
-    public String getShortcut() {
-        return null;
-    }
-
-    @Override
-    public void setShortcut(String shortcut) {
-    }
-
-    @Override
-    public Float getWeight() {
-        return weight;
-    }
-
-    @Override
-    public void setWeight(Float weight) {
-        this.weight = weight;
+    public <V> void setProperty(String key, V value) {
+        propertyMap.put(key, value);
     }
 
     @Override
@@ -149,15 +81,5 @@ public class NoteDTO implements Note {
     @Override
     public Note getSubject(ListNode<Note> notes) {
         return null;
-    }
-
-    @Override
-    public String getSource() {
-        return source;
-    }
-
-    @Override
-    public void setSource(String source) {
-        this.source = source;
     }
 }

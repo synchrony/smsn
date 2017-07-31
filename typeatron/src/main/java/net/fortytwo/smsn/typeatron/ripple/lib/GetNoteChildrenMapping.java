@@ -13,27 +13,27 @@ import net.fortytwo.ripple.model.RippleList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class GetAtomChildrenMapping extends AtomMapping {
+public class GetNoteChildrenMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomChildrenMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetNoteChildrenMapping.class.getName());
 
-    public GetAtomChildrenMapping(final BrainClient client,
+    public GetNoteChildrenMapping(final BrainClient client,
                                   final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "get-atom-children"
+                SmSnLibrary.NS_2014_12 + "get-note-children"
         };
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("atom", "the reference atom", true)};
+        return new Parameter[]{new Parameter("note", "the reference note", true)};
     }
 
     public String getComment() {
-        return "gets the list of children of an atom";
+        return "gets the list of children of an note";
     }
 
     public void apply(RippleList stack,
@@ -46,7 +46,7 @@ public class GetAtomChildrenMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 1, true);
 
         if (null == n) {
-            logger.warning("can't get children of non-atom: " + first);
+            logger.warning("can't get children of non-note: " + first);
         } else {
             List<TreeNode<Link>> children = TreeViews.getChildrenAsList(n);
             if (null != children && 0 != children.size()) {
@@ -54,7 +54,7 @@ public class GetAtomChildrenMapping extends AtomMapping {
                 for (int i = children.size() - 1; i >= 0; i--) {
                     cur = cur.push(children.get(i));
                 }
-                // put both the children and the (synced) atom back on the stack
+                // put both the children and the (synced) note back on the stack
                 solutions.accept(stack.push(n).push(cur));
             }
         }

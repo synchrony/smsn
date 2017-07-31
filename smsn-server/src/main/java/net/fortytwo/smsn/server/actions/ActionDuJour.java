@@ -33,7 +33,7 @@ public class ActionDuJour extends Action {
 
             //migrateIds(context);
 
-            //findAnomalousAtoms(context);
+            //findAnomalousNotes(context);
 
             //sharabilityToSource(context);
         } catch (Exception e) {
@@ -42,8 +42,8 @@ public class ActionDuJour extends Action {
     }
 
     private void pageToText(final ActionContext context) {
-        for (Note atom : context.getBrain().getTopicGraph().getAllNotes()) {
-            Vertex v = ((PGNote) atom).asVertex();
+        for (Note note : context.getBrain().getTopicGraph().getAllNotes()) {
+            Vertex v = ((PGNote) note).asVertex();
             VertexProperty<String> prop = v.property("page");
             if (prop.isPresent()) {
                 String text = prop.value();
@@ -54,27 +54,27 @@ public class ActionDuJour extends Action {
     }
 
     private void sharabilityToSource(final ActionContext context) {
-        for (Note atom : context.getBrain().getTopicGraph().getAllNotes()) {
-            Property<String> source1 = ((PGNote) atom).asVertex().property("source");
+        for (Note note : context.getBrain().getTopicGraph().getAllNotes()) {
+            Property<String> source1 = ((PGNote) note).asVertex().property("source");
             if (!source1.isPresent()) {
-                System.out.println("atom " + atom.getId() + " has no source. Title: " + atom.getTitle());
-                Property<Float> sharability = ((PGNote) atom).asVertex().property("sharability");
+                System.out.println("note " + Note.getId(note) + " has no source. Title: " + Note.getTitle(note));
+                Property<Float> sharability = ((PGNote) note).asVertex().property("sharability");
                 if (sharability.isPresent()) {
                     System.out.println("\tsharability: " + sharability.value());
                 } else {
                     System.out.println("\tno sharability");
                 }
 
-                String source = sourceForSharability(atom);
+                String source = sourceForSharability(note);
                 if (null != source) {
-                    atom.setSource(source);
+                    Note.setSource(note, source);
                 }
             }
         }
     }
 
-    private String sourceForSharability(final Note atom) {
-        Property<Float> sharability = ((PGNote) atom).asVertex().property("sharability");
+    private String sourceForSharability(final Note note) {
+        Property<Float> sharability = ((PGNote) note).asVertex().property("sharability");
         if (sharability.isPresent()) {
             switch ((int) (sharability.value() * 4)) {
                 case 0:
@@ -103,9 +103,9 @@ public class ActionDuJour extends Action {
             for (File file : dir.listFiles()) {
                 if (VCSFormat.isSmSnFile(file)) {
                     String id = file.getName();
-                    Optional<Note> opt = graph.getNotesById(id);
+                    Optional<Note> opt = graph.getNoteById(id);
                     Preconditions.checkArgument(opt.isPresent());
-                    opt.get().setSource(source.getName());
+                    Note.setSource(opt.get(), source.getName());
                 }
             }
             //SmSnGitRepository repo = new SmSnGitRepository(context.getBrain(), source);
@@ -116,11 +116,11 @@ public class ActionDuJour extends Action {
     private void migrateIds(final ActionContext context) {
         TopicGraph graph = context.getBrain().getTopicGraph();
         for (Note a : graph.getAllNotes()) {
-            a.setId(SemanticSynchrony.migrateId(a.getId()));
+            Note.setId(a, SemanticSynchrony.migrateId(Note.getId(a)));
         }
     }
 
-    private void findAnomalousAtoms(final ActionContext context) {
+    private void findAnomalousNotes(final ActionContext context) {
         for (Note a : context.getBrain().getTopicGraph().getAllNotes()) {
             checkNotNull(a, Note::getId, "id");
             checkNotNull(a, Note::getSource, "source");
@@ -133,7 +133,7 @@ public class ActionDuJour extends Action {
     private <T> void checkNotNull(final Note a, final Function<Note, T> accessor, final String name) {
         T value = accessor.apply(a);
         if (null == value) {
-            System.out.println("atom " + a.getId() + " has null " + name);
+            System.out.println("note " + Note.getId(a) + " has null " + name);
         }
     }
 

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import org.openrdf.model.IRI;
@@ -12,7 +12,7 @@ import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
-public class WebPage extends AtomClass {
+public class WebPage extends NoteClass {
 
     public WebPage() {
         super(
@@ -36,8 +36,8 @@ public class WebPage extends AtomClass {
         IRI self = handleTypeAndAlias(a, context, FOAF.DOCUMENT);
 
         // note: assumes that the value ends with "(web page)"
-        int i = a.getTitle().lastIndexOf("(");
-        String d = a.getTitle().substring(0, i).trim();
+        int i = Note.getTitle(a).lastIndexOf("(");
+        String d = Note.getTitle(a).substring(0, i).trim();
         handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(d)));
 
         return self;

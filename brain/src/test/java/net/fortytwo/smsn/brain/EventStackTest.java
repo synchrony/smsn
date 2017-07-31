@@ -42,12 +42,12 @@ public class EventStackTest {
         //KeyIndexableGraph g = bg.getPropertyGraph();
 
         assertEquals(0, events.size());
-        //assertEquals(0, countAtoms(bg));
+        //assertEquals(0, countNotes(bg));
         //assertEquals(0, countVertices(g));
 
         eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
         assertEquals(1, events.size());
-        //assertEquals(3, countAtoms(bg));
+        //assertEquals(3, countNotes(bg));
         //assertEquals(5, countVertices(g));
 
         TreeNode<Link> e = events.get(0);
@@ -62,7 +62,7 @@ public class EventStackTest {
 
         eventStack.push(eventStack.createGestureEvent(agent2, new Date()));
         assertEquals(2, events.size());
-        //assertEquals(6, countAtoms(bg));
+        //assertEquals(6, countNotes(bg));
         //assertEquals(10, countVertices(g));
 
         // verify that it is a stack, not a queue
@@ -75,7 +75,7 @@ public class EventStackTest {
         // push another event from agent #1 and verify that he is given the same routine name
         eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
         assertEquals(3, events.size());
-        //assertEquals(9, countAtoms(bg));
+        //assertEquals(9, countNotes(bg));
         //assertEquals(15, countVertices(g));
         e = events.get(0);
         kids = TreeViews.getChildrenAsList(e);
@@ -86,21 +86,21 @@ public class EventStackTest {
         // fill to capacity
         eventStack.clear();
         assertEquals(0, events.size());
-        //assertEquals(0, countAtoms(bg));
+        //assertEquals(0, countNotes(bg));
         //assertEquals(0, countVertices(g));
 
         for (int i = 0; i < testCapacity; i++) {
             eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
         }
         assertEquals(testCapacity, events.size());
-        //assertEquals(3 * testCapacity, countAtoms(bg));
+        //assertEquals(3 * testCapacity, countNotes(bg));
         //assertEquals(5 * testCapacity, countVertices(g));
 
         // accommodate further events, but drop events from the bottom of the stack
         eventStack.push(eventStack.createGestureEvent(agent2, new Date()));
         // the stack has not grown
         assertEquals(testCapacity, events.size());
-        //assertEquals(3 * testCapacity, countAtoms(bg));
+        //assertEquals(3 * testCapacity, countNotes(bg));
         //assertEquals(5 * testCapacity, countVertices(g));
         // this is the newest event
         assertEquals(agent2, TreeViews.getAlias(eventStack.getEvents().get(0).getChildren().get(0)));
@@ -109,7 +109,7 @@ public class EventStackTest {
         eventStack.clear();
         assertEquals(0, events.size());
         
-        //assertEquals(0, countAtoms(bg));
+        //assertEquals(0, countNotes(bg));
         //assertEquals(0, countVertices(g));
     }
 

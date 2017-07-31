@@ -37,9 +37,9 @@ public class LatexWriter extends NoteWriter {
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
-        Optional<Note> opt = context.getTopicGraph().getNotesById(rootId);
+        Optional<Note> opt = context.getTopicGraph().getNoteById(rootId);
         if (!opt.isPresent()) {
-            throw new IllegalStateException("no such atom: " + rootId);
+            throw new IllegalStateException("no such note: " + rootId);
         }
 
         writeLatex(opt.get(), filter, 0, 0, context.getDestStream());
@@ -61,7 +61,7 @@ public class LatexWriter extends NoteWriter {
         }
 
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = root.getTitle().trim();
+        String value = Note.getTitle(root).trim();
 
         for (Serializer serializer : serializers) {
             if (serializer.matches(value)) {

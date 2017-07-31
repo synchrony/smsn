@@ -116,9 +116,9 @@ public class Filter implements Predicate<Note>, Serializable {
     }
 
     @Override
-    public boolean test(final Note atom) {
-        Integer sourceIndex = getSourceIndexFor(atom);
-        Float weight = atom.getWeight();
+    public boolean test(final Note note) {
+        Integer sourceIndex = getSourceIndexFor(note);
+        Float weight = Note.getWeight(note);
 
         if (null == sourceIndex || null == weight) return false;
 
@@ -127,8 +127,8 @@ public class Filter implements Predicate<Note>, Serializable {
         return sourceIndex >= minSourceIndex && weight >= minWeight;
     }
 
-    private Integer getSourceIndexFor(final Note atom) {
-        String source = atom.getSource();
+    private Integer getSourceIndexFor(final Note note) {
+        String source = Note.getSource(note);
         return null == source ? null : indexForSource(source);
     }
 }

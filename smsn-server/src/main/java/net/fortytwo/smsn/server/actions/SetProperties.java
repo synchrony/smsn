@@ -10,7 +10,7 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import javax.validation.constraints.NotNull;
 
 /**
- * A service for setting the properties of an atom
+ * A service for setting the properties of a note
  */
 public class SetProperties extends FilteredAction {
 
@@ -78,7 +78,7 @@ public class SetProperties extends FilteredAction {
 
     private void validateWeight() {
         float f = toFloat(getValue());
-        // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
+        // Note: weight may not currently be set to 0, which would cause the note to disappear from all normal views
         if (f <= 0 || f > 1.0) {
             throw new BadRequestException("weight is outside of range (0, 1]: " + f);
         }
@@ -120,29 +120,29 @@ public class SetProperties extends FilteredAction {
 
         switch (getName()) {
             case SemanticSynchrony.PropertyKeys.TITLE:
-                root.setTitle((String) value);
+                Note.setTitle(root, (String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.TEXT:
-                root.setText(trimPage((String) value));
+                Note.setText(root, trimPage((String) value));
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
-                root.setWeight(toFloat(value));
+                Note.setWeight(root, toFloat(value));
                 break;
             case SemanticSynchrony.PropertyKeys.SOURCE:
-                root.setSource((String) value);
+                Note.setSource(root, (String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
-                root.setPriority(toFloat(value));
+                Note.setPriority(root, toFloat(value));
                 context.getBrain().getPriorities().updatePriority(root);
                 break;
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
-                // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
+                // first remove this shortcut from any note(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
                 for (Note a : context.getBrain().getTopicGraph().getNotesByShortcut(shortcut, getFilter())) {
-                    a.setShortcut(null);
+                    Note.setShortcut(a, null);
                 }
 
-                root.setShortcut(shortcut);
+                Note.setShortcut(root, shortcut);
                 break;
             default:
                 throw new IllegalStateException();

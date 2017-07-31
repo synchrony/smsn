@@ -41,7 +41,7 @@ public abstract class Action {
 
     protected static final int MAX_VIEW_HEIGHT = 7;
 
-    protected static final String CREATE_NEW_ATOM = "create-new-atom";
+    protected static final String CREATE_NEW_NOTE = "create-new-note";
 
     private static final Map<Graph, Brain> brains = new HashMap<>();
     private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();

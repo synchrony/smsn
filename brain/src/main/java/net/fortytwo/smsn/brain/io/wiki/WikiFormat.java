@@ -7,11 +7,13 @@ import java.util.regex.Pattern;
 public class WikiFormat extends Format {
 
     // A special value, for incoming notes only,
-    // which causes an atom's alias or shortcut to be set to null (rather than merely ignored)
+    // which causes a note's alias or shortcut to be set to null (rather than merely ignored)
     public static final String CLEARME = "C.L.E.A.R.M.E";
 
     static final String NODE_BULLET = "*";
     static final String LABEL_BULLET = "--";
+
+    static final String MULTILINE_DELIMITER = "```";
 
     // regex of valid id suffixes
     static final Pattern ID_INFIX = Pattern.compile(":[a-zA-Z0-9]{5,}:");
@@ -27,5 +29,9 @@ public class WikiFormat extends Format {
 
     public static WikiFormat getInstance() {
         return instance;
+    }
+
+    static String stripTrailingSpace(final String text) {
+        return text.replaceFirst("\\s++$", "");
     }
 }

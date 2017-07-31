@@ -15,7 +15,7 @@ public class FindRoots extends BasicViewAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
-        TreeNode<Link> tree = context.getQueries().findRootAtoms(getFilter(), style, height - 1);
+        TreeNode<Link> tree = context.getQueries().findRootNotes(getFilter(), style, height - 1);
         try {
             addView(tree, context);
         } catch (IOException e) {

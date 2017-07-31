@@ -100,11 +100,15 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
 
     @Test
     public void historyDoesntBreak() throws Exception {
-        addFile(testNote(ARTHUR_ID, "Arthur Dent"));
+        String arthurId = SemanticSynchrony.createRandomId();
+        String fordId = SemanticSynchrony.createRandomId();
+        String zaphodId = SemanticSynchrony.createRandomId();
+
+        addFile(testNote(arthurId, "Arthur Dent"));
         repo.addAll();
         repo.commitAll("first commit");
-        addFile(testNote(FORD_ID, "Ford Prefect"));
-        addFile(testNote(ZAPHOD_ID, "Zaphod Beeblebrox"));
+        addFile(testNote(fordId, "Ford Prefect"));
+        addFile(testNote(zaphodId, "Zaphod Beeblebrox"));
         repo.addAll();
         repo.commitAll("second commit");
 
@@ -114,7 +118,7 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         TreeNode<Link> firstCommit = history.getChildren().get(1);
         assertTrue(TreeViews.getTitle(firstCommit).endsWith("first commit"));
         assertTrue(TreeViews.getTitle(secondCommit).endsWith("second commit"));
-        /* TODO: test interned atoms
+        /* TODO: test interned notes
         assertEquals(1, firstCommit.getChildren().size());
         assertEquals(2, secondCommit.getChildren().size());
         assertEquals("Arthur Dent", firstCommit.getChildren().get(0).getTitle());

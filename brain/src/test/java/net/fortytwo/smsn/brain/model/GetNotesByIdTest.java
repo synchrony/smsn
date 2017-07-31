@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class GetAtomsByIdTest extends BrainTestBase {
+public class GetNotesByIdTest extends BrainTestBase {
 
     @Override
     protected TopicGraph createTopicGraph() throws IOException {
@@ -22,40 +22,40 @@ public class GetAtomsByIdTest extends BrainTestBase {
 
         int count = 0;
         for (String id : ids) {
-            Note atom = createNote(id);
-            atom.setTitle("atom #" + ++count);
+            Note note = createNote(id);
+            Note.setTitle(note, "note #" + ++count);
         }
 
         for (int i = 0; i < ids.length; i++) {
-            Note atom = topicGraph.getNotesById(ids[i]).get();
-            assertEquals("atom #" + (i + 1), atom.getTitle());
+            Note note = topicGraph.getNoteById(ids[i]).get();
+            assertEquals("note #" + (i + 1), Note.getTitle(note));
         }
     }
 
     @Test
-    public void testGetAtoms() throws Exception {
+    public void testGetNotes() throws Exception {
         Note chaos = createNote();
-        chaos.setTitle("Chaos");
+        Note.setTitle(chaos, "Chaos");
         Note tartarus = createNote();
-        tartarus.setTitle("Tartarus");
+        Note.setTitle(tartarus, "Tartarus");
         Note gaia = createNote();
-        gaia.setTitle("Gaia");
+        Note.setTitle(gaia, "Gaia");
         Note eros = createNote();
-        eros.setTitle("Eros");
+        Note.setTitle(eros, "Eros");
         Note nyx = createNote();
-        nyx.setTitle("Nyx");
+        Note.setTitle(nyx, "Nyx");
         Note erebus = createNote();
-        erebus.setTitle("Erebus");
+        Note.setTitle(erebus, "Erebus");
         ListNode<Note> children = topicGraph.createListOfNotes(tartarus, gaia, eros, nyx, erebus);
         chaos.setChildren(children);
 
         //System.out.println(chaos.getId());
         //System.out.println(chaos.getValue());
 
-        // getAtoms returns a list of only atom vertices, excluding list vertices
+        // getNotes returns a list of only note vertices, excluding list vertices
         int count = 0;
-        Iterable<Note> atoms = topicGraph.getAllNotes();
-        for (Note a : atoms) {
+        Iterable<Note> notes = topicGraph.getAllNotes();
+        for (Note ignored : notes) {
             count++;
             //System.out.println(a.getId());
             //System.out.println(a.getValue());

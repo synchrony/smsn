@@ -15,7 +15,7 @@ import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
 import java.util.logging.Logger;
 
-public class AddToStreamMapping extends AtomMapping {
+public class AddToStreamMapping extends NoteMapping {
     private static final Logger logger = Logger.getLogger(AddToStreamMapping.class.getName());
 
     private final String brainStream;
@@ -34,12 +34,12 @@ public class AddToStreamMapping extends AtomMapping {
 
     public Parameter[] getParameters() {
         return new Parameter[]{
-                new Parameter("value", "the value of the atom to add", true),
+                new Parameter("value", "the value of the note to add", true),
         };
     }
 
     public String getComment() {
-        return "adds a string as the @value of a new atom in a stream";
+        return "adds a string as the @value of a new note in a stream";
     }
 
     public void apply(RippleList stack,

@@ -5,9 +5,9 @@ import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 /**
- * A service for removing isolated atoms (i.e. atoms with neither parents nor children) from an Extend-o-Brain graph
+ * A service for removing isolated notes (i.e. notes with neither parents nor children) from an Extend-o-Brain graph
  */
-public class RemoveIsolatedAtoms extends FilteredAction {
+public class RemoveIsolatedNotes extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {

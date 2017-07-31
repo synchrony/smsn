@@ -32,26 +32,26 @@ public class WikiParser extends PageParser {
     private final Stack<Integer> indentHierarachy = new Stack<>();
 
     private int lineNumber;
-    private String currentText;
     private String currentLine;
     private String currentLineTrimmed;
     private State currentState;
+
+    private String currentPropertyKey;
+    private String currentPropertyValue;
+    private Page currentPage;
 
     @Override
     public Page parse(final InputStream inputStream) throws IOException {
         return parseInternal(inputStream);
     }
 
-    private Page parseInternal(final InputStream inputStream)
-            throws IOException {
+    private Page parseInternal(final InputStream inputStream) throws IOException {
         reset();
 
         BufferedReader br = createReader(inputStream);
         while ((currentLine = br.readLine()) != null) {
             parseLine();
         }
-
-        finishText();
 
         adjustHierarchy(-1);
 
@@ -86,29 +86,12 @@ public class WikiParser extends PageParser {
         return copy;
     }
 
-    private void finishText() {
-        if (State.Text == currentState && !isEmptyText(currentText)) {
-            page.setText(currentText);
-        }
-    }
-
-    private void toTextState() {
-        currentState = State.Text;
-    }
-
     private void parseLine() throws IOException {
         incrementLineNumber();
 
         replaceTabsWithSpaces();
 
         currentLineTrimmed = currentLine.trim();
-
-        if (currentLineIsEmpty()) {
-            if (State.Text != currentState) {
-                toTextState();
-                return;
-            }
-        }
 
         switch (currentState) {
             case Properties:
@@ -128,14 +111,15 @@ public class WikiParser extends PageParser {
                 }
                 break;
             case Text:
-                if (!currentText.isEmpty()) currentText += "\n";
-                currentText += currentLine;
+                if (currentLineTrimmed.equals(WikiFormat.MULTILINE_DELIMITER)) {
+                    currentState = State.Properties;
+                    finishProperty();
+                } else {
+                    if (!currentPropertyValue.isEmpty()) currentPropertyValue += "\n";
+                    currentPropertyValue += currentLine;
+                }
                 break;
         }
-    }
-
-    private boolean isEmptyText(final String page) {
-        return page.trim().length() == 0;
     }
 
     private BufferedReader createReader(final InputStream in) throws IOException {
@@ -148,7 +132,6 @@ public class WikiParser extends PageParser {
         indentHierarachy.push(-1);
 
         currentState = State.Properties;
-        currentText = "";
         lineNumber = 0;
 
         page = createPage();
@@ -238,25 +221,35 @@ public class WikiParser extends PageParser {
     }
 
     private void parsePropertyLine(final Page page) throws IOException {
-        String key;
-        String value;
+        currentPage = page;
 
         int firstSpace = currentLineTrimmed.indexOf(' ');
         if (-1 == firstSpace) {
-            key = currentLineTrimmed.substring(1);
-            value = "";
+            currentPropertyKey = currentLineTrimmed.substring(1);
+            currentPropertyValue = "";
         } else if (firstSpace < 2) {
-            key = null;
-            value = null;
             parseError("empty property key");
         } else {
-            key = currentLineTrimmed.substring(1, firstSpace).trim();
-            value = currentLineTrimmed.substring(firstSpace).trim();
+            currentPropertyKey = currentLineTrimmed.substring(1, firstSpace).trim();
+            String value = currentLineTrimmed.substring(firstSpace).trim();
+            if (value.equals(WikiFormat.MULTILINE_DELIMITER)) {
+                currentPropertyValue = "";
+                currentState = State.Text;
+                return;
+            } else {
+                currentPropertyValue = value;
+            }
         }
 
-        checkForEmptyPropertyValue(key, value);
+        finishProperty();
+    }
 
-        setProperty(page, key, value);
+    private void finishProperty() throws IOException {
+        String key = currentPropertyKey;
+        String value = WikiFormat.stripTrailingSpace(currentPropertyValue);
+
+        checkForEmptyPropertyValue(key, value);
+        setProperty(currentPage, key, value);
     }
 
     private void checkForEmptyPropertyValue(final String key, final String value) throws IOException {
@@ -308,37 +301,36 @@ public class WikiParser extends PageParser {
     }
 
     private <T> void setProperty(final Page page, final String key, String value) throws IOException {
-        if (key.equals(SemanticSynchrony.PropertyKeys.TEXT)) {
-            toTextState();
-            return;
-        }
-
         if (value.length() == 0) {
             value = WikiFormat.CLEARME;
         }
 
         // TODO: transitional
-        if (key.equals("id")) {
-            page.getContent().getValue().getTarget().setId(value);
-        } else if (key.equals("title")) {
-            page.getContent().getValue().setLabel(value);
-        } else {
-            Property<Page, T> prop = (Property<Page, T>) Page.propertiesByKey.get(key);
-            if (null == prop) {
-                // unknown properties are quietly ignored
-                return;
-            }
+        switch (key) {
+            case "id":
+                page.getContent().getValue().getTarget().setId(value);
+                break;
+            case "title":
+                page.getContent().getValue().setLabel(value);
+                break;
+            default:
+                Property<Page, T> prop = (Property<Page, T>) Page.propertiesByKey.get(key);
+                if (null == prop) {
+                    // unknown properties are quietly ignored
+                    return;
+                }
 
-            T typeSafeValue;
+                T typeSafeValue;
 
-            try {
-                typeSafeValue = prop.getFromString().apply(value);
-            } catch (Exception e) {
-                parseError("invalid value for @" + key + " property: " + value);
-                return;
-            }
+                try {
+                    typeSafeValue = prop.getFromString().apply(value);
+                } catch (Exception e) {
+                    parseError("invalid value for @" + key + " property: " + value);
+                    return;
+                }
 
-            prop.getSetter().accept(page, typeSafeValue);
+                prop.getSetter().accept(page, typeSafeValue);
+                break;
         }
     }
 

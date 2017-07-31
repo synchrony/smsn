@@ -35,19 +35,19 @@ public class VertexWriter extends NoteWriter {
         p.println("created\tid\tweight\tsource\tclass\tout\tin\ttitle\talias");
 
         for (Note a : sourceGraph.getAllNotes()) {
-            if (isTrueAtom(a) && filter.test(a)) {
-                p.print(a.getCreated());
+            if (isTrueNote(a) && filter.test(a)) {
+                p.print(Note.getCreated(a));
                 p.print('\t');
-                p.print(a.getId());
+                p.print(Note.getId(a));
                 p.print('\t');
-                p.print(a.getWeight());
+                p.print(Note.getWeight(a));
                 p.print('\t');
-                p.print(a.getSource());
+                p.print(Note.getSource(a));
                 p.print('\t');
 
-                List<KnowledgeBase.AtomClassEntry> entries = sourceKb.getClassInfo(a);
+                List<KnowledgeBase.NoteClassEntry> entries = sourceKb.getClassInfo(a);
                 if (null != entries && entries.size() > 0) {
-                    KnowledgeBase.AtomClassEntry e = entries.get(0);
+                    KnowledgeBase.NoteClassEntry e = entries.get(0);
                     p.print(e.getInferredClassName());
                     p.print('\t');
                     p.print(e.getOutScore());
@@ -58,15 +58,15 @@ public class VertexWriter extends NoteWriter {
                     p.print("\t0\t0\t");
                 }
 
-                String value = a.getTitle();
+                String value = Note.getTitle(a);
                 if (null == value) {
-                    logger.warning("note has null @title: " + a.getId());
+                    logger.warning("note has null @title: " + Note.getId(a));
                 } else {
-                    p.print(escapeValue(a.getTitle()));
+                    p.print(escapeValue(Note.getTitle(a)));
                 }
                 p.print('\t');
 
-                String alias = a.getAlias();
+                String alias = Note.getAlias(a);
                 if (null != alias) {
                     p.print(escapeValue(alias));
                 }
@@ -76,8 +76,8 @@ public class VertexWriter extends NoteWriter {
         }
     }
 
-    private boolean isTrueAtom(final Note a) {
-        return null != a.getCreated();
+    private boolean isTrueNote(final Note a) {
+        return null != Note.getCreated(a);
     }
 
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.

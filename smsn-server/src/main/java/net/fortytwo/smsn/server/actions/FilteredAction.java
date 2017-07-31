@@ -24,11 +24,11 @@ abstract class FilteredAction extends Action {
 
     protected Note getRoot(String rootId, final ActionContext context) {
         Note root;
-        if (rootId.equals(CREATE_NEW_ATOM)) {
+        if (rootId.equals(CREATE_NEW_NOTE)) {
             root = createNewRoot(context);
-            rootId = root.getId();
+            rootId = Note.getId(root);
         } else {
-            Optional<Note> opt = context.getBrain().getTopicGraph().getNotesById(rootId);
+            Optional<Note> opt = context.getBrain().getTopicGraph().getNoteById(rootId);
             if (opt.isPresent()) {
                 root = opt.get();
             } else {
@@ -40,10 +40,10 @@ abstract class FilteredAction extends Action {
             throw new BadRequestException("root of view is not visible: " + rootId);
         }
 
-        context.getMap().put(Params.ROOT, root.getId());
+        context.getMap().put(Params.ROOT, Note.getId(root));
 
-        setTitle(context, null == root.getTitle() || 0 == root.getTitle().length()
-                ? "[no title]" : root.getTitle());
+        setTitle(context, null == Note.getTitle(root) || 0 == Note.getTitle(root).length()
+                ? "[no title]" : Note.getTitle(root));
 
         return root;
     }
@@ -57,7 +57,7 @@ abstract class FilteredAction extends Action {
 
     private Note createNewRoot(final ActionContext context) {
         Note root = context.getBrain().getTopicGraph().createNoteWithProperties(getFilter(), null);
-        root.setTitle("life, the universe, and everything");
+        Note.setTitle(root, "life, the universe, and everything");
         return root;
     }
 }

@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class GetAtomsByValueTest extends BrainTestBase {
+public class GetNotesByValueTest extends BrainTestBase {
     private Note arthur;
 
     @Override
@@ -23,7 +23,7 @@ public class GetAtomsByValueTest extends BrainTestBase {
         super.setUp();
 
         arthur = createNote();
-        arthur.setTitle("Arthur Dent");
+        Note.setTitle(arthur, "Arthur Dent");
     }
 
     @Test
@@ -88,6 +88,6 @@ public class GetAtomsByValueTest extends BrainTestBase {
     public void quotedExactMatchSucceeds() throws Exception {
         queryResult = topicGraph.getNotesByTitleQuery("\"Arthur Dent\"", filter);
         assertEquals(1, queryResult.size());
-        assertEquals(arthur.getId(), queryResult.iterator().next().getId());
+        assertEquals(Note.getId(arthur), Note.getId(queryResult.iterator().next()));
     }
 }

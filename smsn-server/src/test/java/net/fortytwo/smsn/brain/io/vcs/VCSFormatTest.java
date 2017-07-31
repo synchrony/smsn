@@ -22,7 +22,7 @@ public class VCSFormatTest {
     }
 
     @Test
-    public void nonAtomFilesRejected() throws Exception {
+    public void nonSmSnFilesRejected() throws Exception {
         assertFalse(VCSFormat.isSmSnFile(new File("1234.smsn")));
         assertFalse(VCSFormat.isSmSnFile(new File("?1234567.smsn")));
         assertFalse(VCSFormat.isSmSnFile(new File("12345678 9.smsn")));
@@ -31,7 +31,7 @@ public class VCSFormatTest {
     }
 
     @Test
-    public void oldSchoolAtomFilesRejected() {
+    public void oldSchoolSmSnFilesRejected() {
         assertFalse(VCSFormat.isSmSnFile(new File("au-lH78_")));
         File dir = new File("/tmp");
         assertFalse(VCSFormat.isSmSnFile(new File(dir, "a1_234567")));

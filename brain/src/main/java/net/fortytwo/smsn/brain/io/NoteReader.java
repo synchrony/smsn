@@ -66,7 +66,7 @@ public abstract class NoteReader {
 
         long after = System.currentTimeMillis();
         logger.info("imported " + context.getFormat() + " data in " + (after - before) + " ms (before commit). " +
-                "Resulting graph has " + getSizeOf(context) + " atoms");
+                "Resulting graph has " + getSizeOf(context) + " notes");
     }
 
     protected synchronized void checkAndCommit(final TopicGraph graph) {

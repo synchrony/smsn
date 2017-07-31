@@ -8,16 +8,16 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import java.io.IOException;
 
 /**
- * A service for finding recently visited atoms
+ * A service for finding recently visited notes
  */
 public class GetHistory extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
-        Iterable<Note> atoms = getHistory(context.getBrain().getTopicGraph(), getFilter());
+        Iterable<Note> notes = getHistory(context.getBrain().getTopicGraph(), getFilter());
 
         try {
-            addView(context.getQueries().customView(atoms, getFilter()), context);
+            addView(context.getQueries().customView(notes, getFilter()), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

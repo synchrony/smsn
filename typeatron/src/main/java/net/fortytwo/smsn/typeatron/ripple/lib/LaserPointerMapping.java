@@ -15,7 +15,7 @@ import org.openrdf.model.IRI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LaserPointerMapping extends AtomMapping {
+public class LaserPointerMapping extends NoteMapping {
 
     private static final Logger logger = Logger.getLogger(LaserPointerMapping.class.getName());
 
@@ -49,7 +49,7 @@ public class LaserPointerMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't point to non-atom: " + first);
+            logger.warning("can't point to non-note: " + first);
 
             // soft fail; propagate the stack even if we couldn't point
         } else {

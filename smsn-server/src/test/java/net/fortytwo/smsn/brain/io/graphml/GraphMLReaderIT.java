@@ -36,7 +36,7 @@ public class GraphMLReaderIT extends BrainTestBase {
 
         reader.doImport(inputFile, GraphMLFormat.getInstance(), brain);
 
-        System.out.println("# atoms: " + countNotes());
+        System.out.println("# notes: " + countNotes());
 
         NoteWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(outputFile)) {

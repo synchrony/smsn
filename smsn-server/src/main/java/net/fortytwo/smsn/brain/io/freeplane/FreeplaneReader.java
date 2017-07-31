@@ -111,7 +111,7 @@ public class FreeplaneReader extends NoteReader {
         Filter filter = Filter.noFilter();
 
         Note note = destGraph.createNoteWithProperties(filter, SemanticSynchrony.createRandomId());
-        TreeViews.setId(rootNote, note.getId());
+        TreeViews.setId(rootNote, Note.getId(note));
 
         queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
@@ -254,17 +254,17 @@ public class FreeplaneReader extends NoteReader {
             persistArrowLinks();
         }
 
-        private Note getAtom(final String id) {
-            return destGraph.getNotesById(TreeViews.getId(notesByFreeplaneId.get(id))).get();
+        private Note getNote(final String id) {
+            return destGraph.getNoteById(TreeViews.getId(notesByFreeplaneId.get(id))).get();
         }
 
         private void persistArrowLinks() throws InvalidGraphException {
             for (Map.Entry<String, List<String>> link : arrowLinks.entrySet()) {
-                Note tailAtom = getAtom(link.getKey());
+                Note tailNote = getNote(link.getKey());
                 List<String> heads = link.getValue();
                 for (String head : heads) {
-                    Note headAtom = getAtom(head);
-                    tailAtom.addChildAt(headAtom, 0);
+                    Note headNote = getNote(head);
+                    tailNote.addChildAt(headNote, 0);
                 }
             }
         }

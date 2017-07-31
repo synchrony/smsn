@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
 import org.openrdf.model.IRI;
@@ -11,20 +11,20 @@ import org.openrdf.rio.RDFHandlerException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class AbstractEvent extends AtomClass {
+public class AbstractEvent extends NoteClass {
     public AbstractEvent() {
         super("abstract-event",
                 Pattern.compile("[A-Z].+"),
                 null,
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new NickHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new PageHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
-                        new AtomRegex.El(new InteractorHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, InteractorCollection.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(new NickHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AKAReference.class),
+                        new NoteReqex.El(new PageHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, WebPage.class),
+                        new NoteReqex.El(new InteractorHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, InteractorCollection.class),
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 

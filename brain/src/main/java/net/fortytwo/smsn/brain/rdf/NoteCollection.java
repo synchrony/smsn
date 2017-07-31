@@ -6,12 +6,12 @@ import org.openrdf.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 
-public abstract class AtomCollection extends AtomClass {
+public abstract class NoteCollection extends NoteClass {
 
-    public AtomCollection(final String name,
+    public NoteCollection(final String name,
                           final Pattern valueRegex,
                           final Pattern aliasRegex,
-                          final AtomRegex memberRegex) {
+                          final NoteReqex memberRegex) {
         super(name, valueRegex, aliasRegex, memberRegex);
     }
 

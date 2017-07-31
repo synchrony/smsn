@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
@@ -65,49 +66,54 @@ public class VCSWriterTest extends BrainTestBase {
     @Test
     public void singlePageIsWrittenCorrectly() throws Exception {
         String source = DefaultSources.PUBLIC;
+        String fordId = SemanticSynchrony.createRandomId();
+        String zaphodId = SemanticSynchrony.createRandomId();
 
-        Note root = createAtom("11111", "change me");
-        root.setSource(source);
+        Note root = createNote("11111", "change me");
+        Note.setSource(root, source);
 
-        TreeNode<Link> tree = createTreeDTO(root.getId(), "Arthur Dent");
+        TreeNode<Link> tree = createTreeDTO(Note.getId(root), "Arthur Dent");
         Page page = PageDTO.createTransitional();
         page.setSource(source);
         page.setContent(tree);
         page.setText("He's a jerk.\nA complete kneebiter.");
         tree.getValue().setPage(page);
-        TreeNode<Link> fordTree = createTreeDTO(fordTopic.getId(), "Ford Prefect");
+        TreeNode<Link> fordTree = createTreeDTO(fordId, "Ford Prefect");
         fordTree.getValue().setPage(page);
-        TreeNode<Link> zaphodTree = createTreeDTO(zaphodTopic.getId(), "Zaphod Beeblebrox");
+        TreeNode<Link> zaphodTree = createTreeDTO(zaphodId, "Zaphod Beeblebrox");
         zaphodTree.getValue().setPage(page);
         tree.addChild(fordTree);
         tree.addChild(zaphodTree);
 
         queries.update(tree, Integer.MAX_VALUE, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
 
-        Note ad = topicGraph.getNotesById(root.getId()).get();
-        assertEquals(DefaultSources.PUBLIC, ad.getSource());
-        assertEquals("Arthur Dent", ad.getTitle());
-        assertEquals("He's a jerk.\nA complete kneebiter.", ad.getText());
+        Note ad = topicGraph.getNoteById(Note.getId(root)).get();
+        assertEquals(DefaultSources.PUBLIC, Note.getSource(ad));
+        assertEquals("Arthur Dent", Note.getTitle(ad));
+        assertEquals("He's a jerk.\nA complete kneebiter.", Note.getText(ad));
         assertEquals(2, ListNode.toJavaList(ad.getChildren()).size());
         Note random = ad.getChildren().getFirst();
-        assertEquals("Ford Prefect", random.getTitle());
+        assertEquals("Ford Prefect", Note.getTitle(random));
 
         File dir = doExport();
         assertEquals(4, dir.listFiles().length);
         File publicDir = new File(dir, "public");
         assertTrue(publicDir.exists() && publicDir.isDirectory());
-        File arthurFile = new File(publicDir, root.getId() + ".smsn");
+        File arthurFile = new File(publicDir, Note.getId(root) + ".smsn");
         assertTrue(arthurFile.exists());
         List<String> lines = readLines(arthurFile);
         assertEquals(9, lines.size());
-        assertEquals("@id " + root.getId(), lines.get(0));
+        assertEquals("@id " + Note.getId(root), lines.get(0));
         assertEquals("@title Arthur Dent", lines.get(1));
         assertEquals("created", readPropertyLine(lines.get(2)).getKey());
-        assertEquals("@weight 0.5", lines.get(3));
-        assertEquals("* :" + fordTopic.getId() + ": ", lines.get(4));
-        assertEquals("* :" + zaphodTopic.getId() + ": ", lines.get(5));
-        assertEquals("@text", lines.get(6));
-        assertEquals("He's a jerk.", lines.get(7));
+        // note: no @weight or @priority
+        assertEquals("@text ```", lines.get(3));
+        assertEquals("He's a jerk.", lines.get(4));
+        assertEquals("A complete kneebiter.", lines.get(5));
+        assertEquals("```", lines.get(6));
+        assertEquals("* :" + fordId + ": ", lines.get(7));
+        assertEquals("* :" + zaphodId + ": ", lines.get(8));
+
     }
 
     private Map.Entry<String, String> readPropertyLine(final String line) {

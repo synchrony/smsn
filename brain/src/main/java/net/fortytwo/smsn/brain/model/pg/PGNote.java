@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain.model.pg;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.model.Property;
-import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -23,6 +22,8 @@ public abstract class PGNote extends PGEntity implements Note {
 
     static {
         setterTriggersByPropertyKey = new HashMap<>();
+
+        setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.ID, PGNote::idUpdated);
         setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.TITLE, PGNote::titleUpdated);
         setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.SHORTCUT, PGNote::shortcutUpdated);
     }
@@ -31,109 +32,7 @@ public abstract class PGNote extends PGEntity implements Note {
         super(vertex);
     }
 
-    @Override
-    public String getId() {
-        return super.getId();
-    }
-
-    @Override
-    public void setId(final String id) {
-        String atomId = null == id ? SemanticSynchrony.createRandomId() : id;
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.ID_V, atomId);
-
-        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.ID_V);
-    }
-
-    public Role getRole() {
-        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
-        return null == name ? null : Role.valueOf(name);
-    }
-
-    public void setRole(final Role role) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
-    }
-
-    @Override
-    public String getAlias() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS);
-    }
-
-    @Override
-    public void setAlias(String alias) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
-    }
-
-    @Override
-    public Long getCreated() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.CREATED);
-    }
-
-    @Override
-    public void setCreated(Long created) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
-    }
-
-    @Override
-    public String getTitle() {
-        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TITLE);
-    }
-
-    @Override
-    public void setTitle(final String title) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.TITLE, title);
-        titleUpdated();
-    }
-
-    @Override
-    public String getText() {
-        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT);
-    }
-
-    @Override
-    public void setText(String text) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
-    }
-
-    @Override
-    public Float getPriority() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY);
-    }
-
-    @Override
-    public void setPriority(Float priority) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
-    }
-
-    @Override
-    public String getShortcut() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT);
-    }
-
-    @Override
-    public void setShortcut(final String shortcut) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
-        shortcutUpdated();
-    }
-
-    @Override
-    public Float getWeight() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT);
-    }
-
-    @Override
-    public void setWeight(Float weight) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
-    }
-
-    @Override
-    public String getSource() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SOURCE);
-    }
-
-    @Override
-    public void setSource(final String source) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
-    }
+    protected abstract PGTopicGraph getGraph();
 
     @Override
     public Topic getTopic() {
@@ -147,7 +46,7 @@ public abstract class PGNote extends PGEntity implements Note {
 
     @Override
     public ListNode<Note> getChildren() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfAtoms(v));
+        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfNotes(v));
     }
 
     @Override
@@ -160,12 +59,12 @@ public abstract class PGNote extends PGEntity implements Note {
     @Override
     public void forFirstOf(Consumer<ListNode<Note>> consumer) {
         forEachAdjacentVertex(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
-                vertex -> consumer.accept(getGraph().asListOfAtoms(vertex)));
+                vertex -> consumer.accept(getGraph().asListOfNotes(vertex)));
     }
 
     @Override
     public void addChildAt(final Note child, int position) {
-        // create a list node for the atom and insert it
+        // create a list node for the note and insert it
         ListNode<Note> list = getGraph().createListOfNotes(child);
         if (0 == position) {
             list.setRest(getChildren());
@@ -185,7 +84,7 @@ public abstract class PGNote extends PGEntity implements Note {
     public void deleteChildAt(int position) {
         ListNode<Note> list = getChildren();
 
-        // remove the atom's list node
+        // remove the note's list node
         if (0 == position) {
             setChildrenInternal(list.getRest());
 
@@ -223,7 +122,7 @@ public abstract class PGNote extends PGEntity implements Note {
     public Collection<ListNode<Note>> getFirstOf() {
         List<ListNode<Note>> result = new java.util.LinkedList<>();
         forAllVertices(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
-                vertex -> result.add(getGraph().asListOfAtoms(vertex)));
+                vertex -> result.add(getGraph().asListOfNotes(vertex)));
 
         return result;
     }
@@ -232,7 +131,7 @@ public abstract class PGNote extends PGEntity implements Note {
     public Note getSubject(ListNode<Note> notes) {
         PGEntity entity = (PGEntity) notes;
         return entity.getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN,
-                vertex -> getGraph().asAtom(vertex));
+                vertex -> getGraph().asNote(vertex));
     }
 
     @Override
@@ -246,7 +145,7 @@ public abstract class PGNote extends PGEntity implements Note {
 
     private void updateAcronym() {
         Vertex vertex = asVertex();
-        String value = getTitle();
+        String value = Note.getTitle(this);
         String acronym = valueToAcronym(value);
 
         VertexProperty<String> previousProperty = vertex.property(SemanticSynchrony.PropertyKeys.ACRONYM);
@@ -288,6 +187,10 @@ public abstract class PGNote extends PGEntity implements Note {
         return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 
+    private void idUpdated() {
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.ID);
+    }
+
     private void titleUpdated() {
         getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.TITLE);
         updateAcronym();
@@ -297,7 +200,23 @@ public abstract class PGNote extends PGEntity implements Note {
         getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
 
-    private <V> V getProperty(final Property<Note, V> property) {
+    private <V> Property<Note, V> getPropertyForKey(final String key) {
+        Property<Note, V> property = (Property<Note, V>) Note.propertiesByKey.get(key);
+        if (null == property) {
+            throw new IllegalArgumentException("no such property: " + key);
+        }
+        return property;
+    }
+
+    public <V> V getProperty(final String key) {
+        return getProperty(getPropertyForKey(key));
+    }
+
+    public <V> void setProperty(final String key, final V value) {
+        setProperty(getPropertyForKey(key), value);
+    }
+
+    public <V> V getProperty(final Property<Note, V> property) {
         V value = getOptionalProperty(property.getKey());
         if (null == value) {
             if (null != property.getDefaultValue()) {
@@ -312,7 +231,7 @@ public abstract class PGNote extends PGEntity implements Note {
         }
     }
 
-    private <V> void setProperty(final Property<Note, V> property, final V value) {
+    public <V> void setProperty(final Property<Note, V> property, final V value) {
         V internalValue;
         if (null == value) {
             if (property.isRequired()) {

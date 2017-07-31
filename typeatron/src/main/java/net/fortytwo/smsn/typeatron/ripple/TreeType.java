@@ -30,10 +30,10 @@ public class TreeType extends SimpleType<TreeNode<Link>> {
     public Value toRDF(TreeNode<Link> instance, ModelConnection mc) throws RippleException {
         // if the note has an alias, use that as its IRI.
         // Otherwise, use the "thing" IRI based on its ID
-        // This has the effect of mapping to an externally-defined resource if the given atom has an alias,
+        // This has the effect of mapping to an externally-defined resource if the given note has an alias,
         // otherwise mapping to a reference to a thing described in the personal knowledge base.
         // In the latter case, the resource will only be accessible in an interactive setting if the thing is a public,
-        // classified atom and the knowledge base has been appropriately published as Linked Data.
+        // classified note and the knowledge base has been appropriately published as Linked Data.
         return null == TreeViews.getAlias(instance)
                 ? null == TreeViews.getId(instance) ? null : valueFactory.createIRI(
                         PGTopicGraph.iriForId(TreeViews.getId(instance)))

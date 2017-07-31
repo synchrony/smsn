@@ -19,7 +19,7 @@ public abstract class ActionTestBase extends BrainTestBase {
 
     @Override
     protected TopicGraph createTopicGraph() throws IOException {
-        //return createNeo4jAtomGraph();
+        //return createNeo4jTopicGraph();
         return createTinkerTopicGraph();
     }
 
@@ -30,11 +30,5 @@ public abstract class ActionTestBase extends BrainTestBase {
 
     protected JSONObject getView(final ActionContext context) {
         return (JSONObject) context.getMap().get(Params.VIEW);
-    }
-
-    protected Note createAtomWithTitle(final String title) {
-        Note atom = topicGraph.createNoteWithProperties(Filter.noFilter(), null);
-        atom.setTitle(title);
-        return atom;
     }
 }

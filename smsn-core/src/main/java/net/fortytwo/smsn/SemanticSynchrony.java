@@ -19,7 +19,7 @@ public class SemanticSynchrony {
 
     public interface VertexLabels {
         String
-                ATOM = "atom",
+                NOTE = "note",
                 LIST = "list",
                 LINK = "link",
                 PAGE = "page",
@@ -45,7 +45,7 @@ public class SemanticSynchrony {
                 ACRONYM = "acronym",
                 ALIAS = "alias",
                 CREATED = "created",
-                ID_V = "idV",
+                ID = "idV",
                 LABEL = "label",
                 PRIORITY = "priority",
                 ROLE = "role",
@@ -161,7 +161,7 @@ public class SemanticSynchrony {
 
     /**
      * Creates a pseudo-random Base62 SmSn key.
-     * These keys are typically used as ids of atoms and list elements in Extend-o-Brain.
+     * These keys are typically used as ids of notes and list elements in Extend-o-Brain.
      *
      * @return a new pseudo-random key
      */

@@ -104,29 +104,29 @@ public class MarkdownParserTest {
     }
 
     @Test
-    public void headingWithoutChildrenIsEquivalentToSimpleAtom() throws IOException {
-        TreeNode<Link> root = parse("[simple atom](aaaaaaa)\n" +
+    public void headingWithoutChildrenIsEquivalentToSimpleNote() throws IOException {
+        TreeNode<Link> root = parse("[simple note](aaaaaaa)\n" +
                 "\n" +
                 "# heading without content\n" +
                 "\n" +
                 "# heading with content\n" +
                 "\n" +
-                "[another atom](bbbbbbb)");
+                "[another note](bbbbbbb)");
 
         assertEquals(3, TreeViews.countChildren(root));
 
-        TreeNode<Link> simpleAtom = root.getChildren().get(0);
-        assertEquals("simple atom", TreeViews.getTitle(simpleAtom));
-        assertEquals(0, TreeViews.countChildren(simpleAtom));
+        TreeNode<Link> simpleNote = root.getChildren().get(0);
+        assertEquals("simple note", TreeViews.getTitle(simpleNote));
+        assertEquals(0, TreeViews.countChildren(simpleNote));
         TreeNode<Link> headingWithoutContent = root.getChildren().get(1);
         assertEquals("heading without content", TreeViews.getTitle(headingWithoutContent));
         assertEquals(0, TreeViews.countChildren(headingWithoutContent));
         TreeNode<Link> headingWithContent = root.getChildren().get(2);
         assertEquals("heading with content", TreeViews.getTitle(headingWithContent));
         assertEquals(1, TreeViews.countChildren(headingWithContent));
-        TreeNode<Link> anotherAtom = headingWithContent.getChildren().get(0);
-        assertEquals("another atom", TreeViews.getTitle(anotherAtom));
-        assertEquals(0, TreeViews.countChildren(anotherAtom));
+        TreeNode<Link> anotherNote = headingWithContent.getChildren().get(0);
+        assertEquals("another note", TreeViews.getTitle(anotherNote));
+        assertEquals(0, TreeViews.countChildren(anotherNote));
     }
 
     private TreeNode<Link> parse(final String content) throws IOException {

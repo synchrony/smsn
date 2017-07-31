@@ -12,36 +12,36 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class SetAtomWeightMapping extends AtomMapping {
+public class SetNoteShortcutMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(SetAtomWeightMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(SetNoteShortcutMapping.class.getName());
 
-    public SetAtomWeightMapping(final BrainClient client,
-                                final Filter filter) {
+    public SetNoteShortcutMapping(final BrainClient client,
+                                  final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "set-atom-weight"
+                SmSnLibrary.NS_2014_12 + "set-note-shortcut"
         };
     }
 
     public Parameter[] getParameters() {
         return new Parameter[]{
-                new Parameter("atom", "the reference atom", true),
-                new Parameter("weight", "the new weight", true)};
+                new Parameter("note", "the reference note", true),
+                new Parameter("shortcut", "the new shortcut", true)};
     }
 
     public String getComment() {
-        return "sets the @weight property of an atom";
+        return "sets the @shortcut property of a note";
     }
 
     public void apply(RippleList stack,
                       final Sink<RippleList> solutions,
                       final ModelConnection mc) throws RippleException {
 
-        Object value = stack.getFirst();
+        String value = mc.toString(stack.getFirst());
         stack = stack.getRest();
         Object no = stack.getFirst();
         stack = stack.getRest();
@@ -49,13 +49,11 @@ public class SetAtomWeightMapping extends AtomMapping {
         TreeNode<Link> n = toTree(no, 0, false);
 
         if (null == n) {
-            logger.warning("can't set @weight of non-atom: " + no);
+            logger.warning("can't set @shortcut of non-note: " + no);
         } else {
-            Float f = weightFromArgument(value, mc);
+            setProperty(n, SemanticSynchrony.PropertyKeys.SHORTCUT, value);
 
-            setProperty(n, SemanticSynchrony.PropertyKeys.WEIGHT, "" + f);
-
-            // put the atom back on the stack
+            // put the note back on the stack
             solutions.accept(stack.push(n));
         }
     }

@@ -12,27 +12,27 @@ import net.fortytwo.ripple.model.RippleList;
 
 import java.util.logging.Logger;
 
-public class GetAtomSourceMapping extends AtomMapping {
+public class GetNoteIdMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(GetAtomSourceMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GetNoteIdMapping.class.getName());
 
-    public GetAtomSourceMapping(final BrainClient client,
-                                final Filter filter) {
+    public GetNoteIdMapping(final BrainClient client,
+                            final Filter filter) {
         super(client, filter);
     }
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "get-atom-source"
+                SmSnLibrary.NS_2014_12 + "get-note-id"
         };
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("atom", "the reference atom", true)};
+        return new Parameter[]{new Parameter("note", "the reference note", true)};
     }
 
     public String getComment() {
-        return "gets the @source property of an atom";
+        return "gets the unique id of a note";
     }
 
     public void apply(RippleList stack,
@@ -45,12 +45,12 @@ public class GetAtomSourceMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't get @source of non-atom: " + first);
+            logger.warning("can't get id of non-note: " + first);
         } else {
-            String value = TreeViews.getSource(n);
-            if (null != value) {
-                // put both the @source property and the (synced) atom back on the stack
-                solutions.accept(stack.push(n).push(value));
+            String id = TreeViews.getId(n);
+            if (null != id) {
+                // put both the id and the (synced) note back on the stack
+                solutions.accept(stack.push(n).push(id));
             }
         }
     }

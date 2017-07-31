@@ -1,13 +1,13 @@
 package net.fortytwo.smsn.brain.rdf.classes.collections;
 
-import net.fortytwo.smsn.brain.rdf.AtomCollection;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.rdf.NoteCollection;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.classes.Document;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class DocumentAboutTopicCollection extends AtomCollection {
+public class DocumentAboutTopicCollection extends NoteCollection {
 
     // TODO: unit tests for documents about plain and sub-typed topics
     public DocumentAboutTopicCollection() {
@@ -15,14 +15,14 @@ public class DocumentAboutTopicCollection extends AtomCollection {
                 "documents-about-collection",
                 Pattern.compile("some (papers|books|articles|documents) (about|on) .+"),
                 null,
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore, DocumentCollection.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore,
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore, DocumentCollection.class),
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore,
                                 Document.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 }

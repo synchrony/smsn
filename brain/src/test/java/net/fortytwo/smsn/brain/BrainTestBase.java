@@ -112,7 +112,7 @@ public abstract class BrainTestBase {
         return parseToTree(Brain.class.getResourceAsStream(exampleFile));
     }
 
-    protected Note importAtomFromFile(final String exampleFile) throws IOException {
+    protected Note importNoteFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 0.5f, DefaultSources.PRIVATE, DefaultSources.PERSONAL);
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
@@ -123,14 +123,22 @@ public abstract class BrainTestBase {
         return root;
     }
 
-    protected Note createAtom(final String title) {
-        return createAtom(SemanticSynchrony.createRandomId(), title);
+    protected Note createNote(final String id) {
+        return topicGraph.createNoteWithProperties(filter, id );
     }
 
-    protected Note createAtom(final String id, final String title) {
-        Note atom = topicGraph.createNoteWithProperties(filter, id);
-        atom.setTitle(title);
-        return atom;
+    protected Note createNote() {
+        return createNote(null);
+    }
+
+    protected Note createNoteWithTitle(final String title) {
+        return createNote(null, title);
+    }
+
+    protected Note createNote(final String id, final String title) {
+        Note note = topicGraph.createNoteWithProperties(filter, id);
+        Note.setTitle(note, title);
+        return note;
     }
 
     protected Topic createTopic(final String id) {
@@ -153,15 +161,6 @@ public abstract class BrainTestBase {
         return tree;
     }
 
-    protected Note createNote(final String id) {
-        Note note = topicGraph.createNoteWithProperties(filter, id );
-        return note;
-    }
-
-    protected Note createNote() {
-        return createNote(null);
-    }
-
     protected int countNotes(final TopicGraph graph) {
         int count = 0;
         for (Note ignored : graph.getAllNotes()) {
@@ -174,8 +173,8 @@ public abstract class BrainTestBase {
         return countNotes(topicGraph);
     }
 
-    protected static List<Note> childList(final Note atom) {
-        return ListNode.toJavaList(atom.getChildren());
+    protected static List<Note> childList(final Note note) {
+        return ListNode.toJavaList(note.getChildren());
     }
 
     protected File createTempDirectory() throws IOException {
@@ -223,7 +222,7 @@ public abstract class BrainTestBase {
         int i = 0;
         ListNode<Note> cur = a.getChildren();
         while (null != cur) {
-            actual[i++] = cur.getFirst().getTitle();
+            actual[i++] = Note.getTitle(cur.getFirst());
             cur = cur.getRest();
         }
 

@@ -22,7 +22,6 @@ public class WikiPrinter {
     public void print(final Page page) {
         printProperties(page);
         printContent(page);
-        printText(page);
     }
 
     private PrintStream createPrintStream(final OutputStream out) {
@@ -92,31 +91,34 @@ public class WikiPrinter {
         }
     }
 
-    private void printText(final Page page) {
-        if (!isEmptyText(page.getText())) {
-            printStream.println("@text");
-            printStream.print(page.getText());
-        }
-    }
-
-    private boolean isEmptyText(final String text) {
-        return null == text || text.trim().length() == 0;
-    }
-
     private void printProperties(final Page page) {
         printProperty("id", page.getContent().getValue().getTarget().getId());
         printProperty("title", page.getContent().getValue().getLabel());
 
         Page.propertiesByKey.values().stream().filter(Property::isAnnotationProperty).forEach(prop -> {
             Object value = prop.getGetter().apply(page);
-            if (null != value) {
+            if (null != value && (null == prop.getDefaultValue() || !value.equals(prop.getDefaultValue()))) {
                 printProperty(prop.getKey(), value);
             }
         });
     }
 
     private void printProperty(final String key, final Object value) {
-        printStream.println("@" + key + " " + value);
+        String valueString = value.toString();
+        if (0 == valueString.trim().length()) return;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("@").append(key).append(" ");
+        if (containsNewline(valueString)) {
+            sb.append("```\n").append(WikiFormat.stripTrailingSpace(valueString)).append("\n```");
+        } else {
+            sb.append(valueString);
+        }
+        printStream.println(sb.toString());
+    }
+
+    private boolean containsNewline(final String text) {
+        return text.contains("\n");
     }
 
     private void indent(final int indent) {

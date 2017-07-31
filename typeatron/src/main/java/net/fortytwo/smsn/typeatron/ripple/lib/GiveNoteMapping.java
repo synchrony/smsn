@@ -17,12 +17,12 @@ import org.openrdf.model.IRI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GiveAtomMapping extends AtomMapping {
+public class GiveNoteMapping extends NoteMapping {
 
-    private static final Logger logger = Logger.getLogger(GiveAtomMapping.class.getName());
+    private static final Logger logger = Logger.getLogger(GiveNoteMapping.class.getName());
     private final TypeatronControl typeatron;
 
-    public GiveAtomMapping(final BrainClient client,
+    public GiveNoteMapping(final BrainClient client,
                            final Filter filter,
                            final TypeatronControl typeatron) {
         super(client, filter);
@@ -31,16 +31,16 @@ public class GiveAtomMapping extends AtomMapping {
 
     public String[] getIdentifiers() {
         return new String[]{
-                SmSnLibrary.NS_2014_12 + "give-atom"
+                SmSnLibrary.NS_2014_12 + "give-note"
         };
     }
 
     public Parameter[] getParameters() {
-        return new Parameter[]{new Parameter("atom", "the reference atom", true)};
+        return new Parameter[]{new Parameter("note", "the reference note", true)};
     }
 
     public String getComment() {
-        return "prepares an atom for the 'give' half of a hand-off gesture";
+        return "prepares a note for the 'give' half of a hand-off gesture";
     }
 
     public void apply(RippleList stack,
@@ -51,7 +51,7 @@ public class GiveAtomMapping extends AtomMapping {
         TreeNode<Link> n = toTree(first, 0, true);
 
         if (null == n) {
-            logger.warning("can't give non-atom: " + first);
+            logger.warning("can't give non-note: " + first);
         } else {
             IRI iri = iriOf(n);
 

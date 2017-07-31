@@ -20,7 +20,7 @@ public abstract class GraphWrapper {
         this.graph = graph;
 
         // TODO: add id strategy
-        add(createExactIndex(SemanticSynchrony.PropertyKeys.ID_V, true));
+        add(createExactIndex(SemanticSynchrony.PropertyKeys.ID, true));
         add(createExactIndex(SemanticSynchrony.PropertyKeys.SHORTCUT, true));
 
         add(createFullTextIndex(SemanticSynchrony.PropertyKeys.TITLE));
@@ -44,9 +44,9 @@ public abstract class GraphWrapper {
     public Vertex createVertex(final String id, final String label) {
         Vertex vertex = graph.addVertex(T.label, label);
         // TODO: use id strategy
-        vertex.property(SemanticSynchrony.PropertyKeys.ID_V, getNonNullId(id));
+        vertex.property(SemanticSynchrony.PropertyKeys.ID, getNonNullId(id));
         // TODO: use auto-indexing
-        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ID_V);
+        updateIndex(vertex, SemanticSynchrony.PropertyKeys.ID);
 
         return vertex;
     }
@@ -56,7 +56,7 @@ public abstract class GraphWrapper {
     }
 
     public Vertex getVertexById(final String id) {
-        return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID_V, id);
+        return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID, id);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByTitle(final String term) {
