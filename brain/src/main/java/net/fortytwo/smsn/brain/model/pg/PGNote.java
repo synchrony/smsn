@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class PGNote extends PGEntity implements Note {
 
@@ -250,5 +251,17 @@ public abstract class PGNote extends PGEntity implements Note {
         if (null != trigger) {
             trigger.accept(this);
         }
+    }
+
+    @Override
+    public String toString() {
+        String id;
+        try {
+            id = Note.getId(this);
+        } catch (IllegalArgumentException e) {
+            Function<PGEntity, String> toString = PGEntity::toString;
+            return toString.apply(this);
+        }
+        return "Note[" + id + "]";
     }
 }

@@ -22,9 +22,9 @@ public class GraphMLReader extends NoteReader {
 
         if (context.getTopicGraph() instanceof PGTopicGraph) {
             // note: no transaction buffering
-            org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader r
+            org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader reader
                     = org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader.build().create();
-            r.readGraph(context.getSourceStream(), ((PGTopicGraph) context.getTopicGraph()).getPropertyGraph());
+            reader.readGraph(context.getSourceStream(), ((PGTopicGraph) context.getTopicGraph()).getPropertyGraph());
         } else {
             throw new UnsupportedOperationException("GraphML I/O is not supported for this graph");
         }
@@ -33,9 +33,9 @@ public class GraphMLReader extends NoteReader {
     }
 
     private void addAllToIndices(TopicGraph destGraph) {
-        for (Note a : destGraph.getAllNotes()) {
-            String value = Note.getTitle(a);
-            if (null != value) destGraph.reindex(a);
+        for (Note note : destGraph.getAllNotes()) {
+            String title = Note.getTitle(note);
+            if (null != title) destGraph.reindex(note);
         }
     }
 }

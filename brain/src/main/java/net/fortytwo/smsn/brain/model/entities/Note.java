@@ -24,7 +24,7 @@ public interface Note extends Entity {
                         .build(),
                 new Property.Builder<Note, Long>()
                         .key(SemanticSynchrony.PropertyKeys.CREATED)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .isSettable(false)
                         .getter(Note::getCreated)
                         .setter(Note::setCreated)
@@ -32,7 +32,7 @@ public interface Note extends Entity {
                         .build(),
                 new Property.Builder<Note, String>()
                         .key(SemanticSynchrony.PropertyKeys.ID)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .isSettable(false)
                         .isAnnotationProperty(false)
                         .getter(Note::getId)
@@ -41,7 +41,7 @@ public interface Note extends Entity {
                         .build(),
                 new Property.Builder<Note, Float>()
                         .key(SemanticSynchrony.PropertyKeys.PRIORITY)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .getter(Note::getPriority)
                         .setter(Note::setPriority)
                         .fromString(Float::valueOf)
@@ -49,7 +49,7 @@ public interface Note extends Entity {
                         .build(),
                 new Property.Builder<Note, Role>()
                         .key(SemanticSynchrony.PropertyKeys.ROLE)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .getter(Note::getRole)
                         .setter(Note::setRole)
                         .fromString(Role::valueOf)
@@ -63,7 +63,7 @@ public interface Note extends Entity {
                         .build(),
                 new Property.Builder<Note, String>()
                         .key(SemanticSynchrony.PropertyKeys.SOURCE)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .getter(Note::getSource)
                         .setter(Note::setSource)
                         .fromString(s -> s)
@@ -77,14 +77,14 @@ public interface Note extends Entity {
                         .build(),
                 new Property.Builder<Note, String>()
                         .key(SemanticSynchrony.PropertyKeys.TITLE)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .getter(Note::getTitle)
                         .setter(Note::setTitle)
                         .fromString(s -> s)
                         .build(),
                 new Property.Builder<Note, Float>()
                         .key(SemanticSynchrony.PropertyKeys.WEIGHT)
-                        .isRequired(true)
+                        //.isRequired(true) RESTORE ME
                         .getter(Note::getWeight)
                         .setter(Note::setWeight)
                         .fromString(Float::valueOf)
