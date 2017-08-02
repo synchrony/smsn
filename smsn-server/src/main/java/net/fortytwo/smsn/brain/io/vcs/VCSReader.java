@@ -74,7 +74,11 @@ public class VCSReader extends NoteReader {
     private void readPage(final File file, final Helper helper, final DataSource source) throws IOException {
         Page page;
         try (InputStream in = new FileInputStream(file)) {
-            page = reader.parse(in);
+            try {
+                page = reader.parse(in);
+            } catch (IOException e) {
+                throw new IOException("parse error in VCS file " + file, e);
+            }
             String rootId = idFromFileName(file);
             Note root = helper.resolveNoteReference(rootId);
 
