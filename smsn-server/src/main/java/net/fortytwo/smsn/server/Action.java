@@ -11,13 +11,12 @@ import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
+import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
@@ -101,7 +100,7 @@ public abstract class Action {
         logActivity(context);
     }
 
-    protected void addView(final TreeNode<Link> view,
+    protected void addView(final Note view,
                            final ActionContext context) throws IOException {
         JSONObject json = context.getJsonPrinter().toJson(view);
 
@@ -156,7 +155,7 @@ public abstract class Action {
     }
 
     private static void setIO(final ActionContext context) {
-        context.setQueries(new TreeViews(context.getBrain()));
+        context.setModel(new Model(context.getBrain()));
         context.setWikiParser(new WikiParser());
         context.setJsonParser(new JsonParser());
         context.setJsonPrinter(new JsonPrinter());
@@ -174,5 +173,17 @@ public abstract class Action {
     protected <T> T notNull(T object) {
         Preconditions.checkNotNull(object, "action is missing a required field");
         return object;
+    }
+
+    protected void logUpdateOperation(final ActionContext context, final Topic topic) {
+        if (null != context.getBrain().getActivityLog()) {
+            context.getBrain().getActivityLog().logUpdate(topic);
+        }
+    }
+
+    protected void logViewOperation(final ActionContext context, final Topic topic) {
+        if (null != context.getBrain().getActivityLog()) {
+            context.getBrain().getActivityLog().logView(topic);
+        }
     }
 }

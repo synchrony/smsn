@@ -22,9 +22,9 @@ public class ListDiff {
         return result;
     }
 
-    public static String toString(List<String> l) {
+    public static String toString(List<String> list) {
         StringBuilder sb = new StringBuilder();
-        l.forEach(sb::append);
+        list.forEach(sb::append);
 
         return sb.toString();
     }

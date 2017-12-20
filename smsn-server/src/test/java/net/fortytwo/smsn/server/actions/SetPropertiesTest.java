@@ -19,13 +19,13 @@ public class SetPropertiesTest extends ActionTestBase {
 
         topicGraph.begin();
         note = createNoteWithTitle("before");
-        Note.setText(note, "the page");
+        note.setText("the page");
         assertEquals(1, countNotes());
         topicGraph.commit();
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals("before", Note.getTitle(note));
-        assertEquals("the page", Note.getText(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals("before", note.getLabel());
+        assertEquals("the page", note.getText());
 
         assertEquals(1, countNotes());
     }
@@ -35,13 +35,13 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(Note.getId(note));
-        action.setName(SemanticSynchrony.PropertyKeys.TITLE);
+        action.setName(SemanticSynchrony.PropertyKeys.LABEL);
         action.setValue("after");
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals("after", Note.getTitle(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals("after", note.getLabel());
     }
 
     @Test(expected = RequestProcessingException.class)
@@ -49,7 +49,7 @@ public class SetPropertiesTest extends ActionTestBase {
 
         SetProperties action = new SetProperties();
         action.setId(Note.getId(note));
-        action.setName(SemanticSynchrony.PropertyKeys.TITLE);
+        action.setName(SemanticSynchrony.PropertyKeys.LABEL);
         action.setValue("  \n");
 
         perform(action);
@@ -65,8 +65,8 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals("after", Note.getText(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals("after", note.getText());
     }
 
     @Test
@@ -79,19 +79,19 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertNull(Note.getText(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertNull(note.getText());
     }
 
     @Test
     public void weightIsSetCorrectly() throws Exception {
         topicGraph.begin();
         Note note = createNoteWithTitle("test");
-        Note.setWeight(note, 0.25f);
+        note.setWeight(0.25f);
         topicGraph.commit();
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals(0.25f, Note.getWeight(note), 0.0f);
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals(0.25f, note.getWeight(), 0.0f);
 
         SetProperties action = createAction();
         action.setId(Note.getId(note));
@@ -100,19 +100,19 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals(0.5f, Note.getWeight(note), 0.0f);
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals(0.5f, note.getWeight(), 0.0f);
     }
 
     @Test
     public void sourceIsSetCorrectly() throws Exception {
         topicGraph.begin();
         Note note = createNoteWithTitle("test");
-        Note.setSource(note, DefaultSources.PRIVATE);
+        note.setSource(DefaultSources.PRIVATE);
         topicGraph.commit();
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals(DefaultSources.PRIVATE, Note.getSource(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals(DefaultSources.PRIVATE, note.getSource());
 
         SetProperties action = createAction();
         action.setId(Note.getId(note));
@@ -121,19 +121,19 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals(DefaultSources.PERSONAL, Note.getSource(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals(DefaultSources.PERSONAL, note.getSource());
     }
 
     @Test
     public void priorityIsSetCorrectly() throws Exception {
         topicGraph.begin();
         Note note = createNoteWithTitle("test");
-        Note.setPriority(note, 0.25f);
+        note.setPriority(0.25f);
         topicGraph.commit();
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals(0.25f, Note.getPriority(note), 0.0f);
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals(0.25f, note.getPriority(), 0.0f);
 
         SetProperties action = createAction();
         action.setId(Note.getId(note));
@@ -142,8 +142,8 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals(0.5f, Note.getPriority(note), 0.0f);
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals(0.5f, note.getPriority(), 0.0f);
     }
 
     @Test
@@ -152,8 +152,8 @@ public class SetPropertiesTest extends ActionTestBase {
         Note note = createNoteWithTitle("test");
         topicGraph.commit();
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertNull(Note.getShortcut(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertNull(note.getShortcut());
 
         SetProperties action = createAction();
         action.setId(Note.getId(note));
@@ -162,8 +162,8 @@ public class SetPropertiesTest extends ActionTestBase {
 
         perform(action);
 
-        note = topicGraph.getNoteById(Note.getId(note)).get();
-        assertEquals("after", Note.getShortcut(note));
+        note = topicGraph.getTopicById(Note.getId(note)).get();
+        assertEquals("after", note.getShortcut());
     }
 
     private SetProperties createAction() {

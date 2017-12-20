@@ -2,8 +2,10 @@ package net.fortytwo.smsn.brain.model.pg;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
+import net.fortytwo.smsn.brain.model.entities.Entity;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
@@ -61,60 +63,50 @@ abstract class PGEntity {
         return value;
     }
 
-    private <T> boolean setProperty(String name, T value) {
+    private <T> void setProperty(String name, T value) {
         Object previousValue = vertex.property(name);
 
         if (null == value) {
-            if (null == previousValue) {
-                return false;
-            } else {
+            if (null != previousValue) {
                 vertex.property(name).remove();
-                return true;
             }
         } else {
             if (null == previousValue || !value.equals(previousValue)) {
                 vertex.property(name, value);
-                return true;
-            } else {
-                return false;
             }
         }
     }
 
-    protected boolean setOptionalProperty(String name, Object value) {
-        return setProperty(name, value);
+    protected void setOptionalProperty(String name, Object value) {
+        setProperty(name, value);
     }
 
-    protected boolean setRequiredProperty(String name, Object value) {
+    protected void setRequiredProperty(String name, Object value) {
         if (null == value) {
             throw new IllegalArgumentException("can't clear required property '" + name
                     + "' on " + this);
         }
 
-        return setProperty(name, value);
+        setProperty(name, value);
     }
 
-    protected boolean setRequiredEntity(final String label, final Object other) {
-        return setEntity(label, other, true);
+    protected void setRequiredEntity(final String label, final Entity other) {
+        setEntity(label, other, true);
     }
 
-    protected boolean setOptionalEntity(final String label, final Object other) {
-        return setEntity(label, other, false);
+    protected void setOptionalEntity(final String label, final Entity other) {
+        setEntity(label, other, false);
     }
 
-    private boolean setEntity(final String label, final Object other, final boolean required) {
+    private void setEntity(final String label, final Entity other, final boolean required) {
         Preconditions.checkArgument(!required || null != other);
 
-        boolean changed = removeEdge(label, Direction.OUT);
-        if (null != other) {
+        if (null == other) {
+            removeEdges(label, Direction.OUT);
+        } else {
+            // note: uniqueness of edges is not guaranteed
             addOutEdge(((PGEntity) other).asVertex(), label);
-            changed = true;
         }
-        return changed;
-    }
-
-    protected void forAllVertices(final String label, final Direction direction, final Consumer<Vertex> consumer) {
-        vertex.vertices(direction, label).forEachRemaining(consumer);
     }
 
     private Vertex getAtMostOneVertex(final String label, final Direction direction) {
@@ -135,6 +127,11 @@ abstract class PGEntity {
             final String label, final Direction direction, final Function<Vertex, T> constructor) {
         Vertex vertex = getAtMostOneVertex(label, direction);
         return null == vertex ? null : constructor.apply(vertex);
+    }
+
+    protected <T> Iterator<T> getEntities(
+            final String label, final Direction direction, final Function<Vertex, T> constructor) {
+        return mapIterator(getVertices(asVertex(), label, direction), constructor);
     }
 
     private Edge getAtMostOneEdge(final String label, final Direction direction) {
@@ -159,34 +156,24 @@ abstract class PGEntity {
         return other;
     }
 
-    protected void forEachAdjacentVertex(final String label, Direction direction, Consumer<Vertex> consumer) {
-        vertex.vertices(direction, label).forEachRemaining(consumer);
+    protected void forEachAdjacentVertex(final String label, Direction direction, Consumer<Vertex> visitor) {
+        vertex.vertices(direction, label).forEachRemaining(visitor);
     }
 
     protected boolean hasAdjacentVertex(final String label, Direction direction) {
         return vertex.vertices(direction, label).hasNext();
     }
 
-    protected boolean removeEdge(final String label, Direction direction) {
-        final Mutable<Boolean> changed = new Mutable<>(false);
-        asVertex().edges(direction, label).forEachRemaining(
-                edge -> {
-                    edge.remove();
-                    changed.value = true;
-                });
-        return changed.value;
+    protected void removeEdges(final String label, Direction direction) {
+        asVertex().edges(direction, label).forEachRemaining(Element::remove);
     }
 
     protected void destroyInternal() {
         vertex.remove();
     }
 
-    private static class Mutable<T> {
-        public T value;
-
-        public Mutable(T value) {
-            this.value = value;
-        }
+    private Iterator<Vertex> getVertices(final Vertex start, final String label, final Direction direction) {
+        return start.vertices(direction, label);
     }
 
     private Vertex getVertex(final Edge edge, final Direction direction) {
@@ -198,6 +185,20 @@ abstract class PGEntity {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    private <D, R> Iterator<R> mapIterator(final Iterator<D> base, final Function<D, R> mapping) {
+        return new Iterator<R>() {
+            @Override
+            public boolean hasNext() {
+                return base.hasNext();
+            }
+
+            @Override
+            public R next() {
+                return mapping.apply(base.next());
+            }
+        };
     }
 
     @Override

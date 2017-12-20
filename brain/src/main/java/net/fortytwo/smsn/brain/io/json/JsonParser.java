@@ -1,13 +1,10 @@
 package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.PageParser;
-import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.io.NoteParser;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,10 +12,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class JsonParser extends PageParser {
+public class JsonParser extends NoteParser {
 
     @Override
-    public Page parse(final InputStream in) throws IOException {
+    public Note parse(final InputStream in) throws IOException {
         JSONObject json = new JSONObject(in);
         try {
             return parse(json);
@@ -27,51 +24,51 @@ public class JsonParser extends PageParser {
         }
     }
 
-    private Page parse(final JSONObject json) throws JSONException {
-        Page page = PageDTO.createTransitional();
+    private Note parse(final JSONObject json) throws JSONException {
+        NoteDTO note = new NoteDTO();
 
         if (json.has(JsonFormat.Keys.ID)) {
-            TreeViews.setId(page.getContent(), json.getString(JsonFormat.Keys.ID));
+            Model.setTopicId(note, json.getString(JsonFormat.Keys.ID));
         }
-        if (json.has(SemanticSynchrony.PropertyKeys.TITLE)) {
-            TreeViews.setTitle(page.getContent(), json.getString(SemanticSynchrony.PropertyKeys.TITLE));
+        if (json.has(SemanticSynchrony.PropertyKeys.LABEL)) {
+            note.setLabel(json.getString(SemanticSynchrony.PropertyKeys.LABEL));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.ALIAS)) {
-            page.setAlias(json.getString(SemanticSynchrony.PropertyKeys.ALIAS));
+            note.setAlias(json.getString(SemanticSynchrony.PropertyKeys.ALIAS));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.SHORTCUT)) {
-            page.setShortcut(json.getString(SemanticSynchrony.PropertyKeys.SHORTCUT));
+            note.setShortcut(json.getString(SemanticSynchrony.PropertyKeys.SHORTCUT));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.SOURCE)) {
-            page.setSource(json.getString(SemanticSynchrony.PropertyKeys.SOURCE));
+            note.setSource(json.getString(SemanticSynchrony.PropertyKeys.SOURCE));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.WEIGHT)) {
-            page.setWeight((float) json.getDouble(SemanticSynchrony.PropertyKeys.WEIGHT));
+            note.setWeight((float) json.getDouble(SemanticSynchrony.PropertyKeys.WEIGHT));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.PRIORITY)) {
-            page.setPriority((float) json.getDouble(SemanticSynchrony.PropertyKeys.PRIORITY));
+            note.setPriority((float) json.getDouble(SemanticSynchrony.PropertyKeys.PRIORITY));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.CREATED)) {
-            page.setCreated(json.getLong(SemanticSynchrony.PropertyKeys.CREATED));
+            note.setCreated(json.getLong(SemanticSynchrony.PropertyKeys.CREATED));
         }
         if (json.has(JsonFormat.Keys.NUMBER_OF_CHILDREN)) {
-            page.getContent().setNumberOfChildren(json.optInt(JsonFormat.Keys.NUMBER_OF_CHILDREN));
+            note.setNumberOfChildren(json.optInt(JsonFormat.Keys.NUMBER_OF_CHILDREN));
         }
         if (json.has(JsonFormat.Keys.NUMBER_OF_PARENTS)) {
-            page.getContent().setNumberOfParents(json.optInt(JsonFormat.Keys.NUMBER_OF_PARENTS));
+            note.setNumberOfParents(json.optInt(JsonFormat.Keys.NUMBER_OF_PARENTS));
         }
 
         JSONArray a = json.optJSONArray(JsonFormat.Keys.CHILDREN);
         if (null != a) {
-            TreeNode<Link>[] children = new TreeNode[a.length()];
+            Note[] children = new Note[a.length()];
             for (int i = 0; i < a.length(); i++) {
                 JSONObject jc = a.getJSONObject(i);
 
-                children[i] = parse(jc).getContent();
+                children[i] = parse(jc);
             }
-            page.getContent().setChildren(ListNodeDTO.fromArray());
+            Note.setChildren(note, children);
         }
 
-        return page;
+        return note;
     }
 }

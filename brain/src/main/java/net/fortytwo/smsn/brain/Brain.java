@@ -2,7 +2,6 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,8 +27,6 @@ public class Brain {
 
     private final TopicGraph topicGraph;
 
-    private final KnowledgeBase knowledgeBase;
-
     private final ActivityLog activityLog;
 
     private final Priorities priorities;
@@ -38,14 +35,6 @@ public class Brain {
 
     public Brain(final TopicGraph topicGraph) throws BrainException {
         this.topicGraph = topicGraph;
-
-        knowledgeBase = new KnowledgeBase(topicGraph);
-
-        try {
-            knowledgeBase.addDefaultClasses();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new BrainException(e);
-        }
 
         String filePath = SemanticSynchrony.getConfiguration().getActivityLog();
 
@@ -72,16 +61,10 @@ public class Brain {
         if (!RUN_BACKGROUND_TASKS) return;
 
         priorities.refreshQueue(topicGraph);
-
-        knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);
     }
 
     public TopicGraph getTopicGraph() {
         return topicGraph;
-    }
-
-    public KnowledgeBase getKnowledgeBase() {
-        return knowledgeBase;
     }
 
     public ActivityLog getActivityLog() {

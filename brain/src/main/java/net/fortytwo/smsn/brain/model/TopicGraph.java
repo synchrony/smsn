@@ -1,13 +1,9 @@
 package net.fortytwo.smsn.brain.model;
 
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,47 +11,27 @@ import java.util.Optional;
  */
 public interface TopicGraph {
 
-    Iterable<Note> getAllNotes();
+    Optional<Topic> getTopicById(String id);
 
-    Optional<Note> getNoteById(String id);
+    String idOf(Topic topic);
 
-    List<Note> getNotesByAcronym(String acronym, Filter filter);
-
-    List<Note> getNotesByShortcut(String shortcut, Filter filter);
-
-    List<Note> getNotesByTitleQuery(String value, Filter filter);
-
-    String idOf(Note a);
-
-    String iriOf(Note a);
+    String iriOf(Topic topic);
 
     Topic createTopic(String id);
 
-    Page createPage(Link root);
+    Iterable<Note> getAllNotes();
 
-    Link createLink(Topic target, String label, Role role);
+    Iterable<Note> getNotesByAcronym(String acronym, Filter filter);
 
-    TreeNode<Link> createTopicTree(Link link);
+    Iterable<Note> getNotesByShortcut(String shortcut, Filter filter);
 
-    Note createNote(String id);
+    Iterable<Note> getNotesByTitleQuery(String value, Filter filter);
 
-    Note createNoteWithProperties(Filter filter, String id);
+    Note createNote(Topic topic, String label, Role role);
 
-    ListNode<Link> toList(Link... elements);
-
-    ListNode<Topic> toList(Topic... elements);
-
-    ListNode<TreeNode<Link>> toList(TreeNode<Link>... elements);
-
-    ListNode<Note> createListOfNotes(Note... elements);
-
-    void removeIsolatedNotes(Filter filter);
-
-    void notifyOfUpdate();
+    Note createNoteWithProperties(Filter filter, Topic topic);
 
     void reindex(Note a);
-
-    long getLastUpdate();
 
     void begin();
 

@@ -1,16 +1,14 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.config.DataSource;
 import org.parboiled.common.Preconditions;
 
@@ -21,8 +19,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public class VCSReader extends NoteReader {
 
@@ -56,8 +53,8 @@ public class VCSReader extends NoteReader {
         if (null != files) {
             for (File file : files) {
                 try {
-                    if (VCSFormat.isSmSnFile(file)) {
-                        readPage(file, helper, dataSource);
+                    if (VCSFormat.isDataFile(file)) {
+                        readDataFile(file, helper, dataSource);
                     }
                 } catch (IOException e) {
                     throw new IOException("failed to load file " + file.getAbsolutePath(), e);
@@ -71,114 +68,116 @@ public class VCSReader extends NoteReader {
         return fileName.substring(0, fileName.indexOf("."));
     }
 
-    private void readPage(final File file, final Helper helper, final DataSource source) throws IOException {
-        Page page;
-        try (InputStream in = new FileInputStream(file)) {
-            try {
-                page = reader.parse(in);
-            } catch (IOException e) {
-                throw new IOException("parse error in VCS file " + file, e);
-            }
+    private void readDataFile(final File file, final Helper helper, final DataSource source) throws IOException {
+        forDataFile(file, source, sourceNote -> {
             String rootId = idFromFileName(file);
-            Note root = helper.resolveNoteReference(rootId);
-
-            for (TreeNode<Link> note : TreeViews.getChildrenAsList(page.getContent())) {
-                String id = TreeViews.getId(note);
-                Preconditions.checkNotNull(id);
-            }
-            page.setSource(source.getName());
-            helper.setNote(root);
-            helper.setPage(page);
+            Note destNote = helper.getOrCreateTopicRootForSource(rootId, source);
+            helper.setFromNote(destNote);
+            helper.setToNote(sourceNote);
             helper.updateNote();
 
             checkAndCommit(helper.context.getTopicGraph());
+        });
+    }
+
+    private void forDataFile(final File file, final DataSource source, final Consumer<Note> consumer)
+            throws IOException {
+        try (InputStream in = new FileInputStream(file)) {
+            Note note;
+            try {
+                note = reader.parse(in);
+            } catch (IOException e) {
+                throw new IOException("parse error in VCS file " + file, e);
+            }
+
+            Note.forAllChildren(note, this::checkHasTopic);
+            note.setSource(source.getName());
+
+            consumer.accept(note);
         }
+    }
+
+    private void checkHasTopic(final Note note) {
+        Topic topic = note.getTopic();
+        Preconditions.checkNotNull(topic);
     }
 
     private class Helper {
         private final Context context;
-        private Note note;
-        private Page page;
+        private Note fromNote;
+        private Note toNote;
 
         private Helper(Context context) {
             this.context = context;
         }
 
-        public void setNote(Note note) {
-            this.note = note;
+        public void setFromNote(Note fromNote) {
+            this.fromNote = fromNote;
         }
 
-        public void setPage(Page page) {
-            this.page = page;
+        public void setToNote(Note toNote) {
+            this.toNote = toNote;
         }
 
         private void updateNote() {
             updateNoteProperties();
-            updateNoteChildren();
+            updateChildren();
         }
 
         private void updateNoteProperties() {
-            updatePageProperty(note, page, p -> page.getCreated(), Note::setCreated);
-            updatePageProperty(note, page, p -> page.getText(), Note::setText);
-            updatePageProperty(note, page, p -> page.getAlias(), Note::setAlias);
-            updatePageProperty(note, page, p -> page.getPriority(), Note::setPriority);
-            updatePageProperty(note, page, p -> page.getSource(), Note::setSource);
-            updatePageProperty(note, page, p -> page.getShortcut(), Note::setShortcut);
-            updatePageProperty(note, page, p -> page.getText(), Note::setText);
-            updatePageProperty(note, page, p -> page.getWeight(), Note::setWeight);
-
-            TreeNode<Link> tree = page.getContent();
-            updateTreeProperty(note, tree, TreeViews::getTitle, Note::setTitle);
+            Note.copyProperties(fromNote, toNote);
         }
 
-        private void updateNoteChildren() {
-            Optional<ListNode<Note>> newChildren = createNoteList();
-            if (newChildren.isPresent()) {
-                note.setChildren(newChildren.get());
-            }
+        private void updateChildren() {
+            context.getModel().view()
+                    .root(toNote).height(1).filter(Filter.noFilter()).style(ViewStyle.Basic.Forward.getStyle())
+                    .put(fromNote);
         }
 
-        private <T> void updatePageProperty(final Note note,
-                                            final Page page,
-                                            final Function<Page, T> noteGetter,
-                                            final BiConsumer<Note, T> noteSetter) {
-            T value = noteGetter.apply(page);
-            if (null != value) {
-                noteSetter.accept(note, value);
-            }
-        }
-
-        private <T> void updateTreeProperty(final Note note,
-                                            final TreeNode<Link> node,
-                                            final Function<TreeNode<Link>, T> noteGetter,
-                                            final BiConsumer<Note, T> noteSetter) {
-            T value = noteGetter.apply(node);
-            if (null != value) {
-                noteSetter.accept(note, value);
-            }
-        }
-
-        private Optional<ListNode<Note>> createNoteList() {
-            if (0 == TreeViews.countChildren(page.getContent())) return Optional.empty();
-
-            Note[] notes = new Note[TreeViews.countChildren(page.getContent())];
-            int i = 0;
-            for (TreeNode<Link> child : TreeViews.getChildrenAsList(page.getContent())) {
-                notes[i++] = resolveNoteReference(TreeViews.getId(child));
-            }
-            return Optional.of(context.getTopicGraph().createListOfNotes(notes));
-        }
-
-        private Note resolveNoteReference(final String id) {
-            TopicGraph graph = context.getTopicGraph();
-            Optional<Note> opt = graph.getNoteById(id);
-            Note referenced;
+        private Note getOrCreateTopicRootForSource(final String topicId, final DataSource source) {
+            Mutable<Note> root = new Mutable<>();
+            Optional<Topic> opt = context.getTopicGraph().getTopicById(topicId);
+            Topic topic;
             if (opt.isPresent()) {
-                referenced = opt.get();
+                topic = opt.get();
+                forEachTopicRoot(topic, note -> {
+                    if (note.getSource().equals(source.getName())) {
+                        if (null != root.getValue()) {
+                            throw new InvalidGraphException(
+                                    "multiple roots for topic " + topic.getId() + " in '" + source.getName() + "'");
+                        }
+                        root.setValue(note);
+                    }
+                });
             } else {
-                referenced = graph.createNote(id);
+                topic = context.getTopicGraph().createTopic(topicId);
             }
-            return referenced;
+
+            if (null == root.getValue()) {
+                return context.getTopicGraph().createNote(topic, null, null);
+            } else {
+                return root.getValue();
+            }
+        }
+
+        private void forEachTopicRoot(final Topic topic, final Consumer<Note> consumer) {
+            topic.forEachNote(note -> {
+                if (Note.isRoot(note)) {
+                    consumer.accept(note);
+                }
+            });
+        }
+    }
+
+    private static class Mutable<T> {
+        private T value;
+
+        public T getValue() {
+            return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
         }
     }
 }

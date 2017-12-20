@@ -23,7 +23,7 @@ public abstract class GraphWrapper {
         add(createExactIndex(SemanticSynchrony.PropertyKeys.ID, true));
         add(createExactIndex(SemanticSynchrony.PropertyKeys.SHORTCUT, true));
 
-        add(createFullTextIndex(SemanticSynchrony.PropertyKeys.TITLE));
+        add(createFullTextIndex(SemanticSynchrony.PropertyKeys.LABEL));
         add(createFullTextIndex(SemanticSynchrony.PropertyKeys.ACRONYM));
     }
 
@@ -60,7 +60,7 @@ public abstract class GraphWrapper {
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByTitle(final String term) {
-        return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.TITLE, term);
+        return getVerticesByKeyValue(SemanticSynchrony.PropertyKeys.LABEL, term);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByAcronym(final String acronym) {

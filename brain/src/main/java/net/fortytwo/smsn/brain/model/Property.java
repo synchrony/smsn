@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Property<T, V> {
     private boolean isRequired = false;
@@ -12,6 +13,8 @@ public class Property<T, V> {
     private BiConsumer<T, V> setter;
     private Function<String, V> fromString;
     private V defaultValue;
+    private Class<V> valueClass;
+    private Validator<V> validator;
 
     private Property() {}
 
@@ -43,17 +46,37 @@ public class Property<T, V> {
         return defaultValue;
     }
 
+    public Class<V> getValueClass() {
+        return valueClass;
+    }
+
     public boolean isRequired() {
         return isRequired;
+    }
+
+    public Validator<V> getValidator() {
+        return validator;
+    }
+
+    public interface Validator<V> {
+        void consume(V value) throws IllegalArgumentException;
     }
 
     public static class Builder<T, V> {
         private final Property<T, V> property = new Property<>();
 
+        public Builder(final Class<V> valueClass) {
+            property.valueClass = valueClass;
+        }
+
         public Property<T, V> build() {
             checkIsReady();
-
             return property;
+        }
+
+        public Builder<T, V> validator(final Validator<V> validator) {
+            property.validator = validator;
+            return this;
         }
 
         public Builder<T, V> isRequired(final boolean isRequired) {
@@ -97,6 +120,7 @@ public class Property<T, V> {
         }
 
         private void checkIsReady() {
+            checkNotNull(property.valueClass, "value class");
             checkNotNull(property.key, "property key");
             checkNotNull(property.getter, "getter");
             if (property.isSettable) {

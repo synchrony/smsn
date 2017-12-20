@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,26 +14,12 @@ public class ActivityLog {
         this.out = out;
     }
 
-    public void logCreate(final Note a) {
-        log("create", a);
+    public void logUpdate(final Topic topic) {
+        log("update", topic);
     }
 
-    public void logView(final Note a) {
-        log("view", a);
-    }
-
-    public void logSetProperties(final Note a) {
-        log("set-props", a);
-    }
-
-    public void logLink(final Note tail,
-                        final Note head) {
-        log("link", tail, head);
-    }
-
-    public void logUnlink(final Note tail,
-                          final Note head) {
-        log("unlink", tail, head);
+    public void logView(final Topic topic) {
+        log("view", topic);
     }
 
     public void flush() {
@@ -47,14 +34,14 @@ public class ActivityLog {
         out.close();
     }
 
-    private void log(final String action, final Note... notes) {
+    private void log(final String action, final Topic... topics) {
         try {
             out.append("")
                     .append("").append(String.valueOf(System.currentTimeMillis()))
                     .append("\t").append(action);
 
-            for (Note note : notes) {
-                out.append("\t").append(Note.getId(note));
+            for (Topic topic : topics) {
+                out.append("\t").append(topic.getId());
             }
 
             out.append("\n");

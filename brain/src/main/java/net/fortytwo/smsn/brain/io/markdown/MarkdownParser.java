@@ -1,8 +1,7 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
-import net.fortytwo.smsn.brain.io.PageParser;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.io.NoteParser;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.commonmark.node.Document;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -11,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class MarkdownParser extends PageParser {
+public class MarkdownParser extends NoteParser {
     private boolean verbose;
 
     public void setVerbose(boolean verbose) {
@@ -19,7 +18,7 @@ public class MarkdownParser extends PageParser {
     }
 
     @Override
-    public Page parse(InputStream inputStream) throws IOException {
+    public Note parse(InputStream inputStream) throws IOException {
         Document document = parseToMarkdownDocument(inputStream);
         return parse(document);
     }
@@ -30,11 +29,9 @@ public class MarkdownParser extends PageParser {
         return (Document) document;
     }
 
-    private Page parse(final Document document) {
+    private Note parse(final Document document) {
         MarkdownVisitor visitor = new MarkdownVisitor(verbose);
         document.accept(visitor);
-        Page page = PageDTO.createTransitional();
-        page.setContent(visitor.getRoot());
-        return page;
+        return visitor.getRoot();
     }
 }

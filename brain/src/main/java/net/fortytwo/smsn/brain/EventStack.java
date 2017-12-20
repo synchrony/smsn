@@ -1,10 +1,10 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +19,7 @@ public class EventStack {
 
     private final int capacity;
 
-    private final LinkedList<TreeNode<Link>> stack = new LinkedList<>();
+    private final LinkedList<Note> stack = new LinkedList<>();
 
     private final RoutineNamer personNames = new RoutineNamer("person");
 
@@ -27,7 +27,7 @@ public class EventStack {
         this.capacity = capacity;
     }
 
-    public List<TreeNode<Link>> getEvents() {
+    public List<Note> getEvents() {
         return stack;
     }
 
@@ -35,46 +35,46 @@ public class EventStack {
         stack.clear();
     }
 
-    public TreeNode<Link> createGestureEvent(final String expressedBy,
+    public Note createGestureEvent(final String expressedBy,
                                    final Date recognizedAt) {
         // TODO: use personal knowledge and Linked Data to find the person's name
         // Use this temporary name only if no actual name is discoverable
         String personName = personNames.getRoutineName(expressedBy);
 
-        TreeNode<Link> gesture = TreeNodeDTO.createEmptyNode();
-        TreeViews.setTitle(gesture, personName + " did something");
+        Note gesture = new NoteDTO();
+        gesture.setLabel(personName + " did something");
 
         // note: there will be duplicate people notes in the in-memory graph
-        TreeNode<Link> person = TreeNodeDTO.createEmptyNode();
-        TreeViews.setTitle(person, personName);
-        TreeViews.setAlias(person, expressedBy);
+        Note person = new NoteDTO();
+        person.setLabel(personName);
+        person.setAlias(expressedBy);
 
-        TreeNode<Link> time = TreeNodeDTO.createEmptyNode();
-        TreeViews.setTitle(time, EVENT_TIME_FORMAT.format(recognizedAt));
+        Note time = new NoteDTO();
+        time.setLabel(EVENT_TIME_FORMAT.format(recognizedAt));
 
-        gesture.addChild(person);
-        gesture.addChild(time);
+        gesture.addChild(0, person);
+        gesture.addChild(0, time);
 
         return gesture;
     }
 
-    public void push(final TreeNode<Link> n) {
-        setIds(n);
+    public void push(final Note note) {
+        setIds(note);
 
         while (stack.size() >= capacity) {
             stack.removeLast();
         }
 
-        stack.push(n);
+        stack.push(note);
     }
 
     // make the note look like it came from a graph (so it is compatible with Brain-mode views) by giving it an ID
-    private void setIds(final TreeNode<Link> n) {
-        if (null == TreeViews.getId(n)) {
-            TreeViews.setId(n, SemanticSynchrony.createRandomId());
+    private void setIds(final Note note) {
+        if (null == Model.getTopicId(note)) {
+            Model.setTopicId(note, SemanticSynchrony.createRandomId());
         }
 
-        TreeViews.getChildrenAsList(n).forEach(this::setIds);
+        ListNode.toJavaList(note.getFirst()).forEach(this::setIds);
     }
 
     // note: instances of this class currently grow without bound
@@ -89,11 +89,7 @@ public class EventStack {
         }
 
         public String getRoutineName(final String longName) {
-            Long number = numberByName.get(longName);
-            if (null == number) {
-                number = ++count;
-                numberByName.put(longName, number);
-            }
+            Long number = numberByName.computeIfAbsent(longName, k -> ++count);
 
             return type + " " + number;
         }

@@ -1,8 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -18,13 +17,13 @@ public class Search extends BasicViewAction {
     @NotNull
     private String query;
     @NotNull
-    private TreeViews.QueryType queryType;
+    private Model.QueryType queryType;
 
     private String getQuery() {
         return notNull(query);
     }
 
-    private TreeViews.QueryType getQueryType() {
+    private Model.QueryType getQueryType() {
         return notNull(queryType);
     }
 
@@ -37,7 +36,7 @@ public class Search extends BasicViewAction {
         this.query = query;
     }
 
-    public void setQueryType(TreeViews.QueryType queryType) {
+    public void setQueryType(Model.QueryType queryType) {
         this.queryType = queryType;
     }
 
@@ -52,7 +51,7 @@ public class Search extends BasicViewAction {
         params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
         try {
-            if (!getQueryType().equals(TreeViews.QueryType.Ripple)) {
+            if (!getQueryType().equals(Model.QueryType.Ripple)) {
                 addSearchResults(params);
             }
         } catch (IOException e) {
@@ -73,7 +72,7 @@ public class Search extends BasicViewAction {
     }
 
     private void addSearchResults(final ActionContext params) throws IOException {
-        TreeNode<Link> tree = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
+        Note tree = params.getModel().search(getQueryType(), getQuery(), height, getFilter(), style);
         addView(tree, params);
     }
 }

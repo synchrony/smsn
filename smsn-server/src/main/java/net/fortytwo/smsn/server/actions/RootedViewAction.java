@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.server.ActionContext;
 
 import javax.validation.constraints.NotNull;

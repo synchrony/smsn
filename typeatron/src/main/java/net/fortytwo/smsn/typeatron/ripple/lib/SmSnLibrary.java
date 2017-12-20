@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.smsn.typeatron.ripple.TreeType;
+import net.fortytwo.smsn.typeatron.ripple.NoteType;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.Library;
 import net.fortytwo.ripple.model.LibraryLoader;
@@ -14,7 +14,7 @@ public class SmSnLibrary extends Library {
 
     public void load(LibraryLoader.Context context) throws RippleException {
         Model model = context.getModelConnection().getModel();
-        model.register(new TreeType());
+        model.register(new NoteType());
 
         // note: primitives are currently registered in TypeatronDictionaryMapping
     }

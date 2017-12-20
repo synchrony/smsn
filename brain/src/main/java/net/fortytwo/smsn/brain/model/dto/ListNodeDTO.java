@@ -4,9 +4,14 @@ import net.fortytwo.smsn.brain.model.entities.ListNode;
 
 import java.util.function.BiFunction;
 
+// TODO: make abstract
 public class ListNodeDTO<T> implements ListNode<T> {
     private T first;
     private ListNode<T> rest;
+
+    public ListNodeDTO() {
+        this(null, null);
+    }
 
     public ListNodeDTO(final T first, final ListNode<T> rest) {
         this.first = first;

@@ -6,9 +6,7 @@ import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
@@ -48,7 +46,7 @@ public class GiveNoteMapping extends NoteMapping {
                       final ModelConnection mc) throws RippleException {
 
         Object first = stack.getFirst();
-        TreeNode<Link> n = toTree(first, 0, true);
+        Note n = toTree(first, 0, true);
 
         if (null == n) {
             logger.warning("can't give non-note: " + first);
@@ -56,7 +54,7 @@ public class GiveNoteMapping extends NoteMapping {
             IRI iri = iriOf(n);
 
             // value is informational; it is used only for development/debugging purposes
-            String value = TreeViews.getTitle(n);
+            String value = n.getLabel();
 
             logger.log(Level.INFO, "preparing to give " + iri + " (" + value + ")");
 

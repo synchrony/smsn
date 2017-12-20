@@ -24,7 +24,7 @@ public class FilterTest extends BrainTestBase {
         Filter filter = Filter.noFilter();
 
         Note note = createNote("public", 0.75f);
-        Note.setTitle(note, null);
+        note.setLabel(null);
         assertTrue(filter.test(note));
     }
 
@@ -62,8 +62,8 @@ public class FilterTest extends BrainTestBase {
 
     private Note createNote(final String source, final Float weight) {
         Note note = new NoteDTO();
-        Note.setSource(note, source);
-        Note.setWeight(note, weight);
+        note.setSource(source);
+        note.setWeight(weight);
         return note;
     }
 

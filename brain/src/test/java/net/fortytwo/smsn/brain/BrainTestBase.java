@@ -4,20 +4,16 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.dto.LinkDTO;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.config.DataSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -28,11 +24,13 @@ import org.junit.Before;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public abstract class BrainTestBase {
@@ -55,7 +53,7 @@ public abstract class BrainTestBase {
                 UNIVERSAL = "universal";
     }
 
-    protected TreeViews queries;
+    protected Model model;
     protected TopicGraph topicGraph;
     protected final WikiParser wikiParser = new WikiParser();
 
@@ -64,13 +62,13 @@ public abstract class BrainTestBase {
     protected GraphWrapper graphWrapper;
     protected Filter filter = Filter.noFilter();
     protected final ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
-    protected Collection<Note> queryResult;
+    protected Iterable<Note> queryResult;
 
     @Before
     public void setUp() throws Exception {
         topicGraph = createTopicGraph();
         brain = new Brain(topicGraph);
-        queries = new TreeViews(brain);
+        model = new Model(brain);
         filter = Filter.noFilter();
 
         arthurTopic = createTopic(ARTHUR_ID);
@@ -108,23 +106,24 @@ public abstract class BrainTestBase {
         return new PGTopicGraph(graphWrapper);
     }
 
-    protected TreeNode<Link> importNodeFromFile(final String exampleFile) throws IOException {
-        return parseToTree(Brain.class.getResourceAsStream(exampleFile));
+    protected Note importNodeFromFile(final String exampleFile) throws IOException {
+        return parseToNote(Brain.class.getResourceAsStream(exampleFile));
     }
 
     protected Note importNoteFromFile(final String exampleFile) throws IOException {
         Filter writeFilter = new Filter(0f, 0.5f, DefaultSources.PRIVATE, DefaultSources.PERSONAL);
         ViewStyle style = ViewStyle.Basic.Forward.getStyle();
 
-        TreeNode<Link> rootNode = importNodeFromFile(exampleFile);
-        TreeViews.setId(rootNode, SemanticSynchrony.createRandomId());
-        Note root = topicGraph.createNoteWithProperties(writeFilter, TreeViews.getId(rootNode));
-        queries.update(rootNode, 5, writeFilter, style);
+        Note rootNode = importNodeFromFile(exampleFile);
+        Model.setTopicId(rootNode, SemanticSynchrony.createRandomId());
+        Note root = topicGraph.createNoteWithProperties(writeFilter, rootNode.getTopic());
+        model.view().root(root).height(5).filter(writeFilter).style(style).put(rootNode);
         return root;
     }
 
     protected Note createNote(final String id) {
-        return topicGraph.createNoteWithProperties(filter, id );
+        Topic topic = topicGraph.createTopic(id);
+        return topicGraph.createNoteWithProperties(filter, topic);
     }
 
     protected Note createNote() {
@@ -135,9 +134,10 @@ public abstract class BrainTestBase {
         return createNote(null, title);
     }
 
-    protected Note createNote(final String id, final String title) {
-        Note note = topicGraph.createNoteWithProperties(filter, id);
-        Note.setTitle(note, title);
+    protected Note createNote(final String topicId, final String label) {
+        Topic topic = topicGraph.createTopic(topicId);
+        Note note = topicGraph.createNoteWithProperties(filter, topic);
+        note.setLabel(label);
         return note;
     }
 
@@ -151,14 +151,12 @@ public abstract class BrainTestBase {
         return topic;
     }
 
-    protected TreeNode<Link> createTreeDTO(final String topicId, final String label) {
+    protected Note createNoteDTO(final String topicId, final String label) {
         Topic topic = createTopicDTO(topicId);
-        Link link = new LinkDTO();
-        link.setTarget(topic);
-        link.setLabel(label);
-        TreeNode<Link> tree = new TreeNodeDTO<>();
-        tree.setValue(link);
-        return tree;
+        Note note = new NoteDTO();
+        note.setTopic(topic);
+        note.setLabel(label);
+        return note;
     }
 
     protected int countNotes(final TopicGraph graph) {
@@ -174,7 +172,7 @@ public abstract class BrainTestBase {
     }
 
     protected static List<Note> childList(final Note note) {
-        return ListNode.toJavaList(note.getChildren());
+        return ListNode.toJavaList(note.getFirst());
     }
 
     protected File createTempDirectory() throws IOException {
@@ -188,31 +186,12 @@ public abstract class BrainTestBase {
         return file;
     }
 
-
-    protected TreeNode<Link> parseToTree(final String s) throws IOException {
-        return parseToPage(s).getContent();
+    protected Note parseToNote(final String input) throws IOException {
+        return wikiParser.parse(input);
     }
 
-    protected TreeNode<Link> parseToTree(final InputStream in) throws IOException {
-        return parseToPage(in).getContent();
-    }
-
-    protected void setContent(final Page page) {
-        page.setSource(parserSource);
-        page.getContent().getValue().setLabel(parserLabel);
-        page.getContent().getValue().getTarget().setId(parserTopicId);
-    }
-
-    protected Page parseToPage(final String input) throws IOException {
-        Page page = wikiParser.parse(input);
-        setContent(page);
-        return page;
-    }
-
-    protected Page parseToPage(final InputStream input) throws IOException {
-        Page page = wikiParser.parse(input);
-        setContent(page);
-        return page;
+    protected Note parseToNote(final InputStream input) throws IOException {
+        return wikiParser.parse(input);
     }
 
     protected void assertNodesEqual(final Note a,
@@ -220,24 +199,53 @@ public abstract class BrainTestBase {
         String[] actual = new String[(int) countChildren(a)];
 
         int i = 0;
-        ListNode<Note> cur = a.getChildren();
+        ListNode<Note> cur = a.getFirst();
         while (null != cur) {
-            actual[i++] = Note.getTitle(cur.getFirst());
+            actual[i++] = cur.getFirst().getLabel();
             cur = cur.getRest();
         }
 
         assertArrayEquals(expected, actual);
     }
 
+    protected int count(final Iterable iter) {
+        return count(iter.iterator());
+    }
+
+    protected int count(final Iterator iter) {
+        int count = 0;
+        while (iter.hasNext()) {
+            iter.next();
+            count++;
+        }
+        return count;
+    }
+
     protected long countChildren(final Note a) {
-        ListNode<Note> children = a.getChildren();
+        ListNode<Note> children = a.getFirst();
         return null == children ? 0 : ListNode.toJavaList(children).size();
     }
 
-    protected void assertChildCount(final int expected, final TreeNode<Link> node) {
-        ListNode<TreeNode<Link>> children = node.getChildren();
+    protected void assertChildCount(final int expected, final Note note) {
+        Note children = note.getFirst();
         int actual = null == children ? 0 : children.length();
         assertEquals(expected, actual);
+    }
+
+    protected Note getNote(final String topicId) {
+        Optional<Topic> opt = topicGraph.getTopicById(topicId);
+        return opt.map(this::getNote).orElse(null);
+    }
+
+    protected Note getNote(final Topic topic) {
+        Iterator<Note> iter = topic.getNotes();
+        if (iter.hasNext()) {
+            Note result = iter.next();
+            assertFalse("more than one note for topic " + topic, iter.hasNext());
+            return result;
+        } else {
+            return null;
+        }
     }
 
     protected File createVCSTestDirectory() throws IOException {

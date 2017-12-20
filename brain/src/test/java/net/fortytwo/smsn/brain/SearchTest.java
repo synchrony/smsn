@@ -1,11 +1,9 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.junit.Test;
 
@@ -32,9 +30,9 @@ public class SearchTest extends BrainTestBase {
         createNote(ARTHUR_ID, "Arthur Dent");
         createNote(FORD_ID, "Ford");
 
-        TreeNode<Link> results = search("Arthur");
+        Note results = search("Arthur");
         assertChildCount(1, results);
-        assertEquals(ARTHUR_ID, TreeViews.getId(results.getChildren().get(0)));
+        assertEquals(ARTHUR_ID, Model.getTopicId(results.getFirst().get(0)));
     }
 
     @Test
@@ -56,10 +54,10 @@ public class SearchTest extends BrainTestBase {
         createNoteWithTitle("Arthur");
         createNoteWithTitle("Arthur Dent");
 
-        TreeNode<Link> results = search("arthur");
+        Note results = search("arthur");
         assertChildCount(2, results);
-        assertEquals("Arthur", TreeViews.getTitle(results.getChildren().get(0)));
-        assertEquals("Arthur Dent", TreeViews.getTitle(results.getChildren().get(1)));
+        assertEquals("Arthur", results.getFirst().get(0).getLabel());
+        assertEquals("Arthur Dent", results.getFirst().get(1).getLabel());
     }
 
     @Test
@@ -67,15 +65,15 @@ public class SearchTest extends BrainTestBase {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
             Note a = createNoteWithTitle("Lintilla");
-            Note.setWeight(a, random.nextFloat());
+            a.setWeight(random.nextFloat());
         }
 
-        TreeNode<Link> results = search("Lintilla");
+        Note results = search("Lintilla");
         assertChildCount(10, results);
         float lastWeight = 1f;
-        for (TreeNode<Link> result : ListNode.toJavaList(results.getChildren())) {
-            assertEquals("Lintilla", TreeViews.getTitle(result));
-            float weight = TreeViews.getWeight(result);
+        for (Note result : ListNode.toJavaList(results.getFirst())) {
+            assertEquals("Lintilla", result.getLabel());
+            float weight = result.getWeight();
             assertTrue(weight <= lastWeight);
             lastWeight = weight;
         }
@@ -87,22 +85,22 @@ public class SearchTest extends BrainTestBase {
         for (int i = 0; i < 10; i++) {
             Note a = createNoteWithTitle("Lintilla");
             if (random.nextBoolean()) {
-                Note.setPriority(a, random.nextFloat());
+                a.setPriority(random.nextFloat());
             }
         }
 
-        TreeNode<Link> results = search("Lintilla");
+        Note results = search("Lintilla");
         assertChildCount(10, results);
         float lastPriority = 1f;
-        for (TreeNode<Link> result : ListNode.toJavaList(results.getChildren())) {
-            assertEquals("Lintilla", TreeViews.getTitle(result));
-            float priority = null == TreeViews.getPriority(result) ? 0f : TreeViews.getPriority(result);
+        for (Note result : ListNode.toJavaList(results.getFirst())) {
+            assertEquals("Lintilla", result.getLabel());
+            float priority = null == result.getPriority() ? 0f : result.getPriority();
             assertTrue(priority <= lastPriority);
             lastPriority = priority;
         }
     }
 
-    private TreeNode<Link> search(final String query) {
-        return queries.search(TreeViews.QueryType.FullText, query, 1, filter, ViewStyle.Basic.Forward.getStyle());
+    private Note search(final String query) {
+        return model.search(Model.QueryType.FullText, query, 1, filter, ViewStyle.Basic.Forward.getStyle());
     }
 }

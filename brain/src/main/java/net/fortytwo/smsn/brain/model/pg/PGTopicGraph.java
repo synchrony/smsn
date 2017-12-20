@@ -5,16 +5,11 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Entity;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
-import org.apache.tinkerpop.gremlin.structure.Direction;
-import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -25,6 +20,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -35,12 +32,8 @@ public class PGTopicGraph implements TopicGraph {
 
     private static final String REDACTED_VALUE = "";
 
-    private static final String thingNamespace = SemanticSynchrony.getConfiguration().getThingNamespace();
-
     private final GraphWrapper wrapper;
     private final Graph propertyGraph;
-
-    private long lastUpdate;
 
     public PGTopicGraph(final GraphWrapper wrapper) {
         this.wrapper = wrapper;
@@ -49,24 +42,6 @@ public class PGTopicGraph implements TopicGraph {
 
     public Graph getPropertyGraph() {
         return propertyGraph;
-    }
-
-    public String idOf(final Note a) {
-        return Note.getId(a);
-    }
-
-    // TODO: move me
-    public static String iriForId(final String id) {
-        return thingNamespace + id;
-    }
-
-    public String iriOf(final Note a) {
-        return iriForId(idOf(a));
-    }
-
-    @Override
-    public long getLastUpdate() {
-        return lastUpdate;
     }
 
     @Override
@@ -90,36 +65,20 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public void notifyOfUpdate() {
-        this.lastUpdate = System.currentTimeMillis();
-    }
-
-    @Override
-    public Optional<Note> getNoteById(final String id) {
+    public Optional<Topic> getTopicById(final String id) {
         Vertex v = wrapper.getVertexById(id);
 
-        return null == v ? Optional.empty() : Optional.of(asNote(v));
+        return null == v ? Optional.empty() : Optional.of(asTopic(v));
     }
 
     @Override
-    public ListNode<Link> toList(final Link... elements) {
-        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinks, elements);
+    public String idOf(Topic topic) {
+        return topic.getId();
     }
 
     @Override
-    public ListNode<Topic> toList(final Topic... elements) {
-        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfTopics, elements);
-    }
-
-    @Override
-    public ListNode<TreeNode<Link>> toList(
-            TreeNode<Link>... elements) {
-        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfLinkTrees, elements);
-    }
-
-    @Override
-    public ListNode<Note> createListOfNotes(final Note... elements) {
-        return createListOfEntities(SemanticSynchrony.VertexLabels.LIST, this::asListOfNotes, elements);
+    public String iriOf(Topic topic) {
+        return SemanticSynchrony.iriForId(topic.getId());
     }
 
     @Override
@@ -130,52 +89,36 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Page createPage(final Link topicLink) {
-        Page page = createEntity(null, SemanticSynchrony.VertexLabels.PAGE, this::asPage);
-        page.setContent(createTopicTree(topicLink));
-        return page;
+    public Note createNote(final Topic topic, final String label, final Role role) {
+        Note note = createNote(topic);
+        note.setLabel(label);
+        note.setRole(role);
+        return note;
     }
 
-    @Override
-    public Link createLink(final Topic target, final String label, final Role role) {
-        Link link = createEntity(null, SemanticSynchrony.VertexLabels.LINK, this::asLink);
-        link.setTarget(target);
-        link.setLabel(label);
-        link.setRole(role);
-        return link;
-    }
-
-    @Override
-    public TreeNode<Link> createTopicTree(final Link link) {
-        Preconditions.checkNotNull(link);
-        TreeNode<Link> tree
-                = createEntity(null, SemanticSynchrony.VertexLabels.TREE, this::asLinkTree);
-        tree.setValue(link);
-        return tree;
-    }
-
-    @Override
-    public Note createNote(final String id) {
-        return createEntity(id, SemanticSynchrony.VertexLabels.NOTE, this::asNote);
+    private Note createNote(final Topic topic) {
+        Note note = createEntity(null, SemanticSynchrony.VertexLabels.NOTE, this::asNote);
+        note.setTopic(topic);
+        return note;
     }
 
     @Override
     public Note createNoteWithProperties(final Filter filter,
-                                         final String id) {
+                                         final Topic topic) {
 
-        Note note = createNote(id);
+        Note note = createNote(topic);
 
-        Note.setCreated(note, new Date().getTime());
-        Note.setSource(note, filter.getDefaultSource());
-        Note.setWeight(note, filter.getDefaultWeight());
+        note.setCreated(new Date().getTime());
+        note.setSource(filter.getDefaultSource());
+        note.setWeight(filter.getDefaultWeight());
 
         return note;
     }
 
     public <T extends Entity> ListNode<T> createListNode(
-            final T first, final ListNode<T> rest, final Function<Vertex, T> constructor) {
-        ListNode<T> list = createListOfEntities(SemanticSynchrony.VertexLabels.LIST,
-                vertex -> asEntityList(vertex, constructor), first);
+            final T first, final ListNode<T> rest, final Function<Vertex, T> constructor, final String label) {
+        ListNode<T> list = createListOfEntities(label,
+                vertex -> asEntityList(vertex, constructor, label), first);
         list.setRest(rest);
         return list;
     }
@@ -191,32 +134,10 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public Link asLink(final Vertex vertex) {
-        Preconditions.checkNotNull(vertex, "vertex");
-
-        return new PGLink(vertex) {
-            @Override
-            protected PGTopicGraph getGraph() {
-                return PGTopicGraph.this;
-            }
-        };
-    }
-
-    public Page asPage(final Vertex vertex) {
-        Preconditions.checkNotNull(vertex, "vertex");
-
-        return new PGPage(vertex) {
-            @Override
-            protected PGTopicGraph getGraph() {
-                return PGTopicGraph.this;
-            }
-        };
-    }
-
     public Note asNote(final Vertex vertex) {
         Preconditions.checkNotNull(vertex, "vertex");
 
-        return new PGNote(vertex) {
+        return new PGNote(vertex, this::asNote) {
             @Override
             protected PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
@@ -224,75 +145,22 @@ public class PGTopicGraph implements TopicGraph {
         };
     }
 
-    public <T extends Entity> ListNode<T> asEntityList(final Vertex vertex, final Function<Vertex, T> constructor) {
+    public <T extends Entity> ListNode<T> asEntityList(
+            final Vertex vertex, final Function<Vertex, T> constructor, final String label) {
         Preconditions.checkNotNull(vertex, "vertex");
 
-        return new PGListNode<T>(vertex, constructor) {
+        return new PGListNode<T>(vertex, constructor, label) {
             @Override
             protected PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };
-    }
-
-    public <T extends Entity> TreeNode<T> asEntityTree(final Vertex vertex,
-                                                       final Function<Vertex, T> constructor) {
-        Preconditions.checkNotNull(vertex, "vertex");
-
-        return new PGTreeNode<T>(vertex, constructor) {
-            @Override
-            protected PGTopicGraph getGraph() {
-                return PGTopicGraph.this;
-            }
-        };
-    }
-
-    public ListNode<Topic> asListOfTopics(final Vertex vertex) {
-        return asEntityList(vertex, this::asTopic);
-    }
-
-    public ListNode<Link> asListOfLinks(final Vertex vertex) {
-        return asEntityList(vertex, this::asLink);
-    }
-
-    public ListNode<TreeNode<Link>> asListOfLinkTrees(final Vertex vertex) {
-        return asEntityList(vertex, this::asLinkTree);
-    }
-
-    public ListNode<Note> asListOfNotes(final Vertex vertex) {
-        return asEntityList(vertex, this::asNote);
-    }
-
-    public TreeNode<Link> asLinkTree(final Vertex vertex) {
-        return asEntityTree(vertex, this::asLink);
-    }
-
-    @Override
-    public void removeIsolatedNotes(final Filter filter) {
-        Preconditions.checkNotNull(filter, "filter");
-
-        List<Vertex> toRemove = new LinkedList<>();
-
-        propertyGraph.vertices().forEachRemaining(v -> {
-            if (isNoteVertex(v)
-                    && !v.edges(Direction.IN).hasNext()
-                    && !v.edges(Direction.OUT).hasNext()) {
-                if (filter.test(asNote(v))) {
-                    toRemove.add(v);
-                }
-            }
-        });
-
-        // note: we assume from the above that there are no dependent vertices (i.e. list nodes) to remove first
-        toRemove.forEach(Element::remove);
-
-        notifyOfUpdate();
     }
 
     @Override
     public void reindex(final Note note) {
         updateIndex(note, SemanticSynchrony.PropertyKeys.ID);
-        updateIndex(note, SemanticSynchrony.PropertyKeys.TITLE);
+        updateIndex(note, SemanticSynchrony.PropertyKeys.LABEL);
         updateIndex(note, SemanticSynchrony.PropertyKeys.ACRONYM);
         updateIndex(note, SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
@@ -356,21 +224,35 @@ public class PGTopicGraph implements TopicGraph {
         return null != label && label.equals(SemanticSynchrony.VertexLabels.NOTE);
     }
 
+    private void forAllRootNotes(final Filter filter, final Consumer<Note> consumer) {
+        for (Note note : getAllNotes()) {
+            if (filter.test(note) && Note.isRoot(note)) {
+                consumer.accept(note);
+            }
+        }
+    }
+
     public PGTopicGraph copyGraph(final Filter filter) {
         GraphWrapper newWrapper = new TinkerGraphWrapper(TinkerGraph.open());
         PGTopicGraph newGraph = new PGTopicGraph(newWrapper);
 
-        for (Note original : getAllNotes()) {
-            if (filter.test(original)) {
-                PGNote newNote = findOrCopy(original, filter, newGraph);
-                PGListNode<Note> children = (PGListNode<Note>) original.getChildren();
-                if (null != children) {
-                    newNote.setChildren(copyNoteList(children, filter, newGraph));
-                }
-            }
-        }
+        forAllRootNotes(filter, oldNote -> copyTree(oldNote, filter, newGraph));
 
         return newGraph;
+    }
+
+    private Note copyTree(final Note oldNote, final Filter filter, final TopicGraph newGraph) {
+        PGNote newNote = copyNote(oldNote, filter, newGraph);
+        Note child = oldNote.getFirst();
+        if (null != child) {
+            Stack<Note> children = new Stack<>();
+            while (null != child) {
+                children.push(copyTree(child, filter, newGraph));
+                child = (Note) child.getRest();
+            }
+            Note.setChildren(newNote, children);
+        }
+        return newNote;
     }
 
     private <T> T createEntity(final String id, final String label, final Function<Vertex, T> constructor) {
@@ -400,57 +282,30 @@ public class PGTopicGraph implements TopicGraph {
 
     private float findScore(final Sortable<Vertex, Float> in, final Note a, final String query) {
         float nativeScore = in.getScore();
-        float weight = Note.getWeight(a);
+        float weight = a.getWeight();
 
-        String title = Note.getTitle(a);
+        String title = a.getLabel();
         float lengthPenalty = Math.min(1.0f, 1.0f * query.length() / title.length());
 
-        Float priority = Note.getPriority(a);
+        Float priority = a.getPriority();
         float priorityBonus = null == priority ? 1f : 1f + priority;
 
         return nativeScore * weight * lengthPenalty * priorityBonus;
     }
 
-    // TODO: copy properties directly
-    private PGNote findOrCopy(final Note original, final Filter filter, final TopicGraph newGraph) {
-        Optional<Note> opt = newGraph.getNoteById(Note.getId(original));
-        if (opt.isPresent()) return (PGNote) opt.get();
-        PGNote newNote = (PGNote) newGraph.createNoteWithProperties(filter, Note.getId(original));
-        Note.setSource(newNote, Note.getSource(original));
+    private PGNote copyNote(final Note oldNote, final Filter filter, final TopicGraph newGraph) {
+        Topic oldTopic = oldNote.getTopic();
+        Topic newTopic = newGraph.createTopic(oldTopic.getId());
+        PGNote newNote = (PGNote) newGraph.createNoteWithProperties(filter, newTopic);
 
-        if (filter.test(original)) {
-            Note.setTitle(newNote, Note.getTitle(original));
-            Note.setWeight(newNote, Note.getWeight(original));
-            Note.setShortcut(newNote, Note.getShortcut(original));
-            Note.setPriority(newNote, Note.getPriority(original));
-            Note.setAlias(newNote, Note.getAlias(original));
-            Note.setCreated(newNote, Note.getCreated(original));
+        if (filter.test(oldNote)) {
+            Note.copyProperties(newNote, oldNote);
         } else {
-            Note.setTitle(newNote, REDACTED_VALUE);
+            newNote.setSource(oldNote.getSource());
+            newNote.setLabel(REDACTED_VALUE);
         }
 
         return newNote;
-    }
-
-    private ListNode<Note> copyNoteList(final PGListNode<Note> original, final Filter filter, final PGTopicGraph newGraph) {
-        PGListNode<Note> originalCur = original;
-        PGListNode<Note> newHead = null, newCur, newPrev = null;
-        while (null != originalCur) {
-            Note originalFirst = originalCur.getFirst();
-            PGNote newNote = findOrCopy(originalFirst, filter, newGraph);
-            newCur = (PGListNode<Note>) newGraph.createListOfNotes(newNote);
-
-            if (null == newPrev) {
-                newHead = newCur;
-            } else {
-                newPrev.setRest(newCur);
-            }
-
-            newPrev = newCur;
-            originalCur = (PGListNode<Note>) originalCur.getRest();
-        }
-
-        return newHead;
     }
 
     private <A> Stream<A> asFilteredStream(Iterator<A> sourceIterator, Predicate<A> filter) {

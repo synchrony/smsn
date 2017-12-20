@@ -1,14 +1,12 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
-import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
+import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
 import java.util.logging.Logger;
 
@@ -42,12 +40,12 @@ public class GetNoteShortcutMapping extends NoteMapping {
         Object first = stack.getFirst();
         stack = stack.getRest();
 
-        TreeNode<Link> n = toTree(first, 0, true);
+        Note n = toTree(first, 0, true);
 
         if (null == n) {
             logger.warning("can't get @shortcut of non-note: " + first);
         } else {
-            String value = TreeViews.getShortcut(n);
+            String value = n.getShortcut();
             if (null != value) {
                 // put both the @shortcut property and the (synced) note back on the stack
                 solutions.accept(stack.push(n).push(value));

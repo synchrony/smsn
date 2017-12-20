@@ -17,7 +17,7 @@ public class GetHistory extends FilteredAction {
         Iterable<Note> notes = getHistory(context.getBrain().getTopicGraph(), getFilter());
 
         try {
-            addView(context.getQueries().customView(notes, getFilter()), context);
+            addView(context.getModel().customView(notes, getFilter()), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

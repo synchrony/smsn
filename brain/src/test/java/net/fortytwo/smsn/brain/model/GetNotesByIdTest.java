@@ -2,12 +2,14 @@ package net.fortytwo.smsn.brain.model;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GetNotesByIdTest extends BrainTestBase {
 
@@ -23,31 +25,32 @@ public class GetNotesByIdTest extends BrainTestBase {
         int count = 0;
         for (String id : ids) {
             Note note = createNote(id);
-            Note.setTitle(note, "note #" + ++count);
+            note.setLabel("note #" + ++count);
         }
 
         for (int i = 0; i < ids.length; i++) {
-            Note note = topicGraph.getNoteById(ids[i]).get();
-            assertEquals("note #" + (i + 1), Note.getTitle(note));
+            Topic topic = topicGraph.getTopicById(ids[i]).get();
+            Iterator<Note> notes = topic.getNotes();
+            assertTrue(notes.hasNext());
+            assertEquals("note #" + (i + 1), notes.next().getLabel());
         }
     }
 
     @Test
     public void testGetNotes() throws Exception {
         Note chaos = createNote();
-        Note.setTitle(chaos, "Chaos");
+        chaos.setLabel("Chaos");
         Note tartarus = createNote();
-        Note.setTitle(tartarus, "Tartarus");
+        tartarus.setLabel("Tartarus");
         Note gaia = createNote();
-        Note.setTitle(gaia, "Gaia");
+        gaia.setLabel("Gaia");
         Note eros = createNote();
-        Note.setTitle(eros, "Eros");
+        eros.setLabel("Eros");
         Note nyx = createNote();
-        Note.setTitle(nyx, "Nyx");
+        nyx.setLabel("Nyx");
         Note erebus = createNote();
-        Note.setTitle(erebus, "Erebus");
-        ListNode<Note> children = topicGraph.createListOfNotes(tartarus, gaia, eros, nyx, erebus);
-        chaos.setChildren(children);
+        erebus.setLabel("Erebus");
+        Note.setChildren(chaos, tartarus, gaia, eros, nyx, erebus);
 
         //System.out.println(chaos.getId());
         //System.out.println(chaos.getValue());

@@ -5,11 +5,9 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.PrimitiveStackMapping;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
@@ -32,23 +30,23 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
         this.filter = filter;
     }
 
-    protected TreeNode<Link> toTree(Object o, int height, boolean sync) throws RippleException {
+    protected Note toTree(Object o, int height, boolean sync) throws RippleException {
         if (o instanceof String) {
             if (SemanticSynchrony.ID_PATTERN.matcher((String) o).matches()) {
-                TreeNode<Link> n = TreeNodeDTO.createEmptyNode();
-                TreeViews.setId(n, (String) o);
+                Note n = new NoteDTO();
+                Model.setTopicId(n, (String) o);
                 o = n;
             } else {
                 return null;
             }
         }
 
-        if (o instanceof TreeNode) {
-            TreeNode<Link> n = (TreeNode<Link>) o;
-            if (null != TreeViews.getTitle(n) && !sync) {
+        if (o instanceof Note) {
+            Note n = (Note) o;
+            if (null != n.getLabel() && !sync) {
                 return n;
             } else {
-                if (null == TreeViews.getId(n)) {
+                if (null == Model.getTopicId(n)) {
                     logger.warning("note with null id");
                     return null;
                 } else if (sync) {
@@ -66,7 +64,7 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
         }
     }
 
-    protected void setProperty(final TreeNode<Link> n, final String name, final String value) throws RippleException {
+    protected void setProperty(final Note n, final String name, final String value) throws RippleException {
         try {
             client.setProperty(n, name, value);
         } catch (BrainClient.BrainClientException e) {
@@ -98,8 +96,8 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
         }
     }
 
-    protected IRI iriOf(final TreeNode<Link> n) {
-        String alias = TreeViews.getAlias(n);
+    protected IRI iriOf(final Note n) {
+        String alias = n.getAlias();
         if (null != alias) {
             try {
                 return valueFactory.createIRI(alias);
@@ -108,6 +106,6 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
             }
         }
 
-        return valueFactory.createIRI(PGTopicGraph.iriForId(TreeViews.getId(n)));
+        return valueFactory.createIRI(SemanticSynchrony.iriForId(Model.getTopicId(n)));
     }
 }

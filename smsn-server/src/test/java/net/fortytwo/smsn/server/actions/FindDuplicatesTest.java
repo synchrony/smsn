@@ -46,8 +46,8 @@ public class FindDuplicatesTest extends ActionTestBase {
         note3 = createNoteWithTitle("earth");
         topicGraph.commit();
 
-        Note note = topicGraph.getNoteById(Note.getId(note1)).get();
-        assertEquals("earth", Note.getTitle(note));
+        Note note = topicGraph.getTopicById(Note.getId(note1)).get();
+        assertEquals("earth", note.getLabel());
         assertEquals(3, countNotes());
 
         ActionContext context = perform(createAction());
@@ -55,7 +55,7 @@ public class FindDuplicatesTest extends ActionTestBase {
         assertNotNull(view);
         assertEquals(3, view.optJSONArray(JsonFormat.Keys.CHILDREN).length());
         assertEquals("earth", view.optJSONArray(JsonFormat.Keys.CHILDREN).getJSONObject(0)
-                .get(SemanticSynchrony.PropertyKeys.TITLE));
+                .get(SemanticSynchrony.PropertyKeys.LABEL));
     }
 
     private FindDuplicates createAction() {

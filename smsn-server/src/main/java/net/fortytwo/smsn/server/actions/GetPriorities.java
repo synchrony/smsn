@@ -1,8 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -27,7 +26,7 @@ public class GetPriorities extends FilteredAction {
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
 
-        TreeNode<Link> tree = context.getQueries().priorityView(getFilter(), maxResults, context.getBrain().getPriorities());
+        Note tree = context.getModel().priorityView(getFilter(), maxResults, context.getBrain().getPriorities());
         try {
             addView(tree, context);
         } catch (IOException e) {

@@ -1,11 +1,8 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +34,7 @@ public class EventStackTest {
 
     @Test
     public void testStack() throws Exception {
-        List<TreeNode<Link>> events = eventStack.getEvents();
+        List<Note> events = eventStack.getEvents();
         //BrainGraph bg = eventStack.getInMemoryGraph();
         //KeyIndexableGraph g = bg.getPropertyGraph();
 
@@ -50,15 +47,15 @@ public class EventStackTest {
         //assertEquals(3, countNotes(bg));
         //assertEquals(5, countVertices(g));
 
-        TreeNode<Link> e = events.get(0);
-        assertEquals("person 1 did something", TreeViews.getTitle(e));
-        List<TreeNode<Link>> kids = TreeViews.getChildrenAsList(e);
+        Note e = events.get(0);
+        assertEquals("person 1 did something", e.getLabel());
+        List<Note> kids = ListNode.toJavaList(e.getFirst());
         assertEquals(2, kids.size());
-        TreeNode<Link> person = kids.get(0);
-        TreeNode<Link> time = kids.get(1);
-        assertEquals("person 1", TreeViews.getTitle(person));
-        assertEquals(agent1, TreeViews.getAlias(person));
-        assertEquals(2, TreeViews.getTitle(time).indexOf(":"));
+        Note person = kids.get(0);
+        Note time = kids.get(1);
+        assertEquals("person 1", person.getLabel());
+        assertEquals(agent1, person.getAlias());
+        assertEquals(2, time.getLabel().indexOf(":"));
 
         eventStack.push(eventStack.createGestureEvent(agent2, new Date()));
         assertEquals(2, events.size());
@@ -67,10 +64,10 @@ public class EventStackTest {
 
         // verify that it is a stack, not a queue
         e = events.get(0);
-        kids = TreeViews.getChildrenAsList(e);
+        kids = ListNode.toJavaList(e.getFirst());
         person = kids.get(0);
-        assertEquals("person 2", TreeViews.getTitle(person));
-        assertEquals(agent2, TreeViews.getAlias(person));
+        assertEquals("person 2", person.getLabel());
+        assertEquals(agent2, person.getAlias());
 
         // push another event from agent #1 and verify that he is given the same routine name
         eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
@@ -78,10 +75,10 @@ public class EventStackTest {
         //assertEquals(9, countNotes(bg));
         //assertEquals(15, countVertices(g));
         e = events.get(0);
-        kids = TreeViews.getChildrenAsList(e);
+        kids = ListNode.toJavaList(e.getFirst());
         person = kids.get(0);
-        assertEquals("person 1", TreeViews.getTitle(person));
-        assertEquals(agent1, TreeViews.getAlias(person));
+        assertEquals("person 1", person.getLabel());
+        assertEquals(agent1, person.getAlias());
 
         // fill to capacity
         eventStack.clear();
@@ -103,7 +100,7 @@ public class EventStackTest {
         //assertEquals(3 * testCapacity, countNotes(bg));
         //assertEquals(5 * testCapacity, countVertices(g));
         // this is the newest event
-        assertEquals(agent2, TreeViews.getAlias(eventStack.getEvents().get(0).getChildren().get(0)));
+        assertEquals(agent2, eventStack.getEvents().get(0).getFirst().get(0).getAlias());
 
         // cleanup leaves nothing behind
         eventStack.clear();
@@ -119,11 +116,9 @@ public class EventStackTest {
             eventStack.push(eventStack.createGestureEvent(0 == i % 2 ? agent1 : agent2, new Date()));
         }
 
-        WikiPrinter w = new WikiPrinter(System.out);
-        for (TreeNode<Link> event : eventStack.getEvents()) {
-            Page page = PageDTO.createTransitional();
-            page.setContent(event);
-            w.print(page);
+        WikiPrinter printer = new WikiPrinter(System.out);
+        for (Note event : eventStack.getEvents()) {
+            printer.print(event);
         }
     }
 }

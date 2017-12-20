@@ -1,14 +1,13 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
+import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
 import java.util.logging.Logger;
 
@@ -41,17 +40,17 @@ public class SetNoteValueMapping extends NoteMapping {
                       final Sink<RippleList> solutions,
                       final ModelConnection mc) throws RippleException {
 
-        String value = mc.toString(stack.getFirst());
+        String label = mc.toString(stack.getFirst());
         stack = stack.getRest();
         Object no = stack.getFirst();
         stack = stack.getRest();
 
-        TreeNode<Link> n = toTree(no, 0, false);
+        Note n = toTree(no, 0, false);
 
         if (null == n) {
-            logger.warning("can't set @value of non-note: " + no);
+            logger.warning("can't set @" + SemanticSynchrony.PropertyKeys.LABEL + " of non-note: " + no);
         } else {
-            setProperty(n, SemanticSynchrony.PropertyKeys.TITLE, value);
+            setProperty(n, SemanticSynchrony.PropertyKeys.LABEL, label);
 
             // put the note back on the stack
             solutions.accept(stack.push(n));

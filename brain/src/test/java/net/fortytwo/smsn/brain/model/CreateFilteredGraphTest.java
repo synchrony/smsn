@@ -24,14 +24,14 @@ public class CreateFilteredGraphTest extends BrainTestBase {
 
         // unfiltered
         Note root = importNoteFromFile("io/wiki/wiki-example-4.txt");
-        Note.setTitle(root, "William James");
-        assertEquals(DefaultSources.PERSONAL, Note.getSource(root));
+        root.setLabel("William James");
+        assertEquals(DefaultSources.PERSONAL, root.getSource());
         assertEquals(23, countNotes(topicGraph));
         assertEquals(7, childList(root).size());
-        assertEquals("some works by William James", Note.getTitle(childList(root).get(0)));
-        assertEquals("William James's depression", Note.getTitle(childList(root).get(3)));
-        assertEquals(DefaultSources.PUBLIC, Note.getSource(childList(root).get(0)));
-        assertEquals(DefaultSources.PRIVATE, Note.getSource(childList(root).get(3)));
+        assertEquals("some works by William James", childList(root).get(0).getLabel());
+        assertEquals("William James's depression", childList(root).get(3).getLabel());
+        assertEquals(DefaultSources.PUBLIC, childList(root).get(0).getSource());
+        assertEquals(DefaultSources.PRIVATE, childList(root).get(3).getSource());
         assertEquals(3, childList(childList(root).get(0)).size());
         assertEquals(2, childList(childList(root).get(3)).size());
 
@@ -40,16 +40,16 @@ public class CreateFilteredGraphTest extends BrainTestBase {
         assertTrue(publicFilter.test(root));
         TopicGraph filteredGraph = topicGraph.createFilteredGraph(publicFilter);
         assertEquals(22, countNotes(filteredGraph));
-        root = filteredGraph.getNoteById(Note.getId(root)).get();
-        assertEquals(DefaultSources.PERSONAL, Note.getSource(root));
-        assertEquals("William James", Note.getTitle(root));
+        root = getNote(filteredGraph.getTopicById(root.getTopic().getId()).get());
+        assertEquals(DefaultSources.PERSONAL, root.getSource());
+        assertEquals("William James", root.getLabel());
 
         assertEquals(7, childList(root).size());
-        assertEquals("some works by William James", Note.getTitle(childList(root).get(0)));
-        assertEquals("", Note.getTitle(childList(root).get(3)));
-        assertEquals(DefaultSources.PUBLIC, Note.getSource(childList(root).get(0)));
-        assertEquals(DefaultSources.PRIVATE, Note.getSource(childList(root).get(3)));
+        assertEquals("some works by William James", childList(root).get(0).getLabel());
+        assertEquals("", childList(root).get(3).getLabel());
+        assertEquals(DefaultSources.PUBLIC, childList(root).get(0).getSource());
+        assertEquals(DefaultSources.PRIVATE, childList(root).get(3).getSource());
         assertEquals(3, childList(childList(root).get(0)).size());
-        assertNull(childList(root).get(3).getChildren());
+        assertNull(childList(root).get(3).getFirst());
     }
 }

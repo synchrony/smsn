@@ -118,7 +118,7 @@ public class Filter implements Predicate<Note>, Serializable {
     @Override
     public boolean test(final Note note) {
         Integer sourceIndex = getSourceIndexFor(note);
-        Float weight = Note.getWeight(note);
+        Float weight = note.getWeight();
 
         if (null == sourceIndex || null == weight) return false;
 
@@ -128,7 +128,7 @@ public class Filter implements Predicate<Note>, Serializable {
     }
 
     private Integer getSourceIndexFor(final Note note) {
-        String source = Note.getSource(note);
+        String source = note.getSource();
         return null == source ? null : indexForSource(source);
     }
 }

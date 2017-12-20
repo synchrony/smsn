@@ -3,10 +3,9 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -98,22 +97,23 @@ public class RepositoryCollection implements AbstractRepository {
         return unionOf(AbstractRepository::getMissing);
     }
 
-    public TreeNode<Link> getHistory(final SmSnGitRepository.Limits limits) throws IOException, GitAPIException {
+    public Note getHistory(final SmSnGitRepository.Limits limits) throws IOException, GitAPIException {
         long now = System.currentTimeMillis();
 
-        TreeNode<Link> parent = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(parent, SemanticSynchrony.createRandomId());
+        NoteDTO parent = new NoteDTO();
+        Model.setTopicId(parent, SemanticSynchrony.createRandomId());
         // TODO: don't hard-code a source
-        TreeViews.setSource(parent, "public");
-        TreeViews.setWeight(parent, SemanticSynchrony.DEFAULT_WEIGHT);
-        TreeViews.setCreated(parent, now);
+        parent.setSource("public");
+        parent.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
+        parent.setCreated(now);
 
-        TreeViews.setTitle(parent, "Git history for " + directory.getName()
+        parent.setLabel("Git history for " + directory.getName()
                 + " at " + SmSnGitRepository.formatDate(now));
 
+        int index = 0;
         for (SmSnGitRepository repo : repositoriesBySource.values()) {
-            TreeNode<Link> repoHistory = repo.getHistory(limits);
-            parent.addChild(repoHistory);
+            Note repoHistory = repo.getHistory(limits);
+            parent.addChild(index++, repoHistory);
         }
 
         parent.setNumberOfChildren(repositoriesBySource.size());

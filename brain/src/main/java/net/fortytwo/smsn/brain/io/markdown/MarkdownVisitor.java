@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import org.commonmark.node.BlockQuote;
 import org.commonmark.node.BulletList;
 import org.commonmark.node.Code;
@@ -32,12 +32,12 @@ import java.util.Stack;
 
 class MarkdownVisitor implements Visitor {
 
-    private final Stack<TreeNode<net.fortytwo.smsn.brain.model.entities.Link>> headings = new Stack<>();
+    private final Stack<Note> headings = new Stack<>();
     private int currentDepth;
-    private final TreeNode<net.fortytwo.smsn.brain.model.entities.Link> root;
+    private final Note root;
     private final boolean verbose;
 
-    public TreeNode<net.fortytwo.smsn.brain.model.entities.Link> getRoot() {
+    public Note getRoot() {
         return root;
     }
 
@@ -45,7 +45,7 @@ class MarkdownVisitor implements Visitor {
         this.verbose = verbose;
 
         headings.clear();
-        root = TreeNodeDTO.createEmptyNode();
+        root = new NoteDTO();
         addHeading(root, 0);
         currentDepth = 0;
     }
@@ -66,9 +66,9 @@ class MarkdownVisitor implements Visitor {
         String destination = link.getDestination();
 
         if (null != destination && 0 < destination.length() && null != (title = getLinkTitle(link))) {
-            TreeNode<net.fortytwo.smsn.brain.model.entities.Link> tree = TreeNodeDTO.createEmptyNode();
-            TreeViews.setId(tree, link.getDestination());
-            TreeViews.setTitle(tree, title);
+            Note tree = new NoteDTO();
+            Model.setTopicId(tree, link.getDestination());
+            tree.setLabel(title);
 
             addNote(tree);
         }
@@ -169,8 +169,8 @@ class MarkdownVisitor implements Visitor {
         visitChildren(customNode);
     }
 
-    private TreeNode<net.fortytwo.smsn.brain.model.entities.Link> toTree(final Heading heading) {
-        TreeNode<net.fortytwo.smsn.brain.model.entities.Link> tree = TreeNodeDTO.createEmptyNode();
+    private Note toTree(final Heading heading) {
+        Note tree = new NoteDTO();
 
         Node child = heading.getFirstChild();
         while (null != child) {
@@ -178,13 +178,13 @@ class MarkdownVisitor implements Visitor {
                 Link link = (Link) child;
                 String title = getLinkTitle(link);
                 if (null != title && null != link.getDestination() && 0 < link.getDestination().length()) {
-                    TreeViews.setId(tree, link.getDestination().trim());
-                    TreeViews.setTitle(tree, title);
+                    Model.setTopicId(tree, link.getDestination().trim());
+                    tree.setLabel(title);
                     break;
                 }
             } else if (child instanceof Text) {
                 Text text = (Text) child;
-                TreeViews.setTitle(tree, text.getLiteral().trim());
+                tree.setLabel(text.getLiteral().trim());
             }
             child = child.getNext();
         }
@@ -207,13 +207,14 @@ class MarkdownVisitor implements Visitor {
         }
     }
 
-    private void addNote(final TreeNode<net.fortytwo.smsn.brain.model.entities.Link> note) {
+    private void addNote(final Note note) {
         if (!headings.isEmpty()) {
-            headings.peek().addChild(note);
+            // note: possibly inverted order
+            headings.peek().addChild(0, note);
         }
     }
 
-    private void addHeading(final TreeNode<net.fortytwo.smsn.brain.model.entities.Link> note, int level) {
+    private void addHeading(final Note note, int level) {
         if (level > headings.size()) {
             throw new IllegalStateException("invalid heading level (" + level + " > " + headings.size() + ")");
         }

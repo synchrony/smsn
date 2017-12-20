@@ -30,7 +30,7 @@ public class Priorities {
             long startTime = System.currentTimeMillis();
 
             for (Note a : graph.getAllNotes()) {
-                if (null != Note.getPriority(a)) {
+                if (null != a.getPriority()) {
                     updatePriority(a);
                 }
             }
@@ -42,7 +42,7 @@ public class Priorities {
 
     public void updatePriority(final Note a) {
         queue.remove(a);
-        if (null != Note.getPriority(a)) {
+        if (null != a.getPriority()) {
             queue.add(a);
         }
     }
@@ -50,8 +50,8 @@ public class Priorities {
     // order primarily by descending priority, secondarily by descending weight
     private static class NotePriorityComparator implements Comparator<Note> {
         public int compare(final Note a, final Note b) {
-            Float pa = Note.getPriority(a);
-            Float pb = Note.getPriority(b);
+            Float pa = a.getPriority();
+            Float pb = b.getPriority();
 
             if (null == pa) {
                 return null == pb || 0 == pb ? 0 : -1;
@@ -60,7 +60,7 @@ public class Priorities {
             } else {
                 int c = pa.compareTo(pb);
                 return 0 == c
-                        ? Note.getWeight(b).compareTo(Note.getWeight(a))
+                        ? b.getWeight().compareTo(a.getWeight())
                         : c;
             }
         }

@@ -1,8 +1,7 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -28,84 +27,84 @@ public class MarkdownParserTest {
 
     @Test
     public void completeExampleParsedCorrectly() throws IOException {
-        TreeNode<Link> root;
+        Note root;
         MarkdownParser parser = new MarkdownParser();
         try (InputStream in = MarkdownParserTest.class.getResourceAsStream("markdown-example-1.md")) {
-            root = parser.parse(in).getContent();
+            root = parser.parse(in);
         }
 
-        assertEquals(7, TreeViews.countChildren(root));
+        assertEquals(7, Model.countChildren(root));
     }
 
     @Test
     public void linksBeforeFirstHeadingAreNotes() throws IOException {
-        TreeNode<Link> root = parse("This line has [a link](aaaaaaa) and [another link](bbbbbbb).\n" +
+        Note root = parse("This line has [a link](aaaaaaa) and [another link](bbbbbbb).\n" +
                 "\n" +
                 "# this is a heading\n" +
                 "This is [a link under the first heading](ccccccc).");
 
-        assertEquals(3, TreeViews.countChildren(root));
-        TreeNode<Link> aLink = root.getChildren().get(0);
-        assertEquals("a link", TreeViews.getTitle(aLink));
-        assertEquals("aaaaaaa", TreeViews.getId(aLink));
-        TreeNode<Link> anotherLink = root.getChildren().get(1);
-        assertEquals("another link", TreeViews.getTitle(anotherLink));
-        assertEquals("bbbbbbb", TreeViews.getId(anotherLink));
-        TreeNode<Link> heading = root.getChildren().get(2);
-        assertEquals("this is a heading", TreeViews.getTitle(heading));
-        assertEquals(1, TreeViews.countChildren(heading));
-        TreeNode<Link> linkUnder = heading.getChildren().get(0);
-        assertEquals("a link under the first heading", TreeViews.getTitle(linkUnder));
-        assertEquals("ccccccc", TreeViews.getId(linkUnder));
+        assertEquals(3, Model.countChildren(root));
+        Note aLink = root.getFirst().get(0);
+        assertEquals("a link", aLink.getLabel());
+        assertEquals("aaaaaaa", Model.getTopicId(aLink));
+        Note anotherLink = root.getFirst().get(1);
+        assertEquals("another link", anotherLink.getLabel());
+        assertEquals("bbbbbbb", Model.getTopicId(anotherLink));
+        Note heading = root.getFirst().get(2);
+        assertEquals("this is a heading", heading.getLabel());
+        assertEquals(1, Model.countChildren(heading));
+        Note linkUnder = heading.getFirst().get(0);
+        assertEquals("a link under the first heading", linkUnder.getLabel());
+        assertEquals("ccccccc", Model.getTopicId(linkUnder));
     }
 
     @Test
     public void ordinaryLinesAreNotNotes() throws IOException {
-        TreeNode<Link> root = parse("This is just a line without links.\n" +
+        Note root = parse("This is just a line without links.\n" +
                 "\n" +
                 "This line has [a link](0000000).");
 
-        assertEquals(1, TreeViews.countChildren(root));
-        TreeNode<Link> aLink = root.getChildren().get(0);
-        assertEquals("a link", TreeViews.getTitle(aLink));
-        assertEquals("0000000", TreeViews.getId(aLink));
+        assertEquals(1, Model.countChildren(root));
+        Note aLink = root.getFirst().get(0);
+        assertEquals("a link", aLink.getLabel());
+        assertEquals("0000000", Model.getTopicId(aLink));
     }
 
     @Test
     public void listItemsWithoutLinksAreNotNotes() throws IOException {
-        TreeNode<Link> root = parse("* list item with no link\n" +
+        Note root = parse("* list item with no link\n" +
                 "* list item [with a link](http://example.org)");
 
-        assertEquals(1, TreeViews.countChildren(root));
-        assertEquals("with a link", TreeViews.getTitle(root.getChildren().get(0)));
+        assertEquals(1, Model.countChildren(root));
+        assertEquals("with a link", root.getFirst().get(0).getLabel());
     }
 
     @Test
     public void headingsWithoutLinksAreNotes() throws IOException {
-        TreeNode<Link> root = parse("# heading with no link\n" +
+        Note root = parse("# heading with no link\n" +
                 "* [child of heading with no link](bbbbbbb)\n" +
                 "# heading [with a link](zzzzzzz)\n" +
                 "* [child of heading with a link](aaaaaaa)\n");
 
-        assertEquals(2, TreeViews.countChildren(root));
+        assertEquals(2, Model.countChildren(root));
 
-        TreeNode<Link> withoutLink = root.getChildren().get(0);
-        assertEquals("heading with no link", TreeViews.getTitle(withoutLink));
-        assertNull(TreeViews.getId(withoutLink));
-        assertEquals(1, TreeViews.countChildren(withoutLink));
+        Note withoutLink = root.getFirst().get(0);
+        assertEquals("heading with no link", withoutLink.getLabel());
+        assertNull(Model.getTopicId(withoutLink));
+        assertEquals(1, Model.countChildren(withoutLink));
 
-        TreeNode<Link> withALink = root.getChildren().get(1);
-        assertEquals("with a link", TreeViews.getTitle(withALink));
-        assertEquals("zzzzzzz", TreeViews.getId(withALink));
-        assertEquals(1, TreeViews.countChildren(withALink));
-        TreeNode<Link> child = withALink.getChildren().get(0);
-        assertEquals("child of heading with a link", TreeViews.getTitle(child));
-        assertEquals("aaaaaaa", TreeViews.getId(child));
+        Note withALink = root.getFirst().get(1);
+        assertEquals("with a link", withALink.getLabel());
+        assertEquals("zzzzzzz", Model.getTopicId(withALink));
+        assertEquals(1, Model.countChildren(withALink));
+        Note child = withALink.getFirst().get(0);
+        assertEquals("child of heading with a link", child.getLabel());
+        assertEquals("aaaaaaa", Model.getTopicId(child));
     }
 
     @Test
     public void headingWithoutChildrenIsEquivalentToSimpleNote() throws IOException {
-        TreeNode<Link> root = parse("[simple note](aaaaaaa)\n" +
+        Note root = parse("[simple note](aaaaaaa)\n" +
                 "\n" +
                 "# heading without content\n" +
                 "\n" +
@@ -113,27 +112,27 @@ public class MarkdownParserTest {
                 "\n" +
                 "[another note](bbbbbbb)");
 
-        assertEquals(3, TreeViews.countChildren(root));
+        assertEquals(3, Model.countChildren(root));
 
-        TreeNode<Link> simpleNote = root.getChildren().get(0);
-        assertEquals("simple note", TreeViews.getTitle(simpleNote));
-        assertEquals(0, TreeViews.countChildren(simpleNote));
-        TreeNode<Link> headingWithoutContent = root.getChildren().get(1);
-        assertEquals("heading without content", TreeViews.getTitle(headingWithoutContent));
-        assertEquals(0, TreeViews.countChildren(headingWithoutContent));
-        TreeNode<Link> headingWithContent = root.getChildren().get(2);
-        assertEquals("heading with content", TreeViews.getTitle(headingWithContent));
-        assertEquals(1, TreeViews.countChildren(headingWithContent));
-        TreeNode<Link> anotherNote = headingWithContent.getChildren().get(0);
-        assertEquals("another note", TreeViews.getTitle(anotherNote));
-        assertEquals(0, TreeViews.countChildren(anotherNote));
+        Note simpleNote = root.getFirst().get(0);
+        assertEquals("simple note", simpleNote.getLabel());
+        assertEquals(0, Model.countChildren(simpleNote));
+        Note headingWithoutContent = root.getFirst().get(1);
+        assertEquals("heading without content", headingWithoutContent.getLabel());
+        assertEquals(0, Model.countChildren(headingWithoutContent));
+        Note headingWithContent = root.getFirst().get(2);
+        assertEquals("heading with content", headingWithContent.getLabel());
+        assertEquals(1, Model.countChildren(headingWithContent));
+        Note anotherNote = headingWithContent.getFirst().get(0);
+        assertEquals("another note", anotherNote.getLabel());
+        assertEquals(0, Model.countChildren(anotherNote));
     }
 
-    private TreeNode<Link> parse(final String content) throws IOException {
+    private Note parse(final String content) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes());
 
         MarkdownParser parser = new MarkdownParser();
         //parser.setVerbose(true);
-        return parser.parse(input).getContent();
+        return parser.parse(input);
     }
 }

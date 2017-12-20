@@ -15,29 +15,19 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-public class SemanticSynchrony {
+public final class SemanticSynchrony {
 
     public interface VertexLabels {
         String
-                NOTE = "note",
-                LIST = "list",
-                LINK = "link",
-                PAGE = "page",
-                TOPIC = "topic",
-                TREE = "tree";
+                NOTE = "Note",
+                TOPIC = "Topic";
     }
 
     public interface EdgeLabels {
         String
-                CHILDREN = "children",
                 FIRST = "first",
-                NOTES = "notes",
-                PAGE = "page",
                 REST = "rest",
-                TARGET = "target",
-                TOPIC = "topic",
-                CONTENT = "tree",
-                VALUE = "value";
+                TOPIC = "topic";
     }
 
     public interface PropertyKeys {
@@ -48,11 +38,10 @@ public class SemanticSynchrony {
                 ID = "idV",
                 LABEL = "label",
                 PRIORITY = "priority",
-                ROLE = "role",
+                ROLE = "role",  // TODO: deprecate "role"
                 SHORTCUT = "shortcut",
                 SOURCE = "source",
                 TEXT = "text",
-                TITLE = "title",
                 WEIGHT = "weight";
     }
 
@@ -61,7 +50,7 @@ public class SemanticSynchrony {
 
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
-    private static final int ID_DIGITS = 16;
+    public static final int ID_DIGITS = 16;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 
@@ -98,6 +87,10 @@ public class SemanticSynchrony {
 
     public static Logger getLogger(final Class c) {
         return Logger.getLogger(c.getName());
+    }
+
+    public static String iriForId(final String id) {
+        return getConfiguration().getThingNamespace() + id;
     }
 
     public static DataSource getDataSourceByName(final String name) {

@@ -2,8 +2,7 @@ package net.fortytwo.smsn.git;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Test;
 
@@ -24,7 +23,7 @@ public class RepositoryCollectionIT extends BrainTestBase {
         limits.setMaxFilesPerDiff(10);
 
         RepositoryCollection repo = new RepositoryCollection(brain, new File("/Users/josh/data/smsn/brains/git-smsn"));
-        TreeNode<Link> history = repo.getHistory(limits);
+        Note history = repo.getHistory(limits);
 
         System.out.println("history: " + history);
     }

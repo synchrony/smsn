@@ -1,16 +1,14 @@
 package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.List;
 
 public class JsonPrinter {
 
@@ -24,7 +22,7 @@ public class JsonPrinter {
         this.titleLengthCutoff = titleLengthCutoff;
     }
 
-    public JSONObject toJson(final TreeNode<Link> node) throws IOException {
+    public JSONObject toJson(final Note node) throws IOException {
         try {
             return toJsonInternal(node);
         } catch (JSONException e) {
@@ -32,44 +30,45 @@ public class JsonPrinter {
         }
     }
 
-    private void putPriority(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        Float priority = TreeViews.getPriority(node);
+    private void putPriority(final Note node, final JSONObject json) throws JSONException {
+        Float priority = node.getPriority();
         if (null != priority && priority > 0) {
             json.put(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
         }
     }
 
-    private void putTitle(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        String title = TreeViews.getTitle(node);
+    private void putTitle(final Note node, final JSONObject json) throws JSONException {
+        String title = node.getLabel();
         if (title != null && titleLengthCutoff > 0 && title.length() > titleLengthCutoff) {
             title = title.substring(0, titleLengthCutoff) + JsonFormat.TITLE_TRUNCATOR;
         }
-        json.put(SemanticSynchrony.PropertyKeys.TITLE, title);
+        json.put(SemanticSynchrony.PropertyKeys.LABEL, title);
     }
 
-    private void putText(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        String text = TreeViews.getText(node);
+    private void putText(final Note node, final JSONObject json) throws JSONException {
+        String text = node.getText();
         if (null != text) {
             json.put(SemanticSynchrony.PropertyKeys.TEXT, text);
         }
     }
 
-    private void putAlias(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        String alias = TreeViews.getAlias(node);
+    private void putAlias(final Note node, final JSONObject json) throws JSONException {
+        String alias = node.getAlias();
         if (null != alias) {
             json.put(SemanticSynchrony.PropertyKeys.ALIAS, alias);
         }
     }
 
-    private void putShortcut(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        String shortcut = TreeViews.getShortcut(node);
+    private void putShortcut(final Note node, final JSONObject json) throws JSONException {
+        String shortcut = node.getShortcut();
         if (null != shortcut) {
             json.put(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
         }
     }
 
-    private void putMeta(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        List<String> meta = TreeViews.getMeta(node);
+    private void putMeta(final Note node, final JSONObject json) throws JSONException {
+        /*
+        List<String> meta = Note.getMeta(node);
         if (null != meta && 0 != meta.size()) {
             JSONArray c = new JSONArray();
             json.put(JsonFormat.Keys.META, c);
@@ -78,28 +77,29 @@ public class JsonPrinter {
                 c.put(i++, s);
             }
         }
+        */
     }
 
-    private void putChildren(final TreeNode<Link> node, final JSONObject json) throws JSONException {
-        if (null != node.getChildren()) {
+    private void putChildren(final Note node, final JSONObject json) throws JSONException {
+        if (null != node.getFirst()) {
             JSONArray c = new JSONArray();
             json.put(JsonFormat.Keys.CHILDREN, c);
             int i = 0;
             // TODO: put
-            for (TreeNode<Link> child : ListNode.toJavaList(node.getChildren())) {
+            for (Note child : ListNode.toJavaList(node.getFirst())) {
                 c.put(i, toJsonInternal(child));
                 i++;
             }
         }
     }
 
-    public JSONObject toJsonInternal(final TreeNode<Link> node) throws JSONException {
+    public JSONObject toJsonInternal(final Note node) throws JSONException {
         JSONObject json = new JSONObject();
 
-        json.put(JsonFormat.Keys.ID, TreeViews.getId(node));
-        json.put(SemanticSynchrony.PropertyKeys.WEIGHT, TreeViews.getWeight(node));
-        json.put(SemanticSynchrony.PropertyKeys.SOURCE, TreeViews.getSource(node));
-        json.put(SemanticSynchrony.PropertyKeys.CREATED, TreeViews.getCreated(node));
+        json.put(JsonFormat.Keys.ID, Model.getTopicId(node));
+        json.put(SemanticSynchrony.PropertyKeys.WEIGHT, node.getWeight());
+        json.put(SemanticSynchrony.PropertyKeys.SOURCE, node.getSource());
+        json.put(SemanticSynchrony.PropertyKeys.CREATED, node.getCreated());
         json.put(JsonFormat.Keys.NUMBER_OF_CHILDREN, node.getNumberOfChildren());
         json.put(JsonFormat.Keys.NUMBER_OF_PARENTS, node.getNumberOfParents());
 

@@ -32,7 +32,7 @@ public class VCSFormat extends Format {
         return instance;
     }
 
-    public static boolean isSmSnFile(final File file) {
+    public static boolean isDataFile(final File file) {
         return SMSN_FILENAME_PATTERN.matcher(file.getName()).matches();
     }
 

@@ -1,14 +1,13 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
+import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
 import java.util.logging.Logger;
 
@@ -46,7 +45,7 @@ public class SetNoteShortcutMapping extends NoteMapping {
         Object no = stack.getFirst();
         stack = stack.getRest();
 
-        TreeNode<Link> n = toTree(no, 0, false);
+        Note n = toTree(no, 0, false);
 
         if (null == n) {
             logger.warning("can't set @shortcut of non-note: " + no);

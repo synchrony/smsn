@@ -2,18 +2,14 @@ package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.junit.Test;
 
@@ -29,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class VCSWriterTest extends BrainTestBase {
@@ -55,14 +50,6 @@ public class VCSWriterTest extends BrainTestBase {
         }
     }
 
-    private TreeNode<Link> createTree() {
-        TreeNode<Link> node = new TreeNodeDTO<>();
-        Link link = new LinkDTO();
-        link.setPage(new PageDTO());
-        node.setValue(link);
-        return node;
-    }
-
     @Test
     public void singlePageIsWrittenCorrectly() throws Exception {
         String source = DefaultSources.PUBLIC;
@@ -70,40 +57,39 @@ public class VCSWriterTest extends BrainTestBase {
         String zaphodId = SemanticSynchrony.createRandomId();
 
         Note root = createNote("11111", "change me");
-        Note.setSource(root, source);
+        root.setSource(source);
 
-        TreeNode<Link> tree = createTreeDTO(Note.getId(root), "Arthur Dent");
-        Page page = PageDTO.createTransitional();
-        page.setSource(source);
-        page.setContent(tree);
-        page.setText("He's a jerk.\nA complete kneebiter.");
-        tree.getValue().setPage(page);
-        TreeNode<Link> fordTree = createTreeDTO(fordId, "Ford Prefect");
-        fordTree.getValue().setPage(page);
-        TreeNode<Link> zaphodTree = createTreeDTO(zaphodId, "Zaphod Beeblebrox");
-        zaphodTree.getValue().setPage(page);
-        tree.addChild(fordTree);
-        tree.addChild(zaphodTree);
+        Note note = createNoteDTO(root.getTopic().getId(), "Arthur Dent");
+        note.setSource(source);
+        note.setText("He's a jerk.\nA complete kneebiter.");
+        Note fordTree = createNoteDTO(fordId, "Ford Prefect");
+        Note zaphodTree = createNoteDTO(zaphodId, "Zaphod Beeblebrox");
+        note.addChild(0, fordTree);
+        note.addChild(1, zaphodTree);
 
-        queries.update(tree, Integer.MAX_VALUE, Filter.noFilter(), ViewStyle.Basic.Forward.getStyle());
+        model.view()
+                .root(root).height(Integer.MAX_VALUE).filter(Filter.noFilter()).style(ViewStyle.Basic.Forward.getStyle())
+                .put(note);
 
-        Note ad = topicGraph.getNoteById(Note.getId(root)).get();
-        assertEquals(DefaultSources.PUBLIC, Note.getSource(ad));
-        assertEquals("Arthur Dent", Note.getTitle(ad));
-        assertEquals("He's a jerk.\nA complete kneebiter.", Note.getText(ad));
-        assertEquals(2, ListNode.toJavaList(ad.getChildren()).size());
-        Note random = ad.getChildren().getFirst();
-        assertEquals("Ford Prefect", Note.getTitle(random));
+        Topic adTopic = topicGraph.getTopicById(root.getTopic().getId()).get();
+        Note ad = topicGraph.createNote(adTopic, "Arthur dent", Role.Entity);
+
+        assertEquals(DefaultSources.PUBLIC, ad.getSource());
+        assertEquals("Arthur Dent", ad.getLabel());
+        assertEquals("He's a jerk.\nA complete kneebiter.", ad.getText());
+        assertEquals(2, ListNode.toJavaList(ad.getFirst()).size());
+        Note random = ad.getFirst();
+        assertEquals("Ford Prefect", random.getLabel());
 
         File dir = doExport();
         assertEquals(4, dir.listFiles().length);
         File publicDir = new File(dir, "public");
         assertTrue(publicDir.exists() && publicDir.isDirectory());
-        File arthurFile = new File(publicDir, Note.getId(root) + ".smsn");
+        File arthurFile = new File(publicDir, root.getTopic().getId() + ".smsn");
         assertTrue(arthurFile.exists());
         List<String> lines = readLines(arthurFile);
         assertEquals(9, lines.size());
-        assertEquals("@id " + Note.getId(root), lines.get(0));
+        assertEquals("@id " + root.getTopic().getId(), lines.get(0));
         assertEquals("@title Arthur Dent", lines.get(1));
         assertEquals("created", readPropertyLine(lines.get(2)).getKey());
         // note: no @weight or @priority
@@ -120,8 +106,8 @@ public class VCSWriterTest extends BrainTestBase {
         Map<String, String> map = new HashMap<>();
         int atIndex = line.indexOf('@');
         int spaceIndex = line.indexOf(' ');
-        String key = line.substring(atIndex+1, spaceIndex);
-        String value = line.substring(spaceIndex+1);
+        String key = line.substring(atIndex + 1, spaceIndex);
+        String value = line.substring(spaceIndex + 1);
         map.put(key, value);
         return map.entrySet().iterator().next();
     }

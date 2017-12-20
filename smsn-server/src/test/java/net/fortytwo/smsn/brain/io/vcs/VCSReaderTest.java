@@ -54,17 +54,17 @@ public class VCSReaderTest extends BrainTestBase {
 
         assertEquals(2, countNotes());
 
-        Note arthur = topicGraph.getNoteById(ARTHUR_ID).get();
+        Note arthur = topicGraph.getTopicById(ARTHUR_ID).get();
         assertEquals(ARTHUR_ID, Note.getId(arthur));
-        assertEquals("Arthur Dent", Note.getTitle(arthur));
-        assertEquals(DefaultSources.UNIVERSAL, Note.getSource(arthur));
-        assertEquals(1344485170113L, (long) Note.getCreated(arthur));
-        assertEquals("He's a jerk.\nA real kneebiter.", Note.getText(arthur));
+        assertEquals("Arthur Dent", arthur.getLabel());
+        assertEquals(DefaultSources.UNIVERSAL, arthur.getSource());
+        assertEquals(1344485170113L, (long) arthur.getCreated());
+        assertEquals("He's a jerk.\nA real kneebiter.", arthur.getText());
 
         assertEquals(1, countChildren(arthur));
         Note ford = arthur.getChildren().getFirst();
-        assertEquals("Ford Prefect (character)", Note.getTitle(ford));
-        assertNull(Note.getText(ford));
+        assertEquals("Ford Prefect (character)", ford.getLabel());
+        assertNull(ford.getText());
     }
 
     private void copyVCSFileToDirectory(final Topic topic, final File dir) throws IOException {

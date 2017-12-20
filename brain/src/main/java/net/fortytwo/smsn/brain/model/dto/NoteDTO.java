@@ -5,27 +5,28 @@ import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
-public class NoteDTO implements Note {
+public class NoteDTO extends ListNodeDTO<Note> implements Note {
 
     private final Map<String, Object> propertyMap;
     private Topic topic;
 
+    private int numberOfChildren;
+    private int numberOfParents;
+
     public NoteDTO() {
+        super();
+
         propertyMap = new HashMap<>();
 
-        String id = SemanticSynchrony.createRandomId();
-        Note.setId(this, id);
-        Note.setTitle(this, "note " + id);
-        Note.setCreated(this, System.currentTimeMillis());
-        Note.setWeight(this, SemanticSynchrony.DEFAULT_WEIGHT);
-        Note.setPriority(this, SemanticSynchrony.DEFAULT_PRIORITY);
+        setLabel("default note");
+        setCreated(System.currentTimeMillis());
+        setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
+        setPriority(SemanticSynchrony.DEFAULT_PRIORITY);
         // TODO: don't hard-code the default source
-        Note.setSource(this, "public");
+        setSource("public");
     }
 
     @Override
@@ -43,6 +44,24 @@ public class NoteDTO implements Note {
     }
 
     @Override
+    public int getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
+    @Override
+    public int getNumberOfParents() {
+        return numberOfParents;
+    }
+
+    public void setNumberOfChildren(int number) {
+        this.numberOfChildren = number;
+    }
+
+    public void setNumberOfParents(int number) {
+        this.numberOfParents = number;
+    }
+
+    @Override
     public Topic getTopic() {
         return topic;
     }
@@ -53,33 +72,20 @@ public class NoteDTO implements Note {
     }
 
     @Override
-    public ListNode<Note> getChildren() {
+    public Note getParent() {
         return null;
     }
 
     @Override
-    public void setChildren(ListNode<Note> notes) {
+    public void addChild(int index, Note child) {
+        ListNode.add(this, index, child, (note, rest) -> {
+            setRest(rest);
+            return note;
+        });
     }
 
     @Override
-    public void forFirstOf(Consumer<ListNode<Note>> consumer) {
-    }
-
-    @Override
-    public void addChildAt(Note child, int position) {
-    }
-
-    @Override
-    public void deleteChildAt(int position) {
-    }
-
-    @Override
-    public Collection<ListNode<Note>> getFirstOf() {
-        return null;
-    }
-
-    @Override
-    public Note getSubject(ListNode<Note> notes) {
-        return null;
+    public void removeChild(int index) {
+        ListNode.remove(this, index);
     }
 }

@@ -6,9 +6,8 @@ import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.config.Service;
 import org.apache.commons.io.IOUtils;
@@ -101,19 +100,19 @@ public class BrainClient {
      * @param style  the adjacency style of the view
      * @return a partial view of the graph as a tree of <code>Note</code> objects
      */
-    public TreeNode<Link> view(final TreeNode<Link> root,
+    public Note view(final Note root,
                      final int height,
                      final Filter filter,
                      final ViewStyle style,
                      final boolean includeTypes) throws BrainClientException {
 
-        if (null == root || null == TreeViews.getId(root) || height < 0 || null == filter || null == style) {
+        if (null == root || null == Model.getTopicId(root) || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
-            requestJson.put(Params.ROOT, TreeViews.getId(root));
+            requestJson.put(Params.ROOT, Model.getTopicId(root));
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.INCLUDE_TYPES, includeTypes);
@@ -126,7 +125,7 @@ public class BrainClient {
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "view?" + paramStr;
 
-        final TreeNode<Link>[] results = new TreeNode[1];
+        final Note[] results = new Note[1];
 
         HttpResponseHandler handler = response -> {
             int code = response.getStatusLine().getStatusCode();
@@ -168,18 +167,18 @@ public class BrainClient {
      *               Notes and links which do not meet the criteria are not to be affected by the update.
      * @param style  the adjacency style of the view
      */
-    public void update(final TreeNode<Link> root,
+    public void update(final Note root,
                        final int height,
                        final Filter filter,
                        final ViewStyle style) throws BrainClientException {
 
-        if (null == root || null == TreeViews.getId(root) || height < 0 || null == filter || null == style) {
+        if (null == root || null == Model.getTopicId(root) || height < 0 || null == filter || null == style) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
-            requestJson.put(Params.ROOT, TreeViews.getId(root));
+            requestJson.put(Params.ROOT, Model.getTopicId(root));
             requestJson.put(Params.HEIGHT, height);
             requestJson.put(Params.STYLE, style.getName());
             requestJson.put(Params.VIEW, toJson(root));
@@ -221,18 +220,18 @@ public class BrainClient {
         }
     }
 
-    public void setProperty(final TreeNode<Link> root,
+    public void setProperty(final Note root,
                             final String name,
                             final String value) throws BrainClientException {
         // TODO: add ability to clear property values
-        if (null == root || null == TreeViews.getId(root)
+        if (null == root || null == Model.getTopicId(root)
                 || null == name || 0 == name.length() || null == value || 0 == value.length()) {
             throw new IllegalArgumentException();
         }
 
         JSONObject requestJson = new JSONObject();
         try {
-            requestJson.put(Params.ID, TreeViews.getId(root));
+            requestJson.put(Params.ID, Model.getTopicId(root));
             requestJson.put(Params.NAME, name);
             requestJson.put(Params.TITLE, value);
         } catch (JSONException e) {
@@ -271,7 +270,7 @@ public class BrainClient {
      * @param style     the adjacency style of the view
      * @return an ordered list of query results
      */
-    public List<TreeNode<Link>> search(final TreeViews.QueryType queryType,
+    public List<Note> search(final Model.QueryType queryType,
                              final String query,
                              final int height,
                              final Filter filter,
@@ -296,7 +295,7 @@ public class BrainClient {
         String paramStr = URLEncodedUtils.format(params, SemanticSynchrony.UTF8);
         String path = baseUrl + "search?" + paramStr;
 
-        final List<TreeNode<Link>> results = new LinkedList<>();
+        final List<Note> results = new LinkedList<>();
 
         HttpResponseHandler handler = response -> {
             int code = response.getStatusLine().getStatusCode();
@@ -397,7 +396,7 @@ public class BrainClient {
         void handle(HttpResponse response) throws IOException;
     }
 
-    private JSONObject toJson(final TreeNode<Link> tree) throws IOException {
+    private JSONObject toJson(final Note tree) throws IOException {
         return jsonPrinter.toJson(tree);
     }
 

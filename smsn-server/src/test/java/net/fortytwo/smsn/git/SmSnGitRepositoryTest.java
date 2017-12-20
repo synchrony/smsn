@@ -4,12 +4,10 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
@@ -112,12 +110,12 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         repo.addAll();
         repo.commitAll("second commit");
 
-        TreeNode<Link> history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
-        assertEquals(2, history.getChildren().length());
-        TreeNode<Link> secondCommit = history.getChildren().get(0);
-        TreeNode<Link> firstCommit = history.getChildren().get(1);
-        assertTrue(TreeViews.getTitle(firstCommit).endsWith("first commit"));
-        assertTrue(TreeViews.getTitle(secondCommit).endsWith("second commit"));
+        Note history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
+        assertEquals(2, ListNode.lengthOf(history.getFirst()));
+        Note secondCommit = history.getFirst().get(0);
+        Note firstCommit = history.getFirst().get(1);
+        assertTrue(firstCommit.getLabel().endsWith("first commit"));
+        assertTrue(secondCommit.getLabel().endsWith("second commit"));
         /* TODO: test interned notes
         assertEquals(1, firstCommit.getChildren().size());
         assertEquals(2, secondCommit.getChildren().size());
@@ -151,25 +149,23 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         return count;
     }
 
-    private TreeNode<Link> testNote(final String id, final String title) {
-        TreeNode<Link> note = TreeNodeDTO.createEmptyNode();
+    private Note testNote(final String id, final String title) {
+        Note note = new NoteDTO();
 
-        TreeViews.setId(note, id);
-        TreeViews.setTitle(note, title);
-        TreeViews.setSource(note, DefaultSources.PUBLIC);
-        TreeViews.setWeight(note, SemanticSynchrony.DEFAULT_WEIGHT);
-        TreeViews.setCreated(note, System.currentTimeMillis());
+        Model.setTopicId(note, id);
+        note.setLabel(title);
+        note.setSource(DefaultSources.PUBLIC);
+        note.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
+        note.setCreated(System.currentTimeMillis());
 
         return note;
     }
 
-    private void addFile(final TreeNode<Link> tree) throws IOException {
-        assertNotNull(TreeViews.getId(tree));
-        File file = new File(repoDir, TreeViews.getId(tree));
+    private void addFile(final Note note) throws IOException {
+        assertNotNull(Model.getTopicId(note));
+        File file = new File(repoDir, Model.getTopicId(note));
         try (OutputStream out = new FileOutputStream(file)) {
-            Page page = PageDTO.createTransitional();
-            page.setContent(tree);
-            new WikiPrinter(out).print(page);
+            new WikiPrinter(out).print(note);
         }
     }
 

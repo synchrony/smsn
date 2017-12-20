@@ -24,6 +24,10 @@ public interface ListNode<T> extends Entity {
 
     ListNode<T> remove(int index);
 
+    static <T> int lengthOf(final ListNode<T> list) {
+        return null == list ? 0 : list.length();
+    }
+
     static <T> List<T> toJavaList(ListNode<T> list) {
         List<T> javaList = new LinkedList<>();
         ListNode<T> cur = list;

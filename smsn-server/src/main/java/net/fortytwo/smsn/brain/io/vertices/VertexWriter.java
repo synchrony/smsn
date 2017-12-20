@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,44 +28,30 @@ public class VertexWriter extends NoteWriter {
         TopicGraph sourceGraph = context.getTopicGraph();
         Filter filter = context.getFilter();
         Preconditions.checkNotNull(filter);
-        KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
-        p.println("created\tid\tweight\tsource\tclass\tout\tin\ttitle\talias");
+        p.println("created\tid\tweight\tsource\ttitle\talias");
 
         for (Note a : sourceGraph.getAllNotes()) {
             if (isTrueNote(a) && filter.test(a)) {
-                p.print(Note.getCreated(a));
+                p.print(a.getCreated());
                 p.print('\t');
-                p.print(Note.getId(a));
+                p.print(a.getTopic().getId());
                 p.print('\t');
-                p.print(Note.getWeight(a));
+                p.print(a.getWeight());
                 p.print('\t');
-                p.print(Note.getSource(a));
+                p.print(a.getSource());
                 p.print('\t');
 
-                List<KnowledgeBase.NoteClassEntry> entries = sourceKb.getClassInfo(a);
-                if (null != entries && entries.size() > 0) {
-                    KnowledgeBase.NoteClassEntry e = entries.get(0);
-                    p.print(e.getInferredClassName());
-                    p.print('\t');
-                    p.print(e.getOutScore());
-                    p.print('\t');
-                    p.print(e.getInScore());
-                    p.print('\t');
-                } else {
-                    p.print("\t0\t0\t");
-                }
-
-                String value = Note.getTitle(a);
+                String value = a.getLabel();
                 if (null == value) {
-                    logger.warning("note has null @title: " + Note.getId(a));
+                    logger.warning("note has null @title: " + a.getTopic().getId());
                 } else {
-                    p.print(escapeValue(Note.getTitle(a)));
+                    p.print(escapeValue(a.getLabel()));
                 }
                 p.print('\t');
 
-                String alias = Note.getAlias(a);
+                String alias = a.getAlias();
                 if (null != alias) {
                     p.print(escapeValue(alias));
                 }
@@ -77,7 +62,7 @@ public class VertexWriter extends NoteWriter {
     }
 
     private boolean isTrueNote(final Note a) {
-        return null != Note.getCreated(a);
+        return null != a.getCreated();
     }
 
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.

@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.Model;
 import org.junit.Test;
 
 import java.util.function.Predicate;
@@ -58,7 +58,7 @@ public class FilterIndexTest {
 
     private int indexFor(final int position, final Integer[] array) {
         ListNode<Integer> list = toEntityList(array);
-        return TreeViews.indexOfNthVisible(list, position, filter);
+        return Model.indexOfNthVisible(list, position, filter);
     }
 
     private ListNode<Integer> toEntityList(final Integer[] array) {

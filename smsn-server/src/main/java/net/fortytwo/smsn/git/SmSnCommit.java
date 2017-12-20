@@ -28,16 +28,16 @@ public class SmSnCommit extends NoteDTO {
         this.repository = repository;
         this.commit = commit;
 
-        Note.setCreated(this, commit.getCommitTime() * 1000L);
-        Note.setTitle(this, createTitle());
-        Note.setSource(this, Note.getSource(repository));
+        this.setCreated(commit.getCommitTime() * 1000L);
+        this.setLabel(createTitle());
+        this.setSource(repository.getSource());
     }
 
 
     private String createTitle() {
         String message = commit.getFullMessage().trim();
 
-        String dateLabel = SmSnGitRepository.formatDate(Note.getCreated(this));
+        String dateLabel = SmSnGitRepository.formatDate(this.getCreated());
         String authorLabel = getPersonLabel(getAuthorOrCommitter(commit));
 
         return dateLabel + " " + authorLabel + ": " + message;
@@ -112,7 +112,7 @@ public class SmSnCommit extends NoteDTO {
     }
 
     private Note changedNote(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
-        Optional<Note> opt = repository.getBrain().getTopicGraph().getNoteById(id);
+        Optional<Note> opt = repository.getBrain().getTopicGraph().getTopicById(id);
         Note note;
 
         if (opt.isPresent()) {
@@ -120,10 +120,10 @@ public class SmSnCommit extends NoteDTO {
         } else {
             note = new NoteDTO();
             Note.setId(note, id);
-            Note.setCreated(note, timestamp);
-            Note.setTitle(note, SmSnGitRepository.titleForMissingNote(changeType));
-            Note.setWeight(note, SemanticSynchrony.DEFAULT_WEIGHT);
-            Note.setSource(note, Note.getSource(this));
+            note.setCreated(timestamp);
+            note.setLabel(SmSnGitRepository.titleForMissingNote(changeType));
+            note.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
+            note.setSource(this.getSource());
         }
 
         return note;

@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.Model;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class ActionContext {
     private Map<String, Object> map;
     private GraphWrapper graphWrapper;
     private Brain brain;
-    private TreeViews queries;
+    private Model model;
     private WikiParser wikiParser;
     private JsonParser jsonParser;
     private JsonPrinter jsonPrinter;
@@ -43,12 +43,12 @@ public class ActionContext {
         this.map = map;
     }
 
-    public TreeViews getQueries() {
-        return queries;
+    public Model getModel() {
+        return model;
     }
 
-    public void setQueries(TreeViews queries) {
-        this.queries = queries;
+    public void setModel(Model model) {
+        this.model = model;
     }
 
     public JsonPrinter getJsonPrinter() {

@@ -1,20 +1,14 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.PageParser;
+import net.fortytwo.smsn.brain.io.NoteParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
-import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,12 +17,12 @@ import java.io.InputStreamReader;
 import java.util.Stack;
 import java.util.regex.Matcher;
 
-public class WikiParser extends PageParser {
+public class WikiParser extends NoteParser {
 
     private enum State {Properties, Content, Text}
 
-    private Page page;
-    private final Stack<Stack<TreeNode<Link>>> nodeHierarchy = new Stack<>();
+    private Note root;
+    private final Stack<Stack<Note>> noteHierarchy = new Stack<>();
     private final Stack<Integer> indentHierarachy = new Stack<>();
 
     private int lineNumber;
@@ -38,14 +32,14 @@ public class WikiParser extends PageParser {
 
     private String currentPropertyKey;
     private String currentPropertyValue;
-    private Page currentPage;
+    private Note currentNote;
 
     @Override
-    public Page parse(final InputStream inputStream) throws IOException {
+    public Note parse(final InputStream inputStream) throws IOException {
         return parseInternal(inputStream);
     }
 
-    private Page parseInternal(final InputStream inputStream) throws IOException {
+    private Note parseInternal(final InputStream inputStream) throws IOException {
         reset();
 
         BufferedReader br = createReader(inputStream);
@@ -55,37 +49,9 @@ public class WikiParser extends PageParser {
 
         adjustHierarchy(-1);
 
-        return page;
+        return root;
     }
-
-    private Page createPage() {
-        // TODO: supply id externally
-        Topic topic = new TopicDTO();
-        topic.setId(null);
-        Link link = new LinkDTO();
-        // TODO: set label externally
-        link.setLabel(null);
-        link.setTarget(topic);
-        TreeNode<Link> content = new TreeNodeDTO<>();
-        content.setValue(link);
-
-        Page page = new PageDTO();
-        page.setContent(content);
-        // TODO: set source externally
-
-        return page;
-    }
-
-    private Page copyPage() {
-        Page copy = new PageDTO();
-
-        for (Property prop : Page.propertiesByKey.values()) {
-            prop.getSetter().accept(copy, prop.getGetter().apply(page));
-        }
-
-        return copy;
-    }
-
+    
     private void parseLine() throws IOException {
         incrementLineNumber();
 
@@ -97,7 +63,7 @@ public class WikiParser extends PageParser {
             case Properties:
                 if (!currentLineIsEmpty()) {
                     if (currentLineIsProperty()) {
-                        parsePropertyLine(page);
+                        parsePropertyLine(root);
                         break;
                     } else {
                         // note: falls through to "Content" case
@@ -127,16 +93,16 @@ public class WikiParser extends PageParser {
     }
 
     private void reset() {
-        nodeHierarchy.clear();
+        noteHierarchy.clear();
         indentHierarachy.clear();
         indentHierarachy.push(-1);
 
         currentState = State.Properties;
         lineNumber = 0;
 
-        page = createPage();
-        nodeHierarchy.push(new Stack<>());
-        nodeHierarchy.peek().push(page.getContent());
+        root = new NoteDTO();
+        noteHierarchy.push(new Stack<>());
+        noteHierarchy.peek().push(root);
     }
 
     private void replaceTabsWithSpaces() {
@@ -163,37 +129,25 @@ public class WikiParser extends PageParser {
     private void adjustHierarchy(final int indentLevel) {
         while (indentLevel < indentHierarachy.peek()) {
             indentHierarachy.pop();
-            Stack<TreeNode<Link>> siblings = nodeHierarchy.pop();
-            TreeNode<Link> parent = nodeHierarchy.peek().peek();
-            addChildren(parent, siblings);
+            Stack<Note> siblings = noteHierarchy.pop();
+            Note parent = noteHierarchy.peek().peek();
+            Note.setChildren(parent, siblings);
         }
 
         if (indentLevel > indentHierarachy.peek()) {
             indentHierarachy.push(indentLevel);
-            nodeHierarchy.push(new Stack<>());
+            noteHierarchy.push(new Stack<>());
         }
     }
 
-    private TreeNode<Link> getCurrentNode() {
-        return nodeHierarchy.peek().peek();
+    private Note getCurrentNote() {
+        return noteHierarchy.peek().peek();
     }
 
-    private void addToHierarchy(final TreeNode<Link> tree) {
+    private void addToHierarchy(final Note note) {
         adjustHierarchy(findIndentLevel());
 
-        nodeHierarchy.peek().push(tree);
-    }
-
-    private void addChildren(final TreeNode<Link> parent, Stack<TreeNode<Link>> children) {
-        if (children.isEmpty()) {
-            return;
-        }
-
-        ListNode<TreeNode<Link>> cur = null;
-        while (!children.isEmpty()) {
-            cur = new ListNodeDTO<>(children.pop(), cur);
-        }
-        parent.setChildren(cur);
+        noteHierarchy.peek().push(note);
     }
 
     private boolean currentLineIsEmpty() {
@@ -204,14 +158,15 @@ public class WikiParser extends PageParser {
         return currentLineTrimmed.startsWith("@");
     }
 
-    private void validateLink(Link link) throws IOException {
-        if (null != link.getLabel() && 0 == link.getLabel().length()) {
-            if (null == link.getTarget()) {
-                parseError("empty label in placeholder link");
+    private void validate(Note note) throws IOException {
+        String label = note.getLabel();
+        if (null != label && 0 == label.length()) {
+            if (null == note.getTopic()) {
+                parseError("empty label in placeholder note");
             } else {
                 // Empty labels are allowed for existing links.
                 // They signify that an existing link's label should not be overwritten.
-                link.setLabel(null);
+                note.setLabel(null);
             }
         }
     }
@@ -220,8 +175,8 @@ public class WikiParser extends PageParser {
         throw new IOException("line " + lineNumber + ": " + message);
     }
 
-    private void parsePropertyLine(final Page page) throws IOException {
-        currentPage = page;
+    private void parsePropertyLine(final Note note) throws IOException {
+        currentNote = note;
 
         int firstSpace = currentLineTrimmed.indexOf(' ');
         if (-1 == firstSpace) {
@@ -249,7 +204,7 @@ public class WikiParser extends PageParser {
         String value = WikiFormat.stripTrailingSpace(currentPropertyValue);
 
         checkForEmptyPropertyValue(key, value);
-        setProperty(currentPage, key, value);
+        setProperty(currentNote, key, value);
     }
 
     private void checkForEmptyPropertyValue(final String key, final String value) throws IOException {
@@ -271,7 +226,7 @@ public class WikiParser extends PageParser {
     }
 
     private void parseContentPropertyLine() throws IOException {
-        parsePropertyLine(getCurrentNode().getValue().getPage());
+        parsePropertyLine(getCurrentNote());
     }
 
     private void parseContentTitleLine() throws IOException {
@@ -296,11 +251,11 @@ public class WikiParser extends PageParser {
             label = rest;
         }
 
-        TreeNode<Link> tree = constructTreeNode(id, tagForBullet(bullet), label);
-        addToHierarchy(tree);
+        Note note = constructNote(id, tagForBullet(bullet), label);
+        addToHierarchy(note);
     }
 
-    private <T> void setProperty(final Page page, final String key, String value) throws IOException {
+    private <T> void setProperty(final Note note, final String key, String value) throws IOException {
         if (value.length() == 0) {
             value = WikiFormat.CLEARME;
         }
@@ -308,13 +263,13 @@ public class WikiParser extends PageParser {
         // TODO: transitional
         switch (key) {
             case "id":
-                page.getContent().getValue().getTarget().setId(value);
+                note.getTopic().setId(value);
                 break;
             case "title":
-                page.getContent().getValue().setLabel(value);
+                note.setLabel(value);
                 break;
             default:
-                Property<Page, T> prop = (Property<Page, T>) Page.propertiesByKey.get(key);
+                Property<Note, T> prop = (Property<Note, T>) Note.propertiesByKey.get(key);
                 if (null == prop) {
                     // unknown properties are quietly ignored
                     return;
@@ -329,7 +284,7 @@ public class WikiParser extends PageParser {
                     return;
                 }
 
-                prop.getSetter().accept(page, typeSafeValue);
+                prop.getSetter().accept(note, typeSafeValue);
                 break;
         }
     }
@@ -340,26 +295,18 @@ public class WikiParser extends PageParser {
                 : null;
     }
 
-    private TreeNode<Link> constructTreeNode(final String topicId, final Role role, final String label)
+    private Note constructNote(final String topicId, final Role role, final String label)
             throws IOException {
-        Link link = new LinkDTO();
-        link.setRole(role);
-        link.setLabel(label);
+        Note note = new NoteDTO();
+        note.setRole(role);
+        note.setLabel(label);
         if (null != topicId) {
-            Topic target = new TopicDTO();
-            if (null != topicId) {
-                target.setId(topicId);
-            }
-            link.setTarget(target);
+            Topic topic = new TopicDTO();
+            topic.setId(topicId);
+            note.setTopic(topic);
         }
-        //link.setPage(page);
-        link.setPage(copyPage());
-
-        validateLink(link);
-
-        TreeNode<Link> treeNode = new TreeNodeDTO<>();
-        treeNode.setValue(link);
-        return treeNode;
+        validate(note);
+        return note;
     }
 
     private void incrementLineNumber() {

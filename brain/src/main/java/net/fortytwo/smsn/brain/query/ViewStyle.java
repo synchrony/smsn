@@ -2,19 +2,22 @@ package net.fortytwo.smsn.brain.query;
 
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.query.styles.TopicParents;
+import net.fortytwo.smsn.brain.query.styles.TopicChildrenAddOnly;
+import net.fortytwo.smsn.brain.query.styles.TopicChildren;
+import net.fortytwo.smsn.brain.query.styles.NoteChildren;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Consumer;
 
 public interface ViewStyle {
 
     enum Direction {Forward, Backward}
 
     enum Basic {
-        Forward(createForwardStyle()),
-        ForwardAddOnly(createForwardAddOnlyStyle()),
-        Backward(createBackwardStyle());
+        Simple(new NoteChildren()),
+        Forward(new TopicChildren()),
+        ForwardAddOnly(new TopicChildrenAddOnly()),
+        Backward(new TopicParents());
 
         private final ViewStyle style;
 
@@ -33,137 +36,19 @@ public interface ViewStyle {
                 }
             }
 
-            throw new IllegalArgumentException("unknown view style: " + name);
-        }
-
-        private static ViewStyle createForwardStyle() {
-            return new ViewStyle() {
-                @Override
-                public String getName() {
-                    return "forward";
-                }
-
-                @Override
-                public Iterable<Note> getLinked(final Note root,
-                                                final Filter filter) {
-                    return TreeViews.toFilteredIterable(root.getChildren(), filter);
-                }
-
-                @Override
-                public boolean addOnUpdate() {
-                    return true;
-                }
-
-                @Override
-                public boolean deleteOnUpdate() {
-                    return true;
-                }
-
-                @Override
-                public Direction getDirection() {
-                    return Direction.Forward;
-                }
-
-                @Override
-                public ViewStyle getInverse() {
-                    return Basic.Backward.getStyle();
-                }
-            };
-        }
-
-        private static ViewStyle createForwardAddOnlyStyle() {
-            return new ViewStyle() {
-                @Override
-                public String getName() {
-                    return "forward-add-only";
-                }
-
-                @Override
-                public Iterable<Note> getLinked(final Note root,
-                                                final Filter filter) {
-                    return TreeViews.toFilteredIterable(root.getChildren(), filter);
-                }
-
-                @Override
-                public boolean addOnUpdate() {
-                    return true;
-                }
-
-                @Override
-                public boolean deleteOnUpdate() {
-                    return false;
-                }
-
-                @Override
-                public Direction getDirection() {
-                    return Direction.Forward;
-                }
-
-                @Override
-                public ViewStyle getInverse() {
-                    return Basic.Backward.getStyle();
-                }
-            };
-        }
-
-        private static ViewStyle createBackwardStyle() {
-            return new ViewStyle() {
-                @Override
-                public String getName() {
-                    return "backward";
-                }
-
-                @Override
-                public Iterable<Note> getLinked(final Note root,
-                                                final Filter filter) {
-                    List<Note> results = new LinkedList<>();
-                    root.forFirstOf(list -> {
-                        ListNode<Note> cur = list;
-                        ListNode<Note> prev = null;
-                        while (null != cur) {
-                            prev = cur;
-                            cur = cur.getRestOf();
-                        }
-
-                        Note a = root.getSubject(prev);
-                        if (filter.test(a)) {
-                            results.add(a);
-                        }
-                    });
-
-                    return results;
-                }
-
-                @Override
-                public boolean addOnUpdate() {
-                    return false;
-                }
-
-                @Override
-                public boolean deleteOnUpdate() {
-                    return false;
-                }
-
-                @Override
-                public Direction getDirection() {
-                    return Direction.Backward;
-                }
-
-                @Override
-                public ViewStyle getInverse() {
-                    return Basic.Forward.getStyle();
-                }
-            };
+            throw new IllegalArgumentException("unknown " + ViewStyle.class.getName() + ": " + name);
         }
     }
 
     String getName();
 
-    Iterable<Note> getLinked(Note root, Filter filter);
+    void visitLinked(Note root, Filter filter, Consumer<Note> visitor);
 
     boolean addOnUpdate();
 
     boolean deleteOnUpdate();
+
+    boolean deleteRecursively();
 
     Direction getDirection();
 

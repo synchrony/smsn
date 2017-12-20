@@ -1,21 +1,16 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
+import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,7 +52,7 @@ public class VCSWriter extends NoteWriter {
 
     private void clearDirectoryOfSmSnData(final File dir) {
         for (File file : dir.listFiles()) {
-            if (VCSFormat.isSmSnFile(file)) {
+            if (VCSFormat.isDataFile(file)) {
                 if (!file.delete()) {
                     throw new IllegalStateException("failed to delete SmSn file " + file.getAbsolutePath());
                 }
@@ -85,11 +80,11 @@ public class VCSWriter extends NoteWriter {
     }
 
     private boolean isNoteWithPage(final Note a) {
-        return null != Note.getSource(a);
+        return null != a.getSource();
     }
 
     private File chooseDirectoryForNote(final Note a, Map<String, File> dirs) {
-        String source = Note.getSource(a);
+        String source = a.getSource();
         Preconditions.checkNotNull(source);
         File dir = dirs.get(source);
         Preconditions.checkNotNull(dir);
@@ -97,35 +92,23 @@ public class VCSWriter extends NoteWriter {
     }
 
     private void writeNoteToStream(final Note note, final OutputStream out) {
-        TreeNode<Link> tree = new TreeNodeDTO<>();
-        Topic topic = new TopicDTO();
-        topic.setId(Note.getId(note));
-        Link link = new LinkDTO();
-        link.setTarget(topic);
-        link.setLabel(Note.getTitle(note));
-        tree.setValue(link);
-
-        ListNode<Note> cur = note.getChildren();
-        while (null != cur) {
-            tree.addChild(toTree(cur.getFirst()));
-            cur = cur.getRest();
+        Note outNote = new NoteDTO();
+        outNote.setTopic(note.getTopic());
+        for (Property prop : Note.propertiesByKey.values()) {
+            prop.getSetter().accept(outNote, prop.getGetter().apply(note));
         }
 
-        Page page = PageDTO.createTransitional();
-        page.setContent(tree);
-        page.setCreated(Note.getCreated(note));
-        page.setShortcut(Note.getShortcut(note));
-        page.setText(Note.getText(note));
-        page.setAlias(Note.getAlias(note));
-        page.setPriority(Note.getPriority(note));
-        page.setWeight(Note.getWeight(note));
-        new WikiPrinter(out).print(page);
-    }
+        if (null != note.getFirst()) {
+            List<Note> children = new LinkedList<>();
+            for (Note child : ListNode.toJavaList(note.getFirst())) {
+                NoteDTO childCopy = new NoteDTO();
+                childCopy.setTopic(child.getTopic());
+                children.add(childCopy);
+            }
+            Note.setChildren(outNote, (Note[]) children.toArray());
+        }
 
-    private TreeNode<Link> toTree(final Note note) {
-        TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(tree, Note.getId(note));
-        return tree;
+        new WikiPrinter(out).print(note);
     }
 
     private <E extends Exception> void timeAction(final String description,

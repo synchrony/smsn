@@ -1,14 +1,12 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
-import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
-import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
+import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
 import java.util.logging.Logger;
 
@@ -42,12 +40,12 @@ public class GetNoteValueMapping extends NoteMapping {
         Object first = stack.getFirst();
         stack = stack.getRest();
 
-        TreeNode<Link> n = toTree(first, 0, true);
+        Note n = toTree(first, 0, true);
 
         if (null == n) {
             logger.warning("can't get @value of non-note: " + first);
         } else {
-            String value = TreeViews.getTitle(n);
+            String value = n.getLabel();
             if (null == value) {
                 logger.warning("note note has no @value: " + n);
             } else {

@@ -43,7 +43,7 @@ public class FindDuplicates extends FilteredAction {
         dups.forEach(flat::addAll);
 
         try {
-            addView(context.getQueries().customView(flat, getFilter()), context);
+            addView(context.getModel().customView(flat, getFilter()), context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
@@ -67,7 +67,7 @@ public class FindDuplicates extends FilteredAction {
 
         for (Note a : graph.getAllNotes()) {
             if (filter.test(a)) {
-                String title = Note.getTitle(a);
+                String title = a.getLabel();
                 if (null != title && 0 < title.length()) {
                     String hash;
                     try {

@@ -6,10 +6,9 @@ import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.model.dto.NoteDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.query.Model;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 
@@ -59,16 +58,16 @@ public class AddToStreamMapping extends NoteMapping {
     }
 
     private void prepend(final String value) throws RippleException {
-        TreeNode<Link> note = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(note, SemanticSynchrony.createRandomId());
-        TreeViews.setSource(note, filter.getDefaultSource());
-        TreeViews.setWeight(note, filter.getDefaultWeight());
-        TreeViews.setCreated(note, System.currentTimeMillis());
-        TreeViews.setTitle(note, value);
+        Note note = new NoteDTO();
+        Model.setTopicId(note, SemanticSynchrony.createRandomId());
+        note.setSource(filter.getDefaultSource());
+        note.setWeight(filter.getDefaultWeight());
+        note.setCreated(System.currentTimeMillis());
+        note.setLabel(value);
 
-        TreeNode<Link> streamTreeNode = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(streamTreeNode, brainStream);
-        streamTreeNode.addChild(note);
+        Note streamTreeNode = new NoteDTO();
+        Model.setTopicId(streamTreeNode, brainStream);
+        streamTreeNode.addChild(0, note);
 
         try {
             client.update(streamTreeNode, 1, filter, ViewStyle.Basic.ForwardAddOnly.getStyle());

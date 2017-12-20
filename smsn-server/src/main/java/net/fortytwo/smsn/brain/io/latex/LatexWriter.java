@@ -37,7 +37,7 @@ public class LatexWriter extends NoteWriter {
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
-        Optional<Note> opt = context.getTopicGraph().getNoteById(rootId);
+        Optional<Note> opt = context.getTopicGraph().getTopicById(rootId);
         if (!opt.isPresent()) {
             throw new IllegalStateException("no such note: " + rootId);
         }
@@ -61,7 +61,7 @@ public class LatexWriter extends NoteWriter {
         }
 
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = Note.getTitle(root).trim();
+        String value = root.getLabel().trim();
 
         for (Serializer serializer : serializers) {
             if (serializer.matches(value)) {
@@ -72,7 +72,7 @@ public class LatexWriter extends NoteWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Note child : ViewStyle.Basic.Forward.getStyle().getLinked(root, filter)) {
+                    for (Note child : ViewStyle.Basic.Forward.getStyle().visitLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }

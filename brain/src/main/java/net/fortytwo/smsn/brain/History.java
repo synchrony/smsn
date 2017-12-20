@@ -3,8 +3,10 @@ package net.fortytwo.smsn.brain;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.model.entities.Topic;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -40,9 +42,15 @@ public class History {
 
             String id = visited[i % CAPACITY];
 
-            Optional<Note> a = graph.getNoteById(id);
-            if (a.isPresent() && filter.test(a.get())) {
-                notes.add(a.get());
+            Optional<Topic> a = graph.getTopicById(id);
+            if (a.isPresent()) {
+                Iterator<Note> iter = a.get().getNotes();
+                while (iter.hasNext()) {
+                    Note note = iter.next();
+                    if (filter.test(note)) {
+                        notes.add(note);
+                    }
+                }
             }
         }
 

@@ -1,7 +1,8 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.ActivityLog;
+import net.fortytwo.smsn.brain.error.InvalidUpdateException;
+import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -45,64 +46,42 @@ public class SetProperties extends FilteredAction {
         this.value = value;
     }
 
-    private void validateKeyValue() {
-        switch (getName()) {
-            case SemanticSynchrony.PropertyKeys.TITLE:
-                validateTitle();
-                break;
-            case SemanticSynchrony.PropertyKeys.TEXT:
-                // nothing to do; every Markdown page is valid
-                break;
-            case SemanticSynchrony.PropertyKeys.WEIGHT:
-                validateWeight();
-                break;
-            case SemanticSynchrony.PropertyKeys.SOURCE:
-                validateSource();
-                break;
-            case SemanticSynchrony.PropertyKeys.PRIORITY:
-                validatePriority();
-                break;
-            case SemanticSynchrony.PropertyKeys.SHORTCUT:
-                validateShortcut();
-                break;
-            default:
-                throw new BadRequestException("unknown property: " + name);
+    private <V> V setProperty(final String key, final Object rawValue) {
+        Property<Note, V> prop = (Property<Note, V>) Note.propertiesByKey.get(key);
+        if (null == prop) {
+            throw new BadRequestException("unknown property: " + key);
         }
-    }
 
-    private void validateTitle() {
-        if (((String) getValue()).trim().length() == 0) {
-            throw new BadRequestException("empty value");
+        if (!prop.isSettable()) {
+            throw new InvalidUpdateException("property '" + prop.getKey() + "' is read-only");
         }
-    }
+        if (null == rawValue) {
+            if (prop.isRequired()) {
+                throw new InvalidUpdateException(
+                        "property '" + prop.getKey() + "' is required and cannot be set to null");
+            }
+        }
 
-    private void validateWeight() {
-        float f = toFloat(getValue());
-        // Note: weight may not currently be set to 0, which would cause the note to disappear from all normal views
-        if (f <= 0 || f > 1.0) {
-            throw new BadRequestException("weight is outside of range (0, 1]: " + f);
+        V value;
+        if (prop.getValueClass().isAssignableFrom(rawValue.getClass())) {
+            value = (V) rawValue;
+        } else if (rawValue instanceof String && null != prop.getFromString()) {
+            value = prop.getFromString().apply((String) rawValue);
+        } else {
+            throw new InvalidUpdateException("value is not of expected type " + prop.getValueClass().getSimpleName()
+                    + ": " + rawValue);
         }
-    }
 
-    private void validateSource() {
-        String source = (String) getValue();
-        if (source.trim().length() == 0) {
-            throw new BadRequestException("empty source");
+        if (null != prop.getValidator()) {
+            try {
+                prop.getValidator().consume(value);
+            } catch (BadRequestException e) {
+                throw new InvalidUpdateException("invalid value for property '" + prop.getKey()
+                        + "': " + e.getMessage());
+            }
         }
-    }
 
-    private void validatePriority() {
-        float f = toFloat(getValue());
-        if (f < 0 || f > 1.0) {
-            throw new BadRequestException("priority is outside of range [0, 1]: " + f);
-        }
-    }
-
-    private void validateShortcut() {
-        String s = (String) getValue();
-        if (s.length() > 50) {
-            throw new BadRequestException("shortcut is too long: " + s);
-        }
+        return value;
     }
 
     private String trimPage(final String page) {
@@ -112,52 +91,48 @@ public class SetProperties extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
-        validateKeyValue();
-
         Note root = getRoot(getId(), context);
         setFilterParams(context);
-        Object value = getValue();
+
+        setProperty(root, getName(), getValue());
+
+
 
         switch (getName()) {
-            case SemanticSynchrony.PropertyKeys.TITLE:
-                Note.setTitle(root, (String) value);
+            case SemanticSynchrony.PropertyKeys.LABEL:
+                root.setLabel((String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.TEXT:
-                Note.setText(root, trimPage((String) value));
+                root.setText(trimPage((String) value));
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
-                Note.setWeight(root, toFloat(value));
+                root.setWeight(toFloat(value));
                 break;
             case SemanticSynchrony.PropertyKeys.SOURCE:
-                Note.setSource(root, (String) value);
+                root.setSource((String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
-                Note.setPriority(root, toFloat(value));
+                root.setPriority(toFloat(value));
                 context.getBrain().getPriorities().updatePriority(root);
                 break;
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
                 // first remove this shortcut from any note(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
                 for (Note a : context.getBrain().getTopicGraph().getNotesByShortcut(shortcut, getFilter())) {
-                    Note.setShortcut(a, null);
+                    a.setShortcut(null);
                 }
 
-                Note.setShortcut(root, shortcut);
+                root.setShortcut(shortcut);
                 break;
             default:
                 throw new IllegalStateException();
         }
 
-        context.getBrain().getTopicGraph().notifyOfUpdate();
-
         context.getMap().put("key", context.getBrain().getTopicGraph().idOf(root));
         context.getMap().put("name", getName());
         context.getMap().put("value", value.toString());
 
-        ActivityLog log = context.getBrain().getActivityLog();
-        if (null != log) {
-            log.logSetProperties(root);
-        }
+        logViewOperation(context, root.getTopic());
     }
 
     @Override

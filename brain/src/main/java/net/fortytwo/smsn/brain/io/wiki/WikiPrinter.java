@@ -4,9 +4,7 @@ import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.Note;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -19,9 +17,9 @@ public class WikiPrinter {
         printStream = createPrintStream(outputStream);
     }
 
-    public void print(final Page page) {
-        printProperties(page);
-        printContent(page);
+    public void print(final Note note) {
+        printProperties(note);
+        printContent(note);
     }
 
     private PrintStream createPrintStream(final OutputStream out) {
@@ -32,40 +30,41 @@ public class WikiPrinter {
         }
     }
 
-    private void printInternal(final TreeNode<Link> tree,
+    private void printInternal(final Note note,
                                final int indent,
                                final PrintStream ps) {
         indent(indent);
-        printBullet(tree);
-        printId(tree);
-        printTitle(tree);
+        printBullet(note);
+        printId(note);
+        printTitle(note);
         ps.print("\n");
 
         int nextIndent = indent + 1;
 
-        ListNode<TreeNode<Link>> cur = tree.getChildren();
+        ListNode<Note> cur = note.getFirst();
         while (null != cur) {
             printInternal(cur.getFirst(), nextIndent, ps);
             cur = cur.getRest();
         }
     }
 
-    private void printTitle(final TreeNode<Link> tree) {
-        if (null != tree.getValue().getLabel()) {
-            printStream.print(escapeValue(tree.getValue().getLabel()));
+    private void printTitle(final Note tree) {
+        String label = tree.getLabel();
+        if (null != label) {
+            printStream.print(escapeValue(label));
         }
     }
 
-    private void printId(final TreeNode<Link> tree) {
-        if (null != tree.getValue().getTarget()) {
+    private void printId(final Note tree) {
+        if (null != tree.getTopic()) {
             printStream.print(":");
-            printStream.print(tree.getValue().getTarget().getId());
+            printStream.print(tree.getTopic().getId());
             printStream.print(": ");
         }
     }
 
-    private void printBullet(final TreeNode<Link> tree) {
-        Role role = tree.getValue().getRole();
+    private void printBullet(final Note note) {
+        Role role = note.getRole();
         if (null == role) {
             printStream.print(WikiFormat.NODE_BULLET);
         } else {
@@ -80,23 +79,21 @@ public class WikiPrinter {
         printStream.print(" ");
     }
 
-    private void printContent(final Page page) {
-        TreeNode<Link> content = page.getContent();
-        if (null != content) {
-            ListNode<TreeNode<Link>> cur = content.getChildren();
-            while (null != cur) {
-                printInternal(cur.getFirst(), 0, printStream);
-                cur = cur.getRest();
-            }
+    private void printContent(final Note note) {
+        Note cur = note.getFirst();
+        while (null != cur) {
+            printInternal(cur, 0, printStream);
+            cur = (Note) cur.getRest();
         }
     }
 
-    private void printProperties(final Page page) {
-        printProperty("id", page.getContent().getValue().getTarget().getId());
-        printProperty("title", page.getContent().getValue().getLabel());
+    private void printProperties(final Note note) {
+        printProperty("id", note.getTopic().getId());
+        // TODO: label does not need to be special-cased
+        printProperty("title", note.getLabel());
 
-        Page.propertiesByKey.values().stream().filter(Property::isAnnotationProperty).forEach(prop -> {
-            Object value = prop.getGetter().apply(page);
+        Note.propertiesByKey.values().stream().filter(Property::isAnnotationProperty).forEach(prop -> {
+            Object value = prop.getGetter().apply(note);
             if (null != value && (null == prop.getDefaultValue() || !value.equals(prop.getDefaultValue()))) {
                 printProperty(prop.getKey(), value);
             }

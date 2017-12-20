@@ -1,8 +1,10 @@
 package net.fortytwo.smsn.brain.model.pg;
 
+import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.model.Property;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -10,14 +12,12 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class PGNote extends PGEntity implements Note {
+public abstract class PGNote extends PGListNode<Note> implements Note {
 
     private static final Map<String, Consumer<PGNote>> setterTriggersByPropertyKey;
 
@@ -25,15 +25,13 @@ public abstract class PGNote extends PGEntity implements Note {
         setterTriggersByPropertyKey = new HashMap<>();
 
         setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.ID, PGNote::idUpdated);
-        setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.TITLE, PGNote::titleUpdated);
+        setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.LABEL, PGNote::titleUpdated);
         setterTriggersByPropertyKey.put(SemanticSynchrony.PropertyKeys.SHORTCUT, PGNote::shortcutUpdated);
     }
 
-    public PGNote(final Vertex vertex) {
-        super(vertex);
+    public PGNote(final Vertex vertex, Function<Vertex, Note> toNote) {
+        super(vertex, toNote, SemanticSynchrony.VertexLabels.NOTE);
     }
-
-    protected abstract PGTopicGraph getGraph();
 
     @Override
     public Topic getTopic() {
@@ -46,107 +44,130 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     @Override
-    public ListNode<Note> getChildren() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfNotes(v));
+    public Note getParent() {
+        return null;
     }
 
     @Override
-    public void setChildren(ListNode<Note> children) {
-        removeAllChildren();
+    public void addChild(int index, Note child) {
+        assertHasNoRest(child);
 
-        setChildrenInternal(children);
+        setFirst((Note) ListNode.add(this, index, child, (note, rest) -> {
+            note.setRest(rest);
+            return note;
+        }));
     }
 
     @Override
-    public void forFirstOf(Consumer<ListNode<Note>> consumer) {
-        forEachAdjacentVertex(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
-                vertex -> consumer.accept(getGraph().asListOfNotes(vertex)));
+    public void removeChild(int index) {
+        ListNode<Note> removed = ListNode.remove(this, index);
+        removed.setRest(null);
+        removed.destroy();
     }
 
     @Override
-    public void addChildAt(final Note child, int position) {
-        // create a list node for the note and insert it
-        ListNode<Note> list = getGraph().createListOfNotes(child);
-        if (0 == position) {
-            list.setRest(getChildren());
-            setChildrenInternal(list);
-        } else {
-            ListNode<Note> prev = getChildren();
-            for (int i = 1; i < position; i++) {
-                prev = prev.getRest();
-            }
-
-            list.setRest(prev.getRest());
-            prev.setRest(list);
-        }
+    public int getNumberOfChildren() {
+        return ListNode.lengthOf(getFirst());
     }
 
     @Override
-    public void deleteChildAt(int position) {
-        ListNode<Note> list = getChildren();
-
-        // remove the note's list node
-        if (0 == position) {
-            setChildrenInternal(list.getRest());
-
-            deleteEntity(list);
-        } else {
-            ListNode<Note> prev = list;
-            for (int i = 1; i < position; i++) {
-                prev = prev.getRest();
-            }
-
-            ListNode<Note> l = prev.getRest();
-            prev.setRest(l.getRest());
-            deleteEntity(l);
-        }
-    }
-
-    private void setChildrenInternal(ListNode<Note> children) {
-        removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
-
-        if (null != children) {
-            addOutEdge(((PGEntity) children).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
-        }
-    }
-
-    private void removeAllChildren() {
-        ListNode<Note> cur = getChildren();
-        while (null != cur) {
-            ListNode<Note> rest = cur.getRest();
-            deleteEntity(cur);
-            cur = rest;
-        }
+    public int getNumberOfParents() {
+        return null == getParent() ? 0 : 1;
     }
 
     @Override
-    public Collection<ListNode<Note>> getFirstOf() {
-        List<ListNode<Note>> result = new java.util.LinkedList<>();
-        forAllVertices(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
-                vertex -> result.add(getGraph().asListOfNotes(vertex)));
-
-        return result;
+    public Role getRole() {
+        return getProperty(SemanticSynchrony.PropertyKeys.ROLE);
     }
 
     @Override
-    public Note getSubject(ListNode<Note> notes) {
-        PGEntity entity = (PGEntity) notes;
-        return entity.getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN,
-                vertex -> getGraph().asNote(vertex));
+    public void setRole(Role role) {
+        setProperty(SemanticSynchrony.PropertyKeys.ROLE, role);
     }
 
     @Override
-    public void destroy() {
-        destroyInternal();
+    public String getAlias() {
+        return getProperty(SemanticSynchrony.PropertyKeys.ALIAS);
     }
 
-    private void deleteEntity(final ListNode<Note> l) {
-        ((PGEntity) l).asVertex().remove();
+    @Override
+    public void setAlias(String alias) {
+        setProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
+    }
+
+    @Override
+    public Long getCreated() {
+        return getProperty(SemanticSynchrony.PropertyKeys.CREATED);
+    }
+
+    @Override
+    public void setCreated(Long created) {
+        setProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
+    }
+
+    @Override
+    public String getLabel() {
+        return getProperty(SemanticSynchrony.PropertyKeys.LABEL);
+    }
+
+    @Override
+    public void setLabel(String title) {
+        setProperty(SemanticSynchrony.PropertyKeys.LABEL, title);
+    }
+
+    @Override
+    public String getText() {
+        return getProperty(SemanticSynchrony.PropertyKeys.TEXT);
+    }
+
+    @Override
+    public void setText(String text) {
+        setProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
+    }
+
+    @Override
+    public Float getPriority() {
+        return getProperty(SemanticSynchrony.PropertyKeys.PRIORITY);
+    }
+
+    @Override
+    public void setPriority(Float priority) {
+        setProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
+    }
+
+    @Override
+    public String getShortcut() {
+        return getProperty(SemanticSynchrony.PropertyKeys.SHORTCUT);
+    }
+
+    @Override
+    public void setShortcut(String shortcut) {
+        setProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
+    }
+
+    @Override
+    public Float getWeight() {
+        return getProperty(SemanticSynchrony.PropertyKeys.WEIGHT);
+    }
+
+    @Override
+    public void setWeight(Float weight) {
+        setProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+    }
+
+    @Override
+    public String getSource() {
+        return getProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+    }
+
+    @Override
+    public void setSource(String source) {
+        setProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
     }
 
     private void updateAcronym() {
         Vertex vertex = asVertex();
-        String value = Note.getTitle(this);
+        String value = this.getLabel();
         String acronym = valueToAcronym(value);
 
         VertexProperty<String> previousProperty = vertex.property(SemanticSynchrony.PropertyKeys.ACRONYM);
@@ -193,7 +214,7 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     private void titleUpdated() {
-        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.TITLE);
+        getGraph().updateIndex(this, SemanticSynchrony.PropertyKeys.LABEL);
         updateAcronym();
     }
 
@@ -257,11 +278,15 @@ public abstract class PGNote extends PGEntity implements Note {
     public String toString() {
         String id;
         try {
-            id = Note.getId(this);
+            id = getTopic().getId();
         } catch (IllegalArgumentException e) {
             Function<PGEntity, String> toString = PGEntity::toString;
             return toString.apply(this);
         }
         return "Note[" + id + "]";
+    }
+
+    private void assertHasNoRest(final Note note) {
+        Preconditions.checkArgument(null == note.getRest());
     }
 }

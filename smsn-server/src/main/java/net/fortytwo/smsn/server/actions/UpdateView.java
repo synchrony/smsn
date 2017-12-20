@@ -1,11 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -45,49 +41,48 @@ public class UpdateView extends RootedViewAction {
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         super.performTransaction(context);
 
-        TreeNode<Link> view;
+        Note update;
 
         switch (getViewFormat()) {
             case json:
-                view = parseJson(context);
+                update = parseJson(context);
                 break;
             case wiki:
-                view = parseWikiText(context);
+                update = parseWikiText(context);
                 break;
             default:
                 throw new IllegalStateException();
         }
 
-        TreeViews.setId(view, Note.getId(getRoot()));
+        update.setTopic(getRoot().getTopic());
 
         // Apply the update
-        context.getQueries().update(view, height, getFilter(), style);
-
-        TopicGraph graph = context.getBrain().getTopicGraph();
-        // TODO: produce an appropriate view (e.g. a search) if the root is null
-        TreeNode<Link> n = null == getRoot()
-                ? graph.createTopicTree(graph.createLink(null, null, null))
-                : context.getQueries().view(getRoot(), height, getFilter(), style);
+        Note n = context.getModel().view()
+                .root(getRoot()).height(height).filter(getFilter()).style(style)
+                .put(update)
+                .get();
         try {
             addView(n, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
+
+        logUpdateOperation(context, n.getTopic());
     }
 
-    private TreeNode<Link> parseWikiText(final ActionContext params) {
+    private Note parseWikiText(final ActionContext params) {
         try {
             try (InputStream in = new ByteArrayInputStream(getView().getBytes())) {
-                return params.getWikiParser().parse(in).getContent();
+                return params.getWikiParser().parse(in);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
     }
 
-    private TreeNode<Link> parseJson(final ActionContext params) {
+    private Note parseJson(final ActionContext params) {
         try {
-            return params.getJsonParser().parse(getView()).getContent();
+            return params.getJsonParser().parse(getView());
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

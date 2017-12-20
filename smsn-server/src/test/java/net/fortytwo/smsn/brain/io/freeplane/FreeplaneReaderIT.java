@@ -44,7 +44,6 @@ public class FreeplaneReaderIT extends BrainTestBase {
         try (OutputStream out = new FileOutputStream(new File("/tmp/mindMap.xml"))) {
             NoteWriter.Context context = new NoteWriter.Context();
             context.setTopicGraph(brain.getTopicGraph());
-            context.setKnowledgeBase(brain.getKnowledgeBase());
             context.setDestStream(out);
             context.setFormat(GraphMLFormat.getInstance());
             exporter.doWrite(context);

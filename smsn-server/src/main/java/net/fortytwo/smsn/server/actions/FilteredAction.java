@@ -28,7 +28,7 @@ abstract class FilteredAction extends Action {
             root = createNewRoot(context);
             rootId = Note.getId(root);
         } else {
-            Optional<Note> opt = context.getBrain().getTopicGraph().getNoteById(rootId);
+            Optional<Note> opt = context.getBrain().getTopicGraph().getTopicById(rootId);
             if (opt.isPresent()) {
                 root = opt.get();
             } else {
@@ -42,8 +42,8 @@ abstract class FilteredAction extends Action {
 
         context.getMap().put(Params.ROOT, Note.getId(root));
 
-        setTitle(context, null == Note.getTitle(root) || 0 == Note.getTitle(root).length()
-                ? "[no title]" : Note.getTitle(root));
+        setTitle(context, null == root.getLabel() || 0 == root.getLabel().length()
+                ? "[no title]" : root.getLabel());
 
         return root;
     }
@@ -57,7 +57,7 @@ abstract class FilteredAction extends Action {
 
     private Note createNewRoot(final ActionContext context) {
         Note root = context.getBrain().getTopicGraph().createNoteWithProperties(getFilter(), null);
-        Note.setTitle(root, "life, the universe, and everything");
+        root.setLabel("life, the universe, and everything");
         return root;
     }
 }
