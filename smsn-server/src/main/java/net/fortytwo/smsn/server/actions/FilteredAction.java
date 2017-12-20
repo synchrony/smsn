@@ -7,11 +7,9 @@ import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 abstract class FilteredAction extends Action {
-    @NotNull
     private Filter filter = Filter.noFilter();
 
     public Filter getFilter() {

@@ -1,0 +1,15 @@
+dependencies {
+    compile project(':smsn-core')
+    compile(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version:rdfagentsVersion) {
+        exclude(module: 'jackson-core')
+        exclude(module: 'xmpp-mtp')
+        exclude(module: 'sesame-repository-sparql')
+        exclude(module: 'commons-codec')
+        exclude(module: 'jackson-core')
+    }
+    compile group: 'net.fortytwo.stream', name: 'stream42-sparql', version:stream42Version
+    compile group: 'com.illposed.osc', name: 'javaosc-core', version:'0.3'
+    compile group: 'commons-cli', name: 'commons-cli', version:'1.2'
+
+    testCompile group: 'junit', name: 'junit', version:junitVersion
+}
