@@ -1,12 +1,11 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.server.Action;
-import net.fortytwo.smsn.server.CoordinatorService;
 import net.fortytwo.smsn.server.ActionContext;
+import net.fortytwo.smsn.server.CoordinatorService;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.openrdf.rio.RDFFormat;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 /**
@@ -14,7 +13,6 @@ import java.io.IOException;
  */
 public class BroadcastRDF extends Action {
 
-    @NotNull
     private String dataset;
 
     public void setDataset(String dataset) {

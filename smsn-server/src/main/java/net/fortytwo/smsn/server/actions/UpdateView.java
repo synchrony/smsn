@@ -10,7 +10,6 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
-import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,9 +19,7 @@ import java.io.InputStream;
  */
 public class UpdateView extends RootedViewAction {
 
-    @NotNull
     private String view;
-    @NotNull
     private Params.Format viewFormat;
 
     private String getView() {

@@ -9,12 +9,10 @@ import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 
 public class ViewLog extends BasicViewAction {
-    @NotNull
     private File file;
 
     public File getFile() {

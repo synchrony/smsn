@@ -2,9 +2,7 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.SmSnScriptEngine;

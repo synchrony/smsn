@@ -1,0 +1,10 @@
+dependencies {
+    compile project(':brain')
+    compile project(':smsn-services')
+    compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version:tinkerpopVersion
+    compile group: 'org.apache.tinkerpop', name: 'gremlin-server', version:tinkerpopVersion
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version:'4.8.0.201705170830-rc1'
+
+    testCompile group: 'junit', name: 'junit', version:junitVersion
+    testCompile project(path: ':brain', configuration: 'testOutput')
+}

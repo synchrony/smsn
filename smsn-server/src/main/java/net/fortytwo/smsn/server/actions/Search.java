@@ -7,7 +7,6 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 /**
@@ -15,9 +14,7 @@ import java.io.IOException;
  */
 public class Search extends BasicViewAction {
 
-    @NotNull
     private String query;
-    @NotNull
     private TreeViews.QueryType queryType;
 
     private String getQuery() {

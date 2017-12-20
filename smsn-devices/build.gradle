@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':smsn-services')
+
+    testCompile group: 'junit', name: 'junit', version:junitVersion
+}

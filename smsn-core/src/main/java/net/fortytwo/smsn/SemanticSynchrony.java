@@ -61,7 +61,7 @@ public class SemanticSynchrony {
 
     public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
-    private static final int ID_DIGITS = 16;
+    public static final int ID_DIGITS = 16;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 

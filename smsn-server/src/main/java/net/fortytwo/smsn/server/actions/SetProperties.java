@@ -7,18 +7,13 @@ import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * A service for setting the properties of a note
  */
 public class SetProperties extends FilteredAction {
 
-    @NotNull
     private String id;
-    @NotNull
     private String name;
-    @NotNull
     private Object value;
 
     private String getId() {
