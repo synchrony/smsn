@@ -1,0 +1,18 @@
+name:                smsn
+version:             0.0.1
+license:             AllRightsReserved
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+-- This is needed for now to allow `etlas deps` to run.
+library
+  build-depends:       base >=4.8 && <4.9, parsec >= 3.1.11
+  hs-source-dirs:      brain/src/main/eta
+  default-language:    Haskell2010
+
+executable smsn
+  main-is:             SmSnEta.hs
+  build-depends:       base >=4.8 && <4.9
+  hs-source-dirs:      brain/src/main/eta
+  default-language:    Haskell2010
