@@ -1,8 +1,32 @@
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+    dependencies{
+        classpath 'com.typelead:gradle-eta:0.0.1-SNAPSHOT'
+    }
+}
+
+apply plugin: 'eta'
+
+eta {
+    etlasVersion = '1.1.0.0'
+}
+
+// compile Eta sources to Jar, included in the classpath when compiling Java sources
+compileJava.dependsOn compileEta
+
 configurations {
+    // provide test classes as a dependency
     testOutput
 }
 
 dependencies {
+    compile files('../build/etlas/dist/build/smsn/smsn.jar')
+    compile 'com.typelead:gradle-eta:0.0.1-SNAPSHOT'
+    // TODO: temporary, locally-built Eta "uberjar"
+    compile 'com.typelead:eta:2017-12-21'
+
     compile project(':smsn-rdf')
     compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version:tinkerpopVersion
     compile group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version:tinkerpopVersion
