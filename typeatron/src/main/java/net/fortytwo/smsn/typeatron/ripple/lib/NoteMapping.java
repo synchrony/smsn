@@ -34,7 +34,7 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
 
     protected TreeNode<Link> toTree(Object o, int height, boolean sync) throws RippleException {
         if (o instanceof String) {
-            if (SemanticSynchrony.ID_PATTERN.matcher((String) o).matches()) {
+            if (SemanticSynchrony.isValidId((String) o)) {
                 TreeNode<Link> n = TreeNodeDTO.createEmptyNode();
                 TreeViews.setId(n, (String) o);
                 o = n;

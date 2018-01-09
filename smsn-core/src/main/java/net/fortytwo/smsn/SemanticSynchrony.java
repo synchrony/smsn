@@ -59,7 +59,7 @@ public class SemanticSynchrony {
     public static final float DEFAULT_WEIGHT = 0.5f;
     public static final float DEFAULT_PRIORITY = 0f;
 
-    public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
+    private static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
     public static final int ID_DIGITS = 16;
 
@@ -76,8 +76,7 @@ public class SemanticSynchrony {
     public static final String UTF8 = "UTF-8";
 
     public static final int
-            GESTURE_TTL = 1, // we consider gestural events to be valid only for 1 second (the minimum TTL)
-            ATTENTION_TTL = 5; // we consider attention to be valid for several seconds
+            GESTURE_TTL = 1; // we consider gestural events to be valid only for 1 second (the minimum TTL)
 
     private static Configuration configuration;
     private static Map<String, DataSource> dataSourcesByName;
@@ -98,6 +97,10 @@ public class SemanticSynchrony {
 
     public static Logger getLogger(final Class c) {
         return Logger.getLogger(c.getName());
+    }
+
+    public static boolean isValidId(final String id) {
+        return ID_PATTERN.matcher(id).matches();
     }
 
     public static DataSource getDataSourceByName(final String name) {
