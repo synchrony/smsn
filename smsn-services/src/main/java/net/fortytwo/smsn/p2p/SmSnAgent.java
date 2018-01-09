@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.p2p;
 
+import com.google.common.base.Preconditions;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.sparql.ProxySparqlStreamProcessor;
@@ -48,6 +49,7 @@ public class SmSnAgent {
 
     public SmSnAgent(final String agentIri,
                      final boolean listenForServices) {
+        Preconditions.checkNotNull(agentIri);
         logger.log(Level.INFO, "creating SmSn agent with IRI " + agentIri);
 
         ValueFactory vf = factory.getValueFactory();
