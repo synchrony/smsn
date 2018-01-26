@@ -139,7 +139,6 @@ indentedLine = do
 
 lines = Parsec.sepBy indentedLine (Parsec.char '\n')
 
-
 text = "[] Hercules\n\
        \  @aka Herakles\n\
        \\n\

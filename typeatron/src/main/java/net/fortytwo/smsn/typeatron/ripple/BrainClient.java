@@ -46,10 +46,6 @@ import java.util.List;
 
 public class BrainClient {
 
-    private static final String PROP_SERVER_NAME = "net.fortytwo.smsn.brain.client.serverName";
-    private static final String PROP_SERVER_PORT = "net.fortytwo.smsn.brain.client.serverPort";
-    private static final String PROP_GRAPH = "net.fortytwo.smsn.brain.client.graph";
-
     private static final int DEFAULT_VALUE_CUTOFF = 100;
 
     private final JsonParser jsonParser = new JsonParser();
