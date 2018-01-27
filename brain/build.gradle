@@ -13,6 +13,13 @@ eta {
     etlasVersion = '1.1.0.0'
 }
 
+// temporary
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 // compile Eta sources to Jar, included in the classpath when compiling Java sources
 compileJava.dependsOn compileEta
 
@@ -25,7 +32,7 @@ dependencies {
     compile files('../build/etlas/dist/build/smsn/smsn.jar')
     compile 'com.typelead:gradle-eta:0.0.1-SNAPSHOT'
     // TODO: temporary, locally-built Eta "uberjar"
-    compile 'com.typelead:eta:2017-12-21'
+    //compile 'com.typelead:eta:2017-12-21'
 
     compile project(':smsn-rdf')
     compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version:tinkerpopVersion

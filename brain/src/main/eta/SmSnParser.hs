@@ -133,8 +133,7 @@ indentedLine = do
 
 lines = sepBy indentedLine (char '\n')
 
-
-text = "[] Hercules  \n\
+text = "[] Hercules\n\
        \  @aka Herakles\n\
        \\n\
        \  with source: [JJsVfKZm09uxCNjz] Wikipedia\n\
