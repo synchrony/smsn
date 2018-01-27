@@ -1,22 +1,16 @@
--- :! ghc -c SmSnParser.hs -XFlexibleContexts
+{-
+:! ghc -c SmSnParser.hs -XFlexibleContexts
+:load SmSnParser
+
+parse SmSnParser.lines "file.smsn" text
+-}
 
 module SmSnParser where
 
 
-import Data.Text
-import Data.Char
-
-import qualified Text.Parsec as Parsec
-
--- I am the error message infix operator, used later:
-import Text.Parsec ((<?>))
-
--- Imported so we can play with applicative things later.
--- not qualified as mostly infix operators we'll be using.
-import Control.Applicative
-
--- Get the Identity monad from here:
-import Control.Monad.Identity (Identity)
+import Data.Char (isSpace)
+import Text.Parsec (Parsec, parse, many, many1, oneOf, noneOf, char, string, letter, sepBy)
+import Control.Applicative ((<|>))
 
 
 data Entity = Entity (Maybe String) String deriving Show
@@ -33,33 +27,33 @@ data Line = EntityLine Entity
 data Indented = Indented Int Line deriving Show
 
 
-expandTabs s = Prelude.concat $ Prelude.map (\c -> if c == '\t' then "    " else [c]) s
-stripHead s = if (Data.Char.isSpace $ Prelude.head s) then stripHead(Prelude.tail s) else s
-strip s = Prelude.reverse(stripHead(Prelude.reverse(stripHead(s))))
+expandTabs s = concat $ map (\c -> if c == '\t' then "    " else [c]) s
+stripHead s = if (isSpace $ head s) then (stripHead . tail) s else s
+strip = reverse . stripHead . reverse . stripHead
 getId s = if s == [] then Nothing else Just s
 
-requiredSpace = Parsec.many1 $ Parsec.oneOf(" \t")
-optionalSpace = Parsec.many $ Parsec.oneOf(" \t")
+requiredSpace = many1 $ oneOf(" \t")
+optionalSpace = many $ oneOf(" \t")
 
 -- | Note: tabs count as four spaces.
 indentation = do
   ws <- optionalSpace
-  return (Prelude.length $ expandTabs $ ws)
+  return (length $ expandTabs $ ws)
 
-bullet :: Parsec.Parsec String () (Maybe String)
+bullet :: Parsec String () (Maybe String)
 bullet = do
-    Parsec.char '['
+    char '['
     optionalSpace
-    id <- Parsec.many $ Parsec.oneOf(['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'])
+    id <- many $ oneOf(['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'])
     optionalSpace
-    Parsec.char ']'
+    char ']'
     return (getId id)
 
-propertyKey = Parsec.many1 Parsec.letter
-roleName = Parsec.many1 Parsec.letter
+propertyKey = many1 letter
+roleName = many1 letter
 
 lineText = do
-  text <- Parsec.many $ Parsec.noneOf "\n"
+  text <- many $ noneOf "\n"
   return (SmSnParser.strip $ text)
 
 entity = do
@@ -73,7 +67,7 @@ entityLine = do
     return (EntityLine ent)
 
 propertyLine = do
-    Parsec.char '@'
+    char '@'
     key <- propertyKey
     requiredSpace
     value <- lineText
@@ -98,12 +92,12 @@ withOut = do
     return (PlainRel ("with" ++ rest))
 
 asRel = do
-    Parsec.string "as"
+    string "as"
     rel <- asIn <|> asOut
     return rel
 
 withRel = do
-    Parsec.string "with"
+    string "with"
     rel <- withIn <|> withOut
     return rel
 
@@ -111,19 +105,19 @@ plainRel = do
     role <- roleName
     return (PlainRel role)
 
-yesEntity :: Parsec.Parsec String () (Maybe Entity)
+yesEntity :: Parsec String () (Maybe Entity)
 yesEntity = do
     ent <- entity
     return (Just ent)
 
-noEntity :: Parsec.Parsec String () (Maybe Entity)
+noEntity :: Parsec String () (Maybe Entity)
 noEntity = do
     optionalSpace
     return Nothing
 
 relLine = do
     rel <- asRel <|> withRel <|> plainRel
-    Parsec.char ':'
+    char ':'
     optionalSpace
     ent <- yesEntity <|> noEntity
     return (RelLine rel ent)
@@ -137,15 +131,14 @@ indentedLine = do
     line <- entityLine <|> propertyLine <|> relLine <|> emptyLine
     return (Indented indent line)
 
-lines = Parsec.sepBy indentedLine (Parsec.char '\n')
+lines = sepBy indentedLine (char '\n')
 
 
-text = "[] Hercules\n\
+text = "[] Hercules  \n\
        \  @aka Herakles\n\
        \\n\
        \  with source: [JJsVfKZm09uxCNjz] Wikipedia\n\
+       \    \n\
        \    as child: \n\
        \      father: [123] Zeus\n\
        \        mother: [] Alcmene"
-
--- try:    Parsec.parse SmSnParser.lines "file.smsn" text
