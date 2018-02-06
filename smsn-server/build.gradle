@@ -1,3 +1,15 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+    }
+}
+
 dependencies {
     compile project(':brain')
     compile project(':smsn-services')
@@ -7,4 +19,8 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version:junitVersion
     testCompile project(path: ':brain', configuration: 'testOutput')
+}
+
+shadowJar {
+    mergeServiceFiles()
 }
