@@ -1,0 +1,73 @@
+---
+# TODO: restore TOC
+title: Semantic Synchrony dashboard
+output:
+  html_document:
+    toc: true
+#runtime: shiny
+# rmarkdown::run("/Users/josh/projects/fortytwo/synchrony/smsn/dashboard")
+# rmarkdown::render_site("/Users/josh/projects/fortytwo/synchrony/smsn/dashboard")
+---
+
+This dashboard provides an overview of a [Semantic Synchrony](https://github.com/synchrony/smsn) dataset.
+Unless otherwise stated, all timestamps are in [Unix time](https://en.wikipedia.org/wiki/Unix_time) and are displayed in [GMT](https://en.wikipedia.org/wiki/Greenwich_Mean_Time).
+
+---
+
+## Basic structure of the graph
+
+```{r, echo=FALSE}
+t.to <- table(relations$to)
+t.from <- table(relations$from)
+mean.parents <- mean(t.from)
+mean.children <- mean(t.to)
+sd.parents <- sd(t.from)
+sd.children <- sd(t.to)
+```
+
+There are **`r num(total.entities)` entities** and **`r num(total.relations)` parent-child relations** in the graph.
+The average entity has **`r num(mean.parents)` parents** (&sigma;=`r num(sd.parents)`) and **`r num(mean.children)` children** (&sigma;=`r num(sd.children)`).
+
+TODO: distribution of parent and child count
+
+#### Root entities
+
+```{r, echo=FALSE}
+with.parents <- unique(relations$to)
+without.parents <- setdiff(unique.entities.id, with.parents)
+
+total.without.parents <- length(without.parents)
+total.without.parents.rel <- total.without.parents / total.entities
+
+with.children <- unique(relations$from)
+without.children <- setdiff(unique.entities.id, with.children)
+
+roots <- setdiff(without.parents, without.children)
+isolated <- intersect(without.parents, without.children)
+
+root.entities <- merge(entities, data.frame(id=roots), by="id")
+isolated.entities <- merge(entities, data.frame(id=isolated), by="id")
+
+total.roots <- length(roots)
+total.isolated <- length(isolated)
+```
+
+An entity with no parent, but which does have children, is considered a "root" node in the graph. There are **`r num(total.roots)` root entities** `r perc.of.entities(total.roots)` in this graph, shown below.
+
+```{r, echo = FALSE}
+showTable(entities.for.display(root.entities),
+  list(pageLength=10))
+```
+
+#### Isolated entities
+
+An entity with neither parents nor children is an isolated node in the graph. These are commonly the result of combining data from multiple individuals.
+For example, if Arthur has data sources {A,B} in his graph, and Ford has data sources {B,C} in his graph, an entity in B may appear isolated in Ford's graph, even if it has parents or children in A, making it non-isolated in Arthur's graph.
+On the other hand, some entities are isolated in all graphs; these are "junk" or lost data.
+
+There are **`r num(total.isolated)` isolated entities** `r perc.of.entities(total.isolated)` in this graph, shown below.
+
+```{r, echo = FALSE}
+showTable(entities.for.display(isolated.entities),
+          list(pageLength=10))
+```

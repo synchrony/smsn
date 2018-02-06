@@ -1,0 +1,8 @@
+## Browse entities
+
+All entities are accessible in the table below. You can use the search box to find a particular one, and filter or sort by any of the provied fields.
+
+```{r, echo = FALSE}
+showTable(entities.for.display(entities),
+  list(pageLength=20))
+```
