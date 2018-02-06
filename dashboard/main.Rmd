@@ -19,8 +19,8 @@ Unless otherwise stated, all timestamps are in [Unix time](https://en.wikipedia.
 ```{r, echo=FALSE}
 t.to <- table(relations$to)
 t.from <- table(relations$from)
-mean.parents <- mean(t.from)
-mean.children <- mean(t.to)
+mean.parents <- mean(t.to)
+mean.children <- mean(t.from)
 sd.parents <- sd(t.from)
 sd.children <- sd(t.to)
 ```
