@@ -52,22 +52,22 @@ total.roots <- length(roots)
 total.isolated <- length(isolated)
 ```
 
-An entity with no parent, but which does have children, is considered a "root" node in the graph. There are **`r num(total.roots)` root entities** `r perc.of.entities(total.roots)` in this graph, shown below.
+An entity with no parent, but which does have children, is considered a *root node* in the graph. There are **`r num(total.roots)` root entities** `r perc.of.entities(total.roots)` in this graph, shown below.
 
 ```{r, echo = FALSE}
 showTable(entities.for.display(root.entities),
-  list(pageLength=10))
+  list(pageLength=5))
 ```
 
 #### Isolated entities
 
-An entity with neither parents nor children is an isolated node in the graph. These are commonly the result of combining data from multiple individuals.
-For example, if Arthur has data sources {A,B} in his graph, and Ford has data sources {B,C} in his graph, an entity in B may appear isolated in Ford's graph, even if it has parents or children in A, making it non-isolated in Arthur's graph.
+An entity with neither parents nor children is an *isolated node* in the graph. These are commonly the result of recombining data sets.
+For example, if Arthur has data sources {A,B} in his data set, and Ford has data sources {B,C} in his data set, an entity in B may appear isolated in Ford's graph, even if it has parents or children in A, making it non-isolated in Arthur's graph.
 On the other hand, some entities are isolated in all graphs; these are "junk" or lost data.
 
 There are **`r num(total.isolated)` isolated entities** `r perc.of.entities(total.isolated)` in this graph, shown below.
 
 ```{r, echo = FALSE}
 showTable(entities.for.display(isolated.entities),
-          list(pageLength=10))
+          list(pageLength=5))
 ```

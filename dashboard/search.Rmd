@@ -1,6 +1,6 @@
 ## Browse entities
 
-All entities are accessible in the table below. You can use the search box to find a particular one, and filter or sort by any of the provied fields.
+All entities are accessible in the table below. You can use the search box to find a particular one, and filter on or sort by any of the provided fields.
 
 ```{r, echo = FALSE}
 showTable(entities.for.display(entities),
