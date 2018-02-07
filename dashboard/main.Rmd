@@ -1,0 +1,235 @@
+---
+# TODO: restore TOC
+title: Semantic Synchrony dashboard
+output:
+  html_document:
+    toc: true
+#runtime: shiny
+# rmarkdown::run("/Users/josh/projects/fortytwo/synchrony/smsn/dashboard")
+# rmarkdown::render_site("/Users/josh/projects/fortytwo/synchrony/smsn/dashboard")
+---
+
+This dashboard provides an overview of a [Semantic Synchrony](https://github.com/synchrony/smsn) dataset.
+Unless otherwise stated, all timestamps are in [Unix time](https://en.wikipedia.org/wiki/Unix_time) and are displayed in [GMT](https://en.wikipedia.org/wiki/Greenwich_Mean_Time).
+
+---
+
+```{r, echo=FALSE}
+library(igraph)
+
+g <- graph_from_data_frame(relations)
+```
+
+## Graph analysis
+
+A Semantic Synchrony knowledge graph is a set of *entities* or topics, together with a set of *relations* or assertions connecting entities, as well as a set of *properties* annotating entities.
+There are **`r num(total.entities)` entities** and **`r num(total.relations)` parent-child relations** in the current graph. Below, we will look at the structure of the graph in terms of connectivity of entities.
+
+### Entity degree
+
+```{r, echo=FALSE}
+t.to <- table(relations$to)
+t.from <- table(relations$from)
+mean.parents <- mean(t.to)
+mean.children <- mean(t.from)
+sd.parents <- sd(t.from)
+sd.children <- sd(t.to)
+```
+
+The average entity in the current graph has an in-degree of **`r num(mean.parents)` parents** (&sigma;=`r num(sd.parents)`) and an out-degree of **`r num(mean.children)` children** (&sigma;=`r num(sd.children)`).
+
+#### Degree distribution
+
+```{r, echo=FALSE}
+# Out-degree follows a power law, for the most part
+
+# In-degree follows a distribution vaguely resembling a power-law after degree=1
+
+# Total degree is dominated by out-degree
+```
+
+The [degree distributions](https://en.wikipedia.org/wiki/Degree_distribution) of a graph often provide characteristic clues as to the *kind* of graph it is. A typical Semantic Synchrony graph is characterized by a [power-law distribution](https://en.wikipedia.org/wiki/Power_law) in its out-degree (similar to the in-degree of a typical social network)...
+
+```{r, echo=FALSE}
+renderPlot(plot(degree.distribution(g, mode="out"), log="xy",
+  xlab="out-degree", ylab="number of entities", main="out-degree distribution"))
+```
+
+...and a somewhat less well-defined power-law distribution in its in-degree.
+
+```{r, echo=FALSE}
+renderPlot(plot(degree.distribution(g, mode="in"), log="xy",
+  xlab="in-degree", ylab="number of entities", main="in-degree distribution"))
+```
+
+The overall degree distribution in SmSn tends to be dominated by out-degree.
+ 
+```{r, echo=FALSE}
+renderPlot(plot(degree.distribution(g, mode="total"), log="xy",
+  xlab="total degree", ylab="number of entities", main="total degree distribution"))
+```
+
+#### Root entities
+
+```{r, echo=FALSE}
+with.parents <- unique(relations$to)
+without.parents <- setdiff(unique.entities.id, with.parents)
+
+total.without.parents <- length(without.parents)
+total.without.parents.rel <- total.without.parents / total.entities
+
+with.children <- unique(relations$from)
+without.children <- setdiff(unique.entities.id, with.children)
+
+roots <- setdiff(without.parents, without.children)
+isolated <- intersect(without.parents, without.children)
+
+root.entities <- merge(entities, data.frame(id=roots), by="id")
+isolated.entities <- merge(entities, data.frame(id=isolated), by="id")
+
+total.roots <- length(roots)
+total.isolated <- length(isolated)
+```
+
+An entity with no parent, but which does have children (i.e. with zero in-degree but non-zero out-degree), is considered a *root node* in the graph. There are **`r num(total.roots)` root entities** `r perc.of.entities(total.roots)` in this graph, shown below.
+
+```{r, echo = FALSE}
+showTable(entities.for.display(root.entities),
+  list(pageLength=5))
+```
+
+#### Isolated entities
+
+An entity with neither parents nor children is an *isolated node* in the graph. These are commonly the result of recombining data sets.
+For example, if Arthur has data sources {A,B} in his data set, and Ford has data sources {B,C} in his data set, an entity in B may appear isolated in Ford's graph, even if it has parents or children in A, making it non-isolated in Arthur's graph.
+On the other hand, some entities are isolated in all graphs; these are "junk" or lost data.
+
+There are **`r num(total.isolated)` isolated entities** `r perc.of.entities(total.isolated)` in this graph, shown below.
+
+```{r, echo = FALSE}
+showTable(entities.for.display(isolated.entities),
+          list(pageLength=5))
+```
+
+### Graph diameter
+
+```{r, echo=FALSE}
+diam <- diameter(g)
+```
+
+The [diameter](http://mathworld.wolfram.com/GraphDiameter.html) of the current graph is **`r num(diam)` edges**. A large diameter indicates that there are neightborhoods of the graph which are loosely connected with the rest of the graph.
+
+### PageRank
+
+```{r, echo=FALSE}
+round5 <- function(x) { round(x, 4) }
+pagerank.for.display <- function(g) {
+  pg <- page.rank(g)
+  df <- data.frame(id=V(g)$name, score=pg$vector)
+  m <- merge(df, entities, by="id")
+  ranking <- m[rev(order(m[, "score"])),]
+  data.frame(entities.for.display(ranking), score=sapply(ranking$score, round5))
+}
+
+ranking <- pagerank.for.display(g)
+```
+
+The [PageRank](https://en.wikipedia.org/wiki/PageRank) algorithm provides a useful metric for centrality or importance in the graph.
+Below is the result of applying PageRank to the parent-child relationships of the current graph.
+
+```{r, echo=FALSE}
+showTable(ranking, list(pageLength=5))
+```
+
+#### Inverse PageRank
+
+```{r, echo=FALSE}
+relations.inv <- data.frame(to=relations$to, from=relations$from)
+g.inv <- graph_from_data_frame(relations.inv)
+ranking.inv <- pagerank.for.display(g.inv)
+```
+
+The direction of links is relevant to PageRank. In Semantic Synchrony, a child-parent relationship often reflects more on the parent than the child, so it is useful to also compute the PageRank of the inverse relationship, from child to parent. Below is an inverse PageRank ranking for the current graph.
+
+```{r, echo=FALSE}
+showTable(ranking.inv, list(pageLength=5))
+```
+
+<!--
+# combined PageRank
+# in-PageRank currently dominates the ranking of the top nodes
+score <- (pgin$vector + pgout$vector) / 2
+tmp <- data.frame(id=V(g)$name, score=score)
+m <- merge(tmp, v, by="id")
+ranked <- m[rev(order(m[, "score"])),]
+ranked[1:50,]
+
+# alternative construction of the graph (apparently not necessary/useful)
+t <- read.table(file("/tmp/tinkernotes-edges.txt"), header=TRUE)
+tmp <- unique(c(as.vector(t$from), as.vector(t$to)))
+vid <- data.frame(id=tmp, gid=1:length(tmp))
+y <- merge(t, vid, by.x="from", by.y="id")
+z <- merge(y, vid, by.x="to", by.y="id")
+adj <- data.frame(from=z$gid.x, to=z$gid.y)
+g <- graph.data.frame(adj)
+
+################################################################################
+# connected components (TODO)
+
+# Discover disconnected islands of brain
+c <- clusters(g)
+
+tmp <- data.frame(index=c(1:length(c$csize)), size=c$csize)
+x <- subset(tmp, size == max(c$csize))
+i <- x[1,1] - 1
+
+tmp <- data.frame(id=V(g)$name, c$membership)
+oddballs <- subset(tmp, c.membership != i)
+x <- merge(oddballs, v, by="id")
+paste(x$id, ": * ", x$value, sep="")
+# vim /tmp/d
+# cat /tmp/d | grep ":" | sed 's/\[[0-9]*\]..//' | sed 's/"[ ]*$//' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/' | sed 's/\\"/"/'
+
+
+################################################################################
+# clusters / community detection (TODO)
+
+library(igraph)
+
+# cat /tmp/extendo-edges.txt | grep -v "^from.to$" | sort -u > /tmp/extendo-edges-unique.txt
+gu <- read.graph(file("/tmp/extendo-edges-unique.txt"), format="ncol", directed = FALSE, weights = "no", names = "yes")
+
+# Unfortunately, this segfaults.
+# Initially, I thought it was because the graph was not fully connected, but it happens even
+# after I got rid of the other roots.
+#f <- fastgreedy.community(gu)
+
+#cm <- spinglass.community(gu, spins=10)
+
+# R crashes on the second step
+#cm <- walktrap.community(gu, modularity=TRUE)
+#m <- community.to.membership(gu, cm$merges, steps=which.max(cm$modularity) - 1)
+
+cm <- leading.eigenvector.community(gu)
+s <- data.frame(id=cm[8], cm[2])
+s <- data.frame(id=s$names, membership=s$membership)
+m <- merge(s, v, by="id")
+
+# Huge (48719).  So huge that the clustering is practically meaningless.
+ones <- subset(m, membership==1)
+
+# This small (838-large) cluster seems to be mostly about opioid use
+twos <- subset(m, membership==2)
+
+# Small (349), seems to be focused on Relpax use
+threes <- subset(m, membership==3)
+
+# Tiny (285), focused on self-reflection
+fours <- subset(m, membership==4)
+
+# Medium (1374), people and places
+fives <- subset(m, membership==5)
+
+# Tiny (162), the "death and depression word list"
+sixes <- subset(m, membership==6)
+-->

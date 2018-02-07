@@ -7,3 +7,6 @@ gradle*
 .idea
 *.iml
 *~
+dashboard/data
+dashboard/figure
+.Rproj.user
