@@ -7,7 +7,12 @@ shinyUI(
   navbarPage("Semantic Synchrony dashboard",
     tabPanel("Structure", uiOutput("main")),
     tabPanel("Sources", uiOutput("sources")),
-    tabPanel("Properties", uiOutput("properties")),
+    navbarMenu("Properties",
+               tabPanel("@weight", uiOutput("weight")),
+               tabPanel("@title", uiOutput("title")),
+               tabPanel("@alias", uiOutput("alias")),
+               tabPanel("@priority", uiOutput("priority")),
+               tabPanel("@shortcut", uiOutput("shortcut"))),
     tabPanel("Search", uiOutput("search"), getdeps())
   )
 )

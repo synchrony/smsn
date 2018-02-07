@@ -1,0 +1,12 @@
+## @alias property
+
+```{r, echo=FALSE}
+aliases <- sapply(as.vector(entities$alias), as.character)
+alias.lengths <- sapply(aliases, nchar)
+alias.entities <- entities[alias.lengths > 0,]
+total.alias.entities <- nrow(alias.entities)
+```
+
+The `@alias` property provides an external identity for an entity, such as a [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). For example, the entity representing Saturn might given an alias of `https://en.wikipedia.org/wiki/Saturn`, linking it with the Wikipedia page for the planet Saturn.
+
+In the current data set, there are **`r num(total.alias.entities)` entities** `r perc.of.entities(nrow(alias.entities))` with a non-empty alias.

@@ -24,8 +24,20 @@ shinyServer(function(input, output, session) {
   output$sources <- renderUI({
     inclRmd("./sources.Rmd")
   })
-	output$properties <- renderUI({
-	  inclRmd("./properties.Rmd")
+	output$weight <- renderUI({
+	  inclRmd("./weight.Rmd")
+	})
+	output$title <- renderUI({
+	  inclRmd("./title.Rmd")
+	})
+	output$alias <- renderUI({
+	  inclRmd("./alias.Rmd")
+	})
+	output$priority <- renderUI({
+	  inclRmd("./priority.Rmd")
+	})
+	output$shortcut <- renderUI({
+	  inclRmd("./shortcut.Rmd")
 	})
 	output$search <- renderUI({
 	  inclRmd("./search.Rmd")
