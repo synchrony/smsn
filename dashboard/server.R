@@ -17,30 +17,32 @@ shinyServer(function(input, output, session) {
 	    })
 	  )
 	})
-
-	output$main <- renderUI({
-	  inclRmd("./main.Rmd")
-	})
-  output$sources <- renderUI({
-    inclRmd("./sources.Rmd")
-  })
-	output$weight <- renderUI({
-	  inclRmd("./weight.Rmd")
-	})
-	output$title <- renderUI({
-	  inclRmd("./title.Rmd")
-	})
 	output$alias <- renderUI({
 	  inclRmd("./alias.Rmd")
+	})
+	output$created <- renderUI({
+	  inclRmd("./created.Rmd")
+	})
+	output$main <- renderUI({
+	  inclRmd("./main.Rmd")
 	})
 	output$priority <- renderUI({
 	  inclRmd("./priority.Rmd")
 	})
+	output$search <- renderUI({
+	  inclRmd("./search.Rmd")
+	})
 	output$shortcut <- renderUI({
 	  inclRmd("./shortcut.Rmd")
 	})
-	output$search <- renderUI({
-	  inclRmd("./search.Rmd")
+	output$sources <- renderUI({
+	  inclRmd("./sources.Rmd")
+	})
+	output$title <- renderUI({
+	  inclRmd("./title.Rmd")
+	})
+	output$weight <- renderUI({
+	  inclRmd("./weight.Rmd")
 	})
 })
 

@@ -21,7 +21,6 @@ count.dupes <- nrow(dup.alias.entities)
 ```
 
 Duplicate alias values are to be avoided; in most cases, two entities which share an alias should be the same entity (i.e. should also have the same id).
-
 In the current graph, there are **`r num(count.dupes)` entities** `r perc.of.entities(count.dupes)` with non-unique aliases, sharing a total of **`r num(length(unique(dup.alias.entities$alias)))`** aliases overall.
 
 ### Alias domains
@@ -34,7 +33,7 @@ uris <- unique.aliases[sapply(unique.aliases, is.http.uri)]
 domains <- sapply(uris, domain)
 ```
 
-`@alias` values are not necessarily HTTP URIs, but many of them are; they are used as bookmarks to link to resources on the Web. Below are the domains of HTTP or HTTPS URI aliases in the current graph, ranked by frequency.
+`@alias` values are not necessarily HTTP URIs, but many of them are; aliases are often used as bookmarks, linking to resources on the Web. Below are the domains of HTTP or HTTPS URI aliases in the current graph, ranked by frequency.
 
 ```{r, echo=FALSE}
 showFreqTable(domains, FALSE)
