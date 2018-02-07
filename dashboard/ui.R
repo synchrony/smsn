@@ -6,7 +6,7 @@ getdeps <- function() {
 shinyUI(
   navbarPage("Semantic Synchrony dashboard",
   #navlistPanel("Semantic Synchrony dashboard",
-    tabPanel("Structure", uiOutput("main")),
+    tabPanel("Graph", uiOutput("main")),
     tabPanel("Sources", uiOutput("sources")),
     navbarMenu("Properties",
       tabPanel("@alias", uiOutput("alias")),

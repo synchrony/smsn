@@ -7,7 +7,7 @@ sources <- unique(entities$source)
 total.sources <- length(sources)
 ```
 
-A SmSn knowledge base is organized into *data sources*, which are like buckets for graph data.
+A SmSn knowledge graph is organized into *data sources*, which are like buckets for graph data.
 Each data source contains any number of entities and relationships, and any set of data sources may be combined to form a data set, or *graph*.
 The current graph contains **`r num(total.sources)` data sources** with names and entity counts as below.
 
