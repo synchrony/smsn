@@ -55,15 +55,16 @@ showTable <- function(df, options) {
   })
 }
 
-showFreqTable <- function(v) {
+showFreqTable <- function(v, simple=TRUE) {
   df <- as.data.frame(table(v))
+  df <- df[with(df, order(-Freq)),]
   tot <- sum(df$Freq)
   showTable(
     data.frame(
       value=df$v,
       count=sapply(df$Freq, num),
       "%"=sapply(df$Freq, function(n) { num(100 * n/tot)}), check.names=FALSE),
-    list(searching=FALSE, paging=FALSE))
+    if (simple) list(searching=FALSE, paging=FALSE) else list())
 }
 
 entities.for.display <- function(v) {
