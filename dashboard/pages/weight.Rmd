@@ -22,3 +22,9 @@ invalid.weight.entities <- subset(entities,
 
 Every `@weight` property should have a value of 0.25, 0.5, 0.75, or 1.0; any other weight is invalid, including 0.0.
 This graph has **`r num(nrow(invalid.weight.entities))` invalid weight value(s)**.
+
+```{r, echo=FALSE}
+if (nrow(invalid.weight.entities) > 0) {
+  showTable(invalid.weight.entities)
+}
+```
