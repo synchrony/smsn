@@ -17,32 +17,9 @@ shinyServer(function(input, output, session) {
 	    })
 	  )
 	})
-	output$alias <- renderUI({
-	  inclRmd("./alias.Rmd")
-	})
-	output$created <- renderUI({
-	  inclRmd("./created.Rmd")
-	})
-	output$main <- renderUI({
-	  inclRmd("./main.Rmd")
-	})
-	output$priority <- renderUI({
-	  inclRmd("./priority.Rmd")
-	})
-	output$search <- renderUI({
-	  inclRmd("./search.Rmd")
-	})
-	output$shortcut <- renderUI({
-	  inclRmd("./shortcut.Rmd")
-	})
-	output$sources <- renderUI({
-	  inclRmd("./sources.Rmd")
-	})
-	output$title <- renderUI({
-	  inclRmd("./title.Rmd")
-	})
-	output$weight <- renderUI({
-	  inclRmd("./weight.Rmd")
+
+	sapply(list.files("pages"), function (f){
+		output[[f]] <- renderUI({inclRmd(paste0("./pages/", f))})
 	})
 })
 
@@ -51,7 +28,7 @@ shinyServer(function(input, output, session) {
 
 num <- function(x) { prettyNum(round(x, 2), big.mark=",") }
 
-showTable <- function(df, options) {
+showTable <- function(df, options=list()) {
   renderUI({
     tagList(renderDataTable(df, escape=FALSE, options=options))
   })

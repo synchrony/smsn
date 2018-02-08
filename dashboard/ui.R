@@ -6,15 +6,15 @@ getdeps <- function() {
 shinyUI(
   navbarPage("Semantic Synchrony dashboard",
   #navlistPanel("Semantic Synchrony dashboard",
-    tabPanel("Graph", uiOutput("main")),
-    tabPanel("Sources", uiOutput("sources")),
+    tabPanel("Graph", uiOutput("main.Rmd")),
+    tabPanel("Sources", uiOutput("sources.Rmd")),
     navbarMenu("Properties",
-      tabPanel("@alias", uiOutput("alias")),
-      tabPanel("@created", uiOutput("created")),
-      tabPanel("@priority", uiOutput("priority")),
-      tabPanel("@shortcut", uiOutput("shortcut")),
-      tabPanel("@title", uiOutput("title")),
-      tabPanel("@weight", uiOutput("weight"))),
-  tabPanel("Search", uiOutput("search"), getdeps())
+      tabPanel("@alias", uiOutput("alias.Rmd")),
+      tabPanel("@created", uiOutput("created.Rmd")),
+      tabPanel("@priority", uiOutput("priority.Rmd")),
+      tabPanel("@shortcut", uiOutput("shortcut.Rmd")),
+      tabPanel("@title", uiOutput("title.Rmd")),
+      tabPanel("@weight", uiOutput("weight.Rmd"))),
+  tabPanel("Search", uiOutput("search.Rmd"), getdeps())
   )
 )
