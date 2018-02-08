@@ -15,6 +15,7 @@ shinyUI(
       tabPanel("@shortcut", uiOutput("shortcut.Rmd")),
       tabPanel("@title", uiOutput("title.Rmd")),
       tabPanel("@weight", uiOutput("weight.Rmd"))),
+  tabPanel("Activity", uiOutput("activity.Rmd")),
   tabPanel("Search", uiOutput("search.Rmd"), getdeps())
   )
 )

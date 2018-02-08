@@ -26,6 +26,10 @@ shinyServer(function(input, output, session) {
 ########################################
 # SmSn-specific global variables and functions
 
+find.increments <- function(v) {
+  v[2:length(v)]-v[1:(length(v)-1)]
+}
+
 num <- function(x) { prettyNum(round(x, 2), big.mark=",") }
 
 showTable <- function(df, options=list()) {
