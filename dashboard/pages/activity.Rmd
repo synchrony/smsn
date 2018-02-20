@@ -1,0 +1,75 @@
+## Activity log
+
+```{r, echo=FALSE}
+hour <- 60*60*1000   # milliseconds per hour
+day <- 24*hour       # milliseconds per day
+
+to.time <- function(unix.ms) {
+  as.POSIXct(as.numeric(as.vector(unix.ms))/1000, origin="1970-01-01 GMT", tz="GMT")
+}
+
+# Note: occasionally, activity.log becomes corrupted (due to a killed process)
+# and needs to be manually cleaned up (by deleting an invalid line).
+read.activity <- function() {
+  activity.data <- read.table(file("data/activity.log"), header=FALSE, sep="\t", fill=TRUE, col.names=c("time.raw", "action", "entity1", "entity2"))
+  time <- to.time(activity.data$time.raw)
+  activity.data <- subset(activity.data, !is.na(time))
+  activity.data <- data.frame(activity.data, time=to.time(activity.data$time.raw))
+}
+
+activity <- read.activity()
+activity <- activity[with(activity, order(time)),]
+time <- activity$time
+diff <- find.increments(time)
+```
+
+By default, SmSn Server maintains an ongoing record of editing and viewing activity in a file called `activity.log`. From this log, a great deal of information can be gleaned on temporal patterns of activity level, topics, and sentiment.
+
+Note: the activity log is typically a large file (megabytes to tens of megabytes), and may take a while to load. It may also require manual cleanup in the case of abnormal program termination.
+
+### Continuity
+
+```{r, echo=FALSE}
+```
+
+The plot below shows the gaps between successive actions in the activity log. Any long periods of inactivity (or loss of activity data) should be visible here.
+
+```{r, echo=FALSE}
+renderPlot({
+  plot(x=time[1:(length(time)-1)], y=diff, type="l", log="y", ylim=c(1, max(diff)),
+    xlab="event time", ylab="time between events (s)", main="activity gaps by time")
+})
+```
+
+### Entity frequency
+
+```{r, echo=FALSE}
+e1 <- as.vector(activity$entity1)
+e2 <- as.vector(activity$entity2[sapply(as.vector(activity$entity2), function(s){nchar(s) > 0})])
+e <- c(e1, e2)
+t <- table(e)
+
+mean.events.per.entity <- mean(t)
+sd.events.per.entity <- sd(t)
+
+logmean <- mean(log(t))
+logsd <- sd(log(t))
+```
+
+Most entities in the graph are the subject of repeated activity.
+In the current graph, the average entity has been edited **`r num(mean.events.per.entity)` times** (&sigma;=`r num(sd.events.per.entity)`)).
+In graphs studied thus far, frequency follows a [log-normal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution), in this case with &mu;=`r num(logmean)` and &sigma;=`r num(logsd)`.
+
+```{r, echo=FALSE}
+tl <- as.vector(t[t <= 100])
+renderPlot({
+  plot(hist(tl, breaks=100),
+    xlab="number of events",
+    ylab="number of entities",
+    main="frequency of activity by entity")
+  abline(col="red", v=logmean)
+  abline(col="blue", v=mean.events.per.entity)
+})
+```
+
+The mode of the distribution is indicated with a <span style="color:red">red line</span>, while the mean is indicated with a <span style="color:blue">blue line</span>.

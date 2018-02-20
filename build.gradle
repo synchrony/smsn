@@ -16,8 +16,6 @@ subprojects {
     repositories {
         mavenLocal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-        // TODO: remove dependency on fortytwo.net repo
-        maven { url "http://fortytwo.net/maven2" }
     }
 
     test {

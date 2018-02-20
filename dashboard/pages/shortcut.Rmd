@@ -1,0 +1,11 @@
+## @shortcut property
+
+```{r, echo=FALSE}
+with.shortcut <- subset(entities, nchar(as.character(shortcut)) > 0)
+unique.shortcuts <- unique(with.shortcut$shortcut)
+```
+
+SmSn's `@shortcut` property is not commonly used, but it allows you to put certain entities on speed dial, so to speak. For example, if you often look up Wikipedia in the graph, you might assign it a shortcut of "wpd".
+The current graph includes **`r num(length(unique.shortcuts))` unique shortcuts** annotating **`r num(nrow(with.shortcut))` entities** `r perc.of.entities(nrow(with.shortcut))`.
+
+These shortcuts are: `r paste(sort(as.vector(unique.shortcuts)), sep=", ")`.

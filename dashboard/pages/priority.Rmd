@@ -1,0 +1,17 @@
+## @priority property
+
+```{r, echo=FALSE}
+entities.with.priority <- subset(entities, priority > 0)
+total.with.priority <- nrow(entities.with.priority)
+
+df <- as.data.frame(table(entities$priority))
+t.priority <- data.frame(priority=df$Var1, count=sapply(df$Freq, num))
+```
+
+The `@priority` property is used to associate a priority or urgency with an entity; entities with non-zero priority are displayed with an underline in the UI, and may appear higher in search results.
+
+There are **`r num(total.with.priority)` entities** `r perc.of.entities(total.with.priority)` in the graph with non-zero priority. The frequency of priority levels is shown below.
+
+```{r, echo=FALSE}
+showFreqTable(entities$priority)
+```
