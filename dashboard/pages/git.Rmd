@@ -1,0 +1,14 @@
+## Git history
+
+```{r}
+git <- read.csv(file("/tmp/git-r.csv"), header=FALSE)
+```
+
+
+### Preparing the data for this page
+
+```bash
+git log --stat --pretty=format:"COMMIT,%h,%an,%at" \
+  | grep "COMMIT\|[-+]$" | sed 's/^ /FILE,/' | sed 's/  *\|  */,/' | sed 's/ [-+][-+]*$/,/' \
+  > /tmp/git-r.csv
+```
