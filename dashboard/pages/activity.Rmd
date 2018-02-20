@@ -57,8 +57,8 @@ logsd <- sd(log(t))
 ```
 
 Most entities in the graph are the subject of repeated activity.
-In the current graph, the average entity has been edited **`r num(mean.events.per.entity)` times** (&sigma;=`r num(sd.events.per.entity)`).
-In graphs studied thus far, frequency follows a [log-normal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution) with &mu;=`r num(logmean)` and &sigma;=`r num(logsd)`.
+In the current graph, the average entity has been edited **`r num(mean.events.per.entity)` times** (&sigma;=`r num(sd.events.per.entity)`)).
+In graphs studied thus far, frequency follows a [log-normal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution), in this case with &mu;=`r num(logmean)` and &sigma;=`r num(logsd)`.
 
 ```{r, echo=FALSE}
 tl <- as.vector(t[t <= 100])
