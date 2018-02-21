@@ -16,6 +16,7 @@ shinyUI(
       tabPanel("@title", uiOutput("title.Rmd")),
       tabPanel("@weight", uiOutput("weight.Rmd"))),
   tabPanel("Activity", uiOutput("activity.Rmd")),
+  tabPanel("Git", uiOutput("git.Rmd")),
   tabPanel("Search", uiOutput("search.Rmd"), getdeps())
   )
 )

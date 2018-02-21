@@ -38,6 +38,10 @@ showTable <- function(df, options=list()) {
   })
 }
 
+showSimpleTable <- function(df) {
+  showTable(df, list(searching=FALSE, paging=FALSE))
+}
+
 showFreqTable <- function(v, simple=TRUE) {
   df <- as.data.frame(table(v))
   df <- df[with(df, order(-Freq)),]
