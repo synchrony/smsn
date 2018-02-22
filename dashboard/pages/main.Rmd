@@ -1,11 +1,13 @@
+```{r, error=FALSE}
+require.entities.and.relations()
+```
+
 This dashboard provides an overview of a [Semantic Synchrony](https://github.com/synchrony/smsn) dataset.
 Unless otherwise stated, all timestamps are in [Unix time](https://en.wikipedia.org/wiki/Unix_time) and are displayed in [GMT](https://en.wikipedia.org/wiki/Greenwich_Mean_Time).
 
 ---
 
-```{r, echo=FALSE}
-require.entities.and.relations()
-
+```{r}
 library(igraph)
 
 g <- graph_from_data_frame(relations)
@@ -18,7 +20,7 @@ There are **`r num(total.entities)` entities** and **`r num(total.relations)` pa
 
 ### Entity degree
 
-```{r, echo=FALSE}
+```{r}
 t.to <- table(relations$to)
 t.from <- table(relations$from)
 mean.parents <- mean(t.to)
@@ -31,7 +33,7 @@ The average entity in the current graph has an in-degree of **`r num(mean.parent
 
 #### Degree distribution
 
-```{r, echo=FALSE}
+```{r}
 # Out-degree follows a power law, for the most part
 
 # In-degree follows a distribution vaguely resembling a power-law after degree=1
@@ -41,28 +43,28 @@ The average entity in the current graph has an in-degree of **`r num(mean.parent
 
 The [degree distributions](https://en.wikipedia.org/wiki/Degree_distribution) of a graph often provide characteristic clues as to the *kind* of graph it is. A typical Semantic Synchrony graph is characterized by a [power-law distribution](https://en.wikipedia.org/wiki/Power_law) in its out-degree (similar to the in-degree of a typical social network)...
 
-```{r, echo=FALSE}
+```{r}
 renderPlot(plot(degree.distribution(g, mode="out"), log="xy",
   xlab="out-degree", ylab="number of entities", main="out-degree distribution"))
 ```
 
 ...and a somewhat less well-defined power-law distribution in its in-degree.
 
-```{r, echo=FALSE}
+```{r}
 renderPlot(plot(degree.distribution(g, mode="in"), log="xy",
   xlab="in-degree", ylab="number of entities", main="in-degree distribution"))
 ```
 
 The overall degree distribution in SmSn tends to be dominated by out-degree.
  
-```{r, echo=FALSE}
+```{r}
 renderPlot(plot(degree.distribution(g, mode="total"), log="xy",
   xlab="total degree", ylab="number of entities", main="total degree distribution"))
 ```
 
 #### Root entities
 
-```{r, echo=FALSE}
+```{r}
 with.parents <- unique(relations$to)
 without.parents <- setdiff(unique.entities.id, with.parents)
 
@@ -84,7 +86,7 @@ total.isolated <- length(isolated)
 
 An entity with no parent, but which does have children (i.e. with zero in-degree but non-zero out-degree), is considered a *root node* in the graph. There are **`r num(total.roots)` root entities** `r perc.of.entities(total.roots)` in this graph, shown below.
 
-```{r, echo = FALSE}
+```{r}
 showTable(entities.for.display(root.entities),
   list(pageLength=5))
 ```
@@ -97,14 +99,14 @@ On the other hand, some entities are isolated in all graphs; these are "junk" or
 
 There are **`r num(total.isolated)` isolated entities** `r perc.of.entities(total.isolated)` in this graph, shown below.
 
-```{r, echo = FALSE}
+```{r}
 showTable(entities.for.display(isolated.entities),
           list(pageLength=5))
 ```
 
 ### Graph diameter
 
-```{r, echo=FALSE}
+```{r}
 diam <- diameter(g)
 ```
 
@@ -112,7 +114,7 @@ The [diameter](http://mathworld.wolfram.com/GraphDiameter.html) of the current g
 
 ### PageRank
 
-```{r, echo=FALSE}
+```{r}
 round5 <- function(x) { round(x, 4) }
 pagerank.for.display <- function(g) {
   pg <- page.rank(g)
@@ -128,13 +130,13 @@ ranking <- pagerank.for.display(g)
 The [PageRank](https://en.wikipedia.org/wiki/PageRank) algorithm provides a useful metric for centrality or importance in the graph.
 Below is the result of applying PageRank to the parent-child relationships of the current graph.
 
-```{r, echo=FALSE}
+```{r}
 showTable(ranking, list(pageLength=5))
 ```
 
 #### Inverse PageRank
 
-```{r, echo=FALSE}
+```{r}
 relations.inv <- data.frame(to=relations$to, from=relations$from)
 g.inv <- graph_from_data_frame(relations.inv)
 ranking.inv <- pagerank.for.display(g.inv)
@@ -142,7 +144,7 @@ ranking.inv <- pagerank.for.display(g.inv)
 
 The direction of links is relevant to PageRank. In Semantic Synchrony, a child-parent relationship often reflects more on the parent than the child, so it is useful to also compute the PageRank of the inverse relationship, from child to parent. Below is an inverse PageRank ranking for the current graph.
 
-```{r, echo=FALSE}
+```{r}
 showTable(ranking.inv, list(pageLength=5))
 ```
 

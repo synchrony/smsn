@@ -1,10 +1,10 @@
-```{r}
-require.entities.and.relations()
+```{r, error=FALSE}
+require.entities()
 ```
 
 ## @alias property
 
-```{r, echo=FALSE}
+```{r}
 aliases <- sapply(as.vector(entities$alias), as.character)
 alias.lengths <- sapply(aliases, nchar)
 alias.entities <- entities[alias.lengths > 0,]
@@ -18,7 +18,7 @@ In the current data set, there are **`r num(total.alias.entities)` entities** `r
 
 ### Duplicate aliases
 
-```{r, echo=FALSE}
+```{r}
 df <- data.frame(alias=subset(data.frame(entities, d=duplicated(entities$alias), l=nchar(as.vector(entities$alias))), l > 0 & d == TRUE)$alias)
 dup.alias.entities <- merge(df, entities, by="alias")
 count.dupes <- nrow(dup.alias.entities)
@@ -29,7 +29,7 @@ In the current graph, there are **`r num(count.dupes)` entities** `r perc.of.ent
 
 ### Alias domains
 
-```{r, echo=FALSE}
+```{r}
 library(urltools)
 
 is.http.uri <- function(s) {substr(s, 1, 4) == "http"}
@@ -39,7 +39,7 @@ domains <- sapply(uris, domain)
 
 `@alias` values are not necessarily HTTP URIs, but many of them are; aliases are often used as bookmarks, linking to resources on the Web. Below are the domains of HTTP or HTTPS URI aliases in the current graph, ranked by frequency.
 
-```{r, echo=FALSE}
+```{r}
 showFreqTable(domains, FALSE)
 ```
 

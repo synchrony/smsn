@@ -1,10 +1,10 @@
-```{r}
-require.entities.and.relations()
+```{r, error=FALSE}
+require.entities()
 ```
 
 ## @weight property
 
-```{r, echo=FALSE}
+```{r}
 mean.weight <- mean(entities$weight)
 sd.weight <- sd(entities$weight)
 ```
@@ -13,13 +13,13 @@ SmSn's `@weight` property ranges from 0 to 1 and is used to convey importance or
 In this graph, the mean weight of entities is **`r num(mean.weight)`** (&sigma;=`r num(sd.weight)`).
 The distribution of entity weights is show below.
 
-```{r, echo=FALSE}
+```{r}
 showFreqTable(entities$weight)
 ```
 
 ### Invalid weights
 
-```{r, echo=FALSE}
+```{r}
 invalid.weight.entities <- subset(entities,
   weight == 0 | weight > 1.0 | (weight*4)%%1 != 0)
 ```
@@ -27,8 +27,8 @@ invalid.weight.entities <- subset(entities,
 Every `@weight` property should have a value of 0.25, 0.5, 0.75, or 1.0; any other weight is invalid, including 0.0.
 This graph has **`r num(nrow(invalid.weight.entities))` invalid weight value(s)**.
 
-```{r, echo=FALSE}
+```{r}
 if (nrow(invalid.weight.entities) > 0) {
-  showTable(invalid.weight.entities)
+  showTable(entities.for.display(invalid.weight.entities))
 }
 ```

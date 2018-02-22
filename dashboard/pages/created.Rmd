@@ -1,10 +1,10 @@
-```{r}
-require.entities.and.relations()
+```{r, error=FALSE}
+require.entities()
 ```
 
 ## @created property
 
-```{r, echo=FALSE}
+```{r}
 created <- as.vector(entities$created)
 invalid.created <- created[created <= 0]
 total.invalid.created <- length(invalid.created)
@@ -25,13 +25,13 @@ For tracking activity over time, the best resource is SmSn's activity log. As lo
 
 #### Time of day
 
-```{r, echo=FALSE}
+```{r}
 total.created.by.hour.of.day <- (created) %% (24*60*60*1000) / (60*60*1000)
 ```
 
 Below is a histogram showing peak hours of entity creation, aggregated over all time.
 
-```{r, echo=FALSE}
+```{r}
 renderPlot(hist(total.created.by.hour.of.day, breaks=24,
   main="creation timestamps by hour of day",
   xlab="hour of day (GMT)",

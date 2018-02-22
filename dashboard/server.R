@@ -80,15 +80,69 @@ entities.for.display <- function(v) {
     # note: no @shortcut
 }
 
-require.entities.and.relations <- function() {
-  if (is.null(env$entities.and.relations)) {
-    env$entities <- read.table("data/vertices.tsv", header=TRUE, sep="\t", quote="", comment.char="")
+require.entities <- function() {
+  if (is.null(env$entities)) {
+    f <- "data/vertices.tsv"
+    if (!file.exists(f)) {
+      stop(paste0("entity file does not exist: ", f))
+    }
+
+    env$entities <- read.table(f, header=TRUE, sep="\t", quote="", comment.char="")
     env$total.entities <- nrow(entities)
     env$unique.entities.id <- unique(entities$id)
+  }
+}
+
+require.relations <- function() {
+  if (is.null(env$relations)) {
+    f <- "data/edges.tsv"
+    if (!file.exists(f)) {
+      stop(paste0("relation file does not exist: ", f))
+    }
     
-    env$relations <- read.table("data/edges.tsv", header=TRUE)
+    env$relations <- read.table(f, header=TRUE)
     env$total.relations <- nrow(relations)
     env$entities.and.relations <- TRUE
+  }
+}
+
+require.entities.and.relations <- function() {
+  require.entities()
+  require.relations()
+}
+
+hour <- 60*60*1000   # milliseconds per hour
+day <- 24*hour       # milliseconds per day
+
+to.time <- function(unix.ms) {
+  as.POSIXct(as.numeric(as.vector(unix.ms))/1000, origin="1970-01-01 GMT", tz="GMT")
+}
+
+# Note: occasionally, activity.log becomes corrupted (due to a killed process)
+# and needs to be manually cleaned up (by deleting an invalid line).
+require.activity.log <- function() {
+  if (is.null(env$activity)) {
+    f <- "data/activity.log"
+    if (!file.exists(f)) {
+      stop(paste0("activity log does not exist: ", f))
+    }
+    
+    activity.data <- read.table(f, header=FALSE, sep="\t", fill=TRUE, col.names=c("time.raw", "action", "entity1", "entity2"))
+    env$time <- to.time(activity.data$time.raw)
+    activity.data <- subset(activity.data, !is.na(time))
+    activity <- data.frame(activity.data, time=to.time(activity.data$time.raw))
+    env$activity <- activity[with(activity, order(time)),]
+  }
+}
+
+require.git.history <- function() {
+  if (is.null(env$git)) {
+    f <- "data/git-log.csv"
+    if (!file.exists(f)) {
+      stop(paste0("git history does not exist: ", f))
+    }
+    
+    env$git <- read.csv(f, header=FALSE)
   }
 }
 

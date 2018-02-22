@@ -1,10 +1,10 @@
-```{r}
-require.entities.and.relations()
+```{r, error=FALSE}
+require.entities()
 ```
 
 ## Data sources
 
-```{r, echo = FALSE}
+```{r}
 df <- as.data.frame(table(entities$source))
 t.source <- data.frame(source=df$Var1, size=df$Freq)
 sources <- find.sources()
@@ -15,6 +15,6 @@ A SmSn knowledge graph is organized into *data sources*, which are like buckets 
 Each data source contains any number of entities and relationships, and any set of data sources may be combined to form a data set, or *graph*.
 The current graph contains **`r num(total.sources)` data sources** with names and entity counts as below.
 
-```{r, echo = FALSE}
+```{r}
 showFreqTable(entities$source)
 ```

@@ -1,10 +1,10 @@
-```{r}
-require.entities.and.relations()
+```{r, error=FALSE}
+require.entities()
 ```
 
 ## @title property
 
-```{r, echo=FALSE}
+```{r}
 titles <- as.character(entities$title)
 title.length <- as.vector(sapply(titles, nchar))
 ```
@@ -13,7 +13,7 @@ SmSn's `@title` property provides a label for each entity in the graph; entities
 
 ### Empty titles
 
-```{r, echo=FALSE}
+```{r}
 total.empty.titles <- length(title.length[title.length == 0])
 rel.empty.titles <- total.empty.titles / total.entities
 
@@ -26,7 +26,7 @@ The current graph contains `r num(total.empty.titles)` entities `r perc.of.entit
 
 ### Duplicate titles
 
-```{r, echo=FALSE}
+```{r}
 t.titles <- as.data.frame(table(nonempty.titles))
 
 df <- t.titles[t.titles$Freq > 1,]
@@ -39,13 +39,13 @@ total.duplicate.titles <- nrow(dup.titles)
 While duplicate titles (e.g. two entities, both with the title "Arthur Dent") are allowed, they are to be discouraged, as they are often a sign of unnecessary data duplication, or misalignment of data sources.
 In the current graph, there are **`r num(total.duplicate.titles)` distinct duplicate titles**, as shown in the table below.
 
-```{r, echo=FALSE}
+```{r}
 showTable(dup.titles, list(searching=FALSE, pageLength=5))
 ```
 
 ### Title length
 
-```{r, echo=FALSE}
+```{r}
 len <- nonempty.title.length
 mean.title.length <- mean(len)
 sd.title.length <- sd(len)
@@ -61,7 +61,7 @@ When titles are used to name things, shorter titles are better; they are easier 
 However, titles are also used to capture free-form text of any kind, so there is no hard limit to the length of a title.
 The distribution of lengths for non-empty titles in the current graph is shown below.
 
-```{r, echo=FALSE}
+```{r}
 renderPlot({
   plot(density(len, from=0, to=200),
     main="title length distribution", xlab="length (characters)", ylab="kernel density")

@@ -1,9 +1,10 @@
+```{r, error=FALSE}
+require.git.history()
+```
+
 ## Git history
 
 ```{r}
-git.log.file <- "data/git-log.csv"
-git <- read.csv(file(git.log.file), header=FALSE)
-
 timestamp <- {}
 commit <- {}
 committer <- {}
@@ -127,7 +128,6 @@ SMSN_HOME=...
 DATA_HOME=...
 
 OUT_FILE=${SMSN_HOME}/dashboard/data/git-log.csv
-
 mkdir -p ${SMSN_HOME}/dashboard/data
 echo "" > ${OUT_FILE}
 cd ${DATA_HOME}
@@ -135,6 +135,7 @@ for DIR in `echo */ | tr '/' '\n'`; do
   if [ -e ${DIR}/.git ]; then
       echo "adding Git log for "${DIR}
       cd ${DIR}
+      git config diff.renameLimit 999999
       git log --stat --pretty=format:"COMMIT,%h,%an,%at" \
   | grep "COMMIT\|[-+]$" | sed 's/^COMMIT/'${DIR}',COMMIT/' | sed 's/^ /'${DIR}',FILE,/' | sed 's/\.smsn//' | sed 's/  *\|  */,/' | sed 's/ [-+][-+]*$/,/' \
   >> ${OUT_FILE}
