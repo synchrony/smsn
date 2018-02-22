@@ -143,6 +143,7 @@ require.git.history <- function() {
     }
     
     env$git <- read.csv(f, header=FALSE)
+    env$git.log.file <- f
   }
 }
 
