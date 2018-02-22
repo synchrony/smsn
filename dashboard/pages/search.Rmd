@@ -1,3 +1,7 @@
+```{r}
+require.entities.and.relations()
+```
+
 ## Browse entities
 
 All entities are accessible in the table below. You can use the search box to find a particular one, and filter on or sort by any of the provided fields.

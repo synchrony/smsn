@@ -1,20 +1,11 @@
----
-# TODO: restore TOC
-title: Semantic Synchrony dashboard
-output:
-  html_document:
-    toc: true
-#runtime: shiny
-# rmarkdown::run("/Users/josh/projects/fortytwo/synchrony/smsn/dashboard")
-# rmarkdown::render_site("/Users/josh/projects/fortytwo/synchrony/smsn/dashboard")
----
-
 This dashboard provides an overview of a [Semantic Synchrony](https://github.com/synchrony/smsn) dataset.
 Unless otherwise stated, all timestamps are in [Unix time](https://en.wikipedia.org/wiki/Unix_time) and are displayed in [GMT](https://en.wikipedia.org/wiki/Greenwich_Mean_Time).
 
 ---
 
 ```{r, echo=FALSE}
+require.entities.and.relations()
+
 library(igraph)
 
 g <- graph_from_data_frame(relations)

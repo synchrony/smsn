@@ -26,6 +26,9 @@ shinyServer(function(input, output, session) {
 ########################################
 # SmSn-specific global variables and functions
 
+# get the global environment
+env <- environment()
+
 find.increments <- function(v) {
   v[2:length(v)]-v[1:(length(v)-1)]
 }
@@ -77,13 +80,23 @@ entities.for.display <- function(v) {
     # note: no @shortcut
 }
 
-entities <- read.table("data/vertices.tsv", header=TRUE, sep="\t", quote="", comment.char="")
-total.entities <- nrow(entities)
-unique.entities.id <- unique(entities$id)
-
-relations <- read.table("data/edges.tsv", header=TRUE)
-total.relations <- nrow(relations)
+require.entities.and.relations <- function() {
+  if (is.null(env$entities.and.relations)) {
+    env$entities <- read.table("data/vertices.tsv", header=TRUE, sep="\t", quote="", comment.char="")
+    env$total.entities <- nrow(entities)
+    env$unique.entities.id <- unique(entities$id)
+    
+    env$relations <- read.table("data/edges.tsv", header=TRUE)
+    env$total.relations <- nrow(relations)
+    env$entities.and.relations <- TRUE
+  }
+}
 
 perc.of.entities <- function(n) {
   paste0("(", num(100 * n/total.entities), "% of total)")
 }
+
+find.sources <- function() {
+  unique(as.vector(env$entities$source))
+}
+

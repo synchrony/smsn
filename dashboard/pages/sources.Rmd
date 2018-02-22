@@ -1,9 +1,13 @@
+```{r}
+require.entities.and.relations()
+```
+
 ## Data sources
 
 ```{r, echo = FALSE}
 df <- as.data.frame(table(entities$source))
 t.source <- data.frame(source=df$Var1, size=df$Freq)
-sources <- unique(entities$source)
+sources <- find.sources()
 total.sources <- length(sources)
 ```
 

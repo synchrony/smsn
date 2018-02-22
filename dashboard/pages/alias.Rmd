@@ -1,3 +1,7 @@
+```{r}
+require.entities.and.relations()
+```
+
 ## @alias property
 
 ```{r, echo=FALSE}

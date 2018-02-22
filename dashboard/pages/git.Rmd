@@ -26,6 +26,8 @@ df <- data.frame(git, time=time, commit=commit, committer=committer)
 df <- subset(df, V2=="FILE")
 changes <- data.frame(entity=df$V3, lines=as.numeric(df$V4), source=df$V1, time=df$time, commit=df$commit, committer=df$committer)
 changes <- changes[with(changes, order(time)),]
+
+git.sources <- unique(as.vector(changes$source))
 ```
 
 ### All changes
@@ -39,31 +41,40 @@ showTable(changes)
 ```{r}
 committers <- unique(as.vector(changes$committer))
 
-total.commits <- function(c) {
-  df <- subset(changes, committer==c)
-  num(length(unique(df$commit)))
+changes.subset <- function(committer0=NULL, source0) {
+  df <- if (is.null(committer0)) changes
+  else subset(changes, committer==committer0)
+  
+  if (source0 == "all sources") df
+  else subset(df, source==source0)
 }
-
-total.entities.changed <- function(c) {
-  df <- subset(changes, committer==c)
-  num(length(unique(df$entity)))
-}
-
-total.lines.changed <- function(c) {
-  df <- subset(changes, committer==c)
-  num(sum(as.vector(as.numeric(df$lines))))
-}
-
-totals.by.author <- data.frame(committer=committers,
-                               commits=sapply(committers, total.commits),
-                               entities=sapply(committers, total.entities.changed),
-                               lines=sapply(committers, total.lines.changed))
 ```
 
-There are **`r num(length(committers))` committers in the log, responsible for the following cumulative changes.
+There are **`r num(length(committers))` committers** in the log, responsible for the following cumulative changes.
 
 ```{r}
-showSimpleTable(totals.by.author)
+get.totals.by.author <- function(source) {
+  data.frame(committer=committers,
+    commits=sapply(committers, function(c) {
+        num(length(unique(changes.subset(c,source)$commit)))
+      }),
+    entities=sapply(committers, function(c) {
+      num(length(unique(changes.subset(c,source)$entity)))
+      }),
+    lines=sapply(committers, function(c) {
+      num(sum(as.vector(as.numeric(changes.subset(c,source)$lines))))
+    }))
+}
+
+sources <- c("all sources", git.sources)
+```
+
+```{r}
+renderTable({get.totals.by.author(get.agg.by.committer.source())})
+selectInput("agg.by.committer.source", label=NULL, choices=sources)
+get.agg.by.committer.source <- reactive({
+  input$agg.by.committer.source
+})
 ```
 
 ### Aggregate changes over time
@@ -78,23 +89,31 @@ max.t <- max(changes$time)
 breaks <- seq(min.t, max.t + month, by="months")
 labels <- sapply(breaks[1:(length(breaks)-1)], function(t) { format(t, format="%Y-%m") })
 
-plot.data <- {}
-for (cm in committers) {
-  ct <- hist(subset(changes, committer==cm)$time, breaks=breaks, plot=FALSE)$counts
-  df <- data.frame(time=labels, committer=cm, entities=ct)
-  plot.data <- rbind(plot.data, df)
+get.plot.data <- function(source) {
+  plot.data <- {}
+  for (cm in committers) {
+    ct <- hist(subset(changes.subset(NULL, source), committer==cm)$time, breaks=breaks, plot=FALSE)$counts
+    df <- data.frame(time=labels, committer=cm, entities=ct)
+    plot.data <- rbind(plot.data, df)
+  }
+  plot.data
 }
 ```
 
 The following plot shows the number of entities changed by each committer over time. The y-axis is rendered on a log scale, as some commits tend to be much larger than others.
 
 ```{r}
-renderPlot(
-  ggplot(plot.data, aes(x=factor(time), y=entities)) + 
+renderPlot({
+  source <- get.hist.by.committer.source()
+  ggplot(get.plot.data(source), aes(x=factor(time), y=entities)) + 
     geom_bar(stat="identity", position="dodge", aes(fill = committer)) +
     scale_y_log10() +
-    #geom_text(data=plot.data, aes(label=entities), size=3) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)))
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+})
+selectInput("hist.by.committer.source", label=NULL, choices=sources)
+get.hist.by.committer.source <- reactive({
+  input$hist.by.committer.source
+})
 ```
 
 ### Preparing the data for this page
