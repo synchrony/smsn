@@ -143,3 +143,37 @@ for DIR in `echo */ | tr '/' '\n'`; do
   fi
 done
 ```
+
+
+# temp: splitting data-public
+
+```{r}
+
+# ls | while read file; do TS=`cat $file |grep "^ *@created"|sed 's/.*created.//'` && echo $file","$TS; done
+
+
+df <- as.data.frame(table(changes$commit))
+df <- df[with(df, order(-Freq)),]
+df2 <- merge(changes, df, by.x="commit", by.y="Var1")
+df3 <- unique(data.frame(commit=df2$commit, source=df2$source, time=df2$time, committer=df2$committer, files=df2$Freq))
+df3 <- df3[with(df3, order(time)),]
+josh <- subset(df3, committer=="Joshua Shinavier")
+jeff <- subset(df3, committer=="JeffreyBenjaminBrown")
+plot(x=df3$time, y=df3$files)
+lines(col="red", x=josh$time, y=josh$files)
+lines(col="blue", x=jeff$time, y=jeff$files)
+
+wm <- which.max(changes$files)
+df3[(wm-10):(wm+10),]
+
+
+ts.u <- read.csv(file("/tmp/ts.universal.csv"), header=FALSE, col.names = c("entity", "timestamp"))
+len.u <- sapply(as.vector(ts.u$entity), nchar)
+
+ts.p <- read.csv(file("/tmp/ts.public.csv"), header=FALSE, col.names = c("entity", "timestamp"))
+len.p <- sapply(as.vector(ts.p$entity), nchar)
+
+
+
+
+```
