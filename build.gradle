@@ -14,6 +14,7 @@ subprojects {
     }
 
     repositories {
+        mavenCentral()
         mavenLocal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
@@ -21,6 +22,10 @@ subprojects {
     test {
         exclude '**/**IT.*'
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4.1'
 }
 
 ext {
