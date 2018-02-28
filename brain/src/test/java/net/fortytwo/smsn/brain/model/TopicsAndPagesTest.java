@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TopicsAndPagesTest extends BrainTestBase {
 
-    private Link friendsLink, arthurLink, fordLink, zaphodLink, earthLink, teaLink;
+    private Link friendsLink, arthurLink, fordLink, zaphodLink, teaLink;
 
     @Override
     protected TopicGraph createTopicGraph() throws IOException {
@@ -35,7 +35,6 @@ public class TopicsAndPagesTest extends BrainTestBase {
         arthurLink = topicGraph.createLink(arthurTopic, "Arthur P. Dent", null);
         fordLink = topicGraph.createLink(fordTopic, "Ford Prefect", null);
         zaphodLink = topicGraph.createLink(zaphodTopic, "Zaphod Beeblebrox", Role.Relation);
-        earthLink = topicGraph.createLink(earthTopic, "The Earth", null);
         teaLink = topicGraph.createLink(teaTopic, "Tea", null);
     }
 

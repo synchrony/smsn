@@ -1,5 +1,6 @@
 dependencies {
     compile project(':smsn-devices')
     compile project(':brain')
+
     testCompile group: 'junit', name: 'junit', version:junitVersion
 }

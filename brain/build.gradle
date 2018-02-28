@@ -7,7 +7,7 @@ dependencies {
     compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version:tinkerpopVersion
     compile group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version:tinkerpopVersion
     compile group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version:tinkerpopVersion
-    compile group: 'org.neo4j', name: 'neo4j-tinkerpop-api-impl', version:neo4jTinkertopApiVersion
+    compile group: 'org.neo4j', name: 'neo4j-tinkerpop-api-impl', version:neo4jTinkerpopApiVersion
     compile group: 'org.apache.lucene', name: 'lucene-analyzers', version:luceneVersion
     compile group: 'org.openrdf.sesame', name: 'sesame-rio-api', version:sesameVersion
     compile(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version:sesameVersion) {

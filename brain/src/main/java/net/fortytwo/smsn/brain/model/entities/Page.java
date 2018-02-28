@@ -3,11 +3,9 @@ package net.fortytwo.smsn.brain.model.entities;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
-import net.fortytwo.smsn.brain.query.TreeViews;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public interface Page extends Entity {
 

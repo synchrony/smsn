@@ -577,12 +577,15 @@ public class TreeViews {
         Property<Page, T> pageProp = (Property<Page, T>) Page.propertiesByKey.get(key);
         T value = null;
         if (null == pageProp) {
-            if (key.equals(SemanticSynchrony.PropertyKeys.TITLE)) {
-                value = (T) fromNode.getValue().getLabel();
-            } else if (key.equals(SemanticSynchrony.PropertyKeys.ID)) {
-                value = (T) fromNode.getValue().getTarget().getId();
-            } else {
-                throw new InvalidUpdateException("no such property: " + key);
+            switch (key) {
+                case SemanticSynchrony.PropertyKeys.TITLE:
+                    value = (T) fromNode.getValue().getLabel();
+                    break;
+                case SemanticSynchrony.PropertyKeys.ID:
+                    value = (T) fromNode.getValue().getTarget().getId();
+                    break;
+                default:
+                    throw new InvalidUpdateException("no such property: " + key);
             }
         } else {
             if (null != page) {
@@ -601,19 +604,17 @@ public class TreeViews {
     private static void setNodeProperties(final Note from,
                                           final TreeNode<Link> to,
                                           final boolean isVisible) {
-        for (String key : Note.propertiesByKey.keySet()) {
-            // The convention for "invisible" notes is to leave the title and page blank,
-            // as well as to avoid displaying any child notes.
-            if (isVisible ||
-                    (!key.equals(SemanticSynchrony.PropertyKeys.TITLE)
-                            && !key.equals(SemanticSynchrony.PropertyKeys.TEXT))) {
-                if (key.equals(SemanticSynchrony.PropertyKeys.TITLE)) {
-                    to.getValue().setLabel(Note.getTitle(from));
-                } else {
-                    setNodeProperty(from, to, key);
-                }
+        // The convention for "invisible" notes is to leave the title and page blank,
+// as well as to avoid displaying any child notes.
+        Note.propertiesByKey.keySet().stream().filter(key -> isVisible ||
+                (!key.equals(SemanticSynchrony.PropertyKeys.TITLE)
+                        && !key.equals(SemanticSynchrony.PropertyKeys.TEXT))).forEach(key -> {
+            if (key.equals(SemanticSynchrony.PropertyKeys.TITLE)) {
+                to.getValue().setLabel(Note.getTitle(from));
+            } else {
+                setNodeProperty(from, to, key);
             }
-        }
+        });
     }
 
     private static <T> void setNodeProperty(final Note fromNote, final TreeNode<Link> toNode, final String key) {
