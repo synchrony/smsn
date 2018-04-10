@@ -93,8 +93,11 @@ public class WikiPrinter {
 
     private void printProperties(final Page page) {
         printProperty("id", page.getContent().getValue().getTarget().getId());
-        printProperty("title", page.getContent().getValue().getLabel());
-
+        String title = page.getContent().getValue().getLabel();
+        if (null != title) {
+            printProperty("title", title);
+        }
+        
         Page.propertiesByKey.values().stream().filter(Property::isAnnotationProperty).forEach(prop -> {
             Object value = prop.getGetter().apply(page);
             if (null != value && (null == prop.getDefaultValue() || !value.equals(prop.getDefaultValue()))) {
