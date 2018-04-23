@@ -4,20 +4,16 @@
 
 SmSn.Ripple.main
 
+Examples:
 
-reduce [Op, dup, string "foo"]
-reduce [Op, plus, int 2, int 3, int 42]
-reduce [Op, swap, int 2, int 3, int 42]
-reduce [Op, times, int 3, ListValue [int 100, int 50], string "foo"]
-reduce [Op, times, int 2, ListValue [dup, Op], string "foo"]
-reduce [Op, SmSn.Ripple.sqrt, double 42]
-
-
-[Op, times, int 2, ListValue [dup, Op], string "foo"]
-[Op, ListValue [dup, Op], Op, ListValue [dup, Op], string "foo"]
-[Op, dup, Op, ListValue [dup, Op], string "foo"]
-
-
+reduce 1 [Do, dup, string "foo"]
+reduce 1 [Do, plus, int 2, int 3, int 42]
+reduce 1 [Do, swap, int 2, int 3, int 42]
+reduce 2 [Do, times, int 3, ListValue [int 100, int 50], string "foo"]
+reduce 4 [Do, times, int 3, ListValue [int 100, int 50], string "foo"]
+reduce 6 [Do, times, int 3, ListValue [int 100, int 50], string "foo"]
+reduce 1 [Do, times, int 2, ListValue [dup, Do], string "foo"]
+reduce 1 [Do, SmSn.Ripple.sqrt, double 42]
 -}
 
 module SmSn.Ripple where
@@ -27,7 +23,7 @@ import Data.Maybe as Y
 
 -- data types ------------------------------------------------------------------
 
-data Value = Op
+data Value = Do
          | BooleanValue Bool
          | DoubleValue Double
          | IntValue Int
@@ -52,37 +48,50 @@ string = StringValue
 
 -- reduction/computation -------------------------------------------------------
 
-reduce :: Stack -> [Stack]
--- an Op with nothing beneath it has no reduction
-reduce [Op] = []
--- an Op at the head of a non-empty stack will activate the element beneath it
-reduce (Op:tail) = reduceAll $ activate (L.head tail) (L.tail tail)
--- all other stacks, including the empty stack, remain unchanged
-reduce xs = [xs]
+-- | reduces a stack to N-normal form; a stack is in N-normal form if it has at least N elements and none of the
+--   first N elements is "Do"
+reduce :: Int -> Stack -> [Stack]
+-- every stack is in 0-normal form
+reduce 0 stack = [stack]
+-- a Do with nothing beneath it has no N>0 normal form
+reduce _ [Do] = []
+-- a Do with elements beneath it first reduces the tail of the stack to 1st normal form,
+-- pops a mapping value from each resulting stack, and applies the mapping to the tail of each resulting stack
+reduce 1 (Do:tail) = forAll (reduce 1) $ forAll popAndApply $ reduce 1 tail
+  where popAndApply s = apply (L.head s) (L.tail s)
+-- any stack without a Do at its head, including the empty stack, remains unchanged at a depth of 1
+reduce 1 xs = [xs]
+-- at depths greater than one, we must first reduce the stack to a depth of one,
+-- then remove the heads of the new stacks, then reduce the tails of the stacks to a depth of N-1,
+-- and finally push the original heads back to the N-1 reduced stacks
+reduce n stack = forAll reduceTail $ reduce 1 stack
+  where reduceTail [] = []
+        reduceTail [_] = []
+        reduceTail (head:tail) = map (\s -> head:s) $ reduce (n-1) tail
 
-reduceAll :: [Stack] -> [Stack]
-reduceAll stacks = L.concat $ L.map reduce stacks
+-- | removes the head of the stack and applies it to the tail of the stack according to a type-specific rule
+apply :: Value -> Stack -> [Stack]
+-- a mapping is applied according to its internal lambda
+apply (MappingValue mv) tail = reduceAndApply mv tail
+-- a list is applied by dequoting the list and prepending it to the tail of the stack
+apply (ListValue lv) tail = [(reverse lv) ++ tail]
+-- other values cannot be applied, or rather their application is the null mapping
+apply _ _ = []
 
-activate :: Value -> Stack -> [Stack]
-activate Op _ = []
-activate (MappingValue mv) tail = applyMapping mv tail
-activate (ListValue lv) tail = [(reverse lv) ++ tail]
-activate head tail = [head:tail]
+-- | applies a mapping to a stack, first reducing the stack to N-normal form, where N is the mapping's in-arity
+reduceAndApply :: Mapping -> Stack -> [Stack]
+reduceAndApply (Mapping n _ mapping) stack = forAll (applyMapping n mapping) $ reduce n stack
 
-applyMapping :: Mapping -> Stack -> [Stack]
-applyMapping (Mapping inArity outArity mapping) stack = Y.maybe [] apply $ marshal inArity (stack, [])
-  where apply = \(tail, args) -> prependAll tail $ mapping args
+-- | applies a mapping to a stack in N-normal form
+applyMapping :: Int -> (Stack -> [Stack]) -> Stack -> [Stack]
+applyMapping n mapping reduced = L.map (\s -> s ++ rest) $ mapping $ take n reduced
+  where rest = drop n reduced
 
-prependAll :: Stack -> [Stack] -> [Stack]
-prependAll tail stacks = L.map (\s -> s ++ tail) stacks
+-- | a convenience function to distribute a given stack function across a list of stacks, concatenating the results
+forAll :: (Stack -> [Stack]) -> [Stack] -> [Stack]
+forAll f stacks = L.concat $ L.map f stacks
 
-marshal :: Int -> ([a], [a]) -> Maybe ([a], [a])
-marshal 0 stacks = Just stacks
-marshal _ ([], _) = Nothing
-marshal n (x:xs, second) = Y.maybe Nothing psh $ marshal (n-1) (xs, second)
-  where psh = \(first', second') -> Just (first', (x:second'))
-
--- a small library of mappings -------------------------------------------------
+-- an example library of mappings ----------------------------------------------
 
 plus = MappingValue $ Mapping 2 1 mapping
   where mapping [(IntValue v1), (IntValue v2)] = [[int $ v1 + v2]]
@@ -102,5 +111,5 @@ dup = MappingValue $ Mapping 1 2 mapping
         mapping _ = []
 
 times = MappingValue $ Mapping 2 0 mapping
-  where mapping [(IntValue n), v] = [L.concat $ take n $ repeat [Op, v]]
+  where mapping [(IntValue n), v] = [L.concat $ take n $ repeat [Do, v]]
         mapping _ = []
