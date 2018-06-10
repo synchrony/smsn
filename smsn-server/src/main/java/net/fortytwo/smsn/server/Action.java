@@ -135,6 +135,10 @@ public abstract class Action {
         try {
             TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> performTransaction(context));
         } catch (Exception e) {
+            // Gremlin Server does not necessarily print the full stack trace,
+            // so we print it here before propagating the exception.
+            e.printStackTrace(System.err);
+
             throw new RequestProcessingException(e);
         }
     }

@@ -73,6 +73,7 @@ public class VCSReader extends NoteReader {
 
     private void readPage(final File file, final Helper helper, final DataSource source) throws IOException {
         Page page;
+
         try (InputStream in = new FileInputStream(file)) {
             try {
                 page = reader.parse(in);
