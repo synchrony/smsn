@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
+import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
@@ -97,6 +98,42 @@ public class VCSWriter extends NoteWriter {
     }
 
     private void writeNoteToStream(final Note note, final OutputStream out) {
+        new WikiPrinter(out).print(noteToPage(note));
+    }
+
+    public static TreeNode<Link> noteToTreeMinimal(final Note note) {
+        TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
+        TreeViews.setId(tree, Note.getId(note));
+        return tree;
+    }
+
+    public static TreeNode<Link> noteToTree(final Note note) {
+        TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
+
+        TreeViews.setId(tree, Note.getId(note));
+        TreeViews.setAlias(tree, Note.getAlias(note));
+        TreeViews.setCreated(tree, Note.getCreated(note));
+        TreeViews.setPriority(tree, Note.getPriority(note));
+        TreeViews.setShortcut(tree, Note.getShortcut(note));
+        TreeViews.setSource(tree, Note.getSource(note));
+        TreeViews.setText(tree, Note.getText(note));
+        TreeViews.setTitle(tree, Note.getTitle(note));
+        TreeViews.setWeight(tree, Note.getWeight(note));
+
+        if (null != note.getChildren()) {
+            List<Note> kids = ListNode.toJavaList(note.getChildren());
+            TreeNode<Link>[] children = new TreeNode[kids.size()];
+            int i = 0;
+            for (Note kid : kids) {
+                children[i++] = noteToTreeMinimal(kid);
+            }
+            tree.setChildren(ListNodeDTO.fromArray(children));
+        }
+
+        return tree;
+    }
+
+    public static Page noteToPage(final Note note) {
         TreeNode<Link> tree = new TreeNodeDTO<>();
         Topic topic = new TopicDTO();
         topic.setId(Note.getId(note));
@@ -107,7 +144,7 @@ public class VCSWriter extends NoteWriter {
 
         ListNode<Note> cur = note.getChildren();
         while (null != cur) {
-            tree.addChild(toTree(cur.getFirst()));
+            tree.addChild(noteToTreeMinimal(cur.getFirst()));
             cur = cur.getRest();
         }
 
@@ -119,25 +156,7 @@ public class VCSWriter extends NoteWriter {
         page.setAlias(Note.getAlias(note));
         page.setPriority(Note.getPriority(note));
         page.setWeight(Note.getWeight(note));
-        new WikiPrinter(out).print(page);
-    }
 
-    private TreeNode<Link> toTree(final Note note) {
-        TreeNode<Link> tree = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(tree, Note.getId(note));
-        return tree;
-    }
-
-    private <E extends Exception> void timeAction(final String description,
-                                                  final RunnableWithException<E> action) throws E {
-        long before = System.currentTimeMillis();
-        action.run();
-        long after = System.currentTimeMillis();
-
-        logger.info(description + " in " + (after - before) + " ms");
-    }
-
-    private interface RunnableWithException<E extends Exception> {
-        void run() throws E;
+        return page;
     }
 }

@@ -61,7 +61,10 @@ public class AddToStreamMapping extends NoteMapping {
     private void prepend(final String value) throws RippleException {
         TreeNode<Link> note = TreeNodeDTO.createEmptyNode();
         TreeViews.setId(note, SemanticSynchrony.createRandomId());
-        TreeViews.setSource(note, filter.getDefaultSource());
+        String source = filter.getDefaultSource();
+        if (null != source) {
+            TreeViews.setSource(note, source);
+        }
         TreeViews.setWeight(note, filter.getDefaultWeight());
         TreeViews.setCreated(note, System.currentTimeMillis());
         TreeViews.setTitle(note, value);

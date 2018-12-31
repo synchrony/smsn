@@ -35,8 +35,19 @@ public class Filter implements Predicate<Note>, Serializable {
 
     private static final Filter NO_FILTER = new Filter();
 
+    private static final Filter SIMPLE_FILTER = new Filter(0f, 0.5f, 0, null);
+
     public static Filter noFilter() {
         return NO_FILTER;
+    }
+
+    public static Filter simpleFilter() {
+        return SIMPLE_FILTER;
+    }
+
+    // Default constructor is required.
+    private Filter() {
+        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
     }
 
     public float getMinWeight() {
@@ -64,6 +75,18 @@ public class Filter implements Predicate<Note>, Serializable {
         this.defaultSource = defaultSource;
     }
 
+    public String getDefaultSource() {
+        return defaultSource;
+    }
+
+    public float getDefaultWeight() {
+        return defaultWeight;
+    }
+
+    public boolean isTrivial() {
+        return minSourceIndex == 0 && minWeight == 0;
+    }
+
     private static int indexForSource(final String source) {
         Integer index = sourceToIndex.get(source);
         Preconditions.checkNotNull(index, "data source '" + source + "' does not exist");
@@ -79,17 +102,14 @@ public class Filter implements Predicate<Note>, Serializable {
         checkBetweenZeroAndOne(defaultWeight);
         Preconditions.checkArgument(defaultWeight >= minWeight, "default weight greater than minimum");
 
-        Preconditions.checkNotNull(defaultSource);
-        indexForSource(defaultSource);
+        if (null != defaultSource) {
+            indexForSource(defaultSource);
+        }
 
         this.minSourceIndex = minSourceIndex;
         this.defaultSource = defaultSource;
         this.minWeight = minWeight;
         this.defaultWeight = defaultWeight;
-    }
-
-    private Filter() {
-        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
     }
 
     public Filter(final float minWeight,
@@ -101,18 +121,6 @@ public class Filter implements Predicate<Note>, Serializable {
 
     private void checkBetweenZeroAndOne(final float value) {
         Preconditions.checkArgument(value >= 0f && value <= 1f, "argument outside of range [0, 1]");
-    }
-
-    public String getDefaultSource() {
-        return defaultSource;
-    }
-
-    public float getDefaultWeight() {
-        return defaultWeight;
-    }
-
-    public boolean isTrivial() {
-        return minSourceIndex == 0 && minWeight == 0;
     }
 
     @Override

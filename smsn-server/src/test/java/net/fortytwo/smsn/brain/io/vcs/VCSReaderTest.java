@@ -7,6 +7,7 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 

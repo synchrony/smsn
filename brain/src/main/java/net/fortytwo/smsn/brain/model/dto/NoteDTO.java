@@ -14,6 +14,7 @@ public class NoteDTO implements Note {
 
     private final Map<String, Object> propertyMap;
     private Topic topic;
+    private ListNode<Note> children;
 
     public NoteDTO() {
         propertyMap = new HashMap<>();
@@ -54,32 +55,36 @@ public class NoteDTO implements Note {
 
     @Override
     public ListNode<Note> getChildren() {
-        return null;
+        return children;
     }
 
     @Override
     public void setChildren(ListNode<Note> notes) {
+        this.children = notes;
     }
 
     @Override
     public void forFirstOf(Consumer<ListNode<Note>> consumer) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void addChildAt(Note child, int position) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void deleteChildAt(int position) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<ListNode<Note>> getFirstOf() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Note getSubject(ListNode<Note> notes) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

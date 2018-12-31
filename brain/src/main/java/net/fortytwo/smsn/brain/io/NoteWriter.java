@@ -95,4 +95,17 @@ public abstract class NoteWriter {
             }
         }
     }
+
+    protected  <E extends Exception> void timeAction(final String description,
+                                                  final RunnableWithException<E> action) throws E {
+        long before = System.currentTimeMillis();
+        action.run();
+        long after = System.currentTimeMillis();
+
+        logger.info(description + " in " + (after - before) + " ms");
+    }
+
+    protected interface RunnableWithException<E extends Exception> {
+        void run() throws E;
+    }
 }

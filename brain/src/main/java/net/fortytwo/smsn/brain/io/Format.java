@@ -72,7 +72,7 @@ public class Format {
         NoteReader reader = readersByFormat.get(format);
 
         if (null == reader) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("no reader for format: " + format);
         }
 
         return reader;

@@ -5,6 +5,7 @@ import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -98,6 +99,7 @@ public abstract class NoteReader {
         Context context = new Context();
         context.setTopicGraph(brain.getTopicGraph());
         context.setFormat(format);
+        context.setQueries(new TreeViews(brain));
 
         doImport(context);
     }
@@ -140,6 +142,7 @@ public abstract class NoteReader {
         private InputStream sourceStream;
         private File sourceDirectory;
         private Format format;
+        private TreeViews queries;
 
         public TopicGraph getTopicGraph() {
             return topicGraph;
@@ -171,6 +174,14 @@ public abstract class NoteReader {
 
         public void setSourceDirectory(File sourceDirectory) {
             this.sourceDirectory = sourceDirectory;
+        }
+
+        public TreeViews getQueries() {
+            return queries;
+        }
+
+        public void setQueries(TreeViews queries) {
+            this.queries = queries;
         }
     }
 }

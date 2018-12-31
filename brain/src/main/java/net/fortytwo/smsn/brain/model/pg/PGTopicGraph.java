@@ -166,7 +166,10 @@ public class PGTopicGraph implements TopicGraph {
         Note note = createNote(id);
 
         Note.setCreated(note, new Date().getTime());
-        Note.setSource(note, filter.getDefaultSource());
+        String source = filter.getDefaultSource();
+        if (null != source) {
+            Note.setSource(note, source);
+        }
         Note.setWeight(note, filter.getDefaultWeight());
 
         return note;

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A service for importing an Extend-o-Brain subgraph
+ * A service for importing a SmSn subgraph
  */
 public class ReadGraph extends IOAction {
     private static final Map<Graph, Set<String>> importsInProgress = new HashMap<>();

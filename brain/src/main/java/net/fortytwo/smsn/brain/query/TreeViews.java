@@ -102,7 +102,7 @@ public class TreeViews {
     /**
      * Updates the graph.
      *
-     * @param root   the root of the TreeNode tree
+     * @param root   the root of the tree
      * @param height the maximum height of the tree which will be applied to the graph as an update.
      *               If height is 0, only the root node will be affected,
      *               while a height of 1 will also affect children (which have a depth of 1 from the root), etc.
@@ -498,9 +498,11 @@ public class TreeViews {
             throw new InvalidUpdateException("note has no id");
         }
 
-        Note note = getNoteById(getId(node), cache);
+        String id = getId(node);
+        Note note = getNoteById(id, cache);
         if (null == note) {
-            throw new InvalidUpdateException("no such note: " + getId(node));
+            note = brain.getTopicGraph().createNote(id);
+            //throw new InvalidUpdateException("no such note: " + getId(node));
         }
 
         return note;
@@ -509,7 +511,10 @@ public class TreeViews {
     private Note createNote(final String id,
                             final Filter filter) {
         Note a = brain.getTopicGraph().createNoteWithProperties(filter, id);
-        Note.setSource(a, filter.getDefaultSource());
+        String source = filter.getDefaultSource();
+        if (null != source) {
+            Note.setSource(a, source);
+        }
 
         if (null != brain.getActivityLog()) {
             brain.getActivityLog().logCreate(a);
