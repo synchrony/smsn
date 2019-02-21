@@ -12,6 +12,8 @@ import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,10 +60,11 @@ public class GiveAtomMapping extends AtomMapping {
 
             logger.log(Level.INFO, "preparing to give " + iri + " (" + value + ")");
 
-            OSCMessage m = new OSCMessage(SmSnActivityOntology.EXO_ACTIVITY_GIVE);
-            m.addArgument(typeatron.getAgent().getAgentIri().stringValue());
-            m.addArgument(iri.stringValue());
-            //m.addArgument(value);
+            final List<Object> arguments = new LinkedList<>();
+            arguments.add(typeatron.getAgent().getAgentIri().stringValue());
+            arguments.add(iri.stringValue());
+            //arguments.add(value);
+            OSCMessage m = new OSCMessage(SmSnActivityOntology.EXO_ACTIVITY_GIVE, arguments);
             typeatron.getAgent().sendOSCMessageToCoordinator(m);
 
             // keep the stack unchanged

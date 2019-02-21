@@ -1,9 +1,10 @@
 package net.fortytwo.smsn.gesture;
 
 import com.illposed.osc.OSCBundle;
-import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
-import com.illposed.osc.OSCPortIn;
+import com.illposed.osc.OSCMessageListener;
+import com.illposed.osc.messageselector.OSCPatternAddressMessageSelector;
+import com.illposed.osc.transport.udp.OSCPortIn;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.p2p.osc.OscSender;
 import net.fortytwo.smsn.p2p.osc.udp.UdpOscSender;
@@ -16,7 +17,6 @@ import org.openrdf.model.impl.SimpleValueFactory;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -50,7 +50,7 @@ public class GesturalServer {
         // TODO: host and port are temporary; they should be configurable
         try {
             notificationSender = new UdpOscSender("localhost", 42003);
-        } catch (UnknownHostException | SocketException e) {
+        } catch (IOException e) {
             throw new IllegalStateException();
         }
 
@@ -132,9 +132,9 @@ public class GesturalServer {
         return System.currentTimeMillis();
     }
 
-    public void start() throws SocketException {
-        OSCListener handshakeListener = (date, oscMessage) -> {
-            List<Object> args = oscMessage.getArguments();
+    public void start() throws SocketException, IOException {
+        OSCMessageListener handshakeListener = (oscMessageEvent) -> {
+            List<Object> args = oscMessageEvent.getMessage().getArguments();
             if (badArgs(args, 1, SmSnActivityOntology.EXO_ACTIVITY_HANDSHAKE)) {
                 return;
             }
@@ -152,8 +152,8 @@ public class GesturalServer {
         };
 
         // this serves as both the "give" and "take" half of the hand-off interaction
-        OSCListener handoffListener = (date, oscMessage) -> {
-            List<Object> args = oscMessage.getArguments();
+        OSCMessageListener handoffListener = (oscMessageEvent) -> {
+            List<Object> args = oscMessageEvent.getMessage().getArguments();
             if (badArgs(args, 1, SmSnActivityOntology.EXO_ACTIVITY_HANDOFF)) {
                 return;
             }
@@ -170,9 +170,9 @@ public class GesturalServer {
         };
 
         // this is where the "giver" in a handoff interaction provides the item to give
-        OSCListener giveListener = (date, oscMessage) -> {
+        OSCMessageListener giveListener = (oscMessageEvent) -> {
 
-            List<Object> args = oscMessage.getArguments();
+            List<Object> args = oscMessageEvent.getMessage().getArguments();
             if (badArgs(args, 2, SmSnActivityOntology.EXO_ACTIVITY_GIVE)) {
                 return;
             }
@@ -186,8 +186,8 @@ public class GesturalServer {
             handoffMatcher.prepareForGive(actor, thingGiven, System.currentTimeMillis());
         };
 
-        OSCListener highFiveListener = (date, oscMessage) -> {
-            List<Object> args = oscMessage.getArguments();
+        OSCMessageListener highFiveListener = (oscMessageEvent) -> {
+            List<Object> args = oscMessageEvent.getMessage().getArguments();
             if (badArgs(args, 1, SmSnActivityOntology.EXO_ACTIVITY_HIGHFIVE)) {
                 return;
             }
@@ -203,19 +203,19 @@ public class GesturalServer {
             highFiveMatcher.receiveEvent(actor, timestamp);
         };
 
-        OSCListener infoListener = (date, oscMessage) ->
-                logger.info("info message via OSC: " + oscMessage.getArguments().get(0));
+        OSCMessageListener infoListener = (oscMessageEvent) ->
+                logger.info("info message via OSC: " + oscMessageEvent.getMessage().getArguments().get(0));
 
-        OSCListener errorListener = (date, oscMessage) ->
-                logger.warning("error message via OSC: " + oscMessage.getArguments().get(0));
+        OSCMessageListener errorListener = (oscMessageEvent) ->
+                logger.warning("error message via OSC: " + oscMessageEvent.getMessage().getArguments().get(0));
 
         final OSCPortIn portIn = new OSCPortIn(port);
-        portIn.addListener(SmSnActivityOntology.EXO_ACTIVITY_GIVE, giveListener);
-        portIn.addListener(SmSnActivityOntology.EXO_ACTIVITY_HANDOFF, handoffListener);
-        portIn.addListener(SmSnActivityOntology.EXO_ACTIVITY_HANDSHAKE, handshakeListener);
-        portIn.addListener(SmSnActivityOntology.EXO_ACTIVITY_HIGHFIVE, highFiveListener);
-        portIn.addListener("/exo/hand/info", infoListener);
-        portIn.addListener("/exo/hand/error", errorListener);
+        portIn.getDispatcher().addListener(new OSCPatternAddressMessageSelector(SmSnActivityOntology.EXO_ACTIVITY_GIVE), giveListener);
+        portIn.getDispatcher().addListener(new OSCPatternAddressMessageSelector(SmSnActivityOntology.EXO_ACTIVITY_HANDOFF), handoffListener);
+        portIn.getDispatcher().addListener(new OSCPatternAddressMessageSelector(SmSnActivityOntology.EXO_ACTIVITY_HANDSHAKE), handshakeListener);
+        portIn.getDispatcher().addListener(new OSCPatternAddressMessageSelector(SmSnActivityOntology.EXO_ACTIVITY_HIGHFIVE), highFiveListener);
+        portIn.getDispatcher().addListener(new OSCPatternAddressMessageSelector("/exo/hand/info"), infoListener);
+        portIn.getDispatcher().addListener(new OSCPatternAddressMessageSelector("/exo/hand/error"), errorListener);
 
         new Thread(() -> {
             try {

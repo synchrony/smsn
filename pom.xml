@@ -50,7 +50,7 @@
     <properties>
         <smsn.version>1.4</smsn.version>
         <httpcomponents.version>4.4</httpcomponents.version>
-        <javaosc.version>0.3</javaosc.version>
+        <javaosc.version>0.5</javaosc.version>
         <junit.version>4.12</junit.version>
         <lucene.version>3.6.2</lucene.version>
         <neo4j.version>2.3.3</neo4j.version>

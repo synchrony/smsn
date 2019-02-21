@@ -2,8 +2,11 @@ package net.fortytwo.smsn.p2p.osc;
 
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPacket;
-import com.illposed.osc.utility.OSCByteArrayToJavaConverter;
+import com.illposed.osc.OSCParseException;
+import com.illposed.osc.OSCParser;
+import com.illposed.osc.OSCParserFactory;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,9 +22,12 @@ public class OscReceiver {
 
     private final Set<OSCMessageListener> listeners;
 
+    private final OSCParserFactory oscParserFactory;
+
     public OscReceiver() {
         handlers = new HashMap<>();
         listeners = new HashSet<>();
+        oscParserFactory = OSCParserFactory.createDefaultFactory();
     }
 
     public void register(final String oscAddress,
@@ -73,10 +79,10 @@ public class OscReceiver {
         }
     }
 
-    public boolean receive(final byte[] data, int length) {
-        OSCByteArrayToJavaConverter c = new OSCByteArrayToJavaConverter();
+    public boolean receive(final ByteBuffer data) throws OSCParseException {
+        OSCParser c = oscParserFactory.create();
 
-        OSCPacket p = c.convert(data, length);
+        OSCPacket p = c.convert(data);
 
         return receive(p);
     }

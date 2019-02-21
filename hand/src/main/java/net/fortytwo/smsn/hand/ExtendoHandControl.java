@@ -5,6 +5,8 @@ import net.fortytwo.smsn.SmSnDeviceControl;
 import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.smsn.p2p.osc.OscReceiver;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -48,11 +50,12 @@ public class ExtendoHandControl extends SmSnDeviceControl {
             throw new IllegalArgumentException("vibration duration is out of range: " + vibrationDurationMs);
         }
 
-        OSCMessage m = new OSCMessage(absoluteAddress(OSC_MULTI));
-        m.addArgument(toneFrequency);
-        m.addArgument(toneDurationMs);
-        m.addArgument(color);
-        m.addArgument(vibrationDurationMs);
+        final List<Object> arguments = new LinkedList<>();
+        arguments.add(toneFrequency);
+        arguments.add(toneDurationMs);
+        arguments.add(color);
+        arguments.add(vibrationDurationMs);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_MULTI), arguments);
         send(m);
     }
 }

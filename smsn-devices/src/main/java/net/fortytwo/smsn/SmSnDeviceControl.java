@@ -5,6 +5,7 @@ import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.smsn.p2p.osc.OscControl;
 import net.fortytwo.smsn.p2p.osc.OscReceiver;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -104,8 +105,7 @@ public abstract class SmSnDeviceControl extends OscControl {
     }
 
     public void sendMorseMessage(final String text) {
-        OSCMessage m = new OSCMessage(absoluteAddress(OSC_MORSE));
-        m.addArgument(text);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_MORSE), Collections.singletonList(text));
         send(m);
     }
 
@@ -115,9 +115,8 @@ public abstract class SmSnDeviceControl extends OscControl {
     }
 
     public void sendPingMessage() {
-        OSCMessage message = new OSCMessage(absoluteAddress(OSC_PING));
+        OSCMessage message = new OSCMessage(absoluteAddress(OSC_PING), Collections.singletonList(latestPing));
         latestPing = System.currentTimeMillis();
-        message.addArgument(latestPing);
         send(message);
     }
 
@@ -140,8 +139,7 @@ public abstract class SmSnDeviceControl extends OscControl {
             throw new IllegalArgumentException("vibration interval too short or too long: " + time);
         }
 
-        OSCMessage m = new OSCMessage(absoluteAddress(OSC_VIBRO));
-        m.addArgument(time);
+        OSCMessage m = new OSCMessage(absoluteAddress(OSC_VIBRO), Collections.singletonList(time));
         send(m);
     }
 
