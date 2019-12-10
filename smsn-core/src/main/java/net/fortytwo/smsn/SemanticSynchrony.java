@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.LogManager;
@@ -54,6 +55,9 @@ public class SemanticSynchrony {
                 TEXT = "text",
                 TITLE = "title",
                 WEIGHT = "weight";
+
+        String[] allPropertyKeys = {
+                ACRONYM, ALIAS, CREATED, ID, LABEL, PRIORITY, ROLE, SHORTCUT, SOURCE, TEXT, TITLE, WEIGHT};
     }
 
     public static final float DEFAULT_WEIGHT = 0.5f;
