@@ -209,6 +209,10 @@ public abstract class PGNote extends PGEntity implements Note {
         return property;
     }
 
+    public <V> V optProperty(final String key) {
+        return getOptionalProperty(key);
+    }
+
     public <V> V getProperty(final String key) {
         return getProperty(getPropertyForKey(key));
     }

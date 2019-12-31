@@ -34,8 +34,13 @@ public class NoteDTO implements Note {
     }
 
     @Override
-    public <V> V getProperty(String key) {
+    public <V> V optProperty(String key) {
         return (V) propertyMap.get(key);
+    }
+
+    @Override
+    public <V> V getProperty(String key) {
+        return optProperty(key);
     }
 
     @Override

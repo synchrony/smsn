@@ -16,6 +16,12 @@ public interface Note extends Entity {
     static Map<String, Property<Note, ?>> createPropertiesByKey() {
         Map<String, Property<Note, ?>> propertiesByKey = new LinkedHashMap<>();
         for (Property<Note, ?> prop : new Property[]{
+//                new Property.Builder<Note, String>()
+//                        .key(SemanticSynchrony.PropertyKeys.ACRONYM)
+//                        .getter(Note::getAcronym)
+//                        .setter(Note::setAcronym)
+//                        .fromString(s -> s)
+//                        .build(),
                 new Property.Builder<Note, String>()
                         .key(SemanticSynchrony.PropertyKeys.ALIAS)
                         .getter(Note::getAlias)
@@ -96,6 +102,7 @@ public interface Note extends Entity {
         return propertiesByKey;
     }
 
+    <V> V optProperty(String key);
     <V> V getProperty(String key);
     <V> void setProperty(String key, V value);
 
@@ -132,6 +139,14 @@ public interface Note extends Entity {
     static void setRole(Note note, Role role) {
         note.setProperty(SemanticSynchrony.PropertyKeys.ROLE, role);
     }
+
+//    static String getAcronym(Note note) {
+//        return note.getProperty(SemanticSynchrony.PropertyKeys.ACRONYM);
+//    }
+//
+//    static void setAcronym(Note note, String acronym) {
+//        note.setProperty(SemanticSynchrony.PropertyKeys.ACRONYM, acronym);
+//    }
 
     static String getAlias(Note note) {
         return note.getProperty(SemanticSynchrony.PropertyKeys.ALIAS);
