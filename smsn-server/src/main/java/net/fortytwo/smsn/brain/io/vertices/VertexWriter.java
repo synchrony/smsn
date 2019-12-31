@@ -32,7 +32,7 @@ public class VertexWriter extends NoteWriter {
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
-        p.println("created\tid\tweight\tpriority\tsource\tclass\tout\tin\ttitle\talias\tshortcut");
+        p.println("created\tid\tweight\tpriority\tsource\tclass\tout\tin\ttitle\talias\tshortcut\ttext");
 
         for (Note a : sourceGraph.getAllNotes()) {
             if (isTrueNote(a) && filter.test(a)) {
@@ -77,6 +77,11 @@ public class VertexWriter extends NoteWriter {
                 String shortcut = Note.getShortcut(a);
                 if (null != shortcut) {
                     p.print(escapeValue(shortcut));
+                }
+
+                String text = Note.getText(a);
+                if (null != text) {
+                    p.print(escapeValue(text));
                 }
 
                 p.print('\n');

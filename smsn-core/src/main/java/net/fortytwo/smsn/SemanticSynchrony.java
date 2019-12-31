@@ -127,6 +127,10 @@ public class SemanticSynchrony {
         return configuration;
     }
 
+    public static void setConfiguration(final Configuration config) {
+        configuration = config;
+    }
+
     private static void loadLoggingConfiguration() throws IOException {
         try (InputStream in = SemanticSynchrony.class.getResourceAsStream("logging.properties")) {
             if (null == in) throw new IllegalStateException();

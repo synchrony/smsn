@@ -14,8 +14,13 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
+import net.fortytwo.smsn.config.Configuration;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -38,6 +43,18 @@ public class ActionDuJour extends Action {
             //sharabilityToSource(context);
         } catch (Exception e) {
             throw new RequestProcessingException(e);
+        }
+    }
+
+    private void addGraph(final File configFile) throws IOException {
+        Configuration config = SemanticSynchrony.getConfiguration();
+        try {
+            try (InputStream input = new FileInputStream(configFile)) {
+                SemanticSynchrony.readConfigurationYaml(input);
+            }
+            Configuration other = SemanticSynchrony.getConfiguration();
+        } finally {
+            SemanticSynchrony.setConfiguration(config);
         }
     }
 
