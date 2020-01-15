@@ -6,6 +6,9 @@ import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
+import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -126,8 +129,11 @@ class YAMLSource {
             Note.setSource(note, sourceName);
 
             fromMap(map, note, YAMLFormat.Constants.AtomFields.ALIAS, (n, o) -> Note.setAlias(n, toString(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.CREATED, (n, o) -> Note.setCreated(n, (Long) o));
+            fromMap(map, note, YAMLFormat.Constants.AtomFields.CREATED, (n, o) -> Note.setCreated(n, toLong(o)));
             fromMap(map, note, YAMLFormat.Constants.AtomFields.ID, (n, o) -> Note.setId(n, toString(o)));
+//System.out.println("id: " + Note.getId(note));
+//Object title = map.get(YAMLFormat.Constants.AtomFields.TITLE);
+//System.out.println("\ttitle: " + title + (title == null ? "" : title.getClass()));
             fromMap(map, note, YAMLFormat.Constants.AtomFields.PRIORITY, (n, o) -> Note.setPriority(n, toFloat(o)));
             fromMap(map, note, YAMLFormat.Constants.AtomFields.SHORTCUT, (n, o) -> Note.setShortcut(n, toString(o)));
             fromMap(map, note, YAMLFormat.Constants.AtomFields.TEXT, (n, o) -> Note.setText(n, toString(o)));
@@ -146,7 +152,15 @@ class YAMLSource {
     }
 
     private Float toFloat(final Object o) {
-        return ((Double) o).floatValue();
+        return o instanceof Number
+                ? ((Number) o).floatValue()
+                : Float.valueOf(o.toString());
+    }
+
+    private Long toLong(final Object o) {
+        return o instanceof Number
+                ? ((Number) o).longValue()
+                : Long.valueOf(o.toString());
     }
 
     private String toString(final Object o) {
@@ -171,9 +185,15 @@ class YAMLSource {
         return ListNodeDTO.fromArray(notes);
     }
 
+    private static Resolver createResolver() {
+        return new CustomResolver();
+    }
+
     private List<Map<String, Object>> loadYaml(final File file) throws IOException {
         try (InputStream in = new FileInputStream(file)) {
-            return (List<Map<String, Object>>) new Yaml().load(in);
+            //Yaml yaml = new Yaml();
+            Yaml yaml = new Yaml(new Constructor(), new Representer(), new DumperOptions(), createResolver());
+            return (List<Map<String, Object>>) yaml.load(in);
         }
     }
 }
