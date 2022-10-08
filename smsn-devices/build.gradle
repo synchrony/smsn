@@ -2,5 +2,5 @@ dependencies {
   implementation project(':smsn-services')
   implementation 'com.illposed.osc:javaosc-core:0.3'
 
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
 }

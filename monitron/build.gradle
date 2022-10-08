@@ -11,5 +11,5 @@ dependencies {
   implementation group: 'com.illposed.osc', name: 'javaosc-core', version: '0.3'
   implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
 
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
 }

@@ -12,5 +12,5 @@ dependencies {
   testImplementation(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: sesameVersion) {
     exclude(module: 'commons-codec')
   }
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
 }

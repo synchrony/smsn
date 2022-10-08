@@ -38,7 +38,7 @@ dependencies {
   implementation group: 'net.fortytwo', name: 'linked-data-sail', version: rippleVersion
   implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
 
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
   testImplementation project(path: ':brain', configuration: 'testOutput')
 }
 

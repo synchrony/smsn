@@ -4,5 +4,5 @@ dependencies {
   implementation project(':brain')
   implementation 'com.illposed.osc:javaosc-core:0.3'
 
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
 }

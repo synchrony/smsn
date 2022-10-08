@@ -1,0 +1,14 @@
+sourceSets {
+  main {
+    java {
+      srcDirs 'src/main/java'
+      srcDirs 'src/gen-main/java'
+      srcDirs 'hydra/src/main/java'
+      srcDirs 'hydra/src/gen-main/java'
+    }
+  }
+}
+
+dependencies {
+  testImplementation "junit:junit:$junitVersion"
+}

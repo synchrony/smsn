@@ -14,5 +14,5 @@ dependencies {
   implementation 'com.illposed.osc:javaosc-core:0.3'
   implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4'
 
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
 }

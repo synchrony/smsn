@@ -25,7 +25,7 @@ dependencies {
   testImplementation group: 'org.openrdf.sesame', name: 'sesame-rio-ntriples', version: sesameVersion
   testImplementation group: 'org.openrdf.sesame', name: 'sesame-repository-sail', version: sesameVersion
   testImplementation group: 'org.openrdf.sesame', name: 'sesame-queryalgebra-evaluation', version: sesameVersion
-  testImplementation group: 'junit', name: 'junit', version: junitVersion
+  testImplementation "junit:junit:$junitVersion"
 
   testOutput sourceSets.test.output
 }
