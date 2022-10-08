@@ -1,7 +1,21 @@
 dependencies {
-  compile project(':smsn-devices')
-  compile project(':brain')
-  compile group: 'net.fortytwo.ripple', name: 'ripple-core', version:'1.5'
+  implementation project(':smsn-core')
+  implementation project(':smsn-devices')
+  implementation project(':smsn-services')
+  implementation project(':smsn-rdf')
+  implementation project(':brain')
+  implementation group: 'net.fortytwo.ripple', name: 'ripple-core', version: rippleVersion
 
-  testCompile group: 'junit', name: 'junit', version:'4.12'
+  implementation 'com.illposed.osc:javaosc-core:0.3'
+
+  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
+    exclude(module: 'jackson-core')
+    exclude(module: 'xmpp-mtp')
+    exclude(module: 'sesame-repository-sparql')
+    exclude(module: 'commons-codec')
+    exclude(module: 'jackson-core')
+  }
+  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
+
+  testImplementation group: 'junit', name: 'junit', version:'4.12'
 }

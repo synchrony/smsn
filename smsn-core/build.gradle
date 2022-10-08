@@ -1,6 +1,8 @@
 dependencies {
-    compile group: 'org.json', name: 'json', version:'20080701'
-    compile group: 'org.yaml', name: 'snakeyaml', version:'1.15'
+//  implementation group: 'org.json', name: 'json', version: '20080701'
+//  implementation 'org.json:json:20220924'
 
-    testCompile group: 'junit', name: 'junit', version:junitVersion
+  implementation group: 'org.yaml', name: 'snakeyaml', version: '1.15'
+
+  testImplementation group: 'junit', name: 'junit', version: junitVersion
 }

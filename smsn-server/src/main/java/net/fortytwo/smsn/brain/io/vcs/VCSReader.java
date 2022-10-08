@@ -12,7 +12,7 @@ import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.config.DataSource;
-import org.parboiled.common.Preconditions;
+//import org.parboiled.common.Preconditions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +46,7 @@ public class VCSReader extends NoteReader {
 
     private void readDataSource(final DataSource dataSource, final Context context) throws IOException {
         String location = dataSource.getLocation();
-        Preconditions.checkNotNull(location);
+//        Preconditions.checkNotNull(location);
         File dir = new File(location);
         assertDirectoryExists(dir);
 
@@ -85,7 +85,7 @@ public class VCSReader extends NoteReader {
 
             for (TreeNode<Link> note : TreeViews.getChildrenAsList(page.getContent())) {
                 String id = TreeViews.getId(note);
-                Preconditions.checkNotNull(id);
+//                Preconditions.checkNotNull(id);
             }
             page.setSource(source.getName());
             helper.setNote(root);

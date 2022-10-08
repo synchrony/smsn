@@ -76,6 +76,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
     protected TopicGraph createTopicGraph() throws IOException {
         return createNeo4jTopicGraph();
     }
+
     @Test
     public void testAKASyntax() throws Exception {
         NoteClass t = AKAReference.class.newInstance();

@@ -1,17 +1,16 @@
 dependencies {
-    compile project(':smsn-core')
-    compile(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version:rdfagentsVersion) {
-        exclude(module: 'jackson-core')
-        exclude(module: 'xmpp-mtp')
-        exclude(module: 'sesame-repository-sparql')
-        exclude(module: 'commons-codec')
-        exclude(module: 'jackson-core')
-    }
-    compile group: 'org.openrdf.sesame', name: 'sesame-model', version:sesameVersion
+  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
+    exclude(module: 'jackson-core')
+    exclude(module: 'xmpp-mtp')
+    exclude(module: 'sesame-repository-sparql')
+    exclude(module: 'commons-codec')
+    exclude(module: 'jackson-core')
+  }
+  implementation group: 'org.openrdf.sesame', name: 'sesame-model', version: sesameVersion
 
-    testCompile group: 'org.openrdf.sesame', name: 'sesame-queryparser-sparql', version:sesameVersion
-    testCompile(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version:sesameVersion) {
-        exclude(module: 'commons-codec')
-    }
-    testCompile group: 'junit', name: 'junit', version:junitVersion
+  testImplementation group: 'org.openrdf.sesame', name: 'sesame-queryparser-sparql', version: sesameVersion
+  testImplementation(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: sesameVersion) {
+    exclude(module: 'commons-codec')
+  }
+  testImplementation group: 'junit', name: 'junit', version: junitVersion
 }

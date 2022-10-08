@@ -1,0 +1,26 @@
+name:       smsn-models
+version:    0.1.0
+
+extra-source-files:
+  - stack.yaml
+
+dependencies:
+  - base
+  - containers
+  - hydra
+
+library:
+  source-dirs:
+    - src/main/haskell
+    - src/gen-main/haskell
+
+tests:
+  smsn-models-test:
+    main: Spec.hs
+    source-dirs: src/test/haskell
+    dependencies:
+      - hydra
+      - hspec
+      - hspec-discover
+      - HUnit
+      - QuickCheck

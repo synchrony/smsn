@@ -1,6 +1,7 @@
 rootProject.name = 'smsn-all'
 include ':smsn-core'
 include ':brain'
+include ':smsn-models'
 include ':smsn-services'
 include ':smsn-rdf'
 include ':smsn-server'
@@ -9,12 +10,13 @@ include ':monitron'
 include ':hand'
 include ':typeatron'
 
-project(':smsn-core').projectDir = "$rootDir/smsn-core" as File
-project(':brain').projectDir = "$rootDir/brain" as File
-project(':smsn-services').projectDir = "$rootDir/smsn-services" as File
-project(':smsn-rdf').projectDir = "$rootDir/smsn-rdf" as File
-project(':smsn-server').projectDir = "$rootDir/smsn-server" as File
-project(':smsn-devices').projectDir = "$rootDir/smsn-devices" as File
-project(':monitron').projectDir = "$rootDir/monitron" as File
-project(':hand').projectDir = "$rootDir/hand" as File
-project(':typeatron').projectDir = "$rootDir/typeatron" as File
+//project(':smsn-core').projectDir = "$rootDir/smsn-core" as File
+//project(':brain').projectDir = "$rootDir/brain" as File
+//project(':smsn-models').projectDir = "$rootDir/smsn-models" as File
+//project(':smsn-services').projectDir = "$rootDir/smsn-services" as File
+//project(':smsn-rdf').projectDir = "$rootDir/smsn-rdf" as File
+//project(':smsn-server').projectDir = "$rootDir/smsn-server" as File
+//project(':smsn-devices').projectDir = "$rootDir/smsn-devices" as File
+//project(':monitron').projectDir = "$rootDir/monitron" as File
+//project(':hand').projectDir = "$rootDir/hand" as File
+//project(':typeatron').projectDir = "$rootDir/typeatron" as File
