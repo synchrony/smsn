@@ -19,7 +19,7 @@ dependencies {
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-server', version: tinkerpopVersion
   implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.8.0.201705170830-rc1'
-  implementation 'org.json:json:20220924'
+  implementation 'org.json:json:20180130'
   implementation 'commons-io:commons-io:2.11.0'
 
   implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {

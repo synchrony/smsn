@@ -6,7 +6,7 @@ dependencies {
   implementation project(':smsn-core')
   implementation project(':smsn-rdf')
 
-  implementation 'org.json:json:20220924'
+  implementation 'org.json:json:20180130'
 
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version: tinkerpopVersion

@@ -1,6 +1,6 @@
 dependencies {
 //  implementation group: 'org.json', name: 'json', version: '20080701'
-//  implementation 'org.json:json:20220924'
+//  implementation 'org.json:json:20230618'
 
   implementation group: 'org.yaml', name: 'snakeyaml', version: '1.15'
 
