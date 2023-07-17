@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 import org.yaml.snakeyaml.resolver.Resolver;
@@ -192,7 +193,9 @@ class YAMLSource {
     private List<Map<String, Object>> loadYaml(final File file) throws IOException {
         try (InputStream in = new FileInputStream(file)) {
             //Yaml yaml = new Yaml();
-            Yaml yaml = new Yaml(new Constructor(), new Representer(), new DumperOptions(), createResolver());
+            LoaderOptions options = new LoaderOptions();
+            Representer representer = new Representer(new DumperOptions());
+            Yaml yaml = new Yaml(new Constructor(options), representer, new DumperOptions(), createResolver());
             return (List<Map<String, Object>>) yaml.load(in);
         }
     }
