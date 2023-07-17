@@ -9,7 +9,7 @@ import net.fortytwo.smsn.p2p.osc.OscSender;
 import net.fortytwo.smsn.p2p.osc.udp.UdpOscSender;
 import net.fortytwo.smsn.rdf.Activities;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
@@ -259,7 +259,7 @@ public class GesturalServer {
         try {
             // TODO: temporary for demo
             Runtime runtime = Runtime.getRuntime();
-            p = runtime.exec("say \"" + StringUtils.escape(message) + "\"");
+            p = runtime.exec("say \"" + StringEscapeUtils.escapeJava(message) + "\"");
         } catch (IOException e) {
             logger.log(Level.WARNING, "'say' command failed", e);
         }
