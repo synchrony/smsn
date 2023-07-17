@@ -1,13 +1,6 @@
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
-
-buildscript {
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
-  }
+plugins {
+  id 'com.github.johnrengelman.shadow' version '8.1.1'
+  id 'java'
 }
 
 dependencies {
@@ -43,5 +36,6 @@ dependencies {
 }
 
 shadowJar {
+  minimize()
   mergeServiceFiles()
 }
