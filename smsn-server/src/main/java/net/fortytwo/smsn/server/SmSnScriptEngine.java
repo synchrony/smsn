@@ -77,8 +77,9 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         return new NoAction();
     }
 
-    private Action readAsWarmupScript(final String expression) {
+    private Action readAsWarmupScript(final String ignored) {
         // this is ServerGremlinExecutor's warmup script hack; ignore
+        logger.info("warm-up script ignored");
         return new NoAction();
     }
 
