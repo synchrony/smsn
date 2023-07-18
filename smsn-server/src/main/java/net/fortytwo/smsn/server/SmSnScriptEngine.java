@@ -3,6 +3,7 @@ package net.fortytwo.smsn.server;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.server.actions.NoAction;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngine;
 import org.apache.tinkerpop.gremlin.jsr223.GremlinScriptEngineFactory;
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode;
@@ -57,6 +58,12 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
         }
     }
 
+    @Override
+    public Traversal.Admin eval(Bytecode bytecode, Bindings bindings, String traversalSource) {
+        throw new NotImplementedException("use eval(String, ScriptContext) instead");
+    }
+
+
     private Action readAsJson(final String expression) throws IOException {
         return objectMapper.readValue(expression, Action.class);
     }
@@ -85,11 +92,6 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
 
     private String readerToString(final Reader reader) throws IOException {
         return IOUtils.toString(reader);
-    }
-
-    @Override
-    public Traversal.Admin eval(Bytecode bytecode, Bindings bindings) throws ScriptException {
-        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import info.aduna.io.IOUtil;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
