@@ -1,14 +1,18 @@
 sourceSets {
-  main {
-    java {
-      srcDirs 'src/main/java'
-      srcDirs 'src/gen-main/java'
-      srcDirs 'hydra/src/main/java'
-      srcDirs 'hydra/src/gen-main/java'
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'src/gen-main/java'
+            srcDirs 'hydra/hydra-java/src/main/java'
+            srcDirs 'hydra/hydra-java/src/gen-main/java'
+        }
     }
-  }
 }
 
 dependencies {
-  testImplementation "junit:junit:$junitVersion"
+    testImplementation "junit:junit:$junitVersion"
+
+    // Hydra dependencies
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
+    implementation 'org.eclipse.rdf4j:rdf4j-rio-ntriples:4.2.3'
 }
