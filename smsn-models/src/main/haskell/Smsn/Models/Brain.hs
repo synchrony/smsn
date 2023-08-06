@@ -3,18 +3,19 @@
 module Smsn.Models.Brain where
 
 import Hydra.Kernel
-import Hydra.Impl.Haskell.Dsl.Types as Types
-import Hydra.Impl.Haskell.Dsl.Standard
-import Hydra.Impl.Haskell.Sources.Core
+import Hydra.Dsl.Annotations
+import Hydra.Dsl.Bootstrap
+import Hydra.Sources.Core
+import Hydra.Dsl.Types as Types
 
 
 smsnModules = [smsnBrainModule]
 
-smsnBrainModule :: Module Meta
-smsnBrainModule = Module ns elements [] Nothing
+smsnBrainModule :: Module Kv
+smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
   where
     ns = Namespace "net/fortytwo/smsn/brain"
-    brain = nsref ns
+    brain = typeref ns
 
     def = datatype ns
 
