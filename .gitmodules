@@ -1,0 +1,3 @@
+[submodule "smsn-models/hydra"]
+	path = smsn-models/hydra
+	url = git@github.com:CategoricalData/hydra.git
