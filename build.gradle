@@ -7,8 +7,8 @@ allprojects {
 
 subprojects {
   apply plugin: 'java'
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  sourceCompatibility = 1.11
+  targetCompatibility = 1.11
   tasks.withType(JavaCompile) {
 //    options.release = 8
     options.encoding = 'UTF-8'
