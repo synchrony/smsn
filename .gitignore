@@ -6,6 +6,9 @@
 .idea
 *.iml
 *~
+
+*.cabal
+
 dashboard/data
 dashboard/figure
 .Rproj.user

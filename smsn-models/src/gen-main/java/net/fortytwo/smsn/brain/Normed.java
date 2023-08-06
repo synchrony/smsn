@@ -1,20 +1,20 @@
 package net.fortytwo.smsn.brain;
 
-public class Priority {
-  public static final hydra.core.Name NAME = new hydra.core.Name("net/fortytwo/smsn/brain.Priority");
+public class Normed {
+  public static final hydra.core.Name NAME = new hydra.core.Name("net/fortytwo/smsn/brain.Normed");
   
   public final Float value;
   
-  public Priority (Float value) {
+  public Normed (Float value) {
     this.value = value;
   }
   
   @Override
   public boolean equals(Object other) {
-    if (!(other instanceof Priority)) {
+    if (!(other instanceof Normed)) {
       return false;
     }
-    Priority o = (Priority) (other);
+    Normed o = (Normed) (other);
     return value.equals(o.value);
   }
   

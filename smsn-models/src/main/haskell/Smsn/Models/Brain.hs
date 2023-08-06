@@ -29,14 +29,14 @@ smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
         record [
           "id">: brain "AtomId",
           "created">: brain "Timestamp",
-          "weight">: brain "Weight",
-          "priority">: optional $ brain "Priority",
+          "weight">: brain "Normed",
+          "priority">: optional $ brain "Normed",
           "source">: brain "SourceName",
           "title">: string,
           "alias">: optional string,
           "children">: list $ brain "AtomId"],
 
-      def "Priority" float32,
+      def "Normed" float32,
 
       def "SourceName" string,
 
@@ -44,20 +44,19 @@ smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
         doc "A Unix timestamp in seconds"
         int32,
 
---      def "TreeNode" $
---        record [
---          "id">: brain "AtomId",
---          "created">: brain "Timestamp",
---          "weight">: brain "Weight",
---          "priority">: optional $ brain "Priority",
---          "source">: brain "SourceName",
---          "title">: string,
---          "alias">: optional string,
---          "children">: list $ brain "TreeNode",
---          "numberOfChildren">: int32,
---          "numberOfParents">: int32,
---        ],
---
+      def "TreeNode" $
+        record [
+          "id">: brain "AtomId",
+          "created">: brain "Timestamp",
+          "weight">: brain "Normed",
+          "priority">: optional $ brain "Normed",
+          "source">: brain "SourceName",
+          "title">: string,
+          "alias">: optional string,
+          "children">: list $ brain "TreeNode",
+          "numberOfChildren">: int32,
+          "numberOfParents">: int32]
+
 --      def "TreeView" $
 --        record [
 --          "root">: brain "AtomId",
@@ -65,7 +64,7 @@ smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
 --          "view">: brain "TreeNode",
 --          "minSource">: brain "SourceName",
 --          "defaultSource">: brain "SourceName",
---          "minWeight">: brain "Weight",
---          "defaultWeight">: brain "Weight"],
+--          "minWeight">: brain "Normed",
+--          "defaultWeight">: brain "Normed"],
 
-      def "Weight" float32]
+      ]

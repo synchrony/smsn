@@ -7,9 +7,9 @@ public class Atom {
   
   public final net.fortytwo.smsn.brain.Timestamp created;
   
-  public final net.fortytwo.smsn.brain.Weight weight;
+  public final net.fortytwo.smsn.brain.Normed weight;
   
-  public final java.util.Optional<net.fortytwo.smsn.brain.Priority> priority;
+  public final java.util.Optional<net.fortytwo.smsn.brain.Normed> priority;
   
   public final net.fortytwo.smsn.brain.SourceName source;
   
@@ -19,7 +19,7 @@ public class Atom {
   
   public final java.util.List<net.fortytwo.smsn.brain.AtomId> children;
   
-  public Atom (net.fortytwo.smsn.brain.AtomId id, net.fortytwo.smsn.brain.Timestamp created, net.fortytwo.smsn.brain.Weight weight, java.util.Optional<net.fortytwo.smsn.brain.Priority> priority, net.fortytwo.smsn.brain.SourceName source, String title, java.util.Optional<String> alias, java.util.List<net.fortytwo.smsn.brain.AtomId> children) {
+  public Atom (net.fortytwo.smsn.brain.AtomId id, net.fortytwo.smsn.brain.Timestamp created, net.fortytwo.smsn.brain.Normed weight, java.util.Optional<net.fortytwo.smsn.brain.Normed> priority, net.fortytwo.smsn.brain.SourceName source, String title, java.util.Optional<String> alias, java.util.List<net.fortytwo.smsn.brain.AtomId> children) {
     this.id = id;
     this.created = created;
     this.weight = weight;
@@ -52,11 +52,11 @@ public class Atom {
     return new Atom(id, created, weight, priority, source, title, alias, children);
   }
   
-  public Atom withWeight(net.fortytwo.smsn.brain.Weight weight) {
+  public Atom withWeight(net.fortytwo.smsn.brain.Normed weight) {
     return new Atom(id, created, weight, priority, source, title, alias, children);
   }
   
-  public Atom withPriority(java.util.Optional<net.fortytwo.smsn.brain.Priority> priority) {
+  public Atom withPriority(java.util.Optional<net.fortytwo.smsn.brain.Normed> priority) {
     return new Atom(id, created, weight, priority, source, title, alias, children);
   }
   
