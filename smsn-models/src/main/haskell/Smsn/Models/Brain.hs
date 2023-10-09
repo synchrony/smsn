@@ -23,7 +23,9 @@ smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
 --      def "Role" $
 --        enum ["entity", "relation"]]
 
-      def "AtomId" string,
+      def "AtomId"
+        doc "The unique id of an atom, as a base-62 encoded number"
+        string,
 
       def "Atom" $
         record [
@@ -36,7 +38,9 @@ smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
           "alias">: optional string,
           "children">: list $ brain "AtomId"],
 
-      def "Normed" float32,
+      def "Normed"
+        doc "A normalized floating-point value representing weight or probability, ranging from 0.0 to 1.0"
+        float32,
 
       def "SourceName" string,
 
