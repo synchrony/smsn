@@ -3,7 +3,6 @@ package net.fortytwo.smsn.brain.io;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,20 +20,11 @@ public abstract class NoteWriter {
 
     public static class Context {
         private TopicGraph topicGraph;
-        private KnowledgeBase knowledgeBase;
         private AtomId rootId;
         private Filter filter;
         private File destDirectory;
         private OutputStream destStream;
         private Format format;
-
-        public KnowledgeBase getKnowledgeBase() {
-            return knowledgeBase;
-        }
-
-        public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
-            this.knowledgeBase = knowledgeBase;
-        }
 
         public TopicGraph getTopicGraph() {
             return topicGraph;

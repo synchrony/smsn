@@ -32,7 +32,6 @@ public class WriteGraph extends IOAction {
 
         NoteWriter.Context context = new NoteWriter.Context();
         context.setTopicGraph(params.getBrain().getTopicGraph());
-        context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
         context.setRootId(getRootId());
         context.setFilter(getFilter());
         context.setFormat(getFormat());

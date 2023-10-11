@@ -42,7 +42,6 @@ public class GraphMLReaderIT extends BrainTestBase {
         try (OutputStream out = new FileOutputStream(outputFile)) {
             NoteWriter.Context context = new NoteWriter.Context();
             context.setTopicGraph(brain.getTopicGraph());
-            context.setKnowledgeBase(brain.getKnowledgeBase());
             context.setDestStream(out);
             context.setFormat(GraphMLFormat.getInstance());
             exporter.doWrite(context);

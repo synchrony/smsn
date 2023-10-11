@@ -7,7 +7,6 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,7 +28,6 @@ public class VertexWriter extends NoteWriter {
         TopicGraph sourceGraph = context.getTopicGraph();
         Filter filter = context.getFilter();
         Preconditions.checkNotNull(filter);
-        KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
         p.println("created\tid\tweight\tpriority\tsource\tclass\tout\tin\ttitle\talias\tshortcut\ttext");
@@ -47,18 +45,7 @@ public class VertexWriter extends NoteWriter {
                 p.print(Note.getSource(a));
                 p.print('\t');
 
-                List<KnowledgeBase.NoteClassEntry> entries = sourceKb.getClassInfo(a);
-                if (null != entries && entries.size() > 0) {
-                    KnowledgeBase.NoteClassEntry e = entries.get(0);
-                    p.print(e.getInferredClassName());
-                    p.print('\t');
-                    p.print(e.getOutScore());
-                    p.print('\t');
-                    p.print(e.getInScore());
-                    p.print('\t');
-                } else {
-                    p.print("\t0\t0\t");
-                }
+                p.print("\t0\t0\t");
 
                 String title = Note.getTitle(a);
                 if (null == title) {
