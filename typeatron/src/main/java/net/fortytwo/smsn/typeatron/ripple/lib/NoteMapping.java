@@ -15,6 +15,7 @@ import net.fortytwo.smsn.typeatron.ripple.BrainClient;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.SimpleValueFactory;
+import net.fortytwo.smsn.brain.AtomId;
 
 import java.util.logging.Logger;
 
@@ -36,7 +37,7 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
         if (o instanceof String) {
             if (SemanticSynchrony.isValidId((String) o)) {
                 TreeNode<Link> n = TreeNodeDTO.createEmptyNode();
-                TreeViews.setId(n, (String) o);
+                TreeViews.setId(n, new AtomId((String) o));
                 o = n;
             } else {
                 return null;

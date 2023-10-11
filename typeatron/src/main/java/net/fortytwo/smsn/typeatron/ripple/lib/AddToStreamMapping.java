@@ -12,13 +12,14 @@ import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
+import net.fortytwo.smsn.brain.AtomId;
 
 import java.util.logging.Logger;
 
 public class AddToStreamMapping extends NoteMapping {
     private static final Logger logger = Logger.getLogger(AddToStreamMapping.class.getName());
 
-    private final String brainStream;
+    private final AtomId brainStream;
 
     public AddToStreamMapping(final BrainClient client,
                               final Filter filter) {

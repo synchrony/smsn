@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.PageParser;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
@@ -31,7 +32,7 @@ public class JsonParser extends PageParser {
         Page page = PageDTO.createTransitional();
 
         if (json.has(JsonFormat.Keys.ID)) {
-            TreeViews.setId(page.getContent(), json.getString(JsonFormat.Keys.ID));
+            TreeViews.setId(page.getContent(), new AtomId(json.getString(JsonFormat.Keys.ID)));
         }
         if (json.has(SemanticSynchrony.PropertyKeys.TITLE)) {
             TreeViews.setTitle(page.getContent(), json.getString(SemanticSynchrony.PropertyKeys.TITLE));

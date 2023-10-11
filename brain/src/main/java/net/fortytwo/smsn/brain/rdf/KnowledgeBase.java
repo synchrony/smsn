@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.rdf;
 
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
@@ -183,7 +184,7 @@ public class KnowledgeBase {
     private void handleAllMembers(final NoteCollectionMemory memory,
                                   final NoteClass.FieldHandler fieldHandler,
                                   final RDFizationContext context,
-                                  final Set<String> alreadyHandled,
+                                  final Set<AtomId> alreadyHandled,
                                   final Filter filter) throws RDFHandlerException {
         // avoid cycles
         if (alreadyHandled.contains(memory.getNoteId())) {

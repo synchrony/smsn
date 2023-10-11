@@ -37,6 +37,6 @@ public class VCSFormat extends Format {
     }
 
     public static String fileNameForTopic(final Topic topic) {
-        return topic.getId() + ".smsn";
+        return topic.getId().value + ".smsn";
     }
 }

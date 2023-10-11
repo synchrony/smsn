@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.dto;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
@@ -19,7 +20,7 @@ public class NoteDTO implements Note {
     public NoteDTO() {
         propertyMap = new HashMap<>();
 
-        String id = SemanticSynchrony.createRandomId();
+        AtomId id = SemanticSynchrony.createRandomId();
         Note.setId(this, id);
         Note.setTitle(this, "note " + id);
         Note.setCreated(this, System.currentTimeMillis());

@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.query;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Priorities;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
@@ -121,7 +122,7 @@ public class TreeViews {
         checkFilterArg(filter);
         checkStyleArg(style, true);
 
-        Map<String, Note> cache = createCache();
+        Map<AtomId, Note> cache = createCache();
 
         updateInternal(root, height, filter, style, cache);
 
@@ -274,13 +275,13 @@ public class TreeViews {
         Preconditions.checkArgNotNull(priorities, "priorities");
     }
 
-    private void addToCache(final Note note, final Map<String, Note> cache) {
+    private void addToCache(final Note note, final Map<AtomId, Note> cache) {
         if (null != cache) cache.put(Note.getId(note), note);
     }
 
     private final Comparator<TreeNode<Link>> compareById = (a, b) -> null == getId(a)
             ? (null == getId(b) ? 0 : -1)
-            : (null == getId(b) ? 1 : getId(a).compareTo(getId(b)));
+            : (null == getId(b) ? 1 : getId(a).value.compareTo(getId(b).value));
 
     private final Comparator<TreeNode<Link>> compareByProperties = (a, b) -> {
         int cmp = getWeight(b).compareTo(getWeight(a));
@@ -312,7 +313,7 @@ public class TreeViews {
                                         final Filter filter,
                                         final ViewStyle style,
                                         final boolean getProperties,
-                                        final Map<String, Note> cache) {
+                                        final Map<AtomId, Note> cache) {
         Preconditions.checkNotNull(root);
 
         TreeNode<Link> note = toTreeNode(root, filter.test(root), getProperties);
@@ -338,7 +339,7 @@ public class TreeViews {
                                 final int height,
                                 final Filter filter,
                                 final ViewStyle style,
-                                final Map<String, Note> cache) {
+                                final Map<AtomId, Note> cache) {
 
         Note rootNote = getRequiredNoteForNode(rootNode, cache);
 
@@ -375,14 +376,14 @@ public class TreeViews {
                                 final int height,
                                 final Filter filter,
                                 final ViewStyle style,
-                                final Map<String, Note> cache) {
+                                final Map<AtomId, Note> cache) {
 
         if (0 >= height || !filter.test(rootNote)) {
             return;
         }
 
-        Set<String> childrenAdded = new HashSet<>();
-        Set<String> childrenCreated = new HashSet<>();
+        Set<AtomId> childrenAdded = new HashSet<>();
+        Set<AtomId> childrenCreated = new HashSet<>();
 
         ListDiff.DiffEditor<TreeNode<Link>> editor = new ListDiff.DiffEditor<TreeNode<Link>>() {
             @Override
@@ -453,12 +454,12 @@ public class TreeViews {
         return ListNode.toJavaList(list);
     }
 
-    private Map<String, Note> createCache() {
+    private Map<AtomId, Note> createCache() {
         return new HashMap<>();
     }
 
     // avoids unnecessary (and costly) index lookups by using a cache of already-retrieved notes
-    private Note getNoteById(final String id, final Map<String, Note> cache) {
+    private Note getNoteById(final AtomId id, final Map<AtomId, Note> cache) {
         Note note = cache.get(id);
         if (null == note) {
             Optional<Note> opt = brain.getTopicGraph().getNoteById(id);
@@ -475,10 +476,10 @@ public class TreeViews {
     // notes are only created if they appear under a parent which is also an note
     private Note getNoteForNode(final TreeNode<Link> node,
                                 final Filter filter,
-                                final Set<String> created,
-                                final Map<String, Note> cache) {
+                                final Set<AtomId> created,
+                                final Map<AtomId, Note> cache) {
 
-        String id = getId(node);
+        AtomId id = getId(node);
         Note note = null == id ? null : getNoteById(id, cache);
 
         if (null == note) {
@@ -493,12 +494,12 @@ public class TreeViews {
         return note;
     }
 
-    private Note getRequiredNoteForNode(final TreeNode<Link> node, final Map<String, Note> cache) {
+    private Note getRequiredNoteForNode(final TreeNode<Link> node, final Map<AtomId, Note> cache) {
         if (null == getId(node)) {
             throw new InvalidUpdateException("note has no id");
         }
 
-        String id = getId(node);
+        AtomId id = getId(node);
         Note note = getNoteById(id, cache);
         if (null == note) {
             note = brain.getTopicGraph().createNote(id);
@@ -508,7 +509,7 @@ public class TreeViews {
         return note;
     }
 
-    private Note createNote(final String id,
+    private Note createNote(final AtomId id,
                             final Filter filter) {
         Note a = brain.getTopicGraph().createNoteWithProperties(filter, id);
         String source = filter.getDefaultSource();
@@ -587,7 +588,7 @@ public class TreeViews {
                     value = (T) fromNode.getValue().getLabel();
                     break;
                 case SemanticSynchrony.PropertyKeys.ID:
-                    value = (T) fromNode.getValue().getTarget().getId();
+                    value = (T) fromNode.getValue().getTarget().getId().value;
                     break;
                 default:
                     throw new InvalidUpdateException("no such property: " + key);
@@ -632,7 +633,7 @@ public class TreeViews {
         }
     }
 
-    public static String getId(final TreeNode<Link> node) {
+    public static AtomId getId(final TreeNode<Link> node) {
         Topic target = node.getValue().getTarget();
         return null == target ? null : target.getId();
     }
@@ -689,7 +690,7 @@ public class TreeViews {
         return null == node.getChildren() ? 0 : node.getChildren().length();
     }
 
-    public static void setId(final TreeNode<Link> node, final String id) {
+    public static void setId(final TreeNode<Link> node, final AtomId id) {
         Topic topic = new TopicDTO();
         topic.setId(id);
         node.getValue().setTarget(topic);

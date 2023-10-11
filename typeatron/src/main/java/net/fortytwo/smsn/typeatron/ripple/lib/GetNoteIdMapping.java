@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.typeatron.ripple.lib;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -47,10 +48,10 @@ public class GetNoteIdMapping extends NoteMapping {
         if (null == n) {
             logger.warning("can't get id of non-note: " + first);
         } else {
-            String id = TreeViews.getId(n);
+            AtomId id = TreeViews.getId(n);
             if (null != id) {
                 // put both the id and the (synced) note back on the stack
-                solutions.accept(stack.push(n).push(id));
+                solutions.accept(stack.push(n).push(id.value));
             }
         }
     }

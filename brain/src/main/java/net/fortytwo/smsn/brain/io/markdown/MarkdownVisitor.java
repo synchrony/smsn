@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
@@ -67,7 +68,7 @@ class MarkdownVisitor implements Visitor {
 
         if (null != destination && 0 < destination.length() && null != (title = getLinkTitle(link))) {
             TreeNode<net.fortytwo.smsn.brain.model.entities.Link> tree = TreeNodeDTO.createEmptyNode();
-            TreeViews.setId(tree, link.getDestination());
+            TreeViews.setId(tree, new AtomId(link.getDestination()));
             TreeViews.setTitle(tree, title);
 
             addNote(tree);
@@ -178,7 +179,7 @@ class MarkdownVisitor implements Visitor {
                 Link link = (Link) child;
                 String title = getLinkTitle(link);
                 if (null != title && null != link.getDestination() && 0 < link.getDestination().length()) {
-                    TreeViews.setId(tree, link.getDestination().trim());
+                    TreeViews.setId(tree, new AtomId(link.getDestination().trim()));
                     TreeViews.setTitle(tree, title);
                     break;
                 }

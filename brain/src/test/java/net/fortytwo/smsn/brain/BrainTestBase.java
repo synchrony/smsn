@@ -37,13 +37,13 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class BrainTestBase {
 
-    protected static final String ARTHUR_ID = "bxSoyLUM4w4RfitB";
-    protected static final String FORD_ID = "QoTIPwLOID58u3Lr";
-    protected static final String ZAPHOD_ID = "RqAUSvwi1H878V5j";
+    protected static final AtomId ARTHUR_ID = new AtomId("bxSoyLUM4w4RfitB");
+    protected static final AtomId FORD_ID = new AtomId("QoTIPwLOID58u3Lr");
+    protected static final AtomId ZAPHOD_ID = new AtomId("RqAUSvwi1H878V5j");
 
     protected Topic arthurTopic, fordTopic, zaphodTopic, friendTopic, earthTopic, teaTopic;
 
-    protected final String parserTopicId = ARTHUR_ID;
+    protected final AtomId parserTopicId = ARTHUR_ID;
     protected final String parserLabel = "Arthur Dent";
     protected final String parserSource = "universal";
 
@@ -76,9 +76,9 @@ public abstract class BrainTestBase {
         arthurTopic = createTopic(ARTHUR_ID);
         fordTopic = createTopic(FORD_ID);
         zaphodTopic = createTopic(ZAPHOD_ID);
-        friendTopic = createTopic("friend");
-        earthTopic = createTopic("earth");
-        teaTopic = createTopic("tea");
+        friendTopic = createTopic(new AtomId("friend"));
+        earthTopic = createTopic(new AtomId("earth"));
+        teaTopic = createTopic(new AtomId("tea"));
     }
 
     @After
@@ -123,7 +123,7 @@ public abstract class BrainTestBase {
         return root;
     }
 
-    protected Note createNote(final String id) {
+    protected Note createNote(final AtomId id) {
         return topicGraph.createNoteWithProperties(filter, id );
     }
 
@@ -132,26 +132,30 @@ public abstract class BrainTestBase {
     }
 
     protected Note createNoteWithTitle(final String title) {
-        return createNote(null, title);
+        return createNote((AtomId) null, title);
     }
 
-    protected Note createNote(final String id, final String title) {
+    protected Note createNote(final AtomId id, final String title) {
         Note note = topicGraph.createNoteWithProperties(filter, id);
         Note.setTitle(note, title);
         return note;
     }
 
-    protected Topic createTopic(final String id) {
+    protected Note createNote(String id, String title) {
+        return createNote(new AtomId(id), title);
+    }
+
+    protected Topic createTopic(final AtomId id) {
         return topicGraph.createTopic(id);
     }
 
-    protected Topic createTopicDTO(final String id) {
+    protected Topic createTopicDTO(final AtomId id) {
         Topic topic = new TopicDTO();
         topic.setId(id);
         return topic;
     }
 
-    protected TreeNode<Link> createTreeDTO(final String topicId, final String label) {
+    protected TreeNode<Link> createTreeDTO(final AtomId topicId, final String label) {
         Topic topic = createTopicDTO(topicId);
         Link link = new LinkDTO();
         link.setTarget(topic);

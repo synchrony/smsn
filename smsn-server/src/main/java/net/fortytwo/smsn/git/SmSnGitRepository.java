@@ -2,6 +2,7 @@ package net.fortytwo.smsn.git;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
@@ -288,14 +289,14 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
 
             String newPath = diffEntry.getNewPath();
 
-            String id = toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
+            AtomId id = toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
             TreeNode<Link> changeNote = toTreeNode(id, getTimeStamp(newCommit), changeType);
 
             commitNote.addChild(changeNote);
         }
     }
 
-    private TreeNode<Link> toTreeNode(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
+    private TreeNode<Link> toTreeNode(final AtomId id, final long timestamp, final DiffEntry.ChangeType changeType) {
         Optional<Note> opt = brain.getTopicGraph().getNoteById(id);
 
         TreeNode<Link> note;
@@ -327,9 +328,9 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
         }
     }
 
-    public static String toId(final String path) {
+    public static AtomId toId(final String path) {
         String[] parts = path.split("/");
-        return parts[parts.length - 1].trim();
+        return new AtomId(parts[parts.length - 1].trim());
     }
 
     private Optional<RevCommit> getParent(final RevCommit commit) {

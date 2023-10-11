@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
@@ -37,7 +38,8 @@ public class WikiParserTest extends BrainTestBase {
     public void transitionalAttributesAreAttachedCorrectly() throws Exception {
         Page page = getExample();
 
-        assertEquals("12345", page.getContent().getValue().getTarget().getId());
+        assertEquals(new AtomId("12345")
+                , page.getContent().getValue().getTarget().getId());
         assertEquals("SmSn syntax example", page.getContent().getValue().getLabel());
     }
 
@@ -96,7 +98,7 @@ public class WikiParserTest extends BrainTestBase {
 
         TreeNode<Link> subHeader = header.getChildren().get(3);
         assertEquals(Role.Relation, subHeader.getValue().getRole());
-        assertEquals("gzScm", subHeader.getValue().getTarget().getId());
+        assertEquals(new AtomId("gzScm"), subHeader.getValue().getTarget().getId());
         assertEquals("additional comments", subHeader.getValue().getLabel());
         assertEquals(1, subHeader.getChildren().length());
     }
@@ -162,7 +164,7 @@ public class WikiParserTest extends BrainTestBase {
     public void testEmptyValuesAllowedForExistingNotes() throws Exception {
         Page page = parseToPage("* :1234567: ");
         assertEquals(1, page.getContent().getChildren().length());
-        assertEquals("1234567", page.getContent().getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("1234567"), page.getContent().getChildren().get(0).getValue().getTarget().getId());
     }
 
     @Test
@@ -203,16 +205,16 @@ public class WikiParserTest extends BrainTestBase {
                 "+ :rArdqLh: detachment\n" +
                 "+ :pXOAOuS: sincerity\n");
         assertEquals(6, page.getContent().getChildren().length());
-        assertEquals("LTWrf62", page.getContent().getChildren().get(0).getValue().getTarget().getId());
-        assertEquals("rArdqLh", page.getContent().getChildren().get(4).getValue().getTarget().getId());
+        assertEquals(new AtomId("LTWrf62"), page.getContent().getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("rArdqLh"), page.getContent().getChildren().get(4).getValue().getTarget().getId());
 
         page = parseToPage("" +
                 "* :aaaaa:        IDs as short as 5 bytes are OK, although 16-byte IDs are 'standard'\n" +
                 "* :aaaaaaaa: longer IDs are OK, too\n" +
                 "* :a: this is not an ID");
         assertEquals(3, page.getContent().getChildren().length());
-        assertEquals("aaaaa", page.getContent().getChildren().get(0).getValue().getTarget().getId());
-        assertEquals("aaaaaaaa", page.getContent().getChildren().get(1).getValue().getTarget().getId());
+        assertEquals(new AtomId("aaaaa"), page.getContent().getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("aaaaaaaa"), page.getContent().getChildren().get(1).getValue().getTarget().getId());
         assertNull(page.getContent().getChildren().get(2).getValue().getTarget());
     }
 
@@ -249,8 +251,8 @@ public class WikiParserTest extends BrainTestBase {
 
         TreeNode<Link> ids = page.getContent().getChildren().get(3);
         assertEquals("ids", ids.getValue().getLabel());
-        assertEquals("0txXBm", ids.getChildren().get(0).getValue().getTarget().getId());
-        assertEquals("cE85nD", ids.getChildren().get(1).getValue().getTarget().getId());
+        assertEquals(new AtomId("0txXBm"), ids.getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("cE85nD"), ids.getChildren().get(1).getValue().getTarget().getId());
     }
 
     @Test

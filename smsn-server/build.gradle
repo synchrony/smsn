@@ -6,6 +6,7 @@ plugins {
 dependencies {
   implementation project(':brain')
   implementation project(':smsn-core')
+  implementation project(':smsn-models')
   implementation project(':smsn-rdf')
   implementation project(':smsn-services')
 

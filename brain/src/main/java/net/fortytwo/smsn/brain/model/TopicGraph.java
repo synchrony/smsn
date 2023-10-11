@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -17,7 +18,7 @@ public interface TopicGraph {
 
     Iterable<Note> getAllNotes();
 
-    Optional<Note> getNoteById(String id);
+    Optional<Note> getNoteById(AtomId id);
 
     List<Note> getNotesByAcronym(String acronym, Filter filter);
 
@@ -25,11 +26,11 @@ public interface TopicGraph {
 
     List<Note> getNotesByTitleQuery(String value, Filter filter);
 
-    String idOf(Note a);
+    AtomId idOf(Note a);
 
     String iriOf(Note a);
 
-    Topic createTopic(String id);
+    Topic createTopic(AtomId id);
 
     Page createPage(Link root);
 
@@ -37,9 +38,9 @@ public interface TopicGraph {
 
     TreeNode<Link> createTopicTree(Link link);
 
-    Note createNote(String id);
+    Note createNote(AtomId id);
 
-    Note createNoteWithProperties(Filter filter, String id);
+    Note createNoteWithProperties(Filter filter, AtomId id);
 
     ListNode<Link> toList(Link... elements);
 

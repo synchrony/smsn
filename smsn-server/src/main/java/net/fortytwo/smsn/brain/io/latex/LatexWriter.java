@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.latex;
 
 import com.google.common.base.Preconditions;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.entities.Note;
@@ -33,7 +34,7 @@ public class LatexWriter extends NoteWriter {
 
     @Override
     public void doWrite(Context context) throws IOException {
-        String rootId = context.getRootId();
+        AtomId rootId = context.getRootId();
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 

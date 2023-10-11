@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
@@ -96,10 +97,10 @@ public class WikiPrinterTest {
         Page page = new PageDTO();
         page.setContent(createTree("123", "Arthur Dent", null));
         TreeNode<Link> content = page.getContent();
-        TreeNode<Link> node1 = createTree(null, "Arthur Philip Dent", null);
+        TreeNode<Link> node1 = createTree((AtomId) null, "Arthur Philip Dent", null);
         TreeNode<Link> node2 = createTree("12345", "friends", Role.Relation);
         TreeNode<Link> node3 = createTree("00000", "Ford Prefect", null);
-        TreeNode<Link> node4 = createTree(null, "Slartibartfast", null);
+        TreeNode<Link> node4 = createTree((AtomId) null, "Slartibartfast", null);
         content.setChildren(ListNodeDTO.fromArray(node1, node2));
         node2.setChildren(ListNodeDTO.fromArray(node3, node4));
 
@@ -111,7 +112,7 @@ public class WikiPrinterTest {
                 "    * Slartibartfast\n", write(page));
     }
 
-    private TreeNode<Link> createTree(final String id, final String label, final Role role) {
+    private TreeNode<Link> createTree(final AtomId id, final String label, final Role role) {
         Link link = new LinkDTO();
         link.setRole(role);
         link.setLabel(label);
@@ -123,6 +124,10 @@ public class WikiPrinterTest {
         TreeNode<Link> tree = new TreeNodeDTO<>();
         tree.setValue(link);
         return tree;
+    }
+
+    private TreeNode<Link> createTree(final String id, final String label, final Role role) {
+        return createTree(null == id ? null : new AtomId(id), label, role);
     }
 
     private String write(final Page page) {

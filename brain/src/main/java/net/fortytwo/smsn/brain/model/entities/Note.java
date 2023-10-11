@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.entities;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.Role;
 
@@ -41,8 +42,8 @@ public interface Note extends Entity {
                         //.isRequired(true) RESTORE ME
                         .isSettable(false)
                         .isAnnotationProperty(false)
-                        .getter(Note::getId)
-                        .setter(Note::setId)
+                        .getter(n -> Note.getId(n).value)
+                        .setter((n, s) -> Note.setId(n, new AtomId(s)))
                         .fromString(s -> s)
                         .build(),
                 new Property.Builder<Note, Float>()
@@ -124,12 +125,12 @@ public interface Note extends Entity {
 
     Note getSubject(ListNode<Note> notes);
 
-    static String getId(Note note) {
-        return note.getProperty(SemanticSynchrony.PropertyKeys.ID);
+    static AtomId getId(Note note) {
+        return new AtomId(note.getProperty(SemanticSynchrony.PropertyKeys.ID));
     }
 
-    static void setId(Note note, String id) {
-        note.setProperty(SemanticSynchrony.PropertyKeys.ID, id);
+    static void setId(Note note, AtomId id) {
+        note.setProperty(SemanticSynchrony.PropertyKeys.ID, id.value);
     }
 
     static Role getRole(Note note) {

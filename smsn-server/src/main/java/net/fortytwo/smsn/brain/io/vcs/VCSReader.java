@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
@@ -66,9 +67,9 @@ public class VCSReader extends NoteReader {
         }
     }
 
-    private String idFromFileName(final File file) {
+    private AtomId idFromFileName(final File file) {
         String fileName = file.getName();
-        return fileName.substring(0, fileName.indexOf("."));
+        return new AtomId(fileName.substring(0, fileName.indexOf(".")));
     }
 
     private void readPage(final File file, final Helper helper, final DataSource source) throws IOException {
@@ -80,11 +81,11 @@ public class VCSReader extends NoteReader {
             } catch (IOException e) {
                 throw new IOException("parse error in VCS file " + file, e);
             }
-            String rootId = idFromFileName(file);
+            AtomId rootId = idFromFileName(file);
             Note root = helper.resolveNoteReference(rootId);
 
             for (TreeNode<Link> note : TreeViews.getChildrenAsList(page.getContent())) {
-                String id = TreeViews.getId(note);
+                AtomId id = TreeViews.getId(note);
 //                Preconditions.checkNotNull(id);
             }
             page.setSource(source.getName());
@@ -170,7 +171,7 @@ public class VCSReader extends NoteReader {
             return Optional.of(context.getTopicGraph().createListOfNotes(notes));
         }
 
-        private Note resolveNoteReference(final String id) {
+        private Note resolveNoteReference(final AtomId id) {
             TopicGraph graph = context.getTopicGraph();
             Optional<Note> opt = graph.getNoteById(id);
             Note referenced;

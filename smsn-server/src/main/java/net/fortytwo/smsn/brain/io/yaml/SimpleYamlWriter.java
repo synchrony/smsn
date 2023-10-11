@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.yaml;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
@@ -49,7 +50,7 @@ public class SimpleYamlWriter extends NoteWriter {
 
             List<Note> children = ListNode.toJavaList(note.getChildren());
             if (!children.isEmpty()) {
-                List<String> childIds = new LinkedList<>();
+                List<AtomId> childIds = new LinkedList<>();
                 for (Note child : children) {
                     childIds.add(Note.getId(child));
                 }

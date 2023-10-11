@@ -61,6 +61,6 @@ public class TreeType extends SimpleType<TreeNode<Link>> {
         // note: an alternative is comparison by creation time
         return null == TreeViews.getId(o1)
                 ? null == TreeViews.getId(o2) ? 0 : -1
-                : null == TreeViews.getId(o2) ? 1 : TreeViews.getId(o1).compareTo(TreeViews.getId(o2));
+                : null == TreeViews.getId(o2) ? 1 : TreeViews.getId(o1).value.compareTo(TreeViews.getId(o2).value);
     }
 }

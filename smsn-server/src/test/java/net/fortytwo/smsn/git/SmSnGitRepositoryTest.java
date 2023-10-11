@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.git;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
@@ -100,9 +101,9 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
 
     @Test
     public void historyDoesntBreak() throws Exception {
-        String arthurId = SemanticSynchrony.createRandomId();
-        String fordId = SemanticSynchrony.createRandomId();
-        String zaphodId = SemanticSynchrony.createRandomId();
+        AtomId arthurId = SemanticSynchrony.createRandomId();
+        AtomId fordId = SemanticSynchrony.createRandomId();
+        AtomId zaphodId = SemanticSynchrony.createRandomId();
 
         addFile(testNote(arthurId, "Arthur Dent"));
         repo.addAll();
@@ -151,7 +152,7 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         return count;
     }
 
-    private TreeNode<Link> testNote(final String id, final String title) {
+    private TreeNode<Link> testNote(final AtomId id, final String title) {
         TreeNode<Link> note = TreeNodeDTO.createEmptyNode();
 
         TreeViews.setId(note, id);
@@ -165,7 +166,7 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
 
     private void addFile(final TreeNode<Link> tree) throws IOException {
         assertNotNull(TreeViews.getId(tree));
-        File file = new File(repoDir, TreeViews.getId(tree));
+        File file = new File(repoDir, TreeViews.getId(tree).value);
         try (OutputStream out = new FileOutputStream(file)) {
             Page page = PageDTO.createTransitional();
             page.setContent(tree);

@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
@@ -21,7 +22,7 @@ public abstract class NoteWriter {
     public static class Context {
         private TopicGraph topicGraph;
         private KnowledgeBase knowledgeBase;
-        private String rootId;
+        private AtomId rootId;
         private Filter filter;
         private File destDirectory;
         private OutputStream destStream;
@@ -43,11 +44,11 @@ public abstract class NoteWriter {
             this.topicGraph = topicGraph;
         }
 
-        public String getRootId() {
+        public AtomId getRootId() {
             return rootId;
         }
 
-        public void setRootId(String rootId) {
+        public void setRootId(AtomId rootId) {
             this.rootId = rootId;
         }
 

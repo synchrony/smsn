@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -41,10 +42,10 @@ public abstract class GraphWrapper {
 
     public abstract void shutdown();
 
-    public Vertex createVertex(final String id, final String label) {
+    public Vertex createVertex(final AtomId id, final String label) {
         Vertex vertex = graph.addVertex(T.label, label);
         // TODO: use id strategy
-        vertex.property(SemanticSynchrony.PropertyKeys.ID, getNonNullId(id));
+        vertex.property(SemanticSynchrony.PropertyKeys.ID, getNonNullId(id).value);
         // TODO: use auto-indexing
         updateIndex(vertex, SemanticSynchrony.PropertyKeys.ID);
 
@@ -55,8 +56,8 @@ public abstract class GraphWrapper {
         return graph;
     }
 
-    public Vertex getVertexById(final String id) {
-        return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID, id);
+    public Vertex getVertexById(final AtomId id) {
+        return getVertexByKeyValue(SemanticSynchrony.PropertyKeys.ID, id.value);
     }
 
     public Iterator<Sortable<Vertex, Float>> getVerticesByTitle(final String term) {
@@ -75,7 +76,7 @@ public abstract class GraphWrapper {
         return indices.get(key);
     }
 
-    private String getNonNullId(final String id) {
+    private AtomId getNonNullId(final AtomId id) {
         return null == id ? SemanticSynchrony.createRandomId() : id;
     }
 

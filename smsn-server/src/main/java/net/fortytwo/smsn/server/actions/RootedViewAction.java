@@ -1,11 +1,12 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 
 public abstract class RootedViewAction extends BasicViewAction {
 
-    private String root;
+    private AtomId root;
 
     private Note rootNote;
 
@@ -13,11 +14,11 @@ public abstract class RootedViewAction extends BasicViewAction {
         return notNull(rootNote);
     }
 
-    public void setRoot(String root) {
+    public void setRoot(String rootStr) {
         // work around for a Brain-mode quirk
-        if (null != root && root.equals("null")) root = null;
+        if (null != rootStr && rootStr.equals("null")) root = null;
 
-        this.root = root;
+        this.root = new AtomId(rootStr);
     }
 
     @Override

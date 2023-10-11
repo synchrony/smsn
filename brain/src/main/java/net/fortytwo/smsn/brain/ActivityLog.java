@@ -54,7 +54,7 @@ public class ActivityLog {
                     .append("\t").append(action);
 
             for (Note note : notes) {
-                out.append("\t").append(Note.getId(note));
+                out.append("\t").append(Note.getId(note).value);
             }
 
             out.append("\n");

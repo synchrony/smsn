@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model.dto;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -8,7 +9,7 @@ import net.fortytwo.smsn.brain.model.entities.Page;
 
 public class PageDTO implements Page {
 
-    public static final String TRANSITIONAL_ID = "IGNORED";
+    public static final AtomId TRANSITIONAL_ID = new AtomId("IGNORED");
     public static final String TRANSITIONAL_TITLE = "IGNORED";
 
     private Role role;

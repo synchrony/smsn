@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.Params;
@@ -41,7 +42,7 @@ public abstract class Action {
 
     protected static final int MAX_VIEW_HEIGHT = 7;
 
-    protected static final String CREATE_NEW_NOTE = "create-new-note";
+    protected static final AtomId CREATE_NEW_NOTE = new AtomId("create-new-note");
 
     private static final Map<Graph, Brain> brains = new HashMap<>();
     private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
@@ -120,7 +121,7 @@ public abstract class Action {
         return context;
     }
 
-    protected void addToHistory(final String rootId) {
+    protected void addToHistory(final AtomId rootId) {
         history.visit(rootId);
     }
 

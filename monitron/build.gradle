@@ -1,5 +1,6 @@
 dependencies {
   implementation project(':smsn-core')
+  implementation project(':smsn-models')
   implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
     exclude(module: 'jackson-core')
     exclude(module: 'xmpp-mtp')

@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
@@ -47,16 +48,16 @@ public class MarkdownParserTest {
         assertEquals(3, TreeViews.countChildren(root));
         TreeNode<Link> aLink = root.getChildren().get(0);
         assertEquals("a link", TreeViews.getTitle(aLink));
-        assertEquals("aaaaaaa", TreeViews.getId(aLink));
+        assertEquals(new AtomId("aaaaaaa"), TreeViews.getId(aLink));
         TreeNode<Link> anotherLink = root.getChildren().get(1);
         assertEquals("another link", TreeViews.getTitle(anotherLink));
-        assertEquals("bbbbbbb", TreeViews.getId(anotherLink));
+        assertEquals(new AtomId("bbbbbbb"), TreeViews.getId(anotherLink));
         TreeNode<Link> heading = root.getChildren().get(2);
         assertEquals("this is a heading", TreeViews.getTitle(heading));
         assertEquals(1, TreeViews.countChildren(heading));
         TreeNode<Link> linkUnder = heading.getChildren().get(0);
         assertEquals("a link under the first heading", TreeViews.getTitle(linkUnder));
-        assertEquals("ccccccc", TreeViews.getId(linkUnder));
+        assertEquals(new AtomId("ccccccc"), TreeViews.getId(linkUnder));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class MarkdownParserTest {
         assertEquals(1, TreeViews.countChildren(root));
         TreeNode<Link> aLink = root.getChildren().get(0);
         assertEquals("a link", TreeViews.getTitle(aLink));
-        assertEquals("0000000", TreeViews.getId(aLink));
+        assertEquals(new AtomId("0000000"), TreeViews.getId(aLink));
     }
 
     @Test
@@ -96,11 +97,11 @@ public class MarkdownParserTest {
 
         TreeNode<Link> withALink = root.getChildren().get(1);
         assertEquals("with a link", TreeViews.getTitle(withALink));
-        assertEquals("zzzzzzz", TreeViews.getId(withALink));
+        assertEquals(new AtomId("zzzzzzz"), TreeViews.getId(withALink));
         assertEquals(1, TreeViews.countChildren(withALink));
         TreeNode<Link> child = withALink.getChildren().get(0);
         assertEquals("child of heading with a link", TreeViews.getTitle(child));
-        assertEquals("aaaaaaa", TreeViews.getId(child));
+        assertEquals(new AtomId("aaaaaaa"), TreeViews.getId(child));
     }
 
     @Test

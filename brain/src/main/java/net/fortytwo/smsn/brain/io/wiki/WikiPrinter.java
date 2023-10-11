@@ -59,7 +59,7 @@ public class WikiPrinter {
     private void printId(final TreeNode<Link> tree) {
         if (null != tree.getValue().getTarget()) {
             printStream.print(":");
-            printStream.print(tree.getValue().getTarget().getId());
+            printStream.print(tree.getValue().getTarget().getId().value);
             printStream.print(": ");
         }
     }
@@ -92,7 +92,7 @@ public class WikiPrinter {
     }
 
     private void printProperties(final Page page) {
-        printProperty("id", page.getContent().getValue().getTarget().getId());
+        printProperty("id", page.getContent().getValue().getTarget().getId().value);
         String title = page.getContent().getValue().getLabel();
         if (null != title) {
             printProperty("title", title);

@@ -4,6 +4,7 @@ configurations {
 
 dependencies {
   implementation project(':smsn-core')
+  implementation project(':smsn-models')
   implementation project(':smsn-rdf')
 
   implementation 'org.json:json:20180130'

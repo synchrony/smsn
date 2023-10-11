@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Note;
@@ -20,7 +21,7 @@ abstract class FilteredAction extends Action {
         this.filter = filter;
     }
 
-    protected Note getRoot(String rootId, final ActionContext context) {
+    protected Note getRoot(AtomId rootId, final ActionContext context) {
         Note root;
         if (rootId.equals(CREATE_NEW_NOTE)) {
             root = createNewRoot(context);

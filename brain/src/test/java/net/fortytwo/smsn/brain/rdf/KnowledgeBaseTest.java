@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -336,7 +337,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
         Filter filter = Filter.noFilter();
         Note root = createNote(SemanticSynchrony.createRandomId());
         Note.setTitle(root, "root");
-        String rootId = Note.getId(root);
+        AtomId rootId = Note.getId(root);
 
         try (InputStream in = getClass().getResourceAsStream("inference-example-1.txt")) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -364,39 +365,39 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
         kb.addDefaultClasses();
 
-        Note einstein = topicGraph.getNoteById("yOXFhhN").get();
-        Note einsteinPapers = topicGraph.getNoteById("Z5UUQn6").get();
-        Note specialRelPaper = topicGraph.getNoteById("mRwSsu2").get();
-        Note bibtex = topicGraph.getNoteById("xKWD1wC").get();
-        Note einsteinQuotes = topicGraph.getNoteById("5OfUlUN").get();
-        Note einsteinQuotes2 = topicGraph.getNoteById("vtdNdMF").get();
-        Note einsteinFamily = topicGraph.getNoteById("yWBqSc2").get();
-        Note speedOfLight = topicGraph.getNoteById("dDn4jt0").get();
-        Note simultaneity = topicGraph.getNoteById("x6rw4et").get();
-        Note relativity = topicGraph.getNoteById("-kKLYO8").get();
-        Note paperPdf = topicGraph.getNoteById("gsaYMBs").get();
-        Note topics = topicGraph.getNoteById("GORFdGO").get();
-        Note ellipsis = topicGraph.getNoteById("0MQ4h4a").get();
-        Note quote = topicGraph.getNoteById("-ngTO_3").get();
-        Note h2g2 = topicGraph.getNoteById("TT698yn").get();
-        Note physics = topicGraph.getNoteById("ynyUshJ").get();
+        Note einstein = topicGraph.getNoteById(new AtomId("yOXFhhN")).get();
+        Note einsteinPapers = topicGraph.getNoteById(new AtomId("Z5UUQn6")).get();
+        Note specialRelPaper = topicGraph.getNoteById(new AtomId("mRwSsu2")).get();
+        Note bibtex = topicGraph.getNoteById(new AtomId("xKWD1wC")).get();
+        Note einsteinQuotes = topicGraph.getNoteById(new AtomId("5OfUlUN")).get();
+        Note einsteinQuotes2 = topicGraph.getNoteById(new AtomId("vtdNdMF")).get();
+        Note einsteinFamily = topicGraph.getNoteById(new AtomId("yWBqSc2")).get();
+        Note speedOfLight = topicGraph.getNoteById(new AtomId("dDn4jt0")).get();
+        Note simultaneity = topicGraph.getNoteById(new AtomId("x6rw4et")).get();
+        Note relativity = topicGraph.getNoteById(new AtomId("-kKLYO8")).get();
+        Note paperPdf = topicGraph.getNoteById(new AtomId("gsaYMBs")).get();
+        Note topics = topicGraph.getNoteById(new AtomId("GORFdGO")).get();
+        Note ellipsis = topicGraph.getNoteById(new AtomId("0MQ4h4a")).get();
+        Note quote = topicGraph.getNoteById(new AtomId("-ngTO_3")).get();
+        Note h2g2 = topicGraph.getNoteById(new AtomId("TT698yn")).get();
+        Note physics = topicGraph.getNoteById(new AtomId("ynyUshJ")).get();
 
-        Note john = topicGraph.getNoteById("0rYY9z0").get();
+        Note john = topicGraph.getNoteById(new AtomId("0rYY9z0")).get();
 
         // The following are nested directly under Einstein's family
-        Note hermann = topicGraph.getNoteById("mPx8zEW").get();
-        Note pauline = topicGraph.getNoteById("PR8p9B5").get();
-        Note maria = topicGraph.getNoteById("b6jFIkg").get();
+        Note hermann = topicGraph.getNoteById(new AtomId("mPx8zEW")).get();
+        Note pauline = topicGraph.getNoteById(new AtomId("PR8p9B5")).get();
+        Note maria = topicGraph.getNoteById(new AtomId("b6jFIkg")).get();
         // The following are under Einstein's family, but also have Wikipedia links
-        Note mileva = topicGraph.getNoteById("U2RAPqU").get();
-        Note elsa = topicGraph.getNoteById("Wks2hZM").get();
+        Note mileva = topicGraph.getNoteById(new AtomId("U2RAPqU")).get();
+        Note elsa = topicGraph.getNoteById(new AtomId("Wks2hZM")).get();
         // The following are two degrees removed, under Einstein's family > Einstein's children
-        Note lieserl = topicGraph.getNoteById("Y3X-skF").get();
-        Note hansAlbert = topicGraph.getNoteById("6_sSpVa").get();
-        Note eduard = topicGraph.getNoteById("dleUIwo").get();
+        Note lieserl = topicGraph.getNoteById(new AtomId("Y3X-skF")).get();
+        Note hansAlbert = topicGraph.getNoteById(new AtomId("6_sSpVa")).get();
+        Note eduard = topicGraph.getNoteById(new AtomId("dleUIwo")).get();
 
-        Note googleGlass = topicGraph.getNoteById("ufIPR_C").get();
-        Note sebastian = topicGraph.getNoteById("-L7cCbN").get();
+        Note googleGlass = topicGraph.getNoteById(new AtomId("ufIPR_C")).get();
+        Note sebastian = topicGraph.getNoteById(new AtomId("-L7cCbN")).get();
 
         for (int i = 0; i < 4; i++) {
             System.out.println("#### ITERATION #" + (i + 1) + " ######");

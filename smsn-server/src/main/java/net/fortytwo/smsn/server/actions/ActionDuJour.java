@@ -2,10 +2,12 @@ package net.fortytwo.smsn.server.actions;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.pg.PGNote;
+import net.fortytwo.smsn.config.Configuration;
 import net.fortytwo.smsn.config.DataSource;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
@@ -14,11 +16,9 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
-import net.fortytwo.smsn.config.Configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -119,7 +119,7 @@ public class ActionDuJour extends Action {
             TopicGraph graph = context.getBrain().getTopicGraph();
             for (File file : dir.listFiles()) {
                 if (VCSFormat.isSmSnFile(file)) {
-                    String id = file.getName();
+                    AtomId id = new AtomId(file.getName());
                     Optional<Note> opt = graph.getNoteById(id);
                     Preconditions.checkArgument(opt.isPresent());
                     Note.setSource(opt.get(), source.getName());

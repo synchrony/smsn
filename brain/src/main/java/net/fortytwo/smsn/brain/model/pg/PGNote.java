@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.model.Property;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
@@ -259,13 +260,13 @@ public abstract class PGNote extends PGEntity implements Note {
 
     @Override
     public String toString() {
-        String id;
+        AtomId id;
         try {
             id = Note.getId(this);
         } catch (IllegalArgumentException e) {
             Function<PGEntity, String> toString = PGEntity::toString;
             return toString.apply(this);
         }
-        return "Note[" + id + "]";
+        return "Note[" + id.value + "]";
     }
 }

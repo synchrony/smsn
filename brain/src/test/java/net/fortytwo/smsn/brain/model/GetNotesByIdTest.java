@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
@@ -18,10 +19,16 @@ public class GetNotesByIdTest extends BrainTestBase {
 
     @Test
     public void allLegalIdsMayBeUsed() throws Exception {
-        String[] ids = new String[]{"aaaaaaa", "0000000", "a1b2c3d", "-------", "_______", "-_0-ad_"};
+        AtomId[] ids = new AtomId[]{
+                new AtomId("aaaaaaa"),
+                new AtomId("0000000"),
+                new AtomId("a1b2c3d"),
+                new AtomId("-------"),
+                new AtomId("_______"),
+                new AtomId("-_0-ad_")};
 
         int count = 0;
-        for (String id : ids) {
+        for (AtomId id : ids) {
             Note note = createNote(id);
             Note.setTitle(note, "note #" + ++count);
         }

@@ -1,9 +1,10 @@
 package net.fortytwo.smsn.brain.model.dto;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
 public class TopicDTO implements Topic {
-    private String id;
+    private AtomId id;
 
     @Override
     public void destroy() {
@@ -11,12 +12,12 @@ public class TopicDTO implements Topic {
     }
 
     @Override
-    public String getId() {
+    public AtomId getId() {
         return id;
     }
 
     @Override
-    public void setId(final String id) {
+    public void setId(final AtomId id) {
         this.id = id;
     }
 

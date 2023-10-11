@@ -2,12 +2,11 @@ package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Topic;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -71,6 +70,9 @@ public class VCSReaderTest extends BrainTestBase {
     private void copyVCSFileToDirectory(final Topic topic, final File dir) throws IOException {
         String fileName = VCSFormat.fileNameForTopic(topic);
         try (InputStream in = VCSReaderTest.class.getResourceAsStream(fileName)) {
+            if (in == null) {
+                throw new IOException("failed to find resource: " + fileName);
+            }
             try (OutputStream out = new FileOutputStream(new File(dir, fileName))) {
                 IOUtils.copy(in, out);
             }

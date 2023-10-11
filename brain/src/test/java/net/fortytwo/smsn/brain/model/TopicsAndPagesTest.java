@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.model;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -51,7 +52,7 @@ public class TopicsAndPagesTest extends BrainTestBase {
 
         Link secondLink = page.getContent().getChildren().get(0).getValue();
         assertEquals("Tea", secondLink.getLabel());
-        assertEquals("tea", secondLink.getTarget().getId());
+        assertEquals(new AtomId("tea"), secondLink.getTarget().getId());
 
         TreeNode<Link> friendsTree = topicGraph.createTopicTree(friendsLink);
         ListNode<TreeNode<Link>> childLinks = topicGraph.toList(

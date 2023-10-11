@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.PageParser;
 import net.fortytwo.smsn.brain.io.json.JsonFormat;
 import net.fortytwo.smsn.brain.model.Property;
@@ -285,11 +286,11 @@ public class WikiParser extends PageParser {
         String bullet = currentLineTrimmed.substring(0, firstSpace);
         String rest = currentLineTrimmed.substring(firstSpace).trim();
 
-        String id;
+        AtomId id;
         String label;
         Matcher matcher = WikiFormat.ID_INFIX.matcher(rest);
         if (matcher.find() && 0 == matcher.start()) {
-            id = rest.substring(1, matcher.end() - 1);
+            id = new AtomId(rest.substring(1, matcher.end() - 1));
             label = rest.substring(matcher.end()).trim();
         } else {
             id = null;
@@ -308,7 +309,7 @@ public class WikiParser extends PageParser {
         // TODO: transitional
         switch (key) {
             case "id":
-                page.getContent().getValue().getTarget().setId(value);
+                page.getContent().getValue().getTarget().setId(new AtomId(value));
                 break;
             case "title":
                 page.getContent().getValue().setLabel(value);
@@ -340,7 +341,7 @@ public class WikiParser extends PageParser {
                 : null;
     }
 
-    private TreeNode<Link> constructTreeNode(final String topicId, final Role role, final String label)
+    private TreeNode<Link> constructTreeNode(final AtomId topicId, final Role role, final String label)
             throws IOException {
         Link link = new LinkDTO();
         link.setRole(role);

@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteWriter;
@@ -65,10 +66,10 @@ public class VCSWriterTest extends BrainTestBase {
     @Test
     public void singlePageIsWrittenCorrectly() throws Exception {
         String source = DefaultSources.PUBLIC;
-        String fordId = SemanticSynchrony.createRandomId();
-        String zaphodId = SemanticSynchrony.createRandomId();
+        AtomId fordId = SemanticSynchrony.createRandomId();
+        AtomId zaphodId = SemanticSynchrony.createRandomId();
 
-        Note root = createNote("11111", "change me");
+        Note root = createNote(new AtomId("11111"), "change me");
         Note.setSource(root, source);
 
         TreeNode<Link> tree = createTreeDTO(Note.getId(root), "Arthur Dent");
@@ -98,11 +99,11 @@ public class VCSWriterTest extends BrainTestBase {
         assertEquals(4, dir.listFiles().length);
         File publicDir = new File(dir, "public");
         assertTrue(publicDir.exists() && publicDir.isDirectory());
-        File arthurFile = new File(publicDir, Note.getId(root) + ".smsn");
+        File arthurFile = new File(publicDir, Note.getId(root).value + ".smsn");
         assertTrue(arthurFile.exists());
         List<String> lines = readLines(arthurFile);
         assertEquals(9, lines.size());
-        assertEquals("@id " + Note.getId(root), lines.get(0));
+        assertEquals("@id " + Note.getId(root).value, lines.get(0));
         assertEquals("@title Arthur Dent", lines.get(1));
         assertEquals("created", readPropertyLine(lines.get(2)).getKey());
         // note: no @weight or @priority
@@ -110,9 +111,8 @@ public class VCSWriterTest extends BrainTestBase {
         assertEquals("He's a jerk.", lines.get(4));
         assertEquals("A complete kneebiter.", lines.get(5));
         assertEquals("```", lines.get(6));
-        assertEquals("* :" + fordId + ": ", lines.get(7));
-        assertEquals("* :" + zaphodId + ": ", lines.get(8));
-
+        assertEquals("* :" + fordId.value + ": ", lines.get(7));
+        assertEquals("* :" + zaphodId.value + ": ", lines.get(8));
     }
 
     private Map.Entry<String, String> readPropertyLine(final String line) {

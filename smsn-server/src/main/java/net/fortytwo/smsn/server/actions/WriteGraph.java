@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.server.ActionContext;
@@ -16,13 +17,13 @@ import java.io.OutputStream;
 public class WriteGraph extends IOAction {
 
     // note: may be null
-    private String rootId;
+    private AtomId rootId;
 
-    private String getRootId() {
+    private AtomId getRootId() {
         return rootId;
     }
 
-    public void setRootId(String rootId) {
+    public void setRootId(AtomId rootId) {
         this.rootId = rootId;
     }
 

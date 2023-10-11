@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.yaml;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
@@ -54,7 +55,7 @@ class YAMLSource {
 
         if (null != a.getChildren()) {
             List<Note> children = ListNode.toJavaList(a.getChildren());
-            List<String> ids = children.stream().map(note -> Note.getId(note)).collect(Collectors.toList());
+            List<String> ids = children.stream().map(note -> Note.getId(note).value).collect(Collectors.toList());
             map.put(YAMLFormat.Constants.AtomFields.CHILDREN, ids);
         }
 
@@ -103,7 +104,7 @@ class YAMLSource {
     }
 
     public Collection<Note> readFrom(final File dir) throws IOException {
-        Map<String, Note> notes = readAtoms(dir);
+        Map<AtomId, Note> notes = readAtoms(dir);
         return notes.values();
     }
 
@@ -121,9 +122,9 @@ class YAMLSource {
         }
     }
 
-    private Map<String, Note> readAtoms(final File dir) throws IOException {
+    private Map<AtomId, Note> readAtoms(final File dir) throws IOException {
         File file = atomFile(dir);
-        Map<String, Note> notes = new HashMap<>();
+        Map<AtomId, Note> notes = new HashMap<>();
 
         for (Map<String, Object> map : loadYaml(file)) {
             Note note = new NoteDTO();
@@ -131,7 +132,7 @@ class YAMLSource {
 
             fromMap(map, note, YAMLFormat.Constants.AtomFields.ALIAS, (n, o) -> Note.setAlias(n, toString(o)));
             fromMap(map, note, YAMLFormat.Constants.AtomFields.CREATED, (n, o) -> Note.setCreated(n, toLong(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.ID, (n, o) -> Note.setId(n, toString(o)));
+            fromMap(map, note, YAMLFormat.Constants.AtomFields.ID, (n, o) -> Note.setId(n, new AtomId(toString(o))));
 //System.out.println("id: " + Note.getId(note));
 //Object title = map.get(YAMLFormat.Constants.AtomFields.TITLE);
 //System.out.println("\ttitle: " + title + (title == null ? "" : title.getClass()));
@@ -180,7 +181,7 @@ class YAMLSource {
         int i = 0;
         for (String id : ids) {
             Note note = new NoteDTO();
-            Note.setId(note, id);
+            Note.setId(note, new AtomId(id));
             notes[i++] = note;
         }
         return ListNodeDTO.fromArray(notes);
@@ -196,7 +197,7 @@ class YAMLSource {
             LoaderOptions options = new LoaderOptions();
             Representer representer = new Representer(new DumperOptions());
             Yaml yaml = new Yaml(new Constructor(options), representer, new DumperOptions(), createResolver());
-            return (List<Map<String, Object>>) yaml.load(in);
+            return yaml.load(in);
         }
     }
 }

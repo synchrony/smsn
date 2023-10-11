@@ -2,6 +2,7 @@ package net.fortytwo.smsn.git;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.Note;
@@ -98,7 +99,7 @@ public class SmSnCommit extends NoteDTO {
 
             String newPath = diffEntry.getNewPath();
 
-            String id = SmSnGitRepository.toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
+            AtomId id = SmSnGitRepository.toId(changeType == DiffEntry.ChangeType.DELETE ? oldPath : newPath);
             Note changed = changedNote(id, SmSnGitRepository.getTimeStamp(newCommit), changeType);
 
             list = creatList(changed, list);
@@ -111,7 +112,7 @@ public class SmSnCommit extends NoteDTO {
         return new ListNodeDTO<>(first, rest);
     }
 
-    private Note changedNote(final String id, final long timestamp, final DiffEntry.ChangeType changeType) {
+    private Note changedNote(final AtomId id, final long timestamp, final DiffEntry.ChangeType changeType) {
         Optional<Note> opt = repository.getBrain().getTopicGraph().getNoteById(id);
         Note note;
 

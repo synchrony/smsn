@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.io.vcs;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.dto.TopicDTO;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.junit.Test;
@@ -39,11 +40,11 @@ public class VCSFormatTest {
 
     @Test
     public void topicsMapToExpectedFileNames() {
-        assertEquals("12345.smsn", VCSFormat.fileNameForTopic(createTopic("12345")));
-        assertEquals("abcdefgh.smsn", VCSFormat.fileNameForTopic(createTopic("abcdefgh")));
+        assertEquals("12345.smsn", VCSFormat.fileNameForTopic(createTopic(new AtomId("12345"))));
+        assertEquals("abcdefgh.smsn", VCSFormat.fileNameForTopic(createTopic(new AtomId("abcdefgh"))));
     }
 
-    private Topic createTopic(final String id) {
+    private Topic createTopic(final AtomId id) {
         Topic topic = new TopicDTO();
         topic.setId(id);
         return topic;

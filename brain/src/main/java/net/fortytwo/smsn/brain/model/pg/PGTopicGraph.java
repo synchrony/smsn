@@ -2,6 +2,7 @@ package net.fortytwo.smsn.brain.model.pg;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
@@ -51,13 +52,13 @@ public class PGTopicGraph implements TopicGraph {
         return propertyGraph;
     }
 
-    public String idOf(final Note a) {
+    public AtomId idOf(final Note a) {
         return Note.getId(a);
     }
 
     // TODO: move me
-    public static String iriForId(final String id) {
-        return thingNamespace + id;
+    public static String iriForId(final AtomId id) {
+        return thingNamespace + id.value;
     }
 
     public String iriOf(final Note a) {
@@ -95,7 +96,7 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Optional<Note> getNoteById(final String id) {
+    public Optional<Note> getNoteById(final AtomId id) {
         Vertex v = wrapper.getVertexById(id);
 
         return null == v ? Optional.empty() : Optional.of(asNote(v));
@@ -123,7 +124,7 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Topic createTopic(final String topicId) {
+    public Topic createTopic(final AtomId topicId) {
         Topic topic = createEntity(null, SemanticSynchrony.VertexLabels.TOPIC, this::asTopic);
         topic.setId(topicId);
         return topic;
@@ -155,13 +156,13 @@ public class PGTopicGraph implements TopicGraph {
     }
 
     @Override
-    public Note createNote(final String id) {
+    public Note createNote(final AtomId id) {
         return createEntity(id, SemanticSynchrony.VertexLabels.NOTE, this::asNote);
     }
 
     @Override
     public Note createNoteWithProperties(final Filter filter,
-                                         final String id) {
+                                         final AtomId id) {
 
         Note note = createNote(id);
 
@@ -376,7 +377,7 @@ public class PGTopicGraph implements TopicGraph {
         return newGraph;
     }
 
-    private <T> T createEntity(final String id, final String label, final Function<Vertex, T> constructor) {
+    private <T> T createEntity(final AtomId id, final String label, final Function<Vertex, T> constructor) {
         Vertex vertex = wrapper.createVertex(id, label);
 
         return constructor.apply(vertex);

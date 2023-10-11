@@ -1,5 +1,6 @@
 dependencies {
   implementation project(':smsn-core')
+  implementation project(':smsn-models')
   implementation project(':smsn-devices')
   implementation project(':smsn-services')
   implementation project(':smsn-rdf')

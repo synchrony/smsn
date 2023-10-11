@@ -1,5 +1,6 @@
 package net.fortytwo.smsn;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.config.Configuration;
 import net.fortytwo.smsn.config.DataSource;
 import org.yaml.snakeyaml.Yaml;
@@ -175,9 +176,10 @@ public class SemanticSynchrony {
      *
      * @return a new pseudo-random key
      */
-    public static String migrateId(final String original) {
+    public static AtomId migrateId(final AtomId original) {
         if (null != original) {
-            random.setSeed(original.length() + original.hashCode());
+            String originalStr = original.value;
+            random.setSeed(originalStr.length() + originalStr.hashCode());
         }
 
         byte[] bytes = new byte[ID_DIGITS];
@@ -191,10 +193,10 @@ public class SemanticSynchrony {
             bytes[i] = (byte) b;
         }
 
-        return new String(bytes);
+        return new AtomId(new String(bytes));
     }
 
-    public static String createRandomId() {
+    public static AtomId createRandomId() {
         return migrateId(null);
     }
 
