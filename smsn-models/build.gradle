@@ -15,4 +15,7 @@ dependencies {
     // Hydra dependencies
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
     implementation 'org.eclipse.rdf4j:rdf4j-rio-ntriples:4.2.3'
+    // TODO: replace these dependencies, along with the extra srcDirs, with:
+    //       implementation 'net.fortytwo.hydra:hydra-java:0.2.1'
+    //       This can only be done once Hydra is allowed to advance to Java 11.
 }
