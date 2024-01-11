@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "Semantic Synchrony",
+  "version": "1.0",
+  "description": "Copy bookmark information to clipboard",
+  "permissions": ["activeTab", "storage"],
+  "browser_action": {
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
+    "default_title": "Semantic Synchrony",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
+
