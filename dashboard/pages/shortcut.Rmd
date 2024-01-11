@@ -1,0 +1,25 @@
+```{r, error=FALSE}
+require.entities()
+```
+
+## @shortcut property
+
+```{r}
+with.shortcut <- subset(entities, nchar(as.character(shortcut)) > 0)
+unique.shortcuts <- unique(with.shortcut$shortcut)
+```
+
+SmSn's `@shortcut` property is not commonly used, but it allows you to put certain entities on speed dial, so to speak. For example, if you often look up Wikipedia in the graph, you might assign it a shortcut of "wpd".
+The current graph includes **`r num(length(unique.shortcuts))` unique shortcuts** annotating **`r num(nrow(with.shortcut))` entities** `r perc.of.entities(nrow(with.shortcut))`.
+The annotated entities can be seen in the table below.
+
+```{r}
+# format shortcut-annotated entities for display
+df <- data.frame(
+  shortcut=with.shortcut$shortcut,
+  entities.for.display(with.shortcut))
+# order althabetically by shortcut
+df <- df[with(df, order(shortcut)),]
+
+showTable(df)
+```

@@ -2,21 +2,23 @@ package net.fortytwo.smsn.server;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.Neo4jGraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
-import net.fortytwo.smsn.brain.model.pg.TinkerGraphWrapper;
+import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
@@ -40,7 +42,7 @@ public abstract class Action {
 
     protected static final int MAX_VIEW_HEIGHT = 7;
 
-    protected static final String CREATE_NEW_ATOM = "create-new-atom";
+    protected static final AtomId CREATE_NEW_NOTE = new AtomId("create-new-note");
 
     private static final Map<Graph, Brain> brains = new HashMap<>();
     private static final Map<Graph, GraphWrapper> wrappers = new HashMap<>();
@@ -100,9 +102,9 @@ public abstract class Action {
         logActivity(context);
     }
 
-    protected void addView(final Note n,
+    protected void addView(final TreeNode<Link> view,
                            final ActionContext context) throws IOException {
-        JSONObject json = context.getJsonPrinter().toJson(n);
+        JSONObject json = context.getJsonPrinter().toJson(view);
 
         context.getMap().put(Params.VIEW, json);
     }
@@ -119,11 +121,11 @@ public abstract class Action {
         return context;
     }
 
-    protected void addToHistory(final String rootId) {
+    protected void addToHistory(final AtomId rootId) {
         history.visit(rootId);
     }
 
-    protected Iterable<Atom> getHistory(final TopicGraph graph,
+    protected Iterable<Note> getHistory(final TopicGraph graph,
                                         final Filter filter) {
         return history.getHistory(100, graph, filter);
     }
@@ -134,6 +136,10 @@ public abstract class Action {
         try {
             TopicGraph.wrapInTransaction(context.getBrain().getTopicGraph(), () -> performTransaction(context));
         } catch (Exception e) {
+            // Gremlin Server does not necessarily print the full stack trace,
+            // so we print it here before propagating the exception.
+            e.printStackTrace(System.err);
+
             throw new RequestProcessingException(e);
         }
     }

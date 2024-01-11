@@ -1,199 +1,284 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import org.junit.Before;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 public class WikiParserTest extends BrainTestBase {
-    private WikiParser wikiParser = new WikiParser();
+
+    private Page examplePage;
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        wikiParser = new WikiParser();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 
     @Test
-    public void testExample1() throws Exception {
-        List<Note> notes = wikiParser.parse(
-                getClass().getResourceAsStream("wiki-example-1.txt")).getChildren();
-        assertEquals(7, notes.size());
+    public void pageAttributesAreParsedCorrectly() throws Exception {
+        Page page = getExample();
 
-        Note indentation = notes.get(1);
-        assertNull(indentation.getId());
-        assertEquals("indentation", indentation.getTitle());
-        assertEquals("and this", indentation.getChildren()
-                .get(2).getChildren()
-                .get(0).getChildren()
-                .get(0).getChildren()
-                .get(0).getTitle());
-
-        Note atts = notes.get(3);
-        assertEquals("http://example.org/ns/attributes", atts.getAlias());
-        assertEquals(0.75f, atts.getWeight());
-
-        Note ws = notes.get(4);
-        assertEquals(4, ws.getChildren().size());
-
-        assertEquals("leading and trailing whitespace are ignored", ws.getChildren().get(2).getTitle());
-
-        Note ids = notes.get(5);
-        assertEquals("ids", ids.getTitle());
-        assertEquals("0txXBm", ids.getChildren().get(0).getId());
-        assertEquals("cE85nD", ids.getChildren().get(1).getId());
+        assertEquals("http://example.org/alias-url-for-this-page", page.getAlias());
+        assertEquals("se", page.getShortcut());
+        assertEquals(0.75f, page.getWeight());
+        assertEquals(0.5f, page.getPriority());
     }
 
     @Test
-    public void testExample2() throws Exception {
-        Note root = wikiParser.parse(getClass().getResourceAsStream("wiki-example-2.txt"));
+    public void transitionalAttributesAreAttachedCorrectly() throws Exception {
+        Page page = getExample();
 
-        assertEquals("http://example.org/ns/top-level-attributes-are-allowed", root.getAlias());
-        assertEquals(1.0f, root.getWeight());
-        assertEquals(DefaultSources.PUBLIC, root.getSource());
-        assertEquals(0.5f, root.getPriority());
-
-        assertEquals(1, root.getChildren().size());
-        assertEquals(1, root.getChildren().get(0).getChildren().size());
+        assertEquals(new AtomId("12345")
+                , page.getContent().getValue().getTarget().getId());
+        assertEquals("SmSn syntax example", page.getContent().getValue().getLabel());
     }
 
     @Test
-    public void testEmptyLinesIgnored() throws Exception {
-        List<Note> notes = readNotes(
-                "* one\n" +
-                        "   \n" +     // empty line with additional whitespace
-                        "* two" +
-                        "\n" +        // empty line without additional whitespace
-                        "* three");
-        assertEquals(3, notes.size());
-    }
+    public void textBeginsWithProperty() throws IOException {
+        Page page = wikiParser.parse("* Arthur\n" +
+                "    @text ```\n" +
+                "Here is some text about Arthur.\n" +
+                "```\n");
 
-    @Test(expected = IOException.class)
-    public void pageIsOnlyAllowedInCanonicalFormat() throws IOException {
-        wikiParser.setUseCanonicalFormat(false);
-        readNotes("* Arthur Dent\n" +
-                "\n" +
-                "He's a jerk.\n" +
-                "A complete kneebiter.");
+        assertEquals("Arthur", page.getContent().getChildren().getFirst().getValue().getLabel());
+        Page embeddedPage = page.getContent().getChildren().getFirst().getValue().getPage();
+
+        assertEquals("Here is some text about Arthur.", embeddedPage.getText());
     }
 
     @Test
-    public void nonEmptyPageIsCopiedVerbatim() throws Exception {
-        wikiParser.setUseCanonicalFormat(true);
-        List<Note> notes = readNotes("* Arthur Dent\n" +
-                "\n" +
-                "He's a jerk.\n" +
-                "A complete kneebiter.");
-        assertEquals(1, notes.size());
-        Note root = notes.get(0);
-        assertEquals("Arthur Dent", root.getTitle());
-        assertEquals("He's a jerk.\nA complete kneebiter.", root.getText());
+    public void textIsCopiedVerbatim() throws Exception {
+        Page page = getExample();
+
+        assertEquals("Unstructured text may be included between triple backticks, similar to Markdown.\n" +
+                        "Any number of lines of text is allowed.",
+                page.getText());
     }
 
     @Test
-    public void emptyPageIsIgnored() throws Exception {
-        wikiParser.setUseCanonicalFormat(true);
-        List<Note> notes = readNotes("* Arthur Dent\n" +
-                "\n" +
-                "   ");
-        assertEquals(1, notes.size());
-        Note root = notes.get(0);
-        assertEquals("Arthur Dent", root.getTitle());
-        assertNull(root.getText());
+    public void emptyTextIsIgnored() throws Exception {
+        Page page = parseToPage("* token node\n\n");
+
+        assertEquals(1, page.getContent().getChildren().length());
+        assertNull(page.getText());
+
+        page = parseToPage("* token node\n  \n");
+        assertNull(page.getText());
+    }
+
+    @Test
+    public void nodeHierarchyIsCorrect() throws Exception {
+        Page page = getExample();
+
+        assertNotNull(page.getContent());
+        assertNotNull(page.getContent().getValue());
+        assertEquals(7, page.getContent().getChildren().length());
+        assertEquals(5, page.getContent().getChildren().get(0).getChildren().length());
+    }
+
+    @Test
+    public void testRoleIsRespected() throws Exception {
+        Page page = getExample();
+        assertNull(page.getContent().getValue().getRole());
+        assertNull(page.getContent().getChildren().get(0).getValue().getRole());
+
+        TreeNode<Link> header = page.getContent().getChildren().get(5);
+        assertEquals(Role.Relation, header.getValue().getRole());
+        assertNull(header.getChildren().get(0).getValue().getRole());
+
+        TreeNode<Link> subHeader = header.getChildren().get(3);
+        assertEquals(Role.Relation, subHeader.getValue().getRole());
+        assertEquals(new AtomId("gzScm"), subHeader.getValue().getTarget().getId());
+        assertEquals("additional comments", subHeader.getValue().getLabel());
+        assertEquals(1, subHeader.getChildren().length());
+    }
+
+    @Test
+    public void testEmptyLinesAreIgnored() throws Exception {
+        Page page = getExample();
+
+        TreeNode<Link> whitespaceNode = page.getContent().getChildren().get(2);
+        assertEquals("white space", whitespaceNode.getValue().getLabel());
+        assertEquals(4, whitespaceNode.getChildren().length());
+        assertEquals("blank lines don't matter", whitespaceNode.getChildren().get(3).getValue().getLabel());
+    }
+
+    @Test
+    public void testWhitespaceIsTrimmed() throws Exception {
+        Page page = getExample();
+
+        TreeNode<Link> whitespaceNode = page.getContent().getChildren().get(2);
+        assertEquals("white space", whitespaceNode.getValue().getLabel());
+        assertEquals("leading and/or trailing whitespace is trimmed",
+                whitespaceNode.getChildren().get(2).getValue().getLabel());
+    }
+
+    @Test
+    public void unicodeIsHandledAsExpected() throws IOException {
+        Page page = parseToPage(
+                "+ :UAk6ejU: gemuetlichkeit\n\u00b7 :hSsMqzT: gem\\u00ftlichkeit\n");
+        assertEquals(2, page.getContent().getChildren().length());
+        assertEquals("gemuetlichkeit", page.getContent().getChildren().get(0).getValue().getLabel());
+        assertEquals("gem\\u00ftlichkeit", page.getContent().getChildren().get(1).getValue().getLabel());
+    }
+
+    @Test
+    public void testInvalidIdCharacters() throws Exception {
+        Page page = parseToPage("" +
+                "* :123@456: the 'ID' of this note contains a character not in [A-Za-z0-9]\n" +
+                "* it does not actually become an ID; just more value text");
+        assertEquals(2, page.getContent().getChildren().length());
+        assertNull(page.getContent().getChildren().get(0).getValue().getTarget());
+    }
+
+    @Test
+    public void emptyPageIsAllowed() throws Exception {
+        Page page = parseToPage("");
+        assertEquals(parserTopicId, page.getContent().getValue().getTarget().getId());
+        assertEquals(parserLabel, page.getContent().getValue().getLabel());
+        assertNull(page.getContent().getChildren());
+        assertEquals(parserSource, page.getSource());
+        assertNull(page.getAlias());
+        assertNull(page.getText());
+        assertNull(page.getPriority());
+        assertNull(page.getWeight());
+        assertNull(page.getShortcut());
     }
 
     @Test(expected = IOException.class)
     public void testEmptyValuesNotAllowedForNewNotes() throws Exception {
-        readNotes("* ");
+        parseToTree("* ");
     }
 
     @Test
     public void testEmptyValuesAllowedForExistingNotes() throws Exception {
-        readNotes("* :1234567: ");
+        Page page = parseToPage("* :1234567: ");
+        assertEquals(1, page.getContent().getChildren().length());
+        assertEquals(new AtomId("1234567"), page.getContent().getChildren().get(0).getValue().getTarget().getId());
     }
 
     @Test
     public void testEmptyAliasAttributeAllowed() throws Exception {
-        readNotes("@alias ");
+        Page page = parseToPage("@alias ");
+        assertEquals(WikiFormat.CLEARME, page.getAlias());
+    }
+
+    @Test
+    public void testEmptyShortcutAttributeAllowed() throws Exception {
+        Page page = parseToPage("@shortcut ");
+        assertEquals(WikiFormat.CLEARME, page.getShortcut());
     }
 
     @Test(expected = IOException.class)
     public void testEmptyPriorityAttributeNotAllowed() throws Exception {
-        readNotes("@priority ");
-    }
-
-    @Test(expected = IOException.class)
-    public void testEmptySourceAttributeNotAllowed() throws Exception {
-        readNotes("@source ");
+        parseToTree("@priority ");
     }
 
     @Test(expected = IOException.class)
     public void testEmptyWeightAttributeNotAllowed() throws Exception {
-        readNotes("@weight ");
+        parseToTree("@weight ");
     }
 
     @Test(expected = IOException.class)
     public void testLineTruncationSequenceNotAllowed() throws Exception {
-        readNotes("" +
+        parseToTree("" +
                 "* this is a note whose value was truncated for readability [...]\n" +
                 "   * you wouldn't want to lose the actual value because of a careless copy and paste, would you?");
     }
 
     @Test
     public void testLegalIds() throws Exception {
-        List<Note> notes = readNotes("+ :LTWrf62: courage\n" +
+        Page page = parseToPage("+ :LTWrf62: courage\n" +
                 "+ :COAZgCU: justice\n" +
                 "+ :g20vP2u: prudence\n" +
                 "+ :Ifkv0cj: temperance\n" +
                 "+ :rArdqLh: detachment\n" +
                 "+ :pXOAOuS: sincerity\n");
-        assertEquals(6, notes.size());
-        assertEquals("LTWrf62", notes.get(0).getId());
-        assertEquals("rArdqLh", notes.get(4).getId());
+        assertEquals(6, page.getContent().getChildren().length());
+        assertEquals(new AtomId("LTWrf62"), page.getContent().getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("rArdqLh"), page.getContent().getChildren().get(4).getValue().getTarget().getId());
 
-        notes = readNotes("" +
+        page = parseToPage("" +
                 "* :aaaaa:        IDs as short as 5 bytes are OK, although 16-byte IDs are 'standard'\n" +
                 "* :aaaaaaaa: longer IDs are OK, too\n" +
                 "* :a: this is not an ID");
-        assertEquals(3, notes.size());
-        assertEquals("aaaaa", notes.get(0).getId());
-        assertEquals("aaaaaaaa", notes.get(1).getId());
-        assertNull(notes.get(2).getId());
+        assertEquals(3, page.getContent().getChildren().length());
+        assertEquals(new AtomId("aaaaa"), page.getContent().getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("aaaaaaaa"), page.getContent().getChildren().get(1).getValue().getTarget().getId());
+        assertNull(page.getContent().getChildren().get(2).getValue().getTarget());
     }
 
     @Test
-    public void testInvalidIdCharacters() throws Exception {
-        List<Note> notes = readNotes("" +
-                "* :123@456: the 'ID' of this note contains a character not in [A-Za-z0-9]\n" +
-                "* it does not actually become an ID; just more value text");
-        assertEquals(2, notes.size());
-        assertNotSame("123@456", notes.get(0).getId());
-    }
+    public void singleCharacterBulletsAreInterchangeable() throws Exception {
+        Page page = getExample();
 
-    @Test
-    public void unicodeIsHandledAsExpected() throws IOException {
-        List<Note> notes = readNotes("+ :UAk6ejU: foo bar\n\u00b7 :hSsMqzT: quux\n");
-        assertEquals(2, notes.size());
-    }
-
-    private List<Note> readNotes(final String s) throws IOException {
-        try (InputStream in = new ByteArrayInputStream(s.getBytes())) {
-            return wikiParser.parse(in).getChildren();
+        TreeNode<Link> tree = page.getContent().getChildren().get(4);
+        assertEquals("ordinary bullets", tree.getValue().getLabel());
+        assertEquals(5, tree.getChildren().length());
+        for (int i = 0; i < tree.getChildren().length(); i++) {
+            TreeNode<Link> child = tree.getChildren().get(i);
+            assertNull(child.getValue().getRole());
         }
+    }
+
+    @Test
+    public void indentationIsRespected() throws Exception {
+        Page page = getExample();
+
+        TreeNode<Link> indentation = page.getContent().getChildren().get(1);
+        assertNull(indentation.getValue().getTarget());
+        assertEquals("indentation", indentation.getValue().getLabel());
+        assertEquals("and this", indentation.getChildren()
+                .get(2).getChildren()
+                .get(0).getChildren()
+                .get(0).getChildren()
+                .get(0).getValue().getLabel());
+    }
+
+    @Test
+    public void idsAreParsedCorrectly() throws Exception {
+        Page page = getExample();
+
+        TreeNode<Link> ids = page.getContent().getChildren().get(3);
+        assertEquals("ids", ids.getValue().getLabel());
+        assertEquals(new AtomId("0txXBm"), ids.getChildren().get(0).getValue().getTarget().getId());
+        assertEquals(new AtomId("cE85nD"), ids.getChildren().get(1).getValue().getTarget().getId());
+    }
+
+    @Test
+    public void embeddedPropertiesAreParsedCorrectly() throws IOException {
+        Page page = getExample();
+
+        TreeNode<Link> noProps = page.getContent().getChildren().get(1);
+        //assertEquals(DefaultSources.UNIVERSAL, noProps.getValue().getPage().getSource());
+        assertNull(noProps.getValue().getPage().getSource());
+
+        TreeNode<Link> props = page.getContent().getChildren().get(6);
+        Page embeddedPage = props.getValue().getPage();
+        assertNotNull(embeddedPage);
+        assertEquals("another-source", embeddedPage.getSource());
+        assertEquals(0.75f, embeddedPage.getWeight());
+        assertEquals(0.5f, embeddedPage.getPriority());
+        assertEquals("http://example.org/alias-url-for-this-note", embeddedPage.getAlias());
+        assertEquals("ep", embeddedPage.getShortcut());
+    }
+
+    private Page getExample() throws IOException {
+        if (null == examplePage) {
+            examplePage = wikiParser.parse(
+                    getClass().getResourceAsStream("syntax-example.txt"));
+        }
+
+        return examplePage;
     }
 }

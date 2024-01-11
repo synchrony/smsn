@@ -1,38 +1,43 @@
 package net.fortytwo.smsn.brain.model.dto;
 
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.entities.Topic;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.Topic;
 
 public class PageDTO implements Page {
 
-    private String format;
+    public static final AtomId TRANSITIONAL_ID = new AtomId("IGNORED");
+    public static final String TRANSITIONAL_TITLE = "IGNORED";
+
+    private Role role;
     private String text;
-    private Float weight;
     private String source;
-    private Float priority;
-    private Long created;
     private String alias;
     private String shortcut;
-    private KeyValueTree<Link, EntityList<Link>> topicTree;
+    private Float weight;
+    private Float priority;
+
+    // TODO: temporary
+    private Long created;
+
+    private TreeNode<Link> content;
 
     @Override
     public void destroy() {
         // nothing to do
     }
 
-    @Override
-    public String getFormat() {
-        return format;
+    public Role getRole() {
+        return role;
     }
 
-    @Override
-    public boolean setFormat(String format) {
-        this.format = format;
-        return false;
+    public void setRole(final Role role) {
+        this.role = role;
     }
+
 
     @Override
     public String getText() {
@@ -40,9 +45,8 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public boolean setText(String text) {
+    public void setText(String text) {
         this.text = text;
-        return false;
     }
 
     @Override
@@ -51,31 +55,8 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public boolean setAlias(String alias) {
+    public void setAlias(String alias) {
         this.alias = alias;
-        return false;
-    }
-
-    @Override
-    public Long getCreated() {
-        return created;
-    }
-
-    @Override
-    public boolean setCreated(Long created) {
-        this.created = created;
-        return false;
-    }
-
-    @Override
-    public Float getPriority() {
-        return priority;
-    }
-
-    @Override
-    public boolean setPriority(Float priority) {
-        this.priority = priority;
-        return false;
     }
 
     @Override
@@ -84,9 +65,8 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public boolean setSource(String source) {
+    public void setSource(String source) {
         this.source = source;
-        return false;
     }
 
     @Override
@@ -95,9 +75,18 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public boolean setShortcut(String shortcut) {
+    public void setShortcut(String shortcut) {
         this.shortcut = shortcut;
-        return false;
+    }
+
+    @Override
+    public TreeNode<Link> getContent() {
+        return content;
+    }
+
+    @Override
+    public void setContent(TreeNode<Link> tree) {
+        content = tree;
     }
 
     @Override
@@ -106,29 +95,40 @@ public class PageDTO implements Page {
     }
 
     @Override
-    public boolean setWeight(Float weight) {
+    public void setWeight(Float weight) {
         this.weight = weight;
-        return false;
     }
 
     @Override
-    public Topic getPrimaryTopic() {
-        return null == topicTree ? null : topicTree.getKey().getTarget();
+    public Float getPriority() {
+        return priority;
     }
 
     @Override
-    public boolean setPrimaryTopic(Topic topic) {
-        throw new IllegalArgumentException();
+    public void setPriority(Float priority) {
+        this.priority = priority;
     }
 
     @Override
-    public KeyValueTree<Link, EntityList<Link>> getContent() {
-        return topicTree;
+    public Long getCreated() {
+        return created;
     }
 
     @Override
-    public boolean setContent(KeyValueTree<Link, EntityList<Link>> tree) {
-        topicTree = tree;
-        return false;
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public static Page createTransitional() {
+        Page page = new PageDTO();
+        Link link = new LinkDTO();
+        Topic topic = new TopicDTO();
+        topic.setId(TRANSITIONAL_ID);
+        link.setTarget(topic);
+        link.setLabel(TRANSITIONAL_TITLE);
+        TreeNode<Link> content = new TreeNodeDTO<>();
+        content.setValue(link);
+        page.setContent(content);
+        return page;
     }
 }

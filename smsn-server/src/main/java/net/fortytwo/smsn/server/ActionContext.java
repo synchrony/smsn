@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
+import net.fortytwo.smsn.brain.query.TreeViews;
 
 import java.util.Map;
 
@@ -59,19 +59,19 @@ public class ActionContext {
         this.jsonPrinter = jsonPrinter;
     }
 
-    public WikiParser getWikiParser() {
-        return wikiParser;
-    }
-
-    public void setWikiParser(WikiParser wikiParser) {
-        this.wikiParser = wikiParser;
-    }
-
     public JsonParser getJsonParser() {
         return jsonParser;
     }
 
     public void setJsonParser(JsonParser jsonParser) {
         this.jsonParser = jsonParser;
+    }
+
+    public WikiParser getWikiParser() {
+        return wikiParser;
+    }
+
+    public void setWikiParser(WikiParser wikiParser) {
+        this.wikiParser = wikiParser;
     }
 }

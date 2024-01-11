@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.GenericCollection;
@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-public class Document extends AtomClass {
+public class Document extends NoteClass {
     private static final Logger logger = Logger.getLogger(Document.class.getName());
     private static final ISBNValidator isbnValidator = new ISBNValidator();
 
@@ -33,38 +33,38 @@ public class Document extends AtomClass {
                 DOCUMENT,
                 Pattern.compile("[A-Z].+"),
                 null,
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new NickHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new PageHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(new NickHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AKAReference.class),
+                        new NoteReqex.El(new PageHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, WebPage.class),
 
-                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+                        new NoteReqex.El(new DocumentsAboutTopicHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
 
                         // multiple RFID tags on an object are possible, though they may be uncommon
-                        new AtomRegex.El(2, new RFIDHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, RFIDReference.class),
+                        new NoteReqex.El(2, new RFIDHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, RFIDReference.class),
 
-                        new AtomRegex.El(2, null, // TODO: do something with BibTeX references
-                                AtomRegex.Modifier.ZeroOrOne, BibtexReference.class),
-                        new AtomRegex.El(2, new BibtexEntryHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, BibtexEntry.class),
-                        new AtomRegex.El(2, new ISBNHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, ISBNReference.class),
+                        new NoteReqex.El(2, null, // TODO: do something with BibTeX references
+                                NoteReqex.Modifier.ZeroOrOne, BibtexReference.class),
+                        new NoteReqex.El(2, new BibtexEntryHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, BibtexEntry.class),
+                        new NoteReqex.El(2, new ISBNHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, ISBNReference.class),
 
                         // note: without a collection, only the first author is recognized.
                         // Otherwise, we run the risk of incorrectly classifying publishers (which often
                         // follow authors) as people.
-                        new AtomRegex.El(new MakerHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AuthorCollection.class, Person.class),
+                        new NoteReqex.El(new MakerHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AuthorCollection.class, Person.class),
 
-                        new AtomRegex.El(new TopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, TopicCollection.class),
-                        new AtomRegex.El(new NoteHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, NoteCollection.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(new TopicHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, TopicCollection.class),
+                        new NoteReqex.El(new NoteHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, NoteCollection.class),
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 
@@ -74,22 +74,22 @@ public class Document extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
         // TODO: a more specific type than foaf:Document may be appropriate (WebPage also uses foaf:Document)
         IRI self = handleTypeAndAlias(a, context, FOAF.DOCUMENT);
 
-        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getTitle())));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(Note.getTitle(a))));
 
         return self;
     }
 
     private static class ISBNHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            String value = object.getTitle();
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
+            String value = Note.getTitle(object);
             IRI predicate;
 
             int i = value.indexOf(':');
@@ -127,8 +127,8 @@ public class Document extends AtomClass {
     private static class BibtexEntryHandler implements FieldHandler {
         // TODO: we no longer use this inline format
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
-            String entry = object.getTitle().trim();
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
+            String entry = Note.getTitle(object).trim();
 
             ValueFactory vf = context.getValueFactory();
             context.getHandler().handleStatement(vf.createStatement(
@@ -138,7 +138,7 @@ public class Document extends AtomClass {
 
     private static class MakerHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -149,7 +149,7 @@ public class Document extends AtomClass {
 
     private static class TopicHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -162,7 +162,7 @@ public class Document extends AtomClass {
 
     private static class NoteHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             // TODO
         }
     }

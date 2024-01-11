@@ -1,0 +1,154 @@
+```{r, error=FALSE}
+require.entities()
+```
+
+## @title property
+
+```{r}
+titles <- as.character(entities$title)
+title.length <- as.vector(sapply(titles, nchar))
+```
+
+SmSn's `@title` property provides a label for each entity in the graph; entities are seen and understood on the basis of their titles.
+
+### Empty titles
+
+```{r}
+total.empty.titles <- length(title.length[title.length == 0])
+rel.empty.titles <- total.empty.titles / total.entities
+
+nonempty.titles <- titles[title.length > 0]
+nonempty.title.length <- title.length[title.length > 0]
+```
+
+While entities without titles are valid in some contexts, they are invalid in others; in the user interface, an entity without a title is not useful.
+The current graph contains `r num(total.empty.titles)` entities `r perc.of.entities(total.empty.titles)` without titles.
+
+### Duplicate titles
+
+```{r}
+t.titles <- as.data.frame(table(nonempty.titles))
+
+df <- t.titles[t.titles$Freq > 1,]
+df <- df[with(df, order(-Freq)),]
+dup.titles <- data.frame(title=df$nonempty.titles, count=df$Freq)
+
+total.duplicate.titles <- nrow(dup.titles)
+```
+
+While duplicate titles (e.g. two entities, both with the title "Arthur Dent") are allowed, they are to be discouraged, as they are often a sign of unnecessary data duplication, or misalignment of data sources.
+In the current graph, there are **`r num(total.duplicate.titles)` distinct duplicate titles**, as shown in the table below.
+
+```{r}
+showTable(dup.titles, list(searching=FALSE, pageLength=5))
+```
+
+### Title length
+
+```{r}
+len <- nonempty.title.length
+mean.title.length <- mean(len)
+sd.title.length <- sd(len)
+
+loglen = log(len)
+m <- mean(loglen)
+s <- sd(loglen)
+loglen.norm <- rnorm(length(loglen), mean=m, sd=s)
+loglen.mode <- exp(m-s^2)
+```
+
+When titles are used to name things, shorter titles are better; they are easier to recognize and search on.
+However, titles are also used to capture free-form text of any kind, so there is no hard limit to the length of a title.
+The distribution of lengths for non-empty titles in the current graph is shown below.
+
+```{r}
+renderPlot({
+  plot(density(len, from=0, to=200),
+    main="title length distribution", xlab="length (characters)", ylab="kernel density")
+  lines(col="gray", density(exp(loglen.norm), from=0, to=200))
+  abline(col="blue", v=mean.title.length)
+  abline(col="red", v=loglen.mode)
+})
+```
+
+The **mean length** of a non-empty title is **`r num(mean.title.length)` characters** (&sigma;=`r num(sd.title.length)`), indicated with a <span style="color:blue">blue line</span> in the plot above.
+A better metric is the **most likely length**, **`r num(loglen.mode)` characters**, indicated with a <span style="color:red">red line</span>. This number is the *mode* of a [log-normal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution) of lengths (<span style="color:gray">gray line</span>).
+
+Alternative distributions with a resemblance to observed data include the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) and the [gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution), but neither has been found to fit as well. See the code comments for additional analysis.
+
+<!--
+#########################################
+# try to fit the data with a log-normal distribution
+
+# the log certainly *looks* normally-distributed
+plot(density(loglen))
+
+# estimate goodness-of-fit of log-normal distribution
+# It's definitely not a perfect fit.
+z <- (loglen - mean(loglen)) / sd(loglen)
+qqnorm(z)
+abline(0,1)
+
+# Compare log-distributions visually
+# They're pretty close, but the actual distro is "skinnier, and skews to the left"
+loglen.norm <- rnorm(length(loglen), mean=mean(loglen), sd=sd(loglen))
+plot(density(loglen))
+lines(density(loglen.norm), col="red")
+
+# Compare the distributions visually
+plot(density(len, from=0, to=200))
+lines(density(exp(loglen.norm), from=0, to=200), col="red")
+
+mean(loglen)/mean(loglen.norm)
+sd(loglen)/sd(loglen.norm)
+
+# Show the difference between actual and predicted distributions
+min <- 0
+max <- 200
+d.len <- density(len, from=min, to=max)
+d.len.norm <- density(exp(loglen.norm), from=min, to=max)
+diff <- d.len$y - d.len.norm$y
+plot(diff, x=d.len$x, type="l")
+abline(h=0)
+
+# roots
+f <- approxfun(d.len$x, diff)
+# 7.547115, 
+root1 <- uniroot(f, interval=c(0,15))
+# 46.8836
+root2 <- uniroot(f, interval=c(15,80))
+
+df <- data.frame(d.len.norm$x, d.len.norm$y)
+df.diff <- data.frame(d.len$x, diff)
+# -0.1707804
+sum(subset(df.diff, d.len.x <= root1)$diff)/sum(subset(df, d.len.norm.x <= root1)$d.len.norm.y)
+# 0.09355527
+sum(subset(df.diff, d.len.x > root1 & d.len.x <= root2)$diff)/sum(subset(df, d.len.norm.x > root1 & d.len.norm.x <= root2)$d.len.norm.y)
+# -0.0214103
+sum(subset(df.diff, d.len.x > root2)$diff)/sum(subset(df, d.len.norm.x > root2)$d.len.norm.y)
+
+#########################################
+# Try to fit with a Poisson distribution
+
+# Poisson distribution can be ruled out. This should be equal to 1 otherwise.
+mean(len)/(sd(len) ^ 2)
+
+#########################################
+# Just for fun, try to fit the data with a gamma distribution
+
+theta <- function(gamma.dist) { (sd(gamma.dist) ^ 2) / mean(gamma.dist)}
+alpha <- function(gamma.dist) { mean(gamma.dist) / theta(gamma.dist)}
+len.gamma <- rgamma(length(len), shape=alpha(len), scale=theta(len))
+
+# verify that the mean and variance of the distributions are very close...
+mean(len)/mean(len.gamma)
+sd(len)/sd(len.gamma)
+
+# yet the curves are quite different
+plot(density(len, from=0, to=200))
+lines(density(len.gamma, from=0, to=200), col="blue")
+
+# log of len.gamma is very different, as well.
+# It looks nothing like a normal distribution
+plot(density(log(len.gamma)))
+-->

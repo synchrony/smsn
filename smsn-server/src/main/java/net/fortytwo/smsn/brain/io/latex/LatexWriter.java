@@ -1,22 +1,22 @@
 package net.fortytwo.smsn.brain.io.latex;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class LatexWriter extends BrainWriter {
+public class LatexWriter extends NoteWriter {
 
     private static final int MAX_LATEX_RECURSE_LEVELS = 16;
 
@@ -33,20 +33,20 @@ public class LatexWriter extends BrainWriter {
     }
 
     @Override
-    public void doExport(Context context) throws IOException {
-        String rootId = context.getRootId();
+    public void doWrite(Context context) throws IOException {
+        AtomId rootId = context.getRootId();
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
 
-        Optional<Atom> opt = context.getTopicGraph().getAtomById(rootId);
+        Optional<Note> opt = context.getTopicGraph().getNoteById(rootId);
         if (!opt.isPresent()) {
-            throw new IllegalStateException("no such atom: " + rootId);
+            throw new IllegalStateException("no such note: " + rootId);
         }
 
         writeLatex(opt.get(), filter, 0, 0, context.getDestStream());
     }
 
-    private void writeLatex(final Atom root,
+    private void writeLatex(final Note root,
                             final Filter filter,
                             final int level,
                             final int sectionLevel,
@@ -62,7 +62,7 @@ public class LatexWriter extends BrainWriter {
         }
 
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = root.getTitle().trim();
+        String value = Note.getTitle(root).trim();
 
         for (Serializer serializer : serializers) {
             if (serializer.matches(value)) {
@@ -73,7 +73,7 @@ public class LatexWriter extends BrainWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Atom child : ViewStyle.Basic.Forward.getStyle().getLinked(root, filter)) {
+                    for (Note child : ViewStyle.Basic.Forward.getStyle().getLinked(root, filter)) {
                         writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }
@@ -99,7 +99,6 @@ public class LatexWriter extends BrainWriter {
         public int getSectionLevel() {
             return sectionLevel;
         }
-
     }
 
     private static class SerializerOut {

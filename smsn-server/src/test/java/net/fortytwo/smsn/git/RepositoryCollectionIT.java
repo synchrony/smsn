@@ -1,8 +1,9 @@
 package net.fortytwo.smsn.git;
 
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Test;
 
@@ -12,8 +13,8 @@ import java.io.IOException;
 public class RepositoryCollectionIT extends BrainTestBase {
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 
     @Test
@@ -23,7 +24,7 @@ public class RepositoryCollectionIT extends BrainTestBase {
         limits.setMaxFilesPerDiff(10);
 
         RepositoryCollection repo = new RepositoryCollection(brain, new File("/Users/josh/data/smsn/brains/git-smsn"));
-        Note history = repo.getHistory(limits);
+        TreeNode<Link> history = repo.getHistory(limits);
 
         System.out.println("history: " + history);
     }

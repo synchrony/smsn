@@ -2,26 +2,22 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
-import javax.validation.constraints.NotNull;
-
 /**
- * A service for setting the properties of an atom
+ * A service for setting the properties of a note
  */
 public class SetProperties extends FilteredAction {
 
-    @NotNull
-    private String id;
-    @NotNull
+    private AtomId id;
     private String name;
-    @NotNull
     private Object value;
 
-    private String getId() {
+    private AtomId getId() {
         return notNull(id);
     }
 
@@ -33,7 +29,7 @@ public class SetProperties extends FilteredAction {
         return notNull(value);
     }
 
-    public void setId(String id) {
+    public void setId(AtomId id) {
         this.id = id;
     }
 
@@ -78,7 +74,7 @@ public class SetProperties extends FilteredAction {
 
     private void validateWeight() {
         float f = toFloat(getValue());
-        // Note: weight may not currently be set to 0, which would cause the atom to disappear from all normal views
+        // Note: weight may not currently be set to 0, which would cause the note to disappear from all normal views
         if (f <= 0 || f > 1.0) {
             throw new BadRequestException("weight is outside of range (0, 1]: " + f);
         }
@@ -114,35 +110,35 @@ public class SetProperties extends FilteredAction {
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         validateKeyValue();
 
-        Atom root = getRoot(getId(), context);
+        Note root = getRoot(getId(), context);
         setFilterParams(context);
         Object value = getValue();
 
         switch (getName()) {
             case SemanticSynchrony.PropertyKeys.TITLE:
-                root.setTitle((String) value);
+                Note.setTitle(root, (String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.TEXT:
-                root.setText(trimPage((String) value));
+                Note.setText(root, trimPage((String) value));
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
-                root.setWeight(toFloat(value));
+                Note.setWeight(root, toFloat(value));
                 break;
             case SemanticSynchrony.PropertyKeys.SOURCE:
-                root.setSource((String) value);
+                Note.setSource(root, (String) value);
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
-                root.setPriority(toFloat(value));
+                Note.setPriority(root, toFloat(value));
                 context.getBrain().getPriorities().updatePriority(root);
                 break;
             case SemanticSynchrony.PropertyKeys.SHORTCUT:
-                // first remove this shortcut from any atom(s) currently holding it; shortcuts are inverse functional
+                // first remove this shortcut from any note(s) currently holding it; shortcuts are inverse functional
                 String shortcut = (String) value;
-                for (Atom a : context.getBrain().getTopicGraph().getAtomsByShortcut(shortcut, getFilter())) {
-                    a.setShortcut(null);
+                for (Note a : context.getBrain().getTopicGraph().getNotesByShortcut(shortcut, getFilter())) {
+                    Note.setShortcut(a, null);
                 }
 
-                root.setShortcut(shortcut);
+                Note.setShortcut(root, shortcut);
                 break;
             default:
                 throw new IllegalStateException();
@@ -150,7 +146,7 @@ public class SetProperties extends FilteredAction {
 
         context.getBrain().getTopicGraph().notifyOfUpdate();
 
-        context.getMap().put("key", context.getBrain().getTopicGraph().idOfAtom(root));
+        context.getMap().put("key", context.getBrain().getTopicGraph().idOf(root));
         context.getMap().put("name", getName());
         context.getMap().put("value", value.toString());
 

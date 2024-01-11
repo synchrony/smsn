@@ -1,0 +1,8 @@
+dependencies {
+  implementation project(':smsn-devices')
+  implementation project(':smsn-services')
+  implementation project(':brain')
+  implementation 'com.illposed.osc:javaosc-core:0.3'
+
+  testImplementation "junit:junit:$junitVersion"
+}

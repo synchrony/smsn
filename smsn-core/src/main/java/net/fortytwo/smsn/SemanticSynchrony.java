@@ -1,5 +1,6 @@
 package net.fortytwo.smsn;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.config.Configuration;
 import net.fortytwo.smsn.config.DataSource;
 import org.yaml.snakeyaml.Yaml;
@@ -19,7 +20,7 @@ public class SemanticSynchrony {
 
     public interface VertexLabels {
         String
-                ATOM = "atom",
+                NOTE = "note",
                 LIST = "list",
                 LINK = "link",
                 PAGE = "page",
@@ -30,10 +31,9 @@ public class SemanticSynchrony {
     public interface EdgeLabels {
         String
                 CHILDREN = "children",
-                CONTEXT = "context",
                 FIRST = "first",
-                KEY = "key",
                 NOTES = "notes",
+                PAGE = "page",
                 REST = "rest",
                 TARGET = "target",
                 TOPIC = "topic",
@@ -46,23 +46,26 @@ public class SemanticSynchrony {
                 ACRONYM = "acronym",
                 ALIAS = "alias",
                 CREATED = "created",
-                FORMAT = "format",
-                ID_V = "idV",
+                ID = "idV",
                 LABEL = "label",
                 PRIORITY = "priority",
+                ROLE = "role",
                 SHORTCUT = "shortcut",
                 SOURCE = "source",
                 TEXT = "text",
                 TITLE = "title",
                 WEIGHT = "weight";
+
+        String[] allPropertyKeys = {
+                ACRONYM, ALIAS, CREATED, ID, LABEL, PRIORITY, ROLE, SHORTCUT, SOURCE, TEXT, TITLE, WEIGHT};
     }
 
     public static final float DEFAULT_WEIGHT = 0.5f;
     public static final float DEFAULT_PRIORITY = 0f;
 
-    public static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
+    private static final Pattern ID_PATTERN = Pattern.compile("[a-zA-Z0-9-_]{7,}");
 
-    private static final int ID_DIGITS = 16;
+    public static final int ID_DIGITS = 16;
 
     private static final byte[] HEX_CHARS = "0123456789ABCDEF".getBytes();
 
@@ -77,8 +80,7 @@ public class SemanticSynchrony {
     public static final String UTF8 = "UTF-8";
 
     public static final int
-            GESTURE_TTL = 1, // we consider gestural events to be valid only for 1 second (the minimum TTL)
-            ATTENTION_TTL = 5; // we consider attention to be valid for several seconds
+            GESTURE_TTL = 1; // we consider gestural events to be valid only for 1 second (the minimum TTL)
 
     private static Configuration configuration;
     private static Map<String, DataSource> dataSourcesByName;
@@ -99,6 +101,10 @@ public class SemanticSynchrony {
 
     public static Logger getLogger(final Class c) {
         return Logger.getLogger(c.getName());
+    }
+
+    public static boolean isValidId(final String id) {
+        return ID_PATTERN.matcher(id).matches();
     }
 
     public static DataSource getDataSourceByName(final String name) {
@@ -123,6 +129,10 @@ public class SemanticSynchrony {
 
     public static Configuration getConfiguration() {
         return configuration;
+    }
+
+    public static void setConfiguration(final Configuration config) {
+        configuration = config;
     }
 
     private static void loadLoggingConfiguration() throws IOException {
@@ -162,13 +172,14 @@ public class SemanticSynchrony {
 
     /**
      * Creates a pseudo-random Base62 SmSn key.
-     * These keys are typically used as ids of atoms and list elements in Extend-o-Brain.
+     * These keys are typically used as ids of notes and list elements in Extend-o-Brain.
      *
      * @return a new pseudo-random key
      */
-    public static String migrateId(final String original) {
+    public static AtomId migrateId(final AtomId original) {
         if (null != original) {
-            random.setSeed(original.length() + original.hashCode());
+            String originalStr = original.value;
+            random.setSeed(originalStr.length() + originalStr.hashCode());
         }
 
         byte[] bytes = new byte[ID_DIGITS];
@@ -182,10 +193,10 @@ public class SemanticSynchrony {
             bytes[i] = (byte) b;
         }
 
-        return new String(bytes);
+        return new AtomId(new String(bytes));
     }
 
-    public static String createRandomId() {
+    public static AtomId createRandomId() {
         return migrateId(null);
     }
 

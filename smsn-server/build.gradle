@@ -1,0 +1,42 @@
+plugins {
+  id 'com.github.johnrengelman.shadow' version '8.1.1'
+  id 'java'
+}
+
+dependencies {
+  implementation project(':brain')
+  implementation project(':smsn-core')
+  implementation project(':smsn-models')
+  implementation project(':smsn-rdf')
+  implementation project(':smsn-services')
+
+  implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
+  implementation group: 'org.apache.tinkerpop', name: 'gremlin-server', version: tinkerpopVersion
+  implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.8.0.201705170830-rc1'
+  implementation 'org.json:json:20180130'
+  implementation 'commons-io:commons-io:2.11.0'
+
+  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
+    exclude(module: 'jackson-core')
+    exclude(module: 'xmpp-mtp')
+    exclude(module: 'sesame-repository-sparql')
+    exclude(module: 'commons-codec')
+    exclude(module: 'jackson-core')
+  }
+
+  implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4'
+  implementation group: 'org.openrdf.sesame', name: 'sesame-rio-api', version: sesameVersion
+  implementation 'com.illposed.osc:javaosc-core:0.3'
+  implementation(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: sesameVersion)
+  implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
+  implementation group: 'net.fortytwo', name: 'linked-data-sail', version: rippleVersion
+  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
+
+  testImplementation "junit:junit:$junitVersion"
+  testImplementation project(path: ':brain', configuration: 'testOutput')
+}
+
+shadowJar {
+  minimize()
+  mergeServiceFiles()
+}

@@ -1,17 +1,16 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 abstract class FilteredAction extends Action {
-    @NotNull
     private Filter filter = Filter.noFilter();
 
     public Filter getFilter() {
@@ -22,13 +21,13 @@ abstract class FilteredAction extends Action {
         this.filter = filter;
     }
 
-    protected Atom getRoot(String rootId, final ActionContext context) {
-        Atom root;
-        if (rootId.equals(CREATE_NEW_ATOM)) {
+    protected Note getRoot(AtomId rootId, final ActionContext context) {
+        Note root;
+        if (rootId.equals(CREATE_NEW_NOTE)) {
             root = createNewRoot(context);
-            rootId = root.getId();
+            rootId = Note.getId(root);
         } else {
-            Optional<Atom> opt = context.getBrain().getTopicGraph().getAtomById(rootId);
+            Optional<Note> opt = context.getBrain().getTopicGraph().getNoteById(rootId);
             if (opt.isPresent()) {
                 root = opt.get();
             } else {
@@ -40,10 +39,10 @@ abstract class FilteredAction extends Action {
             throw new BadRequestException("root of view is not visible: " + rootId);
         }
 
-        context.getMap().put(Params.ROOT, root.getId());
+        context.getMap().put(Params.ROOT, Note.getId(root));
 
-        setTitle(context, null == root.getTitle() || 0 == root.getTitle().length()
-                ? "[no title]" : root.getTitle());
+        setTitle(context, null == Note.getTitle(root) || 0 == Note.getTitle(root).length()
+                ? "[no title]" : Note.getTitle(root));
 
         return root;
     }
@@ -55,9 +54,9 @@ abstract class FilteredAction extends Action {
         context.getMap().put(Params.MIN_WEIGHT, filter.getMinWeight());
     }
 
-    private Atom createNewRoot(final ActionContext context) {
-        Atom root = context.getBrain().getTopicGraph().createAtomWithProperties(getFilter(), null);
-        root.setTitle("life, the universe, and everything");
+    private Note createNewRoot(final ActionContext context) {
+        Note root = context.getBrain().getTopicGraph().createNoteWithProperties(getFilter(), null);
+        Note.setTitle(root, "life, the universe, and everything");
         return root;
     }
 }

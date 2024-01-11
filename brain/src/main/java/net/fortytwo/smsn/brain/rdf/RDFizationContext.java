@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
@@ -25,7 +25,7 @@ public class RDFizationContext {
         return topicGraph;
     }
 
-    public void setSubject(Atom subject) {
+    public void setSubject(Note subject) {
         this.subjectUri = iriOf(subject);
     }
 
@@ -41,7 +41,7 @@ public class RDFizationContext {
         return handler;
     }
 
-    public IRI iriOf(final Atom a) {
-        return valueFactory.createIRI(topicGraph.iriOfAtom(a));
+    public IRI iriOf(final Note a) {
+        return valueFactory.createIRI(topicGraph.iriOf(a));
     }
 }

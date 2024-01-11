@@ -1,6 +1,0 @@
-net.fortytwo.smsn.brain.io.edges.EdgeWriter
-net.fortytwo.smsn.brain.io.graphml.GraphMLWriter
-net.fortytwo.smsn.brain.io.latex.LatexWriter
-net.fortytwo.smsn.brain.io.rdf.RDFWriter
-net.fortytwo.smsn.brain.io.vcs.VCSWriter
-net.fortytwo.smsn.brain.io.vertices.VertexWriter

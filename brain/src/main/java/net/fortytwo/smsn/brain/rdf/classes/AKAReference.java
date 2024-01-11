@@ -1,10 +1,10 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.rdf.SimpleAtomClass;
+import net.fortytwo.smsn.brain.rdf.SimpleNoteClass;
 
 import java.util.regex.Pattern;
 
-public class AKAReference extends SimpleAtomClass {
+public class AKAReference extends SimpleNoteClass {
 
     public AKAReference() {
         super(

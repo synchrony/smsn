@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -14,9 +15,9 @@ public class FindRoots extends BasicViewAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
-        Note n = context.getQueries().findRootAtoms(getFilter(), style, height - 1);
+        TreeNode<Link> tree = context.getQueries().findRootNotes(getFilter(), style, height - 1);
         try {
-            addView(n, context);
+            addView(tree, context);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

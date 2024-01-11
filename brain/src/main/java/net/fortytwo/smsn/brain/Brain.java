@@ -11,7 +11,7 @@ import java.io.IOException;
 public class Brain {
 
     /**
-     * A configuration property indicating a special atom to which notes may be prepended
+     * A configuration property indicating a special note to which notes may be prepended
      * in a stream-of-consciousness style
      */
     public static final String PROP_BRAINSTREAM = "net.fortytwo.smsn.brain.brainStream";

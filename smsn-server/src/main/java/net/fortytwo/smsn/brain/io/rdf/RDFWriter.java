@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.rdf;
 
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class RDFWriter extends BrainWriter {
+public class RDFWriter extends NoteWriter {
 
     private static final List<Format> formats;
     private static final Map<Format, RDFFormat> rdfFormats;
@@ -39,7 +39,7 @@ public class RDFWriter extends BrainWriter {
     }
 
     @Override
-    public void doExport(Context context) throws IOException {
+    public void doWrite(Context context) throws IOException {
 
         RDFFormat rdfFormat = toRDFFormat(context.getFormat());
 

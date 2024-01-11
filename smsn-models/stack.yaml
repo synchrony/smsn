@@ -1,0 +1,8 @@
+resolver: lts-20.1
+
+packages:
+  - .
+
+# TODO: restore me after switching back to named releases and removing the submodule
+#extra-deps:
+#  - hydra-0.1.1

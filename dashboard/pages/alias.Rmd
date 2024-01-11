@@ -1,0 +1,105 @@
+```{r, error=FALSE}
+require.entities()
+```
+
+## @alias property
+
+```{r}
+aliases <- sapply(as.vector(entities$alias), as.character)
+alias.lengths <- sapply(aliases, nchar)
+alias.entities <- entities[alias.lengths > 0,]
+unique.aliases <- unique(alias.entities$alias)
+total.alias.entities <- nrow(alias.entities)
+```
+
+The `@alias` property provides an external identity for an entity, such as a [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). For example, the entity representing Saturn might given an alias of `https://en.wikipedia.org/wiki/Saturn`, linking it with the Wikipedia page for the planet Saturn.
+
+In the current data set, there are **`r num(total.alias.entities)` entities** `r perc.of.entities(nrow(alias.entities))` with a non-empty alias.
+
+### Duplicate aliases
+
+```{r}
+df <- data.frame(alias=subset(data.frame(entities, d=duplicated(entities$alias), l=nchar(as.vector(entities$alias))), l > 0 & d == TRUE)$alias)
+dup.alias.entities <- merge(df, entities, by="alias")
+count.dupes <- nrow(dup.alias.entities)
+```
+
+Duplicate alias values are to be avoided; in most cases, two entities which share an alias should be the same entity (i.e. should also have the same id).
+In the current graph, there are **`r num(count.dupes)` entities** `r perc.of.entities(count.dupes)` with non-unique aliases, sharing a total of **`r num(length(unique(dup.alias.entities$alias)))`** aliases overall.
+
+### Alias domains
+
+```{r}
+library(urltools)
+
+is.http.uri <- function(s) {substr(s, 1, 4) == "http"}
+uris <- unique.aliases[sapply(unique.aliases, is.http.uri)]
+domains <- sapply(uris, domain)
+```
+
+`@alias` values are not necessarily HTTP URIs, but many of them are; aliases are often used as bookmarks, linking to resources on the Web. Below are the domains of HTTP or HTTPS URI aliases in the current graph, ranked by frequency.
+
+```{r}
+showFreqTable(domains, FALSE)
+```
+
+<!--
+#########################################
+# distance from DBpedia-linked atoms
+
+v <- read.table(file("/tmp/joshkb-vertices.tsv"), header=TRUE, sep="\t", quote="", comment.char="")
+e <- read.table(file("/tmp/joshkb-edges.tsv"), header=TRUE)
+d <- subset(v, substr(alias, 1, 28) == "http://dbpedia.org/resource/")
+
+did <- d$id
+
+merge.dbpedia.ids <- function(id) {
+    if (id %in% did) "DBPEDIA" else id
+}
+
+# note: this takes much longer without as.vector
+e.merged <- data.frame(
+    from=sapply(as.vector(e$from), merge.dbpedia.ids),
+    to=sapply(as.vector(e$to), merge.dbpedia.ids))
+
+from <- sapply(e$from, merge.dbpedia.ids)
+
+library(igraph)
+
+g <- graph.data.frame(e.merged)
+
+# confirm that this is the "DBPEDIA" vertex
+V(g)[1]
+
+vs <- as.vector(c(1))
+sp <- shortest.paths(g, v=vs)
+
+df <- data.frame(len=as.vector(sp-1))
+df <- subset(df, len >= 0)
+
+t <- table(df$len)
+display <- c(nrow(d), t[2:length(t)])
+pdf("/tmp/steps-from-dbpedia-atoms.pdf", width=5, height=2)
+par(mar=c(2,5,2,1.5))
+barplot(display, ylab="total atoms")
+dev.off()
+
+# TODO: is.inf?
+df2 <- subset(df, len <= 100)
+t2 <- table(df2)
+totals <- c(nrow(d), t2[2:length(t2)])
+[0:(length(totals)+1)]*totals
+
+# hmm, why are we missing 14% of vertices?
+sum(totals)/nrow(v)
+
+# anyway, we'll call it 2.35 steps on average
+s <- sum((0:(length(totals)-1))*totals)
+s / sum(totals)
+
+# TODO: is.inf?
+mean(subset(df, len <= 100)$len)
+-->
+
+
+

@@ -1,0 +1,18 @@
+dependencies {
+  implementation project(':smsn-core')
+  implementation project(':smsn-rdf')
+  implementation 'org.json:json:20180130'
+  implementation group: 'org.openrdf.sesame', name: 'sesame-rio-api', version: sesameVersion
+  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
+  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
+    exclude(module: 'jackson-core')
+    exclude(module: 'xmpp-mtp')
+    exclude(module: 'sesame-repository-sparql')
+    exclude(module: 'commons-codec')
+    exclude(module: 'jackson-core')
+  }
+  implementation 'com.illposed.osc:javaosc-core:0.3'
+  implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4'
+
+  testImplementation "junit:junit:$junitVersion"
+}

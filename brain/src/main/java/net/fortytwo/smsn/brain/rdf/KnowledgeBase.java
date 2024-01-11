@@ -2,10 +2,11 @@ package net.fortytwo.smsn.brain.rdf;
 
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.rdf.classes.*;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
 import net.fortytwo.smsn.brain.rdf.classes.collections.*;
@@ -26,21 +27,21 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * An inference layer for an Extend-o-Brain graph, supporting automatic classification of atoms and exporting to RDF
+ * An inference layer for an Extend-o-Brain graph, supporting automatic classification of notes and exporting to RDF
  */
 public class KnowledgeBase {
 
     private final TopicGraph topicGraph;
 
-    private final Map<Class<? extends AtomClass>, AtomClass> classes;
+    private final Map<Class<? extends NoteClass>, NoteClass> classes;
 
-    private final Map<Atom, List<AtomClassEntry>> atomClassifications;
+    private final Map<Note, List<NoteClassEntry>> noteClassifications;
 
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     public KnowledgeBase(final TopicGraph topicGraph) {
         this.topicGraph = topicGraph;
-        this.atomClassifications = new HashMap<>();
+        this.noteClassifications = new HashMap<>();
         this.classes = new HashMap<>();
     }
 
@@ -55,27 +56,27 @@ public class KnowledgeBase {
 
     // note: graph and vocabulary are not affected by this operation
     public synchronized void reset() {
-        atomClassifications.clear();
+        noteClassifications.clear();
     }
 
     /**
-     * Gets a list of classifications of the given atom, sorted in descending order by score.
-     * If the atom has not been classified, a null is returned.
+     * Gets a list of classifications of the given note, sorted in descending order by score.
+     * If the note has not been classified, a null is returned.
      *
-     * @param a the classified atom
-     * @return either null (if the atom has not been classified)
-     * or a list of classifications of the given atom, sorted in descending order by score
+     * @param a the classified note
+     * @return either null (if the note has not been classified)
+     * or a list of classifications of the given note, sorted in descending order by score
      */
-    public List<AtomClassEntry> getClassInfo(final Atom a) {
-        List<AtomClassEntry> entries = atomClassifications.get(a);
+    public List<NoteClassEntry> getClassInfo(final Note a) {
+        List<NoteClassEntry> entries = noteClassifications.get(a);
 
         if (null == entries || 0 == entries.size()) {
             return entries;
         } else {
             // sort in descending order by total score, putting the top-ranked class first
-            List<KnowledgeBase.AtomClassEntry> helper = new java.util.LinkedList<>();
+            List<NoteClassEntry> helper = new java.util.LinkedList<>();
             helper.addAll(entries);
-            Collections.sort(helper, KnowledgeBase.AtomClassificationComparator.INSTANCE);
+            Collections.sort(helper, NoteClassificationComparator.INSTANCE);
             return helper;
         }
     }
@@ -131,8 +132,8 @@ public class KnowledgeBase {
                 //     Account, ManufacturedPart, Place, SoftwareProject
         };
 
-        for (Class<? extends AtomClass> atomClass : vocabulary) {
-            classes.put(atomClass, atomClass.newInstance());
+        for (Class<? extends NoteClass> noteClass : vocabulary) {
+            classes.put(noteClass, noteClass.newInstance());
         }
     }
 
@@ -180,26 +181,26 @@ public class KnowledgeBase {
         }).start();
     }
 
-    private void handleAllMembers(final AtomCollectionMemory memory,
-                                  final AtomClass.FieldHandler fieldHandler,
+    private void handleAllMembers(final NoteCollectionMemory memory,
+                                  final NoteClass.FieldHandler fieldHandler,
                                   final RDFizationContext context,
-                                  final Set<String> alreadyHandled,
+                                  final Set<AtomId> alreadyHandled,
                                   final Filter filter) throws RDFHandlerException {
         // avoid cycles
-        if (alreadyHandled.contains(memory.getAtomId())) {
+        if (alreadyHandled.contains(memory.getNoteId())) {
             return;
         }
-        alreadyHandled.add(memory.getAtomId());
+        alreadyHandled.add(memory.getNoteId());
 
         // only rdfize fields with a known class
-        memory.getMemberAtoms().stream().filter(a -> null == filter || filter.test(a)).forEach(a -> {
+        memory.getMemberNotes().stream().filter(a -> null == filter || filter.test(a)).forEach(a -> {
             // only rdfize fields with a known class
             if (isClassified(a)) {
                 fieldHandler.handle(a, context);
             }
         });
 
-        for (AtomCollectionMemory m : memory.getMemberCollections()) {
+        for (NoteCollectionMemory m : memory.getMemberCollections()) {
             handleAllMembers(m, fieldHandler, context, alreadyHandled, filter);
         }
     }
@@ -210,11 +211,11 @@ public class KnowledgeBase {
 
     private enum MatchResult {Unclassified, Supported, Unsupported, NoMatch}
 
-    private boolean isClassified(final List<AtomClassEntry> entries) {
+    private boolean isClassified(final List<NoteClassEntry> entries) {
         if (null == entries || 0 == entries.size()) {
             return false;
         } else {
-            for (AtomClassEntry e : entries) {
+            for (NoteClassEntry e : entries) {
                 if (e.getScore() > 0) {
                     return true;
                 }
@@ -223,40 +224,40 @@ public class KnowledgeBase {
         }
     }
 
-    private boolean isClassified(final Atom atom) {
+    private boolean isClassified(final Note note) {
         /*
-        if (atom.asVertex().getId().equals("ynyUshJ")) {
+        if (note.asVertex().getId().equals("ynyUshJ")) {
             System.out.println("break here");
         }*/
-        List<AtomClassEntry> entries = atomClassifications.get(atom);
+        List<NoteClassEntry> entries = noteClassifications.get(note);
         return isClassified(entries);
     }
 
     /*
-    Matches the children of an atom against an atom regex element (class or wildcard with quantifier)
+    Matches the children of a note against a note regex element (class or wildcard with quantifier)
      */
-    private MatchResult match(final Atom childAtom,
-                              final AtomRegex.El el,
-                              final List<AtomClassEntry> evidenceEntries,
-                              final AtomCollectionMemory memory,
+    private MatchResult match(final Note childNote,
+                              final NoteReqex.El el,
+                              final List<NoteClassEntry> evidenceEntries,
+                              final NoteCollectionMemory memory,
                               final RDFizationContext context,
                               final Collection<RdfizationCallback> callbacks,
                               final Filter filter) throws RDFHandlerException {
-        Set<Class<? extends AtomClass>> alts = el.getAlternatives();
+        Set<Class<? extends NoteClass>> alts = el.getAlternatives();
 
-        final List<AtomClassEntry> entries = atomClassifications.get(childAtom);
+        final List<NoteClassEntry> entries = noteClassifications.get(childNote);
         if (null == entries) { // unclassified
-            // The unclassified atom matches if the element has no alternatives, i.e. accepts everything.
-            // note: (as yet) unclassified atoms are only allowed to be trivial matches;
+            // The unclassified note matches if the element has no alternatives, i.e. accepts everything.
+            // note: (as yet) unclassified notes are only allowed to be trivial matches;
             // we don't attempt to rdfize them
             return 0 == alts.size() ? MatchResult.Unclassified : MatchResult.NoMatch;
         } else { // one or more classes
-            for (final AtomClassEntry entry : entries) {
+            for (final NoteClassEntry entry : entries) {
                 // note: if multiple class entries are acceptable, only the first will match, in greedy fashion.
                 // The entries are sorted in descending order such that one with the highest out-score,
                 // or self-classification, is encountered first
                 if (0 == alts.size() || alts.contains(entry.getInferredClass())) {
-                    final AtomClass atomClass = classes.get(entry.getInferredClass());
+                    final NoteClass noteClass = classes.get(entry.getInferredClass());
 
                     // only add evidence for specifically matched classes,
                     // omitting evidence if the element is scored as a wildcard.
@@ -265,23 +266,23 @@ public class KnowledgeBase {
                     }
 
                     // add an rdfization callback which will be executed if and only if the current classification is
-                    // chosen for the parent atom.  Delaying execution avoids multiple-typing of atoms,
+                    // chosen for the parent note.  Delaying execution avoids multiple-typing of notes,
                     // or the wasted effort of generating RDF statements which are not allowed in the output.
                     if (null != callbacks) {
-                        final AtomClass.FieldHandler fieldHandler = el.getFieldHandler();
+                        final NoteClass.FieldHandler fieldHandler = el.getFieldHandler();
 
                         // fieldHandler is optional
                         if (null != fieldHandler) {
                             callbacks.add(() -> {
-                                if (atomClass.isCollectionClass()) {
+                                if (noteClass.isCollectionClass()) {
                                     if (null != entry.memory) {
                                         handleAllMembers(entry.memory, fieldHandler, context,
                                                 new HashSet<>(), filter);
                                     }
-                                } else if (null == filter || filter.test(childAtom)) {
+                                } else if (null == filter || filter.test(childNote)) {
                                     // only rdfize fields with a known class
                                     if (isClassified(entries)) {
-                                        fieldHandler.handle(childAtom, context);
+                                        fieldHandler.handle(childNote, context);
                                     }
                                 }
                             });
@@ -291,12 +292,12 @@ public class KnowledgeBase {
                     // if the parent is in the process of being matched as a collection,
                     // add this member to the collection memory
                     if (null != memory) {
-                        if (atomClass.isCollectionClass()) {
+                        if (noteClass.isCollectionClass()) {
                             if (null != entry.memory) {
                                 memory.getMemberCollections().add(entry.memory);
                             }
                         } else {
-                            memory.getMemberAtoms().add(childAtom);
+                            memory.getMemberNotes().add(childNote);
                         }
                     }
 
@@ -324,33 +325,33 @@ public class KnowledgeBase {
         RDFizationContext context = new RDFizationContext(topicGraph, handler, valueFactory);
 
         // class entries are sorted in descending order based on out-score rather than total score so as to avoid
-        // feedback -- see match().  The final score for a class and atom is the sum of out-score and in-score.
+        // feedback -- see match().  The final score for a class and note is the sum of out-score and in-score.
         Comparator outScoreDescending = Collections.reverseOrder();
-        Comparator totalScoreDescending = new AtomClassificationComparator();
+        Comparator totalScoreDescending = new NoteClassificationComparator();
 
-        // classify or re-classify each atom
-        for (Atom subject : topicGraph.getAllAtoms()) {
+        // classify or re-classify each note
+        for (Note subject : topicGraph.getAllNotes()) {
             context.setSubject(subject);
 
-            String value = subject.getTitle();
-            String alias = subject.getAlias();
+            String value = Note.getTitle(subject);
+            String alias = Note.getAlias(subject);
 
-            List<AtomClassEntry> oldEntries = atomClassifications.get(subject);
-            List<AtomClassEntry> newEntries = new java.util.LinkedList<>();
+            List<NoteClassEntry> oldEntries = noteClassifications.get(subject);
+            List<NoteClassEntry> newEntries = new java.util.LinkedList<>();
 
-            for (AtomClass clazz : classes.values()) {
+            for (NoteClass clazz : classes.values()) {
                 /* DO NOT REMOVE
                 if (subject.asVertex().getId().equals("0rYY9z0") && clazz.name.equals("person")) {// && null != handler) {
                     System.out.println("break point here");
                 }//*/
 
-                List<AtomClassEntry> evidenceEntries = new java.util.LinkedList<>();
+                List<NoteClassEntry> evidenceEntries = new java.util.LinkedList<>();
 
                 Collection<RdfizationCallback> callbacks = null == handler
                         ? null : new java.util.LinkedList();
 
-                AtomCollectionMemory memory = clazz.isCollectionClass()
-                        ? new AtomCollectionMemory(subject.getId())
+                NoteCollectionMemory memory = clazz.isCollectionClass()
+                        ? new NoteCollectionMemory(Note.getId(subject))
                         : null;
 
                 if (null != clazz.valueRegex) {
@@ -365,17 +366,17 @@ public class KnowledgeBase {
                     }
                 }
 
-                // out-score is the number of ways in which the member regex of the atom matches
+                // out-score is the number of ways in which the member regex of the note matches
                 // out-score is not affected by the value or alias regex, as these are considered necessary
                 // but not sufficient for classification
                 int outScore = 0;
 
                 if (null != clazz.memberRegex) {
-                    EntityList<Atom> cur = subject.getChildren();
-                    Atom first = null;
+                    ListNode<Note> cur = subject.getChildren();
+                    Note first = null;
                     int eli = 0;
-                    AtomRegex.El el = null;
-                    AtomRegex.Modifier mod = null;
+                    NoteReqex.El el = null;
+                    NoteReqex.Modifier mod = null;
                     boolean advanceInput = true;
                     boolean advanceRegex = true;
                     boolean matched;
@@ -402,7 +403,7 @@ public class KnowledgeBase {
                         if (advanceInput) {
                             if (null == cur) {
                                 // we have exhausted the input
-                                if (AtomRegex.Modifier.One == mod || AtomRegex.Modifier.OneOrMore == mod) {
+                                if (NoteReqex.Modifier.One == mod || NoteReqex.Modifier.OneOrMore == mod) {
                                     // additional input is required by the regex; fail
                                     fail = true;
                                     break;
@@ -468,7 +469,7 @@ public class KnowledgeBase {
                                 break;
                             case OneOrMore:
                                 if (matched) {
-                                    mod = AtomRegex.Modifier.ZeroOrMore;
+                                    mod = NoteReqex.Modifier.ZeroOrMore;
                                     advanceInput = true;
                                 } else {
                                     fail = true;
@@ -482,13 +483,13 @@ public class KnowledgeBase {
                     }
                 }
 
-                // at this point, we have classified the atom
+                // at this point, we have classified the note
 
-                // update or create the atom's entry for this class.
+                // update or create the note's entry for this class.
                 // It is necessary to preserve an existing entry, if any, for the sake of the in-score
-                AtomClassEntry classEntry = null;
+                NoteClassEntry classEntry = null;
                 if (null != oldEntries) {
-                    for (AtomClassEntry e : oldEntries) {
+                    for (NoteClassEntry e : oldEntries) {
                         if (e.getInferredClass() == clazz.getClass()) {
                             e.outScore = outScore;
                             e.memory = memory;
@@ -498,33 +499,33 @@ public class KnowledgeBase {
                     }
                 }
                 if (null == classEntry) {
-                    classEntry = new AtomClassEntry(clazz.getClass(), outScore, memory);
+                    classEntry = new NoteClassEntry(clazz.getClass(), outScore, memory);
                 }
                 classEntry.callbacks = callbacks;
                 newEntries.add(classEntry);
 
-                // augment relevant in-scores of member atoms
-                for (AtomClassEntry e : evidenceEntries) {
+                // augment relevant in-scores of member notes
+                for (NoteClassEntry e : evidenceEntries) {
                     e.futureInScore += 1;
                 }
             }
 
             // remove old classification (if any) and replace with the new one (if any)
-            atomClassifications.remove(subject);
+            noteClassifications.remove(subject);
             if (newEntries.size() > 0) {
                 Collections.sort(newEntries, outScoreDescending);
-                atomClassifications.put(subject, newEntries);
+                noteClassifications.put(subject, newEntries);
             }
 
             // perform rdfization, choosing at most one classification
             if (null != handler && (null == filter || filter.test(subject))) {
                 if (newEntries.size() > 0) {
-                    List<AtomClassEntry> helper = new java.util.LinkedList<>();
+                    List<NoteClassEntry> helper = new java.util.LinkedList<>();
                     helper.addAll(newEntries);
                     Collections.sort(helper, totalScoreDescending);
-                    AtomClassEntry best = helper.get(0);
+                    NoteClassEntry best = helper.get(0);
                     if (best.isNonTrivial()) {
-                        AtomClass clazz = classes.get(best.getInferredClass());
+                        NoteClass clazz = classes.get(best.getInferredClass());
                         clazz.toRDF(subject, context);
                         best.callbacks.forEach(RdfizationCallback::execute);
                     }
@@ -533,8 +534,8 @@ public class KnowledgeBase {
         }
 
         // update all in-scores, globally, and clear future in-scores in preparation for the next iteration
-        for (List<AtomClassEntry> l : atomClassifications.values()) {
-            for (AtomClassEntry e : l) {
+        for (List<NoteClassEntry> l : noteClassifications.values()) {
+            for (NoteClassEntry e : l) {
                 e.inScore = e.futureInScore;
                 e.futureInScore = 0;
                 // also clear callbacks to free memory
@@ -542,48 +543,48 @@ public class KnowledgeBase {
             }
         }
 
-        long typed = atomClassifications.size();
-        long total = countAtoms();
+        long typed = noteClassifications.size();
+        long total = countNotes();
 
         long endTime = System.currentTimeMillis();
-        SemanticSynchrony.getLogger().info("classified " + typed + " of " + total + " atoms ("
+        SemanticSynchrony.getLogger().info("classified " + typed + " of " + total + " notes ("
                 + (total - typed) + " remaining) in " + (endTime - startTime) + "ms");
     }
 
-    private long countAtoms() {
+    private long countNotes() {
         long count = 0;
-        for (Atom a : topicGraph.getAllAtoms()) {
+        for (Note a : topicGraph.getAllNotes()) {
             count++;
         }
         return count;
     }
 
     /**
-     * Prints a representation of the class inference results for a given atom to standard output.
+     * Prints a representation of the class inference results for a given note to standard output.
      * This is a development/convenience method.
      *
-     * @param a the atom to view
+     * @param a the note to view
      */
-    public void viewInferred(final Atom a) {
+    public void viewInferred(final Note a) {
         viewInferredInternal(a, 0);
     }
 
-    private void viewInferredInternal(final Atom a,
+    private void viewInferredInternal(final Note a,
                                       int indent) {
         for (int i = 0; i < indent; i++) System.out.print("\t");
-        String value = a.getTitle();
+        String value = Note.getTitle(a);
         String value50 = null == value
                 ? "[null]"
                 : value.length() > 50
                 ? value.substring(0, 50)
                 : value;
-        System.out.println("* :" + a.getId() + ": " + value50);
-        List<AtomClassEntry> entries = atomClassifications.get(a);
+        System.out.println("* :" + Note.getId(a) + ": " + value50);
+        List<NoteClassEntry> entries = noteClassifications.get(a);
         if (null != entries) {
-            List<AtomClassEntry> helper = new java.util.LinkedList();
+            List<NoteClassEntry> helper = new java.util.LinkedList();
             helper.addAll(entries);
-            Collections.sort(helper, AtomClassificationComparator.INSTANCE);
-            for (AtomClassEntry e : helper) {
+            Collections.sort(helper, NoteClassificationComparator.INSTANCE);
+            for (NoteClassEntry e : helper) {
                 for (int i = 0; i <= indent; i++) System.out.print("\t");
                 System.out.println("@(" + e.getInferredClassName()
                         + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore() + ")");
@@ -591,9 +592,9 @@ public class KnowledgeBase {
         }
         indent++;
         if (indent < 2) {
-            EntityList<Atom> notes = a.getChildren();
+            ListNode<Note> notes = a.getChildren();
             if (null != notes) {
-                EntityList<Atom> cur = notes;
+                ListNode<Note> cur = notes;
                 while (null != cur) {
                     viewInferredInternal(cur.getFirst(), indent);
                     cur = cur.getRest();
@@ -648,10 +649,10 @@ public class KnowledgeBase {
         }
     }
 
-    private static class AtomClassificationComparator implements Comparator<KnowledgeBase.AtomClassEntry> {
-        public static final AtomClassificationComparator INSTANCE = new AtomClassificationComparator();
+    private static class NoteClassificationComparator implements Comparator<NoteClassEntry> {
+        public static final NoteClassificationComparator INSTANCE = new NoteClassificationComparator();
 
-        public int compare(KnowledgeBase.AtomClassEntry first, KnowledgeBase.AtomClassEntry second) {
+        public int compare(NoteClassEntry first, NoteClassEntry second) {
             // descending order based on total score.  Resolve a tie by lexicographical order of class names.
             int cmp = ((Integer) second.getScore()).compareTo(first.getScore());
             return 0 == cmp
@@ -696,15 +697,15 @@ public class KnowledgeBase {
         }
     }
 
-    public class AtomClassEntry implements Comparable<AtomClassEntry> {
-        private final Class<? extends AtomClass> inferredClass;
+    public class NoteClassEntry implements Comparable<NoteClassEntry> {
+        private final Class<? extends NoteClass> inferredClass;
         private int outScore;
         private int inScore;
         private int futureInScore;
-        private AtomCollectionMemory memory;
+        private NoteCollectionMemory memory;
         private Collection<RdfizationCallback> callbacks;
 
-        public AtomClassEntry(Class<? extends AtomClass> inferredClass, int outScore, AtomCollectionMemory memory) {
+        public NoteClassEntry(Class<? extends NoteClass> inferredClass, int outScore, NoteCollectionMemory memory) {
             this.inferredClass = inferredClass;
             this.outScore = outScore;
             this.memory = memory;
@@ -714,7 +715,7 @@ public class KnowledgeBase {
             futureInScore = 0;
         }
 
-        public Class<? extends AtomClass> getInferredClass() {
+        public Class<? extends NoteClass> getInferredClass() {
             return inferredClass;
         }
 
@@ -727,7 +728,7 @@ public class KnowledgeBase {
         }
 
         // compare based on out-score alone.  Used for the first stage of classification
-        public int compareTo(AtomClassEntry other) {
+        public int compareTo(NoteClassEntry other) {
             return ((Integer) outScore).compareTo(other.outScore);
         }
 

@@ -1,7 +1,14 @@
-/target
+*/build
+.gradle
 .classpath
 .project
 .settings
 .idea
 *.iml
 *~
+
+*.cabal
+
+dashboard/data
+dashboard/figure
+.Rproj.user

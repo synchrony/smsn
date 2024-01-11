@@ -1,26 +1,24 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
-
-import javax.validation.constraints.NotNull;
 
 public abstract class RootedViewAction extends BasicViewAction {
 
-    @NotNull
-    private String root;
+    private AtomId root;
 
-    private Atom rootAtom;
+    private Note rootNote;
 
-    public Atom getRoot() {
-        return notNull(rootAtom);
+    public Note getRoot() {
+        return notNull(rootNote);
     }
 
-    public void setRoot(String root) {
+    public void setRoot(String rootStr) {
         // work around for a Brain-mode quirk
-        if (null != root && root.equals("null")) root = null;
+        if (null != rootStr && rootStr.equals("null")) root = null;
 
-        this.root = root;
+        this.root = new AtomId(rootStr);
     }
 
     @Override
@@ -30,7 +28,7 @@ public abstract class RootedViewAction extends BasicViewAction {
         setFilterParams(context);
 
         if (null != root) {
-            rootAtom = getRoot(root, context);
+            rootNote = getRoot(root, context);
         }
     }
 }

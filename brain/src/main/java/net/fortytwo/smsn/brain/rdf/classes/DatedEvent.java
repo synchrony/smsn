@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
@@ -16,19 +16,19 @@ import org.openrdf.rio.RDFHandlerException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class DatedEvent extends AtomClass {
+public class DatedEvent extends NoteClass {
 
     public DatedEvent() {
         super(
                 "dated-event",
                 null,
                 null,
-                new AtomRegex(Arrays.asList(
+                new NoteReqex(Arrays.asList(
                         // event starts with a date, followed by anything or nothing
-                        new AtomRegex.El(new EventDateHandler(),
-                                AtomRegex.Modifier.One, Date.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(new EventDateHandler(),
+                                NoteReqex.Modifier.One, Date.class),
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 
@@ -38,13 +38,13 @@ public class DatedEvent extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
         IRI self = handleTypeAndAlias(a, context, net.fortytwo.smsn.rdf.vocab.Event.Event);
 
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getTitle())));
+        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(Note.getTitle(a))));
 
         return self;
     }
@@ -60,11 +60,11 @@ public class DatedEvent extends AtomClass {
 
     private static class EventDateHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             RDFHandler h = context.getHandler();
 
-            String dateStr = object.getTitle();
+            String dateStr = Note.getTitle(object);
 
             Literal dateValue = vf.createLiteral(dateStr, XMLSchema.DATE);
 

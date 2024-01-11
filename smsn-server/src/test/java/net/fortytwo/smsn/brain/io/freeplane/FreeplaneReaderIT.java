@@ -2,8 +2,8 @@ package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.BrainTestBase;
-import net.fortytwo.smsn.brain.io.BrainReader;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteReader;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.graphml.GraphMLFormat;
 import net.fortytwo.smsn.brain.io.graphml.GraphMLWriter;
@@ -22,8 +22,8 @@ public class FreeplaneReaderIT extends BrainTestBase {
     private final File mindMapFile = new File("/tmp/1.mm");
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 
     @Test
@@ -32,22 +32,22 @@ public class FreeplaneReaderIT extends BrainTestBase {
 
         Format format = Format.getFormat("fReePLAne");
         assertNotNull(format);
-        BrainReader reader = Format.getReader(format);
+        NoteReader reader = Format.getReader(format);
         assertNotNull(reader);
 
         //reader.doImport(mindMapDirectory, FreeplaneFormat.getInstance(), brain);
         reader.doImport(mindMapFile, FreeplaneFormat.getInstance(), brain);
 
-        System.out.println("# atoms: " + countAtoms());
+        System.out.println("# notes: " + countNotes());
 
-        BrainWriter exporter = new GraphMLWriter();
+        NoteWriter exporter = new GraphMLWriter();
         try (OutputStream out = new FileOutputStream(new File("/tmp/mindMap.xml"))) {
-            BrainWriter.Context context = new BrainWriter.Context();
+            NoteWriter.Context context = new NoteWriter.Context();
             context.setTopicGraph(brain.getTopicGraph());
             context.setKnowledgeBase(brain.getKnowledgeBase());
             context.setDestStream(out);
             context.setFormat(GraphMLFormat.getInstance());
-            exporter.doExport(context);
+            exporter.doWrite(context);
         }
     }
 }

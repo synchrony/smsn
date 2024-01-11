@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.model;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.config.DataSource;
 
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class Filter implements Predicate<Atom>, Serializable {
+public class Filter implements Predicate<Note>, Serializable {
 
     private static final Map<String, Integer> sourceToIndex;
 
@@ -35,8 +35,19 @@ public class Filter implements Predicate<Atom>, Serializable {
 
     private static final Filter NO_FILTER = new Filter();
 
+    private static final Filter SIMPLE_FILTER = new Filter(0f, 0.5f, 0, null);
+
     public static Filter noFilter() {
         return NO_FILTER;
+    }
+
+    public static Filter simpleFilter() {
+        return SIMPLE_FILTER;
+    }
+
+    // Default constructor is required.
+    private Filter() {
+        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
     }
 
     public float getMinWeight() {
@@ -64,9 +75,21 @@ public class Filter implements Predicate<Atom>, Serializable {
         this.defaultSource = defaultSource;
     }
 
+    public String getDefaultSource() {
+        return defaultSource;
+    }
+
+    public float getDefaultWeight() {
+        return defaultWeight;
+    }
+
+    public boolean isTrivial() {
+        return minSourceIndex == 0 && minWeight == 0;
+    }
+
     private static int indexForSource(final String source) {
         Integer index = sourceToIndex.get(source);
-        Preconditions.checkNotNull(index);
+        Preconditions.checkNotNull(index, "data source '" + source + "' does not exist");
         return index;
     }
 
@@ -79,17 +102,14 @@ public class Filter implements Predicate<Atom>, Serializable {
         checkBetweenZeroAndOne(defaultWeight);
         Preconditions.checkArgument(defaultWeight >= minWeight, "default weight greater than minimum");
 
-        Preconditions.checkNotNull(defaultSource);
-        indexForSource(defaultSource);
+        if (null != defaultSource) {
+            indexForSource(defaultSource);
+        }
 
         this.minSourceIndex = minSourceIndex;
         this.defaultSource = defaultSource;
         this.minWeight = minWeight;
         this.defaultWeight = defaultWeight;
-    }
-
-    private Filter() {
-        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
     }
 
     public Filter(final float minWeight,
@@ -103,22 +123,10 @@ public class Filter implements Predicate<Atom>, Serializable {
         Preconditions.checkArgument(value >= 0f && value <= 1f, "argument outside of range [0, 1]");
     }
 
-    public String getDefaultSource() {
-        return defaultSource;
-    }
-
-    public float getDefaultWeight() {
-        return defaultWeight;
-    }
-
-    public boolean isTrivial() {
-        return minSourceIndex == 0 && minWeight == 0;
-    }
-
     @Override
-    public boolean test(final Atom atom) {
-        Integer sourceIndex = getSourceIndexFor(atom);
-        Float weight = atom.getWeight();
+    public boolean test(final Note note) {
+        Integer sourceIndex = getSourceIndexFor(note);
+        Float weight = Note.getWeight(note);
 
         if (null == sourceIndex || null == weight) return false;
 
@@ -127,8 +135,8 @@ public class Filter implements Predicate<Atom>, Serializable {
         return sourceIndex >= minSourceIndex && weight >= minWeight;
     }
 
-    private Integer getSourceIndexFor(final Atom atom) {
-        String source = atom.getSource();
-        return null == source ? null : sourceToIndex.get(source);
+    private Integer getSourceIndexFor(final Note note) {
+        String source = Note.getSource(note);
+        return null == source ? null : indexForSource(source);
     }
 }

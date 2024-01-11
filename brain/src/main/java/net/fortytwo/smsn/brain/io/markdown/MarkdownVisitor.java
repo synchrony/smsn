@@ -1,6 +1,9 @@
 package net.fortytwo.smsn.brain.io.markdown;
 
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import org.commonmark.node.BlockQuote;
 import org.commonmark.node.BulletList;
 import org.commonmark.node.Code;
@@ -30,12 +33,12 @@ import java.util.Stack;
 
 class MarkdownVisitor implements Visitor {
 
-    private final Stack<Note> headings = new Stack<>();
+    private final Stack<TreeNode<net.fortytwo.smsn.brain.model.entities.Link>> headings = new Stack<>();
     private int currentDepth;
-    private final Note root;
+    private final TreeNode<net.fortytwo.smsn.brain.model.entities.Link> root;
     private final boolean verbose;
 
-    public Note getRoot() {
+    public TreeNode<net.fortytwo.smsn.brain.model.entities.Link> getRoot() {
         return root;
     }
 
@@ -43,7 +46,7 @@ class MarkdownVisitor implements Visitor {
         this.verbose = verbose;
 
         headings.clear();
-        root = new Note();
+        root = TreeNodeDTO.createEmptyNode();
         addHeading(root, 0);
         currentDepth = 0;
     }
@@ -55,7 +58,7 @@ class MarkdownVisitor implements Visitor {
 
     @Override
     public void visit(Heading heading) {
-        addHeading(toNote(heading), heading.getLevel());
+        addHeading(toTree(heading), heading.getLevel());
     }
 
     @Override
@@ -64,11 +67,11 @@ class MarkdownVisitor implements Visitor {
         String destination = link.getDestination();
 
         if (null != destination && 0 < destination.length() && null != (title = getLinkTitle(link))) {
-            Note note = new Note();
-            note.setId(link.getDestination());
-            note.setTitle(title);
+            TreeNode<net.fortytwo.smsn.brain.model.entities.Link> tree = TreeNodeDTO.createEmptyNode();
+            TreeViews.setId(tree, new AtomId(link.getDestination()));
+            TreeViews.setTitle(tree, title);
 
-            addNote(note);
+            addNote(tree);
         }
     }
 
@@ -167,8 +170,8 @@ class MarkdownVisitor implements Visitor {
         visitChildren(customNode);
     }
 
-    private Note toNote(final Heading heading) {
-        Note note = new Note();
+    private TreeNode<net.fortytwo.smsn.brain.model.entities.Link> toTree(final Heading heading) {
+        TreeNode<net.fortytwo.smsn.brain.model.entities.Link> tree = TreeNodeDTO.createEmptyNode();
 
         Node child = heading.getFirstChild();
         while (null != child) {
@@ -176,18 +179,18 @@ class MarkdownVisitor implements Visitor {
                 Link link = (Link) child;
                 String title = getLinkTitle(link);
                 if (null != title && null != link.getDestination() && 0 < link.getDestination().length()) {
-                    note.setId(link.getDestination().trim());
-                    note.setTitle(title);
+                    TreeViews.setId(tree, new AtomId(link.getDestination().trim()));
+                    TreeViews.setTitle(tree, title);
                     break;
                 }
             } else if (child instanceof Text) {
                 Text text = (Text) child;
-                note.setTitle(text.getLiteral().trim());
+                TreeViews.setTitle(tree, text.getLiteral().trim());
             }
             child = child.getNext();
         }
 
-        return note;
+        return tree;
     }
 
     private String getLinkTitle(final Link link) {
@@ -205,13 +208,13 @@ class MarkdownVisitor implements Visitor {
         }
     }
 
-    private void addNote(final Note note) {
+    private void addNote(final TreeNode<net.fortytwo.smsn.brain.model.entities.Link> note) {
         if (!headings.isEmpty()) {
             headings.peek().addChild(note);
         }
     }
 
-    private void addHeading(final Note note, int level) {
+    private void addHeading(final TreeNode<net.fortytwo.smsn.brain.model.entities.Link> note, int level) {
         if (level > headings.size()) {
             throw new IllegalStateException("invalid heading level (" + level + " > " + headings.size() + ")");
         }

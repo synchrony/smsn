@@ -23,6 +23,7 @@ public class ExampleSubscriber {
         final int portNumber = 4201;
         logger.info("creating socket to '" + host + "' on port " + portNumber);
 
+        // infinite loop
         while (true) {
             logger.info("opening SPARQL notification socket for reading");
 

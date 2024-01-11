@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
@@ -20,28 +20,28 @@ import java.util.regex.Pattern;
 /**
  * Something which is used for a purpose, such as hardware, software, or a service.
  */
-public class Tool extends AtomClass {
+public class Tool extends NoteClass {
 
     public Tool() {
         super(
                 "tool",
                 Pattern.compile("[a-zA-Z0-9].{1,49}"),
                 null,
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new AtomClass.NickHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new PageHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(new NoteClass.NickHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AKAReference.class),
+                        new NoteReqex.El(new PageHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, WebPage.class),
 
-                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+                        new NoteReqex.El(new DocumentsAboutTopicHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
 
-                        new AtomRegex.El(null, // do nothing with usage for now
-                                AtomRegex.Modifier.ZeroOrOne, Usage.class),
-                        new AtomRegex.El(new ContributorHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, ContributorCollection.class),
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(null, // do nothing with usage for now
+                                NoteReqex.Modifier.ZeroOrOne, Usage.class),
+                        new NoteReqex.El(new ContributorHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, ContributorCollection.class),
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 
@@ -52,7 +52,7 @@ public class Tool extends AtomClass {
 
     private static class ContributorHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectURI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(
@@ -62,12 +62,12 @@ public class Tool extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
         IRI self = handleTypeAndAlias(a, context, OWL.THING);
-        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(a.getTitle())));
+        handler.handleStatement(vf.createStatement(self, RDFS.LABEL, vf.createLiteral(Note.getTitle(a))));
 
         return self;
     }

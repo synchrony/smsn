@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.config;
 
+import net.fortytwo.smsn.brain.AtomId;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +12,7 @@ public class Configuration implements Serializable {
     private String activityLog = "smsn-activity.tsv";
     private Integer transactionBufferSize;
     private String thingNamespace = "http://example.org/things/";
-    private String brainstream;
+    private AtomId brainstream;
 
     private boolean verbose = false;
 
@@ -65,11 +67,11 @@ public class Configuration implements Serializable {
         this.thingNamespace = thingNamespace;
     }
 
-    public String getBrainstream() {
+    public AtomId getBrainstream() {
         return brainstream;
     }
 
-    public void setBrainstream(String brainstream) {
+    public void setBrainstream(AtomId brainstream) {
         this.brainstream = brainstream;
     }
 

@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import com.google.common.base.Preconditions;
-import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -36,14 +35,6 @@ abstract class PGEntity {
 
     protected abstract PGTopicGraph getGraph();
 
-    protected String getId() {
-        VertexProperty<String> property = vertex.property(SemanticSynchrony.PropertyKeys.ID_V);
-        if (!property.isPresent()) {
-            throw new IllegalStateException("missing id");
-        }
-        return property.value();
-    }
-
     public Vertex asVertex() {
         return vertex;
     }
@@ -65,7 +56,7 @@ abstract class PGEntity {
     protected <T> T getRequiredProperty(String name) {
         T value = getOptionalProperty(name);
         if (null == value) {
-            throw new InvalidGraphException("missing property '" + name + "' for vertex " + getId());
+            throw new InvalidGraphException("missing property '" + name + "' for " + this);
         }
         return value;
     }
@@ -97,7 +88,7 @@ abstract class PGEntity {
     protected boolean setRequiredProperty(String name, Object value) {
         if (null == value) {
             throw new IllegalArgumentException("can't clear required property '" + name
-                    + "' on atom vertex " + getId());
+                    + "' on " + this);
         }
 
         return setProperty(name, value);
@@ -153,7 +144,7 @@ abstract class PGEntity {
         }
         Edge result = iter.next();
         if (iter.hasNext()) {
-            throw new InvalidGraphException("vertex " + getId()
+            throw new InvalidGraphException("vertex " + this
                     + " has more than one '" + label + "' " + direction + " edge");
         }
         return result;
@@ -162,7 +153,7 @@ abstract class PGEntity {
     private Edge getExactlyOneEdge(final String label, final Direction direction) {
         Edge other = getAtMostOneEdge(label, direction);
         if (null == other) {
-            throw new InvalidGraphException("vertex " + getId()
+            throw new InvalidGraphException("vertex " + this
                     + " is missing '" + label + "' " + direction + " edge");
         }
         return other;
@@ -207,5 +198,14 @@ abstract class PGEntity {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    @Override
+    public String toString() {
+        String className = getClass().getSimpleName();
+        if (0 == className.length()) {
+            className = "vertex";
+        }
+        return className + "[" + vertex.id() + "]";
     }
 }

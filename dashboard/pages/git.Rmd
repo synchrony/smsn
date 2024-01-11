@@ -1,0 +1,179 @@
+```{r, error=FALSE}
+require.git.history()
+```
+
+## Git history
+
+```{r}
+timestamp <- {}
+commit <- {}
+committer <- {}
+last.timestamp <- -1
+last.commit <- ""
+last.committer <- ""
+for (i in c(1:nrow(git))) {
+  if (git$V2[i] == "COMMIT") {
+    last.timestamp <- git$V5[i]
+    last.commit <- as.character(git$V3[i])
+    last.committer <- as.character(git$V4[i])
+  }
+  timestamp[i] <- last.timestamp
+  commit[i] <- last.commit
+  committer[i] <- last.committer
+}
+time <- ISOdatetime(1970,1,1,0,0,0, tz="GMT") + timestamp
+
+df <- data.frame(git, time=time, commit=commit, committer=committer)
+df <- subset(df, V2=="FILE")
+changes <- data.frame(entity=df$V3, lines=as.numeric(df$V4), source=df$V1, time=df$time, commit=df$commit, committer=df$committer)
+changes <- changes[with(changes, order(time)),]
+
+git.sources <- unique(as.vector(changes$source))
+```
+
+### All changes
+
+```{r}
+showTable(changes)
+```
+
+### Changes by committer
+
+```{r}
+committers <- unique(as.vector(changes$committer))
+
+changes.subset <- function(committer0=NULL, source0) {
+  df <- if (is.null(committer0)) changes
+  else subset(changes, committer==committer0)
+  
+  if (source0 == "all sources") df
+  else subset(df, source==source0)
+}
+```
+
+There are **`r num(length(committers))` committers** in the log, responsible for the following cumulative changes.
+
+```{r}
+get.totals.by.author <- function(source) {
+  data.frame(committer=committers,
+    commits=sapply(committers, function(c) {
+        num(length(unique(changes.subset(c,source)$commit)))
+      }),
+    entities=sapply(committers, function(c) {
+      num(length(unique(changes.subset(c,source)$entity)))
+      }),
+    lines=sapply(committers, function(c) {
+      num(sum(as.vector(as.numeric(changes.subset(c,source)$lines))))
+    }))
+}
+
+sources <- c("all sources", git.sources)
+```
+
+```{r}
+renderTable({get.totals.by.author(get.agg.by.committer.source())})
+selectInput("agg.by.committer.source", label=NULL, choices=sources)
+get.agg.by.committer.source <- reactive({
+  input$agg.by.committer.source
+})
+```
+
+### Aggregate changes over time
+
+```{r}
+library(ggplot2)
+
+day <- 60*60*24; week <- day*7; month <- day*30
+min.t <- min(changes$time)
+max.t <- max(changes$time)
+
+breaks <- seq(min.t, max.t + month, by="months")
+labels <- sapply(breaks[1:(length(breaks)-1)], function(t) { format(t, format="%Y-%m") })
+
+get.plot.data <- function(source) {
+  plot.data <- {}
+  for (cm in committers) {
+    ct <- hist(subset(changes.subset(NULL, source), committer==cm)$time, breaks=breaks, plot=FALSE)$counts
+    df <- data.frame(time=labels, committer=cm, entities=ct)
+    plot.data <- rbind(plot.data, df)
+  }
+  plot.data
+}
+```
+
+The following plot shows the number of entities changed by each committer over time. The y-axis is rendered on a log scale, as some commits tend to be much larger than others.
+
+```{r}
+renderPlot({
+  source <- get.hist.by.committer.source()
+  ggplot(get.plot.data(source), aes(x=factor(time), y=entities)) + 
+    geom_bar(stat="identity", position="dodge", aes(fill = committer)) +
+    scale_y_log10() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+})
+selectInput("hist.by.committer.source", label=NULL, choices=sources)
+get.hist.by.committer.source <- reactive({
+  input$hist.by.committer.source
+})
+```
+
+### Preparing the data for this page
+
+Create the data file `r git.log.file` by executing the script below, first setting the Bash variables for the input and output directories appropriately.
+
+```bash
+# the path to the smsn repository. The "dashboard" subdirectory should appear under this.
+SMSN_HOME=...
+# the path to your data; the Git directories from which you would like to extract logs should appear under this.
+DATA_HOME=...
+
+OUT_FILE=${SMSN_HOME}/dashboard/data/git-log.csv
+mkdir -p ${SMSN_HOME}/dashboard/data
+echo "" > ${OUT_FILE}
+cd ${DATA_HOME}
+for DIR in `echo */ | tr '/' '\n'`; do
+  if [ -e ${DIR}/.git ]; then
+      echo "adding Git log for "${DIR}
+      cd ${DIR}
+      git config diff.renameLimit 999999
+      git log --stat --pretty=format:"COMMIT,%h,%an,%at" \
+  | grep "COMMIT\|[-+]$" | sed 's/^COMMIT/'${DIR}',COMMIT/' | sed 's/^ /'${DIR}',FILE,/' | sed 's/\.smsn//' | sed 's/  *\|  */,/' | sed 's/ [-+][-+]*$/,/' \
+  >> ${OUT_FILE}
+      cd ..
+  fi
+done
+```
+
+
+# temp: splitting data-public
+
+```{r}
+
+# ls | while read file; do TS=`cat $file |grep "^ *@created"|sed 's/.*created.//'` && echo $file","$TS; done
+
+
+df <- as.data.frame(table(changes$commit))
+df <- df[with(df, order(-Freq)),]
+df2 <- merge(changes, df, by.x="commit", by.y="Var1")
+df3 <- unique(data.frame(commit=df2$commit, source=df2$source, time=df2$time, committer=df2$committer, files=df2$Freq))
+df3 <- df3[with(df3, order(time)),]
+josh <- subset(df3, committer=="Joshua Shinavier")
+jeff <- subset(df3, committer=="JeffreyBenjaminBrown")
+plot(x=df3$time, y=df3$files)
+lines(col="red", x=josh$time, y=josh$files)
+lines(col="blue", x=jeff$time, y=jeff$files)
+
+wm <- which.max(changes$files)
+df3[(wm-10):(wm+10),]
+
+
+ts.u <- read.csv(file("/tmp/ts.universal.csv"), header=FALSE, col.names = c("entity", "timestamp"))
+len.u <- sapply(as.vector(ts.u$entity), nchar)
+
+ts.p <- read.csv(file("/tmp/ts.public.csv"), header=FALSE, col.names = c("entity", "timestamp"))
+len.p <- sapply(as.vector(ts.p$entity), nchar)
+
+
+
+
+```

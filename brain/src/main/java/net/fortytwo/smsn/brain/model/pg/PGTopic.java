@@ -1,13 +1,10 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-
-import java.util.function.Consumer;
 
 public abstract class PGTopic extends PGEntity implements Topic {
 
@@ -16,25 +13,14 @@ public abstract class PGTopic extends PGEntity implements Topic {
     }
 
     @Override
-    public String getId() {
-        return super.getId();
+    public AtomId getId() {
+        return new AtomId(getRequiredProperty(SemanticSynchrony.PropertyKeys.ID));
     }
 
     @Override
-    public boolean setId(final String id) {
-        String atomId = null == id ? SemanticSynchrony.createRandomId() : id;
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.ID_V, atomId);
-    }
-
-    @Override
-    public Page getPrimaryTopicOf() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.TOPIC, Direction.IN, vertex -> getGraph().asPage(vertex));
-    }
-
-    @Override
-    public void forTargetOf(Consumer<Link> consumer) {
-        forEachAdjacentVertex(SemanticSynchrony.EdgeLabels.TARGET, Direction.IN,
-                vertex -> consumer.accept(getGraph().asLink(vertex)));
+    public void setId(final AtomId id) {
+        AtomId noteId = null == id ? SemanticSynchrony.createRandomId() : id;
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.ID, noteId.value);
     }
 
     @Override

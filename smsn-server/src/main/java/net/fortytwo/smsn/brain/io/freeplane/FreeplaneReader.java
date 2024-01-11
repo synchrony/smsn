@@ -3,12 +3,14 @@ package net.fortytwo.smsn.brain.io.freeplane;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
-import net.fortytwo.smsn.brain.io.BrainReader;
+import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import org.w3c.dom.Document;
@@ -27,7 +29,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class FreeplaneReader extends BrainReader {
+public class FreeplaneReader extends NoteReader {
 
     private interface Elmt {
         String
@@ -100,7 +101,7 @@ public class FreeplaneReader extends BrainReader {
         return instance;
     }
 
-    private void persistNote(final TopicGraph destGraph, final Note rootNote)
+    private void persistNote(final TopicGraph destGraph, final TreeNode<Link> rootNote)
             throws Brain.BrainException {
 
         int maxHeight = 1000;
@@ -109,20 +110,20 @@ public class FreeplaneReader extends BrainReader {
         TreeViews queries = new TreeViews(brain);
         Filter filter = Filter.noFilter();
 
-        Atom atom = destGraph.createAtomWithProperties(filter, SemanticSynchrony.createRandomId());
-        rootNote.setId(atom.getId());
+        Note note = destGraph.createNoteWithProperties(filter, SemanticSynchrony.createRandomId());
+        TreeViews.setId(rootNote, Note.getId(note));
 
         queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
         checkAndCommit(destGraph);
     }
 
-    private void setTextOrTitle(Note note, String text) {
+    private void setTextOrTitle(TreeNode<Link> note, String text) {
         if (text.contains("\n")) {
-            note.setText(text);
-            note.setTitle("[multiple lines]");
+            TreeViews.setText(note, text);
+            TreeViews.setTitle(note, "[multiple lines]");
         } else {
-            note.setTitle(text);
+            TreeViews.setTitle(note, text);
         }
     }
 
@@ -214,8 +215,8 @@ public class FreeplaneReader extends BrainReader {
     private class ParserInstance {
         private final TopicGraph destGraph;
         private final Map<String, List<String>> arrowLinks = new HashMap<>();
-        private final Map<String, Note> notesByFreeplaneId = new HashMap<>();
-        private final Map<String, Note> styleNotes = new HashMap<>();
+        private final Map<String, TreeNode<Link>> notesByFreeplaneId = new HashMap<>();
+        private final Map<String, TreeNode<Link>> styleNotes = new HashMap<>();
 
         public ParserInstance(TopicGraph destGraph) {
             this.destGraph = destGraph;
@@ -243,7 +244,7 @@ public class FreeplaneReader extends BrainReader {
 
             resetArrowLinks();
 
-            Note mindMapAsNote = parseTree(rootNode);
+            TreeNode<Link> mindMapAsNote = parseTree(rootNode);
             try {
                 persistNote(destGraph, mindMapAsNote);
             } catch (Brain.BrainException e) {
@@ -253,17 +254,17 @@ public class FreeplaneReader extends BrainReader {
             persistArrowLinks();
         }
 
-        private Atom getAtom(final String id) {
-            return destGraph.getAtomById(notesByFreeplaneId.get(id).getId()).get();
+        private Note getNote(final String id) {
+            return destGraph.getNoteById(TreeViews.getId(notesByFreeplaneId.get(id))).get();
         }
 
         private void persistArrowLinks() throws InvalidGraphException {
             for (Map.Entry<String, List<String>> link : arrowLinks.entrySet()) {
-                Atom tailAtom = getAtom(link.getKey());
+                Note tailNote = getNote(link.getKey());
                 List<String> heads = link.getValue();
                 for (String head : heads) {
-                    Atom headAtom = getAtom(head);
-                    tailAtom.addChildAt(headAtom, 0);
+                    Note headNote = getNote(head);
+                    tailNote.addChildAt(headNote, 0);
                 }
             }
         }
@@ -272,18 +273,18 @@ public class FreeplaneReader extends BrainReader {
             arrowLinks.clear();
         }
 
-        private Note parseTree(Element nodeElement) {
-            Note root = new Note();
-            root.setId(SemanticSynchrony.createRandomId());
+        private TreeNode<Link> parseTree(Element nodeElement) {
+            TreeNode<Link> root = TreeNodeDTO.createEmptyNode();
+            TreeViews.setId(root, SemanticSynchrony.createRandomId());
 
             String id = nodeElement.getAttribute(Attr.ID);
             long created = getCreated(nodeElement);
             long modified = getModified(nodeElement);
 
-            Note styleNote = getStyleNote(getStyle(nodeElement));
+            TreeNode<Link> styleNote = getStyleNote(getStyle(nodeElement));
 
             notesByFreeplaneId.put(id, root);
-            root.setCreated(created);
+            TreeViews.setCreated(root, created);
             // TODO: make id and modified date into property values
 
             setTextOrTitle(root, getText(nodeElement));
@@ -299,11 +300,11 @@ public class FreeplaneReader extends BrainReader {
             return root;
         }
 
-        private void makeLegal(final Note note) {
-            if (null != note.getText() && note.getChildren().size() > 0) {
-                note.setTitle(note.getText().replaceAll("\\n", "\\n"));
+        private void makeLegal(final TreeNode<Link> note) {
+            if (null != TreeViews.getText(note) && TreeViews.countChildren(note) > 0) {
+                TreeViews.setTitle(note, TreeViews.getText(note).replaceAll("\\n", "\\n"));
                 logger.warning("note had both children and multi-line text (collapsed): "
-                        + titlePreview(note.getTitle()));
+                        + titlePreview(TreeViews.getTitle(note)));
             }
         }
 
@@ -311,7 +312,7 @@ public class FreeplaneReader extends BrainReader {
             return title.length() > 30 ? title.substring(0, 25) + "[...]" : title;
         }
 
-        private void parseChildren(final Note note, final Element nodeElement, String nodeId) {
+        private void parseChildren(final TreeNode<Link> note, final Element nodeElement, String nodeId) {
             List<Element> backlinkChildren = getChildElements(nodeElement, Elmt.ARROWLINK);
             if (0 != backlinkChildren.size()) {
                 List<String> heads = arrowLinks.get(nodeId);
@@ -333,20 +334,20 @@ public class FreeplaneReader extends BrainReader {
             if (0 != treeChildren.size()) {
                 //note.setHasChildren(true);
                 for (Element childElement : treeChildren) {
-                    Note child = parseTree(childElement);
+                    TreeNode<Link> child = parseTree(childElement);
                     note.addChild(child);
                 }
             }
         }
 
-        private Note getStyleNote(final String style) {
+        private TreeNode<Link> getStyleNote(final String style) {
             if (null == style || style.length() == 0) return null;
 
-            Note note = styleNotes.get(style);
+            TreeNode<Link> note = styleNotes.get(style);
             if (null == note) {
-                note = new Note();
-                note.setTitle(style + " (style)");
-                note.setId(SemanticSynchrony.createRandomId());
+                note = TreeNodeDTO.createEmptyNode();
+                TreeViews.setTitle(note, style + " (style)");
+                TreeViews.setId(note, SemanticSynchrony.createRandomId());
                 styleNotes.put(style, note);
             }
             return note;

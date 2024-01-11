@@ -1,16 +1,28 @@
 package net.fortytwo.smsn.brain.model.dto;
 
+import net.fortytwo.smsn.brain.model.Role;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
 public class LinkDTO implements Link {
+
+    private Role role;
     private Topic target;
     private String label;
+    private Page page;
 
     @Override
     public void destroy() {
         // nothing to do
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override
@@ -19,9 +31,8 @@ public class LinkDTO implements Link {
     }
 
     @Override
-    public boolean setTarget(Topic target) {
+    public void setTarget(Topic target) {
         this.target = target;
-        return false;
     }
 
     @Override
@@ -30,18 +41,17 @@ public class LinkDTO implements Link {
     }
 
     @Override
-    public boolean setLabel(String label) {
+    public void setLabel(String label) {
         this.label = label;
-        return false;
     }
 
     @Override
-    public Page getContext() {
-        throw new UnsupportedOperationException();
+    public Page getPage() {
+        return page;
     }
 
     @Override
-    public boolean setContext(Page page) {
-        throw new UnsupportedOperationException();
+    public void setPage(Page page) {
+        this.page = page;
     }
 }

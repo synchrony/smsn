@@ -1,16 +1,12 @@
 package net.fortytwo.smsn.brain.model.entities;
 
-import java.util.function.Consumer;
+import net.fortytwo.smsn.brain.AtomId;
 
 public interface Topic extends Entity {
 
-    String getId();
+    AtomId getId();
 
-    boolean setId(String id);
-
-    Page getPrimaryTopicOf();
-
-    void forTargetOf(Consumer<Link> consumer);
+    void setId(AtomId id);
 
     boolean isIsolated();
 }

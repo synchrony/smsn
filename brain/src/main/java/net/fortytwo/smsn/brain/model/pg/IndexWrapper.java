@@ -4,7 +4,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.Iterator;
 
-abstract class IndexWrapper {
+public abstract class IndexWrapper {
     protected final String key;
 
     protected IndexWrapper(String key) {

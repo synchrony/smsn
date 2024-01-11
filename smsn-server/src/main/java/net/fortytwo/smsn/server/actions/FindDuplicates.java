@@ -3,7 +3,7 @@ package net.fortytwo.smsn.server.actions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * A service for identifying atoms with duplicate values.
+ * A service for identifying notes with duplicate values.
  */
 public class FindDuplicates extends FilteredAction {
 
@@ -38,8 +38,8 @@ public class FindDuplicates extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
-        List<List<Atom>> dups = getDuplicates(context.getBrain().getTopicGraph(), getFilter());
-        List<Atom> flat = new LinkedList<>();
+        List<List<Note>> dups = getDuplicates(context.getBrain().getTopicGraph(), getFilter());
+        List<Note> flat = new LinkedList<>();
         dups.forEach(flat::addAll);
 
         try {
@@ -59,15 +59,15 @@ public class FindDuplicates extends FilteredAction {
         return false;
     }
 
-    private List<List<Atom>> getDuplicates(final TopicGraph graph,
+    private List<List<Note>> getDuplicates(final TopicGraph graph,
                                            final Filter filter) throws RequestProcessingException {
-        Map<String, List<Atom>> m = new HashMap<>();
-        List<List<Atom>> dups = new LinkedList<>();
+        Map<String, List<Note>> m = new HashMap<>();
+        List<List<Note>> dups = new LinkedList<>();
         int total = 0;
 
-        for (Atom a : graph.getAllAtoms()) {
+        for (Note a : graph.getAllNotes()) {
             if (filter.test(a)) {
-                String title = a.getTitle();
+                String title = Note.getTitle(a);
                 if (null != title && 0 < title.length()) {
                     String hash;
                     try {
@@ -75,14 +75,14 @@ public class FindDuplicates extends FilteredAction {
                     } catch (UnsupportedEncodingException e) {
                         throw new RequestProcessingException(e);
                     }
-                    List<Atom> atoms = m.get(hash);
-                    if (null == atoms) {
-                        atoms = new LinkedList<>();
-                        m.put(hash, atoms);
+                    List<Note> notes = m.get(hash);
+                    if (null == notes) {
+                        notes = new LinkedList<>();
+                        m.put(hash, notes);
                     } else {
-                        if (1 == atoms.size()) {
+                        if (1 == notes.size()) {
                             total++;
-                            dups.add(atoms);
+                            dups.add(notes);
                         }
 
                         total++;
@@ -93,7 +93,7 @@ public class FindDuplicates extends FilteredAction {
                         }
                     }
 
-                    atoms.add(a);
+                    notes.add(a);
                 }
             }
         }

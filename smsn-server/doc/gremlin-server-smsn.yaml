@@ -1,53 +1,40 @@
 # Example Gremlin Server configuration file for use with SmSn
 
-host: localhost
-port: 8182
-scriptEvaluationTimeout: 300000
-
-# Uncomment to use HTTP rather than WebSocket
-#channelizer: org.apache.tinkerpop.gremlin.server.channel.HttpChannelizer
-
+channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer
+evaluationTimeout: 600000 # Long timeout for the sake of SmSn whole-graph I/O operations
 graphs: {
   graph: conf/neo4j-smsn.properties}
-plugins:
-  - tinkerpop.neo4j
-  - smsn
+host: localhost
+idleConnectionTimeout: 0
+keepAliveInterval: 0
+maxAccumulationBufferComponents: 1024
+maxChunkSize: 8192
+maxContentLength: 10485760
+maxHeaderSize: 8192
+maxInitialLineLength: 4096
+#metrics: {
+#  consoleReporter: { enabled: true, interval: 180000 },
+#  csvReporter: { enabled: true, interval: 180000, fileName: /tmp/gremlin-server-metrics.csv },
+#  jmxReporter: { enabled: true },
+#  slf4jReporter: { enabled: true, interval: 180000 } }
+port: 8182
+processors:
+  - { className: org.apache.tinkerpop.gremlin.server.op.session.SessionOpProcessor, config: { sessionTimeout: 28800000 } }
+  - { className: org.apache.tinkerpop.gremlin.server.op.traversal.TraversalOpProcessor }
+resultIterationBatchSize: 64
 scriptEngines: {
   smsn: {
-    scripts: [conf/smsn.yaml]
-  },
+    plugins: { org.apache.tinkerpop.gremlin.server.jsr223.GremlinServerGremlinPlugin: { },
+               org.apache.tinkerpop.gremlin.jsr223.ScriptFileGremlinPlugin: { files: [ conf/smsn.yaml ] } } },
   gremlin-groovy: {
-    imports: [java.lang.Math],
-    staticImports: [java.lang.Math.PI],
-    scripts: [scripts/empty-sample.groovy]}}
+    plugins: { org.apache.tinkerpop.gremlin.server.jsr223.GremlinServerGremlinPlugin: { },
+               org.apache.tinkerpop.gremlin.neo4j.jsr223.Neo4jGremlinPlugin: { },
+               org.apache.tinkerpop.gremlin.jsr223.ImportGremlinPlugin: { classImports: [ java.lang.Math ], methodImports: [ java.lang.Math#* ] },
+               org.apache.tinkerpop.gremlin.jsr223.ScriptFileGremlinPlugin: { files: [ scripts/empty-sample.groovy ] } } } }
 serializers:
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0, configuration: { useMapperFromGraph: graph }}            # application/vnd.gremlin-v1.0+gryo
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GryoLiteMessageSerializerV1d0, configuration: { useMapperFromGraph: graph }}        # application/vnd.gremlin-v1.0+gryo-lite
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0, configuration: { serializeResultToString: true }}        # application/vnd.gremlin-v1.0+gryo-stringd
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerGremlinV1d0, configuration: { useMapperFromGraph: graph }} # application/vnd.gremlin-v1.0+json
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerGremlinV2d0, configuration: { useMapperFromGraph: graph }} # application/vnd.gremlin-v2.0+json
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, configuration: { useMapperFromGraph: graph }}        # application/json
-processors:
-  - { className: org.apache.tinkerpop.gremlin.server.op.session.SessionOpProcessor, configuration: { sessionTimeout: 28800000 }}
-  - { className: org.apache.tinkerpop.gremlin.server.op.traversal.TraversalOpProcessor, configuration: { cacheExpirationTime: 600000, cacheMaxSize: 1000 }}
-
-# Uncomment for metrics output
-#metrics: {
-#  consoleReporter: {enabled: true, interval: 180000},
-#  csvReporter: {enabled: true, interval: 180000, fileName: /tmp/gremlin-server-metrics.csv},
-#  jmxReporter: {enabled: true},
-#  slf4jReporter: {enabled: true, interval: 180000},
-#  gangliaReporter: {enabled: false, interval: 180000, addressingMode: MULTICAST},
-#  graphiteReporter: {enabled: false, interval: 180000}}
-
-strictTransactionManagement: false
-maxInitialLineLength: 4096
-maxHeaderSize: 8192
-maxChunkSize: 8192
-maxContentLength: 65536
-maxAccumulationBufferComponents: 1024
-resultIterationBatchSize: 64
-writeBufferLowWaterMark: 32768
-writeBufferHighWaterMark: 65536
+  - { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV1d0, config: { useMapperFromGraph: graph } } # application/json
 ssl: {
-  enabled: false}
+  enabled: false }
+strictTransactionManagement: false
+writeBufferHighWaterMark: 65536
+writeBufferLowWaterMark: 32768

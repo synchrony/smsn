@@ -1,11 +1,10 @@
 package net.fortytwo.smsn.brain.model.pg;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
@@ -15,34 +14,23 @@ public abstract class PGPage extends PGEntity implements Page {
         super(vertex);
     }
 
+    public Role getRole() {
+        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
+        return null == name ? null : Role.valueOf(name);
+    }
+
+    public void setRole(final Role role) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
+    }
+
     @Override
     public String getAlias() {
         return getOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS);
     }
 
     @Override
-    public boolean setAlias(String alias) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
-    }
-
-    @Override
-    public Long getCreated() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.CREATED);
-    }
-
-    @Override
-    public boolean setCreated(Long created) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED, created);
-    }
-
-    @Override
-    public String getFormat() {
-        return getRequiredProperty(SemanticSynchrony.PropertyKeys.FORMAT);
-    }
-
-    @Override
-    public boolean setFormat(String format) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.FORMAT, format);
+    public void setAlias(String alias) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
     }
 
     @Override
@@ -51,8 +39,8 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public boolean setText(String text) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
+    public void setText(String text) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
     }
 
     @Override
@@ -61,8 +49,18 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public boolean setPriority(Float priority) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
+    public void setPriority(Float priority) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
+    }
+
+    @Override
+    public Long getCreated() {
+        return getRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED);
+    }
+
+    @Override
+    public void setCreated(Long created) {
+        setRequiredEntity(SemanticSynchrony.PropertyKeys.CREATED, created);
     }
 
     @Override
@@ -71,8 +69,8 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public boolean setSource(String source) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+    public void setSource(String source) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
     }
 
     @Override
@@ -81,8 +79,8 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public boolean setShortcut(String shortcut) {
-        return setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
+    public void setShortcut(String shortcut) {
+        setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
     }
 
     @Override
@@ -91,28 +89,18 @@ public abstract class PGPage extends PGEntity implements Page {
     }
 
     @Override
-    public boolean setWeight(Float weight) {
-        return setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+    public void setWeight(Float weight) {
+        setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
     }
 
     @Override
-    public Topic getPrimaryTopic() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.TOPIC, Direction.OUT, v -> getGraph().asTopic(v));
-    }
-
-    @Override
-    public boolean setPrimaryTopic(Topic topic) {
-        return setRequiredEntity(SemanticSynchrony.EdgeLabels.TOPIC, topic);
-    }
-
-    @Override
-    public KeyValueTree<Link, EntityList<Link>> getContent() {
+    public TreeNode<Link> getContent() {
         return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.CONTENT, Direction.OUT, v -> getGraph().asLinkTree(v));
     }
 
     @Override
-    public boolean setContent(KeyValueTree<Link, EntityList<Link>> tree) {
-        return setRequiredEntity(SemanticSynchrony.EdgeLabels.CONTENT, tree);
+    public void setContent(TreeNode<Link> tree) {
+        setRequiredEntity(SemanticSynchrony.EdgeLabels.CONTENT, tree);
     }
 
     @Override

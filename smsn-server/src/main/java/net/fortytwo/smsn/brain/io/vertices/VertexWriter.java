@@ -2,21 +2,20 @@ package net.fortytwo.smsn.brain.io.vertices;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.io.BrainWriter;
+import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Atom;
+import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class VertexWriter extends BrainWriter {
+public class VertexWriter extends NoteWriter {
     private static final Logger logger = Logger.getLogger(VertexWriter.class.getName());
 
     @Override
@@ -25,7 +24,7 @@ public class VertexWriter extends BrainWriter {
     }
 
     @Override
-    public void doExport(Context context) throws IOException {
+    public void doWrite(Context context) throws IOException {
 
         TopicGraph sourceGraph = context.getTopicGraph();
         Filter filter = context.getFilter();
@@ -33,22 +32,24 @@ public class VertexWriter extends BrainWriter {
         KnowledgeBase sourceKb = context.getKnowledgeBase();
         PrintStream p = new PrintStream(context.getDestStream());
 
-        p.println("created\tid\tweight\tsource\tclass\tout\tin\ttitle\talias");
+        p.println("created\tid\tweight\tpriority\tsource\tclass\tout\tin\ttitle\talias\tshortcut\ttext");
 
-        for (Atom a : sourceGraph.getAllAtoms()) {
-            if (isTrueAtom(a) && filter.test(a)) {
-                p.print(a.getCreated());
+        for (Note a : sourceGraph.getAllNotes()) {
+            if (isTrueNote(a) && filter.test(a)) {
+                p.print(Note.getCreated(a));
                 p.print('\t');
-                p.print(a.getId());
+                p.print(Note.getId(a));
                 p.print('\t');
-                p.print(a.getWeight());
+                p.print(Note.getWeight(a));
                 p.print('\t');
-                p.print(a.getSource());
+                p.print(Note.getPriority(a));
+                p.print('\t');
+                p.print(Note.getSource(a));
                 p.print('\t');
 
-                List<KnowledgeBase.AtomClassEntry> entries = sourceKb.getClassInfo(a);
+                List<KnowledgeBase.NoteClassEntry> entries = sourceKb.getClassInfo(a);
                 if (null != entries && entries.size() > 0) {
-                    KnowledgeBase.AtomClassEntry e = entries.get(0);
+                    KnowledgeBase.NoteClassEntry e = entries.get(0);
                     p.print(e.getInferredClassName());
                     p.print('\t');
                     p.print(e.getOutScore());
@@ -59,17 +60,28 @@ public class VertexWriter extends BrainWriter {
                     p.print("\t0\t0\t");
                 }
 
-                String value = a.getTitle();
-                if (null == value) {
-                    logger.warning("note has null @title: " + a.getId());
+                String title = Note.getTitle(a);
+                if (null == title) {
+                    logger.warning("note has null @title: " + Note.getId(a));
                 } else {
-                    p.print(escapeValue(a.getTitle()));
+                    p.print(escapeValue(title));
                 }
                 p.print('\t');
 
-                String alias = a.getAlias();
+                String alias = Note.getAlias(a);
                 if (null != alias) {
                     p.print(escapeValue(alias));
+                }
+                p.print('\t');
+
+                String shortcut = Note.getShortcut(a);
+                if (null != shortcut) {
+                    p.print(escapeValue(shortcut));
+                }
+
+                String text = Note.getText(a);
+                if (null != text) {
+                    p.print(escapeValue(text));
                 }
 
                 p.print('\n');
@@ -77,8 +89,8 @@ public class VertexWriter extends BrainWriter {
         }
     }
 
-    private boolean isTrueAtom(final Atom a) {
-        return null != a.getCreated();
+    private boolean isTrueNote(final Note a) {
+        return null != Note.getCreated(a);
     }
 
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.

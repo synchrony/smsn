@@ -1,25 +1,27 @@
 package net.fortytwo.smsn.brain.io.wiki;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.Note;
+import net.fortytwo.smsn.brain.model.Property;
+import net.fortytwo.smsn.brain.model.Role;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 public class WikiPrinter {
+    private final PrintStream printStream;
 
-    private boolean useCanonicalFormat;
-
-    public void setUseCanonicalFormat(boolean useCanonicalFormat) {
-        this.useCanonicalFormat = useCanonicalFormat;
+    public WikiPrinter(final OutputStream outputStream) {
+        printStream = createPrintStream(outputStream);
     }
 
-    public void print(final Note note,
-                      final OutputStream out,
-                      final boolean withProperties) {
-
-        printInternal(note, 0, createPrintStream(out), withProperties);
+    public void print(final Page page) {
+        printProperties(page);
+        printContent(page);
     }
 
     private PrintStream createPrintStream(final OutputStream out) {
@@ -30,67 +32,106 @@ public class WikiPrinter {
         }
     }
 
-    private void printInternal(final Note note,
+    private void printInternal(final TreeNode<Link> tree,
                                final int indent,
-                               final PrintStream p,
-                               final boolean withProperties) {
-        indent(indent, p);
-
-        p.print("* ");
-
-        if (null != note.getId()) {
-            p.print(":");
-            p.print(note.getId());
-            p.print(": ");
-        }
-
-        if (null != note.getTitle()) {
-            p.print(escapeValue(note.getTitle()));
-        }
-
-        p.print("\n");
+                               final PrintStream ps) {
+        indent(indent);
+        printBullet(tree);
+        printId(tree);
+        printTitle(tree);
+        ps.print("\n");
 
         int nextIndent = indent + 1;
 
-        if (withProperties) {
-            printProperties(note, p, nextIndent);
-        }
-
-        for (Note child : note.getChildren()) {
-            printInternal(child, nextIndent, p, withProperties);
-        }
-
-        if (useCanonicalFormat && !isEmptyPage(note.getText())) {
-            p.println();
-            p.print(note.getText());
+        ListNode<TreeNode<Link>> cur = tree.getChildren();
+        while (null != cur) {
+            printInternal(cur.getFirst(), nextIndent, ps);
+            cur = cur.getRest();
         }
     }
 
-    private boolean isEmptyPage(final String page) {
-        return null == page || page.trim().length() == 0;
+    private void printTitle(final TreeNode<Link> tree) {
+        if (null != tree.getValue().getLabel()) {
+            printStream.print(escapeValue(tree.getValue().getLabel()));
+        }
     }
 
-    private static void printProperties(final Note n, final PrintStream p, final int indent) {
-        Note.propertiesByKey.values().stream().filter(Note.Property::isAnnotationProperty).forEach(prop -> {
-            Object value = prop.getNoteGetter().apply(n);
-            if (null != value) {
-                indent(indent, p);
-                p.println("@" + prop.getPropertyKey() + " " + value);
+    private void printId(final TreeNode<Link> tree) {
+        if (null != tree.getValue().getTarget()) {
+            printStream.print(":");
+            printStream.print(tree.getValue().getTarget().getId().value);
+            printStream.print(": ");
+        }
+    }
+
+    private void printBullet(final TreeNode<Link> tree) {
+        Role role = tree.getValue().getRole();
+        if (null == role) {
+            printStream.print(WikiFormat.NODE_BULLET);
+        } else {
+            switch (role) {
+                case Relation:
+                    printStream.print(WikiFormat.LABEL_BULLET);
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+        printStream.print(" ");
+    }
+
+    private void printContent(final Page page) {
+        TreeNode<Link> content = page.getContent();
+        if (null != content) {
+            ListNode<TreeNode<Link>> cur = content.getChildren();
+            while (null != cur) {
+                printInternal(cur.getFirst(), 0, printStream);
+                cur = cur.getRest();
+            }
+        }
+    }
+
+    private void printProperties(final Page page) {
+        printProperty("id", page.getContent().getValue().getTarget().getId().value);
+        String title = page.getContent().getValue().getLabel();
+        if (null != title) {
+            printProperty("title", title);
+        }
+        
+        Page.propertiesByKey.values().stream().filter(Property::isAnnotationProperty).forEach(prop -> {
+            Object value = prop.getGetter().apply(page);
+            if (null != value && (null == prop.getDefaultValue() || !value.equals(prop.getDefaultValue()))) {
+                printProperty(prop.getKey(), value);
             }
         });
     }
 
-    private static void indent(final int indent, final PrintStream p) {
+    private void printProperty(final String key, final Object value) {
+        String valueString = value.toString();
+        if (0 == valueString.trim().length()) return;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("@").append(key).append(" ");
+        if (containsNewline(valueString)) {
+            sb.append("```\n").append(WikiFormat.stripTrailingSpace(valueString)).append("\n```");
+        } else {
+            sb.append(valueString);
+        }
+        printStream.println(sb.toString());
+    }
+
+    private boolean containsNewline(final String text) {
+        return text.contains("\n");
+    }
+
+    private void indent(final int indent) {
         for (int i = 0; i < indent; i++) {
-            p.print("    ");
+            printStream.print("    ");
         }
     }
 
     private static String escapeValue(final String value) {
-        if (value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0) {
-            return WikiFormat.VERBATIM_BLOCK_START + "\n" + value + "\n" + WikiFormat.VERBATIM_BLOCK_END;
-        } else {
-            return value;
-        }
+        return value.replaceAll("\n", "\\n")
+                .replaceAll("\r", "\\r");
     }
 }

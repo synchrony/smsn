@@ -1,0 +1,40 @@
+```{r, error=FALSE}
+require.entities()
+```
+
+## @created property
+
+```{r}
+created <- as.vector(entities$created)
+invalid.created <- created[created <= 0]
+total.invalid.created <- length(invalid.created)
+
+times <- as.POSIXct(created/1000,  origin="1970-01-01", tz="GMT")
+```
+
+SmSn's mandatory `@created` property is an immutable timestamp which is associated with each entity at the moment its IDs is minted. It provides a basic historical record of entities in the graph, which is frequently useful.
+
+### Invalid timestamps
+
+The only `@created` timestamps considered invalid are less than or equal to zero; it is safe to assume that no entity was created prior to the Unix epoch (1970), as SmSn and related tools did not exist yet.
+The current graph has `r num(total.invalid.created)` invalid timestamps `r perc.of.entities(total.invalid.created)`.
+
+### Timestamps as time series
+
+For tracking activity over time, the best resource is SmSn's activity log. As long as deletion of entities from the graph is relatively uncommon, however, much of the same analysis can be performed on the set of entities with their `@created` timestamps.
+
+#### Time of day
+
+```{r}
+total.created.by.hour.of.day <- (created) %% (24*60*60*1000) / (60*60*1000)
+```
+
+Below is a histogram showing peak hours of entity creation, aggregated over all time.
+
+```{r}
+renderPlot(hist(total.created.by.hour.of.day, breaks=24,
+  main="creation timestamps by hour of day",
+  xlab="hour of day (GMT)",
+  ylab="total @created"))
+```
+

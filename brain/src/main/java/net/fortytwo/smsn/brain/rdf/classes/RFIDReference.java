@@ -1,10 +1,10 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.rdf.SimpleAtomClass;
+import net.fortytwo.smsn.brain.rdf.SimpleNoteClass;
 
 import java.util.regex.Pattern;
 
-public class RFIDReference extends SimpleAtomClass {
+public class RFIDReference extends SimpleNoteClass {
 
     public RFIDReference() {
         super(

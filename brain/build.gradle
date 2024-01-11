@@ -1,0 +1,32 @@
+configurations {
+  testOutput
+}
+
+dependencies {
+  implementation project(':smsn-core')
+  implementation project(':smsn-models')
+  implementation project(':smsn-rdf')
+
+  implementation 'org.json:json:20180130'
+
+  implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
+  implementation group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version: tinkerpopVersion
+  implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
+  implementation group: 'org.neo4j', name: 'neo4j-tinkerpop-api-impl', version: neo4jTinkerpopApiVersion
+  implementation group: 'org.apache.lucene', name: 'lucene-analyzers', version: luceneVersion
+  implementation group: 'org.openrdf.sesame', name: 'sesame-rio-api', version: sesameVersion
+  implementation(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: sesameVersion) {
+    exclude(module: 'commons-codec')
+  }
+  implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.8.0'
+  implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+  implementation(group: 'commons-validator', name: 'commons-validator', version: '1.4.0') {
+    exclude(module: 'commons-logging')
+  }
+  testImplementation group: 'org.openrdf.sesame', name: 'sesame-rio-ntriples', version: sesameVersion
+  testImplementation group: 'org.openrdf.sesame', name: 'sesame-repository-sail', version: sesameVersion
+  testImplementation group: 'org.openrdf.sesame', name: 'sesame-queryalgebra-evaluation', version: sesameVersion
+  testImplementation "junit:junit:$junitVersion"
+
+  testOutput sourceSets.test.output
+}

@@ -1,10 +1,16 @@
 package net.fortytwo.smsn.git;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.BrainTestBase;
 import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
-import net.fortytwo.smsn.brain.model.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.dto.PageDTO;
+import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
+import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.model.entities.Page;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
@@ -28,7 +34,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SmSnGitRepositoryTest extends BrainTestBase {
-    private final WikiPrinter printer = new WikiPrinter();
     private File repoDir;
     private SmSnGitRepository repo;
     private Git git;
@@ -53,8 +58,8 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
     }
 
     @Override
-    protected TopicGraph createAtomGraph() throws IOException {
-        return createTinkerAtomGraph();
+    protected TopicGraph createTopicGraph() throws IOException {
+        return createTinkerTopicGraph();
     }
 
     @Test
@@ -96,21 +101,25 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
 
     @Test
     public void historyDoesntBreak() throws Exception {
-        addFile(testNote(ARTHUR_ID, "Arthur Dent"));
+        AtomId arthurId = SemanticSynchrony.createRandomId();
+        AtomId fordId = SemanticSynchrony.createRandomId();
+        AtomId zaphodId = SemanticSynchrony.createRandomId();
+
+        addFile(testNote(arthurId, "Arthur Dent"));
         repo.addAll();
         repo.commitAll("first commit");
-        addFile(testNote(FORD_ID, "Ford Prefect"));
-        addFile(testNote(ZAPHOD_ID, "Zaphod Beeblebrox"));
+        addFile(testNote(fordId, "Ford Prefect"));
+        addFile(testNote(zaphodId, "Zaphod Beeblebrox"));
         repo.addAll();
         repo.commitAll("second commit");
 
-        Note history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
-        assertEquals(2, history.getChildren().size());
-        Note secondCommit = history.getChildren().get(0);
-        Note firstCommit = history.getChildren().get(1);
-        assertTrue(firstCommit.getTitle().endsWith("first commit"));
-        assertTrue(secondCommit.getTitle().endsWith("second commit"));
-        /* TODO: test interned atoms
+        TreeNode<Link> history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
+        assertEquals(2, history.getChildren().length());
+        TreeNode<Link> secondCommit = history.getChildren().get(0);
+        TreeNode<Link> firstCommit = history.getChildren().get(1);
+        assertTrue(TreeViews.getTitle(firstCommit).endsWith("first commit"));
+        assertTrue(TreeViews.getTitle(secondCommit).endsWith("second commit"));
+        /* TODO: test interned notes
         assertEquals(1, firstCommit.getChildren().size());
         assertEquals(2, secondCommit.getChildren().size());
         assertEquals("Arthur Dent", firstCommit.getChildren().get(0).getTitle());
@@ -143,23 +152,25 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         return count;
     }
 
-    private Note testNote(final String id, final String title) {
-        Note note = new Note();
+    private TreeNode<Link> testNote(final AtomId id, final String title) {
+        TreeNode<Link> note = TreeNodeDTO.createEmptyNode();
 
-        note.setId(id);
-        note.setTitle(title);
-        note.setSource(DefaultSources.PUBLIC);
-        note.setWeight(SemanticSynchrony.DEFAULT_WEIGHT);
-        note.setCreated(System.currentTimeMillis());
+        TreeViews.setId(note, id);
+        TreeViews.setTitle(note, title);
+        TreeViews.setSource(note, DefaultSources.PUBLIC);
+        TreeViews.setWeight(note, SemanticSynchrony.DEFAULT_WEIGHT);
+        TreeViews.setCreated(note, System.currentTimeMillis());
 
         return note;
     }
 
-    private void addFile(final Note note) throws IOException {
-        assertNotNull(note.getId());
-        File file = new File(repoDir, note.getId());
+    private void addFile(final TreeNode<Link> tree) throws IOException {
+        assertNotNull(TreeViews.getId(tree));
+        File file = new File(repoDir, TreeViews.getId(tree).value);
         try (OutputStream out = new FileOutputStream(file)) {
-            printer.print(note, out, true);
+            Page page = PageDTO.createTransitional();
+            page.setContent(tree);
+            new WikiPrinter(out).print(page);
         }
     }
 

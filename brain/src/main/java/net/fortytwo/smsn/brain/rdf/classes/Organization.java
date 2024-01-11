@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf.classes;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.rdf.AtomClass;
-import net.fortytwo.smsn.brain.rdf.AtomRegex;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.rdf.NoteClass;
+import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.DocumentAboutTopicCollection;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-public class Organization extends AtomClass {
+public class Organization extends NoteClass {
     private static final Logger logger = Logger.getLogger(Organization.class.getName());
 
     public Organization() {
@@ -25,20 +25,20 @@ public class Organization extends AtomClass {
                 "organization",
                 Pattern.compile("[A-Z].+"),
                 null,
-                new AtomRegex(Arrays.asList(
-                        new AtomRegex.El(new NickHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, AKAReference.class),
-                        new AtomRegex.El(new PageHandler(),
-                                AtomRegex.Modifier.ZeroOrMore, WebPage.class),
+                new NoteReqex(Arrays.asList(
+                        new NoteReqex.El(new NickHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, AKAReference.class),
+                        new NoteReqex.El(new PageHandler(),
+                                NoteReqex.Modifier.ZeroOrMore, WebPage.class),
 
-                        new AtomRegex.El(new DocumentsAboutTopicHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
+                        new NoteReqex.El(new DocumentsAboutTopicHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, DocumentAboutTopicCollection.class),
 
-                        new AtomRegex.El(new MemberHandler(),
-                                AtomRegex.Modifier.ZeroOrOne, PersonCollection.class),
+                        new NoteReqex.El(new MemberHandler(),
+                                NoteReqex.Modifier.ZeroOrOne, PersonCollection.class),
 
-                        new AtomRegex.El(null,
-                                AtomRegex.Modifier.ZeroOrMore)
+                        new NoteReqex.El(null,
+                                NoteReqex.Modifier.ZeroOrMore)
                 )));
     }
 
@@ -48,20 +48,20 @@ public class Organization extends AtomClass {
     }
 
     @Override
-    public IRI toRDF(Atom a, RDFizationContext context) throws RDFHandlerException {
+    public IRI toRDF(Note a, RDFizationContext context) throws RDFHandlerException {
         ValueFactory vf = context.getValueFactory();
         RDFHandler handler = context.getHandler();
 
         IRI self = handleTypeAndAlias(a, context, FOAF.ORGANIZATION);
 
-        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(a.getTitle())));
+        handler.handleStatement(vf.createStatement(self, DCTERMS.TITLE, vf.createLiteral(Note.getTitle(a))));
 
         return self;
     }
 
     public static class MemberHandler implements FieldHandler {
         @Override
-        public void handle(Atom object, RDFizationContext context) throws RDFHandlerException {
+        public void handle(Note object, RDFizationContext context) throws RDFHandlerException {
             ValueFactory vf = context.getValueFactory();
             IRI objectIRI = context.iriOf(object);
             context.getHandler().handleStatement(vf.createStatement(

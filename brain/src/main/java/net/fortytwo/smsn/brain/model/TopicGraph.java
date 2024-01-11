@@ -1,66 +1,60 @@
 package net.fortytwo.smsn.brain.model;
 
-import net.fortytwo.smsn.brain.model.entities.Atom;
-import net.fortytwo.smsn.brain.model.entities.EntityList;
-import net.fortytwo.smsn.brain.model.entities.KeyValueTree;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.model.entities.ListNode;
+import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * A graph of atoms and lists conforming to the Extend-o-Brain data model
+ * A graph of notes and lists conforming to the SmSn data model
  */
 public interface TopicGraph {
 
-    /**
-     * The configurable namespace into which things, i.e. classified atoms, are mapped
-     */
-    String PROP_THING_NAMESPACE = "net.fortytwo.smsn.brain.thingNamespace";
+    Iterable<Note> getAllNotes();
 
-    String DEFAULT_THING_NAMESPACE = "http://example.org/things/";
+    Optional<Note> getNoteById(AtomId id);
 
-    Iterable<Atom> getAllAtoms();
+    List<Note> getNotesByAcronym(String acronym, Filter filter);
 
-    Optional<Atom> getAtomById(String id);
+    List<Note> getNotesByShortcut(String shortcut, Filter filter);
 
-    List<Atom> getAtomsByAcronym(String acronym, Filter filter);
+    List<Note> getNotesByTitleQuery(String value, Filter filter);
 
-    List<Atom> getAtomsByShortcut(String shortcut, Filter filter);
+    AtomId idOf(Note a);
 
-    List<Atom> getAtomsByTitleQuery(String value, Filter filter);
+    String iriOf(Note a);
 
-    String idOfAtom(Atom a);
+    Topic createTopic(AtomId id);
 
-    String iriOfAtom(Atom a);
+    Page createPage(Link root);
 
-    Topic createTopic(String id);
+    Link createLink(Topic target, String label, Role role);
 
-    Page createPage(Link topicLink);
+    TreeNode<Link> createTopicTree(Link link);
 
-    Link createLink(Topic target, String label);
+    Note createNote(AtomId id);
 
-    KeyValueTree<Link, EntityList<Link>> createTopicTree(Link link);
+    Note createNoteWithProperties(Filter filter, AtomId id);
 
-    Atom createAtom(String id);
+    ListNode<Link> toList(Link... elements);
 
-    Atom createAtomWithProperties(Filter filter, String id);
+    ListNode<Topic> toList(Topic... elements);
 
-    EntityList<Link> createListOfLinks(Link... elements);
+    ListNode<TreeNode<Link>> toList(TreeNode<Link>... elements);
 
-    EntityList<KeyValueTree<Link, EntityList<Link>>> createListOfTrees(
-            KeyValueTree<Link, EntityList<Link>>... elements);
+    ListNode<Note> createListOfNotes(Note... elements);
 
-    EntityList<Atom> createListOfAtoms(Atom... elements);
-
-    void removeIsolatedAtoms(Filter filter);
+    void removeIsolatedNotes(Filter filter);
 
     void notifyOfUpdate();
 
-    void reindexAtom(Atom a);
+    void reindex(Note a);
 
     long getLastUpdate();
 
@@ -76,7 +70,7 @@ public interface TopicGraph {
         void run();
     }
 
-    static void wrapInTransaction(final TopicGraph graph, final IORunnable runnable) throws IOException {
+    static void wrapInTransaction(final TopicGraph graph, final IORunnable runnable) {
         graph.begin();
 
         boolean success = false;

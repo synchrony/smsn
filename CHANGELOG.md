@@ -1,6 +1,16 @@
 Semantic Synchrony CHANGELOG
 ========================================
 
+SmSn 1.5 (Four Hundred Pounds of Butterflies)
+----------------------------------------
+****************************************
+* Add dashboard pages for graph analytics, data sources, properties, the activity log, Git history, and search
+* Create RStudio-based analytics dashboard
+* Build a shadow jar for use with Gremlin Server
+* Migrate from Maven to Gradle, adding a Gradle wrapper
+* Improved parse error messages
+****************************************
+
 SmSn 1.4 (Pogo Stilts)
 ----------------------------------------
 ****************************************

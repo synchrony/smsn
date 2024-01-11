@@ -1,0 +1,16 @@
+dependencies {
+  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
+    exclude(module: 'jackson-core')
+    exclude(module: 'xmpp-mtp')
+    exclude(module: 'sesame-repository-sparql')
+    exclude(module: 'commons-codec')
+    exclude(module: 'jackson-core')
+  }
+  implementation group: 'org.openrdf.sesame', name: 'sesame-model', version: sesameVersion
+
+  testImplementation group: 'org.openrdf.sesame', name: 'sesame-queryparser-sparql', version: sesameVersion
+  testImplementation(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: sesameVersion) {
+    exclude(module: 'commons-codec')
+  }
+  testImplementation "junit:junit:$junitVersion"
+}
