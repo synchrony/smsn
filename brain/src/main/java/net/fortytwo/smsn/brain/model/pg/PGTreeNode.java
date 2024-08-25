@@ -9,36 +9,52 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.function.Function;
 
-public abstract class PGTreeNode<T extends Entity> extends PGEntity implements TreeNode<T> {
+public abstract class PGTreeNode<T extends Entity> implements PGEntity, TreeNode<T> {
+
+    private final Vertex vertex;
+
+    @Override
+    public Vertex asVertex() {
+        return vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGTreeNode && PGEntity.equals(asVertex(), ((PGTreeNode) other).asVertex());
+    }
+    @Override
+    public int hashCode() {
+        return PGEntity.hashCode(asVertex());
+    }
 
     private final Function<Vertex, T> constructor;
 
     public PGTreeNode(Vertex vertex,
                       Function<Vertex, T> constructor) {
-        super(vertex);
+        this.vertex = vertex;
         this.constructor = constructor;
     }
 
     @Override
     public T getValue() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.VALUE, Direction.OUT, constructor);
+        return PGEntity.getAtMostOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.VALUE, Direction.OUT, constructor);
     }
 
     @Override
     public void setValue(T value) {
-        setRequiredEntity(SemanticSynchrony.EdgeLabels.VALUE, value);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.EdgeLabels.VALUE, value);
     }
 
     @Override
     public ListNode<TreeNode<T>> getChildren() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.CHILDREN, Direction.OUT,
+        return PGEntity.getAtMostOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.CHILDREN, Direction.OUT,
                 v -> getGraph().asEntityList(v,
                         vertex -> getGraph().asEntityTree(vertex, constructor)));
     }
 
     @Override
     public void setChildren(ListNode<TreeNode<T>> children) {
-        setOptionalEntity(SemanticSynchrony.EdgeLabels.CHILDREN, children);
+        PGEntity.setOptionalEntity(asVertex(), SemanticSynchrony.EdgeLabels.CHILDREN, children);
     }
 
     @Override

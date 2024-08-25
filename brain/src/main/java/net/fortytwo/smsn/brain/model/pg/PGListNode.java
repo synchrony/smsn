@@ -8,40 +8,56 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.function.Function;
 
-public abstract class PGListNode<T extends Entity> extends PGEntity implements ListNode<T> {
+public abstract class PGListNode<T extends Entity> implements PGEntity, ListNode<T> {
+
+    private final Vertex vertex;
+
+    @Override
+    public Vertex asVertex() {
+        return vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGListNode && PGEntity.equals(asVertex(), ((PGListNode) other).asVertex());
+    }
+    @Override
+    public int hashCode() {
+        return PGEntity.hashCode(asVertex());
+    }
 
     private final Function<Vertex, T> constructor;
 
     public PGListNode(final Vertex vertex,
                       final Function<Vertex, T> constructor) {
-        super(vertex);
+        this.vertex = vertex;
         this.constructor = constructor;
     }
 
     @Override
     public T getFirst() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.FIRST, Direction.OUT, constructor);
+        return PGEntity.getExactlyOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.FIRST, Direction.OUT, constructor);
     }
 
     @Override
     public void setFirst(T first) {
-        setRequiredEntity(SemanticSynchrony.EdgeLabels.FIRST, first);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.EdgeLabels.FIRST, first);
     }
 
     @Override
     public ListNode<T> getRest() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.REST, Direction.OUT,
+        return PGEntity.getAtMostOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.REST, Direction.OUT,
                 vertex -> getGraph().asEntityList(vertex, constructor));
     }
 
     @Override
     public void setRest(ListNode<T> rest) {
-        setOptionalEntity(SemanticSynchrony.EdgeLabels.REST, rest);
+        PGEntity.setOptionalEntity(asVertex(), SemanticSynchrony.EdgeLabels.REST, rest);
     }
 
     @Override
     public ListNode<T> getRestOf() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.REST, Direction.IN,
+        return PGEntity.getAtMostOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.REST, Direction.IN,
                 vertex -> getGraph().asEntityList(vertex, constructor));
     }
 
@@ -77,6 +93,6 @@ public abstract class PGListNode<T extends Entity> extends PGEntity implements L
             rest.destroy();
         }
 
-        destroyInternal();
+        PGEntity.destroyInternal(asVertex());
     }
 }

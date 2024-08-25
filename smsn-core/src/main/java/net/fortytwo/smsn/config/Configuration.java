@@ -13,10 +13,8 @@ public class Configuration implements Serializable {
     private Integer transactionBufferSize;
     private String thingNamespace = "http://example.org/things/";
     private AtomId brainstream;
-
-    private boolean verbose = false;
-
     private Services services = new Services();
+    private boolean verbose = false;
     private List<DataSource> sources = new LinkedList<>();
 
     public Services getServices() {

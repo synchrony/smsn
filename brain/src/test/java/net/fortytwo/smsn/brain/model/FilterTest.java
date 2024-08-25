@@ -61,7 +61,7 @@ public class FilterTest extends BrainTestBase {
     }
 
     private Note createNote(final String source, final Float weight) {
-        Note note = new NoteDTO();
+        Note note = NoteDTO.createNew();
         Note.setSource(note, source);
         Note.setWeight(note, weight);
         return note;

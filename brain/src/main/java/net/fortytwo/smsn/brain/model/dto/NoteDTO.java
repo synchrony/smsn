@@ -17,17 +17,21 @@ public class NoteDTO implements Note {
     private Topic topic;
     private ListNode<Note> children;
 
-    public NoteDTO() {
+    protected NoteDTO() {
         propertyMap = new HashMap<>();
+    }
 
+    public static NoteDTO createNew() {
+        NoteDTO note = new NoteDTO();
         AtomId id = SemanticSynchrony.createRandomId();
-        Note.setId(this, id);
-        Note.setTitle(this, "note " + id);
-        Note.setCreated(this, System.currentTimeMillis());
-        Note.setWeight(this, SemanticSynchrony.DEFAULT_WEIGHT);
-        Note.setPriority(this, SemanticSynchrony.DEFAULT_PRIORITY);
+        Note.setId(note, id);
+        Note.setTitle(note, "note " + id);
+        Note.setCreated(note, System.currentTimeMillis());
+        Note.setWeight(note, SemanticSynchrony.DEFAULT_WEIGHT);
+        Note.setPriority(note, SemanticSynchrony.DEFAULT_PRIORITY);
         // TODO: don't hard-code the default source
-        Note.setSource(this, "public");
+        Note.setSource(note, "public");
+        return note;
     }
 
     @Override

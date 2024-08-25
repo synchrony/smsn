@@ -189,7 +189,7 @@ public class PGTopicGraph implements TopicGraph {
 
         return new PGTopic(vertex) {
             @Override
-            protected PGTopicGraph getGraph() {
+            public PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };
@@ -200,7 +200,7 @@ public class PGTopicGraph implements TopicGraph {
 
         return new PGLink(vertex) {
             @Override
-            protected PGTopicGraph getGraph() {
+            public PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };
@@ -211,7 +211,7 @@ public class PGTopicGraph implements TopicGraph {
 
         return new PGPage(vertex) {
             @Override
-            protected PGTopicGraph getGraph() {
+            public PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };
@@ -222,7 +222,7 @@ public class PGTopicGraph implements TopicGraph {
 
         return new PGNote(vertex) {
             @Override
-            protected PGTopicGraph getGraph() {
+            public PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };
@@ -233,7 +233,7 @@ public class PGTopicGraph implements TopicGraph {
 
         return new PGListNode<T>(vertex, constructor) {
             @Override
-            protected PGTopicGraph getGraph() {
+            public PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };
@@ -245,7 +245,7 @@ public class PGTopicGraph implements TopicGraph {
 
         return new PGTreeNode<T>(vertex, constructor) {
             @Override
-            protected PGTopicGraph getGraph() {
+            public PGTopicGraph getGraph() {
                 return PGTopicGraph.this;
             }
         };

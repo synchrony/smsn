@@ -138,7 +138,7 @@ public class RepositoryCollection implements AbstractRepository {
     }
 
     private SmSnGitRepository createRepository(final DataSource dataSource) throws IOException {
-        return new SmSnGitRepository(brain, dataSource);
+        return SmSnGitRepository.createRepository(brain, dataSource);
     }
 
     private interface ConsumerWithException<T, E extends Exception> {

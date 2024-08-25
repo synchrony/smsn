@@ -8,99 +8,115 @@ import net.fortytwo.smsn.brain.model.entities.Page;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-public abstract class PGPage extends PGEntity implements Page {
+public abstract class PGPage implements PGEntity, Page {
+
+    private final Vertex vertex;
+
+    @Override
+    public Vertex asVertex() {
+        return vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGPage && PGEntity.equals(asVertex(), ((PGPage) other).asVertex());
+    }
+    @Override
+    public int hashCode() {
+        return PGEntity.hashCode(asVertex());
+    }
 
     public PGPage(Vertex vertex) {
-        super(vertex);
+        this.vertex = vertex;
     }
 
     public Role getRole() {
-        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
+        String name = PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.ROLE);
         return null == name ? null : Role.valueOf(name);
     }
 
     public void setRole(final Role role) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
+        PGEntity.setOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
     }
 
     @Override
     public String getAlias() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS);
+        return PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.ALIAS);
     }
 
     @Override
     public void setAlias(String alias) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.ALIAS, alias);
+        PGEntity.setOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.ALIAS, alias);
     }
 
     @Override
     public String getText() {
-        return (String) getOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT);
+        return (String) PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.TEXT);
     }
 
     @Override
     public void setText(String text) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.TEXT, text);
+        PGEntity.setOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.TEXT, text);
     }
 
     @Override
     public Float getPriority() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY);
+        return PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.PRIORITY);
     }
 
     @Override
     public void setPriority(Float priority) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.PRIORITY, priority);
+        PGEntity.setOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.PRIORITY, priority);
     }
 
     @Override
     public Long getCreated() {
-        return getRequiredProperty(SemanticSynchrony.PropertyKeys.CREATED);
+        return PGEntity.getRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.CREATED);
     }
 
     @Override
     public void setCreated(Long created) {
-        setRequiredEntity(SemanticSynchrony.PropertyKeys.CREATED, created);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.PropertyKeys.CREATED, created);
     }
 
     @Override
     public String getSource() {
-        return getRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE);
+        return PGEntity.getRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.SOURCE);
     }
 
     @Override
     public void setSource(String source) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.SOURCE, source);
+        PGEntity.setRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.SOURCE, source);
     }
 
     @Override
     public String getShortcut() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT);
+        return PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.SHORTCUT);
     }
 
     @Override
     public void setShortcut(String shortcut) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
+        PGEntity.setOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.SHORTCUT, shortcut);
     }
 
     @Override
     public Float getWeight() {
-        return getOptionalProperty(SemanticSynchrony.PropertyKeys.WEIGHT, 0f);
+        return PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.WEIGHT, 0f);
     }
 
     @Override
     public void setWeight(Float weight) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.WEIGHT, weight);
+        PGEntity.setRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.WEIGHT, weight);
     }
 
     @Override
     public TreeNode<Link> getContent() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.CONTENT, Direction.OUT, v -> getGraph().asLinkTree(v));
+        return PGEntity.getExactlyOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.CONTENT, Direction.OUT, v -> getGraph().asLinkTree(v));
     }
 
     @Override
     public void setContent(TreeNode<Link> tree) {
-        setRequiredEntity(SemanticSynchrony.EdgeLabels.CONTENT, tree);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.EdgeLabels.CONTENT, tree);
     }
 
     @Override
@@ -108,6 +124,6 @@ public abstract class PGPage extends PGEntity implements Page {
         // a page does not own its primary topic, but it does own its topic tree
         getContent().destroy();
 
-        destroyInternal();
+        PGEntity.destroyInternal(asVertex());
     }
 }

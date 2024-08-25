@@ -11,57 +11,43 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-abstract class PGEntity {
+interface PGEntity {
 
-    private final Vertex vertex;
+    Vertex asVertex();
 
-    protected PGEntity(final Vertex vertex) {
-        this.vertex = vertex;
+    static boolean equals(final Vertex vertex, Object other) {
+        return other instanceof Vertex && ((Vertex) other).id().equals(vertex.id());
     }
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof PGEntity && ((PGEntity) other).vertex.id().equals(vertex.id());
-    }
-
-    @Override
-    public int hashCode() {
+    static int hashCode(final Vertex vertex) {
         return vertex.id().hashCode();
     }
 
-    public void remove() {
-        vertex.remove();
+    PGTopicGraph getGraph();
+
+    static void addOutEdge(final Vertex vertex, final Vertex inVertex, final String label) {
+        vertex.addEdge(label, inVertex);
     }
 
-    protected abstract PGTopicGraph getGraph();
-
-    public Vertex asVertex() {
-        return vertex;
-    }
-
-    protected void addOutEdge(final Vertex inVertex, final String label) {
-        asVertex().addEdge(label, inVertex);
-    }
-
-    protected <T> T getOptionalProperty(String name) {
+    static <T> T getOptionalProperty(final Vertex vertex, String name) {
         VertexProperty<T> property = vertex.property(name);
         return property.isPresent() ? property.value() : null;
     }
 
-    protected <T> T getOptionalProperty(String name, T defaultValue) {
-        T value = getOptionalProperty(name);
+    static <T> T getOptionalProperty(final Vertex vertex, String name, T defaultValue) {
+        T value = getOptionalProperty(vertex, name);
         return null == value ? defaultValue : value;
     }
 
-    protected <T> T getRequiredProperty(String name) {
-        T value = getOptionalProperty(name);
+    static <T> T getRequiredProperty(final Vertex vertex, String name) {
+        T value = getOptionalProperty(vertex, name);
         if (null == value) {
-            throw new InvalidGraphException("missing property '" + name + "' for " + this);
+            throw new InvalidGraphException("missing property '" + name + "' for " + toString(vertex));
         }
         return value;
     }
 
-    private <T> boolean setProperty(String name, T value) {
+    private static <T> boolean setProperty(final Vertex vertex, String name, T value) {
         Object previousValue = vertex.property(name);
 
         if (null == value) {
@@ -81,95 +67,96 @@ abstract class PGEntity {
         }
     }
 
-    protected boolean setOptionalProperty(String name, Object value) {
-        return setProperty(name, value);
+    static boolean setOptionalProperty(final Vertex vertex, String name, Object value) {
+        return setProperty(vertex, name, value);
     }
 
-    protected boolean setRequiredProperty(String name, Object value) {
+    static boolean setRequiredProperty(final Vertex vertex, String name, Object value) {
         if (null == value) {
             throw new IllegalArgumentException("can't clear required property '" + name
-                    + "' on " + this);
+                    + "' on " + toString(vertex));
         }
 
-        return setProperty(name, value);
+        return setProperty(vertex, name, value);
     }
 
-    protected boolean setRequiredEntity(final String label, final Object other) {
-        return setEntity(label, other, true);
+    static boolean setRequiredEntity(final Vertex vertex, final String label, final Object other) {
+        return setEntity(vertex, label, other, true);
     }
 
-    protected boolean setOptionalEntity(final String label, final Object other) {
-        return setEntity(label, other, false);
+    static boolean setOptionalEntity(final Vertex vertex, final String label, final Object other) {
+        return setEntity(vertex, label, other, false);
     }
 
-    private boolean setEntity(final String label, final Object other, final boolean required) {
+    private static boolean setEntity(Vertex vertex, final String label, final Object other, final boolean required) {
         Preconditions.checkArgument(!required || null != other);
 
-        boolean changed = removeEdge(label, Direction.OUT);
+        boolean changed = PGEntity.removeEdge(vertex, label, Direction.OUT);
         if (null != other) {
-            addOutEdge(((PGEntity) other).asVertex(), label);
+            addOutEdge(vertex, ((PGEntity) other).asVertex(), label);
             changed = true;
         }
         return changed;
     }
 
-    protected void forAllVertices(final String label, final Direction direction, final Consumer<Vertex> consumer) {
+    static void forAllVertices(final Vertex vertex,
+                                         final String label, final Direction direction, final Consumer<Vertex> consumer) {
         vertex.vertices(direction, label).forEachRemaining(consumer);
     }
 
-    private Vertex getAtMostOneVertex(final String label, final Direction direction) {
-        Edge edge = getAtMostOneEdge(label, direction);
+    private static Vertex getAtMostOneVertex(final Vertex vertex, final String label, final Direction direction) {
+        Edge edge = getAtMostOneEdge(vertex, label, direction);
         return null == edge ? null : getVertex(edge, direction.opposite());
     }
 
-    private Vertex getExactlyOneVertex(final String label, final Direction direction) {
-        return getVertex(getExactlyOneEdge(label, direction), direction.opposite());
+    private static Vertex getExactlyOneVertex(final Vertex vertex, final String label, final Direction direction) {
+        return getVertex(getExactlyOneEdge(vertex, label, direction), direction.opposite());
     }
 
-    protected <T> T getExactlyOneEntity(
+    static <T> T getExactlyOneEntity(final Vertex vertex,
             final String label, final Direction direction, final Function<Vertex, T> constructor) {
-        return constructor.apply(getExactlyOneVertex(label, direction));
+        return constructor.apply(getExactlyOneVertex(vertex, label, direction));
     }
 
-    protected <T> T getAtMostOneEntity(
+    static <T> T getAtMostOneEntity(final Vertex vertex,
             final String label, final Direction direction, final Function<Vertex, T> constructor) {
-        Vertex vertex = getAtMostOneVertex(label, direction);
-        return null == vertex ? null : constructor.apply(vertex);
+        Vertex v = getAtMostOneVertex(vertex, label, direction);
+        return null == v ? null : constructor.apply(v);
     }
 
-    private Edge getAtMostOneEdge(final String label, final Direction direction) {
+    private static Edge getAtMostOneEdge(final Vertex vertex, final String label, final Direction direction) {
         Iterator<Edge> iter = vertex.edges(direction, label);
         if (!iter.hasNext()) {
             return null;
         }
         Edge result = iter.next();
         if (iter.hasNext()) {
-            throw new InvalidGraphException("vertex " + this
+            throw new InvalidGraphException("vertex " + toString(vertex)
                     + " has more than one '" + label + "' " + direction + " edge");
         }
         return result;
     }
 
-    private Edge getExactlyOneEdge(final String label, final Direction direction) {
-        Edge other = getAtMostOneEdge(label, direction);
+    private static Edge getExactlyOneEdge(final Vertex vertex, final String label, final Direction direction) {
+        Edge other = getAtMostOneEdge(vertex, label, direction);
         if (null == other) {
-            throw new InvalidGraphException("vertex " + this
+            throw new InvalidGraphException("vertex " + toString(vertex)
                     + " is missing '" + label + "' " + direction + " edge");
         }
         return other;
     }
 
-    protected void forEachAdjacentVertex(final String label, Direction direction, Consumer<Vertex> consumer) {
+    static void forEachAdjacentVertex(Vertex vertex, final String label, Direction direction, Consumer<Vertex> consumer) {
         vertex.vertices(direction, label).forEachRemaining(consumer);
     }
 
-    protected boolean hasAdjacentVertex(final String label, Direction direction) {
+    static boolean hasAdjacentVertex(Vertex vertex, final String label, Direction direction) {
         return vertex.vertices(direction, label).hasNext();
     }
 
-    protected boolean removeEdge(final String label, Direction direction) {
+    static boolean removeEdge(Vertex vertex, final String label, Direction direction) {
         final Mutable<Boolean> changed = new Mutable<>(false);
-        asVertex().edges(direction, label).forEachRemaining(
+        vertex.edges(direction, label).forEachRemaining(
                 edge -> {
                     edge.remove();
                     changed.value = true;
@@ -177,11 +164,11 @@ abstract class PGEntity {
         return changed.value;
     }
 
-    protected void destroyInternal() {
+    static void destroyInternal(final Vertex vertex) {
         vertex.remove();
     }
 
-    private static class Mutable<T> {
+    static class Mutable<T> {
         public T value;
 
         public Mutable(T value) {
@@ -189,7 +176,7 @@ abstract class PGEntity {
         }
     }
 
-    private Vertex getVertex(final Edge edge, final Direction direction) {
+    private static Vertex getVertex(final Edge edge, final Direction direction) {
         switch (direction) {
             case OUT:
                 return edge.outVertex();
@@ -200,12 +187,7 @@ abstract class PGEntity {
         }
     }
 
-    @Override
-    public String toString() {
-        String className = getClass().getSimpleName();
-        if (0 == className.length()) {
-            className = "vertex";
-        }
-        return className + "[" + vertex.id() + "]";
+    static String toString(final Vertex vertex) {
+        return "entity[" + vertex.id() + "]";
     }
 }

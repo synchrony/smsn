@@ -58,17 +58,34 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
         return dateFormat.get().format(new Date(timeStamp));
     }
 
-    public SmSnGitRepository(final Brain brain, final DataSource dataSource) throws IOException {
+    private SmSnGitRepository(
+            DataSource dataSource,
+            Repository repository,
+            Git git,
+            File directory,
+
+            Brain brain,
+            TreeViews treeViews,
+            Filter filter) {
         super();
 
-        this.brain = brain;
         this.dataSource = dataSource;
-        treeViews = new TreeViews(brain);
+        this.repository = repository;
+        this.git = git;
+        this.directory = directory;
+        this.brain = brain;
+        this.treeViews = treeViews;
+        this.filter = filter;
+    }
+
+    public static SmSnGitRepository createRepository(final Brain brain, final DataSource dataSource) throws IOException {
+
+        TreeViews treeViews = new TreeViews(brain);
 
         // TODO
-        this.filter = Filter.noFilter();
+        Filter filter = Filter.noFilter();
 
-        directory = new File(dataSource.getLocation());
+        File directory = new File(dataSource.getLocation());
         Preconditions.checkNotNull(directory);
         Preconditions.checkArgument(directory.exists());
         Preconditions.checkArgument(directory.isDirectory());
@@ -77,18 +94,21 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
         Preconditions.checkArgument(gitDirectory.exists());
         Preconditions.checkArgument(gitDirectory.isDirectory());
 
-        verifyCanRead();
 
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        repository = builder.setGitDir(gitDirectory)
+        Repository repository = builder.setGitDir(gitDirectory)
                 .readEnvironment() // scan environment GIT_* variables
                 .findGitDir() // scan up the file system tree
                 .build();
 
-        git = new Git(repository);
+        Git git = new Git(repository);
 
-        Note.setSource(this, dataSource.getName());
-        Note.setTitle(this, "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis()));
+        SmSnGitRepository note = new SmSnGitRepository(dataSource, repository, git, directory, brain, treeViews, filter);
+        note.verifyCanRead();
+        Note.setSource(note, dataSource.getName());
+        Note.setTitle(note, "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis()));
+
+        return note;
     }
 
     Git getGit() {

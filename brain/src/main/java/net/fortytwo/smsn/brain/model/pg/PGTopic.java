@@ -6,31 +6,47 @@ import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-public abstract class PGTopic extends PGEntity implements Topic {
+public abstract class PGTopic implements PGEntity, Topic {
+
+    private final Vertex vertex;
+
+    @Override
+    public Vertex asVertex() {
+        return vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGTopic && PGEntity.equals(asVertex(), ((PGTopic) other).asVertex());
+    }
+    @Override
+    public int hashCode() {
+        return PGEntity.hashCode(asVertex());
+    }
 
     protected PGTopic(Vertex vertex) {
-        super(vertex);
+        this.vertex = vertex;
     }
 
     @Override
     public AtomId getId() {
-        return new AtomId(getRequiredProperty(SemanticSynchrony.PropertyKeys.ID));
+        return new AtomId(PGEntity.getRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.ID));
     }
 
     @Override
     public void setId(final AtomId id) {
         AtomId noteId = null == id ? SemanticSynchrony.createRandomId() : id;
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.ID, noteId.value);
+        PGEntity.setRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.ID, noteId.value);
     }
 
     @Override
     public boolean isIsolated() {
-        return !hasAdjacentVertex(SemanticSynchrony.EdgeLabels.TARGET, Direction.IN);
+        return !PGEntity.hasAdjacentVertex(asVertex(), SemanticSynchrony.EdgeLabels.TARGET, Direction.IN);
     }
 
     @Override
     public void destroy() {
         // nothing else to do; a topic owns no other entities
-        destroyInternal();
+        PGEntity.destroyInternal(asVertex());
     }
 }

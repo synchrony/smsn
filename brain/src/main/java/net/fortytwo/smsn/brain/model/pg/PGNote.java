@@ -18,7 +18,23 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class PGNote extends PGEntity implements Note {
+public abstract class PGNote implements PGEntity, Note {
+
+    private final Vertex vertex;
+
+    @Override
+    public Vertex asVertex() {
+        return vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGNote && PGEntity.equals(asVertex(), ((PGNote) other).asVertex());
+    }
+    @Override
+    public int hashCode() {
+        return PGEntity.hashCode(asVertex());
+    }
 
     private static final Map<String, Consumer<PGNote>> setterTriggersByPropertyKey;
 
@@ -31,24 +47,22 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     public PGNote(final Vertex vertex) {
-        super(vertex);
+        this.vertex = vertex;
     }
-
-    protected abstract PGTopicGraph getGraph();
 
     @Override
     public Topic getTopic() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.TOPIC, Direction.OUT, v -> getGraph().asTopic(v));
+        return PGEntity.getExactlyOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.TOPIC, Direction.OUT, v -> getGraph().asTopic(v));
     }
 
     @Override
     public void setTopic(final Topic topic) {
-        setRequiredEntity(SemanticSynchrony.EdgeLabels.TOPIC, topic);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.EdgeLabels.TOPIC, topic);
     }
 
     @Override
     public ListNode<Note> getChildren() {
-        return getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfNotes(v));
+        return PGEntity.getAtMostOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT, v -> getGraph().asListOfNotes(v));
     }
 
     @Override
@@ -60,7 +74,7 @@ public abstract class PGNote extends PGEntity implements Note {
 
     @Override
     public void forFirstOf(Consumer<ListNode<Note>> consumer) {
-        forEachAdjacentVertex(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
+        PGEntity.forEachAdjacentVertex(this.asVertex(), SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
                 vertex -> consumer.accept(getGraph().asListOfNotes(vertex)));
     }
 
@@ -104,10 +118,10 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     private void setChildrenInternal(ListNode<Note> children) {
-        removeEdge(SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
+        PGEntity.removeEdge(asVertex(), SemanticSynchrony.EdgeLabels.NOTES, Direction.OUT);
 
         if (null != children) {
-            addOutEdge(((PGEntity) children).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
+            PGEntity.addOutEdge(asVertex(), ((PGEntity) children).asVertex(), SemanticSynchrony.EdgeLabels.NOTES);
         }
     }
 
@@ -123,7 +137,7 @@ public abstract class PGNote extends PGEntity implements Note {
     @Override
     public Collection<ListNode<Note>> getFirstOf() {
         List<ListNode<Note>> result = new java.util.LinkedList<>();
-        forAllVertices(SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
+        PGEntity.forAllVertices(asVertex(), SemanticSynchrony.EdgeLabels.FIRST, Direction.IN,
                 vertex -> result.add(getGraph().asListOfNotes(vertex)));
 
         return result;
@@ -132,13 +146,13 @@ public abstract class PGNote extends PGEntity implements Note {
     @Override
     public Note getSubject(ListNode<Note> notes) {
         PGEntity entity = (PGEntity) notes;
-        return entity.getAtMostOneEntity(SemanticSynchrony.EdgeLabels.NOTES, Direction.IN,
+        return PGEntity.getAtMostOneEntity(entity.asVertex(), SemanticSynchrony.EdgeLabels.NOTES, Direction.IN,
                 vertex -> getGraph().asNote(vertex));
     }
 
     @Override
     public void destroy() {
-        destroyInternal();
+        PGEntity.destroyInternal(asVertex());
     }
 
     private void deleteEntity(final ListNode<Note> l) {
@@ -211,7 +225,7 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     public <V> V optProperty(final String key) {
-        return getOptionalProperty(key);
+        return PGEntity.getOptionalProperty(asVertex(), key);
     }
 
     public <V> V getProperty(final String key) {
@@ -223,7 +237,7 @@ public abstract class PGNote extends PGEntity implements Note {
     }
 
     public <V> V getProperty(final Property<Note, V> property) {
-        V value = getOptionalProperty(property.getKey());
+        V value = PGEntity.getOptionalProperty(asVertex(), property.getKey());
         if (null == value) {
             if (null != property.getDefaultValue()) {
                 return property.getDefaultValue();
@@ -251,7 +265,7 @@ public abstract class PGNote extends PGEntity implements Note {
             internalValue = value;
         }
 
-        setOptionalProperty(property.getKey(), internalValue);
+        PGEntity.setOptionalProperty(asVertex(), property.getKey(), internalValue);
         Consumer<PGNote> trigger = setterTriggersByPropertyKey.get(property.getKey());
         if (null != trigger) {
             trigger.accept(this);

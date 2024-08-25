@@ -49,7 +49,7 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         dataSource.setName(DefaultSources.PUBLIC);
         dataSource.setLocation(repoDir.getAbsolutePath());
 
-        repo = new SmSnGitRepository(brain, dataSource);
+        repo = SmSnGitRepository.createRepository(brain, dataSource);
         git = repo.getGit();
         assertNotNull(git.getRepository().getRef(Constants.HEAD));
         assertTrue(git.status().call().isClean());

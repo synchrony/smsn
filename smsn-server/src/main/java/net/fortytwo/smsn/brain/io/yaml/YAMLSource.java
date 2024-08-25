@@ -127,7 +127,7 @@ class YAMLSource {
         Map<AtomId, Note> notes = new HashMap<>();
 
         for (Map<String, Object> map : loadYaml(file)) {
-            Note note = new NoteDTO();
+            Note note = NoteDTO.createNew();
             Note.setSource(note, sourceName);
 
             fromMap(map, note, YAMLFormat.Constants.AtomFields.ALIAS, (n, o) -> Note.setAlias(n, toString(o)));
@@ -180,7 +180,7 @@ class YAMLSource {
         Note[] notes = new Note[ids.size()];
         int i = 0;
         for (String id : ids) {
-            Note note = new NoteDTO();
+            Note note = NoteDTO.createNew();
             Note.setId(note, new AtomId(id));
             notes[i++] = note;
         }

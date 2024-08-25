@@ -8,58 +8,74 @@ import net.fortytwo.smsn.brain.model.entities.Topic;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-public abstract class PGLink extends PGEntity implements Link {
+public abstract class PGLink implements PGEntity, Link {
+
+    private final Vertex vertex;
+
+    @Override
+    public Vertex asVertex() {
+        return vertex;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof PGLink && PGEntity.equals(asVertex(), ((PGLink) other).asVertex());
+    }
+    @Override
+    public int hashCode() {
+        return PGEntity.hashCode(asVertex());
+    }
 
     protected PGLink(Vertex vertex) {
-        super(vertex);
+        this.vertex = vertex;
     }
 
     public Role getRole() {
-        String name = getOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE);
+        String name = PGEntity.getOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.ROLE);
         return null == name ? null : Role.valueOf(name);
     }
 
     public void setRole(final Role role) {
-        setOptionalProperty(SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
+        PGEntity.setOptionalProperty(asVertex(), SemanticSynchrony.PropertyKeys.ROLE, null == role ? null : role.name());
     }
 
     @Override
     public Topic getTarget() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.TARGET, Direction.OUT,
+        return PGEntity.getExactlyOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.TARGET, Direction.OUT,
                 vertex -> getGraph().asTopic(vertex));
     }
 
     @Override
     public void setTarget(Topic target) {
-        setRequiredEntity(SemanticSynchrony.EdgeLabels.TARGET, target);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.EdgeLabels.TARGET, target);
     }
 
     @Override
     public String getLabel() {
-        return getRequiredProperty(SemanticSynchrony.PropertyKeys.LABEL);
+        return PGEntity.getRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.LABEL);
     }
 
     @Override
     public void setLabel(String label) {
-        setRequiredProperty(SemanticSynchrony.PropertyKeys.LABEL, label);
+        PGEntity.setRequiredProperty(asVertex(), SemanticSynchrony.PropertyKeys.LABEL, label);
     }
 
     @Override
     public Page getPage() {
-        return getExactlyOneEntity(SemanticSynchrony.EdgeLabels.PAGE, Direction.OUT,
+        return PGEntity.getExactlyOneEntity(asVertex(), SemanticSynchrony.EdgeLabels.PAGE, Direction.OUT,
                 vertex -> getGraph().asPage(vertex));
     }
 
     @Override
     public void setPage(Page page) {
-        setRequiredEntity(SemanticSynchrony.EdgeLabels.PAGE, page);
+        PGEntity.setRequiredEntity(asVertex(), SemanticSynchrony.EdgeLabels.PAGE, page);
     }
 
     @Override
     public void destroy() {
         Topic target = getTarget();
 
-        destroyInternal();
+        PGEntity.destroyInternal(asVertex());
 
         // a link owns its target only if there are no other links to the target
         if (target.isIsolated()) {
