@@ -1,0 +1,22 @@
+{
+  "name": "Semantic Synchrony",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "An extension for importing bookmarks into Semantic Synchrony",
+  "action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "history",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:8182/"
+  ]
+}
+
