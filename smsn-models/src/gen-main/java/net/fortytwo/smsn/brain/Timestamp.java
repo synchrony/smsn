@@ -1,17 +1,21 @@
+// Note: this is an automatically generated file. Do not edit.
+
 package net.fortytwo.smsn.brain;
+
+import java.io.Serializable;
 
 /**
  * A Unix timestamp in seconds
  */
-public class Timestamp {
-  public static final hydra.core.Name NAME = new hydra.core.Name("net/fortytwo/smsn/brain.Timestamp");
+public class Timestamp implements Serializable {
+  public static final hydra.core.Name TYPE_NAME = new hydra.core.Name("net/fortytwo/smsn/brain.Timestamp");
   
-  /**
-   * A Unix timestamp in seconds
-   */
+  public static final hydra.core.Name FIELD_NAME_VALUE = new hydra.core.Name("value");
+  
   public final Integer value;
   
   public Timestamp (Integer value) {
+    java.util.Objects.requireNonNull((value));
     this.value = value;
   }
   

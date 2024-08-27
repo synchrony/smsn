@@ -1,11 +1,18 @@
+// Note: this is an automatically generated file. Do not edit.
+
 package net.fortytwo.smsn.brain;
 
-public class SourceName {
-  public static final hydra.core.Name NAME = new hydra.core.Name("net/fortytwo/smsn/brain.SourceName");
+import java.io.Serializable;
+
+public class SourceName implements Serializable {
+  public static final hydra.core.Name TYPE_NAME = new hydra.core.Name("net/fortytwo/smsn/brain.SourceName");
+  
+  public static final hydra.core.Name FIELD_NAME_VALUE = new hydra.core.Name("value");
   
   public final String value;
   
   public SourceName (String value) {
+    java.util.Objects.requireNonNull((value));
     this.value = value;
   }
   

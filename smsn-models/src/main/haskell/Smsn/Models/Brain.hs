@@ -11,19 +11,18 @@ import Hydra.Dsl.Types as Types
 
 smsnModules = [smsnBrainModule]
 
-smsnBrainModule :: Module Kv
-smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
+smsnBrainModule :: Module
+smsnBrainModule = Module ns elements [hydraCoreModule] [hydraCoreModule] Nothing
   where
     ns = Namespace "net/fortytwo/smsn/brain"
     brain = typeref ns
-
     def = datatype ns
 
     elements = [
 --      def "Role" $
 --        enum ["entity", "relation"]]
 
-      def "AtomId"
+      def "AtomId" $
         doc "The unique id of an atom, as a base-62 encoded number"
         string,
 
@@ -38,7 +37,7 @@ smsnBrainModule = Module ns elements [hydraCoreModule] Nothing
           "alias">: optional string,
           "children">: list $ brain "AtomId"],
 
-      def "Normed"
+      def "Normed" $
         doc "A normalized floating-point value representing weight or probability, ranging from 0.0 to 1.0"
         float32,
 
