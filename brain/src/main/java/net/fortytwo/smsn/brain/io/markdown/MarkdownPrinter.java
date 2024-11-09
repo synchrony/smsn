@@ -48,24 +48,26 @@ public class MarkdownPrinter {
 
         printStream.println("# " + title + "\n");
 
-        printStream.println("id: " + id.value);
+        printStream.println("attributes:");
+        printStream.println("* id: " + id.value);
 
-        printStream.println("created: " + toUtcDateTimeString(created));
+        printStream.println("* created: " + toUtcDateTimeString(created));
 
         if (weight != null && weight > 0f) {
-            printStream.println("weight: " + weight);
+            printStream.println("* weight: " + weight);
         }
 
         if (priority != null && priority > 0f) {
-            printStream.println("priority: " + priority);
+            printStream.println("* priority: " + priority);
         }
 
         if (alias != null) {
-            printStream.println("alias: [" + alias + "](" + alias + ")");
+            printStream.println("* alias: [" + alias + "](" + alias + ")");
         }
 
         if (!children.isEmpty()) {
-            printStream.println("\nchildren:");
+            printStream.println("\n" +
+                    "children:");
             for (Note child : children) {
                 printStream.println("* " + toChildReference(note, child));
             }
