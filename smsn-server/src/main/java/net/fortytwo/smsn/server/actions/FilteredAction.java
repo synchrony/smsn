@@ -31,12 +31,12 @@ abstract class FilteredAction extends Action {
             if (opt.isPresent()) {
                 root = opt.get();
             } else {
-                throw new IllegalArgumentException("no such root: " + rootId);
+                throw new IllegalArgumentException("no such root id: " + rootId.value);
             }
         }
 
         if (null != filter && !filter.test(root)) {
-            throw new BadRequestException("root of view is not visible: " + rootId);
+            throw new BadRequestException("root of view is not visible: " + rootId.value);
         }
 
         context.getMap().put(Params.ROOT, Note.getId(root));

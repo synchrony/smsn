@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScriptEngine {
+    private static final boolean DEBUG_MODE = false;
 
     protected static final Logger logger = Logger.getLogger(SmSnScriptEngine.class.getName());
 
@@ -120,11 +121,20 @@ public class SmSnScriptEngine extends AbstractScriptEngine implements GremlinScr
     }
 
     private JSONObject handleRequest(String actionStr, final Graph graph) throws IOException {
+        if (DEBUG_MODE) {
+            System.out.println("REQUEST: " + actionStr);
+        }
+
         Action action = deserializeRequest(actionStr);
 
         ActionContext params = new ActionPerformer(graph).perform(action);
 
-        return toJson(params.getMap());
+        JSONObject response = toJson(params.getMap());
+
+        if (DEBUG_MODE) {
+            System.out.println("RESPONSE: " + response);
+        }
+        return response;
     }
 
     private Action deserializeRequest(final String requestStr) throws IOException {

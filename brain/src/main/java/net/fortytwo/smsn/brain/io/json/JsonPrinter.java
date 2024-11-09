@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.json;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
@@ -96,7 +97,8 @@ public class JsonPrinter {
     public JSONObject toJsonInternal(final TreeNode<Link> node) throws JSONException {
         JSONObject json = new JSONObject();
 
-        json.put(JsonFormat.Keys.ID, TreeViews.getId(node));
+        AtomId id = TreeViews.getId(node);
+        json.put(JsonFormat.Keys.ID, id == null ? null : id.value);
         json.put(SemanticSynchrony.PropertyKeys.WEIGHT, TreeViews.getWeight(node));
         json.put(SemanticSynchrony.PropertyKeys.SOURCE, TreeViews.getSource(node));
         json.put(SemanticSynchrony.PropertyKeys.CREATED, TreeViews.getCreated(node));
