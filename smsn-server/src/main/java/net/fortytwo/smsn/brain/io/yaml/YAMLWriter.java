@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.io.yaml;
 
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteWriter;
-import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
+import net.fortytwo.smsn.brain.io.vcs.FilePerNoteFormat;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
 
@@ -27,7 +27,7 @@ public class YAMLWriter extends NoteWriter {
 
     @Override
     public void doWrite(final Context context) throws IOException {
-        Map<String, File> dirs = VCSFormat.getDirsBySource();
+        Map<String, File> dirs = FilePerNoteFormat.directoriesBySource();
 
         timeAction("exported notes as individual files", () -> doExport(context.getTopicGraph(), dirs));
     }

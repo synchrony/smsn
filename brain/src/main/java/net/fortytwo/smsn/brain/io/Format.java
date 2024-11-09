@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class Format {
     private static final Logger logger = Logger.getLogger(Format.class.getName());
 
-    public enum Type {Internal, FileBased, Complex }
+    public enum Type {Internal, FileBased, Complex}
 
     private static final Map<String, Format> formatsByNameLowercase;
     private static final Map<Format, NoteReader> readersByFormat;
@@ -60,7 +60,8 @@ public class Format {
         Format format = formatsByNameLowercase.get(formatNameIgnoreCase.toLowerCase());
 
         if (null == format) {
-            throw new IllegalArgumentException("unknown format: " + formatNameIgnoreCase);
+            throw new IllegalArgumentException("unknown format: '" + formatNameIgnoreCase + "';"
+             + " supported formats are " + formatsByNameLowercase.keySet());
         }
 
         return format;

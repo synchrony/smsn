@@ -2,7 +2,7 @@ package net.fortytwo.smsn.brain.io.yaml;
 
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteReader;
-import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
+import net.fortytwo.smsn.brain.io.vcs.FilePerNoteFormat;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Note;
@@ -32,7 +32,7 @@ public class YAMLReader extends NoteReader {
 
     @Override
     protected void importInternal(final Context context) throws IOException {
-        Map<String, File> dirs = VCSFormat.getDirsBySource();
+        Map<String, File> dirs = FilePerNoteFormat.directoriesBySource();
 
         YAMLGraph data = new YAMLGraph();
         for (Note root : data.readFrom(dirs)) {

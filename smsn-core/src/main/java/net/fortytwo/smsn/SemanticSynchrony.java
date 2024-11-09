@@ -56,7 +56,7 @@ public class SemanticSynchrony {
                 TITLE = "title",
                 WEIGHT = "weight";
 
-        String[] allPropertyKeys = {
+        String[] reservedPropertyKeys = {
                 ACRONYM, ALIAS, CREATED, ID, LABEL, PRIORITY, ROLE, SHORTCUT, SOURCE, TEXT, TITLE, WEIGHT};
     }
 

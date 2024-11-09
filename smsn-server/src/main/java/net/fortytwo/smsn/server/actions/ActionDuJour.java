@@ -3,7 +3,7 @@ package net.fortytwo.smsn.server.actions;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.io.vcs.VCSFormat;
+import net.fortytwo.smsn.brain.io.vcs.VCSWriter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.pg.PGNote;
@@ -118,7 +118,7 @@ public class ActionDuJour extends Action {
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());
             TopicGraph graph = context.getBrain().getTopicGraph();
             for (File file : dir.listFiles()) {
-                if (VCSFormat.isSmSnFile(file)) {
+                if (VCSWriter.FORMAT.isMatchingFile(file)) {
                     AtomId id = new AtomId(file.getName());
                     Optional<Note> opt = graph.getNoteById(id);
                     Preconditions.checkArgument(opt.isPresent());

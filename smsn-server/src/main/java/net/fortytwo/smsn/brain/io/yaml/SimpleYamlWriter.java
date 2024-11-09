@@ -36,11 +36,11 @@ public class SimpleYamlWriter extends NoteWriter {
     private void writeGraph(final PGTopicGraph graph,
                             final OutputStream out) throws IOException {
 
-        List<Object> notesObj = new ArrayList<Object>();
+        List<Object> notesObj = new ArrayList<>();
         for (Note note : graph.getAllNotes()) {
             Map<String, Object> obj = new HashMap<>();
 
-            for (String key : SemanticSynchrony.PropertyKeys.allPropertyKeys) {
+            for (String key : SemanticSynchrony.PropertyKeys.reservedPropertyKeys) {
                 Object value = note.optProperty(key);
                 if (null != value) {
                     key = key.equals(SemanticSynchrony.PropertyKeys.ID) ? "id" : key;

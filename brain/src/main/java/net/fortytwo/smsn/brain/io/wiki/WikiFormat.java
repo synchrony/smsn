@@ -10,16 +10,16 @@ public class WikiFormat extends Format {
     // which causes a note's alias or shortcut to be set to null (rather than merely ignored)
     public static final String CLEARME = "C.L.E.A.R.M.E";
 
-    static final String NODE_BULLET = "*";
-    static final String LABEL_BULLET = "--";
+    public static final String NODE_BULLET = "*";
+    public static final String LABEL_BULLET = "--";
 
-    static final String MULTILINE_DELIMITER = "```";
+    public static final String MULTILINE_DELIMITER = "```";
 
     // regex of valid id suffixes
-    static final Pattern ID_INFIX = Pattern.compile(":[a-zA-Z0-9]{5,}:");
+    public static final Pattern ID_INFIX = Pattern.compile(":[a-zA-Z0-9]{5,}:");
 
     // Tabs count as four spaces each.
-    static final String TAB_REPLACEMENT = "    ";
+    public static final String TAB_REPLACEMENT = "    ";
 
     private static final WikiFormat instance = new WikiFormat();
 
@@ -31,7 +31,7 @@ public class WikiFormat extends Format {
         return instance;
     }
 
-    static String stripTrailingSpace(final String text) {
+    public static String stripTrailingSpace(final String text) {
         return text.replaceFirst("\\s++$", "");
     }
 }

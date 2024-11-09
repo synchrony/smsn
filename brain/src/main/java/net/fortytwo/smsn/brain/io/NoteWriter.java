@@ -85,7 +85,7 @@ public abstract class NoteWriter {
         }
     }
 
-    protected void createDirectoryIfNotExists(final File dir) throws IOException {
+    protected static void createDirectoryIfNotExists(final File dir) throws IOException {
         if (dir.exists()) {
             if (!dir.isDirectory()) {
                 throw new IllegalArgumentException("file " + dir.getAbsolutePath() + " is not a directory");
@@ -97,8 +97,8 @@ public abstract class NoteWriter {
         }
     }
 
-    protected  <E extends Exception> void timeAction(final String description,
-                                                  final RunnableWithException<E> action) throws E {
+    protected static <E extends Exception> void timeAction(final String description,
+                                                           final RunnableWithException<E> action) throws E {
         long before = System.currentTimeMillis();
         action.run();
         long after = System.currentTimeMillis();

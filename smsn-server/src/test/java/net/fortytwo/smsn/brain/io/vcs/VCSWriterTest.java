@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 
 public class VCSWriterTest extends BrainTestBase {
     @Override
-    protected TopicGraph createTopicGraph() throws IOException {
+    protected TopicGraph createTopicGraph() {
         return createTinkerTopicGraph();
     }
 

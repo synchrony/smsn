@@ -13,7 +13,6 @@ import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.config.DataSource;
-//import org.parboiled.common.Preconditions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,6 +25,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class VCSReader extends NoteReader {
+    private final FilePerNoteFormat format = VCSWriter.FORMAT;
 
     private final WikiParser reader;
 
@@ -42,12 +42,11 @@ public class VCSReader extends NoteReader {
 
     @Override
     public List<Format> getFormats() {
-        return Collections.singletonList(VCSFormat.getInstance());
+        return Collections.singletonList(format);
     }
 
     private void readDataSource(final DataSource dataSource, final Context context) throws IOException {
         String location = dataSource.getLocation();
-//        Preconditions.checkNotNull(location);
         File dir = new File(location);
         assertDirectoryExists(dir);
 
@@ -57,7 +56,7 @@ public class VCSReader extends NoteReader {
         if (null != files) {
             for (File file : files) {
                 try {
-                    if (VCSFormat.isSmSnFile(file)) {
+                    if (format.isMatchingFile(file)) {
                         readPage(file, helper, dataSource);
                     }
                 } catch (IOException e) {

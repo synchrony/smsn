@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class VCSReaderTest extends BrainTestBase {
+    private final FilePerNoteFormat format = VCSWriter.FORMAT;
 
     @Override
     protected TopicGraph createTopicGraph() throws IOException {
@@ -68,7 +69,7 @@ public class VCSReaderTest extends BrainTestBase {
     }
 
     private void copyVCSFileToDirectory(final Topic topic, final File dir) throws IOException {
-        String fileName = VCSFormat.fileNameForTopic(topic);
+        String fileName = format.fileNameFor(topic);
         try (InputStream in = VCSReaderTest.class.getResourceAsStream(fileName)) {
             if (in == null) {
                 throw new IOException("failed to find resource: " + fileName);

@@ -9,6 +9,8 @@ dependencies {
 
   implementation 'org.json:json:20180130'
 
+  //implementation 'org.jsoup:jsoup:1.16.1'
+
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
