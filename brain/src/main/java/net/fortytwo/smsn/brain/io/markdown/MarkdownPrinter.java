@@ -78,6 +78,9 @@ public class MarkdownPrinter {
             printStream.println(text);
             printStream.println("```");
         }
+
+        // Extra newline is useful when multiple Markdown files are concatenated
+        printStream.println();
     }
 
     public static String toUtcDateTimeString(long millis) {
