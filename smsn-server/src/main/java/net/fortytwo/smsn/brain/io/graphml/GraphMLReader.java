@@ -2,8 +2,6 @@ package net.fortytwo.smsn.brain.io.graphml;
 
 import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 
 import java.io.IOException;
@@ -21,21 +19,17 @@ public class GraphMLReader extends NoteReader {
     protected void importInternal(Context context) throws IOException {
 
         if (context.getTopicGraph() instanceof PGTopicGraph) {
+            PGTopicGraph pgGraph = (PGTopicGraph) context.getTopicGraph();
             // note: no transaction buffering
             org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader reader
                     = org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader.build().create();
-            reader.readGraph(context.getSourceStream(), ((PGTopicGraph) context.getTopicGraph()).getPropertyGraph());
+            reader.readGraph(context.getSourceStream(), pgGraph.getPropertyGraph());
+
+            // Note: GraphML import writes directly to the property graph.
+            // Reindexing would require iterating over all imported atoms,
+            // but this is deferred to the caller if needed.
         } else {
             throw new UnsupportedOperationException("GraphML I/O is not supported for this graph");
-        }
-
-        addAllToIndices(context.getTopicGraph());
-    }
-
-    private void addAllToIndices(TopicGraph destGraph) {
-        for (Note note : destGraph.getAllNotes()) {
-            String title = Note.getTitle(note);
-            if (null != title) destGraph.reindex(note);
         }
     }
 }

@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.io.freeplane;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.io.NoteReader;
@@ -8,11 +9,11 @@ import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -110,8 +111,11 @@ public class FreeplaneReader extends NoteReader {
         TreeViews queries = new TreeViews(brain);
         Filter filter = Filter.noFilter();
 
-        Note note = destGraph.createNoteWithProperties(filter, SemanticSynchrony.createRandomId());
-        TreeViews.setId(rootNote, Note.getId(note));
+        // Create a new note using TopicGraph
+        AtomId atomId = SemanticSynchrony.createRandomId();
+        destGraph.createNoteWithProperties(filter, atomId);
+
+        TreeViews.setId(rootNote, atomId);
 
         queries.update(rootNote, maxHeight, filter, ViewStyle.Basic.Forward.getStyle());
 
@@ -254,16 +258,19 @@ public class FreeplaneReader extends NoteReader {
             persistArrowLinks();
         }
 
-        private Note getNote(final String id) {
-            return destGraph.getNoteById(TreeViews.getId(notesByFreeplaneId.get(id))).get();
+        private AtomId getAtomId(final String freeplaneId) {
+            return TreeViews.getId(notesByFreeplaneId.get(freeplaneId));
         }
 
         private void persistArrowLinks() throws InvalidGraphException {
             for (Map.Entry<String, List<String>> link : arrowLinks.entrySet()) {
-                Note tailNote = getNote(link.getKey());
+                AtomId tailId = getAtomId(link.getKey());
                 List<String> heads = link.getValue();
                 for (String head : heads) {
-                    Note headNote = getNote(head);
+                    AtomId headId = getAtomId(head);
+                    // Use TopicGraph to add the child relationship
+                    var tailNote = destGraph.getNoteById(tailId).orElseThrow();
+                    var headNote = destGraph.getNoteById(headId).orElseThrow();
                     tailNote.addChildAt(headNote, 0);
                 }
             }
