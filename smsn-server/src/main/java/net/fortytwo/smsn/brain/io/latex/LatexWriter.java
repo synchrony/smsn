@@ -1,12 +1,12 @@
 package net.fortytwo.smsn.brain.io.latex;
 
 import com.google.common.base.Preconditions;
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.query.ViewStyle;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,22 +37,24 @@ public class LatexWriter extends NoteWriter {
         AtomId rootId = context.getRootId();
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
+        AtomRepository repository = context.getAtomRepository();
 
-        Optional<Note> opt = context.getTopicGraph().getNoteById(rootId);
+        Optional<Atom> opt = repository.findById(rootId);
         if (!opt.isPresent()) {
-            throw new IllegalStateException("no such note: " + rootId);
+            throw new IllegalStateException("no such atom: " + rootId);
         }
 
-        writeLatex(opt.get(), filter, 0, 0, context.getDestStream());
+        writeLatex(opt.get(), repository, filter, 0, 0, context.getDestStream());
     }
 
-    private void writeLatex(final Note root,
+    private void writeLatex(final Atom root,
+                            final AtomRepository repository,
                             final Filter filter,
                             final int level,
                             final int sectionLevel,
                             final OutputStream out) throws IOException {
 
-        if (!filter.test(root)) {
+        if (!repository.testFilter(root, filter)) {
             return;
         }
 
@@ -62,7 +64,7 @@ public class LatexWriter extends NoteWriter {
         }
 
         // trim immediately; don't try to preserve indentation or trailing whitespace
-        String value = Note.getTitle(root).trim();
+        String value = root.title.trim();
 
         for (Serializer serializer : serializers) {
             if (serializer.matches(value)) {
@@ -73,8 +75,11 @@ public class LatexWriter extends NoteWriter {
                 out.write('\n');
 
                 if (output.isRecursive()) {
-                    for (Note child : ViewStyle.Basic.Forward.getStyle().getLinked(root, filter)) {
-                        writeLatex(child, filter, level + 1, output.isSection() ? sectionLevel + 1 : sectionLevel, out);
+                    // Iterate over children (Forward style - just direct children)
+                    for (AtomId childId : root.children) {
+                        Atom child = repository.load(childId);
+                        writeLatex(child, repository, filter, level + 1,
+                                  output.isSection() ? sectionLevel + 1 : sectionLevel, out);
                     }
                 }
 

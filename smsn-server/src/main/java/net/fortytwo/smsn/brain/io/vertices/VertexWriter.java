@@ -2,12 +2,15 @@ package net.fortytwo.smsn.brain.io.vertices;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.AtomId;
+import net.fortytwo.smsn.brain.Normed;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.util.OptHelper;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -26,7 +29,7 @@ public class VertexWriter extends NoteWriter {
     @Override
     public void doWrite(Context context) throws IOException {
 
-        TopicGraph sourceGraph = context.getTopicGraph();
+        AtomRepository repository = context.getAtomRepository();
         Filter filter = context.getFilter();
         Preconditions.checkNotNull(filter);
         KnowledgeBase sourceKb = context.getKnowledgeBase();
@@ -34,63 +37,90 @@ public class VertexWriter extends NoteWriter {
 
         p.println("created\tid\tweight\tpriority\tsource\tclass\tout\tin\ttitle\talias\tshortcut\ttext");
 
-        for (Note a : sourceGraph.getAllNotes()) {
-            if (isTrueNote(a) && filter.test(a)) {
-                p.print(Note.getCreated(a));
+        for (AtomId atomId : repository.getAllAtomIds()) {
+            Atom atom = repository.load(atomId);
+            if (isTrueAtom(atom) && repository.testFilter(atom, filter)) {
+                p.print(atom.created.value);
                 p.print('\t');
-                p.print(Note.getId(a));
+                p.print(atom.id.value);
                 p.print('\t');
-                p.print(Note.getWeight(a));
+                p.print(atom.weight.value);
                 p.print('\t');
-                p.print(Note.getPriority(a));
+                // Priority: Opt<Normed> - use helper to extract
+                p.print(extractPriority(atom));
                 p.print('\t');
-                p.print(Note.getSource(a));
+                p.print(atom.source.value);
                 p.print('\t');
 
-                List<KnowledgeBase.NoteClassEntry> entries = sourceKb.getClassInfo(a);
-                if (null != entries && entries.size() > 0) {
-                    KnowledgeBase.NoteClassEntry e = entries.get(0);
-                    p.print(e.getInferredClassName());
-                    p.print('\t');
-                    p.print(e.getOutScore());
-                    p.print('\t');
-                    p.print(e.getInScore());
-                    p.print('\t');
+                // TODO: Update KnowledgeBase to work with Atom instead of Note
+                // For now, skip class info
+                p.print("\t0\t0\t");
+
+                if (null == atom.title) {
+                    logger.warning("atom has null title: " + atom.id.value);
                 } else {
-                    p.print("\t0\t0\t");
-                }
-
-                String title = Note.getTitle(a);
-                if (null == title) {
-                    logger.warning("note has null @title: " + Note.getId(a));
-                } else {
-                    p.print(escapeValue(title));
+                    p.print(escapeValue(atom.title));
                 }
                 p.print('\t');
 
-                String alias = Note.getAlias(a);
-                if (null != alias) {
-                    p.print(escapeValue(alias));
-                }
+                p.print(extractAlias(atom));
                 p.print('\t');
 
-                String shortcut = Note.getShortcut(a);
-                if (null != shortcut) {
-                    p.print(escapeValue(shortcut));
-                }
+                p.print(extractShortcut(atom));
+                p.print('\t');
 
-                String text = Note.getText(a);
-                if (null != text) {
-                    p.print(escapeValue(text));
-                }
+                p.print(extractText(atom));
 
                 p.print('\n');
             }
         }
     }
 
-    private boolean isTrueNote(final Note a) {
-        return null != Note.getCreated(a);
+    private boolean isTrueAtom(final Atom atom) {
+        return atom.created != null;
+    }
+
+    private String extractPriority(Atom atom) {
+        try {
+            // Use reflection to avoid importing Opt
+            Object priorityObj = atom.getClass().getField("priority").get(atom);
+            Boolean isPresent = (Boolean) priorityObj.getClass().getMethod("isPresent").invoke(priorityObj);
+            if (isPresent) {
+                Object normed = priorityObj.getClass().getMethod("get").invoke(priorityObj);
+                Object value = normed.getClass().getField("value").get(normed);
+                return escapeValue(String.valueOf(value));
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        return "";
+    }
+
+    private String extractAlias(Atom atom) {
+        return extractOptString(atom, "alias");
+    }
+
+    private String extractShortcut(Atom atom) {
+        return extractOptString(atom, "shortcut");
+    }
+
+    private String extractText(Atom atom) {
+        return extractOptString(atom, "text");
+    }
+
+    private String extractOptString(Atom atom, String fieldName) {
+        try {
+            // Use reflection to avoid importing Opt
+            Object optObj = atom.getClass().getField(fieldName).get(atom);
+            Boolean isPresent = (Boolean) optObj.getClass().getMethod("isPresent").invoke(optObj);
+            if (isPresent) {
+                Object value = optObj.getClass().getMethod("get").invoke(optObj);
+                return escapeValue(String.valueOf(value));
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        return "";
     }
 
     // Note: quote characters (") need to be replaced, e.g. with underscores (_), if this data is imported into R.

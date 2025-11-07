@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.brain.io.edges;
 
+import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -21,30 +21,29 @@ public class EdgeWriter extends NoteWriter {
 
     @Override
     public void doWrite(Context context) throws IOException {
-        TopicGraph sourceGraph = context.getTopicGraph();
+        AtomRepository repository = context.getAtomRepository();
         PrintStream p = new PrintStream(context.getDestStream());
         Filter filter = context.getFilter();
 
         p.println("from\tto");
 
-        for (Note fromNote : sourceGraph.getAllNotes()) {
-            if (null != fromNote && filter.test(fromNote)) {
-                ListNode<Note> l = fromNote.getChildren();
-                while (null != l) {
-                    Note toNote = l.getFirst();
-                    if (filter.test(toNote)) {
-                        printEdge(p, fromNote, toNote);
+        for (AtomId fromId : repository.getAllAtomIds()) {
+            Atom from = repository.load(fromId);
+            if (null != from && repository.testFilter(from, filter)) {
+                for (AtomId toId : from.children) {
+                    Atom to = repository.load(toId);
+                    if (repository.testFilter(to, filter)) {
+                        printEdge(p, from.id, to.id);
                     }
-                    l = l.getRest();
                 }
             }
         }
     }
 
-    private void printEdge(final PrintStream p, final Note fromNote, final Note toNote) {
-        p.print(Note.getId(fromNote));
+    private void printEdge(final PrintStream p, final AtomId fromId, final AtomId toId) {
+        p.print(fromId.value);
         p.print('\t');
-        p.print(Note.getId(toNote));
+        p.print(toId.value);
         p.print('\n');
     }
 }
