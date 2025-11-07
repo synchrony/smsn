@@ -1,13 +1,12 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.model.entities.Link;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-
-import java.io.IOException;
+import org.json.JSONObject;
 
 /**
  * A service for retrieving hierarchical views of Extend-o-Brain graphs
@@ -19,14 +18,20 @@ public class GetView extends RootedViewAction {
             throws RequestProcessingException, BadRequestException {
         super.performTransaction(context);
 
-        TreeNode<Link> tree = context.getQueries().view(getRoot(), height, getFilter(), style);
+        // Use new TreeViewBuilder instead of old TreeViews
+        AtomId rootId = Note.getId(getRoot());
+        TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildView(rootId, height, getFilter());
+
+        // Serialize directly using new JSON printer
         try {
-            addView(tree, context);
-        } catch (IOException e) {
+            JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);
+            context.getMap().put(net.fortytwo.smsn.brain.Params.VIEW, json);
+        } catch (java.io.IOException e) {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(Note.getId(getRoot()));
+        addToHistory(rootId);
     }
 
     @Override

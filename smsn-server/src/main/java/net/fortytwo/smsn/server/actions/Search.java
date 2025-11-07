@@ -1,14 +1,13 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -50,12 +49,8 @@ public class Search extends BasicViewAction {
 
         params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
-        try {
-            if (!getQueryType().equals(TreeViews.QueryType.Ripple)) {
-                addSearchResults(params);
-            }
-        } catch (IOException e) {
-            throw new RequestProcessingException(e);
+        if (!getQueryType().equals(TreeViews.QueryType.Ripple)) {
+            addSearchResults(params);
         }
 
         params.getMap().put("title", getQuery());
@@ -71,10 +66,19 @@ public class Search extends BasicViewAction {
         return false;
     }
 
-    private void addSearchResults(final ActionContext params) throws IOException {
-        // TODO: Migrate to use AtomRepository.search() directly
-        // For now, keep using existing implementation
-        TreeNode<Link> tree = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
-        addView(tree, params);
+    private void addSearchResults(final ActionContext params) {
+        // Use AtomRepository.search() and TreeViewBuilder
+        List<Atom> results = params.getRepository().search(getQuery(), getFilter());
+
+        TreeViewBuilder builder = new TreeViewBuilder(params.getRepository());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildSearchResultsView(results, height, getFilter());
+
+        // Serialize directly using new JSON printer
+        try {
+            JSONObject json = params.getTreeNodeJsonPrinter().toJson(tree);
+            params.getMap().put(net.fortytwo.smsn.brain.Params.VIEW, json);
+        } catch (java.io.IOException e) {
+            throw new RequestProcessingException(e);
+        }
     }
 }
