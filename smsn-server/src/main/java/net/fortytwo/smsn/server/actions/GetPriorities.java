@@ -1,13 +1,17 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
+import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.json.JSONObject;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * A service for deriving a prioritized list of items in the knowledge base
@@ -26,11 +30,31 @@ public class GetPriorities extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
+        // Get priority queue (still uses old Note interface)
+        Queue<Note> queue = context.getBrain().getPriorities().getQueue();
 
-        TreeNode<Link> tree = context.getQueries().priorityView(getFilter(), maxResults, context.getBrain().getPriorities());
+        // Convert to Atoms
+        List<Atom> prioritizedAtoms = new ArrayList<>();
+        int i = 0;
+        for (Note note : queue) {
+            if (getFilter() == null || getFilter().test(note)) {
+                Atom atom = context.getRepository().load(Note.getId(note));
+                prioritizedAtoms.add(atom);
+
+                if (++i >= maxResults) {
+                    break;
+                }
+            }
+        }
+
+        // Build list view
+        TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(prioritizedAtoms, getFilter());
+
         try {
-            addView(tree, context);
-        } catch (IOException e) {
+            JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);
+            context.getMap().put(net.fortytwo.smsn.brain.Params.VIEW, json);
+        } catch (java.io.IOException e) {
             throw new RequestProcessingException(e);
         }
     }

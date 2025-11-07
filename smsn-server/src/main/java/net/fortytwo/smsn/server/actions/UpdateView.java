@@ -56,16 +56,18 @@ public class UpdateView extends RootedViewAction {
                 throw new IllegalStateException();
         }
 
-        TreeViews.setId(view, Note.getId(getRoot()));
+        TreeViews.setId(view, getRoot().id);
 
         // Apply the update
         context.getQueries().update(view, height, getFilter(), style);
 
         TopicGraph graph = context.getBrain().getTopicGraph();
-        // TODO: produce an appropriate view (e.g. a search) if the root is null
-        TreeNode<Link> n = null == getRoot()
+        // TODO: Migrate UpdateView to use AtomRepository and TreeViewBuilder
+        // For now, convert Atom back to Note for compatibility
+        net.fortytwo.smsn.brain.model.entities.Note rootNote = graph.getNoteById(getRoot().id).orElse(null);
+        TreeNode<Link> n = null == rootNote
                 ? graph.createTopicTree(graph.createLink(null, null, null))
-                : context.getQueries().view(getRoot(), height, getFilter(), style);
+                : context.getQueries().view(rootNote, height, getFilter(), style);
         try {
             addView(n, context);
         } catch (IOException e) {

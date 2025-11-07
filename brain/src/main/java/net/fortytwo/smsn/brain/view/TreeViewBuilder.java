@@ -37,6 +37,53 @@ public class TreeViewBuilder {
     }
 
     /**
+     * Build a simple list view from atoms with no children expanded.
+     * Creates a virtual root with the atoms as direct children (height 0).
+     *
+     * @param atoms list of atoms to include
+     * @param filter filter for atoms
+     * @return TreeNode representing the flat list
+     */
+    public TreeNode buildListView(List<Atom> atoms, Filter filter) {
+        List<TreeNode> childNodes = new ArrayList<>();
+
+        for (Atom atom : atoms) {
+            if (filter == null || passesFilter(atom, filter)) {
+                // Add each atom with no children (height 0)
+                childNodes.add(atomToTreeNode(atom, new ArrayList<>()));
+            }
+        }
+
+        // Create a virtual root for the list
+        if (atoms.isEmpty()) {
+            Atom firstAtom = repository.getAllAtomIds().stream()
+                    .findFirst()
+                    .map(repository::load)
+                    .orElse(null);
+            if (firstAtom == null) {
+                throw new IllegalStateException("No atoms in repository");
+            }
+            return atomToTreeNode(firstAtom, new ArrayList<>());
+        }
+
+        Atom firstAtom = atoms.get(0);
+        return new TreeNode(
+                new AtomId("list-view"),
+                firstAtom.created,
+                firstAtom.weight,
+                firstAtom.priority,
+                firstAtom.source,
+                "List View",
+                firstAtom.alias,
+                firstAtom.text,
+                firstAtom.shortcut,
+                childNodes,
+                childNodes.size(),
+                0
+        );
+    }
+
+    /**
      * Build tree view from a list of atoms (e.g., search results).
      * Creates a virtual root with the atoms as children.
      *

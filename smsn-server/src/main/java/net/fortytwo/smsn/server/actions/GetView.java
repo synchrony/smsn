@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.server.actions;
 
-import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -19,9 +17,8 @@ public class GetView extends RootedViewAction {
         super.performTransaction(context);
 
         // Use new TreeViewBuilder instead of old TreeViews
-        AtomId rootId = Note.getId(getRoot());
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildView(rootId, height, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildView(getRoot().id, height, getFilter());
 
         // Serialize directly using new JSON printer
         try {
@@ -31,7 +28,7 @@ public class GetView extends RootedViewAction {
             throw new RequestProcessingException(e);
         }
 
-        addToHistory(rootId);
+        addToHistory(getRoot().id);
     }
 
     @Override

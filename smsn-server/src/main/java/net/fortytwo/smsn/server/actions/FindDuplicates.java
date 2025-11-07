@@ -1,13 +1,13 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,13 +38,18 @@ public class FindDuplicates extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
-        List<List<Note>> dups = getDuplicates(context.getBrain().getTopicGraph(), getFilter());
-        List<Note> flat = new LinkedList<>();
+        List<List<Atom>> dups = getDuplicates(context, getFilter());
+        List<Atom> flat = new LinkedList<>();
         dups.forEach(flat::addAll);
 
+        // Use TreeViewBuilder for the view
+        TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(flat, getFilter());
+
         try {
-            addView(context.getQueries().customView(flat, getFilter()), context);
-        } catch (IOException e) {
+            JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);
+            context.getMap().put(net.fortytwo.smsn.brain.Params.VIEW, json);
+        } catch (java.io.IOException e) {
             throw new RequestProcessingException(e);
         }
     }
@@ -59,15 +64,16 @@ public class FindDuplicates extends FilteredAction {
         return false;
     }
 
-    private List<List<Note>> getDuplicates(final TopicGraph graph,
+    private List<List<Atom>> getDuplicates(final ActionContext context,
                                            final Filter filter) throws RequestProcessingException {
-        Map<String, List<Note>> m = new HashMap<>();
-        List<List<Note>> dups = new LinkedList<>();
+        Map<String, List<Atom>> m = new HashMap<>();
+        List<List<Atom>> dups = new LinkedList<>();
         int total = 0;
 
-        for (Note a : graph.getAllNotes()) {
-            if (filter.test(a)) {
-                String title = Note.getTitle(a);
+        for (net.fortytwo.smsn.brain.AtomId atomId : context.getRepository().getAllAtomIds()) {
+            Atom atom = context.getRepository().load(atomId);
+            if (filter == null || context.getRepository().testFilter(atom, filter)) {
+                String title = atom.title;
                 if (null != title && 0 < title.length()) {
                     String hash;
                     try {
@@ -75,14 +81,14 @@ public class FindDuplicates extends FilteredAction {
                     } catch (UnsupportedEncodingException e) {
                         throw new RequestProcessingException(e);
                     }
-                    List<Note> notes = m.get(hash);
-                    if (null == notes) {
-                        notes = new LinkedList<>();
-                        m.put(hash, notes);
+                    List<Atom> atoms = m.get(hash);
+                    if (null == atoms) {
+                        atoms = new LinkedList<>();
+                        m.put(hash, atoms);
                     } else {
-                        if (1 == notes.size()) {
+                        if (1 == atoms.size()) {
                             total++;
-                            dups.add(notes);
+                            dups.add(atoms);
                         }
 
                         total++;
@@ -93,7 +99,7 @@ public class FindDuplicates extends FilteredAction {
                         }
                     }
 
-                    notes.add(a);
+                    atoms.add(atom);
                 }
             }
         }

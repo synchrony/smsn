@@ -228,13 +228,18 @@ public class AtomRepository {
 
     /**
      * Get all atom IDs in the graph.
+     * Only returns vertices with the NOTE label.
      */
     public List<AtomId> getAllAtomIds() {
         List<AtomId> ids = new ArrayList<>();
         wrapper.getGraph().vertices().forEachRemaining(v -> {
-            String idValue = getOptionalProperty(v, SemanticSynchrony.PropertyKeys.ID, null);
-            if (idValue != null) {
-                ids.add(new AtomId(idValue));
+            // Only include NOTE vertices (not other vertex types)
+            String label = v.label();
+            if (label != null && label.equals(SemanticSynchrony.VertexLabels.NOTE)) {
+                String idValue = getOptionalProperty(v, SemanticSynchrony.PropertyKeys.ID, null);
+                if (idValue != null) {
+                    ids.add(new AtomId(idValue));
+                }
             }
         });
         return ids;
@@ -315,7 +320,7 @@ public class AtomRepository {
      * Test if an atom passes the filter criteria.
      * Checks source and weight against filter settings.
      */
-    private boolean testFilter(Atom atom, Filter filter) {
+    public boolean testFilter(Atom atom, Filter filter) {
         if (filter == null || filter.isTrivial()) {
             return true;
         }
