@@ -2,17 +2,18 @@ package net.fortytwo.smsn.server.actions;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.vcs.VCSWriter;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.pg.PGNote;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.config.Configuration;
 import net.fortytwo.smsn.config.DataSource;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -59,39 +61,52 @@ public class ActionDuJour extends Action {
     }
 
     private void pageToText(final ActionContext context) {
-        for (Note note : context.getBrain().getTopicGraph().getAllNotes()) {
-            Vertex v = ((PGNote) note).asVertex();
-            VertexProperty<String> prop = v.property("page");
-            if (prop.isPresent()) {
-                String text = prop.value();
-                prop.remove();
-                v.property(SemanticSynchrony.PropertyKeys.TEXT, text);
+        PGTopicGraph topicGraph = (PGTopicGraph) context.getBrain().getTopicGraph();
+        Graph graph = topicGraph.getPropertyGraph();
+        for (Iterator<Vertex> it = graph.vertices(); it.hasNext(); ) {
+            Vertex v = it.next();
+            if (isNoteVertex(v)) {
+                VertexProperty<String> prop = v.property("page");
+                if (prop.isPresent()) {
+                    String text = prop.value();
+                    prop.remove();
+                    v.property(SemanticSynchrony.PropertyKeys.TEXT, text);
+                }
             }
         }
     }
 
     private void sharabilityToSource(final ActionContext context) {
-        for (Note note : context.getBrain().getTopicGraph().getAllNotes()) {
-            Property<String> source1 = ((PGNote) note).asVertex().property("source");
-            if (!source1.isPresent()) {
-                System.out.println("note " + Note.getId(note) + " has no source. Title: " + Note.getTitle(note));
-                Property<Float> sharability = ((PGNote) note).asVertex().property("sharability");
-                if (sharability.isPresent()) {
-                    System.out.println("\tsharability: " + sharability.value());
-                } else {
-                    System.out.println("\tno sharability");
-                }
+        PGTopicGraph topicGraph = (PGTopicGraph) context.getBrain().getTopicGraph();
+        Graph graph = topicGraph.getPropertyGraph();
+        for (Iterator<Vertex> it = graph.vertices(); it.hasNext(); ) {
+            Vertex v = it.next();
+            if (isNoteVertex(v)) {
+                Property<String> source1 = v.property("source");
+                if (!source1.isPresent()) {
+                    String id = v.property(SemanticSynchrony.PropertyKeys.ID).value().toString();
+                    VertexProperty<String> titleProp = v.property(SemanticSynchrony.PropertyKeys.TITLE);
+                    String title = titleProp.isPresent() ? titleProp.value() : "(no title)";
+                    System.out.println("note " + id + " has no source. Title: " + title);
 
-                String source = sourceForSharability(note);
-                if (null != source) {
-                    Note.setSource(note, source);
+                    Property<Float> sharability = v.property("sharability");
+                    if (sharability.isPresent()) {
+                        System.out.println("\tsharability: " + sharability.value());
+                    } else {
+                        System.out.println("\tno sharability");
+                    }
+
+                    String source = sourceForSharability(v);
+                    if (null != source) {
+                        v.property(SemanticSynchrony.PropertyKeys.SOURCE, source);
+                    }
                 }
             }
         }
     }
 
-    private String sourceForSharability(final Note note) {
-        Property<Float> sharability = ((PGNote) note).asVertex().property("sharability");
+    private String sourceForSharability(final Vertex vertex) {
+        Property<Float> sharability = vertex.property("sharability");
         if (sharability.isPresent()) {
             switch ((int) (sharability.value() * 4)) {
                 case 0:
@@ -113,16 +128,16 @@ public class ActionDuJour extends Action {
     }
 
     private void assignSources(ActionContext context) {
+        AtomRepository repository = context.getRepository();
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
             File dir = new File(source.getLocation());
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());
-            TopicGraph graph = context.getBrain().getTopicGraph();
             for (File file : dir.listFiles()) {
                 if (VCSWriter.FORMAT.isMatchingFile(file)) {
                     AtomId id = new AtomId(file.getName());
-                    Optional<Note> opt = graph.getNoteById(id);
+                    Optional<Atom> opt = repository.findById(id);
                     Preconditions.checkArgument(opt.isPresent());
-                    Note.setSource(opt.get(), source.getName());
+                    repository.updateProperty(id, SemanticSynchrony.PropertyKeys.SOURCE, source.getName());
                 }
             }
             //SmSnGitRepository repo = new SmSnGitRepository(context.getBrain(), source);
@@ -131,27 +146,47 @@ public class ActionDuJour extends Action {
     }
 
     private void migrateIds(final ActionContext context) {
-        TopicGraph graph = context.getBrain().getTopicGraph();
-        for (Note a : graph.getAllNotes()) {
-            Note.setId(a, SemanticSynchrony.migrateId(Note.getId(a)));
+        PGTopicGraph topicGraph = (PGTopicGraph) context.getBrain().getTopicGraph();
+        Graph graph = topicGraph.getPropertyGraph();
+        for (Iterator<Vertex> it = graph.vertices(); it.hasNext(); ) {
+            Vertex v = it.next();
+            if (isNoteVertex(v)) {
+                VertexProperty<String> idProp = v.property(SemanticSynchrony.PropertyKeys.ID);
+                if (idProp.isPresent()) {
+                    AtomId oldId = new AtomId(idProp.value());
+                    AtomId newId = SemanticSynchrony.migrateId(oldId);
+                    v.property(SemanticSynchrony.PropertyKeys.ID, newId.value);
+                }
+            }
         }
     }
 
     private void findAnomalousNotes(final ActionContext context) {
-        for (Note a : context.getBrain().getTopicGraph().getAllNotes()) {
-            checkNotNull(a, Note::getId, "id");
-            checkNotNull(a, Note::getSource, "source");
-            checkNotNull(a, Note::getWeight, "weight");
-            checkNotNull(a, Note::getCreated, "created");
-            checkNotNull(a, Note::getTitle, "title");
+        PGTopicGraph topicGraph = (PGTopicGraph) context.getBrain().getTopicGraph();
+        Graph graph = topicGraph.getPropertyGraph();
+        for (Iterator<Vertex> it = graph.vertices(); it.hasNext(); ) {
+            Vertex v = it.next();
+            if (isNoteVertex(v)) {
+                checkVertexProperty(v, SemanticSynchrony.PropertyKeys.ID, "id");
+                checkVertexProperty(v, SemanticSynchrony.PropertyKeys.SOURCE, "source");
+                checkVertexProperty(v, SemanticSynchrony.PropertyKeys.WEIGHT, "weight");
+                checkVertexProperty(v, SemanticSynchrony.PropertyKeys.CREATED, "created");
+                checkVertexProperty(v, SemanticSynchrony.PropertyKeys.TITLE, "title");
+            }
         }
     }
 
-    private <T> void checkNotNull(final Note a, final Function<Note, T> accessor, final String name) {
-        T value = accessor.apply(a);
-        if (null == value) {
-            System.out.println("note " + Note.getId(a) + " has null " + name);
+    private void checkVertexProperty(final Vertex v, final String propertyKey, final String name) {
+        VertexProperty<?> prop = v.property(propertyKey);
+        if (!prop.isPresent()) {
+            String id = v.property(SemanticSynchrony.PropertyKeys.ID).value().toString();
+            System.out.println("note " + id + " has null " + name);
         }
+    }
+
+    private boolean isNoteVertex(final Vertex v) {
+        String label = v.label();
+        return null != label && label.equals(SemanticSynchrony.VertexLabels.NOTE);
     }
 
     @Override
