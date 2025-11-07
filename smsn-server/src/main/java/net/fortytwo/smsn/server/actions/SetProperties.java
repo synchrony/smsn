@@ -137,7 +137,7 @@ public class SetProperties extends FilteredAction {
             context.getBrain().getPriorities().updatePriorityById(atomId);
         }
 
-        context.getBrain().getTopicGraph().notifyOfUpdate();
+        context.getBrain().notifyOfUpdate();
 
         context.getMap().put("key", atomId);
         context.getMap().put("name", propertyKey);

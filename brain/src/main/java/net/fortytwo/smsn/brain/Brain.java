@@ -95,6 +95,14 @@ public class Brain {
         return topicGraph;
     }
 
+    /**
+     * Notify that the graph has been updated.
+     * This is used for change tracking and inference.
+     */
+    public void notifyOfUpdate() {
+        topicGraph.notifyOfUpdate();
+    }
+
     public KnowledgeBase getKnowledgeBase() {
         return knowledgeBase;
     }

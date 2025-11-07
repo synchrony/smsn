@@ -12,12 +12,8 @@ import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
-import net.fortytwo.smsn.brain.util.TreeNodeConverter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
@@ -105,17 +101,6 @@ public abstract class Action {
                 + " action in " + (after - before) + " ms");
 
         logActivity(context);
-    }
-
-    protected void addView(final TreeNode<Link> view,
-                           final ActionContext context) throws IOException {
-        // Convert old TreeNode<Link> to new immutable TreeNode
-        net.fortytwo.smsn.brain.TreeNode newTreeNode = TreeNodeConverter.fromTreeNodeLink(view);
-
-        // Serialize using new JSON printer
-        JSONObject json = context.getTreeNodeJsonPrinter().toJson(newTreeNode);
-
-        context.getMap().put(Params.VIEW, json);
     }
 
     public static ActionContext createContext(final Graph graph) {
