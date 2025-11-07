@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.util.TreeNodeConverter;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
@@ -84,7 +85,11 @@ public class UpdateView extends RootedViewAction {
 
     private TreeNode<Link> parseJson(final ActionContext params) {
         try {
-            return params.getJsonParser().parse(getView()).getContent();
+            // Parse using new TreeNodeJsonParser
+            net.fortytwo.smsn.brain.TreeNode newTreeNode = params.getTreeNodeJsonParser().parse(getView());
+
+            // Convert to old TreeNode<Link> format for internal processing
+            return TreeNodeConverter.toTreeNodeLink(newTreeNode);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

@@ -8,7 +8,10 @@ import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.io.json.JsonParser;
 import net.fortytwo.smsn.brain.io.json.JsonPrinter;
+import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
+import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.WikiParser;
+import net.fortytwo.smsn.brain.util.TreeNodeConverter;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.entities.Note;
@@ -104,7 +107,11 @@ public abstract class Action {
 
     protected void addView(final TreeNode<Link> view,
                            final ActionContext context) throws IOException {
-        JSONObject json = context.getJsonPrinter().toJson(view);
+        // Convert old TreeNode<Link> to new immutable TreeNode
+        net.fortytwo.smsn.brain.TreeNode newTreeNode = TreeNodeConverter.fromTreeNodeLink(view);
+
+        // Serialize using new JSON printer
+        JSONObject json = context.getTreeNodeJsonPrinter().toJson(newTreeNode);
 
         context.getMap().put(Params.VIEW, json);
     }
@@ -165,6 +172,9 @@ public abstract class Action {
         context.setWikiParser(new WikiParser());
         context.setJsonParser(new JsonParser());
         context.setJsonPrinter(new JsonPrinter());
+        // New parsers/printers for immutable TreeNode
+        context.setTreeNodeJsonParser(new TreeNodeJsonParser());
+        context.setTreeNodeJsonPrinter(new TreeNodeJsonPrinter());
     }
 
     private static void setGraphWrapper(final ActionContext context, final Graph graph) {
