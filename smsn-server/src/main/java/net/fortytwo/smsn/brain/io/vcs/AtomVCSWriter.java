@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.wiki.AtomWikiPrinter;
-import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.config.DataSource;
 
@@ -27,15 +26,10 @@ public class AtomVCSWriter extends NoteWriter {
 
     @Override
     public void doWrite(Context context) throws IOException {
-        AtomRepository repository = createRepository(context);
+        AtomRepository repository = context.getAtomRepository();
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
             writeDataSource(source, repository);
         }
-    }
-
-    private AtomRepository createRepository(Context context) {
-        PGTopicGraph pgTopicGraph = (PGTopicGraph) context.getTopicGraph();
-        return new AtomRepository(pgTopicGraph.getWrapper());
     }
 
     private void writeDataSource(DataSource source, AtomRepository repository) throws IOException {

@@ -1,10 +1,10 @@
 package net.fortytwo.smsn.brain.io.yaml;
 
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
-import net.fortytwo.smsn.brain.model.dto.NoteDTO;
-import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.Timestamp;
+import net.fortytwo.smsn.brain.Normed;
+import net.fortytwo.smsn.brain.SourceName;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,8 +41,8 @@ class YAMLSource {
         this.sourceName = sourceName;
     }
 
-    public void add(final Note a) {
-        addAtom(a);
+    public void add(final Atom atom) {
+        addAtom(atom);
     }
 
     private Map<String, Object> createMap() {
@@ -49,44 +50,68 @@ class YAMLSource {
         return new LinkedHashMap<>();
     }
 
-    private void addAtom(final Note a) {
+    private void addAtom(final Atom atom) {
         Map<String, Object> map = createMap();
-        toMap(map, a, YAMLFormat.Constants.AtomFields.ALIAS, Note::getAlias);
 
-        if (null != a.getChildren()) {
-            List<Note> children = ListNode.toJavaList(a.getChildren());
-            List<String> ids = children.stream().map(note -> Note.getId(note).value).collect(Collectors.toList());
+        // Add ID (required)
+        map.put(YAMLFormat.Constants.AtomFields.ID, atom.id.value);
+
+        // Add title (required)
+        if (atom.title != null) {
+            map.put(YAMLFormat.Constants.AtomFields.TITLE, atom.title);
+        }
+
+        // Add optional Opt<String> fields using reflection
+        addOptionalStringField(map, atom, "alias", YAMLFormat.Constants.AtomFields.ALIAS);
+        addOptionalStringField(map, atom, "shortcut", YAMLFormat.Constants.AtomFields.SHORTCUT);
+        addOptionalStringField(map, atom, "text", YAMLFormat.Constants.AtomFields.TEXT);
+
+        // Add optional Opt<Normed> priority field using reflection
+        addOptionalNormedField(map, atom, "priority", YAMLFormat.Constants.AtomFields.PRIORITY);
+
+        // Add children
+        if (!atom.children.isEmpty()) {
+            List<String> ids = atom.children.stream().map(id -> id.value).collect(Collectors.toList());
             map.put(YAMLFormat.Constants.AtomFields.CHILDREN, ids);
         }
 
-        toMap(map, a, YAMLFormat.Constants.AtomFields.CREATED, Note::getCreated);
-        toMap(map, a, YAMLFormat.Constants.AtomFields.ID, Note::getId);
-        toMap(map, a, YAMLFormat.Constants.AtomFields.PRIORITY, Note::getPriority);
-        toMap(map, a, YAMLFormat.Constants.AtomFields.SHORTCUT, Note::getShortcut);
-        toMap(map, a, YAMLFormat.Constants.AtomFields.TEXT, Note::getText);
-        toMap(map, a, YAMLFormat.Constants.AtomFields.TITLE, Note::getTitle);
-        toMap(map, a, YAMLFormat.Constants.AtomFields.WEIGHT, Note::getWeight);
+        // Add created
+        if (atom.created != null) {
+            map.put(YAMLFormat.Constants.AtomFields.CREATED, atom.created.value);
+        }
+
+        // Add weight
+        if (atom.weight != null) {
+            map.put(YAMLFormat.Constants.AtomFields.WEIGHT, atom.weight.value);
+        }
 
         atoms.add(map);
     }
 
-    private void toMap(final Map<String, Object> map,
-                       final Note a,
-                       final String key,
-                       final Function<Note, Object> getter) {
-        Object value = getter.apply(a);
-        if (null != value) {
-            map.put(key, value);
+    private void addOptionalStringField(Map<String, Object> map, Atom atom, String fieldName, String yamlKey) {
+        try {
+            Object optObj = atom.getClass().getField(fieldName).get(atom);
+            Boolean isPresent = (Boolean) optObj.getClass().getMethod("isPresent").invoke(optObj);
+            if (isPresent) {
+                Object value = optObj.getClass().getMethod("get").invoke(optObj);
+                map.put(yamlKey, value);
+            }
+        } catch (Exception e) {
+            // Ignore - field not present
         }
     }
 
-    private void fromMap(final Map<String, Object> map,
-                         final Note a,
-                         final String key,
-                         final BiConsumer<Note, Object> setter) {
-        Object o = map.get(key);
-        if (null != o) {
-            setter.accept(a, o);
+    private void addOptionalNormedField(Map<String, Object> map, Atom atom, String fieldName, String yamlKey) {
+        try {
+            Object optObj = atom.getClass().getField(fieldName).get(atom);
+            Boolean isPresent = (Boolean) optObj.getClass().getMethod("isPresent").invoke(optObj);
+            if (isPresent) {
+                Object normedObj = optObj.getClass().getMethod("get").invoke(optObj);
+                Object value = normedObj.getClass().getField("value").get(normedObj);
+                map.put(yamlKey, value);
+            }
+        } catch (Exception e) {
+            // Ignore - field not present
         }
     }
 
@@ -103,9 +128,9 @@ class YAMLSource {
         writeFile(atomFile(dir), atoms);
     }
 
-    public Collection<Note> readFrom(final File dir) throws IOException {
-        Map<AtomId, Note> notes = readAtoms(dir);
-        return notes.values();
+    public Collection<Atom> readFrom(final File dir) throws IOException {
+        Map<AtomId, Atom> atomsMap = readAtoms(dir);
+        return atomsMap.values();
     }
 
     private File atomFile(final File dir) {
@@ -122,35 +147,123 @@ class YAMLSource {
         }
     }
 
-    private Map<AtomId, Note> readAtoms(final File dir) throws IOException {
+    private Map<AtomId, Atom> readAtoms(final File dir) throws IOException {
         File file = atomFile(dir);
-        Map<AtomId, Note> notes = new HashMap<>();
+        Map<AtomId, Atom> atomsMap = new HashMap<>();
 
         for (Map<String, Object> map : loadYaml(file)) {
-            Note note = NoteDTO.createNew();
-            Note.setSource(note, sourceName);
+            // Extract required fields
+            AtomId id = new AtomId(toString(map.get(YAMLFormat.Constants.AtomFields.ID)));
+            Object titleObj = map.get(YAMLFormat.Constants.AtomFields.TITLE);
+            String title = titleObj != null ? toString(titleObj) : "";
 
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.ALIAS, (n, o) -> Note.setAlias(n, toString(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.CREATED, (n, o) -> Note.setCreated(n, toLong(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.ID, (n, o) -> Note.setId(n, new AtomId(toString(o))));
-//System.out.println("id: " + Note.getId(note));
-//Object title = map.get(YAMLFormat.Constants.AtomFields.TITLE);
-//System.out.println("\ttitle: " + title + (title == null ? "" : title.getClass()));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.PRIORITY, (n, o) -> Note.setPriority(n, toFloat(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.SHORTCUT, (n, o) -> Note.setShortcut(n, toString(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.TEXT, (n, o) -> Note.setText(n, toString(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.TITLE, (n, o) -> Note.setTitle(n, toString(o)));
-            fromMap(map, note, YAMLFormat.Constants.AtomFields.WEIGHT, (n, o) -> Note.setWeight(n, toFloat(o)));
-
-            List<String> children = (List<String>) map.get(YAMLFormat.Constants.AtomFields.CHILDREN);
-            if (null != children) {
-                note.setChildren(fromIds(children));
+            // Extract children
+            List<AtomId> children = new ArrayList<>();
+            List<String> childIds = (List<String>) map.get(YAMLFormat.Constants.AtomFields.CHILDREN);
+            if (childIds != null) {
+                for (String childId : childIds) {
+                    children.add(new AtomId(childId));
+                }
             }
 
-            notes.put(Note.getId(note), note);
+            // Extract timestamp (required field)
+            Timestamp created = extractTimestamp(map);
+
+            // Extract weight (required field)
+            Normed weight = extractWeight(map);
+
+            // Create Atom using reflection to avoid direct Opt import
+            Atom atom = createAtom(
+                id,
+                created,
+                weight,
+                extractOptNormed(map, YAMLFormat.Constants.AtomFields.PRIORITY),
+                new SourceName(sourceName),
+                title,
+                extractOptString(map, YAMLFormat.Constants.AtomFields.ALIAS),
+                extractOptString(map, YAMLFormat.Constants.AtomFields.TEXT),
+                extractOptString(map, YAMLFormat.Constants.AtomFields.SHORTCUT),
+                children
+            );
+
+            atomsMap.put(id, atom);
         }
 
-        return notes;
+        return atomsMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Atom createAtom(AtomId id, Timestamp created, Normed weight, Object priority,
+                            SourceName source, String title, Object alias, Object text,
+                            Object shortcut, List<AtomId> children) {
+        try {
+            // Use reflection to call Atom constructor
+            Class<?> atomClass = Atom.class;
+            java.lang.reflect.Constructor<?> constructor = atomClass.getConstructor(
+                AtomId.class,
+                Timestamp.class,
+                Normed.class,
+                Class.forName("hydra.util.Opt"),  // priority
+                SourceName.class,
+                String.class,
+                Class.forName("hydra.util.Opt"),  // alias
+                Class.forName("hydra.util.Opt"),  // text
+                Class.forName("hydra.util.Opt"),  // shortcut
+                java.util.List.class
+            );
+            return (Atom) constructor.newInstance(id, created, weight, priority, source, title, alias, text, shortcut, children);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Atom", e);
+        }
+    }
+
+    private Timestamp extractTimestamp(Map<String, Object> map) {
+        Object obj = map.get(YAMLFormat.Constants.AtomFields.CREATED);
+        // Default to current time if not present
+        // Timestamp is in seconds (Integer), not milliseconds
+        return obj != null ? new Timestamp(toInt(obj)) : new Timestamp((int) (System.currentTimeMillis() / 1000));
+    }
+
+    private Normed extractWeight(Map<String, Object> map) {
+        Object obj = map.get(YAMLFormat.Constants.AtomFields.WEIGHT);
+        // Default weight to 0.5 if not present
+        return obj != null ? new Normed(toFloat(obj)) : new Normed(0.5f);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object extractOptString(Map<String, Object> map, String key) {
+        Object obj = map.get(key);
+        try {
+            Class<?> optClass = Class.forName("hydra.util.Opt");
+            if (obj != null) {
+                return optClass.getMethod("of", Object.class).invoke(null, toString(obj));
+            } else {
+                return optClass.getMethod("empty").invoke(null);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Opt for " + key, e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object extractOptNormed(Map<String, Object> map, String key) {
+        Object obj = map.get(key);
+        try {
+            Class<?> optClass = Class.forName("hydra.util.Opt");
+            if (obj != null) {
+                return optClass.getMethod("of", Object.class).invoke(null, new Normed(toFloat(obj)));
+            } else {
+                return optClass.getMethod("empty").invoke(null);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Opt for " + key, e);
+        }
+    }
+
+    private Integer toInt(final Object o) {
+        return o instanceof Number
+                ? ((Number) o).intValue()
+                : Integer.valueOf(o.toString());
     }
 
     private Float toFloat(final Object o) {
@@ -174,17 +287,6 @@ class YAMLSource {
             throw new IllegalStateException("object of class " + o.getClass()
                     + " cannot be converted to a String: " + o);
         }
-    }
-
-    private ListNode<Note> fromIds(final List<String> ids) {
-        Note[] notes = new Note[ids.size()];
-        int i = 0;
-        for (String id : ids) {
-            Note note = NoteDTO.createNew();
-            Note.setId(note, new AtomId(id));
-            notes[i++] = note;
-        }
-        return ListNodeDTO.fromArray(notes);
     }
 
     private static Resolver createResolver() {

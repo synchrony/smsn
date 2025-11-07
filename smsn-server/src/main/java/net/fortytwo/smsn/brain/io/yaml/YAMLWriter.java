@@ -1,10 +1,11 @@
 package net.fortytwo.smsn.brain.io.yaml;
 
+import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.vcs.FilePerNoteFormat;
-import net.fortytwo.smsn.brain.model.TopicGraph;
-import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,14 +30,15 @@ public class YAMLWriter extends NoteWriter {
     public void doWrite(final Context context) throws IOException {
         Map<String, File> dirs = FilePerNoteFormat.directoriesBySource();
 
-        timeAction("exported notes as individual files", () -> doExport(context.getTopicGraph(), dirs));
+        timeAction("exported atoms as individual files", () -> doExport(context.getAtomRepository(), dirs));
     }
 
-    private void doExport(final TopicGraph graph, final Map<String, File> dirs) throws IOException {
+    private void doExport(final AtomRepository repository, final Map<String, File> dirs) throws IOException {
         YAMLGraph data = new YAMLGraph();
 
-        for (Note a : graph.getAllNotes()) {
-            data.addAtom(a);
+        for (AtomId atomId : repository.getAllAtomIds()) {
+            Atom atom = repository.load(atomId);
+            data.addAtom(atom);
         }
 
         data.writeTo(dirs);

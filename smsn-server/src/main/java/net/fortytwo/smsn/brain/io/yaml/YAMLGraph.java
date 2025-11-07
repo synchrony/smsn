@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.yaml;
 
-import net.fortytwo.smsn.brain.model.entities.Note;
+import net.fortytwo.smsn.brain.Atom;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +12,11 @@ import java.util.Map;
 class YAMLGraph {
     private Map<String, YAMLSource> sourceGraphs = new HashMap<>();
 
-    public void addAtom(final Note a) {
-        String source = Note.getSource(a);
+    public void addAtom(final Atom atom) {
+        String source = atom.source != null ? atom.source.value : null;
         // A null source means that the atom is just a reference, and is not described in any of the owned graphs.
         if (null != source) {
-            getSource(source).add(a);
+            getSource(source).add(atom);
         }
     }
 
@@ -30,13 +30,13 @@ class YAMLGraph {
         }
     }
 
-    public Collection<Note> readFrom(final Map<String, File> sourceDirs) throws IOException {
-        Collection<Note> notes = new LinkedList<>();
+    public Collection<Atom> readFrom(final Map<String, File> sourceDirs) throws IOException {
+        Collection<Atom> atoms = new LinkedList<>();
         for (Map.Entry<String, File> e : sourceDirs.entrySet()) {
             YAMLSource source = getSource(e.getKey());
-            notes.addAll(source.readFrom(e.getValue()));
+            atoms.addAll(source.readFrom(e.getValue()));
         }
-        return notes;
+        return atoms;
     }
 
     private YAMLSource getSource(final String name) {

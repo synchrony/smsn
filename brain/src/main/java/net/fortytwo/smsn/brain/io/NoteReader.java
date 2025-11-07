@@ -139,6 +139,7 @@ public abstract class NoteReader {
 
     public static class Context {
         private TopicGraph topicGraph;
+        private net.fortytwo.smsn.brain.repository.AtomRepository atomRepository;
         private InputStream sourceStream;
         private File sourceDirectory;
         private Format format;
@@ -150,6 +151,14 @@ public abstract class NoteReader {
 
         public void setTopicGraph(TopicGraph topicGraph) {
             this.topicGraph = topicGraph;
+        }
+
+        public net.fortytwo.smsn.brain.repository.AtomRepository getAtomRepository() {
+            return atomRepository;
+        }
+
+        public void setAtomRepository(net.fortytwo.smsn.brain.repository.AtomRepository atomRepository) {
+            this.atomRepository = atomRepository;
         }
 
         public InputStream getSourceStream() {

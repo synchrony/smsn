@@ -5,7 +5,6 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.wiki.AtomWikiParser;
-import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.config.DataSource;
 
@@ -30,15 +29,10 @@ public class AtomVCSReader extends NoteReader {
 
     @Override
     protected void importInternal(Context context) throws IOException {
-        AtomRepository repository = createRepository(context);
+        AtomRepository repository = context.getAtomRepository();
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
             readDataSource(source, repository);
         }
-    }
-
-    private AtomRepository createRepository(Context context) {
-        PGTopicGraph pgTopicGraph = (PGTopicGraph) context.getTopicGraph();
-        return new AtomRepository(pgTopicGraph.getWrapper());
     }
 
     private void readDataSource(DataSource source, AtomRepository repository) throws IOException {
