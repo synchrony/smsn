@@ -591,6 +591,35 @@ public class AtomRepository {
     }
 
     /**
+     * Remove all isolated atoms (atoms with no parents and no children) matching the filter.
+     *
+     * @param filter Filter to apply, or null for no filter
+     */
+    public void removeIsolatedAtoms(Filter filter) {
+        List<AtomId> toRemove = new ArrayList<>();
+
+        for (AtomId atomId : getAllAtomIds()) {
+            Atom atom = load(atomId);
+
+            // Check if isolated (no children and no parents)
+            if (atom.children.isEmpty() && countParents(atomId) == 0) {
+                // Check filter
+                if (filter == null || testFilter(atom, filter)) {
+                    toRemove.add(atomId);
+                }
+            }
+        }
+
+        // Remove the isolated atoms
+        for (AtomId atomId : toRemove) {
+            Vertex v = wrapper.getVertexById(atomId);
+            if (v != null) {
+                v.remove();
+            }
+        }
+    }
+
+    /**
      * Update search indices for a vertex.
      */
     private void updateAllIndices(Vertex v) {
