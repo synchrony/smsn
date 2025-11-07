@@ -7,6 +7,9 @@ dependencies {
   implementation project(':smsn-models')
   implementation project(':smsn-rdf')
 
+  // Hydra dependency (for Opt and other utilities)
+  implementation 'net.fortytwo.hydra:hydra-java:0.7.0'
+
   implementation 'org.json:json:20180130'
 
   //implementation 'org.jsoup:jsoup:1.16.1'
@@ -31,4 +34,15 @@ dependencies {
   testImplementation "junit:junit:$junitVersion"
 
   testOutput sourceSets.test.output
+}
+
+test {
+  // Add JVM arguments to open Java modules for Neo4j compatibility with Java 11+
+  // Neo4j's older version uses reflection to access internal Java classes
+  jvmArgs = [
+    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+    '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+    '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+    '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED'
+  ]
 }

@@ -35,6 +35,8 @@ smsnBrainModule = Module ns elements [hydraCoreModule] [hydraCoreModule] Nothing
           "source">: brain "SourceName",
           "title">: string,
           "alias">: optional string,
+          "text">: optional string,
+          "shortcut">: optional string,
           "children">: list $ brain "AtomId"],
 
       def "Normed" $
@@ -56,6 +58,8 @@ smsnBrainModule = Module ns elements [hydraCoreModule] [hydraCoreModule] Nothing
           "source">: brain "SourceName",
           "title">: string,
           "alias">: optional string,
+          "text">: optional string,
+          "shortcut">: optional string,
           "children">: list $ brain "TreeNode",
           "numberOfChildren">: int32,
           "numberOfParents">: int32]

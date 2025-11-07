@@ -36,6 +36,17 @@ dependencies {
   testImplementation project(path: ':brain', configuration: 'testOutput')
 }
 
+test {
+  // Add JVM arguments to open Java modules for Neo4j compatibility with Java 11+
+  // Neo4j's older version uses reflection to access internal Java classes
+  jvmArgs = [
+    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+    '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+    '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+    '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED'
+  ]
+}
+
 shadowJar {
   minimize()
   mergeServiceFiles()
