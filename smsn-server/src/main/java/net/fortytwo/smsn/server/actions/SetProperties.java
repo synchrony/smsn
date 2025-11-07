@@ -110,48 +110,45 @@ public class SetProperties extends FilteredAction {
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         validateKeyValue();
 
-        Note root = getRoot(getId(), context);
-        setFilterParams(context);
+        AtomId atomId = getId();
+        String propertyKey = getName();
         Object value = getValue();
 
-        switch (getName()) {
-            case SemanticSynchrony.PropertyKeys.TITLE:
-                Note.setTitle(root, (String) value);
-                break;
-            case SemanticSynchrony.PropertyKeys.TEXT:
-                Note.setText(root, trimPage((String) value));
-                break;
-            case SemanticSynchrony.PropertyKeys.WEIGHT:
-                Note.setWeight(root, toFloat(value));
-                break;
-            case SemanticSynchrony.PropertyKeys.SOURCE:
-                Note.setSource(root, (String) value);
-                break;
-            case SemanticSynchrony.PropertyKeys.PRIORITY:
-                Note.setPriority(root, toFloat(value));
-                context.getBrain().getPriorities().updatePriority(root);
-                break;
-            case SemanticSynchrony.PropertyKeys.SHORTCUT:
-                // first remove this shortcut from any note(s) currently holding it; shortcuts are inverse functional
-                String shortcut = (String) value;
-                for (Note a : context.getBrain().getTopicGraph().getNotesByShortcut(shortcut, getFilter())) {
-                    Note.setShortcut(a, null);
+        // Special handling for shortcuts - must be unique across the graph
+        if (SemanticSynchrony.PropertyKeys.SHORTCUT.equals(propertyKey)) {
+            String shortcut = (String) value;
+            // Remove this shortcut from any other atoms currently holding it
+            for (net.fortytwo.smsn.brain.Atom atom : context.getRepository().findByShortcut(shortcut, getFilter())) {
+                if (!atom.id.equals(atomId)) {
+                    context.getRepository().updateProperty(atom.id, SemanticSynchrony.PropertyKeys.SHORTCUT, null);
                 }
+            }
+        }
 
-                Note.setShortcut(root, shortcut);
-                break;
-            default:
-                throw new IllegalStateException();
+        // Trim text values
+        if (SemanticSynchrony.PropertyKeys.TEXT.equals(propertyKey)) {
+            value = trimPage((String) value);
+        }
+
+        // Update the property using AtomRepository
+        context.getRepository().updateProperty(atomId, propertyKey, value);
+
+        // Update priority queue if priority changed (still uses old Note interface)
+        if (SemanticSynchrony.PropertyKeys.PRIORITY.equals(propertyKey)) {
+            Note root = getRoot(atomId, context);
+            context.getBrain().getPriorities().updatePriority(root);
         }
 
         context.getBrain().getTopicGraph().notifyOfUpdate();
 
-        context.getMap().put("key", context.getBrain().getTopicGraph().idOf(root));
-        context.getMap().put("name", getName());
-        context.getMap().put("value", value.toString());
+        context.getMap().put("key", atomId);
+        context.getMap().put("name", propertyKey);
+        context.getMap().put("value", value != null ? value.toString() : "");
 
+        // Activity logging still uses old Note interface
         ActivityLog log = context.getBrain().getActivityLog();
         if (null != log) {
+            Note root = getRoot(atomId, context);
             log.logSetProperties(root);
         }
     }

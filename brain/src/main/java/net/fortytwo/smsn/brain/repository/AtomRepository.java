@@ -138,6 +138,7 @@ public class AtomRepository {
 
     /**
      * Update a single property of an atom.
+     * Handles type conversions automatically (e.g., Double to Float from JSON).
      */
     public void updateProperty(AtomId atomId, String propertyKey, Object value) {
         Atom atom = load(atomId);
@@ -151,10 +152,10 @@ public class AtomRepository {
                 updated = atom.withText(value == null ? Opt.empty() : Opt.of((String) value));
                 break;
             case SemanticSynchrony.PropertyKeys.WEIGHT:
-                updated = atom.withWeight(new Normed((Float) value));
+                updated = atom.withWeight(new Normed(toFloat(value)));
                 break;
             case SemanticSynchrony.PropertyKeys.PRIORITY:
-                updated = atom.withPriority(value == null ? Opt.empty() : Opt.of(new Normed((Float) value)));
+                updated = atom.withPriority(value == null ? Opt.empty() : Opt.of(new Normed(toFloat(value))));
                 break;
             case SemanticSynchrony.PropertyKeys.SOURCE:
                 updated = atom.withSource(new SourceName((String) value));
@@ -170,6 +171,24 @@ public class AtomRepository {
         }
 
         save(updated);
+    }
+
+    /**
+     * Convert various numeric types to float.
+     * Handles JSON deserialization which produces Doubles.
+     */
+    private float toFloat(Object value) {
+        if (value instanceof Float) {
+            return (Float) value;
+        } else if (value instanceof Double) {
+            return ((Double) value).floatValue();
+        } else if (value instanceof Number) {
+            return ((Number) value).floatValue();
+        } else if (value instanceof String) {
+            return Float.parseFloat((String) value);
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to float");
+        }
     }
 
     /**
@@ -362,9 +381,15 @@ public class AtomRepository {
      * Convert a graph Vertex to an Atom.
      */
     private Atom vertexToAtom(Vertex v) {
+        // Handle CREATED property - stored as Long for compatibility, but Timestamp expects int
+        Object createdValue = getRequiredProperty(v, SemanticSynchrony.PropertyKeys.CREATED);
+        int created = createdValue instanceof Long
+                ? ((Long) createdValue).intValue()
+                : (Integer) createdValue;
+
         return new Atom(
                 new AtomId(getRequiredProperty(v, SemanticSynchrony.PropertyKeys.ID)),
-                new Timestamp(getRequiredProperty(v, SemanticSynchrony.PropertyKeys.CREATED)),
+                new Timestamp(created),
                 new Normed(getOptionalProperty(v, SemanticSynchrony.PropertyKeys.WEIGHT, 0.5f)),
                 optionalNormed(getOptionalProperty(v, SemanticSynchrony.PropertyKeys.PRIORITY, null)),
                 new SourceName(getRequiredProperty(v, SemanticSynchrony.PropertyKeys.SOURCE)),
@@ -381,7 +406,8 @@ public class AtomRepository {
      */
     private void atomToVertex(Atom atom, Vertex v) {
         v.property(SemanticSynchrony.PropertyKeys.ID, atom.id.value);
-        v.property(SemanticSynchrony.PropertyKeys.CREATED, atom.created.value);
+        // Store CREATED as Long for compatibility with old Note interface
+        v.property(SemanticSynchrony.PropertyKeys.CREATED, (long) atom.created.value);
         v.property(SemanticSynchrony.PropertyKeys.WEIGHT, atom.weight.value);
 
         setOptionalProperty(v, SemanticSynchrony.PropertyKeys.PRIORITY,
