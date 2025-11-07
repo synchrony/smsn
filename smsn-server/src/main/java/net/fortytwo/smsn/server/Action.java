@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,9 +134,9 @@ public abstract class Action {
         history.visit(rootId);
     }
 
-    protected Iterable<Note> getHistory(final TopicGraph graph,
-                                        final Filter filter) {
-        return history.getHistory(100, graph, filter);
+    protected List<Atom> getHistory(final net.fortytwo.smsn.brain.repository.AtomRepository repository,
+                                     final Filter filter) {
+        return history.getHistory(100, repository, filter);
     }
 
     private void wrapTransactionAndExceptions(final ActionContext context) {

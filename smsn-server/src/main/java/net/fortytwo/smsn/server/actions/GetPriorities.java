@@ -2,7 +2,6 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -30,15 +29,14 @@ public class GetPriorities extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
-        // Get priority queue (still uses old Note interface)
-        Queue<Note> queue = context.getBrain().getPriorities().getQueue();
+        // Get priority queue (now uses Atoms)
+        Queue<Atom> queue = context.getBrain().getPriorities().getQueue();
 
-        // Convert to Atoms
+        // Filter and limit
         List<Atom> prioritizedAtoms = new ArrayList<>();
         int i = 0;
-        for (Note note : queue) {
-            if (getFilter() == null || getFilter().test(note)) {
-                Atom atom = context.getRepository().load(Note.getId(note));
+        for (Atom atom : queue) {
+            if (getFilter() == null || context.getRepository().testFilter(atom, getFilter())) {
                 prioritizedAtoms.add(atom);
 
                 if (++i >= maxResults) {

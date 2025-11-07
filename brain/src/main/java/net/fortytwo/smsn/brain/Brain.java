@@ -2,7 +2,9 @@ package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,8 +38,17 @@ public class Brain {
 
     private final EventStack eventStack;
 
+    private final AtomRepository atomRepository;
+
     public Brain(final TopicGraph topicGraph) throws BrainException {
         this.topicGraph = topicGraph;
+
+        // Create AtomRepository from the graph wrapper
+        if (topicGraph instanceof PGTopicGraph) {
+            this.atomRepository = new AtomRepository(((PGTopicGraph) topicGraph).getWrapper());
+        } else {
+            throw new BrainException(new IllegalArgumentException("TopicGraph must be a PGTopicGraph"));
+        }
 
         knowledgeBase = new KnowledgeBase(topicGraph);
 
@@ -63,7 +74,7 @@ public class Brain {
             }
         }
 
-        priorities = new Priorities();
+        priorities = new Priorities(atomRepository);
 
         eventStack = new EventStack(EVENT_STACK_CAPACITY);
     }
@@ -71,9 +82,13 @@ public class Brain {
     public void startBackgroundTasks() {
         if (!RUN_BACKGROUND_TASKS) return;
 
-        priorities.refreshQueue(topicGraph);
+        priorities.refreshQueue();
 
         knowledgeBase.inferAutomatically(INFERENCE_INITIAL_WAIT, INFERENCE_PERIOD);
+    }
+
+    public AtomRepository getAtomRepository() {
+        return atomRepository;
     }
 
     public TopicGraph getTopicGraph() {

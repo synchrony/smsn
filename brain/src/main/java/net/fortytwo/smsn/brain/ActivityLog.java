@@ -1,7 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.entities.Note;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -13,26 +11,44 @@ public class ActivityLog {
         this.out = out;
     }
 
-    public void logCreate(final Note a) {
-        log("create", a);
+    public void logCreate(final Atom atom) {
+        log("create", atom);
     }
 
-    public void logView(final Note a) {
-        log("view", a);
+    public void logCreateById(final AtomId atomId) {
+        logById("create", atomId);
     }
 
-    public void logSetProperties(final Note a) {
-        log("set-props", a);
+    public void logView(final Atom atom) {
+        log("view", atom);
     }
 
-    public void logLink(final Note tail,
-                        final Note head) {
+    public void logViewById(final AtomId atomId) {
+        logById("view", atomId);
+    }
+
+    public void logSetProperties(final Atom atom) {
+        log("set-props", atom);
+    }
+
+    public void logSetPropertiesById(final AtomId atomId) {
+        logById("set-props", atomId);
+    }
+
+    public void logLink(final Atom tail, final Atom head) {
         log("link", tail, head);
     }
 
-    public void logUnlink(final Note tail,
-                          final Note head) {
+    public void logLinkById(final AtomId tailId, final AtomId headId) {
+        logById("link", tailId, headId);
+    }
+
+    public void logUnlink(final Atom tail, final Atom head) {
         log("unlink", tail, head);
+    }
+
+    public void logUnlinkById(final AtomId tailId, final AtomId headId) {
+        logById("unlink", tailId, headId);
     }
 
     public void flush() {
@@ -47,14 +63,30 @@ public class ActivityLog {
         out.close();
     }
 
-    private void log(final String action, final Note... notes) {
+    private void log(final String action, final Atom... atoms) {
         try {
             out.append("")
                     .append("").append(String.valueOf(System.currentTimeMillis()))
                     .append("\t").append(action);
 
-            for (Note note : notes) {
-                out.append("\t").append(Note.getId(note).value);
+            for (Atom atom : atoms) {
+                out.append("\t").append(atom.id.value);
+            }
+
+            out.append("\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void logById(final String action, final AtomId... atomIds) {
+        try {
+            out.append("")
+                    .append("").append(String.valueOf(System.currentTimeMillis()))
+                    .append("\t").append(action);
+
+            for (AtomId atomId : atomIds) {
+                out.append("\t").append(atomId.value);
             }
 
             out.append("\n");

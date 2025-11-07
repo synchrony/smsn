@@ -133,10 +133,9 @@ public class SetProperties extends FilteredAction {
         // Update the property using AtomRepository
         context.getRepository().updateProperty(atomId, propertyKey, value);
 
-        // Update priority queue if priority changed (still uses old Note interface)
+        // Update priority queue if priority changed
         if (SemanticSynchrony.PropertyKeys.PRIORITY.equals(propertyKey)) {
-            Note root = getRoot(atomId, context);
-            context.getBrain().getPriorities().updatePriority(root);
+            context.getBrain().getPriorities().updatePriorityById(atomId);
         }
 
         context.getBrain().getTopicGraph().notifyOfUpdate();
@@ -145,11 +144,10 @@ public class SetProperties extends FilteredAction {
         context.getMap().put("name", propertyKey);
         context.getMap().put("value", value != null ? value.toString() : "");
 
-        // Activity logging still uses old Note interface
+        // Activity logging
         ActivityLog log = context.getBrain().getActivityLog();
         if (null != log) {
-            Note root = getRoot(atomId, context);
-            log.logSetProperties(root);
+            log.logSetPropertiesById(atomId);
         }
     }
 

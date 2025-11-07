@@ -1,12 +1,11 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.repository.AtomRepository;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Optional;
+import java.util.List;
 
 public class History {
     private static final int CAPACITY = 1000;
@@ -26,27 +25,57 @@ public class History {
         }
     }
 
-    public Iterable<Note> getHistory(final int maxlen,
-                                     final TopicGraph graph,
-                                     final Filter filter) {
-        Collection<Note> notes = new LinkedList<>();
+    /**
+     * Get recent visit history as Atoms.
+     *
+     * @param maxlen the maximum number of atoms to return
+     * @param repository the atom repository
+     * @param filter filter for atoms
+     * @return list of recently visited atoms
+     */
+    public List<Atom> getHistory(final int maxlen,
+                                  final AtomRepository repository,
+                                  final Filter filter) {
+        List<Atom> atoms = new LinkedList<>();
 
         int low = Math.max(totalVisits - CAPACITY, 0);
 
         for (int i = totalVisits - 1; i >= low; i--) {
-            if (notes.size() >= maxlen) {
+            if (atoms.size() >= maxlen) {
                 break;
             }
 
             AtomId id = visited[i % CAPACITY];
 
-            Optional<Note> a = graph.getNoteById(id);
-            if (a.isPresent() && filter.test(a.get())) {
-                notes.add(a.get());
+            // Load atom and check filter
+            Atom atom = repository.load(id);
+            if (atom != null && (filter == null || repository.testFilter(atom, filter))) {
+                atoms.add(atom);
             }
         }
 
-        return notes;
+        return atoms;
+    }
+
+    /**
+     * Get recent visit history as AtomIds.
+     *
+     * @param maxlen the maximum number of IDs to return
+     * @return list of recently visited atom IDs
+     */
+    public List<AtomId> getHistoryIds(final int maxlen) {
+        List<AtomId> ids = new LinkedList<>();
+
+        int low = Math.max(totalVisits - CAPACITY, 0);
+
+        for (int i = totalVisits - 1; i >= low && ids.size() < maxlen; i--) {
+            AtomId id = visited[i % CAPACITY];
+            if (id != null) {
+                ids.add(id);
+            }
+        }
+
+        return ids;
     }
 
     private AtomId getLastVisit() {

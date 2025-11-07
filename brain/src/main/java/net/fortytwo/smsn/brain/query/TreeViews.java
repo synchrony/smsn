@@ -1,6 +1,7 @@
 package net.fortytwo.smsn.brain.query;
 
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Priorities;
@@ -78,7 +79,7 @@ public class TreeViews {
         checkStyleArg(style, false);
 
         if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logView(root);
+            brain.getActivityLog().logViewById(Note.getId(root));
         }
 
         return viewInternal(root, height, filter, style, true, null);
@@ -200,6 +201,7 @@ public class TreeViews {
 
     /**
      * Generates a prioritized list of notes
+     * DEPRECATED: Use GetPriorities action with TreeViewBuilder instead
      *
      * @param filter     a collection of criteria for nots and links.
      *                   Notes and links which do not meet the criteria are not to appear in the view.
@@ -207,6 +209,7 @@ public class TreeViews {
      * @param priorities the list of priorities to view
      * @return a prioritized list of notes
      */
+    @Deprecated
     public TreeNode<Link> priorityView(final Filter filter,
                                        final int maxResults,
                                        final Priorities priorities) throws InvalidGraphException {
@@ -217,11 +220,13 @@ public class TreeViews {
         TreeNode<Link> result = createTreeNode();
         result.getValue().setLabel("priority queue with up to " + maxResults + " results");
 
-        Queue<Note> queue = priorities.getQueue();
+        Queue<Atom> queue = priorities.getQueue();
         int i = 0;
-        for (Note a : queue) {
-            if (filter.test(a)) {
-                result.addChild(toTreeNode(a, true, true));
+        for (Atom atom : queue) {
+            // Convert Atom to Note for compatibility
+            Note note = brain.getTopicGraph().getNoteById(atom.id).orElse(null);
+            if (note != null && filter.test(note)) {
+                result.addChild(toTreeNode(note, true, true));
 
                 if (++i >= maxResults) {
                     break;
@@ -401,7 +406,7 @@ public class TreeViews {
 
                 // log this activity
                 if (null != brain.getActivityLog()) {
-                    brain.getActivityLog().logLink(rootNote, note);
+                    brain.getActivityLog().logLinkById(Note.getId(rootNote), Note.getId(note));
                 }
             }
 
@@ -418,7 +423,7 @@ public class TreeViews {
                 if (null != brain.getActivityLog()) {
                     Note a = getNoteById(getId(note), cache);
                     if (null != a) {
-                        brain.getActivityLog().logUnlink(rootNote, a);
+                        brain.getActivityLog().logUnlinkById(Note.getId(rootNote), Note.getId(a));
                     }
                 }
             }
@@ -518,7 +523,7 @@ public class TreeViews {
         }
 
         if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logCreate(a);
+            brain.getActivityLog().logCreateById(Note.getId(a));
         }
 
         return a;
@@ -571,7 +576,7 @@ public class TreeViews {
         }
 
         if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logSetProperties(toNote);
+            brain.getActivityLog().logSetPropertiesById(Note.getId(toNote));
         }
     }
 
