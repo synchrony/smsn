@@ -12,3 +12,76 @@
 dashboard/data
 dashboard/figure
 .Rproj.user
+
+# Data directories
+*/data/
+brain/data/
+smsn-server/data/
+
+# R history files
+.Rhistory
+.Rapp.history
+
+# Haskell build artifacts
+.stack-work/
+stack.yaml.lock
+
+# Documentation and notes (project-specific)
+SMSN_V2_DESIGN.txt
+examples.txt
+cheatsheet.txt
+id-migration.txt
+separate-repos.txt
+debug.json
+
+# Backup/development directories
+bk/
+new/
+lenses/
+
+# External projects/experiments
+docker-smsn/
+demo-smsn-docker/
+haskell-smsn/
+smsn-chrome/
+smsn-why/
+
+# Configuration files
+config/
+
+# Binary/executable files in root
+java
+
+# Deployment scripts
+deploy-*.sh
+
+# Miscellaneous
+tinkerpop-classic.xml
+
+# Freeplane test resources
+smsn-server/src/test/resources/net/fortytwo/smsn/brain/io/freeplane/
+
+# Device-specific subdirs
+smsn-devices/synchronometer/
+
+# STL files
+*.stl
+
+# Installer artifacts
+smsn-server/installer/
+
+# Generated/temporary Java files in root
+/*.java
+
+# Test output
+smsn-server/net/
+
+# Generated docs
+brain/doc/*.png
+
+# Lisp experiments (symlink)
+brain/src/main/lisp
+
+# README files for submodules
+smsn-models/README.md
+smsn-models/src/test/
