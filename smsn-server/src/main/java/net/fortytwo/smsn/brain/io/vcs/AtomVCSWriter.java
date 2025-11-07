@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.wiki.AtomWikiPrinter;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.config.DataSource;
 
@@ -21,20 +22,23 @@ import java.util.List;
 public class AtomVCSWriter extends NoteWriter {
     private static final FilePerNoteFormat FORMAT = new FilePerNoteFormat("VCS-Atom", "smsn");
 
-    private final AtomRepository repository;
-
-    public AtomVCSWriter(AtomRepository repository) {
-        this.repository = repository;
+    public AtomVCSWriter() {
     }
 
     @Override
     public void doWrite(Context context) throws IOException {
+        AtomRepository repository = createRepository(context);
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
-            writeDataSource(source);
+            writeDataSource(source, repository);
         }
     }
 
-    private void writeDataSource(DataSource source) throws IOException {
+    private AtomRepository createRepository(Context context) {
+        PGTopicGraph pgTopicGraph = (PGTopicGraph) context.getTopicGraph();
+        return new AtomRepository(pgTopicGraph.getWrapper());
+    }
+
+    private void writeDataSource(DataSource source, AtomRepository repository) throws IOException {
         String location = source.getLocation();
         File dir = new File(location);
 
@@ -43,8 +47,10 @@ public class AtomVCSWriter extends NoteWriter {
         }
 
         // Get all atoms from this source and write them
-        // Note: This requires a way to query atoms by source, which we'll need to add
-        // For now, this is a placeholder showing the structure
+        List<Atom> atoms = repository.getAtomsBySource(source.getName());
+        for (Atom atom : atoms) {
+            writeAtom(atom, dir);
+        }
     }
 
     public void writeAtom(Atom atom, File directory) throws IOException {

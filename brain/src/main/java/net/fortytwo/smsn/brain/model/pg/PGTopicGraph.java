@@ -52,6 +52,10 @@ public class PGTopicGraph implements TopicGraph {
         return propertyGraph;
     }
 
+    public GraphWrapper getWrapper() {
+        return wrapper;
+    }
+
     public AtomId idOf(final Note a) {
         return Note.getId(a);
     }

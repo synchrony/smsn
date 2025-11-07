@@ -133,6 +133,36 @@ public class AtomRepository {
         return count;
     }
 
+    // ========== Bulk Operations ==========
+
+    /**
+     * Get all atom IDs in the graph.
+     */
+    public List<AtomId> getAllAtomIds() {
+        List<AtomId> ids = new ArrayList<>();
+        wrapper.getGraph().vertices().forEachRemaining(v -> {
+            String idValue = getOptionalProperty(v, SemanticSynchrony.PropertyKeys.ID, null);
+            if (idValue != null) {
+                ids.add(new AtomId(idValue));
+            }
+        });
+        return ids;
+    }
+
+    /**
+     * Get all atoms from a specific source.
+     */
+    public List<Atom> getAtomsBySource(String sourceName) {
+        List<Atom> atoms = new ArrayList<>();
+        wrapper.getGraph().vertices().forEachRemaining(v -> {
+            String source = getOptionalProperty(v, SemanticSynchrony.PropertyKeys.SOURCE, null);
+            if (sourceName.equals(source)) {
+                atoms.add(vertexToAtom(v));
+            }
+        });
+        return atoms;
+    }
+
     // ========== Search Operations ==========
 
     /**

@@ -1,4 +1,5 @@
 net.fortytwo.smsn.brain.io.graphml.GraphMLReader
 net.fortytwo.smsn.brain.io.freeplane.FreeplaneReader
 net.fortytwo.smsn.brain.io.vcs.VCSReader
+net.fortytwo.smsn.brain.io.vcs.AtomVCSReader
 net.fortytwo.smsn.brain.io.yaml.YAMLReader

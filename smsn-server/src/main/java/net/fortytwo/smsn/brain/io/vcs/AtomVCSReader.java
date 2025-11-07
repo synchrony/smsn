@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.wiki.AtomWikiParser;
+import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.config.DataSource;
 
@@ -21,22 +22,26 @@ import java.util.List;
 public class AtomVCSReader extends NoteReader {
     private static final FilePerNoteFormat FORMAT = new FilePerNoteFormat("VCS-Atom", "smsn");
 
-    private final AtomRepository repository;
     private final AtomWikiParser parser;
 
-    public AtomVCSReader(AtomRepository repository) {
-        this.repository = repository;
+    public AtomVCSReader() {
         this.parser = new AtomWikiParser();
     }
 
     @Override
     protected void importInternal(Context context) throws IOException {
+        AtomRepository repository = createRepository(context);
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
-            readDataSource(source);
+            readDataSource(source, repository);
         }
     }
 
-    private void readDataSource(DataSource source) throws IOException {
+    private AtomRepository createRepository(Context context) {
+        PGTopicGraph pgTopicGraph = (PGTopicGraph) context.getTopicGraph();
+        return new AtomRepository(pgTopicGraph.getWrapper());
+    }
+
+    private void readDataSource(DataSource source, AtomRepository repository) throws IOException {
         String location = source.getLocation();
         File dir = new File(location);
 
@@ -49,7 +54,7 @@ public class AtomVCSReader extends NoteReader {
             for (File file : files) {
                 if (FORMAT.isMatchingFile(file)) {
                     try {
-                        readAtomFile(file, source);
+                        readAtomFile(file, source, repository);
                     } catch (IOException e) {
                         throw new IOException("Failed to read file " + file.getAbsolutePath(), e);
                     }
@@ -58,7 +63,7 @@ public class AtomVCSReader extends NoteReader {
         }
     }
 
-    private void readAtomFile(File file, DataSource source) throws IOException {
+    private void readAtomFile(File file, DataSource source, AtomRepository repository) throws IOException {
         AtomId expectedId = idFromFileName(file);
 
         try (InputStream in = new FileInputStream(file)) {
