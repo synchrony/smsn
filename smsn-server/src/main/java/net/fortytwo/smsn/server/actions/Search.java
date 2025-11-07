@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Atom;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.query.QueryType;
 import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
@@ -16,13 +16,13 @@ import java.util.List;
 public class Search extends BasicViewAction {
 
     private String query;
-    private TreeViews.QueryType queryType;
+    private QueryType queryType;
 
     private String getQuery() {
         return notNull(query);
     }
 
-    private TreeViews.QueryType getQueryType() {
+    private QueryType getQueryType() {
         return notNull(queryType);
     }
 
@@ -35,7 +35,7 @@ public class Search extends BasicViewAction {
         this.query = query;
     }
 
-    public void setQueryType(TreeViews.QueryType queryType) {
+    public void setQueryType(QueryType queryType) {
         this.queryType = queryType;
     }
 
@@ -49,7 +49,7 @@ public class Search extends BasicViewAction {
 
         params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
-        if (!getQueryType().equals(TreeViews.QueryType.Ripple)) {
+        if (!getQueryType().equals(QueryType.Ripple)) {
             addSearchResults(params);
         }
 
