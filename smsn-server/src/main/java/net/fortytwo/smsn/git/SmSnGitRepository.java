@@ -6,12 +6,10 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
-import net.fortytwo.smsn.brain.model.dto.NoteDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.ListNode;
-import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
@@ -38,7 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
+public class SmSnGitRepository implements AbstractRepository {
 
     private static final Logger logger = Logger.getLogger(SmSnGitRepository.class.getName());
 
@@ -54,6 +52,10 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
     private final TreeViews treeViews;
     private final Filter filter;
 
+    // Repository metadata (no longer using NoteDTO inheritance)
+    private String source;
+    private String title;
+
     public static String formatDate(final long timeStamp) {
         return dateFormat.get().format(new Date(timeStamp));
     }
@@ -67,7 +69,6 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
             Brain brain,
             TreeViews treeViews,
             Filter filter) {
-        super();
 
         this.dataSource = dataSource;
         this.repository = repository;
@@ -103,12 +104,20 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
 
         Git git = new Git(repository);
 
-        SmSnGitRepository note = new SmSnGitRepository(dataSource, repository, git, directory, brain, treeViews, filter);
-        note.verifyCanRead();
-        Note.setSource(note, dataSource.getName());
-        Note.setTitle(note, "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis()));
+        SmSnGitRepository repo = new SmSnGitRepository(dataSource, repository, git, directory, brain, treeViews, filter);
+        repo.verifyCanRead();
+        repo.source = dataSource.getName();
+        repo.title = "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis());
 
-        return note;
+        return repo;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     Git getGit() {
@@ -201,7 +210,7 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
 
         TreeNode<Link> repoNote = TreeNodeDTO.createEmptyNode();
         TreeViews.setId(repoNote, SemanticSynchrony.createRandomId());
-        TreeViews.setTitle(repoNote, Note.getTitle(this));
+        TreeViews.setTitle(repoNote, this.title);
         TreeViews.setSource(repoNote, dataSource.getName());
         TreeViews.setWeight(repoNote, SemanticSynchrony.DEFAULT_WEIGHT);
         TreeViews.setCreated(repoNote, now);
@@ -317,7 +326,7 @@ public class SmSnGitRepository extends NoteDTO implements AbstractRepository {
     }
 
     private TreeNode<Link> toTreeNode(final AtomId id, final long timestamp, final DiffEntry.ChangeType changeType) {
-        Optional<Note> opt = brain.getTopicGraph().getNoteById(id);
+        var opt = brain.getTopicGraph().getNoteById(id);
 
         TreeNode<Link> note;
         if (opt.isPresent()) {

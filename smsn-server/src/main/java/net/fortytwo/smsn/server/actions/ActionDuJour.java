@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.io.vcs.VCSWriter;
+import net.fortytwo.smsn.brain.io.vcs.AtomVCSWriter;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.config.Configuration;
@@ -133,7 +133,7 @@ public class ActionDuJour extends Action {
             File dir = new File(source.getLocation());
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());
             for (File file : dir.listFiles()) {
-                if (VCSWriter.FORMAT.isMatchingFile(file)) {
+                if (AtomVCSWriter.FORMAT.isMatchingFile(file)) {
                     AtomId id = new AtomId(file.getName());
                     Optional<Atom> opt = repository.findById(id);
                     Preconditions.checkArgument(opt.isPresent());

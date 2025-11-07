@@ -19,7 +19,7 @@ import java.util.List;
  * Writes .smsn files directly from Atom objects without the old Page/Note layer.
  */
 public class AtomVCSWriter extends NoteWriter {
-    private static final FilePerNoteFormat FORMAT = new FilePerNoteFormat("VCS-Atom", "smsn");
+    public static final FilePerNoteFormat FORMAT = new FilePerNoteFormat("VCS-Atom", "smsn");
 
     public AtomVCSWriter() {
     }
