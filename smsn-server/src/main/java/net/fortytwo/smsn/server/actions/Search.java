@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
+import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.query.TreeViews;
@@ -8,6 +9,7 @@ import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A service for executing keyword search over an Extend-o-Brain graph
@@ -70,6 +72,8 @@ public class Search extends BasicViewAction {
     }
 
     private void addSearchResults(final ActionContext params) throws IOException {
+        // TODO: Migrate to use AtomRepository.search() directly
+        // For now, keep using existing implementation
         TreeNode<Link> tree = params.getQueries().search(getQueryType(), getQuery(), height, getFilter(), style);
         addView(tree, params);
     }

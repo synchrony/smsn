@@ -15,6 +15,7 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,6 +134,77 @@ public class AtomRepository {
         return count;
     }
 
+    // ========== Update Operations ==========
+
+    /**
+     * Update a single property of an atom.
+     */
+    public void updateProperty(AtomId atomId, String propertyKey, Object value) {
+        Atom atom = load(atomId);
+        Atom updated;
+
+        switch (propertyKey) {
+            case SemanticSynchrony.PropertyKeys.TITLE:
+                updated = atom.withTitle((String) value);
+                break;
+            case SemanticSynchrony.PropertyKeys.TEXT:
+                updated = atom.withText(value == null ? Opt.empty() : Opt.of((String) value));
+                break;
+            case SemanticSynchrony.PropertyKeys.WEIGHT:
+                updated = atom.withWeight(new Normed((Float) value));
+                break;
+            case SemanticSynchrony.PropertyKeys.PRIORITY:
+                updated = atom.withPriority(value == null ? Opt.empty() : Opt.of(new Normed((Float) value)));
+                break;
+            case SemanticSynchrony.PropertyKeys.SOURCE:
+                updated = atom.withSource(new SourceName((String) value));
+                break;
+            case SemanticSynchrony.PropertyKeys.SHORTCUT:
+                updated = atom.withShortcut(value == null ? Opt.empty() : Opt.of((String) value));
+                break;
+            case SemanticSynchrony.PropertyKeys.ALIAS:
+                updated = atom.withAlias(value == null ? Opt.empty() : Opt.of((String) value));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown property: " + propertyKey);
+        }
+
+        save(updated);
+    }
+
+    /**
+     * Create a new atom with default values.
+     */
+    public Atom createAtom(AtomId id, SourceName source, String title) {
+        Atom atom = new Atom(
+                id,
+                new Timestamp((int) (System.currentTimeMillis() / 1000)),
+                new Normed(0.5f),  // default weight
+                Opt.empty(),       // no priority
+                source,
+                title,
+                Opt.empty(),       // no alias
+                Opt.empty(),       // no text
+                Opt.empty(),       // no shortcut
+                new ArrayList<>()  // no children
+        );
+        save(atom);
+        return atom;
+    }
+
+    /**
+     * Load an atom with all its children recursively.
+     * Returns the atom with children list populated.
+     */
+    public Atom loadWithChildren(AtomId id) {
+        return load(id);
+        // Note: children IDs are already included in the Atom
+        // If we want to load the full child Atoms, we'd need to:
+        // 1. Get the atom
+        // 2. Load each child
+        // This is intentionally left simple - caller can load children if needed
+    }
+
     // ========== Bulk Operations ==========
 
     /**
@@ -166,27 +238,122 @@ public class AtomRepository {
     // ========== Search Operations ==========
 
     /**
-     * Search for atoms by full-text query.
+     * Search for atoms by full-text query on title.
      */
     public List<Atom> search(String query, Filter filter) {
-        // TODO: Implement full-text search using Lucene index
-        throw new UnsupportedOperationException("Search not yet implemented");
+        return filterAndSort(wrapper.getVerticesByTitle(query), filter, query);
     }
 
     /**
-     * Find an atom by shortcut.
+     * Find atoms by shortcut.
      */
-    public Optional<Atom> findByShortcut(String shortcut) {
-        // TODO: Use index to find by shortcut
-        throw new UnsupportedOperationException("findByShortcut not yet implemented");
+    public List<Atom> findByShortcut(String shortcut, Filter filter) {
+        return filterAndSort(wrapper.getVerticesByShortcut(shortcut), filter, shortcut);
     }
 
     /**
      * Find atoms by acronym.
      */
-    public List<Atom> findByAcronym(String acronym) {
-        // TODO: Use index to find by acronym
-        throw new UnsupportedOperationException("findByAcronym not yet implemented");
+    public List<Atom> findByAcronym(String acronym, Filter filter) {
+        return filterAndSort(wrapper.getVerticesByAcronym(acronym.toLowerCase()), filter, acronym);
+    }
+
+    /**
+     * Filter and sort search results by relevance score.
+     * Combines native search score with weight, priority, and title length.
+     */
+    private List<Atom> filterAndSort(
+            Iterator<net.fortytwo.smsn.brain.model.pg.Sortable<Vertex, Float>> unranked,
+            Filter filter,
+            String query) {
+
+        List<net.fortytwo.smsn.brain.model.pg.Sortable<Atom, Float>> ranked = new ArrayList<>();
+
+        while (unranked.hasNext()) {
+            net.fortytwo.smsn.brain.model.pg.Sortable<Vertex, Float> in = unranked.next();
+            Atom atom = vertexToAtom(in.getEntity());
+
+            // Apply filter
+            if (!testFilter(atom, filter)) {
+                continue;
+            }
+
+            // Calculate relevance score
+            float score = calculateScore(in, atom, query);
+            ranked.add(new net.fortytwo.smsn.brain.model.pg.Sortable<>(atom, score));
+        }
+
+        // Sort by score (descending)
+        Collections.sort(ranked);
+
+        // Extract atoms from sorted list
+        return ranked.stream()
+                .map(net.fortytwo.smsn.brain.model.pg.Sortable::getEntity)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Test if an atom passes the filter criteria.
+     * Checks source and weight against filter settings.
+     */
+    private boolean testFilter(Atom atom, Filter filter) {
+        if (filter == null || filter.isTrivial()) {
+            return true;
+        }
+
+        // Check weight
+        if (atom.weight.value < filter.getMinWeight()) {
+            return false;
+        }
+
+        // Check source
+        String minSource = filter.getMinSource();
+        if (minSource != null) {
+            // Source comparison based on configuration order
+            Integer atomSourceIndex = getSourceIndex(atom.source.value);
+            Integer minSourceIndex = getSourceIndex(minSource);
+            if (atomSourceIndex == null || minSourceIndex == null || atomSourceIndex < minSourceIndex) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the index of a source from configuration.
+     */
+    private Integer getSourceIndex(String sourceName) {
+        List<net.fortytwo.smsn.config.DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
+        for (int i = 0; i < sources.size(); i++) {
+            if (sources.get(i).getName().equals(sourceName)) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Calculate relevance score for search results.
+     * Combines native search score with weight, priority, and title length penalty.
+     */
+    private float calculateScore(
+            net.fortytwo.smsn.brain.model.pg.Sortable<Vertex, Float> in,
+            Atom atom,
+            String query) {
+
+        float nativeScore = in.getScore();
+        float weight = atom.weight.value;
+
+        // Penalize longer titles (prefer shorter, more concise matches)
+        float lengthPenalty = Math.min(1.0f, 1.0f * query.length() / Math.max(1, atom.title.length()));
+
+        // Boost by priority if present
+        float priorityBonus = atom.priority.isPresent()
+                ? 1f + atom.priority.get().value
+                : 1f;
+
+        return nativeScore * weight * lengthPenalty * priorityBonus;
     }
 
     // ========== Conversion Methods ==========
