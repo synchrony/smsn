@@ -1,15 +1,15 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.TreeNode;
 import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Note;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.util.TreeNodeConverter;
+import net.fortytwo.smsn.brain.view.TreeUpdater;
+import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,55 +43,62 @@ public class UpdateView extends RootedViewAction {
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
         super.performTransaction(context);
 
-        TreeNode<Link> view;
-
+        // Parse the view update
+        TreeNode treeUpdate;
         switch (getViewFormat()) {
             case json:
-                view = parseJson(context);
+                treeUpdate = parseJson(context);
                 break;
             case wiki:
-                view = parseWikiText(context);
+                treeUpdate = parseWikiText(context);
                 break;
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("Unknown format: " + getViewFormat());
         }
 
-        TreeViews.setId(view, getRoot().id);
+        // Ensure the tree has the root ID
+        if (treeUpdate.id == null || !treeUpdate.id.equals(getRoot().id)) {
+            treeUpdate = treeUpdate.withId(getRoot().id);
+        }
 
-        // Apply the update
-        context.getQueries().update(view, height, getFilter(), style);
+        // Apply the update using TreeUpdater
+        TreeUpdater updater = new TreeUpdater(context.getRepository(), context.getBrain().getActivityLog());
+        updater.update(treeUpdate, height, getFilter());
 
-        TopicGraph graph = context.getBrain().getTopicGraph();
-        // TODO: Migrate UpdateView to use AtomRepository and TreeViewBuilder
-        // For now, convert Atom back to Note for compatibility
-        net.fortytwo.smsn.brain.model.entities.Note rootNote = graph.getNoteById(getRoot().id).orElse(null);
-        TreeNode<Link> n = null == rootNote
-                ? graph.createTopicTree(graph.createLink(null, null, null))
-                : context.getQueries().view(rootNote, height, getFilter(), style);
+        // Generate the updated view
+        TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
+        TreeNode updatedView = builder.buildView(getRoot().id, height, getFilter());
+
+        // Serialize and return the view
         try {
-            addView(n, context);
+            JSONObject json = context.getTreeNodeJsonPrinter().toJson(updatedView);
+            context.getMap().put(Params.VIEW, json);
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
+
+        addToHistory(getRoot().id);
     }
 
-    private TreeNode<Link> parseWikiText(final ActionContext params) {
+    private TreeNode parseWikiText(final ActionContext params) {
         try {
             try (InputStream in = new ByteArrayInputStream(getView().getBytes())) {
-                return params.getWikiParser().parse(in).getContent();
+                // Parse using old WikiParser
+                net.fortytwo.smsn.brain.model.entities.TreeNode<Link> oldTree =
+                    params.getWikiParser().parse(in).getContent();
+
+                // Convert to new TreeNode format
+                return TreeNodeConverter.fromTreeNodeLink(oldTree);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
     }
 
-    private TreeNode<Link> parseJson(final ActionContext params) {
+    private TreeNode parseJson(final ActionContext params) {
         try {
-            // Parse using new TreeNodeJsonParser
-            net.fortytwo.smsn.brain.TreeNode newTreeNode = params.getTreeNodeJsonParser().parse(getView());
-
-            // Convert to old TreeNode<Link> format for internal processing
-            return TreeNodeConverter.toTreeNodeLink(newTreeNode);
+            // Parse directly using new TreeNodeJsonParser
+            return params.getTreeNodeJsonParser().parse(getView());
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

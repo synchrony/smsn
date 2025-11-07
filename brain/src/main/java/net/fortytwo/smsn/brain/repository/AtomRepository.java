@@ -557,6 +557,40 @@ public class AtomRepository {
     }
 
     /**
+     * Create a new atom with default properties based on the filter.
+     * Used during graph updates when creating new nodes.
+     */
+    public Atom createAtom(Filter filter) {
+        AtomId newId = SemanticSynchrony.createRandomId();
+        String defaultSource = filter != null ? filter.getDefaultSource() : null;
+        SourceName source = defaultSource != null ? new SourceName(defaultSource) : new SourceName("default");
+        float defaultWeight = filter != null ? filter.getDefaultWeight() : 0.5f;
+
+        Atom atom = new Atom(
+                newId,
+                new Timestamp((int) (System.currentTimeMillis() / 1000)),
+                new Normed(defaultWeight),
+                Opt.empty(),       // no priority
+                source,
+                "",                // empty title
+                Opt.empty(),       // no alias
+                Opt.empty(),       // no text
+                Opt.empty(),       // no shortcut
+                new ArrayList<>()  // no children
+        );
+        save(atom);
+        return atom;
+    }
+
+    /**
+     * Notify that the graph has been updated.
+     * This triggers any necessary post-update processing.
+     */
+    public void notifyOfUpdate() {
+        // Notification handled at the transaction level
+    }
+
+    /**
      * Update search indices for a vertex.
      */
     private void updateAllIndices(Vertex v) {
