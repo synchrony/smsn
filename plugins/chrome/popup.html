@@ -1,33 +1,41 @@
 <!doctype html>
 <html>
   <head>
-    <title>Semantic Synchrony integration panel</title>
+    <title>Semantic Synchrony Integration Panel</title>
     <style>
       body {
-        min-width:357px;
-        overflow-x:hidden;
+        min-width: 357px;
+        overflow-x: hidden;
+        font-family: Arial, sans-serif;
       }
 
       img {
-        margin:5px;
-        border:2px solid black;
-        vertical-align:middle;
-        width:75px;
-        height:75px;
+        margin: 5px;
+        border: 2px solid black;
+        vertical-align: middle;
+        width: 75px;
+        height: 75px;
+      }
+
+      button {
+        margin-top: 10px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
       }
     </style>
-
-    <!-- JavaScript and HTML must be in separate files for security. -->
-    <script src="lib/md5.js"></script>
-    <script src="popup.js"></script>
   </head>
   <body>
     <h3>Copying to clipboard:</h3>
     <div id="content">
         <pre id="clipboard-view"></pre>
-        <!-- Note: if you make the textarea hidden, the Copy command doesn't work -->
-        <textarea rows="1" cols="1" id="clipboard-input" style="visibility:hidden"></textarea>
-        <input type="button" id="cache-button" value="Add to cache"/>
+        <button id="copy-button">Copy to Clipboard</button>
+        <button id="cache-button">Add to Cache</button>
     </div>
+
+    <!-- JavaScript and HTML must be in separate files for security. -->
+    <script src="lib/md5.js"></script>
+    <script src="popup.js"></script>
   </body>
 </html>
+
