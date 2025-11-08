@@ -46,8 +46,8 @@ smsnBrainModule = Module ns elements [hydraCoreModule] [hydraCoreModule] Nothing
       def "SourceName" string,
 
       def "Timestamp" $
-        doc "A Unix timestamp in seconds"
-        int32,
+        doc "A Unix timestamp in milliseconds"
+        int64,
 
       def "TreeNode" $
         record [

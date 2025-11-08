@@ -1,11 +1,5 @@
 package net.fortytwo.smsn.brain;
 
-import net.fortytwo.smsn.brain.io.wiki.WikiPrinter;
-import net.fortytwo.smsn.brain.model.dto.PageDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.Page;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EventStackTest {
     private EventStack eventStack;
@@ -37,80 +32,67 @@ public class EventStackTest {
 
     @Test
     public void testStack() throws Exception {
-        List<TreeNode<Link>> events = eventStack.getEvents();
-        //BrainGraph bg = eventStack.getInMemoryGraph();
-        //KeyIndexableGraph g = bg.getPropertyGraph();
+        List<TreeNode> events = eventStack.getEvents();
 
         assertEquals(0, events.size());
-        //assertEquals(0, countNotes(bg));
-        //assertEquals(0, countVertices(g));
 
         eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
         assertEquals(1, events.size());
-        //assertEquals(3, countNotes(bg));
-        //assertEquals(5, countVertices(g));
 
-        TreeNode<Link> e = events.get(0);
-        assertEquals("person 1 did something", TreeViews.getTitle(e));
-        List<TreeNode<Link>> kids = TreeViews.getChildrenAsList(e);
+        TreeNode e = events.get(0);
+        assertEquals("person 1 did something", e.title);
+        List<TreeNode> kids = e.children;
         assertEquals(2, kids.size());
-        TreeNode<Link> person = kids.get(0);
-        TreeNode<Link> time = kids.get(1);
-        assertEquals("person 1", TreeViews.getTitle(person));
-        assertEquals(agent1, TreeViews.getAlias(person));
-        assertEquals(2, TreeViews.getTitle(time).indexOf(":"));
+        TreeNode person = kids.get(0);
+        TreeNode time = kids.get(1);
+        assertEquals("person 1", person.title);
+        assertTrue(person.alias.isPresent());
+        assertEquals(agent1, person.alias.get());
+        assertEquals(2, time.title.indexOf(":"));
 
         eventStack.push(eventStack.createGestureEvent(agent2, new Date()));
         assertEquals(2, events.size());
-        //assertEquals(6, countNotes(bg));
-        //assertEquals(10, countVertices(g));
 
         // verify that it is a stack, not a queue
         e = events.get(0);
-        kids = TreeViews.getChildrenAsList(e);
+        kids = e.children;
         person = kids.get(0);
-        assertEquals("person 2", TreeViews.getTitle(person));
-        assertEquals(agent2, TreeViews.getAlias(person));
+        assertEquals("person 2", person.title);
+        assertTrue(person.alias.isPresent());
+        assertEquals(agent2, person.alias.get());
 
         // push another event from agent #1 and verify that he is given the same routine name
         eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
         assertEquals(3, events.size());
-        //assertEquals(9, countNotes(bg));
-        //assertEquals(15, countVertices(g));
         e = events.get(0);
-        kids = TreeViews.getChildrenAsList(e);
+        kids = e.children;
         person = kids.get(0);
-        assertEquals("person 1", TreeViews.getTitle(person));
-        assertEquals(agent1, TreeViews.getAlias(person));
+        assertEquals("person 1", person.title);
+        assertTrue(person.alias.isPresent());
+        assertEquals(agent1, person.alias.get());
 
         // fill to capacity
         eventStack.clear();
         assertEquals(0, events.size());
-        //assertEquals(0, countNotes(bg));
-        //assertEquals(0, countVertices(g));
 
         for (int i = 0; i < testCapacity; i++) {
             eventStack.push(eventStack.createGestureEvent(agent1, new Date()));
         }
         assertEquals(testCapacity, events.size());
-        //assertEquals(3 * testCapacity, countNotes(bg));
-        //assertEquals(5 * testCapacity, countVertices(g));
 
         // accommodate further events, but drop events from the bottom of the stack
         eventStack.push(eventStack.createGestureEvent(agent2, new Date()));
         // the stack has not grown
         assertEquals(testCapacity, events.size());
-        //assertEquals(3 * testCapacity, countNotes(bg));
-        //assertEquals(5 * testCapacity, countVertices(g));
         // this is the newest event
-        assertEquals(agent2, TreeViews.getAlias(eventStack.getEvents().get(0).getChildren().get(0)));
+        TreeNode firstEvent = eventStack.getEvents().get(0);
+        TreeNode firstChild = firstEvent.children.get(0);
+        assertTrue(firstChild.alias.isPresent());
+        assertEquals(agent2, firstChild.alias.get());
 
         // cleanup leaves nothing behind
         eventStack.clear();
         assertEquals(0, events.size());
-        
-        //assertEquals(0, countNotes(bg));
-        //assertEquals(0, countVertices(g));
     }
 
     @Test
@@ -119,11 +101,10 @@ public class EventStackTest {
             eventStack.push(eventStack.createGestureEvent(0 == i % 2 ? agent1 : agent2, new Date()));
         }
 
-        WikiPrinter w = new WikiPrinter(System.out);
-        for (TreeNode<Link> event : eventStack.getEvents()) {
-            Page page = PageDTO.createTransitional();
-            page.setContent(event);
-            w.print(page);
+        // Just verify we can iterate over events
+        for (TreeNode event : eventStack.getEvents()) {
+            assertTrue(event.title.contains("did something"));
+            assertEquals(2, event.children.size());
         }
     }
 }

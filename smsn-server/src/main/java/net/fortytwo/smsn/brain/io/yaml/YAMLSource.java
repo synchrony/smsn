@@ -220,8 +220,8 @@ class YAMLSource {
     private Timestamp extractTimestamp(Map<String, Object> map) {
         Object obj = map.get(YAMLFormat.Constants.AtomFields.CREATED);
         // Default to current time if not present
-        // Timestamp is in seconds (Integer), not milliseconds
-        return obj != null ? new Timestamp(toInt(obj)) : new Timestamp((int) (System.currentTimeMillis() / 1000));
+        // Timestamp is in milliseconds
+        return obj != null ? new Timestamp(toLong(obj)) : new Timestamp(System.currentTimeMillis());
     }
 
     private Normed extractWeight(Map<String, Object> map) {

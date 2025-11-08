@@ -92,12 +92,18 @@ public abstract class NoteReader {
     }
 
     private long getSizeOf(final Context context) {
+        // Try to use AtomRepository if available (new API)
+        if (context.getAtomRepository() != null) {
+            return context.getAtomRepository().getAllAtomIds().size();
+        }
+        // Fall back to legacy TopicGraph API
         return Iterators.size(context.getTopicGraph().getAllNotes().iterator());
     }
 
     private void importComplex(final Format format, final Brain brain) throws IOException {
         Context context = new Context();
         context.setTopicGraph(brain.getTopicGraph());
+        context.setAtomRepository(brain.getAtomRepository());
         context.setFormat(format);
         context.setQueries(new TreeViews(brain));
 
@@ -129,6 +135,7 @@ public abstract class NoteReader {
             try (InputStream sourceStream = new FileInputStream(file)) {
                 Context context = new Context();
                 context.setTopicGraph(brain.getTopicGraph());
+                context.setAtomRepository(brain.getAtomRepository());
                 context.setSourceStream(sourceStream);
                 context.setFormat(format);
 

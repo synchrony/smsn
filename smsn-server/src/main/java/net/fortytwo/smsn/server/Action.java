@@ -7,11 +7,8 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.History;
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.io.json.JsonParser;
-import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
-import net.fortytwo.smsn.brain.io.wiki.WikiParser;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
@@ -154,10 +151,8 @@ public abstract class Action {
     }
 
     private static void setIO(final ActionContext context) {
-        context.setWikiParser(new WikiParser());
-        context.setJsonParser(new JsonParser());
-        context.setJsonPrinter(new JsonPrinter());
-        // New parsers/printers for immutable TreeNode
+        // Modern parsers/printers for immutable TreeNode
+        context.setTreeNodeWikiParser(new net.fortytwo.smsn.brain.io.wiki.TreeNodeWikiParser());
         context.setTreeNodeJsonParser(new TreeNodeJsonParser());
         context.setTreeNodeJsonPrinter(new TreeNodeJsonPrinter());
     }

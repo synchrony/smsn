@@ -47,7 +47,7 @@ public class Search extends BasicViewAction {
     protected void performTransaction(final ActionContext params)
             throws RequestProcessingException, BadRequestException {
 
-        params.getJsonPrinter().setTitleLengthCutoff(titleCutoff);
+        params.getTreeNodeJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
         if (!getQueryType().equals(QueryType.Ripple)) {
             addSearchResults(params);

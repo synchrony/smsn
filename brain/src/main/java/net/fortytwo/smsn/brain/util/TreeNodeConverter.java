@@ -93,7 +93,7 @@ public class TreeNodeConverter {
         }
 
         Long createdValue = TreeViews.getCreated(oldNode);
-        Timestamp created = new Timestamp(createdValue != null ? createdValue.intValue() : (int) (System.currentTimeMillis() / 1000));
+        Timestamp created = new Timestamp(createdValue != null ? createdValue : System.currentTimeMillis());
 
         Float weightValue = TreeViews.getWeight(oldNode);
         Normed weight = new Normed(weightValue != null ? weightValue : 0.5f);

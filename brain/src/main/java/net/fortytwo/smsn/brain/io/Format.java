@@ -105,35 +105,61 @@ public class Format {
     private static void initializeReaders() {
         ServiceLoader<NoteReader> loader = ServiceLoader.load(NoteReader.class);
         int count = 0;
+        StringBuilder formatList = new StringBuilder();
+
         for (NoteReader reader : loader) {
-            Preconditions.checkNotNull(reader.getFormats());
-            if (0 == reader.getFormats().size()) {
-                logger.warning("reader has no formats: " + reader);
+            try {
+                Preconditions.checkNotNull(reader.getFormats());
+                if (0 == reader.getFormats().size()) {
+                    logger.warning("reader has no formats: " + reader.getClass().getName());
+                } else {
+                    for (Format format : reader.getFormats()) {
+                        addFormat(format, reader);
+                        readersByFormat.put(format, reader);
+                        if (formatList.length() > 0) formatList.append(", ");
+                        formatList.append(format.getName());
+                    }
+                    logger.info("loaded reader " + reader.getClass().getName() +
+                               " with formats: " + reader.getFormats().stream()
+                                   .map(Format::getName).reduce((a, b) -> a + ", " + b).orElse(""));
+                }
+                count++;
+            } catch (Exception e) {
+                logger.severe("Failed to load reader " + reader.getClass().getName() + ": " + e.getMessage());
+                e.printStackTrace();
             }
-            for (Format format : reader.getFormats()) {
-                addFormat(format, reader);
-                readersByFormat.put(format, reader);
-            }
-            count++;
         }
 
-        logger.info("loaded " + count + " readers");
+        logger.info("loaded " + count + " readers with formats: [" + formatList + "]");
     }
 
     private static void initializeWriters() {
         ServiceLoader<NoteWriter> loader = ServiceLoader.load(NoteWriter.class);
         int count = 0;
+        StringBuilder formatList = new StringBuilder();
+
         for (NoteWriter writer : loader) {
-            if (0 == writer.getFormats().size()) {
-                logger.warning("writer has no formats: " + writer);
+            try {
+                if (0 == writer.getFormats().size()) {
+                    logger.warning("writer has no formats: " + writer.getClass().getName());
+                } else {
+                    for (Format format : writer.getFormats()) {
+                        addFormat(format, writer);
+                        writersByFormat.put(format, writer);
+                        if (formatList.length() > 0) formatList.append(", ");
+                        formatList.append(format.getName());
+                    }
+                    logger.info("loaded writer " + writer.getClass().getName() +
+                               " with formats: " + writer.getFormats().stream()
+                                   .map(Format::getName).reduce((a, b) -> a + ", " + b).orElse(""));
+                }
+                count++;
+            } catch (Exception e) {
+                logger.severe("Failed to load writer " + writer.getClass().getName() + ": " + e.getMessage());
+                e.printStackTrace();
             }
-            for (Format format : writer.getFormats()) {
-                addFormat(format, writer);
-                writersByFormat.put(format, writer);
-            }
-            count++;
         }
-        logger.info("loaded " + count + " writers");
+        logger.info("loaded " + count + " writers with formats: [" + formatList + "]");
     }
 
     private static void addFormat(final Format format, final Object owner) {

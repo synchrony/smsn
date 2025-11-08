@@ -32,20 +32,20 @@ public class AtomWikiPrinter {
     }
 
     private void printProperties(final Atom atom) {
-        // Required properties
+        // id and title first
         printProperty("id", atom.id.value);
         printProperty("title", atom.title);
-        printProperty("created", atom.created.value);
-        printProperty("weight", atom.weight.value);
-        printProperty("source", atom.source.value);
 
-        // Optional properties
-        if (atom.priority.isPresent()) {
-            printProperty("priority", atom.priority.get().value);
-        }
-
+        // Then remaining properties in alphabetical order
         if (atom.alias.isPresent()) {
             printProperty("alias", atom.alias.get());
+        }
+
+        // created timestamp in milliseconds
+        printProperty("created", atom.created.value);
+
+        if (atom.priority.isPresent()) {
+            printProperty("priority", atom.priority.get().value);
         }
 
         if (atom.shortcut.isPresent()) {
@@ -55,13 +55,21 @@ public class AtomWikiPrinter {
         if (atom.text.isPresent()) {
             printProperty("text", atom.text.get());
         }
+
+        // Only print weight if it's not the default value of 0.5
+        // Use epsilon comparison for floating point
+        if (Math.abs(atom.weight.value - 0.5f) > 0.0001f) {
+            printProperty("weight", atom.weight.value);
+        }
+
+        // Note: @source is not printed as it's repository metadata, not atom data
     }
 
     private void printChildren(final Atom atom) {
         if (atom.children != null && !atom.children.isEmpty()) {
             for (net.fortytwo.smsn.brain.AtomId childId : atom.children) {
-                // Print child reference in wiki format: "* :childId:"
-                printStream.println(WikiFormat.NODE_BULLET + " :" + childId.value + ":");
+                // Print child reference in wiki format: "* :childId: " (note trailing space)
+                printStream.println(WikiFormat.NODE_BULLET + " :" + childId.value + ": ");
             }
         }
     }

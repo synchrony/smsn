@@ -330,7 +330,7 @@ public class TreeViewBuilder {
             List<AtomId> children) {
         return new Atom(
                 id,
-                new net.fortytwo.smsn.brain.Timestamp((int) (createdTimestamp / 1000)),
+                new net.fortytwo.smsn.brain.Timestamp(createdTimestamp),
                 new net.fortytwo.smsn.brain.Normed(weight),
                 hydra.util.Opt.empty(), // priority
                 new net.fortytwo.smsn.brain.SourceName(source),

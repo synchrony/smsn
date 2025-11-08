@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class VCSFormatTest {
-    private final FilePerNoteFormat format = VCSWriter.FORMAT;
+    private final FilePerNoteFormat format = VCSFormat.FORMAT;
 
     @Test
     public void smsnFilesAreAccepted() {

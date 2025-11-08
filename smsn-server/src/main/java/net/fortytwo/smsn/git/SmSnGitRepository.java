@@ -212,7 +212,7 @@ public class SmSnGitRepository implements AbstractRepository {
 
         return TreeViewBuilder.createSimpleTreeNode(
                 SemanticSynchrony.createRandomId(),
-                new Timestamp((int) (now / 1000)),
+                new Timestamp(now),
                 new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
                 new SourceName(dataSource.getName()),
                 this.title,
@@ -263,7 +263,7 @@ public class SmSnGitRepository implements AbstractRepository {
 
         return TreeViewBuilder.createSimpleTreeNode(
                 SemanticSynchrony.createRandomId(),
-                new Timestamp((int) (getTimeStamp(commit) / 1000)),
+                new Timestamp(getTimeStamp(commit)),
                 new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
                 new SourceName(dataSource.getName()),
                 createTitleFor(commit),
@@ -327,7 +327,7 @@ public class SmSnGitRepository implements AbstractRepository {
             // Create placeholder for missing/deleted file
             return TreeViewBuilder.createSimpleTreeNode(
                     id,
-                    new Timestamp((int) (timestamp / 1000)),
+                    new Timestamp(timestamp),
                     new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
                     new SourceName(dataSource.getName()),
                     titleForMissingNote(changeType),

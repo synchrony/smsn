@@ -91,9 +91,10 @@ public class AtomWikiParser {
                 ? new AtomId(properties.get("id"))
                 : new AtomId("temp-" + System.nanoTime());
 
+        // created is stored as milliseconds in .smsn files
         Timestamp created = properties.containsKey("created")
-                ? new Timestamp(Integer.parseInt(properties.get("created")))
-                : new Timestamp((int) (System.currentTimeMillis() / 1000));
+                ? new Timestamp(Long.parseLong(properties.get("created")))
+                : new Timestamp(System.currentTimeMillis());
 
         Normed weight = properties.containsKey("weight")
                 ? new Normed(Float.parseFloat(properties.get("weight")))

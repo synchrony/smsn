@@ -1,11 +1,9 @@
 package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.io.json.JsonParser;
-import net.fortytwo.smsn.brain.io.json.JsonPrinter;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
-import net.fortytwo.smsn.brain.io.wiki.WikiParser;
+import net.fortytwo.smsn.brain.io.wiki.TreeNodeWikiParser;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 
@@ -16,9 +14,7 @@ public class ActionContext {
     private Map<String, Object> map;
     private GraphWrapper graphWrapper;
     private Brain brain;
-    private WikiParser wikiParser;
-    private JsonParser jsonParser;
-    private JsonPrinter jsonPrinter;
+    private TreeNodeWikiParser treeNodeWikiParser;
     private TreeNodeJsonParser treeNodeJsonParser;
     private TreeNodeJsonPrinter treeNodeJsonPrinter;
     private AtomRepository repository;
@@ -47,28 +43,12 @@ public class ActionContext {
         this.map = map;
     }
 
-    public JsonPrinter getJsonPrinter() {
-        return jsonPrinter;
+    public TreeNodeWikiParser getTreeNodeWikiParser() {
+        return treeNodeWikiParser;
     }
 
-    public void setJsonPrinter(JsonPrinter jsonPrinter) {
-        this.jsonPrinter = jsonPrinter;
-    }
-
-    public JsonParser getJsonParser() {
-        return jsonParser;
-    }
-
-    public void setJsonParser(JsonParser jsonParser) {
-        this.jsonParser = jsonParser;
-    }
-
-    public WikiParser getWikiParser() {
-        return wikiParser;
-    }
-
-    public void setWikiParser(WikiParser wikiParser) {
-        this.wikiParser = wikiParser;
+    public void setTreeNodeWikiParser(TreeNodeWikiParser treeNodeWikiParser) {
+        this.treeNodeWikiParser = treeNodeWikiParser;
     }
 
     public TreeNodeJsonParser getTreeNodeJsonParser() {

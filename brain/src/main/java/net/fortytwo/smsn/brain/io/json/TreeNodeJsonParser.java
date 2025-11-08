@@ -48,8 +48,8 @@ public class TreeNodeJsonParser {
                 : new AtomId("temp-" + System.nanoTime());
 
         Timestamp created = json.has(SemanticSynchrony.PropertyKeys.CREATED)
-                ? new Timestamp((int) json.getLong(SemanticSynchrony.PropertyKeys.CREATED))
-                : new Timestamp((int) (System.currentTimeMillis() / 1000));
+                ? new Timestamp(json.getLong(SemanticSynchrony.PropertyKeys.CREATED))
+                : new Timestamp(System.currentTimeMillis());
 
         Normed weight = json.has(SemanticSynchrony.PropertyKeys.WEIGHT)
                 ? new Normed((float) json.getDouble(SemanticSynchrony.PropertyKeys.WEIGHT))

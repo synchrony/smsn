@@ -179,7 +179,7 @@ public class TreeViewBuilder {
         // Create a placeholder root with minimal info
         return new TreeNode(
                 new AtomId("virtual-root"),
-                new net.fortytwo.smsn.brain.Timestamp((int) (System.currentTimeMillis() / 1000)),
+                new net.fortytwo.smsn.brain.Timestamp(System.currentTimeMillis()),
                 new net.fortytwo.smsn.brain.Normed(0.5f),
                 hydra.util.Opt.empty(),
                 new net.fortytwo.smsn.brain.SourceName("public"),

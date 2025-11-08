@@ -262,7 +262,7 @@ public class AtomRepository {
     public Atom createAtom(AtomId id, SourceName source, String title) {
         Atom atom = new Atom(
                 id,
-                new Timestamp((int) (System.currentTimeMillis() / 1000)),
+                new Timestamp(System.currentTimeMillis()),
                 new Normed(0.5f),  // default weight
                 Opt.empty(),       // no priority
                 source,
@@ -451,11 +451,8 @@ public class AtomRepository {
      * Convert a graph Vertex to an Atom.
      */
     private Atom vertexToAtom(Vertex v) {
-        // Handle CREATED property - stored as Long for compatibility, but Timestamp expects int
-        Object createdValue = getRequiredProperty(v, SemanticSynchrony.PropertyKeys.CREATED);
-        int created = createdValue instanceof Long
-                ? ((Long) createdValue).intValue()
-                : (Integer) createdValue;
+        // CREATED property stored as Long in milliseconds
+        Long created = getRequiredProperty(v, SemanticSynchrony.PropertyKeys.CREATED);
 
         return new Atom(
                 new AtomId(getRequiredProperty(v, SemanticSynchrony.PropertyKeys.ID)),
@@ -476,8 +473,8 @@ public class AtomRepository {
      */
     private void atomToVertex(Atom atom, Vertex v) {
         v.property(SemanticSynchrony.PropertyKeys.ID, atom.id.value);
-        // Store CREATED as Long for compatibility with old Note interface
-        v.property(SemanticSynchrony.PropertyKeys.CREATED, (long) atom.created.value);
+        // Store CREATED as Long in milliseconds
+        v.property(SemanticSynchrony.PropertyKeys.CREATED, atom.created.value);
         v.property(SemanticSynchrony.PropertyKeys.WEIGHT, atom.weight.value);
 
         setOptionalProperty(v, SemanticSynchrony.PropertyKeys.PRIORITY,
@@ -633,7 +630,7 @@ public class AtomRepository {
 
         Atom atom = new Atom(
                 newId,
-                new Timestamp((int) (System.currentTimeMillis() / 1000)),
+                new Timestamp(System.currentTimeMillis()),
                 new Normed(defaultWeight),
                 Opt.empty(),       // no priority
                 source,
@@ -687,8 +684,7 @@ public class AtomRepository {
     }
 
     private void updateIndex(Vertex v, String propertyKey) {
-        // TODO: Update Lucene index
-        // This will be needed for search functionality
+        wrapper.updateIndex(v, propertyKey);
     }
 
     /**

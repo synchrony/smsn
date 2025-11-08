@@ -112,7 +112,7 @@ public class RepositoryCollection implements AbstractRepository {
 
         return TreeViewBuilder.createSimpleTreeNode(
                 SemanticSynchrony.createRandomId(),
-                new Timestamp((int) (now / 1000)),
+                new Timestamp(now),
                 new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
                 new SourceName("public"),  // TODO: don't hard-code a source
                 "Git history for " + directory.getName() + " at " + SmSnGitRepository.formatDate(now),

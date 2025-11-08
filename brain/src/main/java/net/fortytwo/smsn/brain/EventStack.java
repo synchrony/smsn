@@ -1,12 +1,10 @@
 package net.fortytwo.smsn.brain;
 
+import hydra.util.Opt;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,7 +17,7 @@ public class EventStack {
 
     private final int capacity;
 
-    private final LinkedList<TreeNode<Link>> stack = new LinkedList<>();
+    private final LinkedList<TreeNode> stack = new LinkedList<>();
 
     private final RoutineNamer personNames = new RoutineNamer("person");
 
@@ -27,7 +25,7 @@ public class EventStack {
         this.capacity = capacity;
     }
 
-    public List<TreeNode<Link>> getEvents() {
+    public List<TreeNode> getEvents() {
         return stack;
     }
 
@@ -35,46 +33,100 @@ public class EventStack {
         stack.clear();
     }
 
-    public TreeNode<Link> createGestureEvent(final String expressedBy,
+    public TreeNode createGestureEvent(final String expressedBy,
                                    final Date recognizedAt) {
         // TODO: use personal knowledge and Linked Data to find the person's name
         // Use this temporary name only if no actual name is discoverable
         String personName = personNames.getRoutineName(expressedBy);
 
-        TreeNode<Link> gesture = TreeNodeDTO.createEmptyNode();
-        TreeViews.setTitle(gesture, personName + " did something");
+        // Create gesture event node
+        long now = System.currentTimeMillis();
 
-        // note: there will be duplicate people notes in the in-memory graph
-        TreeNode<Link> person = TreeNodeDTO.createEmptyNode();
-        TreeViews.setTitle(person, personName);
-        TreeViews.setAlias(person, expressedBy);
+        // Create person node
+        TreeNode person = createSimpleNode(
+                personName,
+                Opt.of(expressedBy) // alias
+        );
 
-        TreeNode<Link> time = TreeNodeDTO.createEmptyNode();
-        TreeViews.setTitle(time, EVENT_TIME_FORMAT.format(recognizedAt));
+        // Create time node
+        TreeNode time = createSimpleNode(
+                EVENT_TIME_FORMAT.format(recognizedAt),
+                Opt.empty() // no alias
+        );
 
-        gesture.addChild(person);
-        gesture.addChild(time);
+        // Create gesture node with children
+        List<TreeNode> children = new ArrayList<>();
+        children.add(person);
+        children.add(time);
 
-        return gesture;
+        return new TreeNode(
+                SemanticSynchrony.createRandomId(),
+                new Timestamp(now),
+                new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
+                Opt.empty(), // priority
+                new SourceName("public"),
+                personName + " did something",
+                Opt.empty(), // alias
+                Opt.empty(), // text
+                Opt.empty(), // shortcut
+                children,
+                children.size(),
+                0 // numberOfParents
+        );
     }
 
-    public void push(final TreeNode<Link> n) {
-        setIds(n);
+    private TreeNode createSimpleNode(String title, Opt<String> alias) {
+        long now = System.currentTimeMillis();
+
+        return new TreeNode(
+                SemanticSynchrony.createRandomId(),
+                new Timestamp(now),
+                new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
+                Opt.empty(), // priority
+                new SourceName("public"),
+                title,
+                alias,
+                Opt.empty(), // text
+                Opt.empty(), // shortcut
+                new ArrayList<>(), // no children
+                0,
+                0 // numberOfParents
+        );
+    }
+
+    public void push(final TreeNode n) {
+        TreeNode withIds = ensureIds(n);
 
         while (stack.size() >= capacity) {
             stack.removeLast();
         }
 
-        stack.push(n);
+        stack.push(withIds);
     }
 
     // make the note look like it came from a graph (so it is compatible with Brain-mode views) by giving it an ID
-    private void setIds(final TreeNode<Link> n) {
-        if (null == TreeViews.getId(n)) {
-            TreeViews.setId(n, SemanticSynchrony.createRandomId());
+    private TreeNode ensureIds(final TreeNode n) {
+        AtomId id = n.id != null ? n.id : SemanticSynchrony.createRandomId();
+
+        List<TreeNode> childrenWithIds = new ArrayList<>();
+        for (TreeNode child : n.children) {
+            childrenWithIds.add(ensureIds(child));
         }
 
-        TreeViews.getChildrenAsList(n).forEach(this::setIds);
+        return new TreeNode(
+                id,
+                n.created,
+                n.weight,
+                n.priority,
+                n.source,
+                n.title,
+                n.alias,
+                n.text,
+                n.shortcut,
+                childrenWithIds,
+                childrenWithIds.size(),
+                n.numberOfParents
+        );
     }
 
     // note: instances of this class currently grow without bound

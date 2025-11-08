@@ -133,7 +133,7 @@ public class ActionDuJour extends Action {
             File dir = new File(source.getLocation());
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());
             for (File file : dir.listFiles()) {
-                if (AtomVCSWriter.FORMAT.isMatchingFile(file)) {
+                if (net.fortytwo.smsn.brain.io.vcs.VCSFormat.FORMAT.isMatchingFile(file)) {
                     AtomId id = new AtomId(file.getName());
                     Optional<Atom> opt = repository.findById(id);
                     Preconditions.checkArgument(opt.isPresent());

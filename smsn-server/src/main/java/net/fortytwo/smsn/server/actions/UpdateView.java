@@ -2,8 +2,6 @@ package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.TreeNode;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.util.TreeNodeConverter;
 import net.fortytwo.smsn.brain.view.TreeUpdater;
 import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
@@ -84,12 +82,8 @@ public class UpdateView extends RootedViewAction {
     private TreeNode parseWikiText(final ActionContext params) {
         try {
             try (InputStream in = new ByteArrayInputStream(getView().getBytes())) {
-                // Parse using old WikiParser
-                net.fortytwo.smsn.brain.model.entities.TreeNode<Link> oldTree =
-                    params.getWikiParser().parse(in).getContent();
-
-                // Convert to new TreeNode format
-                return TreeNodeConverter.fromTreeNodeLink(oldTree);
+                // Parse directly using new TreeNodeWikiParser
+                return params.getTreeNodeWikiParser().parse(in);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);
