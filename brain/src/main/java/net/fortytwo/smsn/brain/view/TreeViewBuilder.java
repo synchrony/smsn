@@ -122,9 +122,13 @@ public class TreeViewBuilder {
         List<TreeNode> childNodes = new ArrayList<>();
         Set<AtomId> visited = new HashSet<>();
 
+        // Use childHeight - 1 to match legacy behavior where search results showed
+        // only the matched atoms without expanding children at height 1
+        int actualHeight = childHeight > 0 ? childHeight - 1 : 0;
+
         for (Atom atom : atoms) {
             if (!visited.contains(atom.id)) {
-                childNodes.add(buildViewInternal(atom.id, childHeight, filter, visited, direction));
+                childNodes.add(buildViewInternal(atom.id, actualHeight, filter, visited, direction));
             }
         }
 

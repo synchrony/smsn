@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
  * Provides a clean abstraction over the TinkerPop/Neo4j graph implementation.
  */
 public class AtomRepository {
+    private static final int DEFAULT_MAX_SEARCH_RESULTS = 100;
+
     private final GraphWrapper wrapper;
     private long lastUpdate = System.currentTimeMillis();
 
@@ -375,9 +377,10 @@ public class AtomRepository {
         // Sort by score (descending)
         Collections.sort(ranked);
 
-        // Extract atoms from sorted list
+        // Extract atoms from sorted list and limit results
         return ranked.stream()
                 .map(net.fortytwo.smsn.brain.model.pg.Sortable::getEntity)
+                .limit(DEFAULT_MAX_SEARCH_RESULTS)
                 .collect(Collectors.toList());
     }
 
