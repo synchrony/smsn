@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.Timestamp;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
@@ -133,6 +134,69 @@ public class AtomRepository {
             count++;
         }
         return count;
+    }
+
+    /**
+     * Get the IDs of all parent atoms (atoms that have this atom as a child).
+     * Navigates backwards through the linked list structure:
+     * Child <--FIRST-- ListNode <--REST-- ... <--NOTES-- Parent
+     */
+    public List<AtomId> getParentIds(AtomId atomId) {
+        Vertex child = wrapper.getVertexById(atomId);
+        if (child == null) {
+            return new ArrayList<>();
+        }
+
+        List<AtomId> parentIds = new ArrayList<>();
+
+        // Find all ListNodes that point to this child via FIRST edge
+        var firstEdges = child.edges(Direction.IN, SemanticSynchrony.EdgeLabels.FIRST);
+        while (firstEdges.hasNext()) {
+            Vertex listNode = firstEdges.next().outVertex();
+
+            // Navigate backwards through REST edges to find the head of the list
+            Vertex headListNode = findListHead(listNode);
+
+            // Find the parent atom that has a NOTES edge to this list head
+            var notesEdges = headListNode.edges(Direction.IN, SemanticSynchrony.EdgeLabels.NOTES);
+            if (notesEdges.hasNext()) {
+                Vertex parentVertex = notesEdges.next().outVertex();
+                String parentIdValue = getOptionalProperty(parentVertex, SemanticSynchrony.PropertyKeys.ID, null);
+                if (parentIdValue != null) {
+                    parentIds.add(new AtomId(parentIdValue));
+                }
+            }
+        }
+        return parentIds;
+    }
+
+    /**
+     * Navigate backwards through REST edges to find the head of a linked list.
+     */
+    private Vertex findListHead(Vertex listNode) {
+        Vertex current = listNode;
+        Vertex head = current;
+
+        // Keep going backwards through REST edges until we can't go anymore
+        while (true) {
+            var restEdgesIn = current.edges(Direction.IN, SemanticSynchrony.EdgeLabels.REST);
+            if (!restEdgesIn.hasNext()) {
+                break;
+            }
+            head = restEdgesIn.next().outVertex();
+            current = head;
+        }
+
+        return head;
+    }
+
+    /**
+     * Get all parent atoms (fully loaded).
+     */
+    public List<Atom> getParents(AtomId atomId) {
+        return getParentIds(atomId).stream()
+                .map(this::load)
+                .collect(Collectors.toList());
     }
 
     // ========== Update Operations ==========

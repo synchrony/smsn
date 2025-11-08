@@ -24,7 +24,7 @@ public class TreeViewBuilder {
     }
 
     /**
-     * Build a tree view starting from a root atom.
+     * Build a forward tree view starting from a root atom (expanding children).
      *
      * @param rootId the root atom ID
      * @param height maximum tree depth (0 = root only, 1 = root + children, etc.)
@@ -32,8 +32,21 @@ public class TreeViewBuilder {
      * @return immutable TreeNode with children populated up to specified height
      */
     public TreeNode buildView(AtomId rootId, int height, Filter filter) {
+        return buildView(rootId, height, filter, ViewDirection.FORWARD);
+    }
+
+    /**
+     * Build a tree view starting from a root atom with specified direction.
+     *
+     * @param rootId the root atom ID
+     * @param height maximum tree depth (0 = root only, 1 = root + linked nodes, etc.)
+     * @param filter filter for which atoms to include
+     * @param direction FORWARD to expand children, BACKWARD to expand parents
+     * @return immutable TreeNode with linked nodes populated up to specified height
+     */
+    public TreeNode buildView(AtomId rootId, int height, Filter filter, ViewDirection direction) {
         Set<AtomId> visited = new HashSet<>();
-        return buildViewInternal(rootId, height, filter, visited);
+        return buildViewInternal(rootId, height, filter, visited, direction);
     }
 
     /**
@@ -84,8 +97,7 @@ public class TreeViewBuilder {
     }
 
     /**
-     * Build tree view from a list of atoms (e.g., search results).
-     * Creates a virtual root with the atoms as children.
+     * Build tree view from a list of atoms (e.g., search results) with forward direction.
      *
      * @param atoms list of atoms to include as top-level results
      * @param childHeight height to expand each result's children
@@ -93,12 +105,26 @@ public class TreeViewBuilder {
      * @return TreeNode representing the result set
      */
     public TreeNode buildSearchResultsView(List<Atom> atoms, int childHeight, Filter filter) {
+        return buildSearchResultsView(atoms, childHeight, filter, ViewDirection.FORWARD);
+    }
+
+    /**
+     * Build tree view from a list of atoms (e.g., search results).
+     * Creates a virtual root with the atoms as children.
+     *
+     * @param atoms list of atoms to include as top-level results
+     * @param childHeight height to expand each result's linked nodes
+     * @param filter filter for linked atoms
+     * @param direction FORWARD to expand children, BACKWARD to expand parents
+     * @return TreeNode representing the result set
+     */
+    public TreeNode buildSearchResultsView(List<Atom> atoms, int childHeight, Filter filter, ViewDirection direction) {
         List<TreeNode> childNodes = new ArrayList<>();
         Set<AtomId> visited = new HashSet<>();
 
         for (Atom atom : atoms) {
             if (!visited.contains(atom.id)) {
-                childNodes.add(buildViewInternal(atom.id, childHeight, filter, visited));
+                childNodes.add(buildViewInternal(atom.id, childHeight, filter, visited, direction));
             }
         }
 
@@ -136,7 +162,7 @@ public class TreeViewBuilder {
     /**
      * Internal recursive builder with cycle detection.
      */
-    private TreeNode buildViewInternal(AtomId atomId, int remainingHeight, Filter filter, Set<AtomId> visited) {
+    private TreeNode buildViewInternal(AtomId atomId, int remainingHeight, Filter filter, Set<AtomId> visited, ViewDirection direction) {
         // Prevent cycles
         if (visited.contains(atomId)) {
             // Return stub node for cycle detection
@@ -154,21 +180,25 @@ public class TreeViewBuilder {
             return null;
         }
 
-        // Base case: no more height, don't expand children
+        // Base case: no more height, don't expand linked nodes
         if (remainingHeight <= 0) {
             return atomToTreeNode(atom, new ArrayList<>());
         }
 
-        // Recursive case: expand children
-        List<TreeNode> childNodes = new ArrayList<>();
-        for (AtomId childId : atom.children) {
-            TreeNode childNode = buildViewInternal(childId, remainingHeight - 1, filter, new HashSet<>(visited));
-            if (childNode != null) {
-                childNodes.add(childNode);
+        // Recursive case: expand linked nodes based on direction
+        List<TreeNode> linkedNodes = new ArrayList<>();
+        List<AtomId> linkedIds = direction == ViewDirection.FORWARD
+            ? atom.children
+            : repository.getParentIds(atomId);
+
+        for (AtomId linkedId : linkedIds) {
+            TreeNode linkedNode = buildViewInternal(linkedId, remainingHeight - 1, filter, new HashSet<>(visited), direction);
+            if (linkedNode != null) {
+                linkedNodes.add(linkedNode);
             }
         }
 
-        return atomToTreeNode(atom, childNodes);
+        return atomToTreeNode(atom, linkedNodes);
     }
 
     /**

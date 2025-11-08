@@ -67,7 +67,8 @@ public class UpdateView extends RootedViewAction {
 
         // Generate the updated view
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        TreeNode updatedView = builder.buildView(getRoot().id, height, getFilter());
+        TreeNode updatedView = builder.buildView(
+            getRoot().id, height, getFilter(), getViewDirection());
 
         // Serialize and return the view
         try {

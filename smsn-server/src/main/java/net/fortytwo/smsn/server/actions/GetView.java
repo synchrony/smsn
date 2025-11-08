@@ -18,7 +18,8 @@ public class GetView extends RootedViewAction {
 
         // Use new TreeViewBuilder instead of old TreeViews
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildView(getRoot().id, height, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildView(
+            getRoot().id, height, getFilter(), getViewDirection());
 
         // Serialize directly using new JSON printer
         try {
