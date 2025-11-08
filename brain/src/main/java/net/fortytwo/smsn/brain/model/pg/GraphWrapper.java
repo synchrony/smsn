@@ -16,6 +16,7 @@ public abstract class GraphWrapper {
     protected final Graph graph;
 
     private final Map<String, IndexWrapper> indices = new HashMap<>();
+    private long lastUpdate = System.currentTimeMillis();
 
     protected GraphWrapper(Graph graph) {
         this.graph = graph;
@@ -114,5 +115,21 @@ public abstract class GraphWrapper {
 
     private Iterator<Sortable<Vertex, Float>> getVerticesByKeyValue(String key, String value) {
         return getFromIndex(key, value);
+    }
+
+    /**
+     * Notify the wrapper that the graph has been updated.
+     * Updates the last update timestamp for change tracking.
+     */
+    public void notifyOfUpdate() {
+        lastUpdate = System.currentTimeMillis();
+    }
+
+    /**
+     * Get the timestamp of the last update to the graph.
+     * Used for change tracking and triggering inference.
+     */
+    public long getLastUpdate() {
+        return lastUpdate;
     }
 }

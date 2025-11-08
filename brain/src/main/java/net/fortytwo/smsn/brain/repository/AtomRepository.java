@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  */
 public class AtomRepository {
     private final GraphWrapper wrapper;
+    private long lastUpdate = System.currentTimeMillis();
 
     public AtomRepository(GraphWrapper wrapper) {
         this.wrapper = wrapper;
@@ -583,14 +584,6 @@ public class AtomRepository {
     }
 
     /**
-     * Notify that the graph has been updated.
-     * This triggers any necessary post-update processing.
-     */
-    public void notifyOfUpdate() {
-        // Notification handled at the transaction level
-    }
-
-    /**
      * Remove all isolated atoms (atoms with no parents and no children) matching the filter.
      *
      * @param filter Filter to apply, or null for no filter
@@ -673,5 +666,24 @@ public class AtomRepository {
 
     private String cleanForAcronym(String value) {
         return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
+    }
+
+    // ========== Update Tracking ==========
+
+    /**
+     * Notify the repository that the graph has been updated.
+     * This updates the last update timestamp for change tracking and inference.
+     */
+    public void notifyOfUpdate() {
+        lastUpdate = System.currentTimeMillis();
+        wrapper.notifyOfUpdate();
+    }
+
+    /**
+     * Get the timestamp of the last update to the graph.
+     * Used for change tracking and triggering inference.
+     */
+    public long getLastUpdate() {
+        return Math.max(lastUpdate, wrapper.getLastUpdate());
     }
 }

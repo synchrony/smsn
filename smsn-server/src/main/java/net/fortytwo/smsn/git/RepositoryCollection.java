@@ -3,17 +3,20 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
-import net.fortytwo.smsn.brain.model.entities.Link;
-import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.query.TreeViews;
+import net.fortytwo.smsn.brain.Normed;
+import net.fortytwo.smsn.brain.SourceName;
+import net.fortytwo.smsn.brain.Timestamp;
+import net.fortytwo.smsn.brain.TreeNode;
+import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,27 +101,25 @@ public class RepositoryCollection implements AbstractRepository {
         return unionOf(AbstractRepository::getMissing);
     }
 
-    public TreeNode<Link> getHistory(final SmSnGitRepository.Limits limits) throws IOException, GitAPIException {
+    public TreeNode getHistory(final SmSnGitRepository.Limits limits) throws IOException, GitAPIException {
         long now = System.currentTimeMillis();
 
-        TreeNode<Link> parent = TreeNodeDTO.createEmptyNode();
-        TreeViews.setId(parent, SemanticSynchrony.createRandomId());
-        // TODO: don't hard-code a source
-        TreeViews.setSource(parent, "public");
-        TreeViews.setWeight(parent, SemanticSynchrony.DEFAULT_WEIGHT);
-        TreeViews.setCreated(parent, now);
-
-        TreeViews.setTitle(parent, "Git history for " + directory.getName()
-                + " at " + SmSnGitRepository.formatDate(now));
-
+        List<TreeNode> children = new ArrayList<>();
         for (SmSnGitRepository repo : repositoriesBySource.values()) {
-            TreeNode<Link> repoHistory = repo.getHistory(limits);
-            parent.addChild(repoHistory);
+            TreeNode repoHistory = repo.getHistory(limits);
+            children.add(repoHistory);
         }
 
-        parent.setNumberOfChildren(repositoriesBySource.size());
-
-        return parent;
+        return TreeViewBuilder.createSimpleTreeNode(
+                SemanticSynchrony.createRandomId(),
+                new Timestamp((int) (now / 1000)),
+                new Normed(SemanticSynchrony.DEFAULT_WEIGHT),
+                new SourceName("public"),  // TODO: don't hard-code a source
+                "Git history for " + directory.getName() + " at " + SmSnGitRepository.formatDate(now),
+                children,
+                children.size(),
+                0
+        );
     }
 
     private <R> Set<R> unionOf(FunctionWithException<AbstractRepository, Set<R>, RepositoryException> function)

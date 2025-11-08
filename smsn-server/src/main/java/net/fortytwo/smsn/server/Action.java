@@ -18,7 +18,6 @@ import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
-import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
@@ -155,7 +154,6 @@ public abstract class Action {
     }
 
     private static void setIO(final ActionContext context) {
-        context.setQueries(new TreeViews(context.getBrain()));
         context.setWikiParser(new WikiParser());
         context.setJsonParser(new JsonParser());
         context.setJsonPrinter(new JsonPrinter());

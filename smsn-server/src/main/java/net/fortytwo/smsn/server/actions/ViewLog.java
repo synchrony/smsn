@@ -1,7 +1,6 @@
 package net.fortytwo.smsn.server.actions;
 
 import net.fortytwo.smsn.brain.Params;
-import net.fortytwo.smsn.brain.util.TreeNodeConverter;
 import net.fortytwo.smsn.git.RepositoryCollection;
 import net.fortytwo.smsn.git.SmSnGitRepository;
 import net.fortytwo.smsn.server.ActionContext;
@@ -39,12 +38,8 @@ public class ViewLog extends BasicViewAction {
         try {
             RepositoryCollection repos = new RepositoryCollection(context.getBrain(), getFile());
 
-            // Get history as old TreeNode<Link> from git repository
-            net.fortytwo.smsn.brain.model.entities.TreeNode<net.fortytwo.smsn.brain.model.entities.Link> legacyView
-                = repos.getHistory(createExampleLimits());
-
-            // Convert to new immutable TreeNode
-            net.fortytwo.smsn.brain.TreeNode view = TreeNodeConverter.fromTreeNodeLink(legacyView);
+            // Get history as Hydra TreeNode from git repository
+            net.fortytwo.smsn.brain.TreeNode view = repos.getHistory(createExampleLimits());
 
             // Serialize directly using new JSON printer
             JSONObject json = context.getTreeNodeJsonPrinter().toJson(view);

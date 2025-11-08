@@ -235,4 +235,54 @@ public class TreeViewBuilder {
         }
         return null;
     }
+
+    /**
+     * Create a simple TreeNode with no optional fields.
+     * Helper for code outside brain module that cannot directly access Opt.
+     */
+    public static TreeNode createSimpleTreeNode(
+            AtomId id,
+            net.fortytwo.smsn.brain.Timestamp created,
+            net.fortytwo.smsn.brain.Normed weight,
+            net.fortytwo.smsn.brain.SourceName source,
+            String title,
+            List<TreeNode> children,
+            int totalChildren,
+            int numberOfParents) {
+        return new TreeNode(
+                id,
+                created,
+                weight,
+                hydra.util.Opt.empty(),  // no priority
+                source,
+                title,
+                hydra.util.Opt.empty(),  // no alias
+                hydra.util.Opt.empty(),  // no text
+                hydra.util.Opt.empty(),  // no shortcut
+                children,
+                totalChildren,
+                numberOfParents
+        );
+    }
+
+    /**
+     * Convert an Atom to a TreeNode with specified children.
+     * Helper for code outside brain module that cannot directly access Opt.
+     */
+    public static TreeNode atomToTreeNode(Atom atom, List<TreeNode> children, int numberOfParents) {
+        return new TreeNode(
+                atom.id,
+                atom.created,
+                atom.weight,
+                atom.priority,
+                atom.source,
+                atom.title,
+                atom.alias,
+                atom.text,
+                atom.shortcut,
+                children,
+                atom.children.size(),
+                numberOfParents
+        );
+    }
 }

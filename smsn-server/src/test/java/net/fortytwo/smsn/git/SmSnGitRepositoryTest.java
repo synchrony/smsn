@@ -113,16 +113,16 @@ public class SmSnGitRepositoryTest extends BrainTestBase {
         repo.addAll();
         repo.commitAll("second commit");
 
-        TreeNode<Link> history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
-        assertEquals(2, history.getChildren().length());
-        TreeNode<Link> secondCommit = history.getChildren().get(0);
-        TreeNode<Link> firstCommit = history.getChildren().get(1);
-        assertTrue(TreeViews.getTitle(firstCommit).endsWith("first commit"));
-        assertTrue(TreeViews.getTitle(secondCommit).endsWith("second commit"));
+        net.fortytwo.smsn.brain.TreeNode history = repo.getHistory(SmSnGitRepository.Limits.noLimits());
+        assertEquals(2, history.children.size());
+        net.fortytwo.smsn.brain.TreeNode secondCommit = history.children.get(0);
+        net.fortytwo.smsn.brain.TreeNode firstCommit = history.children.get(1);
+        assertTrue(firstCommit.title.endsWith("first commit"));
+        assertTrue(secondCommit.title.endsWith("second commit"));
         /* TODO: test interned notes
-        assertEquals(1, firstCommit.getChildren().size());
-        assertEquals(2, secondCommit.getChildren().size());
-        assertEquals("Arthur Dent", firstCommit.getChildren().get(0).getTitle());
+        assertEquals(1, firstCommit.children.size());
+        assertEquals(2, secondCommit.children.size());
+        assertEquals("Arthur Dent", firstCommit.children.get(0).title);
         */
     }
 
