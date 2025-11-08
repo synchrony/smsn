@@ -285,4 +285,30 @@ public class TreeViewBuilder {
                 numberOfParents
         );
     }
+
+    /**
+     * Create an Atom with basic properties and optional text.
+     * Helper for code outside brain module that cannot directly access Opt.
+     */
+    public static Atom createAtom(
+            AtomId id,
+            long createdTimestamp,
+            float weight,
+            String source,
+            String title,
+            String text,
+            List<AtomId> children) {
+        return new Atom(
+                id,
+                new net.fortytwo.smsn.brain.Timestamp((int) (createdTimestamp / 1000)),
+                new net.fortytwo.smsn.brain.Normed(weight),
+                hydra.util.Opt.empty(), // priority
+                new net.fortytwo.smsn.brain.SourceName(source),
+                title,
+                hydra.util.Opt.empty(), // alias
+                text != null ? hydra.util.Opt.of(text) : hydra.util.Opt.empty(),
+                hydra.util.Opt.empty(), // shortcut
+                children
+        );
+    }
 }
