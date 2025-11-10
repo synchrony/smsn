@@ -427,6 +427,11 @@ public class TreeViews {
                     }
                 }
             }
+
+            @Override
+            public void retain(final int position, final TreeNode<Link> note) {
+                // No action needed - child is already in the correct position
+            }
         };
 
         List<TreeNode<Link>> before = toJavaList(viewInternal(rootNote, 1, filter, style, false, cache).getChildren());

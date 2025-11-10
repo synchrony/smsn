@@ -120,6 +120,140 @@ public class AtomRepository {
     }
 
     /**
+     * Add a child at a specific position in the parent's child list.
+     * More efficient than rebuilding the entire list.
+     *
+     * @param parentId the parent atom ID
+     * @param childId the child atom ID to add
+     * @param position the position to insert at (0-based)
+     */
+    public void addChildAt(AtomId parentId, AtomId childId, int position) {
+        Vertex parent = wrapper.getVertexById(parentId);
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent atom not found: " + parentId.value);
+        }
+
+        Vertex child = wrapper.getVertexById(childId);
+        if (child == null) {
+            throw new IllegalArgumentException("Child atom not found: " + childId.value);
+        }
+
+        // Create a new list node for the child
+        Vertex newListNode = wrapper.getGraph().addVertex(org.apache.tinkerpop.gremlin.structure.T.label, SemanticSynchrony.VertexLabels.LIST);
+        newListNode.addEdge(SemanticSynchrony.EdgeLabels.FIRST, child);
+
+        if (position == 0) {
+            // Insert at head
+            var notesEdges = parent.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.NOTES);
+            if (notesEdges.hasNext()) {
+                // There's an existing list - link new node to it
+                Vertex oldHead = notesEdges.next().inVertex();
+                newListNode.addEdge(SemanticSynchrony.EdgeLabels.REST, oldHead);
+            }
+            // Remove old NOTES edge if it exists
+            parent.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.NOTES).forEachRemaining(Edge::remove);
+            // Add new NOTES edge to new head
+            parent.addEdge(SemanticSynchrony.EdgeLabels.NOTES, newListNode);
+        } else {
+            // Insert in middle or at end
+            var notesEdges = parent.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.NOTES);
+            if (!notesEdges.hasNext()) {
+                throw new IllegalArgumentException("Cannot insert at position " + position + " - list is empty");
+            }
+
+            Vertex prevListNode = notesEdges.next().inVertex();
+            for (int i = 1; i < position; i++) {
+                var restEdges = prevListNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST);
+                if (!restEdges.hasNext()) {
+                    throw new IllegalArgumentException("Cannot insert at position " + position + " - list too short");
+                }
+                prevListNode = restEdges.next().inVertex();
+            }
+
+            // Link new node to rest of list
+            var restEdges = prevListNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST);
+            if (restEdges.hasNext()) {
+                Vertex nextNode = restEdges.next().inVertex();
+                newListNode.addEdge(SemanticSynchrony.EdgeLabels.REST, nextNode);
+            }
+
+            // Remove old REST edge from prev node
+            prevListNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST).forEachRemaining(Edge::remove);
+
+            // Link prev node to new node
+            prevListNode.addEdge(SemanticSynchrony.EdgeLabels.REST, newListNode);
+        }
+    }
+
+    /**
+     * Delete a child at a specific position in the parent's child list.
+     * More efficient than rebuilding the entire list.
+     *
+     * @param parentId the parent atom ID
+     * @param position the position to delete (0-based)
+     */
+    public void deleteChildAt(AtomId parentId, int position) {
+        Vertex parent = wrapper.getVertexById(parentId);
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent atom not found: " + parentId.value);
+        }
+
+        var notesEdges = parent.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.NOTES);
+        if (!notesEdges.hasNext()) {
+            throw new IllegalArgumentException("Cannot delete from empty list");
+        }
+
+        Vertex listNode = notesEdges.next().inVertex();
+
+        if (position == 0) {
+            // Delete head
+            var restEdges = listNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST);
+
+            // Remove NOTES edge
+            parent.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.NOTES).forEachRemaining(Edge::remove);
+
+            if (restEdges.hasNext()) {
+                // Link parent to next node
+                Vertex nextNode = restEdges.next().inVertex();
+                parent.addEdge(SemanticSynchrony.EdgeLabels.NOTES, nextNode);
+            }
+
+            // Delete the list node
+            listNode.remove();
+        } else {
+            // Delete in middle or at end
+            Vertex prevListNode = listNode;
+            for (int i = 1; i < position; i++) {
+                var restEdges = prevListNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST);
+                if (!restEdges.hasNext()) {
+                    throw new IllegalArgumentException("Cannot delete at position " + position + " - list too short");
+                }
+                prevListNode = restEdges.next().inVertex();
+            }
+
+            var restEdges = prevListNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST);
+            if (!restEdges.hasNext()) {
+                throw new IllegalArgumentException("Cannot delete at position " + position + " - list too short");
+            }
+
+            Vertex nodeToDelete = restEdges.next().inVertex();
+
+            // Remove REST edge from prev node
+            prevListNode.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST).forEachRemaining(Edge::remove);
+
+            // Link prev node to next node (if it exists)
+            var nextEdges = nodeToDelete.edges(Direction.OUT, SemanticSynchrony.EdgeLabels.REST);
+            if (nextEdges.hasNext()) {
+                Vertex nextNode = nextEdges.next().inVertex();
+                prevListNode.addEdge(SemanticSynchrony.EdgeLabels.REST, nextNode);
+            }
+
+            // Delete the list node
+            nodeToDelete.remove();
+        }
+    }
+
+    /**
      * Count the number of parents (atoms that have this atom as a child).
      */
     public int countParents(AtomId atomId) {
@@ -573,8 +707,10 @@ public class AtomRepository {
             return;
         }
 
-        Vertex listNode = notesEdges.next().inVertex();
-        notesEdges.next().remove(); // Remove NOTES edge
+        // Get the NOTES edge and save it before extracting the vertex
+        Edge notesEdge = notesEdges.next();
+        Vertex listNode = notesEdge.inVertex();
+        notesEdge.remove(); // Remove NOTES edge
 
         // Delete all list nodes
         while (listNode != null) {
@@ -603,7 +739,7 @@ public class AtomRepository {
             }
 
             // Create list node
-            Vertex listNode = wrapper.getGraph().addVertex();
+            Vertex listNode = wrapper.getGraph().addVertex(org.apache.tinkerpop.gremlin.structure.T.label, SemanticSynchrony.VertexLabels.LIST);
             listNode.addEdge(SemanticSynchrony.EdgeLabels.FIRST, child);
 
             if (firstListNode == null) {

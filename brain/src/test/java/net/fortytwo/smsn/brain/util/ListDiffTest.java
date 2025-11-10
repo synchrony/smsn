@@ -48,6 +48,10 @@ public class ListDiffTest {
                 work.remove(position);
                 removals++;
             }
+
+            public void retain(int position, String letter) {
+                // No action needed - element is already in the list
+            }
         };
 
         Comparator<String> cmp = new ListDiff.StringComparator();

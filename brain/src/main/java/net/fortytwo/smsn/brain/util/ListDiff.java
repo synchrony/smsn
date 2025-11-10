@@ -89,6 +89,8 @@ public class ListDiff {
                 bcur++;
                 ecur++;
             } else {
+                // Item in LCS - present in both lists, should be retained
+                ed.retain(ecur, a.get(acur));
                 lcur++;
                 acur++;
                 bcur++;
@@ -114,5 +116,7 @@ public class ListDiff {
         void add(int position, T letter);
 
         void delete(int position, T letter);
+
+        void retain(int position, T letter);
     }
 }

@@ -10,6 +10,9 @@ dependencies {
   implementation project(':smsn-rdf')
   implementation project(':smsn-services')
 
+  // Hydra dependency (needed for Atom/TreeNode field access)
+  implementation 'net.fortytwo.hydra:hydra-java:0.7.0'
+
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-server', version: tinkerpopVersion
   implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.8.0.201705170830-rc1'

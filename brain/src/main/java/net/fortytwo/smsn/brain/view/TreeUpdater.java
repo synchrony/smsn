@@ -54,68 +54,91 @@ public class TreeUpdater {
         Atom atom = getOrCreateAtom(tree.id, filter, cache);
 
         // Update properties of this atom
-        updateProperties(tree, atom);
+        updateProperties(tree, atom, cache);
 
         // Update children
         updateChildren(tree, atom, height, filter, cache);
     }
 
-    private void updateProperties(TreeNode tree, Atom atom) {
-        // Update title (required field in TreeNode)
+    private void updateProperties(TreeNode tree, Atom atom, Map<AtomId, Atom> cache) {
+        boolean updated = false;
+
+        // Always update title (even if empty, it's explicitly set)
         String newTitle = tree.title;
         String oldTitle = atom.title;
         if (!newTitle.equals(oldTitle)) {
             repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.TITLE, newTitle);
+            updated = true;
         }
 
-        // Update text if present
-        if (tree.text.isPresent()) {
-            String newText = tree.text.get();
-            String oldText = atom.text.isPresent() ? atom.text.get() : null;
-            if (!newText.equals(oldText)) {
-                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.TEXT, newText);
-            }
-        }
-
-        // Update alias if present
+        // Update optional properties if explicitly present in the tree
+        // WikiParser now parses @alias, @text, @weight, etc. from wiki text
+        // Empty string values (e.g., "@alias" alone) mean "clear this property"
         if (tree.alias.isPresent()) {
             String newAlias = tree.alias.get();
             String oldAlias = atom.alias.isPresent() ? atom.alias.get() : null;
-            if (!newAlias.equals(oldAlias)) {
-                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.ALIAS, newAlias);
+            // Empty string means "clear the property" - pass null to repository
+            Object valueToSet = newAlias.isEmpty() ? null : newAlias;
+            if (!java.util.Objects.equals(newAlias.isEmpty() ? null : newAlias, oldAlias)) {
+                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.ALIAS, valueToSet);
+                updated = true;
             }
         }
 
-        // Update weight (required field)
+        if (tree.text.isPresent()) {
+            String newText = tree.text.get();
+            String oldText = atom.text.isPresent() ? atom.text.get() : null;
+            // Empty string means "clear the property" - pass null to repository
+            Object valueToSet = newText.isEmpty() ? null : newText;
+            if (!java.util.Objects.equals(newText.isEmpty() ? null : newText, oldText)) {
+                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.TEXT, valueToSet);
+                updated = true;
+            }
+        }
+
+        if (tree.shortcut.isPresent()) {
+            String newShortcut = tree.shortcut.get();
+            String oldShortcut = atom.shortcut.isPresent() ? atom.shortcut.get() : null;
+            // Empty string means "clear the property" - pass null to repository
+            Object valueToSet = newShortcut.isEmpty() ? null : newShortcut;
+            if (!java.util.Objects.equals(newShortcut.isEmpty() ? null : newShortcut, oldShortcut)) {
+                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.SHORTCUT, valueToSet);
+                updated = true;
+            }
+        }
+
+        if (tree.priority.isPresent()) {
+            float newPriority = tree.priority.get().value;
+            Float oldPriority = atom.priority.isPresent() ? atom.priority.get().value : null;
+            // Sentinel value -1.0f means "clear the priority" (from empty "@priority")
+            if (newPriority < 0.0f) {
+                // Clear the priority if it exists
+                if (oldPriority != null) {
+                    repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.PRIORITY, null);
+                    updated = true;
+                }
+            } else if (oldPriority == null || newPriority != oldPriority) {
+                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.PRIORITY, newPriority);
+                updated = true;
+            }
+        }
+
+        // Update weight if explicitly provided in the tree
+        // Note: Weight is always present in TreeNode (non-optional), so we check if it differs from current
         float newWeight = tree.weight.value;
         float oldWeight = atom.weight.value;
         if (newWeight != oldWeight) {
             repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.WEIGHT, newWeight);
+            updated = true;
         }
 
-        // Update priority if present
-        if (tree.priority.isPresent()) {
-            float newPriority = tree.priority.get().value;
-            Float oldPriority = atom.priority.isPresent() ? atom.priority.get().value : null;
-            if (oldPriority == null || newPriority != oldPriority) {
-                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.PRIORITY, newPriority);
-            }
-        }
+        // Note: We don't update source here because:
+        // - Source should typically not change for existing atoms
+        // - Changing source could have security implications
 
-        // Update shortcut if present
-        if (tree.shortcut.isPresent()) {
-            String newShortcut = tree.shortcut.get();
-            String oldShortcut = atom.shortcut.isPresent() ? atom.shortcut.get() : null;
-            if (!newShortcut.equals(oldShortcut)) {
-                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.SHORTCUT, newShortcut);
-            }
-        }
-
-        // Update source (required field)
-        String newSource = tree.source.value;
-        String oldSource = atom.source.value;
-        if (!newSource.equals(oldSource)) {
-            repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.SOURCE, newSource);
+        // Invalidate cache after updates so subsequent accesses get fresh atom
+        if (updated) {
+            cache.remove(atom.id);
         }
 
         // Log the property update
@@ -129,13 +152,14 @@ public class TreeUpdater {
             return;
         }
 
-        Atom currentAtom = repository.load(atom.id);
+        Atom currentAtom = repository.findById(atom.id).orElse(null);
         if (currentAtom == null || (filter != null && !repository.testFilter(currentAtom, filter))) {
             return;
         }
 
         Set<AtomId> childrenAdded = new HashSet<>();
         Set<AtomId> childrenCreated = new HashSet<>();
+        Map<Integer, AtomId> positionToCreatedId = new HashMap<>();
 
         // Get current children from the graph
         List<TreeNode> currentChildren = new ArrayList<>();
@@ -161,18 +185,25 @@ public class TreeUpdater {
 
         List<TreeNode> lcs = ListDiff.longestCommonSubsequence(currentChildren, desiredChildren, compareById);
 
-        // Apply the diff
-        final List<AtomId> newChildrenList = new ArrayList<>();
-
+        // Apply the diff using in-place modifications
         ListDiff.DiffEditor<TreeNode> editor = new ListDiff.DiffEditor<TreeNode>() {
             @Override
             public void add(int position, TreeNode node) {
                 AtomId childId = node.id;
-                if (childId == null) {
+                // Check if we need to create a new atom:
+                // - childId is null, OR
+                // - childId is a temporary ID (starts with "temp-"), OR
+                // - atom doesn't exist in the repository
+                boolean needsCreation = childId == null
+                    || childId.value.startsWith("temp-")
+                    || getAtom(childId, cache) == null;
+
+                if (needsCreation) {
                     // Create new atom
                     Atom newAtom = repository.createAtom(filter);
                     childId = newAtom.id;
                     childrenCreated.add(childId);
+                    positionToCreatedId.put(position, childId);  // Track position -> ID mapping
                     cache.put(childId, newAtom);
 
                     if (activityLog != null) {
@@ -180,8 +211,17 @@ public class TreeUpdater {
                     }
                 }
 
-                newChildrenList.add(childId);
                 childrenAdded.add(childId);
+
+                // Reload atom to get current children list (after previous adds/deletes)
+                Atom freshAtom = repository.findById(atom.id).orElse(null);
+                if (freshAtom == null) {
+                    throw new IllegalStateException("Parent atom disappeared: " + atom.id.value);
+                }
+
+                // Convert visible position to actual position in unfiltered list
+                int actualPosition = indexOfNthVisible(freshAtom.children, position, filter, cache);
+                repository.addChildAt(atom.id, childId, actualPosition);
 
                 if (activityLog != null) {
                     activityLog.logLinkById(atom.id, childId);
@@ -190,30 +230,41 @@ public class TreeUpdater {
 
             @Override
             public void delete(int position, TreeNode node) {
-                // Don't add this child to the new list (effectively removes it)
+                // Reload atom to get current children list (after previous adds/deletes)
+                Atom freshAtom = repository.findById(atom.id).orElse(null);
+                if (freshAtom == null) {
+                    throw new IllegalStateException("Parent atom disappeared: " + atom.id.value);
+                }
+
+                // Convert visible position to actual position in unfiltered list
+                int actualPosition = indexOfNthVisible(freshAtom.children, position, filter, cache);
+                repository.deleteChildAt(atom.id, actualPosition);
+
                 if (activityLog != null && node.id != null) {
                     activityLog.logUnlinkById(atom.id, node.id);
                 }
+            }
+
+            @Override
+            public void retain(int position, TreeNode node) {
+                // Child is in both current and desired - no action needed
             }
         };
 
         ListDiff.applyDiff(currentChildren, desiredChildren, lcs, compareById, editor);
 
-        // Update the atom's children list
-        repository.setChildren(atom.id, newChildrenList);
-
         // Recursively update children
         for (int i = 0; i < desiredChildren.size(); i++) {
             TreeNode childTree = desiredChildren.get(i);
-            if (childTree.id == null) {
-                // This was a newly created child, use the ID we created
-                int addIndex = 0;
-                for (AtomId addedId : childrenAdded) {
-                    if (addIndex == i) {
-                        childTree = childTree.withId(addedId);
-                        break;
-                    }
-                    addIndex++;
+            // Check if this child was newly created (null ID, temp ID, or in the created set)
+            if (childTree.id == null || childTree.id.value.startsWith("temp-")) {
+                // This was a newly created child, look up the ID we created for this position
+                AtomId createdId = positionToCreatedId.get(i);
+                if (createdId != null) {
+                    childTree = childTree.withId(createdId);
+                } else {
+                    // No ID found - this shouldn't happen, skip this child
+                    continue;
                 }
             }
 
@@ -256,7 +307,8 @@ public class TreeUpdater {
 
         Atom atom = cache.get(id);
         if (atom == null) {
-            atom = repository.load(id);
+            // Use findById instead of load to avoid exception when atom doesn't exist
+            atom = repository.findById(id).orElse(null);
             if (atom != null) {
                 cache.put(id, atom);
             }
@@ -281,5 +333,33 @@ public class TreeUpdater {
             0,  // numberOfChildren
             0   // numberOfParents
         );
+    }
+
+    /**
+     * Convert a visible (filtered) position to an actual position in the unfiltered list.
+     * This accounts for children that are filtered out.
+     *
+     * @param allChildren the complete list of children (unfiltered)
+     * @param visiblePosition the position among visible (filtered) children
+     * @param filter the filter to apply
+     * @param cache cache of loaded atoms
+     * @return the actual position in the unfiltered list
+     */
+    private int indexOfNthVisible(List<AtomId> allChildren, int visiblePosition, Filter filter, Map<AtomId, Atom> cache) {
+        int visibleCount = 0;
+        for (int i = 0; i < allChildren.size(); i++) {
+            AtomId childId = allChildren.get(i);
+            Atom childAtom = getAtom(childId, cache);
+
+            if (childAtom != null && (filter == null || repository.testFilter(childAtom, filter))) {
+                if (visibleCount == visiblePosition) {
+                    return i;
+                }
+                visibleCount++;
+            }
+        }
+
+        // If we get here, position is at the end (for adds)
+        return allChildren.size();
     }
 }
