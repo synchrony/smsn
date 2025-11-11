@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.brain.view;
 
+import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.TreeNode;
@@ -133,19 +134,25 @@ public class TreeViewBuilder {
         }
 
         // Create a virtual root node for search results
-        // Use the first atom's properties as template, but with special markers
         if (atoms.isEmpty()) {
-            // Return empty result set
-            Atom firstAtom = repository.getAllAtomIds().stream()
-                    .findFirst()
-                    .map(repository::load)
-                    .orElse(null);
-            if (firstAtom == null) {
-                throw new IllegalStateException("No atoms in repository");
-            }
-            return atomToTreeNode(firstAtom, new ArrayList<>());
+            // Return empty result set with default properties
+            return new TreeNode(
+                    new AtomId("search-results"),
+                    new net.fortytwo.smsn.brain.Timestamp(System.currentTimeMillis()),
+                    new net.fortytwo.smsn.brain.Normed(SemanticSynchrony.DEFAULT_WEIGHT),
+                    hydra.util.Opt.empty(),
+                    new net.fortytwo.smsn.brain.SourceName("public"),
+                    "Search Results (no matches)",
+                    hydra.util.Opt.empty(),
+                    hydra.util.Opt.empty(),
+                    hydra.util.Opt.empty(),
+                    new ArrayList<>(),  // Empty children
+                    0,
+                    0
+            );
         }
 
+        // Use the first atom's properties as template for the virtual root
         Atom firstAtom = atoms.get(0);
         return new TreeNode(
                 new AtomId("search-results"),
