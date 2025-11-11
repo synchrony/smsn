@@ -268,21 +268,22 @@ public class TreeUpdater {
                 }
             }
 
-            // Determine update depth for this child
-            int childHeight;
-            if (childrenCreated.contains(childTree.id)) {
-                // New atom - only update properties, not grandchildren
-                childHeight = 1;
-            } else if (childrenAdded.contains(childTree.id)) {
-                // Existing atom newly added here - don't update further
-                childHeight = 0;
-            } else {
-                // Existing child - full recursive update
-                childHeight = height - 1;
+            // Determine whether and how to update this child
+            if (childTree.id == null) {
+                continue;  // Skip if no ID
             }
 
-            if (childHeight > 0 && childTree.id != null) {
-                updateInternal(childTree, childHeight, filter, cache);
+            if (childrenCreated.contains(childTree.id)) {
+                // New atom - update properties only, not grandchildren
+                updateInternal(childTree, 1, filter, cache);
+            } else if (childrenAdded.contains(childTree.id)) {
+                // Existing atom newly linked here - don't update its properties
+                // (we only added a link to it; the atom's content should not change)
+                // Skip the update
+            } else {
+                // Existing child already linked - full recursive update
+                // Always recurse, even if height-1 = 0, to update properties at this level
+                updateInternal(childTree, height - 1, filter, cache);
             }
         }
     }
