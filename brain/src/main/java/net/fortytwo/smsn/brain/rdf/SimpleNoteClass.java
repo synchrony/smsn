@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
-import org.openrdf.model.IRI;
-import org.openrdf.rio.RDFHandlerException;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
 
 import java.util.regex.Pattern;
 

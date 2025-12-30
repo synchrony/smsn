@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.monitron.demos;
 
-import info.aduna.io.IOUtil;
+import org.eclipse.rdf4j.common.io.IOUtil;
 import net.fortytwo.smsn.monitron.EventHandler;
 import net.fortytwo.smsn.monitron.MonitronService;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
@@ -11,12 +11,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.openrdf.model.Statement;
-import org.openrdf.query.BindingSet;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.Rio;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFHandler;
+import org.eclipse.rdf4j.rio.RDFParser;
+import org.eclipse.rdf4j.rio.Rio;
 
 import java.io.File;
 import java.io.FileInputStream;

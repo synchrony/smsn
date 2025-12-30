@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import net.fortytwo.rdfagents.RDFAgents;
-import org.openrdf.model.IRI;
+import net.fortytwo.smsn.rdf.RDF4JUtil;
+import org.eclipse.rdf4j.model.IRI;
 
 /**
  * The Event Ontology as a collection of terms
@@ -12,28 +12,28 @@ public interface Event {
 
     // classes
     IRI
-            Event = RDFAgents.createIRI(NAMESPACE + "Event"),
-            Factor = RDFAgents.createIRI(NAMESPACE + "Factor"),
-            Product = RDFAgents.createIRI(NAMESPACE + "Product");
+            Event = RDF4JUtil.createIRI(NAMESPACE + "Event"),
+            Factor = RDF4JUtil.createIRI(NAMESPACE + "Factor"),
+            Product = RDF4JUtil.createIRI(NAMESPACE + "Product");
 
     // properties
     IRI
-            agent = RDFAgents.createIRI(NAMESPACE + "agent"),
-            agent_in = RDFAgents.createIRI(NAMESPACE + "agent_in"),
-            factor = RDFAgents.createIRI(NAMESPACE + "factor"),
-            factor_of = RDFAgents.createIRI(NAMESPACE + "factor_of"),
-            hasAgent = RDFAgents.createIRI(NAMESPACE + "hasAgent"),
-            hasFactor = RDFAgents.createIRI(NAMESPACE + "hasFactor"),
-            hasLiteralFactor = RDFAgents.createIRI(NAMESPACE + "hasLiteralFactor"),
-            hasProduct = RDFAgents.createIRI(NAMESPACE + "hasProduct"),
-            hasSubEvent = RDFAgents.createIRI(NAMESPACE + "hasSubEvent"),
-            isAgentIn = RDFAgents.createIRI(NAMESPACE + "isAgentIn"),
-            isFactorOf = RDFAgents.createIRI(NAMESPACE + "isFactorOf"),
-            literal_factor = RDFAgents.createIRI(NAMESPACE + "literal_factor"),
-            place = RDFAgents.createIRI(NAMESPACE + "place"),
-            producedIn = RDFAgents.createIRI(NAMESPACE + "producedIn"),
-            produced_in = RDFAgents.createIRI(NAMESPACE + "produced_in"),
-            product = RDFAgents.createIRI(NAMESPACE + "product"),
-            sub_event = RDFAgents.createIRI(NAMESPACE + "sub_event"),
-            time = RDFAgents.createIRI(NAMESPACE + "time");
+            agent = RDF4JUtil.createIRI(NAMESPACE + "agent"),
+            agent_in = RDF4JUtil.createIRI(NAMESPACE + "agent_in"),
+            factor = RDF4JUtil.createIRI(NAMESPACE + "factor"),
+            factor_of = RDF4JUtil.createIRI(NAMESPACE + "factor_of"),
+            hasAgent = RDF4JUtil.createIRI(NAMESPACE + "hasAgent"),
+            hasFactor = RDF4JUtil.createIRI(NAMESPACE + "hasFactor"),
+            hasLiteralFactor = RDF4JUtil.createIRI(NAMESPACE + "hasLiteralFactor"),
+            hasProduct = RDF4JUtil.createIRI(NAMESPACE + "hasProduct"),
+            hasSubEvent = RDF4JUtil.createIRI(NAMESPACE + "hasSubEvent"),
+            isAgentIn = RDF4JUtil.createIRI(NAMESPACE + "isAgentIn"),
+            isFactorOf = RDF4JUtil.createIRI(NAMESPACE + "isFactorOf"),
+            literal_factor = RDF4JUtil.createIRI(NAMESPACE + "literal_factor"),
+            place = RDF4JUtil.createIRI(NAMESPACE + "place"),
+            producedIn = RDF4JUtil.createIRI(NAMESPACE + "producedIn"),
+            produced_in = RDF4JUtil.createIRI(NAMESPACE + "produced_in"),
+            product = RDF4JUtil.createIRI(NAMESPACE + "product"),
+            sub_event = RDF4JUtil.createIRI(NAMESPACE + "sub_event"),
+            time = RDF4JUtil.createIRI(NAMESPACE + "time");
 }

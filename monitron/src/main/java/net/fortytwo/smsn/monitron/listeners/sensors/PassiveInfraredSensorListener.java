@@ -5,7 +5,7 @@ import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.BooleanData;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.events.MotionObservation;
-import org.openrdf.model.IRI;
+import org.eclipse.rdf4j.model.IRI;
 
 public class PassiveInfraredSensorListener extends SensorListener {
 

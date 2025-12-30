@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import net.fortytwo.rdfagents.RDFAgents;
-import org.openrdf.model.IRI;
+import net.fortytwo.smsn.rdf.RDF4JUtil;
+import org.eclipse.rdf4j.model.IRI;
 
 /**
  * The Semantic Synchrony gesture/activity ontology as a collection of terms
@@ -20,25 +20,25 @@ public interface SmSnActivityOntology {
 
     // classes
     IRI
-            Activity = RDFAgents.createIRI(NAMESPACE + "Activity"),
-            Attention = RDFAgents.createIRI(NAMESPACE + "Attention"),
-            BatonGesture = RDFAgents.createIRI(NAMESPACE + "BatonGesture"),
-            Handoff = RDFAgents.createIRI(NAMESPACE + "Handoff"),
-            Handshake = RDFAgents.createIRI(NAMESPACE + "Handshake"),
-            HandshakePulse = RDFAgents.createIRI(NAMESPACE + "HandshakePulse"),
-            HighFive = RDFAgents.createIRI(NAMESPACE + "HighFive"),
-            Interaction = RDFAgents.createIRI(NAMESPACE + "Interaction"),
-            Gesture = RDFAgents.createIRI(NAMESPACE + "Gesture"),
-            Motion = RDFAgents.createIRI(NAMESPACE + "Motion"),
-            Point = RDFAgents.createIRI(NAMESPACE + "Point");
+            Activity = RDF4JUtil.createIRI(NAMESPACE + "Activity"),
+            Attention = RDF4JUtil.createIRI(NAMESPACE + "Attention"),
+            BatonGesture = RDF4JUtil.createIRI(NAMESPACE + "BatonGesture"),
+            Handoff = RDF4JUtil.createIRI(NAMESPACE + "Handoff"),
+            Handshake = RDF4JUtil.createIRI(NAMESPACE + "Handshake"),
+            HandshakePulse = RDF4JUtil.createIRI(NAMESPACE + "HandshakePulse"),
+            HighFive = RDF4JUtil.createIRI(NAMESPACE + "HighFive"),
+            Interaction = RDF4JUtil.createIRI(NAMESPACE + "Interaction"),
+            Gesture = RDF4JUtil.createIRI(NAMESPACE + "Gesture"),
+            Motion = RDF4JUtil.createIRI(NAMESPACE + "Motion"),
+            Point = RDF4JUtil.createIRI(NAMESPACE + "Point");
 
     // properties
     IRI
-            actor = RDFAgents.createIRI(NAMESPACE + "actor"),
-            focusOfAttention = RDFAgents.createIRI(NAMESPACE + "focusOfAttention"),
-            giver = RDFAgents.createIRI(NAMESPACE + "giver"),
-            recognitionTime = RDFAgents.createIRI(NAMESPACE + "recognitionTime"),
-            taker = RDFAgents.createIRI(NAMESPACE + "taker"),
-            thingGiven = RDFAgents.createIRI(NAMESPACE + "thingGiven"),
-            referent = RDFAgents.createIRI(NAMESPACE + "referent");
+            actor = RDF4JUtil.createIRI(NAMESPACE + "actor"),
+            focusOfAttention = RDF4JUtil.createIRI(NAMESPACE + "focusOfAttention"),
+            giver = RDF4JUtil.createIRI(NAMESPACE + "giver"),
+            recognitionTime = RDF4JUtil.createIRI(NAMESPACE + "recognitionTime"),
+            taker = RDF4JUtil.createIRI(NAMESPACE + "taker"),
+            thingGiven = RDF4JUtil.createIRI(NAMESPACE + "thingGiven"),
+            referent = RDF4JUtil.createIRI(NAMESPACE + "referent");
 }

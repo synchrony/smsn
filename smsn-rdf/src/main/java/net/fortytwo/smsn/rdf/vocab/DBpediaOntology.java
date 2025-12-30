@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import net.fortytwo.rdfagents.RDFAgents;
-import org.openrdf.model.IRI;
+import net.fortytwo.smsn.rdf.RDF4JUtil;
+import org.eclipse.rdf4j.model.IRI;
 
 /**
  * A selection of terms from the DBpedia Ontology
@@ -11,5 +11,5 @@ public class DBpediaOntology {
 
     // properties
     public static final IRI
-            owner = RDFAgents.createIRI(NAMESPACE + "owner");
+            owner = RDF4JUtil.createIRI(NAMESPACE + "owner");
 }

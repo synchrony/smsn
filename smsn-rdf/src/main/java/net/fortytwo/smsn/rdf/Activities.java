@@ -1,19 +1,17 @@
 package net.fortytwo.smsn.rdf;
 
-import net.fortytwo.rdfagents.data.DatasetFactory;
-import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.rdf.vocab.FOAF;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.rdf.vocab.Timeline;
-import org.openrdf.model.IRI;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
-import org.openrdf.model.vocabulary.XMLSchema;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.model.vocabulary.XSD;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -67,8 +65,7 @@ public class Activities {
                     "?referent foaf:interest ?interest .\n" +
                     "}";
 
-    private static final DatasetFactory factory = new DatasetFactory();
-    private static final ValueFactory vf = factory.getValueFactory();
+    private static final ValueFactory vf = RDF4JUtil.getValueFactory();
 
     private static final Resource[] defaultGraphArray = {null};
 
@@ -81,7 +78,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForPointingGesture(final long timestamp,
+    public static RDFDataset datasetForPointingGesture(final long timestamp,
                                                     final Resource actor,
                                                     final Resource referent,
                                                     Resource... graphs) {
@@ -90,7 +87,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Point, graph));
@@ -108,7 +105,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForBatonGesture(final long timestamp,
+    public static RDFDataset datasetForBatonGesture(final long timestamp,
                                                  final Resource actor,
                                                  Resource... graphs) {
         if (null == actor) {
@@ -116,7 +113,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.BatonGesture, graph));
@@ -133,7 +130,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForHandshakePulse(final long timestamp,
+    public static RDFDataset datasetForHandshakePulse(final long timestamp,
                                                    final Resource actor,
                                                    Resource... graphs) {
         if (null == actor) {
@@ -141,7 +138,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.HandshakePulse, graph));
@@ -159,7 +156,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForHandshakeInteraction(final long timestamp,
+    public static RDFDataset datasetForHandshakeInteraction(final long timestamp,
                                                          final Resource actor1,
                                                          final Resource actor2,
                                                          Resource... graphs) {
@@ -168,7 +165,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handshake, graph));
@@ -190,7 +187,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForHandoffInteraction(final long timestamp,
+    public static RDFDataset datasetForHandoffInteraction(final long timestamp,
                                                        final Resource giver,
                                                        final Resource taker,
                                                        final Resource thingGiven,
@@ -200,7 +197,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Handoff, graph));
@@ -221,7 +218,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForHighFiveInteraction(final long timestamp,
+    public static RDFDataset datasetForHighFiveInteraction(final long timestamp,
                                                         final Resource actor1,
                                                         final Resource actor2,
                                                         Resource... graphs) {
@@ -230,7 +227,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.HighFive, graph));
@@ -250,7 +247,7 @@ public class Activities {
      * @param graphs    RDF graphs of the dataset
      * @return an RDF dataset describing the activity
      */
-    public static Dataset datasetForAttentionActivity(final long timestamp,
+    public static RDFDataset datasetForAttentionActivity(final long timestamp,
                                                       final Resource actor,
                                                       final Resource focusOfAttention,
                                                       Resource... graphs) {
@@ -259,7 +256,7 @@ public class Activities {
         }
 
         Collection<Statement> c = new LinkedList<>();
-        IRI activity = factory.randomIRI();
+        IRI activity = RDF4JUtil.randomIRI();
 
         for (Resource graph : fixGraphs(graphs)) {
             c.add(createStatement(activity, RDF.TYPE, SmSnActivityOntology.Attention, graph));
@@ -270,7 +267,7 @@ public class Activities {
         return datasetForActivity(timestamp, activity, c, graphs);
     }
 
-    private static Dataset datasetForGesture(final long timestamp,
+    private static RDFDataset datasetForGesture(final long timestamp,
                                              final Resource activity,
                                              final Collection<Statement> c,
                                              final Resource agent,
@@ -282,19 +279,19 @@ public class Activities {
         return datasetForActivity(timestamp, activity, c, graphs);
     }
 
-    private static Dataset datasetForActivity(final long timestamp,
+    private static RDFDataset datasetForActivity(final long timestamp,
                                               final Resource activity,
                                               final Collection<Statement> c,
                                               Resource... graphs) {
         for (Resource graph : fixGraphs(graphs)) {
-            IRI instant = factory.randomIRI();
+            IRI instant = RDF4JUtil.randomIRI();
             c.add(createStatement(instant, RDF.TYPE, Timeline.Instant, graph));
-            Literal dateValue = vf.createLiteral(TIMESTAMP_FORMAT.format(timestamp), XMLSchema.DATETIME);
+            Literal dateValue = vf.createLiteral(TIMESTAMP_FORMAT.format(timestamp), XSD.DATETIME);
             c.add(createStatement(instant, Timeline.at, dateValue, graph));
             c.add(createStatement(activity, SmSnActivityOntology.recognitionTime, instant, graph));
         }
 
-        return new Dataset(c);
+        return new RDFDataset(c);
     }
 
     private static Resource[] fixGraphs(Resource... graphs) {

@@ -2,9 +2,9 @@ package net.fortytwo.smsn.gesture;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.IRI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import java.util.Collections;
 import java.util.HashSet;

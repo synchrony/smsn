@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.rdf;
 
-import info.aduna.iteration.CloseableIteration;
+import org.eclipse.rdf4j.common.iteration.CloseableIteration;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.Filter;
@@ -10,17 +10,17 @@ import net.fortytwo.smsn.brain.model.entities.ListNode;
 import net.fortytwo.smsn.brain.rdf.classes.*;
 import net.fortytwo.smsn.brain.rdf.classes.Date;
 import net.fortytwo.smsn.brain.rdf.classes.collections.*;
-import org.openrdf.model.Statement;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.SimpleValueFactory;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.Rio;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailException;
-import org.openrdf.sail.memory.MemoryStore;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFHandler;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.sail.Sail;
+import org.eclipse.rdf4j.sail.SailConnection;
+import org.eclipse.rdf4j.sail.SailException;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -317,7 +317,7 @@ public class KnowledgeBase {
      *                Type inference is performed on the entire knowledge base without regard to source,
      *                but generated RDF statements are limited to those subjects which are sharable according to
      *                the filter.
-     * @throws org.openrdf.rio.RDFHandlerException if a downstream error occurs
+     * @throws org.eclipse.rdf4j.rio.RDFHandlerException if a downstream error occurs
      */
     public synchronized void inferClasses(final RDFHandler handler, final Filter filter) throws RDFHandlerException {
         long startTime = System.currentTimeMillis();

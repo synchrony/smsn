@@ -6,9 +6,9 @@ import net.fortytwo.smsn.monitron.data.Data;
 import net.fortytwo.smsn.monitron.ontologies.OMOntology;
 import net.fortytwo.smsn.monitron.ontologies.OWLTime;
 import net.fortytwo.smsn.monitron.ontologies.Universe;
-import org.openrdf.model.IRI;
-import org.openrdf.model.Resource;
-import org.openrdf.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import java.util.Date;
 

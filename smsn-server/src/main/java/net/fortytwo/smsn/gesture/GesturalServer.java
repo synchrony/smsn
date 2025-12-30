@@ -10,9 +10,9 @@ import net.fortytwo.smsn.p2p.osc.udp.UdpOscSender;
 import net.fortytwo.smsn.rdf.Activities;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import org.apache.commons.text.StringEscapeUtils;
-import org.openrdf.model.IRI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import java.io.IOException;
 import java.net.SocketException;

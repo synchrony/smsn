@@ -5,8 +5,8 @@ import net.fortytwo.smsn.brain.rdf.NoteClass;
 import net.fortytwo.smsn.brain.rdf.NoteReqex;
 import net.fortytwo.smsn.brain.rdf.RDFizationContext;
 import net.fortytwo.smsn.brain.rdf.classes.collections.PersonCollection;
-import org.openrdf.model.IRI;
-import org.openrdf.rio.RDFHandlerException;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;

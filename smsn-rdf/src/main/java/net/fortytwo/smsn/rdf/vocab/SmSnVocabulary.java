@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.rdf.vocab;
 
-import net.fortytwo.rdfagents.RDFAgents;
-import org.openrdf.model.IRI;
+import net.fortytwo.smsn.rdf.RDF4JUtil;
+import org.eclipse.rdf4j.model.IRI;
 
 /**
  * The Personal Knowledge Base vocabulary provides additional terms
@@ -13,8 +13,8 @@ public interface SmSnVocabulary {
 
     // classes
     IRI
-            TODO = RDFAgents.createIRI(NAMESPACE + "TODO"),      // temporary.  Find a more standard vocabulary term for TODOs
-            WORDORPHRASE = RDFAgents.createIRI(NAMESPACE + "WordOrPhrase");  // temporary.  If it is possible to distinguish
+            TODO = RDF4JUtil.createIRI(NAMESPACE + "TODO"),      // temporary.  Find a more standard vocabulary term for TODOs
+            WORDORPHRASE = RDF4JUtil.createIRI(NAMESPACE + "WordOrPhrase");  // temporary.  If it is possible to distinguish
                                                                      // between words and phrases, choose terms from
                                                                      // appropriate vocabularies
 }

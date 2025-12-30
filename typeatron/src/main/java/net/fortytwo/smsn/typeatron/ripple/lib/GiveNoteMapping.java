@@ -12,7 +12,7 @@ import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import net.fortytwo.smsn.typeatron.TypeatronControl;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
-import org.openrdf.model.IRI;
+import org.eclipse.rdf4j.model.IRI;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

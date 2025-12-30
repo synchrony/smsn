@@ -10,7 +10,7 @@ import net.fortytwo.flow.Sink;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.RippleList;
-import org.openrdf.model.IRI;
+import org.eclipse.rdf4j.model.IRI;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

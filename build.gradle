@@ -35,7 +35,7 @@ ext {
   neo4jTinkerpopApiVersion = '0.9-3.4.0'
   rdfagentsVersion = '1.3'
   rippleVersion = '1.5'
-  sesameVersion = '4.1.2'
+  rdf4jVersion = '3.4.4'
   stream42Version = '1.2'
   tinkerpopVersion = '3.6.4'
 }

@@ -4,7 +4,7 @@ import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
 import net.fortytwo.smsn.monitron.events.RelativeHumidityObservation;
-import org.openrdf.model.IRI;
+import org.eclipse.rdf4j.model.IRI;
 
 public class HygrometerListener extends GaussianSensorListener {
 

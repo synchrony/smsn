@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain.io.rdf;
 
-import org.openrdf.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.util.LinkedList;
 import java.util.List;

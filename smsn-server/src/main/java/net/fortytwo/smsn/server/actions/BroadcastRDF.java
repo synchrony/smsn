@@ -4,7 +4,7 @@ import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 import net.fortytwo.smsn.server.CoordinatorService;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.openrdf.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.IOException;
 

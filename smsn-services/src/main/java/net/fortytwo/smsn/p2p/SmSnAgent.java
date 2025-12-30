@@ -4,12 +4,12 @@ import com.google.common.base.Preconditions;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.sparql.ProxySparqlStreamProcessor;
-import net.fortytwo.rdfagents.data.DatasetFactory;
-import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.smsn.rdf.RDF4JUtil;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import net.fortytwo.stream.sparql.RDFStreamProcessor;
-import org.openrdf.model.IRI;
-import org.openrdf.model.Statement;
-import org.openrdf.model.ValueFactory;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.ValueFactory;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -28,7 +28,7 @@ public class SmSnAgent {
             PROP_TAG = "tag";
 
     private final IRI agentIri;
-    private final DatasetFactory factory = new DatasetFactory();
+    private final ValueFactory valueFactory = RDF4JUtil.getValueFactory();
 
     private ServiceBroadcastListener listener;
 
@@ -52,8 +52,7 @@ public class SmSnAgent {
         Preconditions.checkNotNull(agentIri);
         logger.log(Level.INFO, "creating SmSn agent with IRI " + agentIri);
 
-        ValueFactory vf = factory.getValueFactory();
-        this.agentIri = vf.createIRI(agentIri);
+        this.agentIri = valueFactory.createIRI(agentIri);
 
         coordinatorConnection = new Connection();
 
@@ -117,8 +116,8 @@ public class SmSnAgent {
         return streamProcessor;
     }
 
-    public DatasetFactory getDatasetFactory() {
-        return factory;
+    public ValueFactory getValueFactory() {
+        return valueFactory;
     }
 
     public Service getCoordinatorService() {
@@ -165,7 +164,7 @@ public class SmSnAgent {
      * @param d   the RDF Dataset to send
      * @param ttl the time-to-live of the data, in milliseconds. Use ttl=0 for an infinite lifetime
      */
-    public void sendDataset(final Dataset d, final int ttl) {
+    public void sendDataset(final RDFDataset d, final int ttl) {
         getStreamProcessor().addInputs(ttl, toArray(d));
 
         /*
@@ -207,7 +206,7 @@ public class SmSnAgent {
         */
     }
 
-    private Statement[] toArray(Dataset d) {
+    private Statement[] toArray(RDFDataset d) {
         Collection<Statement> c = d.getStatements();
         Statement[] a = new Statement[c.size()];
         return c.toArray(a);

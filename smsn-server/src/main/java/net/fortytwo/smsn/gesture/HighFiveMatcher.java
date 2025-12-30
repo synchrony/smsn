@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.gesture;
 
-import org.openrdf.model.IRI;
+import org.eclipse.rdf4j.model.IRI;
 
 public class HighFiveMatcher {
 

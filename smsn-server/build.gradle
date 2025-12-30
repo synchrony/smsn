@@ -28,9 +28,9 @@ dependencies {
   }
 
   implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4'
-  implementation group: 'org.openrdf.sesame', name: 'sesame-rio-api', version: sesameVersion
+  implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-api', version: rdf4jVersion
   implementation 'com.illposed.osc:javaosc-core:0.3'
-  implementation(group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: sesameVersion)
+  implementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-sail-memory', version: rdf4jVersion)
   implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
   implementation group: 'net.fortytwo', name: 'linked-data-sail', version: rippleVersion
   implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version

@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.typeatron;
 
 import com.illposed.osc.OSCMessage;
-import info.aduna.io.IOUtil;
+import org.eclipse.rdf4j.common.io.IOUtil;
 import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.smsn.SemanticSynchrony;
@@ -15,9 +15,9 @@ import net.fortytwo.smsn.typeatron.ripple.RippleSession;
 import net.fortytwo.smsn.typeatron.ripple.SmSnRippleRepl;
 import net.fortytwo.smsn.typeatron.ripple.lib.music.TypeatronMusicControl;
 import net.fortytwo.stream.StreamProcessor;
-import org.openrdf.model.IRI;
-import org.openrdf.model.Value;
-import org.openrdf.query.BindingSet;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.query.BindingSet;
 
 import java.io.IOException;
 import java.io.PipedInputStream;

@@ -2,7 +2,7 @@ package net.fortytwo.smsn.monitron.listeners.sensors;
 
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.listeners.MonitronListener;
-import org.openrdf.model.IRI;
+import org.eclipse.rdf4j.model.IRI;
 
 public abstract class SensorListener extends MonitronListener {
     protected final IRI sensor;

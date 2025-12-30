@@ -2,9 +2,9 @@ package net.fortytwo.smsn.brain.io.rdf;
 
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.sail.SailException;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.sail.SailException;
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -2,9 +2,9 @@ package net.fortytwo.smsn.brain.rdf;
 
 import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.TopicGraph;
-import org.openrdf.model.IRI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.rio.RDFHandler;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.rio.RDFHandler;
 
 public class RDFizationContext {
     private final TopicGraph topicGraph;

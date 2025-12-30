@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.brain;
 
-import info.aduna.io.IOUtil;
+import org.eclipse.rdf4j.common.io.IOUtil;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;

@@ -1,20 +1,20 @@
 package net.fortytwo.smsn.monitron.ontologies;
 
-import net.fortytwo.rdfagents.RDFAgents;
-import org.openrdf.model.IRI;
+import net.fortytwo.smsn.rdf.RDF4JUtil;
+import org.eclipse.rdf4j.model.IRI;
 
 public interface OMOntology {
     String NAMESPACE = "http://def.seegrid.csiro.au/ontology/om/om-lite#";
 
     IRI
-            FEATURE_OF_INTEREST = RDFAgents.createIRI(NAMESPACE + "featureOfInterest"),
-            MEASUREMENT = RDFAgents.createIRI(NAMESPACE + "Measurement"),
-            OBSERVATION = RDFAgents.createIRI(NAMESPACE + "Observation"),
-            OBSERVED_PROPERTY = RDFAgents.createIRI(NAMESPACE + "observedProperty"),
-            PROCEDURE = RDFAgents.createIRI(NAMESPACE + "procedure"),
-            RESULT = RDFAgents.createIRI(NAMESPACE + "result"),
-            SIMPLE_MEASURE = RDFAgents.createIRI(NAMESPACE + "SimpleMeasure"),
-            PHENOMENON_TIME = RDFAgents.createIRI(NAMESPACE + "phenomenonTime"),
-            UOM = RDFAgents.createIRI(NAMESPACE + "uom"),
-            AMOUNT = RDFAgents.createIRI(NAMESPACE + "amount");
+            FEATURE_OF_INTEREST = RDF4JUtil.createIRI(NAMESPACE + "featureOfInterest"),
+            MEASUREMENT = RDF4JUtil.createIRI(NAMESPACE + "Measurement"),
+            OBSERVATION = RDF4JUtil.createIRI(NAMESPACE + "Observation"),
+            OBSERVED_PROPERTY = RDF4JUtil.createIRI(NAMESPACE + "observedProperty"),
+            PROCEDURE = RDF4JUtil.createIRI(NAMESPACE + "procedure"),
+            RESULT = RDF4JUtil.createIRI(NAMESPACE + "result"),
+            SIMPLE_MEASURE = RDF4JUtil.createIRI(NAMESPACE + "SimpleMeasure"),
+            PHENOMENON_TIME = RDF4JUtil.createIRI(NAMESPACE + "phenomenonTime"),
+            UOM = RDF4JUtil.createIRI(NAMESPACE + "uom"),
+            AMOUNT = RDF4JUtil.createIRI(NAMESPACE + "amount");
 }

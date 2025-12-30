@@ -1,8 +1,8 @@
 package net.fortytwo.smsn.monitron;
 
 import net.fortytwo.smsn.monitron.events.MonitronEvent;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 public class Context {
 
