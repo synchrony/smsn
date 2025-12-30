@@ -47,10 +47,14 @@ public class History {
 
             AtomId id = visited[i % CAPACITY];
 
-            // Load atom and check filter
-            Atom atom = repository.load(id);
-            if (atom != null && (filter == null || repository.testFilter(atom, filter))) {
-                atoms.add(atom);
+            // Load atom if it exists and check filter
+            // Skip atoms that no longer exist (may have been deleted or from a different session)
+            java.util.Optional<Atom> optAtom = repository.findById(id);
+            if (optAtom.isPresent()) {
+                Atom atom = optAtom.get();
+                if (filter == null || repository.testFilter(atom, filter)) {
+                    atoms.add(atom);
+                }
             }
         }
 

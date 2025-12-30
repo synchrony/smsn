@@ -50,7 +50,7 @@ smsn-why/
 config/
 
 # Binary/executable files in root
-java
+/java
 
 # Deployment scripts
 deploy-*.sh
