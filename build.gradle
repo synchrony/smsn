@@ -7,6 +7,8 @@ allprojects {
 
 subprojects {
   apply plugin: 'java'
+  apply plugin: 'jacoco'
+
   sourceCompatibility = 1.11
   targetCompatibility = 1.11
   tasks.withType(JavaCompile) {
@@ -22,6 +24,36 @@ subprojects {
 
   test {
     exclude '**/**IT.*'
+    finalizedBy jacocoTestReport
+  }
+
+  jacocoTestReport {
+    dependsOn test
+    reports {
+      xml.required = true
+      html.required = true
+    }
+  }
+}
+
+// Print coverage summary from all subprojects
+task jacocoSummary {
+  description = 'Prints a coverage summary from all subprojects'
+  group = 'verification'
+
+  dependsOn subprojects.test, subprojects.jacocoTestReport
+
+  doLast {
+    println "\n=== JaCoCo Coverage Summary ==="
+    println "Individual reports available at:"
+    subprojects.each { proj ->
+      def reportFile = file("${proj.buildDir}/reports/jacoco/test/html/index.html")
+      if (reportFile.exists()) {
+        println "  ${proj.name}: ${reportFile}"
+      }
+    }
+    println "\nRun './gradlew test' to generate coverage reports."
+    println "Open the HTML reports in a browser for detailed coverage information."
   }
 }
 
