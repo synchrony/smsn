@@ -1,11 +1,11 @@
 package net.fortytwo.smsn.monitron.events;
 
-import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.Data;
 import net.fortytwo.smsn.monitron.ontologies.OMOntology;
 import net.fortytwo.smsn.monitron.ontologies.OWLTime;
 import net.fortytwo.smsn.monitron.ontologies.Universe;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -38,34 +38,32 @@ public abstract class Observation extends MonitronEvent {
     }
 
     @Override
-    public Dataset toRDF() {
-        Dataset dataset = super.toRDF();
-
+    public RDFDataset toRDF() {
         // TODO: use appropriate class for result type in Observation subclasses
         // (om:SimpleMeasure is only for xsd:double values)
-        addStatement(dataset, result, RDF.TYPE, OMOntology.SIMPLE_MEASURE);
-        addStatement(dataset, event, OMOntology.RESULT, result);
+        addStatement(result, RDF.TYPE, OMOntology.SIMPLE_MEASURE);
+        addStatement(event, OMOntology.RESULT, result);
         // add details of result in subclasses
 
         // TODO: don't hard-code location
-        addStatement(dataset, event, OMOntology.FEATURE_OF_INTEREST, Universe.ROOM_1);
+        addStatement(event, OMOntology.FEATURE_OF_INTEREST, Universe.ROOM_1);
 
-        addStatement(dataset, event, OMOntology.PROCEDURE, sensor);
+        addStatement(event, OMOntology.PROCEDURE, sensor);
 
         Resource samplingTime = valueFactory.createBNode();
-        addStatement(dataset, samplingTime, RDF.TYPE, OWLTime.INTERVAL);
-        addStatement(dataset, event, OMOntology.PHENOMENON_TIME, samplingTime);
+        addStatement(samplingTime, RDF.TYPE, OWLTime.INTERVAL);
+        addStatement(event, OMOntology.PHENOMENON_TIME, samplingTime);
         Resource beginning = valueFactory.createBNode();
-        addStatement(dataset, beginning, RDF.TYPE, OWLTime.INSTANT);
+        addStatement(beginning, RDF.TYPE, OWLTime.INSTANT);
         Resource end = valueFactory.createBNode();
-        addStatement(dataset, end, RDF.TYPE, OWLTime.INSTANT);
-        addStatement(dataset, beginning, OWLTime.IN_XSD_DATE_TIME,
+        addStatement(end, RDF.TYPE, OWLTime.INSTANT);
+        addStatement(beginning, OWLTime.IN_XSD_DATE_TIME,
                 toLiteral(new Date(data.getSampleIntervalBeginning())));
-        addStatement(dataset, end, OWLTime.IN_XSD_DATE_TIME,
+        addStatement(end, OWLTime.IN_XSD_DATE_TIME,
                 toLiteral(new Date(data.getSampleIntervalEnd())));
-        addStatement(dataset, samplingTime, OWLTime.HAS_BEGINNING, beginning);
-        addStatement(dataset, samplingTime, OWLTime.HAS_END, end);
+        addStatement(samplingTime, OWLTime.HAS_BEGINNING, beginning);
+        addStatement(samplingTime, OWLTime.HAS_END, end);
 
-        return dataset;
+        return super.toRDF();
     }
 }

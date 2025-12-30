@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.monitron.events;
 
-import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.BooleanData;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
@@ -18,16 +18,16 @@ public class MotionObservation extends Observation {
     }
 
     @Override
-    public Dataset toRDF() {
-        Dataset dataset = super.toRDF();
+    public RDFDataset toRDF() {
+        
 
-        addStatement(dataset, event, RDF.TYPE, MonitronOntology.MOTION_OBSERVATION);
-        addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.IS_MOTION);
+        addStatement(event, RDF.TYPE, MonitronOntology.MOTION_OBSERVATION);
+        addStatement(event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.IS_MOTION);
 
         Literal value = valueFactory.createLiteral(((BooleanData) data).getResult());
-        addStatement(dataset, result, OMOntology.AMOUNT, value);
+        addStatement(result, OMOntology.AMOUNT, value);
         // no units; the result is a true/false value
 
-        return dataset;
+        return super.toRDF();
     }
 }

@@ -19,21 +19,12 @@ dependencies {
   implementation 'org.json:json:20180130'
   implementation 'commons-io:commons-io:2.11.0'
 
-  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
-    exclude(module: 'jackson-core')
-    exclude(module: 'xmpp-mtp')
-    exclude(module: 'sesame-repository-sparql')
-    exclude(module: 'commons-codec')
-    exclude(module: 'jackson-core')
-  }
-
   implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4'
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-api', version: rdf4jVersion
   implementation 'com.illposed.osc:javaosc-core:0.3'
   implementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-sail-memory', version: rdf4jVersion)
   implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
   implementation group: 'net.fortytwo', name: 'linked-data-sail', version: rippleVersion
-  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
 
   testImplementation "junit:junit:$junitVersion"
   testImplementation project(path: ':brain', configuration: 'testOutput')

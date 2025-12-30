@@ -1,21 +1,28 @@
 package net.fortytwo.smsn.monitron.events;
 
-import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.ontologies.Universe;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
+/**
+ * Base class for monitron sensor events.
+ *
+ * NOTE: Changed from rdfagents Dataset to RDFDataset in Dec 2024 during RDF4J migration.
+ */
 public abstract class MonitronEvent {
     private static final DatatypeFactory DATATYPE_FACTORY;
 
@@ -28,13 +35,14 @@ public abstract class MonitronEvent {
     }
 
     protected final ValueFactory valueFactory;
+    protected final Collection<Statement> statements = new LinkedList<>();
 
     public MonitronEvent(final Context context) {
         this.valueFactory = context.getValueFactory();
     }
 
-    public Dataset toRDF() {
-        return new Dataset(new LinkedList<>());
+    public RDFDataset toRDF() {
+        return new RDFDataset(statements);
     }
 
     protected IRI coinEventIRI() {
@@ -47,11 +55,9 @@ public abstract class MonitronEvent {
         return valueFactory.createLiteral(DATATYPE_FACTORY.newXMLGregorianCalendar(c));
     }
 
-    protected void addStatement(final Dataset d,
-                                final Resource subject,
+    protected void addStatement(final Resource subject,
                                 final IRI predicate,
                                 final Value object) {
-        d.getStatements().add(valueFactory.createStatement(subject, predicate, object));
+        statements.add(valueFactory.createStatement(subject, predicate, object));
     }
-
 }

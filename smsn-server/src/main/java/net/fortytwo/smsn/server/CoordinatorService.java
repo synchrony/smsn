@@ -1,17 +1,10 @@
 package net.fortytwo.smsn.server;
 
-import net.fortytwo.linkeddata.LinkedDataCache;
-import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.p2p.ConnectionHost;
 import net.fortytwo.smsn.p2p.PingAnswerer;
 import net.fortytwo.smsn.p2p.ServiceBroadcaster;
 import net.fortytwo.smsn.p2p.ServiceDescription;
-import net.fortytwo.smsn.p2p.sparql.QueryEngineWrapper;
-import net.fortytwo.smsn.gesture.GesturalServer;
-import net.fortytwo.stream.StreamProcessor;
-import net.fortytwo.stream.sparql.SparqlStreamProcessor;
-import net.fortytwo.stream.sparql.impl.shj.SHJSparqlStreamProcessor;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
@@ -20,22 +13,32 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.rio.helpers.BasicParserSettings;
-import org.eclipse.rdf4j.sail.SailException;
-import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+/**
+ * Coordinator service for P2P SmSn communication.
+ *
+ * NOTE: SPARQL streaming and gestural server functionality was removed in Dec 2024
+ * during RDF4J migration. The following features are no longer available:
+ * - Continuous SPARQL query processing (stream42-sparql)
+ * - Linked data caching with streaming
+ * - Gestural event processing integration
+ *
+ * To restore these features, consider:
+ * - Apache Kafka Streams for event processing
+ * - RDF4J's native capabilities
+ * - gRPC or WebSockets for real-time communication
+ */
 public class CoordinatorService {
     private static final Logger logger = Logger.getLogger(CoordinatorService.class.getName());
 
     private static final int
-            LINKED_DATA_TTL = StreamProcessor.INFINITE_TTL,
-            PUSHED_DATA_TTL = StreamProcessor.INFINITE_TTL;
+            LINKED_DATA_TTL = 0,  // Was StreamProcessor.INFINITE_TTL
+            PUSHED_DATA_TTL = 0;  // Was StreamProcessor.INFINITE_TTL
 
     private static CoordinatorService INSTANCE;
 
@@ -44,10 +47,7 @@ public class CoordinatorService {
     // TODO
     private static final String BROADCAST_ENDPOINT = "/graphs/joshkb/smsn/";
 
-    private final SparqlStreamProcessor streamProcessor;
-
     public static CoordinatorService getInstance() {
-
         if (null == INSTANCE) {
             try {
                 INSTANCE = new CoordinatorService();
@@ -55,56 +55,43 @@ public class CoordinatorService {
                 throw new IllegalStateException(e);
             }
         }
-
         return INSTANCE;
     }
 
-    private CoordinatorService()
-            throws IOException, SailException {
-
+    private CoordinatorService() throws IOException {
         int oscPort = SemanticSynchrony.getConfiguration().getServices().getOsc().getPort();
         int pubsubPort = SemanticSynchrony.getConfiguration().getServices().getPubSub().getPort();
 
-        streamProcessor = new SHJSparqlStreamProcessor();
-        QueryEngineWrapper wrapper = new QueryEngineWrapper(streamProcessor);
+        // NOTE: SPARQL stream processor removed. Was: new SHJSparqlStreamProcessor()
+        // NOTE: LinkedDataCache integration removed.
+        // NOTE: GesturalServer integration removed.
 
-        if (SemanticSynchrony.getConfiguration().isVerbose()) {
-            streamProcessor.setDoPerformanceMetrics(true);
-            streamProcessor.setDoUseCompactLogFormat(false);
-        }
+        logger.warning("CoordinatorService initialized without streaming support. "
+                + "SPARQL streaming was removed in Dec 2024 during RDF4J migration.");
 
-        // TODO: make the base Sail configurable (e.g. disable it, or make it a persistent NativeStore)
-        MemoryStore sail = new MemoryStore();
-        sail.initialize();
-        LinkedDataCache.DataStore store = sc -> statement -> streamProcessor.addInputs(LINKED_DATA_TTL, statement);
-        LinkedDataCache cache = LinkedDataCache.createDefault(sail);
-        cache.setDataStore(store);
-        streamProcessor.setLinkedDataCache(cache);
-
-        Consumer<Dataset> h = dataset -> {
-            System.out.println("received " + dataset.getStatements().size() + " statements from gestural server");
-            streamProcessor.addInputs(SemanticSynchrony.GESTURE_TTL, toArray(dataset));
-        };
-
-        // gestural event processing via OSC
-        GesturalServer gesturalServer = new GesturalServer(oscPort, h);
-        gesturalServer.start();
-
-        // SPARQL pub/sub via SmSn Services
+        // SPARQL pub/sub via SmSn Services (connection infrastructure still works)
         ConnectionHost ch = new ConnectionHost(pubsubPort);
-        ch.addNotifier(wrapper.getNotifier());
         ch.addNotifier(PingAnswerer::new);
         ch.start();
 
-        // begin advertising the service now that the query engine is available
+        // begin advertising the service
         ServiceDescription d = new ServiceDescription(SemanticSynchrony.getConfiguration().getVersion(),
                 BROADCAST_ENDPOINT,
                 oscPort,
                 pubsubPort);
-        // TODO: stop the broadcaster when this object is destroyed
         new ServiceBroadcaster(d).start();
     }
 
+    /**
+     * Push RDF update data.
+     *
+     * NOTE: This method parses the RDF but does not process it through a stream processor
+     * since SPARQL streaming was removed.
+     *
+     * @param rdfData the RDF data as a string
+     * @param format  the RDF format
+     * @throws IOException if parsing fails
+     */
     public void pushUpdate(final String rdfData,
                            final RDFFormat format) throws IOException {
         long count;
@@ -116,11 +103,10 @@ public class CoordinatorService {
         }
 
         if (SemanticSynchrony.getConfiguration().isVerbose()) {
-            logger.info("received a dataset with " + count + " statements");
+            logger.info("received a dataset with " + count + " statements (not processed - streaming removed)");
         }
     }
 
-    // synchronized because the query engine is not thread-safe
     private long parseRdfContent(final InputStream content,
                                  final RDFFormat format) throws RDFParseException, IOException, RDFHandlerException {
 
@@ -133,12 +119,6 @@ public class CoordinatorService {
         parser.setRDFHandler(parsedRDFHandler);
         parser.parse(content, BASE_IRI);
         return parsedRDFHandler.getCount();
-    }
-
-    private Statement[] toArray(Dataset d) {
-        Collection<Statement> c = d.getStatements();
-        Statement[] a = new Statement[c.size()];
-        return c.toArray(a);
     }
 
     private class ParsedRDFHandler implements RDFHandler {
@@ -157,8 +137,8 @@ public class CoordinatorService {
 
         public void handleStatement(Statement statement) throws RDFHandlerException {
             count++;
-
-            streamProcessor.addInputs(PUSHED_DATA_TTL, statement);
+            // NOTE: Was: streamProcessor.addInputs(PUSHED_DATA_TTL, statement);
+            // Streaming removed - statement is counted but not processed
         }
 
         public void handleComment(String s) throws RDFHandlerException {
@@ -173,4 +153,3 @@ public class CoordinatorService {
         }
     }
 }
-

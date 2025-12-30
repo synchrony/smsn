@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.monitron.events;
 
-import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
@@ -18,16 +18,16 @@ public class AtmosphericPressureObservation extends Observation {
     }
 
     @Override
-    public Dataset toRDF() {
-        Dataset dataset = super.toRDF();
+    public RDFDataset toRDF() {
+        
 
-        addStatement(dataset, event, RDF.TYPE, MonitronOntology.ATMOSPHERIC_PRESSURE_OBSERVATION);
-        addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.ATMOSPHERIC_PRESSURE);
+        addStatement(event, RDF.TYPE, MonitronOntology.ATMOSPHERIC_PRESSURE_OBSERVATION);
+        addStatement(event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.ATMOSPHERIC_PRESSURE);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
-        addStatement(dataset, result, OMOntology.AMOUNT, value);
-        addStatement(dataset, result, OMOntology.UOM, MonitronOntology.PASCALS);
+        addStatement(result, OMOntology.AMOUNT, value);
+        addStatement(result, OMOntology.UOM, MonitronOntology.PASCALS);
 
-        return dataset;
+        return super.toRDF();
     }
 }

@@ -3,10 +3,8 @@ package net.fortytwo.smsn.p2p;
 import com.google.common.base.Preconditions;
 import com.illposed.osc.OSCMessage;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.p2p.sparql.ProxySparqlStreamProcessor;
 import net.fortytwo.smsn.rdf.RDF4JUtil;
 import net.fortytwo.smsn.rdf.RDFDataset;
-import net.fortytwo.stream.sparql.RDFStreamProcessor;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -20,6 +18,16 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * P2P agent for SmSn communication.
+ *
+ * NOTE: SPARQL streaming functionality was removed in Dec 2024 during RDF4J migration.
+ * The stream42-sparql library used deprecated OpenRDF Sesame APIs.
+ * To restore streaming, consider:
+ * - Apache Kafka Streams for event processing
+ * - gRPC or WebSockets for real-time communication
+ * - RDF4J's native streaming capabilities
+ */
 public class SmSnAgent {
     private static final Logger logger = Logger.getLogger(SmSnAgent.class.getName());
 
@@ -31,8 +39,6 @@ public class SmSnAgent {
     private final ValueFactory valueFactory = RDF4JUtil.getValueFactory();
 
     private ServiceBroadcastListener listener;
-
-    private final ProxySparqlStreamProcessor streamProcessor;
 
     private Service coordinatorService;
     private final Connection coordinatorConnection;
@@ -57,8 +63,6 @@ public class SmSnAgent {
         coordinatorConnection = new Connection();
 
         pinger = new Pinger(coordinatorConnection);
-
-        streamProcessor = new ProxySparqlStreamProcessor(coordinatorConnection);
 
         if (listenForServices) {
             listener = new ServiceBroadcastListener((address, description) -> {
@@ -85,13 +89,6 @@ public class SmSnAgent {
                         return;
                     }
 
-                    try {
-                        streamProcessor.notifyConnectionOpen();
-                    } catch (IOException e) {
-                        logger.log(Level.WARNING, "error on query engine notification", e);
-                        return;
-                    }
-
                     coordinatorConnection.start(socket);
                 } else {
                     if (SemanticSynchrony.getConfiguration().isVerbose()) {
@@ -110,10 +107,6 @@ public class SmSnAgent {
 
     public Pinger getPinger() {
         return pinger;
-    }
-
-    public RDFStreamProcessor getStreamProcessor() {
-        return streamProcessor;
     }
 
     public ValueFactory getValueFactory() {
@@ -159,57 +152,18 @@ public class SmSnAgent {
     }
 
     /**
-     * Sends an RDF Dataset to the continuous query engine
+     * Sends an RDF Dataset to the continuous query engine.
+     *
+     * NOTE: This method is currently a no-op. SPARQL streaming was removed in Dec 2024.
+     * To restore this functionality, implement a new streaming backend.
      *
      * @param d   the RDF Dataset to send
      * @param ttl the time-to-live of the data, in milliseconds. Use ttl=0 for an infinite lifetime
      */
     public void sendDataset(final RDFDataset d, final int ttl) {
-        getStreamProcessor().addInputs(ttl, toArray(d));
-
-        /*
-        // TODO: temporary
-        OutputStream os = new FileOutputStream("/tmp/smsn.nt");
-        RDFWriter w = new NTriplesWriter(os);
-        try {
-            w.startRDF();
-            for (Statement s : d.getStatements()) {
-                w.handleStatement(s);
-            }
-            w.endRDF();
-        } catch (RDFHandlerException e) {
-            throw new IOException(e);
-        }
-        os.close();
-        */
-
-        /*
-        if (relayAsOsc) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            // note: direct instantiation of a format-specific writer (as opposed to classloading via Rio)
-            // makes things simpler w.r.t. Proguard's shrinking phase
-            RDFWriter w = new NTriplesWriter(bos);
-            //RDFWriter w = Rio.createWriter(RDFFormat.NTRIPLES, bos);
-            try {
-                w.startRDF();
-                for (Statement s : d.getStatements()) {
-                    w.handleStatement(s);
-                }
-                w.endRDF();
-            } catch (RDFHandlerException e) {
-                throw new IOException(e);
-            }
-            OSCMessage m = new OSCMessage("/exo/fctr/tt/rdf");
-            m.addArgument(new String(bos.toByteArray()));
-            sendOSCMessageToCoordinator(m);
-        }
-        */
-    }
-
-    private Statement[] toArray(RDFDataset d) {
-        Collection<Statement> c = d.getStatements();
-        Statement[] a = new Statement[c.size()];
-        return c.toArray(a);
+        // STUB: Streaming functionality removed. See class javadoc for restoration notes.
+        logger.log(Level.FINE, "sendDataset called but streaming is not implemented. "
+                + "Dataset has " + d.size() + " statements, ttl=" + ttl);
     }
 
     public class Service {

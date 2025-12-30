@@ -6,17 +6,19 @@ dependencies {
   implementation project(':smsn-rdf')
   implementation project(':brain')
   implementation group: 'net.fortytwo.ripple', name: 'ripple-core', version: rippleVersion
+  implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-model', version: rdf4jVersion
+  // Note: OpenRDF Sesame dependencies are needed for Ripple integration
+  // Ripple (net.fortytwo.ripple) still uses the Sesame API (org.openrdf.*)
+  implementation group: 'org.openrdf.sesame', name: 'sesame-sail-memory', version: '2.9.0'
+  implementation group: 'org.openrdf.sesame', name: 'sesame-model', version: '2.9.0'
 
   implementation 'com.illposed.osc:javaosc-core:0.3'
 
-  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
-    exclude(module: 'jackson-core')
-    exclude(module: 'xmpp-mtp')
-    exclude(module: 'sesame-repository-sparql')
-    exclude(module: 'commons-codec')
-    exclude(module: 'jackson-core')
-  }
-  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
-
   testImplementation "junit:junit:$junitVersion"
 }
+
+// NOTE: The following dependencies were removed during RDF4J migration (Dec 2024):
+// - net.fortytwo.rdfagents:rdfagents-core - Used for Dataset model
+// - net.fortytwo.stream:stream42-sparql - Used for streaming data from wearable
+// The typeatron module controlled the Typeatron wearable keyboard device.
+// To restore streaming functionality, consider modern alternatives.

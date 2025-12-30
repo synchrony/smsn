@@ -2,7 +2,6 @@ package net.fortytwo.smsn.typeatron;
 
 import com.illposed.osc.OSCMessage;
 import org.eclipse.rdf4j.common.io.IOUtil;
-import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.ripple.RippleException;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.SmSnDeviceControl;
@@ -11,29 +10,30 @@ import net.fortytwo.smsn.p2p.SideEffects;
 import net.fortytwo.smsn.p2p.SmSnAgent;
 import net.fortytwo.smsn.p2p.osc.OscReceiver;
 import net.fortytwo.smsn.rdf.Activities;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import net.fortytwo.smsn.typeatron.ripple.RippleSession;
 import net.fortytwo.smsn.typeatron.ripple.SmSnRippleRepl;
 import net.fortytwo.smsn.typeatron.ripple.lib.music.TypeatronMusicControl;
-import net.fortytwo.stream.StreamProcessor;
 import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Value;
-import org.eclipse.rdf4j.query.BindingSet;
 
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * A controller for the Typeatron chorded keyer
+ *
+ * NOTE: SPARQL streaming query subscriptions were removed in Dec 2024 during RDF4J migration.
+ * The stream42-sparql library used deprecated OpenRDF Sesame APIs.
+ * Attentional feedback via continuous SPARQL queries is no longer available.
  */
 public class TypeatronControl extends SmSnDeviceControl {
     private static final Logger logger = Logger.getLogger(TypeatronControl.class.getName());
-    
+
     // fully specified, since PATH may or may not include /usr/bin
     private static final String EMACSCLIENT_BIN = "/usr/bin/emacsclient";
 
@@ -72,38 +72,12 @@ public class TypeatronControl extends SmSnDeviceControl {
             throw new DeviceInitializationException(e);
         }
 
-        try {
-            agent.getStreamProcessor().addQuery(QUERY_TTL, Activities.QUERY_FOR_ATTENTION,
-                    new BiConsumer<BindingSet, Long>() {
-                @Override
-                public void accept(BindingSet b, Long expirationTime) {
-                    Value actor = b.getValue("actor");
-                    Value focus = b.getValue("focus");
-
-                    if (keyer.getMode().equals(ChordedKeyer.Mode.Laser)) {
-                        if (null == thingPointedTo) {
-                            throw new IllegalStateException();
-                        }
-
-                        if (thingPointedTo.equals(focus)) {
-                            sendLaserFeedbackMessage();
-                        } else {
-                            // TODO: temporary
-                            logger.warning("got attentional feedback on item not pointed to" +
-                                    " (OK IRL, but not expected in a demo)");
-                        }
-                    } else {
-                        // TODO: temporary
-                        logger.warning("got attentional feedback outside of Laser mode" +
-                                " (OK IRL, but not expected in a demo)");
-                    }
-
-                    logger.info("notified of attention by " + actor + " to " + focus);
-                }
-            });
-        } catch (IOException | StreamProcessor.IncompatibleQueryException | StreamProcessor.InvalidQueryException e) {
-            throw new DeviceInitializationException("failed to create Typeatron's query subscription", e);
-        }
+        // NOTE: SPARQL streaming query subscription removed (Dec 2024).
+        // The original code registered a continuous query for attention events:
+        //   agent.getStreamProcessor().addQuery(QUERY_TTL, Activities.QUERY_FOR_ATTENTION, handler)
+        // This provided real-time feedback when another user focused attention on the pointed item.
+        // To restore this functionality, implement a new event subscription mechanism.
+        logger.info("TypeatronControl initialized without streaming query support");
 
         try {
             rippleSession = new RippleSession();
@@ -409,7 +383,7 @@ public class TypeatronControl extends SmSnDeviceControl {
 
         Date recognizedAt = new Date(recognitionTime);
 
-        Dataset d = Activities.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentIri(), thingPointedTo);
+        RDFDataset d = Activities.datasetForPointingGesture(recognizedAt.getTime(), agent.getAgentIri(), thingPointedTo);
         try {
             agent.sendDataset(d, SemanticSynchrony.GESTURE_TTL);
         } catch (Exception e) {

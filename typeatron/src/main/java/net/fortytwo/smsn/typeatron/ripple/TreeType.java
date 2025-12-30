@@ -9,13 +9,13 @@ import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.query.TreeViews;
-import org.eclipse.rdf4j.model.Value;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 public class TreeType extends SimpleType<TreeNode<Link>> {
 
-    private static final ValueFactory valueFactory = SimpleValueFactory.getInstance();
+    private static final ValueFactory valueFactory = ValueFactoryImpl.getInstance();
 
     public TreeType() {
         super(TreeNode.class);

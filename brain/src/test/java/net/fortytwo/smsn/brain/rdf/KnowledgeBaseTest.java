@@ -421,7 +421,7 @@ public class KnowledgeBaseTest extends BrainTestBase {
 
         Sail inferred = new MemoryStore();
         Repository repo = new SailRepository(inferred);
-        repo.initialize();
+        repo.init();
         RDFHandler handler;
         RDFizationContext context;
         try (RepositoryConnection rc = repo.getConnection()) {

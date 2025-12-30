@@ -18,7 +18,10 @@ dependencies {
   implementation group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
   implementation group: 'org.neo4j', name: 'neo4j-tinkerpop-api-impl', version: neo4jTinkerpopApiVersion
-  implementation group: 'org.apache.lucene', name: 'lucene-analyzers', version: luceneVersion
+  // Note: lucene-analyzers-common version must match what Neo4j expects (5.5.5)
+  // Neo4j 3.4.x requires Lucene 5.x; RDF4J 4.x wants Lucene 8.x
+  // We exclude Lucene from RDF4J to avoid the conflict
+  implementation group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '5.5.5'
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-api', version: rdf4jVersion
   implementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-sail-memory', version: rdf4jVersion) {
     exclude(module: 'commons-codec')
@@ -30,7 +33,10 @@ dependencies {
   }
   testImplementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-ntriples', version: rdf4jVersion
   testImplementation group: 'org.eclipse.rdf4j', name: 'rdf4j-repository-sail', version: rdf4jVersion
-  testImplementation group: 'org.eclipse.rdf4j', name: 'rdf4j-queryalgebra-evaluation', version: rdf4jVersion
+  testImplementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-queryalgebra-evaluation', version: rdf4jVersion) {
+    // Exclude Lucene modules to avoid conflict with Neo4j's Lucene 5.x
+    exclude(group: 'org.apache.lucene')
+  }
   testImplementation "junit:junit:$junitVersion"
 
   testOutput sourceSets.test.output

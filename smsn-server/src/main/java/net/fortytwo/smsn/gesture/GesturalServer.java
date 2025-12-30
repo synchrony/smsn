@@ -4,10 +4,10 @@ import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
-import net.fortytwo.rdfagents.model.Dataset;
 import net.fortytwo.smsn.p2p.osc.OscSender;
 import net.fortytwo.smsn.p2p.osc.udp.UdpOscSender;
 import net.fortytwo.smsn.rdf.Activities;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import net.fortytwo.smsn.rdf.vocab.SmSnActivityOntology;
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.rdf4j.model.IRI;
@@ -22,6 +22,15 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Gestural server for recognizing handshakes, high-fives, and hand-off interactions.
+ *
+ * This server receives OSC (Open Sound Control) messages from wearable devices
+ * and matches gesture events from multiple participants to recognize interactions.
+ *
+ * NOTE: The Dataset output was changed from rdfagents Dataset to RDFDataset in Dec 2024
+ * during RDF4J migration. The rdfagents library used deprecated OpenRDF Sesame APIs.
+ */
 public class GesturalServer {
     private static final Logger logger = Logger.getLogger(GesturalServer.class.getName());
 
@@ -39,12 +48,12 @@ public class GesturalServer {
 
     private final OscSender notificationSender;
 
-    public GesturalServer(final Consumer<Dataset> datasetHandler) {
+    public GesturalServer(final Consumer<RDFDataset> datasetHandler) {
         this(DEFAULT_PORT, datasetHandler);
     }
 
     public GesturalServer(final int port,
-                          final Consumer<Dataset> datasetHandler) {
+                          final Consumer<RDFDataset> datasetHandler) {
         this.port = port;
 
         // TODO: host and port are temporary; they should be configurable
@@ -57,7 +66,7 @@ public class GesturalServer {
         HandshakeMatcher.HandshakeHandler handshakeHandler = (left, right, timestamp) -> {
             notifyOfInteraction(SmSnActivityOntology.EXO_ACTIVITY_HANDSHAKE);
 
-            Dataset d = Activities.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
+            RDFDataset d = Activities.datasetForHandshakeInteraction(timestamp, left.actor, right.actor);
             datasetHandler.accept(d);
 
             speakWithSystemCall(left.actor.getLocalName() + " shook hands with " + right.actor.getLocalName());
@@ -68,7 +77,7 @@ public class GesturalServer {
         HandoffMatcher.HandoffHandler handoffHandler = (give, take, thingGiven, timestamp) -> {
             notifyOfInteraction(SmSnActivityOntology.EXO_ACTIVITY_HANDOFF);
 
-            Dataset d = Activities.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
+            RDFDataset d = Activities.datasetForHandoffInteraction(timestamp, give.actor, take.actor, thingGiven);
             datasetHandler.accept(d);
 
             speakWithSystemCall(give.actor.getLocalName() + " gave \"" + thingGiven.getLocalName()
@@ -100,10 +109,6 @@ public class GesturalServer {
             logger.warning("expected " + expected + " arguments to " + address + "; got " + args.size()
                     + ". Ignoring event.");
 
-            // TODO: temporary.  Beware of an apparent JavaOSC bug when sending certain combinations of arguments.
-            //for (Object arg : args) {
-            //    System.err.println("\targ: " + arg);
-            //}
             return true;
         } else {
             return false;
@@ -179,7 +184,6 @@ public class GesturalServer {
 
             IRI actor = valueFactory.createIRI((String) args.get(0));
             IRI thingGiven = valueFactory.createIRI((String) args.get(1));
-            //String value = (String) args.get(2);
 
             System.out.println(actor + " gave " + thingGiven);
 
@@ -237,7 +241,7 @@ public class GesturalServer {
     }
 
     public static void main(final String[] args) throws Exception {
-        Consumer<Dataset> h = dataset -> {
+        Consumer<RDFDataset> h = dataset -> {
             // discard dataset
         };
 

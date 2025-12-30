@@ -1,11 +1,4 @@
 dependencies {
-  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
-    exclude(module: 'jackson-core')
-    exclude(module: 'xmpp-mtp')
-    exclude(module: 'sesame-repository-sparql')
-    exclude(module: 'commons-codec')
-    exclude(module: 'jackson-core')
-  }
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-model', version: rdf4jVersion
 
   testImplementation group: 'org.eclipse.rdf4j', name: 'rdf4j-queryparser-sparql', version: rdf4jVersion
@@ -14,3 +7,6 @@ dependencies {
   }
   testImplementation "junit:junit:$junitVersion"
 }
+
+// NOTE: rdfagents-core dependency removed during RDF4J migration (Dec 2024).
+// It used deprecated OpenRDF Sesame API. RDF4JUtil now provides IRI creation.

@@ -1,6 +1,6 @@
 package net.fortytwo.smsn.monitron.events;
 
-import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
@@ -27,17 +27,17 @@ public class ColorLightLevelObservation extends Observation {
     }
 
     @Override
-    public Dataset toRDF() {
-        Dataset dataset = super.toRDF();
+    public RDFDataset toRDF() {
+        
 
-        addStatement(dataset, event, RDF.TYPE, MonitronOntology.COLOR_LIGHT_LEVEL_OBSERVATION);
+        addStatement(event, RDF.TYPE, MonitronOntology.COLOR_LIGHT_LEVEL_OBSERVATION);
 
-        addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, colorProperty);
+        addStatement(event, OMOntology.OBSERVED_PROPERTY, colorProperty);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
-        addStatement(dataset, result, OMOntology.AMOUNT, value);
+        addStatement(result, OMOntology.AMOUNT, value);
         // TODO: add units
 
-        return dataset;
+        return super.toRDF();
     }
 }

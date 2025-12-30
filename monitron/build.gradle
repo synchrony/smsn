@@ -1,16 +1,19 @@
 dependencies {
   implementation project(':smsn-core')
   implementation project(':smsn-models')
-  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
-    exclude(module: 'jackson-core')
-    exclude(module: 'xmpp-mtp')
-    exclude(module: 'sesame-repository-sparql')
-    exclude(module: 'commons-codec')
-    exclude(module: 'jackson-core')
-  }
-  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
+  implementation project(':smsn-rdf')
+  implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-model', version: rdf4jVersion
+  implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-nquads', version: rdf4jVersion
   implementation group: 'com.illposed.osc', name: 'javaosc-core', version: '0.3'
   implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
 
   testImplementation "junit:junit:$junitVersion"
 }
+
+// NOTE: The following dependencies were removed during RDF4J migration (Dec 2024):
+// - net.fortytwo.rdfagents:rdfagents-core - Used for Dataset model
+// - net.fortytwo.stream:stream42-sparql - Used for continuous SPARQL queries
+// The monitron module provided IoT sensor monitoring with RDF streaming.
+// To restore this functionality, consider modern alternatives like:
+// - Apache Kafka Streams for event processing
+// - RDF4J's native capabilities for RDF handling

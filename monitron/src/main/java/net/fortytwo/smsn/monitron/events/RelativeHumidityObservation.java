@@ -4,7 +4,7 @@ import net.fortytwo.smsn.monitron.Context;
 import net.fortytwo.smsn.monitron.data.GaussianData;
 import net.fortytwo.smsn.monitron.ontologies.MonitronOntology;
 import net.fortytwo.smsn.monitron.ontologies.OMOntology;
-import net.fortytwo.rdfagents.model.Dataset;
+import net.fortytwo.smsn.rdf.RDFDataset;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -20,16 +20,16 @@ public class RelativeHumidityObservation extends Observation {
     }
 
     @Override
-    public Dataset toRDF() {
-        Dataset dataset = super.toRDF();
+    public RDFDataset toRDF() {
+        
 
-        addStatement(dataset, event, RDF.TYPE, MonitronOntology.RELATIVE_HUMIDITY_OBSERVATION);
-        addStatement(dataset, event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.RELATIVE_HUMIDITY);
+        addStatement(event, RDF.TYPE, MonitronOntology.RELATIVE_HUMIDITY_OBSERVATION);
+        addStatement(event, OMOntology.OBSERVED_PROPERTY, MonitronOntology.RELATIVE_HUMIDITY);
 
         Literal value = valueFactory.createLiteral(((GaussianData) data).getMean());
-        addStatement(dataset, result, OMOntology.AMOUNT, value);
+        addStatement(result, OMOntology.AMOUNT, value);
         // no units (relative humidity is dimensionless)
 
-        return dataset;
+        return super.toRDF();
     }
 }

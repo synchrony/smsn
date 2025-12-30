@@ -609,7 +609,7 @@ public class KnowledgeBase {
         SemanticSynchrony.getLogger().info("exporting RDF in format " + format);
         long startTime, endTime;
         Sail dedupSail = new MemoryStore();
-        dedupSail.initialize();
+        dedupSail.init();
         try {
             SailConnection sc = dedupSail.getConnection();
             try {

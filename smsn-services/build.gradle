@@ -1,19 +1,21 @@
 dependencies {
   implementation project(':smsn-core')
   implementation project(':smsn-rdf')
+  implementation 'com.google.guava:guava:32.1.2-jre'
   implementation 'org.json:json:20180130'
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-api', version: rdf4jVersion
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-query', version: rdf4jVersion
-  implementation group: 'net.fortytwo.stream', name: 'stream42-sparql', version: stream42Version
-  implementation(group: 'net.fortytwo.rdfagents', name: 'rdfagents-core', version: rdfagentsVersion) {
-    exclude(module: 'jackson-core')
-    exclude(module: 'xmpp-mtp')
-    exclude(module: 'sesame-repository-sparql')
-    exclude(module: 'commons-codec')
-    exclude(module: 'jackson-core')
-  }
   implementation 'com.illposed.osc:javaosc-core:0.3'
   implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4'
 
   testImplementation "junit:junit:$junitVersion"
 }
+
+// NOTE: The following dependencies were removed during RDF4J migration (Dec 2024):
+// - net.fortytwo.stream:stream42-sparql - SPARQL streaming processor (last updated 2016)
+// - net.fortytwo.rdfagents:rdfagents-core - RDF agent communication (last updated 2016)
+// These libraries use the deprecated OpenRDF Sesame API and were not updated for RDF4J.
+// If P2P/streaming functionality is needed in the future, consider:
+// - RDF4J's native streaming capabilities
+// - Apache Kafka or similar for event streaming
+// - gRPC or WebSockets for real-time communication
