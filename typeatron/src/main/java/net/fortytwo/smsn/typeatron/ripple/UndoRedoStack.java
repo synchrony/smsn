@@ -49,7 +49,7 @@ public class UndoRedoStack<T> {
             throw new IllegalStateException();
         }
 
-        T t = undoStack.pop();
+        T t = redoStack.pop();
         undoStack.push(t);
         return t;
     }

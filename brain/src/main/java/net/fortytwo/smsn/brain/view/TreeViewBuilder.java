@@ -56,7 +56,7 @@ public class TreeViewBuilder {
      *
      * @param atoms list of atoms to include
      * @param filter filter for atoms
-     * @return TreeNode representing the flat list
+     * @return TreeNode representing the flat list (empty list if no atoms)
      */
     public TreeNode buildListView(List<Atom> atoms, Filter filter) {
         List<TreeNode> childNodes = new ArrayList<>();
@@ -68,16 +68,9 @@ public class TreeViewBuilder {
             }
         }
 
-        // Create a virtual root for the list
+        // Handle empty list gracefully
         if (atoms.isEmpty()) {
-            Atom firstAtom = repository.getAllAtomIds().stream()
-                    .findFirst()
-                    .map(repository::load)
-                    .orElse(null);
-            if (firstAtom == null) {
-                throw new IllegalStateException("No atoms in repository");
-            }
-            return atomToTreeNode(firstAtom, new ArrayList<>());
+            return createEmptyListView("List View (empty)");
         }
 
         Atom firstAtom = atoms.get(0);
@@ -93,6 +86,26 @@ public class TreeViewBuilder {
                 firstAtom.shortcut,
                 childNodes,
                 childNodes.size(),
+                0
+        );
+    }
+
+    /**
+     * Create an empty list view with default properties.
+     */
+    private TreeNode createEmptyListView(String title) {
+        return new TreeNode(
+                new AtomId("list-view"),
+                new net.fortytwo.smsn.brain.Timestamp(System.currentTimeMillis()),
+                new net.fortytwo.smsn.brain.Normed(SemanticSynchrony.DEFAULT_WEIGHT),
+                hydra.util.Opt.empty(),
+                new net.fortytwo.smsn.brain.SourceName("public"),
+                title,
+                hydra.util.Opt.empty(),
+                hydra.util.Opt.empty(),
+                hydra.util.Opt.empty(),
+                new ArrayList<>(),
+                0,
                 0
         );
     }

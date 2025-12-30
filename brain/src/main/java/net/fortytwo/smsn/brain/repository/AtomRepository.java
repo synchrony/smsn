@@ -62,7 +62,8 @@ public class AtomRepository {
     public void save(Atom atom) {
         Vertex v = wrapper.getVertexById(atom.id);
         if (v == null) {
-            v = wrapper.getGraph().addVertex();
+            // Use wrapper.createVertex to ensure proper label and ID indexing
+            v = wrapper.createVertex(atom.id, SemanticSynchrony.VertexLabels.NOTE);
         }
         atomToVertex(atom, v);
         updateAllIndices(v);

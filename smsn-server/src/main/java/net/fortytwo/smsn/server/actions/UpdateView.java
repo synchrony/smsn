@@ -165,10 +165,15 @@ public class UpdateView extends RootedViewAction {
         // Adjust filter to inherit root's source for new children
         // This matches the original behavior where children inherit parent's source
         Filter originalFilter = getFilter();
+        String minSource = originalFilter.getMinSource();
+        if (minSource == null) {
+            // Use the first source (usually "private") as the minimum if not specified
+            minSource = SemanticSynchrony.getConfiguration().getSources().get(0).getName();
+        }
         Filter adjustedFilter = new Filter(
             originalFilter.getMinWeight(),
             originalFilter.getDefaultWeight(),
-            originalFilter.getMinSource(),
+            minSource,
             rootAtom.source.value  // Use root's source as default for new children
         );
 
