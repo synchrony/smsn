@@ -38,17 +38,22 @@ header {
     align-items: center;
     gap: 16px;
     background: #f8f8f8;
+    min-width: 0;  /* Allow flex children to shrink below content size */
 }
 
 header h1 {
     font-size: 16px;
     font-weight: normal;
     color: #0066cc;
+    flex-shrink: 0;  /* Don't shrink title */
+    white-space: nowrap;
 }
 
 #connection-status {
     font-size: 12px;
     color: var(--muted-color);
+    flex-shrink: 0;  /* Don't shrink status */
+    white-space: nowrap;
 }
 
 #connection-status.connected {
@@ -57,6 +62,12 @@ header h1 {
 
 #connection-status.error {
     color: var(--priority-color);
+}
+
+/* Header buttons and links - never shrink */
+header > .toolbar-btn,
+header > a {
+    flex-shrink: 0;
 }
 
 /* Toolbar components (used in header and per-pane toolbars) */
@@ -469,12 +480,17 @@ button.danger:hover {
     gap: 12px;
     font-size: 11px;
     margin-left: auto;  /* Push to the right */
+    flex-shrink: 1;     /* Allow legend to shrink */
+    min-width: 0;       /* Allow shrinking below content size */
+    overflow: hidden;   /* Hide overflowing items */
 }
 
 .legend-item {
     display: flex;
     align-items: center;
     gap: 4px;
+    flex-shrink: 0;     /* Don't shrink individual items */
+    white-space: nowrap;
 }
 
 .legend-color {
