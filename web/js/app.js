@@ -1087,9 +1087,67 @@ function showNewNote(mode) {
     State.newNoteMode = mode;
     document.getElementById('new-note-title').textContent =
         mode === 'child' ? 'New Child Note' : 'New Sibling Note';
+
+    // Clear/reset all fields
     document.getElementById('new-note-input').value = '';
+    document.getElementById('new-note-alias').value = '';
+
+    // Default weight to 0.5
+    document.getElementById('new-note-weight').value = 0.5;
+    document.getElementById('new-note-weight-value').textContent = '0.5';
+
+    // Default priority to 0 (none)
+    document.getElementById('new-note-priority').value = 0;
+    document.getElementById('new-note-priority-value').textContent = '-';
+
+    // Populate source dropdown if not already done
+    const sourceSelect = document.getElementById('new-note-source');
+    if (sourceSelect.options.length === 0 && State.config && State.config.sources) {
+        State.config.sources.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.name;
+            option.textContent = s.name;
+            sourceSelect.appendChild(option);
+        });
+    }
+
+    // Get parent's source for inheritance
+    let parentSource = 'private';  // fallback default
+    if (mode === 'child') {
+        const parentId = State.selectedId || State.rootId;
+        if (parentId) {
+            const parent = findNodeById(State.view, parentId);
+            if (parent && parent.source) {
+                parentSource = parent.source;
+            }
+        }
+    } else if (mode === 'sibling') {
+        // For sibling, inherit from the selected node's parent
+        if (State.selectedId) {
+            const parentId = findParentId(State.view, State.selectedId);
+            if (parentId) {
+                const parent = findNodeById(State.view, parentId);
+                if (parent && parent.source) {
+                    parentSource = parent.source;
+                }
+            }
+        }
+    }
+    sourceSelect.value = parentSource;
+
+    // Update Create button state based on title
+    updateNewNoteCreateButton();
+
     document.getElementById('new-note-overlay').classList.add('visible');
     document.getElementById('new-note-input').focus();
+}
+
+function updateNewNoteCreateButton() {
+    const title = document.getElementById('new-note-input').value.trim();
+    const createBtn = document.querySelector('#new-note-overlay .primary');
+    if (createBtn) {
+        createBtn.disabled = !title;
+    }
 }
 
 function hideNewNote() {
@@ -1101,47 +1159,62 @@ function createNewNote() {
     const title = document.getElementById('new-note-input').value.trim();
     if (!title) {
         setStatusMessage('Title cannot be empty');
+        document.getElementById('new-note-input').focus();
         return;
     }
+
+    // Collect all properties from the form
+    const weight = parseFloat(document.getElementById('new-note-weight').value);
+    const priority = parseFloat(document.getElementById('new-note-priority').value);
+    const source = document.getElementById('new-note-source').value;
+    const alias = document.getElementById('new-note-alias').value.trim();
 
     // Save mode before hideNewNote clears it
     const mode = State.newNoteMode;
     hideNewNote();
 
+    // Get existing children IDs so we can identify the new note after creation
+    let parentId;
+    let existingChildIds = new Set();
+
     if (mode === 'child') {
-        const parentId = State.selectedId || State.rootId;
+        parentId = State.selectedId || State.rootId;
         if (!parentId) {
             setStatusMessage('No parent selected');
             return;
         }
-
         const parent = findNodeById(State.view, parentId);
-        let wikiContent = '';
+        if (parent && parent.children) {
+            parent.children.forEach(c => existingChildIds.add(c.id));
+        }
+    } else if (mode === 'sibling') {
+        if (!State.selectedId || State.selectedId === State.rootId) {
+            setStatusMessage('Cannot add sibling to root');
+            return;
+        }
+        parentId = findParentId(State.view, State.selectedId);
+        if (!parentId) {
+            setStatusMessage('Could not find parent');
+            return;
+        }
+        const parent = findNodeById(State.view, parentId);
+        if (parent && parent.children) {
+            parent.children.forEach(c => existingChildIds.add(c.id));
+        }
+    }
 
+    // Build wiki content
+    const parent = findNodeById(State.view, parentId);
+    let wikiContent = '';
+
+    if (mode === 'child') {
         if (parent && parent.children) {
             for (const child of parent.children) {
                 wikiContent += `* ${child.title}\n    :${child.id}:\n`;
             }
         }
         wikiContent += `* ${title}\n`;
-
-        updateView(parentId, wikiContent, 2);
-
     } else if (mode === 'sibling') {
-        if (!State.selectedId || State.selectedId === State.rootId) {
-            setStatusMessage('Cannot add sibling to root');
-            return;
-        }
-
-        const parentId = findParentId(State.view, State.selectedId);
-        if (!parentId) {
-            setStatusMessage('Could not find parent');
-            return;
-        }
-
-        const parent = findNodeById(State.view, parentId);
-        let wikiContent = '';
-
         if (parent && parent.children) {
             for (const child of parent.children) {
                 wikiContent += `* ${child.title}\n    :${child.id}:\n`;
@@ -1150,9 +1223,104 @@ function createNewNote() {
                 }
             }
         }
-
-        updateView(parentId, wikiContent, 2);
     }
+
+    // Create the note and then set its properties
+    createNoteWithProperties(parentId, wikiContent, existingChildIds, {
+        weight, priority, source, alias
+    });
+}
+
+function createNoteWithProperties(parentId, wikiContent, existingChildIds, props) {
+    const currentRootId = State.rootId;
+
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.UpdateView',
+        root: parentId,
+        view: wikiContent,
+        viewFormat: 'wiki',
+        height: 2,
+        filter: State.filter,
+        style: 'forward'
+    }, (data) => {
+        if (data.view) {
+            // Find the newly created note by looking for a child that wasn't there before
+            let newNoteId = null;
+            if (data.view.children) {
+                for (const child of data.view.children) {
+                    if (!existingChildIds.has(child.id)) {
+                        newNoteId = child.id;
+                        break;
+                    }
+                }
+            }
+
+            // Set properties on the new note if we found it and have non-default values
+            if (newNoteId) {
+                setNewNoteProperties(newNoteId, props, () => {
+                    // Refresh the original view to show changes
+                    if (currentRootId && currentRootId !== parentId) {
+                        refreshView();
+                    } else {
+                        State.view = data.view;
+                        State.rootId = data.root || data.view.id;
+                        State.expandedNodes.add(State.rootId);
+                        State.selectedId = newNoteId;  // Select the new note
+                        const pane = State.panes[State.activePane];
+                        pane.view = State.view;
+                        pane.rootId = State.rootId;
+                        pane.expandedNodes.add(State.rootId);
+                        pane.selectedId = newNoteId;
+                        render();
+                        focusTreeContainer();
+                    }
+                    setStatusMessage('Note created');
+                });
+            } else {
+                // Couldn't find new note, just refresh
+                if (currentRootId && currentRootId !== parentId) {
+                    refreshView();
+                }
+                setStatusMessage('Note created');
+            }
+        }
+    });
+}
+
+function setNewNoteProperties(noteId, props, callback) {
+    const updates = [];
+
+    // Only set non-default properties
+    if (props.weight !== 0.5) {
+        updates.push(['weight', props.weight]);
+    }
+    if (props.priority > 0) {
+        updates.push(['priority', props.priority]);
+    }
+    if (props.source && props.source !== 'private') {
+        updates.push(['source', props.source]);
+    }
+    if (props.alias) {
+        updates.push(['shortcut', props.alias]);
+    }
+
+    if (updates.length === 0) {
+        callback();
+        return;
+    }
+
+    function sendNext(index) {
+        if (index >= updates.length) {
+            callback();
+            return;
+        }
+        const [name, value] = updates[index];
+        setPropertyNoUndo(noteId, name, value, () => {
+            sendNext(index + 1);
+        });
+    }
+
+    sendNext(0);
 }
 
 function showConfirmDelete() {
@@ -2397,7 +2565,7 @@ function setupKeyboardHandler() {
 // =============================================================================
 
 function setupEventListeners() {
-    // Property sliders
+    // Property overlay sliders
     document.getElementById('prop-weight').addEventListener('input', (e) => {
         document.getElementById('prop-weight-value').textContent = parseFloat(e.target.value).toFixed(1);
     });
@@ -2407,12 +2575,34 @@ function setupEventListeners() {
         document.getElementById('prop-priority-value').textContent = val > 0 ? val.toFixed(1) : '-';
     });
 
-    // New note input
+    // New note overlay sliders
+    document.getElementById('new-note-weight').addEventListener('input', (e) => {
+        document.getElementById('new-note-weight-value').textContent = parseFloat(e.target.value).toFixed(1);
+    });
+
+    document.getElementById('new-note-priority').addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById('new-note-priority-value').textContent = val > 0 ? val.toFixed(1) : '-';
+    });
+
+    // New note title input - update Create button state on input
+    document.getElementById('new-note-input').addEventListener('input', (e) => {
+        updateNewNoteCreateButton();
+    });
+
+    // New note input - Enter to create, Escape to cancel
     document.getElementById('new-note-input').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             createNewNote();
         } else if (e.key === 'Escape') {
+            hideNewNote();
+        }
+    });
+
+    // Allow Escape from any field in the new note overlay
+    document.getElementById('new-note-overlay').addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
             hideNewNote();
         }
     });

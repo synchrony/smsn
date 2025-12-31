@@ -434,6 +434,12 @@ button.primary:hover {
     background: #0055aa;
 }
 
+button.primary:disabled {
+    background: #99c2e6;
+    border-color: #99c2e6;
+    cursor: not-allowed;
+}
+
 button.danger {
     background: #cc0000;
     border-color: #cc0000;
