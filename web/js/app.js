@@ -2057,8 +2057,8 @@ const chordBindings = {
     'u': () => refreshView(),
     // C-c n - new note
     'n': () => showNewNote('child'),
-    // C-c p - push view to server (save changes to graph)
-    'p': () => pushViewToServer(),
+    // C-c p - push view to server (DISABLED - buggy, mangles data)
+    // 'p': () => pushViewToServer(),
     // C-c h - history
     'h': () => popView(),
     // C-c x - shortcut query (go to alias)
