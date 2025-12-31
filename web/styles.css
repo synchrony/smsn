@@ -384,6 +384,11 @@ footer {
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
+.overlay-content-wide {
+    min-width: 600px;
+    max-width: 800px;
+}
+
 .overlay-content h2 {
     margin-bottom: 16px;
     color: #0066cc;
@@ -412,11 +417,13 @@ footer {
 
 .property-row label {
     width: 80px;
+    flex-shrink: 0;
     color: var(--muted-color);
 }
 
 .property-row input,
-.property-row select {
+.property-row select,
+.property-row textarea {
     flex: 1;
     padding: 6px 10px;
     background: white;
@@ -427,8 +434,36 @@ footer {
     border-radius: 4px;
 }
 
+/* Title textarea - auto-expands to fit content */
+.prop-title-input {
+    resize: none;
+    overflow: hidden;
+    min-height: 1.5em;
+    line-height: 1.5;
+}
+
+/* Text row - align label to top */
+.property-row-text {
+    align-items: flex-start;
+}
+
+.property-row-text label {
+    padding-top: 8px;
+}
+
+/* Text textarea - fixed size with scrollbars */
+.prop-text-input {
+    min-width: 480px;  /* ~80 characters */
+    height: 150px;
+    max-height: 300px;
+    resize: vertical;
+    overflow: auto;
+    line-height: 1.5;
+}
+
 .property-row input:focus,
-.property-row select:focus {
+.property-row select:focus,
+.property-row textarea:focus {
     outline: none;
     border-color: #0066cc;
 }

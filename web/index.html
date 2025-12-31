@@ -189,11 +189,11 @@
 
     <!-- Properties overlay -->
     <div id="properties-overlay" class="overlay">
-        <div class="overlay-content">
+        <div class="overlay-content overlay-content-wide">
             <h2>Edit Properties</h2>
             <div class="property-row">
                 <label>Title</label>
-                <input type="text" id="prop-title" />
+                <textarea id="prop-title" class="prop-title-input" oninput="autoResizeTextarea(this)"></textarea>
             </div>
             <div class="property-row">
                 <label>Weight</label>
@@ -212,6 +212,10 @@
             <div class="property-row">
                 <label>Alias</label>
                 <input type="text" id="prop-alias" placeholder="(e.g. URL)" style="font-family: monospace;" />
+            </div>
+            <div class="property-row property-row-text">
+                <label>Text</label>
+                <textarea id="prop-text" class="prop-text-input" placeholder="(optional extended content)"></textarea>
             </div>
             <div class="button-row">
                 <button onclick="hideProperties()">Cancel</button>

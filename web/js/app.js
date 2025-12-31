@@ -1022,16 +1022,20 @@ function showProperties() {
     const node = findNodeById(State.view, State.selectedId);
     if (!node) return;
 
-    document.getElementById('prop-title').value = node.title || '';
+    const titleInput = document.getElementById('prop-title');
+    titleInput.value = node.title || '';
     document.getElementById('prop-weight').value = node.weight || 0.5;
     document.getElementById('prop-weight-value').textContent = (node.weight || 0.5).toFixed(1);
     document.getElementById('prop-priority').value = node.priority || 0;
     document.getElementById('prop-priority-value').textContent = node.priority ? node.priority.toFixed(1) : '-';
     document.getElementById('prop-source').value = node.source || 'private';
     document.getElementById('prop-alias').value = node.alias || '';
+    document.getElementById('prop-text').value = node.text || '';
 
     document.getElementById('properties-overlay').classList.add('visible');
-    document.getElementById('prop-title').focus();
+    titleInput.focus();
+    // Auto-resize title textarea to fit content
+    setTimeout(() => autoResizeTextarea(titleInput), 0);
 }
 
 function hideProperties() {
@@ -1047,7 +1051,8 @@ function saveProperties() {
         weight: parseFloat(document.getElementById('prop-weight').value),
         priority: parseFloat(document.getElementById('prop-priority').value),
         source: document.getElementById('prop-source').value,
-        alias: document.getElementById('prop-alias').value.trim()
+        alias: document.getElementById('prop-alias').value.trim(),
+        text: document.getElementById('prop-text').value
     };
 
     hideProperties();
@@ -1069,6 +1074,9 @@ function saveProperties() {
     }
     if (props.alias !== (node.alias || '')) {
         updates.push(['alias', props.alias || null, node.alias || null]);
+    }
+    if (props.text !== (node.text || '')) {
+        updates.push(['text', props.text || null, node.text || null]);
     }
 
     if (updates.length === 0) {
