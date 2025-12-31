@@ -966,6 +966,13 @@ function searchShortcut(shortcut) {
 // Editing Functions
 // =============================================================================
 
+function autoResizeTextarea(textarea) {
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto';
+    // Set height to scrollHeight to fit content
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
 function startEditTitle(nodeId) {
     State.editingNodeId = nodeId;
     render();
@@ -975,6 +982,8 @@ function startEditTitle(nodeId) {
         if (input) {
             input.focus();
             input.select();
+            // Trigger auto-resize to fit initial content
+            autoResizeTextarea(input);
         }
     }, 0);
 }
@@ -1785,10 +1794,10 @@ function renderNodeForPane(node, isRoot, depth, paneIndex) {
 
     let titleHtml;
     if (isEditing) {
-        titleHtml = `<input type="text" class="edit-input" id="edit-title-input"
-            value="${escapeAttr(node.title || '')}"
+        titleHtml = `<textarea class="edit-input" id="edit-title-input"
             onkeydown="handleEditKeydown(event)"
-            onblur="cancelEditTitle()" />`;
+            onblur="cancelEditTitle()"
+            oninput="autoResizeTextarea(this)">${escapeHtml(node.title || '')}</textarea>`;
     } else {
         const titleText = escapeHtml(node.title || '[no title]');
         const aliasClass = hasAlias ? ' has-alias' : '';
@@ -1859,10 +1868,10 @@ function renderNode(node, isRoot = false, depth = 0) {
 
     let titleHtml;
     if (isEditing) {
-        titleHtml = `<input type="text" class="edit-input" id="edit-title-input"
-            value="${escapeAttr(node.title || '')}"
+        titleHtml = `<textarea class="edit-input" id="edit-title-input"
             onkeydown="handleEditKeydown(event)"
-            onblur="cancelEditTitle()" />`;
+            onblur="cancelEditTitle()"
+            oninput="autoResizeTextarea(this)">${escapeHtml(node.title || '')}</textarea>`;
     } else {
         const titleText = escapeHtml(node.title || '[no title]');
         const aliasClass = hasAlias ? ' has-alias' : '';
@@ -2000,9 +2009,15 @@ function handleNodeClick(nodeId) {
 }
 
 function handleEditKeydown(event) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        // Enter (without Shift) saves the title
         event.preventDefault();
         saveEditTitle();
+    } else if (event.key === 'Enter' && event.shiftKey) {
+        // Shift+Enter inserts a newline - let it happen, then resize
+        setTimeout(() => {
+            autoResizeTextarea(event.target);
+        }, 0);
     } else if (event.key === 'Escape') {
         event.preventDefault();
         cancelEditTitle();

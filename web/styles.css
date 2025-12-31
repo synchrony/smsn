@@ -311,18 +311,38 @@ header > a {
 
 /* Inline editing */
 .edit-input {
-    flex: 1;
-    padding: 2px 6px;
+    width: 100%;
+    padding: 4px 8px;
     background: white;
     border: 1px solid #0066cc;
     color: var(--text-color);
     font-family: inherit;
     font-size: 14px;
+    line-height: 1.5;
     border-radius: 2px;
+    resize: none;           /* Disable manual resize handle */
+    overflow: hidden;       /* Hide scrollbar since we auto-size */
+    min-height: 1.5em;      /* At least one line */
+    box-sizing: border-box;
 }
 
 .edit-input:focus {
     outline: none;
+}
+
+/* When editing, the node takes full width */
+.tree-node.editing {
+    display: block;
+}
+
+.tree-node.editing .node-content {
+    display: block;
+    width: 100%;
+}
+
+.tree-node.editing .node-title {
+    display: block;
+    width: 100%;
 }
 
 /* Status bar */
