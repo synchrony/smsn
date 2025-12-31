@@ -1,0 +1,2438 @@
+// =============================================================================
+// Semantic Synchrony Web UI - Main Application
+// =============================================================================
+
+// =============================================================================
+// State Management
+// =============================================================================
+
+const State = {
+    // Connection
+    ws: null,
+    connected: false,
+    serverUrl: 'ws://localhost:8182/gremlin',
+
+    // Configuration from server
+    config: null,
+    sourcesByName: {},
+
+    // View state
+    rootId: null,
+    view: null,
+    selectedId: null,
+    expandedNodes: new Set(),
+    history: [],
+    forwardHistory: [],
+    viewStyle: 'forward',  // 'forward' or 'backward'
+
+    // Filter settings
+    filter: {
+        minSource: 'private',
+        defaultSource: 'private',
+        minWeight: 0.0,
+        defaultWeight: 0.5
+    },
+
+    // UI state
+    searchQuery: '',
+    editingNodeId: null,
+    pendingCallback: null,
+    newNoteMode: null,
+
+    // Emacs-style key chord state
+    pendingChord: null,  // e.g., 'C-c' when waiting for next key
+    pendingNumericAction: null,  // e.g., 'weight' when waiting for 0-4 digit
+
+    // Clipboard for cut/copy/paste
+    clipboard: null,  // { id, title, isCut: boolean }
+
+    // Undo stack - stores operations that can be undone
+    // Each entry: { type: 'setProperty'|'delete'|'create'|'move', ...data }
+    undoStack: [],
+    maxUndoSize: 50,
+
+    // View options
+    wrapTitles: true,  // true = wrap long titles, false = single line with scroll
+
+    // Split view
+    splitView: false,
+    activePane: 0,  // 0 or 1
+    panes: [
+        { rootId: null, view: null, selectedId: null, expandedNodes: new Set(), history: [], forwardHistory: [], viewStyle: 'forward', viewDepth: 2, lastSearchQuery: null },
+        { rootId: null, view: null, selectedId: null, expandedNodes: new Set(), history: [], forwardHistory: [], viewStyle: 'forward', viewDepth: 2, lastSearchQuery: null }
+    ]
+};
+
+// Special marker for search results that we want to be able to navigate back to
+const SEARCH_RESULT_PREFIX = '__search__:';
+
+// Get current pane state
+function getPane() {
+    return State.panes[State.activePane];
+}
+
+// Initialize pane 0 to share references with State
+function initializePaneState() {
+    const pane = State.panes[0];
+    pane.history = State.history;
+    pane.forwardHistory = State.forwardHistory;
+    pane.expandedNodes = State.expandedNodes;
+}
+initializePaneState();
+
+// =============================================================================
+// Color Utilities (matching smsn-mode)
+// =============================================================================
+
+function parseColor(numericColor) {
+    // Convert numeric color (e.g., 0xff0000) to RGB
+    const blue = numericColor % 256;
+    const green = Math.floor(numericColor / 256) % 256;
+    const red = Math.floor(numericColor / 65536);
+    return { r: red, g: green, b: blue };
+}
+
+function colorToHex(color) {
+    const r = Math.round(color.r).toString(16).padStart(2, '0');
+    const g = Math.round(color.g).toString(16).padStart(2, '0');
+    const b = Math.round(color.b).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+}
+
+function darkenColor(color, factor) {
+    // Darken by multiplying RGB values
+    return {
+        r: color.r * factor,
+        g: color.g * factor,
+        b: color.b * factor
+    };
+}
+
+function fadeColor(color, weight) {
+    // Fade toward white based on weight (lower weight = more faded)
+    // This matches smsn-mode's fade function
+    function fade(c, w) {
+        const low = c + (255 - c) * 0.9375; // weighted toward white
+        const high = c;
+        return low + (high - low) * w;
+    }
+    return {
+        r: fade(color.r, weight),
+        g: fade(color.g, weight),
+        b: fade(color.b, weight)
+    };
+}
+
+function getNoteColor(source, weight) {
+    const sourceConfig = State.sourcesByName[source];
+    if (!sourceConfig || !sourceConfig.color) {
+        return '#333333'; // fallback
+    }
+
+    const baseColor = parseColor(sourceConfig.color);
+    // Darken for better readability on white background
+    const darkenedColor = darkenColor(baseColor, 0.6);
+    // Fade based on weight (lower weight = more faded toward white)
+    const fadedColor = fadeColor(darkenedColor, weight);
+    return colorToHex(fadedColor);
+}
+
+function getSourceColor(source) {
+    const sourceConfig = State.sourcesByName[source];
+    if (!sourceConfig || !sourceConfig.color) {
+        return '#333333';
+    }
+    return colorToHex(parseColor(sourceConfig.color));
+}
+
+// =============================================================================
+// WebSocket Communication
+// =============================================================================
+
+function connect() {
+    updateConnectionStatus('connecting');
+
+    State.ws = new WebSocket(State.serverUrl);
+
+    State.ws.onopen = () => {
+        State.connected = true;
+        updateConnectionStatus('connected');
+        // First get configuration, then find roots
+        getConfiguration();
+    };
+
+    State.ws.onclose = () => {
+        State.connected = false;
+        updateConnectionStatus('disconnected');
+        setTimeout(connect, 3000);
+    };
+
+    State.ws.onerror = (err) => {
+        console.error('WebSocket error:', err);
+        updateConnectionStatus('error');
+    };
+
+    State.ws.onmessage = (event) => {
+        try {
+            const response = JSON.parse(event.data);
+            handleResponse(response);
+        } catch (e) {
+            console.error('Failed to parse response:', e);
+        }
+    };
+}
+
+function sendAction(action, callback = null) {
+    if (!State.connected) {
+        console.warn('Not connected');
+        return;
+    }
+
+    if (callback) {
+        State.pendingCallback = callback;
+    }
+
+    const request = {
+        op: 'eval',
+        processor: '',
+        args: {
+            language: 'smsn',
+            gremlin: JSON.stringify(action)
+        }
+    };
+
+    State.ws.send(JSON.stringify(request));
+}
+
+function handleResponse(response) {
+    if (response.status && response.status.code !== 200) {
+        console.error('Server error:', response.status);
+        setStatusMessage('Error: ' + (response.status.message || 'Unknown error'));
+        State.pendingCallback = null;
+        return;
+    }
+
+    if (response.result && response.result.data && response.result.data.length > 0) {
+        const data = JSON.parse(response.result.data[0]);
+
+        if (State.pendingCallback) {
+            State.pendingCallback(data);
+            State.pendingCallback = null;
+        } else if (data.view) {
+            State.view = data.view;
+            State.rootId = data.root || (data.view.id);
+            // Expand root by default and select root node
+            State.expandedNodes.add(State.rootId);
+            State.selectedId = State.rootId;
+            // Also sync to active pane
+            const pane = State.panes[State.activePane];
+            pane.view = State.view;
+            pane.rootId = State.rootId;
+            pane.expandedNodes.add(State.rootId);
+            pane.selectedId = State.rootId;
+            render();
+            updateToolbar();
+            focusTreeContainer();
+            setStatusMessage('View loaded');
+        }
+    }
+}
+
+// =============================================================================
+// Server Actions
+// =============================================================================
+
+function getConfiguration() {
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.GetConfiguration'
+    }, (data) => {
+        if (data.configuration) {
+            const config = JSON.parse(data.configuration);
+            State.config = config;
+
+            // Build source lookup
+            if (config.sources) {
+                State.sourcesByName = {};
+                config.sources.forEach(s => {
+                    State.sourcesByName[s.name] = s;
+                });
+
+                // Update source dropdown and legend
+                updateSourceOptions();
+                updateSourceLegend();
+            }
+        }
+        // Don't auto-load anything - wait for user action
+        setStatusMessage('Ready. Press / to search or C-c C-f to find roots.');
+        // Clear the "Connecting..." message from tree containers
+        document.getElementById('tree-container-0').innerHTML = '<div class="loading">Press / to search</div>';
+    });
+}
+
+function getView(rootId, height = null) {
+    const pane = getPane();
+    const viewHeight = height || pane.viewDepth || 2;
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.GetView',
+        root: rootId,
+        height: viewHeight,
+        filter: State.filter,
+        style: pane.viewStyle
+    });
+    updateToolbar();
+}
+
+function search(query) {
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.Search',
+        query: query,
+        queryType: 'FullText',
+        height: 1,
+        filter: State.filter,
+        titleCutoff: 100
+    });
+}
+
+function searchInPane(query, paneIndex) {
+    const pane = State.panes[paneIndex];
+    // Save current view to history before showing search results
+    if (pane.rootId) {
+        pane.history.push(pane.rootId);
+        pane.forwardHistory.length = 0;
+    }
+    // Save the search query so we can re-execute it when navigating back
+    pane.lastSearchQuery = query;
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.Search',
+        query: query,
+        queryType: 'FullText',
+        height: 1,
+        filter: State.filter,
+        titleCutoff: 100
+    }, (data) => {
+        if (data.view) {
+            pane.view = data.view;
+            // Override root title to include search term
+            pane.view.title = `Search results for "${query}"`;
+            // Use a special marker so we know this is a search result
+            pane.rootId = SEARCH_RESULT_PREFIX + query;
+            // Expand root and select root for search results
+            pane.expandedNodes.add(data.view.id);
+            pane.selectedId = data.view.id;
+            if (paneIndex === State.activePane) {
+                State.view = pane.view;
+                State.rootId = pane.rootId;
+                State.expandedNodes.add(data.view.id);
+                State.selectedId = data.view.id;
+            }
+            render();
+            updateToolbar();
+            focusTreeContainer();
+            setStatusMessage(`Found ${countNodes(data.view)} results`);
+        }
+    });
+}
+
+function findRoots() {
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.FindRoots',
+        height: 2,
+        filter: State.filter
+    });
+}
+
+// =============================================================================
+// Undo Support
+// =============================================================================
+
+function pushUndo(operation) {
+    State.undoStack.push(operation);
+    // Limit stack size
+    if (State.undoStack.length > State.maxUndoSize) {
+        State.undoStack.shift();
+    }
+}
+
+function undo() {
+    if (State.undoStack.length === 0) {
+        setStatusMessage('Nothing to undo');
+        return;
+    }
+
+    const op = State.undoStack.pop();
+
+    switch (op.type) {
+        case 'setProperty':
+            // Restore the old value
+            setPropertyNoUndo(op.nodeId, op.propertyName, op.oldValue, () => {
+                refreshView();
+                setStatusMessage(`Undo: ${op.propertyName} restored`);
+            });
+            break;
+
+        case 'delete':
+            // Re-add the deleted note as a child of its parent
+            // This requires using UpdateView with wiki format
+            const wikiContent = `* :${op.parentId}:\n    * ${op.note.title}`;
+            sendAction({
+                action: 'net.fortytwo.smsn.server.actions.UpdateView',
+                root: op.parentId,
+                view: wikiContent,
+                viewFormat: 'wiki',
+                height: 2,
+                filter: State.filter,
+                style: 'forward'
+            }, () => {
+                refreshView();
+                setStatusMessage(`Undo: "${op.note.title}" restored`);
+            });
+            break;
+
+        case 'create':
+            // Delete the created note
+            // Note: this is tricky since we'd need to know the new note's ID
+            setStatusMessage('Undo create not yet supported');
+            break;
+
+        case 'move':
+            // Move the note back to its original position
+            // This would require re-implementing the move in reverse
+            setStatusMessage('Undo move not yet supported');
+            break;
+
+        default:
+            setStatusMessage('Unknown undo operation');
+    }
+}
+
+// Version of setProperty that doesn't add to undo stack (used by undo itself)
+function setPropertyNoUndo(nodeId, propertyName, value, callback = null) {
+    let sendValue = value;
+    if ((propertyName === 'weight' || propertyName === 'priority') && typeof value === 'number') {
+        if (value === 1) {
+            sendValue = 0.9999999;
+        } else if (value === 0) {
+            sendValue = 0.0000001;
+        } else if (Number.isInteger(value)) {
+            sendValue = value + 0.0000001;
+        }
+    }
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.SetProperties',
+        id: nodeId,
+        name: propertyName,
+        value: sendValue,
+        filter: State.filter
+    }, callback);
+}
+
+function setProperty(nodeId, propertyName, value, callback = null, oldValue = null) {
+    // Record undo info if oldValue is provided
+    if (oldValue !== null) {
+        pushUndo({
+            type: 'setProperty',
+            nodeId: nodeId,
+            propertyName: propertyName,
+            oldValue: oldValue
+        });
+    }
+
+    // Ensure weight and priority are always sent as floats (not integers)
+    // to avoid ClassCastException on the server (expects Double, not Integer)
+    let sendValue = value;
+    if ((propertyName === 'weight' || propertyName === 'priority') && typeof value === 'number') {
+        // Force a decimal representation by adding tiny epsilon away from boundaries
+        if (value === 1) {
+            sendValue = 0.9999999;  // Just under 1.0
+        } else if (value === 0) {
+            sendValue = 0.0000001;  // Just over 0.0
+        } else if (Number.isInteger(value)) {
+            sendValue = value + 0.0000001;
+        }
+    }
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.SetProperties',
+        id: nodeId,
+        name: propertyName,
+        value: sendValue,
+        filter: State.filter
+    }, callback);
+}
+
+function updateView(rootId, viewContent, height = 2) {
+    // Remember the current view root so we can refresh it after the update
+    const currentRootId = State.rootId;
+
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.UpdateView',
+        root: rootId,
+        view: viewContent,
+        viewFormat: 'wiki',
+        height: height,
+        filter: State.filter,
+        style: 'forward'
+    }, (data) => {
+        if (data.view) {
+            // If we updated a subtree, refresh the original view to show changes
+            if (currentRootId && currentRootId !== rootId) {
+                refreshView();
+                setStatusMessage('Updated');
+            } else {
+                // We updated the root itself
+                State.view = data.view;
+                State.rootId = data.root || data.view.id;
+                State.expandedNodes.add(State.rootId);
+                State.selectedId = State.rootId;
+                const pane = State.panes[State.activePane];
+                pane.view = State.view;
+                pane.rootId = State.rootId;
+                pane.expandedNodes.add(State.rootId);
+                pane.selectedId = State.rootId;
+                render();
+                focusTreeContainer();
+                setStatusMessage('Updated');
+            }
+        }
+    });
+}
+
+// Convert a node and its children to wiki format recursively
+function nodeToWiki(node, indent = 0) {
+    const prefix = '    '.repeat(indent);
+    let wiki = `${prefix}* ${node.title}\n`;
+    wiki += `${prefix}    :${node.id}:\n`;
+    if (node.children && node.children.length > 0) {
+        for (const child of node.children) {
+            wiki += nodeToWiki(child, indent + 1);
+        }
+    }
+    return wiki;
+}
+
+// Push the current view to the server (C-c p in smsn-mode)
+function pushViewToServer() {
+    const pane = getPane();
+    if (!pane.view || !pane.rootId) {
+        setStatusMessage('No view to push');
+        return;
+    }
+
+    // Convert the current view to wiki format
+    let wikiContent = nodeToWiki(pane.view);
+
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.UpdateView',
+        root: pane.rootId,
+        view: wikiContent,
+        viewFormat: 'wiki',
+        height: pane.height || 2,
+        filter: State.filter,
+        style: pane.viewStyle || 'forward'
+    }, (data) => {
+        if (data.view) {
+            pane.view = data.view;
+            pane.rootId = data.root || data.view.id;
+            pane.expandedNodes.add(pane.rootId);
+            if (State.activePane === 0) {
+                State.view = data.view;
+                State.rootId = pane.rootId;
+                State.expandedNodes.add(State.rootId);
+            }
+            render();
+            focusTreeContainer();
+            setStatusMessage('View pushed to server');
+        }
+    });
+}
+
+// =============================================================================
+// Navigation
+// =============================================================================
+
+function visitTarget(nodeId) {
+    const pane = getPane();
+    if (pane.rootId) {
+        pane.history.push(pane.rootId);
+        pane.forwardHistory.length = 0;  // Clear forward history
+    }
+    if (State.activePane === 0) {
+        getView(nodeId);
+    } else {
+        getViewForPane(nodeId, State.activePane);
+    }
+}
+
+function popView() {
+    const pane = getPane();
+    if (pane.history.length > 0) {
+        if (pane.rootId) {
+            pane.forwardHistory.push(pane.rootId);
+        }
+        const prevId = pane.history.pop();
+        navigateToId(prevId, State.activePane);
+    }
+    updateToolbar();
+}
+
+function forwardView() {
+    const pane = getPane();
+    if (pane.forwardHistory.length > 0) {
+        if (pane.rootId) {
+            pane.history.push(pane.rootId);
+        }
+        const nextId = pane.forwardHistory.pop();
+        navigateToId(nextId, State.activePane);
+    }
+    updateToolbar();
+}
+
+function navigateToId(targetId, paneIndex) {
+    // Check if this is a search result marker
+    if (targetId && targetId.startsWith(SEARCH_RESULT_PREFIX)) {
+        const query = targetId.substring(SEARCH_RESULT_PREFIX.length);
+        // Re-execute the search
+        reExecuteSearch(query, paneIndex);
+    } else {
+        // Normal view navigation
+        if (paneIndex === 0) {
+            getView(targetId);
+        } else {
+            getViewForPane(targetId, paneIndex);
+        }
+    }
+}
+
+function reExecuteSearch(query, paneIndex) {
+    const pane = State.panes[paneIndex];
+    pane.lastSearchQuery = query;
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.Search',
+        query: query,
+        queryType: 'FullText',
+        height: 1,
+        filter: State.filter,
+        titleCutoff: 100
+    }, (data) => {
+        if (data.view) {
+            pane.view = data.view;
+            // Override root title to include search term
+            pane.view.title = `Search results for "${query}"`;
+            pane.rootId = SEARCH_RESULT_PREFIX + query;
+            // Expand root and select root for search results
+            pane.expandedNodes.add(data.view.id);
+            pane.selectedId = data.view.id;
+            if (paneIndex === State.activePane) {
+                State.view = pane.view;
+                State.rootId = pane.rootId;
+                State.expandedNodes.add(data.view.id);
+                State.selectedId = data.view.id;
+            }
+            render();
+            updateToolbar();
+            focusTreeContainer();
+            setStatusMessage(`Search: "${query}"`);
+        }
+    });
+}
+
+function refreshView() {
+    const pane = getPane();
+    if (pane.rootId) {
+        // Handle refresh of search results
+        if (pane.rootId.startsWith(SEARCH_RESULT_PREFIX)) {
+            const query = pane.rootId.substring(SEARCH_RESULT_PREFIX.length);
+            reExecuteSearch(query, State.activePane);
+        } else if (State.activePane === 0) {
+            getView(pane.rootId);
+        } else {
+            getViewForPane(pane.rootId, State.activePane);
+        }
+    } else {
+        findRoots();
+    }
+}
+
+function setViewStyle(style) {
+    const pane = getPane();
+    pane.viewStyle = style;
+    if (State.activePane === 0) {
+        State.viewStyle = style;
+    }
+    updateToolbar();
+    if (pane.rootId) {
+        if (State.activePane === 0) {
+            getView(pane.rootId);
+        } else {
+            getViewForPane(pane.rootId, State.activePane);
+        }
+    }
+}
+
+function updateToolbar() {
+    // Update both panes' toolbars
+    for (let i = 0; i < 2; i++) {
+        const pane = State.panes[i];
+        const backBtn = document.getElementById(`btn-back-${i}`);
+        const fwdBtn = document.getElementById(`btn-forward-${i}`);
+        const fwdViewBtn = document.getElementById(`btn-forward-view-${i}`);
+        const bkViewBtn = document.getElementById(`btn-backward-view-${i}`);
+
+        if (backBtn) backBtn.disabled = pane.history.length === 0;
+        if (fwdBtn) fwdBtn.disabled = pane.forwardHistory.length === 0;
+        if (fwdViewBtn) fwdViewBtn.classList.toggle('active', pane.viewStyle === 'forward');
+        if (bkViewBtn) bkViewBtn.classList.toggle('active', pane.viewStyle === 'backward');
+    }
+
+    document.getElementById('btn-split').classList.toggle('active', State.splitView);
+}
+
+function toggleSplit() {
+    State.splitView = !State.splitView;
+    document.getElementById('panes-container').classList.toggle('split-view', State.splitView);
+
+    // If opening split and pane 1 has no view, copy current view
+    if (State.splitView && !State.panes[1].view) {
+        State.panes[1].rootId = State.panes[0].rootId;
+        State.panes[1].view = JSON.parse(JSON.stringify(State.panes[0].view));
+        State.panes[1].viewStyle = State.panes[0].viewStyle;
+        renderPane(1);
+    }
+
+    updateToolbar();
+}
+
+function toggleWrapTitles() {
+    State.wrapTitles = !State.wrapTitles;
+    document.body.classList.toggle('no-wrap-titles', !State.wrapTitles);
+    setStatusMessage(State.wrapTitles ? 'Line wrap: on' : 'Line wrap: off (scroll for long titles)');
+}
+
+function setActivePane(index) {
+    if (State.activePane === index) return;
+
+    // Save current state to old pane
+    syncStateToPane(State.activePane);
+
+    State.activePane = index;
+
+    // Load state from new pane
+    syncPaneToState(index);
+
+    // Update visual - use pane-wrapper class
+    document.querySelectorAll('.pane-wrapper').forEach((el, i) => {
+        el.classList.toggle('active-pane', i === index);
+    });
+
+    updateToolbar();
+}
+
+function syncStateToPane(paneIndex) {
+    const pane = State.panes[paneIndex];
+    pane.rootId = State.rootId;
+    pane.view = State.view;
+    pane.selectedId = State.selectedId;
+    pane.expandedNodes = State.expandedNodes;
+    pane.history = State.history;
+    pane.forwardHistory = State.forwardHistory;
+    pane.viewStyle = State.viewStyle;
+}
+
+function syncPaneToState(paneIndex) {
+    const pane = State.panes[paneIndex];
+    State.rootId = pane.rootId;
+    State.view = pane.view;
+    State.selectedId = pane.selectedId;
+    State.expandedNodes = pane.expandedNodes;
+    State.history = pane.history;
+    State.forwardHistory = pane.forwardHistory;
+    State.viewStyle = pane.viewStyle;
+}
+
+function selectNode(nodeId) {
+    State.selectedId = nodeId;
+    getPane().selectedId = nodeId;
+    render();
+}
+
+function focusTreeContainer() {
+    // Focus the active pane's tree container to enable keyboard navigation
+    const container = document.getElementById(`tree-container-${State.activePane}`);
+    if (container) {
+        container.focus();
+    }
+}
+
+function toggleExpand(nodeId) {
+    const pane = getPane();
+    if (pane.expandedNodes.has(nodeId)) {
+        pane.expandedNodes.delete(nodeId);
+    } else {
+        pane.expandedNodes.add(nodeId);
+    }
+    // Keep State in sync
+    State.expandedNodes = pane.expandedNodes;
+    render();
+}
+
+function toggleExpandPane(nodeId, paneIndex) {
+    const pane = State.panes[paneIndex];
+    if (pane.expandedNodes.has(nodeId)) {
+        pane.expandedNodes.delete(nodeId);
+    } else {
+        pane.expandedNodes.add(nodeId);
+    }
+    // Also sync to active state if this is the active pane
+    if (paneIndex === State.activePane) {
+        State.expandedNodes = pane.expandedNodes;
+    }
+    render();
+}
+
+function handleNodeClickPane(nodeId, paneIndex) {
+    if (State.editingNodeId) return;
+
+    // If clicking on a different pane, activate it
+    if (paneIndex !== State.activePane) {
+        setActivePane(paneIndex);
+    }
+
+    const pane = State.panes[paneIndex];
+    if (pane.selectedId === nodeId) {
+        // Double-click behavior: push view
+        visitTargetPane(nodeId, paneIndex);
+    } else {
+        // Single click: select
+        selectNodePane(nodeId, paneIndex);
+    }
+}
+
+function selectNodePane(nodeId, paneIndex) {
+    const pane = State.panes[paneIndex];
+    pane.selectedId = nodeId;
+    if (paneIndex === State.activePane) {
+        State.selectedId = nodeId;
+    }
+    render();
+}
+
+function visitTargetPane(nodeId, paneIndex) {
+    const pane = State.panes[paneIndex];
+    if (pane.rootId) {
+        pane.history.push(pane.rootId);
+        pane.forwardHistory = [];
+    }
+    getViewForPane(nodeId, paneIndex);
+}
+
+function getViewForPane(rootId, paneIndex, height = null) {
+    const pane = State.panes[paneIndex];
+    const viewHeight = height || pane.viewDepth || 2;
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.GetView',
+        root: rootId,
+        height: viewHeight,
+        filter: State.filter,
+        style: pane.viewStyle
+    }, (data) => {
+        if (data.view) {
+            pane.view = data.view;
+            pane.rootId = data.root || data.view.id;
+            // Expand root by default and select root node
+            pane.expandedNodes.add(pane.rootId);
+            pane.selectedId = pane.rootId;
+            if (paneIndex === State.activePane) {
+                State.view = pane.view;
+                State.rootId = pane.rootId;
+                State.expandedNodes.add(State.rootId);
+                State.selectedId = State.rootId;
+            }
+            render();
+            focusTreeContainer();
+            setStatusMessage('View loaded');
+        }
+    });
+    updateToolbar();
+}
+
+function popViewPane(paneIndex) {
+    const pane = State.panes[paneIndex];
+    if (pane.history.length > 0) {
+        if (pane.rootId) {
+            pane.forwardHistory.push(pane.rootId);
+        }
+        const prevId = pane.history.pop();
+        navigateToId(prevId, paneIndex);
+    }
+    updateToolbar();
+}
+
+function forwardViewPane(paneIndex) {
+    const pane = State.panes[paneIndex];
+    if (pane.forwardHistory.length > 0) {
+        if (pane.rootId) {
+            pane.history.push(pane.rootId);
+        }
+        const nextId = pane.forwardHistory.pop();
+        navigateToId(nextId, paneIndex);
+    }
+    updateToolbar();
+}
+
+function setViewStylePane(style, paneIndex) {
+    const pane = State.panes[paneIndex];
+    pane.viewStyle = style;
+    updateToolbar();
+    if (pane.rootId) {
+        getViewForPane(pane.rootId, paneIndex);
+    }
+}
+
+function refreshViewPane(paneIndex) {
+    const pane = State.panes[paneIndex];
+    if (pane.rootId) {
+        getViewForPane(pane.rootId, paneIndex);
+    }
+}
+
+function setViewDepth(paneIndex, depth) {
+    const pane = State.panes[paneIndex];
+    pane.viewDepth = parseInt(depth, 10);
+    if (pane.rootId) {
+        getViewForPane(pane.rootId, paneIndex, pane.viewDepth);
+    }
+}
+
+function gotoAlias() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+
+    const pane = getPane();
+    const node = findNodeById(pane.view, State.selectedId);
+    if (!node) {
+        setStatusMessage('Note not found');
+        return;
+    }
+
+    // Check if node has a shortcut or alias - navigate to it
+    const shortcutOrAlias = node.shortcut || node.alias;
+    if (shortcutOrAlias) {
+        searchShortcut(shortcutOrAlias);
+        return;
+    }
+
+    // Check if title looks like a URL - open in new tab
+    const title = node.title || '';
+    const urlPattern = /^(https?:\/\/|www\.)/i;
+    if (urlPattern.test(title)) {
+        const url = title.startsWith('www.') ? 'https://' + title : title;
+        window.open(url, '_blank');
+        setStatusMessage('Opened URL in new tab');
+        return;
+    }
+
+    // Check if title contains a URL
+    const urlMatch = title.match(/(https?:\/\/[^\s]+)/i);
+    if (urlMatch) {
+        window.open(urlMatch[1], '_blank');
+        setStatusMessage('Opened URL in new tab');
+        return;
+    }
+
+    setStatusMessage('No alias or URL to visit');
+}
+
+function searchShortcut(shortcut) {
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.Search',
+        query: shortcut,
+        queryType: 'Shortcut',
+        height: 2,
+        filter: State.filter
+    }, (data) => {
+        if (data.view && data.view.children && data.view.children.length > 0) {
+            // Navigate to the first result
+            const targetId = data.view.children[0].id;
+            visitTarget(targetId);
+            setStatusMessage('Jumped to: ' + shortcut);
+        } else {
+            setStatusMessage('Shortcut not found: ' + shortcut);
+        }
+    });
+}
+
+// =============================================================================
+// Editing Functions
+// =============================================================================
+
+function startEditTitle(nodeId) {
+    State.editingNodeId = nodeId;
+    render();
+
+    setTimeout(() => {
+        const input = document.getElementById('edit-title-input');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }, 0);
+}
+
+function cancelEditTitle() {
+    State.editingNodeId = null;
+    render();
+}
+
+function saveEditTitle() {
+    const input = document.getElementById('edit-title-input');
+    if (!input || !State.editingNodeId) return;
+
+    const newTitle = input.value.trim();
+    if (!newTitle) {
+        setStatusMessage('Title cannot be empty');
+        return;
+    }
+
+    const nodeId = State.editingNodeId;
+    State.editingNodeId = null;
+
+    setProperty(nodeId, 'title', newTitle, () => {
+        const node = findNodeById(State.view, nodeId);
+        if (node) {
+            node.title = newTitle;
+        }
+        render();
+        setStatusMessage('Title updated');
+    });
+}
+
+function showProperties() {
+    if (!State.selectedId) return;
+
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    document.getElementById('prop-title').value = node.title || '';
+    document.getElementById('prop-weight').value = node.weight || 0.5;
+    document.getElementById('prop-weight-value').textContent = (node.weight || 0.5).toFixed(1);
+    document.getElementById('prop-priority').value = node.priority || 0;
+    document.getElementById('prop-priority-value').textContent = node.priority ? node.priority.toFixed(1) : '-';
+    document.getElementById('prop-source').value = node.source || 'private';
+    document.getElementById('prop-alias').value = node.alias || '';
+
+    document.getElementById('properties-overlay').classList.add('visible');
+    document.getElementById('prop-title').focus();
+}
+
+function hideProperties() {
+    document.getElementById('properties-overlay').classList.remove('visible');
+}
+
+function saveProperties() {
+    if (!State.selectedId) return;
+
+    const nodeId = State.selectedId;
+    const props = {
+        title: document.getElementById('prop-title').value.trim(),
+        weight: parseFloat(document.getElementById('prop-weight').value),
+        priority: parseFloat(document.getElementById('prop-priority').value),
+        source: document.getElementById('prop-source').value,
+        alias: document.getElementById('prop-alias').value.trim()
+    };
+
+    hideProperties();
+
+    let updates = [];  // Each entry: [name, newValue, oldValue]
+
+    const node = findNodeById(State.view, nodeId);
+    if (props.title && props.title !== node.title) {
+        updates.push(['title', props.title, node.title]);
+    }
+    if (props.weight !== node.weight) {
+        updates.push(['weight', props.weight, node.weight]);
+    }
+    if (props.priority !== (node.priority || 0)) {
+        updates.push(['priority', props.priority, node.priority || 0]);
+    }
+    if (props.source !== node.source) {
+        updates.push(['source', props.source, node.source]);
+    }
+    if (props.alias !== (node.alias || '')) {
+        updates.push(['alias', props.alias || null, node.alias || null]);
+    }
+
+    if (updates.length === 0) {
+        setStatusMessage('No changes');
+        return;
+    }
+
+    function sendNext(index) {
+        if (index >= updates.length) {
+            getView(State.rootId);
+            setStatusMessage('Properties updated');
+            return;
+        }
+
+        const [name, value, oldValue] = updates[index];
+        setProperty(nodeId, name, value, () => {
+            sendNext(index + 1);
+        }, oldValue);
+    }
+
+    sendNext(0);
+}
+
+function showNewNote(mode) {
+    State.newNoteMode = mode;
+    document.getElementById('new-note-title').textContent =
+        mode === 'child' ? 'New Child Note' : 'New Sibling Note';
+    document.getElementById('new-note-input').value = '';
+    document.getElementById('new-note-overlay').classList.add('visible');
+    document.getElementById('new-note-input').focus();
+}
+
+function hideNewNote() {
+    document.getElementById('new-note-overlay').classList.remove('visible');
+    State.newNoteMode = null;
+}
+
+function createNewNote() {
+    const title = document.getElementById('new-note-input').value.trim();
+    if (!title) {
+        setStatusMessage('Title cannot be empty');
+        return;
+    }
+
+    // Save mode before hideNewNote clears it
+    const mode = State.newNoteMode;
+    hideNewNote();
+
+    if (mode === 'child') {
+        const parentId = State.selectedId || State.rootId;
+        if (!parentId) {
+            setStatusMessage('No parent selected');
+            return;
+        }
+
+        const parent = findNodeById(State.view, parentId);
+        let wikiContent = '';
+
+        if (parent && parent.children) {
+            for (const child of parent.children) {
+                wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+            }
+        }
+        wikiContent += `* ${title}\n`;
+
+        updateView(parentId, wikiContent, 2);
+
+    } else if (mode === 'sibling') {
+        if (!State.selectedId || State.selectedId === State.rootId) {
+            setStatusMessage('Cannot add sibling to root');
+            return;
+        }
+
+        const parentId = findParentId(State.view, State.selectedId);
+        if (!parentId) {
+            setStatusMessage('Could not find parent');
+            return;
+        }
+
+        const parent = findNodeById(State.view, parentId);
+        let wikiContent = '';
+
+        if (parent && parent.children) {
+            for (const child of parent.children) {
+                wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+                if (child.id === State.selectedId) {
+                    wikiContent += `* ${title}\n`;
+                }
+            }
+        }
+
+        updateView(parentId, wikiContent, 2);
+    }
+}
+
+function showConfirmDelete() {
+    if (!State.selectedId) return;
+
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    const childCount = node.numberOfChildren || (node.children ? node.children.length : 0);
+    let message = `Remove "${node.title}" from parent?`;
+    if (childCount > 0) {
+        message += `<br><br><span style="color: var(--muted-color)">This note has ${childCount} children. They will remain in the graph but won't appear in this view.</span>`;
+    }
+
+    document.getElementById('confirm-message').innerHTML = message;
+    document.getElementById('confirm-overlay').classList.add('visible');
+    // Focus the Remove button so Enter confirms by default
+    document.getElementById('confirm-remove-btn').focus();
+}
+
+function hideConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('visible');
+}
+
+function confirmDelete() {
+    hideConfirm();
+
+    if (!State.selectedId || State.selectedId === State.rootId) {
+        setStatusMessage('Cannot delete root');
+        return;
+    }
+
+    const parentId = findParentId(State.view, State.selectedId);
+    if (!parentId) {
+        setStatusMessage('Could not find parent');
+        return;
+    }
+
+    // Record undo info before deletion
+    const deletedNode = findNodeById(State.view, State.selectedId);
+    if (deletedNode) {
+        pushUndo({
+            type: 'delete',
+            parentId: parentId,
+            note: { id: deletedNode.id, title: deletedNode.title }
+        });
+    }
+
+    const parent = findNodeById(State.view, parentId);
+    let wikiContent = '';
+
+    if (parent && parent.children) {
+        for (const child of parent.children) {
+            if (child.id !== State.selectedId) {
+                wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+            }
+        }
+    }
+
+    State.selectedId = null;
+    updateView(parentId, wikiContent, 2);
+    setStatusMessage('Note removed from parent');
+}
+
+// =============================================================================
+// Cut/Copy/Paste (C-w, M-w, C-y)
+// =============================================================================
+
+function cutNote() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    if (State.selectedId === State.rootId) {
+        setStatusMessage('Cannot cut root note');
+        return;
+    }
+
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    State.clipboard = {
+        id: node.id,
+        title: node.title,
+        isCut: true
+    };
+    setStatusMessage(`Cut: "${node.title}"`);
+}
+
+function copyNote() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    State.clipboard = {
+        id: node.id,
+        title: node.title,
+        isCut: false
+    };
+    setStatusMessage(`Copied: "${node.title}"`);
+}
+
+function pasteNote() {
+    if (!State.clipboard) {
+        setStatusMessage('Clipboard is empty');
+        return;
+    }
+
+    const targetId = State.selectedId || State.rootId;
+    if (!targetId) {
+        setStatusMessage('No target for paste');
+        return;
+    }
+
+    const target = findNodeById(State.view, targetId);
+    if (!target) return;
+
+    // Build wiki content: existing children + pasted note
+    let wikiContent = '';
+    if (target.children) {
+        for (const child of target.children) {
+            wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+        }
+    }
+    // Add the pasted note as a child
+    wikiContent += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
+
+    // If it was a cut operation, remove from original parent
+    if (State.clipboard.isCut) {
+        const originalParentId = findParentId(State.view, State.clipboard.id);
+        if (originalParentId && originalParentId !== targetId) {
+            // Remove from original parent first
+            const originalParent = findNodeById(State.view, originalParentId);
+            let removeWiki = '';
+            if (originalParent && originalParent.children) {
+                for (const child of originalParent.children) {
+                    if (child.id !== State.clipboard.id) {
+                        removeWiki += `* ${child.title}\n    :${child.id}:\n`;
+                    }
+                }
+            }
+            // Update original parent to remove the cut note
+            updateView(originalParentId, removeWiki, 2);
+        }
+    }
+
+    // Update target with pasted note
+    updateView(targetId, wikiContent, 2);
+    const action = State.clipboard.isCut ? 'Moved' : 'Linked';
+    setStatusMessage(`${action}: "${State.clipboard.title}" under "${target.title}"`);
+
+    // Clear clipboard if it was a cut
+    if (State.clipboard.isCut) {
+        State.clipboard = null;
+    }
+}
+
+function pasteNoteAsSibling() {
+    if (!State.clipboard) {
+        setStatusMessage('Clipboard is empty');
+        return;
+    }
+
+    if (!State.selectedId || State.selectedId === State.rootId) {
+        setStatusMessage('Select a sibling target (not root)');
+        return;
+    }
+
+    const parentId = findParentId(State.view, State.selectedId);
+    if (!parentId) {
+        setStatusMessage('Cannot find parent');
+        return;
+    }
+
+    const parent = findNodeById(State.view, parentId);
+    if (!parent) return;
+
+    // Build wiki content: existing children with pasted note inserted after selected
+    let wikiContent = '';
+    const selectedIndex = parent.children ? parent.children.findIndex(c => c.id === State.selectedId) : -1;
+
+    if (parent.children) {
+        for (let i = 0; i < parent.children.length; i++) {
+            const child = parent.children[i];
+            wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+            // Insert pasted note after the selected sibling
+            if (i === selectedIndex) {
+                wikiContent += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
+            }
+        }
+    }
+
+    // If it was a cut operation, remove from original parent
+    if (State.clipboard.isCut) {
+        const originalParentId = findParentId(State.view, State.clipboard.id);
+        if (originalParentId && originalParentId !== parentId) {
+            const originalParent = findNodeById(State.view, originalParentId);
+            let removeWiki = '';
+            if (originalParent && originalParent.children) {
+                for (const child of originalParent.children) {
+                    if (child.id !== State.clipboard.id) {
+                        removeWiki += `* ${child.title}\n    :${child.id}:\n`;
+                    }
+                }
+            }
+            updateView(originalParentId, removeWiki, 2);
+        }
+    }
+
+    updateView(parentId, wikiContent, 2);
+    const action = State.clipboard.isCut ? 'Moved' : 'Linked';
+    setStatusMessage(`${action}: "${State.clipboard.title}" after "${findNodeById(State.view, State.selectedId).title}"`);
+
+    if (State.clipboard.isCut) {
+        State.clipboard = null;
+    }
+}
+
+function copyNoteReference() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    // Copy reference in smsn format to system clipboard
+    const reference = `*:${node.id}:`;
+    navigator.clipboard.writeText(reference).then(() => {
+        setStatusMessage(`Copied reference: ${reference}`);
+    }).catch(() => {
+        setStatusMessage('Failed to copy to clipboard');
+    });
+}
+
+function copyNoteTitle() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    navigator.clipboard.writeText(node.title).then(() => {
+        setStatusMessage(`Copied title: "${node.title}"`);
+    }).catch(() => {
+        setStatusMessage('Failed to copy to clipboard');
+    });
+}
+
+function moveNoteUp() {
+    if (!State.selectedId || State.selectedId === State.rootId) {
+        setStatusMessage('Cannot move this note');
+        return;
+    }
+
+    const parentId = findParentId(State.view, State.selectedId);
+    if (!parentId) return;
+
+    const parent = findNodeById(State.view, parentId);
+    if (!parent || !parent.children || parent.children.length < 2) return;
+
+    const index = parent.children.findIndex(c => c.id === State.selectedId);
+    if (index <= 0) {
+        setStatusMessage('Already at top');
+        return;
+    }
+
+    // Build wiki content with swapped order
+    let wikiContent = '';
+    for (let i = 0; i < parent.children.length; i++) {
+        let child;
+        if (i === index - 1) {
+            child = parent.children[index]; // Move selected up
+        } else if (i === index) {
+            child = parent.children[index - 1]; // Move previous down
+        } else {
+            child = parent.children[i];
+        }
+        wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+    }
+
+    updateView(parentId, wikiContent, 2);
+    setStatusMessage('Moved up');
+}
+
+function moveNoteDown() {
+    if (!State.selectedId || State.selectedId === State.rootId) {
+        setStatusMessage('Cannot move this note');
+        return;
+    }
+
+    const parentId = findParentId(State.view, State.selectedId);
+    if (!parentId) return;
+
+    const parent = findNodeById(State.view, parentId);
+    if (!parent || !parent.children || parent.children.length < 2) return;
+
+    const index = parent.children.findIndex(c => c.id === State.selectedId);
+    if (index >= parent.children.length - 1) {
+        setStatusMessage('Already at bottom');
+        return;
+    }
+
+    // Build wiki content with swapped order
+    let wikiContent = '';
+    for (let i = 0; i < parent.children.length; i++) {
+        let child;
+        if (i === index) {
+            child = parent.children[index + 1]; // Move next up
+        } else if (i === index + 1) {
+            child = parent.children[index]; // Move selected down
+        } else {
+            child = parent.children[i];
+        }
+        wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+    }
+
+    updateView(parentId, wikiContent, 2);
+    setStatusMessage('Moved down');
+}
+
+// =============================================================================
+// Tree Utilities
+// =============================================================================
+
+function findNodeById(node, id) {
+    if (!node) return null;
+    if (node.id === id) return node;
+    if (node.children) {
+        for (const child of node.children) {
+            const found = findNodeById(child, id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function findParentId(node, childId, parentId = null) {
+    if (!node) return null;
+    if (node.id === childId) return parentId;
+    if (node.children) {
+        for (const child of node.children) {
+            const found = findParentId(child, childId, node.id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function getVisibleNodeIds() {
+    const ids = [];
+    collectVisibleIds(State.view, true, ids);
+    return ids;
+}
+
+function collectVisibleIds(node, isRoot, ids) {
+    if (!node) return;
+    ids.push(node.id);
+    const isExpanded = State.expandedNodes.has(node.id);
+    if (isExpanded && node.children) {
+        for (const child of node.children) {
+            collectVisibleIds(child, false, ids);
+        }
+    }
+}
+
+function moveSelection(direction) {
+    const visibleIds = getVisibleNodeIds();
+    if (visibleIds.length === 0) return;
+
+    const currentIndex = visibleIds.indexOf(State.selectedId);
+    let newIndex;
+
+    if (currentIndex === -1) {
+        newIndex = direction > 0 ? 0 : visibleIds.length - 1;
+    } else {
+        newIndex = currentIndex + direction;
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex >= visibleIds.length) newIndex = visibleIds.length - 1;
+    }
+
+    selectNode(visibleIds[newIndex]);
+
+    const selectedEl = document.querySelector(`.tree-node[data-id="${State.selectedId}"]`);
+    if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest' });
+    }
+}
+
+// =============================================================================
+// Rendering
+// =============================================================================
+
+function render() {
+    renderPane(0);
+    if (State.splitView) {
+        renderPane(1);
+    }
+    updateNodeCount();
+}
+
+function renderPane(paneIndex) {
+    const containerId = `tree-container-${paneIndex}`;
+    const container = document.getElementById(containerId);
+    const pane = State.panes[paneIndex];
+
+    if (!pane.view) {
+        container.innerHTML = '<div class="loading">No data</div>';
+        return;
+    }
+
+    // Render using pane-specific state
+    container.innerHTML = renderNodeForPane(pane.view, true, 0, paneIndex);
+}
+
+function renderNodeForPane(node, isRoot, depth, paneIndex) {
+    if (!node) return '';
+
+    const pane = State.panes[paneIndex];
+    const hasChildren = node.children && node.children.length > 0;
+    const isExpanded = pane.expandedNodes.has(node.id);
+    const isSelected = pane.selectedId === node.id;
+    const isEditing = State.editingNodeId === node.id;
+
+    // Determine toggle icon:
+    // - expanded with children visible
+    // - collapsed but has children loaded (can expand)
+    // - has children (numberOfChildren > 0) but not loaded (at view depth edge)
+    // - no children at all
+    const logicalChildCount = node.numberOfChildren || (node.children ? node.children.length : 0);
+    let toggleIcon;
+    if (hasChildren) {
+        toggleIcon = isExpanded ? '\u25BC' : '\u25B6';
+    } else if (logicalChildCount > 0) {
+        toggleIcon = '\u25B7';  // Hollow triangle - has children but not loaded
+    } else {
+        toggleIcon = '\u00B7';  // No children
+    }
+
+    const weight = parseFloat(node.weight) || 0.5;
+    const source = node.source || 'private';
+    const shortcutOrAlias = node.shortcut || node.alias;  // Check both fields
+    const hasAlias = !!shortcutOrAlias;
+    const hasPriority = node.priority && node.priority > 0;
+
+    const textColor = getNoteColor(source, weight);
+
+    const priorityHtml = hasPriority
+        ? `<span class="node-priority" title="Priority: ${node.priority.toFixed(1)}">!</span>`
+        : `<span class="priority-spacer"></span>`;
+
+    const childCountHtml = hasChildren && !isExpanded
+        ? `<span class="node-meta">(${node.numberOfChildren || node.children.length})</span>`
+        : '';
+
+    let titleHtml;
+    if (isEditing) {
+        titleHtml = `<input type="text" class="edit-input" id="edit-title-input"
+            value="${escapeAttr(node.title || '')}"
+            onkeydown="handleEditKeydown(event)"
+            onblur="cancelEditTitle()" />`;
+    } else {
+        const titleText = escapeHtml(node.title || '[no title]');
+        const aliasClass = hasAlias ? ' has-alias' : '';
+        titleHtml = `<span style="color: ${textColor}" class="${aliasClass}" title="${hasAlias ? 'Alias: ' + shortcutOrAlias : ''}">${titleText}</span>`;
+    }
+
+    let html = `
+        <div class="tree-node ${isRoot ? 'root' : ''} ${isSelected ? 'selected' : ''} ${isEditing ? 'editing' : ''}"
+             data-id="${node.id}" data-depth="${depth}" data-pane="${paneIndex}">
+            ${priorityHtml}
+            <span class="toggle" style="color: ${textColor}" onclick="event.stopPropagation(); toggleExpandPane('${node.id}', ${paneIndex})">${toggleIcon}</span>
+            <div class="node-content" onclick="handleNodeClickPane('${node.id}', ${paneIndex})">
+                <span class="node-title">${titleHtml}</span>
+                ${childCountHtml}
+            </div>
+        </div>
+    `;
+
+    if (hasChildren) {
+        html += `<div class="children ${isExpanded ? '' : 'collapsed'}">`;
+        for (const child of node.children) {
+            html += renderNodeForPane(child, false, depth + 1, paneIndex);
+        }
+        html += '</div>';
+    }
+
+    return html;
+}
+
+function renderNode(node, isRoot = false, depth = 0) {
+    if (!node) return '';
+
+    const hasChildren = node.children && node.children.length > 0;
+    const isExpanded = State.expandedNodes.has(node.id);
+    const isSelected = State.selectedId === node.id;
+    const isEditing = State.editingNodeId === node.id;
+
+    // Determine toggle icon:
+    // - expanded with children visible
+    // - collapsed but has children loaded (can expand)
+    // - has children (numberOfChildren > 0) but not loaded (at view depth edge)
+    // - no children at all
+    const logicalChildCount = node.numberOfChildren || (node.children ? node.children.length : 0);
+    let toggleIcon;
+    if (hasChildren) {
+        toggleIcon = isExpanded ? '\u25BC' : '\u25B6';
+    } else if (logicalChildCount > 0) {
+        toggleIcon = '\u25B7';  // Hollow triangle - has children but not loaded
+    } else {
+        toggleIcon = '\u00B7';  // No children
+    }
+
+    const weight = parseFloat(node.weight) || 0.5;
+    const source = node.source || 'private';
+    const shortcutOrAlias = node.shortcut || node.alias;  // Check both fields
+    const hasAlias = !!shortcutOrAlias;
+    const hasPriority = node.priority && node.priority > 0;
+
+    const textColor = getNoteColor(source, weight);
+
+    const priorityHtml = hasPriority
+        ? `<span class="node-priority" title="Priority: ${node.priority.toFixed(1)}">!</span>`
+        : '';
+
+    const childCountHtml = hasChildren && !isExpanded
+        ? `<span class="node-meta">(${node.numberOfChildren || node.children.length})</span>`
+        : '';
+
+    let titleHtml;
+    if (isEditing) {
+        titleHtml = `<input type="text" class="edit-input" id="edit-title-input"
+            value="${escapeAttr(node.title || '')}"
+            onkeydown="handleEditKeydown(event)"
+            onblur="cancelEditTitle()" />`;
+    } else {
+        const titleText = escapeHtml(node.title || '[no title]');
+        const aliasClass = hasAlias ? ' has-alias' : '';
+        titleHtml = `<span style="color: ${textColor}" class="${aliasClass}">${titleText}</span>`;
+    }
+
+    let html = `
+        <div class="tree-node ${isRoot ? 'root' : ''} ${isSelected ? 'selected' : ''} ${isEditing ? 'editing' : ''}"
+             data-id="${node.id}" data-depth="${depth}">
+            <span class="toggle" style="color: ${textColor}" onclick="event.stopPropagation(); toggleExpand('${node.id}')">${toggleIcon}</span>
+            <div class="node-content" onclick="handleNodeClick('${node.id}')">
+                <span class="node-title">${priorityHtml}${titleHtml}</span>
+                ${childCountHtml}
+            </div>
+        </div>
+    `;
+
+    if (hasChildren) {
+        html += `<div class="children ${isExpanded ? '' : 'collapsed'}">`;
+        for (const child of node.children) {
+            html += renderNode(child, false, depth + 1);
+        }
+        html += '</div>';
+    }
+
+    return html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function escapeAttr(text) {
+    return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// =============================================================================
+// UI Updates
+// =============================================================================
+
+function updateConnectionStatus(status) {
+    const el = document.getElementById('connection-status');
+    el.className = status;
+
+    switch (status) {
+        case 'connected':
+            el.textContent = 'Connected';
+            break;
+        case 'connecting':
+            el.textContent = 'Connecting...';
+            break;
+        case 'disconnected':
+            el.textContent = 'Disconnected (reconnecting...)';
+            break;
+        case 'error':
+            el.textContent = 'Connection error';
+            break;
+    }
+}
+
+function setStatusMessage(msg) {
+    document.getElementById('status-message').textContent = msg;
+}
+
+function updateNodeCount() {
+    const count = countNodes(State.view);
+    document.getElementById('node-count').textContent = `${count} notes`;
+}
+
+function countNodes(node) {
+    if (!node) return 0;
+    let count = 1;
+    if (node.children) {
+        for (const child of node.children) {
+            count += countNodes(child);
+        }
+    }
+    return count;
+}
+
+function updateSourceOptions() {
+    const select = document.getElementById('prop-source');
+    select.innerHTML = '';
+
+    if (State.config && State.config.sources) {
+        State.config.sources.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.name;
+            option.textContent = s.name;
+            select.appendChild(option);
+        });
+    }
+}
+
+function updateSourceLegend() {
+    const legend = document.getElementById('source-legend');
+    legend.innerHTML = '';
+
+    if (State.config && State.config.sources) {
+        // Show all sources in the legend
+        State.config.sources.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML = `
+                <div class="legend-color" style="background: ${colorToHex(parseColor(s.color))}"></div>
+                <span>${s.name}</span>
+            `;
+            legend.appendChild(item);
+        });
+    }
+}
+
+function toggleHelp() {
+    document.getElementById('help-overlay').classList.toggle('visible');
+}
+
+function hideHelp() {
+    document.getElementById('help-overlay').classList.remove('visible');
+}
+
+// =============================================================================
+// Event Handlers
+// =============================================================================
+
+function handleNodeClick(nodeId) {
+    if (State.editingNodeId) return;
+
+    if (State.selectedId === nodeId) {
+        visitTarget(nodeId);
+    } else {
+        selectNode(nodeId);
+    }
+}
+
+function handleEditKeydown(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        saveEditTitle();
+    } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelEditTitle();
+    }
+}
+
+// =============================================================================
+// Keyboard Handling - Emacs-style Chords
+// =============================================================================
+
+// Emacs-style keybindings: C-c and C-x prefixes followed by second key
+// Maps 'C-c X' and 'C-x X' to actions, matching smsn-mode/Emacs where possible
+// C-c C-t is a sub-prefix for "set" operations (C-c C-t C-w for weight, etc.)
+const chordBindings = {
+    'C-c': {
+    // C-c t - visit target (push view into selected note)
+    't': () => { if (State.selectedId) visitTarget(State.selectedId); },
+    // C-c b - backward view
+    'b': () => setViewStyle('backward'),
+    // C-c f - forward view / find roots
+    'f': () => {
+        if (State.rootId) {
+            setViewStyle('forward');
+        } else {
+            findRoots();
+        }
+    },
+    // C-c s - search (title query)
+    's': () => {
+        const input = document.getElementById(`search-input-${State.activePane}`);
+        if (input) {
+            input.focus();
+            input.select();  // Select existing text so typing replaces it
+        }
+    },
+    // C-c u - update/refresh view
+    'u': () => refreshView(),
+    // C-c n - new note
+    'n': () => showNewNote('child'),
+    // C-c p - push view to server (save changes to graph)
+    'p': () => pushViewToServer(),
+    // C-c h - history
+    'h': () => popView(),
+    // C-c x - shortcut query (go to alias)
+    'x': () => gotoAlias(),
+    // C-c d - duplicates / delete
+    'd': () => showConfirmDelete(),
+    // C-c r - copy reference to clipboard (smsn-mode)
+    'r': () => copyNoteReference(),
+    // C-c v - copy title to clipboard (smsn-mode)
+    'v': () => copyNoteTitle(),
+    // C-c C-d - set view depth (prompts for number)
+    'C-d': () => promptViewDepth(),
+    // C-c C-f - find roots
+    'C-f': () => findRoots(),
+    // C-c C-t - sub-prefix for "set" operations (enters C-c C-t mode)
+    'C-t': 'C-c C-t',  // Special marker to enter sub-chord mode
+    // C-c C-v - sub-prefix for view options
+    'C-v': 'C-c C-v',
+    },
+    // C-c C-t sub-bindings for setting properties
+    'C-c C-t': {
+        // C-c C-t i - show property info overlay
+        'i': () => showProperties(),
+        // C-c C-t C-w - set weight (followed by 0-4)
+        'C-w': () => promptSetWeightNumeric(),
+        // C-c C-t C-s - set source
+        'C-s': () => promptSetSource(),
+        // C-c C-t C-p - set priority (followed by 0-4)
+        'C-p': () => promptSetPriorityNumeric(),
+        // C-c C-t C-a - set shortcut/alias
+        'C-a': () => promptSetShortcut(),
+    },
+    // C-c C-v sub-bindings for view options
+    'C-c C-v': {
+        // C-c C-v o - toggle line wrap (truncate-lines in Emacs)
+        'o': () => toggleWrapTitles(),
+    },
+    'C-x': {
+        // C-x k - kill buffer (go back/pop view)
+        'k': () => popView(),
+        // C-x 3 - split window (toggle split view)
+        '3': () => toggleSplit(),
+        // C-x 1 - delete other windows (close split)
+        '1': () => { if (State.splitView) toggleSplit(); },
+        // C-x o - other window (switch pane)
+        'o': () => { if (State.splitView) setActivePane(State.activePane === 0 ? 1 : 0); },
+    }
+};
+
+function showChordStatus(text) {
+    setStatusMessage(text);
+}
+
+function clearChordStatus() {
+    setStatusMessage('');
+}
+
+function promptViewDepth() {
+    const depth = prompt('View depth (1-4):', getPane().viewDepth);
+    if (depth) {
+        const d = parseInt(depth, 10);
+        if (d >= 1 && d <= 4) {
+            setViewDepth(State.activePane, d);
+        }
+    }
+}
+
+function promptSetWeight() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    // smsn-mode uses 0-4 scale mapped to 0.0-1.0 (n/4)
+    const currentWeight = node.weight || 0.5;
+    const input = prompt(
+        'Weight (0-4, or 0.0-1.0):\n' +
+        '  0=0.00  1=0.25  2=0.50  3=0.75  4=1.00',
+        currentWeight
+    );
+    if (input === null) return;
+
+    let weight = parseFloat(input);
+    if (isNaN(weight)) return;
+
+    // If integer 0-4, convert to 0.0-1.0 scale
+    if (Number.isInteger(weight) && weight >= 0 && weight <= 4) {
+        weight = weight / 4.0;
+    }
+
+    // Clamp to valid range
+    weight = Math.max(0.0, Math.min(1.0, weight));
+
+    setProperty(State.selectedId, 'weight', weight, () => {
+        refreshView();
+        setStatusMessage(`Weight set to ${weight.toFixed(2)}`);
+    });
+}
+
+function promptSetSource() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    // Build source options from config
+    let sourceList = 'Sources:\n';
+    let sourceNames = [];
+    if (State.config && State.config.sources) {
+        State.config.sources.forEach((s, i) => {
+            sourceList += `  ${s.code || i}: ${s.name}\n`;
+            sourceNames.push(s.name);
+        });
+    }
+
+    const input = prompt(
+        sourceList + '\nEnter source code or name:',
+        node.source || 'private'
+    );
+    if (input === null || input.trim() === '') return;
+
+    // Find matching source by code or name
+    let sourceName = null;
+    if (State.config && State.config.sources) {
+        for (const s of State.config.sources) {
+            if (s.code === input || s.name === input || s.name.toLowerCase() === input.toLowerCase()) {
+                sourceName = s.name;
+                break;
+            }
+        }
+    }
+
+    if (!sourceName) {
+        setStatusMessage('Unknown source: ' + input);
+        return;
+    }
+
+    setProperty(State.selectedId, 'source', sourceName, () => {
+        refreshView();
+        setStatusMessage(`Source set to ${sourceName}`);
+    });
+}
+
+function promptSetPriority() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    const currentPriority = node.priority || 0;
+    const input = prompt(
+        'Priority (0-4, or 0.0-1.0):\n' +
+        '  0=none  1=0.25  2=0.50  3=0.75  4=1.00',
+        currentPriority > 0 ? currentPriority : '0'
+    );
+    if (input === null) return;
+
+    let priority = parseFloat(input);
+    if (isNaN(priority)) return;
+
+    // If integer 0-4, convert to 0.0-1.0 scale
+    if (Number.isInteger(priority) && priority >= 0 && priority <= 4) {
+        priority = priority / 4.0;
+    }
+
+    // Clamp to valid range
+    priority = Math.max(0.0, Math.min(1.0, priority));
+
+    setProperty(State.selectedId, 'priority', priority, () => {
+        refreshView();
+        setStatusMessage(priority > 0 ? `Priority set to ${priority.toFixed(2)}` : 'Priority cleared');
+    });
+}
+
+// Numeric prompt functions for C-c C-t bindings (wait for single digit 0-4)
+function promptSetWeightNumeric() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    setStatusMessage('Weight (0-4):');
+    State.pendingNumericAction = 'weight';
+}
+
+function promptSetPriorityNumeric() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    setStatusMessage('Priority (0-4):');
+    State.pendingNumericAction = 'priority';
+}
+
+function promptSetShortcut() {
+    if (!State.selectedId) {
+        setStatusMessage('No note selected');
+        return;
+    }
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) return;
+
+    const input = prompt('Shortcut (alias):', node.shortcut || '');
+    if (input === null) return;
+
+    setProperty(State.selectedId, 'shortcut', input.trim() || null, () => {
+        refreshView();
+        setStatusMessage(input.trim() ? `Shortcut set to "${input.trim()}"` : 'Shortcut cleared');
+    });
+}
+
+function handleNumericInput(digit) {
+    const node = findNodeById(State.view, State.selectedId);
+    if (!node) {
+        State.pendingNumericAction = null;
+        return;
+    }
+
+    if (State.pendingNumericAction === 'weight') {
+        const weight = digit / 4.0;
+        const oldWeight = node.weight || 0.5;
+        setProperty(State.selectedId, 'weight', weight, () => {
+            refreshView();
+            setStatusMessage(`Weight set to ${weight.toFixed(2)}`);
+        }, oldWeight);
+    } else if (State.pendingNumericAction === 'priority') {
+        const priority = digit / 4.0;
+        const oldPriority = node.priority || 0;
+        setProperty(State.selectedId, 'priority', priority, () => {
+            refreshView();
+            setStatusMessage(priority > 0 ? `Priority set to ${priority.toFixed(2)}` : 'Priority cleared');
+        }, oldPriority);
+    }
+    State.pendingNumericAction = null;
+}
+
+// =============================================================================
+// Main Keyboard Event Handler
+// =============================================================================
+
+function setupKeyboardHandler() {
+    document.addEventListener('keydown', (e) => {
+        const activeSearchInput = document.getElementById(`search-input-${State.activePane}`);
+        const inSearch = document.activeElement && document.activeElement.classList.contains('search-input');
+        const helpVisible = document.getElementById('help-overlay').classList.contains('visible');
+        const propsVisible = document.getElementById('properties-overlay').classList.contains('visible');
+        const confirmVisible = document.getElementById('confirm-overlay').classList.contains('visible');
+        const newNoteVisible = document.getElementById('new-note-overlay').classList.contains('visible');
+        const inOverlay = propsVisible || confirmVisible || newNoteVisible;
+
+        // Handle Escape - always cancels pending chord, numeric action, or current action
+        if (e.key === 'Escape') {
+            if (State.pendingChord) {
+                State.pendingChord = null;
+                clearChordStatus();
+                return;
+            }
+            if (State.pendingNumericAction) {
+                State.pendingNumericAction = null;
+                setStatusMessage('Cancelled');
+                return;
+            }
+            if (State.editingNodeId) {
+                cancelEditTitle();
+            } else if (helpVisible) {
+                hideHelp();
+            } else if (propsVisible) {
+                hideProperties();
+            } else if (confirmVisible) {
+                hideConfirm();
+                return;
+            } else if (newNoteVisible) {
+                hideNewNote();
+            } else if (inSearch) {
+                document.activeElement.value = '';
+                document.activeElement.blur();
+            }
+            return;
+        }
+
+        // Handle confirm dialog keyboard navigation
+        if (confirmVisible) {
+            const removeBtn = document.getElementById('confirm-remove-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Execute whichever button is focused, or Remove by default
+                if (document.activeElement === cancelBtn) {
+                    hideConfirm();
+                } else {
+                    confirmDelete();
+                }
+                return;
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
+                e.preventDefault();
+                // Toggle focus between buttons
+                if (document.activeElement === removeBtn) {
+                    cancelBtn.focus();
+                } else {
+                    removeBtn.focus();
+                }
+                return;
+            }
+            return;  // Don't process other keys when confirm dialog is open
+        }
+
+        // Handle numeric input for weight/priority (after C-c C-t C-w or C-c C-t C-p)
+        if (State.pendingNumericAction) {
+            const digit = parseInt(e.key);
+            if (!isNaN(digit) && digit >= 0 && digit <= 4) {
+                e.preventDefault();
+                handleNumericInput(digit);
+                return;
+            } else if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
+                // Invalid key, cancel
+                State.pendingNumericAction = null;
+                setStatusMessage('Invalid input, expected 0-4');
+                return;
+            }
+        }
+
+        // Handle C-c and C-x chord initiation
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'x')) {
+            if (!State.editingNodeId && !inOverlay && !inSearch) {
+                e.preventDefault();
+                State.pendingChord = 'C-' + e.key;
+                showChordStatus(State.pendingChord + '-');
+                return;
+            }
+        }
+
+        // Emacs standard bindings (single keys with modifiers)
+        // Only process these if NOT in a pending chord sequence
+        if (!State.editingNodeId && !inOverlay && !inSearch && !State.pendingChord) {
+            // C-w - kill/cut region (cut note)
+            if (e.ctrlKey && e.key === 'w') {
+                e.preventDefault();
+                cutNote();
+                return;
+            }
+            // M-w - copy region (copy note) - Alt+w
+            if (e.altKey && e.key === 'w') {
+                e.preventDefault();
+                copyNote();
+                return;
+            }
+            // C-y - yank/paste as child
+            if (e.ctrlKey && !e.shiftKey && e.key === 'y') {
+                e.preventDefault();
+                pasteNote();
+                return;
+            }
+            // C-S-y - yank/paste as sibling
+            if (e.ctrlKey && e.shiftKey && e.key === 'Y') {
+                e.preventDefault();
+                pasteNoteAsSibling();
+                return;
+            }
+            // C-/ or C-_ - undo (placeholder for now)
+            if (e.ctrlKey && (e.key === '/' || e.key === '_')) {
+                e.preventDefault();
+                undo();
+                return;
+            }
+            // M-up / M-down - move note up/down in parent
+            if (e.altKey && e.key === 'ArrowUp') {
+                e.preventDefault();
+                moveNoteUp();
+                return;
+            }
+            if (e.altKey && e.key === 'ArrowDown') {
+                e.preventDefault();
+                moveNoteDown();
+                return;
+            }
+        }
+
+        // Handle second/third key of chord
+        if (State.pendingChord && chordBindings[State.pendingChord]) {
+            // Prevent browser default IMMEDIATELY to stop Ctrl+W from closing tab, etc.
+            e.preventDefault();
+            e.stopPropagation();
+
+            const prefix = State.pendingChord;
+
+            // Build the chord key (e.g., 't' or 'C-d' for Ctrl+d)
+            let chordKey = e.key;
+            if (e.ctrlKey && e.key !== 'Control') {
+                chordKey = 'C-' + e.key;
+            }
+
+            const action = chordBindings[prefix][chordKey];
+            if (typeof action === 'string') {
+                // This is a sub-prefix (e.g., 'C-c C-t'), enter that mode
+                State.pendingChord = action;
+                showChordStatus(action + '-');
+            } else if (typeof action === 'function') {
+                State.pendingChord = null;
+                clearChordStatus();
+                action();
+            } else {
+                State.pendingChord = null;
+                clearChordStatus();
+                setStatusMessage(`Unknown chord: ${prefix} ${chordKey}`);
+            }
+            return;
+        }
+
+        if (State.editingNodeId) return;
+        if (inOverlay) return;
+
+        if (helpVisible) {
+            hideHelp();
+            return;
+        }
+
+        if (inSearch) {
+            if (e.key === 'Enter') {
+                const query = document.activeElement.value.trim();
+                // Determine which pane this search input belongs to
+                const inputId = document.activeElement.id;
+                const paneIndex = inputId.endsWith('-0') ? 0 : 1;
+                if (query) {
+                    searchInPane(query, paneIndex);
+                }
+            }
+            return;
+        }
+
+        // Simple (non-chord) key bindings for quick access
+        switch (e.key) {
+            case 'Tab':
+                if (State.splitView) {
+                    e.preventDefault();
+                    setActivePane(State.activePane === 0 ? 1 : 0);
+                }
+                break;
+            case '/':
+                e.preventDefault();
+                if (activeSearchInput) activeSearchInput.focus();
+                break;
+            case '?':
+                toggleHelp();
+                break;
+            // Vim-style navigation (kept for convenience)
+            case 'j':
+            case 'ArrowDown':
+                e.preventDefault();
+                moveSelection(1);
+                break;
+            case 'k':
+            case 'ArrowUp':
+                e.preventDefault();
+                moveSelection(-1);
+                break;
+            case 'h':
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (State.selectedId && getPane().expandedNodes.has(State.selectedId)) {
+                    toggleExpand(State.selectedId);
+                }
+                break;
+            case 'l':
+            case 'ArrowRight':
+                e.preventDefault();
+                if (State.selectedId) {
+                    const node = findNodeById(State.view, State.selectedId);
+                    if (node && node.children && node.children.length > 0 && !getPane().expandedNodes.has(State.selectedId)) {
+                        toggleExpand(State.selectedId);
+                    }
+                }
+                break;
+            case 'Enter':
+                if (State.selectedId) {
+                    visitTarget(State.selectedId);
+                }
+                break;
+            case 'Backspace':
+                e.preventDefault();
+                popView();
+                break;
+            // Quick access keys (in addition to C-c chords)
+            case 'r':
+                refreshView();
+                break;
+            case 'e':
+                if (State.selectedId) {
+                    startEditTitle(State.selectedId);
+                }
+                break;
+            case 'n':
+                e.preventDefault();
+                showNewNote('child');
+                break;
+            case 'N':
+                e.preventDefault();
+                showNewNote('sibling');
+                break;
+            case 'p':
+                showProperties();
+                break;
+            case 'd':
+                showConfirmDelete();
+                break;
+            case 'g':
+                gotoAlias();
+                break;
+        }
+    });
+}
+
+// =============================================================================
+// Event Listener Setup (called after DOM ready)
+// =============================================================================
+
+function setupEventListeners() {
+    // Property sliders
+    document.getElementById('prop-weight').addEventListener('input', (e) => {
+        document.getElementById('prop-weight-value').textContent = parseFloat(e.target.value).toFixed(1);
+    });
+
+    document.getElementById('prop-priority').addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById('prop-priority-value').textContent = val > 0 ? val.toFixed(1) : '-';
+    });
+
+    // New note input
+    document.getElementById('new-note-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            createNewNote();
+        } else if (e.key === 'Escape') {
+            hideNewNote();
+        }
+    });
+
+    // Set up keyboard handler
+    setupKeyboardHandler();
+}
+
+// =============================================================================
+// Initialization
+// =============================================================================
+
+function init() {
+    setupEventListeners();
+    connect();
+}
+
+// Start when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

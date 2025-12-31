@@ -1,0 +1,478 @@
+/* Semantic Synchrony Web UI - Styles */
+
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --muted-color: #808080;
+    --border-color: #cccccc;
+    --hover-bg: #f0f0f0;
+    --selected-bg: #cce5ff;
+    --priority-color: #cc0000;
+    --success-color: #00aa00;
+    --warning-color: #cc8800;
+    --indent-width: 24px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f8f8f8;
+}
+
+header h1 {
+    font-size: 16px;
+    font-weight: normal;
+    color: #0066cc;
+}
+
+#connection-status {
+    font-size: 12px;
+    color: var(--muted-color);
+}
+
+#connection-status.connected {
+    color: var(--success-color);
+}
+
+#connection-status.error {
+    color: var(--priority-color);
+}
+
+/* Toolbar components (used in header and per-pane toolbars) */
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background: var(--border-color);
+    margin: 0 8px;
+}
+
+.toolbar-btn {
+    padding: 4px 8px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+}
+
+.toolbar-btn:hover {
+    background: #e8e8e8;
+}
+
+.toolbar-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.toolbar-btn.active {
+    background: #0066cc;
+    color: white;
+    border-color: #0066cc;
+}
+
+.toolbar-label {
+    font-size: 12px;
+    color: var(--muted-color);
+    margin-right: 4px;
+}
+
+.depth-select {
+    padding: 3px 6px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.depth-select:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
+/* Panes container */
+#panes-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Pane wrapper (includes search, toolbar, and content) */
+.pane-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+.pane-wrapper.active-pane {
+    border-color: #0066cc;
+}
+
+#pane-wrapper-1 {
+    display: none;
+}
+
+.split-view #pane-wrapper-1 {
+    display: flex;
+}
+
+#pane-divider {
+    display: none;
+    width: 4px;
+    background: var(--border-color);
+    cursor: col-resize;
+}
+
+#pane-divider:hover {
+    background: #0066cc;
+}
+
+.split-view #pane-divider {
+    display: block;
+}
+
+/* Per-pane search */
+.pane-search {
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: #f8f8f8;
+}
+
+.search-input {
+    width: 100%;
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
+/* Per-pane toolbar */
+.pane-toolbar {
+    padding: 6px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Pane content (tree view) */
+.pane-content {
+    flex: 1;
+    overflow: auto;
+    padding: 8px 0;
+    outline: none;  /* Hide focus outline - selection is shown in tree */
+}
+
+/* Tree view */
+.tree-node {
+    padding: 2px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.tree-node:hover {
+    background-color: var(--hover-bg);
+}
+
+.tree-node.selected {
+    background-color: var(--selected-bg);
+}
+
+.tree-node.root {
+    font-weight: bold;
+}
+
+.tree-node.editing {
+    background-color: var(--hover-bg);
+}
+
+.toggle {
+    width: 16px;
+    flex-shrink: 0;
+    color: var(--muted-color);
+    user-select: none;
+}
+
+.toggle:hover {
+    color: var(--text-color);
+}
+
+.node-content {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.node-title {
+    flex: 1;
+    word-wrap: break-word;
+}
+
+/* No-wrap mode for titles */
+.no-wrap-titles .node-title {
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.no-wrap-titles .pane-content {
+    overflow-x: auto;
+}
+
+.has-alias {
+    text-decoration: underline;
+}
+
+.node-meta {
+    font-size: 12px;
+    color: var(--muted-color);
+    flex-shrink: 0;
+}
+
+.node-priority {
+    color: #cc0000;
+    cursor: default;
+    font-weight: bold;
+    width: 12px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.priority-spacer {
+    width: 12px;
+    flex-shrink: 0;
+}
+
+.children {
+    margin-left: var(--indent-width);
+}
+
+.children.collapsed {
+    display: none;
+}
+
+
+/* Inline editing */
+.edit-input {
+    flex: 1;
+    padding: 2px 6px;
+    background: white;
+    border: 1px solid #0066cc;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 14px;
+    border-radius: 2px;
+}
+
+.edit-input:focus {
+    outline: none;
+}
+
+/* Status bar */
+footer {
+    padding: 4px 16px;
+    border-top: 1px solid var(--border-color);
+    font-size: 12px;
+    color: var(--muted-color);
+    display: flex;
+    justify-content: space-between;
+    background: #f8f8f8;
+}
+
+/* Overlays */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay.visible {
+    display: flex;
+}
+
+.overlay-content {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 24px;
+    border-radius: 8px;
+    max-width: 500px;
+    min-width: 300px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.overlay-content h2 {
+    margin-bottom: 16px;
+    color: #0066cc;
+}
+
+.overlay-content table {
+    width: 100%;
+}
+
+.overlay-content td {
+    padding: 4px 8px;
+}
+
+.overlay-content td:first-child {
+    color: #0066cc;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Properties panel */
+.property-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.property-row label {
+    width: 80px;
+    color: var(--muted-color);
+}
+
+.property-row input,
+.property-row select {
+    flex: 1;
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.property-row input:focus,
+.property-row select:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
+.button-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+button {
+    padding: 6px 16px;
+    background: #f0f0f0;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e0e0e0;
+}
+
+button.primary {
+    background: #0066cc;
+    border-color: #0066cc;
+    color: white;
+}
+
+button.primary:hover {
+    background: #0055aa;
+}
+
+button.danger {
+    background: #cc0000;
+    border-color: #cc0000;
+    color: white;
+}
+
+button.danger:hover {
+    background: #aa0000;
+}
+
+/* Loading state */
+.loading {
+    color: var(--muted-color);
+    padding: 16px;
+    text-align: center;
+}
+
+/* Confirm dialog */
+.confirm-message {
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+/* Source color legend */
+#source-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    margin-left: auto;  /* Push to the right */
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
