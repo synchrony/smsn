@@ -44,7 +44,9 @@ A browser-based frontend for Semantic Synchrony, providing a lightweight alterna
 
 ## Keyboard Shortcuts
 
-### Navigation
+The Web UI supports both quick single-key shortcuts and Emacs-style `C-c` chord sequences (matching smsn-mode where possible).
+
+### Quick Keys
 
 | Key | Action |
 |-----|--------|
@@ -55,24 +57,53 @@ A browser-based frontend for Semantic Synchrony, providing a lightweight alterna
 | `/` | Focus search input |
 | `r` | Refresh current view |
 | `g` | Go to alias (shortcut) or open URL |
-| `Tab` | Switch pane (in split view) |
-
-### Editing
-
-| Key | Action |
-|-----|--------|
 | `e` | Edit selected note title inline |
 | `n` | Create new child note |
 | `N` | Create new sibling note |
-| `p` | Edit properties (weight, priority, source, shortcut) |
-| `d` | Delete selected note (removes from parent) |
+| `p` | Edit properties |
+| `d` | Delete selected note |
+| `Tab` | Switch pane (in split view) |
+| `?` | Show keyboard shortcuts |
+| `Escape` | Cancel / close dialog |
 
-### Other
+### Emacs-style Chords (C-c ...)
+
+Press `Ctrl+C` followed by the second key. The status bar shows `C-c-` while waiting.
+
+| Chord | Action |
+|-------|--------|
+| `C-c t` | Push view (focus selected note) |
+| `C-c h` | Pop view (history back) |
+| `C-c b` | Backward view (show parents) |
+| `C-c f` | Forward view (show children) |
+| `C-c s` | Search (focus search input) |
+| `C-c u` | Update/refresh view |
+| `C-c n` | New child note |
+| `C-c p` | Edit properties |
+| `C-c d` | Delete note |
+| `C-c x` | Go to shortcut/alias |
+| `C-c r` | Copy note reference to clipboard |
+| `C-c v` | Copy note title to clipboard |
+| `C-c C-d` | Set view depth (prompts) |
+| `C-c C-f` | Find roots |
+
+### Emacs-style Chords (C-x ...)
+
+| Chord | Action |
+|-------|--------|
+| `C-x k` | Kill buffer (pop view / go back) |
+| `C-x 3` | Split window (toggle split view) |
+| `C-x 1` | Delete other windows (close split) |
+| `C-x o` | Other window (switch pane) |
+
+### Standard Emacs Bindings
 
 | Key | Action |
 |-----|--------|
-| `Escape` | Cancel edit / close dialog |
-| `?` | Show keyboard shortcuts |
+| `C-w` | Kill/cut note |
+| `M-w` | Copy note |
+| `C-y` | Yank/paste note |
+| `M-↑` / `M-↓` | Move note up/down in parent |
 
 ## Properties
 
