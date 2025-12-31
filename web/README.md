@@ -102,7 +102,8 @@ Press `Ctrl+C` followed by the second key. The status bar shows `C-c-` while wai
 |-----|--------|
 | `C-w` | Kill/cut note |
 | `M-w` | Copy note |
-| `C-y` | Yank/paste note |
+| `C-y` | Yank/paste as child |
+| `C-S-y` | Yank/paste as sibling |
 | `M-↑` / `M-↓` | Move note up/down in parent |
 
 ## Properties

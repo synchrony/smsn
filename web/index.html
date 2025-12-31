@@ -600,10 +600,11 @@
                         <tr><td>e</td><td>Edit title inline</td></tr>
                         <tr><td>n / N</td><td>New child / sibling note</td></tr>
                         <tr><td>p</td><td>Edit properties</td></tr>
-                        <tr><td>d</td><td>Delete note</td></tr>
+                        <tr><td>d</td><td>Remove from parent</td></tr>
                         <tr><td>C-w</td><td>Cut note</td></tr>
                         <tr><td>M-w</td><td>Copy note</td></tr>
-                        <tr><td>C-y</td><td>Paste note</td></tr>
+                        <tr><td>C-y</td><td>Paste as child</td></tr>
+                        <tr><td>C-S-y</td><td>Paste as sibling</td></tr>
                         <tr><td>M-↑ / M-↓</td><td>Move note up/down</td></tr>
                         <tr><td>C-/</td><td>Undo</td></tr>
                         <tr><td>?</td><td>Toggle this help</td></tr>
@@ -623,7 +624,7 @@
                         <tr><td>C-c u</td><td>Update/refresh view</td></tr>
                         <tr><td>C-c n</td><td>New child note</td></tr>
                         <tr><td>C-c p</td><td>Push view to server</td></tr>
-                        <tr><td>C-c d</td><td>Delete note</td></tr>
+                        <tr><td>C-c d</td><td>Remove from parent</td></tr>
                         <tr><td>C-c x</td><td>Go to shortcut/alias</td></tr>
                         <tr><td>C-c r / v</td><td>Copy reference / title</td></tr>
                         <tr><td>C-c C-d</td><td>Set view depth</td></tr>
@@ -697,14 +698,14 @@
         </div>
     </div>
 
-    <!-- Confirm delete overlay -->
+    <!-- Confirm remove overlay -->
     <div id="confirm-overlay" class="overlay">
         <div class="overlay-content">
-            <h2>Confirm Delete</h2>
+            <h2>Confirm Remove</h2>
             <div class="confirm-message" id="confirm-message"></div>
             <div class="button-row">
-                <button onclick="hideConfirm()">Cancel</button>
-                <button class="danger" onclick="confirmDelete()">Delete</button>
+                <button id="confirm-cancel-btn" onclick="hideConfirm()">Cancel</button>
+                <button id="confirm-remove-btn" class="danger" onclick="confirmDelete()">Remove</button>
             </div>
         </div>
     </div>
@@ -1183,6 +1184,9 @@
     }
 
     function updateView(rootId, viewContent, height = 2) {
+        // Remember the current view root so we can refresh it after the update
+        const currentRootId = State.rootId;
+
         sendAction({
             action: 'net.fortytwo.smsn.server.actions.UpdateView',
             root: rootId,
@@ -1193,17 +1197,25 @@
             style: 'forward'
         }, (data) => {
             if (data.view) {
-                State.view = data.view;
-                State.rootId = data.root || data.view.id;
-                // Expand root by default and select root node
-                State.expandedNodes.add(State.rootId);
-                State.selectedId = State.rootId;
-                const pane = State.panes[State.activePane];
-                pane.expandedNodes.add(State.rootId);
-                pane.selectedId = State.rootId;
-                render();
-                focusTreeContainer();
-                setStatusMessage('Updated');
+                // If we updated a subtree, refresh the original view to show changes
+                if (currentRootId && currentRootId !== rootId) {
+                    refreshView();
+                    setStatusMessage('Updated');
+                } else {
+                    // We updated the root itself
+                    State.view = data.view;
+                    State.rootId = data.root || data.view.id;
+                    State.expandedNodes.add(State.rootId);
+                    State.selectedId = State.rootId;
+                    const pane = State.panes[State.activePane];
+                    pane.view = State.view;
+                    pane.rootId = State.rootId;
+                    pane.expandedNodes.add(State.rootId);
+                    pane.selectedId = State.rootId;
+                    render();
+                    focusTreeContainer();
+                    setStatusMessage('Updated');
+                }
             }
         });
     }
@@ -1816,9 +1828,11 @@
             return;
         }
 
+        // Save mode before hideNewNote clears it
+        const mode = State.newNoteMode;
         hideNewNote();
 
-        if (State.newNoteMode === 'child') {
+        if (mode === 'child') {
             const parentId = State.selectedId || State.rootId;
             if (!parentId) {
                 setStatusMessage('No parent selected');
@@ -1837,7 +1851,7 @@
 
             updateView(parentId, wikiContent, 2);
 
-        } else if (State.newNoteMode === 'sibling') {
+        } else if (mode === 'sibling') {
             if (!State.selectedId || State.selectedId === State.rootId) {
                 setStatusMessage('Cannot add sibling to root');
                 return;
@@ -1872,13 +1886,15 @@
         if (!node) return;
 
         const childCount = node.numberOfChildren || (node.children ? node.children.length : 0);
-        let message = `Delete "${node.title}"?`;
+        let message = `Remove "${node.title}" from parent?`;
         if (childCount > 0) {
-            message += `<br><br><span style="color: var(--warning-color)">This note has ${childCount} children. They will become orphaned.</span>`;
+            message += `<br><br><span style="color: var(--muted-color)">This note has ${childCount} children. They will remain in the graph but won't appear in this view.</span>`;
         }
 
         document.getElementById('confirm-message').innerHTML = message;
         document.getElementById('confirm-overlay').classList.add('visible');
+        // Focus the Remove button so Enter confirms by default
+        document.getElementById('confirm-remove-btn').focus();
     }
 
     function hideConfirm() {
@@ -2017,6 +2033,67 @@
         setStatusMessage(`${action}: "${State.clipboard.title}" under "${target.title}"`);
 
         // Clear clipboard if it was a cut
+        if (State.clipboard.isCut) {
+            State.clipboard = null;
+        }
+    }
+
+    function pasteNoteAsSibling() {
+        if (!State.clipboard) {
+            setStatusMessage('Clipboard is empty');
+            return;
+        }
+
+        if (!State.selectedId || State.selectedId === State.rootId) {
+            setStatusMessage('Select a sibling target (not root)');
+            return;
+        }
+
+        const parentId = findParentId(State.view, State.selectedId);
+        if (!parentId) {
+            setStatusMessage('Cannot find parent');
+            return;
+        }
+
+        const parent = findNodeById(State.view, parentId);
+        if (!parent) return;
+
+        // Build wiki content: existing children with pasted note inserted after selected
+        let wikiContent = '';
+        const selectedIndex = parent.children ? parent.children.findIndex(c => c.id === State.selectedId) : -1;
+
+        if (parent.children) {
+            for (let i = 0; i < parent.children.length; i++) {
+                const child = parent.children[i];
+                wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+                // Insert pasted note after the selected sibling
+                if (i === selectedIndex) {
+                    wikiContent += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
+                }
+            }
+        }
+
+        // If it was a cut operation, remove from original parent
+        if (State.clipboard.isCut) {
+            const originalParentId = findParentId(State.view, State.clipboard.id);
+            if (originalParentId && originalParentId !== parentId) {
+                const originalParent = findNodeById(State.view, originalParentId);
+                let removeWiki = '';
+                if (originalParent && originalParent.children) {
+                    for (const child of originalParent.children) {
+                        if (child.id !== State.clipboard.id) {
+                            removeWiki += `* ${child.title}\n    :${child.id}:\n`;
+                        }
+                    }
+                }
+                updateView(originalParentId, removeWiki, 2);
+            }
+        }
+
+        updateView(parentId, wikiContent, 2);
+        const action = State.clipboard.isCut ? 'Moved' : 'Linked';
+        setStatusMessage(`${action}: "${State.clipboard.title}" after "${findNodeById(State.view, State.selectedId).title}"`);
+
         if (State.clipboard.isCut) {
             State.clipboard = null;
         }
@@ -2813,6 +2890,7 @@
                 hideProperties();
             } else if (confirmVisible) {
                 hideConfirm();
+                return;
             } else if (newNoteVisible) {
                 hideNewNote();
             } else if (inSearch) {
@@ -2820,6 +2898,32 @@
                 document.activeElement.blur();
             }
             return;
+        }
+
+        // Handle confirm dialog keyboard navigation
+        if (confirmVisible) {
+            const removeBtn = document.getElementById('confirm-remove-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Execute whichever button is focused, or Remove by default
+                if (document.activeElement === cancelBtn) {
+                    hideConfirm();
+                } else {
+                    confirmDelete();
+                }
+                return;
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
+                e.preventDefault();
+                // Toggle focus between buttons
+                if (document.activeElement === removeBtn) {
+                    cancelBtn.focus();
+                } else {
+                    removeBtn.focus();
+                }
+                return;
+            }
+            return;  // Don't process other keys when confirm dialog is open
         }
 
         // Handle numeric input for weight/priority (after C-c C-t C-w or C-c C-t C-p)
@@ -2862,10 +2966,16 @@
                 copyNote();
                 return;
             }
-            // C-y - yank/paste
-            if (e.ctrlKey && e.key === 'y') {
+            // C-y - yank/paste as child
+            if (e.ctrlKey && !e.shiftKey && e.key === 'y') {
                 e.preventDefault();
                 pasteNote();
+                return;
+            }
+            // C-S-y - yank/paste as sibling
+            if (e.ctrlKey && e.shiftKey && e.key === 'Y') {
+                e.preventDefault();
+                pasteNoteAsSibling();
                 return;
             }
             // C-/ or C-_ - undo (placeholder for now)
@@ -3001,9 +3111,11 @@
                 }
                 break;
             case 'n':
+                e.preventDefault();
                 showNewNote('child');
                 break;
             case 'N':
+                e.preventDefault();
                 showNewNote('sibling');
                 break;
             case 'p':
