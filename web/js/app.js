@@ -1028,7 +1028,7 @@ function showProperties() {
     document.getElementById('prop-weight-value').textContent = (node.weight || 0.5).toFixed(1);
     document.getElementById('prop-priority').value = node.priority || 0;
     document.getElementById('prop-priority-value').textContent = node.priority ? node.priority.toFixed(1) : '-';
-    document.getElementById('prop-source').value = node.source || 'private';
+    selectSource(node.source || 'private');
     document.getElementById('prop-alias').value = node.alias || '';
     document.getElementById('prop-text').value = node.text || '';
 
@@ -1050,7 +1050,7 @@ function saveProperties() {
         title: document.getElementById('prop-title').value.trim(),
         weight: parseFloat(document.getElementById('prop-weight').value),
         priority: parseFloat(document.getElementById('prop-priority').value),
-        source: document.getElementById('prop-source').value,
+        source: getSelectedSource(),
         alias: document.getElementById('prop-alias').value.trim(),
         text: document.getElementById('prop-text').value
     };
@@ -1963,17 +1963,62 @@ function countNodes(node) {
 }
 
 function updateSourceOptions() {
-    const select = document.getElementById('prop-source');
-    select.innerHTML = '';
+    const dropdown = document.getElementById('prop-source-dropdown');
+    dropdown.innerHTML = '';
 
     if (State.config && State.config.sources) {
+        State.config.sources.forEach(s => {
+            const option = document.createElement('div');
+            option.className = 'source-option';
+            option.dataset.value = s.name;
+            option.innerHTML = `
+                <span class="source-option-color" style="background: ${colorToHex(parseColor(s.color))}"></span>
+                <span>${s.name}</span>
+            `;
+            option.addEventListener('click', () => selectSource(s.name));
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Also populate new-note-source dropdown (standard select)
+    const newNoteSelect = document.getElementById('new-note-source');
+    if (newNoteSelect && newNoteSelect.options.length === 0 && State.config && State.config.sources) {
         State.config.sources.forEach(s => {
             const option = document.createElement('option');
             option.value = s.name;
             option.textContent = s.name;
-            select.appendChild(option);
+            newNoteSelect.appendChild(option);
         });
     }
+}
+
+function selectSource(sourceName) {
+    const sourceConfig = State.sourcesByName[sourceName];
+    const select = document.getElementById('prop-source');
+    const dropdown = document.getElementById('prop-source-dropdown');
+
+    // Update displayed value
+    select.querySelector('.source-select-text').textContent = sourceName;
+    select.querySelector('.source-select-color').style.background =
+        sourceConfig ? colorToHex(parseColor(sourceConfig.color)) : '#333';
+    select.dataset.value = sourceName;
+
+    // Update selected state in dropdown
+    dropdown.querySelectorAll('.source-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.value === sourceName);
+    });
+
+    // Close dropdown
+    dropdown.classList.remove('open');
+}
+
+function toggleSourceDropdown() {
+    const dropdown = document.getElementById('prop-source-dropdown');
+    dropdown.classList.toggle('open');
+}
+
+function getSelectedSource() {
+    return document.getElementById('prop-source').dataset.value || 'private';
 }
 
 function updateSourceLegend() {
@@ -2627,6 +2672,49 @@ function setupEventListeners() {
     document.getElementById('new-note-overlay').addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             hideNewNote();
+        }
+    });
+
+    // Custom source dropdown
+    document.getElementById('prop-source').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSourceDropdown();
+    });
+
+    // Close source dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('prop-source-dropdown');
+        const select = document.getElementById('prop-source');
+        if (!dropdown.contains(e.target) && !select.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    // Keyboard navigation for source dropdown
+    document.getElementById('prop-source').addEventListener('keydown', (e) => {
+        const dropdown = document.getElementById('prop-source-dropdown');
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleSourceDropdown();
+        } else if (e.key === 'Escape') {
+            dropdown.classList.remove('open');
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!dropdown.classList.contains('open')) {
+                toggleSourceDropdown();
+            } else {
+                // Navigate through options
+                const options = dropdown.querySelectorAll('.source-option');
+                const currentValue = getSelectedSource();
+                let currentIndex = Array.from(options).findIndex(o => o.dataset.value === currentValue);
+                if (e.key === 'ArrowDown') {
+                    currentIndex = Math.min(currentIndex + 1, options.length - 1);
+                } else {
+                    currentIndex = Math.max(currentIndex - 1, 0);
+                }
+                selectSource(options[currentIndex].dataset.value);
+                dropdown.classList.add('open'); // Keep open while navigating
+            }
         }
     });
 

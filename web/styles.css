@@ -468,6 +468,87 @@ footer {
     border-color: #0066cc;
 }
 
+/* Custom source select with color indicators */
+.source-select-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.source-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.source-select:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
+.source-select-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.source-select-text {
+    flex: 1;
+}
+
+.source-select-arrow {
+    font-size: 10px;
+    color: var(--muted-color);
+}
+
+.source-select-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 200;
+    margin-top: 2px;
+}
+
+.source-select-dropdown.open {
+    display: block;
+}
+
+.source-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.source-option:hover {
+    background: var(--hover-bg);
+}
+
+.source-option.selected {
+    background: var(--selected-bg);
+}
+
+.source-option-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
 .button-row {
     display: flex;
     gap: 8px;
