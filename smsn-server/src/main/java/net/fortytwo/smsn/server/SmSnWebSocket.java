@@ -48,11 +48,22 @@ public class SmSnWebSocket implements WebSocketListener {
 
     /**
      * Unwrap a Gremlin Server format message to get the action JSON.
-     * Gremlin Server format: {"gremlin": "{...escaped JSON...}"}
+     * Full Gremlin Server format: {"op":"eval","processor":"","args":{"language":"smsn","gremlin":"{...}"}}
+     * Simple format: {"gremlin": "{...escaped JSON...}"}
      */
     private String unwrapGremlinMessage(String message) {
         try {
             JSONObject wrapper = new JSONObject(message);
+
+            // Check for full Gremlin Server format with op/args
+            if (wrapper.has("op") && wrapper.has("args")) {
+                JSONObject args = wrapper.getJSONObject("args");
+                if (args.has("gremlin")) {
+                    return args.getString("gremlin");
+                }
+            }
+
+            // Check for simple gremlin wrapper
             if (wrapper.has("gremlin")) {
                 return wrapper.getString("gremlin");
             }
@@ -63,16 +74,19 @@ public class SmSnWebSocket implements WebSocketListener {
     }
 
     /**
-     * Wrap response in Gremlin Server format for Web UI compatibility.
-     * Gremlin Server returns: {"result": {"data": {...}}, "status": {"code": 200}}
+     * Wrap response in Gremlin Server format for client compatibility.
+     * Gremlin Server returns: {"result": {"data": ["...JSON string..."]}, "status": {"code": 200}}
+     * The data field is an array containing the JSON response as a string.
      */
     private String wrapGremlinResponse(String response) {
         try {
-            JSONObject responseObj = new JSONObject(response);
             JSONObject wrapper = new JSONObject();
 
             JSONObject result = new JSONObject();
-            result.put("data", responseObj);
+            // Gremlin Server returns data as an array with the JSON string as the first element
+            org.json.JSONArray dataArray = new org.json.JSONArray();
+            dataArray.put(response);
+            result.put("data", dataArray);
             wrapper.put("result", result);
 
             JSONObject status = new JSONObject();

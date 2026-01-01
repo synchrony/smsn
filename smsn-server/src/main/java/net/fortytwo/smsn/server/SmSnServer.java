@@ -2,7 +2,6 @@ package net.fortytwo.smsn.server;
 
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.ActivityLog;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.TreeNodeWikiParser;
@@ -16,6 +15,7 @@ import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerI
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -38,9 +38,9 @@ public class SmSnServer {
     private final Server server;
     private final FileBasedAtomRepository repository;
     private final ObjectMapper objectMapper;
-    private final Brain brain;
+    private final ActivityLog activityLog;
 
-    public SmSnServer(int port, String host) throws IOException, SQLException, Brain.BrainException {
+    public SmSnServer(int port, String host) throws IOException, SQLException {
         this.objectMapper = new ObjectMapper();
 
         // Initialize file-based repository
@@ -49,8 +49,8 @@ public class SmSnServer {
         this.repository = new FileBasedAtomRepository(indexDir);
         this.repository.initialize();
 
-        // Create Brain wrapper for activity logging
-        this.brain = createBrain();
+        // Create activity log directly (no Brain needed for standalone mode)
+        this.activityLog = createActivityLog();
 
         // Create Jetty server
         this.server = new Server();
@@ -73,27 +73,24 @@ public class SmSnServer {
         logger.info("SmSn Server configured on " + host + ":" + port + WEBSOCKET_PATH);
     }
 
-    private Brain createBrain() throws Brain.BrainException {
-        // Create a minimal Brain instance for activity logging
-        // The Brain is not fully functional without TopicGraph, but we need it for the activity log
-        return new Brain(null) {
-            private final ActivityLog activityLog = createActivityLog();
+    private ActivityLog createActivityLog() {
+        String filePath = SemanticSynchrony.getConfiguration().getActivityLog();
+        if (filePath == null) {
+            logger.warning("No activity log specified in configuration");
+            return null;
+        }
+        try {
+            File logFile = new File(filePath);
+            logFile.getParentFile().mkdirs();
+            return new ActivityLog(new FileWriter(logFile, true));
+        } catch (IOException e) {
+            logger.warning("Could not create activity log: " + e.getMessage());
+            return null;
+        }
+    }
 
-            private ActivityLog createActivityLog() {
-                try {
-                    File logFile = new File(SemanticSynchrony.getConfiguration().getActivityLog());
-                    return new ActivityLog(new java.io.FileWriter(logFile, true));
-                } catch (IOException e) {
-                    logger.warning("Could not create activity log: " + e.getMessage());
-                    return null;
-                }
-            }
-
-            @Override
-            public ActivityLog getActivityLog() {
-                return activityLog;
-            }
-        };
+    public ActivityLog getActivityLog() {
+        return activityLog;
     }
 
     public void start() throws Exception {
@@ -135,7 +132,7 @@ public class SmSnServer {
         ActionContext context = new ActionContext();
         context.setMap(new HashMap<>());
         context.setRepository(repository);
-        context.setBrain(brain);
+        context.setActivityLog(activityLog);
         context.setTreeNodeWikiParser(new TreeNodeWikiParser());
         context.setTreeNodeJsonParser(new TreeNodeJsonParser());
         context.setTreeNodeJsonPrinter(new TreeNodeJsonPrinter());

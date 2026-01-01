@@ -2,6 +2,7 @@ package net.fortytwo.smsn.server;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Brain;
@@ -186,8 +187,9 @@ public abstract class Action {
     private void logActivity(final ActionContext context) {
         // Note: currently, all activities are logged, but the log is not immediately flushed
         //       unless the transaction succeeds.
-        if (null != context.getBrain().getActivityLog()) {
-            context.getBrain().getActivityLog().flush();
+        ActivityLog activityLog = context.getActivityLog();
+        if (null != activityLog) {
+            activityLog.flush();
         }
     }
 

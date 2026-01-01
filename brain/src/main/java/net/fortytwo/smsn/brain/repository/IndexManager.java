@@ -299,10 +299,19 @@ public class IndexManager implements AutoCloseable {
 
         List<Sortable<AtomId, Float>> results = new ArrayList<>();
 
+        // Sanitize query: Lucene doesn't allow leading wildcards
+        // Convert "*term*" to "term" (StandardAnalyzer will handle partial matching via tokenization)
+        // or use a simple substring-style search
+        String sanitizedQuery = sanitizeQuery(queryString);
+        if (sanitizedQuery.isEmpty()) {
+            return results.iterator();
+        }
+
         try {
             QueryParser parser = new QueryParser(field, analyzer);
             parser.setDefaultOperator(QueryParser.Operator.AND);
-            Query query = parser.parse(queryString);
+            parser.setAllowLeadingWildcard(true);  // Allow leading wildcards
+            Query query = parser.parse(sanitizedQuery);
 
             TopDocs topDocs = luceneSearcher.search(query, MAX_SEARCH_RESULTS);
 
@@ -318,6 +327,34 @@ public class IndexManager implements AutoCloseable {
         }
 
         return results.iterator();
+    }
+
+    /**
+     * Sanitize a query string for Lucene.
+     * Handles the "*term*" format from smsn-mode by converting to a standard text query.
+     * The StandardAnalyzer will handle tokenization and matching.
+     */
+    private String sanitizeQuery(String queryString) {
+        if (queryString == null || queryString.isEmpty()) {
+            return "";
+        }
+
+        String trimmed = queryString.trim();
+
+        // Handle "*term*" format from smsn-mode
+        // Convert to plain text query - StandardAnalyzer handles tokenization
+        // This matches behavior of the old Neo4j/TinkerPop implementation
+        if (trimmed.startsWith("*") && trimmed.endsWith("*") && trimmed.length() > 2) {
+            // Extract the term without wildcards
+            String term = trimmed.substring(1, trimmed.length() - 1).trim();
+            if (term.isEmpty()) {
+                return "";
+            }
+            // Return plain term - StandardAnalyzer will tokenize and match
+            return term;
+        }
+
+        return trimmed;
     }
 
     /**

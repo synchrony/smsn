@@ -173,7 +173,7 @@ public class UpdateView extends RootedViewAction {
         );
 
         // Apply the update using TreeUpdater
-        TreeUpdater updater = new TreeUpdater(context.getRepository(), context.getBrain().getActivityLog());
+        TreeUpdater updater = new TreeUpdater(context.getRepository(), context.getActivityLog());
         updater.update(treeUpdate, height, adjustedFilter);
 
         // Generate the updated view

@@ -1,5 +1,6 @@
 package net.fortytwo.smsn.server;
 
+import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
@@ -15,6 +16,7 @@ public class ActionContext {
     private Map<String, Object> map;
     private GraphWrapper graphWrapper;
     private Brain brain;
+    private ActivityLog activityLog;
     private TreeNodeWikiParser treeNodeWikiParser;
     private TreeNodeJsonParser treeNodeJsonParser;
     private TreeNodeJsonPrinter treeNodeJsonPrinter;
@@ -34,6 +36,18 @@ public class ActionContext {
 
     public void setBrain(Brain brain) {
         this.brain = brain;
+    }
+
+    public ActivityLog getActivityLog() {
+        // Prefer direct activity log if set, otherwise get from brain
+        if (activityLog != null) {
+            return activityLog;
+        }
+        return brain != null ? brain.getActivityLog() : null;
+    }
+
+    public void setActivityLog(ActivityLog activityLog) {
+        this.activityLog = activityLog;
     }
 
     public Map<String, Object> getMap() {

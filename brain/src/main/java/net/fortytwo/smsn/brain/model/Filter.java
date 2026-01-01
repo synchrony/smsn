@@ -78,28 +78,38 @@ public class Filter implements Predicate<Note>, Serializable {
      */
     @Deprecated
     public void setMinSource(String minSource) {
-        // For backwards compatibility, convert minSource to includedSources
-        // by including all sources at or above the minSource level
+        // For backwards compatibility, minSource means "show sources at least as public as this"
+        // Since sources are ordered from most private (index 0) to most public,
+        // minSource="private" (index 0) means "show all sources"
+        // We achieve this by setting includedSources to empty set (which means "include all")
         if (minSource == null) {
             this.includedSources = Collections.emptySet();
+            return;
+        }
+
+        List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
+
+        int minIndex = -1;
+        for (int i = 0; i < sources.size(); i++) {
+            if (sources.get(i).getName().equals(minSource)) {
+                minIndex = i;
+                break;
+            }
+        }
+
+        // If minSource is the first (most private) source, include all sources
+        // This is equivalent to "no filter on source"
+        if (minIndex == 0) {
+            this.includedSources = Collections.emptySet();
+        } else if (minIndex > 0) {
+            Set<String> included = new HashSet<>();
+            for (int i = minIndex; i < sources.size(); i++) {
+                included.add(sources.get(i).getName());
+            }
+            this.includedSources = included;
         } else {
-            List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
-            int minIndex = -1;
-            for (int i = 0; i < sources.size(); i++) {
-                if (sources.get(i).getName().equals(minSource)) {
-                    minIndex = i;
-                    break;
-                }
-            }
-            if (minIndex >= 0) {
-                Set<String> included = new HashSet<>();
-                for (int i = minIndex; i < sources.size(); i++) {
-                    included.add(sources.get(i).getName());
-                }
-                this.includedSources = included;
-            } else {
-                this.includedSources = Collections.emptySet();
-            }
+            // Source not found, include all
+            this.includedSources = Collections.emptySet();
         }
     }
 

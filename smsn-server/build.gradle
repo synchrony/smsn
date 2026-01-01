@@ -54,6 +54,7 @@ test {
 shadowJar {
   archiveBaseName.set('smsn-server')
   archiveClassifier.set('standalone')
+  zip64 = true
   mergeServiceFiles()
   manifest {
     attributes 'Main-Class': 'net.fortytwo.smsn.server.SmSnServer'

@@ -68,7 +68,10 @@ public class ReorderChildren extends FilteredAction {
         context.getRepository().deleteChildAt(pid, fromIndex);
         context.getRepository().addChildAt(pid, childId, toIndex);
 
-        context.getBrain().notifyOfUpdate();
+        // Notify of update if brain is available (TinkerPop mode)
+        if (context.getBrain() != null) {
+            context.getBrain().notifyOfUpdate();
+        }
 
         context.getMap().put("parentId", pid.value);
         context.getMap().put("childId", childId.value);
@@ -77,7 +80,7 @@ public class ReorderChildren extends FilteredAction {
         context.getMap().put("success", true);
 
         // Activity logging
-        ActivityLog log = context.getBrain().getActivityLog();
+        ActivityLog log = context.getActivityLog();
         if (log != null) {
             log.logSetPropertiesById(pid);
         }
