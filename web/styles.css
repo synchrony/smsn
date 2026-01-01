@@ -263,11 +263,12 @@ header > a {
 
 /* Tree view */
 .tree-node {
-    padding: 2px 16px;
+    padding: 2px 16px 2px 32px;  /* Left padding for line numbers */
     cursor: pointer;
     display: flex;
     align-items: flex-start;
     gap: 6px;
+    position: relative;
 }
 
 .tree-node:hover {
@@ -284,6 +285,16 @@ header > a {
 
 .tree-node.editing {
     background-color: var(--hover-bg);
+}
+
+.line-number {
+    position: absolute;
+    left: 4px;
+    width: 24px;
+    text-align: right;
+    font-size: 11px;
+    color: #999;
+    user-select: none;
 }
 
 .toggle {

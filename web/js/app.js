@@ -54,6 +54,7 @@ const State = {
 
     // View options
     wrapTitles: true,  // true = wrap long titles, false = single line with scroll
+    showLineNumbers: true,  // Show line numbers in left margin
 
     // Split view
     splitView: false,
@@ -844,6 +845,113 @@ function toggleWrapTitles() {
     State.wrapTitles = !State.wrapTitles;
     document.body.classList.toggle('no-wrap-titles', !State.wrapTitles);
     setStatusMessage(State.wrapTitles ? 'Line wrap: on' : 'Line wrap: off (scroll for long titles)');
+}
+
+function toggleLineNumbers() {
+    State.showLineNumbers = !State.showLineNumbers;
+    render();
+    setStatusMessage(State.showLineNumbers ? 'Line numbers: on' : 'Line numbers: off');
+}
+
+function gotoLineNumber(lineNum) {
+    const container = document.getElementById(`tree-container-${State.activePane}`);
+    const node = container.querySelector(`.tree-node[data-line="${lineNum}"]`);
+
+    // Check if the node is visible (not inside a collapsed ancestor)
+    const isVisible = node && !node.closest('.children.collapsed');
+
+    if (node && isVisible) {
+        const nodeId = node.dataset.id;
+        selectNode(nodeId);
+        node.scrollIntoView({ block: 'center' });
+        setStatusMessage(`Line ${lineNum}`);
+        focusTreeContainer();
+    } else {
+        // Line might be in a collapsed section - try to find it
+        // First, count total lines in the fully expanded view
+        const pane = State.panes[State.activePane];
+        const totalLines = countTotalLines(pane.view);
+
+        if (lineNum > totalLines) {
+            setStatusMessage(`Line ${lineNum} out of range (max: ${totalLines})`);
+            focusTreeContainer();
+        } else {
+            // The line exists but is collapsed - expand to reveal it
+            expandToLine(lineNum);
+        }
+    }
+}
+
+function countTotalLines(node) {
+    if (!node) return 0;
+    let count = 1;  // Count this node
+    if (node.children) {
+        for (const child of node.children) {
+            count += countTotalLines(child);
+        }
+    }
+    return count;
+}
+
+function expandToLine(targetLine) {
+    const pane = State.panes[State.activePane];
+    if (!pane.view) {
+        setStatusMessage(`No view to expand`);
+        focusTreeContainer();
+        return;
+    }
+
+    // Find path to the target line and expand all ancestors
+    const path = findPathToLine(pane.view, targetLine, { value: 1 });
+    if (path && path.length > 0) {
+        // Expand all nodes in the path except the target
+        for (let i = 0; i < path.length - 1; i++) {
+            pane.expandedNodes.add(path[i].id);
+        }
+        // Also sync to State if this is active pane
+        if (State.activePane === 0 || State.activePane === 1) {
+            State.expandedNodes = pane.expandedNodes;
+        }
+        // Re-render and then select the target
+        render();
+
+        // After render, the line should now be visible - select it
+        const targetNode = path[path.length - 1];
+        selectNode(targetNode.id);
+
+        // Scroll to it
+        const container = document.getElementById(`tree-container-${State.activePane}`);
+        const nodeEl = container.querySelector(`.tree-node[data-id="${targetNode.id}"]`);
+        if (nodeEl) {
+            nodeEl.scrollIntoView({ block: 'center' });
+        }
+        setStatusMessage(`Line ${targetLine}`);
+        focusTreeContainer();
+    } else {
+        setStatusMessage(`Could not find line ${targetLine}`);
+        focusTreeContainer();
+    }
+}
+
+function findPathToLine(node, targetLine, counter, path = []) {
+    if (!node) return null;
+
+    const currentLine = counter.value++;
+    path.push(node);
+
+    if (currentLine === targetLine) {
+        return path.slice();  // Return a copy
+    }
+
+    if (node.children) {
+        for (const child of node.children) {
+            const result = findPathToLine(child, targetLine, counter, path);
+            if (result) return result;
+        }
+    }
+
+    path.pop();
+    return null;
 }
 
 function setActivePane(index) {
@@ -1915,11 +2023,12 @@ function renderPane(paneIndex) {
         return;
     }
 
-    // Render using pane-specific state
-    container.innerHTML = renderNodeForPane(pane.view, true, 0, paneIndex);
+    // Render using pane-specific state with line counter
+    const lineCounter = { value: 1 };
+    container.innerHTML = renderNodeForPane(pane.view, true, 0, paneIndex, lineCounter);
 }
 
-function renderNodeForPane(node, isRoot, depth, paneIndex) {
+function renderNodeForPane(node, isRoot, depth, paneIndex, lineCounter) {
     if (!node) return '';
 
     const pane = State.panes[paneIndex];
@@ -1927,6 +2036,9 @@ function renderNodeForPane(node, isRoot, depth, paneIndex) {
     const isExpanded = pane.expandedNodes.has(node.id);
     const isSelected = pane.selectedId === node.id;
     const isEditing = State.editingNodeId === node.id;
+
+    // Get current line number and increment for next node
+    const lineNumber = lineCounter.value++;
 
     // Determine toggle icon:
     // - expanded with children visible
@@ -1951,6 +2063,11 @@ function renderNodeForPane(node, isRoot, depth, paneIndex) {
 
     const textColor = getNoteColor(source, weight);
 
+    // Line number (shown in left margin)
+    const lineNumHtml = State.showLineNumbers
+        ? `<span class="line-number">${lineNumber}</span>`
+        : '';
+
     const priorityHtml = hasPriority
         ? `<span class="node-priority" title="Priority: ${node.priority.toFixed(1)}">!</span>`
         : `<span class="priority-spacer"></span>`;
@@ -1973,7 +2090,8 @@ function renderNodeForPane(node, isRoot, depth, paneIndex) {
 
     let html = `
         <div class="tree-node ${isRoot ? 'root' : ''} ${isSelected ? 'selected' : ''} ${isEditing ? 'editing' : ''}"
-             data-id="${node.id}" data-depth="${depth}" data-pane="${paneIndex}">
+             data-id="${node.id}" data-depth="${depth}" data-pane="${paneIndex}" data-line="${lineNumber}">
+            ${lineNumHtml}
             ${priorityHtml}
             <span class="toggle" style="color: ${textColor}" onclick="event.stopPropagation(); toggleExpandPane('${node.id}', ${paneIndex})">${toggleIcon}</span>
             <div class="node-content" onclick="handleNodeClickPane('${node.id}', ${paneIndex})">
@@ -1986,7 +2104,7 @@ function renderNodeForPane(node, isRoot, depth, paneIndex) {
     if (hasChildren) {
         html += `<div class="children ${isExpanded ? '' : 'collapsed'}">`;
         for (const child of node.children) {
-            html += renderNodeForPane(child, false, depth + 1, paneIndex);
+            html += renderNodeForPane(child, false, depth + 1, paneIndex, lineCounter);
         }
         html += '</div>';
     }
@@ -2639,6 +2757,8 @@ const chordBindings = {
     'C-c C-v': {
         // C-c C-v o - toggle line wrap (truncate-lines in Emacs)
         'o': () => toggleWrapTitles(),
+        // C-c C-v l - toggle line numbers
+        'l': () => toggleLineNumbers(),
     },
     'C-x': {
         // C-x k - kill buffer (go back/pop view)
@@ -3028,13 +3148,42 @@ function setupKeyboardHandler() {
         }
 
         if (inSearch) {
+            // Escape cancels command mode and returns focus to tree
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                document.activeElement.value = '';
+                document.activeElement.blur();
+                focusTreeContainer();
+                return;
+            }
             if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
                 const query = document.activeElement.value.trim();
                 // Determine which pane this search input belongs to
                 const inputId = document.activeElement.id;
                 const paneIndex = inputId.endsWith('-0') ? 0 : 1;
                 if (query) {
-                    searchInPane(query, paneIndex);
+                    // Check if this is a command (starts with :)
+                    if (query.startsWith(':')) {
+                        const input = document.activeElement;
+                        input.value = '';
+                        input.blur();
+                        // Check for line number (:42)
+                        const lineMatch = query.match(/^:(\d+)$/);
+                        if (lineMatch) {
+                            const lineNum = parseInt(lineMatch[1], 10);
+                            setActivePane(paneIndex);
+                            gotoLineNumber(lineNum);
+                        } else {
+                            // Invalid command
+                            setStatusMessage(`Invalid command: ${query}`);
+                            focusTreeContainer();
+                        }
+                    } else {
+                        // Regular search
+                        searchInPane(query, paneIndex);
+                    }
                 }
             }
             return;
@@ -3117,6 +3266,16 @@ function setupKeyboardHandler() {
                 break;
             case 'g':
                 gotoAlias();
+                break;
+            case ':':
+                // Vim-style command mode - focus search and start with colon
+                e.preventDefault();
+                if (activeSearchInput) {
+                    activeSearchInput.value = ':';
+                    activeSearchInput.focus();
+                    // Place cursor at end
+                    activeSearchInput.setSelectionRange(1, 1);
+                }
                 break;
         }
     });
