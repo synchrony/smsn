@@ -10,6 +10,7 @@ public class Configuration implements Serializable {
 
     private String version = "unknown";
     private String activityLog = "smsn-activity.tsv";
+    private String indexDirectory = "data/index";
     private Integer transactionBufferSize;
     private String thingNamespace = "http://example.org/things/";
     private AtomId brainstream;
@@ -79,5 +80,13 @@ public class Configuration implements Serializable {
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+    }
+
+    public String getIndexDirectory() {
+        return indexDirectory;
+    }
+
+    public void setIndexDirectory(String indexDirectory) {
+        this.indexDirectory = indexDirectory;
     }
 }
