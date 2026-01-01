@@ -1,6 +1,11 @@
 plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1'
   id 'java'
+  id 'application'
+}
+
+application {
+  mainClass = 'net.fortytwo.smsn.server.SmSnServer'
 }
 
 dependencies {
@@ -26,6 +31,11 @@ dependencies {
   implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
   implementation group: 'net.fortytwo', name: 'linked-data-sail', version: rippleVersion
 
+  // Jetty WebSocket for standalone server (migration from Gremlin Server)
+  implementation 'org.eclipse.jetty:jetty-server:11.0.18'
+  implementation 'org.eclipse.jetty.websocket:websocket-jetty-server:11.0.18'
+  implementation 'org.eclipse.jetty.websocket:websocket-jetty-api:11.0.18'
+
   testImplementation "junit:junit:$junitVersion"
   testImplementation project(path: ':brain', configuration: 'testOutput')
 }
@@ -42,6 +52,10 @@ test {
 }
 
 shadowJar {
-  minimize()
+  archiveBaseName.set('smsn-server')
+  archiveClassifier.set('standalone')
   mergeServiceFiles()
+  manifest {
+    attributes 'Main-Class': 'net.fortytwo.smsn.server.SmSnServer'
+  }
 }

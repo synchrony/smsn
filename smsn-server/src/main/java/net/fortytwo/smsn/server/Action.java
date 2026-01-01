@@ -115,6 +115,39 @@ public abstract class Action {
         logActivity(context);
     }
 
+    /**
+     * Handle request in standalone mode (without TinkerPop/TopicGraph).
+     * Uses file-based repository directly without graph transactions.
+     */
+    public void handleRequestStandalone(final ActionContext context) {
+        long before = System.currentTimeMillis();
+
+        setTitle(context, "[no title]");
+
+        try {
+            // In standalone mode, we don't have TopicGraph transactions
+            // The FileBasedAtomRepository handles its own persistence
+            performTransaction(context);
+            context.getRepository().commit();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            context.getRepository().rollback();
+            throw new RequestProcessingException(e);
+        }
+
+        long after = System.currentTimeMillis();
+
+        // Echo back the request ID for matching responses to requests
+        if (requestId != null) {
+            context.getMap().put(Params.REQUEST_ID, requestId);
+        }
+
+        SemanticSynchrony.getLogger().log(Level.INFO, "completed " + getClass().getSimpleName()
+                + " action (standalone) in " + (after - before) + " ms");
+
+        logActivity(context);
+    }
+
     public static ActionContext createContext(final Graph graph) {
         ActionContext context = new ActionContext();
 
