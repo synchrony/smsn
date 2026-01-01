@@ -262,13 +262,10 @@ public class TreeViewBuilder {
             return false;
         }
 
-        // Check source
-        String minSource = filter.getMinSource();
-        if (minSource != null) {
-            // Get source indices from configuration
-            Integer atomSourceIndex = getSourceIndex(atom.source.value);
-            Integer minSourceIndex = getSourceIndex(minSource);
-            if (atomSourceIndex == null || minSourceIndex == null || atomSourceIndex < minSourceIndex) {
+        // Check source - empty includedSources means include all
+        java.util.Set<String> includedSources = filter.getIncludedSources();
+        if (includedSources != null && !includedSources.isEmpty()) {
+            if (!includedSources.contains(atom.source.value)) {
                 return false;
             }
         }
@@ -278,7 +275,9 @@ public class TreeViewBuilder {
 
     /**
      * Get the index of a source from configuration.
+     * @deprecated No longer needed with set-based filtering
      */
+    @Deprecated
     private Integer getSourceIndex(String sourceName) {
         List<net.fortytwo.smsn.config.DataSource> sources =
                 net.fortytwo.smsn.SemanticSynchrony.getConfiguration().getSources();

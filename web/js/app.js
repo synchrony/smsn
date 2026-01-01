@@ -27,7 +27,7 @@ const State = {
 
     // Filter settings
     filter: {
-        minSource: 'private',
+        excludedSources: new Set(),  // Empty means include all sources
         defaultSource: 'private',
         minWeight: 0.0,
         defaultWeight: 0.5
@@ -36,7 +36,8 @@ const State = {
     // UI state
     searchQuery: '',
     editingNodeId: null,
-    pendingCallback: null,
+    pendingCallbacks: {},  // Map of requestId -> callback for concurrent requests
+    nextRequestId: 1,
     newNoteMode: null,
 
     // Emacs-style key chord state
@@ -93,18 +94,31 @@ function createHistoryEntry(pane) {
     return entry;
 }
 
-// Built-in visibility levels (in order from most private to most public)
-const VISIBILITY_LEVELS = ['private', 'personal', 'public', 'universal'];
-
-// Check if a source passes the current minSource filter
+// Check if a source passes the current filter (not in excluded set)
 function sourcePassesFilter(source) {
     if (!source) return true;  // Unknown sources pass
+    return !State.filter.excludedSources.has(source);
+}
 
-    const minSourceIndex = VISIBILITY_LEVELS.indexOf(State.filter.minSource);
-    const sourceIndex = VISIBILITY_LEVELS.indexOf(source);
+// Get the list of included sources for server requests
+// Returns empty array if all sources are included (no exclusions)
+function getIncludedSourcesForServer() {
+    if (State.filter.excludedSources.size === 0) {
+        return [];  // Empty means include all
+    }
+    // Return all sources except excluded ones
+    const allSources = State.config.sources.map(s => s.name);
+    return allSources.filter(s => !State.filter.excludedSources.has(s));
+}
 
-    if (minSourceIndex === -1 || sourceIndex === -1) return true;
-    return sourceIndex >= minSourceIndex;
+// Build filter object for server requests
+function getFilterForServer() {
+    return {
+        includedSources: getIncludedSourcesForServer(),
+        defaultSource: State.filter.defaultSource,
+        minWeight: State.filter.minWeight,
+        defaultWeight: State.filter.defaultWeight
+    };
 }
 
 // Navigate to a history entry
@@ -237,9 +251,16 @@ function sendAction(action, callback = null) {
         return;
     }
 
+    // Generate a unique request ID
+    const requestId = 'req-' + (State.nextRequestId++);
+
+    // Store callback with request ID
     if (callback) {
-        State.pendingCallback = callback;
+        State.pendingCallbacks[requestId] = callback;
     }
+
+    // Add request ID to action so we can match the response
+    action.requestId = requestId;
 
     const request = {
         op: 'eval',
@@ -257,16 +278,20 @@ function handleResponse(response) {
     if (response.status && response.status.code !== 200) {
         console.error('Server error:', response.status);
         setStatusMessage('Error: ' + (response.status.message || 'Unknown error'));
-        State.pendingCallback = null;
         return;
     }
 
     if (response.result && response.result.data && response.result.data.length > 0) {
         const data = JSON.parse(response.result.data[0]);
 
-        if (State.pendingCallback) {
-            const callback = State.pendingCallback;
-            State.pendingCallback = null;
+        // Look up callback by request ID
+        const requestId = data.requestId;
+        const callback = requestId ? State.pendingCallbacks[requestId] : null;
+        if (requestId) {
+            delete State.pendingCallbacks[requestId];
+        }
+
+        if (callback) {
             callback(data);
         } else if (data.view) {
             State.view = data.view;
@@ -310,7 +335,7 @@ function getConfiguration() {
                 // Update source dropdown and legend
                 updateSourceOptions();
                 updateSourceLegend();
-                updateMinSourceDropdown();
+                updateSourceFilterDropdown();
             }
         }
         // Don't auto-load anything - wait for user action
@@ -327,7 +352,7 @@ function getView(rootId, height = null) {
         action: 'net.fortytwo.smsn.server.actions.GetView',
         root: rootId,
         height: viewHeight,
-        filter: State.filter,
+        filter: getFilterForServer(),
         style: pane.viewStyle
     });
     updateToolbar();
@@ -339,7 +364,7 @@ function search(query) {
         query: query,
         queryType: 'FullText',
         height: 1,
-        filter: State.filter,
+        filter: getFilterForServer(),
         titleCutoff: 100
     });
 }
@@ -359,7 +384,7 @@ function searchInPane(query, paneIndex) {
         query: query,
         queryType: 'FullText',
         height: 1,
-        filter: State.filter,
+        filter: getFilterForServer(),
         titleCutoff: 100
     }, (data) => {
         if (data.view) {
@@ -389,7 +414,7 @@ function findRoots() {
     sendAction({
         action: 'net.fortytwo.smsn.server.actions.FindRoots',
         height: 2,
-        filter: State.filter
+        filter: getFilterForServer()
     });
 }
 
@@ -432,7 +457,7 @@ function undo() {
                 view: wikiContent,
                 viewFormat: 'wiki',
                 height: 2,
-                filter: State.filter,
+                filter: getFilterForServer(),
                 style: 'forward'
             }, () => {
                 refreshView();
@@ -474,7 +499,7 @@ function setPropertyNoUndo(nodeId, propertyName, value, callback = null) {
         id: nodeId,
         name: propertyName,
         value: sendValue,
-        filter: State.filter
+        filter: getFilterForServer()
     }, callback);
 }
 
@@ -507,7 +532,7 @@ function setProperty(nodeId, propertyName, value, callback = null, oldValue = nu
         id: nodeId,
         name: propertyName,
         value: sendValue,
-        filter: State.filter
+        filter: getFilterForServer()
     }, callback);
 }
 
@@ -522,7 +547,7 @@ function updateView(rootId, viewContent, height = 2, preserveSelection = false) 
         view: viewContent,
         viewFormat: 'wiki',
         height: height,
-        filter: State.filter,
+        filter: getFilterForServer(),
         style: 'forward'
     }, (data) => {
         if (data.view) {
@@ -579,7 +604,7 @@ function pushViewToServer() {
         view: wikiContent,
         viewFormat: 'wiki',
         height: pane.height || 2,
-        filter: State.filter,
+        filter: getFilterForServer(),
         style: pane.viewStyle || 'forward'
     }, (data) => {
         if (data.view) {
@@ -681,7 +706,7 @@ function reExecuteSearch(query, paneIndex) {
         query: query,
         queryType: 'FullText',
         height: 1,
-        filter: State.filter,
+        filter: getFilterForServer(),
         titleCutoff: 100
     }, (data) => {
         if (data.view) {
@@ -731,7 +756,7 @@ function refreshViewPreserveSelection(selectedId) {
             action: 'net.fortytwo.smsn.server.actions.GetView',
             root: pane.rootId,
             height: viewHeight,
-            filter: State.filter,
+            filter: getFilterForServer(),
             style: pane.viewStyle
         }, (data) => {
             if (data.view) {
@@ -946,7 +971,7 @@ function getViewForPane(rootId, paneIndex, height = null) {
         action: 'net.fortytwo.smsn.server.actions.GetView',
         root: rootId,
         height: viewHeight,
-        filter: State.filter,
+        filter: getFilterForServer(),
         style: pane.viewStyle
     }, (data) => {
         if (data.view) {
@@ -1066,7 +1091,7 @@ function searchShortcut(shortcut) {
         query: shortcut,
         queryType: 'Shortcut',
         height: 2,
-        filter: State.filter
+        filter: getFilterForServer()
     }, (data) => {
         if (data.view && data.view.children && data.view.children.length > 0) {
             // Navigate to the first result
@@ -1393,7 +1418,7 @@ function createNoteWithProperties(parentId, wikiContent, existingChildIds, props
         view: wikiContent,
         viewFormat: 'wiki',
         height: 2,
-        filter: State.filter,
+        filter: getFilterForServer(),
         style: 'forward'
     }, (data) => {
         if (data.view) {
@@ -1780,7 +1805,7 @@ function reorderChild(parentId, fromIndex, toIndex) {
         parentId: parentId,
         fromIndex: fromIndex,
         toIndex: toIndex,
-        filter: State.filter
+        filter: getFilterForServer()
     }, (data) => {
         if (data.success) {
             // Refresh the view and preserve selection
@@ -1854,7 +1879,9 @@ function moveSelection(direction) {
 
     selectNode(visibleIds[newIndex]);
 
-    const selectedEl = document.querySelector(`.tree-node[data-id="${State.selectedId}"]`);
+    // Scroll to the selected element in the active pane
+    const container = document.getElementById(`tree-container-${State.activePane}`);
+    const selectedEl = container.querySelector(`.tree-node[data-id="${State.selectedId}"]`);
     if (selectedEl) {
         selectedEl.scrollIntoView({ block: 'nearest' });
     }
@@ -1879,6 +1906,12 @@ function renderPane(paneIndex) {
 
     if (!pane.view) {
         container.innerHTML = '<div class="loading">No data</div>';
+        return;
+    }
+
+    // Check if view root is filtered out
+    if (!sourcePassesFilter(pane.view.source)) {
+        showFilteredRootMessage(paneIndex);
         return;
     }
 
@@ -2157,68 +2190,167 @@ function updateSourceLegend() {
     legend.innerHTML = '';
 
     if (State.config && State.config.sources) {
-        // Show only sources that pass the current filter
+        // Only show sources that are NOT excluded (visible sources only)
         State.config.sources.forEach(s => {
-            if (!sourcePassesFilter(s.name)) return;
-            const item = document.createElement('div');
-            item.className = 'legend-item';
-            item.innerHTML = `
-                <div class="legend-color" style="background: ${colorToHex(parseColor(s.color))}"></div>
-                <span>${s.name}</span>
-            `;
-            legend.appendChild(item);
+            if (!State.filter.excludedSources.has(s.name)) {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.title = s.name;
+                item.innerHTML = `
+                    <div class="legend-color" style="background: ${colorToHex(parseColor(s.color))}"></div>
+                    <span>${s.name}</span>
+                `;
+                legend.appendChild(item);
+            }
         });
     }
 }
 
-function updateMinSourceDropdown() {
-    const select = document.getElementById('min-source-select');
-    if (!select) return;
+function updateSourceFilterDropdown() {
+    const menu = document.getElementById('source-filter-menu');
+    const label = document.getElementById('source-filter-label');
+    if (!menu) return;
 
-    select.innerHTML = '';
+    menu.innerHTML = '';
 
-    // Add the four built-in visibility levels
-    VISIBILITY_LEVELS.forEach((level, index) => {
-        const option = document.createElement('option');
-        option.value = level;
-        if (index === 0) {
-            option.textContent = 'All';
+    if (State.config && State.config.sources) {
+        // Add checkbox for each source
+        State.config.sources.forEach(s => {
+            const isVisible = !State.filter.excludedSources.has(s.name);
+            const item = document.createElement('div');
+            item.className = 'source-filter-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `source-filter-${s.name}`;
+            checkbox.checked = isVisible;
+            checkbox.onchange = (e) => {
+                e.stopPropagation();
+                toggleSourceFilter(s.name);
+            };
+
+            const labelEl = document.createElement('label');
+            labelEl.htmlFor = `source-filter-${s.name}`;
+            labelEl.innerHTML = `
+                <div class="source-filter-color" style="background: ${colorToHex(parseColor(s.color))}"></div>
+                <span>${s.name}</span>
+            `;
+
+            item.appendChild(checkbox);
+            item.appendChild(labelEl);
+            item.onclick = (e) => {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    toggleSourceFilter(s.name);
+                }
+            };
+            menu.appendChild(item);
+        });
+
+        // Add divider and "Show all" action
+        const divider = document.createElement('div');
+        divider.className = 'source-filter-divider';
+        menu.appendChild(divider);
+
+        const showAll = document.createElement('div');
+        showAll.className = 'source-filter-action';
+        showAll.textContent = 'Show all';
+        showAll.onclick = () => {
+            State.filter.excludedSources.clear();
+            applySourceFilterChange();
+        };
+        menu.appendChild(showAll);
+    }
+
+    // Update button label to show count if sources are hidden
+    if (label) {
+        const hiddenCount = State.filter.excludedSources.size;
+        const totalCount = State.config?.sources?.length || 0;
+        if (hiddenCount === 0) {
+            label.textContent = 'Sources';
         } else {
-            option.textContent = `${level}+`;
+            label.textContent = `Sources (${totalCount - hiddenCount}/${totalCount})`;
         }
-        select.appendChild(option);
-    });
-
-    // Set current value
-    select.value = State.filter.minSource;
+    }
 }
 
-function setMinSourceFilter(sourceName) {
-    State.filter.minSource = sourceName;
+function toggleSourceFilterDropdown() {
+    const menu = document.getElementById('source-filter-menu');
+    if (menu) {
+        menu.classList.toggle('open');
+    }
+}
 
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('source-filter-dropdown');
+    const menu = document.getElementById('source-filter-menu');
+    if (dropdown && menu && !dropdown.contains(e.target)) {
+        menu.classList.remove('open');
+    }
+});
+
+function toggleSourceFilter(sourceName) {
+    if (State.filter.excludedSources.has(sourceName)) {
+        State.filter.excludedSources.delete(sourceName);
+    } else {
+        State.filter.excludedSources.add(sourceName);
+    }
+    applySourceFilterChange();
+}
+
+function applySourceFilterChange() {
     // Update legend and source dropdowns to reflect filter
     updateSourceLegend();
+    updateSourceFilterDropdown();
     updateSourceOptions();
 
     // Refresh current views to apply new filter
     const pane0 = State.panes[0];
     const pane1 = State.panes[1];
 
+    // Check if pane0's root is filtered out
     if (pane0.rootId && !pane0.rootId.startsWith(SEARCH_RESULT_PREFIX)) {
-        getViewForPane(pane0.rootId, 0);
+        if (pane0.view && !sourcePassesFilter(pane0.view.source)) {
+            showFilteredRootMessage(0);
+        } else {
+            getViewForPane(pane0.rootId, 0);
+        }
     } else if (pane0.lastSearchQuery) {
         reExecuteSearch(pane0.lastSearchQuery, 0);
     }
 
-    if (State.splitView && pane1.rootId) {
-        if (!pane1.rootId.startsWith(SEARCH_RESULT_PREFIX)) {
-            getViewForPane(pane1.rootId, 1);
+    // Check if pane1's root is filtered out
+    if (State.splitView) {
+        if (pane1.rootId && !pane1.rootId.startsWith(SEARCH_RESULT_PREFIX)) {
+            if (pane1.view && !sourcePassesFilter(pane1.view.source)) {
+                showFilteredRootMessage(1);
+            } else {
+                getViewForPane(pane1.rootId, 1);
+            }
         } else if (pane1.lastSearchQuery) {
             reExecuteSearch(pane1.lastSearchQuery, 1);
         }
     }
 
-    setStatusMessage(`Filter: showing ${sourceName === 'private' ? 'all' : sourceName + '+'} sources`);
+    const hiddenCount = State.filter.excludedSources.size;
+    if (hiddenCount === 0) {
+        setStatusMessage('Showing all sources');
+    } else {
+        setStatusMessage(`Hiding ${hiddenCount} source${hiddenCount > 1 ? 's' : ''}`);
+    }
+}
+
+function showFilteredRootMessage(paneIndex) {
+    const container = document.getElementById(`tree-container-${paneIndex}`);
+    container.innerHTML = `
+        <div class="tree-node root">
+            <span class="priority-spacer"></span>
+            <span class="toggle" style="color: var(--muted-color)">\u00B7</span>
+            <div class="node-content">
+                <span class="node-title" style="color: var(--muted-color); font-style: italic;">View root not visible</span>
+            </div>
+        </div>`;
 }
 
 function toggleHelp() {
@@ -2244,7 +2376,7 @@ function showHistory(paneIndex) {
         allEntries.push(currentEntry);
     }
 
-    // Filter entries based on minSource (search results always pass)
+    // Filter entries based on excluded sources (search results always pass)
     const filteredEntries = allEntries.filter(entry => {
         if (typeof entry === 'string') return true;  // Old format, can't filter
         if (entry.isSearch) return true;  // Search results always shown

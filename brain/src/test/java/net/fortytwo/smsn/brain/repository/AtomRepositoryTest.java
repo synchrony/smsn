@@ -323,7 +323,8 @@ public class AtomRepositoryTest extends BrainTestBase {
         atom = atom.withWeight(new Normed(0.8f));
         repository.save(atom);
 
-        Filter filter = new Filter(0.5f, 0.5f, "private", "private");
+        java.util.Set<String> sources = java.util.Collections.singleton("private");
+        Filter filter = new Filter(0.5f, 0.5f, sources, "private");
         assertTrue(repository.testFilter(repository.load(atom.id), filter));
     }
 
@@ -333,7 +334,8 @@ public class AtomRepositoryTest extends BrainTestBase {
         atom = atom.withWeight(new Normed(0.2f));
         repository.save(atom);
 
-        Filter filter = new Filter(0.5f, 0.5f, "private", "private");
+        java.util.Set<String> sources = java.util.Collections.singleton("private");
+        Filter filter = new Filter(0.5f, 0.5f, sources, "private");
         assertFalse(repository.testFilter(repository.load(atom.id), filter));
     }
 
@@ -349,11 +351,36 @@ public class AtomRepositoryTest extends BrainTestBase {
         assertTrue(repository.testFilter(atom, Filter.noFilter()));
     }
 
+    @Test
+    public void testFilterRejectsExcludedSource() {
+        Atom atom = createAtom("test");  // default source is "private"
+        atom = atom.withWeight(new Normed(0.8f));
+        repository.save(atom);
+
+        // Filter only includes "public" and "universal"
+        java.util.Set<String> sources = new java.util.HashSet<>();
+        sources.add("public");
+        sources.add("universal");
+        Filter filter = new Filter(0f, 0.5f, sources, "public");
+        assertFalse(repository.testFilter(repository.load(atom.id), filter));
+    }
+
+    @Test
+    public void testFilterWithEmptySourcesIncludesAll() {
+        Atom atom = createAtom("test");
+        atom = atom.withWeight(new Normed(0.8f));
+        repository.save(atom);
+
+        // Empty set means include all sources
+        Filter filter = new Filter(0.5f, 0.5f, java.util.Collections.emptySet(), "private");
+        assertTrue(repository.testFilter(repository.load(atom.id), filter));
+    }
+
     // ==================== Create With Filter ====================
 
     @Test
     public void createAtomWithFilterUsesDefaultSource() {
-        Filter filter = new Filter(0.5f, 0.5f, "private", "personal");
+        Filter filter = new Filter(0.5f, 0.5f, java.util.Collections.emptySet(), "personal");
 
         Atom atom = repository.createAtom(filter);
 
@@ -362,7 +389,7 @@ public class AtomRepositoryTest extends BrainTestBase {
 
     @Test
     public void createAtomWithFilterUsesDefaultWeight() {
-        Filter filter = new Filter(0.5f, 0.75f, "private", "private");
+        Filter filter = new Filter(0.5f, 0.75f, java.util.Collections.emptySet(), "private");
 
         Atom atom = repository.createAtom(filter);
 

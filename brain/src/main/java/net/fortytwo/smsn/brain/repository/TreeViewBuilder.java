@@ -130,26 +130,27 @@ public class TreeViewBuilder {
      * This replicates the logic from Filter.test(Note) but works with Atoms.
      */
     private boolean testAtom(Atom atom, Filter filter) {
-        if (filter == null) {
+        if (filter == null || filter.isTrivial()) {
             return true;
-        }
-
-        // Get source index
-        Integer sourceIndex = sourceToIndex.get(atom.source.value);
-        if (sourceIndex == null) {
-            return false;
         }
 
         // Get weight
         float weight = atom.weight.value;
-
-        // Get filter's min values (we need to access these - for now use simple defaults)
-        // In a full implementation, we'd need Filter to expose these or create an AtomFilter
-        // For now, apply basic filtering logic
-        int minSourceIndex = sourceToIndex.getOrDefault(filter.getMinSource(), 0);
         float minWeight = filter.getMinWeight();
 
-        return sourceIndex >= minSourceIndex && weight >= minWeight;
+        if (weight < minWeight) {
+            return false;
+        }
+
+        // Check source - empty includedSources means include all
+        java.util.Set<String> includedSources = filter.getIncludedSources();
+        if (includedSources != null && !includedSources.isEmpty()) {
+            if (!includedSources.contains(atom.source.value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

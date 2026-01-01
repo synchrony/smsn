@@ -46,6 +46,17 @@ public abstract class Action {
 
     private static final History history = new History();
 
+    // Request ID for matching responses to requests (echoed back to client)
+    private String requestId;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
     // override in subclasses
     protected void performTransaction(final ActionContext context)
             throws BadRequestException, RequestProcessingException {}
@@ -92,6 +103,11 @@ public abstract class Action {
         long before = System.currentTimeMillis();
         wrapTransactionAndExceptions(context);
         long after = System.currentTimeMillis();
+
+        // Echo back the request ID for matching responses to requests
+        if (requestId != null) {
+            context.getMap().put(Params.REQUEST_ID, requestId);
+        }
 
         SemanticSynchrony.getLogger().log(Level.INFO, "completed " + getClass().getSimpleName()
                 + " action in " + (after - before) + " ms");

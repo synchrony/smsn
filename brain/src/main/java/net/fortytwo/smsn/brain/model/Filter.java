@@ -6,36 +6,22 @@ import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.config.DataSource;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class Filter implements Predicate<Note>, Serializable {
 
-    private static final Map<String, Integer> sourceToIndex;
-
-    static {
-        sourceToIndex = new HashMap<>();
-        List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
-        Preconditions.checkNotNull(sources);
-        Preconditions.checkArgument(sources.size() > 0);
-        for (int i = 0; i < sources.size(); i++) {
-            DataSource source = sources.get(i);
-            sourceToIndex.put(source.getName(), i);
-        }
-    }
-
     private float minWeight;
     private float defaultWeight;
-    private String minSource;
+    private Set<String> includedSources;
     private String defaultSource;
-
-    private Integer minSourceIndex;
 
     private static final Filter NO_FILTER = new Filter();
 
-    private static final Filter SIMPLE_FILTER = new Filter(0f, 0.5f, 0, null);
+    private static final Filter SIMPLE_FILTER = new Filter(0f, 0.5f, Collections.emptySet(), null);
 
     public static Filter noFilter() {
         return NO_FILTER;
@@ -47,15 +33,28 @@ public class Filter implements Predicate<Note>, Serializable {
 
     // Default constructor is required.
     private Filter() {
-        this(0f, 0.5f, 0, SemanticSynchrony.getConfiguration().getSources().get(0).getName());
+        this(0f, 0.5f, Collections.emptySet(), SemanticSynchrony.getConfiguration().getSources().get(0).getName());
     }
 
     public float getMinWeight() {
         return minWeight;
     }
 
+    /**
+     * Get the set of included source names.
+     * An empty set means "include all sources".
+     */
+    public Set<String> getIncludedSources() {
+        return includedSources;
+    }
+
+    /**
+     * @deprecated Use getIncludedSources() instead
+     */
+    @Deprecated
     public String getMinSource() {
-        return minSource;
+        // For backwards compatibility, return null if using set-based filtering
+        return null;
     }
 
     public void setMinWeight(float minWeight) {
@@ -66,9 +65,42 @@ public class Filter implements Predicate<Note>, Serializable {
         this.defaultWeight = defaultWeight;
     }
 
+    /**
+     * Set the included sources.
+     * An empty set means "include all sources".
+     */
+    public void setIncludedSources(Set<String> includedSources) {
+        this.includedSources = includedSources != null ? new HashSet<>(includedSources) : Collections.emptySet();
+    }
+
+    /**
+     * @deprecated Use setIncludedSources() instead
+     */
+    @Deprecated
     public void setMinSource(String minSource) {
-        this.minSource = minSource;
-        this.minSourceIndex = indexForSource(minSource);
+        // For backwards compatibility, convert minSource to includedSources
+        // by including all sources at or above the minSource level
+        if (minSource == null) {
+            this.includedSources = Collections.emptySet();
+        } else {
+            List<DataSource> sources = SemanticSynchrony.getConfiguration().getSources();
+            int minIndex = -1;
+            for (int i = 0; i < sources.size(); i++) {
+                if (sources.get(i).getName().equals(minSource)) {
+                    minIndex = i;
+                    break;
+                }
+            }
+            if (minIndex >= 0) {
+                Set<String> included = new HashSet<>();
+                for (int i = minIndex; i < sources.size(); i++) {
+                    included.add(sources.get(i).getName());
+                }
+                this.includedSources = included;
+            } else {
+                this.includedSources = Collections.emptySet();
+            }
+        }
     }
 
     public void setDefaultSource(String defaultSource) {
@@ -84,39 +116,34 @@ public class Filter implements Predicate<Note>, Serializable {
     }
 
     public boolean isTrivial() {
-        return minSourceIndex == 0 && minWeight == 0;
+        return (includedSources == null || includedSources.isEmpty()) && minWeight == 0;
     }
 
-    private static int indexForSource(final String source) {
-        Integer index = sourceToIndex.get(source);
-        Preconditions.checkNotNull(index, "data source '" + source + "' does not exist");
-        return index;
-    }
-
-    private Filter(final float minWeight,
-                   final float defaultWeight,
-                   final int minSourceIndex,
-                   final String defaultSource) {
+    public Filter(final float minWeight,
+                  final float defaultWeight,
+                  final Set<String> includedSources,
+                  final String defaultSource) {
 
         checkBetweenZeroAndOne(minWeight);
         checkBetweenZeroAndOne(defaultWeight);
         Preconditions.checkArgument(defaultWeight >= minWeight, "default weight greater than minimum");
 
-        if (null != defaultSource) {
-            indexForSource(defaultSource);
-        }
-
-        this.minSourceIndex = minSourceIndex;
+        this.includedSources = includedSources != null ? new HashSet<>(includedSources) : Collections.emptySet();
         this.defaultSource = defaultSource;
         this.minWeight = minWeight;
         this.defaultWeight = defaultWeight;
     }
 
+    /**
+     * @deprecated Use constructor with Set<String> includedSources instead
+     */
+    @Deprecated
     public Filter(final float minWeight,
                   final float defaultWeight,
                   final String minSource,
                   final String defaultSource) {
-        this(minWeight, defaultWeight, indexForSource(minSource), defaultSource);
+        this(minWeight, defaultWeight, Collections.emptySet(), defaultSource);
+        setMinSource(minSource);  // Convert minSource to includedSources
     }
 
     private void checkBetweenZeroAndOne(final float value) {
@@ -125,18 +152,21 @@ public class Filter implements Predicate<Note>, Serializable {
 
     @Override
     public boolean test(final Note note) {
-        Integer sourceIndex = getSourceIndexFor(note);
+        String source = Note.getSource(note);
         Float weight = Note.getWeight(note);
 
-        if (null == sourceIndex || null == weight) return false;
+        if (null == source || null == weight) return false;
 
-        // The weight criterion includes the minimum; if the minimum is 0.25,
-        // items with a value of 0.25 and greater will be visible.
-        return sourceIndex >= minSourceIndex && weight >= minWeight;
-    }
+        // Check weight - the weight criterion includes the minimum
+        if (weight < minWeight) return false;
 
-    private Integer getSourceIndexFor(final Note note) {
-        String source = Note.getSource(note);
-        return null == source ? null : indexForSource(source);
+        // Check source - empty includedSources means include all
+        if (includedSources != null && !includedSources.isEmpty()) {
+            if (!includedSources.contains(source)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

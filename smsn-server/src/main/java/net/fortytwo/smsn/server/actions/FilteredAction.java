@@ -5,6 +5,9 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
 
+import java.util.ArrayList;
+import java.util.Set;
+
 abstract class FilteredAction extends Action {
     private Filter filter = Filter.noFilter();
 
@@ -19,7 +22,9 @@ abstract class FilteredAction extends Action {
     protected void setFilterParams(final ActionContext context) {
         context.getMap().put(Params.DEFAULT_SOURCE, filter.getDefaultSource());
         context.getMap().put(Params.DEFAULT_WEIGHT, filter.getDefaultWeight());
-        context.getMap().put(Params.MIN_SOURCE, filter.getMinSource());
+        Set<String> includedSources = filter.getIncludedSources();
+        context.getMap().put(Params.INCLUDED_SOURCES,
+            includedSources != null ? new ArrayList<>(includedSources) : new ArrayList<>());
         context.getMap().put(Params.MIN_WEIGHT, filter.getMinWeight());
     }
 }
