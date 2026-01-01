@@ -66,15 +66,15 @@ public class FileBasedAtomRepository implements AtomRepositoryInterface, AutoClo
         // Check if index is empty
         List<AtomId> existingIds = indexManager.getAllAtomIds();
         if (existingIds.isEmpty()) {
-            // Load all atoms from files and index them
+            // Load all atoms from files and index them using bulk operations
             logger.info("Building index from atom files...");
+            long loadStart = System.currentTimeMillis();
             List<Atom> allAtoms = fileStore.loadAll();
-            logger.info("Found " + allAtoms.size() + " atoms");
+            long loadElapsed = System.currentTimeMillis() - loadStart;
+            logger.info("Loaded " + allAtoms.size() + " atoms from files in " + loadElapsed + "ms");
 
-            for (Atom atom : allAtoms) {
-                indexManager.indexAtom(atom);
-                indexManager.updateChildren(atom.id, atom.children);
-            }
+            // Use bulk indexing for much better performance
+            indexManager.indexAtomsBulk(allAtoms);
             indexManager.commit();
             logger.info("Index built successfully");
         } else {

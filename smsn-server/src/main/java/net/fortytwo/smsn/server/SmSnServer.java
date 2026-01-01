@@ -5,8 +5,10 @@ import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.TreeNodeWikiParser;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.brain.repository.FileBasedAtomRepository;
+import net.fortytwo.smsn.brain.repository.FileBasedTopicGraph;
 import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -37,6 +39,7 @@ public class SmSnServer {
 
     private final Server server;
     private final FileBasedAtomRepository repository;
+    private final TopicGraph topicGraph;
     private final ObjectMapper objectMapper;
     private final ActivityLog activityLog;
 
@@ -48,6 +51,9 @@ public class SmSnServer {
         logger.info("Initializing file-based repository with index directory: " + indexDir.getAbsolutePath());
         this.repository = new FileBasedAtomRepository(indexDir);
         this.repository.initialize();
+
+        // Create TopicGraph adapter for VCS export and other operations
+        this.topicGraph = new FileBasedTopicGraph(repository);
 
         // Create activity log directly (no Brain needed for standalone mode)
         this.activityLog = createActivityLog();
@@ -132,6 +138,7 @@ public class SmSnServer {
         ActionContext context = new ActionContext();
         context.setMap(new HashMap<>());
         context.setRepository(repository);
+        context.setTopicGraph(topicGraph);
         context.setActivityLog(activityLog);
         context.setTreeNodeWikiParser(new TreeNodeWikiParser());
         context.setTreeNodeJsonParser(new TreeNodeJsonParser());

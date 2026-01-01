@@ -1,30 +1,26 @@
 #!/bin/bash
 
-# Build the standalone SmSn server (without TinkerPop/Gremlin Server dependencies)
+# Build the standalone SmSn server
 
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "${DIR}/.."
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="${SCRIPT_DIR}/.."
 
 echo "Building standalone SmSn server..."
+cd "$PROJECT_DIR"
 ./gradlew :smsn-server:shadowJar
 
-JAR_PATH="smsn-server/build/libs/smsn-server-standalone.jar"
+JAR_NAME="smsn-server-1.5-standalone.jar"
+JAR_PATH="${PROJECT_DIR}/smsn-server/build/libs/${JAR_NAME}"
 
 if [ -f "$JAR_PATH" ]; then
     echo ""
     echo "Build successful!"
     echo "Standalone server JAR: ${JAR_PATH}"
     echo ""
-    echo "To run the server:"
-    echo "  java -jar ${JAR_PATH} -c smsn.yaml"
-    echo ""
-    echo "Options:"
-    echo "  -p, --port PORT     Server port (default: 8182)"
-    echo "  -h, --host HOST     Server host (default: 0.0.0.0)"
-    echo "  -c, --config FILE   Configuration file (smsn.yaml)"
-    echo "      --help          Show help message"
+    echo "To run the server, cd to a directory containing smsn.yaml and run:"
+    echo "  ${SCRIPT_DIR}/run-standalone-server.sh"
 else
     echo "Build failed: JAR not found at ${JAR_PATH}"
     exit 1

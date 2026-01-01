@@ -31,9 +31,12 @@ public class WriteGraph extends IOAction {
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
 
         NoteWriter.Context context = new NoteWriter.Context();
-        context.setTopicGraph(params.getBrain().getTopicGraph());
+        context.setTopicGraph(params.getTopicGraph());
         context.setAtomRepository(params.getRepository());
-        context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
+        // KnowledgeBase is optional - only available in Brain mode
+        if (params.getBrain() != null) {
+            context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
+        }
         context.setRootId(getRootId());
         context.setFilter(getFilter());
         context.setFormat(getFormat());

@@ -55,7 +55,11 @@ import java.util.logging.Logger;
  */
 public class IndexManager implements AutoCloseable {
     private static final Logger logger = SemanticSynchrony.getLogger();
-    private static final int MAX_SEARCH_RESULTS = 100;
+    // Lucene returns top N results by native score before custom scoring is applied.
+    // For wildcard queries, all matches have equal native scores, so results are
+    // returned in document order. We need a high enough limit to capture matches
+    // from all sources before the repository applies weight-based scoring.
+    private static final int MAX_SEARCH_RESULTS = 5000;
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_TITLE = "title";
@@ -75,10 +79,18 @@ public class IndexManager implements AutoCloseable {
             indexDirectory.mkdirs();
         }
 
-        // Initialize SQLite
+        // Initialize SQLite with performance optimizations
         File sqliteFile = new File(indexDirectory, "index.db");
         String jdbcUrl = "jdbc:sqlite:" + sqliteFile.getAbsolutePath();
         this.sqliteConnection = DriverManager.getConnection(jdbcUrl);
+
+        // Enable WAL mode for better concurrent performance
+        try (Statement stmt = sqliteConnection.createStatement()) {
+            stmt.execute("PRAGMA journal_mode=WAL");
+            stmt.execute("PRAGMA synchronous=NORMAL");
+            stmt.execute("PRAGMA cache_size=10000");
+        }
+
         initializeSqliteTables();
 
         // Initialize Lucene
@@ -88,6 +100,7 @@ public class IndexManager implements AutoCloseable {
 
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        config.setRAMBufferSizeMB(64.0); // Use more RAM for faster indexing
         this.luceneWriter = new IndexWriter(luceneDirectory, config);
 
         refreshLuceneReader();
@@ -145,7 +158,85 @@ public class IndexManager implements AutoCloseable {
      */
     public void indexAtom(Atom atom) throws SQLException, IOException {
         indexAtomInSqlite(atom);
-        indexAtomInLucene(atom);
+        indexAtomInLucene(atom, false);
+    }
+
+    /**
+     * Bulk index many atoms efficiently.
+     * Uses transactions and batch operations for much better performance.
+     */
+    public void indexAtomsBulk(List<Atom> atoms) throws SQLException, IOException {
+        if (atoms.isEmpty()) {
+            return;
+        }
+
+        long startTime = System.currentTimeMillis();
+        logger.info("Bulk indexing " + atoms.size() + " atoms...");
+
+        // Disable auto-commit for bulk insert
+        boolean originalAutoCommit = sqliteConnection.getAutoCommit();
+        sqliteConnection.setAutoCommit(false);
+
+        try {
+            // Batch insert atoms
+            String atomSql = "INSERT OR REPLACE INTO atoms (id, source, created, weight, priority, shortcut, title) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String childSql = "INSERT INTO children (parent_id, child_id, position) VALUES (?, ?, ?)";
+
+            int atomCount = 0;
+            int childCount = 0;
+
+            try (PreparedStatement atomStmt = sqliteConnection.prepareStatement(atomSql);
+                 PreparedStatement childStmt = sqliteConnection.prepareStatement(childSql)) {
+
+                for (Atom atom : atoms) {
+                    // Index atom metadata
+                    atomStmt.setString(1, atom.id.value);
+                    atomStmt.setString(2, atom.source.value);
+                    atomStmt.setLong(3, atom.created.value);
+                    atomStmt.setFloat(4, atom.weight.value);
+                    atomStmt.setObject(5, atom.priority.isPresent() ? atom.priority.get().value : null);
+                    atomStmt.setString(6, atom.shortcut.isPresent() ? atom.shortcut.get() : null);
+                    atomStmt.setString(7, atom.title);
+                    atomStmt.addBatch();
+                    atomCount++;
+
+                    // Index children
+                    for (int i = 0; i < atom.children.size(); i++) {
+                        childStmt.setString(1, atom.id.value);
+                        childStmt.setString(2, atom.children.get(i).value);
+                        childStmt.setInt(3, i);
+                        childStmt.addBatch();
+                        childCount++;
+                    }
+
+                    // Execute in batches of 1000 to avoid memory issues
+                    if (atomCount % 1000 == 0) {
+                        atomStmt.executeBatch();
+                        childStmt.executeBatch();
+                    }
+
+                    // Index in Lucene (skip delete since this is fresh index)
+                    indexAtomInLucene(atom, true);
+                }
+
+                // Execute remaining batches
+                atomStmt.executeBatch();
+                childStmt.executeBatch();
+            }
+
+            sqliteConnection.commit();
+
+            long elapsed = System.currentTimeMillis() - startTime;
+            logger.info("Bulk indexing completed: " + atomCount + " atoms, " + childCount +
+                       " child relationships in " + elapsed + "ms");
+
+        } catch (SQLException | IOException e) {
+            sqliteConnection.rollback();
+            throw e;
+        } finally {
+            sqliteConnection.setAutoCommit(originalAutoCommit);
+        }
     }
 
     private void indexAtomInSqlite(Atom atom) throws SQLException {
@@ -164,9 +255,11 @@ public class IndexManager implements AutoCloseable {
         }
     }
 
-    private void indexAtomInLucene(Atom atom) throws IOException {
-        // Delete existing document
-        luceneWriter.deleteDocuments(new Term(FIELD_ID, atom.id.value));
+    private void indexAtomInLucene(Atom atom, boolean skipDelete) throws IOException {
+        // Only delete if updating (not during bulk initial indexing)
+        if (!skipDelete) {
+            luceneWriter.deleteDocuments(new Term(FIELD_ID, atom.id.value));
+        }
 
         // Create new document
         Document doc = new Document();
@@ -299,9 +392,6 @@ public class IndexManager implements AutoCloseable {
 
         List<Sortable<AtomId, Float>> results = new ArrayList<>();
 
-        // Sanitize query: Lucene doesn't allow leading wildcards
-        // Convert "*term*" to "term" (StandardAnalyzer will handle partial matching via tokenization)
-        // or use a simple substring-style search
         String sanitizedQuery = sanitizeQuery(queryString);
         if (sanitizedQuery.isEmpty()) {
             return results.iterator();
@@ -310,7 +400,7 @@ public class IndexManager implements AutoCloseable {
         try {
             QueryParser parser = new QueryParser(field, analyzer);
             parser.setDefaultOperator(QueryParser.Operator.AND);
-            parser.setAllowLeadingWildcard(true);  // Allow leading wildcards
+            parser.setAllowLeadingWildcard(true);
             Query query = parser.parse(sanitizedQuery);
 
             TopDocs topDocs = luceneSearcher.search(query, MAX_SEARCH_RESULTS);
@@ -331,8 +421,9 @@ public class IndexManager implements AutoCloseable {
 
     /**
      * Sanitize a query string for Lucene.
-     * Handles the "*term*" format from smsn-mode by converting to a standard text query.
-     * The StandardAnalyzer will handle tokenization and matching.
+     * Strips the "*term*" wrapper from smsn-mode queries and adds wildcards
+     * to each term for substring matching.
+     * Uses AND semantics - all terms must be present.
      */
     private String sanitizeQuery(String queryString) {
         if (queryString == null || queryString.isEmpty()) {
@@ -341,20 +432,24 @@ public class IndexManager implements AutoCloseable {
 
         String trimmed = queryString.trim();
 
-        // Handle "*term*" format from smsn-mode
-        // Convert to plain text query - StandardAnalyzer handles tokenization
-        // This matches behavior of the old Neo4j/TinkerPop implementation
+        // Handle "*term*" format from smsn-mode - strip outer wildcards
         if (trimmed.startsWith("*") && trimmed.endsWith("*") && trimmed.length() > 2) {
-            // Extract the term without wildcards
-            String term = trimmed.substring(1, trimmed.length() - 1).trim();
-            if (term.isEmpty()) {
-                return "";
-            }
-            // Return plain term - StandardAnalyzer will tokenize and match
-            return term;
+            trimmed = trimmed.substring(1, trimmed.length() - 1).trim();
         }
 
-        return trimmed;
+        // Add wildcards to each term for substring matching
+        // "log 25 purch" -> "*log* *25* *purch*"
+        StringBuilder result = new StringBuilder();
+        for (String term : trimmed.split("\\s+")) {
+            if (!term.isEmpty()) {
+                if (result.length() > 0) {
+                    result.append(" ");
+                }
+                result.append("*").append(term).append("*");
+            }
+        }
+
+        return result.toString();
     }
 
     /**

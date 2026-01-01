@@ -5,6 +5,7 @@ import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.TreeNodeWikiParser;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
 import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
@@ -21,6 +22,7 @@ public class ActionContext {
     private TreeNodeJsonParser treeNodeJsonParser;
     private TreeNodeJsonPrinter treeNodeJsonPrinter;
     private AtomRepositoryInterface repository;
+    private TopicGraph topicGraph;
 
     public GraphWrapper getGraphWrapper() {
         return graphWrapper;
@@ -98,5 +100,23 @@ public class ActionContext {
      */
     public void setRepository(AtomRepositoryInterface repository) {
         this.repository = repository;
+    }
+
+    /**
+     * Get the TopicGraph for operations that need it (e.g., VCS export).
+     * Returns from Brain if available, otherwise uses the standalone topicGraph.
+     */
+    public TopicGraph getTopicGraph() {
+        if (brain != null) {
+            return brain.getTopicGraph();
+        }
+        return topicGraph;
+    }
+
+    /**
+     * Set the TopicGraph directly (for standalone mode).
+     */
+    public void setTopicGraph(TopicGraph topicGraph) {
+        this.topicGraph = topicGraph;
     }
 }
