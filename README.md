@@ -58,86 +58,30 @@ thingNamespace: http://example.org/things/
 
 Each source `location` should be a directory containing `.smsn` atom files (one per note). These directories can be Git repositories for version control.
 
-### Building
+### Scripts
+
+Helper scripts are provided in `bin/`:
 
 ```bash
-./gradlew :smsn-server:shadowJar
-```
+# Build the server (run from project root)
+bin/build-standalone-server.sh
 
-This creates `smsn-server/build/libs/smsn-server-1.5-standalone.jar`.
-
-### Starting the Server
-
-```bash
+# Start the server (run from directory containing smsn.yaml)
 cd /path/to/directory/with/smsn.yaml
-java -jar /path/to/smsn-server-1.5-standalone.jar > server.log 2>&1 &
+/path/to/smsn/bin/start-standalone-server.sh
+
+# Stop the server (run from anywhere)
+/path/to/smsn/bin/stop-standalone-server.sh
 ```
 
-The server starts on `0.0.0.0:8182` and accepts WebSocket connections at `/gremlin`.
-
-### Stopping the Server
-
-```bash
-pkill -f "smsn-server.*standalone"
-```
-
-### Viewing Logs
-
-```bash
-tail -f server.log
-```
-
-Example startup log:
-```
-INFO: net.fortytwo.smsn.server.SmSnServer <init>: Initializing file-based repository with index directory: /path/to/index
-INFO: net.fortytwo.smsn.brain.repository.FileBasedAtomRepository initialize: Initializing file-based repository...
-INFO: net.fortytwo.smsn.brain.repository.FileBasedAtomRepository initialize: Building index from atom files...
-INFO: net.fortytwo.smsn.brain.repository.FileBasedAtomRepository initialize: Loaded 179082 atoms from files in 13283ms
-INFO: net.fortytwo.smsn.brain.repository.IndexManager indexAtomsBulk: Bulk indexing 179082 atoms...
-INFO: net.fortytwo.smsn.brain.repository.IndexManager indexAtomsBulk: Bulk indexing completed: 179082 atoms, 208854 child relationships in 2383ms
-INFO: net.fortytwo.smsn.server.SmSnServer <init>: SmSn Server configured on 0.0.0.0:8182/gremlin
-INFO: net.fortytwo.smsn.server.SmSnServer start: SmSn Server started
-```
+The start script will automatically build if needed. The server starts on `0.0.0.0:8182` and accepts WebSocket connections at `/gremlin`.
 
 ### Cycling the Graph (Backup and Rebuild)
 
-To rebuild the index from source files (useful after external edits to .smsn files or to recover from corruption), use a cycle script:
+To rebuild the index from source files (useful after external edits to .smsn files or to recover from corruption):
 
-```bash
-#!/bin/bash
-# cycle.sh - Backup index and prepare for fresh rebuild
-
-INDEX_DIR="/path/to/index"
-BACKUP_DIR="/path/to/backups"
-NUM_BACKUPS=3
-
-# Stop the server first!
-
-# Rotate backups
-if [ -d "$INDEX_DIR" ]; then
-    mkdir -p "$BACKUP_DIR"
-
-    # Delete oldest backup
-    rm -rf "$BACKUP_DIR/index.$NUM_BACKUPS"
-
-    # Shift existing backups
-    for ((i=$NUM_BACKUPS-1; i>=1; i--)); do
-        if [ -d "$BACKUP_DIR/index.$i" ]; then
-            mv "$BACKUP_DIR/index.$i" "$BACKUP_DIR/index.$((i+1))"
-        fi
-    done
-
-    # Move current index to backup.1
-    mv "$INDEX_DIR" "$BACKUP_DIR/index.1"
-fi
-
-mkdir -p "$INDEX_DIR"
-echo "Index cleared. Start the server to rebuild from source files."
-```
-
-Usage:
-1. Stop the server: `pkill -f "smsn-server.*standalone"`
-2. Run the cycle script: `./cycle.sh`
+1. Stop the server: `bin/stop-standalone-server.sh`
+2. Delete or move the index directory
 3. Start the server (it will rebuild the index automatically)
 
 ## Contact us through Github (here), [Gitter](https://gitter.im/synchrony/Lobby) or [Facebook](https://www.facebook.com/pg/semanticsynchrony/)
