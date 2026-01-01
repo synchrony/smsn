@@ -1,7 +1,7 @@
 package net.fortytwo.smsn.brain;
 
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -34,7 +34,7 @@ public class History {
      * @return list of recently visited atoms
      */
     public List<Atom> getHistory(final int maxlen,
-                                  final AtomRepository repository,
+                                  final AtomRepositoryInterface repository,
                                   final Filter filter) {
         List<Atom> atoms = new LinkedList<>();
 

@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.wiki.AtomWikiParser;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.config.DataSource;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class AtomVCSReader extends NoteReader {
 
     @Override
     protected void importInternal(Context context) throws IOException {
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
 
         // Two-pass import:
         // Pass 1: Read and save all atoms (properties only)
@@ -92,7 +92,7 @@ public class AtomVCSReader extends NoteReader {
         context.getTopicGraph().commit();
     }
 
-    private int readDataSource(DataSource source, AtomRepository repository, Context context,
+    private int readDataSource(DataSource source, AtomRepositoryInterface repository, Context context,
                                List<Atom> allAtoms) throws IOException {
         String location = source.getLocation();
         File dir = new File(location);
@@ -131,7 +131,7 @@ public class AtomVCSReader extends NoteReader {
         return count;
     }
 
-    private Atom readAtomFile(File file, DataSource source, AtomRepository repository) throws IOException {
+    private Atom readAtomFile(File file, DataSource source, AtomRepositoryInterface repository) throws IOException {
         AtomId expectedId = idFromFileName(file);
 
         try (InputStream in = new FileInputStream(file)) {

@@ -131,7 +131,7 @@ public abstract class Action {
         history.visit(rootId);
     }
 
-    protected List<Atom> getHistory(final net.fortytwo.smsn.brain.repository.AtomRepository repository,
+    protected List<Atom> getHistory(final net.fortytwo.smsn.brain.repository.AtomRepositoryInterface repository,
                                      final Filter filter) {
         return history.getHistory(100, repository, filter);
     }

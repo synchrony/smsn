@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.TreeNode;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.brain.util.ListDiff;
 
 import java.util.ArrayList;
@@ -23,10 +23,10 @@ import java.util.Set;
  */
 public class TreeUpdater {
 
-    private final AtomRepository repository;
+    private final AtomRepositoryInterface repository;
     private final ActivityLog activityLog;
 
-    public TreeUpdater(AtomRepository repository, ActivityLog activityLog) {
+    public TreeUpdater(AtomRepositoryInterface repository, ActivityLog activityLog) {
         this.repository = repository;
         this.activityLog = activityLog;
     }

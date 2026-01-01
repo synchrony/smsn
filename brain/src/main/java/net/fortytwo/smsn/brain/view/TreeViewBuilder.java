@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.TreeNode;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,9 +18,9 @@ import java.util.Set;
  */
 public class TreeViewBuilder {
 
-    private final AtomRepository repository;
+    private final AtomRepositoryInterface repository;
 
-    public TreeViewBuilder(AtomRepository repository) {
+    public TreeViewBuilder(AtomRepositoryInterface repository) {
         this.repository = repository;
     }
 

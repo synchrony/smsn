@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.io.wiki.TreeNodeWikiParser;
 import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
 import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class ActionContext {
     private TreeNodeWikiParser treeNodeWikiParser;
     private TreeNodeJsonParser treeNodeJsonParser;
     private TreeNodeJsonPrinter treeNodeJsonPrinter;
-    private AtomRepository repository;
+    private AtomRepositoryInterface repository;
 
     public GraphWrapper getGraphWrapper() {
         return graphWrapper;
@@ -71,10 +72,17 @@ public class ActionContext {
      * Get the AtomRepository for direct Atom-based operations.
      * Lazily creates the repository from the GraphWrapper if needed.
      */
-    public AtomRepository getRepository() {
+    public AtomRepositoryInterface getRepository() {
         if (repository == null && graphWrapper != null) {
             repository = new AtomRepository(graphWrapper);
         }
         return repository;
+    }
+
+    /**
+     * Set the repository directly (for file-based or other implementations).
+     */
+    public void setRepository(AtomRepositoryInterface repository) {
+        this.repository = repository;
     }
 }

@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
  * Handles recursive tree construction with filtering and depth control.
  */
 public class TreeViewBuilder {
-    private final AtomRepository repository;
+    private final AtomRepositoryInterface repository;
     private static final Map<String, Integer> sourceToIndex = buildSourceIndex();
 
-    public TreeViewBuilder(AtomRepository repository) {
+    public TreeViewBuilder(AtomRepositoryInterface repository) {
         this.repository = repository;
     }
 

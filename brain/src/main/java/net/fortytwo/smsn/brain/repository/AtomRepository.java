@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Repository for loading and saving Atom instances to/from the graph database.
  * Provides a clean abstraction over the TinkerPop/Neo4j graph implementation.
  */
-public class AtomRepository {
+public class AtomRepository implements AtomRepositoryInterface {
     private static final int DEFAULT_MAX_SEARCH_RESULTS = 100;
 
     private final GraphWrapper wrapper;
@@ -865,12 +865,42 @@ public class AtomRepository {
         return value.toLowerCase().replaceAll("[-_\t\n\r]", " ").trim();
     }
 
+    // ========== Transaction Support ==========
+
+    /**
+     * Commit all pending changes.
+     * For TinkerPop, this typically commits the underlying transaction.
+     */
+    @Override
+    public void commit() {
+        wrapper.commit();
+    }
+
+    /**
+     * Rollback all pending changes.
+     * For TinkerPop, this typically rolls back the underlying transaction.
+     */
+    @Override
+    public void rollback() {
+        wrapper.rollback();
+    }
+
+    /**
+     * Begin a transaction.
+     * For TinkerPop, this typically begins the underlying transaction.
+     */
+    @Override
+    public void begin() {
+        // TinkerPop transactions are typically implicit
+    }
+
     // ========== Update Tracking ==========
 
     /**
      * Notify the repository that the graph has been updated.
      * This updates the last update timestamp for change tracking and inference.
      */
+    @Override
     public void notifyOfUpdate() {
         lastUpdate = System.currentTimeMillis();
         wrapper.notifyOfUpdate();
@@ -880,6 +910,7 @@ public class AtomRepository {
      * Get the timestamp of the last update to the graph.
      * Used for change tracking and triggering inference.
      */
+    @Override
     public long getLastUpdate() {
         return Math.max(lastUpdate, wrapper.getLastUpdate());
     }

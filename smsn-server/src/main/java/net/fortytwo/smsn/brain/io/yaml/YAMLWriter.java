@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.vcs.FilePerNoteFormat;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class YAMLWriter extends NoteWriter {
         timeAction("exported atoms as individual files", () -> doExport(context.getAtomRepository(), dirs));
     }
 
-    private void doExport(final AtomRepository repository, final Map<String, File> dirs) throws IOException {
+    private void doExport(final AtomRepositoryInterface repository, final Map<String, File> dirs) throws IOException {
         YAMLGraph data = new YAMLGraph();
 
         for (AtomId atomId : repository.getAllAtomIds()) {

@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteReader;
 import net.fortytwo.smsn.brain.io.vcs.FilePerNoteFormat;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class YAMLReader extends NoteReader {
     @Override
     protected void importInternal(final Context context) throws IOException {
         Map<String, File> dirs = FilePerNoteFormat.directoriesBySource();
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
 
         YAMLGraph data = new YAMLGraph();
         for (Atom atom : data.readFrom(dirs)) {

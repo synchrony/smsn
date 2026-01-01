@@ -4,7 +4,7 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public abstract class NoteWriter {
     public static class Context {
         private TopicGraph topicGraph;
         private KnowledgeBase knowledgeBase;
-        private AtomRepository atomRepository;
+        private AtomRepositoryInterface atomRepository;
         private AtomId rootId;
         private Filter filter;
         private File destDirectory;
@@ -46,11 +46,11 @@ public abstract class NoteWriter {
             this.topicGraph = topicGraph;
         }
 
-        public AtomRepository getAtomRepository() {
+        public AtomRepositoryInterface getAtomRepository() {
             return atomRepository;
         }
 
-        public void setAtomRepository(AtomRepository atomRepository) {
+        public void setAtomRepository(AtomRepositoryInterface atomRepository) {
             this.atomRepository = atomRepository;
         }
 

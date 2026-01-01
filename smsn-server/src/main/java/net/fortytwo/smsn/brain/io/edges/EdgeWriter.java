@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -21,7 +21,7 @@ public class EdgeWriter extends NoteWriter {
 
     @Override
     public void doWrite(Context context) throws IOException {
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
         PrintStream p = new PrintStream(context.getDestStream());
         Filter filter = context.getFilter();
 

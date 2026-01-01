@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.io.NoteWriter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -26,11 +26,11 @@ public class SimpleYamlWriter extends NoteWriter {
 
     @Override
     public void doWrite(Context context) throws IOException {
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
         writeGraph(repository, context.getDestStream());
     }
 
-    private void writeGraph(final AtomRepository repository,
+    private void writeGraph(final AtomRepositoryInterface repository,
                             final OutputStream out) throws IOException {
 
         List<Object> atomsObj = new ArrayList<>();

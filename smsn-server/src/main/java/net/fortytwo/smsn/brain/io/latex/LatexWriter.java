@@ -6,7 +6,7 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,7 +37,7 @@ public class LatexWriter extends NoteWriter {
         AtomId rootId = context.getRootId();
         Preconditions.checkNotNull(rootId, "root id is required");
         Filter filter = context.getFilter();
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
 
         Optional<Atom> opt = repository.findById(rootId);
         if (!opt.isPresent()) {
@@ -48,7 +48,7 @@ public class LatexWriter extends NoteWriter {
     }
 
     private void writeLatex(final Atom root,
-                            final AtomRepository repository,
+                            final AtomRepositoryInterface repository,
                             final Filter filter,
                             final int level,
                             final int sectionLevel,

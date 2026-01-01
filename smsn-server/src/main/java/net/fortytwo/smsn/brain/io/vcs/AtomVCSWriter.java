@@ -5,7 +5,7 @@ import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.wiki.AtomWikiPrinter;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.config.DataSource;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class AtomVCSWriter extends NoteWriter {
 
     @Override
     public void doWrite(Context context) throws IOException {
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
 
         // Step 1: Scan all source directories and build index of existing atoms
         Map<String, Set<AtomId>> existingAtomsBySource = scanExistingAtoms();
@@ -72,7 +72,7 @@ public class AtomVCSWriter extends NoteWriter {
         return result;
     }
 
-    private void writeDataSource(DataSource source, AtomRepository repository,
+    private void writeDataSource(DataSource source, AtomRepositoryInterface repository,
                                   Map<String, Set<AtomId>> existingAtomsBySource) throws IOException {
         String location = source.getLocation();
         File dir = new File(location);

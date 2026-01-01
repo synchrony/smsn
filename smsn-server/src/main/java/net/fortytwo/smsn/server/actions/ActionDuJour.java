@@ -128,7 +128,7 @@ public class ActionDuJour extends Action {
     }
 
     private void assignSources(ActionContext context) {
-        AtomRepository repository = context.getRepository();
+        net.fortytwo.smsn.brain.repository.AtomRepositoryInterface repository = context.getRepository();
         for (DataSource source : SemanticSynchrony.getConfiguration().getSources()) {
             File dir = new File(source.getLocation());
             Preconditions.checkArgument(dir.exists() && dir.isDirectory());

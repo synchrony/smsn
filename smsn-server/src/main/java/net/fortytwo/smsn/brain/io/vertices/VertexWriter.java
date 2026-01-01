@@ -9,7 +9,7 @@ import net.fortytwo.smsn.brain.io.NoteWriter;
 import net.fortytwo.smsn.brain.io.Format;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.rdf.KnowledgeBase;
-import net.fortytwo.smsn.brain.repository.AtomRepository;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.brain.util.OptHelper;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class VertexWriter extends NoteWriter {
     @Override
     public void doWrite(Context context) throws IOException {
 
-        AtomRepository repository = context.getAtomRepository();
+        AtomRepositoryInterface repository = context.getAtomRepository();
         Filter filter = context.getFilter();
         Preconditions.checkNotNull(filter);
         KnowledgeBase sourceKb = context.getKnowledgeBase();

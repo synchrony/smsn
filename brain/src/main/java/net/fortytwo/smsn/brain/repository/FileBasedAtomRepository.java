@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * This provides the same functionality as AtomRepository but without
  * TinkerPop/Neo4j dependencies.
  */
-public class FileBasedAtomRepository implements AutoCloseable {
+public class FileBasedAtomRepository implements AtomRepositoryInterface, AutoCloseable {
     private static final Logger logger = SemanticSynchrony.getLogger();
     private static final int DEFAULT_MAX_SEARCH_RESULTS = 100;
 
