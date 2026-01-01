@@ -32,7 +32,8 @@ public class SmSnServer {
 
     private static final int DEFAULT_PORT = 8182;
     private static final String DEFAULT_HOST = "0.0.0.0";
-    private static final String WEBSOCKET_PATH = "/smsn";
+    // Use /gremlin path for compatibility with existing Web UI
+    private static final String WEBSOCKET_PATH = "/gremlin";
 
     private final Server server;
     private final FileBasedAtomRepository repository;
