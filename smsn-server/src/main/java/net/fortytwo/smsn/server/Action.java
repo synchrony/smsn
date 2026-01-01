@@ -21,8 +21,8 @@ import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.apache.tinkerpop.shaded.jackson.annotation.JsonIgnoreProperties;
-import org.apache.tinkerpop.shaded.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.json.JSONObject;
 
 import java.io.IOException;

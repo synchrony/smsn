@@ -9,7 +9,7 @@ import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.brain.repository.FileBasedAtomRepository;
 import net.fortytwo.smsn.brain.repository.FileBasedTopicGraph;
-import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;

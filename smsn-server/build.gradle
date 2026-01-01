@@ -18,8 +18,14 @@ dependencies {
   // Hydra dependency (needed for Atom/TreeNode field access)
   implementation 'net.fortytwo.hydra:hydra-java:0.7.0'
 
+  // Jackson for JSON parsing (standalone, not from TinkerPop's shaded version)
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+
+  // TinkerPop/Neo4j - still needed for compilation but excluded from standalone JAR
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
   implementation group: 'org.apache.tinkerpop', name: 'gremlin-server', version: tinkerpopVersion
+  implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
+
   implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.8.0.201705170830-rc1'
   implementation 'org.json:json:20180130'
   implementation 'commons-io:commons-io:2.11.0'
@@ -28,10 +34,9 @@ dependencies {
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-api', version: rdf4jVersion
   implementation 'com.illposed.osc:javaosc-core:0.3'
   implementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-sail-memory', version: rdf4jVersion)
-  implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
   implementation group: 'net.fortytwo', name: 'linked-data-sail', version: rippleVersion
 
-  // Jetty WebSocket for standalone server (migration from Gremlin Server)
+  // Jetty WebSocket for standalone server
   implementation 'org.eclipse.jetty:jetty-server:11.0.18'
   implementation 'org.eclipse.jetty.websocket:websocket-jetty-server:11.0.18'
   implementation 'org.eclipse.jetty.websocket:websocket-jetty-api:11.0.18'
@@ -59,4 +64,8 @@ shadowJar {
   manifest {
     attributes 'Main-Class': 'net.fortytwo.smsn.server.SmSnServer'
   }
+
+  // TODO: Exclude TinkerPop/Neo4j after refactoring Action class to not depend on them
+  // Currently kept because Action class references TinkerGraphWrapper/Neo4jGraphWrapper
+  // which Jackson introspects even when not used in standalone mode
 }
