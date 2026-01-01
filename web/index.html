@@ -11,6 +11,12 @@
         <h1>Semantic Synchrony</h1>
         <span id="connection-status">Disconnected</span>
         <div id="source-legend"></div>
+        <div class="filter-control">
+            <label class="filter-label">Show:</label>
+            <select id="min-source-select" class="filter-select" onchange="setMinSourceFilter(this.value)" title="Minimum source visibility">
+                <option value="private">All</option>
+            </select>
+        </div>
         <button class="toolbar-btn" id="btn-split" onclick="toggleSplit()" title="Toggle split view (C-x 3)"><svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><rect x="15" y="4" width="2" height="24"/><path d="M10,7V25H4V7h6m0-2H4A2,2,0,0,0,2,7V25a2,2,0,0,0,2,2h6a2,2,0,0,0,2-2V7a2,2,0,0,0-2-2Z"/><path d="M28,7V25H22V7h6m0-2H22a2,2,0,0,0-2,2V25a2,2,0,0,0,2,2h6a2,2,0,0,0,2-2V7a2,2,0,0,0-2-2Z"/></svg></button>
         <a href="#" onclick="toggleHelp(); return false;" style="color: #0066cc; text-decoration: none; font-size: 13px;" title="Help (?)">Help</a>
     </header>
@@ -24,6 +30,7 @@
                 <div class="toolbar-group">
                     <button class="toolbar-btn" id="btn-back-0" onclick="popView()" title="Go back (Backspace)">&#9664;</button>
                     <button class="toolbar-btn" id="btn-forward-0" onclick="forwardView()" title="Go forward">&#9654;</button>
+                    <a href="#" class="toolbar-link" id="link-history-0" onclick="showHistory(0); return false;" title="View history (C-c H)">History</a>
                 </div>
                 <div class="toolbar-separator"></div>
                 <div class="toolbar-group">
@@ -59,6 +66,7 @@
                 <div class="toolbar-group">
                     <button class="toolbar-btn" id="btn-back-1" onclick="popViewPane(1)" title="Go back">&#9664;</button>
                     <button class="toolbar-btn" id="btn-forward-1" onclick="forwardViewPane(1)" title="Go forward">&#9654;</button>
+                    <a href="#" class="toolbar-link" id="link-history-1" onclick="showHistory(1); return false;" title="View history (C-c H)">History</a>
                 </div>
                 <div class="toolbar-separator"></div>
                 <div class="toolbar-group">
@@ -191,6 +199,7 @@
     <div id="properties-overlay" class="overlay">
         <div class="overlay-content overlay-content-wide">
             <h2>Edit Properties</h2>
+            <div id="prop-meta" class="prop-meta"></div>
             <div class="property-row">
                 <label>Title</label>
                 <textarea id="prop-title" class="prop-title-input" oninput="autoResizeTextarea(this)"></textarea>
@@ -222,7 +231,7 @@
             </div>
             <div class="property-row property-row-text">
                 <label>Text</label>
-                <textarea id="prop-text" class="prop-text-input" placeholder="(optional extended content)"></textarea>
+                <textarea id="prop-text" class="prop-text-input" placeholder="(optional extended content)" oninput="autoResizeTextarea(this)"></textarea>
             </div>
             <div class="button-row">
                 <button onclick="hideProperties()">Cancel</button>
@@ -272,6 +281,17 @@
             <div class="button-row">
                 <button onclick="hideNewNote()">Cancel</button>
                 <button class="primary" onclick="createNewNote()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History overlay -->
+    <div id="history-overlay" class="overlay">
+        <div class="overlay-content overlay-content-wide">
+            <h2>View History</h2>
+            <div id="history-list" class="history-list"></div>
+            <div class="button-row">
+                <button onclick="hideHistory()">Close</button>
             </div>
         </div>
     </div>

@@ -71,6 +71,55 @@ function getPane() {
     return State.panes[State.activePane];
 }
 
+// Create a history entry with all information needed to restore a view
+function createHistoryEntry(pane) {
+    if (!pane.rootId) return null;
+
+    const isSearch = pane.rootId.startsWith(SEARCH_RESULT_PREFIX);
+    const entry = {
+        id: pane.rootId,
+        title: pane.view ? pane.view.title : 'Unknown',
+        source: pane.view ? pane.view.source : null,
+        viewStyle: pane.viewStyle,
+        viewDepth: pane.viewDepth,
+        timestamp: Date.now()
+    };
+
+    if (isSearch) {
+        entry.searchQuery = pane.rootId.substring(SEARCH_RESULT_PREFIX.length);
+        entry.isSearch = true;
+    }
+
+    return entry;
+}
+
+// Built-in visibility levels (in order from most private to most public)
+const VISIBILITY_LEVELS = ['private', 'personal', 'public', 'universal'];
+
+// Check if a source passes the current minSource filter
+function sourcePassesFilter(source) {
+    if (!source) return true;  // Unknown sources pass
+
+    const minSourceIndex = VISIBILITY_LEVELS.indexOf(State.filter.minSource);
+    const sourceIndex = VISIBILITY_LEVELS.indexOf(source);
+
+    if (minSourceIndex === -1 || sourceIndex === -1) return true;
+    return sourceIndex >= minSourceIndex;
+}
+
+// Navigate to a history entry
+function navigateToHistoryEntry(entry, paneIndex) {
+    if (entry.isSearch) {
+        reExecuteSearch(entry.searchQuery, paneIndex);
+    } else {
+        if (paneIndex === 0) {
+            getView(entry.id, entry.viewDepth);
+        } else {
+            getViewForPane(entry.id, paneIndex, entry.viewDepth);
+        }
+    }
+}
+
 // Initialize pane 0 to share references with State
 function initializePaneState() {
     const pane = State.panes[0];
@@ -216,8 +265,9 @@ function handleResponse(response) {
         const data = JSON.parse(response.result.data[0]);
 
         if (State.pendingCallback) {
-            State.pendingCallback(data);
+            const callback = State.pendingCallback;
             State.pendingCallback = null;
+            callback(data);
         } else if (data.view) {
             State.view = data.view;
             State.rootId = data.root || (data.view.id);
@@ -260,6 +310,7 @@ function getConfiguration() {
                 // Update source dropdown and legend
                 updateSourceOptions();
                 updateSourceLegend();
+                updateMinSourceDropdown();
             }
         }
         // Don't auto-load anything - wait for user action
@@ -297,7 +348,8 @@ function searchInPane(query, paneIndex) {
     const pane = State.panes[paneIndex];
     // Save current view to history before showing search results
     if (pane.rootId) {
-        pane.history.push(pane.rootId);
+        const entry = createHistoryEntry(pane);
+        if (entry) pane.history.push(entry);
         pane.forwardHistory.length = 0;
     }
     // Save the search query so we can re-execute it when navigating back
@@ -459,9 +511,10 @@ function setProperty(nodeId, propertyName, value, callback = null, oldValue = nu
     }, callback);
 }
 
-function updateView(rootId, viewContent, height = 2) {
-    // Remember the current view root so we can refresh it after the update
+function updateView(rootId, viewContent, height = 2, preserveSelection = false) {
+    // Remember the current view root and selection so we can restore after refresh
     const currentRootId = State.rootId;
+    const currentSelectedId = preserveSelection ? State.selectedId : null;
 
     sendAction({
         action: 'net.fortytwo.smsn.server.actions.UpdateView',
@@ -475,19 +528,19 @@ function updateView(rootId, viewContent, height = 2) {
         if (data.view) {
             // If we updated a subtree, refresh the original view to show changes
             if (currentRootId && currentRootId !== rootId) {
-                refreshView();
+                refreshViewPreserveSelection(currentSelectedId);
                 setStatusMessage('Updated');
             } else {
                 // We updated the root itself
                 State.view = data.view;
                 State.rootId = data.root || data.view.id;
                 State.expandedNodes.add(State.rootId);
-                State.selectedId = State.rootId;
+                State.selectedId = currentSelectedId || State.rootId;
                 const pane = State.panes[State.activePane];
                 pane.view = State.view;
                 pane.rootId = State.rootId;
                 pane.expandedNodes.add(State.rootId);
-                pane.selectedId = State.rootId;
+                pane.selectedId = State.selectedId;
                 render();
                 focusTreeContainer();
                 setStatusMessage('Updated');
@@ -552,7 +605,11 @@ function pushViewToServer() {
 function visitTarget(nodeId) {
     const pane = getPane();
     if (pane.rootId) {
-        pane.history.push(pane.rootId);
+        const entry = createHistoryEntry(pane);
+        if (entry) {
+            pane.history.push(entry);
+            console.log('visitTarget: pushed to history, now length:', pane.history.length);
+        }
         pane.forwardHistory.length = 0;  // Clear forward history
     }
     if (State.activePane === 0) {
@@ -566,10 +623,11 @@ function popView() {
     const pane = getPane();
     if (pane.history.length > 0) {
         if (pane.rootId) {
-            pane.forwardHistory.push(pane.rootId);
+            const entry = createHistoryEntry(pane);
+            if (entry) pane.forwardHistory.push(entry);
         }
-        const prevId = pane.history.pop();
-        navigateToId(prevId, State.activePane);
+        const prevEntry = pane.history.pop();
+        navigateToEntry(prevEntry, State.activePane);
     }
     updateToolbar();
 }
@@ -578,12 +636,25 @@ function forwardView() {
     const pane = getPane();
     if (pane.forwardHistory.length > 0) {
         if (pane.rootId) {
-            pane.history.push(pane.rootId);
+            const entry = createHistoryEntry(pane);
+            if (entry) pane.history.push(entry);
         }
-        const nextId = pane.forwardHistory.pop();
-        navigateToId(nextId, State.activePane);
+        const nextEntry = pane.forwardHistory.pop();
+        navigateToEntry(nextEntry, State.activePane);
     }
     updateToolbar();
+}
+
+// Navigate to a history entry (object with id, title, etc.)
+function navigateToEntry(entry, paneIndex) {
+    if (!entry) return;
+
+    // Handle both old format (just ID string) and new format (object)
+    if (typeof entry === 'string') {
+        navigateToId(entry, paneIndex);
+    } else {
+        navigateToHistoryEntry(entry, paneIndex);
+    }
 }
 
 function navigateToId(targetId, paneIndex) {
@@ -652,6 +723,41 @@ function refreshView() {
     }
 }
 
+function refreshViewPreserveSelection(selectedId) {
+    const pane = getPane();
+    if (pane.rootId) {
+        const viewHeight = pane.viewDepth || 2;
+        sendAction({
+            action: 'net.fortytwo.smsn.server.actions.GetView',
+            root: pane.rootId,
+            height: viewHeight,
+            filter: State.filter,
+            style: pane.viewStyle
+        }, (data) => {
+            if (data.view) {
+                const foundNode = findNodeById(data.view, selectedId);
+                State.view = data.view;
+                State.rootId = data.root || data.view.id;
+                State.expandedNodes.add(State.rootId);
+                // Restore the previous selection if the node still exists
+                if (selectedId && foundNode) {
+                    State.selectedId = selectedId;
+                } else {
+                    State.selectedId = State.rootId;
+                }
+                const pane = State.panes[State.activePane];
+                pane.view = State.view;
+                pane.rootId = State.rootId;
+                pane.expandedNodes.add(State.rootId);
+                pane.selectedId = State.selectedId;
+                render();
+                updateToolbar();
+                focusTreeContainer();
+            }
+        });
+    }
+}
+
 function setViewStyle(style) {
     const pane = getPane();
     pane.viewStyle = style;
@@ -676,11 +782,14 @@ function updateToolbar() {
         const fwdBtn = document.getElementById(`btn-forward-${i}`);
         const fwdViewBtn = document.getElementById(`btn-forward-view-${i}`);
         const bkViewBtn = document.getElementById(`btn-backward-view-${i}`);
+        const historyLink = document.getElementById(`link-history-${i}`);
 
         if (backBtn) backBtn.disabled = pane.history.length === 0;
         if (fwdBtn) fwdBtn.disabled = pane.forwardHistory.length === 0;
         if (fwdViewBtn) fwdViewBtn.classList.toggle('active', pane.viewStyle === 'forward');
         if (bkViewBtn) bkViewBtn.classList.toggle('active', pane.viewStyle === 'backward');
+        // History link is disabled when there's no view loaded
+        if (historyLink) historyLink.classList.toggle('disabled', !pane.rootId);
     }
 
     document.getElementById('btn-split').classList.toggle('active', State.splitView);
@@ -695,7 +804,12 @@ function toggleSplit() {
         State.panes[1].rootId = State.panes[0].rootId;
         State.panes[1].view = JSON.parse(JSON.stringify(State.panes[0].view));
         State.panes[1].viewStyle = State.panes[0].viewStyle;
+        State.panes[1].lastSearchQuery = State.panes[0].lastSearchQuery;
         renderPane(1);
+        // Focus the newly created right pane and its search bar
+        setActivePane(1);
+        const searchInput = document.getElementById('search-input-1');
+        if (searchInput) searchInput.focus();
     }
 
     updateToolbar();
@@ -818,7 +932,8 @@ function selectNodePane(nodeId, paneIndex) {
 function visitTargetPane(nodeId, paneIndex) {
     const pane = State.panes[paneIndex];
     if (pane.rootId) {
-        pane.history.push(pane.rootId);
+        const entry = createHistoryEntry(pane);
+        if (entry) pane.history.push(entry);
         pane.forwardHistory = [];
     }
     getViewForPane(nodeId, paneIndex);
@@ -858,10 +973,11 @@ function popViewPane(paneIndex) {
     const pane = State.panes[paneIndex];
     if (pane.history.length > 0) {
         if (pane.rootId) {
-            pane.forwardHistory.push(pane.rootId);
+            const entry = createHistoryEntry(pane);
+            if (entry) pane.forwardHistory.push(entry);
         }
-        const prevId = pane.history.pop();
-        navigateToId(prevId, paneIndex);
+        const prevEntry = pane.history.pop();
+        navigateToEntry(prevEntry, paneIndex);
     }
     updateToolbar();
 }
@@ -870,10 +986,11 @@ function forwardViewPane(paneIndex) {
     const pane = State.panes[paneIndex];
     if (pane.forwardHistory.length > 0) {
         if (pane.rootId) {
-            pane.history.push(pane.rootId);
+            const entry = createHistoryEntry(pane);
+            if (entry) pane.history.push(entry);
         }
-        const nextId = pane.forwardHistory.pop();
-        navigateToId(nextId, paneIndex);
+        const nextEntry = pane.forwardHistory.pop();
+        navigateToEntry(nextEntry, paneIndex);
     }
     updateToolbar();
 }
@@ -967,10 +1084,12 @@ function searchShortcut(shortcut) {
 // =============================================================================
 
 function autoResizeTextarea(textarea) {
-    // Reset height to auto to get the correct scrollHeight
-    textarea.style.height = 'auto';
-    // Set height to scrollHeight to fit content
+    // Reset to minimum height to get accurate scrollHeight
+    textarea.style.height = '0';
+    // Set height to scrollHeight to fit content (scrollHeight includes padding)
     textarea.style.height = textarea.scrollHeight + 'px';
+    // Scroll to top so user sees beginning of content
+    textarea.scrollTop = 0;
 }
 
 function startEditTitle(nodeId) {
@@ -1022,6 +1141,17 @@ function showProperties() {
     const node = findNodeById(State.view, State.selectedId);
     if (!node) return;
 
+    // Set meta line with ID and created timestamp
+    const metaEl = document.getElementById('prop-meta');
+    let metaText = `Id: ${node.id}`;
+    if (node.created) {
+        const date = new Date(node.created);
+        const dateStr = date.toLocaleDateString();
+        const timeStr = date.toLocaleTimeString();
+        metaText += ` | Created: ${dateStr} at ${timeStr} (${node.created})`;
+    }
+    metaEl.textContent = metaText;
+
     const titleInput = document.getElementById('prop-title');
     titleInput.value = node.title || '';
     document.getElementById('prop-weight').value = node.weight || 0.5;
@@ -1030,12 +1160,18 @@ function showProperties() {
     document.getElementById('prop-priority-value').textContent = node.priority ? node.priority.toFixed(1) : '-';
     selectSource(node.source || 'private');
     document.getElementById('prop-alias').value = node.alias || '';
-    document.getElementById('prop-text').value = node.text || '';
+    const textInput = document.getElementById('prop-text');
+    textInput.value = node.text || '';
 
     document.getElementById('properties-overlay').classList.add('visible');
     titleInput.focus();
-    // Auto-resize title textarea to fit content
-    setTimeout(() => autoResizeTextarea(titleInput), 0);
+    // Auto-resize textareas to fit content, position cursor at start of title
+    setTimeout(() => {
+        autoResizeTextarea(titleInput);
+        autoResizeTextarea(textInput);
+        titleInput.setSelectionRange(0, 0);
+        titleInput.scrollTop = 0;
+    }, 0);
 }
 
 function hideProperties() {
@@ -1612,22 +1748,7 @@ function moveNoteUp() {
         return;
     }
 
-    // Build wiki content with swapped order
-    let wikiContent = '';
-    for (let i = 0; i < parent.children.length; i++) {
-        let child;
-        if (i === index - 1) {
-            child = parent.children[index]; // Move selected up
-        } else if (i === index) {
-            child = parent.children[index - 1]; // Move previous down
-        } else {
-            child = parent.children[i];
-        }
-        wikiContent += `* ${child.title}\n    :${child.id}:\n`;
-    }
-
-    updateView(parentId, wikiContent, 2);
-    setStatusMessage('Moved up');
+    reorderChild(parentId, index, index - 1);
 }
 
 function moveNoteDown() {
@@ -1648,22 +1769,27 @@ function moveNoteDown() {
         return;
     }
 
-    // Build wiki content with swapped order
-    let wikiContent = '';
-    for (let i = 0; i < parent.children.length; i++) {
-        let child;
-        if (i === index) {
-            child = parent.children[index + 1]; // Move next up
-        } else if (i === index + 1) {
-            child = parent.children[index]; // Move selected down
-        } else {
-            child = parent.children[i];
-        }
-        wikiContent += `* ${child.title}\n    :${child.id}:\n`;
-    }
+    reorderChild(parentId, index, index + 1);
+}
 
-    updateView(parentId, wikiContent, 2);
-    setStatusMessage('Moved down');
+function reorderChild(parentId, fromIndex, toIndex) {
+    const selectedId = State.selectedId;
+
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.ReorderChildren',
+        parentId: parentId,
+        fromIndex: fromIndex,
+        toIndex: toIndex,
+        filter: State.filter
+    }, (data) => {
+        if (data.success) {
+            // Refresh the view and preserve selection
+            refreshViewPreserveSelection(selectedId);
+            setStatusMessage(fromIndex < toIndex ? 'Moved down' : 'Moved up');
+        } else {
+            setStatusMessage('Failed to reorder');
+        }
+    });
 }
 
 // =============================================================================
@@ -1967,7 +2093,9 @@ function updateSourceOptions() {
     dropdown.innerHTML = '';
 
     if (State.config && State.config.sources) {
+        // Show only sources that pass the current filter
         State.config.sources.forEach(s => {
+            if (!sourcePassesFilter(s.name)) return;
             const option = document.createElement('div');
             option.className = 'source-option';
             option.dataset.value = s.name;
@@ -1982,8 +2110,11 @@ function updateSourceOptions() {
 
     // Also populate new-note-source dropdown (standard select)
     const newNoteSelect = document.getElementById('new-note-source');
-    if (newNoteSelect && newNoteSelect.options.length === 0 && State.config && State.config.sources) {
+    newNoteSelect.innerHTML = '';  // Clear existing options
+    if (State.config && State.config.sources) {
+        // Show only sources that pass the current filter
         State.config.sources.forEach(s => {
+            if (!sourcePassesFilter(s.name)) return;
             const option = document.createElement('option');
             option.value = s.name;
             option.textContent = s.name;
@@ -2026,8 +2157,9 @@ function updateSourceLegend() {
     legend.innerHTML = '';
 
     if (State.config && State.config.sources) {
-        // Show all sources in the legend
+        // Show only sources that pass the current filter
         State.config.sources.forEach(s => {
+            if (!sourcePassesFilter(s.name)) return;
             const item = document.createElement('div');
             item.className = 'legend-item';
             item.innerHTML = `
@@ -2039,12 +2171,237 @@ function updateSourceLegend() {
     }
 }
 
+function updateMinSourceDropdown() {
+    const select = document.getElementById('min-source-select');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    // Add the four built-in visibility levels
+    VISIBILITY_LEVELS.forEach((level, index) => {
+        const option = document.createElement('option');
+        option.value = level;
+        if (index === 0) {
+            option.textContent = 'All';
+        } else {
+            option.textContent = `${level}+`;
+        }
+        select.appendChild(option);
+    });
+
+    // Set current value
+    select.value = State.filter.minSource;
+}
+
+function setMinSourceFilter(sourceName) {
+    State.filter.minSource = sourceName;
+
+    // Update legend and source dropdowns to reflect filter
+    updateSourceLegend();
+    updateSourceOptions();
+
+    // Refresh current views to apply new filter
+    const pane0 = State.panes[0];
+    const pane1 = State.panes[1];
+
+    if (pane0.rootId && !pane0.rootId.startsWith(SEARCH_RESULT_PREFIX)) {
+        getViewForPane(pane0.rootId, 0);
+    } else if (pane0.lastSearchQuery) {
+        reExecuteSearch(pane0.lastSearchQuery, 0);
+    }
+
+    if (State.splitView && pane1.rootId) {
+        if (!pane1.rootId.startsWith(SEARCH_RESULT_PREFIX)) {
+            getViewForPane(pane1.rootId, 1);
+        } else if (pane1.lastSearchQuery) {
+            reExecuteSearch(pane1.lastSearchQuery, 1);
+        }
+    }
+
+    setStatusMessage(`Filter: showing ${sourceName === 'private' ? 'all' : sourceName + '+'} sources`);
+}
+
 function toggleHelp() {
     document.getElementById('help-overlay').classList.toggle('visible');
 }
 
 function hideHelp() {
     document.getElementById('help-overlay').classList.remove('visible');
+}
+
+// Track which pane the history overlay is showing for
+let historyPaneIndex = 0;
+
+function showHistory(paneIndex) {
+    historyPaneIndex = paneIndex;
+    const pane = State.panes[paneIndex];
+    const listEl = document.getElementById('history-list');
+
+    // Include current view as most recent entry
+    const currentEntry = createHistoryEntry(pane);
+    const allEntries = [...pane.history];
+    if (currentEntry) {
+        allEntries.push(currentEntry);
+    }
+
+    // Filter entries based on minSource (search results always pass)
+    const filteredEntries = allEntries.filter(entry => {
+        if (typeof entry === 'string') return true;  // Old format, can't filter
+        if (entry.isSearch) return true;  // Search results always shown
+        return sourcePassesFilter(entry.source);
+    });
+
+    if (filteredEntries.length === 0) {
+        listEl.innerHTML = '<div class="history-empty">No history yet</div>';
+    } else {
+        listEl.innerHTML = '';
+        // Show history in reverse chronological order (most recent first)
+        for (let i = filteredEntries.length - 1; i >= 0; i--) {
+            const entry = filteredEntries[i];
+            const isCurrent = (entry === currentEntry);
+            const item = createHistoryListItem(entry, i, isCurrent);
+            listEl.appendChild(item);
+        }
+    }
+
+    document.getElementById('history-overlay').classList.add('visible');
+}
+
+function createHistoryListItem(entry, index, isCurrent = false) {
+    const item = document.createElement('div');
+    item.className = 'history-item' + (isCurrent ? ' history-item-current' : '');
+
+    // Handle both old format (string ID) and new format (object)
+    if (typeof entry === 'string') {
+        // Old format - just ID
+        const isSearch = entry.startsWith(SEARCH_RESULT_PREFIX);
+        const title = isSearch ? entry.substring(SEARCH_RESULT_PREFIX.length) : entry;
+        item.innerHTML = `
+            <span class="history-item-icon">${isSearch ? '&#128269;' : '&#9654;'}</span>
+            <span class="history-item-title ${isSearch ? 'history-item-search' : ''}">${escapeHtml(title)}</span>
+            ${isCurrent ? '<span class="history-item-meta">(current)</span>' : ''}
+        `;
+        if (!isCurrent) {
+            item.onclick = () => {
+                hideHistory();
+                navigateFromHistory(entry, historyPaneIndex, index);
+            };
+        }
+    } else {
+        // New format - object with metadata
+        const isSearch = entry.isSearch;
+        const icon = isSearch ? '&#128269;' : (entry.viewStyle === 'backward' ? '&#9650;' : '&#9660;');
+        const timeStr = isCurrent ? '(current)' : formatHistoryTime(entry.timestamp);
+        item.innerHTML = `
+            <span class="history-item-icon">${icon}</span>
+            <span class="history-item-title ${isSearch ? 'history-item-search' : ''}">${escapeHtml(entry.title || entry.searchQuery || entry.id)}</span>
+            <span class="history-item-meta">${timeStr}</span>
+        `;
+        if (!isCurrent) {
+            item.onclick = () => {
+                hideHistory();
+                navigateFromHistory(entry, historyPaneIndex, index);
+            };
+        }
+    }
+
+    return item;
+}
+
+function formatHistoryTime(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return date.toLocaleDateString();
+}
+
+function navigateFromHistory(entry, paneIndex, historyIndex) {
+    const pane = State.panes[paneIndex];
+
+    // Remove entries from history after this point and add them to forwardHistory
+    const removed = pane.history.splice(historyIndex + 1);
+    pane.forwardHistory = [...removed.reverse(), ...pane.forwardHistory];
+
+    // Navigate to the entry (don't add it to history since it's already there)
+    navigateToEntryNoHistory(entry, paneIndex);
+}
+
+function navigateToEntryNoHistory(entry, paneIndex) {
+    // Navigate to a history entry without adding to history
+    if (typeof entry === 'string') {
+        // Old format - just ID
+        if (entry.startsWith(SEARCH_RESULT_PREFIX)) {
+            const query = entry.substring(SEARCH_RESULT_PREFIX.length);
+            reExecuteSearchNoHistory(query, paneIndex);
+        } else {
+            navigateToIdNoHistory(entry, paneIndex);
+        }
+    } else {
+        // New format - object
+        if (entry.isSearch) {
+            reExecuteSearchNoHistory(entry.searchQuery, paneIndex);
+        } else {
+            navigateToIdNoHistory(entry.id, paneIndex, entry.viewStyle, entry.viewDepth);
+        }
+    }
+}
+
+function navigateToIdNoHistory(id, paneIndex, viewStyle, viewDepth) {
+    const pane = State.panes[paneIndex];
+    if (viewStyle) pane.viewStyle = viewStyle;
+    if (viewDepth) pane.viewDepth = viewDepth;
+
+    // Update depth selector UI
+    const depthSelect = document.getElementById(`depth-select-${paneIndex}`);
+    if (depthSelect) depthSelect.value = pane.viewDepth;
+
+    // Fetch and display the view (uses getViewForPane which doesn't add to history)
+    getViewForPane(id, paneIndex);
+    updateToolbar();
+}
+
+function reExecuteSearchNoHistory(query, paneIndex) {
+    const pane = State.panes[paneIndex];
+    pane.lastSearchQuery = query;
+
+    sendAction({
+        action: 'net.fortytwo.smsn.server.actions.Search',
+        queryType: 'FullText',
+        query: query,
+        height: pane.viewDepth,
+        valueCutoff: pane.filter?.minWeight || 0.0
+    }, (data) => {
+        if (data.view) {
+            const view = data.view;
+            pane.rootId = SEARCH_RESULT_PREFIX + query;
+            pane.view = view;
+            pane.selectedId = null;
+            pane.expandedNodes = new Set();
+
+            // Don't add to history
+
+            if (paneIndex === State.activePane) {
+                State.rootId = pane.rootId;
+                State.view = pane.view;
+                State.selectedId = pane.selectedId;
+                State.expandedNodes = pane.expandedNodes;
+            }
+
+            renderPane(paneIndex);
+            updateNodeCount();
+        }
+    });
+}
+
+function hideHistory() {
+    document.getElementById('history-overlay').classList.remove('visible');
 }
 
 // =============================================================================
@@ -2112,8 +2469,10 @@ const chordBindings = {
     'n': () => showNewNote('child'),
     // C-c p - push view to server (DISABLED - buggy, mangles data)
     // 'p': () => pushViewToServer(),
-    // C-c h - history
+    // C-c h - history (back)
     'h': () => popView(),
+    // C-c H - view full history (uppercase H)
+    'H': () => showHistory(State.activePane),
     // C-c x - shortcut query (go to alias)
     'x': () => gotoAlias(),
     // C-c d - duplicates / delete
@@ -2365,7 +2724,8 @@ function setupKeyboardHandler() {
         const propsVisible = document.getElementById('properties-overlay').classList.contains('visible');
         const confirmVisible = document.getElementById('confirm-overlay').classList.contains('visible');
         const newNoteVisible = document.getElementById('new-note-overlay').classList.contains('visible');
-        const inOverlay = propsVisible || confirmVisible || newNoteVisible;
+        const historyVisible = document.getElementById('history-overlay').classList.contains('visible');
+        const inOverlay = propsVisible || confirmVisible || newNoteVisible || historyVisible;
 
         // Handle Escape - always cancels pending chord, numeric action, or current action
         if (e.key === 'Escape') {
@@ -2390,6 +2750,8 @@ function setupKeyboardHandler() {
                 return;
             } else if (newNoteVisible) {
                 hideNewNote();
+            } else if (historyVisible) {
+                hideHistory();
             } else if (inSearch) {
                 document.activeElement.value = '';
                 document.activeElement.blur();
@@ -2728,7 +3090,11 @@ function setupEventListeners() {
 
 function init() {
     setupEventListeners();
+    updateToolbar();  // Set initial disabled states
     connect();
+    // Focus the search bar on initial load
+    const searchInput = document.getElementById('search-input-0');
+    if (searchInput) searchInput.focus();
 }
 
 // Start when DOM is ready

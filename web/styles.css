@@ -70,6 +70,33 @@ header > a {
     flex-shrink: 0;
 }
 
+/* Filter control in header */
+.filter-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.filter-label {
+    font-size: 12px;
+    color: var(--muted-color);
+}
+
+.filter-select {
+    padding: 2px 6px;
+    font-size: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
 /* Toolbar components (used in header and per-pane toolbars) */
 .toolbar-group {
     display: flex;
@@ -117,6 +144,22 @@ header > a {
     font-size: 12px;
     color: var(--muted-color);
     margin-right: 4px;
+}
+
+.toolbar-link {
+    font-size: 13px;
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.toolbar-link:hover {
+    text-decoration: underline;
+}
+
+.toolbar-link.disabled {
+    color: var(--muted-color);
+    pointer-events: none;
+    cursor: default;
 }
 
 .depth-select {
@@ -386,12 +429,20 @@ footer {
 
 .overlay-content-wide {
     min-width: 600px;
-    max-width: 800px;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .overlay-content h2 {
-    margin-bottom: 16px;
+    margin-bottom: 4px;
     color: #0066cc;
+}
+
+.prop-meta {
+    font-size: 11px;
+    color: var(--muted-color);
+    margin-bottom: 16px;
 }
 
 .overlay-content table {
@@ -437,9 +488,10 @@ footer {
 /* Title textarea - auto-expands to fit content */
 .prop-title-input {
     resize: none;
-    overflow: hidden;
-    min-height: 1.5em;
-    line-height: 1.5;
+    overflow-y: auto;
+    line-height: 1.4;
+    height: 33px;  /* Single line: 14px font * 1.4 line-height + 12px padding */
+    max-height: 30vh;  /* Limit height so overlay doesn't overflow */
 }
 
 /* Text row - align label to top */
@@ -451,14 +503,16 @@ footer {
     padding-top: 8px;
 }
 
-/* Text textarea - fixed size with scrollbars */
+/* Text textarea - auto-expands with scrollbars, no wrapping */
 .prop-text-input {
-    min-width: 480px;  /* ~80 characters */
-    height: 150px;
+    width: 688px;
+    height: 33px;          /* Single line initially */
     max-height: 300px;
     resize: vertical;
     overflow: auto;
     line-height: 1.5;
+    white-space: pre;      /* Preserve whitespace and prevent wrapping */
+    overflow-x: auto;      /* Horizontal scroll for long lines */
 }
 
 .property-row input:focus,
@@ -633,4 +687,59 @@ button.danger:hover {
     width: 12px;
     height: 12px;
     border-radius: 2px;
+}
+
+/* History list */
+.history-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    gap: 12px;
+}
+
+.history-item:hover {
+    background: var(--hover-bg);
+}
+
+.history-item-icon {
+    color: var(--muted-color);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.history-item-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item-search {
+    font-style: italic;
+    color: #0066cc;
+}
+
+.history-item-meta {
+    font-size: 11px;
+    color: var(--muted-color);
+    flex-shrink: 0;
+}
+
+.history-empty {
+    color: var(--muted-color);
+    text-align: center;
+    padding: 24px;
+}
+
+.history-item-current {
+    background: var(--selected-bg);
+    cursor: default;
 }
