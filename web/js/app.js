@@ -2063,9 +2063,11 @@ function renderNodeForPane(node, isRoot, depth, paneIndex, lineCounter) {
 
     const textColor = getNoteColor(source, weight);
 
-    // Line number (shown in left margin)
+    // Line number (shown in left margin, aligned to far left regardless of depth)
+    // Each depth level adds 24px of margin, so we offset left to compensate
+    const lineNumLeft = 4 - (depth * 24);
     const lineNumHtml = State.showLineNumbers
-        ? `<span class="line-number">${lineNumber}</span>`
+        ? `<span class="line-number" style="left: ${lineNumLeft}px">${lineNumber}</span>`
         : '';
 
     const priorityHtml = hasPriority

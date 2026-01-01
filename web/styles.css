@@ -268,7 +268,7 @@ header > a {
     display: flex;
     align-items: flex-start;
     gap: 6px;
-    position: relative;
+    position: relative;  /* Anchor for absolute line numbers */
 }
 
 .tree-node:hover {
@@ -289,7 +289,7 @@ header > a {
 
 .line-number {
     position: absolute;
-    left: 4px;
+    /* left is set dynamically based on depth to align all numbers at far left */
     width: 24px;
     text-align: right;
     font-size: 11px;
