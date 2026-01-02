@@ -42,7 +42,11 @@ public class SmSnWebSocket implements WebSocketListener {
             String wrappedResponse = wrapGremlinResponse(response);
             session.getRemote().sendString(wrappedResponse);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error sending response", e);
+            if (isConnectionClosedError(e)) {
+                logger.warning("Failed to send response (client disconnected): " + e.getClass().getSimpleName());
+            } else {
+                logger.log(Level.SEVERE, "Error sending response", e);
+            }
         }
     }
 
@@ -115,6 +119,39 @@ public class SmSnWebSocket implements WebSocketListener {
 
     @Override
     public void onWebSocketError(Throwable cause) {
-        logger.log(Level.SEVERE, "WebSocket error", cause);
+        // Check for benign connection-closed errors (client disconnected during response)
+        if (isConnectionClosedError(cause)) {
+            logger.warning("WebSocket connection closed unexpectedly: " + cause.getClass().getSimpleName());
+        } else {
+            logger.log(Level.SEVERE, "WebSocket error", cause);
+        }
+    }
+
+    /**
+     * Check if the error is a benign connection-closed condition.
+     * These occur when the client disconnects while the server is sending a response.
+     */
+    private boolean isConnectionClosedError(Throwable cause) {
+        if (cause == null) {
+            return false;
+        }
+
+        String className = cause.getClass().getSimpleName();
+        String message = cause.getMessage();
+
+        // EofException from Jetty
+        if ("EofException".equals(className)) {
+            return true;
+        }
+
+        // Broken pipe or connection reset
+        if (cause instanceof IOException) {
+            if (message != null && (message.contains("Broken pipe") || message.contains("Connection reset"))) {
+                return true;
+            }
+        }
+
+        // Check the cause chain
+        return isConnectionClosedError(cause.getCause());
     }
 }
