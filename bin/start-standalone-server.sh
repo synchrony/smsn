@@ -5,15 +5,17 @@
 
 set -e
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PROJECT_DIR="${SCRIPT_DIR}/.."
+# Resolve symlinks to get the real script location
+# This handles both symlinked scripts and scripts in symlinked directories
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P )"
+PROJECT_DIR="$( cd "${SCRIPT_DIR}/.." && pwd -P )"
 JAR_NAME="smsn-server-1.5-standalone.jar"
 JAR_PATH="${PROJECT_DIR}/smsn-server/build/libs/${JAR_NAME}"
 
 # Build if JAR doesn't exist
 if [ ! -f "$JAR_PATH" ]; then
     echo "JAR not found, building..."
-    (cd "$PROJECT_DIR" && ./gradlew :smsn-server:shadowJar)
+    "${PROJECT_DIR}/gradlew" -p "$PROJECT_DIR" :smsn-server:shadowJar
 fi
 
 # Check if config exists in current directory

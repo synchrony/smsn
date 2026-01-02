@@ -10,7 +10,7 @@ const State = {
     // Connection
     ws: null,
     connected: false,
-    serverUrl: 'ws://localhost:8182/gremlin',
+    serverUrl: 'ws://localhost:8182/smsn',
 
     // Configuration from server
     config: null,
