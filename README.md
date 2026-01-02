@@ -10,7 +10,7 @@ Some essays on the benefits of personal knowledge mapping have been collected at
 Disclaimer (and good news!): Semantic Synchrony is [evolving](https://github.com/synchrony/smsn-why/blob/master/caution-unstable.md).
 
 ### Installing it
-Semantic Synchrony is easy to [install](https://github.com/synchrony/smsn/wiki/installation): build the standalone server JAR, create a configuration file, start the server, and connect with Emacs. You don't need to be good at Emacs.
+Semantic Synchrony is easy to [install](https://github.com/synchrony/smsn/wiki/installation): build the server JAR, create a configuration file, start the server, and connect with Emacs. You don't need to be good at Emacs.
 
 ### Using it
 This brief [howto](https://github.com/synchrony/smsn/wiki/What-you-need-to-know-to-use-Semantic-Synchrony) explains everything you will need to know to use Semantic Synchrony. It assumes no prior familiarity with Emacs, knowledge graphs, or any other technology. (For a brief list of critical commands, or the complete list, see the [smsn-mode wiki](https://github.com/synchrony/smsn-mode/wiki).
@@ -21,9 +21,9 @@ Fear not the commitment! Semantic Synchrony exports to many formats, including p
 ### Hacking it
 Please see the [invitation to coders](https://github.com/synchrony/smsn-why/blob/master/invitations/to-coders.md).
 
-## Running the Standalone Server
+## Running the Server
 
-The SmSn server can run as a standalone Java application with file-based storage (SQLite + Lucene + .smsn files).
+The SmSn server is a Java application with file-based storage (SQLite + Lucene + .smsn files).
 
 ### Configuration
 
@@ -64,14 +64,14 @@ Helper scripts are provided in `bin/`:
 
 ```bash
 # Build the server (run from project root)
-bin/build-standalone-server.sh
+bin/build-server.sh
 
 # Start the server (run from directory containing smsn.yaml)
 cd /path/to/directory/with/smsn.yaml
-/path/to/smsn/bin/start-standalone-server.sh
+/path/to/smsn/bin/start-server.sh
 
 # Stop the server (run from anywhere)
-/path/to/smsn/bin/stop-standalone-server.sh
+/path/to/smsn/bin/stop-server.sh
 ```
 
 The start script will automatically build if needed. The server starts on `0.0.0.0:8182` and accepts WebSocket connections at `/smsn`.
@@ -80,7 +80,7 @@ The start script will automatically build if needed. The server starts on `0.0.0
 
 To rebuild the index from source files (useful after external edits to .smsn files or to recover from corruption):
 
-1. Stop the server: `bin/stop-standalone-server.sh`
+1. Stop the server: `bin/stop-server.sh`
 2. Delete or move the index directory
 3. Start the server (it will rebuild the index automatically)
 

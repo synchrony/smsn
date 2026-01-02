@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run the standalone SmSn server
+# Run the SmSn server
 # Must be invoked from a directory containing smsn.yaml
 
 set -e
@@ -28,7 +28,7 @@ if [ ! -f "smsn.yaml" ]; then
     exit 1
 fi
 
-echo "Starting standalone SmSn server..."
+echo "Starting SmSn server..."
 echo "Config: $(pwd)/smsn.yaml"
 echo "WebSocket endpoint: ws://localhost:8182/smsn"
 echo ""
