@@ -2,214 +2,38 @@
 // Semantic Synchrony Web UI - Main Application
 // =============================================================================
 
-// =============================================================================
-// State Management
-// =============================================================================
+// Import shared modules
+import { 
+    State, 
+    SEARCH_RESULT_PREFIX, 
+    getPane, 
+    createHistoryEntry, 
+    sourcePassesFilter, 
+    getFilterForServer,
+    initializePaneState 
+} from './state.js';
 
-const State = {
-    // Connection
-    ws: null,
-    connected: false,
-    serverUrl: 'ws://localhost:8182/smsn',
+import { 
+    getNoteColor, 
+    getSourceColor, 
+    colorToHex, 
+    parseColor 
+} from './colors.js';
 
-    // Configuration from server
-    config: null,
-    sourcesByName: {},
+import { 
+    findNodeById, 
+    findParentId, 
+    countNodes, 
+    countTotalLines, 
+    findPathToLine, 
+    escapeHtml, 
+    escapeAttr,
+    setStatusMessage 
+} from './utils.js';
 
-    // View state
-    rootId: null,
-    view: null,
-    selectedId: null,
-    expandedNodes: new Set(),
-    history: [],
-    forwardHistory: [],
-    viewStyle: 'forward',  // 'forward' or 'backward'
-
-    // Filter settings
-    filter: {
-        excludedSources: new Set(),  // Empty means include all sources
-        defaultSource: 'private',
-        minWeight: 0.0,
-        defaultWeight: 0.5
-    },
-
-    // UI state
-    searchQuery: '',
-    editingNodeId: null,
-    pendingCallbacks: {},  // Map of requestId -> callback for concurrent requests
-    nextRequestId: 1,
-    newNoteMode: null,
-
-    // Emacs-style key chord state
-    pendingChord: null,  // e.g., 'C-c' when waiting for next key
-    pendingNumericAction: null,  // e.g., 'weight' when waiting for 0-4 digit
-
-    // Clipboard for cut/copy/paste
-    clipboard: null,  // { id, title, isCut: boolean }
-
-    // Undo stack - stores operations that can be undone
-    // Each entry: { type: 'setProperty'|'delete'|'create'|'move', ...data }
-    undoStack: [],
-    maxUndoSize: 50,
-
-    // View options
-    wrapTitles: true,  // true = wrap long titles, false = single line with scroll
-    showLineNumbers: true,  // Show line numbers in left margin
-
-    // Split view
-    splitView: false,
-    activePane: 0,  // 0 or 1
-    panes: [
-        { rootId: null, view: null, selectedId: null, expandedNodes: new Set(), history: [], forwardHistory: [], viewStyle: 'forward', viewDepth: 2, lastSearchQuery: null },
-        { rootId: null, view: null, selectedId: null, expandedNodes: new Set(), history: [], forwardHistory: [], viewStyle: 'forward', viewDepth: 2, lastSearchQuery: null }
-    ]
-};
-
-// Special marker for search results that we want to be able to navigate back to
-const SEARCH_RESULT_PREFIX = '__search__:';
-
-// Get current pane state
-function getPane() {
-    return State.panes[State.activePane];
-}
-
-// Create a history entry with all information needed to restore a view
-function createHistoryEntry(pane) {
-    if (!pane.rootId) return null;
-
-    const isSearch = pane.rootId.startsWith(SEARCH_RESULT_PREFIX);
-    const entry = {
-        id: pane.rootId,
-        title: pane.view ? pane.view.title : 'Unknown',
-        source: pane.view ? pane.view.source : null,
-        viewStyle: pane.viewStyle,
-        viewDepth: pane.viewDepth,
-        timestamp: Date.now()
-    };
-
-    if (isSearch) {
-        entry.searchQuery = pane.rootId.substring(SEARCH_RESULT_PREFIX.length);
-        entry.isSearch = true;
-    }
-
-    return entry;
-}
-
-// Check if a source passes the current filter (not in excluded set)
-function sourcePassesFilter(source) {
-    if (!source) return true;  // Unknown sources pass
-    return !State.filter.excludedSources.has(source);
-}
-
-// Get the list of included sources for server requests
-// Returns empty array if all sources are included (no exclusions)
-function getIncludedSourcesForServer() {
-    if (State.filter.excludedSources.size === 0) {
-        return [];  // Empty means include all
-    }
-    // Return all sources except excluded ones
-    const allSources = State.config.sources.map(s => s.name);
-    return allSources.filter(s => !State.filter.excludedSources.has(s));
-}
-
-// Build filter object for server requests
-function getFilterForServer() {
-    return {
-        includedSources: getIncludedSourcesForServer(),
-        defaultSource: State.filter.defaultSource,
-        minWeight: State.filter.minWeight,
-        defaultWeight: State.filter.defaultWeight
-    };
-}
-
-// Navigate to a history entry
-function navigateToHistoryEntry(entry, paneIndex) {
-    if (entry.isSearch) {
-        reExecuteSearch(entry.searchQuery, paneIndex);
-    } else {
-        if (paneIndex === 0) {
-            getView(entry.id, entry.viewDepth);
-        } else {
-            getViewForPane(entry.id, paneIndex, entry.viewDepth);
-        }
-    }
-}
-
-// Initialize pane 0 to share references with State
-function initializePaneState() {
-    const pane = State.panes[0];
-    pane.history = State.history;
-    pane.forwardHistory = State.forwardHistory;
-    pane.expandedNodes = State.expandedNodes;
-}
+// Initialize pane state
 initializePaneState();
 
-// =============================================================================
-// Color Utilities (matching smsn-mode)
-// =============================================================================
-
-function parseColor(numericColor) {
-    // Convert numeric color (e.g., 0xff0000) to RGB
-    const blue = numericColor % 256;
-    const green = Math.floor(numericColor / 256) % 256;
-    const red = Math.floor(numericColor / 65536);
-    return { r: red, g: green, b: blue };
-}
-
-function colorToHex(color) {
-    const r = Math.round(color.r).toString(16).padStart(2, '0');
-    const g = Math.round(color.g).toString(16).padStart(2, '0');
-    const b = Math.round(color.b).toString(16).padStart(2, '0');
-    return `#${r}${g}${b}`;
-}
-
-function darkenColor(color, factor) {
-    // Darken by multiplying RGB values
-    return {
-        r: color.r * factor,
-        g: color.g * factor,
-        b: color.b * factor
-    };
-}
-
-function fadeColor(color, weight) {
-    // Fade toward white based on weight (lower weight = more faded)
-    // This matches smsn-mode's fade function
-    function fade(c, w) {
-        const low = c + (255 - c) * 0.9375; // weighted toward white
-        const high = c;
-        return low + (high - low) * w;
-    }
-    return {
-        r: fade(color.r, weight),
-        g: fade(color.g, weight),
-        b: fade(color.b, weight)
-    };
-}
-
-function getNoteColor(source, weight) {
-    const sourceConfig = State.sourcesByName[source];
-    if (!sourceConfig || !sourceConfig.color) {
-        return '#333333'; // fallback
-    }
-
-    const baseColor = parseColor(sourceConfig.color);
-    // Darken for better readability on white background
-    const darkenedColor = darkenColor(baseColor, 0.6);
-    // Fade based on weight (lower weight = more faded toward white)
-    const fadedColor = fadeColor(darkenedColor, weight);
-    return colorToHex(fadedColor);
-}
-
-function getSourceColor(source) {
-    const sourceConfig = State.sourcesByName[source];
-    if (!sourceConfig || !sourceConfig.color) {
-        return '#333333';
-    }
-    return colorToHex(parseColor(sourceConfig.color));
-}
-
-// =============================================================================
 // WebSocket Communication
 // =============================================================================
 
@@ -882,17 +706,6 @@ function gotoLineNumber(lineNum) {
     }
 }
 
-function countTotalLines(node) {
-    if (!node) return 0;
-    let count = 1;  // Count this node
-    if (node.children) {
-        for (const child of node.children) {
-            count += countTotalLines(child);
-        }
-    }
-    return count;
-}
-
 function expandToLine(targetLine) {
     const pane = State.panes[State.activePane];
     if (!pane.view) {
@@ -931,27 +744,6 @@ function expandToLine(targetLine) {
         setStatusMessage(`Could not find line ${targetLine}`);
         focusTreeContainer();
     }
-}
-
-function findPathToLine(node, targetLine, counter, path = []) {
-    if (!node) return null;
-
-    const currentLine = counter.value++;
-    path.push(node);
-
-    if (currentLine === targetLine) {
-        return path.slice();  // Return a copy
-    }
-
-    if (node.children) {
-        for (const child of node.children) {
-            const result = findPathToLine(child, targetLine, counter, path);
-            if (result) return result;
-        }
-    }
-
-    path.pop();
-    return null;
 }
 
 function setActivePane(index) {
@@ -1925,77 +1717,6 @@ function reorderChild(parentId, fromIndex, toIndex) {
     });
 }
 
-// =============================================================================
-// Tree Utilities
-// =============================================================================
-
-function findNodeById(node, id) {
-    if (!node) return null;
-    if (node.id === id) return node;
-    if (node.children) {
-        for (const child of node.children) {
-            const found = findNodeById(child, id);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
-function findParentId(node, childId, parentId = null) {
-    if (!node) return null;
-    if (node.id === childId) return parentId;
-    if (node.children) {
-        for (const child of node.children) {
-            const found = findParentId(child, childId, node.id);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
-function getVisibleNodeIds() {
-    const ids = [];
-    collectVisibleIds(State.view, true, ids);
-    return ids;
-}
-
-function collectVisibleIds(node, isRoot, ids) {
-    if (!node) return;
-    ids.push(node.id);
-    const isExpanded = State.expandedNodes.has(node.id);
-    if (isExpanded && node.children) {
-        for (const child of node.children) {
-            collectVisibleIds(child, false, ids);
-        }
-    }
-}
-
-function moveSelection(direction) {
-    const visibleIds = getVisibleNodeIds();
-    if (visibleIds.length === 0) return;
-
-    const currentIndex = visibleIds.indexOf(State.selectedId);
-    let newIndex;
-
-    if (currentIndex === -1) {
-        newIndex = direction > 0 ? 0 : visibleIds.length - 1;
-    } else {
-        newIndex = currentIndex + direction;
-        if (newIndex < 0) newIndex = 0;
-        if (newIndex >= visibleIds.length) newIndex = visibleIds.length - 1;
-    }
-
-    selectNode(visibleIds[newIndex]);
-
-    // Scroll to the selected element in the active pane
-    const container = document.getElementById(`tree-container-${State.activePane}`);
-    const selectedEl = container.querySelector(`.tree-node[data-id="${State.selectedId}"]`);
-    if (selectedEl) {
-        selectedEl.scrollIntoView({ block: 'nearest' });
-    }
-}
-
-// =============================================================================
 // Rendering
 // =============================================================================
 
@@ -2187,16 +1908,6 @@ function renderNode(node, isRoot = false, depth = 0) {
     return html;
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function escapeAttr(text) {
-    return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
 // =============================================================================
 // UI Updates
 // =============================================================================
@@ -2221,24 +1932,9 @@ function updateConnectionStatus(status) {
     }
 }
 
-function setStatusMessage(msg) {
-    document.getElementById('status-message').textContent = msg;
-}
-
 function updateNodeCount() {
     const count = countNodes(State.view);
     document.getElementById('node-count').textContent = `${count} notes`;
-}
-
-function countNodes(node) {
-    if (!node) return 0;
-    let count = 1;
-    if (node.children) {
-        for (const child of node.children) {
-            count += countNodes(child);
-        }
-    }
-    return count;
 }
 
 function updateSourceOptions() {
@@ -3396,3 +3092,33 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+// =============================================================================
+// Global Exports for onclick handlers
+// =============================================================================
+
+// Export functions to window for inline onclick handlers in HTML
+window.toggleSourceFilterDropdown = toggleSourceFilterDropdown;
+window.toggleSplit = toggleSplit;
+window.toggleHelp = toggleHelp;
+window.setActivePane = setActivePane;
+window.popView = popView;
+window.forwardView = forwardView;
+window.showHistory = showHistory;
+window.setViewStyle = setViewStyle;
+window.setViewDepth = setViewDepth;
+window.refreshView = refreshView;
+window.toggleExpandPane = toggleExpandPane;
+window.handleNodeClickPane = handleNodeClickPane;
+window.hideHelp = hideHelp;
+window.hideProperties = hideProperties;
+window.saveProperties = saveProperties;
+window.toggleSourceDropdown = toggleSourceDropdown;
+window.hideNewNote = hideNewNote;
+window.createNewNote = createNewNote;
+window.hideConfirm = hideConfirm;
+window.confirmDelete = confirmDelete;
+window.hideHistory = hideHistory;
+window.handleEditKeydown = handleEditKeydown;
+window.cancelEditTitle = cancelEditTitle;
+window.autoResizeTextarea = autoResizeTextarea;
