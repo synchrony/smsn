@@ -12,27 +12,19 @@ dependencies {
 
   implementation 'org.json:json:20180130'
 
-  //implementation 'org.jsoup:jsoup:1.16.1'
+  // Lucene for full-text search
+  implementation group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '8.11.2'
+  implementation group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.11.2'
+  implementation group: 'org.apache.lucene', name: 'lucene-core', version: '8.11.2'
 
-  implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
-  implementation group: 'org.apache.tinkerpop', name: 'tinkergraph-gremlin', version: tinkerpopVersion
-  implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
-  implementation group: 'org.neo4j', name: 'neo4j-tinkerpop-api-impl', version: neo4jTinkerpopApiVersion
-  // Note: lucene-analyzers-common version must match what Neo4j expects (5.5.5)
-  // Neo4j 3.4.x requires Lucene 5.x; RDF4J 4.x wants Lucene 8.x
-  // We exclude Lucene from RDF4J to avoid the conflict
-  implementation group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '5.5.5'
   implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-api', version: rdf4jVersion
   implementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-sail-memory', version: rdf4jVersion) {
     exclude(module: 'commons-codec')
   }
   implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.8.0'
 
-  // File-based storage dependencies (for migration from Neo4j)
+  // File-based storage dependencies
   implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
-  // Using same Lucene version as Neo4j (5.5.5) to avoid conflicts
-  // lucene-core and lucene-analyzers-common are already pulled in by Neo4j
-  implementation 'org.apache.lucene:lucene-queryparser:5.5.5'
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   implementation(group: 'commons-validator', name: 'commons-validator', version: '1.4.0') {
     exclude(module: 'commons-logging')
@@ -40,21 +32,9 @@ dependencies {
   testImplementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-ntriples', version: rdf4jVersion
   testImplementation group: 'org.eclipse.rdf4j', name: 'rdf4j-repository-sail', version: rdf4jVersion
   testImplementation(group: 'org.eclipse.rdf4j', name: 'rdf4j-queryalgebra-evaluation', version: rdf4jVersion) {
-    // Exclude Lucene modules to avoid conflict with Neo4j's Lucene 5.x
     exclude(group: 'org.apache.lucene')
   }
   testImplementation "junit:junit:$junitVersion"
 
   testOutput sourceSets.test.output
-}
-
-test {
-  // Add JVM arguments to open Java modules for Neo4j compatibility with Java 11+
-  // Neo4j's older version uses reflection to access internal Java classes
-  jvmArgs = [
-    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-    '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
-    '--add-opens', 'java.base/java.util=ALL-UNNAMED',
-    '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED'
-  ]
 }

@@ -8,7 +8,7 @@ import net.fortytwo.smsn.brain.Normed;
 import net.fortytwo.smsn.brain.SourceName;
 import net.fortytwo.smsn.brain.Timestamp;
 import net.fortytwo.smsn.brain.model.Filter;
-import net.fortytwo.smsn.brain.model.pg.Sortable;
+import net.fortytwo.smsn.brain.repository.Sortable;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,6 +79,11 @@ public class FileBasedAtomRepository implements AtomRepositoryInterface, AutoClo
             logger.info("Index built successfully");
         } else {
             logger.info("Using existing index with " + existingIds.size() + " atoms");
+
+            // Check if Lucene index needs rebuild (e.g., due to version upgrade)
+            if (indexManager.luceneNeedsRebuild()) {
+                indexManager.rebuildLuceneFromSqlite();
+            }
         }
 
         initialized = true;

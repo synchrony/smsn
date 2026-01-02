@@ -3,7 +3,7 @@ package net.fortytwo.smsn.brain.repository;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.Atom;
 import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.model.pg.Sortable;
+import net.fortytwo.smsn.brain.repository.Sortable;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -72,6 +72,7 @@ public class IndexManager implements AutoCloseable {
     private DirectoryReader luceneReader;
     private IndexSearcher luceneSearcher;
     private final StandardAnalyzer analyzer;
+    private boolean luceneNeedsRebuild = false;
 
     public IndexManager(File indexDirectory) throws IOException, SQLException {
         this.indexDirectory = indexDirectory;
@@ -94,12 +95,33 @@ public class IndexManager implements AutoCloseable {
         initializeSqliteTables();
 
         // Initialize Lucene
-        Path lucenePath = new File(indexDirectory, "lucene").toPath();
+        File luceneDir = new File(indexDirectory, "lucene");
+        Path lucenePath = luceneDir.toPath();
         this.luceneDirectory = FSDirectory.open(lucenePath);
         this.analyzer = new StandardAnalyzer();
 
+        // Check if existing index needs to be deleted due to format incompatibility
+        boolean needsRebuild = false;
+        if (luceneDir.exists() && luceneDir.listFiles() != null && luceneDir.listFiles().length > 0) {
+            try {
+                // Try to open the existing index
+                IndexWriterConfig testConfig = new IndexWriterConfig(analyzer);
+                testConfig.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
+                IndexWriter testWriter = new IndexWriter(luceneDirectory, testConfig);
+                testWriter.close();
+            } catch (org.apache.lucene.index.IndexFormatTooOldException e) {
+                logger.warning("Lucene index format is too old, will rebuild: " + e.getMessage());
+                needsRebuild = true;
+                luceneNeedsRebuild = true;
+                // Delete the old index
+                for (File f : luceneDir.listFiles()) {
+                    f.delete();
+                }
+            }
+        }
+
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        config.setOpenMode(needsRebuild ? IndexWriterConfig.OpenMode.CREATE : IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         config.setRAMBufferSizeMB(64.0); // Use more RAM for faster indexing
         this.luceneWriter = new IndexWriter(luceneDirectory, config);
 
@@ -566,6 +588,56 @@ public class IndexManager implements AutoCloseable {
         }
 
         return acronym.toString();
+    }
+
+    /**
+     * Check if Lucene index needs to be rebuilt (e.g., due to format incompatibility).
+     */
+    public boolean luceneNeedsRebuild() {
+        return luceneNeedsRebuild;
+    }
+
+    /**
+     * Rebuild Lucene index from SQLite data.
+     * Used when Lucene index format is incompatible.
+     */
+    public void rebuildLuceneFromSqlite() throws SQLException, IOException {
+        logger.info("Rebuilding Lucene index from SQLite data...");
+        long start = System.currentTimeMillis();
+
+        try (Statement stmt = sqliteConnection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, title FROM atoms WHERE title IS NOT NULL")) {
+
+            int count = 0;
+            while (rs.next()) {
+                String id = rs.getString("id");
+                String title = rs.getString("title");
+
+                Document doc = new Document();
+                doc.add(new StringField(FIELD_ID, id, Field.Store.YES));
+                doc.add(new TextField(FIELD_TITLE, title, Field.Store.YES));
+
+                String acronym = generateAcronym(title);
+                if (acronym != null) {
+                    doc.add(new StringField(FIELD_ACRONYM, acronym, Field.Store.YES));
+                }
+
+                luceneWriter.updateDocument(new Term(FIELD_ID, id), doc);
+                count++;
+
+                if (count % 10000 == 0) {
+                    logger.info("Rebuilt Lucene index for " + count + " atoms...");
+                }
+            }
+
+            luceneWriter.commit();
+            refreshLuceneReader();
+
+            long elapsed = System.currentTimeMillis() - start;
+            logger.info("Rebuilt Lucene index for " + count + " atoms in " + elapsed + "ms");
+        }
+
+        luceneNeedsRebuild = false;
     }
 
     @Override

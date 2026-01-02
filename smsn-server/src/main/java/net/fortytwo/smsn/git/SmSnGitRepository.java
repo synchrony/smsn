@@ -3,9 +3,9 @@ package net.fortytwo.smsn.git;
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.Normed;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
 import net.fortytwo.smsn.brain.SourceName;
 import net.fortytwo.smsn.brain.Timestamp;
 import net.fortytwo.smsn.brain.TreeNode;
@@ -46,7 +46,7 @@ public class SmSnGitRepository implements AbstractRepository {
     private final Git git;
     private final File directory;
 
-    private final Brain brain;
+    private final AtomRepositoryInterface atomRepository;
     private final Filter filter;
 
     // Repository metadata (no longer using NoteDTO inheritance)
@@ -62,18 +62,18 @@ public class SmSnGitRepository implements AbstractRepository {
             Repository repository,
             Git git,
             File directory,
-            Brain brain,
+            AtomRepositoryInterface atomRepository,
             Filter filter) {
 
         this.dataSource = dataSource;
         this.repository = repository;
         this.git = git;
         this.directory = directory;
-        this.brain = brain;
+        this.atomRepository = atomRepository;
         this.filter = filter;
     }
 
-    public static SmSnGitRepository createRepository(final Brain brain, final DataSource dataSource) throws IOException {
+    public static SmSnGitRepository createRepository(final AtomRepositoryInterface atomRepository, final DataSource dataSource) throws IOException {
         // TODO
         Filter filter = Filter.noFilter();
 
@@ -95,7 +95,7 @@ public class SmSnGitRepository implements AbstractRepository {
 
         Git git = new Git(repository);
 
-        SmSnGitRepository repo = new SmSnGitRepository(dataSource, repository, git, directory, brain, filter);
+        SmSnGitRepository repo = new SmSnGitRepository(dataSource, repository, git, directory, atomRepository, filter);
         repo.verifyCanRead();
         repo.source = dataSource.getName();
         repo.title = "repository " + directory.getName() + " at " + formatDate(System.currentTimeMillis());
@@ -189,8 +189,8 @@ public class SmSnGitRepository implements AbstractRepository {
         return wrap(() -> git.status().call().getMissing());
     }
 
-    public Brain getBrain() {
-        return brain;
+    public AtomRepositoryInterface getAtomRepository() {
+        return atomRepository;
     }
 
     public TreeNode getHistory(final Limits limits) throws IOException, GitAPIException {
@@ -317,7 +317,7 @@ public class SmSnGitRepository implements AbstractRepository {
 
     private TreeNode createDiffTreeNode(final AtomId id, final long timestamp, final DiffEntry.ChangeType changeType) {
         // Try to load existing atom from repository
-        var atomOpt = brain.getAtomRepository().findById(id);
+        var atomOpt = atomRepository.findById(id);
 
         if (atomOpt.isPresent()) {
             // Convert existing Atom to TreeNode (height 0 - no children)

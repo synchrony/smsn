@@ -5,9 +5,9 @@ import net.fortytwo.ripple.io.RipplePrintStream;
 import net.fortytwo.ripple.model.ModelConnection;
 import net.fortytwo.ripple.model.StackMapping;
 import net.fortytwo.ripple.model.types.SimpleType;
+import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -36,7 +36,7 @@ public class TreeType extends SimpleType<TreeNode<Link>> {
         // classified note and the knowledge base has been appropriately published as Linked Data.
         return null == TreeViews.getAlias(instance)
                 ? null == TreeViews.getId(instance) ? null : valueFactory.createIRI(
-                        PGTopicGraph.iriForId(TreeViews.getId(instance)))
+                        iriForId(TreeViews.getId(instance)))
                 : valueFactory.createIRI(TreeViews.getAlias(instance));
     }
 
@@ -62,5 +62,9 @@ public class TreeType extends SimpleType<TreeNode<Link>> {
         return null == TreeViews.getId(o1)
                 ? null == TreeViews.getId(o2) ? 0 : -1
                 : null == TreeViews.getId(o2) ? 1 : TreeViews.getId(o1).value.compareTo(TreeViews.getId(o2).value);
+    }
+
+    private static String iriForId(AtomId id) {
+        return "urn:smsn:" + id.value;
     }
 }

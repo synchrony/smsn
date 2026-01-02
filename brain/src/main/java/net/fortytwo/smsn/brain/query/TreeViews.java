@@ -1,15 +1,14 @@
 package net.fortytwo.smsn.brain.query;
 
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Atom;
+import net.fortytwo.smsn.brain.ActivityLog;
 import net.fortytwo.smsn.brain.AtomId;
-import net.fortytwo.smsn.brain.Brain;
-import net.fortytwo.smsn.brain.Priorities;
 import net.fortytwo.smsn.brain.error.InvalidGraphException;
 import net.fortytwo.smsn.brain.error.InvalidUpdateException;
 import net.fortytwo.smsn.brain.io.wiki.WikiFormat;
 import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.Property;
+import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.model.dto.LinkDTO;
 import net.fortytwo.smsn.brain.model.dto.ListNodeDTO;
 import net.fortytwo.smsn.brain.model.dto.PageDTO;
@@ -22,7 +21,7 @@ import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
 import net.fortytwo.smsn.brain.util.ListDiff;
-import org.parboiled.common.Preconditions;
+import com.google.common.base.Preconditions;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -45,15 +43,25 @@ public class TreeViews {
         FullText, Acronym, Shortcut, Ripple
     }
 
-    private final Brain brain;
+    private final TopicGraph topicGraph;
+    private final ActivityLog activityLog;
 
     /**
-     * @param brain the Extend-o-Brain instance to query and update
+     * @param topicGraph the TopicGraph instance to query and update
      */
-    public TreeViews(final Brain brain) {
-        Preconditions.checkArgNotNull(brain, "brain");
+    public TreeViews(final TopicGraph topicGraph) {
+        this(topicGraph, null);
+    }
 
-        this.brain = brain;
+    /**
+     * @param topicGraph the TopicGraph instance to query and update
+     * @param activityLog optional activity log for logging operations
+     */
+    public TreeViews(final TopicGraph topicGraph, final ActivityLog activityLog) {
+        Preconditions.checkNotNull(topicGraph, "topicGraph cannot be null");
+
+        this.topicGraph = topicGraph;
+        this.activityLog = activityLog;
     }
 
     /**
@@ -78,8 +86,8 @@ public class TreeViews {
         checkFilterArg(filter);
         checkStyleArg(style, false);
 
-        if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logViewById(Note.getId(root));
+        if (null != activityLog) {
+            activityLog.logViewById(Note.getId(root));
         }
 
         return viewInternal(root, height, filter, style, true, null);
@@ -127,7 +135,7 @@ public class TreeViews {
 
         updateInternal(root, height, filter, style, cache);
 
-        brain.getTopicGraph().notifyOfUpdate();
+        topicGraph.notifyOfUpdate();
     }
 
     /**
@@ -161,13 +169,13 @@ public class TreeViews {
         List<Note> results;
         switch (queryType) {
             case FullText:
-                results = brain.getTopicGraph().getNotesByTitleQuery(rewrittenQuery, filter);
+                results = topicGraph.getNotesByTitleQuery(rewrittenQuery, filter);
                 break;
             case Acronym:
-                results = brain.getTopicGraph().getNotesByAcronym(rewrittenQuery, filter);
+                results = topicGraph.getNotesByAcronym(rewrittenQuery, filter);
                 break;
             case Shortcut:
-                results = brain.getTopicGraph().getNotesByShortcut(rewrittenQuery, filter);
+                results = topicGraph.getNotesByShortcut(rewrittenQuery, filter);
                 break;
             default:
                 throw new IllegalStateException("unexpected query type: " + queryType);
@@ -199,62 +207,24 @@ public class TreeViews {
         return findNotes(filter, true, true, 1, ViewStyle.Basic.Forward.getStyle());
     }
 
-    /**
-     * Generates a prioritized list of notes
-     * DEPRECATED: Use GetPriorities action with TreeViewBuilder instead
-     *
-     * @param filter     a collection of criteria for nots and links.
-     *                   Notes and links which do not meet the criteria are not to appear in the view.
-     * @param maxResults the maximum number of results to return
-     * @param priorities the list of priorities to view
-     * @return a prioritized list of notes
-     */
-    @Deprecated
-    public TreeNode<Link> priorityView(final Filter filter,
-                                       final int maxResults,
-                                       final Priorities priorities) throws InvalidGraphException {
-        checkFilterArg(filter);
-        checkPrioritiesArg(priorities);
-        checkMaxResultsArg(maxResults);
-
-        TreeNode<Link> result = createTreeNode();
-        result.getValue().setLabel("priority queue with up to " + maxResults + " results");
-
-        Queue<Atom> queue = priorities.getQueue();
-        int i = 0;
-        for (Atom atom : queue) {
-            // Convert Atom to Note for compatibility
-            Note note = brain.getTopicGraph().getNoteById(atom.id).orElse(null);
-            if (note != null && filter.test(note)) {
-                result.addChild(toTreeNode(note, true, true));
-
-                if (++i >= maxResults) {
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
     private void checkRootArg(final Note root) {
-        Preconditions.checkArgNotNull(root, "root");
+        Preconditions.checkNotNull(root, "root cannot be null");
     }
 
     private void checkRootArg(final TreeNode<Link> root) {
-        Preconditions.checkArgNotNull(root, "root");
+        Preconditions.checkNotNull(root, "root cannot be null");
     }
 
     private void checkNoteIterableArg(final Iterable<Note> notes) {
-        Preconditions.checkArgNotNull(notes, "notes");
+        Preconditions.checkNotNull(notes, "notes cannot be null");
     }
 
     private void checkFilterArg(final Filter filter) {
-        Preconditions.checkArgNotNull(filter, "filter");
+        Preconditions.checkNotNull(filter, "filter cannot be null");
     }
 
     private void checkStyleArg(final ViewStyle style, boolean isUpdate) {
-        Preconditions.checkArgNotNull(style, "style");
+        Preconditions.checkNotNull(style, "style cannot be null");
 
         Preconditions.checkArgument(!isUpdate || style.addOnUpdate() || style.deleteOnUpdate(),
                 "can't update in style " + style);
@@ -264,20 +234,12 @@ public class TreeViews {
         Preconditions.checkArgument(height >= min, "height of " + height + "expecting >= " + min);
     }
 
-    private void checkMaxResultsArg(final int maxResults) {
-        Preconditions.checkArgument(maxResults >= 1, "invalid maxResults");
-    }
-
     private void checkQueryTypeArg(final QueryType type) {
-        Preconditions.checkArgNotNull(type, "queryType");
+        Preconditions.checkNotNull(type, "queryType cannot be null");
     }
 
     private void checkQueryArg(final String query) {
-        Preconditions.checkArgNotNull(query, "query");
-    }
-
-    private void checkPrioritiesArg(final Priorities priorities) {
-        Preconditions.checkArgNotNull(priorities, "priorities");
+        Preconditions.checkNotNull(query, "query cannot be null");
     }
 
     private void addToCache(final Note note, final Map<AtomId, Note> cache) {
@@ -319,7 +281,7 @@ public class TreeViews {
                                         final ViewStyle style,
                                         final boolean getProperties,
                                         final Map<AtomId, Note> cache) {
-        Preconditions.checkNotNull(root);
+        Preconditions.checkNotNull(root, "root cannot be null");
 
         TreeNode<Link> note = toTreeNode(root, filter.test(root), getProperties);
 
@@ -405,8 +367,8 @@ public class TreeViews {
                 childrenAdded.add(Note.getId(note));
 
                 // log this activity
-                if (null != brain.getActivityLog()) {
-                    brain.getActivityLog().logLinkById(Note.getId(rootNote), Note.getId(note));
+                if (null != activityLog) {
+                    activityLog.logLinkById(Note.getId(rootNote), Note.getId(note));
                 }
             }
 
@@ -420,10 +382,10 @@ public class TreeViews {
                 removeNoteAt(rootNote, position, filter);
 
                 // log this activity
-                if (null != brain.getActivityLog()) {
+                if (null != activityLog) {
                     Note a = getNoteById(getId(note), cache);
                     if (null != a) {
-                        brain.getActivityLog().logUnlinkById(Note.getId(rootNote), Note.getId(a));
+                        activityLog.logUnlinkById(Note.getId(rootNote), Note.getId(a));
                     }
                 }
             }
@@ -472,7 +434,7 @@ public class TreeViews {
     private Note getNoteById(final AtomId id, final Map<AtomId, Note> cache) {
         Note note = cache.get(id);
         if (null == note) {
-            Optional<Note> opt = brain.getTopicGraph().getNoteById(id);
+            Optional<Note> opt = topicGraph.getNoteById(id);
             if (opt.isPresent()) {
                 note = opt.get();
                 cache.put(id, note);
@@ -512,7 +474,7 @@ public class TreeViews {
         AtomId id = getId(node);
         Note note = getNoteById(id, cache);
         if (null == note) {
-            note = brain.getTopicGraph().createNote(id);
+            note = topicGraph.createNote(id);
             //throw new InvalidUpdateException("no such note: " + getId(node));
         }
 
@@ -521,14 +483,14 @@ public class TreeViews {
 
     private Note createNote(final AtomId id,
                             final Filter filter) {
-        Note a = brain.getTopicGraph().createNoteWithProperties(filter, id);
+        Note a = topicGraph.createNoteWithProperties(filter, id);
         String source = filter.getDefaultSource();
         if (null != source) {
             Note.setSource(a, source);
         }
 
-        if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logCreateById(Note.getId(a));
+        if (null != activityLog) {
+            activityLog.logCreateById(Note.getId(a));
         }
 
         return a;
@@ -550,7 +512,7 @@ public class TreeViews {
 
         TreeNode<Link> result = createTreeNode();
 
-        for (Note a : brain.getTopicGraph().getAllNotes()) {
+        for (Note a : topicGraph.getAllNotes()) {
             if (filter.test(a) && !isAdjacent(a, includeChildren, includeParents)) {
                 TreeNode<Link> n = viewInternal(a, height, filter, style, true, null);
                 result.addChild(n);
@@ -580,8 +542,8 @@ public class TreeViews {
             setNoteProperty(fromNode, toNote, key);
         }
 
-        if (null != brain.getActivityLog()) {
-            brain.getActivityLog().logSetPropertiesById(Note.getId(toNote));
+        if (null != activityLog) {
+            activityLog.logSetPropertiesById(Note.getId(toNote));
         }
     }
 
@@ -748,21 +710,7 @@ public class TreeViews {
         if (getProperties) {
             setNodeProperties(note, node, isVisible);
 
-            /* TODO: restore metadata
-            if (null != brain.getKnowledgeBase()) {
-                List<KnowledgeBase.NoteClassEntry> entries = brain.getKnowledgeBase().getClassInfo(note);
-                if (null != entries && entries.size() > 0) {
-                    List<String> meta = new LinkedList<>();
-                    for (KnowledgeBase.NoteClassEntry e : entries) {
-                        String ann = "class " + e.getInferredClassName()
-                                + " " + e.getScore() + "=" + e.getOutScore() + "+" + e.getInScore();
-                        meta.add(ann);
-                    }
-
-                    node.setMeta(meta);
-                }
-            }
-            */
+            // Metadata support removed (was KnowledgeBase-based)
         }
 
         return node;

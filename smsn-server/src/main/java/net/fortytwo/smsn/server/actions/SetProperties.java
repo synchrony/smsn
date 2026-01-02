@@ -132,16 +132,6 @@ public class SetProperties extends FilteredAction {
         // Update the property using AtomRepository
         context.getRepository().updateProperty(atomId, propertyKey, value);
 
-        // Update priority queue if priority changed (TinkerPop mode only)
-        if (SemanticSynchrony.PropertyKeys.PRIORITY.equals(propertyKey) && context.getBrain() != null) {
-            context.getBrain().getPriorities().updatePriorityById(atomId);
-        }
-
-        // Notify of update if brain is available (TinkerPop mode)
-        if (context.getBrain() != null) {
-            context.getBrain().notifyOfUpdate();
-        }
-
         context.getMap().put("key", atomId);
         context.getMap().put("name", propertyKey);
         context.getMap().put("value", value != null ? value.toString() : "");

@@ -13,21 +13,19 @@ import net.fortytwo.smsn.brain.model.entities.Note;
 import net.fortytwo.smsn.brain.model.entities.Page;
 import net.fortytwo.smsn.brain.model.entities.Topic;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.pg.GraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
-import net.fortytwo.smsn.brain.model.pg.neo4j.Neo4jGraphWrapper;
-import net.fortytwo.smsn.brain.model.pg.tg.TinkerGraphWrapper;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
+import net.fortytwo.smsn.brain.repository.FileBasedAtomRepository;
+import net.fortytwo.smsn.brain.repository.FileBasedTopicGraph;
+import net.fortytwo.smsn.config.Configuration;
 import net.fortytwo.smsn.config.DataSource;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.After;
 import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,18 +57,56 @@ public abstract class BrainTestBase {
     protected TopicGraph topicGraph;
     protected final WikiParser wikiParser = new WikiParser();
 
-    protected Brain brain;
-    protected Graph graph;
-    protected GraphWrapper graphWrapper;
+    protected FileBasedAtomRepository repository;
     protected Filter filter = Filter.noFilter();
     protected final ViewStyle viewStyle = ViewStyle.Basic.Forward.getStyle();
     protected Collection<Note> queryResult;
 
+    private File tempDir;
+    private Configuration originalConfig;
+
     @Before
     public void setUp() throws Exception {
-        topicGraph = createTopicGraph();
-        brain = new Brain(topicGraph);
-        queries = new TreeViews(brain);
+        // Save original configuration
+        originalConfig = SemanticSynchrony.getConfiguration();
+
+        // Create temporary directories
+        tempDir = Files.createTempDirectory("smsn-test").toFile();
+        File indexDir = new File(tempDir, "index");
+        File sourceDir = new File(tempDir, "atoms");
+        sourceDir.mkdirs();
+
+        // Configure SmSn with test sources
+        Configuration config = new Configuration();
+        DataSource privateSource = new DataSource();
+        privateSource.setName("private");
+        privateSource.setLocation(new File(tempDir, "private").getAbsolutePath());
+        new File(tempDir, "private").mkdirs();
+
+        DataSource personalSource = new DataSource();
+        personalSource.setName("personal");
+        personalSource.setLocation(new File(tempDir, "personal").getAbsolutePath());
+        new File(tempDir, "personal").mkdirs();
+
+        DataSource publicSource = new DataSource();
+        publicSource.setName("public");
+        publicSource.setLocation(new File(tempDir, "public").getAbsolutePath());
+        new File(tempDir, "public").mkdirs();
+
+        DataSource universalSource = new DataSource();
+        universalSource.setName("universal");
+        universalSource.setLocation(new File(tempDir, "universal").getAbsolutePath());
+        new File(tempDir, "universal").mkdirs();
+
+        config.setSources(List.of(privateSource, personalSource, publicSource, universalSource));
+        SemanticSynchrony.setConfiguration(config);
+
+        // Create file-based repository and topic graph
+        repository = new FileBasedAtomRepository(indexDir);
+        repository.initialize();
+        topicGraph = new FileBasedTopicGraph(repository);
+
+        queries = new TreeViews(topicGraph);
         filter = Filter.noFilter();
 
         arthurTopic = createTopic(ARTHUR_ID);
@@ -83,33 +119,33 @@ public abstract class BrainTestBase {
 
     @After
     public void tearDown() throws Exception {
-        if (null != graphWrapper) {
-            graphWrapper.shutdown();
+        if (repository != null) {
+            repository.close();
         }
+
+        // Restore original configuration
+        if (originalConfig != null) {
+            SemanticSynchrony.setConfiguration(originalConfig);
+        }
+
+        deleteRecursively(tempDir);
     }
 
-    protected TopicGraph createTopicGraph() throws IOException {
-        return createTinkerTopicGraph();
-    }
-
-    protected TopicGraph createTinkerTopicGraph() {
-        graph = TinkerGraph.open();
-        graphWrapper = new TinkerGraphWrapper((TinkerGraph) graph);
-        return new PGTopicGraph(graphWrapper);
-    }
-
-    protected TopicGraph createNeo4jTopicGraph() throws IOException {
-        File dir = createTempDirectory();
-
-        graphWrapper = new Neo4jGraphWrapper(dir);
-        graphWrapper.begin();
-        graph = graphWrapper.getGraph();
-
-        return new PGTopicGraph(graphWrapper);
+    private void deleteRecursively(File file) {
+        if (file == null) return;
+        if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    deleteRecursively(child);
+                }
+            }
+        }
+        file.delete();
     }
 
     protected TreeNode<Link> importNodeFromFile(final String exampleFile) throws IOException {
-        return parseToTree(Brain.class.getResourceAsStream(exampleFile));
+        return parseToTree(BrainTestBase.class.getResourceAsStream(exampleFile));
     }
 
     protected Note importNoteFromFile(final String exampleFile) throws IOException {

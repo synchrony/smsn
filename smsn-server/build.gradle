@@ -18,13 +18,11 @@ dependencies {
   // Hydra dependency (needed for Atom/TreeNode field access)
   implementation 'net.fortytwo.hydra:hydra-java:0.7.0'
 
-  // Jackson for JSON parsing (standalone, not from TinkerPop's shaded version)
+  // Jackson for JSON parsing
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
 
-  // TinkerPop/Neo4j - still needed for compilation but excluded from standalone JAR
-  implementation group: 'org.apache.tinkerpop', name: 'gremlin-core', version: tinkerpopVersion
-  implementation group: 'org.apache.tinkerpop', name: 'gremlin-server', version: tinkerpopVersion
-  implementation group: 'org.apache.tinkerpop', name: 'neo4j-gremlin', version: tinkerpopVersion
+  // SnakeYAML for YAML parsing
+  implementation 'org.yaml:snakeyaml:2.2'
 
   implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.8.0.201705170830-rc1'
   implementation 'org.json:json:20180130'
@@ -45,17 +43,6 @@ dependencies {
   testImplementation project(path: ':brain', configuration: 'testOutput')
 }
 
-test {
-  // Add JVM arguments to open Java modules for Neo4j compatibility with Java 11+
-  // Neo4j's older version uses reflection to access internal Java classes
-  jvmArgs = [
-    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-    '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
-    '--add-opens', 'java.base/java.util=ALL-UNNAMED',
-    '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED'
-  ]
-}
-
 shadowJar {
   archiveBaseName.set('smsn-server')
   archiveClassifier.set('standalone')
@@ -64,8 +51,4 @@ shadowJar {
   manifest {
     attributes 'Main-Class': 'net.fortytwo.smsn.server.SmSnServer'
   }
-
-  // TODO: Exclude TinkerPop/Neo4j after refactoring Action class to not depend on them
-  // Currently kept because Action class references TinkerGraphWrapper/Neo4jGraphWrapper
-  // which Jackson introspects even when not used in standalone mode
 }

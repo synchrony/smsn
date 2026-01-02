@@ -122,7 +122,7 @@ public class SmSnServer {
             Action action = objectMapper.readValue(requestJson, Action.class);
             ActionContext context = createContext();
 
-            action.handleRequestStandalone(context);
+            action.handleRequest(context);
 
             JSONObject response = new JSONObject(context.getMap());
             return response.toString();

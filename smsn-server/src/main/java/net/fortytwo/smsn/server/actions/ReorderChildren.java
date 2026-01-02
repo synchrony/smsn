@@ -68,11 +68,6 @@ public class ReorderChildren extends FilteredAction {
         context.getRepository().deleteChildAt(pid, fromIndex);
         context.getRepository().addChildAt(pid, childId, toIndex);
 
-        // Notify of update if brain is available (TinkerPop mode)
-        if (context.getBrain() != null) {
-            context.getBrain().notifyOfUpdate();
-        }
-
         context.getMap().put("parentId", pid.value);
         context.getMap().put("childId", childId.value);
         context.getMap().put("fromIndex", fromIndex);

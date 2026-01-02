@@ -3,19 +3,13 @@ package net.fortytwo.smsn.brain.io;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.model.TopicGraph;
 import net.fortytwo.smsn.brain.query.TreeViews;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 public abstract class NoteReader {
@@ -31,31 +25,6 @@ public abstract class NoteReader {
 
     protected NoteReader() {
         transactionBufferSize = SemanticSynchrony.getConfiguration().getTransactionBufferSize();
-    }
-
-    public void doImport(
-            File file, Format format, Brain brain) throws IOException {
-
-        switch (format.getType()) {
-
-            case Internal:
-                break;
-            case FileBased:
-                break;
-            case Complex:
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-
-        if (format.getType().equals(Format.Type.Complex)) {
-            importComplex(format, brain);
-        } else {
-            Preconditions.checkNotNull(file);
-            Preconditions.checkArgument(file.exists(), "file " + file.getAbsolutePath() + " does not exist");
-
-            importFile(file, format, brain);
-        }
     }
 
     public void doImport(Context context)
@@ -98,50 +67,6 @@ public abstract class NoteReader {
         }
         // Fall back to legacy TopicGraph API
         return Iterators.size(context.getTopicGraph().getAllNotes().iterator());
-    }
-
-    private void importComplex(final Format format, final Brain brain) throws IOException {
-        Context context = new Context();
-        context.setTopicGraph(brain.getTopicGraph());
-        context.setAtomRepository(brain.getAtomRepository());
-        context.setFormat(format);
-        context.setQueries(new TreeViews(brain));
-
-        doImport(context);
-    }
-
-    private void importDirectory(final File dir, final Format format, final Brain brain) throws IOException {
-        Set<String> extensions = new HashSet<>();
-        Collections.addAll(extensions, format.getFileExtensions());
-        for (File file : dir.listFiles()) {
-            if (!file.isHidden()) {
-                if (file.isDirectory()) {
-                    importDirectory(file, format, brain);
-                } else {
-                    String ext = FilenameUtils.getExtension(file.getName());
-                    if (extensions.contains(ext)) {
-                        importFile(file, format, brain);
-                    }
-                }
-            }
-        }
-    }
-
-    private void importFile(File file, Format format, Brain brain) throws IOException {
-        logger.info("importing file " + file);
-        if (file.isDirectory()) {
-            importDirectory(file, format, brain);
-        } else {
-            try (InputStream sourceStream = new FileInputStream(file)) {
-                Context context = new Context();
-                context.setTopicGraph(brain.getTopicGraph());
-                context.setAtomRepository(brain.getAtomRepository());
-                context.setSourceStream(sourceStream);
-                context.setFormat(format);
-
-                doImport(context);
-            }
-        }
     }
 
     public static class Context {

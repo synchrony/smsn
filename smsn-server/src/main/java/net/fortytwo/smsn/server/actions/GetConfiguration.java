@@ -5,14 +5,13 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.config.Configuration;
 import net.fortytwo.smsn.server.Action;
 import net.fortytwo.smsn.server.ActionContext;
-import net.fortytwo.smsn.server.SmSnScriptEngine;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
-import org.apache.tinkerpop.shaded.jackson.core.JsonProcessingException;
-import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GetConfiguration extends Action {
-    private final ObjectMapper objectMapper = SmSnScriptEngine.createObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void performTransaction(final ActionContext context)

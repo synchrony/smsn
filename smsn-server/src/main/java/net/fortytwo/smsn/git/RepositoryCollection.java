@@ -2,11 +2,13 @@ package net.fortytwo.smsn.git;
 
 import com.google.common.base.Preconditions;
 import net.fortytwo.smsn.SemanticSynchrony;
-import net.fortytwo.smsn.brain.Brain;
 import net.fortytwo.smsn.brain.Normed;
 import net.fortytwo.smsn.brain.SourceName;
 import net.fortytwo.smsn.brain.Timestamp;
 import net.fortytwo.smsn.brain.TreeNode;
+import net.fortytwo.smsn.brain.model.TopicGraph;
+import net.fortytwo.smsn.brain.repository.AtomRepositoryInterface;
+import net.fortytwo.smsn.brain.repository.FileBasedTopicGraph;
 import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.config.DataSource;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -24,11 +26,16 @@ public class RepositoryCollection implements AbstractRepository {
 
     private final File directory;
 
-    private final Brain brain;
+    private final AtomRepositoryInterface atomRepository;
     private final Map<String, SmSnGitRepository> repositoriesBySource;
 
-    public RepositoryCollection(final Brain brain, final File directory) throws IOException {
-        this.brain = brain;
+    public RepositoryCollection(final TopicGraph topicGraph, final File directory) throws IOException {
+        // Get AtomRepositoryInterface from TopicGraph
+        if (topicGraph instanceof FileBasedTopicGraph) {
+            this.atomRepository = ((FileBasedTopicGraph) topicGraph).getRepository();
+        } else {
+            throw new IllegalArgumentException("TopicGraph must be FileBasedTopicGraph for git operations");
+        }
 
         Preconditions.checkNotNull(directory);
         Preconditions.checkArgument(directory.exists());
@@ -139,7 +146,7 @@ public class RepositoryCollection implements AbstractRepository {
     }
 
     private SmSnGitRepository createRepository(final DataSource dataSource) throws IOException {
-        return SmSnGitRepository.createRepository(brain, dataSource);
+        return SmSnGitRepository.createRepository(atomRepository, dataSource);
     }
 
     private interface ConsumerWithException<T, E extends Exception> {

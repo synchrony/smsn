@@ -36,7 +36,7 @@ public class ViewLog extends BasicViewAction {
         super.performTransaction(context);
 
         try {
-            RepositoryCollection repos = new RepositoryCollection(context.getBrain(), getFile());
+            RepositoryCollection repos = new RepositoryCollection(context.getTopicGraph(), getFile());
 
             // Get history as Hydra TreeNode from git repository
             net.fortytwo.smsn.brain.TreeNode view = repos.getHistory(createExampleLimits());

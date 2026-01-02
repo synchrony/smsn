@@ -8,7 +8,6 @@ import net.fortytwo.smsn.brain.model.Filter;
 import net.fortytwo.smsn.brain.model.dto.TreeNodeDTO;
 import net.fortytwo.smsn.brain.model.entities.Link;
 import net.fortytwo.smsn.brain.model.entities.TreeNode;
-import net.fortytwo.smsn.brain.model.pg.PGTopicGraph;
 import net.fortytwo.smsn.brain.query.TreeViews;
 import net.fortytwo.smsn.brain.query.ViewStyle;
 import net.fortytwo.smsn.typeatron.ripple.BrainClient;
@@ -109,6 +108,6 @@ public abstract class NoteMapping extends PrimitiveStackMapping {
             }
         }
 
-        return valueFactory.createIRI(PGTopicGraph.iriForId(TreeViews.getId(n)));
+        return valueFactory.createIRI("urn:smsn:" + TreeViews.getId(n).value);
     }
 }

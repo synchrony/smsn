@@ -35,6 +35,10 @@ public class FileBasedTopicGraph implements TopicGraph {
         this.repository = repository;
     }
 
+    public AtomRepositoryInterface getRepository() {
+        return repository;
+    }
+
     @Override
     public Iterable<Note> getAllNotes() {
         return () -> {

@@ -33,10 +33,6 @@ public class WriteGraph extends IOAction {
         NoteWriter.Context context = new NoteWriter.Context();
         context.setTopicGraph(params.getTopicGraph());
         context.setAtomRepository(params.getRepository());
-        // KnowledgeBase is optional - only available in Brain mode
-        if (params.getBrain() != null) {
-            context.setKnowledgeBase(params.getBrain().getKnowledgeBase());
-        }
         context.setRootId(getRootId());
         context.setFilter(getFilter());
         context.setFormat(getFormat());
