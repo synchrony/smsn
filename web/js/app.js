@@ -1717,6 +1717,53 @@ function reorderChild(parentId, fromIndex, toIndex) {
     });
 }
 
+// =============================================================================
+// Navigation Utilities
+// =============================================================================
+
+function getVisibleNodeIds() {
+    const ids = [];
+    collectVisibleIds(State.view, true, ids);
+    return ids;
+}
+
+function collectVisibleIds(node, isRoot, ids) {
+    if (!node) return;
+    ids.push(node.id);
+    const isExpanded = State.expandedNodes.has(node.id);
+    if (isExpanded && node.children) {
+        for (const child of node.children) {
+            collectVisibleIds(child, false, ids);
+        }
+    }
+}
+
+function moveSelection(direction) {
+    const visibleIds = getVisibleNodeIds();
+    if (visibleIds.length === 0) return;
+
+    const currentIndex = visibleIds.indexOf(State.selectedId);
+    let newIndex;
+
+    if (currentIndex === -1) {
+        newIndex = direction > 0 ? 0 : visibleIds.length - 1;
+    } else {
+        newIndex = currentIndex + direction;
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex >= visibleIds.length) newIndex = visibleIds.length - 1;
+    }
+
+    selectNode(visibleIds[newIndex]);
+
+    // Scroll to the selected element in the active pane
+    const container = document.getElementById(`tree-container-${State.activePane}`);
+    const selectedEl = container.querySelector(`.tree-node[data-id="${State.selectedId}"]`);
+    if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest' });
+    }
+}
+
+// =============================================================================
 // Rendering
 // =============================================================================
 
