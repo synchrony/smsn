@@ -618,8 +618,8 @@ public class IndexManager implements AutoCloseable {
                 doc.add(new TextField(FIELD_TITLE, title, Field.Store.YES));
 
                 String acronym = generateAcronym(title);
-                if (acronym != null) {
-                    doc.add(new StringField(FIELD_ACRONYM, acronym, Field.Store.YES));
+                if (acronym != null && !acronym.isEmpty()) {
+                    doc.add(new TextField(FIELD_ACRONYM, acronym, Field.Store.NO));
                 }
 
                 luceneWriter.updateDocument(new Term(FIELD_ID, id), doc);
