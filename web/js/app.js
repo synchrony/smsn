@@ -454,11 +454,17 @@ function pushViewToServer() {
 
 function visitTarget(nodeId) {
     const pane = getPane();
+
+    // Don't navigate if we're already at this root
+    if (pane.rootId === nodeId) {
+        setStatusMessage('Already at this view');
+        return;
+    }
+
     if (pane.rootId) {
         const entry = createHistoryEntry(pane);
         if (entry) {
             pane.history.push(entry);
-            console.log('visitTarget: pushed to history, now length:', pane.history.length);
         }
         pane.forwardHistory.length = 0;  // Clear forward history
     }
@@ -478,6 +484,8 @@ function popView() {
         }
         const prevEntry = pane.history.pop();
         navigateToEntry(prevEntry, State.activePane);
+    } else {
+        setStatusMessage('No history');
     }
     updateToolbar();
 }
@@ -504,6 +512,18 @@ function navigateToEntry(entry, paneIndex) {
         navigateToId(entry, paneIndex);
     } else {
         navigateToHistoryEntry(entry, paneIndex);
+    }
+}
+
+function navigateToHistoryEntry(entry, paneIndex) {
+    if (entry.isSearch) {
+        reExecuteSearch(entry.searchQuery, paneIndex);
+    } else {
+        if (paneIndex === 0) {
+            getView(entry.id, entry.viewDepth);
+        } else {
+            getViewForPane(entry.id, paneIndex, entry.viewDepth);
+        }
     }
 }
 
@@ -856,6 +876,13 @@ function selectNodePane(nodeId, paneIndex) {
 
 function visitTargetPane(nodeId, paneIndex) {
     const pane = State.panes[paneIndex];
+
+    // Don't navigate if we're already at this root
+    if (pane.rootId === nodeId) {
+        setStatusMessage('Already at this view');
+        return;
+    }
+
     if (pane.rootId) {
         const entry = createHistoryEntry(pane);
         if (entry) pane.history.push(entry);
@@ -3150,11 +3177,15 @@ window.toggleSplit = toggleSplit;
 window.toggleHelp = toggleHelp;
 window.setActivePane = setActivePane;
 window.popView = popView;
+window.popViewPane = popViewPane;
 window.forwardView = forwardView;
+window.forwardViewPane = forwardViewPane;
 window.showHistory = showHistory;
 window.setViewStyle = setViewStyle;
+window.setViewStylePane = setViewStylePane;
 window.setViewDepth = setViewDepth;
 window.refreshView = refreshView;
+window.refreshViewPane = refreshViewPane;
 window.toggleExpandPane = toggleExpandPane;
 window.handleNodeClickPane = handleNodeClickPane;
 window.hideHelp = hideHelp;

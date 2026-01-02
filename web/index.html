@@ -30,15 +30,15 @@
             </div>
             <div class="pane-toolbar">
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" id="btn-back-0" onclick="popView()" title="Go back (Backspace)">&#9664;</button>
-                    <button class="toolbar-btn" id="btn-forward-0" onclick="forwardView()" title="Go forward">&#9654;</button>
+                    <button class="toolbar-btn" id="btn-back-0" onclick="popViewPane(0)" title="Go back (Backspace)">&#9664;</button>
+                    <button class="toolbar-btn" id="btn-forward-0" onclick="forwardViewPane(0)" title="Go forward">&#9654;</button>
                     <a href="#" class="toolbar-link" id="link-history-0" onclick="showHistory(0); return false;" title="View history (C-c H)">History</a>
                 </div>
                 <div class="toolbar-separator"></div>
                 <div class="toolbar-group">
                     <span class="toolbar-label">View:</span>
-                    <button class="toolbar-btn active" id="btn-forward-view-0" onclick="setViewStyle('forward')" title="Forward view (children)">&#9660;</button>
-                    <button class="toolbar-btn" id="btn-backward-view-0" onclick="setViewStyle('backward')" title="Backward view (parents)">&#9650;</button>
+                    <button class="toolbar-btn active" id="btn-forward-view-0" onclick="setViewStylePane('forward', 0)" title="Forward view (children)">&#9660;</button>
+                    <button class="toolbar-btn" id="btn-backward-view-0" onclick="setViewStylePane('backward', 0)" title="Backward view (parents)">&#9650;</button>
                 </div>
                 <div class="toolbar-separator"></div>
                 <div class="toolbar-group">
@@ -52,7 +52,7 @@
                 </div>
                 <div class="toolbar-separator"></div>
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" id="btn-refresh-0" onclick="refreshView()" title="Refresh (r)">&#8635;</button>
+                    <button class="toolbar-btn" id="btn-refresh-0" onclick="refreshViewPane(0)" title="Refresh (r)">&#8635;</button>
                 </div>
             </div>
             <main id="tree-container-0" class="pane-content" tabindex="0">
