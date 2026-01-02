@@ -16,12 +16,16 @@ public class GetHistory extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
+        super.performTransaction(context);
+
+        net.fortytwo.smsn.brain.model.Filter effectiveFilter = getFilterFromContext(context);
+
         // Get history as Atoms directly from the new API
-        List<Atom> atoms = getHistory(context.getRepository(), getFilter());
+        List<Atom> atoms = getHistory(context.getRepository(), effectiveFilter);
 
         // Build list view
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(atoms, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(atoms, effectiveFilter);
 
         try {
             JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);

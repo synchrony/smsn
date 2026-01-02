@@ -107,6 +107,8 @@ public class SetProperties extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
+        super.performTransaction(context);
+
         validateKeyValue();
 
         AtomId atomId = getId();
@@ -117,7 +119,7 @@ public class SetProperties extends FilteredAction {
         if (SemanticSynchrony.PropertyKeys.SHORTCUT.equals(propertyKey)) {
             String shortcut = (String) value;
             // Remove this shortcut from any other atoms currently holding it
-            for (net.fortytwo.smsn.brain.Atom atom : context.getRepository().findByShortcut(shortcut, getFilter())) {
+            for (net.fortytwo.smsn.brain.Atom atom : context.getRepository().findByShortcut(shortcut, getFilterFromContext(context))) {
                 if (!atom.id.equals(atomId)) {
                     context.getRepository().updateProperty(atom.id, SemanticSynchrony.PropertyKeys.SHORTCUT, null);
                 }

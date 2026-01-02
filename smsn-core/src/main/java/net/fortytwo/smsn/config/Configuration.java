@@ -15,6 +15,7 @@ public class Configuration implements Serializable {
     private String thingNamespace = "http://example.org/things/";
     private AtomId brainstream;
     private Services services = new Services();
+    private Authentication authentication = new Authentication();
     private boolean verbose = false;
     private List<DataSource> sources = new LinkedList<>();
 
@@ -88,5 +89,13 @@ public class Configuration implements Serializable {
 
     public void setIndexDirectory(String indexDirectory) {
         this.indexDirectory = indexDirectory;
+    }
+
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
     }
 }

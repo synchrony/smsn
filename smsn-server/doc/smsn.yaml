@@ -8,6 +8,16 @@ transactionBufferSize: 100
 # of view and edit operations are recorded. Move it to a permanent location.
 activityLog: "data/activity.log"
 
+# Authentication settings (optional)
+# When enabled, connections require a token for full access.
+# Anonymous connections can only read from publicSources.
+authentication:
+  enabled: false
+  # token: "your-secret-token-here"  # Required when enabled=true
+  # publicSources:                    # Sources visible to anonymous users
+  #   - public
+  #   - universal
+
 # Add or remove data sources as needed.  Names and locations must be unique.
 sources:
   -

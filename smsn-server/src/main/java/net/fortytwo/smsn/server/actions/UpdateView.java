@@ -164,11 +164,11 @@ public class UpdateView extends RootedViewAction {
 
         // Adjust filter to inherit root's source for new children
         // This matches the original behavior where children inherit parent's source
-        Filter originalFilter = getFilter();
+        Filter effectiveFilter = getFilterFromContext(context);
         Filter adjustedFilter = new Filter(
-            originalFilter.getMinWeight(),
-            originalFilter.getDefaultWeight(),
-            originalFilter.getIncludedSources(),
+            effectiveFilter.getMinWeight(),
+            effectiveFilter.getDefaultWeight(),
+            effectiveFilter.getIncludedSources(),
             rootAtom.source.value  // Use root's source as default for new children
         );
 
@@ -179,7 +179,7 @@ public class UpdateView extends RootedViewAction {
         // Generate the updated view
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
         TreeNode updatedView = builder.buildView(
-            getRoot().id, height, getFilter(), getViewDirection());
+            getRoot().id, height, effectiveFilter, getViewDirection());
 
         // Serialize and return the view
         try {

@@ -16,6 +16,9 @@ public class FindIsolatedNotes extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
+        super.performTransaction(context);
+
+        net.fortytwo.smsn.brain.model.Filter effectiveFilter = getFilterFromContext(context);
         List<Atom> isolated = new ArrayList<>();
 
         for (net.fortytwo.smsn.brain.AtomId atomId : context.getRepository().getAllAtomIds()) {
@@ -23,7 +26,7 @@ public class FindIsolatedNotes extends FilteredAction {
 
             // Isolated means no children AND no parents
             if (atom.children.isEmpty() && context.getRepository().countParents(atomId) == 0) {
-                if (getFilter() == null || context.getRepository().testFilter(atom, getFilter())) {
+                if (effectiveFilter == null || context.getRepository().testFilter(atom, effectiveFilter)) {
                     isolated.add(atom);
                 }
             }
@@ -31,7 +34,7 @@ public class FindIsolatedNotes extends FilteredAction {
 
         // Build a simple list view
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(isolated, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(isolated, effectiveFilter);
 
         try {
             JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);

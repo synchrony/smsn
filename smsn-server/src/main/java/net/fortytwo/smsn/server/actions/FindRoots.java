@@ -17,6 +17,9 @@ public class FindRoots extends BasicViewAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException, BadRequestException {
+        super.performTransaction(context);
+
+        net.fortytwo.smsn.brain.model.Filter effectiveFilter = getFilterFromContext(context);
         List<Atom> roots = new ArrayList<>();
 
         for (net.fortytwo.smsn.brain.AtomId atomId : context.getRepository().getAllAtomIds()) {
@@ -24,7 +27,7 @@ public class FindRoots extends BasicViewAction {
 
             // Root notes have no parents
             if (context.getRepository().countParents(atomId) == 0) {
-                if (getFilter() == null || context.getRepository().testFilter(atom, getFilter())) {
+                if (effectiveFilter == null || context.getRepository().testFilter(atom, effectiveFilter)) {
                     roots.add(atom);
                 }
             }
@@ -32,7 +35,7 @@ public class FindRoots extends BasicViewAction {
 
         // Build search results view with expanded children
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildSearchResultsView(roots, height - 1, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildSearchResultsView(roots, height - 1, effectiveFilter);
 
         try {
             JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);

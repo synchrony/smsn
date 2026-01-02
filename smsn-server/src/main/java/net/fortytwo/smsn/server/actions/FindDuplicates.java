@@ -38,13 +38,16 @@ public class FindDuplicates extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext context) throws RequestProcessingException {
-        List<List<Atom>> dups = getDuplicates(context, getFilter());
+        super.performTransaction(context);
+
+        Filter effectiveFilter = getFilterFromContext(context);
+        List<List<Atom>> dups = getDuplicates(context, effectiveFilter);
         List<Atom> flat = new LinkedList<>();
         dups.forEach(flat::addAll);
 
         // Use TreeViewBuilder for the view
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(flat, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildListView(flat, effectiveFilter);
 
         try {
             JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);

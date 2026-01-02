@@ -46,6 +46,7 @@ public class Search extends BasicViewAction {
     @Override
     protected void performTransaction(final ActionContext params)
             throws RequestProcessingException, BadRequestException {
+        super.performTransaction(params);
 
         params.getTreeNodeJsonPrinter().setTitleLengthCutoff(titleCutoff);
 
@@ -68,10 +69,11 @@ public class Search extends BasicViewAction {
 
     private void addSearchResults(final ActionContext params) {
         // Use AtomRepository.search() and TreeViewBuilder
-        List<Atom> results = params.getRepository().search(getQuery(), getFilter());
+        net.fortytwo.smsn.brain.model.Filter effectiveFilter = getFilterFromContext(params);
+        List<Atom> results = params.getRepository().search(getQuery(), effectiveFilter);
 
         TreeViewBuilder builder = new TreeViewBuilder(params.getRepository());
-        net.fortytwo.smsn.brain.TreeNode tree = builder.buildSearchResultsView(results, height, getFilter());
+        net.fortytwo.smsn.brain.TreeNode tree = builder.buildSearchResultsView(results, height, effectiveFilter);
 
         // Serialize directly using new JSON printer
         try {

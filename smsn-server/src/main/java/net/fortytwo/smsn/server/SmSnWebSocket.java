@@ -1,5 +1,7 @@
 package net.fortytwo.smsn.server;
 
+import net.fortytwo.smsn.SemanticSynchrony;
+import net.fortytwo.smsn.config.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.json.JSONObject;
@@ -17,15 +19,51 @@ public class SmSnWebSocket implements WebSocketListener {
 
     private final SmSnServer server;
     private Session session;
+    private boolean authenticated;
 
     public SmSnWebSocket(SmSnServer server) {
         this.server = server;
+        this.authenticated = false;
     }
 
     @Override
     public void onWebSocketConnect(Session session) {
         this.session = session;
-        logger.info("WebSocket connected: " + session.getRemoteAddress());
+
+        // Check for authentication token in query parameter
+        Authentication auth = SemanticSynchrony.getConfiguration().getAuthentication();
+        if (auth.isEnabled()) {
+            String queryString = session.getUpgradeRequest().getQueryString();
+            String providedToken = extractToken(queryString);
+            String expectedToken = auth.getToken();
+
+            if (expectedToken != null && expectedToken.equals(providedToken)) {
+                this.authenticated = true;
+                logger.info("WebSocket connected (authenticated): " + session.getRemoteAddress());
+            } else {
+                this.authenticated = false;
+                logger.info("WebSocket connected (anonymous): " + session.getRemoteAddress());
+            }
+        } else {
+            // Auth disabled - treat all connections as authenticated
+            this.authenticated = true;
+            logger.info("WebSocket connected: " + session.getRemoteAddress());
+        }
+    }
+
+    /**
+     * Extract token from query string (e.g., "token=SECRET" or "token=SECRET&other=value")
+     */
+    private String extractToken(String queryString) {
+        if (queryString == null || queryString.isEmpty()) {
+            return null;
+        }
+        for (String param : queryString.split("&")) {
+            if (param.startsWith("token=")) {
+                return param.substring(6);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -36,7 +74,7 @@ public class SmSnWebSocket implements WebSocketListener {
             // Handle Gremlin Server message format from Web UI
             // Web UI sends: {"gremlin": "{...action JSON...}"}
             String actionJson = unwrapGremlinMessage(message);
-            String response = server.handleRequest(actionJson);
+            String response = server.handleRequest(actionJson, authenticated);
 
             // Wrap response in Gremlin Server format for Web UI compatibility
             String wrappedResponse = wrapGremlinResponse(response);

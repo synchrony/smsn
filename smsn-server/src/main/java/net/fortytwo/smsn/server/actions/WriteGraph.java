@@ -29,12 +29,13 @@ public class WriteGraph extends IOAction {
 
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
+        super.performTransaction(params);
 
         NoteWriter.Context context = new NoteWriter.Context();
         context.setTopicGraph(params.getTopicGraph());
         context.setAtomRepository(params.getRepository());
         context.setRootId(getRootId());
-        context.setFilter(getFilter());
+        context.setFilter(getFilterFromContext(params));
         context.setFormat(getFormat());
         NoteWriter writer = Format.getWriter(getFormat());
 

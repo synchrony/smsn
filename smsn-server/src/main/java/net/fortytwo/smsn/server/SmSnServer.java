@@ -115,11 +115,14 @@ public class SmSnServer {
 
     /**
      * Handle a request from a WebSocket client.
+     *
+     * @param requestJson the JSON request
+     * @param authenticated whether the client is authenticated
      */
-    public String handleRequest(String requestJson) {
+    public String handleRequest(String requestJson, boolean authenticated) {
         try {
             Action action = objectMapper.readValue(requestJson, Action.class);
-            ActionContext context = createContext();
+            ActionContext context = createContext(authenticated);
 
             action.handleRequest(context);
 
@@ -133,7 +136,7 @@ public class SmSnServer {
         }
     }
 
-    private ActionContext createContext() {
+    private ActionContext createContext(boolean authenticated) {
         ActionContext context = new ActionContext();
         context.setMap(new HashMap<>());
         context.setRepository(repository);
@@ -142,6 +145,7 @@ public class SmSnServer {
         context.setTreeNodeWikiParser(new TreeNodeWikiParser());
         context.setTreeNodeJsonParser(new TreeNodeJsonParser());
         context.setTreeNodeJsonPrinter(new TreeNodeJsonPrinter());
+        context.setAuthenticated(authenticated);
         return context;
     }
 

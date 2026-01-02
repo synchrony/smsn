@@ -11,7 +11,9 @@ public class RemoveIsolatedNotes extends FilteredAction {
 
     @Override
     protected void performTransaction(final ActionContext params) throws RequestProcessingException, BadRequestException {
-        params.getRepository().removeIsolatedAtoms(getFilter());
+        super.performTransaction(params);
+
+        params.getRepository().removeIsolatedAtoms(getFilterFromContext(params));
     }
 
     @Override

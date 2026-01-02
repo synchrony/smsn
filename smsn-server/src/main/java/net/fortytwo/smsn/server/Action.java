@@ -10,6 +10,7 @@ import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonParser;
 import net.fortytwo.smsn.brain.io.json.TreeNodeJsonPrinter;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.server.errors.AuthorizationException;
 import net.fortytwo.smsn.server.errors.BadRequestException;
 import net.fortytwo.smsn.server.errors.RequestProcessingException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -56,6 +57,11 @@ public abstract class Action {
      */
     public void handleRequest(final ActionContext context) {
         long before = System.currentTimeMillis();
+
+        // Check authorization: write operations require authentication
+        if (doesWrite() && !context.isAuthenticated()) {
+            throw new AuthorizationException("Write operations require authentication");
+        }
 
         setTitle(context, "[no title]");
 

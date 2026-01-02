@@ -18,6 +18,8 @@ public class ActionContext {
     private TreeNodeJsonPrinter treeNodeJsonPrinter;
     private AtomRepositoryInterface repository;
     private TopicGraph topicGraph;
+    private boolean authenticated;
+    private net.fortytwo.smsn.brain.model.Filter effectiveFilter;
 
     public ActivityLog getActivityLog() {
         return activityLog;
@@ -73,5 +75,21 @@ public class ActionContext {
 
     public void setTopicGraph(TopicGraph topicGraph) {
         this.topicGraph = topicGraph;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
+    public net.fortytwo.smsn.brain.model.Filter getEffectiveFilter() {
+        return effectiveFilter;
+    }
+
+    public void setEffectiveFilter(net.fortytwo.smsn.brain.model.Filter effectiveFilter) {
+        this.effectiveFilter = effectiveFilter;
     }
 }

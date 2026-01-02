@@ -68,7 +68,8 @@ public abstract class RootedViewAction extends BasicViewAction {
         // TODO: Handle CREATE_NEW_NOTE case when needed
         Atom atom = context.getRepository().load(rootId);
 
-        if (null != getFilter() && !context.getRepository().testFilter(atom, getFilter())) {
+        net.fortytwo.smsn.brain.model.Filter effectiveFilter = getFilterFromContext(context);
+        if (null != effectiveFilter && !context.getRepository().testFilter(atom, effectiveFilter)) {
             throw new net.fortytwo.smsn.server.errors.BadRequestException("root of view is not visible: " + rootId.value);
         }
 
