@@ -28,7 +28,7 @@ fi
 
 echo "Starting standalone SmSn server..."
 echo "Config: $(pwd)/smsn.yaml"
-echo "WebSocket endpoint: ws://localhost:8182/gremlin"
+echo "WebSocket endpoint: ws://localhost:8182/smsn"
 echo ""
 
 exec java -jar "$JAR_PATH" "$@"

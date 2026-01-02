@@ -10,7 +10,7 @@ Some essays on the benefits of personal knowledge mapping have been collected at
 Disclaimer (and good news!): Semantic Synchrony is [evolving](https://github.com/synchrony/smsn-why/blob/master/caution-unstable.md).
 
 ### Installing it
-Semantic Synchrony is among the easier Docker applications to [install](https://github.com/synchrony/smsn/wiki/installation) -- just run the Docker container, add a few lines to your .emacs config file, start Emacs, and run the `smsn-mode` command. You don't need to be good at Emacs.
+Semantic Synchrony is easy to [install](https://github.com/synchrony/smsn/wiki/installation): build the standalone server JAR, create a configuration file, start the server, and connect with Emacs. You don't need to be good at Emacs.
 
 ### Using it
 This brief [howto](https://github.com/synchrony/smsn/wiki/What-you-need-to-know-to-use-Semantic-Synchrony) explains everything you will need to know to use Semantic Synchrony. It assumes no prior familiarity with Emacs, knowledge graphs, or any other technology. (For a brief list of critical commands, or the complete list, see the [smsn-mode wiki](https://github.com/synchrony/smsn-mode/wiki).
@@ -74,7 +74,7 @@ cd /path/to/directory/with/smsn.yaml
 /path/to/smsn/bin/stop-standalone-server.sh
 ```
 
-The start script will automatically build if needed. The server starts on `0.0.0.0:8182` and accepts WebSocket connections at `/gremlin`.
+The start script will automatically build if needed. The server starts on `0.0.0.0:8182` and accepts WebSocket connections at `/smsn`.
 
 ### Cycling the Graph (Backup and Rebuild)
 
