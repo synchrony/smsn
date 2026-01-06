@@ -167,7 +167,7 @@ public class SmSnWebSocket implements WebSocketListener {
 
     /**
      * Check if the error is a benign connection-closed condition.
-     * These occur when the client disconnects while the server is sending a response.
+     * These occur when the client disconnects or the connection times out.
      */
     private boolean isConnectionClosedError(Throwable cause) {
         if (cause == null) {
@@ -182,11 +182,21 @@ public class SmSnWebSocket implements WebSocketListener {
             return true;
         }
 
+        // WebSocketTimeoutException - idle timeout, client will reconnect
+        if (className.contains("TimeoutException")) {
+            return true;
+        }
+
         // Broken pipe or connection reset
         if (cause instanceof IOException) {
             if (message != null && (message.contains("Broken pipe") || message.contains("Connection reset"))) {
                 return true;
             }
+        }
+
+        // Check for idle timeout in message
+        if (message != null && message.contains("Idle Timeout")) {
+            return true;
         }
 
         // Check the cause chain

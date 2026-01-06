@@ -84,6 +84,8 @@ Press `Ctrl+C` followed by the second key. The status bar shows `C-c-` while wai
 | `C-c x` | Go to shortcut/alias |
 | `C-c r` | Copy note reference to clipboard |
 | `C-c v` | Copy note title to clipboard |
+| `C-c y` | Paste bookmark from clipboard (as child) |
+| `C-c Y` | Paste bookmark from clipboard (as sibling) |
 | `C-c C-d` | Set view depth (prompts) |
 | `C-c C-f` | Find roots |
 

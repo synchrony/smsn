@@ -963,6 +963,15 @@ function refreshViewPane(paneIndex) {
     }
 }
 
+function refreshAllPanes() {
+    for (let i = 0; i < State.panes.length; i++) {
+        const pane = State.panes[i];
+        if (pane.rootId && !pane.rootId.startsWith('search:')) {
+            getViewForPane(pane.rootId, i);
+        }
+    }
+}
+
 function setViewDepth(paneIndex, depth) {
     const pane = State.panes[paneIndex];
     pane.viewDepth = parseInt(depth, 10);
@@ -1538,52 +1547,121 @@ function pasteNote() {
         return;
     }
 
-    const targetId = State.selectedId || State.rootId;
+    const pane = getPane();
+    const targetId = State.selectedId || pane.rootId;
     if (!targetId) {
         setStatusMessage('No target for paste');
         return;
     }
 
-    const target = findNodeById(State.view, targetId);
-    if (!target) return;
+    const target = findNodeById(pane.view, targetId);
+    if (!target) {
+        setStatusMessage('Target not found in current view');
+        return;
+    }
 
-    // Build wiki content: existing children + pasted note
-    let wikiContent = '';
+    // For cut operations, we need to find the original parent
+    // It could be in either pane's view
+    let originalParentId = null;
+    let originalParentPane = null;
+    let originalParent = null;
+
+    if (State.clipboard.isCut) {
+        // Search in both panes for the original parent
+        for (let i = 0; i < State.panes.length; i++) {
+            const p = State.panes[i];
+            if (p.view) {
+                const parentId = findParentId(p.view, State.clipboard.id);
+                if (parentId) {
+                    originalParentId = parentId;
+                    originalParentPane = i;
+                    originalParent = findNodeById(p.view, parentId);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Check if we're pasting into the same parent (no-op for structure, just reorder)
+    if (originalParentId === targetId) {
+        setStatusMessage('Note is already a child of this parent');
+        return;
+    }
+
+    // Build wiki content for target: existing children + pasted note
+    let targetWiki = '';
     if (target.children) {
         for (const child of target.children) {
-            wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+            // Skip the clipboard note if it's already a child (shouldn't happen, but safety check)
+            if (child.id !== State.clipboard.id) {
+                targetWiki += `* ${child.title}\n    :${child.id}:\n`;
+            }
         }
     }
     // Add the pasted note as a child
-    wikiContent += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
+    targetWiki += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
 
-    // If it was a cut operation, remove from original parent
-    if (State.clipboard.isCut) {
-        const originalParentId = findParentId(State.view, State.clipboard.id);
-        if (originalParentId && originalParentId !== targetId) {
-            // Remove from original parent first
-            const originalParent = findNodeById(State.view, originalParentId);
-            let removeWiki = '';
-            if (originalParent && originalParent.children) {
-                for (const child of originalParent.children) {
-                    if (child.id !== State.clipboard.id) {
-                        removeWiki += `* ${child.title}\n    :${child.id}:\n`;
-                    }
+    const clipboardTitle = State.clipboard.title;
+    const isCut = State.clipboard.isCut;
+
+    // If cut operation and we found the original parent, remove from there first
+    if (isCut && originalParentId && originalParent) {
+        let removeWiki = '';
+        if (originalParent.children) {
+            for (const child of originalParent.children) {
+                if (child.id !== State.clipboard.id) {
+                    removeWiki += `* ${child.title}\n    :${child.id}:\n`;
                 }
             }
-            // Update original parent to remove the cut note
-            updateView(originalParentId, removeWiki, 2);
         }
-    }
 
-    // Update target with pasted note
-    updateView(targetId, wikiContent, 2);
-    const action = State.clipboard.isCut ? 'Moved' : 'Linked';
-    setStatusMessage(`${action}: "${State.clipboard.title}" under "${target.title}"`);
-
-    // Clear clipboard if it was a cut
-    if (State.clipboard.isCut) {
+        // Clear clipboard before async operations
         State.clipboard = null;
+
+        // Remove from original parent, then add to target (sequentially)
+        sendAction({
+            action: 'net.fortytwo.smsn.server.actions.UpdateView',
+            root: originalParentId,
+            view: removeWiki,
+            viewFormat: 'wiki',
+            height: 2,
+            filter: getFilterForServer(),
+            style: 'forward'
+        }, () => {
+            // Now add to target
+            sendAction({
+                action: 'net.fortytwo.smsn.server.actions.UpdateView',
+                root: targetId,
+                view: targetWiki,
+                viewFormat: 'wiki',
+                height: 2,
+                filter: getFilterForServer(),
+                style: 'forward'
+            }, () => {
+                // Refresh both panes
+                refreshAllPanes();
+                setStatusMessage(`Moved: "${clipboardTitle}"`);
+            });
+        });
+    } else {
+        // Copy operation (or cut where we couldn't find original) - just add to target
+        if (isCut) {
+            State.clipboard = null;
+        }
+
+        sendAction({
+            action: 'net.fortytwo.smsn.server.actions.UpdateView',
+            root: targetId,
+            view: targetWiki,
+            viewFormat: 'wiki',
+            height: 2,
+            filter: getFilterForServer(),
+            style: 'forward'
+        }, () => {
+            refreshAllPanes();
+            const action = isCut ? 'Moved' : 'Linked';
+            setStatusMessage(`${action}: "${clipboardTitle}"`);
+        });
     }
 }
 
@@ -1593,58 +1671,118 @@ function pasteNoteAsSibling() {
         return;
     }
 
-    if (!State.selectedId || State.selectedId === State.rootId) {
+    const pane = getPane();
+    if (!State.selectedId || State.selectedId === pane.rootId) {
         setStatusMessage('Select a sibling target (not root)');
         return;
     }
 
-    const parentId = findParentId(State.view, State.selectedId);
-    if (!parentId) {
+    const targetParentId = findParentId(pane.view, State.selectedId);
+    if (!targetParentId) {
         setStatusMessage('Cannot find parent');
         return;
     }
 
-    const parent = findNodeById(State.view, parentId);
-    if (!parent) return;
+    const targetParent = findNodeById(pane.view, targetParentId);
+    if (!targetParent) return;
 
-    // Build wiki content: existing children with pasted note inserted after selected
-    let wikiContent = '';
-    const selectedIndex = parent.children ? parent.children.findIndex(c => c.id === State.selectedId) : -1;
+    const selectedNode = findNodeById(pane.view, State.selectedId);
+    const selectedTitle = selectedNode ? selectedNode.title : 'selected';
 
-    if (parent.children) {
-        for (let i = 0; i < parent.children.length; i++) {
-            const child = parent.children[i];
-            wikiContent += `* ${child.title}\n    :${child.id}:\n`;
-            // Insert pasted note after the selected sibling
-            if (i === selectedIndex) {
-                wikiContent += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
-            }
-        }
-    }
+    // For cut operations, find the original parent (could be in either pane)
+    let originalParentId = null;
+    let originalParent = null;
 
-    // If it was a cut operation, remove from original parent
     if (State.clipboard.isCut) {
-        const originalParentId = findParentId(State.view, State.clipboard.id);
-        if (originalParentId && originalParentId !== parentId) {
-            const originalParent = findNodeById(State.view, originalParentId);
-            let removeWiki = '';
-            if (originalParent && originalParent.children) {
-                for (const child of originalParent.children) {
-                    if (child.id !== State.clipboard.id) {
-                        removeWiki += `* ${child.title}\n    :${child.id}:\n`;
-                    }
+        for (let i = 0; i < State.panes.length; i++) {
+            const p = State.panes[i];
+            if (p.view) {
+                const parentId = findParentId(p.view, State.clipboard.id);
+                if (parentId) {
+                    originalParentId = parentId;
+                    originalParent = findNodeById(p.view, parentId);
+                    break;
                 }
             }
-            updateView(originalParentId, removeWiki, 2);
         }
     }
 
-    updateView(parentId, wikiContent, 2);
-    const action = State.clipboard.isCut ? 'Moved' : 'Linked';
-    setStatusMessage(`${action}: "${State.clipboard.title}" after "${findNodeById(State.view, State.selectedId).title}"`);
+    // Build wiki content: existing children with pasted note inserted after selected
+    let targetWiki = '';
+    const selectedIndex = targetParent.children ? targetParent.children.findIndex(c => c.id === State.selectedId) : -1;
 
-    if (State.clipboard.isCut) {
+    if (targetParent.children) {
+        for (let i = 0; i < targetParent.children.length; i++) {
+            const child = targetParent.children[i];
+            // Skip the clipboard note if it's already in this parent
+            if (child.id !== State.clipboard.id) {
+                targetWiki += `* ${child.title}\n    :${child.id}:\n`;
+            }
+            // Insert pasted note after the selected sibling
+            if (i === selectedIndex) {
+                targetWiki += `* ${State.clipboard.title}\n    :${State.clipboard.id}:\n`;
+            }
+        }
+    }
+
+    const clipboardTitle = State.clipboard.title;
+    const isCut = State.clipboard.isCut;
+
+    // If cut operation and original parent is different, remove from there first
+    if (isCut && originalParentId && originalParentId !== targetParentId && originalParent) {
+        let removeWiki = '';
+        if (originalParent.children) {
+            for (const child of originalParent.children) {
+                if (child.id !== State.clipboard.id) {
+                    removeWiki += `* ${child.title}\n    :${child.id}:\n`;
+                }
+            }
+        }
+
         State.clipboard = null;
+
+        // Remove from original, then add to target (sequentially)
+        sendAction({
+            action: 'net.fortytwo.smsn.server.actions.UpdateView',
+            root: originalParentId,
+            view: removeWiki,
+            viewFormat: 'wiki',
+            height: 2,
+            filter: getFilterForServer(),
+            style: 'forward'
+        }, () => {
+            sendAction({
+                action: 'net.fortytwo.smsn.server.actions.UpdateView',
+                root: targetParentId,
+                view: targetWiki,
+                viewFormat: 'wiki',
+                height: 2,
+                filter: getFilterForServer(),
+                style: 'forward'
+            }, () => {
+                refreshAllPanes();
+                setStatusMessage(`Moved: "${clipboardTitle}" after "${selectedTitle}"`);
+            });
+        });
+    } else {
+        // Copy operation or same-parent cut
+        if (isCut) {
+            State.clipboard = null;
+        }
+
+        sendAction({
+            action: 'net.fortytwo.smsn.server.actions.UpdateView',
+            root: targetParentId,
+            view: targetWiki,
+            viewFormat: 'wiki',
+            height: 2,
+            filter: getFilterForServer(),
+            style: 'forward'
+        }, () => {
+            refreshAllPanes();
+            const action = isCut ? 'Moved' : 'Linked';
+            setStatusMessage(`${action}: "${clipboardTitle}" after "${selectedTitle}"`);
+        });
     }
 }
 
@@ -1680,6 +1818,149 @@ function copyNoteTitle() {
     }).catch(() => {
         setStatusMessage('Failed to copy to clipboard');
     });
+}
+
+// =============================================================================
+// Paste from System Clipboard (for external bookmarks)
+// =============================================================================
+
+// Parse SmSn bookmark JSON from clipboard text
+function parseSmSnBookmark(text) {
+    try {
+        const data = JSON.parse(text);
+        if (data && data.type === 'smsn-bookmark' && data.title) {
+            return data;
+        }
+    } catch (e) {
+        // Not JSON, ignore
+    }
+    return null;
+}
+
+// Paste external bookmark as child of selected note
+async function pasteBookmarkAsChild() {
+    const targetId = State.selectedId || State.rootId;
+    if (!targetId) {
+        setStatusMessage('No target for paste');
+        return;
+    }
+
+    try {
+        const text = await navigator.clipboard.readText();
+        const bookmark = parseSmSnBookmark(text);
+
+        if (!bookmark) {
+            setStatusMessage('No SmSn bookmark in clipboard');
+            return;
+        }
+
+        const target = findNodeById(State.view, targetId);
+        if (!target) {
+            setStatusMessage('Target not found');
+            return;
+        }
+
+        // Get existing children IDs to identify new note after creation
+        const existingChildIds = new Set();
+        if (target.children) {
+            target.children.forEach(c => existingChildIds.add(c.id));
+        }
+
+        // Build wiki content: existing children + new bookmark
+        let wikiContent = '';
+        if (target.children) {
+            for (const child of target.children) {
+                wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+            }
+        }
+        wikiContent += `* ${bookmark.title}\n`;
+
+        // Properties to set on the new note
+        const props = {
+            weight: 0.5,
+            priority: 0,
+            source: bookmark.source || 'private',
+            alias: bookmark.alias || ''
+        };
+
+        createNoteWithProperties(targetId, wikiContent, existingChildIds, props);
+        setStatusMessage(`Pasted: "${bookmark.title}"`);
+
+    } catch (err) {
+        if (err.name === 'NotAllowedError') {
+            setStatusMessage('Clipboard access denied - focus the window and try again');
+        } else {
+            console.error('Clipboard read error:', err);
+            setStatusMessage('Failed to read clipboard');
+        }
+    }
+}
+
+// Paste external bookmark as sibling after selected note
+async function pasteBookmarkAsSibling() {
+    if (!State.selectedId || State.selectedId === State.rootId) {
+        setStatusMessage('Select a sibling target (not root)');
+        return;
+    }
+
+    const parentId = findParentId(State.view, State.selectedId);
+    if (!parentId) {
+        setStatusMessage('Cannot find parent');
+        return;
+    }
+
+    try {
+        const text = await navigator.clipboard.readText();
+        const bookmark = parseSmSnBookmark(text);
+
+        if (!bookmark) {
+            setStatusMessage('No SmSn bookmark in clipboard');
+            return;
+        }
+
+        const parent = findNodeById(State.view, parentId);
+        if (!parent) {
+            setStatusMessage('Parent not found');
+            return;
+        }
+
+        // Get existing children IDs to identify new note after creation
+        const existingChildIds = new Set();
+        if (parent.children) {
+            parent.children.forEach(c => existingChildIds.add(c.id));
+        }
+
+        // Build wiki content with new bookmark inserted after selected sibling
+        let wikiContent = '';
+        if (parent.children) {
+            for (const child of parent.children) {
+                wikiContent += `* ${child.title}\n    :${child.id}:\n`;
+                if (child.id === State.selectedId) {
+                    // Insert new bookmark after selected sibling
+                    wikiContent += `* ${bookmark.title}\n`;
+                }
+            }
+        }
+
+        // Properties to set on the new note
+        const props = {
+            weight: 0.5,
+            priority: 0,
+            source: bookmark.source || 'private',
+            alias: bookmark.alias || ''
+        };
+
+        createNoteWithProperties(parentId, wikiContent, existingChildIds, props);
+        setStatusMessage(`Pasted: "${bookmark.title}" as sibling`);
+
+    } catch (err) {
+        if (err.name === 'NotAllowedError') {
+            setStatusMessage('Clipboard access denied - focus the window and try again');
+        } else {
+            console.error('Clipboard read error:', err);
+            setStatusMessage('Failed to read clipboard');
+        }
+    }
 }
 
 function moveNoteUp() {
@@ -2503,6 +2784,10 @@ const chordBindings = {
     'r': () => copyNoteReference(),
     // C-c v - copy title to clipboard (smsn-mode)
     'v': () => copyNoteTitle(),
+    // C-c y - paste external bookmark as child (from system clipboard)
+    'y': () => pasteBookmarkAsChild(),
+    // C-c Y - paste external bookmark as sibling
+    'Y': () => pasteBookmarkAsSibling(),
     // C-c C-d - set view depth (prompts for number)
     'C-d': () => promptViewDepth(),
     // C-c C-f - find roots
@@ -2835,29 +3120,37 @@ function setupKeyboardHandler() {
         }
 
         // Emacs standard bindings (single keys with modifiers)
-        // Only process these if NOT in a pending chord sequence
-        if (!State.editingNodeId && !inOverlay && !inSearch && !State.pendingChord) {
+        // These take priority over chord sequences
+        if (!State.editingNodeId && !inOverlay && !inSearch) {
             // C-w - kill/cut region (cut note)
             if (e.ctrlKey && e.key === 'w') {
                 e.preventDefault();
+                State.pendingChord = null;
+                clearChordStatus();
                 cutNote();
                 return;
             }
             // M-w - copy region (copy note) - Alt+w
             if (e.altKey && e.key === 'w') {
                 e.preventDefault();
+                State.pendingChord = null;
+                clearChordStatus();
                 copyNote();
                 return;
             }
-            // C-y - yank/paste as child
+            // C-y - yank/paste as child (takes priority over C-c y chord)
             if (e.ctrlKey && !e.shiftKey && e.key === 'y') {
                 e.preventDefault();
+                State.pendingChord = null;
+                clearChordStatus();
                 pasteNote();
                 return;
             }
             // C-S-y - yank/paste as sibling
             if (e.ctrlKey && e.shiftKey && e.key === 'Y') {
                 e.preventDefault();
+                State.pendingChord = null;
+                clearChordStatus();
                 pasteNoteAsSibling();
                 return;
             }
