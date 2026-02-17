@@ -48,6 +48,7 @@ smsn-why/
 
 # Configuration files
 config/
+/smsn.yaml
 
 # Binary/executable files in root
 /java
@@ -87,3 +88,7 @@ smsn-models/README.md
 smsn-models/src/test/
 migration
 wiki
+
+# Example working directory runtime files
+example/index/
+example/activity.log

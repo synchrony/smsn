@@ -1,0 +1,43 @@
+# SmSn server configuration
+# Copy this file to your working directory and adjust paths as needed.
+# The server looks for smsn.yaml in the current working directory at startup.
+
+# Directory for SQLite and Lucene indices (created automatically on first run)
+indexDirectory: index
+
+# Activity log (optional)
+activityLog: activity.log
+
+# Data sources: each source is a directory of .smsn atom files.
+# These directories can be Git repositories for version control and sharing.
+# Conventional sources are listed below; add or remove as needed.
+sources:
+- location: data/private
+  name: private
+  code: a
+  color: 0xff0000
+- location: data/personal
+  name: personal
+  code: s
+  color: 0xffc000
+- location: data/public
+  name: public
+  code: d
+  color: 0x00e000
+- location: data/universal
+  name: universal
+  code: f
+  color: 0x0000ff
+
+# Optional settings
+verbose: false
+# thingNamespace: http://example.org/things/
+
+# Authentication (optional). Enable to require a token for write access.
+# See https://github.com/synchrony/smsn/wiki/SmSn-Server for details.
+# authentication:
+#   enabled: true
+#   token: "your-secret-token-here"
+#   publicSources:
+#     - public
+#     - universal
