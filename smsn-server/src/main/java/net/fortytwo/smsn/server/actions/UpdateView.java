@@ -6,6 +6,7 @@ import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.Params;
 import net.fortytwo.smsn.brain.TreeNode;
 import net.fortytwo.smsn.brain.model.Filter;
+import net.fortytwo.smsn.brain.view.TreeUpdate;
 import net.fortytwo.smsn.brain.view.TreeUpdater;
 import net.fortytwo.smsn.brain.view.TreeViewBuilder;
 import net.fortytwo.smsn.server.ActionContext;
@@ -17,7 +18,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -66,8 +71,13 @@ public class UpdateView extends RootedViewAction {
             throw new BadRequestException("Root atom not found: " + getRoot().id.value);
         }
 
-        // Parse the view update to get the desired children and any top-level properties
+        // Parse the view update to get the desired children and any top-level properties.
+        // We use the parseUpdate(...) entry points so we get a TreeUpdate carrying the
+        // side-channel (which root properties the user authored, which child atoms were
+        // rendered as collapsed bullets). Without that, the updater can't tell the
+        // difference between "user said nothing" and "user explicitly set the default".
         List<TreeNode> desiredChildren;
+        TreeUpdate parsedUpdate = null;
         TreeNode parsedTree = null;
 
         if (getView() == null || getView().trim().isEmpty()) {
@@ -80,14 +90,15 @@ public class UpdateView extends RootedViewAction {
             // Parse to get children and top-level properties
             switch (getViewFormat()) {
                 case json:
-                    parsedTree = parseJson(context);
+                    parsedUpdate = parseJsonUpdate(context);
                     break;
                 case wiki:
-                    parsedTree = parseWikiText(context);
+                    parsedUpdate = parseWikiTextUpdate(context);
                     break;
                 default:
                     throw new IllegalStateException("Unknown format: " + getViewFormat());
             }
+            parsedTree = parsedUpdate.getTree();
 
             if (verbose) {
                 try {
@@ -102,8 +113,14 @@ public class UpdateView extends RootedViewAction {
             desiredChildren = parsedTree.children;
         }
 
-        // Merge parsed root properties with existing rootAtom properties
-        // If a property was explicitly set in the parsed tree, use it; otherwise keep existing
+        // Merge parsed root properties with existing rootAtom properties.
+        // The TreeUpdate side-channel tells us exactly which @<key> lines
+        // the user authored at the top of the view, so we can replace the
+        // brittle "treat default value as not specified" comparisons with
+        // an honest check.
+        Set<String> rootTouched = parsedUpdate != null
+                ? parsedUpdate.getRootTouchedProperties()
+                : new HashSet<>();
         net.fortytwo.smsn.brain.Normed mergedWeight = rootAtom.weight;
         String mergedTitle = rootAtom.title;
         hydra.util.Opt<String> mergedAlias = rootAtom.alias;
@@ -112,17 +129,12 @@ public class UpdateView extends RootedViewAction {
         hydra.util.Opt<net.fortytwo.smsn.brain.Normed> mergedPriority = rootAtom.priority;
 
         if (parsedTree != null) {
-            // Weight: use parsed if different from default (0.5)
-            if (parsedTree.weight.value != SemanticSynchrony.DEFAULT_WEIGHT) {
+            if (rootTouched.contains(SemanticSynchrony.PropertyKeys.WEIGHT)) {
                 mergedWeight = parsedTree.weight;
             }
-
-            // Title: use parsed if non-empty (dummy root has empty title by default)
-            if (!parsedTree.title.isEmpty()) {
+            if (rootTouched.contains(SemanticSynchrony.PropertyKeys.TITLE)) {
                 mergedTitle = parsedTree.title;
             }
-
-            // Optional properties: use parsed if present
             if (parsedTree.alias.isPresent()) {
                 mergedAlias = parsedTree.alias;
             }
@@ -162,6 +174,26 @@ public class UpdateView extends RootedViewAction {
             }
         }
 
+        // Build a fresh TreeUpdate to pass to the updater. We rebase the
+        // side-channel onto the root atom's actual id (the parser's
+        // "dummy root" had no id), and reuse the per-atom touched sets
+        // and collapsed sets for non-root atoms verbatim.
+        Map<AtomId, Set<String>> mergedTouched = new HashMap<>();
+        if (parsedUpdate != null) {
+            mergedTouched.putAll(parsedUpdate.getTouchedProperties());
+        }
+        // Map root-touched property names onto the root atom's id.
+        if (!rootTouched.isEmpty()) {
+            mergedTouched
+                    .computeIfAbsent(rootAtom.id, k -> new HashSet<>())
+                    .addAll(rootTouched);
+        }
+        Set<AtomId> mergedCollapsed = parsedUpdate != null
+                ? new HashSet<>(parsedUpdate.getCollapsedAtoms())
+                : new HashSet<>();
+        TreeUpdate updateToApply = new TreeUpdate(
+                treeUpdate, rootTouched, mergedTouched, mergedCollapsed);
+
         // Adjust filter to inherit root's source for new children
         // This matches the original behavior where children inherit parent's source
         Filter effectiveFilter = getFilterFromContext(context);
@@ -174,7 +206,7 @@ public class UpdateView extends RootedViewAction {
 
         // Apply the update using TreeUpdater
         TreeUpdater updater = new TreeUpdater(context.getRepository(), context.getActivityLog());
-        updater.update(treeUpdate, height, adjustedFilter);
+        updater.update(updateToApply, height, adjustedFilter);
 
         // Generate the updated view
         TreeViewBuilder builder = new TreeViewBuilder(context.getRepository());
@@ -197,21 +229,19 @@ public class UpdateView extends RootedViewAction {
         addToHistory(getRoot().id);
     }
 
-    private TreeNode parseWikiText(final ActionContext params) {
+    private TreeUpdate parseWikiTextUpdate(final ActionContext params) {
         try {
             try (InputStream in = new ByteArrayInputStream(getView().getBytes())) {
-                // Parse directly using new TreeNodeWikiParser
-                return params.getTreeNodeWikiParser().parse(in);
+                return params.getTreeNodeWikiParser().parseUpdate(in);
             }
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }
     }
 
-    private TreeNode parseJson(final ActionContext params) {
+    private TreeUpdate parseJsonUpdate(final ActionContext params) {
         try {
-            // Parse directly using new TreeNodeJsonParser
-            return params.getTreeNodeJsonParser().parse(getView());
+            return params.getTreeNodeJsonParser().parseUpdate(getView());
         } catch (IOException e) {
             throw new RequestProcessingException(e);
         }

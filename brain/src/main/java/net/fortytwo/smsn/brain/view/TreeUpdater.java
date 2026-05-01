@@ -31,23 +31,74 @@ public class TreeUpdater {
         this.activityLog = activityLog;
     }
 
+    // Per-call side-channel describing which properties the user
+    // actually addressed in their submission, and which atoms were
+    // rendered collapsed. Reset at the top of each update() call.
+    // null means "every property is asserted, no atoms are collapsed"
+    // — used by the legacy update(TreeNode, ...) entry point for
+    // backward compatibility.
+    private TreeUpdate currentUpdate;
+
     /**
-     * Update the graph to match the given tree structure
+     * Update the graph to match the given tree structure.
+     *
+     * <p>Note: this entry point treats every property of every node in
+     * the tree as if the user explicitly asserted its value, which is
+     * correct ONLY when {@code tree} was constructed by code asserting
+     * every value (e.g. test fixtures). For user-edit submissions, use
+     * {@link #update(TreeUpdate, int, Filter)} so omissions in the
+     * user's view do not silently overwrite stored data.
      *
      * @param tree The tree structure to apply
      * @param height Maximum depth to update
      * @param filter Filter for determining which atoms to process
      */
     public void update(TreeNode tree, int height, Filter filter) {
+        update(TreeUpdate.ofAllAsserted(tree), height, filter);
+    }
+
+    /**
+     * Update the graph from a parsed user submission. The
+     * {@link TreeUpdate} carries the parsed tree plus a side-channel
+     * indicating which properties the user wrote (so we don't clobber
+     * properties they didn't address) and which children were rendered
+     * collapsed (so we don't delete a stored child list just because
+     * the user's view didn't expand it).
+     */
+    public void update(TreeUpdate update, int height, Filter filter) {
+        TreeNode tree = update.getTree();
         if (tree.id == null) {
             throw new IllegalArgumentException("Tree root must have an ID");
         }
 
-        Map<AtomId, Atom> cache = new HashMap<>();
-        updateInternal(tree, height, filter, cache);
+        this.currentUpdate = update;
+        try {
+            Map<AtomId, Atom> cache = new HashMap<>();
+            updateInternal(tree, height, filter, cache);
+            repository.notifyOfUpdate();
+        } finally {
+            this.currentUpdate = null;
+        }
+    }
 
-        // Notify that the graph has been updated
-        repository.notifyOfUpdate();
+    /** True iff the user's submission explicitly addressed property
+     *  {@code key} for atom {@code atomId}. Conservatively returns
+     *  {@code true} when no side-channel is available (legacy callers). */
+    private boolean wasPropertyTouched(AtomId atomId, String key) {
+        if (currentUpdate == null) {
+            return true;
+        }
+        return currentUpdate.isPropertyTouched(atomId, key);
+    }
+
+    /** True iff the user rendered atom {@code atomId} as collapsed
+     *  ({@code · :id:}), meaning its children should NOT be diffed
+     *  against the stored value. */
+    private boolean wasCollapsed(AtomId atomId) {
+        if (currentUpdate == null) {
+            return false;
+        }
+        return currentUpdate.isCollapsed(atomId);
     }
 
     private void updateInternal(TreeNode tree, int height, Filter filter, Map<AtomId, Atom> cache) {
@@ -63,12 +114,17 @@ public class TreeUpdater {
     private void updateProperties(TreeNode tree, Atom atom, Map<AtomId, Atom> cache) {
         boolean updated = false;
 
-        // Always update title (even if empty, it's explicitly set)
-        String newTitle = tree.title;
-        String oldTitle = atom.title;
-        if (!newTitle.equals(oldTitle)) {
-            repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.TITLE, newTitle);
-            updated = true;
+        // Update title only when the user actually authored a title for
+        // this atom in their submission. A child rendered as bare
+        // "* :id:" with no title text would otherwise overwrite the
+        // stored title with empty.
+        if (wasPropertyTouched(atom.id, SemanticSynchrony.PropertyKeys.TITLE)) {
+            String newTitle = tree.title;
+            String oldTitle = atom.title;
+            if (!newTitle.equals(oldTitle)) {
+                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.TITLE, newTitle);
+                updated = true;
+            }
         }
 
         // Update optional properties if explicitly present in the tree
@@ -123,13 +179,18 @@ public class TreeUpdater {
             }
         }
 
-        // Update weight if explicitly provided in the tree
-        // Note: Weight is always present in TreeNode (non-optional), so we check if it differs from current
-        float newWeight = tree.weight.value;
-        float oldWeight = atom.weight.value;
-        if (newWeight != oldWeight) {
-            repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.WEIGHT, newWeight);
-            updated = true;
+        // Update weight only when the user explicitly provided an
+        // @weight line in their submission. We can't tell from the
+        // TreeNode alone whether tree.weight came from the user or
+        // from the parser's default fill-in (it's a required field
+        // on the immutable record), so we consult the side-channel.
+        if (wasPropertyTouched(atom.id, SemanticSynchrony.PropertyKeys.WEIGHT)) {
+            float newWeight = tree.weight.value;
+            float oldWeight = atom.weight.value;
+            if (newWeight != oldWeight) {
+                repository.updateProperty(atom.id, SemanticSynchrony.PropertyKeys.WEIGHT, newWeight);
+                updated = true;
+            }
         }
 
         // Note: We don't update source here because:
@@ -149,6 +210,16 @@ public class TreeUpdater {
 
     private void updateChildren(TreeNode tree, Atom atom, int height, Filter filter, Map<AtomId, Atom> cache) {
         if (height <= 0) {
+            return;
+        }
+
+        // If the user rendered this atom with the collapsed-bullet
+        // marker ("· :id:") -- or, in JSON, omitted the "children" key
+        // -- they did not address its children in this submission.
+        // Diffing tree.children (which the parser produces as empty)
+        // against the stored child list would silently delete every
+        // stored child. Skip the diff entirely.
+        if (wasCollapsed(atom.id)) {
             return;
         }
 

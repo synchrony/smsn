@@ -3,6 +3,7 @@ package net.fortytwo.smsn.brain.io.wiki;
 import net.fortytwo.smsn.SemanticSynchrony;
 import net.fortytwo.smsn.brain.AtomId;
 import net.fortytwo.smsn.brain.TreeNode;
+import net.fortytwo.smsn.brain.view.TreeUpdate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +11,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +23,31 @@ import java.util.regex.Pattern;
  * Parses wiki-format text into Hydra TreeNode structures.
  * Replaces legacy WikiParser for creating tree hierarchies.
  * Uses stack-of-stacks approach to properly handle siblings at same indent level.
+ *
+ * <h3>Two outputs: {@code TreeNode} and {@code TreeUpdate}</h3>
+ *
+ * Callers fall into two camps:
+ *
+ * <ul>
+ *   <li><b>Code that just wants the parsed tree</b> (tests, diagnostic
+ *       tools, exporters, etc.) calls {@link #parse(InputStream)} and
+ *       gets back a {@link TreeNode} as before. Defaults are filled in
+ *       for missing properties (e.g. {@code weight = 0.5} when no
+ *       {@code @weight} line was present).
+ *
+ *   <li><b>Code that applies a user edit to a stored graph</b> calls
+ *       {@link #parseUpdate(InputStream)} and gets back a
+ *       {@link TreeUpdate}, which carries the same {@link TreeNode}
+ *       <em>plus</em> a side-channel describing which properties the
+ *       user actually wrote and which children were rendered as
+ *       collapsed ({@code · :id:}). The updater
+ *       ({@link net.fortytwo.smsn.brain.view.TreeUpdater}) consults
+ *       this side-channel before issuing repository updates so the
+ *       user's omissions don't silently overwrite stored data.
+ * </ul>
+ *
+ * <p>See <code>kg/SMSN_BUG_REPORT.md</code> for the bug history that
+ * motivates the {@code parseUpdate(...)} entry point.
  */
 public class TreeNodeWikiParser {
 
@@ -29,15 +57,42 @@ public class TreeNodeWikiParser {
     // Property pattern allows empty values (e.g., "@alias" alone will clear the property)
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("^@(\\w+)\\s*(.*)$");
 
+    /** Bullet characters that indicate the user rendered the child collapsed
+     *  ("I am not addressing this atom's children in this submission"). */
+    private static final String COLLAPSED_BULLET = "·"; // "·"
+
     // Stack of stacks - each indent level has its own stack of siblings
     private final Stack<Stack<TreeNodeBuilder>> nodeHierarchy = new Stack<>();
     private final Stack<Integer> indentHierarchy = new Stack<>();
 
+    // Side-channel collected while parsing, keyed by atom id.
+    private Map<AtomId, Set<String>> touchedProperties;
+    private Set<AtomId> collapsedAtoms;
+
     /**
-     * Parse wiki-format text into a TreeNode.
+     * Parse wiki-format text into a TreeNode. Defaults are filled in for
+     * any missing properties; the result does not preserve information
+     * about which properties were explicitly written by the user. Use
+     * this entry point when you do not need to apply the result as an
+     * update.
      */
     public TreeNode parse(InputStream inputStream) throws IOException {
+        return parseUpdate(inputStream).getTree();
+    }
+
+    /**
+     * Parse wiki-format text into a {@link TreeUpdate}, preserving
+     * information about which properties were explicitly written by
+     * the user (via {@code @<key> <value>} lines) and which children
+     * were rendered collapsed ({@code · :id:}). Use this entry point
+     * when applying the result as an edit to the stored graph; the
+     * side-channel is consulted by {@code TreeUpdater} to avoid
+     * clobbering values the user did not address.
+     */
+    public TreeUpdate parseUpdate(InputStream inputStream) throws IOException {
         reset();
+        touchedProperties = new HashMap<>();
+        collapsedAtoms = new HashSet<>();
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, SemanticSynchrony.UTF8))) {
             String line;
@@ -51,15 +106,21 @@ public class TreeNodeWikiParser {
 
         // After adjustHierarchy(-1), the dummy root should have all top-level nodes as children
         // Extract the dummy root and return it directly
+        TreeNode tree;
+        Set<String> rootTouched;
         if (!nodeHierarchy.isEmpty() && !nodeHierarchy.peek().isEmpty()) {
             TreeNodeBuilder dummyRoot = nodeHierarchy.peek().peek();
-            return dummyRoot.build();
+            tree = dummyRoot.build();
+            rootTouched = new HashSet<>(dummyRoot.touched);
+        } else {
+            // Fallback: empty tree
+            TreeNodeBuilder emptyRoot = new TreeNodeBuilder();
+            emptyRoot.setTitle("");
+            tree = emptyRoot.build();
+            rootTouched = new HashSet<>();
         }
 
-        // Fallback: empty tree
-        TreeNodeBuilder emptyRoot = new TreeNodeBuilder();
-        emptyRoot.setTitle("");
-        return emptyRoot.build();
+        return new TreeUpdate(tree, rootTouched, touchedProperties, collapsedAtoms);
     }
 
     private void reset() {
@@ -95,10 +156,15 @@ public class TreeNodeWikiParser {
 
             // Property lines apply to the most recent node
             // If no current builder (top-level properties), apply to dummy root
+            TreeNodeBuilder target = null;
             if (currentBuilder == null && !nodeHierarchy.isEmpty() && !nodeHierarchy.peek().isEmpty()) {
-                nodeHierarchy.peek().peek().setProperty(key, value);
+                target = nodeHierarchy.peek().peek();
             } else if (currentBuilder != null) {
-                currentBuilder.setProperty(key, value);
+                target = currentBuilder;
+            }
+            if (target != null) {
+                target.setProperty(key, value);
+                target.markPropertyTouched(key);
             }
             return;
         }
@@ -116,6 +182,9 @@ public class TreeNodeWikiParser {
             // Parse the content
             TreeNodeBuilder builder = new TreeNodeBuilder();
             currentBuilder = builder;  // Track for property lines
+            if (COLLAPSED_BULLET.equals(bulletType)) {
+                builder.collapsed = true;
+            }
 
             // Extract ID if present
             Matcher idMatcher = ID_PATTERN.matcher(content);
@@ -125,9 +194,11 @@ public class TreeNodeWikiParser {
                 content = content.substring(idMatcher.end()).trim();
             }
 
-            // Remaining content is the title
+            // Remaining content is the title. The title was authored on
+            // the bullet line itself, so it counts as touched.
             if (!content.isEmpty()) {
                 builder.setTitle(content);
+                builder.markPropertyTouched("title");
             }
 
             // Add to current level's sibling stack
@@ -145,7 +216,11 @@ public class TreeNodeWikiParser {
             // Add all siblings as children to parent (in order)
             List<TreeNode> children = new ArrayList<>();
             while (!siblings.isEmpty()) {
-                children.add(0, siblings.pop().build());  // Prepend to maintain order
+                TreeNodeBuilder siblingBuilder = siblings.pop();
+                // Record the per-atom side-channel for this sibling, then
+                // build its TreeNode.
+                recordSideChannel(siblingBuilder);
+                children.add(0, siblingBuilder.build());  // Prepend to maintain order
             }
             for (TreeNode child : children) {
                 parent.addChild(child);
@@ -159,6 +234,21 @@ public class TreeNodeWikiParser {
         }
     }
 
+    /** Copy a builder's per-atom information into the side-channel maps,
+     *  keyed by the builder's atom id. Called as siblings are popped from
+     *  the hierarchy at the moment we know their final state. */
+    private void recordSideChannel(TreeNodeBuilder builder) {
+        if (builder.id == null) return;  // newly created atoms have no id yet
+        if (!builder.touched.isEmpty()) {
+            touchedProperties
+                    .computeIfAbsent(builder.id, k -> new HashSet<>())
+                    .addAll(builder.touched);
+        }
+        if (builder.collapsed) {
+            collapsedAtoms.add(builder.id);
+        }
+    }
+
     /**
      * Mutable builder for creating TreeNodes during parsing.
      */
@@ -167,6 +257,10 @@ public class TreeNodeWikiParser {
         private String title = "";
         private final List<TreeNode> children = new ArrayList<>();
         private final Map<String, String> properties = new HashMap<>();
+        // Side-channel: which property keys the user explicitly wrote.
+        private final Set<String> touched = new HashSet<>();
+        // Side-channel: was this bullet rendered with the collapsed marker?
+        private boolean collapsed = false;
 
         public void setId(AtomId id) {
             this.id = id;
@@ -182,6 +276,10 @@ public class TreeNodeWikiParser {
 
         public void setProperty(String key, String value) {
             properties.put(key, value);
+        }
+
+        public void markPropertyTouched(String key) {
+            touched.add(key);
         }
 
         public TreeNode build() {
