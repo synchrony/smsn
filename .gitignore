@@ -49,6 +49,7 @@ smsn-why/
 # Configuration files
 config/
 /smsn.yaml
+smsn.log*
 
 # Binary/executable files in root
 /java
@@ -86,8 +87,12 @@ brain/src/main/lisp
 # README files for submodules
 smsn-models/README.md
 smsn-models/src/test/
-migration
-wiki
+
+# Top-level scratch directories (anchored to repo root; the unanchored
+# form was matching every "wiki"/"migration" path component, including
+# brain/src/.../io/wiki/ and brain/migration/, hiding new files there)
+/migration
+/wiki
 
 # Example working directory runtime files
 example/index/
