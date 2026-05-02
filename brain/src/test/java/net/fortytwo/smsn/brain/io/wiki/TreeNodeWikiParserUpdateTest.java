@@ -109,4 +109,47 @@ public class TreeNodeWikiParserUpdateTest {
         AtomId a = new AtomId("childA");
         assertFalse(u.isCollapsed(a));
     }
+
+    @Test
+    public void newAtomGetsTempIdAndTitleIsTouched() throws Exception {
+        // The user typed a brand-new atom: a bullet with title text but
+        // no `:id:` infix. The parser must assign a temp-id and record
+        // the title as touched, so when the updater creates the atom
+        // and rekeys the side-channel onto the real id, the title is
+        // not silently dropped.
+        String wiki = "@title Root\n* A brand-new atom\n";
+        TreeUpdate u = parse(wiki);
+
+        // The tree should have one child with a temp-id.
+        assertEquals(1, u.getTree().children.size());
+        AtomId childId = u.getTree().children.get(0).id;
+        assertNotNull(childId);
+        assertTrue("expected temp- prefix; got " + childId.value,
+                childId.value.startsWith("temp-"));
+
+        // The title should be carried on the TreeNode.
+        assertEquals("A brand-new atom",
+                u.getTree().children.get(0).title);
+
+        // And the side-channel must say the title was touched, keyed
+        // by the temp-id (which TreeUpdater will rekey to the real id
+        // when creating the atom).
+        assertTrue(u.isPropertyTouched(childId,
+                SemanticSynchrony.PropertyKeys.TITLE));
+    }
+
+    @Test
+    public void rekeyTouchedPropertiesMovesTitleToRealId() throws Exception {
+        // Simulate what TreeUpdater does after creating an atom: the
+        // side-channel entry under the temp-id should be reachable
+        // under the new real id after rekey.
+        String wiki = "@title Root\n* A brand-new atom\n";
+        TreeUpdate u = parse(wiki);
+        AtomId tempId = u.getTree().children.get(0).id;
+        AtomId realId = new AtomId("abc123realId");
+
+        u.rekeyTouchedProperties(tempId, realId);
+        assertTrue(u.isPropertyTouched(realId,
+                SemanticSynchrony.PropertyKeys.TITLE));
+    }
 }

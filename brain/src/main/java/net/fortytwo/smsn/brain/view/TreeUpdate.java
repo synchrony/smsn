@@ -148,6 +148,34 @@ public final class TreeUpdate {
         return collapsedAtoms.contains(id);
     }
 
+    /** Rewrite an entry in the touched-set: the user authored values
+     *  under {@code fromId} (typically a parser-assigned {@code temp-...}
+     *  identifier for a brand-new atom), but the repository created the
+     *  atom under {@code toId}. Move (or copy) the entry so the updater
+     *  honors the user's properties when it sees the new id.
+     *
+     *  This is intended for use by {@code TreeUpdater} during
+     *  {@code updateChildren}, at the moment a new atom is created and
+     *  assigned a real id. Public to allow cross-package use and
+     *  test-time verification. */
+    public void rekeyTouchedProperties(final AtomId fromId, final AtomId toId) {
+        if (fromId == null || toId == null || fromId.equals(toId)) {
+            return;
+        }
+        Set<String> entry = touchedProperties.get(fromId);
+        if (entry == null) {
+            return;
+        }
+        // The map may be Collections.emptyMap() when the caller didn't
+        // pass a map; promote to a real mutable map so we can extend.
+        if (touchedProperties == Collections.<AtomId, Set<String>>emptyMap()) {
+            return;  // nothing to rekey
+        }
+        touchedProperties.computeIfAbsent(toId, k -> new HashSet<>()).addAll(entry);
+        // Keep the temp-id entry around in case other code looks it up;
+        // it is harmless after the new atom has been created.
+    }
+
     public Map<AtomId, Set<String>> getTouchedProperties() {
         return Collections.unmodifiableMap(touchedProperties);
     }

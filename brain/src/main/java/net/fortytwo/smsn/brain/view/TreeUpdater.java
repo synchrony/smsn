@@ -272,10 +272,21 @@ public class TreeUpdater {
                 if (needsCreation) {
                     // Create new atom
                     Atom newAtom = repository.createAtom(filter);
+                    AtomId previousChildId = childId;  // may be null or temp-...
                     childId = newAtom.id;
                     childrenCreated.add(childId);
                     positionToCreatedId.put(position, childId);  // Track position -> ID mapping
                     cache.put(childId, newAtom);
+
+                    // The parser-assigned temp-id (or the node's
+                    // pre-existing-but-missing-from-repo id) is the key
+                    // under which the user-touched properties were
+                    // recorded. Rewrite the side-channel so the
+                    // recursive update on this child finds them under
+                    // the real new id.
+                    if (currentUpdate != null && previousChildId != null) {
+                        currentUpdate.rekeyTouchedProperties(previousChildId, childId);
+                    }
 
                     if (activityLog != null) {
                         activityLog.logCreateById(childId);

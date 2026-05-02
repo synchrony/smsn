@@ -192,6 +192,14 @@ public class TreeNodeWikiParser {
                 String id = idMatcher.group(1);
                 builder.setId(new AtomId(id));
                 content = content.substring(idMatcher.end()).trim();
+            } else {
+                // No id on the bullet line — this is a brand-new atom the
+                // user just typed. Assign a stable temp-id NOW so the
+                // side-channel can be keyed by something the downstream
+                // updater will see. The temp-id flows through TreeNode
+                // unchanged; TreeUpdater rewrites the touched-set entry to
+                // the real assigned id at the moment of atom creation.
+                builder.setId(new AtomId("temp-" + System.nanoTime()));
             }
 
             // Remaining content is the title. The title was authored on
@@ -236,9 +244,14 @@ public class TreeNodeWikiParser {
 
     /** Copy a builder's per-atom information into the side-channel maps,
      *  keyed by the builder's atom id. Called as siblings are popped from
-     *  the hierarchy at the moment we know their final state. */
+     *  the hierarchy at the moment we know their final state.
+     *
+     *  Note: newly-created atoms have a temp-id at this point (see
+     *  parseLine where temp-ids are assigned for bullets without an id);
+     *  the touched-set is keyed by that temp-id and is rewritten to the
+     *  real id by TreeUpdater when the atom is actually created. */
     private void recordSideChannel(TreeNodeBuilder builder) {
-        if (builder.id == null) return;  // newly created atoms have no id yet
+        if (builder.id == null) return;  // dummy root or other id-less builder
         if (!builder.touched.isEmpty()) {
             touchedProperties
                     .computeIfAbsent(builder.id, k -> new HashSet<>())
