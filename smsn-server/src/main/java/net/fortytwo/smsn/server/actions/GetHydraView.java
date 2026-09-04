@@ -58,8 +58,10 @@ public class GetHydraView extends RootedViewAction {
             context.getMap().put("hydraSource", record.optString("source"));
             context.getMap().put("hydraEntity", record);
             context.getMap().put("hydraTitles", titles);
-            context.getMap().put("hydraEntityYaml", HydraYaml.toYaml(instance, titles));
-            context.getMap().put("hydraMetaYaml", HydraYaml.toYaml(envelope, titles));
+            context.getMap().put("hydraEntityYaml",
+                    HydraYaml.indentAndComment(HydraYaml.toYaml(instance, titles)));
+            context.getMap().put("hydraMetaYaml",
+                    HydraYaml.indentAndComment(HydraYaml.toYaml(envelope, titles)));
         }
 
         addToHistory(rootId);

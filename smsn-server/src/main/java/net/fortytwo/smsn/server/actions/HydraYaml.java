@@ -103,6 +103,77 @@ final class HydraYaml {
         return sb.toString();
     }
 
+    private static final Pattern FIELD_LINE =
+            Pattern.compile("^(\\s*)(?:- )?[A-Za-z_@'][^:#\\n]*:(.*)$");
+    private static final Pattern EMPTY_VALUE =
+            Pattern.compile("^\\s*(\\[\\]|\\{\\}|null|'')\\s*$");
+
+    /**
+     * Shift every line right by a two-character prefix: "  " for lines
+     * belonging to populated fields, "# " for unpopulated ones (empty list,
+     * empty map, null, empty string) — so the schema stays apparent while
+     * empty fields read as quiet comments. A field whose children are all
+     * unpopulated is itself unpopulated, decided bottom-up. The result is
+     * still valid YAML: the populated indent is uniform and the commented
+     * lines are parse-inert (parsing yields the structure minus empties,
+     * equivalent under the absent-means-empty convention).
+     */
+    static String indentAndComment(final String yaml) {
+        String[] lines = yaml.split("\n", -1);
+        int n = lines.length;
+        boolean[] empty = new boolean[n];
+        int[] indents = new int[n];
+        for (int i = 0; i < n; i++) {
+            int j = 0;
+            while (j < lines[i].length() && ' ' == lines[i].charAt(j)) {
+                j++;
+            }
+            indents[i] = (j == lines[i].length()) ? -1 : j; // blank lines: -1
+        }
+        for (int i = n - 1; i >= 0; i--) {
+            Matcher field = FIELD_LINE.matcher(lines[i]);
+            if (!field.matches()) {
+                continue; // list items, continuations, separators stay populated
+            }
+            String value = field.group(2);
+            if (EMPTY_VALUE.matcher(value).matches()) {
+                empty[i] = true;
+            } else if (value.trim().isEmpty()) {
+                // mapping/list header: unpopulated iff every child line is
+                // (vacuously true when it has no children at all)
+                boolean allEmpty = true;
+                boolean any = false;
+                for (int k = i + 1; k < n; k++) {
+                    if (indents[k] < 0) {
+                        continue; // blank line
+                    }
+                    // a block sequence's "- " items sit at the SAME indent
+                    // as their key; deeper lines are ordinary children
+                    boolean child = indents[k] > indents[i]
+                            || (indents[k] == indents[i]
+                                && lines[k].startsWith("- ", indents[k]));
+                    if (!child) {
+                        break;
+                    }
+                    any = true;
+                    if (!empty[k]) {
+                        allEmpty = false;
+                        break;
+                    }
+                }
+                empty[i] = !any || allEmpty;
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            if (i == n - 1 && lines[i].isEmpty() && yaml.endsWith("\n")) {
+                break; // artifact of split on the trailing newline
+            }
+            sb.append(empty[i] ? "# " : "  ").append(lines[i]).append('\n');
+        }
+        return sb.toString();
+    }
+
     /**
      * Collect resolved titles for every AtomRef in the given record, looking
      * each atom id up in the repository via the provided resolver.
