@@ -78,6 +78,7 @@ public class Search extends BasicViewAction {
         // Serialize directly using new JSON printer
         try {
             JSONObject json = params.getTreeNodeJsonPrinter().toJson(tree);
+            net.fortytwo.smsn.server.HydraEntityStore.annotateTree(json);
             params.getMap().put(net.fortytwo.smsn.brain.Params.VIEW, json);
         } catch (java.io.IOException e) {
             throw new RequestProcessingException(e);

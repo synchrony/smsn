@@ -24,6 +24,7 @@ public class GetView extends RootedViewAction {
         // Serialize directly using new JSON printer
         try {
             JSONObject json = context.getTreeNodeJsonPrinter().toJson(tree);
+            net.fortytwo.smsn.server.HydraEntityStore.annotateTree(json);
             context.getMap().put(net.fortytwo.smsn.brain.Params.VIEW, json);
         } catch (java.io.IOException e) {
             throw new RequestProcessingException(e);
