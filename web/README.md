@@ -13,7 +13,7 @@ A browser-based frontend for Semantic Synchrony, providing a lightweight alterna
    firefox index.html
    ```
 
-3. **Connect** - The UI automatically connects to `ws://localhost:8182/smsn`
+3. **Connect** - The UI automatically connects to `ws://localhost:42001/smsn`
 
 ## Features
 
@@ -126,7 +126,7 @@ Edit the `State` object at the top of the `<script>` section to customize:
 
 ```javascript
 const State = {
-    serverUrl: 'ws://localhost:8182/smsn',  // Change if server is elsewhere
+    serverUrl: 'ws://localhost:42001/smsn',  // Change if server is elsewhere
     filter: {
         minSource: 'private',      // Visibility filter
         defaultSource: 'private',
@@ -197,7 +197,7 @@ WebSocket - server communication (sendAction)
 ## Troubleshooting
 
 **"Disconnected (reconnecting...)"**
-- Ensure SmSn Server is running on port 8182
+- Ensure SmSn Server is running on port 42001
 - Check browser console for detailed errors
 
 **No notes appearing**

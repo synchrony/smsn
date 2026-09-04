@@ -6,7 +6,7 @@ export const State = {
     // Connection
     ws: null,
     connected: false,
-    serverUrl: 'ws://localhost:8182/smsn',
+    serverUrl: 'ws://localhost:42001/smsn',
 
     // Configuration from server
     config: null,
