@@ -97,3 +97,7 @@ smsn-models/src/test/
 # Example working directory runtime files
 example/index/
 example/activity.log
+
+# Haskell build artifacts
+*.hi
+*.o
