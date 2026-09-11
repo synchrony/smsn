@@ -11,6 +11,9 @@ public class WikiFormat extends Format {
     public static final String CLEARME = "C.L.E.A.R.M.E";
 
     public static final String NODE_BULLET = "*";
+    /** Delimiters smsn-mode uses to wrap a title containing newlines. */
+    public static final String MULTILINE_START = "{{{";
+    public static final String MULTILINE_END = "}}}";
     public static final String LABEL_BULLET = "--";
 
     public static final String MULTILINE_DELIMITER = "```";

@@ -51,8 +51,18 @@ import java.util.regex.Pattern;
  */
 public class TreeNodeWikiParser {
 
-    // Match all bullet types: * (new), + (expanded existing), · (collapsed existing)
-    private static final Pattern BULLET_PATTERN = Pattern.compile("^(\\s*)([*+·])\\s+(.*)$");
+    // Match all bullet types: * (new), + (expanded existing), · (collapsed
+    // existing), ◆ (expanded existing WITH a Hydra entity record).
+    //
+    // ◆ is emitted by smsn-mode's choose-bullet for atoms that have an
+    // entity record; it REPLACES the + / · the atom would otherwise carry.
+    // It was added to the view without being added here, so every such
+    // line failed to match, parseLine fell through silently, and the
+    // atom was omitted from the parsed tree -- which the updater then
+    // wrote back as a deletion. Treat it exactly like +: an existing,
+    // expanded child. (A non-matching line MUST never be silently
+    // ignored; see the trailing else below.)
+    private static final Pattern BULLET_PATTERN = Pattern.compile("^(\\s*)([*+·◆])\\s+(.*)$");
     private static final Pattern ID_PATTERN = Pattern.compile("^:([^:]+):");
     // Property pattern allows empty values (e.g., "@alias" alone will clear the property)
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("^@(\\w+)\\s*(.*)$");
@@ -140,9 +150,32 @@ public class TreeNodeWikiParser {
 
     private TreeNodeBuilder currentBuilder = null;
 
+    /** Non-null while inside a {@code {{{ ... }}}} multi-line title block.
+     *  smsn-mode's delimit-title emits these for titles containing a
+     *  newline (13 such atoms in the current store), so the strict
+     *  unknown-line rejection below MUST understand them or it would
+     *  refuse every update touching one. */
+    private StringBuilder multiLineTitle = null;
+
     private void parseLine(String line) {
         String trimmed = line.trim();
 
+        // Multi-line title block: {{{ ... }}}. Collected verbatim (blank
+        // lines and all) and applied to the node whose bullet opened it.
+        if (multiLineTitle != null) {
+            if (trimmed.equals(WikiFormat.MULTILINE_END)) {
+                String title = multiLineTitle.toString();
+                multiLineTitle = null;
+                if (currentBuilder != null) {
+                    currentBuilder.setTitle(title.strip());
+                    currentBuilder.markPropertyTouched("title");
+                }
+            } else {
+                if (multiLineTitle.length() > 0) multiLineTitle.append("\n");
+                multiLineTitle.append(line);
+            }
+            return;
+        }
         // Skip empty lines
         if (trimmed.isEmpty()) {
             return;
@@ -173,7 +206,7 @@ public class TreeNodeWikiParser {
         Matcher bulletMatcher = BULLET_PATTERN.matcher(line);
         if (bulletMatcher.matches()) {
             int indent = bulletMatcher.group(1).length();
-            String bulletType = bulletMatcher.group(2);  // *, +, or ·
+            String bulletType = bulletMatcher.group(2);  // *, +, ·, or ◆
             String content = bulletMatcher.group(3);
 
             // Adjust hierarchy based on indentation
@@ -204,13 +237,40 @@ public class TreeNodeWikiParser {
 
             // Remaining content is the title. The title was authored on
             // the bullet line itself, so it counts as touched.
-            if (!content.isEmpty()) {
+            //
+            // A multi-line title opens WITH the bullet ("* :id: {{{"), so
+            // the delimiter is the tail of this line, not a line of its
+            // own; the body accumulates until the closing }}}.
+            if (content.equals(WikiFormat.MULTILINE_START)) {
+                multiLineTitle = new StringBuilder();
+            } else if (!content.isEmpty()) {
                 builder.setTitle(content);
                 builder.markPropertyTouched("title");
             }
 
             // Add to current level's sibling stack
             nodeHierarchy.peek().push(builder);
+        } else {
+            // FAIL LOUD. Every legitimate line form has been handled above:
+            // blank, property (@key), and bullet (* + · ◆). Anything left
+            // is a line this parser does not understand, and the ONLY safe
+            // response is to refuse the whole update.
+            //
+            // The alternative -- returning quietly -- is what caused this
+            // guard to be written: smsn-mode began emitting ◆ for atoms
+            // with a Hydra entity record, BULLET_PATTERN did not list it,
+            // every such line fell through here, and the atoms were absent
+            // from the parsed tree. The updater faithfully wrote that tree
+            // back, deleting every entity atom from the view. No error was
+            // raised at any point.
+            //
+            // Refusing an update is always recoverable; silently discarding
+            // the user's atoms is not. Never guess whether an unknown line
+            // mattered.
+            throw new IllegalArgumentException(
+                    "Unparseable line in update (refusing to apply, since"
+                    + " ignoring it would delete any atom it describes): \""
+                    + line + "\"");
         }
     }
 
